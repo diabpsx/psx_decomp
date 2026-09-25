@@ -15,6 +15,7 @@ struct FileIO : public SysObj {   /* SYM lists the base subobject as a member na
 
     long Read(const char *Name, unsigned long RamId);                                       /* @0x80085920 */
     int  FileLen(const char *Name);                                                          /* @0x80085A90 */
+    BOOL ReadAtAddr(const char *Name, unsigned char *Dest, int Len);                         /* @0x80085BF4 */
     BOOL StreamFile(const char *Name, int Slice, StreamCallback Func, int Offset, int Size); /* @0x80085B14 */
 };
 #endif

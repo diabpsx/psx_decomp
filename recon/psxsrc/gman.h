@@ -13,6 +13,7 @@
 #include "psxsrc/biglump.h"
 #include "psxsrc/decomp.h"
 #include "cstring.h"
+#include "psxsrc/primpool.h"
 
 struct FRAME_HDR {                    /* sizeof 12 (bitfields) */
     unsigned int FrOffset  : 32;
@@ -61,6 +62,8 @@ struct CPart {                        /* sizeof 8 */
     unsigned long Piece;
     short         X;
     short         Y;
+
+    void SetRect(TextDat &TDat, RECT &R);
 };
 
 struct CBlock {                       /* sizeof 12 */
@@ -110,6 +113,7 @@ struct CTextFileInfo {                /* sizeof 4 */
     BOOL  HasFile(char *Ext) const;
     long  GetFile(char *Ext, unsigned long RamId) const;
     long  LoadDat() const;
+    void  LoadDat(long hnd, int size) const;
     void  MakeFname(char *Dst, const char *Ext) const;
 };
 
@@ -157,6 +161,15 @@ struct TextDat {                      /* sizeof 112 */
     int  GetFrNum(int Creature, int Action, int Direction, int Frame);
     BOOL IsDirAliased(int Creature, int Action, int Direction);
     void DoDecompRequests();
+    void Use(long NewHndDat, BOOL DatLoaded, int size);
+    void SetUVTp(FRAME_HDR *Fr, POLY_FT4 *FT4, int XFlip, int YFlip);
+    void SetUVTpGT4(FRAME_HDR *Fr, POLY_GT4 *FT4, int XFlip, int YFlip);
+    void SetUVTpGT3(FRAME_HDR *Fr, POLY_GT3 *GT3);
+    void SetPal(FRAME_HDR *Fr, POLY_FT4 *FT4);
+    unsigned char *GetDecompBufffer(int Size);
+    void MakePalOffsetTab();
+    void MakeCreatureOffsetTab();
+    void FindDecompArea(RECT &R);
 
     /* GMAN.H in-class methods (line numbers per SYM) */
     FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }                        /* 229 */
@@ -194,7 +207,8 @@ void GPUQ_DiscardHandle(long hnd);
 BOOL TpLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk);
 void GM_ForceTpLoad(int Id);
 void GM_FinishedUsing(TextDat *tex);
-void GM_UseTexData(int Id);
+TextDat *GM_UseTexData(int Id);
+void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);
 
 /* GMAN.H:290-296 — defined in the header (out-of-line copy per TU under -fno-inline) */
 inline void TextDat::DumpDatFile()

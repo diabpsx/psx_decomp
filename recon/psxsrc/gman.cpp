@@ -158,8 +158,10 @@ void TextDat::DumpHdr()
 /* line 481 @0x800925E0 */
 BOOL TextDat::IsCompressed(int Creature, int Action, int Dir, int Frame)
 {
-    /* retail tests the raw flag word (bit 26 of word 1 = InVRAM) with a mask, not a bitfield extract */
-    return (((unsigned long *)GetFr(GetFrNum(Creature, Action, Dir, Frame)))[1] & 0x4000000) == 0;
+    /* raw flag word (bit 26 of word 1), if/return shape: and + sltiu like retail */
+    if (((unsigned long *)GetFr(GetFrNum(Creature, Action, Dir, Frame)))[1] & 0x4000000)
+        return false;
+    return true;
 }
 
 /* line 343 @0x80092368 */
@@ -261,7 +263,8 @@ void CCreatureAction::InitDirRemap()
     for (f = 0; f < 8; f++)
         Dir2Remap[DirRemap[f]] = 1;
     RemapNum = 0;
-    for (f = 0; f < 8; f++) {
+    f = 0;
+    while (f < 8) {
         if (Dir2Remap[f]) {
             OrigNum = f;
             for (g = 0; g < 8; g++) {
@@ -270,6 +273,7 @@ void CCreatureAction::InitDirRemap()
             }
             RemapNum++;
         }
+        f++;
     }
 }
 
@@ -308,14 +312,16 @@ long CTextFileInfo::GetFile(char *Ext, unsigned long RamId) const
 void TextDat::StreamLoadTP()
 {
     char TheName[20];
+    FileIO *Fs;
 
     strcpy(TheName, FileInfo->GetName());
     strcat(TheName, ".tp");
+    Fs = SYSI_GetFs();
     TpW = Hdr->TWidth;
-    TpXDest = (Hdr->DestTPage & 0xf) << 6;
     TpH = Hdr->THeight;
+    TpXDest = (Hdr->DestTPage & 0xf) << 6;
     TpYDest = (Hdr->DestTPage >> 4) << 8;
-    SYSI_GetFs()->StreamFile(TheName, 0x8000, TpLoadCallBack, 0, -1);
+    Fs->StreamFile(TheName, 0x8000, TpLoadCallBack, 0, -1);
 }
 
 /* line 316 @0x800922D0 */
@@ -338,4 +344,422 @@ void CTextFileInfo::MakeFname(char *Dest, const char *Ext) const
 {
     strcpy(Dest, FileName);
     strcat(Dest, Ext);
+}
+
+/* line 375 @0x800923B4 */
+long CBlockHdr::MakeOffsetTab() const
+{
+    CBlock *MyBlock;
+    long hndRet;
+    int *Tab;
+    unsigned int f;
+
+    if (NumOfBlocks == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 381);
+    hndRet = GAL_Alloc(NumOfBlocks * sizeof(int), 0x8001, "GMAN");
+    if (hndRet == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 384);
+    Tab = (int *)GAL_Lock(hndRet);
+    if (Tab == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 387);
+    MyBlock = (CBlock *)Blocks;
+    for (f = 0; f < NumOfBlocks; f++) {
+        Tab[f] = (unsigned char *)MyBlock - (unsigned char *)this;
+        MyBlock = (CBlock *)((unsigned char *)MyBlock + MyBlock->GetSize());
+    }
+    if (GAL_Unlock(hndRet) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 396);
+    return hndRet;
+}
+
+/* line 1934 @0x80094EA8 */
+void CPart::SetRect(TextDat &TDat, RECT &R)
+{
+    FRAME_HDR *Fr;
+
+    Fr = TDat.GetFr(Piece);
+    R.x = X;
+    R.y = -Y;
+    R.w = Fr->W;
+    R.h = Fr->H;
+}
+
+/* line 885 @0x800931CC */
+void TextDat::SetUVTpGT3(FRAME_HDR *Fr, POLY_GT3 *GT3)
+{
+    int Rotated;
+    int Tpage;
+    int U;
+    int V;
+    int W;
+    int H;
+
+    Rotated = Fr->Rotated;
+    Tpage = *(unsigned short *)((unsigned char *)&Fr->FrOffset + 2);
+    U = ((unsigned char *)&Fr->FrOffset)[0];
+    V = ((unsigned char *)&Fr->FrOffset)[1];
+    W = Fr->W;
+    H = Fr->H;
+    if (!Rotated) {
+        GT3->u0 = U;
+        GT3->v0 = V;
+        GT3->u1 = U + W;
+        GT3->v1 = V;
+        GT3->u2 = U;
+        GT3->v2 = V + H;
+    } else {
+        GT3->u0 = U;
+        GT3->v0 = V + W - 1;
+        GT3->u1 = U;
+        GT3->v1 = V - 1;
+        GT3->u2 = U + H;
+        GT3->v2 = V + W - 1;
+    }
+    GT3->tpage = Tpage;
+}
+
+/* line 408 @0x800924E0 */
+void TextDat::SetUVTp(FRAME_HDR *Fr, POLY_FT4 *FT4, int XFlip, int YFlip)
+{
+    int Rotated;
+    int Tpage;
+    int U;
+    int V;
+    int W;
+    int H;
+
+    Rotated = Fr->Rotated;
+    Tpage = *(unsigned short *)((unsigned char *)&Fr->FrOffset + 2);
+    U = ((unsigned char *)&Fr->FrOffset)[0];
+    V = ((unsigned char *)&Fr->FrOffset)[1];
+    W = Fr->W;
+    H = Fr->H;
+    if (!Rotated) {
+        if (!XFlip) {
+            FT4->u0 = U;
+            FT4->u1 = U + W;
+            FT4->u2 = U;
+            FT4->u3 = U + W;
+        } else {
+            FT4->u0 = U + W - 1;
+            FT4->u1 = U - 1;
+            FT4->u2 = U + W - 1;
+            FT4->u3 = U - 1;
+        }
+        if (!YFlip) {
+            FT4->v0 = V;
+            FT4->v1 = V;
+            FT4->v2 = V + H;
+            FT4->v3 = V + H;
+        } else {
+            FT4->v0 = V + H - 1;
+            FT4->v1 = V + H - 1;
+            FT4->v2 = V - 1;
+            FT4->v3 = V - 1;
+        }
+    } else {
+        if (!XFlip) {
+            FT4->v0 = V + W - 1;
+            FT4->v2 = V + W - 1;
+            FT4->v1 = V - 1;
+            FT4->v3 = V - 1;
+        } else {
+            FT4->v0 = V;
+            FT4->v2 = V;
+            FT4->v1 = V + W;
+            FT4->v3 = V + W;
+        }
+        if (!YFlip) {
+            FT4->u0 = U;
+            FT4->u1 = U;
+            FT4->u2 = U + H;
+            FT4->u3 = U + H;
+        } else {
+            FT4->u0 = U + H - 1;
+            FT4->u1 = U + H - 1;
+            FT4->u2 = U - 1;
+            FT4->u3 = U - 1;
+        }
+    }
+    FT4->tpage = Tpage;
+}
+
+/* line 745 @0x80092E74 */
+void TextDat::SetUVTpGT4(FRAME_HDR *Fr, POLY_GT4 *FT4, int XFlip, int YFlip)
+{
+    int Rotated;
+    int Tpage;
+    int U;
+    int V;
+    int W;
+    int H;
+
+    Rotated = Fr->Rotated;
+    Tpage = *(unsigned short *)((unsigned char *)&Fr->FrOffset + 2);
+    U = ((unsigned char *)&Fr->FrOffset)[0];
+    V = ((unsigned char *)&Fr->FrOffset)[1];
+    W = Fr->W;
+    H = Fr->H;
+    if (!Rotated) {
+        if (!XFlip) {
+            FT4->u0 = U;
+            FT4->u1 = U + W;
+            FT4->u2 = U;
+            FT4->u3 = U + W;
+        } else {
+            FT4->u0 = U + W - 1;
+            FT4->u1 = U - 1;
+            FT4->u2 = U + W - 1;
+            FT4->u3 = U - 1;
+        }
+        if (!YFlip) {
+            FT4->v0 = V;
+            FT4->v1 = V;
+            FT4->v2 = V + H;
+            FT4->v3 = V + H;
+        } else {
+            FT4->v0 = V + H - 1;
+            FT4->v1 = V + H - 1;
+            FT4->v2 = V - 1;
+            FT4->v3 = V - 1;
+        }
+    } else {
+        if (!XFlip) {
+            FT4->v0 = V + W - 1;
+            FT4->v2 = V + W - 1;
+            FT4->v1 = V - 1;
+            FT4->v3 = V - 1;
+        } else {
+            FT4->v0 = V;
+            FT4->v2 = V;
+            FT4->v1 = V + W;
+            FT4->v3 = V + W;
+        }
+        if (!YFlip) {
+            FT4->u0 = U;
+            FT4->u1 = U;
+            FT4->u2 = U + H;
+            FT4->u3 = U + H;
+        } else {
+            FT4->u0 = U + H - 1;
+            FT4->u1 = U + H - 1;
+            FT4->u2 = U - 1;
+            FT4->u3 = U - 1;
+        }
+    }
+    FT4->tpage = Tpage;
+}
+
+/* line 1358 @0x80093DD4 */
+void TextDat::SetPal(FRAME_HDR *Fr, POLY_FT4 *FT4)
+{
+    PAL *Pal;
+
+    Pal = GetPal(Fr->PalNum);
+    if (Pal->InVram) {
+        FT4->clut = ((unsigned short *)Pal)[1];
+    } else {
+        RECT R;
+        if (CanXferPal() == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1382);
+        FT4->clut = GetClut(PalX, PalY);
+        R.x = PalX;
+        R.y = PalY;
+        R.w = 64;
+        R.h = 1;
+        LoadImage(&R, (u_long *)Pal->Cols);
+    }
+}
+
+/* line 706 @0x80092D14 */
+unsigned char *TextDat::GetDecompBufffer(int Size)
+{
+    long *DecArray;
+    int DecIndex;
+    long hnd;
+    unsigned char *RetAddr;
+
+    DecIndex = NumOfBuffers[Scr];
+    if (DecIndex == 40) DBG_Error(NULL, "psxsrc/GMAN.CPP", 718);
+    DecArray = (long *)GAL_Lock(hndDecompArrays);
+    if (DecArray == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 721);
+    hnd = GAL_Alloc(Size, 1, "DECB");
+    if (hnd == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 726);
+    RetAddr = (unsigned char *)GAL_Lock(hnd);
+    if (RetAddr == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 729);
+    DecArray[Scr * 40 + DecIndex] = hnd;
+    if (GAL_Unlock(hndDecompArrays) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 734);
+    NumOfBuffers[Scr] = DecIndex + 1;
+    return RetAddr;
+}
+
+/* line 1145 @0x80093958 */
+void TextDat::MakePalOffsetTab()
+{
+    PAL *ThisPal;
+    unsigned int f;
+
+    hndPalOffset = GAL_Alloc(Hdr->NumOfPals * sizeof(int), 0x8001, "GMAN");
+    if (hndPalOffset == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1149);
+    PalOffset = (int *)GAL_Lock(hndPalOffset);
+    if (PalOffset == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1152);
+    ThisPal = (PAL *)Pals;
+    for (f = 0; f < Hdr->NumOfPals; f++) {
+        PalOffset[f] = (unsigned char *)ThisPal - (unsigned char *)Pals;
+        if (!ThisPal->InVram)
+            ThisPal = (PAL *)((unsigned char *)ThisPal + ThisPal->NumOfCols * 2);
+        ThisPal = (PAL *)((unsigned char *)ThisPal + 4);
+    }
+}
+
+/* line 1105 @0x80093818 */
+void TextDat::MakeCreatureOffsetTab()
+{
+    int NumOfCreatures;
+    unsigned char *ThisAddr;
+    unsigned int f;
+
+    NumOfCreatures = Hdr->NumOfCreatures;
+    if (NumOfCreatures == 0) {
+        CreatureOffset = NULL;
+        hndCreatureOffset = -1;
+    } else {
+        hndCreatureOffset = GAL_Alloc(NumOfCreatures * sizeof(int), 0x8001, "GMAN");
+        if (hndCreatureOffset == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1109);
+        CreatureOffset = (int *)GAL_Lock(hndCreatureOffset);
+        if (CreatureOffset == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1112);
+        ThisAddr = CreatureAnims;
+        for (f = 0; f < Hdr->NumOfCreatures; f++) {
+            CreatureOffset[f] = ThisAddr - CreatureAnims;
+            ThisAddr += ((CCreatureHdr *)ThisAddr)->GetSize();
+        }
+    }
+    {
+        int f;
+        NumOfCreatures = GetNumOfCreatures();
+        for (f = 0; f < NumOfCreatures; f++)
+            ((CCreatureHdr *)GetCreature(f))->InitActionDirRemaps();
+    }
+}
+
+/* line 1428 @0x80093F44 */
+void TextDat::DoDecompRequests()
+{
+    long *DecArray;
+    int f;
+
+    if (Scr == 0)
+        Scr = 1;
+    else
+        Scr = 0;
+    DecArray = (long *)GAL_Lock(hndDecompArrays);
+    if (DecArray == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1440);
+    DecArray += Scr * 40;
+    for (f = 0; f < NumOfBuffers[Scr]; f++) {
+        if (GAL_Free(DecArray[f]) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1452);
+    }
+    NumOfBuffers[Scr] = 0;
+    if (GAL_Unlock(hndDecompArrays) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1458);
+}
+
+/* line 1496 @0x80094068 */
+void TextDat::FindDecompArea(RECT &R)
+{
+    int NumOfFrames;
+    int Widest;
+    int Tallest;
+    int f;
+
+    if (Loaded == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1499);
+    NumOfFrames = GetNumOfFrames();
+    Widest = 0;
+    Tallest = 0;
+    for (f = 0; f < NumOfFrames; f++) {
+        int w;
+        int h;
+        w = Frames[f].W;
+        h = Frames[f].H;
+        if (w > Widest) Widest = w;
+        if (h > Tallest) Tallest = h;
+    }
+    Widest = GU_AlignVal(Widest, 2);
+    R.w = Widest;
+    R.h = Tallest;
+}
+
+/* line 1312 @0x80093C10 */
+TextDat *GM_UseTexData(int Id)
+{
+    TextDat *Dat2Use;
+    CTextFileInfo **Tab;
+    int f;
+
+    if ((unsigned int)Id > 0x173) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1313);
+    if (AllDats[Id] == NULL) {
+        Tab = TX_DatTab;
+        Dat2Use = NULL;
+        for (f = 0; f < 20 && Dat2Use == NULL; f++) {
+            if (!DatPool[f].IsLoaded())
+                Dat2Use = &DatPool[f];
+        }
+        if (Dat2Use == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1326);
+        Dat2Use->SetFileInfo(Tab[Id], Id);
+        Dat2Use->OnceOnlyInit();
+        AllDats[Id] = Dat2Use;
+    }
+    AllDats[Id]->Use(-1, true, 0);
+    return AllDats[Id];
+}
+
+/* line 1635 @0x80094458 */
+void CTextFileInfo::LoadDat(long hnd, int size) const
+{
+    char FName[13];
+    unsigned char *Dest;
+    FileIO *MyFileIO;
+
+    if (HasDat() == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1641);
+    if (strlen(FileName) > 8) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1642);
+    MakeFname(FName, ".dat");
+    MyFileIO = SYSI_GetFs();
+    if (MyFileIO->FileLen(FName) > size) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1650);
+    Dest = (unsigned char *)GAL_Lock(hnd);
+    if (Dest == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1653);
+    MyFileIO->ReadAtAddr(FName, Dest, -1);
+    if (GAL_Unlock(hnd) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1656);
+}
+
+/* line 1743 @0x80094788 -- run-length decoder */
+void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes)
+{
+    unsigned char *EndDest;
+    unsigned long *BigDest;
+    unsigned long Code;
+    unsigned long Run;
+    unsigned long BigCode;
+
+    EndDest = Dest + SizeBytes;
+    while (Dest < EndDest) {
+        Code = *Src;
+        Run = Code >> 6;
+        Src++;
+        if (Run) {
+            Code &= 0x3f;
+        } else {
+            Run = *Src;
+            Src++;
+        }
+        if (Run > 7) {
+            BigDest = (unsigned long *)(((unsigned long)Dest + 3) & ~3);
+            while (Dest < (unsigned char *)BigDest) {
+                *Dest++ = Code;
+                Run--;
+            }
+            BigCode = Code | (Code << 8) | (Code << 16) | (Code << 24);
+            while (Run > 3) {
+                *BigDest++ = BigCode;
+                Run -= 4;
+            }
+            Dest = (unsigned char *)BigDest;
+        }
+        while (Run != 0) {
+            *Dest++ = Code;
+            Run--;
+        }
+    }
 }
