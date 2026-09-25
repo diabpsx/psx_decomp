@@ -33,6 +33,14 @@ struct FRAME_HDR {                    /* sizeof 12 (bitfields) */
     unsigned int pad2      : 13;
 };
 
+/* Word 0 of a FRAME_HDR viewed as U/V/Tpage (retail SetUVTp* read them as byte-aligned bitfields:
+ * lbu 0/1 + lhu 2 with a separate SImode copy for the arithmetic V) */
+struct FRAME_TP {
+    unsigned int U     : 8;
+    unsigned int V     : 8;
+    unsigned int Tpage : 16;
+};
+
 struct SPR_HDR {                      /* sizeof 40 (bitfields) */
     unsigned int DecompOffset    : 32;
     unsigned int CreatureOffset  : 32;

@@ -1,8 +1,8 @@
 # Match progress (gate = tools/verify_asm.py)
 
-**Main image: 50 / 2688 functions byte-matched (1.9%)**
+**Main image: 59 / 2688 functions byte-matched (2.2%)**
 
-## gman  (recon/psxsrc/gman.cpp) — 50/76 PASS
+## gman  (recon/psxsrc/gman.cpp) — 59/76 PASS
 - ✅ __7TextDat (13)
 - ✅ OnceOnlyInit__7TextDat (8)
 - ✅ ___7TextDat (18)
@@ -13,36 +13,36 @@
 - ✅ FinishedUsing__7TextDat (38)
 - ✅ MakeBlockOffsetTab__7TextDat (19)
 - ❌ MakeOffsetTab__C9CBlockHdr — 57 diffs (ours 75)
-- ❌ SetUVTp__7TextDatP9FRAME_HDRP8POLY_FT4ii — 58 diffs (ours 64)
+- ✅ SetUVTp__7TextDatP9FRAME_HDRP8POLY_FT4ii (64)
 - ✅ IsCompressed__7TextDatiiii (19)
 - ⬜ PrintMonster__7TextDatiiiiiii
 - ⬜ PrintMonsterA__7TextDatiiibi
 - ⬜ PrepareFt4__7TextDatP8POLY_FT4iiiii
-- ❌ GetDecompBufffer__7TextDati — 69 diffs (ours 88)
-- ❌ SetUVTpGT4__7TextDatP9FRAME_HDRP8POLY_GT4ii — 58 diffs (ours 64)
+- ✅ GetDecompBufffer__7TextDati (88)
+- ✅ SetUVTpGT4__7TextDatP9FRAME_HDRP8POLY_GT4ii (64)
 - ⬜ PrepareGt4__7TextDatP8POLY_GT4iiiii
-- ❌ SetUVTpGT3__7TextDatP9FRAME_HDRP8POLY_GT3 — 44 diffs (ours 33)
+- ✅ SetUVTpGT3__7TextDatP9FRAME_HDRP8POLY_GT3 (33)
 - ⬜ PrepareGt3__7TextDatP8POLY_GT3iii
 - ⬜ PrintFt4__7TextDatiiiiii
 - ⬜ PrintGt4__7TextDatiiiiii
 - ⬜ DecompFrame__7TextDatP9FRAME_HDR
-- ❌ MakeCreatureOffsetTab__7TextDat — 42 diffs (ours 80)
-- ❌ MakePalOffsetTab__7TextDat — 9 diffs (ours 63)
+- ✅ MakeCreatureOffsetTab__7TextDat (80)
+- ✅ MakePalOffsetTab__7TextDat (63)
 - ✅ InitData__7TextDat (12)
 - ✅ DumpData__7TextDat (74)
 - ✅ DumpHdr__7TextDat (25)
-- ❌ GM_UseTexData__Fi — 2 diffs (ours 77)
+- ✅ GM_UseTexData__Fi (77)
 - ✅ GM_ForceTpLoad__Fi (15)
 - ✅ GM_FinishedUsing__FP7TextDat (21)
 - ✅ SetPal__7TextDatP9FRAME_HDRP8POLY_FT4 (49)
 - ✅ GetFrNum__7TextDatiiii (21)
 - ✅ IsDirAliased__7TextDatiii (22)
-- ❌ DoDecompRequests__7TextDat — 75 diffs (ours 73)
+- ✅ DoDecompRequests__7TextDat (73)
 - ✅ FindDecompArea__7TextDatR4RECT (54)
 - ✅ GetFileInfo__7TextDati (20)
 - ✅ GetSize__C15CCreatureAction (10)
 - ✅ GetFrNum__C15CCreatureActionii (12)
-- ❌ InitDirRemap__15CCreatureAction — 9 diffs (ours 48)
+- ✅ InitDirRemap__15CCreatureAction (48)
 - ✅ GetFrNum__C12CCreatureHdriii (17)
 - ✅ GetAction__C12CCreatureHdri (36)
 - ✅ InitActionDirRemaps__12CCreatureHdr (28)

@@ -387,25 +387,25 @@ void TextDat::SetUVTpGT3(FRAME_HDR *Fr, POLY_GT3 *GT3)
     int H;
 
     Rotated = Fr->Rotated;
-    Tpage = *(unsigned short *)((unsigned char *)&Fr->FrOffset + 2);
-    U = ((unsigned char *)&Fr->FrOffset)[0];
-    V = ((unsigned char *)&Fr->FrOffset)[1];
+    Tpage = ((FRAME_TP *)Fr)->Tpage;
+    U = ((FRAME_TP *)Fr)->U;
+    V = ((FRAME_TP *)Fr)->V;
     W = Fr->W;
     H = Fr->H;
     if (!Rotated) {
         GT3->u0 = U;
-        GT3->v0 = V;
         GT3->u1 = U + W;
-        GT3->v1 = V;
         GT3->u2 = U;
+        GT3->v0 = V;
+        GT3->v1 = V;
         GT3->v2 = V + H;
     } else {
-        GT3->u0 = U;
         GT3->v0 = V + W - 1;
-        GT3->u1 = U;
-        GT3->v1 = V - 1;
-        GT3->u2 = U + H;
         GT3->v2 = V + W - 1;
+        GT3->v1 = V - 1;
+        GT3->u0 = U;
+        GT3->u1 = U;
+        GT3->u2 = U + H;
     }
     GT3->tpage = Tpage;
 }
@@ -421,56 +421,56 @@ void TextDat::SetUVTp(FRAME_HDR *Fr, POLY_FT4 *FT4, int XFlip, int YFlip)
     int H;
 
     Rotated = Fr->Rotated;
-    Tpage = *(unsigned short *)((unsigned char *)&Fr->FrOffset + 2);
-    U = ((unsigned char *)&Fr->FrOffset)[0];
-    V = ((unsigned char *)&Fr->FrOffset)[1];
+    Tpage = ((FRAME_TP *)Fr)->Tpage;
+    U = ((FRAME_TP *)Fr)->U;
+    V = ((FRAME_TP *)Fr)->V;
     W = Fr->W;
     H = Fr->H;
     if (!Rotated) {
-        if (!XFlip) {
-            FT4->u0 = U;
-            FT4->u1 = U + W;
-            FT4->u2 = U;
-            FT4->u3 = U + W;
-        } else {
+        if (XFlip) {
             FT4->u0 = U + W - 1;
             FT4->u1 = U - 1;
             FT4->u2 = U + W - 1;
             FT4->u3 = U - 1;
-        }
-        if (!YFlip) {
-            FT4->v0 = V;
-            FT4->v1 = V;
-            FT4->v2 = V + H;
-            FT4->v3 = V + H;
         } else {
+            FT4->u0 = U;
+            FT4->u1 = U + W;
+            FT4->u2 = U;
+            FT4->u3 = U + W;
+        }
+        if (YFlip) {
             FT4->v0 = V + H - 1;
             FT4->v1 = V + H - 1;
             FT4->v2 = V - 1;
             FT4->v3 = V - 1;
+        } else {
+            FT4->v0 = V;
+            FT4->v1 = V;
+            FT4->v2 = V + H;
+            FT4->v3 = V + H;
         }
     } else {
-        if (!XFlip) {
-            FT4->v0 = V + W - 1;
-            FT4->v2 = V + W - 1;
-            FT4->v1 = V - 1;
-            FT4->v3 = V - 1;
-        } else {
+        if (XFlip) {
             FT4->v0 = V;
             FT4->v2 = V;
             FT4->v1 = V + W;
             FT4->v3 = V + W;
-        }
-        if (!YFlip) {
-            FT4->u0 = U;
-            FT4->u1 = U;
-            FT4->u2 = U + H;
-            FT4->u3 = U + H;
         } else {
+            FT4->v0 = V + W - 1;
+            FT4->v2 = V + W - 1;
+            FT4->v1 = V - 1;
+            FT4->v3 = V - 1;
+        }
+        if (YFlip) {
             FT4->u0 = U + H - 1;
             FT4->u1 = U + H - 1;
             FT4->u2 = U - 1;
             FT4->u3 = U - 1;
+        } else {
+            FT4->u0 = U;
+            FT4->u1 = U;
+            FT4->u2 = U + H;
+            FT4->u3 = U + H;
         }
     }
     FT4->tpage = Tpage;
@@ -487,56 +487,56 @@ void TextDat::SetUVTpGT4(FRAME_HDR *Fr, POLY_GT4 *FT4, int XFlip, int YFlip)
     int H;
 
     Rotated = Fr->Rotated;
-    Tpage = *(unsigned short *)((unsigned char *)&Fr->FrOffset + 2);
-    U = ((unsigned char *)&Fr->FrOffset)[0];
-    V = ((unsigned char *)&Fr->FrOffset)[1];
+    Tpage = ((FRAME_TP *)Fr)->Tpage;
+    U = ((FRAME_TP *)Fr)->U;
+    V = ((FRAME_TP *)Fr)->V;
     W = Fr->W;
     H = Fr->H;
     if (!Rotated) {
-        if (!XFlip) {
-            FT4->u0 = U;
-            FT4->u1 = U + W;
-            FT4->u2 = U;
-            FT4->u3 = U + W;
-        } else {
+        if (XFlip) {
             FT4->u0 = U + W - 1;
             FT4->u1 = U - 1;
             FT4->u2 = U + W - 1;
             FT4->u3 = U - 1;
-        }
-        if (!YFlip) {
-            FT4->v0 = V;
-            FT4->v1 = V;
-            FT4->v2 = V + H;
-            FT4->v3 = V + H;
         } else {
+            FT4->u0 = U;
+            FT4->u1 = U + W;
+            FT4->u2 = U;
+            FT4->u3 = U + W;
+        }
+        if (YFlip) {
             FT4->v0 = V + H - 1;
             FT4->v1 = V + H - 1;
             FT4->v2 = V - 1;
             FT4->v3 = V - 1;
+        } else {
+            FT4->v0 = V;
+            FT4->v1 = V;
+            FT4->v2 = V + H;
+            FT4->v3 = V + H;
         }
     } else {
-        if (!XFlip) {
-            FT4->v0 = V + W - 1;
-            FT4->v2 = V + W - 1;
-            FT4->v1 = V - 1;
-            FT4->v3 = V - 1;
-        } else {
+        if (XFlip) {
             FT4->v0 = V;
             FT4->v2 = V;
             FT4->v1 = V + W;
             FT4->v3 = V + W;
-        }
-        if (!YFlip) {
-            FT4->u0 = U;
-            FT4->u1 = U;
-            FT4->u2 = U + H;
-            FT4->u3 = U + H;
         } else {
+            FT4->v0 = V + W - 1;
+            FT4->v2 = V + W - 1;
+            FT4->v1 = V - 1;
+            FT4->v3 = V - 1;
+        }
+        if (YFlip) {
             FT4->u0 = U + H - 1;
             FT4->u1 = U + H - 1;
             FT4->u2 = U - 1;
             FT4->u3 = U - 1;
+        } else {
+            FT4->u0 = U;
+            FT4->u1 = U;
+            FT4->u2 = U + H;
+            FT4->u3 = U + H;
         }
     }
     FT4->tpage = Tpage;
@@ -574,13 +574,15 @@ unsigned char *TextDat::GetDecompBufffer(int Size)
     if (DecIndex == 40) DBG_Error(NULL, "psxsrc/GMAN.CPP", 718);
     DecArray = (long *)GAL_Lock(hndDecompArrays);
     if (DecArray == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 721);
+    DecArray += Scr * 40;
     hnd = GAL_Alloc(Size, 1, "DECB");
     if (hnd == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 726);
     RetAddr = (unsigned char *)GAL_Lock(hnd);
     if (RetAddr == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 729);
-    DecArray[Scr * 40 + DecIndex] = hnd;
+    DecArray[DecIndex] = hnd;
     if (GAL_Unlock(hndDecompArrays) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 734);
-    NumOfBuffers[Scr] = DecIndex + 1;
+    DecIndex++;
+    NumOfBuffers[Scr] = DecIndex;
     return RetAddr;
 }
 
@@ -588,18 +590,18 @@ unsigned char *TextDat::GetDecompBufffer(int Size)
 void TextDat::MakePalOffsetTab()
 {
     PAL *ThisPal;
-    unsigned int f;
 
     hndPalOffset = GAL_Alloc(Hdr->NumOfPals * sizeof(int), 0x8001, "GMAN");
     if (hndPalOffset == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1149);
     PalOffset = (int *)GAL_Lock(hndPalOffset);
     if (PalOffset == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1152);
     ThisPal = (PAL *)Pals;
-    for (f = 0; f < Hdr->NumOfPals; f++) {
+    for (unsigned int f = 0; f < Hdr->NumOfPals; f++) {
         PalOffset[f] = (unsigned char *)ThisPal - (unsigned char *)Pals;
-        if (!ThisPal->InVram)
-            ThisPal = (PAL *)((unsigned char *)ThisPal + ThisPal->NumOfCols * 2);
-        ThisPal = (PAL *)((unsigned char *)ThisPal + 4);
+        if (ThisPal->InVram)
+            ThisPal = (PAL *)((unsigned char *)ThisPal + 4);
+        else
+            ThisPal = (PAL *)((unsigned char *)ThisPal + ThisPal->NumOfCols * 2 + 4);
     }
 }
 
@@ -607,29 +609,26 @@ void TextDat::MakePalOffsetTab()
 void TextDat::MakeCreatureOffsetTab()
 {
     int NumOfCreatures;
-    unsigned char *ThisAddr;
-    unsigned int f;
 
-    NumOfCreatures = Hdr->NumOfCreatures;
-    if (NumOfCreatures == 0) {
-        CreatureOffset = NULL;
-        hndCreatureOffset = -1;
-    } else {
-        hndCreatureOffset = GAL_Alloc(NumOfCreatures * sizeof(int), 0x8001, "GMAN");
+    if (Hdr->NumOfCreatures) {
+        unsigned char *ThisAddr;
+        hndCreatureOffset = GAL_Alloc(Hdr->NumOfCreatures * sizeof(int), 0x8001, "GMAN");
         if (hndCreatureOffset == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1109);
         CreatureOffset = (int *)GAL_Lock(hndCreatureOffset);
         if (CreatureOffset == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1112);
         ThisAddr = CreatureAnims;
-        for (f = 0; f < Hdr->NumOfCreatures; f++) {
+        for (unsigned int f = 0; f < Hdr->NumOfCreatures; f++) {
             CreatureOffset[f] = ThisAddr - CreatureAnims;
             ThisAddr += ((CCreatureHdr *)ThisAddr)->GetSize();
         }
+    } else {
+        CreatureOffset = NULL;
+        hndCreatureOffset = -1;
     }
-    {
-        int f;
-        NumOfCreatures = GetNumOfCreatures();
-        for (f = 0; f < NumOfCreatures; f++)
-            ((CCreatureHdr *)GetCreature(f))->InitActionDirRemaps();
+    NumOfCreatures = GetNumOfCreatures();
+    for (int f = 0; f < NumOfCreatures; f++) {
+        CCreatureHdr *Cr = (CCreatureHdr *)GetCreature(f);
+        Cr->InitActionDirRemaps();
     }
 }
 
@@ -637,7 +636,6 @@ void TextDat::MakeCreatureOffsetTab()
 void TextDat::DoDecompRequests()
 {
     long *DecArray;
-    int f;
 
     if (Scr == 0)
         Scr = 1;
@@ -646,8 +644,9 @@ void TextDat::DoDecompRequests()
     DecArray = (long *)GAL_Lock(hndDecompArrays);
     if (DecArray == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1440);
     DecArray += Scr * 40;
-    for (f = 0; f < NumOfBuffers[Scr]; f++) {
-        if (GAL_Free(DecArray[f]) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1452);
+    for (int f = 0; f < NumOfBuffers[Scr]; f++) {
+        long hnd = DecArray[f];           /* block-local (SYM block line 20; record omitted) */
+        if (GAL_Free(hnd) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1452);
     }
     NumOfBuffers[Scr] = 0;
     if (GAL_Unlock(hndDecompArrays) == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1458);
@@ -687,8 +686,8 @@ TextDat *GM_UseTexData(int Id)
 
     if ((unsigned int)Id > 0x173) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1313);
     if (AllDats[Id] == NULL) {
-        Tab = TX_DatTab;
         Dat2Use = NULL;
+        Tab = TX_DatTab;
         for (f = 0; f < 20 && Dat2Use == NULL; f++) {
             if (!DatPool[f].IsLoaded())
                 Dat2Use = &DatPool[f];
