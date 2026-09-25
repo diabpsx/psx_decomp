@@ -30,7 +30,8 @@ INCLUDE = ROOT / "include"
 BUILD = ROOT / "build"
 OUT = BUILD
 
-ASPSX_VERSION = "2.56"       # PsyQ 4.0 era assembler; TODO confirm vs 2.34/2.67
+ASPSX_VERSION = "2.56"       # PsyQ 4.0-era assembler.  NO --expand-div: gcc 2.7.2 emits `div $zero,rs,rt` (raw op) and
+                             # the retail image carries NO divide guard (TpLoadCallBack oracle: bare div+mfhi).
 G_VALUE = os.environ.get("DIAB_G", "8")   # TODO settle by gate (sdata census)
 AS_ARCH = ["-EL", "-march=r3000", "-mtune=r3000"]
 
@@ -64,7 +65,7 @@ def run(cmd, **kw):
 
 
 def _maspsx_assemble(s_file: Path, obj: Path, g_value: str, rel):
-    cmd = [PY, MASPSX, f"--aspsx-version={ASPSX_VERSION}", "--expand-div",
+    cmd = [PY, MASPSX, f"--aspsx-version={ASPSX_VERSION}",
            "--run-assembler", f"--gnu-as-path={AS}", *AS_ARCH, f"-G{g_value}",
            "-I", INCLUDE, "-I", ROOT, "-o", obj]
     r = subprocess.run([str(c) for c in cmd], input=s_file.read_text(),

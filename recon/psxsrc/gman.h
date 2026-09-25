@@ -2,6 +2,13 @@
 #define PSXSRC_GMAN_H
 /* Reconstructed from DIABPSX.SYM (tools/symtypes.py struct TextDat).  Sizes/offsets are SYM truth. */
 #include "diabpsx_types.h"
+#include "psxsrc/psyq.h"
+#include "glibdev/gal.h"
+#include "glibdev/gdebug.h"
+
+void GPUQ_DiscardHandle(long hnd);
+BOOL TpLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk);
+extern int TpW, TpH, TpXDest, TpYDest;
 
 struct FRAME_HDR;      /* size 12 */
 struct SPR_HDR;        /* size 40 */
@@ -41,6 +48,8 @@ struct TextDat {       /* sizeof 112 */
     void OnceOnlyInit();
     void InitData();
     void DumpData();
+    void DumpHdr();
+    void DumpDatFile();
 };
 
 #endif

@@ -13,7 +13,11 @@ typedef unsigned char u8; typedef unsigned short u16; typedef unsigned long u32;
 typedef unsigned int  uint;  typedef unsigned char uchar;  typedef unsigned long ulong;
 typedef unsigned char UBYTE; typedef unsigned short UWORD; typedef unsigned int UINT;
 typedef unsigned char UCHAR; typedef unsigned short USHORT; typedef unsigned long ULONG;
-typedef int BOOL;
+#ifdef __cplusplus
+typedef bool BOOL;      /* C++ TUs: gcc-2.7 `bool` (int-sized; mangles as `b` -- TpLoadCallBack__FPUciib) */
+#else
+typedef unsigned char BOOL;   /* GLIB C headers (SYM TPDEF BOOL = UCHAR) */
+#endif
 #ifndef NULL
 #define NULL 0
 #endif
