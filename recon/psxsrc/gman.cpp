@@ -255,25 +255,21 @@ void CCreatureAction::InitDirRemap()
     BOOL Dir2Remap[8];
     int f;
     int RemapNum;
-    int OrigNum;
-    int g;
 
     for (f = 7; f >= 0; f--)
         Dir2Remap[f] = 0;
     for (f = 0; f < 8; f++)
         Dir2Remap[DirRemap[f]] = 1;
     RemapNum = 0;
-    f = 0;
-    while (f < 8) {
+    for (f = 0; f < 8; f++) {
         if (Dir2Remap[f]) {
-            OrigNum = f;
-            for (g = 0; g < 8; g++) {
+            int OrigNum = f;                 /* SYM: nested-block locals (block line 19/20) -- the block */
+            for (int g = 0; g < 8; g++) {    /* scoping is what keeps the outer loop UN-rotated */
                 if ((DirRemap[g] & 0xf) == OrigNum)
                     DirRemap[g] |= RemapNum << 4;
             }
             RemapNum++;
         }
-        f++;
     }
 }
 

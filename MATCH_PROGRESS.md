@@ -1,44 +1,44 @@
 # Match progress (gate = tools/verify_asm.py)
 
-**Main image: 37 / 2688 functions byte-matched (1.4%)**
+**Main image: 50 / 2688 functions byte-matched (1.9%)**
 
-## gman  (recon/psxsrc/gman.cpp) — 37/76 PASS
+## gman  (recon/psxsrc/gman.cpp) — 50/76 PASS
 - ✅ __7TextDat (13)
 - ✅ OnceOnlyInit__7TextDat (8)
 - ✅ ___7TextDat (18)
 - ✅ ReloadTP__7TextDat (16)
 - ⬜ Use__7TextDatlbi
 - ✅ TpLoadCallBack__FPUciib (42)
-- ❌ StreamLoadTP__7TextDat — 36 diffs (ours 46)
+- ✅ StreamLoadTP__7TextDat (46)
 - ✅ FinishedUsing__7TextDat (38)
 - ✅ MakeBlockOffsetTab__7TextDat (19)
-- ⬜ MakeOffsetTab__C9CBlockHdr
-- ⬜ SetUVTp__7TextDatP9FRAME_HDRP8POLY_FT4ii
-- ❌ IsCompressed__7TextDatiiii — 7 diffs (ours 19)
+- ❌ MakeOffsetTab__C9CBlockHdr — 57 diffs (ours 75)
+- ❌ SetUVTp__7TextDatP9FRAME_HDRP8POLY_FT4ii — 58 diffs (ours 64)
+- ✅ IsCompressed__7TextDatiiii (19)
 - ⬜ PrintMonster__7TextDatiiiiiii
 - ⬜ PrintMonsterA__7TextDatiiibi
 - ⬜ PrepareFt4__7TextDatP8POLY_FT4iiiii
-- ⬜ GetDecompBufffer__7TextDati
-- ⬜ SetUVTpGT4__7TextDatP9FRAME_HDRP8POLY_GT4ii
+- ❌ GetDecompBufffer__7TextDati — 69 diffs (ours 88)
+- ❌ SetUVTpGT4__7TextDatP9FRAME_HDRP8POLY_GT4ii — 58 diffs (ours 64)
 - ⬜ PrepareGt4__7TextDatP8POLY_GT4iiiii
-- ⬜ SetUVTpGT3__7TextDatP9FRAME_HDRP8POLY_GT3
+- ❌ SetUVTpGT3__7TextDatP9FRAME_HDRP8POLY_GT3 — 44 diffs (ours 33)
 - ⬜ PrepareGt3__7TextDatP8POLY_GT3iii
 - ⬜ PrintFt4__7TextDatiiiiii
 - ⬜ PrintGt4__7TextDatiiiiii
 - ⬜ DecompFrame__7TextDatP9FRAME_HDR
-- ⬜ MakeCreatureOffsetTab__7TextDat
-- ⬜ MakePalOffsetTab__7TextDat
+- ❌ MakeCreatureOffsetTab__7TextDat — 42 diffs (ours 80)
+- ❌ MakePalOffsetTab__7TextDat — 9 diffs (ours 63)
 - ✅ InitData__7TextDat (12)
 - ✅ DumpData__7TextDat (74)
 - ✅ DumpHdr__7TextDat (25)
-- ⬜ GM_UseTexData__Fi
+- ❌ GM_UseTexData__Fi — 2 diffs (ours 77)
 - ✅ GM_ForceTpLoad__Fi (15)
 - ✅ GM_FinishedUsing__FP7TextDat (21)
-- ⬜ SetPal__7TextDatP9FRAME_HDRP8POLY_FT4
+- ✅ SetPal__7TextDatP9FRAME_HDRP8POLY_FT4 (49)
 - ✅ GetFrNum__7TextDatiiii (21)
 - ✅ IsDirAliased__7TextDatiii (22)
-- ⬜ DoDecompRequests__7TextDat
-- ⬜ FindDecompArea__7TextDatR4RECT
+- ❌ DoDecompRequests__7TextDat — 75 diffs (ours 73)
+- ✅ FindDecompArea__7TextDatR4RECT (54)
 - ✅ GetFileInfo__7TextDati (20)
 - ✅ GetSize__C15CCreatureAction (10)
 - ✅ GetFrNum__C15CCreatureActionii (12)
@@ -47,18 +47,18 @@
 - ✅ GetAction__C12CCreatureHdri (36)
 - ✅ InitActionDirRemaps__12CCreatureHdr (28)
 - ✅ GetSize__C12CCreatureHdr (27)
-- ⬜ LoadDat__C13CTextFileInfoli
+- ✅ LoadDat__C13CTextFileInfoli (77)
 - ✅ LoadDat__C13CTextFileInfo (22)
 - ⬜ LoadHdr__C13CTextFileInfo
 - ✅ MakeFname__C13CTextFileInfoPcPCc (18)
 - ✅ GetFile__C13CTextFileInfoPcUl (40)
 - ✅ HasFile__C13CTextFileInfoPc (37)
-- ⬜ Un64__FPUcT0l
+- ✅ Un64__FPUcT0l (53)
 - ✅ __7CScreen (13)
 - ⬜ Load__7CScreeniii
 - ✅ Unload__7CScreen (9)
 - ⬜ Display__7CScreeniiii
-- ⬜ SetRect__5CPartR7TextDatR4RECT
+- ✅ SetRect__5CPartR7TextDatR4RECT (31)
 - ⬜ GetBoundingBox__6CBlockR7TextDatR4RECT
 - ✅ _GLOBAL__D_DatPool (22)
 - ✅ _GLOBAL__I_DatPool (21)
@@ -66,17 +66,17 @@
 - ⬜ PRIM_GetPrim__FPP8POLY_FT4_800951a8
 - ✅ DumpDatFile__7TextDat (29)
 - ⬜ CanXferFrame__C7TextDat
-- ⬜ CanXferPal__C7TextDat
+- ✅ CanXferPal__C7TextDat (10)
 - ✅ IsLoaded__C7TextDat (3)
 - ✅ GetTexNum__C7TextDat (3)
 - ✅ GetCreature__7TextDati_80095300 (7)
-- ⬜ GetNumOfCreatures__7TextDat
-- ⬜ SetFileInfo__7TextDatPC13CTextFileInfoi_80095330
-- ⬜ GetNumOfFrames__7TextDat_8009533c
-- ⬜ GetPal__7TextDati_80095350
+- ✅ GetNumOfCreatures__7TextDat (5)
+- ✅ SetFileInfo__7TextDatPC13CTextFileInfoi_80095330 (3)
+- ✅ GetNumOfFrames__7TextDat_8009533c (5)
+- ✅ GetPal__7TextDati_80095350 (7)
 - ✅ GetFr__7TextDati_8009536c (7)
 - ✅ GetName__C13CTextFileInfo (3)
 - ✅ HasDat__C13CTextFileInfo (10)
 - ✅ HasTp__C13CTextFileInfo (10)
-- ⬜ GetSize__C6CBlock
+- ✅ GetSize__C6CBlock (5)
 
