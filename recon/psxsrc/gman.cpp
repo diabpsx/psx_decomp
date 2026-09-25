@@ -33,3 +33,9 @@ void TextDat::InitData()
     LoadCount = 0;
     Loaded = 0;
 }
+
+/* line 144 @0x80091EA8 — gcc-2.7 deleting-dtor shape (__in_chrg + __builtin_delete) */
+TextDat::~TextDat()
+{
+    DumpData();
+}

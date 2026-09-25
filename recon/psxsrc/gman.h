@@ -40,6 +40,7 @@ struct TextDat {       /* sizeof 112 */
     ~TextDat();
     void OnceOnlyInit();
     void InitData();
+    void DumpData();
 };
 
 #endif
