@@ -1,0 +1,2340 @@
+[
+{
+"start": 2147549184,
+"stop": 2147549191,
+"len": 8,
+"group": "(default)",
+"name": "code"
+},
+{
+"start": 2147549192,
+"stop": 2147549195,
+"len": 4,
+"group": "boot_text",
+"name": ".boot_text"
+},
+{
+"start": 2147549196,
+"stop": 2147680635,
+"len": 131440,
+"group": "text",
+"name": ".text"
+},
+{
+"start": 2147680636,
+"stop": 2147710771,
+"len": 30136,
+"group": "text",
+"name": ".CONTROL_text"
+},
+{
+"start": 2147710772,
+"stop": 2147712391,
+"len": 1620,
+"group": "text",
+"name": ".CURSOR_text"
+},
+{
+"start": 2147712392,
+"stop": 2147712939,
+"len": 548,
+"group": "text",
+"name": ".DEAD_text"
+},
+{
+"start": 2147712940,
+"stop": 2147721095,
+"len": 8156,
+"group": "text",
+"name": ".DIABLO_text"
+},
+{
+"start": 2147721096,
+"stop": 2147733299,
+"len": 12204,
+"group": "text",
+"name": ".TOWNERS_text"
+},
+{
+"start": 2147733300,
+"stop": 2147736103,
+"len": 2804,
+"group": "text",
+"name": ".EFFECTS_text"
+},
+{
+"start": 2147736104,
+"stop": 2147736643,
+"len": 540,
+"group": "text",
+"name": ".ENGINE_text"
+},
+{
+"start": 2147736644,
+"stop": 2147737143,
+"len": 500,
+"group": "text",
+"name": ".ERROR_text"
+},
+{
+"start": 2147737144,
+"stop": 2147738131,
+"len": 988,
+"group": "text",
+"name": ".INTERFAC_text"
+},
+{
+"start": 2147738132,
+"stop": 2147738187,
+"len": 56,
+"group": "text",
+"name": ".ITEMDAT_text"
+},
+{
+"start": 2147738188,
+"stop": 2147794023,
+"len": 55836,
+"group": "text",
+"name": ".ITEMS_text"
+},
+{
+"start": 2147794024,
+"stop": 2147801435,
+"len": 7412,
+"group": "text",
+"name": ".LIGHTING_text"
+},
+{
+"start": 2147801436,
+"stop": 2147805835,
+"len": 4400,
+"group": "text",
+"name": ".MINITEXT_text"
+},
+{
+"start": 2147805836,
+"stop": 2147805851,
+"len": 16,
+"group": "text",
+"name": ".MISDAT_text"
+},
+{
+"start": 2147805852,
+"stop": 2147822499,
+"len": 16648,
+"group": "text",
+"name": ".MSG_text"
+},
+{
+"start": 2147822500,
+"stop": 2147823743,
+"len": 1244,
+"group": "text",
+"name": ".MULTI_text"
+},
+{
+"start": 2147823744,
+"stop": 2147875871,
+"len": 52128,
+"group": "text",
+"name": ".OBJECTS_text"
+},
+{
+"start": 2147875872,
+"stop": 2147876111,
+"len": 240,
+"group": "text",
+"name": ".PFILE_text"
+},
+{
+"start": 2147876112,
+"stop": 2147906739,
+"len": 30628,
+"group": "text",
+"name": ".PLAYER_text"
+},
+{
+"start": 2147906740,
+"stop": 2147914523,
+"len": 7784,
+"group": "text",
+"name": ".QUESTS_text"
+},
+{
+"start": 2147914524,
+"stop": 2147915171,
+"len": 648,
+"group": "text",
+"name": ".SCROLLRT_text"
+},
+{
+"start": 2147915172,
+"stop": 2147959927,
+"len": 44756,
+"group": "text",
+"name": ".STORES_text"
+},
+{
+"start": 2147959928,
+"stop": 2147962903,
+"len": 2976,
+"group": "text",
+"name": ".TOWN_text"
+},
+{
+"start": 2147962904,
+"stop": 2147971155,
+"len": 8252,
+"group": "text",
+"name": ".TRIGS_text"
+},
+{
+"start": 2147971156,
+"stop": 2147974419,
+"len": 3264,
+"group": "text",
+"name": ".SPELLS_text"
+},
+{
+"start": 2147974420,
+"stop": 2147975055,
+"len": 636,
+"group": "text",
+"name": ".SOUND_text"
+},
+{
+"start": 2147975056,
+"stop": 2147987823,
+"len": 12768,
+"group": "text",
+"name": ".GAMEPAD_text"
+},
+{
+"start": 2147987824,
+"stop": 2147987919,
+"len": 96,
+"group": "text",
+"name": ".TESTCODE_text"
+},
+{
+"start": 2147987920,
+"stop": 2147987983,
+"len": 64,
+"group": "text",
+"name": ".STORM_text"
+},
+{
+"start": 2147987984,
+"stop": 2147988295,
+"len": 312,
+"group": "text",
+"name": ".GWIN_text"
+},
+{
+"start": 2147988296,
+"stop": 2147989699,
+"len": 1404,
+"group": "text",
+"name": ".LANG_text"
+},
+{
+"start": 2147989700,
+"stop": 2147997175,
+"len": 7476,
+"group": "text",
+"name": ".MISPRINT_text"
+},
+{
+"start": 2147997176,
+"stop": 2147998183,
+"len": 1008,
+"group": "text",
+"name": ".MLIST_text"
+},
+{
+"start": 2147998184,
+"stop": 2148003427,
+"len": 5244,
+"group": "text",
+"name": ".OBJPRINT_text"
+},
+{
+"start": 2148003428,
+"stop": 2148004691,
+"len": 1264,
+"group": "text",
+"name": ".PALETTE_text"
+},
+{
+"start": 2148004692,
+"stop": 2148010451,
+"len": 5760,
+"group": "text",
+"name": ".COREMON_text"
+},
+{
+"start": 2148010452,
+"stop": 2148011767,
+"len": 1316,
+"group": "text",
+"name": ".COREAUTO_text"
+},
+{
+"start": 2148011768,
+"stop": 2148013575,
+"len": 1808,
+"group": "text",
+"name": ".PORTAL_text"
+},
+{
+"start": 2148013576,
+"stop": 2148016603,
+"len": 3028,
+"group": "text",
+"name": ".COMPMAP_text"
+},
+{
+"start": 2148016604,
+"stop": 2148017823,
+"len": 1220,
+"group": "text",
+"name": ".GAMEOVER_text"
+},
+{
+"start": 2148017824,
+"stop": 2148017947,
+"len": 124,
+"group": "text",
+"name": ".VERSION_text"
+},
+{
+"start": 2148017948,
+"stop": 2148018127,
+"len": 180,
+"group": "text",
+"name": ".COREINV_text"
+},
+{
+"start": 2148018128,
+"stop": 2148018135,
+"len": 8,
+"group": "text",
+"name": ".GAMEMENU_text"
+},
+{
+"start": 2148018136,
+"stop": 2148020479,
+"len": 2344,
+"group": "text",
+"name": ".DPIECE_text"
+},
+{
+"start": 2148020480,
+"stop": 2148021167,
+"len": 688,
+"group": "text",
+"name": ".MAIN_text"
+},
+{
+"start": 2148021168,
+"stop": 2148022259,
+"len": 1092,
+"group": "text",
+"name": ".GPUQ_text"
+},
+{
+"start": 2148022260,
+"stop": 2148024367,
+"len": 2108,
+"group": "text",
+"name": ".PRIMPOOL_text"
+},
+{
+"start": 2148024368,
+"stop": 2148025379,
+"len": 1012,
+"group": "text",
+"name": ".VID_text"
+},
+{
+"start": 2148025380,
+"stop": 2148025419,
+"len": 40,
+"group": "text",
+"name": ".MEM_text"
+},
+{
+"start": 2148025420,
+"stop": 2148025787,
+"len": 368,
+"group": "text",
+"name": ".SYSINIT_text"
+},
+{
+"start": 2148025788,
+"stop": 2148025915,
+"len": 128,
+"group": "text",
+"name": ".GARYL_text"
+},
+{
+"start": 2148025916,
+"stop": 2148030539,
+"len": 4624,
+"group": "text",
+"name": ".DAVEO_text"
+},
+{
+"start": 2148030540,
+"stop": 2148030587,
+"len": 48,
+"group": "text",
+"name": ".TIMS_text"
+},
+{
+"start": 2148030588,
+"stop": 2148032691,
+"len": 2104,
+"group": "text",
+"name": ".FILEIO_text"
+},
+{
+"start": 2148032692,
+"stop": 2148034071,
+"len": 1380,
+"group": "text",
+"name": ".PCIO_text"
+},
+{
+"start": 2148034072,
+"stop": 2148034371,
+"len": 300,
+"group": "text",
+"name": ".SYSOBJ_text"
+},
+{
+"start": 2148034372,
+"stop": 2148035647,
+"len": 1276,
+"group": "text",
+"name": ".DATIO_text"
+},
+{
+"start": 2148035648,
+"stop": 2148037211,
+"len": 1564,
+"group": "text",
+"name": ".CDIO_text"
+},
+{
+"start": 2148037212,
+"stop": 2148041171,
+"len": 3960,
+"group": "text",
+"name": ".BIGLUMP_text"
+},
+{
+"start": 2148041172,
+"stop": 2148041383,
+"len": 212,
+"group": "text",
+"name": ".LZNP_text"
+},
+{
+"start": 2148041384,
+"stop": 2148041927,
+"len": 544,
+"group": "text",
+"name": ".TMALLOC_text"
+},
+{
+"start": 2148041928,
+"stop": 2148046047,
+"len": 4120,
+"group": "text",
+"name": ".PAUSE_text"
+},
+{
+"start": 2148046048,
+"stop": 2148047967,
+"len": 1920,
+"group": "text",
+"name": ".PADS_text"
+},
+{
+"start": 2148047968,
+"stop": 2148052367,
+"len": 4400,
+"group": "text",
+"name": ".PRINTY_text"
+},
+{
+"start": 2148052368,
+"stop": 2148061811,
+"len": 9444,
+"group": "text",
+"name": ".DIALOG_text"
+},
+{
+"start": 2148061812,
+"stop": 2148062235,
+"len": 424,
+"group": "text",
+"name": ".ATTRACT_text"
+},
+{
+"start": 2148062236,
+"stop": 2148081235,
+"len": 19000,
+"group": "text",
+"name": ".BLOCK_text"
+},
+{
+"start": 2148081236,
+"stop": 2148094967,
+"len": 13732,
+"group": "text",
+"name": ".GMAN_text"
+},
+{
+"start": 2148094968,
+"stop": 2148096067,
+"len": 1100,
+"group": "text",
+"name": ".OVERLAY_text"
+},
+{
+"start": 2148096068,
+"stop": 2148096083,
+"len": 16,
+"group": "text",
+"name": ".LAMBO_text"
+},
+{
+"start": 2148096084,
+"stop": 2148100151,
+"len": 4068,
+"group": "text",
+"name": ".CPLAYER_text"
+},
+{
+"start": 2148100152,
+"stop": 2148100955,
+"len": 804,
+"group": "text",
+"name": ".PROF_text"
+},
+{
+"start": 2148100956,
+"stop": 2148103627,
+"len": 2672,
+"group": "text",
+"name": ".PSXMSG_text"
+},
+{
+"start": 2148103628,
+"stop": 2148108679,
+"len": 5052,
+"group": "text",
+"name": ".GPANEL_text"
+},
+{
+"start": 2148108680,
+"stop": 2148114839,
+"len": 6160,
+"group": "text",
+"name": ".STREAM_text"
+},
+{
+"start": 2148114840,
+"stop": 2148116915,
+"len": 2076,
+"group": "text",
+"name": ".SNDBANK_text"
+},
+{
+"start": 2148116916,
+"stop": 2148117623,
+"len": 708,
+"group": "text",
+"name": ".ASYNC_text"
+},
+{
+"start": 2148117624,
+"stop": 2148119351,
+"len": 1728,
+"group": "text",
+"name": ".SCRATCH_text"
+},
+{
+"start": 2148119352,
+"stop": 2148121099,
+"len": 1748,
+"group": "text",
+"name": ".TONY_text"
+},
+{
+"start": 2148121100,
+"stop": 2148123975,
+"len": 2876,
+"group": "text",
+"name": ".GLUE_text"
+},
+{
+"start": 2148123976,
+"stop": 2148129967,
+"len": 5992,
+"group": "text",
+"name": ".CTRL_text"
+},
+{
+"start": 2148129968,
+"stop": 2148131311,
+"len": 1344,
+"group": "text",
+"name": ".GRAHAM_text"
+},
+{
+"start": 2148131312,
+"stop": 2148131827,
+"len": 516,
+"group": "text",
+"name": ".TITLESCR_text"
+},
+{
+"start": 2148131828,
+"stop": 2148141531,
+"len": 9704,
+"group": "text",
+"name": ".DAVEL_text"
+},
+{
+"start": 2148141532,
+"stop": 2148156291,
+"len": 14760,
+"group": "text",
+"name": ".PADFUNCS_text"
+},
+{
+"start": 2148156292,
+"stop": 2148156707,
+"len": 416,
+"group": "text",
+"name": ".DECOMP_text"
+},
+{
+"start": 2148156708,
+"stop": 2148159491,
+"len": 2784,
+"group": "text",
+"name": ".LOADING_text"
+},
+{
+"start": 2148159492,
+"stop": 2148165839,
+"len": 6348,
+"group": "text",
+"name": ".CARDCORE_text"
+},
+{
+"start": 2148165840,
+"stop": 2148185775,
+"len": 19936,
+"group": "text",
+"name": ".OPTIONS_text"
+},
+{
+"start": 2148185776,
+"stop": 2148192087,
+"len": 6312,
+"group": "text",
+"name": ".BIRD_text"
+},
+{
+"start": 2148192088,
+"stop": 2148192751,
+"len": 664,
+"group": "text",
+"name": ".COREFMV_text"
+},
+{
+"start": 2148192752,
+"stop": 2148196251,
+"len": 3500,
+"group": "text",
+"name": ".KANJI_text"
+},
+{
+"start": 2148196252,
+"stop": 2148197259,
+"len": 1008,
+"group": "text",
+"name": ".PAK_text"
+},
+{
+"start": 2148197260,
+"stop": 2148200679,
+"len": 3420,
+"group": "text",
+"name": ".PSXHELP_text"
+},
+{
+"start": 2148200680,
+"stop": 2148200687,
+"len": 8,
+"group": "text",
+"name": ".MONSVIEW_text"
+},
+{
+"start": 2148200688,
+"stop": 2148205339,
+"len": 4652,
+"group": "text",
+"name": ".SPLTARGT_text"
+},
+{
+"start": 2148205340,
+"stop": 2148205343,
+"len": 4,
+"group": "startup_text",
+"name": "$startup_text"
+},
+{
+"start": 2148205344,
+"stop": 2148207767,
+"len": 2424,
+"group": "startup_text",
+"name": ".STARTUP_text"
+},
+{
+"start": 2148207768,
+"stop": 2148207827,
+"len": 60,
+"group": "startup_text",
+"name": ".ctors"
+},
+{
+"start": 2148207828,
+"stop": 2148207871,
+"len": 44,
+"group": "startup_text",
+"name": ".dtors"
+},
+{
+"start": 2148205340,
+"stop": 2148205343,
+"len": 4,
+"group": "map_data",
+"name": "$map_data"
+},
+{
+"start": 2148207872,
+"stop": 2148233351,
+"len": 25480,
+"group": "data",
+"name": ".data"
+},
+{
+"start": 2148233352,
+"stop": 2148234711,
+"len": 1360,
+"group": "data",
+"name": ".MONSTLST_data"
+},
+{
+"start": 2148234712,
+"stop": 2148235551,
+"len": 840,
+"group": "data",
+"name": ".GPUQ_data"
+},
+{
+"start": 2148235552,
+"stop": 2148235631,
+"len": 80,
+"group": "data",
+"name": ".MEM_data"
+},
+{
+"start": 2148235632,
+"stop": 2148235683,
+"len": 52,
+"group": "data",
+"name": ".FILEIO_data"
+},
+{
+"start": 2148235684,
+"stop": 2148236115,
+"len": 432,
+"group": "data",
+"name": ".BIGLUMP_data"
+},
+{
+"start": 2148236116,
+"stop": 2148236595,
+"len": 480,
+"group": "data",
+"name": ".TMALLOC_data"
+},
+{
+"start": 2148236596,
+"stop": 2148238039,
+"len": 1444,
+"group": "data",
+"name": ".PADS_data"
+},
+{
+"start": 2148238040,
+"stop": 2148240079,
+"len": 2040,
+"group": "data",
+"name": ".PRINTY_data"
+},
+{
+"start": 2148240080,
+"stop": 2148240255,
+"len": 176,
+"group": "data",
+"name": ".DIALOG_data"
+},
+{
+"start": 2148240256,
+"stop": 2148240275,
+"len": 20,
+"group": "data",
+"name": ".BLOCK_data"
+},
+{
+"start": 2148240276,
+"stop": 2148244055,
+"len": 3780,
+"group": "data",
+"name": ".GMAN_data"
+},
+{
+"start": 2148244056,
+"stop": 2148244075,
+"len": 20,
+"group": "data",
+"name": ".PSXMSG_data"
+},
+{
+"start": 2148244076,
+"stop": 2148244447,
+"len": 372,
+"group": "data",
+"name": ".GPANEL_data"
+},
+{
+"start": 2148244448,
+"stop": 2148318635,
+"len": 74188,
+"group": "data",
+"name": ".STREAM_data"
+},
+{
+"start": 2148318636,
+"stop": 2148319127,
+"len": 492,
+"group": "data",
+"name": ".SCRATCH_data"
+},
+{
+"start": 2148319128,
+"stop": 2148320099,
+"len": 972,
+"group": "data",
+"name": ".GLUE_data"
+},
+{
+"start": 2148320100,
+"stop": 2148320907,
+"len": 808,
+"group": "data",
+"name": ".CTRL_data"
+},
+{
+"start": 2148320908,
+"stop": 2148320955,
+"len": 48,
+"group": "data",
+"name": ".TITLESCR_data"
+},
+{
+"start": 2148320956,
+"stop": 2148321131,
+"len": 176,
+"group": "data",
+"name": ".DAVEL_data"
+},
+{
+"start": 2148321132,
+"stop": 2148321255,
+"len": 124,
+"group": "data",
+"name": ".LOADING_data"
+},
+{
+"start": 2148321256,
+"stop": 2148321383,
+"len": 128,
+"group": "data",
+"name": ".CARDCORE_data"
+},
+{
+"start": 2148321384,
+"stop": 2148324211,
+"len": 2828,
+"group": "data",
+"name": ".OPTIONS_data"
+},
+{
+"start": 2148324212,
+"stop": 2148324595,
+"len": 384,
+"group": "data",
+"name": ".BIRD_data"
+},
+{
+"start": 2148324596,
+"stop": 2148324643,
+"len": 48,
+"group": "data",
+"name": ".COREFMV_data"
+},
+{
+"start": 2148324644,
+"stop": 2148324943,
+"len": 300,
+"group": "data",
+"name": ".PSXHELP_data"
+},
+{
+"start": 2148324944,
+"stop": 2148324991,
+"len": 48,
+"group": "data",
+"name": ".SPLTARGT_data"
+},
+{
+"start": 2148324992,
+"stop": 2148328207,
+"len": 3216,
+"group": "data",
+"name": ".FE_data"
+},
+{
+"start": 2148328208,
+"stop": 2148330255,
+"len": 2048,
+"group": "data",
+"name": ".CONTROL_data"
+},
+{
+"start": 2148330256,
+"stop": 2148330627,
+"len": 372,
+"group": "data",
+"name": ".DEAD_data"
+},
+{
+"start": 2148330628,
+"stop": 2148333539,
+"len": 2912,
+"group": "data",
+"name": ".DIABLO_data"
+},
+{
+"start": 2148333540,
+"stop": 2148338367,
+"len": 4828,
+"group": "data",
+"name": ".TOWNERS_data"
+},
+{
+"start": 2148338368,
+"stop": 2148342335,
+"len": 3968,
+"group": "data",
+"name": ".EFFECTS_data"
+},
+{
+"start": 2148342336,
+"stop": 2148342591,
+"len": 256,
+"group": "data",
+"name": ".ERROR_data"
+},
+{
+"start": 2148342592,
+"stop": 2148342751,
+"len": 160,
+"group": "data",
+"name": ".ITEMDAT_data"
+},
+{
+"start": 2148342752,
+"stop": 2148357459,
+"len": 14708,
+"group": "data",
+"name": ".ITEMS_data"
+},
+{
+"start": 2148357460,
+"stop": 2148362127,
+"len": 4668,
+"group": "data",
+"name": ".LIGHTING_data"
+},
+{
+"start": 2148362128,
+"stop": 2148362223,
+"len": 96,
+"group": "data",
+"name": ".MINITEXT_data"
+},
+{
+"start": 2148362224,
+"stop": 2148364363,
+"len": 2140,
+"group": "data",
+"name": ".MISDAT_data"
+},
+{
+"start": 2148364364,
+"stop": 2148369131,
+"len": 4768,
+"group": "data",
+"name": ".MSG_data"
+},
+{
+"start": 2148369132,
+"stop": 2148371367,
+"len": 2236,
+"group": "data",
+"name": ".OBJDAT_data"
+},
+{
+"start": 2148371368,
+"stop": 2148377415,
+"len": 6048,
+"group": "data",
+"name": ".OBJECTS_data"
+},
+{
+"start": 2148377416,
+"stop": 2148391175,
+"len": 13760,
+"group": "data",
+"name": ".PLAYER_data"
+},
+{
+"start": 2148391176,
+"stop": 2148391807,
+"len": 632,
+"group": "data",
+"name": ".QUESTS_data"
+},
+{
+"start": 2148391808,
+"stop": 2148393731,
+"len": 1924,
+"group": "data",
+"name": ".SPELLDAT_data"
+},
+{
+"start": 2148393732,
+"stop": 2148413943,
+"len": 20212,
+"group": "data",
+"name": ".STORES_data"
+},
+{
+"start": 2148413944,
+"stop": 2148415643,
+"len": 1700,
+"group": "data",
+"name": ".TRIGS_data"
+},
+{
+"start": 2148415644,
+"stop": 2148415655,
+"len": 12,
+"group": "data",
+"name": ".SOUND_data"
+},
+{
+"start": 2148415656,
+"stop": 2148415715,
+"len": 60,
+"group": "data",
+"name": ".GAMEPAD_data"
+},
+{
+"start": 2148415716,
+"stop": 2148415939,
+"len": 224,
+"group": "data",
+"name": ".MISPRINT_data"
+},
+{
+"start": 2148415940,
+"stop": 2148415971,
+"len": 32,
+"group": "data",
+"name": ".MLIST_data"
+},
+{
+"start": 2148415972,
+"stop": 2148416427,
+"len": 456,
+"group": "data",
+"name": ".OBJPRINT_data"
+},
+{
+"start": 2148416428,
+"stop": 2148416459,
+"len": 32,
+"group": "data",
+"name": ".COREAUTO_data"
+},
+{
+"start": 2148416460,
+"stop": 2148416539,
+"len": 80,
+"group": "data",
+"name": ".PORTAL_data"
+},
+{
+"start": 2148416540,
+"stop": 2148416659,
+"len": 120,
+"group": "data",
+"name": ".VERSION_data"
+},
+{
+"start": 2148416660,
+"stop": 2148417471,
+"len": 812,
+"group": "data",
+"name": ".LOADSAVE_data"
+},
+{
+"start": 2148417472,
+"stop": 2148417575,
+"len": 104,
+"group": "data",
+"name": ".SETMAPS_data"
+},
+{
+"start": 2148417576,
+"stop": 2148417711,
+"len": 136,
+"group": "data",
+"name": ".CHOOSEM_data"
+},
+{
+"start": 2148417712,
+"stop": 2148417731,
+"len": 20,
+"group": "data",
+"name": ".PREOBJ_data"
+},
+{
+"start": 2148417732,
+"stop": 2148542247,
+"len": 124516,
+"group": "data",
+"name": ".GENDUNG_data"
+},
+{
+"start": 2148542248,
+"stop": 2148542935,
+"len": 688,
+"group": "data",
+"name": ".THEMES_data"
+},
+{
+"start": 2148542936,
+"stop": 2148553203,
+"len": 10268,
+"group": "data",
+"name": ".MISSILES_data"
+},
+{
+"start": 2148553204,
+"stop": 2148574587,
+"len": 21384,
+"group": "data",
+"name": ".MONSTER_data"
+},
+{
+"start": 2148574588,
+"stop": 2148585479,
+"len": 10892,
+"group": "data",
+"name": ".MONSTDAT_data"
+},
+{
+"start": 2148585480,
+"stop": 2148587211,
+"len": 1732,
+"group": "data",
+"name": ".INV_data"
+},
+{
+"start": 2148587212,
+"stop": 2148588459,
+"len": 1248,
+"group": "data",
+"name": ".AUTOMAP_data"
+},
+{
+"start": 2148588460,
+"stop": 2148597647,
+"len": 9188,
+"group": "rdata",
+"name": ".rdata"
+},
+{
+"start": 2148597648,
+"stop": 2148597683,
+"len": 36,
+"group": "rdata",
+"name": ".MAIN_rdata"
+},
+{
+"start": 2148597684,
+"stop": 2148597699,
+"len": 16,
+"group": "rdata",
+"name": ".GPUQ_rdata"
+},
+{
+"start": 2148597700,
+"stop": 2148597727,
+"len": 28,
+"group": "rdata",
+"name": ".PRIMPOOL_rdata"
+},
+{
+"start": 2148597728,
+"stop": 2148597743,
+"len": 16,
+"group": "rdata",
+"name": ".VID_rdata"
+},
+{
+"start": 2148597744,
+"stop": 2148597767,
+"len": 24,
+"group": "rdata",
+"name": ".MEM_rdata"
+},
+{
+"start": 2148597768,
+"stop": 2148597879,
+"len": 112,
+"group": "rdata",
+"name": ".SYSINIT_rdata"
+},
+{
+"start": 2148597880,
+"stop": 2148597915,
+"len": 36,
+"group": "rdata",
+"name": ".GARYL_rdata"
+},
+{
+"start": 2148597916,
+"stop": 2148597931,
+"len": 16,
+"group": "rdata",
+"name": ".DAVEO_rdata"
+},
+{
+"start": 2148597932,
+"stop": 2148597947,
+"len": 16,
+"group": "rdata",
+"name": ".TIMS_rdata"
+},
+{
+"start": 2148597948,
+"stop": 2148597983,
+"len": 36,
+"group": "rdata",
+"name": ".LEIGH_rdata"
+},
+{
+"start": 2148597984,
+"stop": 2148598063,
+"len": 80,
+"group": "rdata",
+"name": ".FILEIO_rdata"
+},
+{
+"start": 2148598064,
+"stop": 2148598167,
+"len": 104,
+"group": "rdata",
+"name": ".PCIO_rdata"
+},
+{
+"start": 2148598168,
+"stop": 2148598187,
+"len": 20,
+"group": "rdata",
+"name": ".SYSOBJ_rdata"
+},
+{
+"start": 2148598188,
+"stop": 2148598275,
+"len": 88,
+"group": "rdata",
+"name": ".DATIO_rdata"
+},
+{
+"start": 2148598276,
+"stop": 2148598379,
+"len": 104,
+"group": "rdata",
+"name": ".CDIO_rdata"
+},
+{
+"start": 2148598380,
+"stop": 2148598675,
+"len": 296,
+"group": "rdata",
+"name": ".BIGLUMP_rdata"
+},
+{
+"start": 2148598676,
+"stop": 2148598719,
+"len": 44,
+"group": "rdata",
+"name": ".TMALLOC_rdata"
+},
+{
+"start": 2148598720,
+"stop": 2148598911,
+"len": 192,
+"group": "rdata",
+"name": ".PAUSE_rdata"
+},
+{
+"start": 2148598912,
+"stop": 2148598967,
+"len": 56,
+"group": "rdata",
+"name": ".PADS_rdata"
+},
+{
+"start": 2148598968,
+"stop": 2148599003,
+"len": 36,
+"group": "rdata",
+"name": ".PRINTY_rdata"
+},
+{
+"start": 2148599004,
+"stop": 2148599055,
+"len": 52,
+"group": "rdata",
+"name": ".DIALOG_rdata"
+},
+{
+"start": 2148599056,
+"stop": 2148599099,
+"len": 44,
+"group": "rdata",
+"name": ".ATTRACT_rdata"
+},
+{
+"start": 2148599100,
+"stop": 2148599175,
+"len": 76,
+"group": "rdata",
+"name": ".BLOCK_rdata"
+},
+{
+"start": 2148599176,
+"stop": 2148599227,
+"len": 52,
+"group": "rdata",
+"name": ".GMAN_rdata"
+},
+{
+"start": 2148599228,
+"stop": 2148599299,
+"len": 72,
+"group": "rdata",
+"name": ".OVERLAY_rdata"
+},
+{
+"start": 2148599300,
+"stop": 2148599315,
+"len": 16,
+"group": "rdata",
+"name": ".LAMBO_rdata"
+},
+{
+"start": 2148599316,
+"stop": 2148599507,
+"len": 192,
+"group": "rdata",
+"name": ".CPLAYER_rdata"
+},
+{
+"start": 2148599508,
+"stop": 2148599523,
+"len": 16,
+"group": "rdata",
+"name": ".FRAMEHDR_rdata"
+},
+{
+"start": 2148599524,
+"stop": 2148599875,
+"len": 352,
+"group": "rdata",
+"name": ".PSXMSG_rdata"
+},
+{
+"start": 2148599876,
+"stop": 2148599971,
+"len": 96,
+"group": "rdata",
+"name": ".GPANEL_rdata"
+},
+{
+"start": 2148599972,
+"stop": 2148600203,
+"len": 232,
+"group": "rdata",
+"name": ".STREAM_rdata"
+},
+{
+"start": 2148600204,
+"stop": 2148600383,
+"len": 180,
+"group": "rdata",
+"name": ".SNDBANK_rdata"
+},
+{
+"start": 2148600384,
+"stop": 2148600399,
+"len": 16,
+"group": "rdata",
+"name": ".ASYNC_rdata"
+},
+{
+"start": 2148600400,
+"stop": 2148600415,
+"len": 16,
+"group": "rdata",
+"name": ".CMONST_rdata"
+},
+{
+"start": 2148600416,
+"stop": 2148600515,
+"len": 100,
+"group": "rdata",
+"name": ".SCRATCH_rdata"
+},
+{
+"start": 2148600516,
+"stop": 2148600627,
+"len": 112,
+"group": "rdata",
+"name": ".TONY_rdata"
+},
+{
+"start": 2148600628,
+"stop": 2148600691,
+"len": 64,
+"group": "rdata",
+"name": ".GLUE_rdata"
+},
+{
+"start": 2148600692,
+"stop": 2148600727,
+"len": 36,
+"group": "rdata",
+"name": ".CTRL_rdata"
+},
+{
+"start": 2148600728,
+"stop": 2148600763,
+"len": 36,
+"group": "rdata",
+"name": ".GRAHAM_rdata"
+},
+{
+"start": 2148600764,
+"stop": 2148600779,
+"len": 16,
+"group": "rdata",
+"name": ".TITLESCR_rdata"
+},
+{
+"start": 2148600780,
+"stop": 2148600795,
+"len": 16,
+"group": "rdata",
+"name": ".CREATURE_rdata"
+},
+{
+"start": 2148600796,
+"stop": 2148600851,
+"len": 56,
+"group": "rdata",
+"name": ".DAVEL_rdata"
+},
+{
+"start": 2148600852,
+"stop": 2148600887,
+"len": 36,
+"group": "rdata",
+"name": ".PADFUNCS_rdata"
+},
+{
+"start": 2148600888,
+"stop": 2148600923,
+"len": 36,
+"group": "rdata",
+"name": ".DECOMP_rdata"
+},
+{
+"start": 2148600924,
+"stop": 2148601023,
+"len": 100,
+"group": "rdata",
+"name": ".LOADING_rdata"
+},
+{
+"start": 2148601024,
+"stop": 2148601071,
+"len": 48,
+"group": "rdata",
+"name": ".CARDCORE_rdata"
+},
+{
+"start": 2148601072,
+"stop": 2148601279,
+"len": 208,
+"group": "rdata",
+"name": ".OPTIONS_rdata"
+},
+{
+"start": 2148601280,
+"stop": 2148601391,
+"len": 112,
+"group": "rdata",
+"name": ".BIRD_rdata"
+},
+{
+"start": 2148601392,
+"stop": 2148601539,
+"len": 148,
+"group": "rdata",
+"name": ".COREFMV_rdata"
+},
+{
+"start": 2148601540,
+"stop": 2148601667,
+"len": 128,
+"group": "rdata",
+"name": ".KANJI_rdata"
+},
+{
+"start": 2148601668,
+"stop": 2148601715,
+"len": 48,
+"group": "rdata",
+"name": ".PSXHELP_rdata"
+},
+{
+"start": 2148601716,
+"stop": 2148601731,
+"len": 16,
+"group": "rdata",
+"name": ".MONSVIEW_rdata"
+},
+{
+"start": 2148601732,
+"stop": 2148601767,
+"len": 36,
+"group": "rdata",
+"name": ".SPLTARGT_rdata"
+},
+{
+"start": 2148601768,
+"stop": 2148601791,
+"len": 24,
+"group": "rdata",
+"name": ".PRESONLY_rdata"
+},
+{
+"start": 2148601792,
+"stop": 2148601883,
+"len": 92,
+"group": "rdata",
+"name": ".FE_rdata"
+},
+{
+"start": 2148601884,
+"stop": 2148601907,
+"len": 24,
+"group": "rdata",
+"name": ".PREGAME_rdata"
+},
+{
+"start": 2148601908,
+"stop": 2148602147,
+"len": 240,
+"group": "rdata",
+"name": ".CONTROL_rdata"
+},
+{
+"start": 2148602148,
+"stop": 2148602163,
+"len": 16,
+"group": "rdata",
+"name": ".CURSOR_rdata"
+},
+{
+"start": 2148602164,
+"stop": 2148602279,
+"len": 116,
+"group": "rdata",
+"name": ".DIABLO_rdata"
+},
+{
+"start": 2148602280,
+"stop": 2148602647,
+"len": 368,
+"group": "rdata",
+"name": ".TOWNERS_rdata"
+},
+{
+"start": 2148602648,
+"stop": 2148602663,
+"len": 16,
+"group": "rdata",
+"name": ".EFFECTS_rdata"
+},
+{
+"start": 2148602664,
+"stop": 2148602683,
+"len": 20,
+"group": "rdata",
+"name": ".ENGINE_rdata"
+},
+{
+"start": 2148602684,
+"stop": 2148602699,
+"len": 16,
+"group": "rdata",
+"name": ".ERROR_rdata"
+},
+{
+"start": 2148602700,
+"stop": 2148602787,
+"len": 88,
+"group": "rdata",
+"name": ".INTERFAC_rdata"
+},
+{
+"start": 2148602788,
+"stop": 2148622655,
+"len": 19868,
+"group": "rdata",
+"name": ".ITEMDAT_rdata"
+},
+{
+"start": 2148622656,
+"stop": 2148624103,
+"len": 1448,
+"group": "rdata",
+"name": ".ITEMS_rdata"
+},
+{
+"start": 2148624104,
+"stop": 2148624119,
+"len": 16,
+"group": "rdata",
+"name": ".LIGHTING_rdata"
+},
+{
+"start": 2148624120,
+"stop": 2148624279,
+"len": 160,
+"group": "rdata",
+"name": ".MINITEXT_rdata"
+},
+{
+"start": 2148624280,
+"stop": 2148624295,
+"len": 16,
+"group": "rdata",
+"name": ".MISDAT_rdata"
+},
+{
+"start": 2148624296,
+"stop": 2148624847,
+"len": 552,
+"group": "rdata",
+"name": ".MSG_rdata"
+},
+{
+"start": 2148624848,
+"stop": 2148624863,
+"len": 16,
+"group": "rdata",
+"name": ".MULTI_rdata"
+},
+{
+"start": 2148624864,
+"stop": 2148625103,
+"len": 240,
+"group": "rdata",
+"name": ".OBJDAT_rdata"
+},
+{
+"start": 2148625104,
+"stop": 2148628283,
+"len": 3180,
+"group": "rdata",
+"name": ".OBJECTS_rdata"
+},
+{
+"start": 2148628284,
+"stop": 2148628299,
+"len": 16,
+"group": "rdata",
+"name": ".PFILE_rdata"
+},
+{
+"start": 2148628300,
+"stop": 2148628703,
+"len": 404,
+"group": "rdata",
+"name": ".PLAYER_rdata"
+},
+{
+"start": 2148628704,
+"stop": 2148628739,
+"len": 36,
+"group": "rdata",
+"name": ".QUESTS_rdata"
+},
+{
+"start": 2148628740,
+"stop": 2148628775,
+"len": 36,
+"group": "rdata",
+"name": ".SCROLLRT_rdata"
+},
+{
+"start": 2148628776,
+"stop": 2148628791,
+"len": 16,
+"group": "rdata",
+"name": ".SPELLDAT_rdata"
+},
+{
+"start": 2148628792,
+"stop": 2148629519,
+"len": 728,
+"group": "rdata",
+"name": ".STORES_rdata"
+},
+{
+"start": 2148629520,
+"stop": 2148632763,
+"len": 3244,
+"group": "rdata",
+"name": ".TEXTDAT_rdata"
+},
+{
+"start": 2148632764,
+"stop": 2148632891,
+"len": 128,
+"group": "rdata",
+"name": ".TOWN_rdata"
+},
+{
+"start": 2148632892,
+"stop": 2148633023,
+"len": 132,
+"group": "rdata",
+"name": ".TRIGS_rdata"
+},
+{
+"start": 2148633024,
+"stop": 2148633083,
+"len": 60,
+"group": "rdata",
+"name": ".SPELLS_rdata"
+},
+{
+"start": 2148633084,
+"stop": 2148633119,
+"len": 36,
+"group": "rdata",
+"name": ".SOUND_rdata"
+},
+{
+"start": 2148633120,
+"stop": 2148633367,
+"len": 248,
+"group": "rdata",
+"name": ".GAMEPAD_rdata"
+},
+{
+"start": 2148633368,
+"stop": 2148633647,
+"len": 280,
+"group": "rdata",
+"name": ".GWIN_rdata"
+},
+{
+"start": 2148633648,
+"stop": 2148633751,
+"len": 104,
+"group": "rdata",
+"name": ".LANG_rdata"
+},
+{
+"start": 2148633752,
+"stop": 2148633959,
+"len": 208,
+"group": "rdata",
+"name": ".MISPRINT_rdata"
+},
+{
+"start": 2148633960,
+"stop": 2148633995,
+"len": 36,
+"group": "rdata",
+"name": ".MLIST_rdata"
+},
+{
+"start": 2148633996,
+"stop": 2148634031,
+"len": 36,
+"group": "rdata",
+"name": ".OBJPRINT_rdata"
+},
+{
+"start": 2148634032,
+"stop": 2148634047,
+"len": 16,
+"group": "rdata",
+"name": ".PALETTE_rdata"
+},
+{
+"start": 2148634048,
+"stop": 2148634063,
+"len": 16,
+"group": "rdata",
+"name": ".COREMON_rdata"
+},
+{
+"start": 2148634064,
+"stop": 2148634147,
+"len": 84,
+"group": "rdata",
+"name": ".COREAUTO_rdata"
+},
+{
+"start": 2148634148,
+"stop": 2148634163,
+"len": 16,
+"group": "rdata",
+"name": ".PORTAL_rdata"
+},
+{
+"start": 2148634164,
+"stop": 2148634219,
+"len": 56,
+"group": "rdata",
+"name": ".COMPMAP_rdata"
+},
+{
+"start": 2148634220,
+"stop": 2148634255,
+"len": 36,
+"group": "rdata",
+"name": ".GAMEOVER_rdata"
+},
+{
+"start": 2148634256,
+"stop": 2148635791,
+"len": 1536,
+"group": "rdata",
+"name": ".VERSION_rdata"
+},
+{
+"start": 2148635792,
+"stop": 2148635827,
+"len": 36,
+"group": "rdata",
+"name": ".COREINV_rdata"
+},
+{
+"start": 2148635828,
+"stop": 2148635863,
+"len": 36,
+"group": "rdata",
+"name": ".GAMEMENU_rdata"
+},
+{
+"start": 2148635864,
+"stop": 2148635899,
+"len": 36,
+"group": "rdata",
+"name": ".DPIECE_rdata"
+},
+{
+"start": 2148635900,
+"stop": 2148635967,
+"len": 68,
+"group": "rdata",
+"name": ".LOADSAVE_rdata"
+},
+{
+"start": 2148635968,
+"stop": 2148636371,
+"len": 404,
+"group": "rdata",
+"name": ".SETMAPS_rdata"
+},
+{
+"start": 2148636372,
+"stop": 2148636587,
+"len": 216,
+"group": "rdata",
+"name": ".CHOOSEM_rdata"
+},
+{
+"start": 2148636588,
+"stop": 2148637071,
+"len": 484,
+"group": "rdata",
+"name": ".PREOBJ_rdata"
+},
+{
+"start": 2148637072,
+"stop": 2148637235,
+"len": 164,
+"group": "rdata",
+"name": ".GENDUNG_rdata"
+},
+{
+"start": 2148637236,
+"stop": 2148637447,
+"len": 212,
+"group": "rdata",
+"name": ".THEMES_rdata"
+},
+{
+"start": 2148637448,
+"stop": 2148637463,
+"len": 16,
+"group": "rdata",
+"name": ".PREPORT_rdata"
+},
+{
+"start": 2148637464,
+"stop": 2148637603,
+"len": 140,
+"group": "rdata",
+"name": ".PREQUEST_rdata"
+},
+{
+"start": 2148637604,
+"stop": 2148637639,
+"len": 36,
+"group": "rdata",
+"name": ".PREINV_rdata"
+},
+{
+"start": 2148637640,
+"stop": 2148637695,
+"len": 56,
+"group": "rdata",
+"name": ".PREAUTO_rdata"
+},
+{
+"start": 2148637696,
+"stop": 2148637983,
+"len": 288,
+"group": "rdata",
+"name": ".PREMON_rdata"
+},
+{
+"start": 2148637984,
+"stop": 2148638019,
+"len": 36,
+"group": "rdata",
+"name": ".PREMISS_rdata"
+},
+{
+"start": 2148638020,
+"stop": 2148638055,
+"len": 36,
+"group": "rdata",
+"name": ".PRETRIGS_rdata"
+},
+{
+"start": 2148638056,
+"stop": 2148638091,
+"len": 36,
+"group": "rdata",
+"name": ".PRESTORE_rdata"
+},
+{
+"start": 2148638092,
+"stop": 2148638107,
+"len": 16,
+"group": "rdata",
+"name": ".PREMSG_rdata"
+},
+{
+"start": 2148638108,
+"stop": 2148638143,
+"len": 36,
+"group": "rdata",
+"name": ".PREITEM_rdata"
+},
+{
+"start": 2148638144,
+"stop": 2148639415,
+"len": 1272,
+"group": "rdata",
+"name": ".MISSILES_rdata"
+},
+{
+"start": 2148639416,
+"stop": 2148639655,
+"len": 240,
+"group": "rdata",
+"name": ".MONSTER_rdata"
+},
+{
+"start": 2148639656,
+"stop": 2148639671,
+"len": 16,
+"group": "rdata",
+"name": ".MONSTDAT_rdata"
+},
+{
+"start": 2148639672,
+"stop": 2148640567,
+"len": 896,
+"group": "rdata",
+"name": ".INV_rdata"
+},
+{
+"start": 2148640568,
+"stop": 2148640639,
+"len": 72,
+"group": "rdata",
+"name": ".AUTOMAP_rdata"
+},
+{
+"start": 2148640640,
+"stop": 2148648451,
+"len": 7812,
+"group": "sdata",
+"name": ".sdata"
+},
+{
+"start": 2148648452,
+"stop": 2148649695,
+"len": 1244,
+"group": "sbss",
+"name": ".sbss"
+},
+{
+"start": 2148649696,
+"stop": 2148768755,
+"len": 119060,
+"group": "bss",
+"name": ".bss"
+},
+{
+"start": 2148768760,
+"stop": 2148768763,
+"len": 4,
+"group": "frontend_text",
+"name": "$frontend_text"
+},
+{
+"start": 2148768764,
+"stop": 2148768803,
+"len": 40,
+"group": "frontend_text",
+"name": ".PRESONLY_text"
+},
+{
+"start": 2148768804,
+"stop": 2148780879,
+"len": 12076,
+"group": "frontend_text",
+"name": ".FE_text"
+},
+{
+"start": 2148780880,
+"stop": 2148786519,
+"len": 5640,
+"group": "frontend_text",
+"name": ".CREDITS_text"
+},
+{
+"start": 2148786520,
+"stop": 2148808167,
+"len": 21648,
+"group": "frontend_text",
+"name": ".MEMCARD_text"
+},
+{
+"start": 2148808168,
+"stop": 2148907351,
+"len": 99184,
+"group": "frontend_text",
+"name": ".DLG_text"
+},
+{
+"start": 2148907352,
+"stop": 2148912683,
+"len": 5332,
+"group": "frontend_text",
+"name": ".LOADSAVE_text"
+},
+{
+"start": 2148768760,
+"stop": 2148768763,
+"len": 4,
+"group": "pregame_text",
+"name": "$pregame_text"
+},
+{
+"start": 2148768764,
+"stop": 2148768803,
+"len": 40,
+"group": "pregame_text",
+"name": ".PREGAME_text"
+},
+{
+"start": 2148768804,
+"stop": 2148798195,
+"len": 29392,
+"group": "pregame_text",
+"name": ".DRLG_L1_text"
+},
+{
+"start": 2148798196,
+"stop": 2148828835,
+"len": 30640,
+"group": "pregame_text",
+"name": ".DRLG_L2_text"
+},
+{
+"start": 2148828836,
+"stop": 2148849655,
+"len": 20820,
+"group": "pregame_text",
+"name": ".DRLG_L3_text"
+},
+{
+"start": 2148849656,
+"stop": 2148881111,
+"len": 31456,
+"group": "pregame_text",
+"name": ".DRLG_L4_text"
+},
+{
+"start": 2148881112,
+"stop": 2148882947,
+"len": 1836,
+"group": "pregame_text",
+"name": ".SETMAPS_text"
+},
+{
+"start": 2148882948,
+"stop": 2148884439,
+"len": 1492,
+"group": "pregame_text",
+"name": ".CHOOSEM_text"
+},
+{
+"start": 2148884440,
+"stop": 2148900571,
+"len": 16132,
+"group": "pregame_text",
+"name": ".PREOBJ_text"
+},
+{
+"start": 2148900572,
+"stop": 2148908043,
+"len": 7472,
+"group": "pregame_text",
+"name": ".GENDUNG_text"
+},
+{
+"start": 2148908044,
+"stop": 2148919163,
+"len": 11120,
+"group": "pregame_text",
+"name": ".THEMES_text"
+},
+{
+"start": 2148919164,
+"stop": 2148919259,
+"len": 96,
+"group": "pregame_text",
+"name": ".PREPORT_text"
+},
+{
+"start": 2148919260,
+"stop": 2148922479,
+"len": 3220,
+"group": "pregame_text",
+"name": ".PREQUEST_text"
+},
+{
+"start": 2148922480,
+"stop": 2148922563,
+"len": 84,
+"group": "pregame_text",
+"name": ".PREINV_text"
+},
+{
+"start": 2148922564,
+"stop": 2148923111,
+"len": 548,
+"group": "pregame_text",
+"name": ".PREAUTO_text"
+},
+{
+"start": 2148923112,
+"stop": 2148933595,
+"len": 10484,
+"group": "pregame_text",
+"name": ".PREMON_text"
+},
+{
+"start": 2148933596,
+"stop": 2148934059,
+"len": 464,
+"group": "pregame_text",
+"name": ".PREMISS_text"
+},
+{
+"start": 2148934060,
+"stop": 2148936923,
+"len": 2864,
+"group": "pregame_text",
+"name": ".PRETRIGS_text"
+},
+{
+"start": 2148936924,
+"stop": 2148937683,
+"len": 760,
+"group": "pregame_text",
+"name": ".PRESTORE_text"
+},
+{
+"start": 2148937684,
+"stop": 2148940227,
+"len": 2544,
+"group": "pregame_text",
+"name": ".PREMSG_text"
+},
+{
+"start": 2148768760,
+"stop": 2148768763,
+"len": 4,
+"group": "game_text",
+"name": "$game_text"
+},
+{
+"start": 2148768764,
+"stop": 2148768771,
+"len": 8,
+"group": "game_text",
+"name": ".GAMEONLY_text"
+},
+{
+"start": 2148768772,
+"stop": 2148838259,
+"len": 69488,
+"group": "game_text",
+"name": ".MISSILES_text"
+},
+{
+"start": 2148838260,
+"stop": 2148889203,
+"len": 50944,
+"group": "game_text",
+"name": ".MONSTER_text"
+},
+{
+"start": 2148889204,
+"stop": 2148933463,
+"len": 44260,
+"group": "game_text",
+"name": ".INV_text"
+},
+{
+"start": 2148933464,
+"stop": 2148941343,
+"len": 7880,
+"group": "game_text",
+"name": ".AUTOMAP_text"
+},
+{
+"start": 2148768760,
+"stop": 2148768763,
+"len": 4,
+"group": "fmv_text",
+"name": "$fmv_text"
+},
+{
+"start": 2148768764,
+"stop": 2148768939,
+"len": 176,
+"group": "fmv_text",
+"name": "libpress.rdata"
+},
+{
+"start": 2148768940,
+"stop": 2148772923,
+"len": 3984,
+"group": "fmv_text",
+"name": "libpress.data"
+},
+{
+"start": 2148772924,
+"stop": 2148775899,
+"len": 2976,
+"group": "fmv_text",
+"name": "libpress.text"
+},
+{
+"start": 2148775900,
+"stop": 2148894823,
+"len": 118924,
+"group": "fmv_text",
+"name": ".FMV_text"
+},
+{
+"start": 2148941344,
+"stop": 2148941347,
+"len": 4,
+"group": "last",
+"name": ".last"
+}
+]

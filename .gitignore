@@ -1,0 +1,9 @@
+build/
+rom/DIABPSX.BIN
+rom/*.bin
+rom/*.BIN
+*.o
+*.i
+__pycache__/
+scratch/
+tools/maspsx/__pycache__/
