@@ -38,7 +38,7 @@ AS_ARCH = ["-EL", "-march=r3000", "-mtune=r3000"]
 CPP_FLAGS = ["-nostdinc", "-undef", "-D__GNUC__=2", "-D__OPTIMIZE__",
              "-Dmips", "-D__mips__", "-D__psx__", f"-I{INCLUDE}", f"-I{RECON}"]
 CC1_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}"]
-CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}"]
+CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline"]   # retail never inlines in-class methods (out-of-line copies per TU, callers jal them)
 
 # per-TU flag overrides: {repo-relative posix path: {"g_value": "0", "lane": "c"...}}
 PER_TU_FLAGS = {}
@@ -109,7 +109,9 @@ def compile_cpp(src: Path, skip_asm: bool = False) -> Path:
     if r.returncode:
         sys.exit(f"[cc1plus] {rel}\n{r.stdout}{r.stderr}")
     # cfront dtor label: our cc1plus emits `_._Class`; SN's convention is `___Class`
-    s_file.write_text(s_file.read_text().replace("_._", "___"))
+    txt = s_file.read_text().replace("_._", "___")
+    txt = txt.replace("_GLOBAL_.I.", "_GLOBAL__I_").replace("_GLOBAL_.D.", "_GLOBAL__D_")   # static ctor/dtor thunks, C-identifier spelling used by configs/symbol_addrs.txt
+    s_file.write_text(txt)
     _maspsx_assemble(s_file, obj, g, rel)
     return obj
 

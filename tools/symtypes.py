@@ -55,6 +55,8 @@ def struct(name):
         if inside:
             if r["cls"] in ("MOS", "MOU"):
                 out.append(f"    {ctype(r)};   /* +0x{r['val']:X} size {r['size']} */")
+            elif r["cls"] == "FIELD":       # bitfield: val = BIT offset, size = BIT width
+                out.append(f"    {ctype(r)} : {r['size']};   /* bit {r['val']} */")
             elif r["cls"] == "EOS":
                 out.append(f"}};   /* sizeof {r['val']} */"); break
     return "\n".join(out) if out else f"/* {name}: not found */"

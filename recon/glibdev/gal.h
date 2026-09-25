@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 unsigned char GAL_Free(long Handle);              /* @0x80021860 returns UCHAR */
+unsigned char GAL_SetMemName(long Hnd, char *Text);   /* @0x80022270 */
 #ifdef __cplusplus
 }
 #endif

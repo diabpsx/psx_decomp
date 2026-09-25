@@ -1,20 +1,119 @@
 #ifndef PSXSRC_GMAN_H
 #define PSXSRC_GMAN_H
-/* Reconstructed from DIABPSX.SYM (tools/symtypes.py struct TextDat).  Sizes/offsets are SYM truth. */
+/* GMAN.H — Climax PSX texture/sprite manager.  Layouts are SYM truth (tools/symtypes.py);
+ * the in-class method bodies are the ones the SYM attributes to GMAN.H lines (each including
+ * TU emits its own out-of-line copy, e.g. GetFr__7TextDati x12). */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
 #include "glibdev/gal.h"
 #include "glibdev/gdebug.h"
+#include "glibdev/gutils.h"
+#include "psxsrc/fileio.h"
+#include "psxsrc/sysinit.h"
+#include "psxsrc/biglump.h"
+#include "psxsrc/decomp.h"
+#include "cstring.h"
 
-void GPUQ_DiscardHandle(long hnd);
-BOOL TpLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk);
-extern int TpW, TpH, TpXDest, TpYDest;
+struct FRAME_HDR {                    /* sizeof 12 (bitfields) */
+    unsigned int FrOffset  : 32;
+    int          X         : 8;
+    int          Y         : 8;
+    unsigned int PalNum    : 8;
+    unsigned int NotTrans  : 1;
+    unsigned int Rotated   : 1;
+    unsigned int InVRAM    : 1;
+    unsigned int CompType  : 2;
+    unsigned int Floor     : 1;
+    unsigned int Cycle     : 1;
+    unsigned int pad       : 1;
+    unsigned int W         : 9;
+    unsigned int H         : 9;
+    unsigned int PentaGram : 1;
+    unsigned int pad2      : 13;
+};
 
-struct FRAME_HDR;      /* size 12 */
-struct SPR_HDR;        /* size 40 */
-struct CTextFileInfo;  /* size 4 */
+struct SPR_HDR {                      /* sizeof 40 (bitfields) */
+    unsigned int DecompOffset    : 32;
+    unsigned int CreatureOffset  : 32;
+    unsigned int PalOffset       : 32;
+    unsigned int FrameOffset     : 32;
+    unsigned int BaseFrame       : 32;
+    unsigned int DestTPage       : 32;
+    unsigned int ComponentOffset : 32;
+    unsigned int NumOfCreatures  : 32;
+    unsigned int NumOfFrames     : 16;
+    unsigned int NumOfPals       : 16;
+    unsigned int TWidth          : 8;
+    unsigned int THeight         : 8;
+    unsigned int IsTiles         : 8;
+    unsigned int Spare           : 8;
+};
 
-struct TextDat {       /* sizeof 112 */
+struct PAL {                          /* sizeof 8 */
+    unsigned int   InVram    : 1;
+    unsigned int   NumOfCols : 31;
+    unsigned short Cols[1];
+};
+
+struct TextDat;
+
+struct CPart {                        /* sizeof 8 */
+    unsigned long Piece;
+    short         X;
+    short         Y;
+};
+
+struct CBlock {                       /* sizeof 12 */
+    unsigned long NumOfParts;
+    CPart         Parts[1];
+
+    int GetSize() const { return sizeof(NumOfParts) + NumOfParts * sizeof(CPart); }   /* GMAN.H:67 */
+    void GetBoundingBox(TextDat &TDat, RECT &R);
+};
+
+struct CBlockHdr {                    /* sizeof 16 */
+    unsigned long NumOfBlocks;
+    CBlock        Blocks[1];
+
+    long MakeOffsetTab() const;
+};
+
+struct CCreatureAction {              /* sizeof 14 */
+    unsigned short BaseFrame;
+    unsigned char  NumOfFrames;
+    unsigned char  NumOfPhysFrames;
+    unsigned char  DirRemap[8];
+    unsigned char  AnimRemap[1];
+
+    int GetSize() const;
+    int GetFrNum(int Direction, int Frame) const;
+    void InitDirRemap();
+};
+
+struct CCreatureHdr {                 /* sizeof 20 */
+    long            NumOfActions;
+    CCreatureAction Cr;
+
+    int GetSize() const;
+    int GetFrNum(int Action, int Direction, int Frame) const;
+    CCreatureAction *GetAction(int ActNum) const;
+    void InitActionDirRemaps();
+};
+
+struct CTextFileInfo {                /* sizeof 4 */
+    char *FileName;
+
+    char *GetName() const { return FileName; }                          /* GMAN.H:173 */
+    BOOL  HasTp() const   { return HasFile(".tp"); }                    /* GMAN.H:160 */
+    BOOL  HasDat() const  { return HasFile(".dat"); }                   /* GMAN.H:161 */
+    long  LoadHdr() const { return GetFile(".hdr", 0x8001); }           /* GMAN.H:167 */
+    BOOL  HasFile(char *Ext) const;
+    long  GetFile(char *Ext, unsigned long RamId) const;
+    long  LoadDat() const;
+    void  MakeFname(char *Dst, const char *Ext) const;
+};
+
+struct TextDat {                      /* sizeof 112 */
     BOOL           OwnDat;           /* +0x00 */
     int            TexNum;           /* +0x04 */
     int            LastFrame;        /* +0x08 */
@@ -50,6 +149,60 @@ struct TextDat {       /* sizeof 112 */
     void DumpData();
     void DumpHdr();
     void DumpDatFile();
+    void ReloadTP();
+    void StreamLoadTP();
+    void FinishedUsing();
+    void MakeBlockOffsetTab();
+    BOOL IsCompressed(int Creature, int Action, int Dir, int Frame);
+    int  GetFrNum(int Creature, int Action, int Direction, int Frame);
+    BOOL IsDirAliased(int Creature, int Action, int Direction);
+    void DoDecompRequests();
+
+    /* GMAN.H in-class methods (line numbers per SYM) */
+    FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }                        /* 229 */
+    PAL *GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }         /* 232 */
+    int GetNumOfFrames() { return Hdr->NumOfFrames; }                                              /* 233 */
+    void SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum) { FileInfo = (CTextFileInfo *)NewInfo; TexNum = NewTexNum; }  /* 240 */
+    int GetNumOfCreatures() { return Hdr->NumOfCreatures; }                                        /* 251 */
+    int GetTexNum() const { return TexNum; }                                                       /* 256 */
+    BOOL IsLoaded() const { return LoadCount != 0; }                                               /* 257 */
+    BOOL CanXferPal() const { return PalX >= 0 && PalY >= 0; }                                     /* 258 */
+    BOOL CanXferFrame() const { return DecX >= 0 && DecY >= 0; }                                   /* 259 */
+    unsigned char *GetCreature(int Creature) { return CreatureAnims + CreatureOffset[Creature]; }  /* 284 */
+
+    static CTextFileInfo *GetFileInfo(int Id);
 };
+
+struct CScreen : public TextDat {     /* sizeof 124 */
+    int LoadedId;                    /* +0x70 */
+    int TpX;                         /* +0x74 */
+    int TpY;                         /* +0x78 */
+
+    CScreen();
+    void Load(int Id, int x, int y);
+    void Display(int a, int b, int c, int d);
+    void Unload();
+};
+
+/* GMAN.CPP globals */
+extern TextDat *AllDats[372];        /* @0x800B9454 (.GMAN_data) */
+extern TextDat  DatPool[20];         /* @0x800B8B94 */
+extern int TpW, TpH, TpXDest, TpYDest;   /* .sdata */
+extern CTextFileInfo *TX_DatTab[];
+
+void GPUQ_DiscardHandle(long hnd);
+BOOL TpLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk);
+void GM_ForceTpLoad(int Id);
+void GM_FinishedUsing(TextDat *tex);
+void GM_UseTexData(int Id);
+
+/* GMAN.H:290-296 — defined in the header (out-of-line copy per TU under -fno-inline) */
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        if (!GAL_Free(hndDat)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
 
 #endif

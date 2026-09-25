@@ -73,6 +73,12 @@ for _ln in dis.splitlines():
         _addr2label.setdefault(_m.group(1), _m.group(2))
 def _resolve(fn):
     a = _name2addr.get(fn)
+    if a is None:
+        # header-defined methods are compiled once per including TU; configs/symbol_addrs.txt suffixes
+        # the 2nd+ copies `NAME_<va>` while our object naturally emits the plain NAME -- fall back to it.
+        m = re.match(r'^(.*)_[0-9a-f]{8}$', fn)
+        if m and m.group(1) in _name2addr:
+            a = _name2addr[m.group(1)]
     return _addr2label.get(a, fn) if a else fn
 
 def _compiler_debug_label(name):
