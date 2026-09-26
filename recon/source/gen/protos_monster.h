@@ -129,3 +129,6 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
 void AddDead(int dx, int dy, char dv, int ddir);   /* @0x80037F8C DEAD.CPP:99 */
 void M_UpdateLeader(int i);   /* @0x8007FFD4 COREMON.CPP:559 */
 unsigned char effect_is_playing(int nSFX);   /* @0x8003CF34 EFFECTS.CPP:83 */
+void M_CheckEFlag(int i);   /* @0x8007F354 COREMON.CPP:110 */
+void M_Enemy(int i);   /* @0x8007F5B8 COREMON.CPP:225 */
+void M_ClearSquares(int i);   /* @0x8007F35C COREMON.CPP:139 */

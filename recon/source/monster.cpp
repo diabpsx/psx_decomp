@@ -37,6 +37,7 @@
 #define MM_RATTACK 10
 #define MM_GOTHIT  5
 #define MM_STONE   15
+#define MM_MISSILE 14
 #define MM_WALK    1
 #define MM_WALK2   2
 #define MM_WALK3   3
@@ -51,6 +52,7 @@
 #define MG_WALK_AROUND1 4
 #define MG_TALK         6
 #define MG_WAITTOTALK   7
+#define MG_ATTACK2      5
 #define MM_TALK    0x11
 #define TXT_WARLRD1 0x6E
 #define USFX_WARLRD1 0x358
@@ -69,6 +71,7 @@
 #define MT_INCIN    0x48
 #define MT_NMAGMA   0x3C
 #define MT_STORM    0x4C
+#define MT_UNSEEN   0x1F
 #define MT_HELLBURN 0x4B
 
 #define PC_WARRIOR  0
@@ -309,6 +312,13 @@ int M_DoStand(int i)
 #define MIT_DIABAPOCA    0x43
 #define MIT_FLAMEC       0x31
 #define MIT_CBOLT        0x34
+#define MIT_FIREMAN      0x32
+#define MIT_KRULL        0x33
+#define MIT_FIREBOLT     1
+#define MIT_LIGHTCTRL    7
+#define MIT_FIREBALL     6
+#define MIT_FLASH        0xB
+#define MIT_FLASH2       0xC
 
 void MAI_GoatMc(int i)
 {
@@ -1521,5 +1531,270 @@ void MAI_Warlord(int i)
         monster[i]._mdir = md;
         if (Monst->_mmode == MM_STAND || Monst->_mmode == MM_TALK)
             Monst->Action = MA_STAND;
+    }
+}
+
+void MAI_RoundRanged(int i, int missile_type, unsigned char checkdoors, int dam, unsigned char lessmissiles)
+{
+    int fx, fy, mx, my, md, v, pnum;
+    int dist;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        pnum = Monst->_menemy;
+        fx = Monst->_menemyx;
+        fy = Monst->_menemyy;
+        mx = Monst->_mx - fx;
+        my = Monst->_my - fy;
+        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+
+        if (checkdoors && Monst->_msquelch < 255)
+            MonstCheckDoors(i);
+
+        v = ENG_random(10000);
+        if (abs(mx) < 2 && abs(my) < 2
+            || Monst->_msquelch != 255
+            || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+            Monst->_mgoal = MG_ATTACK;
+        } else if (Monst->_mgoal == MG_WALK_AROUND1
+            || (!(abs(mx) < 3 && abs(my) < 3) && !ENG_random(4 << lessmissiles))) {
+            if (Monst->_mgoal != MG_WALK_AROUND1) {
+                Monst->_mgoalvar1 = 0;
+                Monst->_mgoalvar2 = ENG_random(2);
+            }
+
+            Monst->_mgoal = MG_WALK_AROUND1;
+
+            dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
+
+            if (Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md)) {
+                Monst->_mgoal = MG_ATTACK;
+            } else if (v < (500 + 500 * Monst->_mint) >> lessmissiles
+                && LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+                M_StartRSpAttack(i, missile_type, dam);
+            } else
+                M_RoundWalk(i, md, Monst->_mgoalvar2);
+        }
+        if (Monst->_mgoal == MG_ATTACK) {
+            if (((!(abs(mx) < 3 && abs(my) < 3) && v < (1000 + 500 * Monst->_mint) >> lessmissiles)
+                || v < (500 + 500 * Monst->_mint) >> lessmissiles)
+                && LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+                M_StartRSpAttack(i, missile_type, dam);
+            } else if (abs(mx) < 2 && abs(my) < 2) {
+                if (v < 6000 + 1000 * Monst->_mint) {
+                    Monst->_mdir = md;
+                    M_StartAttack(i);
+                }
+            } else if ((v = ENG_random(100)) < (5000 + 1000 * Monst->_mint)
+                || ((Monst->_mVar1 == MM_WALK || Monst->_mVar1 == MM_WALK2 || Monst->_mVar1 == MM_WALK3)
+                    && Monst->_mVar2 == 0 && v < (8000 + 1000 * Monst->_mint))) {
+                M_CallWalk(i, md);
+            }
+        }
+
+        if (Monst->_mmode == MM_STAND)
+            M_StartDelay(i, ENG_random(10) + 5);
+    }
+}
+
+/* OPEN: bytes near-miss (129 diffs, 254 vs 247 insns) -- logic transcribed from hellfire with 2
+ * confirmed PSX simplifications read off the raw oracle: (1) the `dLight[mx][my]!=lightmax`
+ * visibility guard at the top is ABSENT entirely (PSX runs the whole AI unconditionally once
+ * mmode==MM_STAND); (2) the MG_RUN_AWAY check drops hellfire's `&& !(_mFlags&MFLAG_NOENEMY)`
+ * term.  Residual is mostly register-letter noise (s4 vs s5 for `i8) -- declaration-order swap
+ * (dist before/after Monst) made no difference. */
+void MAI_Sneak(int i)
+{
+    int mx, my, md, v;
+    int dist;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND) {
+        mx = Monst->_mx - Monst->_menemyx;
+        my = Monst->_my - Monst->_menemyy;
+        md = M_GetDir(i);
+
+        dist = 5 - Monst->_mint;
+
+        if (Monst->_mVar1 == MM_GOTHIT) {
+            Monst->_mgoal = MG_RUN_AWAY;
+            Monst->_mgoalvar1 = 0;
+        } else if (!(abs(mx) < dist + 3 && abs(my) < dist + 3) || Monst->_mgoalvar1 > 8) {
+            Monst->_mgoal = MG_ATTACK;
+            Monst->_mgoalvar1 = 0;
+        }
+
+        if (Monst->_mgoal == MG_RUN_AWAY) {
+            if (Monst->_mFlags & MFLAG_TARGETS_MONSTER) {
+                md = GetDirection(Monst->_mx, Monst->_my,
+                    monster[Monst->_menemy]._mx, monster[Monst->_menemy]._my);
+            } else {
+                md = GetDirection(Monst->_mx, Monst->_my,
+                    plr[Monst->_menemy]._pownerx, plr[Monst->_menemy]._pownery);
+            }
+            md = (md + 4) & 7;
+            if (Monst->MType->mtype == MT_UNSEEN) {
+                if (ENG_random(2))
+                    md = (md - 1) & 7;
+                else
+                    md = (md + 1) & 7;
+            }
+        }
+
+        Monst->_mdir = md;
+
+        v = ENG_random(100);
+        if (abs(mx) < dist && (Monst->_mFlags & MFLAG_HIDDEN))
+            M_StartFadein(i, md, 0);
+        else if (!(abs(mx) < dist + 1 && abs(my) < dist + 1) && !(Monst->_mFlags & MFLAG_HIDDEN))
+            M_StartFadeout(i, md, 1);
+        else if (Monst->_mgoal == MG_RUN_AWAY
+            || (abs(mx) < 2 && abs(my) < 2
+                && ((Monst->_mVar2 > 20 && v < (14 + 4 * Monst->_mint))
+                    || ((Monst->_mVar1 == MM_WALK || Monst->_mVar1 == MM_WALK2 || Monst->_mVar1 == MM_WALK3)
+                        && Monst->_mVar2 == 0 && v < (64 + 4 * Monst->_mint))))) {
+            Monst->_mgoalvar1++;
+            M_CallWalk(i, md);
+        }
+        if (Monst->_mmode == MM_STAND) {
+            if (abs(mx) < 2 && abs(my) < 2 && v < (10 + 4 * Monst->_mint)) {
+                M_StartAttack(i);
+            } else {
+                Monst->Action = MA_STAND;
+            }
+        }
+    }
+}
+
+void MAI_Fireman(int i)
+{
+    int mx, my, md, v, pnum;
+    int fx, fy;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        pnum = Monst->_menemy;
+        fx = Monst->_menemyx;
+        fy = Monst->_menemyy;
+        mx = Monst->_mx - fx;
+        my = Monst->_my - fy;
+        md = M_GetDir(i);
+
+        if (Monst->_mgoal == MG_ATTACK) {
+            if (LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+                if (AddMissile(Monst->_mx, Monst->_my, fx, fy, md, MIT_FIREMAN, pnum, i, 0, 0) != -1) {
+                    Monst->_mmode = MM_MISSILE;
+                    Monst->_mgoal = MG_ATTACK2;
+                    Monst->_mgoalvar1 = 0;
+                }
+            }
+        } else if (Monst->_mgoal == MG_ATTACK2) {
+            if (Monst->_mgoalvar1 == 3) {
+                Monst->_mgoal = MG_ATTACK;
+                M_StartFadeout(i, md, 1);
+            } else if (LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+                M_StartRAttack(i, MIT_KRULL, 4);
+                Monst->_mgoalvar1++;
+            } else {
+                M_StartDelay(i, ENG_random(10) + 5);
+                Monst->_mgoalvar1++;
+            }
+        } else if (Monst->_mgoal == MG_RUN_AWAY) {
+            M_StartFadein(i, md, 0);
+            Monst->_mgoal = MG_ATTACK2;
+        }
+
+        Monst->_mdir = md;
+
+        v = ENG_random(100);
+
+        if (Monst->_mmode == MM_STAND) {
+            if (abs(mx) < 2 && abs(my) < 2 && Monst->_mgoal == MG_ATTACK) {
+                M_TryH2HHit(i, monster[i]._menemy, monster[i].mHit, monster[i].mMinDamage, monster[i].mMaxDamage);
+                Monst->_mgoal = MG_RUN_AWAY;
+                if (!M_CallWalk(i, (md + 4) & 7)) {
+                    M_StartFadein(i, md, 0);
+                    Monst->_mgoal = MG_ATTACK2;
+                }
+            } else {
+                if (!M_CallWalk(i, md)) {
+                    if (Monst->_mgoal == MG_ATTACK || Monst->_mgoal == MG_RUN_AWAY) {
+                        M_StartFadein(i, md, 0);
+                        Monst->_mgoal = MG_ATTACK2;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* OPEN: bytes near-miss (165 diffs, 298 vs 295 insns) -- logic transcribed from hellfire; the
+ * `D_8011C2C0[]` static rodata table (values {1,52,7,6} read directly from the ROM image at
+ * 0x8011C2C0) confirmed as `counsmiss[] = {MIT_FIREBOLT,MIT_CBOLT,MIT_LIGHTCTRL,MIT_FIREBALL}`.
+ * Residual is the base-pointer-cache lever not fully landing (oracle keeps &monster[i] in a saved
+ * reg the whole function, ours spills to stack in places) -- not chased further (time budget). */
+void MAI_Counselor(int i)
+{
+    int fx, fy, mx, my, md, v;
+    int dist;
+    MonsterStruct *Monst = &monster[i];
+    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        fx = Monst->_menemyx;
+        fy = Monst->_menemyy;
+        mx = Monst->_mx - fx;
+        my = Monst->_my - fy;
+        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+
+        if (Monst->_msquelch < 255)
+            MonstCheckDoors(i);
+
+        v = ENG_random(100);
+        if (Monst->_mgoal == MG_RUN_AWAY) {
+            if (Monst->_mgoalvar1++ > 3) {
+                Monst->_mgoal = MG_ATTACK;
+                M_StartFadein(i, md, 1);
+            } else
+                M_CallWalk(i, (md + 4) & 7);
+        } else if (Monst->_mgoal == MG_WALK_AROUND1) {
+            dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
+
+            if (abs(mx) < 2 && abs(my) < 2
+                || Monst->_msquelch != 255
+                || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+                Monst->_mgoal = MG_ATTACK;
+                M_StartFadein(i, md, 1);
+            } else if (Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md)) {
+                Monst->_mgoal = MG_ATTACK;
+                M_StartFadein(i, md, 1);
+            } else
+                M_RoundWalk(i, md, Monst->_mgoalvar2);
+        } else if (Monst->_mgoal == MG_ATTACK) {
+            if (abs(mx) < 2 && abs(my) < 2) {
+                Monst->_mdir = md;
+                if (Monst->_mhitpoints < (Monst->_mmaxhp >> 1)) {
+                    Monst->_mgoal = MG_RUN_AWAY;
+                    Monst->_mgoalvar1 = 0;
+                    M_StartFadeout(i, md, 0);
+                } else if (Monst->_mVar1 == MM_DELAY || ENG_random(100) < 20 + 2 * Monst->_mint) {
+                    M_StartRAttack(i, -1, 0);
+                    AddMissile(monster[i]._mx, monster[i]._my, 0, 0, monster[i]._mdir, MIT_FLASH, 1, i, 4, 0);
+                    AddMissile(monster[i]._mx, monster[i]._my, 0, 0, monster[i]._mdir, MIT_FLASH2, 1, i, 4, 0);
+                } else
+                    M_StartDelay(i, ENG_random(10) + 10 - 2 * Monst->_mint);
+            } else if (v < 50 + 5 * Monst->_mint
+                && LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+                M_StartRAttack(i, counsmiss[Monst->_mint], ENG_random(Monst->mMaxDamage - Monst->mMinDamage + 1) + Monst->mMinDamage);
+            } else if (ENG_random(100) < 30) {
+                Monst->_mgoal = MG_WALK_AROUND1;
+                Monst->_mgoalvar1 = 0;
+                M_StartFadeout(i, md, 0);
+            } else
+                M_StartDelay(i, ENG_random(10) + 10 - 2 * Monst->_mint);
+        }
+
+        if (Monst->_mmode == MM_STAND)
+            M_StartDelay(i, ENG_random(10) + 5);
     }
 }
