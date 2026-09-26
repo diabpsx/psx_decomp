@@ -1,6 +1,6 @@
 # Match progress (gate = tools/verify_asm.py)
 
-**Main image: 73 / 3504 functions byte-matched (2.1%)**
+**Main image: 73 / 3660 functions byte-matched (2.0%)**
 
 ## gman  (recon/psxsrc/gman.cpp) — 73/76 PASS
 - ✅ __7TextDat (13)
