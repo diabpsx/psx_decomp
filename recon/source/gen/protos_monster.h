@@ -126,3 +126,6 @@ void NetSendCmdLocParam1(unsigned char bHiPri, unsigned char bCmd, unsigned char
 void MonstCheckDoors(int m);   /* @0x8005704C OBJECTS.CPP:1783 */
 void ChangeLightXY(int i, int x, int y);   /* @0x8004D384 LIGHTING.CPP:1234 */
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl);   /* @0x80142A04 MISSILES.CPP:3451 */
+void AddDead(int dx, int dy, char dv, int ddir);   /* @0x80037F8C DEAD.CPP:99 */
+void M_UpdateLeader(int i);   /* @0x8007FFD4 COREMON.CPP:559 */
+unsigned char effect_is_playing(int nSFX);   /* @0x8003CF34 EFFECTS.CPP:83 */

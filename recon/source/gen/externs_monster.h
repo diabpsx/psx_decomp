@@ -27,3 +27,6 @@ extern unsigned char deltaload;   /* @0x8011B97D */
 extern struct LightListStruct2 LightList[80];   /* @0x800D6300 */
 extern int MWVel[24][3];   /* @0x801051F4 */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
+extern BOOL DiabloDieFlag;   /* @0x8011B25C */
+extern int ViewX;   /* @0x8011C114 */
+extern int ViewY;   /* @0x8011C118 */

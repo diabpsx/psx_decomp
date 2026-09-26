@@ -10,6 +10,7 @@
 
 /* monster types (_mMTidx / CMonster::mtype, retail values) */
 #define MT_GOLEM    109
+#define MT_DIABLO   110
 #define MT_COUNSLR  0x69
 #define MT_ADVOCATE 0x6C
 
@@ -17,9 +18,11 @@
 #define AI_GARG     12
 #define AI_LAZURUS  28
 #define AI_SNAKE    24
+#define AI_MEGA     26
 
 /* monster modes */
 #define MA_STAND   0
+#define Sign(x) ((x) < 0 ? -1 : (x) > 0 ? 1 : 0)
 #define MA_WALK    1
 #define MA_ATTACK  2
 #define MA_GOTHIT  3
@@ -44,8 +47,13 @@
 #define MGOAL_NORMAL    1
 #define CMD_MONSTDEATH 0x24
 #define MG_ATTACK       1
+#define MG_RUN_AWAY     2
 #define MG_WALK_AROUND1 4
 #define MG_TALK         6
+#define MG_WAITTOTALK   7
+#define MM_TALK    0x11
+#define TXT_WARLRD1 0x6E
+#define USFX_WARLRD1 0x358
 #define Q_BETRAYER      15
 #define CMD_KILLGOLEM  0x57
 #define MGOAL_INQUIRING 6
@@ -54,6 +62,7 @@
 #define MFLAG_HIDDEN          0x01
 #define MFLAG_LOCK_ANIMATION  0x02
 #define MFLAG_ALLOW_SPECIAL   0x04
+#define MFLAG_STILL           0x04
 #define MFLAG_NOHEAL          0x08
 #define MFLAG_TARGETS_MONSTER 0x10
 
@@ -1350,4 +1359,167 @@ int M_DoRAttack(int i)
         return 1;
     }
     return 0;
+}
+
+int M_DoRSpAttack(int i)
+{
+    if (monster[i]._mAnimFrame == monster[i].MData->mAFNum2 && !monster[i]._mAnimCnt) {
+        AddMissile(monster[i]._mx, monster[i]._my, monster[i]._menemyx, monster[i]._menemyy,
+            monster[i]._mdir, monster[i]._mVar1, 1, i, monster[i]._mVar3, 0);
+        PlayEffect(i, 3);
+    }
+
+    if (monster[i]._mAi == AI_MEGA && monster[i]._mAnimFrame == 3) {
+        if (!monster[i]._mVar2++)
+            monster[i]._mFlags |= MFLAG_STILL;
+        else if (monster[i]._mVar2 == 15)
+            monster[i]._mFlags &= ~MFLAG_STILL;
+    }
+
+    if (monster[i]._mAnimFrame == monster[i]._mAnimLen) {
+        M_StartStand(i, monster[i]._mdir);
+        return 1;
+    }
+    return 0;
+}
+
+/* SYM OPEN: bytes PASS; retail's block tree has 2 nested levels (the DIABLO if-branch + a further
+ * nested level inside it) that ours doesn't emit -- same family as M_SyncStartKill's block anomaly
+ * (braced blocks with no declarations still get SYM levels in retail). Not resolved (time budget). */
+int M_DoDeath(int i)
+{
+    MonsterStruct *pMonster = &monster[i];
+    int _mx = pMonster->_mx;
+    int _my = pMonster->_my;
+
+    monster[i]._mVar1++;
+    if (monster[i].MType->mtype == MT_DIABLO) {
+        DiabloDieFlag = 1;
+        ViewX += Sign(_mx - ViewX);
+        ViewY += Sign(_my - ViewY);
+        if (monster[i]._mVar1 == 140) {
+            gbMaxPlayers = 1;
+            PrepDoEnding(monster[i]._mVar8);
+        }
+    } else {
+        if (monster[i]._mAnimFrame == monster[i]._mAnimLen) {
+            if (monster[i].MType->mtype != MT_GOLEM)
+                AddDead(_mx, _my, monster[i].MType->mdeadval, monster[i]._mdir);
+            dung_map[_mx][_my].dMonster = 0;
+            monster[i]._mDelFlag = 1;
+            M_UpdateLeader(i);
+        }
+    }
+    return 0;
+}
+
+/* OPEN: bytes near-miss (40 diffs, 131 vs 133 insns) -- logic transcribed directly from hellfire
+ * (nested a/b search loop, InBounds unrolled to explicit 0<=y<98 etc bound checks matching the
+ * DirOK/M_GetKnockback precedent).  Residual is register-init ORDER for the s3/s4/s6/s7 saved regs
+ * (which zero-init happens first) -- not yet resolved (time budget). */
+void M_Teleport(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    unsigned char done = 0;
+    int mulx, muly;
+    int x, y;
+    int a, b;
+    int px, py;
+
+    if (Monst->_mmode == MM_STONE)
+        return;
+
+    px = Monst->_menemyx;
+    py = Monst->_menemyy;
+
+    mulx = ENG_random(2) * 2 - 1;
+    muly = ENG_random(2) * 2 - 1;
+    for (a = -1; a <= 1 && !done; a++)
+        for (b = -1; b < 1 && !done; b++)
+            if (a || b) {
+                x = px + a * mulx;
+                y = py + b * muly;
+                if (y >= 0 && y < 98 && x >= 0 && x < 98
+                    && x != Monst->_mx && y != Monst->_my)
+                    if (PosOkMonst(i, x, y))
+                        done = 1;
+            }
+    if (done) {
+        M_ClearSquares(i);
+        dung_map[Monst->_mx][Monst->_my].dMonster = 0;
+        dung_map[x][y].dMonster = i + 1;
+        Monst->_moldx = x;
+        Monst->_moldy = y;
+        Monst->_mdir = M_GetDir(i);
+        M_CheckEFlag(i);
+    }
+}
+
+/* SYM OPEN: bytes PASS; retail's block tree is FLAT, ours nests (same family as M_SyncStartKill/
+ * M_DoDeath/MAI_Garg's own if/else-if bodies with no declarations getting spurious SYM levels). */
+void MAI_Garg(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int mx, my;
+    int md;
+
+    mx = Monst->_mx - Monst->_lastx;
+    my = Monst->_my - Monst->_lasty;
+    md = M_GetDir(i);
+    if (Monst->_msquelch && (Monst->_mFlags & MFLAG_STILL)) {
+        M_Enemy(i);
+        mx = Monst->_mx - Monst->_menemyx;
+        my = Monst->_my - Monst->_menemyy;
+
+        if (abs(mx) < (Monst->_mint + 2) && abs(my) < (Monst->_mint + 2))
+            Monst->_mFlags &= ~MFLAG_STILL;
+    } else if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        if (Monst->_mhitpoints < (Monst->_mmaxhp >> 1)) {
+            Monst->_mgoal = MG_RUN_AWAY;
+        }
+        if (Monst->_mgoal == MG_RUN_AWAY) {
+            if (abs(mx) < (Monst->_mint + 2) && abs(my) < (Monst->_mint + 2)) {
+                if (!M_CallWalk(i, (md + 4) & 7))
+                    Monst->_mgoal = MG_ATTACK;
+            } else {
+                Monst->_mgoal = MG_ATTACK;
+                M_StartHeal(i);
+            }
+        }
+        MAI_Round(i, 0);
+    }
+}
+
+/* OPEN: bytes near-miss (74 diffs, 90==90 insns -- count exact) -- pure register-coloring (which
+ * saved reg holds `i` -- $17 vs $19 -- and everything downstream that depends on it).  Declaration
+ * order swap (Monst before/after mx,my,md) made no difference. */
+void MAI_Warlord(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int mx, my, md;
+
+    if (Monst->_mmode == MM_STAND) {
+        mx = Monst->_mx;
+        my = Monst->_my;
+        md = M_GetDir(i);
+        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
+            mx = Monst->_mx - Monst->_menemyx;
+            my = Monst->_my - Monst->_menemyy;
+            if (Monst->mtalkmsg == TXT_WARLRD1 && Monst->_mgoal == MG_TALK) {
+                Monst->_mmode = MM_TALK;
+            }
+
+            if (Monst->mtalkmsg == TXT_WARLRD1 && !effect_is_playing(USFX_WARLRD1) && Monst->_mgoal == MG_WAITTOTALK) {
+                Monst->_mgoal = MG_ATTACK;
+                Monst->_msquelch = 255;
+                Monst->mtalkmsg = 0;
+            }
+        }
+        if (Monst->_mgoal == MG_ATTACK) {
+            MAI_SkelSd(i);
+        }
+        monster[i]._mdir = md;
+        if (Monst->_mmode == MM_STAND || Monst->_mmode == MM_TALK)
+            Monst->Action = MA_STAND;
+    }
 }
