@@ -119,3 +119,7 @@ char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */
 void SetLightFX(int x, int y, short s_r, short s_g, short s_b, unsigned char d_r, unsigned char d_g, unsigned char d_b);   /* @0x8004BD40 LIGHTING.CPP:416 */
+void MonstPartJump(int m);   /* @0x8009F594 DAVEL.CPP:461 */
+void RemoveStoneMissiles(int mon, int mx, int my);   /* @0x80147AB8 MISSILES.CPP:4997 */
+void delta_kill_monster(int mi, unsigned char x, unsigned char y, unsigned char bLevel);   /* @0x8004EAF4 MSG.CPP:284 */
+void NetSendCmdLocParam1(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short wParam1);   /* @0x8004F774 MSG.CPP:916 */

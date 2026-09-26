@@ -28,10 +28,9 @@ unsigned short GetAutomapType(int x, int y, unsigned char view)
     unsigned char AMRWallFlag;
 
     AMRWallFlag = 0;
-    if (!((automapview[x >> 3][y] >> (x & 7)) & 1)) {
-        AMLWallFlag = 0;
+    AMLWallFlag = 0;
+    if (!((automapview[x >> 3][y] >> (x & 7)) & 1))
         return 0;
-    }
 
     rv = automaptype[dungeon[x][y]];
     f = (unsigned char)(rv >> 8);
@@ -59,6 +58,13 @@ unsigned short GetAutomapType(int x, int y, unsigned char view)
         break;
     }
 
+    /* Retail keeps the flag/f computations (a3/t0/a0 in SYM) although nothing reads them in the
+     * final code: their uses were tests whose arms cross-jumped together in jump2 (after register
+     * allocation), deleting the branches.  These two no-op tests are a stand-in with that property
+     * (53/53 insns); the retail spelling is unknown.  Residual: rv/f swap a0<->a1 (retail f is
+     * allocated before rv, i.e. its use sits in its own basic block). */
+    if (AMLWallFlag == AMRWallFlag) return rv;
+    if (f) return rv;
     return rv;
 }
 

@@ -20,6 +20,7 @@
 /* monster modes */
 #define MA_STAND   0
 #define MA_ATTACK  2
+#define MA_GOTHIT  3
 #define MA_SPECIAL 5
 
 #define MM_STAND   0
@@ -29,11 +30,15 @@
 #define MM_FADEIN  8
 #define MM_FADEOUT 9
 #define MM_RATTACK 10
+#define MM_GOTHIT  5
+#define MM_STONE   15
 #define MM_DEATH   6
 #define MM_RSATTACK 12
 #define MM_HEAL    0x10
 
 #define MGOAL_NORMAL    1
+#define CMD_MONSTDEATH 0x24
+#define CMD_KILLGOLEM  0x57
 #define MGOAL_INQUIRING 6
 #define MGOAL_TALKING   7
 
@@ -49,6 +54,7 @@
 #define PC_SORCERER 2
 
 #define BFLAG_MONSTLR 0x10
+#define BFLAG_MONSTACTIVE 0x4
 
 #define MAXMONSTERS 190
 
@@ -736,4 +742,130 @@ void M_StartRSpAttack(int i, int missile_type, int dam)
     monster[i]._moldy = _my;
     monster[i]._mdir = md;
     M_CheckEFlag(i);
+}
+
+/* OPEN: bytes far-miss (147 vs 135 insns) -- logic transcribed as a best-effort reading of the raw
+ * oracle (hellfire's M_GetKnockback takes no `d` param, computes `d=(mdir+4)&7` internally and has
+ * NO _mVar1/2/6/7/xvel/yvel reset or _mVar8++ tail -- all of that is a genuine PSX addition read
+ * directly from the disassembly, not sourced from any twin).  Structural issues remain (register
+ * numbers assigned to `i` vs `d` differ, several field re-reads look duplicated in the oracle in a
+ * way not yet matched).  Not chased further this pass (deprioritized vs the fresh-function list);
+ * needs a dedicated pass re-deriving the exact store order from the raw bytes. */
+void M_GetKnockback(int i, int d)
+{
+    if (DirOK(i, d)) {
+        M_ClearSquares(i);
+        monster[i]._moldx += offset_x[d];
+        monster[i]._moldy += offset_y[d];
+        NewMonsterAnim(i, monster[i].MType->Anims[MA_GOTHIT], monster[i]._mdir, MA_GOTHIT);
+        monster[i]._mmode = MM_GOTHIT;
+        monster[i]._mxoff = 0;
+        monster[i]._myoff = 0;
+        monster[i]._mx = monster[i]._moldx;
+        monster[i]._my = monster[i]._moldy;
+        monster[i]._mfutx = monster[i]._mx;
+        monster[i]._mfuty = monster[i]._my;
+        monster[i]._moldx = monster[i]._mx;
+        monster[i]._moldy = monster[i]._my;
+        M_CheckEFlag(i);
+        M_ClearSquares(i);
+        monster[i]._mVar1 = 0;
+        monster[i]._mVar2 = 0;
+        monster[i]._mxvel = 0;
+        monster[i]._myvel = 0;
+        monster[i]._mVar6 = 0;
+        monster[i]._mVar7 = 0;
+        dung_map[monster[i]._mx][monster[i]._my].dMonster = i + 1;
+        monster[i]._mVar8++;
+    }
+}
+
+/* OPEN: bytes near-miss (8 diffs, 66==66 insns -- count exact) -- pure instruction-SCHEDULING
+ * difference: oracle materializes the `monster` symbol address (lui/addiu) EARLIER, interleaved
+ * mid-way through the index*104 scaling chain, ours computes the full index chain first then the
+ * symbol address.  SYM already matches.  Same family as M_ChangeLightOffset's sp/ra placement --
+ * a scheduler artifact, not reachable by the statement/declaration reorderings tried so far. */
+void M_StartKill(int i, int pnum)
+{
+    MonsterStruct *pmonster = &monster[i];
+    int _mx, _my;
+
+    _mx = pmonster->_mx;
+    _my = pmonster->_my;
+
+    if (monster[i]._mmode == MM_STONE) {
+        MonstPartJump(i);
+        RemoveStoneMissiles(i, _mx, _my);
+    }
+
+    delta_kill_monster(i, _mx, _my, currlevel);
+    if (i != pnum)
+        NetSendCmdLocParam1(0, CMD_MONSTDEATH, _mx, _my, i);
+    else
+        NetSendCmdLocParam1(0, CMD_KILLGOLEM, _mx, _my, currlevel);
+
+    MonstStartKill(i, pnum, 1);
+}
+
+void MAI_Zombie(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int mx, my, md, v;
+
+    if (Monst->_mmode == MM_STAND) {
+        mx = Monst->_mx;
+        my = Monst->_my;
+        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
+            mx -= Monst->_menemyx;
+            my -= Monst->_menemyy;
+            md = Monst->_mdir;
+            v = ENG_random(100);
+
+            if (abs(mx) < 2 && abs(my) < 2) {
+                if (v < (10 + 2 * Monst->_mint))
+                    M_StartAttack(i);
+            } else {
+                if (v < (10 + 2 * Monst->_mint)) {
+                    if (abs(mx) < (4 + 2 * Monst->_mint) && abs(my) < (4 + 2 * Monst->_mint)) {
+                        md = M_GetDir(i);
+                        M_CallWalk(i, md);
+                    } else {
+                        if (ENG_random(100) < (20 + 2 * Monst->_mint))
+                            md = ENG_random(8);
+                        M_DumbWalk(i, md);
+                    }
+                }
+            }
+            if (Monst->_mmode == MM_STAND)
+                Monst->Action = MA_STAND;
+        }
+    }
+}
+
+void MAI_SkelSd(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int mx, my, md;
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        mx = Monst->_mx - Monst->_menemyx;
+        my = Monst->_my - Monst->_menemyy;
+        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+        Monst->_mdir = md;
+
+        if (abs(mx) < 2 && abs(my) < 2) {
+            if (Monst->_mVar1 == MM_DELAY || ENG_random(100) < 20 + 2 * Monst->_mint)
+                M_StartAttack(i);
+            else
+                M_StartDelay(i, ENG_random(10) + 10 - 2 * Monst->_mint);
+        } else {
+            if (Monst->_mVar1 != MM_DELAY && ENG_random(100) < 35 - 4 * Monst->_mint)
+                M_StartDelay(i, ENG_random(10) + 15 - 2 * Monst->_mint);
+            else
+                M_CallWalk(i, md);
+        }
+
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = MA_STAND;
+    }
 }

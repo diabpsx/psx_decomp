@@ -420,11 +420,11 @@ int GetDirection8(int x1, int y1, int x2, int y2)
         { 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
         { 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
     };
-    int mx, my, md;
     unsigned char urtoll[3] = { 3, 4, 5 };
     unsigned char ultolr[3] = { 3, 2, 1 };
     unsigned char lrtoul[3] = { 7, 6, 5 };
     unsigned char lltour[3] = { 7, 0, 1 };
+    int mx, my, md;
 
     mx = abs(x2 - x1);
     if (mx > 15)
@@ -467,8 +467,8 @@ int GetDirection16(int x1, int y1, int x2, int y2)
     };
     unsigned char urtoll[5] = { 6, 7, 8, 9, 10 };
     unsigned char ultolr[5] = { 6, 5, 4, 3, 2 };
-    unsigned char lltour[5] = { 14, 13, 12, 11, 10 };
     unsigned char lrtoul[5] = { 14, 15, 0, 1, 2 };
+    unsigned char lltour[5] = { 14, 13, 12, 11, 10 };
     int mx, my, md;
 
     mx = abs(x2 - x1);
@@ -483,11 +483,10 @@ int GetDirection16(int x1, int y1, int x2, int y2)
             md = urtoll[md];
         else
             md = ultolr[md];
-    } else if (y1 > y2) {
-        md = lltour[md];
-    } else {
+    } else if (y1 > y2)
         md = lrtoul[md];
-    }
+    else
+        md = lltour[md];
     return md;
 }
 
@@ -558,7 +557,7 @@ void PutMissile(int i)
 
 void GetMissilePos(int i)
 {
-    int mx, my, dx, dy, lx, ly;
+    long mx, my, dx, dy, lx, ly;
 
     mx = missile[i]._mitxoff >> 16;
     my = missile[i]._mityoff >> 16;
@@ -995,9 +994,13 @@ void AddFirewall(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy
     /* PSX drops hellfire's `if (mienemy != MI_ENEMYMONST || id < 0) mirange += currlevel;` branch
      * entirely -- always applies the pISplDur-scaled adjustment (confirmed: no currlevel add
      * anywhere in the oracle, just one unconditional mult/mflo/sra-7 sequence). */
+    int k;
+
     missile[mi]._midam = ((ENG_random(10) + ENG_random(10) + 2 + plr[id]._pLevel) << 4) >> 1;
     GetMissileVel(mi, sx, sy, dx, dy, 16);
-    missile[mi]._mirange = 10 * (missile[mi]._mispllvl + 1);
+    missile[mi]._mirange = 10;
+    for (k = missile[mi]._mispllvl; k > 0; k--)
+        missile[mi]._mirange += 10;
     missile[mi]._miVar2 = 0;
     missile[mi]._mirange = missile[mi]._mirange + ((plr[id]._pISplDur * missile[mi]._mirange) >> 7);
     missile[mi]._mirange = missile[mi]._mirange << 4;
