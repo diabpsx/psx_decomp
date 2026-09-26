@@ -269,6 +269,44 @@ void S_StartWitch(void)
     storenumh = 0x14;
 }
 
+/* @0x8006D870 */
+void S_StartNoMoney(void)
+{
+    SItemListFlag = 0;
+    StartStore(stextshold);
+    stextsize = 1;
+    stextscrl = 0;
+    ClearSText(5, 0x17);
+    AddSText(0, 0xA, 1, GetStr(0x4E9), 0, 1);
+}
+
+/* @0x8006D8D8 */
+void S_StartNoRoom(void)
+{
+    SItemListFlag = 0;
+    StartStore(stextshold);
+    stextscrl = 0;
+    ClearSText(5, 0x17);
+    AddSText(0, 0xA, 1, GetStr(0x4EA), 0, 1);
+}
+
+/* @0x8006D938 */
+void S_StartNoItems(void)
+{
+    SItemListFlag = 0;
+    stextscrl = 0;
+    if (WFlag) {
+        StartStore(5);
+        ClearSText(5, 0x17);
+        AddSText(0, 0xA, 1, GetStr(0x2DA), 0, 1);
+    } else {
+        StartStore(1);
+        stextshold = 1;
+        ClearSText(5, 0x17);
+        AddSText(0, 0xA, 1, GetStr(0x2BD), 0, 1);
+    }
+}
+
 /* @0x8006E624 */
 void S_StartStory(void)
 {
@@ -324,6 +362,125 @@ void S_StartDrunk(void)
     AddSText(0, 0xB, 1, GetStr(0x38C), 0, 1);
     AddSLine(3);
     storenumh = 0x14;
+}
+
+/* @0x8006F96C -- transcribed literally from the oracle's 24-case jump table (s-1 indexed); the
+ * `StartStore(0x18)` recursive call inside the smith-buy case lands on the SAME table slot as
+ * S_StartBarMaid in this build -- confirmed correct against the raw bytes, semantics unexplained. */
+void StartStore(char s)
+{
+    int i;
+
+    PlaySFX(0x33);
+    StorePlrNo = options_pad;
+    sbookflag = 0;
+    invflag = 0;
+    chrflag = 0;
+    questlog = 0;
+    dropGoldFlag = 0;
+    ClearSText(0, NUMSTLINES);
+    ReleaseStoreBtn();
+
+    switch (s) {
+    case 1:
+        S_StartSmith();
+        break;
+    case 2:
+        SmithItemCount = 0;
+        if (smithitem[0]._itype != -1) {
+            do {
+                SmithItemCount++;
+            } while (smithitem[SmithItemCount]._itype != -1);
+        }
+        if (SmithItemCount != 0) {
+            S_StartSBuy();
+        } else {
+            StartStore(0x18);
+        }
+        break;
+    case 3:
+        S_StartSSell();
+        break;
+    case 4:
+        S_StartSRepair();
+        break;
+    case 5:
+        S_StartWitch();
+        break;
+    case 6:
+        if (storenumh > 0) {
+            S_StartWBuy();
+        }
+        break;
+    case 7:
+        S_StartWSell();
+        break;
+    case 8:
+        S_StartWRecharge();
+        break;
+    case 9:
+        S_StartNoMoney();
+        break;
+    case 10:
+        S_StartNoRoom();
+        break;
+    case 11:
+        S_StartNoItems();
+        break;
+    case 12:
+        S_StartConfirm();
+        break;
+    case 13:
+        S_StartBoy();
+        break;
+    case 14:
+        S_StartBBoy();
+        break;
+    case 15:
+        S_StartHealer();
+        break;
+    case 16:
+        S_StartStory();
+        break;
+    case 17:
+        if (storenumh > 0) {
+            S_StartHBuy();
+        }
+        break;
+    case 18:
+        S_StartSIdentify();
+        break;
+    case 19:
+        if (!S_StartSPBuy()) {
+            return;
+        }
+        break;
+    case 20:
+        S_StartTalk();
+        break;
+    case 21:
+        S_StartIdShow();
+        break;
+    case 22:
+        S_StartTavern();
+        break;
+    case 23:
+        S_StartDrunk();
+        break;
+    case 24:
+        S_StartBarMaid();
+        break;
+    }
+
+    i = 0;
+    while (i < NUMSTLINES && !stext[i]._ssel) {
+        i++;
+    }
+    if (i == NUMSTLINES) {
+        i = -1;
+    }
+    stextsel = i;
+    stextflag = s;
 }
 
 /* @0x80070648 */

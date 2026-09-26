@@ -17,6 +17,12 @@ extern struct ItemStruct _smithitem[2][20];   /* @0x800DE428 */
 extern struct ItemStruct _witchitem[2][20];   /* @0x800DFA18 */
 extern struct ItemStruct _healitem[2][20];   /* @0x800E0BD0 */
 extern struct ItemStruct _golditem[2];   /* @0x800E1CB0 */
+extern int options_pad;   /* @0x8011B250 */
+extern unsigned char sbookflag;   /* @0x8011B6C6 */
+extern unsigned char invflag;   /* @0x8011C32C */
+extern unsigned char chrflag;   /* @0x8011B6C0 */
+extern unsigned char questlog;   /* @0x8011BA29 */
+extern unsigned char dropGoldFlag;   /* @0x8011B6B4 */
 
 long GetRndSeed(void);   /* @0x8003DADC ENGINE.CPP */
 void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP */
