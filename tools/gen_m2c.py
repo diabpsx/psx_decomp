@@ -32,11 +32,65 @@ def jtbl_files(seg):
             out.append(f)
     return out
 
+IMAGES = None
+def images():
+    """(vram, bytes) for every image we can read table words from"""
+    global IMAGES
+    if IMAGES is None:
+        IMAGES = [(0x80010000, (ROOT / "rom" / "DIABPSX.BIN").read_bytes())]
+        for n in ("FRONTEND.BIN", "PREGAME.BIN", "GAME.BIN", "FMV.BIN"):
+            f = ROOT / "rom" / n
+            if f.exists(): IMAGES.append((0x80139BF8, f.read_bytes()))
+    return IMAGES
+
+def synth_jtbls(files, seg):
+    """For every `jtbl_XXXXXXXX` a function references that no rodata file of this segment defines
+    (overlay switch tables live in the main image's .rdata), read the words from the image and
+    emit a spimdisasm-style table: consecutive words that land inside the referencing function."""
+    have = "".join(f.read_text(encoding="utf-8", errors="replace") for f in jtbl_files(seg))
+    out = []; targets = set()
+    for f in files:
+        txt = f.read_text(encoding="utf-8", errors="replace")
+        vas = [int(m, 16) for m in re.findall(r"^\s*/\* [0-9A-F]+ ([0-9A-F]{8}) ", txt, re.M)]
+        if not vas: continue
+        lo, hi = min(vas), max(vas) + 4
+        for t in sorted({int(m, 16) for m in re.findall(r"%hi\(jtbl_([0-9A-F]{8})\)", txt)}):
+            if f"jtbl_{t:08X}" in have: continue
+            for vram, img in images():
+                o = t - vram
+                if not (0 <= o < len(img)): continue
+                words = []
+                while o + 4 <= len(img):
+                    w = int.from_bytes(img[o:o+4], "little")
+                    if not (lo <= w < hi): break
+                    words.append(w); o += 4
+                if words:
+                    out.append(f"jlabel jtbl_{t:08X}\n" + "".join(f"/* synth */ .word .L{w:08X}\n" for w in words))
+                    have += f"jtbl_{t:08X}"; targets.update(words)
+                break
+    return "\n".join(out), targets
+
+
+def add_labels(text, targets):
+    """insert `.L<va>:` before the instruction at each jump-table target that has no label yet"""
+    if not targets: return text
+    present = set(int(m, 16) for m in re.findall(r"^\.L([0-9A-F]{8}):", text, re.M))
+    need = {t for t in targets if t not in present}
+    lines = text.split("\n"); out = []
+    for ln in lines:
+        m = re.match(r"^\s*/\* [0-9A-F]+ ([0-9A-F]{8}) [0-9A-F]{8} \*/", ln)
+        if m and int(m[1], 16) in need:
+            out.append(f".L{m[1]}:"); need.discard(int(m[1], 16))
+        out.append(ln)
+    return "\n".join(out)
+
 def run(files, extra, seg):
     """concatenate the .s files (+ jump tables) into one temp input (Windows argv is limited to 32K)"""
     TMP.parent.mkdir(parents=True, exist_ok=True)
     srcs = list(files) + jtbl_files(seg)
-    TMP.write_text("\n".join(f.read_text(encoding="utf-8", errors="replace") for f in srcs), encoding="utf-8")
+    body = "\n".join(f.read_text(encoding="utf-8", errors="replace") for f in srcs)
+    tables, targets = synth_jtbls(files, seg)
+    TMP.write_text(add_labels(body, targets) + "\n" + tables, encoding="utf-8")
     r = subprocess.run(BASE + extra + [str(TMP)], capture_output=True, text=True, cwd=ROOT)
     return r.returncode, r.stdout, r.stderr
 

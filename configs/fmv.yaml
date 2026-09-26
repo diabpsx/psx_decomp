@@ -1,0 +1,42 @@
+name: Diablo (Japan) overlay FMV (SYM id $e) - rom/FMV.BIN
+options:
+  base_path: ..
+  basename: fmv
+  target_path: rom/FMV.BIN
+  platform: psx
+  compiler: GCC
+  asm_path: asm
+  src_path: src
+  build_path: build
+  ld_script_path: linkers/fmv.ld
+  gp_value: 0x8011A780
+  global_vram_start: 0x80010000
+  global_vram_end: 0x80200000
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  symbol_addrs_path:
+    - configs/symbol_addrs.txt
+    - configs/symbol_addrs_fmv.txt
+  undefined_funcs_auto_path: linkers/undefined_funcs_auto_fmv.txt
+  undefined_syms_auto_path: linkers/undefined_syms_auto_fmv.txt
+  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  find_file_boundaries: False
+  disasm_unknown: True
+
+segments:
+  - name: fmv
+    type: code
+    start: 0x0
+    vram: 0x80139BF8
+    subsegments:
+      - [0x000000, data, fmv_hdr]
+      - [0x000004, rodata, libpress_rdata]
+      - [0x0000B4, data, libpress_data]
+      - [0x001044, c, libpress]
+      - [0x001BE4, c, fmv]
+      - [0x001D18, rodata, fmv_rodata_8013b910]
+      - [0x01C224, c, fmv_1]
+  - [0x01EC70]

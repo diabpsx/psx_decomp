@@ -1,0 +1,41 @@
+name: Diablo (Japan) overlay GAME (SYM id $d) - rom/GAME.BIN
+options:
+  base_path: ..
+  basename: game
+  target_path: rom/GAME.BIN
+  platform: psx
+  compiler: GCC
+  asm_path: asm
+  src_path: src
+  build_path: build
+  ld_script_path: linkers/game.ld
+  gp_value: 0x8011A780
+  global_vram_start: 0x80010000
+  global_vram_end: 0x80200000
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  symbol_addrs_path:
+    - configs/symbol_addrs.txt
+    - configs/symbol_addrs_game.txt
+  undefined_funcs_auto_path: linkers/undefined_funcs_auto_game.txt
+  undefined_syms_auto_path: linkers/undefined_syms_auto_game.txt
+  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  find_file_boundaries: False
+  disasm_unknown: True
+
+segments:
+  - name: game
+    type: code
+    start: 0x0
+    vram: 0x80139BF8
+    subsegments:
+      - [0x000000, data, game_hdr]
+      - [0x000004, c, gameonly]
+      - [0x00000C, c, missiles]
+      - [0x010F7C, c, monster]
+      - [0x01D67C, c, inv]
+      - [0x028360, c, automap]
+  - [0x02A228]

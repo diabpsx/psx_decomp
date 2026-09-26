@@ -1,0 +1,55 @@
+name: Diablo (Japan) overlay FRONTEND (SYM id $b) - rom/FRONTEND.BIN
+options:
+  base_path: ..
+  basename: frontend
+  target_path: rom/FRONTEND.BIN
+  platform: psx
+  compiler: GCC
+  asm_path: asm
+  src_path: src
+  build_path: build
+  ld_script_path: linkers/frontend.ld
+  gp_value: 0x8011A780
+  global_vram_start: 0x80010000
+  global_vram_end: 0x80200000
+  use_legacy_include_asm: False
+  asm_function_macro: glabel
+  asm_jtbl_label_macro: jlabel
+  asm_data_macro: dlabel
+  generate_asm_macros_files: False
+  symbol_addrs_path:
+    - configs/symbol_addrs.txt
+    - configs/symbol_addrs_frontend.txt
+  undefined_funcs_auto_path: linkers/undefined_funcs_auto_frontend.txt
+  undefined_syms_auto_path: linkers/undefined_syms_auto_frontend.txt
+  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  find_file_boundaries: False
+  disasm_unknown: True
+
+segments:
+  - name: frontend
+    type: code
+    start: 0x0
+    vram: 0x80139BF8
+    subsegments:
+      - [0x000000, data, frontend_hdr]
+      - [0x000004, c, presonly]
+      - [0x00002C, c, fe]
+      - [0x002F58, c, credits]
+      - [0x002F7C, rodata, credits_rodata_8013cb74]
+      - [0x0035A8, c, credits_1]
+      - [0x004560, rodata, memcard_rodata_8013e158]
+      - [0x0045F4, c, memcard]
+      - [0x004600, rodata, memcard_rodata_8013e1f8]
+      - [0x008B00, c, memcard_1]
+      - [0x0099F0, c, dlg]
+      - [0x009A00, rodata, dlg_rodata_801435f8]
+      - [0x009A0C, c, dlg_1]
+      - [0x009A54, rodata, dlg_rodata_8014364c]
+      - [0x009AA8, c, dlg_2]
+      - [0x009AF4, rodata, dlg_rodata_801436ec]
+      - [0x01DAF4, c, dlg_3]
+      - [0x01DAF8, rodata, dlg_rodata_801576f0]
+      - [0x01F998, c, dlg_4]
+      - [0x021D60, c, loadsave]
+  - [0x023234]
