@@ -1,3 +1,5 @@
+struct TextDat;
+
 enum PLR_MODE {
     PM_QUIT = 11,
     PM_NEWLVL = 10,

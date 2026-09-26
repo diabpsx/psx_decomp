@@ -12,3 +12,5 @@ unsigned char CanPut(int i, int j);   /* @0x800806C0 COREMON.CPP:699 */
 void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
 void DeleteItem(int ii, int i);   /* @0x800457B8 ITEMS.CPP:3127 */
 void CheckQuestItem(int pnum);   /* @0x8015DCD0 INV.CPP:2496 */
+void NetSendCmdChItem(unsigned char bHiPri, unsigned char bLoc);   /* @0x8004FCF4 MSG.CPP:1192 */
+int CalculateGold(int pnum);   /* @0x80160B64 INV.CPP:3690 */

@@ -27,3 +27,5 @@ extern long numitems;   /* @0x8011B888 */
 extern char itemactive[127];   /* @0x800D5354 */
 extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
+extern unsigned char InvItemWidth[180];   /* @0x8010D518 */
+extern unsigned char InvItemHeight[180];   /* @0x8010D5CC */
