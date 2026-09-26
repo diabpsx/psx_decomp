@@ -105,6 +105,18 @@ struct pad_assigns {   /* sizeof 12 */
     char font_num;
 };
 
+class CFont {
+public:
+    unsigned char data[540];
+    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
+    int GetStrWidth(char *Str);
+};
+
+extern CFont MediumFont;
+extern char tempstr[256];
+extern unsigned char REDR, REDG, REDB;
+extern "C" int sprintf(char *buf, const char *fmt, ...);
+
 extern struct KEY_ASSIGNS txt_actions[20];
 extern struct pad_assigns pad_txt[14];
 extern int options_pad;
@@ -218,4 +230,44 @@ void InitHelp(void)
     HelpTop = 0;
     help_select_line = 1;
     displayinghelp = 0;
+}
+
+/* @0x800AE73C PSXHELP.CPP:294 */
+int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp)
+{
+    int eln;
+
+    if (hp->DisplayType == 1) {
+        int key;
+        BOOL combo;
+
+        key = GetControlKey(hp->HelpTxt, &combo);
+        if (combo) {
+            int nkey = GetControlKey(0xC6, &combo);
+            if (nkey)
+                sprintf(tempstr, "%c + %c %s", nkey, key, txt);
+            else {
+                R = REDR;
+                G = REDG;
+                B = REDB;
+                sprintf(tempstr, "    %s", txt);
+            }
+        } else if (key)
+            sprintf(tempstr, "%c   %s", key, txt);
+        else {
+            R = REDR;
+            G = REDG;
+            B = REDB;
+            sprintf(tempstr, "    %s", txt);
+        }
+        MediumFont.Print(x, y, tempstr, JustLeft, &HelpRect, R, G, B);
+        eln = MediumFont.GetStrWidth(tempstr);
+    } else {
+        if (displayinghelp)
+            MediumFont.Print(x, y, txt, JustCentre, &HelpRect, R, G, B);
+        else
+            MediumFont.Print(x, y, txt, JustLeft, &HelpRect, R, G, B);
+        eln = MediumFont.GetStrWidth(txt);
+    }
+    return eln;
 }
