@@ -25,3 +25,5 @@ extern int sel_data;   /* @0x8011B72C */
 extern char tempstr[256];   /* @0x800CEA10 */
 extern unsigned char deltaload;   /* @0x8011B97D */
 extern struct LightListStruct2 LightList[80];   /* @0x800D6300 */
+extern int MWVel[24][3];   /* @0x801051F4 */
+extern struct QuestStruct quests[16];   /* @0x800DDA40 */

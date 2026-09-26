@@ -19,6 +19,7 @@
 
 /* monster modes */
 #define MA_STAND   0
+#define MA_WALK    1
 #define MA_ATTACK  2
 #define MA_GOTHIT  3
 #define MA_SPECIAL 5
@@ -32,12 +33,19 @@
 #define MM_RATTACK 10
 #define MM_GOTHIT  5
 #define MM_STONE   15
+#define MM_WALK    1
+#define MM_WALK2   2
+#define MM_WALK3   3
 #define MM_DEATH   6
 #define MM_RSATTACK 12
 #define MM_HEAL    0x10
 
 #define MGOAL_NORMAL    1
 #define CMD_MONSTDEATH 0x24
+#define MG_ATTACK       1
+#define MG_WALK_AROUND1 4
+#define MG_TALK         6
+#define Q_BETRAYER      15
 #define CMD_KILLGOLEM  0x57
 #define MGOAL_INQUIRING 6
 #define MGOAL_TALKING   7
@@ -46,6 +54,7 @@
 #define MFLAG_LOCK_ANIMATION  0x02
 #define MFLAG_ALLOW_SPECIAL   0x04
 #define MFLAG_NOHEAL          0x08
+#define MFLAG_TARGETS_MONSTER 0x10
 
 #define MT_INCIN    0x48
 #define MT_HELLBURN 0x4B
@@ -892,4 +901,303 @@ unsigned char M_CallWalk(int i, int md)
         M_WalkDir(i, md);
 
     return ok;
+}
+
+/* OPEN: bytes near-miss (89 vs 86 insns) -- logic verified against hellfire's M_StartWalk (matches
+ * exactly, PSX just drops the unused `pn=dPiece[fx][fy]-1` local).  Residual is the SAME
+ * scheduling-only class as M_ChangeLightOffset/M_StartKill: with a `MonsterStruct *pmonster`
+ * cache the `monster` symbol materializes into the RIGHT register (v0) but at the wrong point in
+ * the schedule (oracle interleaves it mid-way through the index*104 chain; ours emits it as one
+ * block).  Declaration-order swap (pmonster before/after fx,fy) made no difference. */
+void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir)
+{
+    int fx, fy;
+    MonsterStruct *pmonster = &monster[i];
+
+    fx = pmonster->_mx + xadd;
+    fy = pmonster->_my + yadd;
+    dung_map[fx][fy].dMonster = -1 - i;
+    monster[i]._mmode = MM_WALK;
+    monster[i]._moldx = pmonster->_mx;
+    monster[i]._moldy = pmonster->_my;
+    monster[i]._mfutx = fx;
+    monster[i]._mfuty = fy;
+    monster[i]._mxvel = xvel;
+    monster[i]._myvel = yvel;
+    monster[i]._mVar1 = xadd;
+    monster[i]._mVar2 = yadd;
+    monster[i]._mVar3 = EndDir;
+    monster[i]._mdir = EndDir;
+    NewMonsterAnim(i, monster[i].MType->Anims[MA_WALK], EndDir, MA_WALK);
+    monster[i]._mVar6 = 0;
+    monster[i]._mVar7 = 0;
+    monster[i]._mVar8 = 0;
+    M_CheckEFlag(i);
+}
+
+/* OPEN: bytes near-miss (15 diffs, 137 vs 140 insns) -- fully derived from the raw oracle (NOT
+ * from hellfire, whose M_StartWalk2/M_StartWalk3 calls don't exist on PSX -- confirmed all 8
+ * switch-case bodies + the case LAYOUT ORDER from the jump table bytes at 0x8011A310: N,NE,E,SE,
+ * S,SW,W,NW, matching hellfire's switch source order even though the case VALUES are the DIR_
+ * enum).  Getting the case order right (ascending 0..7 instead of the jump-table's physical N-first
+ * order) alone took the diff from "far miss" to this near-miss.  Residual: per-case instruction
+ * SCHEDULING (which value lands in the branch/jump delay slot) -- same scheduling-artifact family
+ * as M_StartWalk/M_StartKill/M_ChangeLightOffset. */
+void M_WalkDir(int i, int md)
+{
+    int mwi = monster[i].MType->Anims[MA_WALK].Frames - 1;
+
+    switch (md) {
+    case DIR_N:
+        M_StartWalk(i, 0, -MWVel[mwi][1], -1, -1, DIR_N);
+        break;
+    case DIR_NE:
+        M_StartWalk(i, MWVel[mwi][1], -MWVel[mwi][0], 0, -1, DIR_NE);
+        break;
+    case DIR_E:
+        M_StartWalk(i, MWVel[mwi][2], 0, 1, -1, DIR_E);
+        break;
+    case DIR_SE:
+        M_StartWalk(i, MWVel[mwi][1], MWVel[mwi][0], 1, 0, DIR_SE);
+        break;
+    case DIR_S:
+        M_StartWalk(i, 0, MWVel[mwi][1], 1, 1, DIR_S);
+        break;
+    case DIR_SW:
+        M_StartWalk(i, -MWVel[mwi][1], MWVel[mwi][0], 0, 1, DIR_SW);
+        break;
+    case DIR_W:
+        M_StartWalk(i, -MWVel[mwi][2], 0, -1, 1, DIR_W);
+        break;
+    case DIR_NW:
+        M_StartWalk(i, -MWVel[mwi][1], MWVel[mwi][0], -1, 0, DIR_NW);
+        break;
+    }
+}
+
+unsigned char M_RoundWalk(int i, int md, int &dir)
+{
+    int mdtemp;
+    unsigned char ok;
+
+    if (dir)
+        md = (((md - 1) & 7) - 1) & 7;
+    else
+        md = (((md + 1) & 7) + 1) & 7;
+    mdtemp = md;
+
+    ok = DirOK(i, md);
+    if (!ok) {
+        if (dir)
+            ok = DirOK(i, md = (mdtemp + 1) & 7) || DirOK(i, md = (((mdtemp + 1) & 7) + 1) & 7);
+        else
+            ok = DirOK(i, md = (mdtemp - 1) & 7) || DirOK(i, md = (((mdtemp - 1) & 7) - 1) & 7);
+    }
+
+    if (ok) {
+        M_WalkDir(i, md);
+    } else {
+        dir = !dir;
+        ok = M_CallWalk(i, (mdtemp + 4) & 7);
+    }
+    return ok;
+}
+
+void MAI_SkelBow(int i)
+{
+    int mx, my, md, fx, fy;
+    unsigned char walking = 0;
+    int v;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        mx = Monst->_mx - Monst->_menemyx;
+        my = Monst->_my - Monst->_menemyy;
+        md = M_GetDir(i);
+        Monst->_mdir = md;
+
+        v = ENG_random(100);
+        if (abs(mx) < 4 && abs(my) < 4
+            && ((Monst->_mVar2 > 20 && v < 13 + 2 * Monst->_mint)
+                || ((Monst->_mVar1 == MM_WALK || Monst->_mVar1 == MM_WALK2 || Monst->_mVar1 == MM_WALK3)
+                    && Monst->_mVar2 == 0 && v < 63 + 2 * Monst->_mint))) {
+            walking = M_DumbWalk(i, (md + 4) & 7);
+        }
+        fx = Monst->_menemyx;
+        fy = Monst->_menemyy;
+        if (!walking && ENG_random(100) < 3 + 2 * Monst->_mint
+            && LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+            M_StartRAttack(i, MIT_ARROW, 4);
+        }
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = MA_STAND;
+    }
+}
+
+void MAI_Fat(int i)
+{
+    int mx, my, md, v;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        mx = Monst->_mx - Monst->_menemyx;
+        my = Monst->_my - Monst->_menemyy;
+        md = M_GetDir(i);
+        Monst->_mdir = md;
+        v = ENG_random(100);
+
+        if (abs(mx) < 2 && abs(my) < 2) {
+            if (v < (15 + 4 * Monst->_mint))
+                M_StartAttack(i);
+            else if (v < (20 + 4 * Monst->_mint))
+                M_StartSpAttack(i);
+        } else {
+            if ((Monst->_mVar2 > 20 && v < (20 + 4 * Monst->_mint))
+                || ((Monst->_mVar1 == MM_WALK || Monst->_mVar1 == MM_WALK2 || Monst->_mVar1 == MM_WALK3)
+                    && Monst->_mVar2 == 0 && v < (70 + 4 * Monst->_mint))) {
+                M_CallWalk(i, md);
+            }
+        }
+
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = MA_STAND;
+    }
+}
+
+void MAI_Round(int i, unsigned char special)
+{
+    int mx, my, md, v;
+    int fx, fy, dist;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        fx = Monst->_menemyx;
+        fy = Monst->_menemyy;
+        mx = Monst->_mx - fx;
+        my = Monst->_my - fy;
+        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+
+        if (Monst->_msquelch < 255)
+            MonstCheckDoors(i);
+
+        v = ENG_random(100);
+        if (abs(mx) < 2 && abs(my) < 2
+            || Monst->_msquelch != 255
+            || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+            Monst->_mgoal = MG_ATTACK;
+        } else if (Monst->_mgoal == MG_WALK_AROUND1
+            || (!(abs(mx) < 4 && abs(my) < 4) && !ENG_random(4))) {
+            if (Monst->_mgoal != MG_WALK_AROUND1) {
+                Monst->_mgoalvar1 = 0;
+                Monst->_mgoalvar2 = ENG_random(2);
+            }
+
+            Monst->_mgoal = MG_WALK_AROUND1;
+
+            dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
+
+            if ((Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md))
+                || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+                Monst->_mgoal = MG_ATTACK;
+            } else if (!M_RoundWalk(i, md, Monst->_mgoalvar2))
+                M_StartDelay(i, ENG_random(10) + 10);
+        }
+        if (Monst->_mgoal == MG_ATTACK) {
+            if (abs(mx) < 2 && abs(my) < 2) {
+                if (v < 23 + 2 * Monst->_mint) {
+                    Monst->_mdir = md;
+                    if (special && Monst->_mhitpoints < (Monst->_mmaxhp >> 1) && ENG_random(2))
+                        M_StartSpAttack(i);
+                    else
+                        M_StartAttack(i);
+                }
+            } else if ((Monst->_mVar2 > 20 && v < (28 + 2 * Monst->_mint))
+                || ((Monst->_mVar1 == MM_WALK || Monst->_mVar1 == MM_WALK2 || Monst->_mVar1 == MM_WALK3)
+                    && Monst->_mVar2 == 0 && v < (78 + 2 * Monst->_mint))) {
+                M_CallWalk(i, md);
+            }
+        }
+
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = MA_STAND;
+    }
+}
+
+void MAI_Ranged(int i, int missile_type, unsigned char special)
+{
+    int fx, fy, mx, my, md;
+    unsigned char walking = 0;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND) {
+        if (Monst->_msquelch == 255 || monster[i]._mFlags & MFLAG_TARGETS_MONSTER) {
+            fx = Monst->_menemyx;
+            fy = Monst->_menemyy;
+            mx = Monst->_mx - fx;
+            my = Monst->_my - fy;
+            md = M_GetDir(i);
+
+            if (Monst->_msquelch < 255)
+                MonstCheckDoors(i);
+
+            Monst->_mdir = md;
+
+            if (Monst->_mVar1 == MM_RATTACK) {
+                M_StartDelay(i, ENG_random(20));
+            } else if (abs(mx) < 4 && abs(my) < 4 && ENG_random(100) < 70 + 10 * Monst->_mint) {
+                walking = M_CallWalk(i, (md + 4) & 7);
+            }
+            if (Monst->_mmode == MM_STAND) {
+                if (LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+                    if (special)
+                        M_StartRSpAttack(i, missile_type, 4);
+                    else
+                        M_StartRAttack(i, missile_type, 4);
+                } else
+                    Monst->Action = MA_STAND;
+            }
+        } else if (Monst->_msquelch && !(monster[i]._mFlags & MFLAG_TARGETS_MONSTER)) {
+            mx = Monst->_lastx;
+            my = Monst->_lasty;
+            md = GetDirection(Monst->_mx, Monst->_my, mx, my);
+
+            M_CallWalk(i, md);
+        }
+    }
+}
+
+/* OPEN: bytes near-miss (11 diffs, 77 vs 78 insns) -- scheduling-only (which of two independent
+ * instructions the sw/lb pair emits first) + one register choice (a0 vs s2 for md across the
+ * M_CheckEFlag-analog call).  Declaration order swap (md first vs last) made no difference. */
+void MAI_Lazhelp(int i)
+{
+    int mx, my;
+    MonsterStruct *Monst = &monster[i];
+    int md;
+
+    mx = Monst->_mx;
+    my = Monst->_my;
+    if (Monst->_mmode == MM_STAND) {
+        md = M_GetDir(i);
+        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
+            mx = Monst->_mx - Monst->_menemyx;
+            my = Monst->_my - Monst->_menemyy;
+            if (gbMaxPlayers == 1) {
+                if (quests[Q_BETRAYER]._qvar1 <= 5)
+                    Monst->_mgoal = MG_TALK;
+                else {
+                    Monst->_mgoal = MG_ATTACK;
+                    Monst->mtalkmsg = 0;
+                }
+            } else if (gbMaxPlayers != 1) {
+                Monst->_mgoal = MG_ATTACK;
+            }
+        }
+        if (Monst->_mgoal == MG_ATTACK) {
+            MAI_Succ(i);
+        }
+        monster[i]._mdir = md;
+    }
+    if (Monst->_mmode == MM_STAND)
+        Monst->Action = MA_STAND;
 }

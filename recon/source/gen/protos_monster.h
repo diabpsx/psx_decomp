@@ -45,7 +45,7 @@ void GroupUnity(int i);   /* @0x8014F33C MONSTER.CPP:2274 */
 unsigned char M_CallWalk(int i, int md);   /* @0x8014F750 MONSTER.CPP:2359 */
 unsigned char M_CallWalk2(int i, int md);   /* @0x8014F8F0 MONSTER.CPP:2410 */
 unsigned char M_DumbWalk(int i, int md);   /* @0x8014F9E8 MONSTER.CPP:2431 */
-unsigned char M_RoundWalk(int i, int md, int *dir);   /* @0x8014FA3C MONSTER.CPP:2445 */
+unsigned char M_RoundWalk(int i, int md, int &dir);   /* @0x8014FA3C MONSTER.CPP:2445 (R = reference, hand-fixed) */
 void MAI_Zombie(int i);   /* @0x8014FB88 MONSTER.CPP:2489 */
 void MAI_SkelSd(int i);   /* @0x8014FD88 MONSTER.CPP:2532 */
 void MAI_Snake(int i);   /* @0x8014FF38 MONSTER.CPP:2570 */
@@ -123,3 +123,4 @@ void MonstPartJump(int m);   /* @0x8009F594 DAVEL.CPP:461 */
 void RemoveStoneMissiles(int mon, int mx, int my);   /* @0x80147AB8 MISSILES.CPP:4997 */
 void delta_kill_monster(int mi, unsigned char x, unsigned char y, unsigned char bLevel);   /* @0x8004EAF4 MSG.CPP:284 */
 void NetSendCmdLocParam1(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short wParam1);   /* @0x8004F774 MSG.CPP:916 */
+void MonstCheckDoors(int m);   /* @0x8005704C OBJECTS.CPP:1783 */
