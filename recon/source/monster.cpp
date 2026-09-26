@@ -869,3 +869,27 @@ void MAI_SkelSd(int i)
             Monst->Action = MA_STAND;
     }
 }
+
+unsigned char M_CallWalk(int i, int md)
+{
+    int mdtemp = md;
+    unsigned char ok;
+
+    ok = DirOK(i, md);
+    if (ENG_random(2)) {
+        ok = ok || DirOK(i, md = (mdtemp - 1) & 7) || DirOK(i, md = (mdtemp + 1) & 7);
+    } else {
+        ok = ok || DirOK(i, md = (mdtemp + 1) & 7) || DirOK(i, md = (mdtemp - 1) & 7);
+    }
+
+    if (ENG_random(2)) {
+        ok = ok || DirOK(i, md = (((mdtemp + 1) & 7) + 1) & 7) || DirOK(i, md = (((mdtemp - 1) & 7) - 1) & 7);
+    } else {
+        ok = ok || DirOK(i, md = (((mdtemp - 1) & 7) - 1) & 7) || DirOK(i, md = (((mdtemp + 1) & 7) + 1) & 7);
+    }
+
+    if (ok)
+        M_WalkDir(i, md);
+
+    return ok;
+}
