@@ -124,3 +124,5 @@ void RemoveStoneMissiles(int mon, int mx, int my);   /* @0x80147AB8 MISSILES.CPP
 void delta_kill_monster(int mi, unsigned char x, unsigned char y, unsigned char bLevel);   /* @0x8004EAF4 MSG.CPP:284 */
 void NetSendCmdLocParam1(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short wParam1);   /* @0x8004F774 MSG.CPP:916 */
 void MonstCheckDoors(int m);   /* @0x8005704C OBJECTS.CPP:1783 */
+void ChangeLightXY(int i, int x, int y);   /* @0x8004D384 LIGHTING.CPP:1234 */
+int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl);   /* @0x80142A04 MISSILES.CPP:3451 */

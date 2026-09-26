@@ -16,6 +16,7 @@
 /* AI ids */
 #define AI_GARG     12
 #define AI_LAZURUS  28
+#define AI_SNAKE    24
 
 /* monster modes */
 #define MA_STAND   0
@@ -57,6 +58,8 @@
 #define MFLAG_TARGETS_MONSTER 0x10
 
 #define MT_INCIN    0x48
+#define MT_NMAGMA   0x3C
+#define MT_STORM    0x4C
 #define MT_HELLBURN 0x4B
 
 #define PC_WARRIOR  0
@@ -296,6 +299,7 @@ int M_DoStand(int i)
 #define MIT_ACID         0x39
 #define MIT_DIABAPOCA    0x43
 #define MIT_FLAMEC       0x31
+#define MIT_CBOLT        0x34
 
 void MAI_GoatMc(int i)
 {
@@ -1200,4 +1204,150 @@ void MAI_Lazhelp(int i)
     }
     if (Monst->_mmode == MM_STAND)
         Monst->Action = MA_STAND;
+}
+
+int M_DoWalk(int i)
+{
+    int rv;
+
+    if (monster[i]._mVar8 == monster[i].MType->Anims[MA_WALK].Frames) {
+        dung_map[monster[i]._mx][monster[i]._my].dMonster = 0;
+        monster[i]._mx += monster[i]._mVar1;
+        monster[i]._my += monster[i]._mVar2;
+        dung_map[monster[i]._mx][monster[i]._my].dMonster = i + 1;
+        if (monster[i]._uniqtype != 0)
+            ChangeLightXY(monster[i].mlid, monster[i]._mx, monster[i]._my);
+        M_StartStand(i, monster[i]._mdir);
+        rv = 1;
+    } else {
+        if (monster[i]._mAnimCnt == 0) {
+            monster[i]._mVar8++;
+            monster[i]._mVar6 += monster[i]._mxvel;
+            monster[i]._mVar7 += monster[i]._myvel;
+            monster[i]._mxoff = monster[i]._mVar6 >> 4;
+            monster[i]._myoff = monster[i]._mVar7 >> 4;
+        }
+        rv = 0;
+    }
+    if (monster[i]._uniqtype != 0)
+        M_ChangeLightOffset(i);
+
+    return rv;
+}
+
+int M_DoWalk2(int i)
+{
+    int rv;
+
+    if (monster[i]._mVar8 == monster[i].MType->Anims[MA_WALK].Frames) {
+        dung_map[monster[i]._mVar1][monster[i]._mVar2].dMonster = 0;
+        if (monster[i]._uniqtype != 0)
+            ChangeLightXY(monster[i].mlid, monster[i]._mx, monster[i]._my);
+        M_StartStand(i, monster[i]._mdir);
+        rv = 1;
+    } else {
+        if (monster[i]._mAnimCnt == 0) {
+            monster[i]._mVar8++;
+            monster[i]._mVar6 += monster[i]._mxvel;
+            monster[i]._mVar7 += monster[i]._myvel;
+            monster[i]._mxoff = monster[i]._mVar6 >> 4;
+            monster[i]._myoff = monster[i]._mVar7 >> 4;
+        }
+        rv = 0;
+    }
+    if (monster[i]._uniqtype != 0)
+        M_ChangeLightOffset(i);
+
+    return rv;
+}
+
+int M_DoWalk3(int i)
+{
+    int rv;
+
+    if (monster[i]._mVar8 == monster[i].MType->Anims[MA_WALK].Frames) {
+        dung_map[monster[i]._mx][monster[i]._my].dMonster = 0;
+        monster[i]._mx = monster[i]._mVar1;
+        monster[i]._my = monster[i]._mVar2;
+        dung_map[monster[i]._mVar4][monster[i]._mVar5].dFlags &= ~BFLAG_MONSTLR;
+        dung_map[monster[i]._mx][monster[i]._my].dMonster = i + 1;
+        if (monster[i]._uniqtype != 0)
+            ChangeLightXY(monster[i].mlid, monster[i]._mx, monster[i]._my);
+        M_StartStand(i, monster[i]._mdir);
+        rv = 1;
+    } else {
+        if (monster[i]._mAnimCnt == 0) {
+            monster[i]._mVar8++;
+            monster[i]._mVar6 += monster[i]._mxvel;
+            monster[i]._mVar7 += monster[i]._myvel;
+            monster[i]._mxoff = monster[i]._mVar6 >> 4;
+            monster[i]._myoff = monster[i]._mVar7 >> 4;
+        }
+        rv = 0;
+    }
+    if (monster[i]._uniqtype != 0)
+        M_ChangeLightOffset(i);
+
+    return rv;
+}
+
+/* OPEN: bytes near-miss (47 diffs, 104 vs 107 insns) -- logic fully verified against hellfire
+ * (3 special-attack combos for Magma/Storm mtype ranges + the AI_SNAKE sound-before-attack quirk).
+ * Caching mHit/mMinDamage/mMaxDamage into locals (needed since the oracle holds all 3 in saved
+ * regs across the whole function) got the frame close but the specific s3/s4/s5 REGISTER
+ * ASSIGNMENT still differs -- a coloring tie-break, not a logic issue. */
+int M_DoAttack(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int mHit = Monst->mHit;
+    int mMinDamage = Monst->mMinDamage;
+    int mMaxDamage = Monst->mMaxDamage;
+
+    if (Monst->_mAnimFrame == Monst->MData->mAFNum) {
+        M_TryH2HHit(i, Monst->_menemy, mHit, mMinDamage, mMaxDamage);
+        if (Monst->_mAi != AI_SNAKE)
+            PlayEffect(i, 0);
+    }
+    if (Monst->MType->mtype >= MT_NMAGMA && Monst->MType->mtype < MT_NMAGMA + 4
+        && Monst->_mAnimFrame == 9) {
+        M_TryH2HHit(i, Monst->_menemy, mHit + 10, mMinDamage - 2, mMaxDamage - 2);
+        PlayEffect(i, 0);
+    }
+    if (Monst->MType->mtype >= MT_STORM && Monst->MType->mtype < MT_STORM + 4
+        && Monst->_mAnimFrame == 13) {
+        M_TryH2HHit(i, Monst->_menemy, mHit - 20, mMinDamage + 4, mMaxDamage + 4);
+        PlayEffect(i, 0);
+    }
+    if (Monst->_mAi == AI_SNAKE && Monst->_mAnimFrame == 1)
+        PlayEffect(i, 0);
+
+    if (Monst->_mAnimFrame == Monst->_mAnimLen) {
+        M_StartStand(i, Monst->_mdir);
+        return 1;
+    }
+    return 0;
+}
+
+int M_DoRAttack(int i)
+{
+    int multimissiles;
+    int mi;
+
+    if (monster[i]._mAnimFrame == monster[i].MData->mAFNum) {
+        if (monster[i]._mVar1 != -1) {
+            if (monster[i]._mVar1 == MIT_CBOLT)
+                multimissiles = 3;
+            else
+                multimissiles = 1;
+            for (mi = 0; mi < multimissiles; mi++)
+                AddMissile(monster[i]._mx, monster[i]._my, monster[i]._menemyx, monster[i]._menemyy,
+                    monster[i]._mdir, monster[i]._mVar1, 1, i, monster[i]._mVar2, 0);
+        }
+        PlayEffect(i, 0);
+    }
+    if (monster[i]._mAnimFrame == monster[i]._mAnimLen) {
+        M_StartStand(i, monster[i]._mdir);
+        return 1;
+    }
+    return 0;
 }

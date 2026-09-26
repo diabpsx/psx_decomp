@@ -364,7 +364,7 @@ int CheckBlock(int fx, int fy, int tx, int ty)
 int FindClosest(int sx, int sy, int rad)
 {
     int j, i, mid, tx, ty, cr;
-    int CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
 
     if (rad > 19)
         rad = 19;
@@ -939,7 +939,7 @@ void AddFirebolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaste
 void AddTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, k, l, j, tx, ty;
-    int CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
 
     missile[mi]._miDelFlag = 1;
     for (k = 0; k < 6; k++) {
@@ -1412,7 +1412,7 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, mx, k, j, l, tx, ty;
-    int CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
 
     missile[mi]._miDelFlag = 0;
     for (i = 0; i < nummissiles; i++) {
@@ -1445,6 +1445,177 @@ void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
             }
             j += 2;
         }
+    }
+}
+
+void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
+{
+    /* PSX massively simplifies devilution's Cels/uniqtrans/mlid handling away -- just picks one of
+     * the CMonster::Anims[] slots (SPECIAL/ATTACK/WALK) by a hardcoded mtype range (the collapsed
+     * EquivMonst(mtype,MT_HORNED)=[0x40,0x43], EquivMonst(mtype,MT_NSNAKE)=[0x59,0x5C] ranges) and
+     * copies Frames/Rate; no Cels pointer, no _miAnimWidth/Width2, no uniqtype/mlid path exist here. */
+    struct AnimStruct *anim;
+    unsigned char mtype;
+
+    mtype = monster[id].MType->mtype;
+    if ((unsigned char)(mtype - 0x40) < 4)
+        anim = &monster[id].MType->Anims[5];
+    else if ((unsigned char)(mtype - 0x59) < 4)
+        anim = &monster[id].MType->Anims[2];
+    else
+        anim = &monster[id].MType->Anims[1];
+
+    GetMissileVel(mi, sx, sy, dx, dy, 18);
+
+    missile[mi]._mimfnum = midir;
+    missile[mi]._miAnimFlags = 0;
+    missile[mi]._miAnimDelay = anim->Rate;
+    missile[mi]._miAnimAdd = 1;
+    missile[mi]._miAnimLen = anim->Frames;
+
+    if ((unsigned char)(monster[id].MType->mtype - 0x59) < 4)
+        missile[mi]._miAnimFrame = 7;
+
+    missile[mi]._miVar1 = 0;
+    missile[mi]._miVar2 = 0;
+    missile[mi]._miLightFlag = 1;
+    missile[mi]._mirange = 256;
+
+    PutMissile(mi);
+}
+
+void AddFirewallC(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
+{
+    int i, k, l, j, tx, ty, dir;
+    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+
+    missile[mi]._miDelFlag = 1;
+    for (k = 0; k < 6; k++) {
+        l = CrawlNum[k];
+        j = l + 1;
+        for (i = CrawlTable[l]; i > 0; i--) {
+            tx = dx + CrawlTable[j];
+            ty = dy + CrawlTable[j + 1];
+            if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
+                if (LineClear(sx, sy, tx, ty) && (sx != tx || sy != ty) && (GetSOLID(tx, ty) | dung_map[tx][ty].dObject) == 0) {
+                    missile[mi]._miVar1 = tx;
+                    missile[mi]._miVar2 = ty;
+                    missile[mi]._miVar5 = tx;
+                    missile[mi]._miVar6 = ty;
+                    missile[mi]._miDelFlag = 0;
+                    k = 6;
+                    break;
+                }
+            }
+            j += 2;
+        }
+    }
+
+    if (missile[mi]._miDelFlag == 1)
+        return;
+
+    missile[mi]._miVar7 = 0;
+    missile[mi]._miVar8 = 0;
+
+    dir = GetDirection(sx, sy, missile[mi]._miVar1, missile[mi]._miVar2);
+    missile[mi]._miVar4 = (dir + 2) & 7;
+    missile[mi]._miVar3 = (dir - 2) & 7;
+
+    missile[mi]._mirange = 7;
+    UseMana(id, SPL_FIREWALL);
+}
+
+void AddDiabApoca(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
+{
+    /* PSX loops 0..FePlayerNo (a front-end/link-cable player-count global), not gbMaxPlayers as
+     * hellfire does, and reads plr[]._px/_py (there is no _pfutx/_pfuty in the PSX struct). */
+    int pnum;
+
+    if (FePlayerNo >= 0) {
+        for (pnum = 0; pnum <= FePlayerNo; pnum++) {
+            if (plr[pnum].plractive && LineClear(sx, sy, plr[pnum]._px, plr[pnum]._py))
+                AddMissile(0, 0, plr[pnum]._px, plr[pnum]._py, 0, 0x42, mienemy, id, dam, 0);
+        }
+    }
+    missile[mi]._miDelFlag = 1;
+}
+
+void MI_Arrow(int i)
+{
+    int p, mind, maxd;
+
+    missile[i]._mirange--;
+    missile[i]._midist++;
+    missile[i]._mitxoff += missile[i]._mixvel;
+    missile[i]._mityoff += missile[i]._miyvel;
+    GetMissilePos(i);
+    p = missile[i]._misource;
+    if (p != -1) {
+        if (missile[i]._micaster == TARGET_MONSTERS) {
+            mind = plr[p]._pIMinDam;
+            maxd = plr[p]._pIMaxDam;
+        } else {
+            mind = monster[p].mMinDamage;
+            maxd = monster[p].mMaxDamage;
+        }
+    } else {
+        mind = currlevel;
+        maxd = currlevel * 2;
+    }
+    if (missile[i]._mix != missile[i]._misx || missile[i]._miy != missile[i]._misy)
+        CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
+    if (missile[i]._mirange == 0)
+        missile[i]._miDelFlag = 1;
+    PutMissile(i);
+}
+
+void MI_Acidsplat(int i)
+{
+    int monst;
+    int dam;
+
+    if (missile[i]._mirange == missile[i]._miAnimLen) {
+        missile[i]._mix++;
+        missile[i]._miy++;
+        missile[i]._miyoff -= 32;
+    }
+
+    missile[i]._mirange--;
+    if (missile[i]._mirange == 0) {
+        missile[i]._miDelFlag = 1;
+        monst = missile[i]._misource;
+        dam = (*(char *)((char *)monster[monst].MData + 0x1A) < 2) ? 1 : 2;
+        AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_ACIDPUD, TARGET_PLAYERS, missile[i]._misource, dam, missile[i]._mispllvl);
+        return;
+    }
+
+    PutMissile(i);
+}
+
+void MI_Stone(int i)
+{
+    int m;
+
+    missile[i]._mirange--;
+    m = missile[i]._miVar2;
+
+    if (monster[m]._mhitpoints == 0 && missile[i]._miAnimType != 0x12) {
+        SetMissAnim(i, 0x12);
+        missile[i]._mirange = 11;
+    }
+
+    if (monster[m]._mmode != MM_STONE) {
+        missile[i]._miDelFlag = 1;
+    } else {
+        if (missile[i]._mirange == 0) {
+            missile[i]._miDelFlag = 1;
+            if (monster[m]._mhitpoints > 0)
+                monster[m]._mmode = missile[i]._miVar1;
+            else
+                AddDead(monster[m]._mx, monster[m]._my, stonendx, monster[m]._mdir);
+        }
+        if (missile[i]._miAnimType == 0x12)
+            PutMissile(i);
     }
 }
 
