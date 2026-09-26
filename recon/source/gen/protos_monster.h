@@ -140,3 +140,6 @@ void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
 void CheckQuestKill(int m, unsigned char sendmsg);   /* @0x80067C04 QUESTS.CPP:317 */
 void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP:94 */
 long GetRndSeed(void);   /* @0x8003DADC ENGINE.CPP:102 */
+ItemStruct * PlrHasItem(int pnum, int item, int *i);   /* @0x8003B768 TOWNERS.CPP:593 */
+void RemoveInvItem(int pnum, int iv);   /* @0x8015D6FC INV.CPP:2399 */
+void NetSendCmdQuest(unsigned char bHiPri, unsigned char q);   /* @0x8004F8C8 MSG.CPP:998 */

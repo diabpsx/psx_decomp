@@ -61,6 +61,15 @@
 #define MT_NACID    0x2E
 #define MT_XACID    0x31
 #define MM_TALK    0x11
+#define AI_SNOTSPIL 0x17
+#define AI_LACHDANAN 0x1E
+#define Q_LTBANNER  7
+#define Q_VEIL      4
+#define IDI_BANNER  0xC
+#define IDI_GLDNELIX 0xF
+#define TXT_BOL3    0x16
+#define TXT_VEIL1   0x51
+#define TXT_VEIL3   0x53
 #define TXT_WARLRD1 0x6E
 #define TXT_ZHAR1   0x94
 #define TXT_ZHAR2   0x95
@@ -1863,7 +1872,7 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
     int _mx, _my;
 
     if (pnum >= 0)
-        Monst->mWhoHit |= 1 << pnum;
+        Monst->mWhoHit = 1 << pnum;
     if (pnum < 2 && i > 2)
         AddPlrMonstExper(Monst->mLevel, Monst->mExp, Monst->mWhoHit);
     monstkills[Monst->MType->mtype]++;
@@ -1911,4 +1920,213 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
     M_FallenFear(_mx, _my);
     if (Monst->MType->mtype - MT_NACID < 4)
         AddMissile(_mx, _my, 0, 0, 0, MIT_ACIDPUD, 1, i, Monst->_mint + 1, 0);
+}
+
+unsigned char LineClearF(unsigned char (*Clear)(int, int), int x1, int y1, int x2, int y2)
+{
+    int dx, dy;
+    int d;
+    int dincH;
+    int dincD;
+    int xincD, yincD;
+    int xorg, yorg;
+    unsigned char done = 0;
+    int tmp;
+
+    xorg = x1;
+    yorg = y1;
+
+    dx = x2 - x1;
+    dy = y2 - y1;
+    if (abs(dx) > abs(dy)) {
+        if (dx < 0) {
+            tmp = x1;
+            x1 = x2;
+            x2 = tmp;
+            tmp = y1;
+            y1 = y2;
+            y2 = tmp;
+
+            dx = -dx;
+            dy = -dy;
+        }
+        if (dy > 0) {
+            d = 2 * dy - dx;
+            dincH = 2 * dy;
+            dincD = 2 * (dy - dx);
+            yincD = 1;
+        } else {
+            d = 2 * dy + dx;
+            dincH = 2 * dy;
+            dincD = 2 * (dy + dx);
+            yincD = -1;
+        }
+
+        while (!done && !(x1 == x2 && y1 == y2)) {
+            if ((d <= 0) ^ (yincD < 0)) {
+                d += dincH;
+            } else {
+                d += dincD;
+                y1 += yincD;
+            }
+            x1++;
+            done = (x1 != xorg || y1 != yorg) && !(*Clear)(x1, y1);
+        }
+    } else {
+        if (dy < 0) {
+            tmp = y1;
+            y1 = y2;
+            y2 = tmp;
+            tmp = x1;
+            x1 = x2;
+            x2 = tmp;
+
+            dy = -dy;
+            dx = -dx;
+        }
+        if (dx > 0) {
+            d = 2 * dx - dy;
+            dincH = 2 * dx;
+            dincD = 2 * (dx - dy);
+            xincD = 1;
+        } else {
+            d = 2 * dx + dy;
+            dincH = 2 * dx;
+            dincD = 2 * (dx + dy);
+            xincD = -1;
+        }
+
+        while (!done && !(y1 == y2 && x1 == x2)) {
+            if ((d <= 0) ^ (xincD < 0)) {
+                d += dincH;
+            } else {
+                d += dincD;
+                x1 += xincD;
+            }
+            y1++;
+            done = (y1 != yorg || x1 != xorg) && !(*Clear)(x1, y1);
+        }
+    }
+
+    return x1 == x2 && y1 == y2;
+}
+
+unsigned char LineClearF1(unsigned char (*Clear)(int, int, int), int monst, int x1, int y1, int x2, int y2)
+{
+    int dx, dy;
+    int d;
+    int dincH;
+    int dincD;
+    int xincD, yincD;
+    int xorg, yorg;
+    unsigned char done = 0;
+    int tmp;
+
+    xorg = x1;
+    yorg = y1;
+
+    dx = x2 - x1;
+    dy = y2 - y1;
+    if (abs(dx) > abs(dy)) {
+        if (dx < 0) {
+            tmp = x1;
+            x1 = x2;
+            x2 = tmp;
+            tmp = y1;
+            y1 = y2;
+            y2 = tmp;
+
+            dx = -dx;
+            dy = -dy;
+        }
+        if (dy > 0) {
+            d = 2 * dy - dx;
+            dincH = 2 * dy;
+            dincD = 2 * (dy - dx);
+            yincD = 1;
+        } else {
+            d = 2 * dy + dx;
+            dincH = 2 * dy;
+            dincD = 2 * (dy + dx);
+            yincD = -1;
+        }
+
+        while (!done && !(x1 == x2 && y1 == y2)) {
+            if ((d <= 0) ^ (yincD < 0)) {
+                d += dincH;
+            } else {
+                d += dincD;
+                y1 += yincD;
+            }
+            x1++;
+            done = (x1 != xorg || y1 != yorg) && !Clear(monst, x1, y1);
+        }
+    } else {
+        if (dy < 0) {
+            tmp = y1;
+            y1 = y2;
+            y2 = tmp;
+            tmp = x1;
+            x1 = x2;
+            x2 = tmp;
+
+            dy = -dy;
+            dx = -dx;
+        }
+        if (dx > 0) {
+            d = 2 * dx - dy;
+            dincH = 2 * dx;
+            dincD = 2 * (dx - dy);
+            xincD = 1;
+        } else {
+            d = 2 * dx + dy;
+            dincH = 2 * dx;
+            dincD = 2 * (dx + dy);
+            xincD = -1;
+        }
+
+        while (!done && !(y1 == y2 && x1 == x2)) {
+            if ((d <= 0) ^ (xincD < 0)) {
+                d += dincH;
+            } else {
+                d += dincD;
+                x1 += xincD;
+            }
+            y1++;
+            done = (y1 != yorg || x1 != xorg) && !Clear(monst, x1, y1);
+        }
+    }
+
+    return x1 == x2 && y1 == y2;
+}
+
+void TalktoMonster(int i)
+{
+    int pnum, itm;
+    MonsterStruct *Monst = &monster[i];
+    pnum = Monst->_menemy;
+
+    if (Monst->_mmode == MM_TALK)
+        return;
+    Monst->_mmode = MM_TALK;
+
+    if (Monst->_mAi != AI_SNOTSPIL && Monst->_mAi != AI_LACHDANAN)
+        return;
+
+    if (QuestStatus(Q_LTBANNER)) {
+        if (quests[Q_LTBANNER]._qvar1 == 2 && PlrHasItem(pnum, IDI_BANNER, &itm)) {
+            RemoveInvItem(pnum, itm);
+            quests[Q_LTBANNER]._qactive = 3;
+            Monst->mtalkmsg = TXT_BOL3;
+            Monst->_mgoal = MG_TALK;
+            NetSendCmdQuest(1, Q_LTBANNER);
+        }
+    }
+    if (QuestStatus(Q_VEIL)) {
+        if (Monst->mtalkmsg >= TXT_VEIL1 && PlrHasItem(pnum, IDI_GLDNELIX, &itm)) {
+            RemoveInvItem(pnum, itm);
+            Monst->mtalkmsg = TXT_VEIL3;
+            Monst->_mgoal = MG_TALK;
+        }
+    }
 }
