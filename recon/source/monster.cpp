@@ -521,13 +521,12 @@ int M_DoDelay(int i)
         if (monster[i]._mVar2 > 8 || monster[i]._mVar2 < 0)
             monster[i]._mVar2 = 8;
     }
-    if (monster[i]._mVar2-- == 0) {
+    if (!monster[i]._mVar2--) {
         int tmp = monster[i]._mAnimFrame;
         M_StartStand(i, monster[i]._mdir);
         monster[i]._mAnimFrame = tmp;
         return 1;
-    }
-    return 0;
+    } else return 0;
 }
 
 void M_StartFadein(int i, int md, unsigned char backwards)
@@ -1404,6 +1403,9 @@ int M_DoDeath(int i)
 
     monster[i]._mVar1++;
     if (monster[i].MType->mtype == MT_DIABLO) {
+        /* Retail's Diablo branch is a block with a local that the optimiser removed (SYM: a level
+         * with no record); the original local is unknown. */
+        int dummy;
         DiabloDieFlag = 1;
         ViewX += Sign(_mx - ViewX);
         ViewY += Sign(_my - ViewY);
