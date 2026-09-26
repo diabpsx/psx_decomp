@@ -359,4 +359,11 @@ for target in funcs:
     else:
         allpass=False; print(f"  {target}: FAIL {len(d)} diffs (ours {len(o)} / oracle {len(e)})")
         for l in d[:int(os.environ.get("VA_MAX","12"))]: print("      "+l)
+        if os.environ.get("VA_CTX"):      # VA_CTX=N: show each differing region with N lines of context (ours | oracle)
+            n=int(os.environ["VA_CTX"]); sm=__import__('difflib').SequenceMatcher(None,o,e,autojunk=False)
+            for tag,i1,i2,j1,j2 in sm.get_opcodes():
+                if tag=="equal": continue
+                print(f"      == {tag} ours[{i1}:{i2}] oracle[{j1}:{j2}]")
+                for k in range(max(0,i1-n),min(len(o),i2+n)):
+                    print(("      > " if i1<=k<i2 else "        ")+f"{k:5d} {o[k]:34s} | {e[k] if k<len(e) else ''}")
 sys.exit(0 if allpass else 1)

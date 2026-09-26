@@ -67,4 +67,72 @@ int abs(int v);
         p = NULL;          \
         mem_free_dbg(p__p); \
     }
+
+/* --- TalkToTowner vocabulary (retail values) --- */
+#define CURSOR_FIRSTITEM 12
+#define PC_WARRIOR  0
+#define PC_ROGUE    1
+#define PC_SORCERER 2
+#define Q_MUSHROOM  1
+#define Q_DIABLO    5
+#define Q_ANVIL     10
+#define Q_SKELKING  12
+#define Q_PWATER    13
+#define Q_BETRAYER  15
+#define QS_TOMEGIVEN  2
+#define QS_MUSHPICKED 4
+#define QS_MUSHGIVEN  5
+#define QS_BRAINGIVEN 7
+#define IDI_ROCK     9
+#define IDI_BANNER   0xC
+#define IDI_ANVIL    0x10
+#define IDI_MUSHROOM 0x11
+#define IDI_BRAIN    0x12
+#define IDI_FUNGALTM 0x13
+#define IDI_SPECELIX 0x14
+#define IDI_LAZSTAFF 0x21
+#define UITEM_INFRARING 2
+#define UITEM_TRING     4
+#define UITEM_HARCREST  5
+#define UITEM_GRISWOLD  8
+#define STORE_SMITH   1
+#define STORE_WITCH   5
+#define STORE_BOY     0xC
+#define STORE_HEALER  0xE
+#define STORE_STORY   0xF
+#define STORE_TAVERN  0x15
+#define STORE_DRUNK   0x16
+#define STORE_BARMAID 0x17
+#define TEXT_KING2     1
+#define TEXT_KING4     3
+#define TEXT_BANNER2   0xC
+#define TEXT_BANNER3   0xD
+#define TEXT_VILE1     0x17
+#define TEXT_VILE3     0x19
+#define TEXT_POISON3   0x27
+#define TEXT_POISON5   0x29
+#define TEXT_BUTCH9    0x3F
+#define TEXT_ANVIL5    0x58
+#define TEXT_ANVIL7    0x5A
+#define TEXT_INFRA5    0x73
+#define TEXT_INFRA7    0x75
+#define TEXT_MUSH3     0x7B
+#define TEXT_MUSH4     0x7C
+#define TEXT_MUSH8     0x80
+#define TEXT_MUSH9     0x81
+#define TEXT_MUSH10    0x82
+#define TEXT_MUSH11    0x83
+#define TEXT_MUSH12    0x84
+#define TEXT_STORY1    0x96
+#define TEXT_OGDEN1    0xA0
+#define TEXT_PEPIN1    0xA9
+#define TEXT_GILLIAN1  0xB3
+#define TEXT_GRISWOLD1 0xBC
+#define TEXT_FARNHAM1  0xC8
+#define TEXT_ADRIA1    0xD4
+#define TEXT_WIRT1     0xE0
+#define TEXT_INTRO     0x102
+#define PS_MAGE8  0x203
+#define PS_ROGUE8 0x26B
+#define PS_WARR8  0x2D3
 #endif

@@ -18,3 +18,7 @@ extern int Qtalklist[11][16];   /* @0x800CFBC0 */
 extern int myplr;   /* @0x8011BA08 */
 extern int options_pad;   /* @0x8011B250 */
 extern unsigned char qtextflag;   /* @0x8011B960 */
+extern char stextflag;   /* @0x8011BAE0 */
+extern unsigned char gbMaxPlayers;   /* @0x8011B9A2 */
+extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */
+extern int _pcurs[2];   /* @0x8011B730 */
