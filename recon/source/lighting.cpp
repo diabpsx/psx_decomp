@@ -31,7 +31,7 @@ int g_light_amp;      /* @D_8011C7FC: per-DoLighting-call colour amplitude (from
 int g_light_amp2;     /* @D_8011C800: per-DoLighting-call secondary amplitude (from D_800D62F0[radius]) */
 int g_light_clamp;    /* @D_8011C804: per-DoLighting-call colour clamp ceiling */
 int g_weirdy_prev;    /* @D_8011C7E0: last weirdy flag DoLighting saw (drives the once-only weird-cheat gate) */
-unsigned char g_lightband_mask;   /* @D_8011C7DC: set_light_bands' circular-buffer mask (0x7F) */
+int g_lightband_mask;   /* @D_8011C7DC: set_light_bands' circular-buffer mask (0x7F; stored as a full word) */
 unsigned char g_lightband[192];  /* @D_8012ED58: set_light_bands' gradient band table (BSS) */
 
 /* per-radius colour amplitude curves (0..15), read via D_800D62E0[radius]/D_800D62F0[radius] */
@@ -80,7 +80,7 @@ int veclen2(int ix, int iy)
 
 void set_light_bands(void)
 {
-    int y, v;
+    int v, y;
     unsigned char *l;
 
     y = 0;
@@ -94,13 +94,15 @@ void set_light_bands(void)
     l = g_lightband;
     v = 0x1F;
     do {
-        *l++ = y;
+        *l = y;
         y++;
+        l++;
     } while (--v >= 0);
     v = 0x1F;
     do {
-        *l++ = y;
+        *l = y;
         y--;
+        l++;
     } while (--v >= 0);
 }
 
@@ -108,9 +110,9 @@ void SetLightFX(int x, int y, short s_r, short s_g, short s_b, unsigned char d_r
 {
     g_lightfx_sr = s_r;
     g_lightfx_sg = s_g;
-    g_lightfx_dr = d_r << 8;
-    g_lightfx_dg = d_g << 8;
     g_lightfx_db = d_b << 8;
+    g_lightfx_dg = d_g << 8;
+    g_lightfx_dr = d_r << 8;
     g_lightfx_sb = s_b;
     AddLight(x, y, 0x6070);
 }
@@ -150,11 +152,11 @@ void DoUnLight(void)
 {
     int nXPos, nYPos, x, y, max_x, max_y;
 
-    nYPos = (gr_scryoff / 2 / 0xA00000) - 0xD;
-    nXPos = (gr_scrxoff / 2 / 0xA00000) - 0x9;
+    nYPos = ((gr_scryoff >> 16) / 5) - 0xD;
+    nXPos = ((gr_scrxoff >> 16) / 5) - 0x9;
     if (leveltype == 0) {
-        nXPos = (gr_scrxoff / 2 / 0xA00000) - 1;
-        nYPos = (gr_scryoff / 2 / 0xA00000) - 5;
+        nXPos = ((gr_scrxoff >> 16) / 5) - 1;
+        nYPos = ((gr_scryoff >> 16) / 5) - 5;
     }
 
     max_x = 0x30;
@@ -196,12 +198,17 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
 {
     int i, j, x1, y1, x2, y2;
 
-    if (num == 0)
+    switch (num) {
+    case 0:
         num = 1;
-    else if (num == 1)
+        break;
+    case 1:
         num = 2;
-    else
+        break;
+    default:
         num = 3;
+        break;
+    }
 
     nRadius++;
     y1 = nYPos - nRadius;
@@ -359,6 +366,7 @@ void ProcessLightList(void)
     int i, j;
     unsigned char temp;
     struct LightListStruct2 *ll;
+    unsigned char *p;
 
     DoUnLight();
     for (i = 0; i < numlights; i++) {
@@ -368,15 +376,18 @@ void ProcessLightList(void)
             DoLighting(ll->_lx, ll->_ly, ll->_lradius, j);
     }
     i = 0;
+    p = lightactive;
     while (i < numlights) {
-        ll = &LightList[lightactive[i]];
+        j = *p;
+        ll = &LightList[j];
         if (ll->_ldel) {
             numlights--;
             temp = lightactive[numlights];
-            lightactive[numlights] = lightactive[i];
-            lightactive[i] = temp;
+            lightactive[numlights] = *p;
+            *p = temp;
         } else {
             i++;
+            p++;
         }
     }
 }
@@ -399,15 +410,15 @@ void InitVision(void)
 int AddVision(int x, int y, int r, unsigned char mine)
 {
     int vid = 0;
-    struct LightListStruct *vl;
 
     if (numvision < MAXVISION) {
+        struct LightListStruct *vl;
+
         vl = &VisionList[numvision];
         vl->_lx = x;
         vl->_ly = y;
         vl->_lradius = r;
-        vid = visionid;
-        visionid = vid + 1;
+        vid = visionid++;
         vl->_lid = vid;
         vl->_ldel = 0;
         vl->_lunflag = 0;
