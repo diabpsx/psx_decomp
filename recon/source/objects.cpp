@@ -268,6 +268,394 @@ void SyncQSTLever(int i)
     }
 }
 
+/* out-of-line header-copy methods (GMAN.H/BLOCK.H inline members compiled into this TU because it uses them) */
+int CBlocks::GetOtPos(int LogicalY)
+{
+    int v;
+
+    v = ClipRect.y + LogicalY + PosAdj;
+    if (v < -0x43)
+        v = -0x43;
+    if (v >= 0x19C)
+        v = 0x19B;
+    return v + 0x4D;
+}
+
+struct CCreatureHdr *TextDat::GetCreature(int Creature)
+{
+    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
+}
+
+int TextDat::GetNumOfFrames(int Creature, int Action)
+{
+    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
+}
+
+void OperateCauldron(int pnum, int i, int sType)
+{
+    SetRndSeed(object[i]._oRndSeed);
+    object[i]._oVar1 = FindValidShrine(i);
+    OperateShrine(pnum, i, sType);
+    object[i]._oAnimFlag = 0;
+    force_redraw = 0xFF;
+}
+
+void OperateGoatShrine(int pnum, int i, int sType)
+{
+    SetRndSeed(object[i]._oRndSeed);
+    object[i]._oVar1 = FindValidShrine(i);
+    OperateShrine(pnum, i, sType);
+    object[i]._oAnimCnt = 2;
+    force_redraw = 0xFF;
+}
+
+void OperateDecap(int pnum, int i, unsigned char sendmsg)
+{
+    if (object[i]._oSelFlag) {
+        object[i]._oSelFlag = 0;
+        if (!deltaload) {
+            SetRndSeed(object[i]._oRndSeed);
+            CreateRndItem(object[i]._ox, object[i]._oy, 0, sendmsg, 0);
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void OperateL1Door(int pnum, int i, unsigned char sendflag)
+{
+    int dpx, dpy;
+
+    dpx = abs(object[i]._ox - plr[pnum]._px);
+    dpy = abs(object[i]._oy - plr[pnum]._py);
+    if (dpx == 1 && dpy < 2 && object[i]._otype == 1)
+        OperateL1LDoor(pnum, i, sendflag);
+    if (dpx < 2 && dpy == 1 && object[i]._otype == 2)
+        OperateL1RDoor(pnum, i, sendflag);
+}
+
+void OperateL2Door(int pnum, int i, unsigned char sendflag)
+{
+    int dpx, dpy;
+
+    dpx = abs(object[i]._ox - plr[pnum]._px);
+    dpy = abs(object[i]._oy - plr[pnum]._py);
+    if (dpx == 1 && dpy < 2 && object[i]._otype == 0x2A)
+        OperateL2LDoor(pnum, i, sendflag);
+    if (dpx < 2 && dpy == 1 && object[i]._otype == 0x2B)
+        OperateL2RDoor(pnum, i, sendflag);
+}
+
+void OperateL3Door(int pnum, int i, unsigned char sendflag)
+{
+    int dpx, dpy;
+
+    dpx = abs(object[i]._ox - plr[pnum]._px);
+    dpy = abs(object[i]._oy - plr[pnum]._py);
+    if (dpx == 1 && dpy < 2 && object[i]._otype == 0x4B)
+        OperateL3LDoor(pnum, i, sendflag);
+    if (dpx < 2 && dpy == 1 && object[i]._otype == 0x4A)
+        OperateL3RDoor(pnum, i, sendflag);
+}
+
+void OperateArmorStand(int pnum, int i, unsigned char sendmsg)
+{
+    unsigned char onlygood;
+    int itype;
+
+    if (object[i]._oSelFlag) {
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame++;
+        if (!deltaload) {
+            SetRndSeed(object[i]._oRndSeed);
+            onlygood = ENG_random(2);
+            if (currlevel < 6) {
+                onlygood = 1;
+                itype = 6;
+            } else if (currlevel - 6 < 4) {
+                itype = 8;
+            } else if (currlevel - 10 < 3) {
+                onlygood = 0;
+                itype = 9;
+            } else if (currlevel - 13 < 4) {
+                onlygood = 1;
+                itype = 9;
+            } else {
+                goto skip;
+            }
+            CreateTypeItem(object[i]._ox, object[i]._oy, onlygood, itype, 0, sendmsg, 0);
+        skip:
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void OperateSkelBook(int pnum, int i, unsigned char sendmsg)
+{
+    int imisc;
+
+    if (object[i]._oSelFlag) {
+        if (!deltaload)
+            PlaySfxLoc(0x26, object[i]._ox, object[i]._oy);
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame += 2;
+        if (!deltaload) {
+            SetRndSeed(object[i]._oRndSeed);
+            if (ENG_random(5) != 0)
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 0x15, sendmsg, 0);
+            else
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 0x18, sendmsg, 0);
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void OperateLazStand(int pnum, int i)
+{
+    int x, y;
+
+    if (numitems >= 0x7F && object[i]._oSelFlag) {
+        PlaySFX(0x3D3);
+        return;
+    }
+    if (deltaload) {
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame++;
+        return;
+    }
+    if (object[i]._oSelFlag) {
+        if (!qtextflag) {
+            if (pnum == myplr) {
+                object[i]._oSelFlag = 0;
+                object[i]._oAnimFrame++;
+                GetSuperItemLoc(object[i]._ox, object[i]._oy, &x, &y);
+                SpawnQuestItem(0x21, x, y, 0, 0);
+                NetSendCmdParam1(0, 0x2D, i);
+            }
+        }
+    }
+}
+
+void OperateWeaponRack(int pnum, int i, unsigned char sendmsg)
+{
+    int itype;
+    int onlygood;
+
+    if (object[i]._oSelFlag) {
+        SetRndSeed(object[i]._oRndSeed);
+        switch (ENG_random(4) + 1) {
+        case 1:
+            itype = 1;
+            break;
+        case 2:
+            itype = 2;
+            break;
+        case 3:
+            itype = 3;
+            break;
+        case 4:
+            itype = 4;
+            break;
+        }
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame++;
+        if (!deltaload) {
+            onlygood = (leveltype < 2) ? 0 : 1;
+            CreateTypeItem(object[i]._ox, object[i]._oy, onlygood, itype, 0, sendmsg, 0);
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void OperateStoryBook(int pnum, int i)
+{
+    if (object[i]._oSelFlag) {
+        object[i]._oAnimFrame = object[i]._oVar4;
+        if (!deltaload) {
+            PauseMode = 1;
+            if (!qtextflag) {
+                if (pnum == myplr) {
+                    PlaySfxLoc(0x26, object[i]._ox, object[i]._oy);
+                    InitQTextMsg(object[i]._oVar2);
+                    NetSendCmdParam1(0, 0x2D, i);
+                }
+            }
+        }
+    }
+}
+
+void GetObjectStr(int i)
+{
+    int id;
+    char *s;
+    short idx;
+
+    s = 0;
+    switch (object[i]._otype) {
+    case 1:
+    case 2:
+    case 42:
+    case 43:
+    case 74:
+    case 75:
+        if (object[i]._oVar4 == 1)
+            strcpy(_infostr[sel_data], GetStr(0x2F3));
+        if (object[i]._oVar4 == 0)
+            strcpy(_infostr[sel_data], GetStr(0xBD));
+        if (object[i]._oVar4 != 2)
+            goto tail;
+        id = 0x5E;
+        break;
+    case 20:
+    case 21:
+    case 22:
+        id = 0xDA;
+        break;
+    case 4:
+    case 50:
+        id = 0x248;
+        break;
+    case 25:
+        if (!setlevel)
+            goto tail;
+        if (setlvlnum == 2)
+            id = 0x17;
+        else if (setlvlnum == 5)
+            id = 0x7B;
+        else
+            goto tail;
+        break;
+    case 28:
+        id = 0x3D8;
+        break;
+    case 41:
+        id = 0x2AE;
+        break;
+    case 5:
+    case 68:
+        id = 0x3DF;
+        break;
+    case 6:
+    case 69:
+        id = 0xB5;
+        break;
+    case 7:
+    case 70:
+    case 97:
+        id = 0x239;
+        break;
+    case 48:
+        id = 0x383;
+        break;
+    case 55:
+        id = 0x78;
+        break;
+    case 62:
+    case 63:
+        id = 0x77;
+        break;
+    case 57:
+    case 58:
+        id = 0x40;
+        break;
+    case 59:
+    case 60:
+        idx = object[i]._oVar1;
+        if (shrinestrs[idx] == 0x1ED) {
+            s = GetStr(0x1EE);
+            sprintf(tempstr, "%s", s);
+        } else if (shrinestrs[idx] == 0x1FA) {
+            s = GetStr(0x1FD);
+            sprintf(tempstr, "%s", s);
+        } else if (shrinestrs[idx] == 0x4C7) {
+            s = GetStr(0x4C8);
+            sprintf(tempstr, "%s", s);
+        } else {
+            s = GetStr(0x517);
+            sprintf(tempstr, s, GetStr(shrinestrs[idx]));
+        }
+        strcpy(_infostr[sel_data], tempstr);
+        goto tail;
+    case 61:
+        id = 0x3D3;
+        break;
+    case 64:
+        id = 0x24B;
+        break;
+    case 66:
+        id = 0x68;
+        break;
+    case 67:
+        id = 0xEF;
+        break;
+    case 71:
+        id = 0x7A;
+        break;
+    case 72:
+        id = 0x40D;
+        break;
+    case 76:
+        id = 0x337;
+        break;
+    case 77:
+    case 89:
+        id = 0x28;
+        break;
+    case 90:
+        id = 0x4C4;
+        break;
+    case 79:
+        id = 0x18C;
+        break;
+    case 80:
+        id = 0xA3;
+        break;
+    case 81:
+        id = 0x2A9;
+        break;
+    case 82:
+        id = 0x169;
+        break;
+    case 73:
+        id = 0x304;
+        break;
+    case 86:
+        idx = object[i]._oVar2;
+        s = GetStr(StoryBookName[idx]);
+        strcpy(_infostr[sel_data], s);
+        goto tail;
+    case 88:
+        id = 0x40D;
+        break;
+    case 92:
+        id = 0x4C4;
+        break;
+    case 94:
+        id = 0x2AA;
+        break;
+    case 95:
+        id = 0x4B3;
+        break;
+    case 96:
+        id = 0x3D9;
+        break;
+    default:
+        goto tail;
+    }
+    strcpy(_infostr[sel_data], GetStr(id));
+tail:
+    if (plr[sel_data]._pClass == 1) {
+        if (object[i]._oDoorFlag) {
+            sprintf(tempstr, GetStr(0x499), _infostr[sel_data]);
+            strcpy(_infostr[sel_data], tempstr);
+            _infoclr[sel_data] = 2;
+        }
+    }
+}
+
 void ObjSetMicro(int dx, int dy, int pn)
 {
     if (dPiece) {
