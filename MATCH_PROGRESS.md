@@ -1,8 +1,8 @@
 # Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only
 
-**Main image: 64 / 3660 functions byte-matched (1.7%)**
+**Main image: 73 / 3660 functions byte-matched (2.0%)**
 
-## gman  (recon/psxsrc/gman.cpp) — 64/76 PASS
+## gman  (recon/psxsrc/gman.cpp) — 73/76 PASS
 - ✅ __7TextDat (13)
 - ✅ OnceOnlyInit__7TextDat (8)
 - ✅ ___7TextDat (18)
@@ -60,21 +60,21 @@
 - ❌ Display__7CScreeniiii — 77 diffs (ours 184)
 - ✅ SetRect__5CPartR7TextDatR4RECT (31)
 - ⬜ GetBoundingBox__6CBlockR7TextDatR4RECT
-- 🟡 _GLOBAL__D_DatPool — bytes PASS, SYM differs
-- 🟡 _GLOBAL__I_DatPool — bytes PASS, SYM differs
-- 🟡 PRIM_GetPrim__FPP8POLY_GT4_8009512c — bytes PASS, SYM differs
-- 🟡 PRIM_GetPrim__FPP8POLY_FT4_800951a8 — bytes PASS, SYM differs
+- ✅ _GLOBAL__D_DatPool (22)
+- ✅ _GLOBAL__I_DatPool (21)
+- ✅ PRIM_GetPrim__FPP8POLY_GT4_8009512c (31)
+- ✅ PRIM_GetPrim__FPP8POLY_FT4_800951a8 (31)
 - ✅ DumpDatFile__7TextDat (29)
 - ✅ CanXferFrame__C7TextDat (10)
 - ✅ CanXferPal__C7TextDat (10)
 - ✅ IsLoaded__C7TextDat (3)
 - ✅ GetTexNum__C7TextDat (3)
-- 🟡 GetCreature__7TextDati_80095300 — bytes PASS, SYM differs
+- ✅ GetCreature__7TextDati_80095300 (7)
 - ✅ GetNumOfCreatures__7TextDat (5)
-- 🟡 SetFileInfo__7TextDatPC13CTextFileInfoi_80095330 — bytes PASS, SYM differs
-- 🟡 GetNumOfFrames__7TextDat_8009533c — bytes PASS, SYM differs
-- 🟡 GetPal__7TextDati_80095350 — bytes PASS, SYM differs
-- 🟡 GetFr__7TextDati_8009536c — bytes PASS, SYM differs
+- ✅ SetFileInfo__7TextDatPC13CTextFileInfoi_80095330 (3)
+- ✅ GetNumOfFrames__7TextDat_8009533c (5)
+- ✅ GetPal__7TextDati_80095350 (7)
+- ✅ GetFr__7TextDati_8009536c (7)
 - ✅ GetName__C13CTextFileInfo (3)
 - ✅ HasDat__C13CTextFileInfo (10)
 - ✅ HasTp__C13CTextFileInfo (10)

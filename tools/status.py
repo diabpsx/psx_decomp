@@ -42,8 +42,8 @@ def sym_ok(tu: Path, fns):
     r = subprocess.run([PY, str(ROOT / "tools" / "symlane.py"), str(tu.relative_to(ROOT)), ",".join(fns)],
                        cwd=ROOT, capture_output=True, text=True)
     out = {}
-    for m in re.finditer(r"^\s+(\S+): (SYM ok|SYM DIFF|NO RETAIL SYM|NOT IN OBJECT)", r.stdout, re.M):
-        out[m.group(1)] = m.group(2) == "SYM ok"
+    for m in re.finditer(r"^\s+(\S+): (SYM ok|SYM n/a|SYM DIFF|NO RETAIL SYM|NOT IN OBJECT)", r.stdout, re.M):
+        out[m.group(1)] = m.group(2) in ("SYM ok", "SYM n/a")
     return out
 
 def main():

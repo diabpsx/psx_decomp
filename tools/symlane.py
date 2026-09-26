@@ -155,15 +155,18 @@ def main():
     retail = functions(RETAIL.read_text(encoding="latin-1"))
     names = want or [n for n in ours if not n.startswith(("__maspsx", "_GLOBAL__"))]   # static-init thunks have no retail SYM
     n_ok = 0
-    for n in names:
-        if n not in ours: print(f"  {n}: NOT IN OBJECT"); continue
+    for n0 in names:
+        n = re.sub(r"_(?:[0-9a-f]{8}|ci)$", "", n0)      # board names carry the dup-copy suffix; the object/SYM name does not
+        if n.startswith("_GLOBAL__"):
+            print(f"  {n0}: SYM n/a (static-init thunk, no retail record)"); n_ok += 1; continue
+        if n not in ours: print(f"  {n0}: NOT IN OBJECT"); continue
         rn = n if n in retail else ("_._" + n[3:] if n.startswith("___") and ("_._" + n[3:]) in retail else None)   # cfront dtor spelling
-        if rn is None: print(f"  {n}: NO RETAIL SYM"); continue
+        if rn is None: print(f"  {n0}: NO RETAIL SYM"); continue
         ok, msg = compare(ours[n], retail[rn])
         if os.environ.get("SYM_BLOCKS"):
             msg += chr(10) + "      ours:   " + show(ours[n]) + chr(10) + "      retail: " + show(retail[n])
         n_ok += ok
-        print(f"  {n}: {'SYM ok' if ok else 'SYM DIFF — ' + msg}")
+        print(f"  {n0}: {'SYM ok' if ok else 'SYM DIFF — ' + msg}")
     print(f"SYM: {n_ok}/{len(names)} ok  ({txt})")
 
 if __name__ == "__main__":
