@@ -85,6 +85,11 @@ int __fastcall Init__5CFont(unsigned int *a1)
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/CREDITS.CPP) — reading copy only */
+#if 0 /* m2c */
+void ClearFont__5CFont_8013e0b8(M2C_UNK *arg0) {
+    GM_FinishedUsing__FP7TextDat(M2C_FIELD(arg0, s32 *, 0x214));
+}
+#endif
 #if 0 /* ida */
 int __fastcall ClearFont__5CFont_8013e0b8(int a1)
 {
@@ -98,6 +103,11 @@ int __fastcall ClearFont__5CFont_8013e0b8(int a1)
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/CREDITS.CPP) — reading copy only */
+#if 0 /* m2c */
+s32 GetCharHeight__5CFontUc(M2C_UNK *arg0, u8 arg1) {
+    return ((u32) M2C_FIELD(GetFr__7TextDati_8013e13c(M2C_FIELD(arg0, void **, 0x214), (s32) M2C_FIELD((((arg1 & 0xFF) * 2) + arg0), u16 *, 4)), u32 *, 8) >> 9) & 0x1FF;
+}
+#endif
 #if 0 /* ida */
 int __fastcall GetCharHeight__5CFontUc(int a1, unsigned __int8 a2)
 {

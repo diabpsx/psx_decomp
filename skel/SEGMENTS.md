@@ -143,6 +143,7 @@
 | spells | SOURCE/SPELLS.CPP | 6 | build/skel/SOURCE/SPELLS.CPP.o |
 | spltargt | PSXSRC/SPLTARGT.CPP | 14 | build/skel/PSXSRC/SPLTARGT.CPP.o |
 | startup | (8 files: PSXSRC/DECOMP.CPP, PSXSRC/GMAN.CPP, PSXSRC/MEM.CPP, PSXSRC/OVERLAY.CPP, PSXSRC/PADS.CPP, PSXSRC/PAUSE.CPP, PSXSRC/SYSINIT.CPP, PSXSRC/VID.CPP) | 10 | build/src/startup.c.o (scaffold) |
+| startup_1 | SOURCE/VERSION.CPP | 2 | build/skel/SOURCE/VERSION.CPP.o |
 | stores | SOURCE/STORES.CPP | 97 | build/skel/SOURCE/STORES.CPP.o |
 | storm | SOURCE/STORM.CPP | 2 | build/skel/SOURCE/STORM.CPP.o |
 | stream | PSXSRC/STREAM.CPP | 21 | build/skel/PSXSRC/STREAM.CPP.o |

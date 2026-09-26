@@ -42,7 +42,7 @@ int FeInitBuffer__Fv()
  */
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont) */
 #if 0 /* m2c */
-void FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(s32 arg0, s32 arg1, s32 arg2, u16 arg3, s32 arg4, M2C_UNK *arg5) {
+void FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     s32 temp_v0;
 
     temp_v0 = FeBufferCount * 0x18;
@@ -88,13 +88,13 @@ int __fastcall FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(int a1, int a2, int a3
  */
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FeAddTable__FP11FeMenuTablei) */
 #if 0 /* m2c */
-void FeAddTable__FP11FeMenuTablei(M2C_UNK *arg0, s32 arg1) {
-    M2C_UNK *var_s0;
+void FeAddTable__FP11FeMenuTablei(void *arg0, s32 arg1) {
     s32 temp_a0;
     s32 temp_a1;
     s32 temp_a2;
     s32 var_s1;
     u16 temp_a3;
+    void *var_s0;
 
     var_s0 = arg0;
     FeInitBuffer__Fv();
@@ -107,7 +107,7 @@ void FeAddTable__FP11FeMenuTablei(M2C_UNK *arg0, s32 arg1) {
             temp_a1 = M2C_FIELD(var_s0, s32 *, 4);
             temp_a2 = M2C_FIELD(var_s0, s32 *, 8);
             var_s0 += 0x18;
-            FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(temp_a0, temp_a1, temp_a2, temp_a3, M2C_FIELD(var_s0, s32 *, 0x10), M2C_FIELD(var_s0, M2C_UNK **, 0x14));
+            FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(temp_a0, temp_a1, temp_a2, temp_a3, M2C_FIELD(var_s0, s32 *, 0x10), M2C_FIELD(var_s0, s32 *, 0x14));
         } while (var_s1 < arg1);
     }
 }
@@ -148,7 +148,7 @@ int __fastcall FeAddTable__FP11FeMenuTablei(int a1, int a2)
  */
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FeAddNameTable__FPUci) */
 #if 0 /* m2c */
-void FeAddNameTable__FPUci(M2C_UNK *arg0, s32 arg1) {
+void FeAddNameTable__FPUci(s32 arg0, s32 arg1) {
     s32 var_s0;
     s32 var_s3;
     s32 var_s4;
@@ -156,7 +156,7 @@ void FeAddNameTable__FPUci(M2C_UNK *arg0, s32 arg1) {
     s32 var_v1;
 
     FeInitBuffer__Fv();
-    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0, 1, 0x131U, 0, &LargeFont);
+    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0, 1, 0x131, 0, &LargeFont);
     var_s5 = 0;
     var_s4 = 0;
     var_s3 = 0x23;
@@ -631,20 +631,20 @@ int FeDrawBuffer__Fv()
  */
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FeNewMenu__FP7FeTable) */
 #if 0 /* m2c */
-void FeNewMenu__FP7FeTable(M2C_UNK *arg0) {
-    M2C_UNK *temp_v1;
+void FeNewMenu__FP7FeTable(void *arg0) {
+    void *temp_v1;
 
     if (arg0 != &DummyMenu) {
         temp_v1 = FeCurMenu;
         FeCurMenu = arg0;
         if (arg0 != &FeMainMenu) {
-            M2C_FIELD(arg0, M2C_UNK **, 0x18) = temp_v1;
+            M2C_FIELD(arg0, void **, 0x18) = temp_v1;
         }
         FeInitBuffer__Fv();
         if (M2C_FIELD(FeCurMenu, s32 *, 4) == -1) {
             M2C_FIELD(FeCurMenu, s32 *, 4) = 1;
         }
-        M2C_FIELD(FeCurMenu, M2C_UNK (**)(M2C_UNK *), 0x10)(FeCurMenu);
+        M2C_FIELD(FeCurMenu, M2C_UNK (**)(void *), 0x10)(FeCurMenu);
         FeMenuDelay = 0;
     }
 }
@@ -685,9 +685,9 @@ int __fastcall FeNewMenu__FP7FeTable(int a1)
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FePrevMenu__Fv) */
 #if 0 /* m2c */
 void FePrevMenu__Fv(void) {
-    M2C_UNK *temp_a0;
-    M2C_UNK *temp_v0;
     M2C_UNK *var_v0;
+    void *temp_a0;
+    void *temp_v0;
 
     if ((FeCurMenu == &FeNewP2ClassMenu) && (M2C_FIELD(&LoadedChar, s32 *, 0) != 0)) {
         M2C_FIELD(&FeNewP2ClassMenu, M2C_UNK **, 0x18) = &FeNewP1ClassMenu;
@@ -710,14 +710,14 @@ block_9:
         FeNoOfPlayers += 1;
     }
     if (temp_a0 != &FeMainMenu) {
-        temp_v0 = M2C_FIELD(temp_a0, M2C_UNK **, 0x18);
+        temp_v0 = M2C_FIELD(temp_a0, void **, 0x18);
         if (temp_v0 != NULL) {
             FeCurMenu = temp_v0;
             FeInitBuffer__Fv(temp_a0);
             if (M2C_FIELD(FeCurMenu, s32 *, 4) == -1) {
                 M2C_FIELD(FeCurMenu, s32 *, 4) = 1;
             }
-            M2C_FIELD(FeCurMenu, M2C_UNK (**)(M2C_UNK *), 0x10)(FeCurMenu);
+            M2C_FIELD(FeCurMenu, M2C_UNK (**)(void *), 0x10)(FeCurMenu);
             FeMenuDelay = 0;
             PlaySFX__Fi(0x33);
             JustQuitQText = 0;
@@ -793,10 +793,10 @@ LABEL_11:
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FeSelUp__Fi) */
 #if 0 /* m2c */
 void FeSelUp__Fi(s32 arg0) {
-    M2C_UNK *var_a1;
     s32 temp_a2;
     s32 temp_v0;
     s32 temp_v1;
+    void *var_a1;
 
     var_a1 = FeCurMenu;
     temp_a2 = M2C_FIELD(var_a1, s32 *, 4);
@@ -806,7 +806,7 @@ void FeSelUp__Fi(s32 arg0) {
         M2C_FIELD(var_a1, s32 *, 4) = (s32) (temp_v1 + FeBufferCount);
     }
     if (*(&FeBuffer + 0x14 + (M2C_FIELD(FeCurMenu, s32 *, 4) * 0x18)) == 0) {
-        var_a1 = (M2C_UNK *) FeBufferCount;
+        var_a1 = FeBufferCount;
         do {
             temp_v0 = M2C_FIELD(FeCurMenu, s32 *, 4) - 1;
             M2C_FIELD(FeCurMenu, s32 *, 4) = temp_v0;
@@ -816,7 +816,7 @@ void FeSelUp__Fi(s32 arg0) {
         } while (*(&FeBuffer + 0x14 + (M2C_FIELD(FeCurMenu, s32 *, 4) * 0x18)) == 0);
     }
     if (temp_a2 != M2C_FIELD(FeCurMenu, s32 *, 4)) {
-        PlaySFX__Fi(0x32, (s32) var_a1, temp_a2);
+        PlaySFX__Fi(0x32, var_a1, temp_a2);
     }
 }
 #endif
@@ -1105,7 +1105,7 @@ void InitDummyMenu__Fv(void) {
  */
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", InitFrontEnd__FP9FE_CREATE) */
 #if 0 /* m2c */
-void InitFrontEnd__FP9FE_CREATE(s32 *arg0) {
+void InitFrontEnd__FP9FE_CREATE(s32 arg0) {
     D_8011C748 = arg0;
     FeNoOfPlayers = 0;
     FePlayerNo = 0;
@@ -1132,7 +1132,7 @@ void InitFrontEnd__FP9FE_CREATE(s32 *arg0) {
     gbRunGame = 0;
     PauseMode = 0;
     qtextflag = 0;
-    if (TSK_AddTask(0, FrontEndTask__FP4TASK, 0x1000, 0) == 0) {
+    if (TSK_AddTask(0, &FrontEndTask__FP4TASK, 0x1000, 0) == 0) {
         DBG_Error(0, &D_80110FE4, 0x241);
     }
     memset(&UniqueItemFlag, 0, 0x80);
@@ -1229,23 +1229,6 @@ int FeInitMainMenu__Fv()
  *   blocks: {1 }21
  */
 /* linked from build/src/fe.c.o (segment fe mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe", FeInitNewGameMenu__Fv) */
-#if 0 /* m2c */
-void FeInitNewGameMenu__Fv(void) {
-    if (FeEnterLang != LANG_GetLang__Fv()) {
-        FeEnterLang = LANG_GetLang__Fv();
-        M2C_FIELD(&FePlayerName, s8 *, 0) = 0;
-        M2C_FIELD(&FePlayerName, s8 *, 0xB) = 0;
-        M2C_FIELD(&FePlayerNameFlag, s8 *, 1) = 1;
-        M2C_FIELD(&FePlayerNameFlag, s8 *, 0) = 1;
-    }
-    FeAddTable__FP11FeMenuTablei(&FeNewGameMenuTable, 3);
-    FeChrClass = -1;
-    FeBackX = 0xC;
-    FeBackY = 0x20;
-    FeBackW = 0xA0;
-    FeBackH = 0x80;
-}
-#endif
 #if 0 /* ida */
 int FeInitNewGameMenu__Fv()
 {
@@ -1286,6 +1269,12 @@ int FeInitNewGameMenu__Fv()
  *   blocks: {1 }16
  */
 /* linked from build/src/fe_2.c.o (segment fe_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_2", FeInitPlayer1ClassMenu__Fv) */
+#if 0 /* m2c */
+s32 FeInitPlayer1ClassMenu__Fv(void) {
+    LoadedChar = 0;
+    return MemCardActive;
+}
+#endif
 #if 0 /* ida */
 int FeInitPlayer1ClassMenu__Fv()
 {
@@ -1314,6 +1303,12 @@ int FeInitPlayer1ClassMenu__Fv()
  *   blocks: {1 }16
  */
 /* linked from build/src/fe_3.c.o (segment fe_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_3", FeInitPlayer2ClassMenu__Fv) */
+#if 0 /* m2c */
+s32 FeInitPlayer2ClassMenu__Fv(void) {
+    M2C_FIELD(&LoadedChar, s32 *, 4) = 0;
+    return MemCardActive;
+}
+#endif
 #if 0 /* ida */
 int FeInitPlayer2ClassMenu__Fv()
 {
@@ -1342,6 +1337,13 @@ int FeInitPlayer2ClassMenu__Fv()
  *   blocks: {1 }4
  */
 /* linked from build/src/fe_4.c.o (segment fe_4 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_4", FePlayerClassMenuCtrl__Fv) */
+#if 0 /* m2c */
+void FePlayerClassMenuCtrl__Fv(void) {
+    *(&FeChrClass + (FePlayerNo * 4)) = M2C_FIELD(FeCurMenu, s32 *, 4) - 1;
+    FeMainKeyCtrl__FP7CScreen(0);
+    FeDrawChrClass__Fv();
+}
+#endif
 #if 0 /* ida */
 int FePlayerClassMenuCtrl__Fv()
 {
@@ -1359,6 +1361,14 @@ int FePlayerClassMenuCtrl__Fv()
  *   blocks: {1 {1 {8 {9 }9 {11 }11 {13 }13 {16 }16 }16 }16 }51
  */
 /* linked from build/src/fe_4.c.o (segment fe_4 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_4", FeDrawChrClass__Fv) */
+#if 0 /* m2c */
+u16 FeDrawChrClass__Fv(void) {
+    M2C_UNK sp28;
+
+    __6Dialog_8013cabc(&sp28);
+    return D_8011B340;
+}
+#endif
 #if 0 /* ida */
 int FeDrawChrClass__Fv()
 {
@@ -1482,6 +1492,17 @@ int FeDrawChrClass__Fv()
  *   blocks: {1 }11
  */
 /* linked from build/src/fe_5.c.o (segment fe_5 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_5", FeInitNewP1NameMenu__Fv) */
+#if 0 /* m2c */
+void FeInitNewP1NameMenu__Fv(void) {
+    FeAddNameTable__FPUci(&FeNameEngMenuTable, 0x28);
+    FeBackX = 0xC;
+    FeBackY = 0x20;
+    FeBackW = 0xA0;
+    FeBackH = 0x80;
+    M2C_FIELD(&plr, s8 *, 0x13C) = 1;
+    M2C_FIELD(&plr, s8 *, 0x1B24) = 1;
+}
+#endif
 #if 0 /* ida */
 int FeInitNewP1NameMenu__Fv()
 {
@@ -1503,6 +1524,16 @@ int FeInitNewP1NameMenu__Fv()
  *   blocks: {1 }9
  */
 /* linked from build/src/fe_5.c.o (segment fe_5 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_5", FeInitNewP2NameMenu__Fv) */
+#if 0 /* m2c */
+void FeInitNewP2NameMenu__Fv(void) {
+    FeAddNameTable__FPUci(&FeNameEngMenuTable, 0x28);
+    FeBackX = 0xC;
+    FeBackY = 0x20;
+    FeBackW = 0xA0;
+    FeBackH = 0x80;
+    M2C_FIELD(&plr, s8 *, 0x1B24) = 1;
+}
+#endif
 #if 0 /* ida */
 int FeInitNewP2NameMenu__Fv()
 {
@@ -1531,6 +1562,59 @@ int FeInitNewP2NameMenu__Fv()
  *   blocks: {1 {1 {4 {6 {7 }8 {14 }23 }23 }23 }26 }26
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeCopyPlayerInfoForReturn__Fv) */
+#if 0 /* m2c */
+void FeCopyPlayerInfoForReturn__Fv(void) {
+    s32 temp_a2;
+    s32 temp_v1;
+    s32 var_s0;
+    s32 var_s1;
+    s32 var_v0;
+    s32 var_v0_2;
+    s8 *var_v1;
+    s8 *var_v1_2;
+    void *temp_v0;
+    void *var_s2;
+    void *var_s3;
+
+    temp_v0 = &plr + 0x166;
+    var_s3 = temp_v0 + 0x11;
+    var_s2 = temp_v0;
+    var_s0 = 0;
+    var_s1 = 0;
+    *D_8011C748 = FePlayerNo + 1;
+loop_1:
+    temp_v1 = var_s0 * 4;
+    if (FePlayerNo >= var_s0) {
+        var_v0 = 0x10;
+        if (*(&LoadedChar + temp_v1) == 0) {
+            temp_a2 = var_s0 * 0x10;
+            M2C_FIELD((D_8011C748 + temp_a2), s32 *, 0x10) = (s32) *(&FeChrClass + temp_v1);
+            strcpy(D_8011C748 + (temp_a2 + 4), var_s1 + &FePlayerName, temp_a2);
+            PAD_GetPad__FiUc(var_s0, 0);
+            var_s3 += 0x19E8;
+        } else {
+            var_v1 = var_s2 + 0x10;
+            do {
+                *var_v1 = 0;
+                var_v0 -= 1;
+                var_v1 -= 1;
+            } while (var_v0 >= 0);
+            var_v0_2 = 9;
+            var_v1_2 = var_s3 + 9;
+            do {
+                *var_v1_2 = 0;
+                var_v0_2 -= 1;
+                var_v1_2 -= 1;
+            } while (var_v0_2 >= 0);
+            var_s3 += 0x19E8;
+        }
+        var_s2 += 0x19E8;
+        var_s1 += 0xB;
+        var_s0 += 1;
+        goto loop_1;
+    }
+}
+#endif
 #if 0 /* ida */
 BOOL FeCopyPlayerInfoForReturn__Fv()
 {
@@ -1601,6 +1685,12 @@ BOOL FeCopyPlayerInfoForReturn__Fv()
  *   blocks: {1 }6
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeEnterGame__Fv) */
+#if 0 /* m2c */
+void FeEnterGame__Fv(void) {
+    FeFlag = 2;
+    FeCopyPlayerInfoForReturn__Fv();
+}
+#endif
 #if 0 /* ida */
 BOOL FeEnterGame__Fv()
 {
@@ -1616,6 +1706,21 @@ BOOL FeEnterGame__Fv()
  *   blocks: {1 }16
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitLoadMemcardSelect__Fv) */
+#if 0 /* m2c */
+void FeInitLoadMemcardSelect__Fv(void) {
+    fileinfoflag = 0;
+    if (MemCardActive == 0) {
+        cardondelay = 5;
+    }
+    M2C_FIELD(&card_active, s32 *, 4) = 1;
+    M2C_FIELD(&card_active, s32 *, 0) = 1;
+    FeBackX = 8;
+    FeBackY = 0x20;
+    FeBackW = 0x140;
+    FeBackH = 0xA0;
+    FeAddTable__FP11FeMenuTablei(&FeMemcardMenuTable, 3);
+}
+#endif
 #if 0 /* ida */
 int FeInitLoadMemcardSelect__Fv()
 {
@@ -1639,6 +1744,16 @@ int FeInitLoadMemcardSelect__Fv()
  *   blocks: {1 }9
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitLoadChar1Menu__Fv) */
+#if 0 /* m2c */
+void FeInitLoadChar1Menu__Fv(void) {
+    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0, 1, 0x3B2, 0, &MediumFont);
+    current_card = 0;
+    ActivateMemcard__Fii(1, 0);
+    CharacterBlockLoaded = 0;
+    fileinfoflag = 1;
+    fileselect = 0;
+}
+#endif
 #if 0 /* ida */
 int FeInitLoadChar1Menu__Fv()
 {
@@ -1659,6 +1774,16 @@ int FeInitLoadChar1Menu__Fv()
  *   blocks: {1 }9
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitLoadChar2Menu__Fv) */
+#if 0 /* m2c */
+void FeInitLoadChar2Menu__Fv(void) {
+    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0, 1, 0x3B2, 0, &MediumFont);
+    current_card = 1;
+    ActivateMemcard__Fii(0, 1);
+    CharacterBlockLoaded = 0;
+    fileinfoflag = 1;
+    fileselect = 0;
+}
+#endif
 #if 0 /* ida */
 int FeInitLoadChar2Menu__Fv()
 {
@@ -1681,6 +1806,31 @@ int FeInitLoadChar2Menu__Fv()
  *   blocks: {1 }24
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitDifficultyMenu__Fv) */
+#if 0 /* m2c */
+void FeInitDifficultyMenu__Fv(void) {
+    s32 var_v0;
+    s8 var_a0;
+
+    FeAddTable__FP11FeMenuTablei(&FeDifficultyMenuTable, 4);
+    var_a0 = M2C_FIELD(&plr, s8 *, 0x13C);
+    if ((FePlayerNo != 0) && (M2C_FIELD(&plr, s8 *, 0x1B24) < var_a0)) {
+        var_a0 = M2C_FIELD(&plr, s8 *, 0x1B24);
+    }
+    M2C_FIELD(FeCurMenu, s32 *, 4) = 1;
+    var_v0 = 2;
+    if (var_a0 >= 0x14) {
+        var_v0 = 3;
+        if (var_a0 >= 0x1E) {
+            var_v0 = 4;
+        }
+    }
+    FeBufferCount = var_v0;
+    FeBackX = 0xC;
+    FeBackY = 0x20;
+    FeBackW = 0xA0;
+    FeBackH = 0x80;
+}
+#endif
 #if 0 /* ida */
 int FeInitDifficultyMenu__Fv()
 {
@@ -1714,12 +1864,42 @@ int FeInitDifficultyMenu__Fv()
  *   blocks: {1 }22
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeDifficultyMenuCtrl__Fv) */
+#if 0 /* m2c */
+void FeDifficultyMenuCtrl__Fv(void) {
+    if ((qtextflag == 0) && (CDWAIT == 0) && (PauseMode == 0)) {
+        gnDifficulty = M2C_FIELD(FeCurMenu, s32 *, 4) - 1;
+        if (DavesPad & 1) {
+            FeSelUp__Fi(1);
+        }
+        if (DavesPad & 2) {
+            FeSelDown__Fi(1);
+        }
+        if (DavesPad & 0x50) {
+            PlaySFX__Fi(0x33);
+            FeEnterGame__Fv();
+        } else if (DavesPad & 0x100) {
+            FePrevMenu__Fv();
+        }
+        FeDrawChrClass__Fv();
+    }
+}
+#endif
 
 /* ---- 0x8013BED0  FeInitBackgroundMenu__Fv  FE.CPP:1277-1283  seg fe_6  fsize 24 ---- */
 /* void FeInitBackgroundMenu(void)
  *   blocks: {1 }7
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitBackgroundMenu__Fv) */
+#if 0 /* m2c */
+void FeInitBackgroundMenu__Fv(void) {
+    FeAddTable__FP11FeMenuTablei(&FeBackgroundMenuTable, 4);
+    FeBackX = 8;
+    FeBackY = 0x20;
+    FeBackW = 0x140;
+    FeBackH = 0x80;
+    BookMenu = 0;
+}
+#endif
 #if 0 /* ida */
 int FeInitBackgroundMenu__Fv()
 {
@@ -1740,6 +1920,16 @@ int FeInitBackgroundMenu__Fv()
  *   blocks: {1 }7
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitBook1Menu__Fv) */
+#if 0 /* m2c */
+void FeInitBook1Menu__Fv(void) {
+    FeAddTable__FP11FeMenuTablei(&FeBook1MenuTable, 5);
+    FeBackX = 8;
+    FeBackY = 0x20;
+    FeBackW = 0x140;
+    FeBackH = 0x80;
+    BookMenu = 1;
+}
+#endif
 #if 0 /* ida */
 int FeInitBook1Menu__Fv()
 {
@@ -1760,6 +1950,16 @@ int FeInitBook1Menu__Fv()
  *   blocks: {1 }7
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitBook2Menu__Fv) */
+#if 0 /* m2c */
+void FeInitBook2Menu__Fv(void) {
+    FeAddTable__FP11FeMenuTablei(&FeBook2MenuTable, 6);
+    FeBackX = 8;
+    FeBackY = 0x20;
+    FeBackW = 0x140;
+    FeBackH = 0x80;
+    BookMenu = 2;
+}
+#endif
 #if 0 /* ida */
 int FeInitBook2Menu__Fv()
 {
@@ -1780,18 +1980,97 @@ int FeInitBook2Menu__Fv()
  *   blocks: {1 }40
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeBackBookMenuCtrl__Fv) */
+#if 0 /* m2c */
+void FeBackBookMenuCtrl__Fv(void) {
+    s32 temp_s0;
+
+    if ((qtextflag == 0) && (CDWAIT == 0) && (PauseMode == 0)) {
+        if (DavesPad & 1) {
+            FeSelUp__Fi(1);
+        }
+        if (DavesPad & 2) {
+            FeSelDown__Fi(1);
+        }
+        if (DavesPad & 0x50) {
+            PlaySFX__Fi(0x33);
+            if ((BookMenu == 0) && (M2C_FIELD(FeCurMenu, s32 *, 4) == 3)) {
+                InitQTextMsg__Fi(0x10A);
+            }
+            if (BookMenu == 1) {
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == BookMenu) {
+                    InitQTextMsg__Fi(0x108);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 2) {
+                    InitQTextMsg__Fi(0x10C);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 3) {
+                    InitQTextMsg__Fi(0x106);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 4) {
+                    InitQTextMsg__Fi(0x104);
+                }
+            }
+            temp_s0 = BookMenu;
+            if (temp_s0 == 2) {
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 1) {
+                    InitQTextMsg__Fi(0x109);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == temp_s0) {
+                    InitQTextMsg__Fi(0x103);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 3) {
+                    InitQTextMsg__Fi(0x105);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 4) {
+                    InitQTextMsg__Fi(0x107);
+                }
+                if (M2C_FIELD(FeCurMenu, s32 *, 4) == 5) {
+                    InitQTextMsg__Fi(0x10B);
+                }
+            }
+        }
+        if (DavesPad & 0x100) {
+            FePrevMenu__Fv();
+        }
+    }
+}
+#endif
 
 /* ---- 0x8013C200  PlayDemo__Fv  FE.CPP:1355-1356  seg fe_6  fsize 0 ---- */
 /* void PlayDemo(void)
  *   blocks: {1 }2
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", PlayDemo__Fv) */
+#if 0 /* m2c */
+void PlayDemo__Fv(void) {
+    PlayDemoFlag = 1;
+}
+#endif
 
 /* ---- 0x8013C214  FadeFEOut__Fv  FE.CPP:1371-1387  seg fe_6  fsize 32 ---- */
 /* void FadeFEOut(void)
  *   blocks: {1 }17
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FadeFEOut__Fv) */
+#if 0 /* m2c */
+void FadeFEOut__Fv(void) {
+    music_fade__Fv();
+    if (PaletteFadeOut__Fi(8) != 0) {
+loop_2:
+        if (GetFadeState__Fv() != 0) {
+            if (D_8011B33C != 0) {
+                if ((FeCurMenu == &FeDifficultyMenu) || (FeCurMenu == &FeNewP1ClassMenu) || (FeCurMenu == &FeNewP2ClassMenu)) {
+                    FeDrawChrClass__Fv();
+                }
+                FeDrawBuffer__Fv();
+            }
+            TSK_Sleep(1);
+            goto loop_2;
+        }
+    }
+    music_stop__Fv();
+}
+#endif
 #if 0 /* ida */
 int FadeFEOut__Fv()
 {
@@ -1823,6 +2102,48 @@ int FadeFEOut__Fv()
  *   blocks: {1 }56
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", DrawBackTSK__FP4TASK) */
+#if 0 /* m2c */
+void DrawBackTSK__FP4TASK(void) {
+    s32 temp_s0;
+
+    D_8011B348 = 1;
+    TakeDownCutScreen__Fv();
+    music_start__Fi(5);
+    flamecol = 0;
+    if (D_8011B348 != 0) {
+        do {
+            if (flamecol < 0x40) {
+                flamecol += 2;
+            }
+            if (InCredits == 0) {
+                if (D_8011B360 == 0) {
+                    DrawFlameLogo__Fv();
+                }
+                Display__7CScreeniiii(&CutScr, 0x12, 0xB, 0, D_8011B33C);
+            }
+            if ((D_8011B360 != 0) && (CDWAIT == 0)) {
+                D_8011B360 = 0;
+            }
+            temp_s0 = InCredits;
+            if (temp_s0 == 1) {
+                D_8011B360 = temp_s0;
+                InCredits = 0;
+                Unload__7CScreen(&CutScr);
+                CDWAIT = temp_s0;
+                Load__7CScreeniii(&CutScr, 0x12, 0xB, 0);
+                CDWAIT = 0;
+            }
+            TSK_Sleep(1);
+            TitleFlag = 0;
+        } while (D_8011B348 != 0);
+    }
+    GM_FinishedUsing__FP7TextDat(FeTData);
+    GM_FinishedUsing__FP7TextDat(FlameTData);
+    FeTData = 0;
+    FlameTData = 0;
+    Unload__7CScreen(&CutScr);
+}
+#endif
 #if 0 /* ida */
 int DrawBackTSK__FP4TASK()
 {
@@ -1881,6 +2202,25 @@ int DrawBackTSK__FP4TASK()
  *   blocks: {1 }20
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FeInitMainStuff__FP4TASK) */
+#if 0 /* m2c */
+void FeInitMainStuff__FP4TASK(s32 arg0) {
+    PutUpCutScreen__Fi(0xA);
+    SPU_Init__Fv();
+    snd_init__FUl(0);
+    SND_LoadBank__Fi(0x11);
+    if (FlameTData == 0) {
+        FlameTData = GM_UseTexData__Fi(0xCC);
+    }
+    if (FeTData == 0) {
+        FeTData = GM_UseTexData__Fi(0xCB);
+    }
+    if (arg0 == 0) {
+        FinishProgress__Fv();
+        TSK_AddTask(0, DrawBackTSK__FP4TASK, 0x800, 0);
+        TSK_Sleep(1);
+    }
+}
+#endif
 #if 0 /* ida */
 int __fastcall FeInitMainStuff__FP4TASK(int a1)
 {
@@ -1920,6 +2260,142 @@ int __fastcall FeInitMainStuff__FP4TASK(int a1)
  *   blocks: {1 }199
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", FrontEndTask__FP4TASK) */
+#if 0 /* m2c */
+void FrontEndTask__FP4TASK(void) {
+    M2C_UNK (*temp_v0)();
+    s32 temp_s0;
+    s32 temp_v0_2;
+    s32 var_s1;
+    u32 var_v0;
+
+    var_s1 = 0;
+    D_8011B33C = 0;
+    if (FeAttractMode != 0) {
+        FinishBootProgress__Fv();
+        if (ADirtyFlagThatGaryWillLove != 0) {
+            if ((DirtyVidx != 0) || (DirtyVidY != 0)) {
+                VID_SetXYOff__Fii(DirtyVidx, DirtyVidY);
+            }
+            ADirtyFlagThatGaryWillLove = 0;
+        }
+    } else {
+        FeInitMainStuff__FP4TASK(0);
+        FeAttractMode = 1;
+        AttractNo = 6;
+    }
+    FeCount = VID_GetTick__Fv();
+    FeNewMenu__FP7FeTable(&FeMainMenu);
+    FeNoOfPlayers = -1;
+    if (FeFlag != 2) {
+        do {
+            if (PlayDemoFlag != 0) {
+                FeFlag = 2;
+            }
+            ReadPad__Fi(-1);
+            if (FeAttractMode != 0) {
+                if (PlayDemoFlag == 0) {
+                    switch (AttractNo) {
+                    case 0:
+                        AttractNo += 1;
+                        FadeFEOut__Fv();
+                        D_8011B348 = 0;
+loop_16:
+                        if (GetFadeState__Fv() != 0) {
+                            TSK_Sleep(1);
+                            goto loop_16;
+                        }
+                        D_8011B33C = 0;
+                        user_start = 0;
+                        var_s1 = 0;
+                        break;
+                    case 1:
+                        if (user_start == 0) {
+                            play_movie(&D_80110FF4);
+                        }
+                        var_v0 = AttractNo + 1;
+block_31:
+                        AttractNo = var_v0;
+                        break;
+                    case 2:
+                        var_v0 = AttractNo + 1;
+                        goto block_31;
+                    case 3:
+                        var_v0 = AttractNo + 1;
+                        goto block_31;
+                    case 4:
+                        FeInitMainStuff__FP4TASK(0);
+                        FeCount = VID_GetTick__Fv();
+                        AttractNo += 1;
+                        break;
+                    case 5:
+                        if ((CDWAIT == 0) && ((IsGameLoading__Fv() ^ 1) != 0)) {
+                            temp_s0 = GetStrWidth__5CFontPc(&MediumFont, GetStr__Fi(0x32E));
+                            Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc(&MediumFont, ((s32) (0x100 - temp_s0) / 2) + 0x20, 0x20, GetStr__Fi(0x32E), 0, 0, (s32) WHITER, (s32) WHITEG, (s32) WHITEB);
+                            if ((s16) DavesPad != 0) {
+                                FeCount = VID_GetTick__Fv();
+                            }
+                            if (DavesPad & 0x10) {
+                                PlaySFX__Fi(0x33);
+                                var_s1 = 0;
+                                D_8011B33C = 0;
+                                var_v0 = AttractNo + 1;
+                                goto block_31;
+                            }
+                            if ((u32) AttractTitleDelay < (u32) (VID_GetTick__Fv() - FeCount)) {
+                                FMVEndPad = -1;
+                                user_start = 0;
+                                AttractNo = 0;
+                                AttractTitleDelay = 0x708;
+                            }
+                        }
+                        break;
+                    case 6:
+                        FeAttractMode = 0;
+                        AttractNo = 0;
+                        FMVEndPad = -1;
+                        FeCount = VID_GetTick__Fv();
+                        break;
+                    }
+                }
+            } else {
+                if (var_s1 >= 0x13) {
+                    FeDrawBuffer__Fv();
+                    temp_v0 = M2C_FIELD(FeCurMenu, M2C_UNK (**)(), 0x14);
+                    if (temp_v0 == NULL) {
+                        FeMainKeyCtrl__FP7CScreen(0);
+                    } else {
+                        temp_v0();
+                    }
+                }
+                if (FeCurMenu == &FeMainMenu) {
+                    if ((s16) DavesPad != 0) {
+                        FeCount = VID_GetTick__Fv();
+                    } else if ((u32) AttractMainDelay < (u32) (VID_GetTick__Fv() - FeCount)) {
+                        AttractNo = 0;
+                        FeAttractMode = 1;
+                    }
+                }
+                temp_v0_2 = D_8011B33C + 1;
+                if (D_8011B33C < 0xF) {
+                    D_8011B33C = temp_v0_2;
+                    var_s1 = temp_v0_2;
+                } else if (var_s1 < 0x1F) {
+                    var_s1 += 1;
+                }
+            }
+            TSK_Sleep(1);
+        } while (FeFlag != 2);
+    }
+    FadeFEOut__Fv();
+    D_8011B348 = 0;
+    TSK_Sleep(1);
+    FeFlag = 0;
+    if (PlayDemoFlag == 0) {
+        AttractNo = 1;
+        FeAttractMode = 0;
+    }
+}
+#endif
 #if 0 /* ida */
 int FrontEndTask__FP4TASK()
 {
@@ -2050,6 +2526,12 @@ int FrontEndTask__FP4TASK()
  *   blocks: {1 }3
  */
 /* linked from build/src/fe_6.c.o (segment fe_6 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/fe_6", DrawFeTwinkle__Fii) */
+#if 0 /* m2c */
+void DrawFeTwinkle__Fii(s32 arg0, M2C_UNK arg1) {
+    DrawSpinner__FiiUcUcUciiibiT8T8Uc(0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+    DrawSpinner__FiiUcUcUciiibiT8T8Uc(arg0, arg1, 0xA0, 0xA0, 0x40, 0x15, 0x30, 0x28, 1, 0xFFFF, 1, 0, 8);
+}
+#endif
 #if 0 /* ida */
 int __fastcall DrawFeTwinkle__Fii(int a1, int a2)
 {

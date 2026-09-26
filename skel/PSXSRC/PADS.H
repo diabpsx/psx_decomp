@@ -813,6 +813,11 @@ int __fastcall GetCur__C4CPad_800b02f4(int a1)
  *   blocks: {1 }3
  */
 /* linked from the including TU skeleton (src/fe_6.c scaffold) — reading copy only */
+#if 0 /* m2c */
+u8 CheckActive__4CPad_8013cb44(void *arg0) {
+    return M2C_FIELD(arg0, u8 *, 1);
+}
+#endif
 
 /* ---- 0x80155FB0  GetDown__C4CPad  PADS.H:120-124  seg choosem  fsize 0 ---- */
 /* unsigned short CPad::GetDown(void) const
@@ -868,6 +873,14 @@ int __fastcall GetDown__C4CPad_80158840(int a1)
  *   blocks: {1 }5
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
+#if 0 /* m2c */
+u16 GetTick__C4CPad_8015b818(void *arg0) {
+    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
+        return M2C_FIELD(arg0, u16 *, 0xE);
+    }
+    return M2C_FIELD(arg0, u16 *, 0x18);
+}
+#endif
 #if 0 /* ida */
 int __fastcall GetTick__C4CPad_8015b818(int a1)
 {
@@ -884,6 +897,14 @@ int __fastcall GetTick__C4CPad_8015b818(int a1)
  *   blocks: {1 }5
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
+#if 0 /* m2c */
+u16 GetDown__C4CPad_8015b840(void *arg0) {
+    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
+        return M2C_FIELD(arg0, u16 *, 0xC);
+    }
+    return M2C_FIELD(arg0, u16 *, 0x16);
+}
+#endif
 #if 0 /* ida */
 int __fastcall GetDown__C4CPad_8015b840(int a1)
 {
@@ -900,6 +921,11 @@ int __fastcall GetDown__C4CPad_8015b840(int a1)
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
+#if 0 /* m2c */
+void SetPadTickMask__4CPadUs_8015b868(void *arg0, s16 arg1) {
+    M2C_FIELD(arg0, s16 *, 4) = arg1;
+}
+#endif
 #if 0 /* ida */
 void __fastcall SetPadTickMask__4CPadUs_8015b868(int a1, __int16 a2)
 {
@@ -913,6 +939,11 @@ void __fastcall SetPadTickMask__4CPadUs_8015b868(int a1, __int16 a2)
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
+#if 0 /* m2c */
+void SetPadTick__4CPadUs_8015b870(void *arg0, s8 arg1) {
+    M2C_FIELD(arg0, s8 *, 3) = arg1;
+}
+#endif
 #if 0 /* ida */
 void __fastcall SetPadTick__4CPadUs_8015b870(int a1, char a2)
 {

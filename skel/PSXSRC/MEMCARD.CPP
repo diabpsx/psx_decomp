@@ -9,6 +9,24 @@
  *   blocks: {1 }5
  */
 /* linked from build/src/memcard.c.o (segment memcard mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard", endian_swap__FPUci) */
+#if 0 /* m2c */
+void endian_swap__FPUci(void *arg0, s32 arg1) {
+    s32 temp_a1;
+    u8 temp_v1;
+    void *var_a0;
+
+    var_a0 = arg0;
+    if (arg1 > 0) {
+        temp_a1 = arg1 + var_a0;
+        do {
+            temp_v1 = M2C_FIELD(var_a0, u8 *, 0);
+            M2C_FIELD(var_a0, u8 *, 0) = (u8) M2C_FIELD(var_a0, u8 *, 1);
+            M2C_FIELD(var_a0, u8 *, 1) = temp_v1;
+            var_a0 += 2;
+        } while ((s32) var_a0 < temp_a1);
+    }
+}
+#endif
 #if 0 /* ida */
 BOOL __fastcall endian_swap__FPUci(char *a1, int a2)
 {
@@ -351,7 +369,7 @@ void read_card_directory__Fi(s32 arg0) {
             sp60 = arg0 << 0xD;
             var_s7 = 0;
 loop_9:
-            sprintf(&sp10, &func_8013E1EC, arg0, ((var_s4 + arg0) << 7) + (var_s7 + &card_dir));
+            sprintf(&sp10, &D_8013E1EC, arg0, ((var_s4 + arg0) << 7) + (var_s7 + &card_dir));
             temp_v0 = open(&sp10, 1);
             if ((temp_v0 == -1) || (temp_s0_3 = sp60 + ((var_s3 << 9) + &card_header), temp_s0_4 = temp_s0_3 + 4, temp_s2 = read(temp_v0, temp_s0_3, 0x200), endian_swap__FPUci(temp_s0_4, 0x40), sjis_to_ascii__FPUsPc(temp_s0_4, temp_s0_4), close(temp_v0), (temp_v0 == -1)) || (temp_s2 == -1)) {
                 card_removed__Fi(arg0);
@@ -595,7 +613,7 @@ s32 delete_card_file__Fii(s32 arg0, s32 arg1) {
             if (mem_card_event_handler != NULL) {
                 mem_card_event_handler(5, arg0);
             }
-            sprintf(&sp10, &func_8013E1EC, arg0, (arg0 * 0x280) + ((arg1 * 0x28) + &card_dir));
+            sprintf(&sp10, &D_8013E1EC, arg0, (arg0 * 0x280) + ((arg1 * 0x28) + &card_dir));
             if (erase(&sp10) != 0) {
                 *(&card_dirty + temp_s2) = 1;
                 *(&card_changed + temp_s2) = 1;
@@ -665,7 +683,7 @@ s32 read_card_file__FiiiPc(s32 arg0, s32 arg1, s32 arg2, M2C_UNK *arg3) {
                 if (mem_card_event_handler != NULL) {
                     mem_card_event_handler(3, arg0);
                 }
-                sprintf(&sp210, &func_8013E1EC, arg0, (arg0 * 0x280) + ((arg1 * 0x28) + &card_dir));
+                sprintf(&sp210, &D_8013E1EC, arg0, (arg0 * 0x280) + ((arg1 * 0x28) + &card_dir));
 loop_6:
                 temp_v0 = open(&sp210, 1);
                 if (temp_v0 != -1) {
@@ -876,7 +894,7 @@ s32 write_card_file__FiiPcT2PUcPUsiT4(s32 arg0, s32 arg1, M2C_UNK arg2, M2C_UNK 
 
     var_s4 = -1;
     var_s1 = arg6;
-    sprintf(&sp210, &func_8013E1EC, arg0, arg2);
+    sprintf(&sp210, &D_8013E1EC, arg0, arg2);
     sp10 = 0x53;
     sp11 = 0x43;
     sp12 = 0x11;

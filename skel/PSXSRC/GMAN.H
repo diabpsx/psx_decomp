@@ -917,6 +917,11 @@ int __fastcall GetFr__7TextDati_800adf80(int a1, unsigned __int16 a2)
  *   this=$a0 __in_chrg=$a1
  */
 /* linked from the including TU skeleton (PSXSRC/CREDITS.CPP) — reading copy only */
+#if 0 /* m2c */
+void ___7CScreen_8013e11c(void) {
+    ___7TextDat();
+}
+#endif
 #if 0 /* ida */
 int ___7CScreen_8013e11c()
 {
@@ -930,6 +935,11 @@ int ___7CScreen_8013e11c()
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/CREDITS.CPP) — reading copy only */
+#if 0 /* m2c */
+void *GetFr__7TextDati_8013e13c(void *arg0, s32 arg1) {
+    return M2C_FIELD(arg0, s32 *, 0x24) + ((arg1 & 0xFFFF) * 0xC);
+}
+#endif
 #if 0 /* ida */
 int __fastcall GetFr__7TextDati_8013e13c(int a1, unsigned __int16 a2)
 {

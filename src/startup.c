@@ -19,7 +19,3 @@ INCLUDE_ASM("asm/nonmatchings/startup", GM_Open__Fv);
 INCLUDE_ASM("asm/nonmatchings/startup", OVR_Open__Fv);
 
 INCLUDE_ASM("asm/nonmatchings/startup", DEC_Open__Fv);
-
-INCLUDE_ASM("asm/nonmatchings/startup", StrDate);
-
-INCLUDE_ASM("asm/nonmatchings/startup", StrTime);

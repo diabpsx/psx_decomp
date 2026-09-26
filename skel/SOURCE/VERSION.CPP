@@ -8,7 +8,7 @@
  *   VerString@sp-0x80
  *   blocks: {1 }7
  */
-INCLUDE_ASM("asm/nonmatchings/version", VER_InitVersion__Fv);
+/* linked from build/src/version.c.o (segment version mixes several source files) — INCLUDE_ASM("asm/nonmatchings/version", VER_InitVersion__Fv) */
 #if 0 /* m2c */
 void VER_InitVersion__Fv(void) {
     M2C_UNK sp10;
@@ -33,7 +33,7 @@ int VER_InitVersion__Fv()
 /* char * VER_GetVerString(void)
  *   blocks: {1 }2
  */
-INCLUDE_ASM("asm/nonmatchings/version", VER_GetVerString__Fv);
+/* linked from build/src/version.c.o (segment version mixes several source files) — INCLUDE_ASM("asm/nonmatchings/version", VER_GetVerString__Fv) */
 #if 0 /* m2c */
 M2C_UNK *VER_GetVerString__Fv(void) {
     return &MyVerString;
@@ -45,7 +45,7 @@ M2C_UNK *VER_GetVerString__Fv(void) {
  *   Str=$a0
  *   blocks: {1 }2
  */
-INCLUDE_ASM("asm/nonmatchings/version", CharPair2Num__FPc);
+/* linked from build/src/version.c.o (segment version mixes several source files) — INCLUDE_ASM("asm/nonmatchings/version", CharPair2Num__FPc) */
 #if 0 /* m2c */
 s32 CharPair2Num__FPc(void *arg0) {
     return ((M2C_FIELD(arg0, s8 *, 0) - 0x30) * 0xA) - 0x30 + M2C_FIELD(arg0, s8 *, 1);
@@ -58,16 +58,66 @@ int __fastcall CharPair2Num__FPc(char *a1)
 }
 #endif
 
-/* ---- 0x800B0A18  GetVersionString__FPc  VERSION.CPP:252-275  seg ?  fsize 72 ---- */
+/* ---- 0x800B0A18  GetVersionString__FPc  VERSION.CPP:252-275  seg startup_1  fsize 72 ---- */
 /* char * GetVersionString(char *VersionString2)
  *   VersionString2=$s1 VersionString@sp-0x38
  *   blocks: {1 }24
  */
-/* no splat oracle found for GetVersionString__FPc (0x800B0A18) */
+/* linked from build/src/startup_1.c.o (segment startup_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup_1", GetVersionString__FPc) */
+#if 0 /* ida */
+_BYTE *__fastcall GetVersionString__FPc(_BYTE *a1)
+{
+  char v3[40]; // [sp+10h] [-28h] BYREF
 
-/* ---- 0x800B0AEC  GetWord__FPc  VERSION.CPP:299-338  seg ?  fsize 48 ---- */
+  strcpy(v3, "May9829.1430");
+  strupr__FPc(v3);
+  strcpy(a1, v3);
+  return a1;
+}
+#endif
+
+/* ---- 0x800B0AEC  GetWord__FPc  VERSION.CPP:299-338  seg startup_1  fsize 48 ---- */
 /* char * GetWord(char *VStr)
  *   VStr=$s3 Found=$s2 MonStr@sp-0x20 DayCount=$s1 Minutes=$s0
  *   blocks: {1 {1 }25 }40
  */
-/* no splat oracle found for GetWord__FPc (0x800B0AEC) */
+/* linked from build/src/startup_1.c.o (segment startup_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup_1", GetWord__FPc) */
+#if 0 /* ida */
+char *__fastcall GetWord__FPc(char *a1)
+{
+  int v2; // $v0
+  int v3; // $gp
+  int v4; // $v0
+  int v5; // $s1
+  int v6; // $gp
+  int v7; // $s2
+  int v8; // $s0
+  int v9; // $gp
+  int v10; // $v0
+  int v11; // $s1
+  int v12; // $s0
+
+  v2 = CharPair2Num__FPc(a1 + 3);
+  *(_DWORD *)(v3 + 5780) = v2;
+  v4 = CharPair2Num__FPc(a1 + 5);
+  v5 = 0;
+  *(_DWORD *)(v6 + 5784) = v4;
+  v7 = 0;
+  v8 = 0;
+  do
+  {
+    strcmp();
+    if ( v10 != 0 )
+      v5 += dword_800B09BC[v8];
+    else
+      v7 = 1;
+    v8 += 2;
+  }
+  while ( v8 < 24 && v7 == 0 );
+  if ( v7 == 0 )
+    DBG_Error();
+  v11 = v5 + *(_DWORD *)(v9 + 5784) + 365 * *(_DWORD *)(v9 + 5780);
+  v12 = 1440 * v11 + 60 * CharPair2Num__FPc(a1 + 8);
+  return (&Words)[(v12 + CharPair2Num__FPc(a1 + 10)) / 360 % 118];
+}
+#endif

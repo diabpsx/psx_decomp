@@ -770,6 +770,11 @@ int GetOverlayOtBase__7CBlocks_800b02ec()
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (src/fe_6.c scaffold) — reading copy only */
+#if 0 /* m2c */
+s32 GetOverlayOtBase__7CBlocks_8013cb3c(void) {
+    return 0x1E8;
+}
+#endif
 #if 0 /* ida */
 int GetOverlayOtBase__7CBlocks_8013cb3c()
 {
@@ -808,6 +813,11 @@ int __fastcall MoveToScrollTarget__7CBlocks_8014ab60(_DWORD *a1)
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
+#if 0 /* m2c */
+s32 GetOverlayOtBase__7CBlocks_8015b950(void) {
+    return 0x1E8;
+}
+#endif
 #if 0 /* ida */
 int GetOverlayOtBase__7CBlocks_8015b950()
 {

@@ -92,7 +92,7 @@ SECTIONS
         . = 0x721DC;   /* 0x800821DC */
         build/skel/SOURCE/GAMEOVER.CPP.o(.text);
         . = 0x726A0;   /* 0x800826A0 */
-        build/skel/SOURCE/VERSION.CPP.o(.text);
+        build/src/version.c.o(.text);
         . = 0x7271C;   /* 0x8008271C */
         build/skel/SOURCE/COREINV.CPP.o(.text);
         . = 0x727D0;   /* 0x800827D0 */
@@ -207,6 +207,12 @@ SECTIONS
         build/asm/data/startup_text_hdr.data.s.o(.data);
         . = 0xA0320;   /* 0x800B0320 */
         build/src/startup.c.o(.text);
+        . = 0xA07C8;   /* 0x800B07C8 */
+        build/asm/data/startup_rodata_800b07c8.rodata.s.o(.rodata);
+        . = 0xA07E0;   /* 0x800B07E0 */
+        build/asm/data/startup_rodata_800b07e0.rodata.s.o(.rodata);
+        . = 0xA0A18;   /* 0x800B0A18 */
+        build/src/startup_1.c.o(.text);
         . = 0xA0C98;   /* 0x800B0C98 */
         build/asm/data/ctors.data.s.o(.data);
         . = 0xA0CD4;   /* 0x800B0CD4 */

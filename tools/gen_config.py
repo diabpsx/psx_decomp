@@ -53,7 +53,33 @@ for s in secs:
     if g == "data":    add(va, "data", "data_" + base if base != "data" else "data")
     elif g == "rdata": add(va, "rodata", "rodata_" + base if base != "rdata" else "rodata")
     elif g == "sdata": add(va, "sdata", "sdata_" + base if base != "sdata" else "sdata")
-sub.sort()
+# carve sized SYM data objects that the linker left INSIDE text sections (e.g. VERSION.CPP's StrDate/StrTime
+# strings before GetVersionString) into rodata subsegments, so splat does not swallow the following code
+_data_iv = []
+for va, typ, size, name in re.findall(r"^[0-9a-f]+: \$([0-9a-f]{8}) 9[46] Def2? class (?:EXT|STAT) type (?!FCN)(.*?) size (\d+).*? name (\S+)$",
+                                     (ROOT / "rom" / "DIABPSX-SYM.txt").read_text(encoding="latin-1"), re.M):
+    v = int(va, 16); sz = int(size)
+    if sz and VRAM <= v < 0x800B0D00: _data_iv.append((v, v + sz))
+_data_iv.sort()
+_merged = []
+for a, b in _data_iv:
+    if _merged and a <= _merged[-1][1]: _merged[-1][1] = max(_merged[-1][1], b)
+    else: _merged.append([a, b])
+_sub2 = []
+_bounds = sorted(o for o, k, n in sub) + [0x800B0D00 - VRAM]
+for o, k, n in sub:
+    if k != "c": _sub2.append((o, k, n)); continue
+    va = VRAM + o; stop = VRAM + _bounds[_bounds.index(o) + 1]
+    cur = va; piece = 0
+    for a, b in _merged:
+        if b <= va or a >= stop: continue
+        a = max(a, va); b = min((b + 3) & ~3, stop)
+        if a > cur:
+            _sub2.append((cur - VRAM, "c", n if piece == 0 else f"{n}_{piece}")); piece += 1
+        _sub2.append((a - VRAM, "rodata", f"{n}_rodata_{a:08x}"))
+        cur = b
+    if cur < stop: _sub2.append((cur - VRAM, "c", n if piece == 0 else f"{n}_{piece}"))
+sub = sorted(_sub2)   # carve
 bss_start = 0x8011C604
 bss_end = 0x80139BF4
 yaml = [

@@ -91,7 +91,6 @@
  "portal": "SOURCE/PORTAL.CPP",
  "compmap": "SOURCE/COMPMAP.CPP",
  "gameover": "SOURCE/GAMEOVER.CPP",
- "version": "SOURCE/VERSION.CPP",
  "coreinv": "SOURCE/COREINV.CPP",
  "gamemenu": "SOURCE/GAMEMENU.CPP",
  "dpiece": "SOURCE/DPIECE.CPP",

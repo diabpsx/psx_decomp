@@ -8,6 +8,19 @@
  *   blocks: {1 }13
  */
 INCLUDE_ASM("asm/nonmatchings/credits", InitCredits__Fv);
+#if 0 /* m2c */
+void InitCredits__Fv(void) {
+    InCredits = 5;
+    CreditSubTitleNo = -1;
+    CreditTitleNo = -1;
+    SetTextDat__5CFontP7TextDat(&LargeFont, GM_UseTexData__Fi(0xCB));
+    Set__7FontTab(&LFont);
+    DoCredits__Fv();
+    ClearFont__5CFont_8013e0b8(&LargeFont);
+    SetTextDat__5CFontP7TextDat(&LargeFont, GM_UseTexData__Fi(0));
+    Set__7FontTab(&LFont);
+}
+#endif
 
 /* ---- 0x8013D248  PrintCredits__Fiiiiii  CREDITS.CPP:429-574  seg credits  fsize 168 ---- */
 /* int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag)
@@ -15,6 +28,263 @@ INCLUDE_ASM("asm/nonmatchings/credits", InitCredits__Fv);
  *   blocks: {1 }146
  */
 INCLUDE_ASM("asm/nonmatchings/credits", PrintCredits__Fiiiiii);
+#if 0 /* m2c */
+s32 PrintCredits__Fiiiiii(s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    void *sp20;
+    s32 sp28;
+    s32 sp30;
+    s32 sp38;
+    s8 *sp40;
+    s32 sp48;
+    s32 sp50;
+    s32 sp78;
+    s16 temp_fp;
+    s16 temp_s6;
+    s16 temp_s7;
+    s16 temp_t1;
+    s16 var_t1;
+    s16 var_t1_2;
+    s32 *temp_a0;
+    s32 *temp_a0_2;
+    s32 *temp_a0_3;
+    s32 *temp_a0_4;
+    s32 *temp_a2;
+    s32 *temp_a2_2;
+    s32 *temp_v1_2;
+    s32 *temp_v1_3;
+    s32 temp_a1;
+    s32 temp_a1_2;
+    s32 temp_v0_2;
+    s32 temp_v0_4;
+    s32 temp_v0_5;
+    s32 temp_v0_6;
+    s32 var_a1;
+    s32 var_a1_2;
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s1;
+    s32 var_s1_2;
+    s32 var_s1_3;
+    s32 var_s5;
+    s32 var_s5_2;
+    s8 *var_s3;
+    s8 temp_v0;
+    s8 temp_v1;
+    u32 temp_v0_3;
+    u32 var_v0;
+    void *temp_t0;
+    void *temp_t0_2;
+    void *var_a2;
+    void *var_a2_2;
+    void *var_a3;
+    void *var_a3_2;
+
+    sp28 = arg1;
+    sp30 = arg2;
+    sp38 = arg3;
+    sp50 = 1;
+    var_s3 = GetStr__Fi();
+loop_43:
+    if (*var_s3 != 0) {
+        sp40 = var_s3;
+        var_s5 = 0;
+        if ((u8) *var_s3 != 0) {
+loop_2:
+            temp_v0 = M2C_FIELD(sp40, s8 *, 0);
+            if (temp_v0 != 0x7C) {
+                temp_v0_2 = GetCharWidth__5CFontUc(&LargeFont, temp_v0 & 0xFF);
+                sp40 += 1;
+                var_s5 += temp_v0_2;
+                if (M2C_FIELD(sp40, s8 *, 1) != 0) {
+                    goto loop_2;
+                }
+            }
+        }
+        temp_v0_3 = 0x140 - var_s5;
+        sp48 = (s32) (temp_v0_3 + (temp_v0_3 >> 0x1F)) >> 1;
+        if (var_s3 != sp40) {
+            do {
+                var_s1 = sp30 + 1;
+                sp30 = var_s1;
+                if (var_s1 >= 0x80) {
+                    var_s1 = 0x7F;
+                }
+                var_v0 = var_s1 - 1;
+                if (var_s1 < 0) {
+                    var_s1 = 0;
+                    var_v0 = -1U;
+                }
+                if (var_v0 < 0x7EU) {
+                    sp50 = 0;
+                }
+                temp_v1 = *var_s3;
+                if (temp_v1 == 0x20) {
+                    var_s5_2 = GetCharWidth__5CFontUc(&LargeFont, 0x20);
+                } else {
+                    temp_v0_4 = PrintChar__5CFontUsUsUcUcUcUc(&LargeFont, (u16) sp48, (u16) sp28, temp_v1 & 0xFF, 0x80, 0x80, 0x80);
+                    M2C_FIELD(CharFt4, u8 *, 7) = (u8) (M2C_FIELD(CharFt4, u8 *, 7) | 2);
+                    M2C_FIELD(CharFt4, u16 *, 0x16) = (u16) (M2C_FIELD(CharFt4, u16 *, 0x16) | 0x20);
+                    M2C_FIELD(CharFt4, u8 *, 7) = (u8) (M2C_FIELD(CharFt4, u8 *, 7) & 0xFE);
+                    var_s5_2 = temp_v0_4;
+                    temp_t1 = M2C_FIELD(CharFt4, s16 *, 8);
+                    temp_fp = M2C_FIELD(CharFt4, s16 *, 0x10);
+                    temp_s7 = M2C_FIELD(CharFt4, s16 *, 0x18);
+                    temp_s6 = M2C_FIELD(CharFt4, s16 *, 0x20);
+                    if (M2C_FIELD(GetFr__7TextDati_8013e13c(FeTData, CharFrm), s32 *, 4) & 0x02000000) {
+                        temp_a0 = ((0x7F - var_s1) * 4) + &CreditsTable;
+                        temp_v1_2 = ((0x83 - var_s1) * 4) + &CreditsTable;
+                        M2C_FIELD(CharFt4, s16 *, 8) = (s16) (temp_t1 + *temp_a0);
+                        M2C_FIELD(CharFt4, s16 *, 0x10) = (s16) (temp_fp + *temp_v1_2);
+                        M2C_FIELD(CharFt4, s16 *, 0x18) = (s16) (temp_s7 + *temp_a0);
+                        M2C_FIELD(CharFt4, s16 *, 0x1A) = (s16) (M2C_FIELD(CharFt4, u16 *, 0xA) + 2);
+                        M2C_FIELD(CharFt4, s8 *, 0x1C) = (s8) (M2C_FIELD(CharFt4, u8 *, 0xC) + 2);
+                        M2C_FIELD(CharFt4, s16 *, 0x20) = (s16) (temp_s6 + *temp_v1_2);
+                        M2C_FIELD(CharFt4, s16 *, 0x22) = (s16) (M2C_FIELD(CharFt4, u16 *, 0x12) + 2);
+                        var_s0 = 2;
+                        M2C_FIELD(CharFt4, s8 *, 0x24) = (s8) (M2C_FIELD(CharFt4, u8 *, 0x14) + 2);
+                        M2C_FIELD(CharFt4, s8 *, 4) = (s8) (var_s1 & sp38);
+                        M2C_FIELD(CharFt4, s8 *, 5) = (s8) (var_s1 & arg4);
+                        M2C_FIELD(CharFt4, s8 *, 6) = (s8) (var_s1 & arg5);
+                        sp78 = (s32) temp_t1;
+                        temp_v0_5 = GetCharHeight__5CFontUc(&LargeFont, (u8) *var_s3);
+                        var_t1 = temp_t1;
+                        if ((temp_v0_5 - 1) > 2) {
+                            var_s1_2 = var_s1 + 1;
+                            do {
+                                temp_a1 = var_s1_2 - var_s0;
+                                if (temp_a1 > 0) {
+                                    if (var_s1_2 & ~0x7F) {
+                                        var_s1_2 = 0x7F;
+                                    }
+                                    sp78 = (s32) var_t1;
+                                    PRIM_GetPrim__FPP8POLY_FT4_8013e03c(&sp20, temp_a1);
+                                    var_a2 = CharFt4;
+                                    var_a3 = sp20;
+                                    temp_t0 = var_a2 + 0x20;
+                                    var_t1 = (s16) sp78;
+                                    do {
+                                        M2C_FIELD(var_a3, s32 *, 0) = (s32) M2C_FIELD(var_a2, s32 *, 0);
+                                        M2C_FIELD(var_a3, s32 *, 4) = (s32) M2C_FIELD(var_a2, s32 *, 4);
+                                        M2C_FIELD(var_a3, s32 *, 8) = (s32) M2C_FIELD(var_a2, s32 *, 8);
+                                        M2C_FIELD(var_a3, s32 *, 0xC) = (s32) M2C_FIELD(var_a2, s32 *, 0xC);
+                                        var_a2 += 0x10;
+                                        var_a3 += 0x10;
+                                    } while (var_a2 != temp_t0);
+                                    M2C_FIELD(var_a3, s32 *, 0) = (s32) M2C_FIELD(var_a2, s32 *, 0);
+                                    M2C_FIELD(var_a3, s32 *, 4) = (s32) M2C_FIELD(var_a2, s32 *, 4);
+                                    temp_a2 = ((0x7F - var_s1_2) * 4) + &CreditsTable;
+                                    temp_a0_2 = ((0x83 - var_s1_2) * 4) + &CreditsTable;
+                                    M2C_FIELD(sp20, s16 *, 8) = (s16) (var_t1 + *temp_a2);
+                                    M2C_FIELD(sp20, u16 *, 0xA) = (u16) (M2C_FIELD(sp20, u16 *, 0xA) + var_s0);
+                                    M2C_FIELD(sp20, u16 *, 0x12) = (u16) (M2C_FIELD(sp20, u16 *, 0x12) + var_s0);
+                                    M2C_FIELD(sp20, s16 *, 0x10) = (s16) (temp_fp + *temp_a0_2);
+                                    M2C_FIELD(sp20, u16 *, 0x1A) = (u16) (M2C_FIELD(sp20, u16 *, 0x1A) + var_s0);
+                                    M2C_FIELD(sp20, s16 *, 0x18) = (s16) (temp_s7 + *temp_a2);
+                                    M2C_FIELD(sp20, u16 *, 0x22) = (u16) (M2C_FIELD(sp20, u16 *, 0x22) + var_s0);
+                                    M2C_FIELD(sp20, u8 *, 0xC) = (u8) (M2C_FIELD(sp20, u8 *, 0xC) + var_s0);
+                                    M2C_FIELD(sp20, s16 *, 0x20) = (s16) (temp_s6 + *temp_a0_2);
+                                    M2C_FIELD(sp20, u8 *, 0x14) = (u8) (M2C_FIELD(sp20, u8 *, 0x14) + var_s0);
+                                    M2C_FIELD(sp20, u8 *, 0x1C) = (u8) (M2C_FIELD(sp20, u8 *, 0x1C) + var_s0);
+                                    var_a1 = var_s1_2 - var_s0;
+                                    M2C_FIELD(sp20, u8 *, 0x24) = (u8) (M2C_FIELD(sp20, u8 *, 0x24) + var_s0);
+                                    if (var_a1 < 0) {
+                                        var_a1 = 0;
+                                    }
+                                    M2C_FIELD(sp20, s8 *, 4) = (s8) (var_a1 & sp38);
+                                    M2C_FIELD(sp20, s8 *, 5) = (s8) (var_a1 & arg4);
+                                    M2C_FIELD(sp20, s8 *, 6) = (s8) (var_a1 & arg5);
+                                    M2C_FIELD(sp20, s32 *, 0) = (s32) ((M2C_FIELD(sp20, s32 *, 0) & 0xFF000000) | (M2C_FIELD(ThisOt, s32 *, 0x190) & 0xFFFFFF));
+                                    M2C_FIELD(ThisOt, s32 *, 0x190) = (s32) ((M2C_FIELD(ThisOt, s32 *, 0x190) & 0xFF000000) | ((s32) sp20 & 0xFFFFFF));
+                                }
+                                var_s0 += 2;
+                                var_s1_2 += 1;
+                            } while (var_s0 < (temp_v0_5 - 1));
+                        }
+                    } else {
+                        temp_a0_3 = ((0x7F - var_s1) * 4) + &CreditsTable;
+                        temp_v1_3 = ((0x83 - var_s1) * 4) + &CreditsTable;
+                        M2C_FIELD(CharFt4, s16 *, 8) = (s16) (temp_t1 + *temp_a0_3);
+                        M2C_FIELD(CharFt4, s16 *, 0x10) = (s16) (temp_fp + *temp_v1_3);
+                        M2C_FIELD(CharFt4, s16 *, 0x18) = (s16) (temp_s7 + *temp_a0_3);
+                        M2C_FIELD(CharFt4, s16 *, 0x1A) = (s16) (M2C_FIELD(CharFt4, u16 *, 0xA) + 2);
+                        M2C_FIELD(CharFt4, s8 *, 0x1D) = (s8) (M2C_FIELD(CharFt4, u8 *, 0xD) + 2);
+                        M2C_FIELD(CharFt4, s16 *, 0x20) = (s16) (temp_s6 + *temp_v1_3);
+                        M2C_FIELD(CharFt4, s16 *, 0x22) = (s16) (M2C_FIELD(CharFt4, u16 *, 0x12) + 2);
+                        var_s0_2 = 1;
+                        M2C_FIELD(CharFt4, s8 *, 0x25) = (s8) (M2C_FIELD(CharFt4, u8 *, 0x15) + 2);
+                        M2C_FIELD(CharFt4, s8 *, 4) = (s8) (var_s1 & sp38);
+                        M2C_FIELD(CharFt4, s8 *, 5) = (s8) (var_s1 & arg4);
+                        M2C_FIELD(CharFt4, s8 *, 6) = (s8) (var_s1 & arg5);
+                        sp78 = (s32) temp_t1;
+                        temp_v0_6 = GetCharHeight__5CFontUc(&LargeFont, (u8) *var_s3);
+                        var_t1_2 = temp_t1;
+                        if ((temp_v0_6 - 1) > 1) {
+                            var_s1_3 = var_s1 + 1;
+                            do {
+                                temp_a1_2 = var_s1_3 - var_s0_2;
+                                if (temp_a1_2 > 0) {
+                                    if (var_s1_3 & ~0x7F) {
+                                        var_s1_3 = 0x7F;
+                                    }
+                                    sp78 = (s32) var_t1_2;
+                                    PRIM_GetPrim__FPP8POLY_FT4_8013e03c(&sp20, temp_a1_2);
+                                    var_a2_2 = CharFt4;
+                                    var_a3_2 = sp20;
+                                    temp_t0_2 = var_a2_2 + 0x20;
+                                    var_t1_2 = (s16) sp78;
+                                    do {
+                                        M2C_FIELD(var_a3_2, s32 *, 0) = (s32) M2C_FIELD(var_a2_2, s32 *, 0);
+                                        M2C_FIELD(var_a3_2, s32 *, 4) = (s32) M2C_FIELD(var_a2_2, s32 *, 4);
+                                        M2C_FIELD(var_a3_2, s32 *, 8) = (s32) M2C_FIELD(var_a2_2, s32 *, 8);
+                                        M2C_FIELD(var_a3_2, s32 *, 0xC) = (s32) M2C_FIELD(var_a2_2, s32 *, 0xC);
+                                        var_a2_2 += 0x10;
+                                        var_a3_2 += 0x10;
+                                    } while (var_a2_2 != temp_t0_2);
+                                    M2C_FIELD(var_a3_2, s32 *, 0) = (s32) M2C_FIELD(var_a2_2, s32 *, 0);
+                                    M2C_FIELD(var_a3_2, s32 *, 4) = (s32) M2C_FIELD(var_a2_2, s32 *, 4);
+                                    temp_a2_2 = ((0x7F - var_s1_3) * 4) + &CreditsTable;
+                                    temp_a0_4 = ((0x83 - var_s1_3) * 4) + &CreditsTable;
+                                    M2C_FIELD(sp20, s16 *, 8) = (s16) (var_t1_2 + *temp_a2_2);
+                                    M2C_FIELD(sp20, u16 *, 0xA) = (u16) (M2C_FIELD(sp20, u16 *, 0xA) + var_s0_2);
+                                    M2C_FIELD(sp20, u16 *, 0x12) = (u16) (M2C_FIELD(sp20, u16 *, 0x12) + var_s0_2);
+                                    M2C_FIELD(sp20, s16 *, 0x10) = (s16) (temp_fp + *temp_a0_4);
+                                    M2C_FIELD(sp20, u16 *, 0x1A) = (u16) (M2C_FIELD(sp20, u16 *, 0x1A) + var_s0_2);
+                                    M2C_FIELD(sp20, s16 *, 0x18) = (s16) (temp_s7 + *temp_a2_2);
+                                    M2C_FIELD(sp20, u16 *, 0x22) = (u16) (M2C_FIELD(sp20, u16 *, 0x22) + var_s0_2);
+                                    M2C_FIELD(sp20, u8 *, 0xD) = (u8) (M2C_FIELD(sp20, u8 *, 0xD) + var_s0_2);
+                                    M2C_FIELD(sp20, s16 *, 0x20) = (s16) (temp_s6 + *temp_a0_4);
+                                    M2C_FIELD(sp20, u8 *, 0x15) = (u8) (M2C_FIELD(sp20, u8 *, 0x15) + var_s0_2);
+                                    M2C_FIELD(sp20, u8 *, 0x1D) = (u8) (M2C_FIELD(sp20, u8 *, 0x1D) + var_s0_2);
+                                    var_a1_2 = var_s1_3 - (var_s0_2 * 2);
+                                    M2C_FIELD(sp20, u8 *, 0x25) = (u8) (M2C_FIELD(sp20, u8 *, 0x25) + var_s0_2);
+                                    if (var_a1_2 < 0) {
+                                        var_a1_2 = 0;
+                                    }
+                                    M2C_FIELD(sp20, s8 *, 4) = (s8) (var_a1_2 & sp38);
+                                    M2C_FIELD(sp20, s8 *, 5) = (s8) (var_a1_2 & arg4);
+                                    M2C_FIELD(sp20, s8 *, 6) = (s8) (var_a1_2 & arg5);
+                                    M2C_FIELD(sp20, s32 *, 0) = (s32) ((M2C_FIELD(sp20, s32 *, 0) & 0xFF000000) | (M2C_FIELD(ThisOt, s32 *, 0x190) & 0xFFFFFF));
+                                    M2C_FIELD(ThisOt, s32 *, 0x190) = (s32) ((M2C_FIELD(ThisOt, s32 *, 0x190) & 0xFF000000) | ((s32) sp20 & 0xFFFFFF));
+                                }
+                                var_s0_2 += 2;
+                                var_s1_3 += 1;
+                            } while (var_s0_2 < (temp_v0_6 - 1));
+                        }
+                    }
+                }
+                sp48 += var_s5_2;
+                var_s3 += 1;
+            } while (var_s3 != sp40);
+        }
+        if (M2C_FIELD(sp40, s8 *, 0) == 0x7C) {
+            var_s3 += 1;
+        }
+        sp28 += 0x14;
+        goto loop_43;
+    }
+    return sp50;
+}
+#endif
 #if 0 /* ida */
 int __fastcall PrintCredits__Fiiiiii(int a1, int a2, int a3, int a4, char a5, char a6)
 {
@@ -374,6 +644,33 @@ int __fastcall PrintCredits__Fiiiiii(int a1, int a2, int a3, int a4, char a5, ch
  *   blocks: {1 }19
  */
 INCLUDE_ASM("asm/nonmatchings/credits", DrawCreditsTitle__Fiiiii);
+#if 0 /* m2c */
+void DrawCreditsTitle__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    s32 var_a0;
+    s32 var_a2;
+    s32 var_v1;
+
+    var_a0 = arg0;
+    var_a2 = arg2;
+    var_v1 = arg1;
+    if (((var_a2 == 0) && (var_a0 == CreditTitleNo)) || ((var_a2 == 2) && (arg3 == CreditTitleNo))) {
+        var_a2 = 1;
+        var_v1 = 0x7F;
+    }
+    switch (var_a2) {                               /* irregular */
+    case 0:
+block_14:
+        PrintCredits__Fiiiiii(var_a0, arg4, var_v1, 0xFF, 0xFF, 0);
+        return;
+    case 1:
+        CreditTitleNo = var_a0;
+        /* fallthrough */
+    case 2:
+        var_a0 = CreditTitleNo;
+        goto block_14;
+    }
+}
+#endif
 #if 0 /* ida */
 int __fastcall DrawCreditsTitle__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -421,6 +718,34 @@ LABEL_14:
  *   blocks: {1 }19
  */
 INCLUDE_ASM("asm/nonmatchings/credits", DrawCreditsSubTitle__Fiiiii);
+#if 0 /* m2c */
+void DrawCreditsSubTitle__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    s32 var_a0;
+    s32 var_a2;
+    s32 var_v1;
+
+    var_a0 = arg0;
+    var_a2 = arg2;
+    var_v1 = arg1;
+    if (((var_a2 == 0) && (var_a0 == CreditSubTitleNo)) || ((var_a2 == 2) && (arg3 == CreditSubTitleNo))) {
+        var_a2 = 1;
+        var_v1 = 0x7F;
+    }
+    switch (var_a2) {                               /* irregular */
+    case 1:
+        CreditSubTitleNo = var_a0;
+        /* fallthrough */
+    case 2:
+        var_a0 = CreditSubTitleNo;
+        /* fallthrough */
+    case 0:
+        if (var_a0 != -1) {
+            PrintCredits__Fiiiiii(var_a0, arg4, var_v1, 0xFF, 0xFF, 0xFF);
+        }
+        return;
+    }
+}
+#endif
 #if 0 /* ida */
 int __fastcall DrawCreditsSubTitle__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -464,6 +789,30 @@ LABEL_14:
  *   blocks: {1 }11
  */
 INCLUDE_ASM("asm/nonmatchings/credits", CredCountNL__Fi);
+#if 0 /* m2c */
+s32 CredCountNL__Fi(void) {
+    s32 var_s0;
+    s32 var_v0;
+    s32 var_v0_2;
+    s8 *var_a0;
+
+    var_s0 = 0;
+    var_a0 = GetStr__Fi();
+    var_v0 = 0;
+    if (*var_a0 != 0) {
+        var_v0_2 = (u8) *var_a0 << 0x18;
+        do {
+            if ((var_v0_2 >> 0x18) == 0x7C) {
+                var_s0 += 1;
+            }
+            var_a0 += 1;
+            var_v0_2 = (u8) *var_a0 << 0x18;
+        } while (*var_a0 != 0);
+        var_v0 = var_s0;
+    }
+    return var_v0;
+}
+#endif
 #if 0 /* ida */
 int CredCountNL__Fi()
 {
@@ -503,6 +852,117 @@ int CredCountNL__Fi()
  *   blocks: {1 {26 {37 {40 {48 }48 {54 }54 {69 }69 }69 }69 }93 }99
  */
 INCLUDE_ASM("asm/nonmatchings/credits", DoCredits__Fv);
+#if 0 /* m2c */
+void DoCredits__Fv(void) {
+    M2C_UNK sp18;
+    s32 temp_s0;
+    s32 temp_s1;
+    s32 temp_s2;
+    s32 temp_t0;
+    s32 temp_v1;
+    s32 var_fp;
+    s32 var_s1;
+    s32 var_s3;
+    s32 var_s4;
+    s32 var_s5;
+    u32 var_v0;
+
+    __7CScreen(&sp18);
+    var_s3 = 0;
+    var_fp = 0;
+    var_s4 = 0;
+    var_s5 = 0;
+    CreditSubTitleNo = -1;
+    CreditTitleNo = -1;
+    InCredits = 5;
+    CDWAIT = 1;
+    Load__7CScreeniii(&sp18, 0xE, 0xB, 0);
+    PrintSelectBack__FUs(0x4000);
+    CDWAIT = 0;
+    PaletteFadeIn__Fi(8);
+loop_1:
+    if (GetFadeState__Fv() != 0) {
+        Display__7CScreeniiii(&sp18, 0xE, 0xB, 0, 0);
+        PrintSelectBack__FUs(0x4000);
+        TSK_Sleep(1);
+        goto loop_1;
+    }
+loop_4:
+    if (InCredits != 0) {
+        ReadPad__Fi(-1);
+        temp_v1 = var_s5 & 0xFFFF;
+        temp_s2 = temp_v1 * 0xC;
+        temp_s0 = (temp_v1 + 1) * 0xC;
+        DrawCreditsTitle__Fiiiii(*(&CreditsText + temp_s2), var_s3, var_s4, *(&CreditsText + temp_s0), 0x28);
+        temp_s1 = CredCountNL__Fi(*(&CreditsText + temp_s2)) * 0x14;
+        DrawCreditsSubTitle__Fiiiii(*(&CreditsText + 4 + temp_s2), var_s3, var_s4, *(&CreditsText + 4 + temp_s0), temp_s1 + 0x44);
+        var_s1 = temp_s1 + (CredCountNL__Fi(*(&CreditsText + 4 + temp_s2)) * 0x14);
+        if (CredCountNL__Fi(*(&CreditsText + temp_s2)) == 0) {
+            var_s1 = 0;
+        }
+        temp_t0 = var_s1 + 0x6E;
+        switch (var_s4) {                           /* irregular */
+        case 0:
+            if (PrintCredits__Fiiiiii(*(&CreditsText + 8 + temp_s2), temp_t0, var_s3, 0xFF, 0xFF, 0xFF) != 0) {
+                var_s4 = 1;
+                var_fp = VID_GetTick__Fv();
+            } else {
+                var_s3 += 1;
+            }
+            break;
+        case 1:
+            PrintCredits__Fiiiiii(*(&CreditsText + 8 + temp_s2), temp_t0, var_s3, 0xFF, 0xFF, 0xFF);
+            if ((u32) (VID_GetTick__Fv() - var_fp) >= 0x1AU) {
+                var_s4 = 2;
+                var_s3 -= 1;
+            }
+            break;
+        case 2:
+            if (PrintCredits__Fiiiiii(*(&CreditsText + 8 + temp_s2), temp_t0, var_s3, 0xFF, 0xFF, 0xFF) != 0) {
+                var_s4 = 0;
+                if (InCredits != 2) {
+                    var_s5 += 1;
+                }
+                var_s3 = 0;
+            } else {
+                var_s3 -= 1;
+            }
+            break;
+        }
+        Display__7CScreeniiii(&sp18, 0xE, 0xB, 0, 0);
+        if (InCredits >= 4) {
+            PrintSelectBack__FUs(0x4000);
+        }
+        TSK_Sleep(1);
+        if (InCredits == 2) {
+            InCredits = 3;
+            PaletteFadeOut__Fi(8);
+        }
+        if ((InCredits == 3) && ((GetFadeState__Fv() ^ 1) != 0)) {
+            InCredits = 1;
+        }
+        if (DavesPad & 0x100) {
+            var_v0 = var_s5 & 0xFFFF;
+            if (InCredits == 5) {
+                PlaySFX__Fi(0x33);
+                InCredits = 2;
+                goto block_34;
+            }
+        } else {
+block_34:
+            var_v0 = var_s5 & 0xFFFF;
+        }
+        if (var_v0 >= 0x39U) {
+            InCredits = 2;
+            var_s5 = 0;
+        }
+        goto loop_4;
+    }
+    LANG_ReloadMainTXT__Fv();
+    Unload__7CScreen(&sp18);
+    ___7CScreen_8013e11c(&sp18, 2);
+}
+#endif
 #if 0 /* ida */
 int DoCredits__Fv()
 {
@@ -628,6 +1088,15 @@ LABEL_29:
  *   blocks: {1 }7
  */
 INCLUDE_ASM("asm/nonmatchings/credits", PRIM_GetPrim__FPP8POLY_FT4_8013e03c);
+#if 0 /* m2c */
+void PRIM_GetPrim__FPP8POLY_FT4_8013e03c(void **arg0) {
+    if ((u32) (ThisPrimAddr + 0x190) >= (u32) AddrToAvoid) {
+        DBG_Error(0, &D_8013D1A0, 0x44);
+    }
+    *arg0 = ThisPrimAddr;
+    ThisPrimAddr += 0x28;
+}
+#endif
 #if 0 /* ida */
 int __fastcall PRIM_GetPrim__FPP8POLY_FT4_8013e03c(_DWORD *a1)
 {
@@ -648,6 +1117,11 @@ int __fastcall PRIM_GetPrim__FPP8POLY_FT4_8013e03c(_DWORD *a1)
  *   blocks: {1 }1
  */
 INCLUDE_ASM("asm/nonmatchings/credits", ClearFont__5CFont_8013e0b8);
+#if 0 /* m2c */
+void ClearFont__5CFont_8013e0b8(M2C_UNK *arg0) {
+    GM_FinishedUsing__FP7TextDat(M2C_FIELD(arg0, s32 *, 0x214));
+}
+#endif
 #if 0 /* ida */
 int __fastcall ClearFont__5CFont_8013e0b8(int a1)
 {
@@ -661,6 +1135,11 @@ int __fastcall ClearFont__5CFont_8013e0b8(int a1)
  *   blocks: {1 }1
  */
 INCLUDE_ASM("asm/nonmatchings/credits", GetCharHeight__5CFontUc);
+#if 0 /* m2c */
+s32 GetCharHeight__5CFontUc(M2C_UNK *arg0, u8 arg1) {
+    return ((u32) M2C_FIELD(GetFr__7TextDati_8013e13c(M2C_FIELD(arg0, void **, 0x214), (s32) M2C_FIELD((((arg1 & 0xFF) * 2) + arg0), u16 *, 4)), u32 *, 8) >> 9) & 0x1FF;
+}
+#endif
 #if 0 /* ida */
 int __fastcall GetCharHeight__5CFontUc(int a1, unsigned __int8 a2)
 {
@@ -673,6 +1152,11 @@ int __fastcall GetCharHeight__5CFontUc(int a1, unsigned __int8 a2)
  *   this=$a0 __in_chrg=$a1
  */
 INCLUDE_ASM("asm/nonmatchings/credits", ___7CScreen_8013e11c);
+#if 0 /* m2c */
+void ___7CScreen_8013e11c(void) {
+    ___7TextDat();
+}
+#endif
 #if 0 /* ida */
 int ___7CScreen_8013e11c()
 {
@@ -686,6 +1170,11 @@ int ___7CScreen_8013e11c()
  *   blocks: {1 }1
  */
 INCLUDE_ASM("asm/nonmatchings/credits", GetFr__7TextDati_8013e13c);
+#if 0 /* m2c */
+void *GetFr__7TextDati_8013e13c(void *arg0, s32 arg1) {
+    return M2C_FIELD(arg0, s32 *, 0x24) + ((arg1 & 0xFFFF) * 0xC);
+}
+#endif
 #if 0 /* ida */
 int __fastcall GetFr__7TextDati_8013e13c(int a1, unsigned __int16 a2)
 {

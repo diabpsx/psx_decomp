@@ -543,6 +543,15 @@ void __noreturn PRIM_GetPrim__FPP8POLY_FT4_800adeb8()
  *   blocks: {1 }7
  */
 /* linked from the including TU skeleton (PSXSRC/CREDITS.CPP) — reading copy only */
+#if 0 /* m2c */
+void PRIM_GetPrim__FPP8POLY_FT4_8013e03c(void **arg0) {
+    if ((u32) (ThisPrimAddr + 0x190) >= (u32) AddrToAvoid) {
+        DBG_Error(0, &D_8013D1A0, 0x44);
+    }
+    *arg0 = ThisPrimAddr;
+    ThisPrimAddr += 0x28;
+}
+#endif
 #if 0 /* ida */
 int __fastcall PRIM_GetPrim__FPP8POLY_FT4_8013e03c(_DWORD *a1)
 {
