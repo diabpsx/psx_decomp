@@ -1,0 +1,30 @@
+extern BOOL optionsflag;   /* @0x8011B248 */
+extern BOOL DoShowPanel;   /* @0x8011B000 */
+extern char stextflag;   /* @0x8011BAE0 */
+extern unsigned char qtextflag;   /* @0x8011B960 */
+extern unsigned char sbookflag;   /* @0x8011B6C6 */
+extern unsigned char _pinfoflag[2];   /* @0x8011B6B8 */
+extern int sel_data;   /* @0x8011B72C */
+extern unsigned char currlevel;   /* @0x8011C10C */
+extern unsigned char automapflag;   /* @0x8011C37B */
+extern unsigned char *pQLogCel;   /* @0x8011BA50 -- oracle uses lui/lw here (absolute): owned elsewhere */
+/* The following are gp-rel (%gp_rel) in this TU's oracle -> CONTROL.CPP owns them (lever #6):
+ * tentative-defined below, NOT extern, despite the SYM's EXT class label. */
+extern int myplr;   /* @0x8011BA08 */
+extern struct PlayerStruct plr[2];   /* @0x800DA538 */
+extern struct SpellData spelldata[37];   /* @0x800DDB80 */
+/* TU-owned STAT globals (tentative defs live in control.cpp; forward decl here for consistency) */
+extern int _pnumlines[2];   /* @0x8011C764 */
+extern int SPLICONY;   /* @0x8011B630 */
+extern int SPLICONRIGHT;   /* @0x8011C76C */
+extern int lus;   /* @0x8011B65C */
+extern char plusanim;   /* @0x8011B664 */
+extern unsigned char *pMultiBtns;   /* @0x8011C7A0 */
+extern unsigned char *pTalkBtns;   /* @0x8011C7A4 */
+extern unsigned char DialogRed;   /* @0x8011ABFD */
+extern unsigned char DialogGreen;   /* @0x8011ABFE */
+extern unsigned char DialogBlue;   /* @0x8011ABFF */
+extern unsigned char DialogTRed;   /* @0x8011AC00 */
+extern unsigned char DialogTGreen;   /* @0x8011AC01 */
+extern unsigned char DialogTBlue;   /* @0x8011AC02 */
+extern int D_801110FC[10];   /* rodata: DrawDurIcon4Item icon-frame table, unnamed in SYM */
