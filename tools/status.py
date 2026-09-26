@@ -37,16 +37,29 @@ def gate(tu: Path, fns):
         print(f"[{tu}] gate error:\n{r.stdout}{r.stderr}", file=sys.stderr)
     return res
 
+def sym_ok(tu: Path, fns):
+    """{fn: True/False} from tools/symlane.py (the SYM receipt of the PASS rule)"""
+    r = subprocess.run([PY, str(ROOT / "tools" / "symlane.py"), str(tu.relative_to(ROOT)), ",".join(fns)],
+                       cwd=ROOT, capture_output=True, text=True)
+    out = {}
+    for m in re.finditer(r"^\s+(\S+): (SYM ok|SYM DIFF|NO RETAIL SYM|NOT IN OBJECT)", r.stdout, re.M):
+        out[m.group(1)] = m.group(2) == "SYM ok"
+    return out
+
 def main():
     tus = recon_tus()
     segs = sys.argv[1:] or sorted(tus)
     total_all = sum(len(seg_functions(s)) for s in sorted(p.stem for p in (ROOT / "src").glob("*.c")))
-    lines = ["# Match progress (gate = tools/verify_asm.py)", ""]
+    lines = ["# Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only", ""]
     grand_pass = 0
     for seg in segs:
         fns = seg_functions(seg)
         if seg not in tus or not fns: continue
         res = gate(tus[seg], fns)
+        sym = sym_ok(tus[seg], [f for f, v in res.items() if v[0] == "PASS"]) if any(v[0] == "PASS" for v in res.values()) else {}
+        for f, v in list(res.items()):
+            if v[0] == "PASS" and not sym.get(f, False):
+                res[f] = ("SYMDIFF", v[1], 0)
         npass = sum(1 for v in res.values() if v[0] == "PASS")
         grand_pass += npass
         lines.append(f"## {seg}  ({tus[seg].relative_to(ROOT).as_posix()}) — {npass}/{len(fns)} PASS")
@@ -54,6 +67,7 @@ def main():
             st = res.get(fn, ("TODO", 0, 0))
             if st[0] == "PASS": lines.append(f"- ✅ {fn} ({st[1]})")
             elif st[0] == "FAIL": lines.append(f"- ❌ {fn} — {st[2]} diffs (ours {st[1]})")
+            elif st[0] == "SYMDIFF": lines.append(f"- 🟡 {fn} — bytes PASS, SYM differs")
             elif st[0] == "NOT IN OBJECT": lines.append(f"- ⬜ {fn}")
             else: lines.append(f"- ⬜ {fn} ({st[0]})")
         lines.append("")

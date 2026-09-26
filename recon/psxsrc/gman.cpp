@@ -167,8 +167,10 @@ BOOL TextDat::IsCompressed(int Creature, int Action, int Dir, int Frame)
 /* line 343 @0x80092368 */
 void TextDat::MakeBlockOffsetTab()
 {
-    if (Hdr->ComponentOffset)
-        hndBlockOffsets = ((CBlockHdr *)Blocks)->MakeOffsetTab();
+    if (Hdr->ComponentOffset) {
+        CBlockHdr *BlockHdr = (CBlockHdr *)Blocks;
+        hndBlockOffsets = BlockHdr->MakeOffsetTab();
+    }
 }
 
 /* line 1526 @0x80094140 */
@@ -210,11 +212,10 @@ int CCreatureHdr::GetSize() const
 {
     int Size;
     CCreatureAction *CAct;
-    int f;
 
     Size = sizeof(NumOfActions);
     CAct = (CCreatureAction *)&Cr;
-    for (f = 0; f < NumOfActions; f++) {
+    for (int f = 0; f < NumOfActions; f++) {
         int ThisSize;
         ThisSize = CAct->GetSize();
         CAct = (CCreatureAction *)((char *)CAct + ThisSize);
@@ -227,10 +228,9 @@ int CCreatureHdr::GetSize() const
 void CCreatureHdr::InitActionDirRemaps()
 {
     CCreatureAction *CAct;
-    int f;
 
     CAct = &Cr;
-    for (f = 0; f < NumOfActions; f++) {
+    for (int f = 0; f < NumOfActions; f++) {
         CAct->InitDirRemap();
         CAct = (CCreatureAction *)((char *)CAct + CAct->GetSize());
     }
@@ -240,11 +240,10 @@ void CCreatureHdr::InitActionDirRemaps()
 CCreatureAction *CCreatureHdr::GetAction(int ActNum) const
 {
     CCreatureAction *CAct;
-    int f;
 
     if (ActNum < 0 || ActNum > NumOfActions) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1592);
     CAct = (CCreatureAction *)&Cr;
-    for (f = 0; f < ActNum; f++)
+    for (int f = 0; f < ActNum; f++)
         CAct = (CCreatureAction *)((char *)CAct + CAct->GetSize());
     return CAct;
 }
@@ -629,7 +628,8 @@ void TextDat::PrepareGt3(POLY_GT3 *GT3, int Frm, int X, int Y)
     GT3->y2 = Y + H;
     Pal = GetPal(Fr->PalNum);
     if (Pal->InVram) {
-        GT3->clut = ((unsigned short *)Pal)[1];
+        unsigned short *Clut = (unsigned short *)Pal;
+        GT3->clut = Clut[1];
     } else {
         RECT R;
         GT3->clut = GetClut(0x140, 0x100);
@@ -694,19 +694,18 @@ void TextDat::PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YF
     GT4->y2 = Y + H;
     GT4->x3 = X + W;
     GT4->y3 = Y + H;
-    {
-        PAL *Pal = GetPal(Fr->PalNum);
-        if (Pal->InVram) {
-            GT4->clut = ((unsigned short *)Pal)[1];
-        } else {
-            RECT R;
-            GT4->clut = GetClut(0x140, 0x100);
-            R.x = 0x140;
-            R.y = 0x100;
-            R.w = 64;
-            R.h = 1;
-            LoadImage(&R, (u_long *)Pal->Cols);
-        }
+    PAL *Pal = GetPal(Fr->PalNum);      /* mid-block declaration: SYM level opens here (+0xbc) */
+    if (Pal->InVram) {
+        unsigned short *Clut = (unsigned short *)Pal;
+        GT4->clut = Clut[1];
+    } else {
+        RECT R;
+        GT4->clut = GetClut(0x140, 0x100);
+        R.x = 0x140;
+        R.y = 0x100;
+        R.w = 64;
+        R.h = 1;
+        LoadImage(&R, (u_long *)Pal->Cols);
     }
     if (Fr->InVRAM) {
         SetUVTpGT4(Fr, GT4, XFlip, YFlip);
@@ -753,9 +752,8 @@ POLY_FT4 *TextDat::PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFl
         else
             addPrim(&ThisOt[OtPos], FT4);
         return FT4;
-    } else {
-        return &MyFT4;
     }
+    return &MyFT4;
 }
 
 /* line 1012 @0x8009356C */
@@ -809,9 +807,9 @@ void TextDat::DecompFrame(FRAME_HDR *Fr)
 /* line 170 @0x80091F30 */
 void TextDat::Use(long NewHndDat, BOOL DatLoaded, int size)
 {
-    char NameBuff[40];
-
     if (!Loaded) {
+        char NameBuff[40];
+
         LastFrame = -1;
         hndHdr = FileInfo->LoadHdr();
         Hdr = (SPR_HDR *)GAL_Lock(hndHdr);
@@ -870,35 +868,35 @@ void TextDat::PrintMonster(int Creature, int Action, int Dir, int Frame, int x, 
 /* line 508 @0x800926D8 */
 POLY_FT4 *TextDat::PrintMonsterA(int Frm, int X, int Y, BOOL XFlip, int OtPos)
 {
-    POLY_FT4 *FT4;
-    FRAME_HDR *Fr;
-
     if (Frm >= 0 && Frm < GetNumOfFrames()) {
+        POLY_FT4 *FT4;
+        FRAME_HDR *Fr;
+        int W;
+        int H;
+
         PRIM_GetPrim(&FT4);
         Fr = GetFr(Frm);
-        {
-            int W = Fr->W;
-            int H = Fr->H;
-            setlen(FT4, 9);
-            setcode(FT4, 0x2C);
-            setShadeTex(FT4, 0);
-            if (XFlip) {
-                X -= Fr->X;
-                X -= W;
-            } else {
-                X += Fr->X;
-            }
-            Y += Fr->Y;
-            FT4->x0 = X;
-            FT4->y0 = Y;
-            FT4->x1 = X + W;
-            FT4->y1 = Y;
-            FT4->x2 = X;
-            FT4->y2 = Y + H;
-            FT4->x3 = X + W;
-            FT4->y3 = Y + H;
-            SetPal(Fr, FT4);
+        W = Fr->W;
+        H = Fr->H;
+        setlen(FT4, 9);
+        setcode(FT4, 0x2C);
+        setShadeTex(FT4, 0);
+        if (XFlip) {
+            X -= Fr->X;
+            X -= W;
+        } else {
+            X += Fr->X;
         }
+        Y += Fr->Y;
+        FT4->x0 = X;
+        FT4->y0 = Y;
+        FT4->x1 = X + W;
+        FT4->y1 = Y;
+        FT4->x2 = X;
+        FT4->y2 = Y + H;
+        FT4->x3 = X + W;
+        FT4->y3 = Y + H;
+        SetPal(Fr, FT4);
         if (Fr->InVRAM) {
             SetUVTp(Fr, FT4, XFlip, 0);
             addPrim(&ThisOt[OtPos], FT4);
@@ -923,32 +921,31 @@ POLY_FT4 *TextDat::PrintMonsterA(int Frm, int X, int Y, BOOL XFlip, int OtPos)
             TpY = DrPtr->rect.y;
             VH = getTPage(0, 0, TpX, TpY);
             FT4->tpage = VH;
-            {
-                int U = (TpX << 2) & 0xff;
-                int V = TpY & 0xff;
-                int W = Fr->W;
-                int H = Fr->H;
-                int u0, u1, u2, u3;
-                if (XFlip) {
-                    u0 = U + W - 1;
-                    u1 = U - 1;
-                    u2 = u0;
-                    u3 = u1;
-                } else {
-                    u0 = U;
-                    u1 = U + W;
-                    u2 = u0;
-                    u3 = u1;
-                }
-                FT4->v0 = V;
-                FT4->v1 = V;
-                FT4->v2 = V + H;
-                FT4->v3 = V + H;
-                FT4->u0 = u0;
-                FT4->u1 = u1;
-                FT4->u2 = u2;
-                FT4->u3 = u3;
+            /* mid-block declarations: SYM level opens here (+0x240) and runs to the end of the else */
+            int U = (TpX << 2) & 0xff;
+            int V = TpY & 0xff;
+            int W = Fr->W;
+            int H = Fr->H;
+            int u0, u1, u2, u3;
+            if (XFlip) {
+                u0 = U + W - 1;
+                u1 = U - 1;
+                u2 = u0;
+                u3 = u1;
+            } else {
+                u0 = U;
+                u1 = U + W;
+                u2 = u0;
+                u3 = u1;
             }
+            FT4->v0 = V;
+            FT4->v1 = V;
+            FT4->v2 = V + H;
+            FT4->v3 = V + H;
+            FT4->u0 = u0;
+            FT4->u1 = u1;
+            FT4->u2 = u2;
+            FT4->u3 = u3;
             addPrim(&ThisOt[OtPos], FT4);
             for (unsigned int f = 0; f < NumOfPrims; f++) {
                 RECT mrect = DrPtr->rect;
@@ -959,21 +956,21 @@ POLY_FT4 *TextDat::PrintMonsterA(int Frm, int X, int Y, BOOL XFlip, int OtPos)
             }
         }
         return FT4;
-    } else {
-        return &MyFT4;
     }
+    return &MyFT4;
 }
 
 /* line 1804 @0x80094890 */
 void CScreen::Load(int Id, int tpx, int tpy)
 {
     unsigned char r, g, b;
-    FRAME_HDR *Fr;
-    RECT R;
-    PAL *Pal;
-    unsigned short MyPal[256];
 
     if (Id != LoadedId) {
+        FRAME_HDR *Fr;
+        RECT R;
+        PAL *Pal;
+        unsigned short MyPal[256];
+
         if (Id != -1) DumpData();
         if (FeFlag) CDWAIT = 1;
         SetFileInfo(TX_DatTab[Id], -1);
@@ -1014,8 +1011,9 @@ void CScreen::Load(int Id, int tpx, int tpy)
             R.h = 1;
             LoadImage(&R, (u_long *)MyPal);
         }
+        int NewId = Id;                     /* coalesced copy: record-less SYM level +0x278..end */
         CDWAIT = 0;
-        LoadedId = Id;
+        LoadedId = NewId;
         if (hndDat != -1) {
             if (!GAL_Free(hndDat)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1873);
             hndDat = -1;
@@ -1064,7 +1062,8 @@ void TextDat::SetPal(FRAME_HDR *Fr, POLY_FT4 *FT4)
 
     Pal = GetPal(Fr->PalNum);
     if (Pal->InVram) {
-        FT4->clut = ((unsigned short *)Pal)[1];
+        unsigned short *Clut = (unsigned short *)Pal;
+        FT4->clut = Clut[1];
     } else {
         RECT R;
         if (CanXferPal() == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1382);
@@ -1173,13 +1172,12 @@ void TextDat::FindDecompArea(RECT &R)
     int NumOfFrames;
     int Widest;
     int Tallest;
-    int f;
 
     if (Loaded == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1499);
     NumOfFrames = GetNumOfFrames();
     Widest = 0;
     Tallest = 0;
-    for (f = 0; f < NumOfFrames; f++) {
+    for (int f = 0; f < NumOfFrames; f++) {
         int w;
         int h;
         w = Frames[f].W;
@@ -1195,15 +1193,11 @@ void TextDat::FindDecompArea(RECT &R)
 /* line 1312 @0x80093C10 */
 TextDat *GM_UseTexData(int Id)
 {
-    TextDat *Dat2Use;
-    CTextFileInfo **Tab;
-    int f;
-
     if ((unsigned int)Id > 0x173) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1313);
     if (AllDats[Id] == NULL) {
-        Dat2Use = NULL;
-        Tab = TX_DatTab;
-        for (f = 0; f < 20 && Dat2Use == NULL; f++) {
+        TextDat *Dat2Use = NULL;
+        CTextFileInfo **Tab = TX_DatTab;
+        for (int f = 0; f < 20 && Dat2Use == NULL; f++) {
             if (!DatPool[f].IsLoaded())
                 Dat2Use = &DatPool[f];
         }

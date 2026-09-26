@@ -50,7 +50,8 @@ def compile_g(src: Path) -> Path:
     txt = s_file.read_text().replace("_._", "___").replace("_GLOBAL_.I.", "_GLOBAL__I_").replace("_GLOBAL_.D.", "_GLOBAL__D_")
     s_file.write_text(txt); crlf(s_file)
     obj = stem.with_suffix(".g.obj")
-    r = subprocess.run([str(ASPSX), "-q", "-g", "-0", f"-G{g}", "-o", str(obj), str(s_file)]   # -0: no div/rem zero-divide guard (retail form), capture_output=True, text=True, cwd=ROOT, env=ENV)
+    # -0: no div/rem zero-divide guard expansion (retail form; guard expansion is ASPSX's default)
+    r = subprocess.run([str(ASPSX), "-q", "-g", "-0", f"-G{g}", "-o", str(obj), str(s_file)], capture_output=True, text=True, cwd=ROOT, env=ENV)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     return obj
 
@@ -93,8 +94,10 @@ def functions(txt: str):
         if cur is None: continue
         m = re.match(r"\s+(\w+) = (.*)", ln)
         if m: cur["hdr"][m[1]] = m[2].strip(); continue
-        m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) (90|92) Block (start|end)", ln)
-        if m: cur["blocks"].append((int(m[1], 16) - cur["start"], m[3])); continue
+        m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) (90|92) Block (start|end)\s+line = (\d+)", ln)
+        if m:
+            cur["blocks"].append((int(m[1], 16) - cur["start"], m[3])); cur.setdefault("blines", []).append(int(m[4]))
+            cur.setdefault("seq", []).append(("B", m[3], int(m[1], 16) - cur["start"])); continue
         m = REC.match(ln)
         if m:
             val, _, cls, typ, size, ndim, dims, tag, name = m.groups()
@@ -103,7 +106,8 @@ def functions(txt: str):
             elif cls in ("AUTO", "ARG"): loc = f"sp{(v - (1 << 32)) if v >= 1 << 31 else v:+d}"
             elif cls == "STAT": loc = "static"
             else: loc = ""
-            cur["recs"].append((cls, typ.strip(), int(size), (dims or "").strip(), (tag or ""), name, loc)); continue
+            cur["recs"].append((cls, typ.strip(), int(size), (dims or "").strip(), (tag or ""), name, loc))
+            cur.setdefault("seq", []).append(("R", name)); continue
         m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) 8e Function end", ln)
         if m:
             cur["end"] = int(m[1], 16) - cur["start"]
@@ -112,6 +116,14 @@ def functions(txt: str):
 
 def norm_tag(t):
     return re.sub(r"^\._\d+$", "<anon>", t)
+
+def show(f):
+    d = 0; out = []
+    for (a, k), ln in zip(f["blocks"], f.get("blines", [])):
+        if k == "end": d -= 1
+        out.append("  " * d + ("{" if k == "start" else "}") + f"+{a:x}/L{ln}")
+        if k == "start": d += 1
+    return " ".join(out)
 
 def compare(ours, retail):
     """(ok, message) for one function"""
@@ -128,8 +140,10 @@ def compare(ours, retail):
         xa, ya = list(x), list(y); xa[4] = norm_tag(xa[4]); ya[4] = norm_tag(ya[4])
         if xa != ya:
             return False, f"record {i} ({y[5]}): ours {x} retail {y}"
+    if ours.get("seq") != retail.get("seq") and ours["blocks"] == retail["blocks"]:
+        return False, "record/level membership differs: ours " + " ".join((x[1] if x[0] == "R" else ("{" if x[1] == "start" else "}")) for x in ours.get("seq", [])) + "  retail " + " ".join((x[1] if x[0] == "R" else ("{" if x[1] == "start" else "}")) for x in retail.get("seq", []))
     if ours["blocks"] != retail["blocks"]:
-        return False, f"blocks: ours {ours['blocks'][:6]}... retail {retail['blocks'][:6]}..."
+        return False, "blocks differ" + chr(10) + "      ours:   " + show(ours) + chr(10) + "      retail: " + show(retail)
     return True, "SYM ok"
 
 def main():
@@ -139,12 +153,15 @@ def main():
     txt = link(obj)
     ours = functions(txt.read_text(encoding="utf-8", errors="replace"))
     retail = functions(RETAIL.read_text(encoding="latin-1"))
-    names = want or [n for n in ours if not n.startswith("__maspsx")]
+    names = want or [n for n in ours if not n.startswith(("__maspsx", "_GLOBAL__"))]   # static-init thunks have no retail SYM
     n_ok = 0
     for n in names:
         if n not in ours: print(f"  {n}: NOT IN OBJECT"); continue
-        if n not in retail: print(f"  {n}: NO RETAIL SYM"); continue
-        ok, msg = compare(ours[n], retail[n])
+        rn = n if n in retail else ("_._" + n[3:] if n.startswith("___") and ("_._" + n[3:]) in retail else None)   # cfront dtor spelling
+        if rn is None: print(f"  {n}: NO RETAIL SYM"); continue
+        ok, msg = compare(ours[n], retail[rn])
+        if os.environ.get("SYM_BLOCKS"):
+            msg += chr(10) + "      ours:   " + show(ours[n]) + chr(10) + "      retail: " + show(retail[n])
         n_ok += ok
         print(f"  {n}: {'SYM ok' if ok else 'SYM DIFF — ' + msg}")
     print(f"SYM: {n_ok}/{len(names)} ok  ({txt})")

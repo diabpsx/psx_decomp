@@ -1,8 +1,8 @@
 #ifndef PSXSRC_FILEIO_H
 #define PSXSRC_FILEIO_H
 /* FILEIO.CPP — Climax file system object.  Layout from SYM (sizeof 20, vtable ptr at +0x10).
- * Only the members used so far are declared; the 7-entry vtable is not modelled yet (callers so far
- * use non-virtual methods). */
+ * Abstract base: retail _vt_6FileIO = [~FileIO, 5x __pure_virtual]; the slot names/signatures come from the
+ * CdIO/PCIO/DatIO vtables (FileExists, LoReadFileAtAddr, GetFileLength, LoSave, LoStreamFile). */
 #include "diabpsx_types.h"
 #include "psxsrc/sysobj.h"
 
@@ -12,6 +12,13 @@ struct FileIO : public SysObj {   /* SYM lists the base subobject as a member na
     unsigned long MemId;         /* +0x04 */
     long          hndPath;       /* +0x08 */
     char         *SearchPath;    /* +0x0C */
+                                 /* +0x10 vptr (gcc 2.7 places it after the members) */
+    virtual ~FileIO();                                                                       /* @0x800858CC */
+    virtual BOOL FileExists(const char *Name) = 0;
+    virtual BOOL LoReadFileAtAddr(const char *Name, unsigned char *Dest, int Len) = 0;
+    virtual int  GetFileLength(const char *Name) = 0;
+    virtual BOOL LoSave(const char *Name, unsigned char *Addr, int Len) = 0;
+    virtual BOOL LoStreamFile(const char *Name, int Slice, StreamCallback Func, int Offset, int Size) = 0;
 
     long Read(const char *Name, unsigned long RamId);                                       /* @0x80085920 */
     int  FileLen(const char *Name);                                                          /* @0x80085A90 */

@@ -38,8 +38,8 @@ AS_ARCH_SCAFFOLD = ["-EL", "-march=mips64", "-mabi=32"]   # splat scaffolds (src
 
 CPP_FLAGS = ["-nostdinc", "-undef", "-D__GNUC__=2", "-D__OPTIMIZE__",
              "-Dmips", "-D__mips__", "-D__psx__", f"-I{INCLUDE}", f"-I{RECON}"]
-CC1_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}"]
-CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline"]   # retail never inlines in-class methods (out-of-line copies per TU, callers jal them)
+CC1_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fsigned-char"]   # -fsigned-char: retail SYM types plain char as CHAR (MIPS gcc default char is unsigned); codegen-neutral on GMAN
+CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline", "-fsigned-char"]   # retail never inlines in-class methods (out-of-line copies per TU, callers jal them)
 
 # per-TU flag overrides: {repo-relative posix path: {"g_value": "0", "lane": "c"...}}
 PER_TU_FLAGS = {}

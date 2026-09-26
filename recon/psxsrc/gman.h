@@ -245,7 +245,8 @@ void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);
 inline void TextDat::DumpDatFile()
 {
     if (hndDat != -1 && OwnDat) {
-        if (!GAL_Free(hndDat)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
         hndDat = -1;
     }
 }
