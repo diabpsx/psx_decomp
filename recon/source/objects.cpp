@@ -271,14 +271,14 @@ void SyncQSTLever(int i)
 /* out-of-line header-copy methods (GMAN.H/BLOCK.H inline members compiled into this TU because it uses them) */
 int CBlocks::GetOtPos(int LogicalY)
 {
-    int v;
+    int OtPos;
 
-    v = ClipRect.y + LogicalY + PosAdj;
-    if (v < -0x43)
-        v = -0x43;
-    if (v >= 0x19C)
-        v = 0x19B;
-    return v + 0x4D;
+    OtPos = ClipRect.y + LogicalY + PosAdj;
+    if (OtPos < -0x43)
+        OtPos = -0x43;
+    if (OtPos >= 0x19C)
+        OtPos = 0x19B;
+    return OtPos + 0x4D;
 }
 
 struct CCreatureHdr *TextDat::GetCreature(int Creature)
@@ -358,33 +358,29 @@ void OperateL3Door(int pnum, int i, unsigned char sendflag)
         OperateL3RDoor(pnum, i, sendflag);
 }
 
+#define IT_ARMOR 6
+#define IT_MARMOR 8
+#define IT_HARMOR 9
+
 void OperateArmorStand(int pnum, int i, unsigned char sendmsg)
 {
-    unsigned char onlygood;
-    int itype;
+    int uniqueRnd;
 
     if (object[i]._oSelFlag) {
         object[i]._oSelFlag = 0;
         object[i]._oAnimFrame++;
         if (!deltaload) {
             SetRndSeed(object[i]._oRndSeed);
-            onlygood = ENG_random(2);
-            if (currlevel < 6) {
-                onlygood = 1;
-                itype = 6;
-            } else if (currlevel - 6 < 4) {
-                itype = 8;
-            } else if (currlevel - 10 < 3) {
-                onlygood = 0;
-                itype = 9;
-            } else if (currlevel - 13 < 4) {
-                onlygood = 1;
-                itype = 9;
-            } else {
-                goto skip;
+            uniqueRnd = ENG_random(2);
+            if (currlevel <= 5) {
+                CreateTypeItem(object[i]._ox, object[i]._oy, 1, IT_ARMOR, 0, sendmsg, 0);
+            } else if (currlevel >= 6 && currlevel <= 9) {
+                CreateTypeItem(object[i]._ox, object[i]._oy, uniqueRnd, IT_MARMOR, 0, sendmsg, 0);
+            } else if (currlevel >= 10 && currlevel <= 12) {
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, IT_HARMOR, 0, sendmsg, 0);
+            } else if (currlevel >= 13 && currlevel <= 16) {
+                CreateTypeItem(object[i]._ox, object[i]._oy, 1, IT_HARMOR, 0, sendmsg, 0);
             }
-            CreateTypeItem(object[i]._ox, object[i]._oy, onlygood, itype, 0, sendmsg, 0);
-        skip:
             if (pnum == myplr)
                 NetSendCmdParam1(0, 0x2D, i);
         }
@@ -440,34 +436,40 @@ void OperateLazStand(int pnum, int i)
 
 void OperateWeaponRack(int pnum, int i, unsigned char sendmsg)
 {
-    int itype;
-    int onlygood;
+    int weaponType, sfxType;
 
-    if (object[i]._oSelFlag) {
-        SetRndSeed(object[i]._oRndSeed);
-        switch (ENG_random(4) + 1) {
-        case 1:
-            itype = 1;
-            break;
-        case 2:
-            itype = 2;
-            break;
-        case 3:
-            itype = 3;
-            break;
-        case 4:
-            itype = 4;
-            break;
-        }
-        object[i]._oSelFlag = 0;
-        object[i]._oAnimFrame++;
-        if (!deltaload) {
-            onlygood = (leveltype < 2) ? 0 : 1;
-            CreateTypeItem(object[i]._ox, object[i]._oy, onlygood, itype, 0, sendmsg, 0);
-            if (pnum == myplr)
-                NetSendCmdParam1(0, 0x2D, i);
-        }
+    weaponType = 0;
+    if (!object[i]._oSelFlag)
+        return;
+    SetRndSeed(object[i]._oRndSeed);
+    switch (ENG_random(4) + 1) {
+    case 1:
+        weaponType = 1;
+        sfxType = 0x22;
+        break;
+    case 2:
+        weaponType = 2;
+        sfxType = 0x23;
+        break;
+    case 3:
+        weaponType = 3;
+        sfxType = 0x24;
+        break;
+    case 4:
+        weaponType = 4;
+        sfxType = 0x23;
+        break;
     }
+    object[i]._oSelFlag = 0;
+    object[i]._oAnimFrame++;
+    if (deltaload)
+        return;
+    if (leveltype > 1)
+        CreateTypeItem(object[i]._ox, object[i]._oy, 1, weaponType, 0, sendmsg, 0);
+    else
+        CreateTypeItem(object[i]._ox, object[i]._oy, 0, weaponType, 0, sendmsg, 0);
+    if (pnum == myplr)
+        NetSendCmdParam1(0, 0x2D, i);
 }
 
 void OperateStoryBook(int pnum, int i)
