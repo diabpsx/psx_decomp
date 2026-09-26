@@ -12,7 +12,7 @@
 
 /* ---- local constants (values confirmed from the oracle / hellfire source) ---- */
 #define MAXCHARLEVEL 51
-#define MAX_PLRS 4
+#define MAX_PLRS 2   /* PSX split-screen caps at 2 local players (devilution/hellfire MAX_PLRS=4) */
 #define NUM_CLASSES 3
 #define MAXBELTITEMS 8
 #define NUM_INV_GRID_ELEM 40
@@ -392,4 +392,358 @@ void SetPlayerOld(int pnum)
 void GetGoldSeed(PlayerStruct *ptrplr, ItemStruct *h)
 {
     GetGoldSeed(plrind(ptrplr), h);
+}
+
+/* ---- out-of-line copies of header-inline accessors landing in this TU (this TU's other code
+ * calls these; the real definitions live in PSXSRC/{PRIMPOOL,SPLTARGT,CPLAYER}.H) ---- */
+
+/* PsyQ addPrim-style primitive-pool cursor advance (identical body wherever it's instantiated --
+ * confirmed byte-identical across every PRIM_GetPrim__FPP8POLY_FT4 VA in refs/skeleton). */
+void PRIM_GetPrim(POLY_FT4 **Prim)
+{
+    if (AddrToAvoid <= ThisPrimAddr + 10) {
+        DBG_Error((char *)0x0, "psxsrc/primpool.h", 0x44);
+    }
+    *Prim = ThisPrimAddr;
+    ThisPrimAddr = ThisPrimAddr + 1;
+}
+
+BOOL SpellTarget::Active()
+{
+    return active;
+}
+
+int CPlayer::GetLastScrX() const
+{
+    return LastScrX;
+}
+
+int CPlayer::GetLastScrY() const
+{
+    return LastScrY;
+}
+
+int CPlayer::GetLastOtPos() const
+{
+    return LastOtPos;
+}
+
+int CalcStatDiff(PlayerStruct *ptrplr)
+{
+    int c = ptrplr->_pClass;
+    int d = MaxStats[c][0] - ptrplr->_pBaseStr;
+    d += MaxStats[c][1] - ptrplr->_pBaseMag;
+    d += MaxStats[c][2] - ptrplr->_pBaseDex;
+    d += MaxStats[c][3] - ptrplr->_pBaseVit;
+    return d;
+}
+
+#define ISPL_NOMANA 0x8000000
+
+/* PSX plays a level-up SFX (0x3DF) right after the level bump -- not present in devilution; also
+ * drops the Hellfire-only CalcPlrInv(TRUE)/barbarian-mana/`_pMana>0` guard branches. */
+void NextPlrLevel(PlayerStruct *ptrplr)
+{
+    ptrplr->_pLevel++;
+    ptrplr->_pMaxLvl++;
+    PlaySFX(0x3DF);
+
+    if (CalcStatDiff(ptrplr) < 5) {
+        ptrplr->_pStatPts = CalcStatDiff(ptrplr);
+    } else {
+        ptrplr->_pStatPts += 5;
+    }
+
+    ptrplr->_pNextExper = ExpLvlsTbl[ptrplr->_pLevel];
+
+    long l = ptrplr->_pClass == CLASS_SORCERER ? 64 : 128;
+    if (gbMaxPlayers == 1) {
+        l++;
+    }
+    ptrplr->_pMaxHP += l;
+    ptrplr->_pHitPoints = ptrplr->_pMaxHP;
+    ptrplr->_pMaxHPBase += l;
+    ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
+
+    if (ismyplr(ptrplr)) {
+        drawhpflag = TRUE;
+    }
+
+    l = ptrplr->_pClass == CLASS_WARRIOR ? 64 : 128;
+    if (gbMaxPlayers == 1) {
+        l++;
+    }
+    ptrplr->_pMaxMana += l;
+    ptrplr->_pMaxManaBase += l;
+
+    if (!(ptrplr->_pIFlags & ISPL_NOMANA)) {
+        ptrplr->_pMana = ptrplr->_pMaxMana;
+        ptrplr->_pManaBase = ptrplr->_pMaxManaBase;
+    }
+
+    if (ismyplr(ptrplr)) {
+        drawmanaflag = TRUE;
+    }
+}
+
+#define MAXEXP 2000000000L
+#define CMD_PLRLEVEL 0x33
+
+/* PSX has no FPU -- devilution's `exp *= 1 + ((double)lvl - _pLevel) / 10;` becomes a literal
+ * Q16.16 fixed-point multiply (gcc's own magic-constant /10 and /20, transcribed as-is).
+ * PSX also has no separate `pnum`: it temporarily repoints the GLOBAL myplr at ptrplr's index
+ * (plrind) so the rest of the body can keep devilution's `plr[myplr]`-style logic unchanged, then
+ * restores myplr on the way out -- EXCEPT the early "_pHitPoints<=0" return bypasses the restore
+ * (retail quirk: myplr is left pointing at ptrplr's index in that case; preserved faithfully). */
+void AddPlrExperience(PlayerStruct *ptrplr, int lvl, long exp)
+{
+    int savedmyplr = myplr;
+    myplr = plrind(ptrplr);
+
+    if (ptrplr->_pHitPoints <= 0)
+        return;
+
+    long fixedmul = (((long)(lvl - ptrplr->_pLevel) << 16) / 10) + 0x10000;
+    exp = (long)((fixedmul * exp) >> 16);
+    if (exp < 0)
+        exp = 0;
+
+    if (gbMaxPlayers > 1) {
+        int powerLvlCap = ptrplr->_pLevel < 0 ? 0 : ptrplr->_pLevel;
+        if (powerLvlCap >= 50)
+            powerLvlCap = 50;
+        if (exp >= ExpLvlsTbl[powerLvlCap] / 20) {
+            exp = ExpLvlsTbl[powerLvlCap] / 20;
+        }
+        int expCap = 200 * powerLvlCap;
+        if (exp >= expCap) {
+            exp = expCap;
+        }
+    }
+
+    ptrplr->_pExperience += exp;
+    if ((unsigned long)ptrplr->_pExperience > MAXEXP) {
+        ptrplr->_pExperience = MAXEXP;
+    }
+
+    if (ptrplr->_pExperience >= ExpLvlsTbl[49]) {
+        ptrplr->_pLevel = 50;
+        return;
+    }
+
+    int newLvl = 0;
+    while (ptrplr->_pExperience >= ExpLvlsTbl[newLvl]) {
+        newLvl++;
+    }
+    if (newLvl != ptrplr->_pLevel) {
+        for (int i = newLvl - ptrplr->_pLevel; i > 0; i--) {
+            NextPlrLevel(ptrplr);
+        }
+    }
+
+    NetSendCmdParam1(FALSE, CMD_PLRLEVEL, ptrplr->_pLevel);
+    myplr = savedmyplr;
+}
+
+/* PSX drops devilution's whole interpolated-offset/abs-clamp light math (xmul/ymul/lx/ly/offx/offy)
+ * -- it derives the light offset directly from the low nibble of the WorldX/WorldY tile coords. */
+void PM_ChangeLightOff(PlayerStruct *ptrplr)
+{
+    ChangeLightOff(ptrplr->_plid, (ptrplr->WorldX & 0xF) - 8, (ptrplr->WorldY & 0xF) - 8);
+}
+
+/* PSX drops devilution's whole _pVar6/_pVar7 sub-pixel accumulator + scroll-offset delta logic --
+ * just bumps the frame counter and re-derives the light offset. */
+void PM_ChangeOffset(PlayerStruct *ptrplr)
+{
+    ptrplr->_pVar8++;
+    PM_ChangeLightOff(ptrplr);
+}
+
+/* PSX drops devilution's LoadPlrGFX/_pNAnim[dir] lookup (texture-pool anim needs no per-dir gfx
+ * load), FixPlayerLocation/FixPlrWalkTags/dPlayer-occupancy write (no such grid maintained here --
+ * RemovePlrFromMap below is a matching no-op), and calls StartPlrKill (not SyncPlrKill). `_pdir` is
+ * stored unconditionally before the invincible/dead/local-player kill check. */
+void StartStand(PlayerStruct *ptrplr, int dir)
+{
+    ptrplr->_pdir = dir;
+    if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
+        StartPlrKill(ptrplr, -1);
+        return;
+    }
+    NewPlrAnim(ptrplr, 0, ptrplr->_pNFrames, 3);
+    ptrplr->_pmode = PM_STAND;
+    ptrplr->_pVar5 = 1;
+    SetPlayerOld(ptrplr);
+}
+
+/* PSX no-op (see StartStand's comment above -- no dPlayer occupancy grid to clear). */
+void RemovePlrFromMap(PlayerStruct *ptrplr)
+{
+}
+
+/* PSX drops devilution's CheckEFlag() call and the ScrollInfo/_sdir/ViewX/ViewY camera reset
+ * (per-player split-screen doesn't recentre a shared camera the way the PC does). */
+void StartWalkStand(PlayerStruct *ptrplr)
+{
+    ptrplr->_pmode = PM_STAND;
+    if (ismyplr(ptrplr)) {
+        ScrollInfo._sxoff = 0;
+        ScrollInfo._syoff = 0;
+        ScrollInfo._sdir = 0;
+        ViewX = ptrplr->_px;
+        ViewY = ptrplr->_py;
+    }
+}
+
+/* PSX's `dir` param is unused (the block-facing direction isn't looked up -- Peq is a fixed literal
+ * 3), and drops LoadPlrGFX/FixPlayerLocation like the other Start* functions. IS_ISWORD's PSX sound
+ * id is 0x2A. */
+void StartPlrBlock(PlayerStruct *ptrplr, int dir)
+{
+    if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
+        StartPlrKill(ptrplr, -1);
+        return;
+    }
+    PlaySfxLoc(0x2A, ptrplr->_px, ptrplr->_py);
+    NewPlrAnim(ptrplr, 3, ptrplr->_pBFrames, 2);
+    ptrplr->_pmode = PM_BLOCK;
+    SetPlayerOld(ptrplr);
+}
+
+/* PSX: `d` is unused -- `_pdir` is instead re-derived from GetDirection(px,py,cx,cy); the
+ * per-sType _pFAnim/_pLAnim/_pTAnim[d] lookups become fixed Peq literals 4/5/6 (texture pool);
+ * FixPlayerLocation is dropped. The PostGamePad first arg is a pointer-arithmetic boolean
+ * `((char*)ptrplr + 3*sizeof(PlayerStruct)) != plr` that is ALWAYS true for both valid player
+ * pointers (MAX_PLRS=2) -- transcribed literally byte-for-byte off the oracle; its real source
+ * intent is unclear (possibly a leftover always-true guard), open for re-derivation. */
+void StartSpell(PlayerStruct *ptrplr, int d, int cx, int cy)
+{
+    if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
+        StartPlrKill(ptrplr, -1);
+        return;
+    }
+    if (leveltype != DTYPE_TOWN) {
+        switch (spelldata[ptrplr->_pSpell].sType) {
+        case 0:
+            NewPlrAnim(ptrplr, 4, ptrplr->_pSFrames, 0);
+            break;
+        case 1:
+            NewPlrAnim(ptrplr, 5, ptrplr->_pSFrames, 0);
+            break;
+        case 2:
+            NewPlrAnim(ptrplr, 6, ptrplr->_pSFrames, 0);
+            break;
+        }
+    }
+    PlaySfxLoc(spelldata[ptrplr->_pSpell].sSFX, ptrplr->_px, ptrplr->_py);
+    PostGamePad((int)((char *)ptrplr + 3 * sizeof(PlayerStruct)) != (int)plr, 0, 0, 0);
+    ptrplr->_pmode = PM_SPELL;
+    SetPlayerOld(ptrplr);
+    ptrplr->_pVar1 = cx;
+    ptrplr->_pVar2 = cy;
+    ptrplr->_pdir = GetDirection(ptrplr->_px, ptrplr->_py, cx, cy);
+    ptrplr->_pVar4 = GetSpellLevel(ptrplr, ptrplr->_pSpell);
+    ptrplr->_pVar8 = 1;
+}
+
+/* PSX resets the gamepad cursor-select array first (`_pcursplr[sel_data] = -1`, not in devilution),
+ * narrows the class-hit-sound cascade to 3 classes (no rogue/monk/bard/barbarian split), and drops
+ * LoadPlrGFX/FixPlayerLocation/FixPlrWalkTags/dPlayer-occupancy like the other Start* functions. */
+void StartPlrHit(PlayerStruct *ptrplr, int dam, unsigned char forcehit)
+{
+    _pcursplr[sel_data] = -1;
+
+    if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
+        StartPlrKill(ptrplr, -1);
+        return;
+    }
+
+    if (ptrplr->_pClass == CLASS_WARRIOR) {
+        PlaySfxLoc(0x316, ptrplr->_px, ptrplr->_py);
+    } else if (ptrplr->_pClass == CLASS_ROGUE) {
+        PlaySfxLoc(0x2A8, ptrplr->_px, ptrplr->_py);
+    } else if (ptrplr->_pClass == CLASS_SORCERER) {
+        PlaySfxLoc(0x240, ptrplr->_px, ptrplr->_py);
+    }
+
+    drawhpflag = TRUE;
+
+    if ((dam >> 6) < ptrplr->_pLevel && !forcehit) {
+        return;
+    }
+
+    /* PSX-only guard: don't interrupt the current animation before it's half played. */
+    if (ptrplr->_pAnimFrame < (ptrplr->_pAnimLen >> 1)) {
+        return;
+    }
+
+    NewPlrAnim(ptrplr, 7, ptrplr->_pHFrames, 0);
+    ptrplr->_pmode = PM_GOTHIT;
+    ptrplr->_pVar8 = 1;
+    SetPlayerOld(ptrplr);
+}
+
+void SyncPlrKill(PlayerStruct *ptrplr, int earflag)
+{
+    StartPlayerKill(ptrplr, earflag);
+}
+
+/* PSX-only "town portal absorbs death" gate around StartPlayerKill (not in devilution): if HP hits
+ * 0 while in town, just top off to 64 HP; otherwise scan for a still-open MIS type-13 (town portal)
+ * missile owned by this player -- if found, stash `val` in its _miVar8 and bail out instead of
+ * actually killing the player. `_misource` is XOR-compared against plrind(ptrplr) (the usual
+ * plrind-style equality-via-xor idiom). */
+#define MIS_TOWNPORTAL 13
+
+void StartPlrKill(PlayerStruct *ptrplr, int val)
+{
+    int pind = plrind(ptrplr);
+
+    if (ptrplr->_pHitPoints == 0 && currlevel == 0) {
+        SetPlayerHitPoints(ptrplr, 64);
+        return;
+    }
+
+    short *pmi = missileactive;
+    for (int i = 0; i < nummissiles; i++, pmi++) {
+        int mi = *pmi;
+        if (missile[mi]._mitype == MIS_TOWNPORTAL) {
+            int caster = missile[mi]._misource;
+            if (pind) {
+                caster ^= 1;
+            }
+            if (caster == 0 && !missile[mi]._miDelFlag) {
+                if (val != -1) {
+                    missile[mi]._miVar8 = val;
+                }
+                return;
+            }
+        }
+    }
+
+    SetPlayerHitPoints(ptrplr, 0);
+    StartPlayerKill(ptrplr, val);
+}
+
+void AddPlrMonstExper(int lvl, long exp, char pmask)
+{
+    int totplrs = 0;
+    for (int i = 0; i < MAX_PLRS; i++) {
+        if ((pmask >> i) & 1)
+            totplrs++;
+    }
+    if (totplrs) {
+        long e = exp / totplrs;
+        if ((pmask >> myplr) & 1)
+            AddPlrExperience(myplr, lvl, e);
+    }
+}
+
+CPlayer *CPlayer::GetPlayer(int PNum)
+{
+    if (1 < (unsigned int)PNum) {
+        DBG_Error((char *)0x0, "psxsrc/cplayer.h", 0x41);
+    }
+    return _7CPlayer_PActiveArray[PNum];
 }
