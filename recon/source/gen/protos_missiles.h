@@ -117,6 +117,7 @@ void ClearMissileSpot(int mi);   /* @0x8014AAC0 MISSILES.CPP:5885 */
 unsigned char PosOkMonst(int i, int x, int y);   /* @0x8008045C COREMON.CPP:665 */
 int GetDirection(int x1, int y1, int x2, int y2);   /* @0x8003DA28 ENGINE.CPP:45 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */
+BOOL GetMISSILE(int x, int y);   /* @0x80082E40 DPIECE.CPP:219 */
 BOOL GetSOLID(int x, int y);   /* @0x80082CE0 DPIECE.CPP:194 */
 long ENG_random(long v);   /* @0x8003DB24 ENGINE.CPP:113 */
 void UseMana(int id, int sn);   /* @0x80077308 SPELLS.CPP:110 */
@@ -135,6 +136,8 @@ unsigned char CheckMonsterHit(int m, unsigned char *ret);   /* @0x8015698C MONST
 void StartPlrKill(int pnum, int val);   /* @0x80066E24 PLAYER.CPP:4688 */
 unsigned char LineClear(int x1, int y1, int x2, int y2);   /* @0x80155478 MONSTER.CPP:4790 */
 void AddDead(int dx, int dy, char dv, int ddir);   /* @0x80037F8C DEAD.CPP:99 */
+void ChangeLight(int i, int x, int y, int r);   /* @0x8004D3E0 LIGHTING.CPP:1283 */
+BOOL GetMISSILE(int x, int y);   /* @0x80082E40 DPIECE.CPP:219 */
 unsigned char PosOkPlayer(int pnum, int x, int y);   /* @0x80066B6C PLAYER.CPP:4679 */
 unsigned char IsDplayer(int x, int y);   /* @0x8005FD10 PLAYER.CPP:262 */
 void CalcPlrItemVals(int p, unsigned char Loadgfx);   /* @0x8003E6B0 ITEMS.CPP:684 */
