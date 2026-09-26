@@ -23,8 +23,8 @@
 #define BFLAG_POPULATED 0x8
 
 #define MPFLAG_SCATTER 1
-#define MPFLAG_UNIQ    2
-#define MPFLAG_DONT    4
+#define MPFLAG_SPECIAL 2
+#define MPFLAG_UNIQUE  4
 
 #define MT_GOLEM 109
 
@@ -206,18 +206,24 @@ void LoadDiabMonsts(void)
 {
     unsigned char *lpSetPiece;
 
-    lpSetPiece = GRL_LoadFileInMemSig("diab1.DUN", NULL);
-    SetMapMonsters(lpSetPiece, 2 * diabquad1x, 2 * diabquad1y);
-    mem_free_dbg(lpSetPiece);
-    lpSetPiece = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
-    SetMapMonsters(lpSetPiece, 2 * diabquad2x, 2 * diabquad2y);
-    mem_free_dbg(lpSetPiece);
-    lpSetPiece = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
-    SetMapMonsters(lpSetPiece, 2 * diabquad3x, 2 * diabquad3y);
-    mem_free_dbg(lpSetPiece);
-    lpSetPiece = GRL_LoadFileInMemSig("diab4a.DUN", NULL);
-    SetMapMonsters(lpSetPiece, 2 * diabquad4x, 2 * diabquad4y);
-    mem_free_dbg(lpSetPiece);
+    { int dummy1; }
+    { int dummy2; }
+    { int dummy3; }
+    {
+        int dummy4;
+        lpSetPiece = GRL_LoadFileInMemSig("diab1.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad1x, 2 * diabquad1y);
+        mem_free_dbg(lpSetPiece);
+        lpSetPiece = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad2x, 2 * diabquad2y);
+        mem_free_dbg(lpSetPiece);
+        lpSetPiece = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad3x, 2 * diabquad3y);
+        mem_free_dbg(lpSetPiece);
+        lpSetPiece = GRL_LoadFileInMemSig("diab4a.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad4x, 2 * diabquad4y);
+        mem_free_dbg(lpSetPiece);
+    }
 }
 
 /* --------------------------------------------------------------------- */
@@ -295,7 +301,7 @@ void GetLevelMTypes(void)
     int numskeltypes;
 
     QuestMask = 0;
-    AddMonsterType(0x6D, MPFLAG_DONT);   /* MT_GOLEM */
+    AddMonsterType(0x6D, MPFLAG_SPECIAL);   /* MT_GOLEM */
     mamask = 3;
 
     if (currlevel == 16) {
@@ -392,37 +398,61 @@ void PlaceQuestMonsters(void)
             PlaceUniqueMonst(9, 0, 0);
 
         if (currlevel == quests[12]._qlevel && gbMaxPlayers != 1) {
-            for (skeltype = 0; skeltype < nummtypes; skeltype++) {
-                if (IsSkel(Monsters[skeltype].mtype))
-                    break;
+            int dummy;
+            {
+                int dummy2;
+                for (skeltype = 0; skeltype < nummtypes; skeltype++) {
+                    if (IsSkel(Monsters[skeltype].mtype))
+                        break;
+                }
+                PlaceUniqueMonst(1, skeltype, 30);
             }
-            PlaceUniqueMonst(1, skeltype, 30);
         }
 
         if (QuestStatus(7)) {
-            setp = GRL_LoadFileInMemSig("Levels\\L1Data\\Banner1.DUN", NULL);
-            SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
-            mem_free_dbg(setp);
+            int dummy;
+            setp = GRL_LoadFileInMemSig("Levels\L1Data\Banner1.DUN", NULL);
+            {
+                int dummy2;
+                SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
+                mem_free_dbg(setp);
+            }
         }
         if (QuestStatus(9)) {
-            setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blood2.DUN", NULL);
-            SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
-            mem_free_dbg(setp);
+            int dummy;
+            setp = GRL_LoadFileInMemSig("Levels\L2Data\Blood2.DUN", NULL);
+            {
+                int dummy2;
+                SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
+                mem_free_dbg(setp);
+            }
         }
         if (QuestStatus(8)) {
-            setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", NULL);
-            SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
-            mem_free_dbg(setp);
+            int dummy;
+            setp = GRL_LoadFileInMemSig("Levels\L2Data\Blind2.DUN", NULL);
+            {
+                int dummy2;
+                SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
+                mem_free_dbg(setp);
+            }
         }
         if (QuestStatus(0xA)) {
-            setp = GRL_LoadFileInMemSig("Levels\\L3Data\\Anvil.DUN", NULL);
-            SetMapMonsters(setp, 2 * (setpc_x + 1), 2 * (setpc_y + 1));
-            mem_free_dbg(setp);
+            int dummy;
+            setp = GRL_LoadFileInMemSig("Levels\L3Data\Anvil.DUN", NULL);
+            {
+                int dummy2;
+                SetMapMonsters(setp, 2 * (setpc_x + 1), 2 * (setpc_y + 1));
+                mem_free_dbg(setp);
+            }
         }
         if (QuestStatus(0xB)) {
-            setp = GRL_LoadFileInMemSig("Levels\\L4Data\\Warlord.DUN", NULL);
-            SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
-            mem_free_dbg(setp);
+            int dummy;
+            setp = GRL_LoadFileInMemSig("Levels\L4Data\Warlord.DUN", NULL);
+            {
+                int dummy2;
+                SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
+                mem_free_dbg(setp);
+            }
             AddMonsterType(UniqMonst[8].mtype, 1);
         }
         if (QuestStatus(4))
@@ -431,14 +461,18 @@ void PlaceQuestMonsters(void)
             quests[3]._qactive = 0;
 
         if (currlevel == quests[15]._qlevel && gbMaxPlayers != 1) {
+            int dummy;
             AddMonsterType(UniqMonst[4].mtype, 4);
             AddMonsterType(UniqMonst[5].mtype, 4);
             PlaceUniqueMonst(4, 0, 0);
             PlaceUniqueMonst(5, 0, 0);
             PlaceUniqueMonst(6, 0, 0);
             setp = GRL_LoadFileInMemSig("Vile14.DUN", NULL);
-            SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
-            mem_free_dbg(setp);
+            {
+                int dummy2;
+                SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
+                mem_free_dbg(setp);
+            }
         }
     } else {
         if (setlvlnum == 1)
@@ -483,7 +517,7 @@ void SetMapMonsters(unsigned char *pMap, int startx, int starty)
                 mtype = *lm;
                 mtype = MonstConvTbl[mtype - 1];
                 SwapMonsterType(&mtype);
-                mtype = AddMonsterType(mtype, MPFLAG_UNIQ);
+                mtype = AddMonsterType(mtype, MPFLAG_SPECIAL);
                 PlaceMonster(nummonsters++, mtype, startx + 16 + i, starty + 16 + j);
             }
             lm++;
@@ -582,9 +616,9 @@ void InitMonsters(void)
         AddMonster(1, 0, 0, 0, 0);
         AddMonster(1, 0, 0, 0, 0);
         AddMonster(1, 0, 0, 0, 0);
-        if (currlevel == 16)
-            LoadDiabMonsts();
     }
+    if (!setlevel && currlevel == 16)
+        LoadDiabMonsts();
 
     nt = numtrigs;
     if (currlevel == 15)
@@ -592,7 +626,7 @@ void InitMonsters(void)
     for (i = 0; i < nt; i++) {
         for (s = -2; s < 2; s++) {
             for (t = -2; t < 2; t++)
-                DoVision(s + trigs[i]._tx, t + trigs[i]._ty, 15, 0, 0);
+                DoVision(trigs[i]._tx + s, trigs[i]._ty + t, 15, 0, 0);
         }
     }
 
@@ -656,20 +690,24 @@ void PlaceUniqueMonst(int uniqindex, int miniontype, int unpackfilesize)
     int monstype;
 
     Monst = &monster[nummonsters];
-    count = 0;
+    count2 = 0;
+    zharflag = 1;
     Uniq = &UniqMonst[uniqindex];
 
-    monstype = Uniq->mtype;
-    SwapMonsterType(&monstype);
+    if ((uniquetrans + 19) << 8 >= 0x1B00)
+        return;
 
     for (uniqtype = 0; uniqtype < nummtypes; uniqtype++) {
+        monstype = Uniq->mtype;
+        SwapMonsterType(&monstype);
         if (Monsters[uniqtype].mtype == monstype)
             break;
     }
 
+    count = 0;
     do {
-        xp = ENG_random(80) + 16;
-        yp = ENG_random(80) + 16;
+        xp = ENG_random(64) + 16;
+        yp = ENG_random(64) + 16;
         count2 = 0;
         for (x = xp - 3; x < xp + 3; x++) {
             for (y = yp - 3; y < yp + 3; y++) {
