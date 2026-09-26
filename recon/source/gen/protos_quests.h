@@ -32,3 +32,4 @@ void DrawQuestLogTSK(TASK *T);
 void RemoveQLog(void);
 void PrintQLString(int x, int y, unsigned char cjustflag, char *str, char col);
 int CBlocks_GetOverlayOtBase(void);
+void FadeGameOut(void);

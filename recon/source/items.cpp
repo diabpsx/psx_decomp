@@ -50,6 +50,17 @@
 #define DMAXX 96
 #define DMAXY 96
 #define OSEL_NONE 0
+#define MAXSPD 8
+#define SPT_ABILITY 0
+#define SPT_MEMORIZED 1
+#define SPT_SCROLL 2
+#define SPT_ITEM 3
+#define SPT_NONE 4
+#define FULLDRAW 0xff
+#define NUM_INVLOC 7
+#define GLOVE_CURS 1
+#define IS_REPAIR 0x42
+#define IRND_DOUBLE 2
 
 #ifndef TRUE
 #define TRUE 1
@@ -243,6 +254,292 @@ unsigned char ItemSpaceOk(int i, int j)
         }
     }
     return GetSOLID(i, j) == 0;
+}
+
+static unsigned char itemhold[3][3];   /* @D_8012ECC8 — hellfire file-scope `BOOL itemhold[3][3]`; this
+ * project's BOOL is 1-byte (bool), matching the oracle's byte stores */
+
+/* @0x8004068C ITEMS.CPP:1670 */
+unsigned char GetItemSpace(int x, int y, char inum)
+{
+    int i, j, xx, yy, rs;
+    unsigned char savail;
+
+    yy = 0;
+    for (j = y - 1; j <= y + 1; j++) {
+        xx = 0;
+        for (i = x - 1; i <= x + 1; i++) {
+            itemhold[xx][yy] = ItemSpaceOk(i, j);
+            xx++;
+        }
+        yy++;
+    }
+
+    savail = FALSE;
+    for (yy = 0; yy < 3; yy++) {
+        for (xx = 0; xx < 3; xx++) {
+            if (itemhold[xx][yy]) savail = TRUE;
+        }
+    }
+
+    rs = ENG_random(15) + 1;
+
+    if (!savail) return FALSE;
+
+    xx = 0;
+    yy = 0;
+    while (rs > 0) {
+        if (itemhold[xx][yy]) rs--;
+        if (rs > 0) {
+            xx++;
+            if (xx == 3) {
+                xx = 0;
+                yy++;
+                if (yy == 3) yy = 0;
+            }
+        }
+    }
+    xx = xx + x - 1;
+    yy = yy + y - 1;
+    item[inum]._ix = xx;
+    item[inum]._iy = yy;
+    dung_map[xx][yy].dItem = inum + 1;
+    return TRUE;
+}
+
+/* @0x800408A4 ITEMS.CPP:1725 */
+void GetSuperItemSpace(int x, int y, char inum)
+{
+    int xx, yy;
+
+    if (GetItemSpace(x, y, inum)) return;
+
+    for (int l = 2; l < 50; l++) {
+        for (int j = -l; j <= l; j++) {
+            yy = y + j;
+            for (int i = -l; i <= l; i++) {
+                xx = x + i;
+                if (!ItemSpaceOk(xx, yy)) continue;
+
+                item[inum]._ix = xx;
+                item[inum]._iy = yy;
+                dung_map[xx][yy].dItem = inum + 1;
+                return;
+            }
+        }
+    }
+}
+
+/* @0x8003F754 ITEMS.CPP:1311 */
+void CalcPlrItemMin(int pnum)
+{
+    int i;
+    ItemStruct *pi;
+    PlayerStruct *p = &plr[pnum];
+
+    pi = &p->InvList[0];
+    for (i = p->_pNumInv; i--; pi++)
+        pi->_iStatFlag = ItemMinStats(p, pi);
+
+    pi = &p->SpdList[0];
+    for (i = MAXSPD; i--; pi++) {
+        if (pi->_itype == -1) continue;
+        pi->_iStatFlag = ItemMinStats(p, pi);
+    }
+}
+
+/* @0x8003F130 ITEMS.CPP:1205 */
+void CalcPlrScrolls(int p)
+{
+    int i;
+    unsigned long long t;
+
+    plr[p]._pScrlSpells = 0;
+    for (i = 0; i < plr[p]._pNumInv; i++) {
+        if (plr[p].InvList[i]._itype != -1) {
+            if (((plr[p].InvList[i]._iMiscId == IMID_SCROLL) ||
+                 (plr[p].InvList[i]._iMiscId == IMID_TSCROLL)) &&
+                (plr[p].InvList[i]._iStatFlag)) {
+                t = 1;
+                plr[p]._pScrlSpells |= (t << (plr[p].InvList[i]._iSpell - 1));
+            }
+        }
+    }
+    for (i = 0; i < MAXSPD; i++) {
+        if (plr[p].SpdList[i]._itype != -1) {
+            if (((plr[p].SpdList[i]._iMiscId == IMID_SCROLL) ||
+                 (plr[p].SpdList[i]._iMiscId == IMID_TSCROLL)) &&
+                (plr[p].SpdList[i]._iStatFlag)) {
+                t = 1;
+                plr[p]._pScrlSpells |= (t << (plr[p].SpdList[i]._iSpell - 1));
+            }
+        }
+    }
+
+    if ((plr[p]._pRSplType == SPT_SCROLL) &&
+        ((plr[p]._pScrlSpells & (1 << (plr[p]._pRSpell - 1))) == 0)) {
+        plr[p]._pRSpell = -1;
+        plr[p]._pRSplType = SPT_NONE;
+        force_redraw = FULLDRAW;
+    }
+}
+
+/* @0x8003F4B0 ITEMS.CPP:1243 — PSX adds an else-branch (not in hellfire): if the wielded staff (InvBody[4]
+ * = the left-hand slot) has run out of charges AND it was the readied spell (_pRSplType==SPT_ITEM,
+ * _pRSpell==the staff's spell), the readied spell is reset (_pRSpell=1, _pRSplType=SPT_NONE) */
+void CalcPlrStaff(PlayerStruct *ptrplr)
+{
+    ptrplr->_pISpells = 0;
+    if (ptrplr->InvBody[4]._itype == -1) return;
+    if (!ptrplr->InvBody[4]._iStatFlag) return;
+    if (ptrplr->InvBody[4]._iCharges > 0) {
+        unsigned long long t = 1;
+        ptrplr->_pISpells |= t << (ptrplr->InvBody[4]._iSpell - 1);
+    } else if (ptrplr->InvBody[4]._iSpell == ptrplr->_pRSpell && ptrplr->_pRSplType == SPT_ITEM) {
+        ptrplr->_pRSpell = 1;
+        ptrplr->_pRSplType = SPT_NONE;
+    }
+}
+
+/* @0x8003FB18 ITEMS.CPP:1360 — PSX drops the `p==myplr` guards around CalcPlrBookVals/Scrolls/Staff and
+ * around the RecalcStoreStats currlevel check (single local player, presumably gated elsewhere) */
+void CalcPlrInv(int p, unsigned char Loadgfx)
+{
+    CalcPlrItemMin(p);
+    CalcSelfItems(p);
+    CalcPlrItemVals(p, Loadgfx);
+    CalcPlrItemMin(p);
+    CalcPlrBookVals(p);
+    CalcPlrScrolls(p);
+    CalcPlrStaff(&plr[p]);
+    if (currlevel == 0) RecalcStoreStats();
+}
+
+/* @0x8003F57C ITEMS.CPP:1255 */
+void CalcSelfItems(int pnum)
+{
+    int i;
+    ItemStruct *pi;
+    PlayerStruct *p = &plr[pnum];
+    unsigned char sf, changeflag;
+    int sa = 0;
+    int ma = 0;
+    int da = 0;
+
+    pi = &p->InvBody[0];
+    for (i = NUM_INVLOC; i--; pi++) {
+        if (pi->_itype == -1) continue;
+        pi->_iStatFlag = TRUE;
+        if (!pi->_iIdentified) continue;
+        sa += pi->_iPLStr;
+        ma += pi->_iPLMag;
+        da += pi->_iPLDex;
+    }
+
+    do {
+        changeflag = FALSE;
+        pi = &p->InvBody[0];
+        for (i = NUM_INVLOC; i--; pi++) {
+            if (pi->_itype == -1) continue;
+            if (!pi->_iStatFlag) continue;
+            sf = TRUE;
+            if ((p->_pBaseStr + sa) < pi->_iMinStr) sf = FALSE;
+            if ((p->_pBaseMag + ma) < pi->_iMinMag) sf = FALSE;
+            if ((p->_pBaseDex + da) < pi->_iMinDex) sf = FALSE;
+            if (!sf) {
+                changeflag = TRUE;
+                pi->_iStatFlag = FALSE;
+                if (pi->_iIdentified) {
+                    sa -= pi->_iPLStr;
+                    ma -= pi->_iPLMag;
+                    da -= pi->_iPLDex;
+                }
+            }
+        }
+    } while (changeflag);
+}
+
+/* @0x800499B0 ITEMS.CPP:4796 */
+void BubbleSwapItem(ItemStruct *a, ItemStruct *b)
+{
+    ItemStruct h;
+
+    h = *a;
+    *a = *b;
+    *b = h;
+}
+
+/* @0x80045E1C ITEMS.CPP:3555 */
+void RepairItem(ItemStruct *i, int lvl)
+{
+    int d, rep;
+
+    if (i->_iDurability == i->_iMaxDur) return;
+    if (i->_iMaxDur <= 0) {
+        i->_itype = -1;
+        return;
+    }
+    rep = 0;
+    do {
+        rep += ENG_random(lvl) + lvl;
+        d = i->_iMaxDur / (9 + lvl);
+        if (d < 1) d = 1;
+        i->_iMaxDur -= d;
+        if (i->_iMaxDur == 0) {
+            i->_itype = -1;
+            return;
+        }
+    } while ((i->_iDurability + rep) < i->_iMaxDur);
+    i->_iDurability += rep;
+    if (i->_iDurability > i->_iMaxDur)
+        i->_iDurability = i->_iMaxDur;
+}
+
+/* @0x80045F0C ITEMS.CPP:3583 — PSX drops the `cii<NUM_INVLOC ? InvBody[cii] : InvList[cii-NUM_INVLOC]`
+ * selector and always repairs `InvBody[cii]` */
+void DoRepair(int pnum, int cii)
+{
+    PlayerStruct *p = &plr[pnum];
+    PlaySfxLoc(IS_REPAIR, p->_px, p->_py);
+
+    RepairItem(&p->InvBody[cii], p->_pLevel);
+    CalcPlrInv(pnum, TRUE);
+
+    if (pnum == myplr)
+        NewCursor(GLOVE_CURS);
+}
+
+/* @0x80045D20 ITEMS.CPP:3540 — PSX adds a PlaySfxLoc(0x3D, ...) feedback sound not present in hellfire */
+void CheckIdentify(int pnum, int cii)
+{
+    ItemStruct *pi;
+
+    PlaySfxLoc(0x3D, plr[pnum]._px, plr[pnum]._py);
+    if (cii < NUM_INVLOC)
+        pi = &plr[pnum].InvBody[cii];
+    else
+        pi = &plr[pnum].InvList[cii - NUM_INVLOC];
+    pi->_iIdentified = TRUE;
+    CalcPlrInv(pnum, TRUE);
+
+    if (pnum == myplr)
+        NewCursor(GLOVE_CURS);
+}
+
+/* @0x8004966C ITEMS.CPP:5461 — PSX drops the `ri < 512` bounds checks (ril[512] sized exactly to fit) */
+int RndSmithItem(int lvl)
+{
+    int ril[512];
+    int ri, i;
+
+    ri = 0;
+    for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iRnd && SmithItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) {
+            ril[ri++] = i;
+            if (AllItemsList[i].iRnd == IRND_DOUBLE) ril[ri++] = i;
+        }
+    }
+    return ril[ENG_random(ri)] + 1;
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */

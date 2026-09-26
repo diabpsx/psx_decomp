@@ -38,9 +38,9 @@ extern int sfxdelay;                     /* @0x8011B850 */
 extern int sfxdnum;                      /* @0x8011B854 */
 extern unsigned char trigs[16][0x10];    /* @0x800E33CC (_tx,_ty,_tmsg,...) */
 extern int numtrigs;                     /* @0x8011BB78 */
-extern unsigned char objectactive[0x7F]; /* @0x800DA220 */
+extern signed char objectactive[0x7F]; /* @0x800DA220 */
 extern int numobjects;                   /* @0x8011B9CC */
-extern int TransVal;                     /* @0x8011C148 */
+extern char TransVal;                     /* @0x8011C148 */
 extern char offset_x[8];                 /* @0x8011C2A8 */
 extern char offset_y[8];                 /* @0x8011C2B0 */
 extern int questtrigstr[5];              /* @0x800DDA08 -- GetStr() text ids, not char* */

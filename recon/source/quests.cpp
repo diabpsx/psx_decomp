@@ -55,6 +55,7 @@ extern "C" int sprintf(char *buf, const char *fmt, ...);
 #define infostr (_infostr[sel_data])
 
 /* --- TU-owned data (this segment materializes it) --- */
+unsigned char questlog = 0;
 struct QuestStruct quests[16];
 
 int ReturnLvlX;
@@ -67,7 +68,6 @@ int numqlines;
 int qtopline;
 static int qlist[16];
 static RECT QSRect;
-unsigned char questlog;
 struct QuestData questlist[16] = {
     { 5, -1, 255, 0, 100, 0, 0, 0x73, 0x461 },  /* ROCK */
     { 9, -1, 255, 1, 100, 0, 0, 0x80, 0x53 },   /* MUSHROOM */
@@ -147,21 +147,30 @@ void CheckQuests(void)
 {
     int i;
     int rportx, rporty;
+    int omp;
+    int pl;
+    struct PlayerStruct *player;
 
-    if (QuestStatus(Q_BETRAYER) && gbMaxPlayers != 1 && quests[Q_BETRAYER]._qvar1 == QS_VBRP2) {
-        AddObject(OBJ_ALTBOY, (setpc_x << 1) + 0x14, (setpc_y << 1) + 0x16);
-        quests[Q_BETRAYER]._qvar1 = QS_VBRP3;
-        if (deltaload == 0) {
-            NetSendCmdQuest(1, Q_BETRAYER);
+    omp = myplr;
+    if (QuestStatus(Q_BETRAYER)) {
+        if (gbMaxPlayers != 1) {
+            if (quests[Q_BETRAYER]._qvar1 == QS_VBRP2) {
+                AddObject(OBJ_ALTBOY, (setpc_x << 1) + 0x14, (setpc_y << 1) + 0x16);
+                quests[Q_BETRAYER]._qvar1 = QS_VBRP3;
+                if (deltaload == 0) {
+                    NetSendCmdQuest(1, Q_BETRAYER);
+                }
+            }
+            goto multi_check;
         }
+        goto single_check;
     }
-    if (gbMaxPlayers != 1) {
-        return;
-    }
-
-    if (currlevel == quests[Q_BETRAYER]._qlevel && setlevel == 0 && quests[Q_BETRAYER]._qvar1 >= QS_VBRP2
-        && quests[Q_BETRAYER]._qactive == QUEST_DONE) {
-        if (quests[Q_BETRAYER]._qvar2 == QS_VBRPOFF || quests[Q_BETRAYER]._qvar2 == QS_VBRP2) {
+multi_check:
+    if (gbMaxPlayers == 1) {
+single_check:
+        if (currlevel == quests[Q_BETRAYER]._qlevel && setlevel == 0 && quests[Q_BETRAYER]._qvar1 >= QS_VBRP2
+            && (unsigned)(quests[Q_BETRAYER]._qactive - QUEST_ACTIVE) < 2
+            && (quests[Q_BETRAYER]._qvar2 == QS_VBRPOFF || quests[Q_BETRAYER]._qvar2 == QS_VBRP2)) {
             rportx = (quests[Q_BETRAYER]._qtx << 1) + 0x10;
             rporty = (quests[Q_BETRAYER]._qty << 1) + 0x10;
             CheckRPortalOK(&rportx, &rporty);
@@ -176,22 +185,27 @@ void CheckQuests(void)
                 NetSendCmdQuest(1, Q_BETRAYER);
             }
         }
-    }
-    if (quests[Q_BETRAYER]._qactive == QUEST_DONE) {
-        if (setlevel != 0 && setlvlnum == SL_VILEBETRAYER && quests[Q_BETRAYER]._qvar2 == QS_VBRP4) {
-            AddMissile(0x23, 0x20, 0x23, 0x20, 0, MIT_RPORTAL, MI_ENEMYMONST, myplr, 0, 0);
-            quests[Q_BETRAYER]._qvar2 = QS_VBRP3;
-            if (deltaload == 0) {
-                NetSendCmdQuest(1, Q_BETRAYER);
+        if (quests[Q_BETRAYER]._qactive == QUEST_DONE) {
+            if (setlevel != 0) {
+                if (setlvlnum == SL_VILEBETRAYER && quests[Q_BETRAYER]._qvar2 == QS_VBRP4) {
+                    AddMissile(0x23, 0x20, 0x23, 0x20, 0, MIT_RPORTAL, MI_ENEMYMONST, myplr, 0, 0);
+                    quests[Q_BETRAYER]._qvar2 = QS_VBRP3;
+                    if (deltaload == 0) {
+                        NetSendCmdQuest(1, Q_BETRAYER);
+                    }
+                }
+                goto after_gate;
             }
+            i = 0;
+            goto double_loop;
         }
-    }
-
-    if (setlevel != 0) {
-        if (setlvlnum == quests[Q_PWATER]._qslvl && quests[Q_PWATER]._qactive != QUEST_NOTACTIVE
-            && leveltype == quests[Q_PWATER]._qlvltype
-            && ((nummonsters == 4 && quests[Q_PWATER]._qactive != QUEST_DONE) || quests[Q_PWATER]._qactive == QUEST_DONE)) {
-            if (WaterDone == 0) {
+after_gate:
+        i = 0;
+        if (setlevel != 0) {
+            if (setlvlnum == quests[Q_PWATER]._qslvl && quests[Q_PWATER]._qactive != QUEST_NOTACTIVE
+                && leveltype == quests[Q_PWATER]._qlvltype
+                && ((nummonsters == 4 && quests[Q_PWATER]._qactive != QUEST_DONE) || quests[Q_PWATER]._qactive == QUEST_DONE)
+                && WaterDone == 0) {
                 quests[Q_PWATER]._qactive = QUEST_DONE;
                 PlaySFX(IS_QUESTDN);
                 WaterDone = 1;
@@ -199,26 +213,27 @@ void CheckQuests(void)
                     NetSendCmdQuest(1, Q_PWATER);
                 }
             }
-        }
-        if (quests[Q_BETRAYER]._qvar1 >= 4) {
-            /* placeholder: setlevel VP-trigger updates are in ResyncQuests */
-        }
-        return;
-    }
-
-    for (i = 0; i < 2; i++) {
-        struct PlayerStruct *player = &plr[i];
-        if (*(unsigned char *)((char *)player + 0x1D) != 0) {
-            myplr = i;
-            if (currlevel == quests[i]._qlevel && quests[i]._qslvl != 0 && quests[i]._qactive != QUEST_NOTAVAIL
-                && *(short *)((char *)player + 0x30) == quests[i]._qtx
-                && *(short *)((char *)player + 0x32) == quests[i]._qty) {
-                unsigned char lt = quests[i]._qlvltype;
-                if (lt != 255) {
-                    setlvltype = lt;
+        } else {
+double_loop:
+            for (; i < MAXQUESTS; i++) {
+                for (pl = 0; pl < 2; pl++) {
+                    player = &plr[pl];
+                    if (*(unsigned char *)((char *)player + 0x1D) != 0) {
+                        myplr = pl;
+                        if (currlevel == quests[i]._qlevel && quests[i]._qslvl != 0 && quests[i]._qactive != QUEST_NOTAVAIL
+                            && *(short *)((char *)player + 0x30) == quests[i]._qtx
+                            && *(short *)((char *)player + 0x32) == quests[i]._qty) {
+                            unsigned char lt = quests[i]._qlvltype;
+                            if (lt != 255) {
+                                setlvltype = lt;
+                            }
+                            FadeGameOut();
+                            StartNewLvl(myplr, WM_DIABSETLVL, quests[i]._qslvl);
+                        }
+                    }
                 }
-                StartNewLvl(myplr, WM_DIABSETLVL, quests[i]._qslvl);
             }
+            myplr = omp;
         }
     }
 }
@@ -382,24 +397,20 @@ void GetReturnLvlPos(void)
 void ResyncQuests(void)
 {
     int i;
+    int tren;
 
-    if (QuestStatus(Q_BUTCHER)) {
-        unsigned char v = quests[Q_LTBANNER]._qvar1;
-        if (v == 1) {
-            int rx = setpc_x + setpc_w;
-            int ry = setpc_y + setpc_h;
-            ObjChangeMapResync(rx - 2, ry - 2, rx + 1, ry + 1);
+    if (QuestStatus(Q_LTBANNER)) {
+        if (quests[Q_LTBANNER]._qvar1 == 1) {
+            ObjChangeMapResync(setpc_x + setpc_w - 2, setpc_y + setpc_h - 2, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1);
         }
-        if (v == 2) {
-            int rx = setpc_x + setpc_w;
-            int ry = setpc_y + setpc_h;
-            ObjChangeMapResync(rx - 2, ry - 2, rx + 1, ry + 1);
+        if (quests[Q_LTBANNER]._qvar1 == 2) {
+            ObjChangeMapResync(setpc_x + setpc_w - 2, setpc_y + setpc_h - 2, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1);
             ObjChangeMapResync(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 2, (setpc_y + (setpc_h >> 1)) - 2);
             for (i = 0; i < numobjects; i++) {
                 SyncObjectAnim(objectactive[i]);
             }
             {
-                int tren = TransVal;
+                tren = TransVal;
                 TransVal = 9;
                 DRLG_MRectTrans(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 4, setpc_y + (setpc_h >> 1));
                 TransVal = tren;
@@ -411,7 +422,7 @@ void ResyncQuests(void)
                 SyncObjectAnim(objectactive[i]);
             }
             {
-                int tren = TransVal;
+                tren = TransVal;
                 TransVal = 9;
                 DRLG_MRectTrans(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 4, setpc_y + (setpc_h >> 1));
                 TransVal = tren;

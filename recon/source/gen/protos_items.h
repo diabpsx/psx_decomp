@@ -1,6 +1,8 @@
 long GetRndSeed(void);   /* @0x8003DADC ENGINE.CPP:102 */
 long ENG_random(long v);   /* @0x8003DB24 ENGINE.CPP:113 */
 BOOL GetSOLID(int x, int y);   /* @0x80082CE0 DPIECE.CPP:194 */
+void NewCursor(int i);   /* @0x80037804 CURSOR.CPP:179 */
+void PlaySfxLoc(int psfx, int x, int y);   /* @0x8003D784 EFFECTS.CPP:535 */
 
 void AddInitItems(void);   /* @0x8003E2F0 ITEMS.CPP:588 */
 void BubbleSwapItem(ItemStruct *a, ItemStruct *b);   /* @0x800499B0 ITEMS.CPP:5590 */
