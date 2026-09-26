@@ -109,6 +109,21 @@ void OffsetSTextY(int y, int yo)
     stext[y]._syoff = yo;
 }
 
+/* @0x80069E10 */
+void AddSText(int x, int y, unsigned char j, char *str, char clr, unsigned char sel)
+{
+    if (*str == 0) {
+        return;
+    }
+    stext[y]._sx = x;
+    stext[y]._syoff = 0;
+    strcpy(stext[y]._sstr, str);
+    stext[y]._sjust = j;
+    stext[y]._sclr = clr;
+    stext[y]._sline = 0;
+    stext[y]._ssel = sel;
+}
+
 /* @0x8006E714 */
 unsigned char IdItemOk(ItemStruct *i)
 {
@@ -214,6 +229,101 @@ unsigned char WitchRechargeOk(int i)
         rv = plr[myplr].InvList[i]._iCharges != plr[myplr].InvList[i]._iMaxCharges;
     }
     return rv;
+}
+
+/* @0x8006AA50 */
+void S_StartSmith(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x4CA), 3, 0);
+    AddSText(0, 2, 1, GetStr(0x4E), 3, 0);
+    AddSText(0, 6, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 8, 1, GetStr(0x42A), 1, 1);
+    AddSText(0, 9, 1, GetStr(0x95), 0, 1);
+    AddSText(0, 0xA, 1, GetStr(0x97), 0, 1);
+    AddSText(0, 0xB, 1, GetStr(0x3B9), 0, 1);
+    AddSText(0, 0xC, 1, GetStr(0x35B), 0, 1);
+    AddSText(0, 0xD, 1, GetStr(0x241), 0, 1);
+    AddSLine(3);
+    storenumh = 0x14;
+}
+
+/* @0x8006C2A4 */
+void S_StartWitch(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x4DC), 3, 0);
+    AddSText(0, 6, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 8, 1, GetStr(0x426), 1, 1);
+    AddSText(0, 9, 1, GetStr(0x96), 0, 1);
+    AddSText(0, 0xA, 1, GetStr(0x98), 0, 1);
+    AddSText(0, 0xB, 1, GetStr(0x3B9), 0, 1);
+    AddSText(0, 0xC, 1, GetStr(0x3BA), 0, 1);
+    AddSText(0, 0xD, 1, GetStr(0x34D), 0, 1);
+    AddSText(0, 0xE, 1, GetStr(0x240), 0, 1);
+    AddSLine(3);
+    storenumh = 0x14;
+}
+
+/* @0x8006E624 */
+void S_StartStory(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x477), 3, 0);
+    AddSText(0, 5, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 7, 1, GetStr(0x427), 1, 1);
+    AddSText(0, 9, 1, GetStr(0x207), 0, 1);
+    AddSText(0, 0xB, 1, GetStr(0x38C), 0, 1);
+    AddSLine(3);
+}
+
+/* @0x8006F6CC */
+void S_StartTavern(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x4CA), 3, 0);
+    AddSText(0, 2, 1, GetStr(0x371), 3, 0);
+    AddSText(0, 7, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 9, 1, GetStr(0x42B), 1, 1);
+    AddSText(0, 0xB, 1, GetStr(0x242), 0, 1);
+    AddSLine(3);
+    storenumh = 0x14;
+}
+
+/* @0x8006F7C4 */
+void S_StartBarMaid(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x183), 3, 0);
+    AddSText(0, 7, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 9, 1, GetStr(0x429), 1, 1);
+    AddSText(0, 0xB, 1, GetStr(0x38C), 0, 1);
+    AddSLine(3);
+    storenumh = 0x14;
+}
+
+/* @0x8006F898 */
+void S_StartDrunk(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x13E), 3, 0);
+    AddSText(0, 7, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 9, 1, GetStr(0x428), 1, 1);
+    AddSText(0, 0xB, 1, GetStr(0x38C), 0, 1);
+    AddSLine(3);
+    storenumh = 0x14;
 }
 
 /* @0x80070648 */

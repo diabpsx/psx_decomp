@@ -460,3 +460,18 @@ struct QuestStruct {   /* sizeof 20 */
     unsigned char _qlog;   /* +0x11 */
     unsigned char pad_for_laz;   /* +0x12 */
 };
+struct UniqMonstStruct {   /* sizeof 24 */
+    char mtype;   /* +0x0 */
+    unsigned short mName;   /* +0x2 */
+    unsigned char mlevel;   /* +0x4 */
+    unsigned short mmaxhp;   /* +0x6 */
+    unsigned char mAi;   /* +0x8 */
+    unsigned char mint;   /* +0x9 */
+    unsigned char mMinDamage;   /* +0xA */
+    unsigned char mMaxDamage;   /* +0xB */
+    unsigned short mMagicRes;   /* +0xC */
+    unsigned short mUnqAttr;   /* +0xE */
+    unsigned char mUnqVar1;   /* +0x10 */
+    unsigned char mUnqVar2;   /* +0x11 */
+    int mtalkmsg;   /* +0x14 */
+};

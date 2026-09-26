@@ -24,6 +24,7 @@
 #define MA_STAND   0
 #define Sign(x) ((x) < 0 ? -1 : (x) > 0 ? 1 : 0)
 #define MA_WALK    1
+#define MA_DEATH   4
 #define MA_ATTACK  2
 #define MA_GOTHIT  3
 #define MA_SPECIAL 5
@@ -53,8 +54,17 @@
 #define MG_TALK         6
 #define MG_WAITTOTALK   7
 #define MG_ATTACK2      5
+#define Q_GARBUD    2
+#define UMT_GARBUD  0
+#define ITYPE_MACE  4
+#define IMISC_NONE  0
+#define MT_NACID    0x2E
+#define MT_XACID    0x31
 #define MM_TALK    0x11
 #define TXT_WARLRD1 0x6E
+#define TXT_ZHAR1   0x94
+#define TXT_ZHAR2   0x95
+#define USFX_ZHAR2  0x35B
 #define USFX_WARLRD1 0x358
 #define Q_BETRAYER      15
 #define CMD_KILLGOLEM  0x57
@@ -319,6 +329,7 @@ int M_DoStand(int i)
 #define MIT_FIREBALL     6
 #define MIT_FLASH        0xB
 #define MIT_FLASH2       0xC
+#define MIT_ACIDPUD      0x3B
 
 void MAI_GoatMc(int i)
 {
@@ -1799,4 +1810,105 @@ void MAI_Counselor(int i)
         if (Monst->_mmode == MM_STAND)
             M_StartDelay(i, ENG_random(10) + 5);
     }
+}
+
+/* OPEN: bytes near-miss (56 diffs, 129 vs 127 insns) -- logic verified against hellfire exactly
+ * (TXT_ZHAR1=0x94, TXT_ZHAR2=0x95, USFX_ZHAR2=0x35B all confirmed from the raw oracle constants).
+ * Residual is register-coloring noise (s3 vs s4 for `i`). */
+void MAI_Zhar(int i)
+{
+    int mx, my, md, dist;
+    MonsterStruct *Monst = &monster[i];
+
+    if (Monst->_mmode == MM_STAND) {
+        mx = Monst->_mx;
+        my = Monst->_my;
+        md = M_GetDir(i);
+        if (Monst->mtalkmsg == TXT_ZHAR1 && !(dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) && Monst->_mgoal == MG_WAITTOTALK) {
+            Monst->mtalkmsg++;
+            Monst->_mgoal = MG_TALK;
+        }
+        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
+            mx = Monst->_mx - Monst->_menemyx;
+            my = Monst->_my - Monst->_menemyy;
+            dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
+            if (Monst->mtalkmsg == TXT_ZHAR2 && !effect_is_playing(USFX_ZHAR2) && Monst->_mgoal == MG_WAITTOTALK) {
+                Monst->_mgoal = MG_ATTACK;
+                Monst->_msquelch = 255;
+                Monst->mtalkmsg = 0;
+            }
+        }
+        if (Monst->_mgoal == MG_ATTACK || Monst->_mgoal == MG_RUN_AWAY || Monst->_mgoal == MG_WALK_AROUND1) {
+            MAI_Counselor(i);
+        }
+        monster[i]._mdir = md;
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = MA_STAND;
+    }
+}
+
+/* OPEN: bytes far-miss (128 diffs, 185 vs 199 insns -- 14 insns short, likely missing/misordered
+ * logic).  Confirmed against the RAW ORACLE (not hellfire, which #if-0's most of this out; used
+ * devilution's non-HELLFIRE branch as the base twin instead): Q_GARBUD=2/UMT_GARBUD=0 unique-item
+ * check, `SetRndSeed(ENG_random(GetRndSeed()))` (a PSX-specific re-seed, NOT `SetRndSeed(_mRndSeed)`
+ * -- MonsterStruct has no such field), a `stream_stop()` call gated on `_uniqtype!=0` with no
+ * devilution equivalent, and `if (i>=4) { _mxoff=0; _myoff=0; }`.  Register layout differs
+ * substantially from what's written here (a1/a2 mapping, frame size) suggesting a real ordering or
+ * missing-statement gap, not just coloring -- needs a full re-derivation pass, not attempted further
+ * this session (time budget). */
+void MonstStartKill(int i, int pnum, unsigned char sendmsg)
+{
+    int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx, _my;
+
+    if (pnum >= 0)
+        Monst->mWhoHit |= 1 << pnum;
+    if (pnum < 2 && i > 2)
+        AddPlrMonstExper(Monst->mLevel, Monst->mExp, Monst->mWhoHit);
+    monstkills[Monst->MType->mtype]++;
+    Monst->_mhitpoints = 0;
+    RemoveStoneMissiles(i, Monst->_mx, Monst->_my);
+    SetRndSeed(ENG_random(GetRndSeed()));
+    if (QuestStatus(Q_GARBUD) && Monst->mName == UniqMonst[UMT_GARBUD].mName) {
+        CreateTypeItem(Monst->_mx + 1, Monst->_my + 1, 1, ITYPE_MACE, IMISC_NONE, 1, 0);
+    } else if (i > 1) {
+        SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+    }
+
+    if (Monst->_uniqtype != 0)
+        stream_stop();
+
+    if (Monst->MType->mtype == MT_DIABLO)
+        M_DiabloDeath(i, 1, pnum);
+    else
+        PlayEffect(i, 2);
+
+    if (pnum >= 0)
+        md = M_GetDir(i);
+    else
+        md = Monst->_mdir;
+    Monst->_mdir = md;
+    NewMonsterAnim(i, Monst->MType->Anims[MA_DEATH], md, MA_DEATH);
+    Monst->_mmode = MM_DEATH;
+    if (i >= 4) {
+        Monst->_mxoff = 0;
+        Monst->_myoff = 0;
+    }
+    _mx = Monst->_moldx;
+    _my = Monst->_moldy;
+    Monst->_mVar1 = 0;
+    Monst->_mx = _mx;
+    Monst->_my = _my;
+    Monst->_mfutx = _mx;
+    Monst->_mfuty = _my;
+    Monst->_moldx = _mx;
+    Monst->_moldy = _my;
+    M_CheckEFlag(i);
+    M_ClearSquares(i);
+    dung_map[_mx][_my].dMonster = i + 1;
+    CheckQuestKill(i, sendmsg);
+    M_FallenFear(_mx, _my);
+    if (Monst->MType->mtype - MT_NACID < 4)
+        AddMissile(_mx, _my, 0, 0, 0, MIT_ACIDPUD, 1, i, Monst->_mint + 1, 0);
 }

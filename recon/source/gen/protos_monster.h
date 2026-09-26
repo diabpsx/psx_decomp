@@ -132,3 +132,11 @@ unsigned char effect_is_playing(int nSFX);   /* @0x8003CF34 EFFECTS.CPP:83 */
 void M_CheckEFlag(int i);   /* @0x8007F354 COREMON.CPP:110 */
 void M_Enemy(int i);   /* @0x8007F5B8 COREMON.CPP:225 */
 void M_ClearSquares(int i);   /* @0x8007F35C COREMON.CPP:139 */
+void AddPlrMonstExper(int lvl, long exp, char pmask);   /* @0x800608A0 PLAYER.CPP:987 */
+unsigned char QuestStatus(int i);   /* @0x80067B70 QUESTS.CPP:305 */
+void CreateTypeItem(int x, int y, unsigned char onlygood, int itype, int imisc, unsigned char sendmsg, unsigned char delta);   /* @0x80044EC4 ITEMS.CPP:2934 */
+void SpawnItem(int m, int x, int y, unsigned char sendmsg);   /* @0x800447C8 ITEMS.CPP:2746 */
+void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
+void CheckQuestKill(int m, unsigned char sendmsg);   /* @0x80067C04 QUESTS.CPP:317 */
+void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP:94 */
+long GetRndSeed(void);   /* @0x8003DADC ENGINE.CPP:102 */
