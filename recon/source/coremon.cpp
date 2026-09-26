@@ -14,8 +14,10 @@
 #define MT_WSKELSD 24
 #define MT_XSKELSD 27
 #define MT_GOLEM   109
+#define MT_DIABLO  110
 
 /* AI ids */
+#define AI_GARG     12
 #define AI_GARBUD   18
 #define AI_ZHAR     22
 #define AI_SNOTSPIL 23
@@ -34,7 +36,13 @@
 
 /* monster modes */
 #define MM_STAND   0
+#define MM_SATTACK 7
 #define MM_SPSTAND 11
+
+#define MGOAL_NORMAL 1
+#define DIFF_NIGHTMARE 1
+#define DIFF_HELL      2
+#define SPL_GOLEM 21
 
 #define MFLAG_LOCK_ANIMATION  0x02
 #define MFLAG_ALLOW_SPECIAL   0x04
@@ -97,6 +105,46 @@ unsigned char M_Talker(int i)
     return 0;
 }
 
+void M_Enemy(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int closest = -1;
+    int _mx = Monst->_mx;
+    int _my = Monst->_my;
+    int _menemy = Monst->_menemy;
+    PlayerStruct *plr1 = &plr[0];
+    PlayerStruct *plr2 = &plr[1];
+
+    if (plr1->plractive) {
+        if (plr2->plractive) {
+            PlayerStruct *enemy = &plr[_menemy];
+            int y = enemy->_py - _my;
+            if (abs(enemy->_px - _mx) >= 2 || abs(y) >= 2) {
+                int x1 = abs(plr1->_px - _mx);
+                int y1 = abs(plr1->_py - _my);
+                int x2 = abs(plr2->_px - _mx);
+                int y2 = abs(plr2->_py - _my);
+                if (x1 < y1)
+                    x1 = y1;
+                if (x2 < y2)
+                    x2 = y2;
+                closest = x2 < x1;
+            } else
+                closest = _menemy;
+        } else
+            closest = 0;
+    } else if (plr2->plractive)
+        closest = 1;
+
+    if (closest != -1) {
+        Monst->_menemy = closest;
+        Monst->_menemyx = plr[closest]._px;
+        Monst->_menemyy = plr[closest]._py;
+        Monst->_mFlags &= ~0x400;
+    } else
+        Monst->_mFlags |= 0x400;
+}
+
 void ClearMVars(int i)
 {
     monster[i]._mVar1 = 0;
@@ -107,6 +155,118 @@ void ClearMVars(int i)
     monster[i]._mVar6 = 0;
     monster[i]._mVar7 = 0;
     monster[i]._mVar8 = 0;
+}
+
+void InitMonster(int i, int rd, int mtype, int x, int y)
+{
+    CMonster *monst = &Monsters[mtype];
+    MonsterStruct *pmonster = &monster[i];
+
+    pmonster->_mdir = rd;
+    pmonster->_mx = x;
+    pmonster->_my = y;
+    pmonster->_mfutx = x;
+    pmonster->_mfuty = y;
+    pmonster->_moldx = x;
+    pmonster->_moldy = y;
+    pmonster->_mMTidx = mtype;
+    pmonster->_mmode = MM_STAND;
+    pmonster->mName = monst->MData->mName;
+    pmonster->MType = monst;
+    pmonster->MData = monst->MData;
+    pmonster->Action = MA_STAND;
+    pmonster->_mAnimDelay = monst->Anims[MA_STAND].Rate;
+    pmonster->_mAnimCnt = ENG_random(pmonster->_mAnimDelay - 1);
+    pmonster->_mAnimLen = monst->Anims[MA_STAND].Frames;
+    pmonster->_mAnimFrame = ENG_random(pmonster->_mAnimLen - 1) + 1;
+
+    if (monst->mtype == MT_DIABLO)
+        pmonster->_mmaxhp = (ENG_random(1) + 1666) << 6;
+    else
+        pmonster->_mmaxhp = (ENG_random(monst->mMaxHP - monst->mMinHP + 1) + monst->mMinHP) << 6;
+
+    if (gbMaxPlayers == 1) {
+        pmonster->_mmaxhp >>= 1;
+        if (pmonster->_mmaxhp < 64)
+            pmonster->_mmaxhp = 64;
+    }
+
+    pmonster->_mhitpoints = pmonster->_mmaxhp;
+    pmonster->_mAi = monst->MData->mAi;
+    pmonster->_mint = monst->MData->mInt;
+    pmonster->_mgoal = MGOAL_NORMAL;
+    pmonster->_mgoalvar1 = 0;
+    pmonster->_mgoalvar2 = 0;
+    pmonster->_mgoalvar3 = 0;
+    pmonster->_mDelFlag = 0;
+    pmonster->_uniqtype = 0;
+    pmonster->_msquelch = 0;
+    pmonster->mWhoHit = 0;
+    pmonster->mLevel = monst->MData->mLevel;
+    pmonster->mExp = monst->MData->mExp;
+
+    if (i < MAX_PLRS) {
+        int slvl = plr[i]._pSplLvl[SPL_GOLEM] + plr[i]._pISplLvlAdd;
+        if (slvl < 0)
+            slvl = 0;
+        pmonster->mHit = monst->MData->mHit;
+        pmonster->mMinDamage = monst->MData->mMinDamage;
+        pmonster->mMaxDamage = monst->MData->mMaxDamage;
+        monster[i]._mmaxhp = 2 * (plr[i]._pMaxMana / 3) + ((slvl << 9) + (slvl << 7));
+        monster[i].mArmorClass = 25;
+        monster[i].mHit = (unsigned char)plr[i]._pLevel * 2 + 40 + 5 * slvl;
+        monster[i].mMinDamage = 2 * slvl + 8;
+        monster[i].mMaxDamage = 2 * slvl + 16;
+    } else {
+        pmonster->mHit = monst->MData->mHit;
+        pmonster->mMinDamage = monst->MData->mMinDamage;
+        pmonster->mMaxDamage = monst->MData->mMaxDamage;
+    }
+    pmonster->mHit2 = monst->MData->mHit2;
+    pmonster->mMinDamage2 = monst->MData->mMinDamage2;
+    pmonster->mMaxDamage2 = monst->MData->mMaxDamage2;
+    pmonster->mArmorClass = monst->MData->mArmorClass;
+    pmonster->mMagicRes = monst->MData->mMagicRes;
+    pmonster->leader = 0;
+    pmonster->leaderflag = 0;
+    pmonster->_mFlags = monst->MData->mFlags;
+    pmonster->mtalkmsg = 0;
+
+    if (pmonster->_mAi == AI_GARG) {
+        pmonster->Action = MA_SPECIAL;
+        pmonster->_mAnimFrame = 1;
+        pmonster->_mFlags |= MFLAG_ALLOW_SPECIAL;
+        pmonster->_mmode = MM_SATTACK;
+    }
+
+    if (gnDifficulty == DIFF_NIGHTMARE) {
+        pmonster->_mmaxhp = 3 * pmonster->_mmaxhp + 100;
+        pmonster->_mhitpoints = pmonster->_mmaxhp;
+        pmonster->mLevel += 15;
+        pmonster->mExp = 2 * pmonster->mExp + 2000;
+        pmonster->mHit += 85;
+        pmonster->mMinDamage = 2 * pmonster->mMinDamage + 4;
+        pmonster->mMaxDamage = 2 * pmonster->mMaxDamage + 4;
+        pmonster->mHit2 += 85;
+        pmonster->mMinDamage2 = 2 * pmonster->mMinDamage2 + 4;
+        pmonster->mMaxDamage2 = 2 * pmonster->mMaxDamage2 + 4;
+        pmonster->mArmorClass += 50;
+    }
+
+    if (gnDifficulty == DIFF_HELL) {
+        pmonster->_mmaxhp = 4 * pmonster->_mmaxhp + 200;
+        pmonster->_mhitpoints = pmonster->_mmaxhp;
+        pmonster->mLevel += 30;
+        pmonster->mExp = 4 * pmonster->mExp + 4000;
+        pmonster->mHit += 120;
+        pmonster->mMinDamage = 4 * pmonster->mMinDamage + 6;
+        pmonster->mMaxDamage = 4 * pmonster->mMaxDamage + 6;
+        pmonster->mHit2 += 120;
+        pmonster->mMinDamage2 = 4 * pmonster->mMinDamage2 + 6;
+        pmonster->mMaxDamage2 = 4 * pmonster->mMaxDamage2 + 6;
+        pmonster->mArmorClass += 80;
+        pmonster->mMagicRes = monst->MData->mMagicRes2;
+    }
 }
 
 int AddMonster(int x, int y, int dir, int mtype, unsigned char InMap)

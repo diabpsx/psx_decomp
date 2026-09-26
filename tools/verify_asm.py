@@ -185,11 +185,15 @@ def ours(fn, oracle_va=None):
             if inb: break
             inb=(m.group(1)==fn); continue
         if inb: lines.append(ln)
-    out=[]
+    out=[]; tg=[]; base=None
     for i,ln in enumerate(lines):
-        mm=re.match(r'^\s*[0-9a-f]+:\t([0-9a-f]+)\s*\t(.*)',ln)
+        mm=re.match(r'^\s*([0-9a-f]+):\t([0-9a-f]+)\s*\t(.*)',ln)
         if not mm: continue
-        word=mm.group(1); insn=mm.group(2)
+        addr=int(mm.group(1),16); word=mm.group(2); insn=mm.group(3)
+        if base is None: base=addr
+        # local branch/jump targets (function-relative), compared after the normalized stream
+        mt=re.match(r'^(?:beq|bne|b\w*z|bgez|blez|bgtz|bltz|b|j)\s+(?:[\w$]+,)*([0-9a-f]+)\s+<', insn)
+        if mt and not insn.startswith(('jal','jr')): tg.append(int(mt.group(1),16)-base)
         # GTE compute op (rtps/rtpt/nclip/mvmva/...): objdump prints `c2 0xNNN` (cofun only).
         # The oracle .s encodes the SAME op as `.word 0x4Annnnnn` (spimdisasm can't name it).
         # Match by the RAW 32-bit instruction word (byte-identical) instead of the rendering.
@@ -216,7 +220,10 @@ def ours(fn, oracle_va=None):
             insn = re.sub(r',\s*-?(?:0x)?[0-9a-fA-F]+\(', ',0(', insn)   # lw rD,N(base) -> 0(base)
             insn = re.sub(r',\s*-?(?:0x)?[0-9a-fA-F]+$', ',0', insn)     # addiu/ori rD,rS,N -> ,0
         out.append(norm_ins(insn))
+    _TARGETS['ours']=tg
     return out
+
+_TARGETS={}
 
 def _exists_exact(p: Path) -> bool:
     """Path.exists() is CASE-INSENSITIVE on this NTFS checkout -- a lookup for
@@ -315,8 +322,12 @@ def oracle(fn, oracle_va=None):
     p = _find_oracle_path(fn, oracle_va)
     if p is None:
         return None
-    out=[]
+    out=[]; tg=[]; fva=None
     for ln in p.read_text().splitlines():
+        mv = re.search(r'/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s', ln)
+        if mv and fva is None: fva = int(mv.group(1), 16)
+        mt = re.search(r'\*/\s*(?:beq|bne|b\w*z|bgez|blez|bgtz|bltz|b|j)\s+.*?\.L([0-9A-Fa-f]{8})\s*$', ln)
+        if mt and fva is not None: tg.append(int(mt.group(1), 16) - fva)
         ln = re.sub(r'/\*.*?\*/', '', ln)                     # strip /* addr hex */ comments
         s = ln.strip()
         if s.startswith('endlabel'):
@@ -334,6 +345,7 @@ def oracle(fn, oracle_va=None):
         if not s or s.startswith(('.','glabel','nonmatching','dlabel','jlabel','alabel')) or s.startswith('.L') or s.endswith(':'):
             continue
         out.append(norm_ins(s))
+    _TARGETS['oracle']=tg
     return out
 
 allpass=True
@@ -355,6 +367,12 @@ for target in funcs:
             mo=_lu.match(r'lui (\w+),0$',o[_i]); me=_lu.match(r'lui (\w+),\d+$',e[_i])
             if mo and me and mo.group(1)==me.group(1): e[_i]=o[_i]
     d=[l for l in __import__('difflib').unified_diff(o,e,lineterm='') if l[0] in '+-' and not l.startswith(('+++','---'))]
+    if not d and not os.environ.get("VA_LENIENT_TARGETS") and _TARGETS.get('ours') != _TARGETS.get('oracle'):
+        to, te = _TARGETS.get('ours', []), _TARGETS.get('oracle', [])
+        k = next((k for k in range(max(len(to), len(te))) if (to[k] if k < len(to) else None) != (te[k] if k < len(te) else None)), None)
+        d = [f"-branch#{k} -> +0x{to[k]:x}" if k is not None and k < len(to) else "-branch?", f"+branch#{k} -> +0x{te[k]:x}" if k is not None and k < len(te) else "+branch?"]
+        print(f"  {target}: FAIL local branch target differs (branch #{k}: ours {to[k] if k is not None and k < len(to) else None:} oracle {te[k] if k is not None and k < len(te) else None})"); allpass=False
+        continue
     if not d: print(f"  {target}: PASS ({len(o)} insns)")
     else:
         allpass=False; print(f"  {target}: FAIL {len(d)} diffs (ours {len(o)} / oracle {len(e)})")
