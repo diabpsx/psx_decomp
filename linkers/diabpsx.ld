@@ -82,7 +82,7 @@ SECTIONS
         . = 0x6EE64;   /* 0x8007EE64 */
         build/skel/SOURCE/PALETTE.CPP.o(.text);
         . = 0x6F354;   /* 0x8007F354 */
-        build/skel/SOURCE/COREMON.CPP.o(.text);
+        build/recon/source/coremon.cpp.o(.text);   /* reconstructed TU */
         . = 0x709D4;   /* 0x800809D4 */
         build/skel/SOURCE/COREAUTO.CPP.o(.text);
         . = 0x70EF8;   /* 0x80080EF8 */
