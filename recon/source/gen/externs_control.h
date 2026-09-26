@@ -31,3 +31,10 @@ extern int D_801110FC[10];   /* rodata: DrawDurIcon4Item icon-frame table, unnam
 extern unsigned char leveltype;   /* @0x8011C10D */
 extern TASK *_spselflag[2];   /* @0x8011B650 */
 extern int force_redraw;   /* @0x8011B790 */
+extern int SpellPages[5][5];   /* @0x800CE34C */
+extern int sbooktab;   /* @0x8011B714 */
+extern int cur_spel[2];   /* @0x8011B718 */
+extern int options_pad;   /* @0x8011B250 */
+extern unsigned char GOLDR;   /* @0x8011ABDA */
+extern unsigned char GOLDG;   /* @0x8011ABDB */
+extern unsigned char GOLDB;   /* @0x8011ABDC */

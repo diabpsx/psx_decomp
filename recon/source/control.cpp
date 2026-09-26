@@ -20,9 +20,12 @@ int SPLICONRIGHT;
 int lus;
 char plusanim;
 int _pnumlines[2];
+int CS_XOFF;
 int _pSpell[2];
 int _pSplType[2];
 int my_cur_spel[2];
+char _panelstr[2][10][64];
+int _pstrjust[2][10];
 unsigned char *pMultiBtns;
 unsigned char *pTalkBtns;
 char SpellCol;
@@ -185,6 +188,91 @@ void SetSpell(int pnum)
         plr[pnum]._pRSplType = _pSplType[pnum];
         force_redraw = 0xFF;
     }
+}
+
+void AddPanelString(const char *str, int just)
+{
+    if (str[0] != 0) {
+        strcpy(&_panelstr[sel_data][_pnumlines[sel_data]][0], str);
+        _pstrjust[sel_data][_pnumlines[sel_data]] = just;
+        if (_pnumlines[sel_data] < 10)
+            _pnumlines[sel_data]++;
+    }
+}
+
+char GetSBookTrans(int ii, unsigned char townok)
+{
+    char st;
+
+    st = 1;
+    if ((plr[myplr]._pISpells >> (ii - 1)) & 1)
+        st = 3;
+    if (plr[myplr]._pAblSpells & (1 << (ii - 1)))   /* missing (__int64) cast -- PSX predates the devilution bugfix */
+        st = 0;
+    if (st == 1) {
+        if (!CheckSpell(myplr, ii, 1, 1))
+            st = 4;
+        if ((char)(plr[myplr]._pSplLvl[ii] + plr[myplr]._pISplLvlAdd) <= 0)
+            st = 4;
+    }
+    if (currlevel == 0 && ii == 0x20 && plr[0].plractive && plr[1].plractive)
+        st = 4;
+    if (townok && currlevel == 0 && st != 4 && !spelldata[ii].sTownSpell)
+        st = 4;
+    return st;
+}
+
+void CheckSBook(void)
+{
+    int cspel;
+    unsigned long long tspls;
+    char st;
+
+    RemoveTargetCursor(options_pad);
+    cspel = SpellPages[sbooktab][cur_spel[options_pad]];
+    tspls = plr[options_pad]._pMemSpells | plr[options_pad]._pISpells | plr[options_pad]._pAblSpells;
+    if (cspel != -1 && ((tspls >> (cspel - 1)) & 1)) {
+        my_cur_spel[options_pad] = cspel;
+        st = 1;
+        if ((plr[options_pad]._pISpells >> (cspel - 1)) & 1)
+            st = 3;
+        if (plr[options_pad]._pAblSpells & (1 << (cspel - 1)))
+            st = 0;
+        plr[options_pad]._pRSpell = cspel;
+        plr[options_pad]._pRSplType = st;
+        PlaySFX(0x33);
+    }
+}
+
+void DrawArrows(void)
+{
+    TextDat *ThisDat;
+    POLY_FT4 *Ft4;
+    unsigned char flip;
+    int OtPos;
+    int x;
+    int code;
+
+    ThisDat = GM_UseTexData(0);
+    OtPos = CBlocks::GetMaxOtPos() - 4;
+    flip = 1;
+    x = 0x11E;
+    if (CS_XOFF) {
+        flip = 0;
+        x = 0x1C;
+    }
+    Ft4 = ThisDat->PrintFt4(0x7E, x, 0xCA, flip, OtPos, 0);
+    Ft4->r0 = GOLDR;
+    Ft4->g0 = GOLDG;
+    code = Ft4->code & 0xFC;
+    Ft4->b0 = GOLDB;
+    Ft4->code = code;
+
+    Ft4 = ThisDat->PrintFt4(0x7E, x | 1, 0xCB, flip, OtPos, 0);
+    Ft4->r0 = 0;
+    Ft4->g0 = 0;
+    Ft4->b0 = 0;
+    Ft4->code = (Ft4->code | 2) & ~1;
 }
 
 void DrawLevelUpIcon(int pnum)

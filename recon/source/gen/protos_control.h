@@ -29,3 +29,5 @@ void RedBack(void);   /* @0x800360F8 CONTROL.CPP:3112 */
 void ToggleSpell(int pnum);   /* @0x80031004 CONTROL.CPP:837 */
 void SetSpell(int pnum);   /* @0x80031D54 CONTROL.CPP:1255 */
 void DrawSpeedSpellTSK(TASK *T);   /* @0x80030ED4 CONTROL.CPP:811 */
+void AddPanelString(const char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
+void DrawArrows(void);   /* @0x80034334 CONTROL.CPP:2564 */
