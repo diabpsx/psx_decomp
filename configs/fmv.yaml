@@ -22,21 +22,23 @@ options:
     - configs/symbol_addrs_fmv.txt
   undefined_funcs_auto_path: linkers/undefined_funcs_auto_fmv.txt
   undefined_syms_auto_path: linkers/undefined_syms_auto_fmv.txt
-  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  section_order: [.text, .data, .rodata, .sdata, .sbss, .bss]
   find_file_boundaries: False
   disasm_unknown: True
 
 segments:
   - name: fmv
     type: code
+    subalign: 4
     start: 0x0
     vram: 0x80139BF8
     subsegments:
       - [0x000000, data, fmv_hdr]
       - [0x000004, rodata, libpress_rdata]
       - [0x0000B4, data, libpress_data]
-      - [0x001044, c, libpress]
-      - [0x001BE4, c, fmv]
-      - [0x001D18, rodata, fmv_rodata_8013b910]
-      - [0x01C224, c, fmv_1]
+      - [0x001044, rodata, libpress_rodata_8013ac3c]
+      - [0x001BE4, rodata, fmv_rodata_8013b7dc]
+      - [0x01C224, c, fmv]
+      - [0x01DAF4, rodata, fmv_rodata_801576ec]
+      - [0x01DB4C, c, fmv_1]
   - [0x01EC70]

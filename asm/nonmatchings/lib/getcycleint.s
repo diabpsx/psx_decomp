@@ -6,7 +6,7 @@ nonmatching getcycleint, 0x3C
 glabel getcycleint
     /* 1FAD8 8002FAD8 E0FFBD27 */  addiu      $sp, $sp, -0x20
     /* 1FADC 8002FADC 1800BFAF */  sw         $ra, 0x18($sp)
-    /* 1FAE0 8002FAE0 01C0000C */  jal        savegp
+    /* 1FAE0 8002FAE0 01C0000C */  jal        savegp_ci
     /* 1FAE4 8002FAE4 1000A427 */   addiu     $a0, $sp, 0x10
     /* 1FAE8 8002FAE8 2023828F */  lw         $v0, %gp_rel(getcycleticks)($gp)
     /* 1FAEC 8002FAEC 1000A48F */  lw         $a0, 0x10($sp)

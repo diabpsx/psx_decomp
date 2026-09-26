@@ -9,7 +9,7 @@ glabel Iasyncreadcallback
     /* 1774C 8002774C 21808000 */  addu       $s0, $a0, $zero
     /* 17750 80027750 3801A427 */  addiu      $a0, $sp, 0x138
     /* 17754 80027754 4801BFAF */  sw         $ra, 0x148($sp)
-    /* 17758 80027758 01C0000C */  jal        savegp
+    /* 17758 80027758 01C0000C */  jal        savegp_ci
     /* 1775C 8002775C 4401B1AF */   sw        $s1, 0x144($sp)
     /* 17760 80027760 901C828F */  lw         $v0, %gp_rel(cdcallbacks)($gp)
     /* 17764 80027764 00000000 */  nop

@@ -34,8 +34,8 @@ glabel LoPlayFMVOverLay
     /* 1E850 80158448 FBFF4014 */  bnez       $v0, .L80158438
     /* 1E854 8015844C 00000000 */   nop
     /* 1E858 80158450 680D80A3 */  sb         $zero, %gp_rel(D_8011B4E8)($gp)
-    /* 1E85C 80158454 1480043C */  lui        $a0, %hi(func_8013B7DC + 0xF8)
-    /* 1E860 80158458 D4B88424 */  addiu      $a0, $a0, %lo(func_8013B7DC + 0xF8)
+    /* 1E85C 80158454 1480043C */  lui        $a0, %hi(D_8013B8D4)
+    /* 1E860 80158458 D4B88424 */  addiu      $a0, $a0, %lo(D_8013B8D4)
     /* 1E864 8015845C 7F67000C */  jal        strcmp
     /* 1E868 80158460 21282002 */   addu      $a1, $s1, $zero
     /* 1E86C 80158464 3C004014 */  bnez       $v0, .L80158558
@@ -66,8 +66,8 @@ glabel LoPlayFMVOverLay
     /* 1E8C8 801584C0 680D82A3 */  sb         $v0, %gp_rel(D_8011B4E8)($gp)
     /* 1E8CC 801584C4 1280043C */  lui        $a0, %hi(D_80121CE8)
     /* 1E8D0 801584C8 E81C8424 */  addiu      $a0, $a0, %lo(D_80121CE8)
-    /* 1E8D4 801584CC 1480053C */  lui        $a1, %hi(func_8013B7DC + 0x104)
-    /* 1E8D8 801584D0 E0B8A524 */  addiu      $a1, $a1, %lo(func_8013B7DC + 0x104)
+    /* 1E8D4 801584CC 1480053C */  lui        $a1, %hi(D_8013B8E0)
+    /* 1E8D8 801584D0 E0B8A524 */  addiu      $a1, $a1, %lo(D_8013B8E0)
     /* 1E8DC 801584D4 9767000C */  jal        sprintf
     /* 1E8E0 801584D8 00000000 */   nop
     /* 1E8E4 801584DC 5A610508 */  j          .L80158568
@@ -79,8 +79,8 @@ glabel LoPlayFMVOverLay
     /* 1E8F8 801584F0 680D82A3 */  sb         $v0, %gp_rel(D_8011B4E8)($gp)
     /* 1E8FC 801584F4 1280043C */  lui        $a0, %hi(D_80121CE8)
     /* 1E900 801584F8 E81C8424 */  addiu      $a0, $a0, %lo(D_80121CE8)
-    /* 1E904 801584FC 1480053C */  lui        $a1, %hi(func_8013B7DC + 0x114)
-    /* 1E908 80158500 F0B8A524 */  addiu      $a1, $a1, %lo(func_8013B7DC + 0x114)
+    /* 1E904 801584FC 1480053C */  lui        $a1, %hi(D_8013B8F0)
+    /* 1E908 80158500 F0B8A524 */  addiu      $a1, $a1, %lo(D_8013B8F0)
     /* 1E90C 80158504 9767000C */  jal        sprintf
     /* 1E910 80158508 00000000 */   nop
     /* 1E914 8015850C 5A610508 */  j          .L80158568
@@ -89,15 +89,15 @@ glabel LoPlayFMVOverLay
     /* 1E920 80158518 680D82A3 */  sb         $v0, %gp_rel(D_8011B4E8)($gp)
     /* 1E924 8015851C 1280043C */  lui        $a0, %hi(D_80121CE8)
     /* 1E928 80158520 E81C8424 */  addiu      $a0, $a0, %lo(D_80121CE8)
-    /* 1E92C 80158524 1480053C */  lui        $a1, %hi(func_8013B7DC + 0x124)
-    /* 1E930 80158528 00B9A524 */  addiu      $a1, $a1, %lo(func_8013B7DC + 0x124)
+    /* 1E92C 80158524 1480053C */  lui        $a1, %hi(D_8013B900)
+    /* 1E930 80158528 00B9A524 */  addiu      $a1, $a1, %lo(D_8013B900)
     /* 1E934 8015852C 9767000C */  jal        sprintf
     /* 1E938 80158530 00000000 */   nop
     /* 1E93C 80158534 5A610508 */  j          .L80158568
     /* 1E940 80158538 00000000 */   nop
     /* 1E944 8015853C 21200000 */  addu       $a0, $zero, $zero
-    /* 1E948 80158540 1480053C */  lui        $a1, %hi(func_8013B7DC + 0xE8)
-    /* 1E94C 80158544 C4B8A524 */  addiu      $a1, $a1, %lo(func_8013B7DC + 0xE8)
+    /* 1E948 80158540 1480053C */  lui        $a1, %hi(D_8013B8C4)
+    /* 1E94C 80158544 C4B8A524 */  addiu      $a1, $a1, %lo(D_8013B8C4)
     /* 1E950 80158548 A583000C */  jal        DBG_Error
     /* 1E954 8015854C FE060624 */   addiu     $a2, $zero, 0x6FE
     /* 1E958 80158550 5A610508 */  j          .L80158568

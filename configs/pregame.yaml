@@ -22,20 +22,20 @@ options:
     - configs/symbol_addrs_pregame.txt
   undefined_funcs_auto_path: linkers/undefined_funcs_auto_pregame.txt
   undefined_syms_auto_path: linkers/undefined_syms_auto_pregame.txt
-  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  section_order: [.text, .data, .rodata, .sdata, .sbss, .bss]
   find_file_boundaries: False
   disasm_unknown: True
 
 segments:
   - name: pregame
     type: code
+    subalign: 4
     start: 0x0
     vram: 0x80139BF8
     subsegments:
       - [0x000000, data, pregame_hdr]
       - [0x000004, c, pregame]
-      - [0x00002C, c, drlg_l1]
-      - [0x000060, rodata, drlg_l1_rodata_80139c58]
+      - [0x00002C, rodata, drlg_l1_rodata_80139c24]
       - [0x00055C, rodata, drlg_l1_rodata_8013a154]
       - [0x00062C, rodata, drlg_l1_rodata_8013a224]
       - [0x0006FC, rodata, drlg_l1_rodata_8013a2f4]
@@ -44,9 +44,14 @@ segments:
       - [0x000760, rodata, drlg_l1_rodata_8013a358]
       - [0x00076C, rodata, drlg_l1_rodata_8013a364]
       - [0x0007B8, rodata, drlg_l1_rodata_8013a3b0]
-      - [0x0020B8, c, drlg_l1_1]
-      - [0x0072FC, c, drlg_l2]
-      - [0x00730C, rodata, drlg_l2_rodata_80140f04]
+      - [0x0020B8, c, drlg_l1]
+      - [0x002F58, rodata, drlg_l1_rodata_8013cb50]
+      - [0x002FB0, c, drlg_l1_1]
+      - [0x0035A8, rodata, drlg_l1_rodata_8013d1a0]
+      - [0x003700, c, drlg_l1_2]
+      - [0x0045F4, rodata, drlg_l1_rodata_8013e1ec]
+      - [0x004634, c, drlg_l1_3]
+      - [0x0072FC, rodata, drlg_l2_rodata_80140ef4]
       - [0x007344, rodata, drlg_l2_rodata_80140f3c]
       - [0x0073E8, rodata, drlg_l2_rodata_80140fe0]
       - [0x00748C, rodata, drlg_l2_rodata_80141084]
@@ -139,11 +144,10 @@ segments:
       - [0x007ABC, rodata, drlg_l2_rodata_801416b4]
       - [0x007AC8, rodata, drlg_l2_rodata_801416c0]
       - [0x007AD4, rodata, drlg_l2_rodata_801416cc]
-      - [0x008B54, c, drlg_l2_1]
-      - [0x008B7C, rodata, drlg_l2_rodata_80142774]
-      - [0x009810, c, drlg_l2_2]
-      - [0x00EAAC, c, drlg_l3]
-      - [0x00EABC, rodata, drlg_l3_rodata_801486b4]
+      - [0x009810, c, drlg_l2]
+      - [0x0099F0, rodata, drlg_l2_rodata_801435e8]
+      - [0x009BA0, c, drlg_l2_1]
+      - [0x00EAAC, rodata, drlg_l3_rodata_801486a4]
       - [0x00EACC, rodata, drlg_l3_rodata_801486c4]
       - [0x00EADC, rodata, drlg_l3_rodata_801486d4]
       - [0x00EAEC, rodata, drlg_l3_rodata_801486e4]
@@ -156,15 +160,16 @@ segments:
       - [0x00EC50, rodata, drlg_l3_rodata_80148848]
       - [0x00EC60, rodata, drlg_l3_rodata_80148858]
       - [0x00EC6C, rodata, drlg_l3_rodata_80148864]
-      - [0x00F3A0, c, drlg_l3_1]
-      - [0x013C00, c, drlg_l4]
-      - [0x013C7C, rodata, drlg_l4_rodata_8014d874]
+      - [0x00F3A0, c, drlg_l3]
+      - [0x013C00, rodata, drlg_l4_rodata_8014d7f8]
       - [0x01575C, rodata, drlg_l4_rodata_8014f354]
       - [0x015788, rodata, drlg_l4_rodata_8014f380]
-      - [0x0158B0, c, drlg_l4_1]
+      - [0x0158B0, c, drlg_l4]
       - [0x01B6E0, c, setmaps]
       - [0x01BE0C, c, choosem]
       - [0x01C3E0, c, preobj]
+      - [0x01DAF4, rodata, preobj_rodata_801576ec]
+      - [0x01DBB4, c, preobj_1]
       - [0x0202E4, c, gendung]
       - [0x022014, c, themes]
       - [0x024B84, c, preport]

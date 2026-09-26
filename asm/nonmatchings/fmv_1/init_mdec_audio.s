@@ -48,8 +48,8 @@ glabel init_mdec_audio
     /* 1DC3C 80157834 00000000 */   nop
   .L80157838:
     /* 1DC40 80157838 21200000 */  addu       $a0, $zero, $zero
-    /* 1DC44 8015783C 1480053C */  lui        $a1, %hi(func_8013B7DC + 0xE8)
-    /* 1DC48 80157840 C4B8A524 */  addiu      $a1, $a1, %lo(func_8013B7DC + 0xE8)
+    /* 1DC44 8015783C 1480053C */  lui        $a1, %hi(D_8013B8C4)
+    /* 1DC48 80157840 C4B8A524 */  addiu      $a1, $a1, %lo(D_8013B8C4)
     /* 1DC4C 80157844 A583000C */  jal        DBG_Error
     /* 1DC50 80157848 CF040624 */   addiu     $a2, $zero, 0x4CF
   .L8015784C:

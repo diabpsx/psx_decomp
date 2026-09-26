@@ -8,7 +8,7 @@ glabel tmrint
     /* 1FEA8 8002FEA8 1000A427 */  addiu      $a0, $sp, 0x10
     /* 1FEAC 8002FEAC 2000BFAF */  sw         $ra, 0x20($sp)
     /* 1FEB0 8002FEB0 1C00B1AF */  sw         $s1, 0x1C($sp)
-    /* 1FEB4 8002FEB4 01C0000C */  jal        savegp
+    /* 1FEB4 8002FEB4 01C0000C */  jal        savegp_ci
     /* 1FEB8 8002FEB8 1800B0AF */   sw        $s0, 0x18($sp)
     /* 1FEBC 8002FEBC 1280023C */  lui        $v0, %hi(finebios)
     /* 1FEC0 8002FEC0 80C5428C */  lw         $v0, %lo(finebios)($v0)

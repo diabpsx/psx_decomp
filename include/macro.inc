@@ -1,4 +1,7 @@
 /* GNU as macros used by splat-generated .s files. */
+/* idempotent: the splat .s files .include this and INCLUDE_ASM includes it once more */
+.ifndef __MACRO_INC
+.set __MACRO_INC, 1
 
 .macro glabel label
     .global \label
@@ -38,3 +41,14 @@
 /* splat annotation header: `nonmatching <name>[, <size>]` — informational */
 .macro nonmatching name, size=0
 .endm
+
+/* GTE (cop2) ops spelled by name by spimdisasm; GNU as has no MIPS-I cop2 mnemonics.
+   Encodings verified against the retail bytes (mvmva 1,0,0,0,0 = 0x4A480012, dpcs = 0x4A780010). */
+.macro mvmva sf, mx, v, cv, lm
+    .word 0x4A400012 | (\sf << 19) | (\mx << 17) | (\v << 15) | (\cv << 13) | (\lm << 10)
+.endm
+.macro dpcs
+    .word 0x4A780010
+.endm
+
+.endif

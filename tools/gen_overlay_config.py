@@ -47,6 +47,18 @@ for ov, (ovid, group, image) in OVERLAYS.items():
     # sized data objects the linker left inside the *_text sections (const tables, e.g. DRLG L5ConvTbl,
     # CreditsText): carve them into rodata subsegments so splat does not disassemble them as functions
     data_iv = sorted((va, va + size) for va, name, is_fn, size in recs if not is_fn and size)
+    # The SYM names EVERY function of the game (full debug build), so code splat had to label `func_<va>`
+    # inside an overlay is data-as-code (unsized tables, e.g. DRLG_L4 @0x8014D7F8): carve [va, next symbol).
+    fn_vas = sorted(va for va, name, is_fn, size in recs if is_fn)
+    all_vas = sorted(va for va, name, is_fn, size in recs)
+    for f in (ROOT / "asm" / "nonmatchings").rglob("func_*.s"):
+        va = int(f.stem[5:], 16)
+        if va < VRAM or va in fn_vas: continue
+        seg_ok = any(x["group"] == group and x["start"] <= va <= x["stop"] for x in secs)
+        if not seg_ok: continue
+        nxt = min([v for v in all_vas if v > va] + [max(x["stop"] + 1 for x in secs if x["group"] == group)])
+        data_iv.append((va, nxt))
+    data_iv.sort()
     merged = []
     for a, b in data_iv:
         if merged and a <= merged[-1][1]: merged[-1][1] = max(merged[-1][1], b)
@@ -56,6 +68,8 @@ for ov, (ovid, group, image) in OVERLAYS.items():
     for s in [x for x in secs if x["group"] == group and x["len"]]:
         va, n = s["start"], s["name"]
         if n.startswith("$"):
+            # the overlay-id word sits first; FMV then has libpress rdata/data BEFORE text, so its order is
+            # rodata,data,text and the word must be rodata to stay first — elsewhere it is text-ordered asm
             kind, name = "data", f"{ov}_hdr"
         elif n.startswith("libpress."):
             kind = {"rdata": "rodata", "data": "data", "text": "c"}[n.split(".")[1]]
@@ -88,9 +102,9 @@ for ov, (ovid, group, image) in OVERLAYS.items():
          "  symbol_addrs_path:", "    - configs/symbol_addrs.txt", f"    - configs/symbol_addrs_{ov}.txt",
          f"  undefined_funcs_auto_path: linkers/undefined_funcs_auto_{ov}.txt",
          f"  undefined_syms_auto_path: linkers/undefined_syms_auto_{ov}.txt",
-         "  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]",
+         "  section_order: [.text, .data, .rodata, .sdata, .sbss, .bss]",
          "  find_file_boundaries: False", "  disasm_unknown: True", "",
-         "segments:", f"  - name: {ov}", "    type: code", "    start: 0x0", f"    vram: 0x{VRAM:08X}",
+         "segments:", f"  - name: {ov}", "    type: code", "    subalign: 4", "    start: 0x0", f"    vram: 0x{VRAM:08X}",
          "    subsegments:"]
     y += [f"      - [0x{o:06X}, {k}, {n}]" for o, k, n in sub]
     y.append(f"  - [0x{img_size:06X}]")

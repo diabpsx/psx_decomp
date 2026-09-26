@@ -34,6 +34,7 @@ ASPSX_VERSION = "2.56"       # PsyQ 4.0-era assembler.  NO --expand-div: gcc 2.7
                              # the retail image carries NO divide guard (TpLoadCallBack oracle: bare div+mfhi).
 G_VALUE = os.environ.get("DIAB_G", "8")   # TODO settle by gate (sdata census)
 AS_ARCH = ["-EL", "-march=r3000", "-mtune=r3000"]
+AS_ARCH_SCAFFOLD = ["-EL", "-march=mips64", "-mabi=32"]   # splat scaffolds (src/*.c, INCLUDE_ASM only): retail lib bytes include data-as-code words that decode as MIPS-II traps (tltu)
 
 CPP_FLAGS = ["-nostdinc", "-undef", "-D__GNUC__=2", "-D__OPTIMIZE__",
              "-Dmips", "-D__mips__", "-D__psx__", f"-I{INCLUDE}", f"-I{RECON}"]
@@ -65,8 +66,9 @@ def run(cmd, **kw):
 
 
 def _maspsx_assemble(s_file: Path, obj: Path, g_value: str, rel):
+    arch = AS_ARCH_SCAFFOLD if str(rel).replace("\\", "/").startswith("src/") else AS_ARCH
     cmd = [PY, MASPSX, f"--aspsx-version={ASPSX_VERSION}",
-           "--run-assembler", f"--gnu-as-path={AS}", *AS_ARCH, f"-G{g_value}",
+           "--run-assembler", f"--gnu-as-path={AS}", *arch, f"-G{g_value}",
            "-I", INCLUDE, "-I", ROOT, "-o", obj]
     r = subprocess.run([str(c) for c in cmd], input=s_file.read_text(),
                        capture_output=True, text=True, cwd=ROOT)

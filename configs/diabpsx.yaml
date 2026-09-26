@@ -21,13 +21,14 @@ options:
     - configs/symbol_addrs.txt
   undefined_funcs_auto_path: linkers/undefined_funcs_auto.txt
   undefined_syms_auto_path: linkers/undefined_syms_auto.txt
-  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  section_order: [.text, .data, .rodata, .sdata, .sbss, .bss]
   find_file_boundaries: False
   disasm_unknown: True
 
 segments:
   - name: diabpsx
     type: code
+    subalign: 4
     start: 0x0
     vram: 0x80010000
     bss_size: 0x1D5EC   # .sbss+.bss 0x8011C608..0x80139BF4 (zero-fill, not in file)
@@ -131,7 +132,7 @@ segments:
       - [0x09E38C, c, psxhelp]
       - [0x09F0E8, c, monsview]
       - [0x09F0F0, c, spltargt]
-      - [0x0A031C, c, startup]
+      - [0x0A031C, data, startup_text_hdr]
       - [0x0A0320, c, startup]
       - [0x0A0C98, data, ctors]
       - [0x0A0CD4, data, dtors]

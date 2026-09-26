@@ -1658,7 +1658,7 @@ INCLUDE_ASM("asm/nonmatchings/lib", tmrint);
 
 INCLUDE_ASM("asm/nonmatchings/lib", initgp);
 
-INCLUDE_ASM("asm/nonmatchings/lib", savegp);
+INCLUDE_ASM("asm/nonmatchings/lib", savegp_ci);
 
 INCLUDE_ASM("asm/nonmatchings/lib", restoregp);
 

@@ -22,20 +22,51 @@ options:
     - configs/symbol_addrs_game.txt
   undefined_funcs_auto_path: linkers/undefined_funcs_auto_game.txt
   undefined_syms_auto_path: linkers/undefined_syms_auto_game.txt
-  section_order: [.rodata, .text, .data, .sdata, .sbss, .bss]
+  section_order: [.text, .data, .rodata, .sdata, .sbss, .bss]
   find_file_boundaries: False
   disasm_unknown: True
 
 segments:
   - name: game
     type: code
+    subalign: 4
     start: 0x0
     vram: 0x80139BF8
     subsegments:
       - [0x000000, data, game_hdr]
       - [0x000004, c, gameonly]
       - [0x00000C, c, missiles]
+      - [0x00002C, rodata, missiles_rodata_80139c24]
+      - [0x000604, c, missiles_1]
+      - [0x001044, rodata, missiles_rodata_8013ac3c]
+      - [0x0011A8, c, missiles_2]
+      - [0x001224, rodata, missiles_rodata_8013ae1c]
+      - [0x0012DC, c, missiles_3]
+      - [0x0012E0, rodata, missiles_rodata_8013aed8]
+      - [0x001454, c, missiles_4]
+      - [0x001484, rodata, missiles_rodata_8013b07c]
+      - [0x0017D8, c, missiles_5]
+      - [0x001AF4, rodata, missiles_rodata_8013b6ec]
+      - [0x001F98, c, missiles_6]
+      - [0x002F58, rodata, missiles_rodata_8013cb50]
+      - [0x003190, c, missiles_7]
+      - [0x0035A8, rodata, missiles_rodata_8013d1a0]
+      - [0x0036C0, c, missiles_8]
+      - [0x0045F4, rodata, missiles_rodata_8013e1ec]
+      - [0x004630, c, missiles_9]
+      - [0x0072FC, rodata, missiles_rodata_80140ef4]
+      - [0x00731C, c, missiles_10]
+      - [0x008B54, rodata, missiles_rodata_8014274c]
+      - [0x008B9C, c, missiles_11]
+      - [0x0099F0, rodata, missiles_rodata_801435e8]
+      - [0x009F5C, c, missiles_12]
+      - [0x00EAAC, rodata, missiles_rodata_801486a4]
+      - [0x00EEA4, c, missiles_13]
       - [0x010F7C, c, monster]
+      - [0x013C00, rodata, monster_rodata_8014d7f8]
+      - [0x013E44, c, monster_1]
       - [0x01D67C, c, inv]
+      - [0x01DAF4, rodata, inv_rodata_801576ec]
+      - [0x01DDA8, c, inv_1]
       - [0x028360, c, automap]
   - [0x02A228]

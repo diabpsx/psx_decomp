@@ -13,8 +13,8 @@ glabel DRLG_LoadL1SP__Fv
     /* 31C0 8013CDB8 FF004230 */  andi       $v0, $v0, 0xFF
     /* 31C4 8013CDBC 0A004010 */  beqz       $v0, .L8013CDE8
     /* 31C8 8013CDC0 00000000 */   nop
-    /* 31CC 8013CDC4 1480043C */  lui        $a0, %hi(func_80139C24 + 0x10)
-    /* 31D0 8013CDC8 349C8424 */  addiu      $a0, $a0, %lo(func_80139C24 + 0x10)
+    /* 31CC 8013CDC4 1480043C */  lui        $a0, %hi(D_80139C34)
+    /* 31D0 8013CDC8 349C8424 */  addiu      $a0, $a0, %lo(D_80139C34)
     /* 31D4 8013CDCC A7D3010C */  jal        GRL_LoadFileInMemSig__FPCcPUl
     /* 31D8 8013CDD0 21280000 */   addu      $a1, $zero, $zero
     /* 31DC 8013CDD4 1280013C */  lui        $at, %hi(pSetPiece)
@@ -33,8 +33,8 @@ glabel DRLG_LoadL1SP__Fv
     /* 320C 8013CE04 00000000 */  nop
     /* 3210 8013CE08 0A006214 */  bne        $v1, $v0, .L8013CE34
     /* 3214 8013CE0C 00000000 */   nop
-    /* 3218 8013CE10 1480043C */  lui        $a0, %hi(func_80139C24 + 0x1C)
-    /* 321C 8013CE14 409C8424 */  addiu      $a0, $a0, %lo(func_80139C24 + 0x1C)
+    /* 3218 8013CE10 1480043C */  lui        $a0, %hi(D_80139C40)
+    /* 321C 8013CE14 409C8424 */  addiu      $a0, $a0, %lo(D_80139C40)
     /* 3220 8013CE18 A7D3010C */  jal        GRL_LoadFileInMemSig__FPCcPUl
     /* 3224 8013CE1C 21280000 */   addu      $a1, $zero, $zero
     /* 3228 8013CE20 1280013C */  lui        $at, %hi(pSetPiece)
@@ -48,8 +48,8 @@ glabel DRLG_LoadL1SP__Fv
     /* 3244 8013CE3C FF004230 */  andi       $v0, $v0, 0xFF
     /* 3248 8013CE40 0A004010 */  beqz       $v0, .L8013CE6C
     /* 324C 8013CE44 00000000 */   nop
-    /* 3250 8013CE48 1480043C */  lui        $a0, %hi(func_80139C24 + 0x28)
-    /* 3254 8013CE4C 4C9C8424 */  addiu      $a0, $a0, %lo(func_80139C24 + 0x28)
+    /* 3250 8013CE48 1480043C */  lui        $a0, %hi(D_80139C4C)
+    /* 3254 8013CE4C 4C9C8424 */  addiu      $a0, $a0, %lo(D_80139C4C)
     /* 3258 8013CE50 A7D3010C */  jal        GRL_LoadFileInMemSig__FPCcPUl
     /* 325C 8013CE54 21280000 */   addu      $a1, $zero, $zero
     /* 3260 8013CE58 1280013C */  lui        $at, %hi(pSetPiece)
