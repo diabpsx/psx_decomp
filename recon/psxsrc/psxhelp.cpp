@@ -115,6 +115,13 @@ public:
 extern CFont MediumFont;
 extern char tempstr[256];
 extern unsigned char REDR, REDG, REDB;
+/* the colour globals are const in the retail headers: gcc hoists their loads across calls */
+extern const unsigned char WHITER, WHITEG, WHITEB;
+extern const unsigned char GOLDR, GOLDG, GOLDB;
+char *GetStr(int StrId);
+void DrawFeTwinkle(int x, int y);
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, int SinStep);
+int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp);
 extern "C" int sprintf(char *buf, const char *fmt, ...);
 
 extern struct KEY_ASSIGNS txt_actions[20];
@@ -270,4 +277,44 @@ int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStr
         eln = MediumFont.GetStrWidth(txt);
     }
     return eln;
+}
+
+/* @0x800AE950 PSXHELP.CPP:346 */
+void DisplayHelp(void)
+{
+    struct HelpStruct *hp = HelpList;
+    int y = 16;
+
+    for (int i = 0; i < 25; i++, hp++) {
+        char *txt = GetStr(hp->HelpTxt);
+        if (i >= HelpTop && !displayinghelp) {
+            if (i == help_select_line) {
+                int nlen = MediumFont.GetStrWidth(txt);
+                if (displayinghelp)
+                    y += 2;
+                nlen = DrawHelpLine(0, y, txt, GOLDR, GOLDG, GOLDB, hp);
+                if (!displayinghelp) {
+                    if (FeFlag) {
+                        DrawFeTwinkle(20, y + 50);
+                        DrawFeTwinkle(nlen + 36, y + 50);
+                    } else {
+                        DrawSpinner(20, y + 50, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0x118, 1, 0, 8);
+                        DrawSpinner(nlen + 36, y + 50, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0x118, 1, 0, 8);
+                    }
+                }
+                y += 16;
+            } else if (hp->DisplayType == 4) {
+                y += MediumFont.Print(0, y, txt, JustCentre, &HelpRect, WHITER, WHITEG, WHITEG) * 16;
+            } else {
+                DrawHelpLine(0, y, txt, WHITER, WHITEG, WHITEB, hp);
+                y += 16;
+            }
+        } else if (displayinghelp && i == help_select_line) {
+            DrawHelpLine(0, y, txt, GOLDR, GOLDG, GOLDB, hp);
+            y += 16;
+            MediumFont.Print(0, y, GetStr(hp->subtxt), JustLeft, &HelpRect, WHITER, WHITEG, WHITEG);
+        }
+        if (y >= 155)
+            break;
+    }
 }
