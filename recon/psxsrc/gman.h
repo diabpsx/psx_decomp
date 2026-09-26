@@ -14,6 +14,7 @@
 #include "psxsrc/decomp.h"
 #include "cstring.h"
 #include "psxsrc/primpool.h"
+#include "psxsrc/gpuq.h"
 
 struct FRAME_HDR {                    /* sizeof 12 (bitfields) */
     unsigned int FrOffset  : 32;
@@ -174,6 +175,14 @@ struct TextDat {                      /* sizeof 112 */
     void SetUVTpGT4(FRAME_HDR *Fr, POLY_GT4 *FT4, int XFlip, int YFlip);
     void SetUVTpGT3(FRAME_HDR *Fr, POLY_GT3 *GT3);
     void SetPal(FRAME_HDR *Fr, POLY_FT4 *FT4);
+    void PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);
+    void PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YFlip);
+    void PrepareGt3(POLY_GT3 *GT3, int Frm, int X, int Y);
+    void DecompFrame(FRAME_HDR *Fr);
+    POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
+    POLY_GT4 *PrintGt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
+    void PrintMonster(int Creature, int Action, int Dir, int Frm, int X, int Y, int OtOffset);
+    POLY_FT4 *PrintMonsterA(int Frm, int X, int Y, BOOL XFlip, int OtPos);
     unsigned char *GetDecompBufffer(int Size);
     void MakePalOffsetTab();
     void MakeCreatureOffsetTab();
@@ -210,8 +219,22 @@ extern TextDat *AllDats[372];        /* @0x800B9454 (.GMAN_data) */
 extern TextDat  DatPool[20];         /* @0x800B8B94 */
 extern int TpW, TpH, TpXDest, TpYDest;   /* .sdata */
 extern CTextFileInfo *TX_DatTab[];
+extern POLY_FT4 MyFT4;               /* @0x8011CC00 (bss, unnamed in SYM) */
+extern POLY_GT4 MyGT4;               /* @0x800B9A24 */
+extern "C" { extern u_long *ThisOt; }   /* .sdata @0x8011AAB4 */
+void LZNP_Decode(unsigned char *Src, unsigned char *Dst);   /* LZNP.CPP */
+void DEC_AddAsDecRequestor(TextDat *Dat);                  /* DECOMP.CPP @0x800A4384 */
+void GPUQ_FlushQ();                                        /* GPUQ.CPP @0x800833F0 */
+extern unsigned char FeFlag;                               /* @0x8011B374 */
+extern int CDWAIT;                                         /* @0x8011ADEC */
+struct DR_LOAD2 {                     /* sizeof 68 (SYM) */
+    unsigned int  addr : 24;
+    unsigned int  len  : 8;
+    unsigned long code[1];
+    RECT          rect;
+    unsigned long p[13];
+};
 
-void GPUQ_DiscardHandle(long hnd);
 BOOL TpLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk);
 void GM_ForceTpLoad(int Id);
 void GM_FinishedUsing(TextDat *tex);

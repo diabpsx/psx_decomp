@@ -1,31 +1,31 @@
 # Match progress (gate = tools/verify_asm.py)
 
-**Main image: 59 / 2688 functions byte-matched (2.2%)**
+**Main image: 73 / 2688 functions byte-matched (2.7%)**
 
-## gman  (recon/psxsrc/gman.cpp) — 59/76 PASS
+## gman  (recon/psxsrc/gman.cpp) — 73/76 PASS
 - ✅ __7TextDat (13)
 - ✅ OnceOnlyInit__7TextDat (8)
 - ✅ ___7TextDat (18)
 - ✅ ReloadTP__7TextDat (16)
-- ⬜ Use__7TextDatlbi
+- ✅ Use__7TextDatlbi (144)
 - ✅ TpLoadCallBack__FPUciib (42)
 - ✅ StreamLoadTP__7TextDat (46)
 - ✅ FinishedUsing__7TextDat (38)
 - ✅ MakeBlockOffsetTab__7TextDat (19)
-- ❌ MakeOffsetTab__C9CBlockHdr — 57 diffs (ours 75)
+- ✅ MakeOffsetTab__C9CBlockHdr (75)
 - ✅ SetUVTp__7TextDatP9FRAME_HDRP8POLY_FT4ii (64)
 - ✅ IsCompressed__7TextDatiiii (19)
-- ⬜ PrintMonster__7TextDatiiiiiii
-- ⬜ PrintMonsterA__7TextDatiiibi
-- ⬜ PrepareFt4__7TextDatP8POLY_FT4iiiii
+- ✅ PrintMonster__7TextDatiiiiiii (43)
+- ✅ PrintMonsterA__7TextDatiiibi (234)
+- ✅ PrepareFt4__7TextDatP8POLY_FT4iiiii (165)
 - ✅ GetDecompBufffer__7TextDati (88)
 - ✅ SetUVTpGT4__7TextDatP9FRAME_HDRP8POLY_GT4ii (64)
-- ⬜ PrepareGt4__7TextDatP8POLY_GT4iiiii
+- ✅ PrepareGt4__7TextDatP8POLY_GT4iiiii (150)
 - ✅ SetUVTpGT3__7TextDatP9FRAME_HDRP8POLY_GT3 (33)
-- ⬜ PrepareGt3__7TextDatP8POLY_GT3iii
-- ⬜ PrintFt4__7TextDatiiiiii
-- ⬜ PrintGt4__7TextDatiiiiii
-- ⬜ DecompFrame__7TextDatP9FRAME_HDR
+- ✅ PrepareGt3__7TextDatP8POLY_GT3iii (114)
+- ✅ PrintFt4__7TextDatiiiiii (85)
+- ✅ PrintGt4__7TextDatiiiiii (85)
+- ✅ DecompFrame__7TextDatP9FRAME_HDR (86)
 - ✅ MakeCreatureOffsetTab__7TextDat (80)
 - ✅ MakePalOffsetTab__7TextDat (63)
 - ✅ InitData__7TextDat (12)
@@ -49,23 +49,23 @@
 - ✅ GetSize__C12CCreatureHdr (27)
 - ✅ LoadDat__C13CTextFileInfoli (77)
 - ✅ LoadDat__C13CTextFileInfo (22)
-- ⬜ LoadHdr__C13CTextFileInfo
+- ✅ LoadHdr__C13CTextFileInfo (10)
 - ✅ MakeFname__C13CTextFileInfoPcPCc (18)
 - ✅ GetFile__C13CTextFileInfoPcUl (40)
 - ✅ HasFile__C13CTextFileInfoPc (37)
 - ✅ Un64__FPUcT0l (53)
 - ✅ __7CScreen (13)
-- ⬜ Load__7CScreeniii
+- ❌ Load__7CScreeniii — 2 diffs (ours 197)
 - ✅ Unload__7CScreen (9)
-- ⬜ Display__7CScreeniiii
+- ❌ Display__7CScreeniiii — 77 diffs (ours 184)
 - ✅ SetRect__5CPartR7TextDatR4RECT (31)
 - ⬜ GetBoundingBox__6CBlockR7TextDatR4RECT
 - ✅ _GLOBAL__D_DatPool (22)
 - ✅ _GLOBAL__I_DatPool (21)
-- ⬜ PRIM_GetPrim__FPP8POLY_GT4_8009512c
-- ⬜ PRIM_GetPrim__FPP8POLY_FT4_800951a8
+- ✅ PRIM_GetPrim__FPP8POLY_GT4_8009512c (31)
+- ✅ PRIM_GetPrim__FPP8POLY_FT4_800951a8 (31)
 - ✅ DumpDatFile__7TextDat (29)
-- ⬜ CanXferFrame__C7TextDat
+- ✅ CanXferFrame__C7TextDat (10)
 - ✅ CanXferPal__C7TextDat (10)
 - ✅ IsLoaded__C7TextDat (3)
 - ✅ GetTexNum__C7TextDat (3)

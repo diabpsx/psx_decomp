@@ -345,18 +345,16 @@ void CTextFileInfo::MakeFname(char *Dest, const char *Ext) const
 /* line 375 @0x800923B4 */
 long CBlockHdr::MakeOffsetTab() const
 {
-    CBlock *MyBlock;
+    CBlock *MyBlock = (CBlock *)Blocks;     /* initializer: retail forms this+4 in the prologue */
     long hndRet;
     int *Tab;
-    unsigned int f;
 
     if (NumOfBlocks == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 381);
     hndRet = GAL_Alloc(NumOfBlocks * sizeof(int), 0x8001, "GMAN");
     if (hndRet == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 384);
     Tab = (int *)GAL_Lock(hndRet);
     if (Tab == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 387);
-    MyBlock = (CBlock *)Blocks;
-    for (f = 0; f < NumOfBlocks; f++) {
+    for (unsigned int f = 0; f < NumOfBlocks; f++) {
         Tab[f] = (unsigned char *)MyBlock - (unsigned char *)this;
         MyBlock = (CBlock *)((unsigned char *)MyBlock + MyBlock->GetSize());
     }
@@ -540,6 +538,523 @@ void TextDat::SetUVTpGT4(FRAME_HDR *Fr, POLY_GT4 *FT4, int XFlip, int YFlip)
         }
     }
     FT4->tpage = Tpage;
+}
+
+/* line 630 @0x80092A80 */
+void TextDat::PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip)
+{
+    FRAME_HDR *Fr;
+    int W;
+    int H;
+
+    Fr = GetFr(Frm);
+    W = Fr->W;
+    H = Fr->H;
+    setlen(FT4, 9);
+    setcode(FT4, 0x2D);
+    if (XFlip) {
+        X -= Fr->X;
+        X -= W;
+    } else {
+        X += Fr->X;
+    }
+    Y += Fr->Y;
+    FT4->x0 = X;
+    FT4->x1 = X + W;
+    FT4->x2 = X;
+    FT4->x3 = X + W;
+    FT4->y0 = Y;
+    FT4->y1 = Y;
+    FT4->y2 = Y + H;
+    FT4->y3 = Y + H;
+    SetPal(Fr, FT4);
+    if (Fr->InVRAM) {
+        SetUVTp(Fr, FT4, XFlip, YFlip);
+    } else {
+        if (CanXferFrame()) {
+            if (LastFrame != Frm) {
+                RECT R;
+                DecompFrame(Fr);
+                R.x = DecX;
+                R.y = DecY;
+                R.w = GU_AlignVal(W, 2) >> 1;
+                R.h = H;
+                GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+            }
+            FT4->u0 = (DecX & 63) * 2;
+            FT4->v0 = DecY;
+            FT4->u1 = (DecX & 63) * 2 + W;
+            FT4->v1 = DecY;
+            FT4->u2 = (DecX & 63) * 2;
+            FT4->v2 = DecY + H;
+            FT4->u3 = (DecX & 63) * 2 + W;
+            FT4->v3 = DecY + H;
+            FT4->tpage = GetTPage(1, 0, DecX, DecY);
+            if (YFlip) {
+                unsigned char sw;
+                sw = FT4->v0;
+                FT4->v0 = FT4->v2;
+                FT4->v2 = sw;
+                sw = FT4->v1;
+                FT4->v1 = FT4->v3;
+                FT4->v3 = sw;
+            }
+        } else {
+            DBG_Error(NULL, "psxsrc/GMAN.CPP", 695);
+        }
+    }
+    LastFrame = Frm;
+}
+
+/* line 917 @0x80093250 */
+void TextDat::PrepareGt3(POLY_GT3 *GT3, int Frm, int X, int Y)
+{
+    FRAME_HDR *Fr;
+    int W;
+    int H;
+    PAL *Pal;
+
+    Fr = GetFr(Frm & 0xffff);
+    W = Fr->W;
+    H = Fr->H;
+    setlen(GT3, 9);
+    setcode(GT3, 0x35);
+    X += Fr->X;
+    Y += Fr->Y;
+    GT3->x0 = X;
+    GT3->y0 = Y;
+    GT3->x1 = X + W;
+    GT3->y1 = Y;
+    GT3->x2 = X;
+    GT3->y2 = Y + H;
+    Pal = GetPal(Fr->PalNum);
+    if (Pal->InVram) {
+        GT3->clut = ((unsigned short *)Pal)[1];
+    } else {
+        RECT R;
+        GT3->clut = GetClut(0x140, 0x100);
+        R.x = 0x140;
+        R.y = 0x100;
+        R.w = 64;
+        R.h = 1;
+        LoadImage(&R, (u_long *)Pal->Cols);
+    }
+    if (Fr->InVRAM) {
+        SetUVTpGT3(Fr, GT3);
+    } else {
+        RECT R;
+        int DecX = 0x141;
+        int DecY = 0x101;
+        DecompFrame(Fr);
+        R.x = DecX;
+        R.y = DecY;
+        R.w = GU_AlignVal(W, 2) >> 1;
+        R.h = H;
+        GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+        GT3->u0 = 1;
+        GT3->v0 = 1;
+        GT3->u1 = W + 1;
+        GT3->v1 = 1;
+        GT3->u2 = 1;
+        GT3->v2 = H + 1;
+        GT3->tpage = GetTPage(1, 0, DecX, DecY);
+    }
+}
+
+/* line 807 @0x80092F74 */
+void TextDat::PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YFlip)
+{
+    FRAME_HDR *Fr;
+    int W;
+    int H;
+
+    Fr = GetFr(Frm & 0xffff);
+    W = Fr->W;
+    H = Fr->H;
+    setlen(GT4, 12);
+    setcode(GT4, 0x3D);
+    if (XFlip) {
+        X -= Fr->X;
+        X -= W;
+    } else {
+        X += Fr->X;
+    }
+    if (YFlip) {
+        Y -= Fr->Y;
+        Y -= H;
+    } else {
+        Y += Fr->Y;
+    }
+    GT4->x0 = X;
+    GT4->y0 = Y;
+    GT4->x1 = X + W;
+    GT4->y1 = Y;
+    GT4->x2 = X;
+    GT4->y2 = Y + H;
+    GT4->x3 = X + W;
+    GT4->y3 = Y + H;
+    {
+        PAL *Pal = GetPal(Fr->PalNum);
+        if (Pal->InVram) {
+            GT4->clut = ((unsigned short *)Pal)[1];
+        } else {
+            RECT R;
+            GT4->clut = GetClut(0x140, 0x100);
+            R.x = 0x140;
+            R.y = 0x100;
+            R.w = 64;
+            R.h = 1;
+            LoadImage(&R, (u_long *)Pal->Cols);
+        }
+    }
+    if (Fr->InVRAM) {
+        SetUVTpGT4(Fr, GT4, XFlip, YFlip);
+    } else {
+        RECT R;
+        int DecX = 0x141;
+        int DecY = 0x101;
+        DecompFrame(Fr);
+        R.x = DecX;
+        R.y = DecY;
+        R.w = GU_AlignVal(W, 2) >> 1;
+        R.h = H;
+        GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+        GT4->u0 = 1;
+        GT4->v0 = 1;
+        GT4->u1 = W + 1;
+        GT4->v1 = 1;
+        GT4->u2 = 1;
+        GT4->v2 = H + 1;
+        GT4->u3 = W + 1;
+        GT4->v3 = H + 1;
+        GT4->tpage = GetTPage(1, 0, DecX, DecY);
+        if (YFlip) {
+            unsigned char sw;
+            sw = GT4->v0;
+            GT4->v0 = GT4->v2;
+            GT4->v2 = sw;
+            sw = GT4->v1;
+            GT4->v1 = GT4->v3;
+            GT4->v3 = sw;
+        }
+    }
+}
+
+/* line 989 @0x80093418 */
+POLY_FT4 *TextDat::PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip)
+{
+    POLY_FT4 *FT4;
+
+    if (Frm >= 0 && Frm < GetNumOfFrames()) {
+        PRIM_GetPrim(&FT4);
+        PrepareFt4(FT4, Frm, X, Y, XFlip, YFlip);
+        if (YFlip)
+            addPrim(&ThisOt[2], FT4);
+        else
+            addPrim(&ThisOt[OtPos], FT4);
+        return FT4;
+    } else {
+        return &MyFT4;
+    }
+}
+
+/* line 1012 @0x8009356C */
+POLY_GT4 *TextDat::PrintGt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip)
+{
+    POLY_GT4 *GT4;
+
+    Frm &= 0xffff;
+    if (Frm >= 0 && Frm < GetNumOfFrames()) {
+        PRIM_GetPrim(&GT4);
+        PrepareGt4(GT4, Frm, X, Y, XFlip, YFlip);
+        if (YFlip)
+            addPrim(&ThisOt[2], GT4);
+        else
+            addPrim(&ThisOt[OtPos], GT4);
+        return GT4;
+    } else {
+        return &MyGT4;
+    }
+}
+
+/* line 1058 @0x800936C0 */
+void TextDat::DecompFrame(FRAME_HDR *Fr)
+{
+    unsigned char *CompFrAddr;
+    int DecompSize;
+    unsigned char *Dest;
+
+    CompFrAddr = (unsigned char *)GAL_Lock(hndDat);
+    if (CompFrAddr == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1064);
+    CompFrAddr += Fr->FrOffset;
+    DecompSize = GU_AlignVal(Fr->W, 2) * Fr->H;
+    Dest = (unsigned char *)GAL_Lock(hndDecompBuffer);
+    if (Dest == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1075);
+    switch (Fr->CompType) {
+    case 1:
+        Un64(CompFrAddr, Dest, DecompSize);
+        break;
+    case 2:
+        LZNP_Decode(CompFrAddr, Dest);
+        break;
+    case 0:
+    default:
+        if (!(!"Wanker!")) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1089);
+        break;
+    }
+    GAL_Unlock(hndDecompBuffer);
+    GAL_Unlock(hndDat);
+}
+
+/* line 170 @0x80091F30 */
+void TextDat::Use(long NewHndDat, BOOL DatLoaded, int size)
+{
+    char NameBuff[40];
+
+    if (!Loaded) {
+        LastFrame = -1;
+        hndHdr = FileInfo->LoadHdr();
+        Hdr = (SPR_HDR *)GAL_Lock(hndHdr);
+        if (Hdr == NULL) DBG_Error(NULL, "psxsrc/GMAN.CPP", 181);
+        if (FileInfo->HasTp()) StreamLoadTP();
+        Frames = (FRAME_HDR *)((unsigned char *)Hdr + Hdr->FrameOffset);
+        CreatureAnims = (unsigned char *)Hdr + Hdr->CreatureOffset;
+        Pals = (unsigned char *)Hdr + Hdr->PalOffset;
+        Blocks = (unsigned char *)Hdr + Hdr->ComponentOffset;
+        MakePalOffsetTab();
+        MakeCreatureOffsetTab();
+        MakeBlockOffsetTab();
+        Loaded = true;
+        if (FileInfo->HasDat()) {
+            if (Hdr->DecompOffset) {
+                hndDecompArrays = GAL_Alloc(320, 0x8001, "DECB");
+                if (hndDecompArrays == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 204);
+                Scr = 0;
+                NumOfBuffers[0] = 0;
+                NumOfBuffers[1] = 0;
+                DEC_AddAsDecRequestor(this);
+            } else {
+                RECT R;
+                int DecompSize;
+                hndDecompBuffer = -1;
+                FindDecompArea(R);
+                DecompSize = R.w * R.h;
+                hndDecompBuffer = GAL_Alloc(DecompSize, 0x8001, FileInfo->GetName());
+                if (hndDecompBuffer == -1) DBG_Error(NULL, "psxsrc/GMAN.CPP", 225);
+            }
+            if (NewHndDat == -1) {
+                NewHndDat = FileInfo->LoadDat();
+            } else {
+                if (!DatLoaded) {
+                    FileInfo->LoadDat(NewHndDat, size);
+                    OwnDat = false;
+                } else {
+                    OwnDat = true;
+                }
+            }
+            hndDat = NewHndDat;
+        }
+    }
+    LoadCount++;
+}
+
+/* line 495 @0x8009262C */
+void TextDat::PrintMonster(int Creature, int Action, int Dir, int Frame, int x, int y, int OtPos)
+{
+    int PhysFrame;
+
+    PhysFrame = GetFrNum(Creature, Action, Dir, Frame);
+    PrintMonsterA(PhysFrame, x, y, IsDirAliased(Creature, Action, Dir), OtPos);
+}
+
+/* line 508 @0x800926D8 */
+POLY_FT4 *TextDat::PrintMonsterA(int Frm, int X, int Y, BOOL XFlip, int OtPos)
+{
+    POLY_FT4 *FT4;
+    FRAME_HDR *Fr;
+
+    if (Frm >= 0 && Frm < GetNumOfFrames()) {
+        PRIM_GetPrim(&FT4);
+        Fr = GetFr(Frm);
+        {
+            int W = Fr->W;
+            int H = Fr->H;
+            setlen(FT4, 9);
+            setcode(FT4, 0x2C);
+            setShadeTex(FT4, 0);
+            if (XFlip) {
+                X -= Fr->X;
+                X -= W;
+            } else {
+                X += Fr->X;
+            }
+            Y += Fr->Y;
+            FT4->x0 = X;
+            FT4->y0 = Y;
+            FT4->x1 = X + W;
+            FT4->y1 = Y;
+            FT4->x2 = X;
+            FT4->y2 = Y + H;
+            FT4->x3 = X + W;
+            FT4->y3 = Y + H;
+            SetPal(Fr, FT4);
+        }
+        if (Fr->InVRAM) {
+            SetUVTp(Fr, FT4, XFlip, 0);
+            addPrim(&ThisOt[OtPos], FT4);
+        } else {
+            unsigned char *Dest;
+            int DecompSize;
+            unsigned char *CompFrAddr;
+            DR_LOAD2 *DrPtr;
+            unsigned long NumOfPrims;
+            int VH;
+            int TpX;
+            int TpY;
+
+            CompFrAddr = (unsigned char *)GAL_Lock(hndDat) + Fr->FrOffset;
+            DecompSize = *CompFrAddr++;
+            DecompSize |= *CompFrAddr++ << 8;
+            Dest = GetDecompBufffer(DecompSize);
+            LZNP_Decode(CompFrAddr, Dest);
+            DrPtr = (DR_LOAD2 *)(Dest + 4);
+            NumOfPrims = *(unsigned long *)Dest;
+            TpX = DrPtr->rect.x;
+            TpY = DrPtr->rect.y;
+            VH = getTPage(0, 0, TpX, TpY);
+            FT4->tpage = VH;
+            {
+                int U = (TpX << 2) & 0xff;
+                int V = TpY & 0xff;
+                int W = Fr->W;
+                int H = Fr->H;
+                int u0, u1, u2, u3;
+                if (XFlip) {
+                    u0 = U + W - 1;
+                    u1 = U - 1;
+                    u2 = u0;
+                    u3 = u1;
+                } else {
+                    u0 = U;
+                    u1 = U + W;
+                    u2 = u0;
+                    u3 = u1;
+                }
+                FT4->v0 = V;
+                FT4->v1 = V;
+                FT4->v2 = V + H;
+                FT4->v3 = V + H;
+                FT4->u0 = u0;
+                FT4->u1 = u1;
+                FT4->u2 = u2;
+                FT4->u3 = u3;
+            }
+            addPrim(&ThisOt[OtPos], FT4);
+            for (unsigned int f = 0; f < NumOfPrims; f++) {
+                RECT mrect = DrPtr->rect;
+                int Len = getlen(DrPtr);
+                SetDrawLoad((DR_LOAD *)DrPtr, &mrect);
+                addPrim(&ThisOt[OtPos], DrPtr);
+                DrPtr = (DR_LOAD2 *)((unsigned char *)DrPtr + Len * 4);
+            }
+        }
+        return FT4;
+    } else {
+        return &MyFT4;
+    }
+}
+
+/* line 1804 @0x80094890 */
+void CScreen::Load(int Id, int tpx, int tpy)
+{
+    unsigned char r, g, b;
+    FRAME_HDR *Fr;
+    RECT R;
+    PAL *Pal;
+    unsigned short MyPal[256];
+
+    if (Id != LoadedId) {
+        if (Id != -1) DumpData();
+        if (FeFlag) CDWAIT = 1;
+        SetFileInfo(TX_DatTab[Id], -1);
+        Use(-1, true, 0);
+        Fr = GetFr(0);
+        if (Fr->InVRAM) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1819);
+        DecompFrame(Fr);
+        if (tpx == 11)
+            setRECT(&R, 0x2C0, tpy, 0xA0, 0xF0);
+        else
+            setRECT(&R, tpx * 64, tpy, 0x80, 0xF0);
+        GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+        GPUQ_FlushQ();
+        Pal = GetPal(0);
+        R.x = 0;
+        R.y = 0xF0;
+        R.w = 0x100;
+        R.h = 1;
+        LoadImage(&R, (u_long *)Pal->Cols);
+        if (Pal->InVram) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1840);
+        for (int i = 0; i < 256; i++)
+            MyPal[i] = Pal->Cols[i];
+        for (int i = 0; i < 16; i++) {
+            int nocols = Pal->NumOfCols;
+            for (int v = 0; v < nocols; v++) {
+                unsigned short c = MyPal[v];
+                r = c & 0x1f;
+                g = (c >> 5) & 0x1f;
+                b = (c >> 10) & 0x1f;
+                if (r) r--;
+                if (g) g--;
+                if (b) b--;
+                MyPal[v] = r | (g << 5) | (b << 10);
+            }
+            R.x = 0;
+            R.y = 0xF0 + i;
+            R.w = 0x100;
+            R.h = 1;
+            LoadImage(&R, (u_long *)MyPal);
+        }
+        CDWAIT = 0;
+        LoadedId = Id;
+        if (hndDat != -1) {
+            if (!GAL_Free(hndDat)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1873);
+            hndDat = -1;
+        }
+        if (hndDecompBuffer != -1) {
+            if (!GAL_Free(hndDecompBuffer)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1880);
+            hndDecompBuffer = -1;
+        }
+    }
+}
+
+/* line 1897 @0x80094BC8 -- NOT MATCHED YET (77 diffs): retail keeps QI 240 / fadeval+240 / addPrim masks
+ * in s-regs across the tpx==11 block but re-materialises 9/0x2C/11/HI 240; ternary width shape still open. */
+void CScreen::Display(int Id, int tpx, int tpy, int fadeval)
+{
+    POLY_FT4 *FT4;
+    if (Id != LoadedId) Load(Id, tpx, tpy);
+    PRIM_GetPrim(&FT4);
+    setlen(FT4, 9);
+    setcode(FT4, 0x2C);
+    setSemiTrans(FT4, 0);
+    setShadeTex(FT4, 1);
+    setXYWH(FT4, 0, 0, (tpx == 11) ? 256 : 320, 240);
+    setUVWH(FT4, 0, 0, 255, 240);
+    FT4->tpage = GetTPage(1, 0, tpx * 64, tpy);
+    FT4->clut = GetClut(0, fadeval + 240);
+    addPrim(ThisOt, FT4);
+    if (tpx == 11) {
+        PRIM_GetPrim(&FT4);
+        setlen(FT4, 9);
+        setcode(FT4, 0x2C);
+        setSemiTrans(FT4, 0);
+        setShadeTex(FT4, 1);
+        setXYWH(FT4, 255, 0, 65, 240);
+        setUVWH(FT4, 0, 0, 64, 240);
+        FT4->tpage = GetTPage(1, 0, 0x340, tpy);
+        FT4->clut = GetClut(0, fadeval + 240);
+        addPrim(ThisOt, FT4);
+    }
 }
 
 /* line 1358 @0x80093DD4 */
