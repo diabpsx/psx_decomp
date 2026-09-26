@@ -14,3 +14,5 @@ void DeleteItem(int ii, int i);   /* @0x800457B8 ITEMS.CPP:3127 */
 void CheckQuestItem(int pnum);   /* @0x8015DCD0 INV.CPP:2496 */
 void NetSendCmdChItem(unsigned char bHiPri, unsigned char bLoc);   /* @0x8004FCF4 MSG.CPP:1192 */
 int CalculateGold(int pnum);   /* @0x80160B64 INV.CPP:3690 */
+void UseItem(int p, int Mid, int spl);   /* @0x800476F0 ITEMS.CPP:4313 */
+void NetSendCmdQuest(unsigned char bHiPri, unsigned char q);   /* @0x8004F8C8 MSG.CPP:998 */

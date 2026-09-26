@@ -29,3 +29,12 @@ extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
 extern unsigned char InvItemWidth[180];   /* @0x8010D518 */
 extern unsigned char InvItemHeight[180];   /* @0x8010D5CC */
+extern char stextflag;   /* @0x8011BAE0 */
+extern unsigned char talkflag;   /* @0x8011B6C7 */
+extern unsigned char currlevel;   /* @0x8011C10C */
+extern unsigned char gbMaxPlayers;   /* @0x8011B9A2 */
+extern int sfxdelay;   /* @0x8011B850 */
+extern int sfxdnum;   /* @0x8011B854 */
+extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */
+extern unsigned char ItemCAnimTbl[169];   /* @0x800D1BE0 */
+extern int ItemInvSnds[35];   /* @0x800D1CB0 */

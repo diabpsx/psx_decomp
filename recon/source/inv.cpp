@@ -601,3 +601,199 @@ void InvAlignObject(void)
         InvCursPos -= 10;
     }
 }
+
+unsigned char UseInvItem(int pnum, int cii)
+{
+    int c;
+    ItemStruct *Item;
+    unsigned char speedlist;
+
+    if (plr[pnum]._pInvincible && plr[pnum]._pHitPoints == 0 && pnum == myplr)
+        return 1;
+    if (_pcurs[myplr] != CURSOR_HAND)
+        return 0;
+    if (stextflag)
+        return 0;
+    if (cii < 6)
+        return 0;
+
+    if (cii < 0x2F) {
+        c = cii - 7;
+        Item = &plr[pnum].InvList[c];
+        speedlist = 0;
+    } else {
+        if (talkflag)
+            return 1;
+        c = cii - 0x2F;
+        Item = &plr[pnum].SpdList[c];
+        speedlist = 1;
+    }
+
+    switch (Item->IDidx) {
+    case 0x11 /* IDI_MUSHROOM */:
+        sfxdelay = 10;
+        if (plr[pnum]._pClass == 0)
+            sfxdnum = 0x331;
+        else if (plr[pnum]._pClass == 1)
+            sfxdnum = 0x2C3;
+        else if (plr[pnum]._pClass == 2)
+            sfxdnum = 0x25B;
+        return 1;
+    case 0x13 /* IDI_FUNGALTM */:
+        PlaySFX(0x1C /* IS_IBOOK */);
+        sfxdelay = 10;
+        if (plr[pnum]._pClass == 0)
+            sfxdnum = 0x2EE;
+        else if (plr[pnum]._pClass == 1)
+            sfxdnum = 0x280;
+        else if (plr[pnum]._pClass == 2)
+            sfxdnum = 0x218;
+        return 1;
+    }
+
+    if (!AllItemsUseable[Item->IDidx])
+        return 0;
+
+    if (!Item->_iStatFlag) {
+        if (plr[pnum]._pClass == 0)
+            PlaySFX(0x2D8);
+        else if (plr[pnum]._pClass == 1)
+            PlaySFX(0x270);
+        else if (plr[pnum]._pClass == 2)
+            PlaySFX(0x208);
+        else
+            return 0;
+        return 1;
+    }
+
+    if (Item->_iMiscId == 0 && Item->_itype == ITYPE_GOLD) {
+        StartGoldDrop();
+        return 1;
+    }
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+
+    if (Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) {
+        if (gbMaxPlayers == 2 && Item->_iSpell == 0x20) {
+            if (plr[pnum ^ 1].plractive)
+                return 0;
+        }
+        if (currlevel == 0 && !spelldata[Item->_iSpell].sTownSpell) {
+            if (plr[pnum]._pClass == 0)
+                PlaySFX(0x2EC);
+            else if (plr[pnum]._pClass == 1)
+                PlaySFX(0x27E);
+            else if (plr[pnum]._pClass == 2)
+                PlaySFX(0x216);
+            else
+                return 0;
+            return 0;
+        }
+    }
+
+    {
+        int idata = ItemCAnimTbl[Item->_iCurs];
+        if (Item->_iMiscId == IMISC_BOOK)
+            PlaySFX(0x2E /* IS_RBOOK */);
+        else if (pnum == myplr)
+            PlaySFX(ItemInvSnds[idata]);
+    }
+
+    UseItem(pnum, Item->_iMiscId, Item->_iSpell);
+
+    if (speedlist) {
+        RemoveSpdBarItem(pnum, c);
+        return 1;
+    } else {
+        if (plr[pnum].InvList[c]._iMiscId == 0x2A)
+            return 1;
+        RemoveInvItem(pnum, c);
+    }
+    return 1;
+}
+
+void CheckQuestItem(int pnum)
+{
+    if (plr[pnum].HoldItem.IDidx == 0xA /* IDI_OPTAMULET */) {
+        quests[8]._qactive = 3 /* QUEST_DONE */;
+        quests[8].pad_for_laz = 1;
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x11 /* IDI_MUSHROOM */) {
+        quests[1].pad_for_laz = 1;
+        if (quests[1]._qactive == 2 /* QUEST_ACTIVE */ && quests[1]._qvar1 == 3 /* QS_MUSHSPAWNED */) {
+            sfxdelay = 10;
+            if (plr[pnum]._pClass == 0)
+                sfxdnum = 0x331;
+            else if (plr[pnum]._pClass == 1)
+                sfxdnum = 0x2C3;
+            else if (plr[pnum]._pClass == 2)
+                sfxdnum = 0x25B;
+            quests[1]._qvar1 = 4 /* QS_MUSHPICKED */;
+        }
+        NetSendCmdQuest(1, 1);
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x10 /* IDI_ANVIL */) {
+        quests[10].pad_for_laz = 1;
+        if (quests[10]._qactive == 1) {
+            quests[10]._qactive = 2;
+            quests[10]._qvar1 = 1;
+        }
+        if (quests[10]._qlog == 1) {
+            sfxdelay = 10;
+            if (plr[myplr]._pClass == 0)
+                sfxdnum = 0x32B;
+            else if (plr[myplr]._pClass == 1)
+                sfxdnum = 0x2BD;
+            else if (plr[myplr]._pClass == 2)
+                sfxdnum = 0x255;
+        }
+        NetSendCmdQuest(1, 0xA);
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0xF /* IDI_GLDNELIX */) {
+        if (quests[4]._qactive != 3 /* QUEST_DONE */) {
+            sfxdelay = 0x1E;
+            if (plr[myplr]._pClass == 0)
+                sfxdnum = 0x32A;
+            else if (plr[myplr]._pClass == 1)
+                sfxdnum = 0x2BC;
+            else if (plr[myplr]._pClass == 2)
+                sfxdnum = 0x254;
+        }
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x9 /* IDI_ROCK */) {
+        quests[0].pad_for_laz = 1;
+        if (quests[0]._qactive == 1) {
+            quests[0]._qactive = 2;
+            quests[0]._qvar1 = 1;
+        }
+        if (quests[0]._qlog == 1) {
+            sfxdelay = 10;
+            if (plr[myplr]._pClass == 0)
+                sfxdnum = 0x329;
+            else if (plr[myplr]._pClass == 1)
+                sfxdnum = 0x2BB;
+            else if (plr[myplr]._pClass == 2)
+                sfxdnum = 0x253;
+        }
+        NetSendCmdQuest(1, 0);
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x1C /* IDI_ARMOFVAL */) {
+        quests[9]._qactive = 3 /* QUEST_DONE */;
+        quests[9].pad_for_laz = 3;
+        NetSendCmdQuest(1, 9);
+        sfxdelay = 0x14;
+        if (plr[myplr]._pClass == 0)
+            sfxdnum = 0x32D;
+        else if (plr[myplr]._pClass == 1)
+            sfxdnum = 0x2BF;
+        else if (plr[myplr]._pClass == 2)
+            sfxdnum = 0x257;
+    }
+}
