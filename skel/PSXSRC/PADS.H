@@ -807,17 +807,12 @@ int __fastcall GetCur__C4CPad_800b02f4(int a1)
 }
 #endif
 
-/* ---- 0x8013CB44  CheckActive__4CPad  PADS.H:97-99  seg fe_6  fsize 0 ---- */
+/* ---- 0x8013CB44  CheckActive__4CPad  PADS.H:97-99  seg fe  fsize 0 ---- */
 /* unsigned char CPad::CheckActive(void)
  *   this=$a0
  *   blocks: {1 }3
  */
-/* linked from the including TU skeleton (src/fe_6.c scaffold) — reading copy only */
-#if 0 /* m2c */
-u8 CheckActive__4CPad_8013cb44(void *arg0) {
-    return M2C_FIELD(arg0, u8 *, 1);
-}
-#endif
+/* linked from the including TU skeleton (PSXSRC/FE.CPP) — reading copy only */
 
 /* ---- 0x80155FB0  GetDown__C4CPad  PADS.H:120-124  seg choosem  fsize 0 ---- */
 /* unsigned short CPad::GetDown(void) const
@@ -843,20 +838,12 @@ int __fastcall GetDown__C4CPad_80155fb0(int a1)
 }
 #endif
 
-/* ---- 0x80158840  GetDown__C4CPad  PADS.H:120-124  seg fmv_1  fsize 0 ---- */
+/* ---- 0x80158840  GetDown__C4CPad  PADS.H:120-124  seg fmv  fsize 0 ---- */
 /* unsigned short CPad::GetDown(void) const
  *   this=$a0
  *   blocks: {1 }5
  */
-/* linked from the including TU skeleton (src/fmv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-u16 GetDown__C4CPad_80158840(void *arg0) {
-    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
-        return M2C_FIELD(arg0, u16 *, 0xC);
-    }
-    return M2C_FIELD(arg0, u16 *, 0x16);
-}
-#endif
+/* linked from the including TU skeleton (PSXSRC/FMV.CPP) — reading copy only */
 #if 0 /* ida */
 int __fastcall GetDown__C4CPad_80158840(int a1)
 {
@@ -867,20 +854,12 @@ int __fastcall GetDown__C4CPad_80158840(int a1)
 }
 #endif
 
-/* ---- 0x8015B818  GetTick__C4CPad  PADS.H:127-131  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B818  GetTick__C4CPad  PADS.H:127-131  seg dlg_2  fsize 0 ---- */
 /* unsigned short CPad::GetTick(void) const
  *   this=$a0
  *   blocks: {1 }5
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-u16 GetTick__C4CPad_8015b818(void *arg0) {
-    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
-        return M2C_FIELD(arg0, u16 *, 0xE);
-    }
-    return M2C_FIELD(arg0, u16 *, 0x18);
-}
-#endif
 #if 0 /* ida */
 int __fastcall GetTick__C4CPad_8015b818(int a1)
 {
@@ -891,20 +870,12 @@ int __fastcall GetTick__C4CPad_8015b818(int a1)
 }
 #endif
 
-/* ---- 0x8015B840  GetDown__C4CPad  PADS.H:120-124  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B840  GetDown__C4CPad  PADS.H:120-124  seg dlg_2  fsize 0 ---- */
 /* unsigned short CPad::GetDown(void) const
  *   this=$a0
  *   blocks: {1 }5
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-u16 GetDown__C4CPad_8015b840(void *arg0) {
-    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
-        return M2C_FIELD(arg0, u16 *, 0xC);
-    }
-    return M2C_FIELD(arg0, u16 *, 0x16);
-}
-#endif
 #if 0 /* ida */
 int __fastcall GetDown__C4CPad_8015b840(int a1)
 {
@@ -915,17 +886,12 @@ int __fastcall GetDown__C4CPad_8015b840(int a1)
 }
 #endif
 
-/* ---- 0x8015B868  SetPadTickMask__4CPadUs  PADS.H:92-92  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B868  SetPadTickMask__4CPadUs  PADS.H:92-92  seg dlg_2  fsize 0 ---- */
 /* void CPad::SetPadTickMask(unsigned short mask)
  *   this=$a0 mask=$a1
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-void SetPadTickMask__4CPadUs_8015b868(void *arg0, s16 arg1) {
-    M2C_FIELD(arg0, s16 *, 4) = arg1;
-}
-#endif
 #if 0 /* ida */
 void __fastcall SetPadTickMask__4CPadUs_8015b868(int a1, __int16 a2)
 {
@@ -933,17 +899,12 @@ void __fastcall SetPadTickMask__4CPadUs_8015b868(int a1, __int16 a2)
 }
 #endif
 
-/* ---- 0x8015B870  SetPadTick__4CPadUs  PADS.H:91-91  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B870  SetPadTick__4CPadUs  PADS.H:91-91  seg dlg_2  fsize 0 ---- */
 /* void CPad::SetPadTick(unsigned short tick)
  *   this=$a0 tick=$a1
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-void SetPadTick__4CPadUs_8015b870(void *arg0, s8 arg1) {
-    M2C_FIELD(arg0, s8 *, 3) = arg1;
-}
-#endif
 #if 0 /* ida */
 void __fastcall SetPadTick__4CPadUs_8015b870(int a1, char a2)
 {

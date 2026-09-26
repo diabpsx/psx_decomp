@@ -39,6 +39,4 @@ segments:
       - [0x001044, rodata, libpress_rodata_8013ac3c]
       - [0x001BE4, rodata, fmv_rodata_8013b7dc]
       - [0x01C224, c, fmv]
-      - [0x01DAF4, rodata, fmv_rodata_801576ec]
-      - [0x01DB4C, c, fmv_1]
   - [0x01EC70]

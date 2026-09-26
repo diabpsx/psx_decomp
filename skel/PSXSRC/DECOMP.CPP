@@ -230,6 +230,20 @@ int FindEmptyIndex__Fv()
  *   blocks: {1 {2 }3 }3
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", DEC_Open__Fv) */
+#if 0 /* m2c */
+void DEC_Open__Fv(void) {
+    s32 *var_v0;
+    s32 var_v1;
+
+    var_v1 = 9;
+    var_v0 = &D_8011D074;
+    do {
+        *var_v0 = 0;
+        var_v1 -= 1;
+        var_v0 -= 4;
+    } while (var_v1 >= 0);
+}
+#endif
 #if 0 /* ida */
 int DEC_Open__Fv()
 {

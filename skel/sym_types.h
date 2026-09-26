@@ -130,7 +130,7 @@ struct EvCB {   /* size 28 */
     long status;   /* +0x4 size 0 */
     long spec;   /* +0x8 size 0 */
     long mode;   /* +0xC size 0 */
-    long *(FHandler)();   /* +0x10 size 0 */
+    long (*FHandler)();   /* +0x10 size 0 */
     long system[2];   /* +0x14 size 8 */
 };   /* sizeof 28 */
 
@@ -925,7 +925,7 @@ typedef unsigned long *LPSIZE;
 typedef struct RECT HRGN;
 typedef struct RECT LPCDLGTEMPLATE;
 typedef struct RECT *LPCRECT;
-typedef unsigned long *(WNDPROC)();
+typedef unsigned long (*WNDPROC)();
 typedef unsigned long HICON;
 typedef unsigned long HBRUSH;
 typedef void *HTRANS;
@@ -1088,7 +1088,7 @@ typedef struct VS_FIXEDFILEINFO VS_FIXEDFILEINFO;
 struct WNDCLASSEX {   /* size 48 */
     unsigned int cbSize;   /* +0x0 size 0 */
     unsigned int style;   /* +0x4 size 0 */
-    unsigned long *(lpfnWndProc)();   /* +0x8 size 0 */
+    unsigned long (*lpfnWndProc)();   /* +0x8 size 0 */
     int cbClsExtra;   /* +0xC size 0 */
     int cbWndExtra;   /* +0x10 size 0 */
     unsigned long hInstance;   /* +0x14 size 0 */
@@ -1462,7 +1462,7 @@ typedef struct DEF_ARGS DEF_ARGS;
 typedef int jmp_buf[12];
 typedef long MHANDLE;
 typedef int MTYPE;
-typedef void *(GAL_FILTER)();
+typedef void (*GAL_FILTER)();
 enum .74fake {
     GAL_FLAGS = 32768,
     GAL_HIGH = 32768,
@@ -1498,7 +1498,7 @@ struct MEM_INIT_INFO {   /* size 40 */
     unsigned long Type;   /* +0x8 size 0 */
     char *TypeString;   /* +0xC size 0 */
     unsigned short Alignment;   /* +0x10 size 0 */
-    void *(MemMove)();   /* +0x14 size 0 */
+    void (*MemMove)();   /* +0x14 size 0 */
     struct MEM_INIT_INFO *NextInitBlock;   /* +0x18 size 40 */
     unsigned short Flags;   /* +0x1C size 0 */
     struct MEM_HDR *Empty;   /* +0x20 size 0 */
@@ -1526,15 +1526,15 @@ struct TASK {   /* size 92 */
     unsigned long StackSize;   /* +0x18 size 0 */
     void *Data;   /* +0x1C size 0 */
     int TskEnv[12];   /* +0x20 size 48 */
-    void *(Main)();   /* +0x50 size 0 */
+    void (*Main)();   /* +0x50 size 0 */
     long hndTask;   /* +0x54 size 0 */
     unsigned short XtraLongs;   /* +0x58 size 0 */
     unsigned short MaxStackSizeBytes;   /* +0x5A size 0 */
 };   /* sizeof 92 */
 
 typedef struct TASK TASK;
-typedef void *(TSK_CBACK)();
-typedef void *(DOTSK_CBACK)();
+typedef void (*TSK_CBACK)();
+typedef void (*DOTSK_CBACK)();
 enum LANG_TYPE {
     LANG_NONE = 5,
     LANG_JAP = 4,
@@ -1785,13 +1785,13 @@ struct SysObj {   /* size 4 */
 };   /* sizeof 4 */
 
 typedef struct SysObj SysObj;
-typedef BOOL *(STR_CB_PTR)();
+typedef BOOL (*STR_CB_PTR)();
 struct FileIO {   /* size 20 */
     struct SysObj SysObj;   /* +0x0 size 4 */
     unsigned long MemId;   /* +0x4 size 0 */
     long hndPath;   /* +0x8 size 0 */
     char *SearchPath;   /* +0xC size 0 */
-    struct __vtbl_ptr_type *.vf[7];   /* +0x10 size 4 */
+    struct __vtbl_ptr_type (*.vf)[7];   /* +0x10 size 4 */
 };   /* sizeof 20 */
 
 typedef struct FileIO FileIO;
@@ -2477,14 +2477,14 @@ struct DJunk {   /* size 32 */
 
 typedef struct DJunk DJunk;
 struct OBJ_TYPE_INFO {   /* size 32 */
-    void *(Constructor)();   /* +0x0 size 0 */
-    void *(Destructor)();   /* +0x4 size 0 */
-    void *(Printer)();   /* +0x8 size 0 */
-    int *(GetWidth)();   /* +0xC size 0 */
-    int *(GetHeight)();   /* +0x10 size 0 */
-    int *(GetXOff)();   /* +0x14 size 0 */
-    int *(GetYOff)();   /* +0x18 size 0 */
-    int *(GetPal)();   /* +0x1C size 0 */
+    void (*Constructor)();   /* +0x0 size 0 */
+    void (*Destructor)();   /* +0x4 size 0 */
+    void (*Printer)();   /* +0x8 size 0 */
+    int (*GetWidth)();   /* +0xC size 0 */
+    int (*GetHeight)();   /* +0x10 size 0 */
+    int (*GetXOff)();   /* +0x14 size 0 */
+    int (*GetYOff)();   /* +0x18 size 0 */
+    int (*GetPal)();   /* +0x1C size 0 */
 };   /* sizeof 32 */
 
 typedef struct OBJ_TYPE_INFO OBJ_TYPE_INFO;
@@ -2499,7 +2499,7 @@ struct OBJ_LIST {   /* size 40 */
     long Y;   /* +0x18 size 0 */
     long Z;   /* +0x1C size 0 */
     struct OBJ_STRUCT *Head;   /* +0x20 size 0 */
-    unsigned char *(SortCompare)();   /* +0x24 size 0 */
+    unsigned char (*SortCompare)();   /* +0x24 size 0 */
 };   /* sizeof 40 */
 
 typedef struct OBJ_LIST OBJ_LIST;
@@ -2675,7 +2675,7 @@ struct RGBData {   /* size 40 */
 };   /* sizeof 40 */
 
 typedef struct RGBData RGBData;
-typedef int *(MAPITFUNC)();
+typedef int (*MAPITFUNC)();
 struct CBlocks {   /* size 264 */
     struct TextDat TextDat;   /* +0x0 size 112 */
     struct TextDat *MonstTexDat;   /* +0x70 size 112 */
@@ -2927,7 +2927,7 @@ typedef struct pad_assigns pad_assigns;
 struct KEY_ASSIGNS {   /* size 16 */
     int txt;   /* +0x0 size 0 */
     int pad_val;   /* +0x4 size 0 */
-    void *(func)();   /* +0x8 size 0 */
+    void (*func)();   /* +0x8 size 0 */
     int combo_val;   /* +0xC size 0 */
 };   /* sizeof 16 */
 
@@ -3023,11 +3023,11 @@ struct GamePad {   /* size 212 */
     char allow_walking;   /* +0x4D size 0 */
     char style;   /* +0x4E size 0 */
     int pad_up_button;   /* +0x50 size 0 */
-    void *(pad_up_action)();   /* +0x54 size 0 */
+    void (*pad_up_action)();   /* +0x54 size 0 */
     struct CPad *Pad;   /* +0x58 size 236 */
     int combo_key;   /* +0x5C size 0 */
-    void *(button_down)()[14];   /* +0x60 size 56 */
-    void *(button_combo)()[14];   /* +0x98 size 56 */
+    void (*button_down[14])();   /* +0x60 size 56 */
+    void (*button_combo[14])();   /* +0x98 size 56 */
     unsigned char await_combo;   /* +0xD0 size 0 */
     unsigned char combo_menu_active;   /* +0xD1 size 0 */
 };   /* sizeof 212 */
@@ -3040,7 +3040,7 @@ struct found_objects {   /* size 3 */
 };   /* sizeof 3 */
 
 typedef struct found_objects found_objects;
-typedef void *(CdlCB)();
+typedef void (*CdlCB)();
 struct CdlLOC {   /* size 4 */
     unsigned char minute;   /* +0x0 size 0 */
     unsigned char second;   /* +0x1 size 0 */
@@ -3177,7 +3177,7 @@ struct matrixtdef {   /* size 36 */
 
 typedef struct matrixtdef matrixtdef;
 typedef struct matrixtdef MATRIX3DT;
-typedef void *(VOIDFN)();
+typedef void (*VOIDFN)();
 struct TSPRT {   /* size 24 */
     unsigned char a0;   /* +0x0 size 0 */
     unsigned char a1;   /* +0x1 size 0 */
@@ -3196,7 +3196,7 @@ struct TSPRT {   /* size 24 */
 };   /* sizeof 24 */
 
 typedef struct TSPRT TSPRT;
-typedef int (INTFN)();
+typedef int INTFN();
 struct memclassstruct {   /* size 24 */
     char **bottomblock;   /* +0x0 size 0 */
     char **topblock;   /* +0x4 size 0 */
@@ -3323,7 +3323,7 @@ struct graphicsmodeinfostruct {   /* size 20 */
 typedef struct graphicsmodeinfostruct graphicsmodeinfostruct;
 typedef struct graphicsmodeinfostruct GRAPHICSMODEINFO;
 typedef void MVI;
-typedef int (EACHOOKCALLBACKFUNC)();
+typedef int EACHOOKCALLBACKFUNC();
 typedef int arg_t;
 struct chunkhdrstruct {   /* size 8 */
     int type;   /* +0x0 size 0 */
@@ -3340,8 +3340,8 @@ struct chunkhdrchkstruct {   /* size 12 */
 
 typedef struct chunkhdrchkstruct chunkhdrchkstruct;
 typedef struct chunkhdrchkstruct CHUNKHDRCHK;
-typedef void (THREADPROC)();
-typedef int (SYSTEMTASK)();
+typedef void THREADPROC();
+typedef int SYSTEMTASK();
 struct UNIQUEID {   /* size 16 */
     unsigned long a;   /* +0x0 size 0 */
     unsigned short b;   /* +0x4 size 0 */
@@ -3550,8 +3550,8 @@ struct SpuCommonAttr {   /* size 40 */
 };   /* sizeof 40 */
 
 typedef struct SpuCommonAttr SpuCommonAttr;
-typedef void *(SpuIRQCallbackProc)();
-typedef void *(SpuTransferCallbackProc)();
+typedef void (*SpuIRQCallbackProc)();
+typedef void (*SpuTransferCallbackProc)();
 struct SpuEnv {   /* size 8 */
     unsigned long mask;   /* +0x0 size 0 */
     unsigned long queueing;   /* +0x4 size 0 */
@@ -3576,7 +3576,7 @@ struct SpuStEnv {   /* size 392 */
 };   /* sizeof 392 */
 
 typedef struct SpuStEnv SpuStEnv;
-typedef void *(SpuStCallbackProc)();
+typedef void (*SpuStCallbackProc)();
 struct VabHdr {   /* size 32 */
     long form;   /* +0x0 size 0 */
     long ver;   /* +0x4 size 0 */
@@ -3667,18 +3667,18 @@ struct SndVoiceStats {   /* size 18 */
 };   /* sizeof 18 */
 
 typedef struct SndVoiceStats SndVoiceStats;
-typedef void *(SsMarkCallbackProc)();
+typedef void (*SsMarkCallbackProc)();
 struct _SsFCALL {   /* size 148 */
-    void *(noteon)();   /* +0x0 size 0 */
-    void *(programchange)();   /* +0x4 size 0 */
-    void *(pitchbend)();   /* +0x8 size 0 */
-    void *(metaevent)();   /* +0xC size 0 */
-    void *(control)()[13];   /* +0x10 size 52 */
-    void *(ccentry)()[20];   /* +0x44 size 80 */
+    void (*noteon)();   /* +0x0 size 0 */
+    void (*programchange)();   /* +0x4 size 0 */
+    void (*pitchbend)();   /* +0x8 size 0 */
+    void (*metaevent)();   /* +0xC size 0 */
+    void (*control[13])();   /* +0x10 size 52 */
+    void (*ccentry[20])();   /* +0x44 size 80 */
 };   /* sizeof 148 */
 
 typedef struct _SsFCALL _SsFCALL;
-typedef void *(MissPrintPtr)();
+typedef void (*MissPrintPtr)();
 struct MissileStruct {   /* size 76 */
     long _mixvel;   /* +0x0 size 0 */
     long _miyvel;   /* +0x4 size 0 */
@@ -3722,7 +3722,7 @@ struct MissileStruct {   /* size 76 */
     char _miAnimCnt;   /* +0x45 size 0 */
     char _miAnimAdd;   /* +0x46 size 0 */
     char _miAnimFrame;   /* +0x47 size 0 */
-    void *(PrintPtr)();   /* +0x48 size 0 */
+    void (*PrintPtr)();   /* +0x48 size 0 */
 };   /* sizeof 76 */
 
 typedef struct MissileStruct MissileStruct;
@@ -3876,14 +3876,14 @@ enum .130fake {
     CUTTT_SCREEN = 0,
 };
 
-typedef void *(FeFuncPtr)();
+typedef void (*FeFuncPtr)();
 struct FeTable {   /* size 28 */
     int Title;   /* +0x0 size 0 */
     int Sel;   /* +0x4 size 0 */
     int SelW;   /* +0x8 size 0 */
     int SelH;   /* +0xC size 0 */
-    void *(InitFuncPtr)();   /* +0x10 size 0 */
-    void *(CtrlFuncPtr)();   /* +0x14 size 0 */
+    void (*InitFuncPtr)();   /* +0x10 size 0 */
+    void (*CtrlFuncPtr)();   /* +0x14 size 0 */
     void *PrevMenu;   /* +0x18 size 0 */
 };   /* sizeof 28 */
 
@@ -5306,7 +5306,7 @@ struct TextDataStruct {   /* size 12 */
 typedef struct TextDataStruct TextDataStruct;
 struct CPauseMessages {   /* size 8 */
     int PadNum;   /* +0x0 size 0 */
-    struct __vtbl_ptr_type *.vf[11];   /* +0x4 size 4 */
+    struct __vtbl_ptr_type (*.vf)[11];   /* +0x4 size 4 */
 };   /* sizeof 8 */
 
 typedef struct CPauseMessages CPauseMessages;
@@ -5485,15 +5485,15 @@ struct PlayerParam {   /* size 8 */
 };   /* sizeof 8 */
 
 typedef struct PlayerParam PlayerParam;
-typedef void *(TMenuFcn)();
+typedef void (*TMenuFcn)();
 struct TMenuItem {   /* size 12 */
     unsigned long dwFlags;   /* +0x0 size 0 */
     int pszStr;   /* +0x4 size 0 */
-    void *(fnMenu)();   /* +0x8 size 0 */
+    void (*fnMenu)();   /* +0x8 size 0 */
 };   /* sizeof 12 */
 
 typedef struct TMenuItem TMenuItem;
-typedef void *(TMenuUpdateFcn)();
+typedef void (*TMenuUpdateFcn)();
 struct SpellData {   /* size 52 */
     unsigned char sName;   /* +0x0 size 0 */
     unsigned char sManaCost;   /* +0x1 size 0 */
@@ -5753,26 +5753,26 @@ struct GsOBJTABLE2 {   /* size 12 */
 
 typedef struct GsOBJTABLE2 GsOBJTABLE2;
 struct _GsFCALL {   /* size 304 */
-    unsigned char *(*f3)()[2][3];   /* +0x0 size 24 */
-    unsigned char *(*nf3)()[2];   /* +0x18 size 8 */
-    unsigned char *(*g3)()[2][3];   /* +0x20 size 24 */
-    unsigned char *(*ng3)()[2];   /* +0x38 size 8 */
-    unsigned char *(*tf3)()[2][3];   /* +0x40 size 24 */
-    unsigned char *(*ntf3)()[2];   /* +0x58 size 8 */
-    unsigned char *(*tg3)()[2][3];   /* +0x60 size 24 */
-    unsigned char *(*ntg3)()[2];   /* +0x78 size 8 */
-    unsigned char *(*f4)()[2][3];   /* +0x80 size 24 */
-    unsigned char *(*nf4)()[2];   /* +0x98 size 8 */
-    unsigned char *(*g4)()[2][3];   /* +0xA0 size 24 */
-    unsigned char *(*ng4)()[2];   /* +0xB8 size 8 */
-    unsigned char *(*tf4)()[2][3];   /* +0xC0 size 24 */
-    unsigned char *(*ntf4)()[2];   /* +0xD8 size 8 */
-    unsigned char *(*tg4)()[2][3];   /* +0xE0 size 24 */
-    unsigned char *(*ntg4)()[2];   /* +0xF8 size 8 */
-    unsigned char *(*f3g)()[3];   /* +0x100 size 12 */
-    unsigned char *(*g3g)()[3];   /* +0x10C size 12 */
-    unsigned char *(*f4g)()[3];   /* +0x118 size 12 */
-    unsigned char *(*g4g)()[3];   /* +0x124 size 12 */
+    unsigned char *(*f3[2][3])();   /* +0x0 size 24 */
+    unsigned char *(*nf3[2])();   /* +0x18 size 8 */
+    unsigned char *(*g3[2][3])();   /* +0x20 size 24 */
+    unsigned char *(*ng3[2])();   /* +0x38 size 8 */
+    unsigned char *(*tf3[2][3])();   /* +0x40 size 24 */
+    unsigned char *(*ntf3[2])();   /* +0x58 size 8 */
+    unsigned char *(*tg3[2][3])();   /* +0x60 size 24 */
+    unsigned char *(*ntg3[2])();   /* +0x78 size 8 */
+    unsigned char *(*f4[2][3])();   /* +0x80 size 24 */
+    unsigned char *(*nf4[2])();   /* +0x98 size 8 */
+    unsigned char *(*g4[2][3])();   /* +0xA0 size 24 */
+    unsigned char *(*ng4[2])();   /* +0xB8 size 8 */
+    unsigned char *(*tf4[2][3])();   /* +0xC0 size 24 */
+    unsigned char *(*ntf4[2])();   /* +0xD8 size 8 */
+    unsigned char *(*tg4[2][3])();   /* +0xE0 size 24 */
+    unsigned char *(*ntg4[2])();   /* +0xF8 size 8 */
+    unsigned char *(*f3g[3])();   /* +0x100 size 12 */
+    unsigned char *(*g3g[3])();   /* +0x10C size 12 */
+    unsigned char *(*f4g[3])();   /* +0x118 size 12 */
+    unsigned char *(*g4g[3])();   /* +0x124 size 12 */
 };   /* sizeof 304 */
 
 typedef struct _GsFCALL _GsFCALL;
@@ -6858,7 +6858,7 @@ struct _SCODEEXECUTEDATA {   /* size 64 */
 typedef struct _SCODEEXECUTEDATA _SCODEEXECUTEDATA;
 typedef struct _SCODEEXECUTEDATA SCODEEXECUTEDATA;
 typedef struct _SCODEEXECUTEDATA *SCODEEXECUTEDATAPTR;
-typedef void *(SEVTHANDLER)();
+typedef void (*SEVTHANDLER)();
 struct _HSARCHIVE {   /* size 4 */
     int unused;   /* +0x0 size 0 */
 };   /* sizeof 4 */
@@ -6905,8 +6905,8 @@ typedef struct _PARAMS _PARAMS;
 typedef struct _PARAMS PARAMS;
 typedef struct _PARAMS *PARAMSPTR;
 typedef struct _PARAMS *LPPARAMS;
-typedef unsigned char *(SMSGIDLEPROC)();
-typedef void *(SMSGHANDLER)();
+typedef unsigned char (*SMSGIDLEPROC)();
+typedef void (*SMSGHANDLER)();
 struct _SNETCAPS {   /* size 36 */
     unsigned long size;   /* +0x0 size 0 */
     unsigned long flags;   /* +0x4 size 0 */
@@ -6950,21 +6950,21 @@ struct _SNETEVENT {   /* size 16 */
 typedef struct _SNETEVENT _SNETEVENT;
 typedef struct _SNETEVENT SNETEVENT;
 typedef struct _SNETEVENT *SNETEVENTPTR;
-typedef unsigned char *(SNETABORTPROC)();
-typedef unsigned char *(SNETCATEGORYPROC)();
-typedef unsigned char *(SNETCHECKAUTHPROC)();
-typedef unsigned char *(SNETCREATEPROC)();
-typedef unsigned char *(SNETDRAWDESCPROC)();
-typedef unsigned char *(SNETENUMDEVICESPROC)();
-typedef unsigned char *(SNETENUMGAMESPROC)();
-typedef unsigned char *(SNETENUMPROVIDERSPROC)();
-typedef void *(SNETEVENTPROC)();
-typedef unsigned char *(SNETGETARTPROC)();
-typedef unsigned char *(SNETGETDATAPROC)();
-typedef int *(SNETMESSAGEBOXPROC)();
-typedef unsigned char *(SNETPLAYSOUNDPROC)();
-typedef unsigned char *(SNETSELECTEDPROC)();
-typedef unsigned char *(SNETSTATUSPROC)();
+typedef unsigned char (*SNETABORTPROC)();
+typedef unsigned char (*SNETCATEGORYPROC)();
+typedef unsigned char (*SNETCHECKAUTHPROC)();
+typedef unsigned char (*SNETCREATEPROC)();
+typedef unsigned char (*SNETDRAWDESCPROC)();
+typedef unsigned char (*SNETENUMDEVICESPROC)();
+typedef unsigned char (*SNETENUMGAMESPROC)();
+typedef unsigned char (*SNETENUMPROVIDERSPROC)();
+typedef void (*SNETEVENTPROC)();
+typedef unsigned char (*SNETGETARTPROC)();
+typedef unsigned char (*SNETGETDATAPROC)();
+typedef int (*SNETMESSAGEBOXPROC)();
+typedef unsigned char (*SNETPLAYSOUNDPROC)();
+typedef unsigned char (*SNETSELECTEDPROC)();
+typedef unsigned char (*SNETSTATUSPROC)();
 struct _SNETPLAYERDATA {   /* size 12 */
     unsigned long size;   /* +0x0 size 0 */
     char *playername;   /* +0x4 size 0 */
@@ -6995,16 +6995,16 @@ struct _SNETUIDATA {   /* size 52 */
     unsigned long size;   /* +0x0 size 0 */
     unsigned long uiflags;   /* +0x4 size 0 */
     unsigned long parentwindow;   /* +0x8 size 0 */
-    unsigned char *(artcallback)();   /* +0xC size 0 */
-    unsigned char *(authcallback)();   /* +0x10 size 0 */
-    unsigned char *(createcallback)();   /* +0x14 size 0 */
-    unsigned char *(drawdesccallback)();   /* +0x18 size 0 */
-    unsigned char *(selectedcallback)();   /* +0x1C size 0 */
-    int *(messageboxcallback)();   /* +0x20 size 0 */
-    unsigned char *(soundcallback)();   /* +0x24 size 0 */
-    unsigned char *(statuscallback)();   /* +0x28 size 0 */
-    unsigned char *(getdatacallback)();   /* +0x2C size 0 */
-    unsigned char *(categorycallback)();   /* +0x30 size 0 */
+    unsigned char (*artcallback)();   /* +0xC size 0 */
+    unsigned char (*authcallback)();   /* +0x10 size 0 */
+    unsigned char (*createcallback)();   /* +0x14 size 0 */
+    unsigned char (*drawdesccallback)();   /* +0x18 size 0 */
+    unsigned char (*selectedcallback)();   /* +0x1C size 0 */
+    int (*messageboxcallback)();   /* +0x20 size 0 */
+    unsigned char (*soundcallback)();   /* +0x24 size 0 */
+    unsigned char (*statuscallback)();   /* +0x28 size 0 */
+    unsigned char (*getdatacallback)();   /* +0x2C size 0 */
+    unsigned char (*categorycallback)();   /* +0x30 size 0 */
 };   /* sizeof 52 */
 
 typedef struct _SNETUIDATA _SNETUIDATA;
@@ -7058,32 +7058,32 @@ typedef struct _SNETSPI_GAMELIST SNETSPI_GAMELIST;
 typedef struct _SNETSPI_GAMELIST *SNETSPI_GAMELISTPTR;
 struct _SNETSPI {   /* size 80 */
     unsigned long size;   /* +0x0 size 0 */
-    unsigned char *(CompareNetAddresses)();   /* +0x4 size 0 */
-    unsigned char *(Destroy)();   /* +0x8 size 0 */
-    unsigned char *(Free)();   /* +0xC size 0 */
-    unsigned char *(FreeExternalMessage)();   /* +0x10 size 0 */
-    unsigned char *(GetGameInfo)();   /* +0x14 size 0 */
-    unsigned char *(GetPerformanceData)();   /* +0x18 size 0 */
-    unsigned char *(Initialize)();   /* +0x1C size 0 */
-    unsigned char *(InitializeDevice)();   /* +0x20 size 0 */
-    unsigned char *(LockDeviceList)();   /* +0x24 size 0 */
-    unsigned char *(LockGameList)();   /* +0x28 size 0 */
-    unsigned char *(Receive)();   /* +0x2C size 0 */
-    unsigned char *(ReceiveExternalMessage)();   /* +0x30 size 0 */
-    unsigned char *(SelectGame)();   /* +0x34 size 0 */
-    unsigned char *(Send)();   /* +0x38 size 0 */
-    unsigned char *(SendExternalMessage)();   /* +0x3C size 0 */
-    unsigned char *(StartAdvertisingGame)();   /* +0x40 size 0 */
-    unsigned char *(StopAdvertisingGame)();   /* +0x44 size 0 */
-    unsigned char *(UnlockDeviceList)();   /* +0x48 size 0 */
-    unsigned char *(UnlockGameList)();   /* +0x4C size 0 */
+    unsigned char (*CompareNetAddresses)();   /* +0x4 size 0 */
+    unsigned char (*Destroy)();   /* +0x8 size 0 */
+    unsigned char (*Free)();   /* +0xC size 0 */
+    unsigned char (*FreeExternalMessage)();   /* +0x10 size 0 */
+    unsigned char (*GetGameInfo)();   /* +0x14 size 0 */
+    unsigned char (*GetPerformanceData)();   /* +0x18 size 0 */
+    unsigned char (*Initialize)();   /* +0x1C size 0 */
+    unsigned char (*InitializeDevice)();   /* +0x20 size 0 */
+    unsigned char (*LockDeviceList)();   /* +0x24 size 0 */
+    unsigned char (*LockGameList)();   /* +0x28 size 0 */
+    unsigned char (*Receive)();   /* +0x2C size 0 */
+    unsigned char (*ReceiveExternalMessage)();   /* +0x30 size 0 */
+    unsigned char (*SelectGame)();   /* +0x34 size 0 */
+    unsigned char (*Send)();   /* +0x38 size 0 */
+    unsigned char (*SendExternalMessage)();   /* +0x3C size 0 */
+    unsigned char (*StartAdvertisingGame)();   /* +0x40 size 0 */
+    unsigned char (*StopAdvertisingGame)();   /* +0x44 size 0 */
+    unsigned char (*UnlockDeviceList)();   /* +0x48 size 0 */
+    unsigned char (*UnlockGameList)();   /* +0x4C size 0 */
 };   /* sizeof 80 */
 
 typedef struct _SNETSPI _SNETSPI;
 typedef struct _SNETSPI SNETSPI;
 typedef struct _SNETSPI *SNETSPIPTR;
-typedef unsigned char *(SNETSPIBIND)();
-typedef unsigned char *(SNETSPIQUERY)();
+typedef unsigned char (*SNETSPIBIND)();
+typedef unsigned char (*SNETSPIQUERY)();
 struct _HSVIDEO {   /* size 4 */
     int unused;   /* +0x0 size 0 */
 };   /* sizeof 4 */
@@ -7125,7 +7125,7 @@ enum _copyprot_results {
 };
 
 typedef enum _copyprot_results _copyprot_results;
-typedef void *(PLAYSND)();
+typedef void (*PLAYSND)();
 enum _mainmenu_selections {
     MAINMENU_ATTRACT_MODE = 6,
     MAINMENU_EXIT_DIABLO = 5,
@@ -7179,11 +7179,11 @@ struct _uiheroinfo {   /* size 40 */
 };   /* sizeof 40 */
 
 typedef struct _uiheroinfo _uiheroinfo;
-typedef unsigned char *(ENUMHEROPROC)();
-typedef unsigned char *(ENUMHEROS)();
-typedef unsigned char *(CREATEHERO)();
-typedef unsigned char *(DELETEHERO)();
-typedef unsigned char *(GETDEFHERO)();
+typedef unsigned char (*ENUMHEROPROC)();
+typedef unsigned char (*ENUMHEROS)();
+typedef unsigned char (*CREATEHERO)();
+typedef unsigned char (*DELETEHERO)();
+typedef unsigned char (*GETDEFHERO)();
 enum _selhero_selections {
     SELHERO_PREVIOUS = 4,
     SELHERO_CONNECT = 3,
@@ -7192,7 +7192,7 @@ enum _selhero_selections {
 };
 
 typedef enum _selhero_selections _selhero_selections;
-typedef int *(PROGRESSFCN)();
+typedef int (*PROGRESSFCN)();
 enum _dialmodes {
     MODE_DIALNEW = 5,
     MODE_DIALOLD = 4,
@@ -7319,12 +7319,12 @@ struct CSDATA {   /* size 40 */
 };   /* sizeof 40 */
 
 typedef struct CSDATA CSDATA;
-typedef void *(MIADDPRC)();
-typedef void *(MIPROC)();
+typedef void (*MIADDPRC)();
+typedef void (*MIPROC)();
 struct MissileData {   /* size 24 */
     unsigned char mName;   /* +0x0 size 0 */
-    void *(mAddProc)();   /* +0x4 size 0 */
-    void *(mProc)();   /* +0x8 size 0 */
+    void (*mAddProc)();   /* +0x4 size 0 */
+    void (*mProc)();   /* +0x8 size 0 */
     unsigned char mDraw;   /* +0xC size 0 */
     unsigned char mType;   /* +0xD size 0 */
     unsigned char mResist;   /* +0xE size 0 */
@@ -7383,7 +7383,7 @@ struct _BLOCKENTRY {   /* size 16 */
 typedef struct _BLOCKENTRY _BLOCKENTRY;
 typedef struct _BLOCKENTRY BLOCKENTRY;
 typedef struct _BLOCKENTRY *BLOCKENTRYPTR;
-typedef unsigned char *(TGetNameFcn)();
+typedef unsigned char (*TGetNameFcn)();
 struct _SHAREDDATA {   /* size 8 */
     long status;   /* +0x0 size 0 */
     unsigned long processid;   /* +0x4 size 0 */
@@ -7392,9 +7392,9 @@ struct _SHAREDDATA {   /* size 8 */
 typedef struct _SHAREDDATA _SHAREDDATA;
 typedef struct _SHAREDDATA SHAREDDATA;
 typedef struct _SHAREDDATA *SHAREDDATAPTR;
-typedef void *(TCrypt)();
+typedef void (*TCrypt)();
 struct CompClass {   /* size 4 */
-    struct __vtbl_ptr_type *.vf[3];   /* +0x0 size 4 */
+    struct __vtbl_ptr_type (*.vf)[3];   /* +0x0 size 4 */
 };   /* sizeof 4 */
 
 typedef struct CompClass CompClass;
@@ -7463,7 +7463,7 @@ struct tagPATHNODE {   /* size 52 */
 
 typedef struct tagPATHNODE tagPATHNODE;
 typedef struct tagPATHNODE PATHNODE;
-typedef unsigned char *(CHECKFUNC1)();
+typedef unsigned char (*CHECKFUNC1)();
 enum .234fake {
     PART_TRANS_RIGHT = 2,
     PART_TRANS_LEFT = 1,
@@ -7503,7 +7503,7 @@ struct MONTH_DAYS {   /* size 8 */
 };   /* sizeof 8 */
 
 typedef struct MONTH_DAYS MONTH_DAYS;
-typedef unsigned char *(CHECKFUNC)();
+typedef unsigned char (*CHECKFUNC)();
 struct InvXY {   /* size 8 */
     int X;   /* +0x0 size 0 */
     int Y;   /* +0x4 size 0 */

@@ -765,16 +765,11 @@ int GetOverlayOtBase__7CBlocks_800b02ec()
 }
 #endif
 
-/* ---- 0x8013CB3C  GetOverlayOtBase__7CBlocks  BLOCK.H:174-174  seg fe_6  fsize 0 ---- */
+/* ---- 0x8013CB3C  GetOverlayOtBase__7CBlocks  BLOCK.H:174-174  seg fe  fsize 0 ---- */
 /* int CBlocks::GetOverlayOtBase(void)
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/fe_6.c scaffold) — reading copy only */
-#if 0 /* m2c */
-s32 GetOverlayOtBase__7CBlocks_8013cb3c(void) {
-    return 0x1E8;
-}
-#endif
+/* linked from the including TU skeleton (PSXSRC/FE.CPP) — reading copy only */
 #if 0 /* ida */
 int GetOverlayOtBase__7CBlocks_8013cb3c()
 {
@@ -782,18 +777,12 @@ int GetOverlayOtBase__7CBlocks_8013cb3c()
 }
 #endif
 
-/* ---- 0x8014AB60  MoveToScrollTarget__7CBlocks  BLOCK.H:205-205  seg missiles_13  fsize 0 ---- */
+/* ---- 0x8014AB60  MoveToScrollTarget__7CBlocks  BLOCK.H:205-205  seg missiles  fsize 0 ---- */
 /* void CBlocks::MoveToScrollTarget(void)
  *   this=$a0
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/missiles_13.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void MoveToScrollTarget__7CBlocks_8014ab60(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xD0) = (s32) M2C_FIELD(arg0, s32 *, 0xC8);
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) M2C_FIELD(arg0, s32 *, 0xCC);
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/MISSILES.CPP) — reading copy only */
 #if 0 /* ida */
 int __fastcall MoveToScrollTarget__7CBlocks_8014ab60(_DWORD *a1)
 {
@@ -808,16 +797,11 @@ int __fastcall MoveToScrollTarget__7CBlocks_8014ab60(_DWORD *a1)
 }
 #endif
 
-/* ---- 0x8015B950  GetOverlayOtBase__7CBlocks  BLOCK.H:174-174  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B950  GetOverlayOtBase__7CBlocks  BLOCK.H:174-174  seg dlg_2  fsize 0 ---- */
 /* int CBlocks::GetOverlayOtBase(void)
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-s32 GetOverlayOtBase__7CBlocks_8015b950(void) {
-    return 0x1E8;
-}
-#endif
 #if 0 /* ida */
 int GetOverlayOtBase__7CBlocks_8015b950()
 {
@@ -825,18 +809,12 @@ int GetOverlayOtBase__7CBlocks_8015b950()
 }
 #endif
 
-/* ---- 0x80161F28  DumpMonsters__7CBlocks  BLOCK.H:228-228  seg inv_1  fsize 24 ---- */
+/* ---- 0x80161F28  DumpMonsters__7CBlocks  BLOCK.H:228-228  seg inv  fsize 24 ---- */
 /* void CBlocks::DumpMonsters(void)
  *   this=$a0
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/inv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void DumpMonsters__7CBlocks_80161f28(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x78) = 0;
-    DumpGraphics__7CBlocksPP7TextDatPi(arg0 + 0x70, arg0 + 0x84);
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/INV.CPP) — reading copy only */
 #if 0 /* ida */
 int __fastcall DumpMonsters__7CBlocks_80161f28(int a1)
 {
@@ -845,16 +823,11 @@ int __fastcall DumpMonsters__7CBlocks_80161f28(int a1)
 }
 #endif
 
-/* ---- 0x80161F50  GetOverlayOtBase__7CBlocks  BLOCK.H:174-174  seg inv_1  fsize 0 ---- */
+/* ---- 0x80161F50  GetOverlayOtBase__7CBlocks  BLOCK.H:174-174  seg inv  fsize 0 ---- */
 /* int CBlocks::GetOverlayOtBase(void)
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/inv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-s32 GetOverlayOtBase__7CBlocks_80161f50(void) {
-    return 0x1E8;
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/INV.CPP) — reading copy only */
 #if 0 /* ida */
 int GetOverlayOtBase__7CBlocks_80161f50()
 {

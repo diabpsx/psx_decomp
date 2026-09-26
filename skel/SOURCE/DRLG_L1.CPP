@@ -8,7 +8,7 @@
  *   x=$a0 y=$a1 c=$a3 df=$t0
  *   blocks: {1 }38
  */
-/* linked from build/src/drlg_l1.c.o (segment drlg_l1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_PlaceDoor__Fii) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_PlaceDoor__Fii);
 #if 0 /* m2c */
 void DRLG_PlaceDoor__Fii(s32 arg0, s32 arg1) {
     s32 temp_a2;
@@ -262,7 +262,7 @@ LABEL_60:
  *   x=$t3 y=$t5 i=$a3 patflag=$a1 sd@sp-0x18 tnv3=$v0
  *   blocks: {1 }65
  */
-/* linked from build/src/drlg_l1.c.o (segment drlg_l1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L1Shadows__Fv) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L1Shadows__Fv);
 #if 0 /* m2c */
 void DRLG_L1Shadows__Fv(void) {
     u8 sp0;
@@ -649,7 +649,7 @@ BOOL DRLG_L1Shadows__Fv()
  *   miniset=$fp tmin=$s3 tmax=$a2 cx=$s5 cy=$s6 noquad=$s7 sx=$s0 sy=$s1 sw=$s2 sh=$s4 xx=$a1 yy=$a3 i=$s3 ii=$t1 numt@sp-0x70 found=$t0 abort=$t4
  *   blocks: {1 }168
  */
-/* linked from build/src/drlg_l1.c.o (segment drlg_l1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_PlaceMiniSet__FPCUciiiiiii) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_PlaceMiniSet__FPCUciiiiiii);
 #if 0 /* m2c */
 s32 DRLG_PlaceMiniSet__FPCUciiiiiii(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
     s32 sp10;
@@ -1135,7 +1135,7 @@ LABEL_44:
  *   i=$a1 j=$a2 yy=$t0 v=$v0
  *   blocks: {1 {5 {7 {11 {11 }29 }30 }31 }32 }32
  */
-/* linked from build/src/drlg_l1.c.o (segment drlg_l1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_SetWalls__Fv) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_SetWalls__Fv);
 #if 0 /* m2c */
 void DRLG_SetWalls__Fv(void) {
     M2C_UNK *var_a0;
@@ -1217,7 +1217,7 @@ BOOL DRLG_SetWalls__Fv()
  *   i=$s1 j=$s3 rv=$v1
  *   blocks: {1 }14
  */
-/* linked from build/src/drlg_l1.c.o (segment drlg_l1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L1Floor__Fv) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L1Floor__Fv);
 #if 0 /* ida */
 BOOL DRLG_L1Floor__Fv()
 {
@@ -1263,89 +1263,12 @@ BOOL DRLG_L1Floor__Fv()
 }
 #endif
 
-/* ---- 0x8013CBA8  DRLG_L1Pass3__Fv  DRLG_L1.CPP:689-775  seg drlg_l1_1  fsize 64 ---- */
+/* ---- 0x8013CBA8  DRLG_L1Pass3__Fv  DRLG_L1.CPP:689-775  seg drlg_l1  fsize 64 ---- */
 /* void DRLG_L1Pass3(void)
  *   i=$s4 j=$fp xx=$s1 yy=$s2 v1=$a3 v2=$s6 v3=$s5 v4=$s7 lv=$v0
  *   blocks: {1 }87
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", DRLG_L1Pass3__Fv) */
-#if 0 /* m2c */
-void DRLG_L1Pass3__Fv(void) {
-    s32 sp10;
-    s16 temp_a3;
-    s16 temp_s5;
-    s16 temp_s5_2;
-    s16 temp_s6;
-    s16 temp_s6_2;
-    s16 temp_s7;
-    s16 temp_s7_2;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s3;
-    s32 temp_s4;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_fp;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s4;
-    u16 *temp_v0;
-    u16 *var_s3;
-
-    var_s2 = 0;
-    temp_s6 = M2C_FIELD(&pMegaTiles, s16 *, 0xAA) + 1;
-    temp_s4 = (M2C_FIELD(&pMegaTiles, s16 *, 0xA8) + 1) << 0x10;
-    temp_s5 = M2C_FIELD(&pMegaTiles, s16 *, 0xAC) + 1;
-    temp_s7 = M2C_FIELD(&pMegaTiles, s16 *, 0xAE) + 1;
-    do {
-        var_s1 = 0;
-        temp_s3 = var_s2 + 1;
-        var_a0 = 0;
-loop_2:
-        SetDPiece__Fiis(var_a0, var_s2, temp_s4 >> 0x10);
-        temp_s0 = var_s1 + 1;
-        SetDPiece__Fiis(temp_s0, var_s2, (s32) temp_s6);
-        SetDPiece__Fiis(var_s1, temp_s3, (s32) temp_s5);
-        SetDPiece__Fiis(temp_s0, temp_s3, (s32) temp_s7);
-        var_s1 += 2;
-        var_a0 = var_s1;
-        if (var_s1 < 0x60) {
-            goto loop_2;
-        }
-        var_s2 += 2;
-        var_fp = 0;
-    } while (var_s2 < 0x60);
-    var_s2_2 = 0x10;
-    do {
-        var_s1_2 = 0x10;
-        var_s4 = 0;
-        sp10 = var_s2_2 + 1;
-        var_s3 = &dungeon;
-loop_6:
-        temp_v0 = &var_s3[var_fp];
-        var_s3 += 0x60;
-        var_s4 += 1;
-        temp_v0_2 = (*temp_v0 - 1) * 8;
-        temp_a3 = *(temp_v0_2 + &pMegaTiles) + 1;
-        temp_s6_2 = M2C_FIELD((&pMegaTiles + temp_v0_2), s16 *, 2) + 1;
-        temp_s5_2 = M2C_FIELD((&pMegaTiles + temp_v0_2), s16 *, 4) + 1;
-        temp_s7_2 = *(temp_v0_2 + (&pMegaTiles + 6)) + 1;
-        SetDPiece__Fiis(var_s1_2, var_s2_2, (s32) temp_a3, temp_a3);
-        temp_s0_2 = var_s1_2 + 1;
-        SetDPiece__Fiis(temp_s0_2, var_s2_2, (s32) temp_s6_2);
-        SetDPiece__Fiis(var_s1_2, sp10, (s32) temp_s5_2);
-        SetDPiece__Fiis(temp_s0_2, sp10, (s32) temp_s7_2);
-        var_s1_2 += 2;
-        if (var_s4 < 0x28) {
-            goto loop_6;
-        }
-        var_fp += 1;
-        var_s2_2 += 2;
-    } while (var_fp < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L1Pass3__Fv);
 #if 0 /* ida */
 BOOL DRLG_L1Pass3__Fv()
 {
@@ -1423,28 +1346,11 @@ BOOL DRLG_L1Pass3__Fv()
 }
 #endif
 
-/* ---- 0x8013CDA0  DRLG_LoadL1SP__Fv  DRLG_L1.CPP:787-799  seg drlg_l1_1  fsize 24 ---- */
+/* ---- 0x8013CDA0  DRLG_LoadL1SP__Fv  DRLG_L1.CPP:787-799  seg drlg_l1  fsize 24 ---- */
 /* void DRLG_LoadL1SP(void)
  *   blocks: {1 }13
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", DRLG_LoadL1SP__Fv) */
-#if 0 /* m2c */
-void DRLG_LoadL1SP__Fv(void) {
-    setloadflag = 0;
-    if (QuestStatus__Fi(6) & 0xFF) {
-        pSetPiece = GRL_LoadFileInMemSig__FPCcPUl(&D_80139C34, 0);
-        setloadflag = 1;
-    }
-    if ((QuestStatus__Fi(0xC) & 0xFF) && (gbMaxPlayers == 1)) {
-        pSetPiece = GRL_LoadFileInMemSig__FPCcPUl(&D_80139C40, 0);
-        setloadflag = 1;
-    }
-    if (QuestStatus__Fi(7) & 0xFF) {
-        pSetPiece = GRL_LoadFileInMemSig__FPCcPUl(&D_80139C4C, 0);
-        setloadflag = 1;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_LoadL1SP__Fv);
 #if 0 /* ida */
 int DRLG_LoadL1SP__Fv()
 {
@@ -1472,21 +1378,12 @@ int DRLG_LoadL1SP__Fv()
 }
 #endif
 
-/* ---- 0x8013CE7C  DRLG_FreeL1SP__Fv  DRLG_L1.CPP:805-806  seg drlg_l1_1  fsize 24 ---- */
+/* ---- 0x8013CE7C  DRLG_FreeL1SP__Fv  DRLG_L1.CPP:805-806  seg drlg_l1  fsize 24 ---- */
 /* void DRLG_FreeL1SP(void)
  *   p__p=$a0
  *   blocks: {1 {1 }2 }2
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", DRLG_FreeL1SP__Fv) */
-#if 0 /* m2c */
-void DRLG_FreeL1SP__Fv(void) {
-    void *temp_a0;
-
-    temp_a0 = pSetPiece;
-    pSetPiece = NULL;
-    mem_free_dbg__FPv(temp_a0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_FreeL1SP__Fv);
 #if 0 /* ida */
 int DRLG_FreeL1SP__Fv()
 {
@@ -1498,16 +1395,11 @@ int DRLG_FreeL1SP__Fv()
 }
 #endif
 
-/* ---- 0x8013CEAC  DRLG_Init_Globals__Fv  DRLG_L1.CPP:812-848  seg drlg_l1_1  fsize 24 ---- */
+/* ---- 0x8013CEAC  DRLG_Init_Globals__Fv  DRLG_L1.CPP:812-848  seg drlg_l1  fsize 24 ---- */
 /* void DRLG_Init_Globals(void)
  *   blocks: {1 }37
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", DRLG_Init_Globals__Fv) */
-#if 0 /* m2c */
-void DRLG_Init_Globals__Fv(void) {
-    set_restore_lighting__Fv();
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_Init_Globals__Fv);
 #if 0 /* ida */
 BOOL DRLG_Init_Globals__Fv()
 {
@@ -1515,45 +1407,12 @@ BOOL DRLG_Init_Globals__Fv()
 }
 #endif
 
-/* ---- 0x8013CECC  set_restore_lighting__Fv  DRLG_L1.CPP:855-865  seg drlg_l1_1  fsize 0 ---- */
+/* ---- 0x8013CECC  set_restore_lighting__Fv  DRLG_L1.CPP:855-865  seg drlg_l1  fsize 0 ---- */
 /* void set_restore_lighting(void)
  *   x=$t2 y=$a2
  *   blocks: {1 }11
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", set_restore_lighting__Fv) */
-#if 0 /* m2c */
-void set_restore_lighting__Fv(void) {
-    M2C_UNK *var_a3;
-    M2C_UNK *var_t0;
-    M2C_UNK *var_t1;
-    s32 var_a2;
-    s32 var_t2;
-    s8 *temp_a0;
-    s8 *temp_a1;
-
-    var_a2 = 0;
-    do {
-        var_t2 = 0;
-        var_t1 = &dung_map_b;
-        var_t0 = &dung_map_g;
-        var_a3 = &dung_map_r;
-loop_2:
-        temp_a1 = var_t1 + var_a2;
-        var_t1 += 0x38;
-        temp_a0 = var_t0 + var_a2;
-        var_t0 += 0x38;
-        *(var_a3 + var_a2) = (s8) restore_r;
-        *temp_a0 = (s8) restore_g;
-        var_t2 += 1;
-        *temp_a1 = (s8) restore_b;
-        var_a3 += 0x38;
-        if (var_t2 < 0x30) {
-            goto loop_2;
-        }
-        var_a2 += 1;
-    } while (var_a2 < 0x30);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", set_restore_lighting__Fv);
 #if 0 /* ida */
 BOOL set_restore_lighting__Fv()
 {
@@ -1591,108 +1450,18 @@ BOOL set_restore_lighting__Fv()
 }
 #endif
 
-/* ---- 0x8013CF5C  DRLG_InitL1Vals__Fv  DRLG_L1.CPP:870-900  seg drlg_l1_1  fsize 0 ---- */
+/* ---- 0x8013CF5C  DRLG_InitL1Vals__Fv  DRLG_L1.CPP:870-900  seg drlg_l1  fsize 0 ---- */
 /* void DRLG_InitL1Vals(void)
  *   blocks: {1 }1
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", DRLG_InitL1Vals__Fv) */
-#if 0 /* m2c */
-void DRLG_InitL1Vals__Fv(void) {
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_InitL1Vals__Fv);
 
-}
-#endif
-
-/* ---- 0x8013CF64  LoadL1Dungeon__FPcii  DRLG_L1.CPP:905-964  seg drlg_l1_1  fsize 48 ---- */
+/* ---- 0x8013CF64  LoadL1Dungeon__FPcii  DRLG_L1.CPP:905-964  seg drlg_l1  fsize 48 ---- */
 /* void LoadL1Dungeon(char *sFileName, int vx, int vy)
  *   sFileName=$s0 vx=$s1 vy=$s2 i=$a1 j=$a3 rw=$t3 rh=$t4 pLevelMap=$s0 lm=$t0
  *   blocks: {1 {44 }60 }60
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", LoadL1Dungeon__FPcii) */
-#if 0 /* m2c */
-void LoadL1Dungeon__FPcii(M2C_UNK *arg0, s32 arg1, s32 arg2) {
-    s16 *temp_v0;
-    s32 temp_v1;
-    s32 var_a1;
-    s32 var_a3;
-    s32 var_a3_2;
-    s32 var_t2;
-    s32 var_t3;
-    u16 *var_a0;
-    u16 *var_a2;
-    u8 *temp_v1_3;
-    u8 *var_t0;
-    u8 temp_t3;
-    u8 temp_t4;
-    u8 temp_v1_2;
-    void *temp_s0;
-    void *temp_t0;
-
-    dminx = 0x10;
-    dminy = 0x10;
-    dmaxx = 0x50;
-    dmaxy = 0x50;
-    DRLG_InitTrans__Fv();
-    temp_s0 = GRL_LoadFileInMemSig__FPCcPUl(arg0, 0);
-    temp_t0 = temp_s0;
-    var_a3 = 0;
-    var_t3 = 0;
-    do {
-        var_a1 = 0;
-        var_a2 = &dungeon;
-loop_2:
-        var_a0 = &var_a2[var_a3];
-        temp_v1 = var_t3 + var_a1;
-        var_a1 += 1;
-        *var_a0 = 0x16;
-        *(mydflags + temp_v1) = 0;
-        var_a2 += 0x60;
-        if (var_a1 < 0x28) {
-            goto loop_2;
-        }
-        var_a3 += 1;
-        var_t3 += 0x28;
-    } while (var_a3 < 0x28);
-    temp_t3 = M2C_FIELD(temp_t0, u8 *, 0);
-    var_a3_2 = 0;
-    temp_t4 = M2C_FIELD(temp_t0, u8 *, 2);
-    var_t0 = temp_t0 + 2 + 2;
-    if (temp_t4 != 0) {
-        var_t2 = 0;
-        do {
-            var_a1 = 0;
-            if (temp_t3 != 0) {
-                var_a2 = (u16 *) (var_a3_2 * 2);
-                var_a0 = &dungeon;
-                do {
-                    temp_v1_2 = *var_t0;
-                    temp_v0 = var_a2 + var_a0;
-                    if (temp_v1_2 != 0) {
-                        *temp_v0 = (s16) temp_v1_2;
-                        temp_v1_3 = mydflags + (var_t2 + var_a1);
-                        *temp_v1_3 |= 0x80;
-                    } else {
-                        *temp_v0 = 0xD;
-                    }
-                    var_t0 += 2;
-                    var_a1 += 1;
-                    var_a0 += 0x60;
-                } while (var_a1 < (s32) temp_t3);
-            }
-            var_a3_2 += 1;
-            var_t2 += 0x28;
-        } while (var_a3_2 < (s32) temp_t4);
-    }
-    DRLG_L1Floor__Fv(var_a0, var_a1, (s32) var_a2, var_a3_2);
-    ViewX = arg1;
-    ViewY = arg2;
-    DRLG_L1Pass3__Fv();
-    DRLG_Init_Globals__Fv();
-    DRLG_InitL1Vals__Fv();
-    SetMapMonsters__FPUcii(temp_s0, 0, 0);
-    SetMapObjects__FPUcii(temp_s0, 0, 0);
-    mem_free_dbg__FPv(temp_s0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", LoadL1Dungeon__FPcii);
 #if 0 /* ida */
 int __fastcall LoadL1Dungeon__FPcii(int a1, int a2, int a3)
 {
@@ -1786,21 +1555,12 @@ int __fastcall LoadL1Dungeon__FPcii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x8013D138  LoadPreL1Dungeon__FPcii  DRLG_L1.CPP:971-1015  seg drlg_l1_1  fsize 40 ---- */
+/* ---- 0x8013D138  LoadPreL1Dungeon__FPcii  DRLG_L1.CPP:971-1015  seg drlg_l1  fsize 40 ---- */
 /* void LoadPreL1Dungeon(char *sFileName, int vx, int vy)
  *   sFileName=$a0 vx=$a1 vy=$a2 i=$a1 j=$a3 rw=$t3 rh=$t4 pLevelMap=$s0 lm=$t0
  *   blocks: {1 {45 }45 }45
  */
-/* linked from build/src/drlg_l1_1.c.o (segment drlg_l1_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_1", LoadPreL1Dungeon__FPcii) */
-#if 0 /* m2c */
-void LoadPreL1Dungeon__FPcii(void) {
-    dminx = 0x10;
-    dminy = 0x10;
-    dmaxx = 0x50;
-    dmaxy = 0x50;
-    GRL_LoadFileInMemSig__FPCcPUl(NULL);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", LoadPreL1Dungeon__FPcii);
 #if 0 /* ida */
 int __fastcall LoadPreL1Dungeon__FPcii(int a1)
 {
@@ -1910,52 +1670,12 @@ int __fastcall LoadPreL1Dungeon__FPcii(int a1)
 }
 #endif
 
-/* ---- 0x8013D2F8  InitL5Dungeon__Fv  DRLG_L1.CPP:1054-1075  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013D2F8  InitL5Dungeon__Fv  DRLG_L1.CPP:1054-1075  seg drlg_l1  fsize 0 ---- */
 /* void InitL5Dungeon(void)
  *   i=$a0 j=$a1
  *   blocks: {1 }22
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", InitL5Dungeon__Fv) */
-#if 0 /* m2c */
-void InitL5Dungeon__Fv(void) {
-    M2C_UNK *var_v1;
-    s32 temp_v0;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_a1;
-    s32 var_a1_2;
-    s32 var_a2;
-
-    var_a1 = 0;
-    var_a0 = 0;
-    do {
-        var_v1 = &dungeon;
-loop_2:
-        *((var_a1 * 2) + var_v1) = 0;
-        var_a0 += 1;
-        var_v1 += 0x60;
-        if (var_a0 < 0x30) {
-            goto loop_2;
-        }
-        var_a1 += 1;
-        var_a0 = 0;
-    } while (var_a1 < 0x30);
-    var_a1_2 = 0;
-    var_a2 = 0;
-    do {
-        var_a0_2 = 0;
-loop_6:
-        temp_v0 = var_a2 + var_a0_2;
-        var_a0_2 += 1;
-        *(mydflags + temp_v0) = 0;
-        if (var_a0_2 < 0x28) {
-            goto loop_6;
-        }
-        var_a1_2 += 1;
-        var_a2 += 0x28;
-    } while (var_a1_2 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", InitL5Dungeon__Fv);
 #if 0 /* ida */
 BOOL InitL5Dungeon__Fv()
 {
@@ -2001,37 +1721,12 @@ BOOL InitL5Dungeon__Fv()
 }
 #endif
 
-/* ---- 0x8013D37C  L5ClearFlags__Fv  DRLG_L1.CPP:1081-1086  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013D37C  L5ClearFlags__Fv  DRLG_L1.CPP:1081-1086  seg drlg_l1  fsize 0 ---- */
 /* void L5ClearFlags(void)
  *   i=$a0 j=$a2
  *   blocks: {1 }6
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5ClearFlags__Fv) */
-#if 0 /* m2c */
-void L5ClearFlags__Fv(void) {
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_a2;
-    u8 *temp_v1;
-    u8 temp_v0;
-
-    var_a2 = 0;
-    var_a1 = 0;
-    do {
-        var_a0 = 0;
-loop_2:
-        temp_v1 = mydflags + (var_a1 + var_a0);
-        temp_v0 = *temp_v1;
-        var_a0 += 1;
-        *temp_v1 = temp_v0 & 0xBF;
-        if (var_a0 < 0x28) {
-            goto loop_2;
-        }
-        var_a2 += 1;
-        var_a1 += 0x28;
-    } while (var_a2 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5ClearFlags__Fv);
 #if 0 /* ida */
 BOOL L5ClearFlags__Fv()
 {
@@ -2058,34 +1753,12 @@ BOOL L5ClearFlags__Fv()
 }
 #endif
 
-/* ---- 0x8013D3CC  L5drawRoom__Fiiii  DRLG_L1.CPP:1092-1101  seg drlg_l1_2  fsize 16 ---- */
+/* ---- 0x8013D3CC  L5drawRoom__Fiiii  DRLG_L1.CPP:1092-1101  seg drlg_l1  fsize 16 ---- */
 /* void L5drawRoom(int x, int y, int w, int h)
  *   x=$a0 y=$a1 w=$a2 h=$a3 i=$t0 j=$t1
  *   blocks: {1 }10
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5drawRoom__Fiiii) */
-#if 0 /* m2c */
-void L5drawRoom__Fiiii(u32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s16 *temp_v1;
-    s32 var_t0;
-    s32 var_t1;
-
-    var_t1 = 0;
-    if (arg3 > 0) {
-        do {
-            var_t0 = 0;
-            if (arg2 > 0) {
-                do {
-                    temp_v1 = ((var_t1 + arg1) * 2) + (((var_t0 + arg0) * 0x60) + &dungeon);
-                    var_t0 += 1;
-                    *temp_v1 = 1;
-                } while (var_t0 < arg2);
-            }
-            var_t1 += 1;
-        } while (var_t1 < arg3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5drawRoom__Fiiii);
 #if 0 /* ida */
 BOOL __fastcall L5drawRoom__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -2107,47 +1780,12 @@ BOOL __fastcall L5drawRoom__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x8013D438  L5checkRoom__Fiiii  DRLG_L1.CPP:1108-1117  seg drlg_l1_2  fsize 16 ---- */
+/* ---- 0x8013D438  L5checkRoom__Fiiii  DRLG_L1.CPP:1108-1117  seg drlg_l1  fsize 16 ---- */
 /* unsigned char L5checkRoom(int x, int y, int width, int height)
  *   x=$a0 y=$a1 width=$a2 height=$a3 i=$t0 j=$t1
  *   blocks: {1 }10
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5checkRoom__Fiiii) */
-#if 0 /* m2c */
-s32 L5checkRoom__Fiiii(u32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s32 var_t0;
-    s32 var_t1;
-    u32 temp_v0;
-    u32 var_v1;
-
-    var_t1 = 0;
-    if (arg3 > 0) {
-loop_2:
-        var_t0 = 0;
-        if (arg2 > 0) {
-            temp_v0 = arg1 + var_t1;
-            var_v1 = arg0;
-loop_4:
-            if ((var_v1 >= 0x28U) || (temp_v0 >= 0x28U) || (var_t0 += 1, (*((temp_v0 * 2) + ((var_v1 * 0x60) + &dungeon)) != 0))) {
-                return 0;
-            }
-            var_v1 = arg0 + var_t0;
-            if (var_t0 >= arg2) {
-                goto block_9;
-            }
-            goto loop_4;
-        }
-block_9:
-        var_t1 += 1;
-        if (var_t1 >= arg3) {
-            goto block_10;
-        }
-        goto loop_2;
-    }
-block_10:
-    return 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5checkRoom__Fiiii);
 #if 0 /* ida */
 int __fastcall L5checkRoom__Fiiii(unsigned int a1, int a2, int a3, int a4)
 {
@@ -2183,137 +1821,12 @@ LABEL_9:
 }
 #endif
 
-/* ---- 0x8013D4CC  L5roomGen__Fiiiii  DRLG_L1.CPP:1124-1208  seg drlg_l1_2  fsize 104 ---- */
+/* ---- 0x8013D4CC  L5roomGen__Fiiiii  DRLG_L1.CPP:1124-1208  seg drlg_l1  fsize 104 ---- */
 /* void L5roomGen(int x, int y, int w, int h, int dir)
  *   x=$s1 w=$s4 dir=$s0 rx=$s7 ry=$fp ry2=$s4 height=$s2 width=$s3 cx1=$s4 cy1=$s0 cw=$s5 ch=$s1 num=$s6 dirProb=$v1 ran=$v1
  *   blocks: {1 }85
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5roomGen__Fiiiii) */
-#if 0 /* m2c */
-void L5roomGen__Fiiiii(u32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 sp18;
-    s32 sp20;
-    s32 sp28;
-    s32 sp30;
-    s32 sp38;
-    s32 temp_fp;
-    s32 temp_fp_2;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s0_3;
-    s32 temp_s1;
-    s32 temp_s1_2;
-    s32 temp_s4_2;
-    s32 temp_s5;
-    s32 temp_s5_2;
-    s32 temp_v0;
-    s32 var_a1;
-    s32 var_s2;
-    s32 var_s3;
-    s32 var_s6;
-    s32 var_s6_2;
-    s32 var_v1;
-    u32 temp_s4;
-    u32 temp_s4_3;
-    u32 temp_s7;
-    u32 temp_s7_2;
-    u32 var_a0;
-    u32 var_v0;
-    u8 temp_v1;
-
-    sp18 = arg1;
-    sp20 = arg3;
-    temp_v1 = ENG_random__Fl(4);
-    if (arg4 == 1) {
-        var_v1 = temp_v1 != 0;
-    } else {
-        var_v1 = temp_v1 == 0;
-    }
-    if (var_v1 != 0) {
-        var_s6 = 0;
-        if (var_v1 != 1) {
-            return;
-        }
-        sp38 = arg0 + (arg2 / 2);
-loop_22:
-        var_s3 = ((s32) (ENG_random__Fl(5) + 2) >> 1) * 2;
-        var_s2 = ((s32) (ENG_random__Fl(5) + 2) >> 1) * 2;
-        if (var_s3 < 3) {
-            var_s3 = 3;
-        }
-        if (var_s2 < 3) {
-            var_s2 = 3;
-        }
-        temp_s1 = var_s2 + 1;
-        temp_s5 = var_s3 + 2;
-        temp_s7 = sp38 - ((s32) (var_s3 + ((u32) var_s3 >> 0x1F)) >> 1);
-        temp_fp = sp18 - var_s2;
-        temp_s4 = temp_s7 - 1;
-        temp_s0 = L5checkRoom__Fiiii(temp_s4, temp_fp - 1, temp_s5, temp_s1) & 0xFF;
-        var_s6 += 1;
-        if ((temp_s0 == 0) && (var_s6 < 0x14)) {
-            goto loop_22;
-        }
-        if (temp_s0 == 1) {
-            L5drawRoom__Fiiii(temp_s7, temp_fp, var_s3, var_s2);
-        }
-        temp_s4_2 = sp18 + sp20;
-        temp_s1_2 = L5checkRoom__Fiiii(temp_s4, temp_s4_2, temp_s5, temp_s1) & 0xFF;
-        if (temp_s1_2 == 1) {
-            L5drawRoom__Fiiii(temp_s7, temp_s4_2, var_s3, var_s2);
-        }
-        if (temp_s0 == 1) {
-            L5roomGen__Fiiiii(temp_s7, temp_fp, (u32) var_s3, var_s2, 0);
-        }
-        var_a0 = temp_s7;
-        if (temp_s1_2 == 1) {
-            var_a1 = temp_s4_2;
-            goto block_36;
-        }
-    } else {
-        var_s6_2 = 0;
-        sp28 = sp18 + (sp20 / 2);
-loop_7:
-        var_s3 = ((s32) (ENG_random__Fl(5) + 2) >> 1) * 2;
-        var_s2 = ((s32) (ENG_random__Fl(5) + 2) >> 1) * 2;
-        if (var_s3 < 3) {
-            var_s3 = 3;
-        }
-        var_v0 = (u32) var_s2 >> 0x1F;
-        if (var_s2 < 3) {
-            var_s2 = 3;
-            var_v0 = 3U >> 0x1F;
-        }
-        temp_s7_2 = arg0 - var_s3;
-        temp_s5_2 = var_s2 + 2;
-        temp_fp_2 = sp28 - ((s32) (var_s2 + var_v0) >> 1);
-        temp_s0_2 = temp_fp_2 - 1;
-        var_s6_2 += 1;
-        temp_v0 = L5checkRoom__Fiiii(temp_s7_2 - 1, temp_s0_2, temp_s5_2, var_s3 + 1) & 0xFF;
-        sp30 = temp_v0;
-        if ((temp_v0 == 0) && (var_s6_2 < 0x14)) {
-            goto loop_7;
-        }
-        if (sp30 == 1) {
-            L5drawRoom__Fiiii(temp_s7_2, temp_fp_2, var_s3, var_s2);
-        }
-        temp_s4_3 = arg0 + arg2;
-        temp_s0_3 = L5checkRoom__Fiiii(temp_s4_3, temp_s0_2, var_s3 + 1, temp_s5_2) & 0xFF;
-        if (temp_s0_3 == 1) {
-            L5drawRoom__Fiiii(temp_s4_3, temp_fp_2, var_s3, var_s2);
-        }
-        if (sp30 == 1) {
-            L5roomGen__Fiiiii(temp_s7_2, temp_fp_2, (u32) var_s3, var_s2, 1);
-        }
-        var_a0 = temp_s4_3;
-        if (temp_s0_3 == 1) {
-            var_a1 = temp_fp_2;
-block_36:
-            L5roomGen__Fiiiii(var_a0, var_a1, (u32) var_s3, var_s2);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5roomGen__Fiiiii);
 #if 0 /* ida */
 int __fastcall L5roomGen__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -2414,145 +1927,12 @@ int __fastcall L5roomGen__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 }
 #endif
 
-/* ---- 0x8013D7FC  L5firstRoom__Fv  DRLG_L1.CPP:1216-1267  seg drlg_l1_2  fsize 40 ---- */
+/* ---- 0x8013D7FC  L5firstRoom__Fv  DRLG_L1.CPP:1216-1267  seg drlg_l1  fsize 40 ---- */
 /* void L5firstRoom(void)
  *   x=$a0 y=$a1 xs=$s1 xe=$s0 ys=$s1 ye=$s0
  *   blocks: {1 }52
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5firstRoom__Fv) */
-#if 0 /* m2c */
-void L5firstRoom__Fv(void) {
-    s16 *var_a2;
-    s16 *var_a3;
-    s16 *var_t1;
-    s16 *var_t2;
-    s16 *var_t3;
-    s16 *var_v1;
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s1;
-    s32 var_v1_2;
-    u8 temp_v0;
-    u8 temp_v0_2;
-    void *temp_a0;
-
-    var_s1 = 1;
-    if (ENG_random__Fl(2) == 0) {
-        D_8011C8DB = ENG_random__Fl(2);
-        D_8011C8DC = ENG_random__Fl(2);
-        temp_v0 = ENG_random__Fl(2);
-        D_8011C8DD = temp_v0;
-        var_s0 = 0x27;
-        if ((D_8011C8DB + (temp_v0 & 0xFF)) < 2) {
-            D_8011C8DC = 1;
-        }
-        if (D_8011C8DB != 0) {
-            L5drawRoom__Fiiii(0xFU, 1, 0xA, 0xA);
-        } else {
-            var_s1 = 0x12;
-        }
-        if (D_8011C8DC != 0) {
-            L5drawRoom__Fiiii(0xFU, 0xF, 0xA, 0xA);
-        }
-        if (D_8011C8DD != 0) {
-            L5drawRoom__Fiiii(0xFU, 0x1D, 0xA, 0xA);
-            var_a1 = var_s1;
-        } else {
-            var_s0 = 0x16;
-            var_a1 = var_s1;
-        }
-        if (var_a1 < var_s0) {
-            temp_a0 = &dungeon + 0x660;
-            temp_v1 = var_a1 * 2;
-            var_t3 = temp_v1 + (temp_a0 + 0x1E0);
-            var_t2 = temp_v1 + (temp_a0 + 0x180);
-            var_t1 = temp_v1 + (temp_a0 + 0x120);
-            var_a3 = temp_v1 + (temp_a0 + 0xC0);
-            var_a2 = temp_v1 + (temp_a0 + 0x60);
-            var_v1 = temp_v1 + temp_a0;
-            do {
-                *var_v1 = 1;
-                *var_a2 = 1;
-                *var_a3 = 1;
-                *var_t1 = 1;
-                *var_t2 = 1;
-                *var_t3 = 1;
-                var_t3 += 2;
-                var_t2 += 2;
-                var_t1 += 2;
-                var_a3 += 2;
-                var_a2 += 2;
-                var_a1 += 1;
-                var_v1 += 2;
-            } while (var_a1 < var_s0);
-        }
-        if (D_8011C8DB != 0) {
-            L5roomGen__Fiiiii(0xFU, 1, 0xAU, 0xA, 0);
-        }
-        if (D_8011C8DC != 0) {
-            L5roomGen__Fiiiii(0xFU, 0xF, 0xAU, 0xA, 0);
-        }
-        if (D_8011C8DD != 0) {
-            L5roomGen__Fiiiii(0xFU, 0x1D, 0xAU, 0xA, 0);
-        }
-        D_8011C8DA = 0;
-        D_8011C8D9 = 0;
-        D_8011C8D8 = 0;
-        return;
-    }
-    D_8011C8D8 = ENG_random__Fl(2);
-    D_8011C8D9 = ENG_random__Fl(2);
-    temp_v0_2 = ENG_random__Fl(2);
-    D_8011C8DA = temp_v0_2;
-    var_s0_2 = 0x27;
-    if ((D_8011C8D8 + (temp_v0_2 & 0xFF)) < 2) {
-        D_8011C8D9 = 1;
-    }
-    if (D_8011C8D8 != 0) {
-        L5drawRoom__Fiiii(1U, 0xF, 0xA, 0xA);
-    } else {
-        var_s1 = 0x12;
-    }
-    if (D_8011C8D9 != 0) {
-        L5drawRoom__Fiiii(0xFU, 0xF, 0xA, 0xA);
-    }
-    if (D_8011C8DA != 0) {
-        L5drawRoom__Fiiii(0x1DU, 0xF, 0xA, 0xA);
-        var_a0 = var_s1;
-    } else {
-        var_s0_2 = 0x16;
-        var_a0 = var_s1;
-    }
-    if (var_a0 < var_s0_2) {
-        var_v1_2 = var_a0 * 0x60;
-        do {
-            *(&dungeon + 0x22 + var_v1_2) = 1;
-            *(&dungeon + 0x24 + var_v1_2) = 1;
-            *(&dungeon + 0x26 + var_v1_2) = 1;
-            *(&dungeon + 0x28 + var_v1_2) = 1;
-            *(&dungeon + 0x2A + var_v1_2) = 1;
-            *(&dungeon + 0x2C + var_v1_2) = 1;
-            var_a0 += 1;
-            var_v1_2 += 0x60;
-        } while (var_a0 < var_s0_2);
-    }
-    if (D_8011C8D8 != 0) {
-        L5roomGen__Fiiiii(1U, 0xF, 0xAU, 0xA, 1);
-    }
-    if (D_8011C8D9 != 0) {
-        L5roomGen__Fiiiii(0xFU, 0xF, 0xAU, 0xA, 1);
-    }
-    if (D_8011C8DA != 0) {
-        L5roomGen__Fiiiii(0x1DU, 0xF, 0xAU, 0xA, 1);
-    }
-    D_8011C8DD = 0;
-    D_8011C8DC = 0;
-    D_8011C8DB = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5firstRoom__Fv);
 #if 0 /* ida */
 int L5firstRoom__Fv()
 {
@@ -2676,38 +2056,12 @@ int L5firstRoom__Fv()
 }
 #endif
 
-/* ---- 0x8013DB9C  L5GetArea__Fv  DRLG_L1.CPP:1274-1284  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013DB9C  L5GetArea__Fv  DRLG_L1.CPP:1274-1284  seg drlg_l1  fsize 0 ---- */
 /* long L5GetArea(void)
  *   i=$a0 j=$a1 rv=$a2
  *   blocks: {1 }11
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5GetArea__Fv) */
-#if 0 /* m2c */
-s32 L5GetArea__Fv(void) {
-    M2C_UNK *var_v1;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_a2;
-
-    var_a2 = 0;
-    var_a1 = 0;
-    do {
-        var_a0 = 0;
-        var_v1 = &dungeon;
-loop_2:
-        if (*((var_a1 * 2) + var_v1) == 1) {
-            var_a2 += 1;
-        }
-        var_a0 += 1;
-        var_v1 += 0x60;
-        if (var_a0 < 0x28) {
-            goto loop_2;
-        }
-        var_a1 += 1;
-    } while (var_a1 < 0x28);
-    return var_a2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5GetArea__Fv);
 #if 0 /* ida */
 int L5GetArea__Fv()
 {
@@ -2734,50 +2088,12 @@ int L5GetArea__Fv()
 }
 #endif
 
-/* ---- 0x8013DBFC  L5makeDungeon__Fv  DRLG_L1.CPP:1290-1303  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013DBFC  L5makeDungeon__Fv  DRLG_L1.CPP:1290-1303  seg drlg_l1  fsize 0 ---- */
 /* void L5makeDungeon(void)
  *   i=$t2 j=$t3 l=$t1
  *   blocks: {1 }14
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5makeDungeon__Fv) */
-#if 0 /* m2c */
-void L5makeDungeon__Fv(void) {
-    M2C_UNK *var_a2;
-    M2C_UNK *var_a3;
-    s32 temp_t1;
-    s32 var_t2;
-    s32 var_t3;
-    u16 *temp_a0;
-    void *temp_a1;
-    void *temp_v0;
-    void *var_t0;
-
-    var_t3 = 0;
-    do {
-        var_t2 = 0;
-        temp_t1 = var_t3 * 2;
-        var_t0 = &L5dungeon + 0x50;
-        var_a3 = &dungeon;
-        var_a2 = &L5dungeon;
-loop_2:
-        temp_a1 = var_t0 + temp_t1;
-        var_t0 += 0xA0;
-        temp_a0 = temp_t1 + var_a3;
-        temp_v0 = var_a2 + temp_t1;
-        M2C_FIELD(temp_v0, s8 *, 0) = (s8) *temp_a0;
-        var_a3 += 0x60;
-        M2C_FIELD(temp_v0, s8 *, 1) = (s8) *temp_a0;
-        M2C_FIELD(temp_a1, s8 *, 0) = (s8) *temp_a0;
-        var_t2 += 1;
-        M2C_FIELD(temp_a1, s8 *, 1) = (s8) *temp_a0;
-        var_a2 += 0xA0;
-        if (var_t2 < 0x28) {
-            goto loop_2;
-        }
-        var_t3 += 1;
-    } while (var_t3 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5makeDungeon__Fv);
 #if 0 /* ida */
 BOOL L5makeDungeon__Fv()
 {
@@ -2822,65 +2138,12 @@ BOOL L5makeDungeon__Fv()
 }
 #endif
 
-/* ---- 0x8013DC88  L5makeDmt__Fv  DRLG_L1.CPP:1309-1330  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013DC88  L5makeDmt__Fv  DRLG_L1.CPP:1309-1330  seg drlg_l1  fsize 0 ---- */
 /* void L5makeDmt(void)
  *   i=$a3 j=$t0 idx=$v0 val=$v0 dmty=$t4
  *   blocks: {1 }22
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5makeDmt__Fv) */
-#if 0 /* m2c */
-void L5makeDmt__Fv(void) {
-    M2C_UNK *var_t1;
-    M2C_UNK *var_v1;
-    s16 *temp_a2;
-    s32 var_a3;
-    s32 var_a3_2;
-    s32 var_t0;
-    s32 var_t0_2;
-    s32 var_t4;
-    void *temp_a0;
-    void *temp_a1;
-    void *var_t2;
-    void *var_t3;
-
-    var_t0 = 0;
-    var_a3 = 0;
-    do {
-        var_v1 = &dungeon;
-loop_2:
-        *((var_t0 * 2) + var_v1) = 0x16;
-        var_a3 += 1;
-        var_v1 += 0x60;
-        if (var_a3 < 0x2F) {
-            goto loop_2;
-        }
-        var_t0 += 1;
-        var_a3 = 0;
-    } while (var_t0 < 0x2F);
-    var_t4 = 0;
-    var_t0_2 = 1;
-    do {
-        var_a3_2 = 1;
-        var_t3 = &L5dungeon + 0x50 + 0x50;
-        var_t2 = &L5dungeon + 0x50;
-        var_t1 = &dungeon;
-loop_6:
-        temp_a2 = (var_t4 * 2) + var_t1;
-        var_t1 += 0x60;
-        temp_a1 = var_t3 + var_t0_2;
-        var_t3 += 0xA0;
-        temp_a0 = var_t2 + var_t0_2;
-        var_a3_2 += 2;
-        *temp_a2 = (s16) *(&L5ConvTbl + (M2C_FIELD(temp_a0, u8 *, 0) + (M2C_FIELD(temp_a1, u8 *, 0) * 2) + (M2C_FIELD(temp_a0, u8 *, 1) * 4) + (M2C_FIELD(temp_a1, u8 *, 1) * 8)));
-        var_t2 += 0xA0;
-        if (var_a3_2 < 0x4E) {
-            goto loop_6;
-        }
-        var_t0_2 += 2;
-        var_t4 += 1;
-    } while (var_t0_2 < 0x4E);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5makeDmt__Fv);
 #if 0 /* ida */
 BOOL L5makeDmt__Fv()
 {
@@ -2944,66 +2207,12 @@ BOOL L5makeDmt__Fv()
 }
 #endif
 
-/* ---- 0x8013DD70  L5HWallOk__Fii  DRLG_L1.CPP:1337-1352  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013DD70  L5HWallOk__Fii  DRLG_L1.CPP:1337-1352  seg drlg_l1  fsize 0 ---- */
 /* int L5HWallOk(int i, int j)
  *   i=$a0 j=$a1 x=$t1 wallok=$a0
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5HWallOk__Fii) */
-#if 0 /* m2c */
-s32 L5HWallOk__Fii(s32 arg0, s32 arg1) {
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_t0;
-    s32 var_t1;
-    s32 var_v0;
-    s32 var_v1;
-    u16 temp_v0;
-    u16 temp_v1_2;
-    u16 var_a2;
-    void *var_a3;
-
-    var_t0 = arg0 + 1;
-    temp_v1 = arg1 * 2;
-    var_a3 = temp_v1 + ((var_t0 * 0x60) + &dungeon);
-    var_t1 = 1;
-    if (M2C_FIELD(var_a3, u16 *, 0) == 0xD) {
-        var_a2 = M2C_FIELD(var_a3, u16 *, -2);
-        if (var_a2 == 0xD) {
-loop_2:
-            if ((M2C_FIELD(var_a3, u16 *, 2) == var_a2) && (*(mydflags + ((arg1 * 0x28) + var_t0)) == 0)) {
-                var_t1 += 1;
-                var_t0 = arg0 + var_t1;
-                var_a3 = temp_v1 + ((var_t0 * 0x60) + &dungeon);
-                temp_v0 = M2C_FIELD(var_a3, u16 *, 0);
-                if (temp_v0 == 0xD) {
-                    var_a2 = M2C_FIELD(var_a3, u16 *, -2);
-                    if (var_a2 == temp_v0) {
-                        goto loop_2;
-                    }
-                }
-            }
-        }
-    }
-    temp_v1_2 = *((arg1 * 2) + (((arg0 + var_t1) * 0x60) + &dungeon));
-    var_a0 = (u32) (temp_v1_2 - 3) < 5U;
-    if ((u32) (temp_v1_2 - 0x10) < 9U) {
-        var_a0 = 1;
-    }
-    if ((temp_v1_2 & 0xFFFF) == 0x16) {
-        var_a0 = 0;
-    }
-    var_v1 = var_a0 & 0xFF;
-    if (var_t1 == 1) {
-        var_v1 = 0 & 0xFF;
-    }
-    var_v0 = var_t1;
-    if (var_v1 == 0) {
-        var_v0 = -1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5HWallOk__Fii);
 #if 0 /* ida */
 int __fastcall L5HWallOk__Fii(int a1, int a2)
 {
@@ -3050,76 +2259,12 @@ int __fastcall L5HWallOk__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8013DEAC  L5VWallOk__Fii  DRLG_L1.CPP:1358-1373  seg drlg_l1_2  fsize 0 ---- */
+/* ---- 0x8013DEAC  L5VWallOk__Fii  DRLG_L1.CPP:1358-1373  seg drlg_l1  fsize 0 ---- */
 /* int L5VWallOk(int i, int j)
  *   i=$t1 j=$a1 y=$t0 wallok=$a0
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5VWallOk__Fii) */
-#if 0 /* m2c */
-s32 L5VWallOk__Fii(s32 arg0, s32 arg1) {
-    s32 temp_a2;
-    s32 temp_a2_2;
-    s32 temp_v0;
-    s32 var_a0;
-    s32 var_a3;
-    s32 var_t0;
-    s32 var_v0;
-    s32 var_v1_2;
-    u16 *var_v0_2;
-    u16 temp_a0;
-    u16 temp_v1;
-    u16 var_v1;
-    void *temp_t2;
-    void *temp_t3;
-    void *temp_t6;
-
-    var_a3 = arg1 + 1;
-    temp_a2 = var_a3 * 2;
-    temp_v0 = arg0 * 0x60;
-    temp_t3 = temp_v0 + &dungeon;
-    temp_t2 = temp_v0 + (&dungeon - 0x60);
-    temp_t6 = temp_v0 + (&dungeon + 0x60);
-    var_t0 = 1;
-    if (*(temp_a2 + temp_t3) == 0xD) {
-        var_v1 = *(temp_a2 + temp_t2);
-        var_v0_2 = temp_a2 + temp_t6;
-        if (var_v1 == 0xD) {
-loop_2:
-            if ((*var_v0_2 == var_v1) && (*(mydflags + ((var_a3 * 0x28) + arg0)) == 0)) {
-                var_t0 += 1;
-                var_a3 = arg1 + var_t0;
-                temp_a2_2 = var_a3 * 2;
-                temp_a0 = *(temp_a2_2 + temp_t3);
-                if (temp_a0 == 0xD) {
-                    var_v1 = *(temp_a2_2 + temp_t2);
-                    var_v0_2 = temp_a2_2 + temp_t6;
-                    if (var_v1 == temp_a0) {
-                        goto loop_2;
-                    }
-                }
-            }
-        }
-    }
-    temp_v1 = *(((arg1 + var_t0) * 2) + ((arg0 * 0x60) + &dungeon));
-    var_a0 = (u32) (temp_v1 - 3) < 5U;
-    if ((u32) (temp_v1 - 0x10) < 9U) {
-        var_a0 = 1;
-    }
-    if ((temp_v1 & 0xFFFF) == 0x16) {
-        var_a0 = 0;
-    }
-    var_v1_2 = var_a0 & 0xFF;
-    if (var_t0 == 1) {
-        var_v1_2 = 0 & 0xFF;
-    }
-    var_v0 = var_t0;
-    if (var_v1_2 == 0) {
-        var_v0 = -1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5VWallOk__Fii);
 #if 0 /* ida */
 int __fastcall L5VWallOk__Fii(int a1, int a2)
 {
@@ -3176,79 +2321,12 @@ int __fastcall L5VWallOk__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8013DFF4  L5HorizWall__Fiici  DRLG_L1.CPP:1379-1411  seg drlg_l1_2  fsize 48 ---- */
+/* ---- 0x8013DFF4  L5HorizWall__Fiici  DRLG_L1.CPP:1379-1411  seg drlg_l1  fsize 48 ---- */
 /* void L5HorizWall(int i, int j, char p, int dx)
  *   i=$s3 j=$s5 p=$s1 dx=$s4 xx=$a2 wt=$s2 dt=$s0
  *   blocks: {1 }33
  */
-/* linked from build/src/drlg_l1_2.c.o (segment drlg_l1_2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_2", L5HorizWall__Fiici) */
-#if 0 /* m2c */
-s32 L5HorizWall__Fiici(s32 arg0, s32 arg1, s8 arg2, s32 arg3) {
-    M2C_UNK *var_a3;
-    s32 temp_a2;
-    s32 temp_v0;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_s0;
-    s32 var_v1;
-    s8 var_s1;
-    s8 var_s2;
-
-    var_s1 = arg2;
-    var_s2 = 0;
-    temp_v0 = ENG_random__Fl(4);
-    switch (temp_v0) {                              /* irregular */
-    default:
-        var_s2 = 2;
-        break;
-    case 2:
-        var_s2 = 0xC;
-        if (arg2 == 2) {
-            var_s1 = 0xC;
-        }
-        if (var_s1 == 4) {
-            var_s1 = 0xA;
-        }
-        break;
-    case 3:
-        var_s2 = 0x24;
-        if (arg2 == 2) {
-            var_s1 = 0x24;
-        }
-        if (var_s1 == 4) {
-            var_s1 = 0x1B;
-        }
-        break;
-    }
-    var_s0 = 0x1A;
-    if (ENG_random__Fl(6) == 5) {
-        var_s0 = 0xC;
-    }
-    if (var_s2 == 0xC) {
-        var_s0 = 0xC;
-    }
-    var_a3 = &dungeon;
-    var_a1 = arg1 * 2;
-    *(var_a1 + ((arg0 * 0x60) + &dungeon)) = (s16) var_s1;
-    var_a2 = 1;
-    if (arg3 > 1) {
-        var_a3 = (M2C_UNK *) var_a1;
-        var_a1 = var_s2 << 0x18;
-        var_v1 = arg0 + 1;
-        do {
-            *(var_a3 + ((var_v1 * 0x60) + &dungeon)) = (s16) var_s2;
-            var_a2 += 1;
-            var_v1 = arg0 + var_a2;
-        } while (var_a2 < arg3);
-    }
-    temp_a2 = ENG_random__Fl(arg3 - 1, var_a1, var_a2, (s32) var_a3) + 1;
-    if (var_s0 == 0xC) {
-        return D_8013E204(&dungeon, 0xC, temp_a2);
-    }
-    *((arg1 * 2) + (((arg0 + temp_a2) * 0x60) + &dungeon)) = 2;
-    return arg1 * 0x28;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5HorizWall__Fiici);
 #if 0 /* ida */
 int __fastcall L5HorizWall__Fiici(int a1, int a2, char a3, int a4)
 {
@@ -3323,77 +2401,12 @@ int __fastcall L5HorizWall__Fiici(int a1, int a2, char a3, int a4)
 }
 #endif
 
-/* ---- 0x8013E22C  L5VertWall__Fiici  DRLG_L1.CPP:1418-1450  seg drlg_l1_3  fsize 48 ---- */
+/* ---- 0x8013E22C  L5VertWall__Fiici  DRLG_L1.CPP:1418-1450  seg drlg_l1  fsize 48 ---- */
 /* void L5VertWall(int i, int j, char p, int dy)
  *   i=$s2 j=$s5 p=$s1 dy=$s4 yy=$a1 wt=$s3 dt=$s0
  *   blocks: {1 }33
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", L5VertWall__Fiici) */
-#if 0 /* m2c */
-void L5VertWall__Fiici(s32 arg0, s32 arg1, s8 arg2, s32 arg3) {
-    s32 temp_a0_2;
-    s32 temp_a1;
-    s32 temp_v0;
-    s32 var_a1;
-    s32 var_s0;
-    s8 var_s1;
-    s8 var_s3;
-    u8 *temp_v1;
-    void *temp_a0;
-
-    var_s1 = arg2;
-    var_s3 = 0;
-    temp_v0 = ENG_random__Fl(4);
-    switch (temp_v0) {                              /* irregular */
-    default:
-        var_s3 = 1;
-        break;
-    case 2:
-        var_s3 = 0xB;
-        if (arg2 == 1) {
-            var_s1 = 0xB;
-        }
-        if (var_s1 == 4) {
-            var_s1 = 0xE;
-        }
-        break;
-    case 3:
-        var_s3 = 0x23;
-        if (arg2 == 1) {
-            var_s1 = 0x23;
-        }
-        if (var_s1 == 4) {
-            var_s1 = 0x25;
-        }
-        break;
-    }
-    var_s0 = 0x19;
-    if (ENG_random__Fl(6) == 5) {
-        var_s0 = 0xB;
-    }
-    if (var_s3 == 0xB) {
-        var_s0 = 0xB;
-    }
-    temp_a0 = (arg0 * 0x60) + &dungeon;
-    *((arg1 * 2) + temp_a0) = (s16) var_s1;
-    var_a1 = 1;
-    if (arg3 > 1) {
-        do {
-            *(((arg1 + var_a1) * 2) + temp_a0) = (s16) var_s3;
-            var_a1 += 1;
-        } while (var_a1 < arg3);
-    }
-    temp_a1 = ENG_random__Fl(arg3 - 1, var_a1, temp_a0, var_s3 << 0x18) + 1;
-    if (var_s0 == 0xB) {
-        *(((arg1 + temp_a1) * 2) + ((arg0 * 0x60) + &dungeon)) = 0xB;
-        return;
-    }
-    temp_a0_2 = arg1 + temp_a1;
-    *((temp_a0_2 * 2) + ((arg0 * 0x60) + &dungeon)) = 1;
-    temp_v1 = mydflags + ((temp_a0_2 * 0x28) + arg0);
-    *temp_v1 |= 2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5VertWall__Fiici);
 #if 0 /* ida */
 int __fastcall L5VertWall__Fiici(int a1, int a2, char a3, int a4)
 {
@@ -3464,102 +2477,12 @@ int __fastcall L5VertWall__Fiici(int a1, int a2, char a3, int a4)
 }
 #endif
 
-/* ---- 0x8013E458  L5AddWall__Fv  DRLG_L1.CPP:1458-1491  seg drlg_l1_3  fsize 48 ---- */
+/* ---- 0x8013E458  L5AddWall__Fv  DRLG_L1.CPP:1458-1491  seg drlg_l1  fsize 48 ---- */
 /* void L5AddWall(void)
  *   i=$s0 j=$s1 x=$v0 y=$v0
  *   blocks: {1 }34
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", L5AddWall__Fv) */
-#if 0 /* m2c */
-void L5AddWall__Fv(void) {
-    M2C_UNK *var_s2;
-    s32 temp_s3;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 temp_v0_6;
-    s32 var_s0;
-    s32 var_s1;
-    u16 *var_v0;
-    u16 *var_v0_2;
-    u16 *var_v0_3;
-    u16 *var_v0_4;
-
-    var_s1 = 0;
-    var_s0 = 0;
-    do {
-        temp_s3 = var_s1 * 2;
-        var_s2 = &dungeon;
-loop_2:
-        if (*(mydflags + ((var_s1 * 0x28) + var_s0)) == 0) {
-            var_v0 = temp_s3 + var_s2;
-            if (*(temp_s3 + var_s2) == 3) {
-                if (ENG_random__Fl(0x64) < 0x64) {
-                    temp_v0 = L5HWallOk__Fii(var_s0, var_s1);
-                    if (temp_v0 != -1) {
-                        L5HorizWall__Fiici(var_s0, var_s1, 2, temp_v0);
-                    }
-                }
-                var_v0 = temp_s3 + var_s2;
-                if (*(temp_s3 + var_s2) == 3) {
-                    if (ENG_random__Fl(0x64) < 0x64) {
-                        temp_v0_2 = L5VWallOk__Fii(var_s0, var_s1);
-                        if (temp_v0_2 != -1) {
-                            L5VertWall__Fiici(var_s0, var_s1, 1, temp_v0_2);
-                        }
-                    }
-                    var_v0 = temp_s3 + var_s2;
-                }
-            }
-            var_v0_2 = temp_s3 + var_s2;
-            if (*var_v0 == 6) {
-                if (ENG_random__Fl(0x64) < 0x64) {
-                    temp_v0_3 = L5HWallOk__Fii(var_s0, var_s1);
-                    if (temp_v0_3 != -1) {
-                        L5HorizWall__Fiici(var_s0, var_s1, 4, temp_v0_3);
-                    }
-                }
-                var_v0_2 = temp_s3 + var_s2;
-            }
-            var_v0_3 = temp_s3 + var_s2;
-            if (*var_v0_2 == 7) {
-                if (ENG_random__Fl(0x64) < 0x64) {
-                    temp_v0_4 = L5VWallOk__Fii(var_s0, var_s1);
-                    if (temp_v0_4 != -1) {
-                        L5VertWall__Fiici(var_s0, var_s1, 4, temp_v0_4);
-                    }
-                }
-                var_v0_3 = temp_s3 + var_s2;
-            }
-            var_v0_4 = temp_s3 + var_s2;
-            if (*var_v0_3 == 2) {
-                if (ENG_random__Fl(0x64) < 0x64) {
-                    temp_v0_5 = L5HWallOk__Fii(var_s0, var_s1);
-                    if (temp_v0_5 != -1) {
-                        L5HorizWall__Fiici(var_s0, var_s1, 2, temp_v0_5);
-                    }
-                }
-                var_v0_4 = temp_s3 + var_s2;
-            }
-            if ((*var_v0_4 == 1) && (ENG_random__Fl(0x64) < 0x64)) {
-                temp_v0_6 = L5VWallOk__Fii(var_s0, var_s1);
-                if (temp_v0_6 != -1) {
-                    L5VertWall__Fiici(var_s0, var_s1, 1, temp_v0_6);
-                }
-            }
-        }
-        var_s0 += 1;
-        var_s2 += 0x60;
-        if (var_s0 < 0x28) {
-            goto loop_2;
-        }
-        var_s1 += 1;
-        var_s0 = 0;
-    } while (var_s1 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5AddWall__Fv);
 #if 0 /* ida */
 BOOL L5AddWall__Fv()
 {
@@ -3668,117 +2591,12 @@ BOOL L5AddWall__Fv()
 }
 #endif
 
-/* ---- 0x8013E6B4  DRLG_L5GChamber__Fiiiiii  DRLG_L1.CPP:1497-1551  seg drlg_l1_3  fsize 0 ---- */
+/* ---- 0x8013E6B4  DRLG_L5GChamber__Fiiiiii  DRLG_L1.CPP:1497-1551  seg drlg_l1  fsize 0 ---- */
 /* void DRLG_L5GChamber(int sx, int sy, int topflag, int bottomflag, int leftflag, int rightflag)
  *   sx=$t1 sy=$t2 topflag=$a2 bottomflag=$t0 leftflag=$t4 rightflag=$t5 i=$a1 j=$a2
  *   blocks: {1 }55
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5GChamber__Fiiiiii) */
-#if 0 /* m2c */
-void DRLG_L5GChamber__Fiiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_a0_5;
-    s32 temp_a1;
-    s32 temp_a2_2;
-    s32 temp_t1;
-    s32 temp_t2;
-    s32 temp_v0;
-    s32 temp_v1_2;
-    s32 temp_v1_3;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_t1;
-    s32 var_t2;
-    u16 *temp_a2_3;
-    u8 *temp_a0_4;
-    void *temp_a0_3;
-    void *temp_a0_6;
-    void *temp_a1_2;
-    void *temp_a1_3;
-    void *temp_a2;
-    void *temp_a2_4;
-    void *temp_v1;
-
-    var_t1 = arg0;
-    var_t2 = arg1;
-    if (arg2 == 1) {
-        temp_a2 = &dungeon + 0xC0;
-        temp_a0 = var_t1 * 0x60;
-        temp_a1 = var_t2 * 2;
-        *(temp_a1 + (temp_a0 + temp_a2)) = 0xC;
-        *(temp_a1 + (temp_a0 + (temp_a2 + 0x60))) = 0xC;
-        *(temp_a1 + (temp_a0 + (temp_a2 + 0xC0))) = 3;
-        *(temp_a1 + (temp_a0 + (temp_a2 + 0x1E0))) = 9;
-        *(temp_a1 + (temp_a0 + (temp_a2 + 0x240))) = 0xC;
-        *(temp_a1 + (temp_a0 + (temp_a2 + 0x2A0))) = 2;
-    }
-    if (arg3 == 1) {
-        temp_t2 = var_t2 + 0xB;
-        temp_a1_2 = &dungeon + 0xC0;
-        temp_a0_2 = var_t1 * 0x60;
-        temp_a2_2 = temp_t2 * 2;
-        *(temp_a2_2 + (temp_a0_2 + temp_a1_2)) = 0xA;
-        *(temp_a2_2 + (temp_a0_2 + (temp_a1_2 + 0x60))) = 0xC;
-        *(temp_a2_2 + (temp_a0_2 + (temp_a1_2 + 0xC0))) = 8;
-        *(temp_a2_2 + (temp_a0_2 + (temp_a1_2 + 0x1E0))) = 5;
-        temp_a2_3 = temp_a2_2 + (temp_a0_2 + (temp_a1_2 + 0x2A0));
-        *(temp_a2_2 + (temp_a0_2 + (temp_a1_2 + 0x240))) = 0xC;
-        if (*temp_a2_3 != 4) {
-            *temp_a2_3 = 0x15;
-        }
-        var_t2 = temp_t2 - 0xB;
-    }
-    if (arg4 == 1) {
-        temp_v1 = (var_t2 * 2) + ((var_t1 * 0x60) + &dungeon);
-        M2C_FIELD(temp_v1, s16 *, 8) = 3;
-        M2C_FIELD(temp_v1, s16 *, 0xE) = 8;
-        M2C_FIELD(temp_v1, s16 *, 4) = 0xB;
-        M2C_FIELD(temp_v1, s16 *, 6) = 0xB;
-        M2C_FIELD(temp_v1, s16 *, 0x10) = 0xB;
-        M2C_FIELD(temp_v1, s16 *, 0x12) = 1;
-    }
-    var_a2 = 1;
-    if (arg5 == 1) {
-        temp_t1 = var_t1 + 0xB;
-        temp_a0_3 = (var_t2 * 2) + ((temp_t1 * 0x60) + &dungeon);
-        M2C_FIELD(temp_a0_3, s16 *, 6) = 0xB;
-        M2C_FIELD(temp_a0_3, s16 *, 0x10) = 0xB;
-        M2C_FIELD(temp_a0_3, s16 *, 4) = 0xE;
-        M2C_FIELD(temp_a0_3, s16 *, 8) = 9;
-        M2C_FIELD(temp_a0_3, s16 *, 0xE) = 5;
-        if (M2C_FIELD(temp_a0_3, u16 *, 0x12) != 4) {
-            M2C_FIELD(temp_a0_3, u16 *, 0x12) = 0x15U;
-        }
-        var_t1 = temp_t1 - 0xB;
-        var_a2 = 1;
-    }
-    var_a1 = 1;
-    do {
-        temp_v1_2 = var_t2 + var_a2;
-loop_14:
-        temp_v1_3 = var_t1 + var_a1;
-        *((temp_v1_2 * 2) + ((temp_v1_3 * 0x60) + &dungeon)) = 0xD;
-        temp_a0_4 = mydflags + ((temp_v1_2 * 0x28) + temp_v1_3);
-        var_a1 += 1;
-        *temp_a0_4 |= 0x40;
-        if (var_a1 < 0xB) {
-            goto loop_14;
-        }
-        var_a2 += 1;
-        var_a1 = 1;
-    } while (var_a2 < 0xB);
-    temp_a2_4 = &dungeon + 0x180;
-    temp_v0 = var_t1 * 0x60;
-    temp_a0_5 = var_t2 * 2;
-    temp_a1_3 = temp_a0_5 + (temp_v0 + temp_a2_4);
-    temp_a0_6 = temp_a0_5 + (temp_v0 + (temp_a2_4 + 0x120));
-    M2C_FIELD(temp_a1_3, s16 *, 8) = 0xF;
-    M2C_FIELD(temp_a0_6, s16 *, 8) = 0xF;
-    M2C_FIELD(temp_a1_3, s16 *, 0xE) = 0xF;
-    M2C_FIELD(temp_a0_6, s16 *, 0xE) = 0xF;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5GChamber__Fiiiiii);
 #if 0 /* ida */
 int __fastcall DRLG_L5GChamber__Fiiiiii(int a1, int a2, int a3, int a4, int a5, int a6)
 {
@@ -3874,51 +2692,12 @@ int __fastcall DRLG_L5GChamber__Fiiiiii(int a1, int a2, int a3, int a4, int a5, 
 }
 #endif
 
-/* ---- 0x8013E974  DRLG_L5GHall__Fiiii  DRLG_L1.CPP:1557-1572  seg drlg_l1_3  fsize 0 ---- */
+/* ---- 0x8013E974  DRLG_L5GHall__Fiiii  DRLG_L1.CPP:1557-1572  seg drlg_l1  fsize 0 ---- */
 /* void DRLG_L5GHall(int x1, int y1, int x2, int y2)
  *   x1=$a0 y1=$a1 x2=$a2 y2=$a3 i=$t0
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5GHall__Fiiii) */
-#if 0 /* m2c */
-void DRLG_L5GHall__Fiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s16 *var_a0;
-    s16 *var_v1_2;
-    s32 temp_a0;
-    s32 temp_v0_2;
-    s32 var_t0;
-    s32 var_t0_2;
-    void *temp_v0;
-    void *var_v1;
-
-    var_t0 = arg1;
-    if (arg1 == arg3) {
-        var_t0_2 = arg0;
-        if (var_t0_2 < arg2) {
-            var_v1 = (var_t0_2 * 0x60) + &dungeon;
-            do {
-                temp_v0 = (arg3 * 2) + var_v1;
-                var_t0_2 += 1;
-                M2C_FIELD(temp_v0, s16 *, 0) = 0xC;
-                M2C_FIELD(temp_v0, s16 *, 6) = 0xC;
-                var_v1 += 0x60;
-            } while (var_t0_2 < arg2);
-        }
-    } else if (var_t0 < arg3) {
-        temp_v0_2 = arg0 * 0x60;
-        temp_a0 = var_t0 * 2;
-        var_v1_2 = temp_a0 + (temp_v0_2 + (&dungeon + 0x120));
-        var_a0 = temp_a0 + (temp_v0_2 + &dungeon);
-        do {
-            *var_a0 = 0xB;
-            *var_v1_2 = 0xB;
-            var_v1_2 += 2;
-            var_t0 += 1;
-            var_a0 += 2;
-        } while (var_t0 < arg3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5GHall__Fiiii);
 #if 0 /* ida */
 int __fastcall DRLG_L5GHall__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -3973,445 +2752,12 @@ int __fastcall DRLG_L5GHall__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x8013EA28  L5tileFix__Fv  DRLG_L1.CPP:1579-1642  seg drlg_l1_3  fsize 16 ---- */
+/* ---- 0x8013EA28  L5tileFix__Fv  DRLG_L1.CPP:1579-1642  seg drlg_l1  fsize 16 ---- */
 /* void L5tileFix(void)
  *   i=$s0 j=$t2
  *   blocks: {1 }64
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", L5tileFix__Fv) */
-#if 0 /* m2c */
-void L5tileFix__Fv(void) {
-    M2C_UNK *var_a1;
-    M2C_UNK *var_a1_2;
-    M2C_UNK *var_a2_2;
-    s32 temp_a1;
-    s32 var_a2;
-    s32 var_a2_3;
-    s32 var_a3;
-    s32 var_a3_2;
-    s32 var_a3_3;
-    s32 var_s0;
-    s32 var_t2;
-    s32 var_t2_2;
-    s32 var_t2_3;
-    u16 *temp_a0_10;
-    u16 *temp_a0_2;
-    u16 *temp_a0_3;
-    u16 *temp_a0_4;
-    u16 *temp_a0_5;
-    u16 *temp_v1;
-    u16 *temp_v1_10;
-    u16 *temp_v1_11;
-    u16 *temp_v1_12;
-    u16 *temp_v1_13;
-    u16 *temp_v1_14;
-    u16 *temp_v1_15;
-    u16 *temp_v1_16;
-    u16 *temp_v1_17;
-    u16 *temp_v1_18;
-    u16 *temp_v1_2;
-    u16 *temp_v1_3;
-    u16 *temp_v1_5;
-    u16 *temp_v1_6;
-    u16 *temp_v1_7;
-    u16 *temp_v1_8;
-    u16 *temp_v1_9;
-    u16 *var_a0;
-    u16 *var_a0_2;
-    u16 *var_a0_3;
-    u16 *var_v0;
-    u16 *var_v0_10;
-    u16 *var_v0_11;
-    u16 *var_v0_12;
-    u16 *var_v0_13;
-    u16 *var_v0_14;
-    u16 *var_v0_16;
-    u16 *var_v0_2;
-    u16 *var_v0_3;
-    u16 *var_v0_4;
-    u16 *var_v0_5;
-    u16 *var_v0_6;
-    u16 *var_v0_7;
-    u16 *var_v0_8;
-    u16 *var_v0_9;
-    u16 *var_v1_2;
-    u16 *var_v1_5;
-    u16 temp_a0;
-    u16 temp_a0_8;
-    u16 var_v0_15;
-    void *temp_a0_6;
-    void *temp_a0_7;
-    void *temp_a0_9;
-    void *temp_t0;
-    void *temp_t6;
-    void *temp_v1_19;
-    void *temp_v1_20;
-    void *temp_v1_4;
-    void *var_a0_4;
-    void *var_a0_5;
-    void *var_a0_6;
-    void *var_t0;
-    void *var_v1;
-    void *var_v1_3;
-    void *var_v1_4;
-    void *var_v1_6;
-
-    var_t2 = 0;
-    temp_t6 = &dungeon + 0x60;
-    var_a2 = 0 * 2;
-    do {
-        var_a1 = &dungeon;
-        var_a3 = 0;
-        var_t0 = temp_t6;
-loop_2:
-        var_a0 = var_a2 + var_a1;
-        if (*(var_a2 + var_a1) == 2) {
-            temp_v1 = var_a2 + var_t0;
-            if (*temp_v1 == 0x16) {
-                *temp_v1 = 0x17;
-                var_a0 = var_a2 + var_a1;
-            }
-        }
-        var_v0 = var_a2 + var_a1;
-        if (*var_a0 == 0xD) {
-            temp_v1_2 = var_a2 + (var_a3 + temp_t6);
-            if (*temp_v1_2 == 0x16) {
-                *temp_v1_2 = 0x12;
-            }
-            var_v0 = var_a2 + var_a1;
-            if (*var_a0 == 0xD) {
-                var_v0 = var_a2 + var_a1;
-                if (*temp_v1_2 == 2) {
-                    *temp_v1_2 = 7;
-                    var_v0 = var_a2 + var_a1;
-                }
-            }
-        }
-        var_v1 = var_a2 + var_a1;
-        if (*var_v0 == 6) {
-            temp_v1_3 = var_a2 + (var_a3 + temp_t6);
-            if (*temp_v1_3 == 0x16) {
-                *temp_v1_3 = 0x18;
-            }
-            var_v1 = var_a2 + var_a1;
-        }
-        if ((M2C_FIELD(var_v1, u16 *, 0) == 1) && (M2C_FIELD(var_v1, u16 *, 2) == 0x16)) {
-            M2C_FIELD(var_v1, u16 *, 2) = 0x18U;
-        }
-        temp_v1_4 = var_a2 + var_a1;
-        temp_a0 = M2C_FIELD(temp_v1_4, u16 *, 0);
-        if (temp_a0 == 0xD) {
-            if (M2C_FIELD(temp_v1_4, u16 *, 2) == 1) {
-                M2C_FIELD(temp_v1_4, u16 *, 2) = 6U;
-            }
-            if ((M2C_FIELD(temp_v1_4, u16 *, 0) == temp_a0) && (M2C_FIELD(temp_v1_4, u16 *, 2) == 0x16)) {
-                M2C_FIELD(temp_v1_4, u16 *, 2) = 0x13U;
-            }
-        }
-        var_a1 += 0x60;
-        var_a3 += 0x60;
-        var_t0 += 0x60;
-        if ((s32) var_a1 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_t2 += 1;
-        var_a2 = var_t2 * 2;
-    } while (var_t2 < 0x28);
-    var_t2_2 = 0;
-    temp_t0 = &dungeon + 0x60;
-    do {
-        var_s0 = 0;
-        temp_a1 = var_t2_2 * 2;
-        var_a2_2 = &dungeon;
-        var_a3_2 = 0;
-loop_28:
-        temp_a0_2 = temp_a1 + var_a2_2;
-        var_v0_2 = temp_a1 + var_a2_2;
-        if (*temp_a0_2 == 0xD) {
-            temp_v1_5 = temp_a1 + (var_a3_2 + temp_t0);
-            if (*temp_v1_5 == 0x13) {
-                *temp_v1_5 = 0x15;
-            }
-            var_v0_2 = temp_a1 + var_a2_2;
-            if (*temp_a0_2 == 0xD) {
-                var_v0_2 = temp_a1 + var_a2_2;
-                if (*temp_v1_5 == 0x16) {
-                    *temp_v1_5 = 0x14;
-                    var_v0_2 = temp_a1 + var_a2_2;
-                }
-            }
-        }
-        var_v0_3 = temp_a1 + var_a2_2;
-        if (*var_v0_2 == 7) {
-            temp_v1_6 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_3 = temp_a1 + var_a2_2;
-            if (*temp_v1_6 == 0x16) {
-                *temp_v1_6 = 0x17;
-                var_v0_3 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_4 = temp_a1 + var_a2_2;
-        if (*var_v0_3 == 0xD) {
-            temp_v1_7 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_4 = temp_a1 + var_a2_2;
-            if (*temp_v1_7 == 0x18) {
-                *temp_v1_7 = 0x15;
-                var_v0_4 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_5 = temp_a1 + var_a2_2;
-        if (*var_v0_4 == 0x13) {
-            temp_v1_8 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_5 = temp_a1 + var_a2_2;
-            if (*temp_v1_8 == 0x16) {
-                *temp_v1_8 = 0x14;
-                var_v0_5 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_6 = temp_a1 + var_a2_2;
-        if (*var_v0_5 == 2) {
-            temp_v1_9 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_6 = temp_a1 + var_a2_2;
-            if (*temp_v1_9 == 0x13) {
-                *temp_v1_9 = 0x15;
-                var_v0_6 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_7 = temp_a1 + var_a2_2;
-        if (*var_v0_6 == 0x13) {
-            temp_v1_10 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_7 = temp_a1 + var_a2_2;
-            if (*temp_v1_10 == 1) {
-                *temp_v1_10 = 6;
-            }
-        }
-        var_v0_8 = temp_a1 + var_a2_2;
-        if (*var_v0_7 == 7) {
-            temp_v1_11 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_8 = temp_a1 + var_a2_2;
-            if (*temp_v1_11 == 0x13) {
-                *temp_v1_11 = 0x15;
-                var_v0_8 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_9 = temp_a1 + var_a2_2;
-        if (*var_v0_8 == 2) {
-            temp_v1_12 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_9 = temp_a1 + var_a2_2;
-            if (*temp_v1_12 == 1) {
-                *temp_v1_12 = 6;
-                var_v0_9 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_10 = temp_a1 + var_a2_2;
-        if (*var_v0_9 == 3) {
-            temp_v1_13 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_10 = temp_a1 + var_a2_2;
-            if (*temp_v1_13 == 0x16) {
-                *temp_v1_13 = 0x18;
-            }
-        }
-        var_a0_2 = temp_a1 + var_a2_2;
-        if (*var_v0_10 == 0x15) {
-            temp_v1_14 = temp_a1 + (var_a3_2 + temp_t0);
-            if (*temp_v1_14 == 1) {
-                *temp_v1_14 = 6;
-                var_a0_2 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_11 = temp_a1 + var_a2_2;
-        if (*var_a0_2 == 7) {
-            temp_v1_15 = temp_a1 + (var_a3_2 + temp_t0);
-            if (*temp_v1_15 == 1) {
-                *temp_v1_15 = 6;
-            }
-            var_v0_11 = temp_a1 + var_a2_2;
-            if (*var_a0_2 == 7) {
-                var_v0_11 = temp_a1 + var_a2_2;
-                if (*temp_v1_15 == 0x18) {
-                    *temp_v1_15 = 0x15;
-                    var_v0_11 = temp_a1 + var_a2_2;
-                }
-            }
-        }
-        var_v0_12 = temp_a1 + var_a2_2;
-        if (*var_v0_11 == 4) {
-            temp_a0_3 = temp_a1 + (var_a3_2 + temp_t0);
-            var_v0_12 = temp_a1 + var_a2_2;
-            if (*temp_a0_3 == 0x10) {
-                *temp_a0_3 = 0x11;
-                var_v0_12 = temp_a1 + var_a2_2;
-            }
-        }
-        var_a0_3 = temp_a1 + var_a2_2;
-        if (*var_v0_12 == 7) {
-            temp_v1_16 = temp_a1 + (var_a3_2 + temp_t0);
-            if (*temp_v1_16 == 0xD) {
-                *temp_v1_16 = 0x11;
-                var_a0_3 = temp_a1 + var_a2_2;
-            }
-        }
-        var_v0_13 = temp_a1 + var_a2_2;
-        if (*var_a0_3 == 2) {
-            temp_v1_17 = temp_a1 + (var_a3_2 + temp_t0);
-            if (*temp_v1_17 == 0x18) {
-                *temp_v1_17 = 0x15;
-            }
-            var_v0_13 = temp_a1 + var_a2_2;
-            if (*var_a0_3 == 2) {
-                var_v0_13 = temp_a1 + var_a2_2;
-                if (*temp_v1_17 == 0xD) {
-                    *temp_v1_17 = 0x11;
-                    var_v0_13 = temp_a1 + var_a2_2;
-                }
-            }
-        }
-        var_v0_14 = temp_a1 + var_a2_2;
-        if (*var_v0_13 == 0x17) {
-            temp_v1_18 = temp_a1 + (var_a3_2 + &D_800E4064);
-            var_v0_14 = temp_a1 + var_a2_2;
-            if (*temp_v1_18 == 0x16) {
-                *temp_v1_18 = 0x13;
-            }
-        }
-        var_v1_2 = temp_a1 + var_a2_2;
-        if (*var_v0_14 == 0x13) {
-            temp_a0_4 = temp_a1 + (var_a3_2 + &D_800E4064);
-            var_v1_2 = temp_a1 + var_a2_2;
-            if (*temp_a0_4 == 0x17) {
-                *temp_a0_4 = 0x15;
-            }
-        }
-        if (*var_v1_2 == 6) {
-            temp_a0_5 = temp_a1 + (var_a3_2 + &D_800E4064);
-            if (*temp_a0_5 == 0x16) {
-                *temp_a0_5 = 0x18;
-            }
-            var_v1_3 = temp_a1 + var_a2_2;
-            if (*var_v1_2 == 6) {
-                var_v1_3 = temp_a1 + var_a2_2;
-                if (*temp_a0_5 == 0x17) {
-                    *temp_a0_5 = 0x15;
-                    goto block_91;
-                }
-            }
-        } else {
-block_91:
-            var_v1_3 = temp_a1 + var_a2_2;
-        }
-        temp_a0_6 = temp_a1 + var_a2_2;
-        if ((M2C_FIELD(var_v1_3, u16 *, 0) == 1) && (M2C_FIELD(var_v1_3, u16 *, 2) == 2)) {
-            M2C_FIELD(var_v1_3, u16 *, 2) = 7U;
-        }
-        if ((M2C_FIELD(temp_a0_6, u16 *, 0) == 6) && (M2C_FIELD(temp_a0_6, u16 *, 2) == 0x12)) {
-            M2C_FIELD(temp_a0_6, u16 *, 2) = 0x15U;
-        }
-        temp_a0_7 = temp_a1 + var_a2_2;
-        if (M2C_FIELD(temp_a0_7, u16 *, 0) == 0x12) {
-            var_v1_4 = temp_a1 + var_a2_2;
-            if (M2C_FIELD(temp_a0_7, u16 *, 2) == 2) {
-                M2C_FIELD(temp_a0_7, u16 *, 2) = 7U;
-                goto block_101;
-            }
-        } else {
-block_101:
-            var_v1_4 = temp_a1 + var_a2_2;
-        }
-        if ((M2C_FIELD(var_v1_4, u16 *, 0) == 6) && (M2C_FIELD(var_v1_4, u16 *, 2) == 2)) {
-            M2C_FIELD(var_v1_4, u16 *, 2) = 7U;
-        }
-        var_v1_5 = temp_a1 + var_a2_2;
-        var_v0_15 = M2C_FIELD(var_v1_5, u16 *, 0);
-        if (var_v0_15 == 0x15) {
-            if (M2C_FIELD(var_v1_5, u16 *, 2) == 2) {
-                M2C_FIELD(var_v1_5, u16 *, 2) = 7U;
-                var_v1_5 = temp_a1 + var_a2_2;
-            }
-            var_v0_15 = *var_v1_5;
-        }
-        if (var_v0_15 == 6) {
-            if (M2C_FIELD(var_v1_5, u16 *, 2) == 0x16) {
-                M2C_FIELD(var_v1_5, u16 *, 2) = 0x18U;
-            }
-            if ((M2C_FIELD(var_v1_5, u16 *, 0) == 6) && (M2C_FIELD(var_v1_5, u16 *, 2) == 0xD)) {
-                M2C_FIELD(var_v1_5, u16 *, 2) = 0x10U;
-            }
-        }
-        temp_v1_19 = temp_a1 + var_a2_2;
-        var_a0_4 = temp_a1 + var_a2_2;
-        if ((M2C_FIELD(temp_v1_19, u16 *, 0) == 1) && (M2C_FIELD(temp_v1_19, u16 *, 2) == 0xD)) {
-            M2C_FIELD(temp_v1_19, u16 *, 2) = 0x10U;
-            var_a0_4 = temp_a1 + var_a2_2;
-        }
-        var_v1_6 = temp_a1 + var_a2_2;
-        if (M2C_FIELD(var_a0_4, u16 *, 0) == 0xD) {
-            var_v1_6 = temp_a1 + var_a2_2;
-            if (M2C_FIELD(var_a0_4, u16 *, 2) == 0x10) {
-                M2C_FIELD(var_a0_4, u16 *, 2) = 0x11U;
-            }
-        }
-        temp_a0_8 = M2C_FIELD(var_v1_6, u16 *, 0);
-        if (temp_a0_8 == 6) {
-            if (M2C_FIELD(var_v1_6, u16 *, -2) == 0x16) {
-                M2C_FIELD(var_v1_6, u16 *, -2) = 7U;
-            }
-            if ((M2C_FIELD(var_v1_6, u16 *, 0) == temp_a0_8) && (M2C_FIELD(var_v1_6, u16 *, -2) == 0x16)) {
-                M2C_FIELD(var_v1_6, u16 *, -2) = 0x18U;
-            }
-        }
-        temp_v1_20 = temp_a1 + var_a2_2;
-        var_a0_5 = temp_a1 + var_a2_2;
-        if ((M2C_FIELD(temp_v1_20, u16 *, 0) == 7) && (M2C_FIELD(temp_v1_20, u16 *, -2) == 0x18)) {
-            M2C_FIELD(temp_v1_20, u16 *, -2) = 0x15U;
-            var_a0_5 = temp_a1 + var_a2_2;
-        }
-        if ((M2C_FIELD(var_a0_5, u16 *, 0) == 0x12) && (M2C_FIELD(var_a0_5, u16 *, -2) == 0x18)) {
-            M2C_FIELD(var_a0_5, u16 *, -2) = 0x15U;
-        }
-        var_a2_2 += 0x60;
-        var_s0 += 1;
-        var_a3_2 += 0x60;
-        if (var_s0 < 0x28) {
-            goto loop_28;
-        }
-        var_t2_2 += 1;
-    } while (var_t2_2 < 0x28);
-    var_t2_3 = 0;
-    var_a2_3 = 0 * 2;
-    do {
-        var_a1_2 = &dungeon;
-        var_a3_3 = 0;
-loop_137:
-        temp_a0_9 = var_a2_3 + var_a1_2;
-        var_v0_16 = var_a2_3 + var_a1_2;
-        if (M2C_FIELD(temp_a0_9, u16 *, 0) == 4) {
-            var_v0_16 = var_a2_3 + var_a1_2;
-            if (M2C_FIELD(temp_a0_9, u16 *, 2) == 2) {
-                M2C_FIELD(temp_a0_9, u16 *, 2) = 7U;
-                var_v0_16 = var_a2_3 + var_a1_2;
-            }
-        }
-        var_a0_6 = var_a2_3 + var_a1_2;
-        if (*var_v0_16 == 2) {
-            temp_a0_10 = var_a2_3 + (var_a3_3 + (&dungeon + 0x60));
-            if (*temp_a0_10 == 0x13) {
-                *temp_a0_10 = 0x15;
-            }
-            var_a0_6 = var_a2_3 + var_a1_2;
-        }
-        if ((M2C_FIELD(var_a0_6, u16 *, 0) == 0x12) && (M2C_FIELD(var_a0_6, u16 *, 2) == 0x16)) {
-            M2C_FIELD(var_a0_6, u16 *, 2) = 0x14U;
-        }
-        var_a1_2 += 0x60;
-        var_a3_3 += 0x60;
-        if ((s32) var_a1_2 < (s32) (&dungeon + 0xF00)) {
-            goto loop_137;
-        }
-        var_t2_3 += 1;
-        var_a2_3 = var_t2_3 * 2;
-    } while (var_t2_3 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5tileFix__Fv);
 #if 0 /* ida */
 BOOL L5tileFix__Fv()
 {
@@ -4878,89 +3224,12 @@ LABEL_102:
 }
 #endif
 
-/* ---- 0x8013F2EC  DRLG_L5Subs__Fv  DRLG_L1.CPP:1648-1682  seg drlg_l1_3  fsize 56 ---- */
+/* ---- 0x8013F2EC  DRLG_L5Subs__Fv  DRLG_L1.CPP:1648-1682  seg drlg_l1  fsize 56 ---- */
 /* void DRLG_L5Subs(void)
  *   x=$s5 y=$s6 i=$a0 rv=$v1
  *   blocks: {1 }35
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5Subs__Fv) */
-#if 0 /* m2c */
-void DRLG_L5Subs__Fv(void) {
-    M2C_UNK *var_s2;
-    s16 *var_v0;
-    s16 var_a0;
-    s32 temp_s3;
-    s32 var_a0_2;
-    s32 var_s1;
-    s32 var_s4;
-    s32 var_s5;
-    s32 var_s6;
-    s32 var_s7;
-    s32 var_v1;
-    u8 *temp_a1_2;
-    u8 temp_s0;
-    void *temp_a1;
-
-    var_s6 = 0;
-    var_s7 = 0;
-    do {
-        var_s5 = 0;
-        temp_s3 = var_s6 * 2;
-        var_s2 = &dungeon;
-        var_s4 = 0;
-        var_s1 = var_s7;
-loop_2:
-        if (ENG_random__Fl(4) == 0) {
-            temp_s0 = *(&L5BTYPES + *(temp_s3 + var_s2));
-            if ((temp_s0 != 0) && (*(mydflags + var_s1) == 0)) {
-                var_v1 = ENG_random__Fl(0x10);
-                var_a0 = -1;
-                if (var_v1 >= 0) {
-                    var_a0_2 = 0;
-                    do {
-                        if (var_a0_2 == 0xCE) {
-                            var_a0_2 = 0;
-                        }
-                        if (temp_s0 == *(&L5BTYPES + var_a0_2)) {
-                            var_v1 -= 1;
-                        }
-                        var_a0_2 += 1;
-                    } while (var_v1 >= 0);
-                    var_a0 = var_a0_2 - 1;
-                }
-                if (var_a0 == 0x59) {
-                    temp_a1 = temp_s3 + var_s2;
-                    if ((*(&L5BTYPES + M2C_FIELD(temp_a1, u8 *, -2)) == 0x4F) && (M2C_FIELD((var_s1 + mydflags), u8 *, -0x28) == 0)) {
-                        M2C_FIELD(temp_a1, u8 *, -2) = 0x5A;
-                    } else {
-                        var_a0 = 0x4F;
-                    }
-                }
-                var_v0 = temp_s3 + var_s2;
-                if (var_a0 == 0x5B) {
-                    temp_a1_2 = temp_s3 + (var_s4 + (&dungeon + 0x60));
-                    if ((*(&L5BTYPES + *temp_a1_2) == 0x50) && (M2C_FIELD((var_s1 + mydflags), u8 *, 1) == 0)) {
-                        *temp_a1_2 = 0x5C;
-                    } else {
-                        var_a0 = 0x50;
-                    }
-                    var_v0 = temp_s3 + var_s2;
-                }
-                *var_v0 = var_a0;
-            }
-        }
-        var_s2 += 0x60;
-        var_s4 += 0x60;
-        var_s5 += 1;
-        var_s1 += 1;
-        if (var_s5 < 0x28) {
-            goto loop_2;
-        }
-        var_s6 += 1;
-        var_s7 += 0x28;
-    } while (var_s6 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5Subs__Fv);
 #if 0 /* ida */
 BOOL DRLG_L5Subs__Fv()
 {
@@ -5047,59 +3316,12 @@ BOOL DRLG_L5Subs__Fv()
 }
 #endif
 
-/* ---- 0x8013F4F8  DRLG_L5SetRoom__Fii  DRLG_L1.CPP:1688-1716  seg drlg_l1_3  fsize 16 ---- */
+/* ---- 0x8013F4F8  DRLG_L5SetRoom__Fii  DRLG_L1.CPP:1688-1716  seg drlg_l1  fsize 16 ---- */
 /* void DRLG_L5SetRoom(int rx1, int ry1)
  *   rx1=$a0 ry1=$a1 rw=$t4 rh=$t5 i=$a3 j=$t2 sp=$t0
  *   blocks: {1 }29
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5SetRoom__Fii) */
-#if 0 /* m2c */
-void DRLG_L5SetRoom__Fii(s32 arg0, s32 arg1) {
-    s32 temp_t1;
-    s32 temp_v1;
-    s32 var_a2;
-    s32 var_a3;
-    s32 var_t2;
-    u8 *temp_v1_3;
-    u8 *var_t0;
-    u8 temp_t4;
-    u8 temp_t5;
-    u8 temp_v1_2;
-
-    var_t2 = 0;
-    temp_t4 = M2C_FIELD(pSetPiece, u8 *, 0);
-    temp_t5 = M2C_FIELD(pSetPiece, u8 *, 2);
-    setpc_x = arg0;
-    setpc_y = arg1;
-    setpc_w = (s32) temp_t4;
-    setpc_h = (s32) temp_t5;
-    var_t0 = pSetPiece + 4;
-    if (temp_t5 != 0) {
-        do {
-            var_a3 = 0;
-            if (temp_t4 != 0) {
-                temp_v1 = arg1 + var_t2;
-                temp_t1 = temp_v1 * 2;
-                var_a2 = arg0;
-                do {
-                    temp_v1_2 = *var_t0;
-                    if (temp_v1_2 != 0) {
-                        *(temp_t1 + ((var_a2 * 0x60) + &dungeon)) = (s16) temp_v1_2;
-                        temp_v1_3 = mydflags + ((temp_v1 * 0x28) + var_a2);
-                        *temp_v1_3 |= 0x80;
-                    } else {
-                        *(temp_t1 + ((var_a2 * 0x60) + &dungeon)) = 0xD;
-                    }
-                    var_t0 += 2;
-                    var_a3 += 1;
-                    var_a2 += 1;
-                } while (var_a3 < (s32) temp_t4);
-            }
-            var_t2 += 1;
-        } while (var_t2 < (s32) temp_t5);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5SetRoom__Fii);
 #if 0 /* ida */
 int __fastcall DRLG_L5SetRoom__Fii(int a1, int a2)
 {
@@ -5155,218 +3377,12 @@ int __fastcall DRLG_L5SetRoom__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8013F5F8  L5FillChambers__Fv  DRLG_L1.CPP:1722-1798  seg drlg_l1_3  fsize 32 ---- */
+/* ---- 0x8013F5F8  L5FillChambers__Fv  DRLG_L1.CPP:1722-1798  seg drlg_l1  fsize 32 ---- */
 /* void L5FillChambers(void)
  *   c=$s0
  *   blocks: {1 }77
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", L5FillChambers__Fv) */
-#if 0 /* m2c */
-void L5FillChambers__Fv(void) {
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_s0;
-
-    if (D_8011C8D8 != 0) {
-        DRLG_L5GChamber__Fiiiiii(0, 0xE, 0, 0, 0, 1);
-    }
-    if (D_8011C8D9 != 0) {
-        if (D_8011C8D8 != 0) {
-            if (D_8011C8DA == 0) {
-                DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 0, 0, 1, 0);
-            }
-            if (D_8011C8D8 == 0) {
-                goto block_7;
-            }
-            goto block_10;
-        }
-block_7:
-        if (D_8011C8DA != 0) {
-            DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 0, 0, 0, 1);
-        }
-        if (D_8011C8D8 != 0) {
-block_10:
-            if (D_8011C8DA != 0) {
-                DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 0, 0, 1, 1);
-            }
-            if (D_8011C8D8 == 0) {
-                goto block_13;
-            }
-            goto block_15;
-        }
-block_13:
-        if (D_8011C8DA == 0) {
-            DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 0, 0, 0, 0);
-            goto block_15;
-        }
-        goto block_16;
-    }
-block_15:
-    if (D_8011C8DA != 0) {
-block_16:
-        DRLG_L5GChamber__Fiiiiii(0x1C, 0xE, 0, 0, 1, 0);
-    }
-    if (D_8011C8D8 != 0) {
-        if (D_8011C8D9 != 0) {
-            DRLG_L5GHall__Fiiii(0xC, 0x12, 0xE, 0x12);
-            goto block_20;
-        }
-    } else {
-block_20:
-        if ((D_8011C8D9 != 0) && (D_8011C8DA != 0)) {
-            DRLG_L5GHall__Fiiii(0x1A, 0x12, 0x1C, 0x12);
-        }
-    }
-    if ((D_8011C8D8 != 0) && (D_8011C8D9 == 0) && (D_8011C8DA != 0)) {
-        DRLG_L5GHall__Fiiii(0xC, 0x12, 0x1C, 0x12);
-    }
-    if (D_8011C8DB != 0) {
-        DRLG_L5GChamber__Fiiiiii(0xE, 0, 0, 1, 0, 0);
-    }
-    if (D_8011C8DC != 0) {
-        if (D_8011C8DB != 0) {
-            if (D_8011C8DD == 0) {
-                DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 1, 0, 0, 0);
-            }
-            if (D_8011C8DB == 0) {
-                goto block_34;
-            }
-            goto block_37;
-        }
-block_34:
-        if (D_8011C8DD != 0) {
-            DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 0, 1, 0, 0);
-        }
-        if (D_8011C8DB != 0) {
-block_37:
-            if (D_8011C8DD != 0) {
-                DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 1, 1, 0, 0);
-            }
-            if (D_8011C8DB == 0) {
-                goto block_40;
-            }
-            goto block_42;
-        }
-block_40:
-        if (D_8011C8DD == 0) {
-            DRLG_L5GChamber__Fiiiiii(0xE, 0xE, 0, 0, 0, 0);
-            goto block_42;
-        }
-        goto block_43;
-    }
-block_42:
-    if (D_8011C8DD != 0) {
-block_43:
-        DRLG_L5GChamber__Fiiiiii(0xE, 0x1C, 1, 0, 0, 0);
-    }
-    if (D_8011C8DB != 0) {
-        if (D_8011C8DC != 0) {
-            DRLG_L5GHall__Fiiii(0x12, 0xC, 0x12, 0xE);
-            goto block_47;
-        }
-    } else {
-block_47:
-        if ((D_8011C8DC != 0) && (D_8011C8DD != 0)) {
-            DRLG_L5GHall__Fiiii(0x12, 0x1A, 0x12, 0x1C);
-        }
-    }
-    if ((D_8011C8DB != 0) && (D_8011C8DC == 0) && (D_8011C8DD != 0)) {
-        DRLG_L5GHall__Fiiii(0x12, 0xC, 0x12, 0x1C);
-    }
-    if (setloadflag != 0) {
-        var_s0 = 1;
-        if (D_8011C8DB == 0) {
-            if ((D_8011C8DC == 0) && (D_8011C8DD == 0)) {
-                if (D_8011C8D8 == 0) {
-                    if ((D_8011C8D9 != 0) && (D_8011C8DA != 0) && (ENG_random__Fl(2) != 0)) {
-                        var_s0 = 2;
-                    }
-                    if (D_8011C8D8 != 0) {
-                        goto block_64;
-                    }
-                } else {
-block_64:
-                    if ((D_8011C8D9 != 0) && (D_8011C8DA == 0) && (ENG_random__Fl(2) != 0)) {
-                        var_s0 = 0;
-                    }
-                    if (D_8011C8D8 != 0) {
-                        if ((D_8011C8D9 == 0) && (D_8011C8DA != 0)) {
-                            var_s0 = (ENG_random__Fl(2) == 0) * 2;
-                        }
-                        if ((D_8011C8D8 != 0) && (D_8011C8D9 != 0) && (D_8011C8DA != 0)) {
-                            var_s0 = ENG_random__Fl(3);
-                        }
-                    }
-                }
-                if (var_s0 != 1) {
-                    if (var_s0 < 2) {
-                        var_a0 = 2;
-                        if (var_s0 != 0) {
-                            return;
-                        }
-                        var_a1 = 0x10;
-                        goto block_112;
-                    }
-                    var_a0 = 0x1E;
-                    if (var_s0 != 2) {
-                        return;
-                    }
-                    var_a1 = 0x10;
-                    goto block_112;
-                }
-                var_a0 = 0x10;
-                var_a1 = 0x10;
-                goto block_112;
-            }
-            var_s0 = 1;
-            if (D_8011C8DB == 0) {
-                if ((D_8011C8DC != 0) && (D_8011C8DD != 0) && (ENG_random__Fl(2) != 0)) {
-                    var_s0 = 2;
-                }
-                if (D_8011C8DB != 0) {
-                    goto block_91;
-                }
-            } else {
-                goto block_91;
-            }
-            goto block_103;
-        }
-block_91:
-        if ((D_8011C8DC != 0) && (D_8011C8DD == 0) && (ENG_random__Fl(2) != 0)) {
-            var_s0 = 0;
-        }
-        if (D_8011C8DB != 0) {
-            if ((D_8011C8DC == 0) && (D_8011C8DD != 0)) {
-                var_s0 = (ENG_random__Fl(2) == 0) * 2;
-            }
-            if ((D_8011C8DB != 0) && (D_8011C8DC != 0) && (D_8011C8DD != 0)) {
-                var_s0 = ENG_random__Fl(3);
-            }
-        }
-block_103:
-        if (var_s0 != 1) {
-            if (var_s0 < 2) {
-                var_a0 = 0x10;
-                if (var_s0 != 0) {
-                    return;
-                }
-                var_a1 = 2;
-                goto block_112;
-            }
-            var_a0 = 0x10;
-            if (var_s0 != 2) {
-                return;
-            }
-            var_a1 = 0x1E;
-            goto block_112;
-        }
-        var_a0 = 0x10;
-        var_a1 = 0x10;
-block_112:
-        DRLG_L5SetRoom__Fii(var_a0, var_a1);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", L5FillChambers__Fv);
 #if 0 /* ida */
 int L5FillChambers__Fv()
 {
@@ -5565,98 +3581,12 @@ LABEL_67:
 }
 #endif
 
-/* ---- 0x8013FCE4  DRLG_L5FTVR__Fiiiii  DRLG_L1.CPP:1807-1845  seg drlg_l1_3  fsize 72 ---- */
+/* ---- 0x8013FCE4  DRLG_L5FTVR__Fiiiii  DRLG_L1.CPP:1807-1845  seg drlg_l1  fsize 72 ---- */
 /* void DRLG_L5FTVR(int i, int j, int x, int y, int d)
  *   i=$s1 j=$s7 x=$s0 y=$fp d=$a1
  *   blocks: {1 }39
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5FTVR__Fiiiii) */
-#if 0 /* m2c */
-void DRLG_L5FTVR__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 sp18;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_s0;
-    s32 temp_s1;
-    s32 temp_s2;
-    s32 temp_s3;
-    s32 temp_s4;
-    s32 temp_s5;
-    s32 temp_s6;
-    s32 temp_t0;
-    s32 temp_t0_2;
-    s32 temp_t1;
-    s32 temp_t2;
-    s32 temp_v0;
-    s32 temp_v1;
-    s32 temp_v1_2;
-
-    temp_t1 = arg3 * 8;
-    temp_t2 = arg2 * 0x380;
-    temp_t0 = temp_t1 + temp_t2;
-    if (*(&dung_map + 7 + temp_t0) == 0) {
-        if (*((arg1 * 2) + ((arg0 * 0x60) + &dungeon)) == 0xD) {
-            temp_s6 = arg2 + 2;
-            sp18 = arg0 + 1;
-            *(&dung_map + 7 + temp_t0) = TransVal;
-            temp_t0_2 = (arg2 + 1) * 0x380;
-            *(&dung_map + 7 + (temp_t1 + temp_t0_2)) = TransVal;
-            temp_v0 = (arg3 + 1) * 8;
-            *(&dung_map + 7 + (temp_v0 + temp_t2)) = TransVal;
-            *(&dung_map + 7 + (temp_v0 + temp_t0_2)) = TransVal;
-            DRLG_L5FTVR__Fiiiii(sp18, arg1, temp_s6, 1);
-            temp_s5 = arg0 - 1;
-            temp_s4 = arg2 - 2;
-            DRLG_L5FTVR__Fiiiii(temp_s5, arg1, temp_s4, arg3, 2);
-            temp_s3 = arg1 + 1;
-            temp_s2 = arg3 + 2;
-            DRLG_L5FTVR__Fiiiii(arg0, temp_s3, arg2, temp_s2, 3);
-            temp_s1 = arg1 - 1;
-            temp_s0 = arg3 - 2;
-            DRLG_L5FTVR__Fiiiii(arg0, temp_s1, arg2, temp_s0, 4);
-            DRLG_L5FTVR__Fiiiii(temp_s5, temp_s1, temp_s4, temp_s0, 5);
-            DRLG_L5FTVR__Fiiiii(sp18, temp_s1, temp_s6, temp_s0, 6);
-            DRLG_L5FTVR__Fiiiii(temp_s5, temp_s3, temp_s4, temp_s2, 7);
-            DRLG_L5FTVR__Fiiiii(sp18, temp_s3, temp_s6, temp_s2, 8);
-            return;
-        }
-        goto block_4;
-    }
-block_4:
-    if (arg4 == 1) {
-        temp_v1 = arg2 * 0x380;
-        *(&dung_map + 7 + ((arg3 * 8) + temp_v1)) = TransVal;
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + temp_v1)) = TransVal;
-    }
-    if (arg4 == 2) {
-        temp_v1_2 = (arg2 + 1) * 0x380;
-        *(&dung_map + 7 + ((arg3 * 8) + temp_v1_2)) = TransVal;
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + temp_v1_2)) = TransVal;
-    }
-    if (arg4 == 3) {
-        temp_a0 = arg3 * 8;
-        *(&dung_map + 7 + (temp_a0 + (arg2 * 0x380))) = TransVal;
-        *(&dung_map + 7 + (temp_a0 + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 4) {
-        temp_a0_2 = (arg3 + 1) * 8;
-        *(&dung_map + 7 + (temp_a0_2 + (arg2 * 0x380))) = TransVal;
-        *(&dung_map + 7 + (temp_a0_2 + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 5) {
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 6) {
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + (arg2 * 0x380))) = TransVal;
-    }
-    if (arg4 == 7) {
-        *(&dung_map + 7 + ((arg3 * 8) + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 8) {
-        *(&dung_map + 7 + ((arg3 * 8) + (arg2 * 0x380))) = TransVal;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5FTVR__Fiiiii);
 #if 0 /* ida */
 int __fastcall DRLG_L5FTVR__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -5730,45 +3660,12 @@ int __fastcall DRLG_L5FTVR__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 }
 #endif
 
-/* ---- 0x8014016C  DRLG_L5FloodTVal__Fv  DRLG_L1.CPP:1852-1867  seg drlg_l1_3  fsize 56 ---- */
+/* ---- 0x8014016C  DRLG_L5FloodTVal__Fv  DRLG_L1.CPP:1852-1867  seg drlg_l1  fsize 56 ---- */
 /* void DRLG_L5FloodTVal(void)
  *   i=$s0 j=$s4 xx=$s3 yy=$s5
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5FloodTVal__Fv) */
-#if 0 /* m2c */
-void DRLG_L5FloodTVal__Fv(void) {
-    M2C_UNK *var_s2;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s5;
-
-    var_s5 = 0x10;
-    var_s4 = 0;
-    do {
-        var_s3 = 0x10;
-        var_s0 = 0;
-        var_s2 = &dungeon;
-        var_s1 = (var_s5 * 8) + 0x3800;
-loop_2:
-        if ((*((var_s4 * 2) + var_s2) == 0xD) && (*(&dung_map + 7 + var_s1) == 0)) {
-            DRLG_L5FTVR__Fiiiii(var_s0, var_s4, var_s3, var_s5, 0);
-            TransVal += 1;
-        }
-        var_s1 += 0x700;
-        var_s3 += 2;
-        var_s0 += 1;
-        var_s2 += 0x60;
-        if (var_s0 < 0x28) {
-            goto loop_2;
-        }
-        var_s4 += 1;
-        var_s5 += 2;
-    } while (var_s4 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5FloodTVal__Fv);
 #if 0 /* ida */
 BOOL DRLG_L5FloodTVal__Fv()
 {
@@ -5809,126 +3706,12 @@ BOOL DRLG_L5FloodTVal__Fv()
 }
 #endif
 
-/* ---- 0x80140264  DRLG_L5TransFix__Fv  DRLG_L1.CPP:1875-1982  seg drlg_l1_3  fsize 24 ---- */
+/* ---- 0x80140264  DRLG_L5TransFix__Fv  DRLG_L1.CPP:1875-1982  seg drlg_l1  fsize 24 ---- */
 /* void DRLG_L5TransFix(void)
  *   j=$s1 yy=$s0 v=$a2
  *   blocks: {1 }108
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5TransFix__Fv) */
-#if 0 /* m2c */
-void DRLG_L5TransFix__Fv(void) {
-    M2C_UNK *var_t2;
-    s32 temp_t0;
-    s32 temp_t5;
-    s32 var_a1;
-    s32 var_a3;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_t3;
-    s32 var_t4;
-    s32 var_t6;
-    s32 var_t7;
-    s32 var_t8;
-    u16 *temp_a0;
-    u16 *temp_v1_2;
-    u16 temp_a2;
-    void *temp_v1;
-    void *var_t1;
-
-    var_s0 = 0x10;
-    var_s1 = 0;
-    var_s2 = 0x78;
-    var_t4 = 0x88;
-    do {
-        temp_t0 = var_s1 * 2;
-        var_t2 = &dungeon;
-        var_t8 = 0;
-        var_t1 = &dungeon - 0x60;
-        temp_t5 = var_s0 * 8;
-        var_a1 = temp_t5 + 0x3800;
-        var_t7 = 0x3800;
-        var_t6 = 0x3480;
-        var_a3 = 0x3B80;
-        var_t3 = var_t4 + 0x3800;
-loop_2:
-        temp_v1 = temp_t0 + var_t2;
-        temp_a2 = M2C_FIELD(temp_v1, u16 *, 0);
-        if ((temp_a2 == 0x17) && (M2C_FIELD(temp_v1, u16 *, -2) == 0x12)) {
-            *(&dung_map + 7 + (temp_t5 + var_a3)) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t4 + var_a3)) = *(&dung_map + 7 + var_a1);
-        }
-        if ((temp_a2 == 0x18) && (*(temp_t0 + (var_t8 + (&dungeon + 0x60))) == 0x13)) {
-            *(&dung_map + 7 + var_t3) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t4 + var_a3)) = *(&dung_map + 7 + var_a1);
-        }
-        if (temp_a2 == 0x12) {
-            *(&dung_map + 7 + (temp_t5 + var_a3)) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t4 + var_a3)) = *(&dung_map + 7 + var_a1);
-        }
-        if (temp_a2 == 0x13) {
-            *(&dung_map + 7 + var_t3) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t4 + var_a3)) = *(&dung_map + 7 + var_a1);
-        }
-        if (temp_a2 == 0x14) {
-            *(&dung_map + 7 + (temp_t5 + var_a3)) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + var_t3) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t4 + var_a3)) = *(&dung_map + 7 + var_a1);
-        }
-        if ((temp_a2 == 0x18) && (M2C_FIELD((temp_t0 + var_t2), u16 *, -2) == 6)) {
-            *(&dung_map + 7 + var_a1) = *(&dung_map + 7 + (((var_s0 - 2) * 8) + var_t7));
-        }
-        if (temp_a2 == 6) {
-            temp_v1_2 = temp_t0 + var_t1;
-            if (*temp_v1_2 == 2) {
-                *(&dung_map + 7 + var_a1) = *(&dung_map + 7 + (temp_t5 + var_a3));
-            }
-            if (*temp_v1_2 == 0x25) {
-                *(&dung_map + 7 + var_a1) = *(&dung_map + 7 + var_t3);
-            }
-        }
-        if ((temp_a2 == 0x1B) && (*(temp_t0 + var_t1) == 2)) {
-            *(&dung_map + 7 + var_a1) = *(&dung_map + 7 + (temp_t5 + var_a3));
-        }
-        if (temp_a2 == 0x17) {
-            temp_a0 = temp_t0 + var_t1;
-            if (*temp_a0 == 7) {
-                *(&dung_map + 7 + var_a1) = -1;
-            }
-            if (*temp_a0 == 0xD) {
-                *(&dung_map + 7 + var_a1) = *(&dung_map + 7 + (var_s2 + var_t6));
-            }
-        }
-        if ((temp_a2 == 7) && (*(temp_t0 + var_t1) == 0xD)) {
-            *(&dung_map + 7 + var_a1) = -1;
-        }
-        if ((temp_a2 == 0xC) && (*(temp_t0 + var_t1) == 2)) {
-            *(&dung_map + 7 + var_a1) = -1;
-        }
-        if ((temp_a2 == 7) && (M2C_FIELD((temp_t0 + var_t2), u16 *, -2) == 1)) {
-            *(&dung_map + 7 + var_a1) = -1;
-        }
-        if ((temp_a2 == 0x15) && (M2C_FIELD((temp_t0 + var_t2), u16 *, -2) == 1)) {
-            *(&dung_map + 7 + var_a1) = -1;
-        }
-        var_a1 += 0x700;
-        var_t7 += 0x700;
-        var_t6 += 0x700;
-        var_a3 += 0x700;
-        var_t3 += 0x700;
-        var_t2 += 0x60;
-        var_t8 += 0x60;
-        var_t1 += 0x60;
-        if ((s32) var_t2 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_s2 += 0x10;
-        var_t4 += 0x10;
-        var_s1 += 1;
-        var_s0 += 2;
-    } while (var_s1 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5TransFix__Fv);
 #if 0 /* ida */
 BOOL DRLG_L5TransFix__Fv()
 {
@@ -6045,80 +3828,12 @@ BOOL DRLG_L5TransFix__Fv()
 }
 #endif
 
-/* ---- 0x801406A8  DRLG_L5DirtFix__Fv  DRLG_L1.CPP:1987-2001  seg drlg_l1_3  fsize 0 ---- */
+/* ---- 0x801406A8  DRLG_L5DirtFix__Fv  DRLG_L1.CPP:1987-2001  seg drlg_l1  fsize 0 ---- */
 /* void DRLG_L5DirtFix(void)
  *   j=$t1
  *   blocks: {1 }15
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5DirtFix__Fv) */
-#if 0 /* m2c */
-void DRLG_L5DirtFix__Fv(void) {
-    M2C_UNK *var_a1;
-    s32 temp_a2;
-    s32 var_a3;
-    s32 var_t1;
-    u16 *var_a0;
-    u16 *var_v1;
-    u16 *var_v1_2;
-    u16 var_v0;
-    void *temp_a0;
-    void *temp_a0_2;
-    void *temp_t5;
-    void *var_t0;
-
-    var_t1 = 0;
-    temp_t5 = &dungeon + 0x60;
-    do {
-        temp_a2 = var_t1 * 2;
-        var_a1 = &dungeon;
-        var_a3 = 0;
-        var_t0 = temp_t5;
-loop_2:
-        temp_a0 = temp_a2 + var_a1;
-        var_v1 = temp_a2 + var_a1;
-        if (M2C_FIELD(temp_a0, u16 *, 0) == 0x15) {
-            if (M2C_FIELD(temp_a0, u16 *, 2) == 0xD) {
-                M2C_FIELD(temp_a0, u16 *, 0) = 7U;
-            }
-            var_v1 = temp_a2 + var_a1;
-            if ((M2C_FIELD(temp_a0, u16 *, 0) == 0x15) && (*(temp_a2 + var_t0) != 0x13)) {
-                M2C_FIELD(temp_a0, u16 *, 0) = 0xCAU;
-            }
-        }
-        var_a0 = temp_a2 + var_a1;
-        if ((*var_v1 == 0x13) && (*(temp_a2 + (var_a3 + temp_t5)) != 0x13)) {
-            *var_v1 = 0xC8;
-            var_a0 = temp_a2 + var_a1;
-        }
-        if ((*var_a0 == 0x18) && (*(temp_a2 + (var_a3 + temp_t5)) != 0x13)) {
-            *var_a0 = 0xCD;
-        }
-        var_v1_2 = temp_a2 + var_a1;
-        var_v0 = M2C_FIELD(var_v1_2, u16 *, 0);
-        if (var_v0 == 0x12) {
-            if (M2C_FIELD(var_v1_2, u16 *, 2) != 0x12) {
-                M2C_FIELD(var_v1_2, u16 *, 0) = 0xC7;
-                var_v1_2 = temp_a2 + var_a1;
-            }
-            var_v0 = *var_v1_2;
-        }
-        temp_a0_2 = temp_a2 + var_a1;
-        if ((var_v0 == 0x15) && (M2C_FIELD(var_v1_2, u16 *, 2) != 0x12)) {
-            M2C_FIELD(var_v1_2, u16 *, 0) = 0xCA;
-        }
-        if ((M2C_FIELD(temp_a0_2, u16 *, 0) == 0x17) && (M2C_FIELD(temp_a0_2, u16 *, 2) != 0x12)) {
-            M2C_FIELD(temp_a0_2, u16 *, 0) = 0xCCU;
-        }
-        var_a1 += 0x60;
-        var_a3 += 0x60;
-        var_t0 += 0x60;
-        if ((s32) var_a1 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_t1 += 1;
-    } while (var_t1 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5DirtFix__Fv);
 #if 0 /* ida */
 BOOL DRLG_L5DirtFix__Fv()
 {
@@ -6188,60 +3903,12 @@ BOOL DRLG_L5DirtFix__Fv()
 }
 #endif
 
-/* ---- 0x80140824  DRLG_L5CornerFix__Fv  DRLG_L1.CPP:2008-2023  seg drlg_l1_3  fsize 0 ---- */
+/* ---- 0x80140824  DRLG_L5CornerFix__Fv  DRLG_L1.CPP:2008-2023  seg drlg_l1  fsize 0 ---- */
 /* void DRLG_L5CornerFix(void)
  *   i=$t1 j=$t3
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5CornerFix__Fv) */
-#if 0 /* m2c */
-void DRLG_L5CornerFix__Fv(void) {
-    s32 temp_t0;
-    s32 var_a2;
-    s32 var_t1;
-    s32 var_t2;
-    s32 var_t3;
-    u16 *var_a0;
-    u16 var_v1;
-    void *temp_a1;
-    void *var_a3;
-
-    var_t3 = 1;
-    var_t2 = 0x28;
-    do {
-        var_t1 = 1;
-        temp_t0 = var_t3 * 2;
-        var_a3 = &dungeon + 0x60;
-        var_a2 = 0x60;
-loop_2:
-        temp_a1 = mydflags + (var_t2 + var_t1);
-        var_a0 = temp_t0 + var_a3;
-        if (!(M2C_FIELD(temp_a1, u8 *, 0) & 0x80)) {
-            var_v1 = M2C_FIELD(var_a0, u16 *, 0);
-            if ((var_v1 == 0x11) && (*(temp_t0 + (var_a2 + (&dungeon - 0x60))) == 0xD) && (M2C_FIELD(var_a0, u16 *, -2) == 1)) {
-                M2C_FIELD(var_a0, u16 *, 0) = 0x10;
-                M2C_FIELD(temp_a1, u8 *, -0x28) = (u8) (M2C_FIELD(temp_a1, u8 *, -0x28) & 0x80);
-                var_a0 = temp_t0 + var_a3;
-                goto block_7;
-            }
-        } else {
-block_7:
-            var_v1 = *var_a0;
-        }
-        if ((var_v1 == 0xCA) && (*(temp_t0 + (var_a2 + (&dungeon + 0x60))) == 0xD) && (M2C_FIELD(var_a0, u16 *, 2) == 1)) {
-            M2C_FIELD(var_a0, u16 *, 0) = 8;
-        }
-        var_a3 += 0x60;
-        var_t1 += 1;
-        var_a2 += 0x60;
-        if (var_t1 < 0x27) {
-            goto loop_2;
-        }
-        var_t3 += 1;
-        var_t2 += 0x28;
-    } while (var_t3 < 0x27);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5CornerFix__Fv);
 #if 0 /* ida */
 BOOL DRLG_L5CornerFix__Fv()
 {
@@ -6294,195 +3961,12 @@ LABEL_8:
 }
 #endif
 
-/* ---- 0x80140930  DRLG_L5__Fi  DRLG_L1.CPP:2029-2158  seg drlg_l1_3  fsize 80 ---- */
+/* ---- 0x80140930  DRLG_L5__Fi  DRLG_L1.CPP:2029-2158  seg drlg_l1  fsize 80 ---- */
 /* void DRLG_L5(int entry)
  *   entry=$s2 minarea=$s4 doneflag=$s0 i=$s0 j=$s3 yy=$s6
  *   blocks: {1 }130
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", DRLG_L5__Fi) */
-#if 0 /* m2c */
-void DRLG_L5__Fi(s32 arg0) {
-    s32 sp20;
-    M2C_UNK *var_a0;
-    M2C_UNK *var_a0_2;
-    M2C_UNK *var_a1;
-    M2C_UNK *var_s4_2;
-    s32 temp_a2;
-    s32 var_fp;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s32 var_s0_4;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s3;
-    s32 var_s3_2;
-    s32 var_s3_3;
-    s32 var_s4;
-    s32 var_s7;
-    s32 var_v0;
-    s32 var_v0_2;
-    u16 *temp_v0;
-    u32 var_s0;
-
-    var_s4 = 0;
-    if (currlevel != 2) {
-        if ((s32) currlevel < 3) {
-            var_v0 = 0 & 0xFF;
-            if (currlevel != 1) {
-
-            } else {
-                var_s4 = 0x215;
-                goto block_8;
-            }
-        } else {
-            var_v0 = 0 & 0xFF;
-            if ((s32) currlevel < 5) {
-                var_s4 = 0x2F9;
-            }
-        }
-    } else {
-        var_s4 = 0x2B5;
-block_8:
-        var_v0 = 0 & 0xFF;
-    }
-    var_s3 = 0;
-    if (var_v0 == 0) {
-        do {
-            UPDATEPROGRESS__Fi(1);
-            DRLG_InitTrans__Fv();
-loop_12:
-            InitL5Dungeon__Fv();
-            L5firstRoom__Fv();
-            if (L5GetArea__Fv() < var_s4) {
-                goto loop_12;
-            }
-            var_s0 = 1;
-            L5makeDungeon__Fv();
-            L5makeDmt__Fv();
-            L5FillChambers__Fv();
-            L5tileFix__Fv();
-            L5AddWall__Fv();
-            L5ClearFlags__Fv();
-            DRLG_L5FloodTVal__Fv();
-            DRLG_SetWalls__Fv();
-            if (QuestStatus__Fi(0xD) & 0xFF) {
-                if (arg0 == 0) {
-                    var_s0 = (u32) ~DRLG_PlaceMiniSet__FPCUciiiiiii(&PWATERIN, 1, 1, 0, 0, 1, -1, 0) >> 0x1F;
-                } else {
-                    if (DRLG_PlaceMiniSet__FPCUciiiiiii(&PWATERIN, 1, 1, 0, 0, 0, -1, 0) < 0) {
-                        var_s0 = 0;
-                    }
-                    ViewY -= 1;
-                }
-            }
-            if (QuestStatus__Fi(7) & 0xFF) {
-                if (arg0 == 0) {
-                    var_a0 = &STAIRSUP;
-                    goto block_29;
-                }
-                if (DRLG_PlaceMiniSet__FPCUciiiiiii(&STAIRSUP, 1, 1, 0, 0, 0, -1, 0) < 0) {
-                    var_s0 = 0;
-                }
-                if (arg0 == 1) {
-                    ViewX = (setpc_x * 2) + 0x14;
-                    ViewY = (setpc_y * 2) + 0x1C;
-                    var_v0_2 = var_s0 & 0xFF;
-                } else {
-                    goto block_34;
-                }
-            } else if (arg0 == 0) {
-                if (DRLG_PlaceMiniSet__FPCUciiiiiii(&L5STAIRSUP, 1, 1, 0, 0, 1, -1, 0) >= 0) {
-                    var_a0 = &STAIRSDOWN;
-block_29:
-                    var_v0_2 = var_s0 & 0xFF;
-                    if (DRLG_PlaceMiniSet__FPCUciiiiiii(var_a0, 1, 1, 0) < 0) {
-                        goto block_30;
-                    }
-                } else {
-block_30:
-                    var_s0 = 0;
-                    goto block_35;
-                }
-            } else {
-                if ((DRLG_PlaceMiniSet__FPCUciiiiiii(&L5STAIRSUP, 1, 1, 0, 0, 0, -1, 0) < 0) || (DRLG_PlaceMiniSet__FPCUciiiiiii(&STAIRSDOWN, 1, 1, 0, 0, 1, -1, 1) < 0)) {
-                    var_s0 = 0;
-                }
-block_34:
-                ViewY -= 1;
-block_35:
-                var_v0_2 = var_s0 & 0xFF;
-            }
-        } while (var_v0_2 == 0);
-        var_s3 = 0;
-    }
-    var_fp = 0x11;
-    var_s7 = 0x10;
-    do {
-        var_s0_2 = 0;
-        sp20 = var_s3 * 2;
-        var_s2 = 0x11;
-        var_s1 = 0x10;
-        var_s4_2 = &dungeon;
-loop_40:
-        if (*(sp20 + var_s4_2) == 0x40) {
-            DRLG_CopyTrans__Fiiii(var_s1, var_fp, var_s1, var_s7);
-            DRLG_CopyTrans__Fiiii(var_s2, var_fp, var_s2, var_s7);
-        }
-        var_s2 += 2;
-        var_s1 += 2;
-        var_s0_2 += 1;
-        var_s4_2 += 0x60;
-        if (var_s0_2 < 0x28) {
-            goto loop_40;
-        }
-        var_fp += 2;
-        var_s3 += 1;
-        var_s7 += 2;
-    } while (var_s3 < 0x28);
-    var_s3_2 = 0;
-    DRLG_L5TransFix__Fv();
-    var_s2_2 = 0;
-    DRLG_L5DirtFix__Fv();
-    DRLG_L5CornerFix__Fv();
-    do {
-        var_s0_3 = 0;
-loop_46:
-        if (*(mydflags + (var_s2_2 + var_s0_3)) & 0x7F) {
-            DRLG_PlaceDoor__Fii(var_s0_3, var_s3_2);
-        }
-        var_s0_3 += 1;
-        if (var_s0_3 < 0x28) {
-            goto loop_46;
-        }
-        var_s3_2 += 1;
-        var_s2_2 += 0x28;
-    } while (var_s3_2 < 0x28);
-    var_s3_3 = 0;
-    DRLG_L5Subs__Fv();
-    DRLG_L1Shadows__Fv();
-    DRLG_PlaceMiniSet__FPCUciiiiiii(&LAMPS, 5, 0xA, 0, 0, 0, -1, 4);
-    DRLG_L1Floor__Fv();
-    do {
-        var_s0_4 = 0;
-        temp_a2 = var_s3_3 * 2;
-        var_a1 = &dungeon;
-        var_a0_2 = &pdungeon;
-loop_52:
-        temp_v0 = temp_a2 + var_a1;
-        var_a1 += 0x60;
-        var_s0_4 += 1;
-        *(var_a0_2 + var_s3_3) = (s8) *temp_v0;
-        var_a0_2 += 0x28;
-        if (var_s0_4 < 0x28) {
-            goto loop_52;
-        }
-        var_s3_3 += 1;
-    } while (var_s3_3 < 0x28);
-    DRLG_Init_Globals__Fv(var_a0_2, var_a1, temp_a2, &dungeon);
-    DRLG_CheckQuests__Fii(setpc_x, setpc_y);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", DRLG_L5__Fi);
 #if 0 /* ida */
 BOOL __fastcall DRLG_L5__Fi(int a1)
 {
@@ -6665,29 +4149,12 @@ LABEL_31:
 }
 #endif
 
-/* ---- 0x80140E64  CreateL5Dungeon__FUii  DRLG_L1.CPP:2176-2193  seg drlg_l1_3  fsize 24 ---- */
+/* ---- 0x80140E64  CreateL5Dungeon__FUii  DRLG_L1.CPP:2176-2193  seg drlg_l1  fsize 24 ---- */
 /* void CreateL5Dungeon(unsigned int rseed, int entry)
  *   rseed=$a0 entry=$s0
  *   blocks: {1 }18
  */
-/* linked from build/src/drlg_l1_3.c.o (segment drlg_l1_3 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l1_3", CreateL5Dungeon__FUii) */
-#if 0 /* m2c */
-void CreateL5Dungeon__FUii(s32 arg1) {
-    SetRndSeed__Fl();
-    dminx = 0x10;
-    dminy = 0x10;
-    dmaxx = 0x50;
-    dmaxy = 0x50;
-    DRLG_InitTrans__Fv();
-    DRLG_InitSetPC__Fv();
-    DRLG_LoadL1SP__Fv();
-    DRLG_L5__Fi(arg1);
-    DRLG_L1Pass3__Fv();
-    DRLG_FreeL1SP__Fv();
-    DRLG_InitL1Vals__Fv();
-    DRLG_SetPC__Fv();
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l1", CreateL5Dungeon__FUii);
 #if 0 /* ida */
 int __fastcall CreateL5Dungeon__FUii(int a1, int a2)
 {

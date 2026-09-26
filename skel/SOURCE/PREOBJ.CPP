@@ -8,7 +8,7 @@
  *   i=$s3 x=$s1 y=$s2 ot=$a3
  *   blocks: {1 }19
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddL1Door__Fiiii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL1Door__Fiiii);
 #if 0 /* m2c */
 void AddL1Door__Fiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s16 var_v0;
@@ -68,7 +68,7 @@ int __fastcall AddL1Door__Fiiii(int a1, int a2, int a3, int a4)
  *   i=$a0
  *   blocks: {1 }12
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddSCambBook__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddSCambBook__Fi);
 #if 0 /* m2c */
 void AddSCambBook__Fi(s32 arg0) {
     s32 temp_v0;
@@ -87,7 +87,7 @@ void AddSCambBook__Fi(s32 arg0) {
  *   i=$s1 t=$s0
  *   blocks: {1 }27
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddChest__Fii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddChest__Fii);
 #if 0 /* m2c */
 void AddChest__Fii(s32 arg0, s32 arg1) {
     M2C_UNK var_a0;
@@ -192,7 +192,7 @@ LABEL_22:
  *   i=$s2 x=$s0 y=$s1 ot=$a3
  *   blocks: {1 }19
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddL2Door__Fiiii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL2Door__Fiiii);
 #if 0 /* m2c */
 void AddL2Door__Fiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 temp_s3;
@@ -243,7 +243,7 @@ int __fastcall AddL2Door__Fiiii(int a1, int a2, int a3, int a4)
  *   i=$s0 x=$a0 y=$a1 ot=$a3
  *   blocks: {1 }10
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddL3Door__Fiiii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL3Door__Fiiii);
 #if 0 /* m2c */
 void AddL3Door__Fiiii(s32 arg0, M2C_UNK arg1, M2C_UNK arg2, s32 arg3) {
     M2C_UNK var_a2;
@@ -283,7 +283,7 @@ int __fastcall AddL3Door__Fiiii(int a1, int a2, int a3, int a4)
  *   i=$a0 x=$a1 y=$v1
  *   blocks: {1 }14
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddSarc__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddSarc__Fi);
 #if 0 /* m2c */
 void AddSarc__Fi(s32 arg0) {
     s32 temp_s0;
@@ -326,7 +326,7 @@ int __fastcall AddSarc__Fi(int a1)
  *   i=$a0
  *   blocks: {1 }6
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddFlameTrap__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddFlameTrap__Fi);
 #if 0 /* m2c */
 void AddFlameTrap__Fi(s32 arg0) {
     s32 temp_v0;
@@ -344,7 +344,7 @@ void AddFlameTrap__Fi(s32 arg0) {
  *   i=$s0 ot=$a1 mt=$a0
  *   blocks: {1 }12
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddTrap__Fii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddTrap__Fii);
 #if 0 /* m2c */
 void AddTrap__Fii(s32 arg0) {
     s32 temp_v0;
@@ -371,7 +371,7 @@ void AddTrap__Fii(s32 arg0) {
  *   i=$s0
  *   blocks: {1 }11
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddArmorStand__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddArmorStand__Fi);
 #if 0 /* m2c */
 void AddArmorStand__Fi(s32 arg0) {
     s32 temp_v0;
@@ -390,7 +390,7 @@ void AddArmorStand__Fi(s32 arg0) {
  *   i=$a0 r=$a2
  *   blocks: {1 }15
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddObjLight__Fii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddObjLight__Fii);
 #if 0 /* m2c */
 void AddObjLight__Fii(s32 arg0, M2C_UNK arg1) {
     s32 temp_s0;
@@ -412,7 +412,7 @@ void AddObjLight__Fii(s32 arg0, M2C_UNK arg1) {
  *   i=$a0 ot=$a1
  *   blocks: {1 }13
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddBarrel__Fii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddBarrel__Fii);
 #if 0 /* m2c */
 void AddBarrel__Fii(s32 arg0) {
     s32 temp_s0;
@@ -455,7 +455,7 @@ int __fastcall AddBarrel__Fii(int a1)
  *   i=$s1 st=$v1 slist@sp-0x30
  *   blocks: {1 }21
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddShrine__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddShrine__Fi);
 #if 0 /* m2c */
 void AddShrine__Fi(s32 arg0) {
     u8 sp10;
@@ -556,7 +556,7 @@ LABEL_13:
  *   i=$s0
  *   blocks: {1 }8
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddBookcase__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddBookcase__Fi);
 #if 0 /* m2c */
 void AddBookcase__Fi(s32 arg0) {
     s32 temp_v1;
@@ -585,7 +585,7 @@ int __fastcall AddBookcase__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddBookstand__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddBookstand__Fi);
 #if 0 /* m2c */
 void AddBookstand__Fi(s32 arg0) {
     *(&object + 4 + (arg0 * 0x2C)) = GetRndSeed__Fv();
@@ -607,7 +607,7 @@ int __fastcall AddBookstand__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddBloodFtn__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddBloodFtn__Fi);
 #if 0 /* m2c */
 void AddBloodFtn__Fi(s32 arg0) {
     *(&object + 4 + (arg0 * 0x2C)) = GetRndSeed__Fv();
@@ -629,7 +629,7 @@ int __fastcall AddBloodFtn__Fi(int a1)
  *   i=$a0 x=$v1 y=$a1
  *   blocks: {1 }12
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddPurifyingFountain__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddPurifyingFountain__Fi);
 #if 0 /* m2c */
 void AddPurifyingFountain__Fi(s32 arg0) {
     s32 temp_a1_2;
@@ -686,7 +686,7 @@ int __fastcall AddPurifyingFountain__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddGoatShrine__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddGoatShrine__Fi);
 #if 0 /* m2c */
 void AddGoatShrine__Fi(s32 arg0) {
     *(&object + 4 + (arg0 * 0x2C)) = GetRndSeed__Fv();
@@ -708,7 +708,7 @@ int __fastcall AddGoatShrine__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddCauldron__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddCauldron__Fi);
 #if 0 /* m2c */
 void AddCauldron__Fi(s32 arg0) {
     *(&object + 4 + (arg0 * 0x2C)) = GetRndSeed__Fv();
@@ -730,7 +730,7 @@ int __fastcall AddCauldron__Fi(int a1)
  *   i=$a0 x=$v1 y=$a1
  *   blocks: {1 }12
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddMurkyFountain__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddMurkyFountain__Fi);
 #if 0 /* m2c */
 void AddMurkyFountain__Fi(s32 arg0) {
     s32 temp_a1_2;
@@ -787,7 +787,7 @@ int __fastcall AddMurkyFountain__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddTearFountain__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddTearFountain__Fi);
 #if 0 /* m2c */
 void AddTearFountain__Fi(s32 arg0) {
     *(&object + 4 + (arg0 * 0x2C)) = GetRndSeed__Fv();
@@ -809,7 +809,7 @@ int __fastcall AddTearFountain__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }9
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddDecap__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddDecap__Fi);
 #if 0 /* m2c */
 void AddDecap__Fi(s32 arg0) {
     s32 temp_s1;
@@ -838,7 +838,7 @@ int __fastcall AddDecap__Fi(int a1)
  *   i=$a0
  *   blocks: {1 }4
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddVilebook__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddVilebook__Fi);
 #if 0 /* m2c */
 void AddVilebook__Fi(s32 arg0) {
     if ((setlevel != 0) && (setlvlnum == 5)) {
@@ -852,7 +852,7 @@ void AddVilebook__Fi(s32 arg0) {
  *   i=$s0
  *   blocks: {1 }11
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddMagicCircle__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddMagicCircle__Fi);
 #if 0 /* m2c */
 void AddMagicCircle__Fi(s32 arg0) {
     s32 temp_v1;
@@ -884,7 +884,7 @@ int __fastcall AddMagicCircle__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddBrnCross__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddBrnCross__Fi);
 #if 0 /* m2c */
 void AddBrnCross__Fi(s32 arg0) {
     *(&object + 4 + (arg0 * 0x2C)) = GetRndSeed__Fv();
@@ -906,7 +906,7 @@ int __fastcall AddBrnCross__Fi(int a1)
  *   i=$a0
  *   blocks: {1 }11
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddPedistal__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddPedistal__Fi);
 #if 0 /* m2c */
 void AddPedistal__Fi(s32 arg0) {
     s32 temp_a2;
@@ -929,7 +929,7 @@ void AddPedistal__Fi(s32 arg0) {
  *   i=$s0 bookframe=$v1
  *   blocks: {1 }18
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddStoryBook__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddStoryBook__Fi);
 #if 0 /* m2c */
 void AddStoryBook__Fi(s32 arg0) {
     s16 temp_v0;
@@ -996,7 +996,7 @@ int __fastcall AddStoryBook__Fi(int a1)
  *   i=$s0
  *   blocks: {1 }11
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddWeaponRack__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddWeaponRack__Fi);
 #if 0 /* m2c */
 void AddWeaponRack__Fi(s32 arg0) {
     s32 temp_v0;
@@ -1015,7 +1015,7 @@ void AddWeaponRack__Fi(s32 arg0) {
  *   i=$s1
  *   blocks: {1 }9
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddTorturedBody__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddTorturedBody__Fi);
 #if 0 /* m2c */
 void AddTorturedBody__Fi(s32 arg0) {
     s32 temp_s0;
@@ -1044,7 +1044,7 @@ int __fastcall AddTorturedBody__Fi(int a1)
  *   i=$a0
  *   blocks: {1 }4
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddFlameLvr__Fi) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddFlameLvr__Fi);
 #if 0 /* m2c */
 void AddFlameLvr__Fi(s32 arg0) {
     s32 temp_v0;
@@ -1060,7 +1060,7 @@ void AddFlameLvr__Fi(s32 arg0) {
  *   randarea=$s2 xx=$s4 yy=$s5 i=$s1 j=$s0 failed=$v1 tries=$s3
  *   blocks: {1 {1 {5 }16 }16 }16
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", GetRndObjLoc__FiRiT1) */
+INCLUDE_ASM("asm/nonmatchings/preobj", GetRndObjLoc__FiRiT1);
 #if 0 /* m2c */
 void GetRndObjLoc__FiRiT1(s32 arg0, s32 *arg1, s32 *arg2) {
     s32 var_s0;
@@ -1160,7 +1160,7 @@ void __fastcall GetRndObjLoc__FiRiT1(int a1, _DWORD *a2, int *a3)
  *   x@sp-0x10 y@sp-0xc i=$s0
  *   blocks: {1 {1 {4 }11 }11 }11
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddMushPatch__Fv) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddMushPatch__Fv);
 #if 0 /* m2c */
 void AddMushPatch__Fv(void) {
     s32 sp10;
@@ -1208,7 +1208,7 @@ int AddMushPatch__Fv()
  *   x@sp-0x10 y@sp-0xc
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", AddSlainHero__Fv) */
+INCLUDE_ASM("asm/nonmatchings/preobj", AddSlainHero__Fv);
 #if 0 /* m2c */
 void AddSlainHero__Fv(void) {
     s32 sp10;
@@ -1234,7 +1234,7 @@ int AddSlainHero__Fv()
  *   xp=$s1 yp=$s2
  *   blocks: {1 }14
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", RndLocOk__Fii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", RndLocOk__Fii);
 #if 0 /* m2c */
 s32 RndLocOk__Fii(s32 arg0, s32 arg1) {
     s32 temp_s0;
@@ -1319,7 +1319,7 @@ BOOL __fastcall RndLocOk__Fii(int a1, int a2)
  *   xp=$a0 yp=$a1
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", TrapLocOk__Fii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", TrapLocOk__Fii);
 #if 0 /* m2c */
 s32 TrapLocOk__Fii(s32 arg0, s32 arg1) {
     s32 var_v0;
@@ -1348,7 +1348,7 @@ BOOL __fastcall TrapLocOk__Fii(int a1, int a2)
  *   min=$s0 max=$a1 objtype=$fp xp=$s4 yp=$s5 numobjs=$s7 i=$s6
  *   blocks: {1 {1 }25 }25
  */
-/* linked from build/src/preobj.c.o (segment preobj mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj", InitRndLocObj__Fiii) */
+INCLUDE_ASM("asm/nonmatchings/preobj", InitRndLocObj__Fiii);
 #if 0 /* ida */
 int __fastcall InitRndLocObj__Fiii(int a1, int a2, int a3)
 {
@@ -1401,82 +1401,12 @@ int __fastcall InitRndLocObj__Fiii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x801577AC  InitRndLocBigObj__Fiii  PREOBJ.CPP:757-787  seg preobj_1  fsize 64 ---- */
+/* ---- 0x801577AC  InitRndLocBigObj__Fiii  PREOBJ.CPP:757-787  seg preobj  fsize 64 ---- */
 /* void InitRndLocBigObj(int min, int max, int objtype)
  *   min=$s0 max=$a1 objtype=$fp xp=$s2 yp=$s5 numobjs=$s7 i=$s6
  *   blocks: {1 {1 }31 }31
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", InitRndLocBigObj__Fiii) */
-#if 0 /* m2c */
-void InitRndLocBigObj__Fiii(s32 arg0, s32 arg1, s32 arg2) {
-    s16 temp_s0;
-    s16 temp_s0_2;
-    s16 temp_s0_3;
-    s16 temp_s1;
-    s16 temp_s1_2;
-    s16 temp_s2;
-    s16 temp_s4;
-    s16 temp_s5;
-    s16 temp_v0;
-    s32 temp_s7;
-    s32 var_s6;
-
-    temp_s7 = ENG_random__Fl(arg1 - arg0) + arg0;
-    var_s6 = 0;
-    if (temp_s7 > 0) {
-        do {
-loop_1:
-            temp_s1 = ENG_random__Fl(0x40);
-            temp_v0 = ENG_random__Fl(0x40);
-            temp_s4 = temp_s1 + 0xF;
-            temp_s0 = temp_v0 + 0xE;
-            temp_s2 = temp_s1 + 0x10;
-            temp_s5 = temp_v0 + 0x10;
-            if (!(RndLocOk__Fii(temp_s4, temp_s0) & 0xFF)) {
-                goto loop_1;
-            }
-            temp_s1_2 = temp_s1 + 0x11;
-            if (!(RndLocOk__Fii(temp_s2, temp_s0) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s1_2, temp_s0) & 0xFF)) {
-                goto loop_1;
-            }
-            temp_s0_2 = temp_v0 + 0xF;
-            if (!(RndLocOk__Fii(temp_s4, temp_s0_2) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s2, temp_s0_2) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s1_2, temp_s0_2) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s4, temp_s5) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s2, temp_s5) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s1_2, temp_s5) & 0xFF)) {
-                goto loop_1;
-            }
-            temp_s0_3 = temp_v0 + 0x11;
-            if (!(RndLocOk__Fii(temp_s4, temp_s0_3) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s2, temp_s0_3) & 0xFF)) {
-                goto loop_1;
-            }
-            if (!(RndLocOk__Fii(temp_s1_2, temp_s0_3) & 0xFF)) {
-                goto loop_1;
-            }
-            AddObject__Fiii(arg2, temp_s2, temp_s5);
-            var_s6 += 1;
-        } while (var_s6 < temp_s7);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", InitRndLocBigObj__Fiii);
 #if 0 /* ida */
 int __fastcall InitRndLocBigObj__Fiii(int a1, int a2, int a3)
 {
@@ -1532,65 +1462,12 @@ int __fastcall InitRndLocBigObj__Fiii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x8015796C  InitRndLocObj5x5__Fiii  PREOBJ.CPP:792-818  seg preobj_1  fsize 64 ---- */
+/* ---- 0x8015796C  InitRndLocObj5x5__Fiii  PREOBJ.CPP:792-818  seg preobj  fsize 64 ---- */
 /* void InitRndLocObj5x5(int min, int max, int objtype)
  *   min=$s0 max=$a1 objtype=$fp xp=$s4 yp=$s2 xx=$s0 yy=$s1 cnt=$s5 done=$s3 numobjs=$s7 i=$s6
  *   blocks: {1 {1 }26 }26
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", InitRndLocObj5x5__Fiii) */
-#if 0 /* m2c */
-void InitRndLocObj5x5__Fiii(s32 arg0, s32 arg1, s32 arg2) {
-    s16 temp_s2;
-    s16 temp_s4;
-    s16 var_a0;
-    s32 temp_s7;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s3;
-    s32 var_s5;
-    s32 var_s6;
-
-    temp_s7 = ENG_random__Fl(arg1 - arg0) + arg0;
-    var_s6 = 0;
-    if (temp_s7 > 0) {
-        var_s5 = 0;
-loop_2:
-        var_s3 = 1;
-loop_3:
-        temp_s4 = ENG_random__Fl(0x40) + 0x10;
-        temp_s2 = ENG_random__Fl(0x40) + 0x10;
-        var_s1 = -2;
-        do {
-            var_s0 = -2;
-            var_a0 = temp_s4 - 2;
-loop_5:
-            if (!(RndLocOk__Fii(var_a0, temp_s2 + var_s1) & 0xFF)) {
-                var_s3 = 0;
-            }
-            var_s0 += 1;
-            var_a0 = temp_s4 + var_s0;
-            if (var_s0 < 3) {
-                goto loop_5;
-            }
-            var_s1 += 1;
-        } while (var_s1 < 3);
-        var_s5 += 1;
-        if (!(var_s3 & 0xFF)) {
-            var_s3 = 1;
-            if (var_s5 < 0x4E21) {
-                goto loop_3;
-            }
-        } else {
-            AddObject__Fiii(arg2, temp_s4, temp_s2);
-            var_s6 += 1;
-            var_s5 = 0;
-            if (var_s6 < temp_s7) {
-                goto loop_2;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", InitRndLocObj5x5__Fiii);
 #if 0 /* ida */
 int __fastcall InitRndLocObj5x5__Fiii(int a1, int a2, int a3)
 {
@@ -1650,113 +1527,12 @@ int __fastcall InitRndLocObj5x5__Fiii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x80157A88  SetMapObjects__FPUcii  PREOBJ.CPP:823-892  seg preobj_1  fsize 176 ---- */
+/* ---- 0x80157A88  SetMapObjects__FPUcii  PREOBJ.CPP:823-892  seg preobj  fsize 176 ---- */
 /* void SetMapObjects(unsigned char *pMap, int startx, int starty)
  *   pMap=$s1 startx=$s5 starty=$s7 i=$s0 j=$s2 rw=$s3 rh=$s4 lm=$s1 h=$a3 mapoff=$v0 ot=$v1 fileload@sp-0xa0 filestr@sp-0x68
  *   blocks: {1 }70
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", SetMapObjects__FPUcii) */
-#if 0 /* m2c */
-void SetMapObjects__FPUcii(void *arg0, s32 arg1, s32 arg2) {
-    u8 sp10;
-    s8 sp47;
-    s32 temp_s3_2;
-    s32 temp_s4_2;
-    s32 var_a0;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_4;
-    s32 var_s2;
-    s32 var_s2_2;
-    s8 *var_a1;
-    s8 *var_v0;
-    s8 var_s0_3;
-    s8 var_v0_2;
-    u8 *temp_a3;
-    u8 *var_s1;
-    u8 *var_s1_2;
-    u8 *var_v1;
-    u8 temp_s3;
-    u8 temp_s4;
-    u8 temp_v0;
-    u8 temp_v0_2;
-
-    ClrAllObjects__Fv();
-    var_s0 = 0x37;
-    InitObjFlag = 1;
-    var_v0 = &sp47;
-    do {
-        *var_v0 = 0;
-        var_s0 -= 1;
-        var_v0 -= 1;
-    } while (var_s0 >= 0);
-    if (AllObjects != -1) {
-        var_a1 = &AllObjects;
-        var_a0 = 0;
-        var_v0_2 = AllObjects;
-        do {
-            if ((var_v0_2 == 1) && (leveltype == (&AllObjects + 4)[var_a0])) {
-                (&sp10)[(&AllObjects + 1)[var_a0]] = 1;
-            }
-            var_a1 += 0x12;
-            var_v0_2 = *var_a1;
-            var_a0 += 0x12;
-        } while (var_v0_2 != -1);
-    }
-    temp_s3 = M2C_FIELD(arg0, u8 *, 0);
-    temp_s4 = M2C_FIELD(arg0, u8 *, 2);
-    temp_s3_2 = temp_s3 * 2;
-    temp_s4_2 = temp_s4 * 2;
-    var_s2 = 0;
-    var_s1 = arg0 + 2 + ((temp_s3 * temp_s4 * 2) + 2 + (temp_s3_2 * temp_s4_2 * 4));
-    temp_a3 = var_s1;
-    if (temp_s4_2 != 0) {
-        do {
-            var_s0_2 = 0;
-            if (temp_s3_2 != 0) {
-                do {
-                    temp_v0 = *var_s1;
-                    if (temp_v0 != 0) {
-                        (&sp10)[*(&AllObjects + 1 + (*((temp_v0 * 4) + &ObjTypeConv) * 0x12))] = 1;
-                    }
-                    var_s0_2 += 1;
-                    var_s1 += 2;
-                } while (var_s0_2 < temp_s3_2);
-            }
-            var_s2 += 1;
-        } while (var_s2 < temp_s4_2);
-    }
-    var_s0_3 = 0;
-    var_v1 = &sp10;
-    do {
-        if (*var_v1 != 0) {
-            *(numobjfiles + &ObjFileList) = var_s0_3;
-            numobjfiles += 1;
-        }
-        var_s0_3 += 1;
-        var_v1 += 1;
-    } while (var_s0_3 < 0x38);
-    var_s1_2 = temp_a3;
-    var_s2_2 = 0;
-    if (temp_s4_2 != 0) {
-        do {
-            var_s0_4 = 0;
-            if (temp_s3_2 != 0) {
-                do {
-                    temp_v0_2 = *var_s1_2;
-                    if (temp_v0_2 != 0) {
-                        AddObject__Fiii(*((temp_v0_2 * 4) + &ObjTypeConv), var_s0_4 + (arg1 + 0x10), var_s2_2 + (arg2 + 0x10));
-                    }
-                    var_s0_4 += 1;
-                    var_s1_2 += 2;
-                } while (var_s0_4 < temp_s3_2);
-            }
-            var_s2_2 += 1;
-        } while (var_s2_2 < temp_s4_2);
-    }
-    InitObjFlag = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", SetMapObjects__FPUcii);
 #if 0 /* ida */
 BOOL __fastcall SetMapObjects__FPUcii(unsigned __int8 *a1, int a2, int a3)
 {
@@ -1890,47 +1666,12 @@ BOOL __fastcall SetMapObjects__FPUcii(unsigned __int8 *a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x80157D28  ClrAllObjects__Fv  PREOBJ.CPP:896-919  seg preobj_1  fsize 0 ---- */
+/* ---- 0x80157D28  ClrAllObjects__Fv  PREOBJ.CPP:896-919  seg preobj  fsize 0 ---- */
 /* void ClrAllObjects(void)
  *   i=$a0
  *   blocks: {1 }24
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", ClrAllObjects__Fv) */
-#if 0 /* m2c */
-void ClrAllObjects__Fv(void) {
-    s32 var_a0;
-    s32 var_v1;
-    s8 var_a0_2;
-
-    var_a0 = 0;
-    var_v1 = 0;
-    do {
-        *(&object + 0x1F + var_v1) = 0;
-        *(&object + 0x20 + var_v1) = 0;
-        *(&object + 8 + var_v1) = 0;
-        *(&object + 0xA + var_v1) = 0;
-        *(&object + 0xC + var_v1) = 0;
-        *(&object + 0x21 + var_v1) = 0;
-        *(&object + 0x26 + var_v1) = 0;
-        *(&object + 0xE + var_v1) = 0;
-        *(&object + 0x10 + var_v1) = 0;
-        *(&object + 0x12 + var_v1) = 0;
-        *(&object + 0x14 + var_v1) = 0;
-        var_a0 += 1;
-        var_v1 += 0x2C;
-    } while (var_a0 < 0x7F);
-    numobjects = 0;
-    var_a0_2 = 0;
-    do {
-        *(&objectavail + var_a0_2) = var_a0_2;
-        *(&objectactive + var_a0_2) = 0;
-        var_a0_2 += 1;
-    } while (var_a0_2 < 0x7F);
-    trapid = 1;
-    trapdir = 0;
-    leverid = 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", ClrAllObjects__Fv);
 #if 0 /* ida */
 int ClrAllObjects__Fv()
 {
@@ -1972,61 +1713,12 @@ int ClrAllObjects__Fv()
 }
 #endif
 
-/* ---- 0x80157E18  AddTortures__Fv  PREOBJ.CPP:924-945  seg preobj_1  fsize 56 ---- */
+/* ---- 0x80157E18  AddTortures__Fv  PREOBJ.CPP:924-945  seg preobj  fsize 56 ---- */
 /* void AddTortures(void)
  *   yp=$s3 xp=$s2
  *   blocks: {1 }22
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddTortures__Fv) */
-#if 0 /* m2c */
-void AddTortures__Fv(void) {
-    s16 temp_fp;
-    s16 temp_s0;
-    s16 temp_s1;
-    s16 temp_s4;
-    s16 temp_s5;
-    s16 temp_s6;
-    s16 temp_s7;
-    s16 var_a0;
-    s16 var_s2;
-    s16 var_s3;
-
-    var_s3 = 0;
-    var_s2 = 0;
-    do {
-        temp_fp = var_s3 + 1;
-        temp_s7 = var_s3 - 1;
-        temp_s6 = var_s3 + 3;
-        temp_s5 = var_s3 + 5;
-        temp_s4 = var_s3 + 2;
-        var_a0 = 0;
-loop_2:
-        if (GetDPiece__Fii(var_a0, var_s3) == 0x16F) {
-            AddObject__Fiii(0x24, var_s2, temp_fp);
-            temp_s0 = var_s2 + 2;
-            AddObject__Fiii(0x26, temp_s0, temp_s7);
-            AddObject__Fiii(0x25, var_s2, temp_s6);
-            temp_s1 = var_s2 + 4;
-            AddObject__Fiii(0x27, temp_s1, temp_s7);
-            AddObject__Fiii(0x28, var_s2, temp_s5);
-            AddObject__Fiii(0x1D, var_s2 + 1, temp_s6);
-            AddObject__Fiii(0x1E, temp_s1, temp_s5);
-            AddObject__Fiii(0x1F, temp_s0, var_s3);
-            AddObject__Fiii(0x20, var_s2 + 3, temp_s4);
-            AddObject__Fiii(0x21, temp_s0, var_s3 + 4);
-            AddObject__Fiii(0x22, temp_s0, temp_fp);
-            AddObject__Fiii(0x23, temp_s1, temp_s4);
-        }
-        var_s2 += 1;
-        var_a0 = var_s2;
-        if (var_s2 < 0x60) {
-            goto loop_2;
-        }
-        var_s3 += 1;
-        var_s2 = 0;
-    } while (var_s3 < 0x60);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddTortures__Fv);
 #if 0 /* ida */
 BOOL AddTortures__Fv()
 {
@@ -2068,29 +1760,12 @@ BOOL AddTortures__Fv()
 }
 #endif
 
-/* ---- 0x80157F98  AddCandles__Fv  PREOBJ.CPP:952-961  seg preobj_1  fsize 32 ---- */
+/* ---- 0x80157F98  AddCandles__Fv  PREOBJ.CPP:952-961  seg preobj  fsize 32 ---- */
 /* void AddCandles(void)
  *   xp=$s0 yp=$s1
  *   blocks: {1 }10
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddCandles__Fv) */
-#if 0 /* m2c */
-void AddCandles__Fv(void) {
-    s16 temp_s1_2;
-    s16 temp_s2;
-    s32 temp_s0;
-    s32 temp_s1;
-
-    temp_s0 = M2C_FIELD(&quests, s32 *, 0x108);
-    temp_s1 = M2C_FIELD(&quests, s32 *, 0x10C);
-    temp_s2 = temp_s1 + 1;
-    AddObject__Fiii(0x57, temp_s0 - 2, temp_s2);
-    AddObject__Fiii(0x57, temp_s0 + 3, temp_s2);
-    temp_s1_2 = temp_s1 + 2;
-    AddObject__Fiii(0x57, temp_s0 - 1, temp_s1_2);
-    AddObject__Fiii(0x57, temp_s0 + 2, temp_s1_2);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddCandles__Fv);
 #if 0 /* ida */
 int AddCandles__Fv()
 {
@@ -2109,76 +1784,12 @@ int AddCandles__Fv()
 }
 #endif
 
-/* ---- 0x80158020  AddBookLever__Fiiiiiiiii  PREOBJ.CPP:1086-1136  seg preobj_1  fsize 56 ---- */
+/* ---- 0x80158020  AddBookLever__Fiiiiiiiii  PREOBJ.CPP:1086-1136  seg preobj  fsize 56 ---- */
 /* void AddBookLever(int lx1, int ly1, int lx2, int ly2, int x1, int y1, int x2, int y2, int msg)
  *   lx1=$a0 ly1=$a1 lx2=$a2 ly2=$a3 y2=$s6 xp=$s4 yp=$s3 xx=$s0 yy=$s1 cnt=$s5 done=$s2 i=$s0
  *   blocks: {1 }50
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddBookLever__Fiiiiiiiii) */
-#if 0 /* m2c */
-void AddBookLever__Fiiiiiiiii(s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
-    s16 temp_s3;
-    s16 temp_s3_2;
-    s16 var_a0;
-    s16 var_s4;
-    s32 temp_s0;
-    s32 temp_v0;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s5;
-    s32 var_v1;
-
-    var_s5 = 0;
-    var_s2 = 1;
-loop_1:
-    var_s4 = ENG_random__Fl(0x40) + 0x10;
-    temp_s3 = ENG_random__Fl(0x40) + 0x10;
-    var_s1 = -2;
-    do {
-        var_s0 = -2;
-        var_a0 = var_s4 - 2;
-loop_3:
-        if (!(RndLocOk__Fii(var_a0, temp_s3 + var_s1) & 0xFF)) {
-            var_s2 = 0;
-        }
-        var_s0 += 1;
-        var_a0 = var_s4 + var_s0;
-        if (var_s0 < 3) {
-            goto loop_3;
-        }
-        var_s1 += 1;
-    } while (var_s1 < 3);
-    var_s5 += 1;
-    if (!(var_s2 & 0xFF)) {
-        var_s2 = 1;
-        if (var_s5 < 0x4E21) {
-            goto loop_1;
-        }
-    } else {
-        if (QuestStatus__Fi(8) & 0xFF) {
-            AddObject__Fiii(0x47, var_s4, temp_s3);
-        }
-        if (QuestStatus__Fi(0xB) & 0xFF) {
-            AddObject__Fiii(0x58, var_s4, temp_s3);
-        }
-        var_v1 = temp_s3 * 8;
-        if (QuestStatus__Fi(9) & 0xFF) {
-            var_s4 = (setpc_x * 2) + 0x19;
-            temp_s3_2 = (setpc_y * 2) + 0x28;
-            AddObject__Fiii(0x48, var_s4, temp_s3_2);
-            var_v1 = temp_s3_2 * 8;
-        }
-        temp_s0 = *(&dung_map + 3 + (var_v1 + (var_s4 * 0x380))) - 1;
-        SetObjMapRange__Fiiiiii(temp_s0, arg4, arg5, arg6, arg7, leverid);
-        SetBookMsg__Fii(temp_s0, arg8);
-        temp_v0 = temp_s0 * 0x2C;
-        *(&object + 0x18 + temp_v0) = 2;
-        leverid += 1;
-        *(&object + 0x21 + temp_v0) = 1;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddBookLever__Fiiiiiiiii);
 #if 0 /* ida */
 int __fastcall AddBookLever__Fiiiiiiiii(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
 {
@@ -2249,79 +1860,12 @@ int __fastcall AddBookLever__Fiiiiiiiii(int a1, int a2, int a3, int a4, int a5, 
 }
 #endif
 
-/* ---- 0x80158214  InitRndBarrels__Fv  PREOBJ.CPP:1141-1181  seg preobj_1  fsize 56 ---- */
+/* ---- 0x80158214  InitRndBarrels__Fv  PREOBJ.CPP:1141-1181  seg preobj  fsize 56 ---- */
 /* void InitRndBarrels(void)
  *   xp=$s3 yp=$s2 o=$a0 c=$s4 t=$s1 numobjs=$fp i=$s5 found=$s0
  *   blocks: {1 {1 {8 }38 }41 }41
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", InitRndBarrels__Fv) */
-#if 0 /* m2c */
-void InitRndBarrels__Fv(void) {
-    s16 var_s2;
-    s16 var_s3;
-    s32 temp_fp;
-    s32 temp_v0;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s4;
-    s32 var_s5;
-    s32 var_v0;
-    s32 var_v0_2;
-
-    temp_fp = ENG_random__Fl(5) + 3;
-    var_s5 = 0;
-loop_1:
-    if (var_s5 < temp_fp) {
-        do {
-            var_s3 = ENG_random__Fl(0x40) + 0x10;
-            var_s2 = ENG_random__Fl(0x40) + 0x10;
-        } while (!(RndLocOk__Fii(var_s3, var_s2) & 0xFF));
-        var_a0 = 0x3A;
-        if (ENG_random__Fl(4) != 0) {
-            var_a0 = 0x39;
-        }
-        AddObject__Fiii(var_a0, var_s3, var_s2);
-        var_s4 = 1;
-        var_s0 = 1;
-loop_6:
-        if (ENG_random__Fl(var_s4 >> 1) == 0) {
-            var_s1 = 0;
-            if (var_s0 & 0xFF) {
-                var_s0 = 0;
-                var_v0 = 0 < 3;
-loop_9:
-                var_v0_2 = var_s0 & 0xFF;
-                if (var_v0 != 0) {
-                    var_s1 += 1;
-                    temp_v0 = ENG_random__Fl(8) * 4;
-                    var_s3 += *(temp_v0 + &bxadd);
-                    var_s2 += *(temp_v0 + &byadd);
-                    var_s0 = RndLocOk__Fii(var_s3, var_s2);
-                    var_v0 = var_s1 < 3;
-                    if (var_s0 & 0xFF) {
-                        var_v0_2 = var_s0 & 0xFF;
-                    } else {
-                        goto loop_9;
-                    }
-                }
-                if (var_v0_2 != 0) {
-                    var_a0_2 = 0x3A;
-                    if (ENG_random__Fl(5) != 0) {
-                        var_a0_2 = 0x39;
-                    }
-                    AddObject__Fiii(var_a0_2, var_s3, var_s2);
-                    var_s4 += 1;
-                }
-                goto loop_6;
-            }
-        }
-        var_s5 += 1;
-        goto loop_1;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", InitRndBarrels__Fv);
 #if 0 /* ida */
 BOOL InitRndBarrels__Fv()
 {
@@ -2401,46 +1945,12 @@ BOOL InitRndBarrels__Fv()
 }
 #endif
 
-/* ---- 0x801583A0  AddL1Objs__Fiiii  PREOBJ.CPP:1188-1200  seg preobj_1  fsize 48 ---- */
+/* ---- 0x801583A0  AddL1Objs__Fiiii  PREOBJ.CPP:1188-1200  seg preobj  fsize 48 ---- */
 /* void AddL1Objs(int x1, int y1, int x2, int y2)
  *   x1=$s5 y1=$a1 x2=$s3 y2=$s4 i=$s1 j=$s2 pn=$s0
  *   blocks: {1 }13
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddL1Objs__Fiiii) */
-#if 0 /* m2c */
-void AddL1Objs__Fiiii(s16 arg0, s16 arg1, s32 arg2, s32 arg3) {
-    s16 temp_v0;
-    s16 var_a0;
-    s16 var_s1;
-    s16 var_s2;
-
-    var_s2 = arg1;
-    if (var_s2 < arg3) {
-        var_s1 = arg0;
-        do {
-            var_a0 = var_s1;
-            if (var_s1 < arg2) {
-                do {
-                    temp_v0 = GetDPiece__Fii(var_a0, var_s2);
-                    if (temp_v0 == 0x10E) {
-                        AddObject__Fiii(0, var_s1, var_s2);
-                    }
-                    if ((temp_v0 == 0x2C) || (temp_v0 == 0x33) || (temp_v0 == 0xD6)) {
-                        AddObject__Fiii(1, var_s1, var_s2);
-                    }
-                    if ((temp_v0 == 0x2E) || (temp_v0 == 0x38)) {
-                        AddObject__Fiii(2, var_s1, var_s2);
-                    }
-                    var_s1 += 1;
-                    var_a0 = var_s1;
-                } while (var_s1 < arg2);
-            }
-            var_s2 += 1;
-            var_s1 = arg0;
-        } while (var_s2 < arg3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL1Objs__Fiiii);
 #if 0 /* ida */
 BOOL __fastcall AddL1Objs__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -2477,48 +1987,12 @@ BOOL __fastcall AddL1Objs__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x801584AC  AddL2Objs__Fiiii  PREOBJ.CPP:1207-1218  seg preobj_1  fsize 56 ---- */
+/* ---- 0x801584AC  AddL2Objs__Fiiii  PREOBJ.CPP:1207-1218  seg preobj  fsize 56 ---- */
 /* void AddL2Objs(int x1, int y1, int x2, int y2)
  *   x1=$s7 y1=$a1 x2=$s3 y2=$s4 i=$s1 j=$s2 pn=$s0
  *   blocks: {1 }12
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddL2Objs__Fiiii) */
-#if 0 /* m2c */
-void AddL2Objs__Fiiii(s16 arg0, s16 arg1, s32 arg2, s32 arg3) {
-    s16 temp_v0;
-    s16 var_a0;
-    s16 var_s1;
-    s16 var_s2;
-
-    var_s2 = arg1;
-    if (var_s2 < arg3) {
-        var_s1 = arg0;
-        do {
-            var_a0 = var_s1;
-            if (var_s1 < arg2) {
-                do {
-                    temp_v0 = GetDPiece__Fii(var_a0, var_s2);
-                    if (temp_v0 != 0xD) {
-                        if (temp_v0 == 0x21D) {
-                            goto block_6;
-                        }
-                    } else {
-block_6:
-                        AddObject__Fiii(0x2A, var_s1, var_s2);
-                    }
-                    if ((temp_v0 == 0x11) || (temp_v0 == 0x21E)) {
-                        AddObject__Fiii(0x2B, var_s1, var_s2);
-                    }
-                    var_s1 += 1;
-                    var_a0 = var_s1;
-                } while (var_s1 < arg2);
-            }
-            var_s2 += 1;
-            var_s1 = arg0;
-        } while (var_s2 < arg3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL2Objs__Fiiii);
 #if 0 /* ida */
 BOOL __fastcall AddL2Objs__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -2553,43 +2027,12 @@ BOOL __fastcall AddL2Objs__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x801585A8  AddL3Objs__Fiiii  PREOBJ.CPP:1225-1236  seg preobj_1  fsize 56 ---- */
+/* ---- 0x801585A8  AddL3Objs__Fiiii  PREOBJ.CPP:1225-1236  seg preobj  fsize 56 ---- */
 /* void AddL3Objs(int x1, int y1, int x2, int y2)
  *   x1=$s7 y1=$a1 x2=$s3 y2=$s4 i=$s0 j=$s2 pn=$s1
  *   blocks: {1 }12
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddL3Objs__Fiiii) */
-#if 0 /* m2c */
-void AddL3Objs__Fiiii(s16 arg0, s16 arg1, s32 arg2, s32 arg3) {
-    s16 temp_v0;
-    s16 var_a0;
-    s16 var_s0;
-    s16 var_s2;
-
-    var_s2 = arg1;
-    if (var_s2 < arg3) {
-        var_s0 = arg0;
-        do {
-            var_a0 = var_s0;
-            if (var_s0 < arg2) {
-                do {
-                    temp_v0 = GetDPiece__Fii(var_a0, var_s2);
-                    if (temp_v0 == 0x213) {
-                        AddObject__Fiii(0x4A, var_s0, var_s2);
-                    }
-                    if (temp_v0 == 0x216) {
-                        AddObject__Fiii(0x4B, var_s0, var_s2);
-                    }
-                    var_s0 += 1;
-                    var_a0 = var_s0;
-                } while (var_s0 < arg2);
-            }
-            var_s2 += 1;
-            var_s0 = arg0;
-        } while (var_s2 < arg3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL3Objs__Fiiii);
 #if 0 /* ida */
 BOOL __fastcall AddL3Objs__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -2624,23 +2067,12 @@ BOOL __fastcall AddL3Objs__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x80158688  WallTrapLocOk__Fii  PREOBJ.CPP:1242-1246  seg preobj_1  fsize 24 ---- */
+/* ---- 0x80158688  WallTrapLocOk__Fii  PREOBJ.CPP:1242-1246  seg preobj  fsize 24 ---- */
 /* unsigned char WallTrapLocOk(int xp, int yp)
  *   xp=$a0 yp=$a1
  *   blocks: {1 }5
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", WallTrapLocOk__Fii) */
-#if 0 /* m2c */
-s32 WallTrapLocOk__Fii(s16 arg0, s16 arg1) {
-    s32 var_v0;
-
-    var_v0 = 0;
-    if (!(*(&dung_map + 6 + ((arg1 * 8) + (arg0 * 0x380))) & 8)) {
-        var_v0 = GetTRAP__Fii() == 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", WallTrapLocOk__Fii);
 #if 0 /* ida */
 BOOL __fastcall WallTrapLocOk__Fii(int a1, int a2)
 {
@@ -2653,17 +2085,12 @@ BOOL __fastcall WallTrapLocOk__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x801586E0  TorchLocOK__Fii  PREOBJ.CPP:1253-1255  seg preobj_1  fsize 0 ---- */
+/* ---- 0x801586E0  TorchLocOK__Fii  PREOBJ.CPP:1253-1255  seg preobj  fsize 0 ---- */
 /* unsigned char TorchLocOK(int xp, int yp)
  *   xp=$a0 yp=$a1
  *   blocks: {1 }3
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", TorchLocOK__Fii) */
-#if 0 /* m2c */
-s32 TorchLocOK__Fii(s16 arg0, s16 arg1) {
-    return (*(&dung_map + 6 + ((arg1 * 8) + (arg0 * 0x380))) & 8) == 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", TorchLocOK__Fii);
 #if 0 /* ida */
 BOOL __fastcall TorchLocOK__Fii(int a1, int a2)
 {
@@ -2671,56 +2098,12 @@ BOOL __fastcall TorchLocOK__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x80158710  AddL2Torches__Fv  PREOBJ.CPP:1261-1276  seg preobj_1  fsize 56 ---- */
+/* ---- 0x80158710  AddL2Torches__Fv  PREOBJ.CPP:1261-1276  seg preobj  fsize 56 ---- */
 /* void AddL2Torches(void)
  *   i=$s0 j=$s1 pn=$s2
  *   blocks: {1 }16
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddL2Torches__Fv) */
-#if 0 /* m2c */
-void AddL2Torches__Fv(void) {
-    s16 temp_v0;
-    s16 var_s0;
-    s16 var_s1;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s5;
-
-    var_s1 = 0;
-    var_s5 = -8;
-    do {
-        var_s0 = 0;
-        var_s4 = var_s5;
-        var_s3 = -0x380;
-loop_2:
-        if (TorchLocOK__Fii(var_s0, var_s1) & 0xFF) {
-            temp_v0 = GetDPiece__Fii(var_s0, var_s1);
-            if ((temp_v0 == 1) && (ENG_random__Fl(3) == 0)) {
-                AddObject__Fiii(0x2E, var_s0, var_s1);
-            }
-            if ((temp_v0 == 5) && (ENG_random__Fl(3) == 0)) {
-                AddObject__Fiii(0x2F, var_s0, var_s1);
-            }
-            if ((temp_v0 == 0x25) && (ENG_random__Fl(0xA) == 0)) {
-                if (*(&dung_map + 3 + ((var_s1 * 8) + var_s3)) == 0) {
-                    AddObject__Fiii(0x2C, var_s0 - 1, var_s1);
-                }
-            }
-            if ((temp_v0 == 0x29) && (ENG_random__Fl(0xA) == 0) && (*(&dung_map + 3 + var_s4) == 0)) {
-                AddObject__Fiii(0x2D, var_s0, var_s1 - 1);
-            }
-        }
-        var_s4 += 0x380;
-        var_s0 += 1;
-        var_s3 += 0x380;
-        if (var_s0 < 0x60) {
-            goto loop_2;
-        }
-        var_s1 += 1;
-        var_s5 += 8;
-    } while (var_s1 < 0x60);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL2Torches__Fv);
 #if 0 /* ida */
 BOOL AddL2Torches__Fv()
 {
@@ -2766,93 +2149,12 @@ BOOL AddL2Torches__Fv()
 }
 #endif
 
-/* ---- 0x801588AC  AddObjTraps__Fv  PREOBJ.CPP:1287-1357  seg preobj_1  fsize 48 ---- */
+/* ---- 0x801588AC  AddObjTraps__Fv  PREOBJ.CPP:1287-1357  seg preobj  fsize 48 ---- */
 /* void AddObjTraps(void)
  *   i=$s2 j=$s3 x=$s0 y=$s1 rndv=$s5 oi=$s4
  *   blocks: {1 }71
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddObjTraps__Fv) */
-#if 0 /* m2c */
-void AddObjTraps__Fv(void) {
-    s16 var_a1;
-    s16 var_s0;
-    s16 var_s1;
-    s16 var_s2;
-    s16 var_s3;
-    s32 temp_s0;
-    s32 temp_v0;
-    s32 var_a0;
-    s32 var_s5;
-    s32 var_v0;
-    s8 temp_a0;
-
-    var_s5 = -(currlevel == 1) & 0xA;
-    if ((u8) currlevel >= 2U) {
-        var_s5 = 0xF;
-    }
-    if ((u8) currlevel >= 5U) {
-        var_s5 = 0x14;
-    }
-    var_s3 = 0;
-    if ((u8) currlevel >= 7U) {
-        var_s5 = 0x19;
-    }
-    var_s2 = 0;
-    do {
-        var_v0 = var_s3 * 8;
-loop_8:
-        temp_s0 = var_v0 + (var_s2 * 0x380);
-        if ((*(&dung_map + 3 + temp_s0) > 0) && (ENG_random__Fl(0x64) < var_s5)) {
-            temp_a0 = *(&dung_map + 3 + temp_s0) - 1;
-            if (*(&AllObjects + 0x11 + (*(&object + 0x1E + (temp_a0 * 0x2C)) * 0x12)) != 0) {
-                var_s0 = var_s2;
-                var_s1 = var_s3;
-                if (ENG_random__Fl(2) == 0) {
-                    var_s0 = var_s2 - 1;
-loop_13:
-                    if ((GetSOLID__Fii(var_s0, var_s1) ^ 1) != 0) {
-                        var_s0 -= 1;
-                        goto loop_13;
-                    }
-                    if (WallTrapLocOk__Fii(var_s0, var_s1) & 0xFF) {
-                        var_a0 = 0x35;
-                        if ((var_s2 - var_s0) >= 2) {
-                            var_a1 = var_s0;
-                            goto block_24;
-                        }
-                    }
-                } else {
-                    var_s1 = var_s3 - 1;
-loop_19:
-                    if ((GetSOLID__Fii(var_s0, var_s1) ^ 1) != 0) {
-                        var_s1 -= 1;
-                        goto loop_19;
-                    }
-                    if (WallTrapLocOk__Fii(var_s0, var_s1) & 0xFF) {
-                        var_a0 = 0x36;
-                        if ((var_s3 - var_s1) >= 2) {
-                            var_a1 = var_s0;
-block_24:
-                            AddObject__Fiii(var_a0, var_a1, var_s1);
-                            temp_v0 = (s8) (*(&dung_map + 3 + ((var_s1 * 8) + (var_s0 * 0x380))) - 1) * 0x2C;
-                            *(&object + 0xE + temp_v0) = var_s2;
-                            *(&object + 0x10 + temp_v0) = var_s3;
-                            *(&object + 0x2A + (temp_a0 * 0x2C)) = 1;
-                        }
-                    }
-                }
-            }
-        }
-        var_s2 += 1;
-        var_v0 = var_s3 * 8;
-        if (var_s2 < 0x60) {
-            goto loop_8;
-        }
-        var_s3 += 1;
-        var_s2 = 0;
-    } while (var_s3 < 0x60);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddObjTraps__Fv);
 #if 0 /* ida */
 BOOL AddObjTraps__Fv()
 {
@@ -2948,49 +2250,12 @@ LABEL_25:
 }
 #endif
 
-/* ---- 0x80158B34  AddChestTraps__Fv  PREOBJ.CPP:1364-1383  seg preobj_1  fsize 48 ---- */
+/* ---- 0x80158B34  AddChestTraps__Fv  PREOBJ.CPP:1364-1383  seg preobj  fsize 48 ---- */
 /* void AddChestTraps(void)
  *   i=$s2 j=$s3
  *   blocks: {1 }20
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddChestTraps__Fv) */
-#if 0 /* m2c */
-void AddChestTraps__Fv(void) {
-    s32 temp_s0;
-    s32 var_a0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s3;
-    s8 temp_v0;
-
-    var_s3 = 0;
-    var_s2 = 0;
-    do {
-        var_s1 = var_s3 * 8;
-loop_2:
-        temp_v0 = *(&dung_map + 3 + var_s1);
-        if (temp_v0 > 0) {
-            temp_s0 = (s8) (temp_v0 - 1) * 0x2C;
-            if (((u32) (*(&object + 0x1E + temp_s0) - 5) < 3U) && (*(&object + 0x2A + temp_s0) == 0) && (ENG_random__Fl(0x64) < 0xA)) {
-                *(&object + 0x2A + temp_s0) = 1;
-                *(&object + 0x1E + temp_s0) = *(&object + 0x1E + temp_s0) + 0x3F;
-                var_a0 = 3;
-                if (leveltype == 2) {
-                    var_a0 = 2;
-                }
-                *(&object + 0x14 + temp_s0) = ENG_random__Fl(var_a0);
-            }
-        }
-        var_s2 += 1;
-        var_s1 += 0x380;
-        if (var_s2 < 0x60) {
-            goto loop_2;
-        }
-        var_s3 += 1;
-        var_s2 = 0;
-    } while (var_s3 < 0x60);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddChestTraps__Fv);
 #if 0 /* ida */
 BOOL AddChestTraps__Fv()
 {
@@ -3037,56 +2302,12 @@ BOOL AddChestTraps__Fv()
 }
 #endif
 
-/* ---- 0x80158C70  LoadMapObjects__FPUciiiiiii  PREOBJ.CPP:1398-1434  seg preobj_1  fsize 88 ---- */
+/* ---- 0x80158C70  LoadMapObjects__FPUciiiiiii  PREOBJ.CPP:1398-1434  seg preobj  fsize 88 ---- */
 /* void LoadMapObjects(unsigned char *pMap, int startx, int starty, int x1, int y1, int w, int h, int leveridx)
  *   pMap=$a0 startx=$fp starty=$a2 x1=$s7 i=$s1 j=$s4 rw=$s5 rh=$s6 ox=$s0 oy=$s3 lm=$s2 mapoff=$v0
  *   blocks: {1 }37
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", LoadMapObjects__FPUciiiiiii) */
-#if 0 /* m2c */
-void LoadMapObjects__FPUciiiiiii(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
-    s32 sp18;
-    s16 temp_s0;
-    s16 temp_s3;
-    s32 temp_s5_2;
-    s32 temp_s6_2;
-    s32 var_s1;
-    s32 var_s4;
-    u8 *var_s2;
-    u8 temp_s5;
-    u8 temp_s6;
-    u8 temp_v0;
-
-    InitObjFlag = 1;
-    temp_s5 = M2C_FIELD(arg0, u8 *, 0);
-    temp_s6 = M2C_FIELD(arg0, u8 *, 2);
-    temp_s5_2 = temp_s5 * 2;
-    temp_s6_2 = temp_s6 * 2;
-    var_s4 = 0;
-    var_s2 = arg0 + 2 + ((temp_s5 * temp_s6 * 2) + 2 + (temp_s5_2 * temp_s6_2 * 4));
-    if (temp_s6_2 != 0) {
-        sp18 = arg2 + 0x10;
-        do {
-            var_s1 = 0;
-            if (temp_s5_2 != 0) {
-                temp_s3 = var_s4 + sp18;
-                do {
-                    temp_v0 = *var_s2;
-                    if (temp_v0 != 0) {
-                        temp_s0 = var_s1 + (arg1 + 0x10);
-                        AddObject__Fiii(*((temp_v0 * 4) + &ObjTypeConv), temp_s0, temp_s3);
-                        SetObjMapRange__Fiiiiii(ObjIndex__Fii(temp_s0, temp_s3), arg3, arg4, arg3 + arg5, arg4 + arg6, arg7);
-                    }
-                    var_s1 += 1;
-                    var_s2 += 2;
-                } while (var_s1 < temp_s5_2);
-            }
-            var_s4 += 1;
-        } while (var_s4 < temp_s6_2);
-    }
-    InitObjFlag = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", LoadMapObjects__FPUciiiiiii);
 #if 0 /* ida */
 int __fastcall LoadMapObjects__FPUciiiiiii(unsigned __int8 *a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8)
 {
@@ -3143,29 +2364,12 @@ int __fastcall LoadMapObjects__FPUciiiiiii(unsigned __int8 *a1, int a2, int a3, 
 }
 #endif
 
-/* ---- 0x80158DDC  AddDiabObjs__Fv  PREOBJ.CPP:1438-1458  seg preobj_1  fsize 48 ---- */
+/* ---- 0x80158DDC  AddDiabObjs__Fv  PREOBJ.CPP:1438-1458  seg preobj  fsize 48 ---- */
 /* void AddDiabObjs(void)
  *   lpSetPiece=$s1
  *   blocks: {1 {1 }1 {1 }1 {1 }21 }21
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddDiabObjs__Fv) */
-#if 0 /* m2c */
-void AddDiabObjs__Fv(void) {
-    void *temp_v0;
-    void *temp_v0_2;
-    void *temp_v0_3;
-
-    temp_v0 = GRL_LoadFileInMemSig__FPCcPUl(&D_801197BC, 0);
-    LoadMapObjects__FPUciiiiiii(temp_v0, diabquad1x * 2, diabquad1y * 2, diabquad2x, diabquad2y, 0xB, 0xC, 1);
-    mem_free_dbg__FPv(temp_v0);
-    temp_v0_2 = GRL_LoadFileInMemSig__FPCcPUl(&D_801197C8, 0);
-    LoadMapObjects__FPUciiiiiii(temp_v0_2, diabquad2x * 2, diabquad2y * 2, diabquad3x, diabquad3y, 0xB, 0xB, 2);
-    mem_free_dbg__FPv(temp_v0_2);
-    temp_v0_3 = GRL_LoadFileInMemSig__FPCcPUl(&D_801197D4, 0);
-    LoadMapObjects__FPUciiiiiii(temp_v0_3, diabquad3x * 2, diabquad3y * 2, diabquad4x, diabquad4y, 9, 9, 3);
-    mem_free_dbg__FPv(temp_v0_3);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddDiabObjs__Fv);
 #if 0 /* ida */
 int AddDiabObjs__Fv()
 {
@@ -3185,67 +2389,12 @@ int AddDiabObjs__Fv()
 }
 #endif
 
-/* ---- 0x80158F30  AddStoryBooks__Fv  PREOBJ.CPP:1465-1490  seg preobj_1  fsize 48 ---- */
+/* ---- 0x80158F30  AddStoryBooks__Fv  PREOBJ.CPP:1465-1490  seg preobj  fsize 48 ---- */
 /* void AddStoryBooks(void)
  *   xp=$s3 yp=$s4 xx=$s0 yy=$s1 cnt=$s5 done=$s2
  *   blocks: {1 }25
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddStoryBooks__Fv) */
-#if 0 /* m2c */
-void AddStoryBooks__Fv(void) {
-    s16 temp_s0;
-    s16 temp_s0_2;
-    s16 temp_s0_3;
-    s16 temp_s1;
-    s16 temp_s3;
-    s16 temp_s4;
-    s16 var_a0;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s5;
-
-    var_s5 = 0;
-    var_s2 = 1;
-loop_1:
-    temp_s3 = ENG_random__Fl(0x40) + 0x10;
-    temp_s4 = ENG_random__Fl(0x40) + 0x10;
-    var_s1 = -2;
-    do {
-        var_s0 = -3;
-        var_a0 = temp_s3 - 3;
-loop_3:
-        if (!(RndLocOk__Fii(var_a0, temp_s4 + var_s1) & 0xFF)) {
-            var_s2 = 0;
-        }
-        var_s0 += 1;
-        var_a0 = temp_s3 + var_s0;
-        if (var_s0 < 4) {
-            goto loop_3;
-        }
-        var_s1 += 1;
-    } while (var_s1 < 3);
-    var_s5 += 1;
-    if (!(var_s2 & 0xFF)) {
-        var_s2 = 1;
-        if (var_s5 < 0x4E21) {
-            goto loop_1;
-        }
-    } else {
-        AddObject__Fiii(0x56, temp_s3, temp_s4);
-        temp_s0 = temp_s3 - 2;
-        temp_s1 = temp_s4 + 1;
-        AddObject__Fiii(0x57, temp_s0, temp_s1);
-        AddObject__Fiii(0x57, temp_s0, temp_s4);
-        temp_s0_2 = temp_s4 - 1;
-        AddObject__Fiii(0x57, temp_s3 - 1, temp_s0_2);
-        AddObject__Fiii(0x57, temp_s3 + 1, temp_s0_2);
-        temp_s0_3 = temp_s3 + 2;
-        AddObject__Fiii(0x57, temp_s0_3, temp_s4);
-        AddObject__Fiii(0x57, temp_s0_3, temp_s1);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddStoryBooks__Fv);
 #if 0 /* ida */
 int AddStoryBooks__Fv()
 {
@@ -3296,123 +2445,12 @@ int AddStoryBooks__Fv()
 }
 #endif
 
-/* ---- 0x80159078  AddHookedBodies__Fi  PREOBJ.CPP:1496-1530  seg preobj_1  fsize 80 ---- */
+/* ---- 0x80159078  AddHookedBodies__Fi  PREOBJ.CPP:1496-1530  seg preobj  fsize 80 ---- */
 /* void AddHookedBodies(int freq)
  *   i=$s7 j@sp-0x38 ii=$s3 jj=$s1
  *   blocks: {1 }35
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddHookedBodies__Fi) */
-#if 0 /* m2c */
-void AddHookedBodies__Fi(s32 arg0) {
-    s32 sp10;
-    s32 sp18;
-    s32 sp20;
-    M2C_UNK *var_s5;
-    s16 temp_v0;
-    s16 temp_v0_2;
-    s16 var_a1;
-    s16 var_s4;
-    s32 temp_a3;
-    s32 temp_s6;
-    s32 var_a0_2;
-    s32 var_s0;
-    s32 var_s7;
-    u16 *temp_s2;
-    u16 temp_s0;
-    void *var_a0;
-    void *var_fp;
-
-    sp10 = arg0;
-    sp18 = 0;
-    do {
-        var_s7 = 0;
-        var_s5 = &dungeon;
-        var_s4 = 0x11;
-        var_fp = &dungeon + 0x60;
-        sp20 = 0;
-        temp_s6 = sp18 * 2;
-loop_2:
-        temp_s2 = temp_s6 + var_s5;
-        if ((u32) (*temp_s2 - 1) < 2U) {
-            var_s0 = 0;
-            if (ENG_random__Fl(sp10) == 0) {
-                var_s0 = (SkipThemeRoom__Fii(var_s7, sp18) & 0xFF) != 0;
-            }
-            if (var_s0 != 0) {
-                temp_s0 = *temp_s2;
-                if (temp_s0 == 1) {
-                    var_a0 = temp_s6 + var_s5;
-                    if (*(temp_s6 + var_fp) == 6) {
-                        temp_v0 = ENG_random__Fl(3);
-                        if (temp_v0 != temp_s0) {
-                            if (temp_v0 < 2) {
-                                var_a0_2 = 0x24;
-                                if (temp_v0 != 0) {
-                                    var_s5 += 0x60;
-                                } else {
-                                    var_a1 = var_s4;
-                                    goto block_25;
-                                }
-                            } else {
-                                var_a0_2 = 0x28;
-                                if (temp_v0 != 2) {
-                                    var_s5 += 0x60;
-                                } else {
-                                    var_a1 = var_s4;
-                                    goto block_25;
-                                }
-                            }
-                        } else {
-                            var_a0_2 = 0x25;
-                            var_a1 = var_s4;
-                            goto block_25;
-                        }
-                    } else {
-                        goto block_18;
-                    }
-                } else {
-                    var_a0 = temp_s6 + var_s5;
-block_18:
-                    if ((M2C_FIELD(var_a0, u16 *, 0) == 2) && (M2C_FIELD(var_a0, u16 *, 2) == 6)) {
-                        temp_v0_2 = ENG_random__Fl(2);
-                        if (temp_v0_2 != 0) {
-                            var_a0_2 = 0x27;
-                            if (temp_v0_2 != 1) {
-                                var_s5 += 0x60;
-                            } else {
-                                goto block_24;
-                            }
-                        } else {
-                            var_a0_2 = 0x26;
-block_24:
-                            var_a1 = sp20 + 0x10;
-block_25:
-                            AddObject__Fiii(var_a0_2, var_a1, temp_s6 + 0x10);
-                            goto block_26;
-                        }
-                    } else {
-                        goto block_26;
-                    }
-                }
-            } else {
-                goto block_26;
-            }
-        } else {
-block_26:
-            var_s5 += 0x60;
-        }
-        var_s4 += 2;
-        var_fp += 0x60;
-        var_s7 += 1;
-        sp20 += 2;
-        if (var_s7 < 0x28) {
-            goto loop_2;
-        }
-        temp_a3 = sp18 + 1;
-        sp18 = temp_a3;
-    } while (temp_a3 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddHookedBodies__Fi);
 #if 0 /* ida */
 BOOL __fastcall AddHookedBodies__Fi(int a1)
 {
@@ -3521,25 +2559,11 @@ LABEL_28:
 }
 #endif
 
-/* ---- 0x8015926C  AddL4Goodies__Fv  PREOBJ.CPP:1536-1546  seg preobj_1  fsize 24 ---- */
+/* ---- 0x8015926C  AddL4Goodies__Fv  PREOBJ.CPP:1536-1546  seg preobj  fsize 24 ---- */
 /* void AddL4Goodies(void)
  *   blocks: {1 }11
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddL4Goodies__Fv) */
-#if 0 /* m2c */
-void AddL4Goodies__Fv(void) {
-    AddHookedBodies__Fi(6);
-    InitRndLocObj__Fiii(2, 6, 0x1D);
-    InitRndLocObj__Fiii(2, 6, 0x1E);
-    InitRndLocObj__Fiii(2, 6, 0x1F);
-    InitRndLocObj__Fiii(2, 6, 0x20);
-    InitRndLocObj__Fiii(2, 6, 0x21);
-    InitRndLocObj__Fiii(2, 6, 0x22);
-    InitRndLocObj__Fiii(2, 6, 0x23);
-    InitRndLocObj__Fiii(2, 6, 0x43);
-    InitRndLocObj__Fiii(1, 3, 0x50);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddL4Goodies__Fv);
 #if 0 /* ida */
 int AddL4Goodies__Fv()
 {
@@ -3556,73 +2580,12 @@ int AddL4Goodies__Fv()
 }
 #endif
 
-/* ---- 0x8015931C  AddLazStand__Fv  PREOBJ.CPP:1552-1586  seg preobj_1  fsize 48 ---- */
+/* ---- 0x8015931C  AddLazStand__Fv  PREOBJ.CPP:1552-1586  seg preobj  fsize 48 ---- */
 /* void AddLazStand(void)
  *   xp=$s3 yp=$s4 xx=$s0 yy=$s1 cnt=$s5 done=$s2
  *   blocks: {1 }34
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", AddLazStand__Fv) */
-#if 0 /* m2c */
-void AddLazStand__Fv(void) {
-    s16 temp_s0;
-    s16 temp_s0_2;
-    s16 temp_s0_3;
-    s16 temp_s1;
-    s16 temp_s2;
-    s16 temp_s3;
-    s16 temp_s4;
-    s16 var_a0;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s5;
-
-    var_s5 = 0;
-    var_s2 = 1;
-loop_1:
-    temp_s3 = ENG_random__Fl(0x40) + 0x10;
-    temp_s4 = ENG_random__Fl(0x40) + 0x10;
-    var_s1 = -3;
-    do {
-        var_s0 = -2;
-        var_a0 = temp_s3 - 2;
-loop_3:
-        if (!(RndLocOk__Fii(var_a0, temp_s4 + var_s1) & 0xFF)) {
-            var_s2 = 0;
-        }
-        var_s0 += 1;
-        var_a0 = temp_s3 + var_s0;
-        if (var_s0 < 4) {
-            goto loop_3;
-        }
-        var_s1 += 1;
-    } while (var_s1 < 4);
-    var_s5 += 1;
-    if (!(var_s2 & 0xFF)) {
-        var_s2 = 1;
-        if (var_s5 >= 0x2711) {
-            InitRndLocObj__Fiii(1, 1, 0x5F);
-            return;
-        }
-        goto loop_1;
-    }
-    AddObject__Fiii(0x5F, temp_s3, temp_s4);
-    temp_s0 = temp_s4 + 2;
-    AddObject__Fiii(0x1E, temp_s3, temp_s0);
-    temp_s2 = temp_s3 + 1;
-    AddObject__Fiii(0x57, temp_s2, temp_s0);
-    temp_s1 = temp_s3 + 2;
-    AddObject__Fiii(0x1F, temp_s1, temp_s0);
-    temp_s0_2 = temp_s4 - 2;
-    AddObject__Fiii(0x21, temp_s3, temp_s0_2);
-    AddObject__Fiii(0x57, temp_s2, temp_s0_2);
-    AddObject__Fiii(0x22, temp_s1, temp_s0_2);
-    temp_s0_3 = temp_s3 - 1;
-    AddObject__Fiii(0x57, temp_s0_3, temp_s4 - 1);
-    AddObject__Fiii(0x23, temp_s0_3, temp_s4);
-    AddObject__Fiii(0x57, temp_s0_3, temp_s4 + 1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", AddLazStand__Fv);
 #if 0 /* ida */
 int AddLazStand__Fv()
 {
@@ -3674,31 +2637,11 @@ int AddLazStand__Fv()
 }
 #endif
 
-/* ---- 0x801594A8  saveplrpos__Fv  PREOBJ.CPP:1593-1611  seg preobj_1  fsize 0 ---- */
+/* ---- 0x801594A8  saveplrpos__Fv  PREOBJ.CPP:1593-1611  seg preobj  fsize 0 ---- */
 /* void saveplrpos(void)
  *   blocks: {1 }19
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", saveplrpos__Fv) */
-#if 0 /* m2c */
-void saveplrpos__Fv(void) {
-    M2C_FIELD(&plr, s16 *, 0x156) = (s16) ViewX;
-    M2C_FIELD(&plr, s16 *, 0x158) = (s16) ViewY;
-    M2C_FIELD(&plr, u16 *, 0x15A) = (u16) M2C_FIELD(&plr, u16 *, 0x30);
-    M2C_FIELD(&plr, u16 *, 0x15C) = (u16) M2C_FIELD(&plr, u16 *, 0x32);
-    M2C_FIELD(&plr, u16 *, 0x15E) = (u16) M2C_FIELD(&plr, u16 *, 0x1A18);
-    M2C_FIELD(&plr, u16 *, 0x160) = (u16) M2C_FIELD(&plr, u16 *, 0x1A1A);
-    if (M2C_FIELD(&plr, u8 *, 0x1D) != 0) {
-        M2C_FIELD(&plr, u16 *, 0x32) = 0U;
-        M2C_FIELD(&plr, u16 *, 0x30) = 0U;
-    }
-    if (M2C_FIELD(&plr, u8 *, 0x1A05) != 0) {
-        M2C_FIELD(&plr, u16 *, 0x1A1A) = 0U;
-        M2C_FIELD(&plr, u16 *, 0x1A18) = 0U;
-    }
-    ViewY = 0;
-    ViewX = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", saveplrpos__Fv);
 #if 0 /* ida */
 int saveplrpos__Fv()
 {
@@ -3727,19 +2670,11 @@ int saveplrpos__Fv()
 }
 #endif
 
-/* ---- 0x80159564  restoreplrpos__Fv  PREOBJ.CPP:1615-1621  seg preobj_1  fsize 24 ---- */
+/* ---- 0x80159564  restoreplrpos__Fv  PREOBJ.CPP:1615-1621  seg preobj  fsize 24 ---- */
 /* void restoreplrpos(void)
  *   blocks: {1 }7
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", restoreplrpos__Fv) */
-#if 0 /* m2c */
-void restoreplrpos__Fv(void) {
-    ViewX = (s32) M2C_FIELD(&plr, s16 *, 0x156);
-    ViewY = (s32) M2C_FIELD(&plr, s16 *, 0x158);
-    PlacePlayer__FiiiUc(0, M2C_FIELD(&plr, s16 *, 0x15A), M2C_FIELD(&plr, s16 *, 0x15C), 0);
-    PlacePlayer__FiiiUc(1, M2C_FIELD(&plr, s16 *, 0x15E), M2C_FIELD(&plr, s16 *, 0x160), 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", restoreplrpos__Fv);
 #if 0 /* ida */
 int restoreplrpos__Fv()
 {
@@ -3750,159 +2685,12 @@ int restoreplrpos__Fv()
 }
 #endif
 
-/* ---- 0x801595D4  InitObjects__Fv  PREOBJ.CPP:1625-1722  seg preobj_1  fsize 56 ---- */
+/* ---- 0x801595D4  InitObjects__Fv  PREOBJ.CPP:1625-1722  seg preobj  fsize 56 ---- */
 /* void InitObjects(void)
  *   textdef=$s1 setp=$s0
  *   blocks: {1 {38 {38 {44 {46 {50 }54 }54 }54 }64 }64 {72 {72 {73 {73 {77 }81 }81 }81 }87 }87 }97
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", InitObjects__Fv) */
-#if 0 /* m2c */
-void InitObjects__Fv(void) {
-    s8 temp_v1_2;
-    s8 temp_v1_3;
-    s8 temp_v1_5;
-    s8 var_s1;
-    u8 temp_s0;
-    u8 temp_v1;
-    u8 temp_v1_4;
-    void *temp_v0;
-    void *temp_v0_2;
-
-    var_s1 = 0;
-    ClrAllObjects__Fv();
-    if (currlevel == 0x10) {
-        AddDiabObjs__Fv();
-        return;
-    }
-    saveplrpos__Fv();
-    InitObjFlag = 1;
-    GetRndSeed__Fv();
-    if ((currlevel == 9) && (gbMaxPlayers == 1)) {
-        AddSlainHero__Fv();
-    }
-    if (QuestStatus__Fi(1) & 0xFF) {
-        if (currlevel == M2C_FIELD(&quests, u8 *, 0x14)) {
-            if (gbMaxPlayers != 2) {
-                AddMushPatch__Fv();
-            }
-        }
-    }
-    if (currlevel == 4) {
-        AddStoryBooks__Fv();
-    }
-    temp_v1 = currlevel;
-    if (temp_v1 == 8) {
-        AddStoryBooks__Fv();
-    }
-    if (temp_v1 == 0xC) {
-        AddStoryBooks__Fv();
-    }
-    if (leveltype == 1) {
-        if (QuestStatus__Fi(6) & 0xFF) {
-            AddTortures__Fv();
-        }
-        if (QuestStatus__Fi(0xD) & 0xFF) {
-            AddCandles__Fv();
-        }
-        if (QuestStatus__Fi(7) & 0xFF) {
-            AddObject__Fiii(0x61, (setpc_x * 2) + 0x1A, (setpc_y * 2) + 0x13);
-        }
-        InitRndLocBigObj__Fiii(0xA, 0xF, 0x30);
-        AddL1Objs__Fiiii(0, 0, 0x60, 0x60);
-        InitRndBarrels__Fv();
-    }
-    temp_s0 = leveltype;
-    if (temp_s0 == 2) {
-        if ((QuestStatus__Fi(0) & 0xFF) && (gbMaxPlayers != temp_s0)) {
-            InitRndLocObj5x5__Fiii(1, 1, 0x17);
-        }
-        if (QuestStatus__Fi(0xE) & 0xFF) {
-            InitRndLocObj5x5__Fiii(1, 1, 0x29);
-        }
-        AddL2Objs__Fiiii(0, 0, 0x60, 0x60);
-        AddL2Torches__Fv();
-        if (QuestStatus__Fi(8) & 0xFF) {
-            temp_v1_2 = *(&plr + 0xF6 + (myplr * 0x19E8));
-            switch (temp_v1_2) {                    /* switch 1; irregular */
-            case 0:                                 /* switch 1 */
-                var_s1 = 0xED;
-                break;
-            case 1:                                 /* switch 1 */
-                var_s1 = 0xF5;
-                break;
-            case 2:                                 /* switch 1 */
-                var_s1 = 0xF1;
-                break;
-            }
-            M2C_FIELD(&quests, s8 *, 0xAE) = var_s1;
-            AddBookLever__Fiiiiiiiii(0, 0, 0x60, 0x60, setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1, (s32) var_s1);
-            temp_v0 = GRL_LoadFileInMemSig__FPCcPUl(&D_801197E0, 0);
-            LoadMapObjs__FPUcii(temp_v0, setpc_x * 2, setpc_y * 2);
-            mem_free_dbg__FPv(temp_v0);
-        }
-        if (QuestStatus__Fi(9) & 0xFF) {
-            temp_v1_3 = *(&plr + 0xF6 + (myplr * 0x19E8));
-            switch (temp_v1_3) {                    /* switch 2; irregular */
-            case 0:                                 /* switch 2 */
-                var_s1 = 0xEC;
-                break;
-            case 1:                                 /* switch 2 */
-                var_s1 = 0xF4;
-                break;
-            case 2:                                 /* switch 2 */
-                var_s1 = 0xF0;
-                break;
-            }
-            M2C_FIELD(&quests, s8 *, 0xC2) = var_s1;
-            AddBookLever__Fiiiiiiiii(0, 0, 0x60, 0x60, setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7, (s32) var_s1);
-            AddObject__Fiii(0x49, (setpc_x * 2) + 0x19, (setpc_y * 2) + 0x20);
-        }
-        InitRndBarrels__Fv();
-    }
-    temp_v1_4 = leveltype;
-    if (temp_v1_4 == 3) {
-        AddL3Objs__Fiiii(0, 0, 0x60, 0x60);
-        InitRndBarrels__Fv();
-    }
-    if (temp_v1_4 == 4) {
-        if (QuestStatus__Fi(0xB) & 0xFF) {
-            temp_v1_5 = *(&plr + 0xF6 + (myplr * 0x19E8));
-            switch (temp_v1_5) {                    /* switch 3; irregular */
-            case 0:                                 /* switch 3 */
-                var_s1 = 0xEE;
-                break;
-            case 1:                                 /* switch 3 */
-                var_s1 = 0xF6;
-                break;
-            case 2:                                 /* switch 3 */
-                var_s1 = 0xF2;
-                break;
-            }
-            M2C_FIELD(&quests, s8 *, 0xEA) = var_s1;
-            AddBookLever__Fiiiiiiiii(0, 0, 0x60, 0x60, setpc_x, setpc_y, setpc_x + setpc_w, setpc_y + setpc_h, (s32) var_s1);
-            temp_v0_2 = GRL_LoadFileInMemSig__FPCcPUl(&D_801197FC, 0);
-            LoadMapObjs__FPUcii(temp_v0_2, setpc_x * 2, setpc_y * 2);
-            mem_free_dbg__FPv(temp_v0_2);
-        }
-        if ((QuestStatus__Fi(0xF) & 0xFF) && (gbMaxPlayers == 1)) {
-            AddLazStand__Fv();
-        }
-        InitRndBarrels__Fv();
-        AddL4Goodies__Fv();
-    }
-    InitRndLocObj__Fiii(5, 0xA, 5);
-    InitRndLocObj__Fiii(3, 6, 6);
-    InitRndLocObj__Fiii(1, 5, 7);
-    if (leveltype != 4) {
-        AddObjTraps__Fv();
-    }
-    if ((u8) leveltype >= 2U) {
-        AddChestTraps__Fv();
-    }
-    restoreplrpos__Fv();
-    InitObjFlag = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", InitObjects__Fv);
 #if 0 /* ida */
 int InitObjects__Fv()
 {
@@ -4092,138 +2880,12 @@ LABEL_10:
 }
 #endif
 
-/* ---- 0x80159C74  PreObjObjAddSwitch__Fiiii  PREOBJ.CPP:1726-1854  seg preobj_1  fsize 24 ---- */
+/* ---- 0x80159C74  PreObjObjAddSwitch__Fiiii  PREOBJ.CPP:1726-1854  seg preobj  fsize 24 ---- */
 /* void PreObjObjAddSwitch(int ot, int ox, int oy, int oi)
  *   ot=$v1 ox=$a1 oy=$a2 oi=$s0
  *   blocks: {1 }129
  */
-/* linked from build/src/preobj_1.c.o (segment preobj_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/preobj_1", PreObjObjAddSwitch__Fiiii) */
-#if 0 /* m2c */
-void PreObjObjAddSwitch__Fiiii(u32 arg0, s32 arg3) {
-    switch (arg0) {
-    case 0x3:
-    case 0x8:
-    case 0x9:
-    case 0x2C:
-    case 0x2D:
-    case 0x2E:
-    case 0x2F:
-    case 0x41:
-    case 0x57:
-        AddObjLight__Fii(arg3, 0x3F3);
-        return;
-    case 0x1:
-    case 0x2:
-        AddL1Door__Fiiii(arg3, arg0);
-        return;
-    case 0x2A:
-    case 0x2B:
-        AddL2Door__Fiiii(arg3, arg0);
-        return;
-    case 0x4A:
-    case 0x4B:
-        AddL3Door__Fiiii(arg3, arg0);
-        return;
-    case 0x29:
-        AddSCambBook__Fi(arg3);
-        return;
-    case 0x5:
-    case 0x6:
-    case 0x7:
-    case 0x44:
-    case 0x45:
-    case 0x46:
-        AddChest__Fii(arg3, arg0);
-        return;
-    case 0x30:
-        AddSarc__Fi(arg3);
-        return;
-    case 0x31:
-        AddFlameTrap__Fi(arg3);
-        return;
-    case 0x32:
-        AddFlameLvr__Fi(arg3);
-        return;
-    case 0x33:
-        *(&object + 0x21 + (arg3 * 0x2C)) = 1;
-        return;
-    case 0x35:
-    case 0x36:
-        AddTrap__Fii(arg3, arg0);
-        return;
-    case 0x39:
-    case 0x3A:
-        AddBarrel__Fii(arg3, arg0);
-        return;
-    case 0x3B:
-    case 0x3C:
-        AddShrine__Fi(arg3);
-        return;
-    case 0x3E:
-    case 0x3F:
-        AddBookcase__Fi(arg3);
-        return;
-    case 0x3D:
-    case 0x40:
-        AddBookstand__Fi(arg3);
-        return;
-    case 0x42:
-        AddBloodFtn__Fi(arg3);
-        return;
-    case 0x43:
-        AddDecap__Fi(arg3);
-        return;
-    case 0x4C:
-        AddPurifyingFountain__Fi(arg3);
-        return;
-    case 0x4D:
-    case 0x59:
-        AddArmorStand__Fi(arg3);
-        return;
-    case 0x4F:
-        AddGoatShrine__Fi(arg3);
-        return;
-    case 0x50:
-        AddCauldron__Fi(arg3);
-        return;
-    case 0x51:
-        AddMurkyFountain__Fi(arg3);
-        return;
-    case 0x52:
-        AddTearFountain__Fi(arg3);
-        return;
-    case 0x19:
-        AddVilebook__Fi(arg3);
-        return;
-    case 0x54:
-    case 0x55:
-        AddMagicCircle__Fi(arg3);
-        return;
-    case 0x56:
-        AddStoryBook__Fi(arg3);
-        return;
-    case 0x1A:
-    case 0x5B:
-        AddBrnCross__Fi(arg3);
-        /* fallthrough */
-    case 0x0:
-        AddObjLight__Fii(arg3, 0x1B8);
-        return;
-    case 0x49:
-        AddPedistal__Fi(arg3);
-        return;
-    case 0x5A:
-    case 0x5C:
-        AddWeaponRack__Fi(arg3);
-        return;
-    case 0x1E:
-        AddTorturedBody__Fi(arg3);
-        /* fallthrough */
-    default:
-        return;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/preobj", PreObjObjAddSwitch__Fiiii);
 #if 0 /* ida */
 BOOL __fastcall PreObjObjAddSwitch__Fiiii(unsigned int a1)
 {

@@ -58,7 +58,7 @@ void DBG_SendMessage()
 #endif
 
 /* ---- 0x80020E84  DBG_SetMessageHandler  GDEBUG.C:135-136  seg lib  fsize 0 ---- */
-/* void DBG_SetMessageHandler(void *(Func)())
+/* void DBG_SetMessageHandler(void (*Func)())
  *   Func=$a0
  */
 /* linked from build/src/lib.c.o (segment lib mixes several source files) — INCLUDE_ASM("asm/nonmatchings/lib", DBG_SetMessageHandler) */
@@ -91,7 +91,7 @@ void __noreturn DBG_Error()
 #endif
 
 /* ---- 0x80020EC8  DBG_SetErrorFunc  GDEBUG.C:166-167  seg lib  fsize 0 ---- */
-/* void DBG_SetErrorFunc(void *(EFunc)())
+/* void DBG_SetErrorFunc(void (*EFunc)())
  *   EFunc=$a0
  */
 /* linked from build/src/lib.c.o (segment lib mixes several source files) — INCLUDE_ASM("asm/nonmatchings/lib", DBG_SetErrorFunc) */
@@ -119,7 +119,7 @@ void SendPsyqString(void) {
 #endif
 
 /* ---- 0x80020EE0  DBG_SetPollRoutine  GDEBUG.C:190-191  seg lib  fsize 0 ---- */
-/* void DBG_SetPollRoutine(void *(Func)())
+/* void DBG_SetPollRoutine(void (*Func)())
  *   Func=$a0
  */
 /* linked from build/src/lib.c.o (segment lib mixes several source files) — INCLUDE_ASM("asm/nonmatchings/lib", DBG_SetPollRoutine) */

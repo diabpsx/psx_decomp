@@ -177,7 +177,7 @@ void __noreturn LoSave__4PCIOPCcPUci()
 #endif
 
 /* ---- 0x80086408  LoStreamFile__4PCIOPCciPFPUciib_bii  PCIO.CPP:169-214  seg pcio  fsize 56 ---- */
-/* BOOL PCIO::LoStreamFile(char *Name, int Slice, BOOL *(Func)(), int Offset, int Size)
+/* BOOL PCIO::LoStreamFile(char *Name, int Slice, BOOL (*Func)(), int Offset, int Size)
  *   this=$a0 Name=$s0 Slice=$s4 Func=$fp Size=$s1 FileHnd=$s3 hnd=$s5 Dest=$s2 OrigSize=$s6 SizeToRead=$s0
  *   blocks: {1 {27 }36 }46
  */

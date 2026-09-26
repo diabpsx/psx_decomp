@@ -23,7 +23,7 @@ void GRL_InitGwin__Fv()
 #endif
 
 /* ---- 0x8007B21C  GRL_SetWindowProc__FPFUlUilUl_Ul  GWIN.CPP:106-110  seg gwin  fsize 0 ---- */
-/* unsigned long *()() GRL_SetWindowProc(unsigned long *(NewProc)())
+/* unsigned long (*)() GRL_SetWindowProc(unsigned long (*NewProc)())
  *   NewProc=$a0 OldProc=$v0
  *   blocks: {1 }5
  */

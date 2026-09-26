@@ -14,7 +14,7 @@ M2C_UNK *GSYS_GetWorkMemInfo(void) {
 #endif
 
 /* ---- 0x8002117C  GSYS_SetStackAndJump  GSYS.C:89-91  seg lib  fsize 32 ---- */
-/* void GSYS_SetStackAndJump(void *Stack, void *(Func)(), void *Param)
+/* void GSYS_SetStackAndJump(void *Stack, void (*Func)(), void *Param)
  *   Stack=$a0 Func=$s1 Param=$s0
  */
 /* linked from build/src/lib.c.o (segment lib mixes several source files) — INCLUDE_ASM("asm/nonmatchings/lib", GSYS_SetStackAndJump) */

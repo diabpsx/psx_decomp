@@ -46,7 +46,7 @@ unsigned int VID_ScrOn__Fv()
 #endif
 
 /* ---- 0x80084094  VID_DoThisNextSync__FPFv_v  VID.CPP:249-255  seg vid  fsize 24 ---- */
-/* void VID_DoThisNextSync(void *(Func)())
+/* void VID_DoThisNextSync(void (*Func)())
  *   Func=$s0
  *   blocks: {1 }7
  */
@@ -332,6 +332,24 @@ int __fastcall VID_SetDBuffer__Fb(int a1)
  *   blocks: {1 }42
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", VID_OpenModule__Fv) */
+#if 0 /* m2c */
+void VID_OpenModule__Fv(void) {
+    SetDispMask(0);
+    VSync(0);
+    VSync(0);
+    VID_SetXYOff__Fii(0, 0);
+    SetVideoMode(0);
+    InitScreens__Fv();
+    if (!(GPUQ_InitModule__Fv() & 0xFF)) {
+        DBG_Error(0, &D_8010FFE0, 0x7F);
+    }
+    D_8011C62C = 0;
+    VSyncCallback(&VID_DispEnvSend);
+    if (!(PRIM_Open__FiiiP10SCREEN_ENVUl(0x400, 0x200, 2, &D_8011CAE0, 1) & 0xFF)) {
+        DBG_Error(0, &D_8010FFE0, 0x86);
+    }
+}
+#endif
 #if 0 /* ida */
 int VID_OpenModule__Fv()
 {
@@ -360,6 +378,26 @@ int VID_OpenModule__Fv()
  *   blocks: {1 }24
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", InitScreens__Fv) */
+#if 0 /* m2c */
+void InitScreens__Fv(void) {
+    M2C_UNK *temp_s2;
+
+    ResetGraph(0);
+    SetGraphDebug(0);
+    InitGeom();
+    SetDefDrawEnv(&D_8011CAE0, 0, 0, 0x140, 0xF0);
+    SetDefDispEnv(&D_8011CAE0 + 0x5C, 0x140, 0, 0x140, 0xF0);
+    temp_s2 = &D_8011CAE0 + 0x70;
+    SetDefDrawEnv(temp_s2, 0x140, 0, 0x140, 0xF0);
+    SetDefDispEnv(&D_8011CAE0 + 0xCC, 0, 0, 0x140, 0xF0);
+    D_8011CAF8 = 0;
+    D_8011CB68 = 0;
+    D_8011CAF6 = 1;
+    D_8011CB66 = 1;
+    SetDrawEnv(&D_8011CAE0 + 0x1C, &D_8011CAE0);
+    SetDrawEnv(&D_8011CAE0 + 0x8C, temp_s2);
+}
+#endif
 #if 0 /* ida */
 int InitScreens__Fv()
 {

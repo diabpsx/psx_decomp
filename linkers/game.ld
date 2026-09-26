@@ -10,71 +10,11 @@ SECTIONS
         . = 0x4;   /* 0x80139BFC */
         build/skel/PSXSRC/GAMEONLY.CPP.o(.text);
         . = 0xC;   /* 0x80139C04 */
-        build/src/missiles.c.o(.text);
-        . = 0x2C;   /* 0x80139C24 */
-        build/asm/data/missiles_rodata_80139c24.rodata.s.o(.rodata);
-        . = 0x604;   /* 0x8013A1FC */
-        build/src/missiles_1.c.o(.text);
-        . = 0x1044;   /* 0x8013AC3C */
-        build/asm/data/missiles_rodata_8013ac3c.rodata.s.o(.rodata);
-        . = 0x11A8;   /* 0x8013ADA0 */
-        build/src/missiles_2.c.o(.text);
-        . = 0x1224;   /* 0x8013AE1C */
-        build/asm/data/missiles_rodata_8013ae1c.rodata.s.o(.rodata);
-        . = 0x12DC;   /* 0x8013AED4 */
-        build/src/missiles_3.c.o(.text);
-        . = 0x12E0;   /* 0x8013AED8 */
-        build/asm/data/missiles_rodata_8013aed8.rodata.s.o(.rodata);
-        . = 0x1454;   /* 0x8013B04C */
-        build/src/missiles_4.c.o(.text);
-        . = 0x1484;   /* 0x8013B07C */
-        build/asm/data/missiles_rodata_8013b07c.rodata.s.o(.rodata);
-        . = 0x17D8;   /* 0x8013B3D0 */
-        build/src/missiles_5.c.o(.text);
-        . = 0x1AF4;   /* 0x8013B6EC */
-        build/asm/data/missiles_rodata_8013b6ec.rodata.s.o(.rodata);
-        . = 0x1F98;   /* 0x8013BB90 */
-        build/src/missiles_6.c.o(.text);
-        . = 0x2F58;   /* 0x8013CB50 */
-        build/asm/data/missiles_rodata_8013cb50.rodata.s.o(.rodata);
-        . = 0x3190;   /* 0x8013CD88 */
-        build/src/missiles_7.c.o(.text);
-        . = 0x35A8;   /* 0x8013D1A0 */
-        build/asm/data/missiles_rodata_8013d1a0.rodata.s.o(.rodata);
-        . = 0x36C0;   /* 0x8013D2B8 */
-        build/src/missiles_8.c.o(.text);
-        . = 0x45F4;   /* 0x8013E1EC */
-        build/asm/data/missiles_rodata_8013e1ec.rodata.s.o(.rodata);
-        . = 0x4630;   /* 0x8013E228 */
-        build/src/missiles_9.c.o(.text);
-        . = 0x72FC;   /* 0x80140EF4 */
-        build/asm/data/missiles_rodata_80140ef4.rodata.s.o(.rodata);
-        . = 0x731C;   /* 0x80140F14 */
-        build/src/missiles_10.c.o(.text);
-        . = 0x8B54;   /* 0x8014274C */
-        build/asm/data/missiles_rodata_8014274c.rodata.s.o(.rodata);
-        . = 0x8B9C;   /* 0x80142794 */
-        build/src/missiles_11.c.o(.text);
-        . = 0x99F0;   /* 0x801435E8 */
-        build/asm/data/missiles_rodata_801435e8.rodata.s.o(.rodata);
-        . = 0x9F5C;   /* 0x80143B54 */
-        build/src/missiles_12.c.o(.text);
-        . = 0xEAAC;   /* 0x801486A4 */
-        build/asm/data/missiles_rodata_801486a4.rodata.s.o(.rodata);
-        . = 0xEEA4;   /* 0x80148A9C */
-        build/src/missiles_13.c.o(.text);
+        build/skel/SOURCE/MISSILES.CPP.o(.text);
         . = 0x10F7C;   /* 0x8014AB74 */
-        build/src/monster.c.o(.text);
-        . = 0x13C00;   /* 0x8014D7F8 */
-        build/asm/data/monster_rodata_8014d7f8.rodata.s.o(.rodata);
-        . = 0x13E44;   /* 0x8014DA3C */
-        build/src/monster_1.c.o(.text);
+        build/skel/SOURCE/MONSTER.CPP.o(.text);
         . = 0x1D67C;   /* 0x80157274 */
-        build/src/inv.c.o(.text);
-        . = 0x1DAF4;   /* 0x801576EC */
-        build/asm/data/inv_rodata_801576ec.rodata.s.o(.rodata);
-        . = 0x1DDA8;   /* 0x801579A0 */
-        build/src/inv_1.c.o(.text);
+        build/skel/SOURCE/INV.CPP.o(.text);
         . = 0x28360;   /* 0x80161F58 */
         build/skel/SOURCE/AUTOMAP.CPP.o(.text);
         . = 0x2A228;   /* image end 0x80163E20 */

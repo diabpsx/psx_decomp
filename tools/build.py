@@ -53,7 +53,7 @@ def per_tu_flags(src: Path) -> dict:
 def _cc1_env():
     """PsyQ's DOS-era cc1/cc1plus write scratch files via TMPDIR/TMP/TEMP and need a
     WINDOWS path WITH a trailing backslash, else `\/ctaNNNNN: No such file or directory`."""
-    tmp = BUILD / "tmp"; tmp.mkdir(parents=True, exist_ok=True)
+    tmp = BUILD / "tmp" / str(os.getpid()); tmp.mkdir(parents=True, exist_ok=True)   # per-process: parallel cc1 runs clobber fixed scratch names
     env = dict(os.environ); w = str(tmp).replace("/", "\\") + "\\"
     env["TMPDIR"] = env["TMP"] = env["TEMP"] = w
     return env

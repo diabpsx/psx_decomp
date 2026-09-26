@@ -146,6 +146,48 @@ int SortOutFileSystem__Fv()
  *   blocks: {1 }78
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", SYSI_Init__Fv) */
+#if 0 /* m2c */
+void SYSI_Init__Fv(void) {
+    s16 sp10;
+    s16 sp12;
+    s16 sp14;
+    s16 sp16;
+
+    SaveGP();
+    MEM_SetupMem__Fv();
+    InitTmalloc__Fv();
+    VID_OpenModule__Fv();
+    sp10 = 0;
+    sp12 = 0;
+    sp14 = 0x140;
+    sp16 = 0x100;
+    ClearImage(&sp10, 0, 0, 0);
+    sp10 = 0x140;
+    ClearImage(&sp10, 0, 0, 0);
+    VID_ScrOn__Fv();
+    SortOutFileSystem__Fv();
+    ResetCallback();
+    if (!(TSK_OpenModule(0x8001) & 0xFF) && (&D_80110018 != NULL)) {
+        DBG_Error(0, &D_80110030, 0x83);
+    }
+    TSK_SetExtraStackProtection(0);
+    GU_InitModule();
+    GM_Open__Fv();
+    PA_Open__Fv();
+    PAD_Open__Fv();
+    PutUpCutScreen__Fi(0xB);
+    if (FileSYS == 2) {
+        BL_LoadDirectory__Fv();
+    }
+    SCR_Open__Fv();
+    DEC_Open__Fv();
+    OVR_Open__Fv();
+    STR_Init__Fv();
+    SpuInit();
+    SPU_OnceOnlyInit__Fv();
+    GLUE_Init__Fv();
+}
+#endif
 #if 0 /* ida */
 void SYSI_Init__Fv()
 {

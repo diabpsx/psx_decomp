@@ -16,11 +16,7 @@ SECTIONS
         . = 0x1BE4;   /* 0x8013B7DC */
         build/asm/data/fmv_rodata_8013b7dc.rodata.s.o(.rodata);
         . = 0x1C224;   /* 0x80155E1C */
-        build/src/fmv.c.o(.text);
-        . = 0x1DAF4;   /* 0x801576EC */
-        build/asm/data/fmv_rodata_801576ec.rodata.s.o(.rodata);
-        . = 0x1DB4C;   /* 0x80157744 */
-        build/src/fmv_1.c.o(.text);
+        build/skel/PSXSRC/FMV.CPP.o(.text);
         . = 0x1EC70;   /* image end 0x80158868 */
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }

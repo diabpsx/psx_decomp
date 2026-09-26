@@ -8,7 +8,7 @@
  *   miniset=$s4 tmin=$s0 tmax=$a2 cx=$s5 cy=$s6 sx=$t1 sy=$t3 sw=$s1 sh=$s2 xx=$a1 yy=$a3 i=$s0 ii=$t0 numt@sp-0x30 found=$a2 randxy@sp-0x250 rcount=$s3 failed=$t6
  *   blocks: {1 {62 {62 }79 }132 }149
  */
-/* linked from build/src/drlg_l2.c.o (segment drlg_l2 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2PlaceMiniSet__FPUciiiiii) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2PlaceMiniSet__FPUciiiiii);
 #if 0 /* ida */
 int __fastcall DRLG_L2PlaceMiniSet__FPUciiiiii(unsigned __int8 *a1, int a2, int a3, int a4, int a5, int a6, int a7)
 {
@@ -169,162 +169,12 @@ LABEL_29:
 }
 #endif
 
-/* ---- 0x80143798  DRLG_L2PlaceRndSet__FPUci  DRLG_L2.CPP:1361-1409  seg drlg_l2_1  fsize 120 ---- */
+/* ---- 0x80143798  DRLG_L2PlaceRndSet__FPUci  DRLG_L2.CPP:1361-1409  seg drlg_l2  fsize 120 ---- */
 /* void DRLG_L2PlaceRndSet(unsigned char *miniset, int rndper)
  *   miniset=$s6 sx=$s0 sy=$s3 sw=$s1 sh=$s4 xx=$a0 yy=$a3 ii=$t0 jj=$a0 kk=$s2 found=$t1
  *   blocks: {1 }49
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2PlaceRndSet__FPUci) */
-#if 0 /* m2c */
-void DRLG_L2PlaceRndSet__FPUci(void *arg0, s32 arg1) {
-    s32 sp10;
-    s32 sp18;
-    s32 temp_fp;
-    s32 temp_t2;
-    s32 temp_v0;
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_a0_3;
-    s32 var_a1;
-    s32 var_a3;
-    s32 var_a3_2;
-    s32 var_lo;
-    s32 var_s0;
-    s32 var_s2;
-    s32 var_s3;
-    s32 var_t0;
-    s32 var_t0_2;
-    s32 var_t1;
-    s32 var_v0;
-    u8 *var_a1_2;
-    u8 *var_a2;
-    u8 temp_a2;
-    u8 temp_s1;
-    u8 temp_s4;
-    u8 temp_v1_2;
-    void *var_v1;
-
-    sp10 = arg1;
-    temp_s4 = M2C_FIELD(arg0, u8 *, 1);
-    temp_s1 = M2C_FIELD(arg0, u8 *, 0);
-    temp_v0 = 0x28 - temp_s4;
-    var_s3 = 0;
-    if (temp_v0 > 0) {
-        temp_fp = 0x28 - temp_s1;
-        sp18 = temp_v0;
-        do {
-            var_s0 = 0;
-            if (temp_fp > 0) {
-                var_t1 = 1;
-                do {
-                    var_t0 = 2;
-                    if ((var_s0 >= nSx1) && (nSx2 >= var_s0) && (var_s3 >= nSy1)) {
-                        var_t1 = nSy2 < var_s3;
-                    }
-                    var_a3 = 0;
-                    if (temp_s4 != 0) {
-loop_10:
-                        var_lo = temp_s4 * temp_s1;
-                        if (var_t1 == 1) {
-                            var_a0 = 0;
-                            if (temp_s1 != 0) {
-                                temp_v1 = var_s3 + var_a3;
-                                temp_t2 = temp_v1 * 0x28;
-                                var_a1 = var_s0;
-                                var_a2 = var_t0 + arg0;
-loop_13:
-                                if (var_t1 == 1) {
-                                    temp_v1_2 = *var_a2;
-                                    if (temp_v1_2 != 0) {
-                                        var_v0 = temp_t2 + var_a1;
-                                        if (*((temp_v1 * 2) + ((var_a1 * 0x60) + &dungeon)) != temp_v1_2) {
-                                            var_t1 = 0;
-                                            goto block_17;
-                                        }
-                                    } else {
-block_17:
-                                        var_v0 = temp_t2 + var_a1;
-                                    }
-                                    if (*(mydflags + var_v0) != 0) {
-                                        var_t1 = 0;
-                                    }
-                                    var_a2 += 1;
-                                    var_t0 += 1;
-                                    var_a0 += 1;
-                                    var_a1 += 1;
-                                    if (var_a0 < (s32) temp_s1) {
-                                        goto loop_13;
-                                    }
-                                }
-                            }
-                            var_a3 += 1;
-                            if (var_a3 >= (s32) temp_s4) {
-                                goto block_22;
-                            }
-                            goto loop_10;
-                        }
-                    } else {
-block_22:
-                        var_lo = temp_s4 * temp_s1;
-                    }
-                    var_s2 = var_lo + 2;
-                    if (var_t1 == 1) {
-                        var_t0_2 = var_s3 - temp_s4;
-                        if (var_t0_2 < (var_s3 + (temp_s4 * 2))) {
-loop_26:
-                            if (var_t1 == 1) {
-                                var_a0_2 = var_s0 - temp_s1;
-                                if (var_a0_2 < (var_s0 + (temp_s1 * 2))) {
-                                    var_v1 = (var_a0_2 * 0x60) + &dungeon;
-                                    do {
-                                        if (*((var_t0_2 * 2) + var_v1) == *(arg0 + var_s2)) {
-                                            var_t1 = 0;
-                                        }
-                                        var_a0_2 += 1;
-                                        var_v1 += 0x60;
-                                    } while (var_a0_2 < (var_s0 + (temp_s1 * 2)));
-                                }
-                                var_t0_2 += 1;
-                                if (var_t0_2 >= (var_s3 + (temp_s4 * 2))) {
-                                    goto block_33;
-                                }
-                                goto loop_26;
-                            }
-                        } else {
-block_33:
-                            if ((var_t1 == 1) && (ENG_random__Fl(0x64) < sp10)) {
-                                var_a3_2 = 0;
-                                if (temp_s4 != 0) {
-                                    do {
-                                        var_a0_3 = 0;
-                                        if (temp_s1 != 0) {
-                                            var_a1_2 = var_s2 + arg0;
-                                            do {
-                                                temp_a2 = *var_a1_2;
-                                                if (temp_a2 != 0) {
-                                                    *(((var_s3 + var_a3_2) * 2) + (((var_s0 + var_a0_3) * 0x60) + &dungeon)) = (s16) temp_a2;
-                                                }
-                                                var_a1_2 += 1;
-                                                var_a0_3 += 1;
-                                                var_s2 += 1;
-                                            } while (var_a0_3 < (s32) temp_s1);
-                                        }
-                                        var_a3_2 += 1;
-                                    } while (var_a3_2 < (s32) temp_s4);
-                                }
-                            }
-                        }
-                    }
-                    var_s0 += 1;
-                    var_t1 = 1;
-                } while (var_s0 < temp_fp);
-            }
-            var_s3 += 1;
-        } while (var_s3 < sp18);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2PlaceRndSet__FPUci);
 #if 0 /* ida */
 int __fastcall DRLG_L2PlaceRndSet__FPUci(unsigned __int8 *a1, int a2, unsigned __int8 *a3)
 {
@@ -489,91 +339,12 @@ LABEL_17:
 }
 #endif
 
-/* ---- 0x80143A90  DRLG_L2Subs__Fv  DRLG_L2.CPP:1417-1450  seg drlg_l2_1  fsize 56 ---- */
+/* ---- 0x80143A90  DRLG_L2Subs__Fv  DRLG_L2.CPP:1417-1450  seg drlg_l2  fsize 56 ---- */
 /* void DRLG_L2Subs(void)
  *   x=$s1 y=$s2 i=$a3 j=$a2 k=$a0 rv=$v1
  *   blocks: {1 }34
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2Subs__Fv) */
-#if 0 /* m2c */
-void DRLG_L2Subs__Fv(void) {
-    M2C_UNK *var_s3;
-    s16 var_a3;
-    s32 temp_s5;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_a3_2;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s4;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v1;
-    u8 temp_s0;
-
-    var_s2 = 0;
-    var_s4 = 2;
-    do {
-        var_s1 = 0;
-        temp_s5 = var_s2 * 2;
-        var_s3 = &dungeon;
-loop_2:
-        if (((var_s1 < nSx1) || (nSx2 < var_s1)) && ((var_s2 < nSy1) || (nSy2 < var_s2)) && (ENG_random__Fl(4) == 0)) {
-            temp_s0 = *(&BTYPESL2 + *(temp_s5 + var_s3));
-            if (temp_s0 != 0) {
-                var_v1 = ENG_random__Fl(0x10);
-                var_a3 = -1;
-                if (var_v1 >= 0) {
-                    var_a3_2 = 0;
-                    do {
-                        if (var_a3_2 == 0xA1) {
-                            var_a3_2 = 0;
-                        }
-                        if (temp_s0 == *(&BTYPESL2 + var_a3_2)) {
-                            var_v1 -= 1;
-                        }
-                        var_a3_2 += 1;
-                    } while (var_v1 >= 0);
-                    var_a3 = var_a3_2 - 1;
-                }
-                var_a2 = var_s2 - 2;
-                var_v0 = var_s2 + 3;
-                if (var_a2 < var_s4) {
-                    do {
-                        var_a0 = var_s1 - 2;
-                        var_a1 = var_s1 + 2;
-                        var_v0_2 = var_a0 * 2;
-                        if (var_a0 < var_a1) {
-                            do {
-                                var_a0 += 1;
-                                if (*((var_a2 * 2) + (((var_v0_2 + var_a0) << 5) + &dungeon)) == var_a3) {
-                                    var_a2 = var_s2 + 3;
-                                    var_a0 = var_a1 + 1;
-                                }
-                                var_a1 = var_s1 + 2;
-                                var_v0_2 = var_a0 * 2;
-                            } while (var_a0 < var_a1);
-                        }
-                        var_a2 += 1;
-                        var_v0 = var_s2 + 3;
-                    } while (var_a2 < var_s4);
-                }
-                if (var_a2 < var_v0) {
-                    *(temp_s5 + var_s3) = var_a3;
-                }
-            }
-        }
-        var_s1 += 1;
-        var_s3 += 0x60;
-        if (var_s1 < 0x28) {
-            goto loop_2;
-        }
-        var_s2 += 1;
-        var_s4 += 1;
-    } while (var_s2 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2Subs__Fv);
 #if 0 /* ida */
 BOOL DRLG_L2Subs__Fv()
 {
@@ -661,96 +432,12 @@ BOOL DRLG_L2Subs__Fv()
 }
 #endif
 
-/* ---- 0x80143C80  DRLG_L2Shadows__Fv  DRLG_L2.CPP:1458-1483  seg drlg_l2_1  fsize 8 ---- */
+/* ---- 0x80143C80  DRLG_L2Shadows__Fv  DRLG_L2.CPP:1458-1483  seg drlg_l2  fsize 8 ---- */
 /* void DRLG_L2Shadows(void)
  *   x=$t1 y=$t4 i=$a3 patflag=$a2 sd@sp-0x8
  *   blocks: {1 }26
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2Shadows__Fv) */
-#if 0 /* m2c */
-void DRLG_L2Shadows__Fv(void) {
-    u8 sp0;
-    u8 sp1;
-    u8 sp2;
-    u8 sp3;
-    s32 temp_t5;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_a3;
-    s32 var_t1;
-    s32 var_t4;
-    u8 temp_v0;
-    u8 temp_v0_2;
-    u8 temp_v0_3;
-    u8 temp_v1_2;
-    u8 temp_v1_3;
-    u8 temp_v1_4;
-    void *temp_a0;
-    void *temp_v1;
-    void *var_t2;
-    void *var_t3;
-
-    var_t4 = 1;
-    var_t1 = 1;
-    do {
-        temp_t5 = var_t4 * 2;
-        var_t3 = &dungeon + 0x60;
-        var_t2 = &dungeon - 0x60 + 0x60;
-loop_2:
-        temp_a0 = temp_t5 + var_t3;
-        temp_v1 = temp_t5 + var_t2;
-        sp0 = *(&BSTYPESL2 + M2C_FIELD(temp_a0, u16 *, 0));
-        sp2 = *(&BSTYPESL2 + M2C_FIELD(temp_v1, u16 *, 0));
-        sp1 = *(&BSTYPESL2 + M2C_FIELD(temp_a0, u16 *, -2));
-        var_a3 = 0;
-        var_a1 = 0;
-        sp3 = *(&BSTYPESL2 + M2C_FIELD(temp_v1, u16 *, -2));
-loop_3:
-        if (*(&SPATSL2 + var_a1) == sp0) {
-            temp_v1_2 = *(&SPATSL2 + 1 + var_a1);
-            var_a2 = 1;
-            if (temp_v1_2 != 0) {
-                var_a2 = temp_v1_2 == sp3;
-            }
-            temp_v1_3 = *(&SPATSL2 + 2 + var_a1);
-            if ((temp_v1_3 != 0) && (temp_v1_3 != sp1)) {
-                var_a2 = 0;
-            }
-            temp_v1_4 = *(&SPATSL2 + 3 + var_a1);
-            if ((temp_v1_4 != 0) && (temp_v1_4 != sp2)) {
-                var_a2 = 0;
-            }
-            if (var_a2 == 1) {
-                temp_v0 = *(&SPATSL2 + 4 + var_a1);
-                if (temp_v0 != 0) {
-                    M2C_FIELD(temp_v1, u16 *, -2) = (u16) temp_v0;
-                }
-                temp_v0_2 = *(&SPATSL2 + 5 + var_a1);
-                if (temp_v0_2 != 0) {
-                    M2C_FIELD(temp_a0, u16 *, -2) = (u16) temp_v0_2;
-                }
-                temp_v0_3 = *(&SPATSL2 + 6 + var_a1);
-                if (temp_v0_3 != 0) {
-                    M2C_FIELD(temp_v1, u16 *, 0) = (u16) temp_v0_3;
-                }
-            }
-        }
-        var_a3 += 1;
-        var_a1 += 7;
-        if (var_a3 < 2) {
-            goto loop_3;
-        }
-        var_t3 += 0x60;
-        var_t1 += 1;
-        var_t2 += 0x60;
-        if (var_t1 < 0x28) {
-            goto loop_2;
-        }
-        var_t4 += 1;
-        var_t1 = 1;
-    } while (var_t4 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2Shadows__Fv);
 #if 0 /* ida */
 BOOL DRLG_L2Shadows__Fv()
 {
@@ -823,33 +510,12 @@ BOOL DRLG_L2Shadows__Fv()
 }
 #endif
 
-/* ---- 0x80143E44  InitDungeon__Fv  DRLG_L2.CPP:1490-1497  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80143E44  InitDungeon__Fv  DRLG_L2.CPP:1490-1497  seg drlg_l2  fsize 0 ---- */
 /* void InitDungeon(void)
  *   i=$a1 j=$a0
  *   blocks: {1 }8
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", InitDungeon__Fv) */
-#if 0 /* m2c */
-void InitDungeon__Fv(void) {
-    M2C_UNK *var_v1;
-    s32 var_a0;
-    s32 var_a1;
-
-    var_a1 = 0;
-    do {
-        var_a0 = 0;
-        var_v1 = &predungeon;
-loop_2:
-        *(var_v1 + var_a1) = 0x20;
-        var_a0 += 1;
-        var_v1 += 0x28;
-        if (var_a0 < 0x28) {
-            goto loop_2;
-        }
-        var_a1 += 1;
-    } while (var_a1 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", InitDungeon__Fv);
 #if 0 /* ida */
 BOOL InitDungeon__Fv()
 {
@@ -875,32 +541,11 @@ BOOL InitDungeon__Fv()
 }
 #endif
 
-/* ---- 0x80143E8C  DRLG_LoadL2SP__Fv  DRLG_L2.CPP:1509-1523  seg drlg_l2_1  fsize 24 ---- */
+/* ---- 0x80143E8C  DRLG_LoadL2SP__Fv  DRLG_L2.CPP:1509-1523  seg drlg_l2  fsize 24 ---- */
 /* void DRLG_LoadL2SP(void)
  *   blocks: {1 }15
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_LoadL2SP__Fv) */
-#if 0 /* m2c */
-void DRLG_LoadL2SP__Fv(void) {
-    M2C_UNK *var_a0;
-
-    setloadflag = 0;
-    if (QuestStatus__Fi(8) & 0xFF) {
-        var_a0 = &D_8014274C;
-        goto block_6;
-    }
-    if (QuestStatus__Fi(9) & 0xFF) {
-        var_a0 = &D_80142758;
-        goto block_6;
-    }
-    if (QuestStatus__Fi(0xE) & 0xFF) {
-        var_a0 = &D_80142764;
-block_6:
-        pSetPiece = GRL_LoadFileInMemSig__FPCcPUl(var_a0, 0);
-        setloadflag = 1;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_LoadL2SP__Fv);
 #if 0 /* ida */
 int DRLG_LoadL2SP__Fv()
 {
@@ -929,21 +574,12 @@ int DRLG_LoadL2SP__Fv()
 }
 #endif
 
-/* ---- 0x80143F2C  DRLG_FreeL2SP__Fv  DRLG_L2.CPP:1531-1532  seg drlg_l2_1  fsize 24 ---- */
+/* ---- 0x80143F2C  DRLG_FreeL2SP__Fv  DRLG_L2.CPP:1531-1532  seg drlg_l2  fsize 24 ---- */
 /* void DRLG_FreeL2SP(void)
  *   p__p=$a0
  *   blocks: {1 {1 }2 }2
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_FreeL2SP__Fv) */
-#if 0 /* m2c */
-void DRLG_FreeL2SP__Fv(void) {
-    s32 temp_a0;
-
-    temp_a0 = pSetPiece;
-    pSetPiece = 0;
-    mem_free_dbg__FPv(temp_a0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_FreeL2SP__Fv);
 #if 0 /* ida */
 int DRLG_FreeL2SP__Fv()
 {
@@ -955,59 +591,12 @@ int DRLG_FreeL2SP__Fv()
 }
 #endif
 
-/* ---- 0x80143F5C  DRLG_L2SetRoom__Fii  DRLG_L2.CPP:1540-1568  seg drlg_l2_1  fsize 16 ---- */
+/* ---- 0x80143F5C  DRLG_L2SetRoom__Fii  DRLG_L2.CPP:1540-1568  seg drlg_l2  fsize 16 ---- */
 /* void DRLG_L2SetRoom(int rx1, int ry1)
  *   rx1=$a0 ry1=$a1 rw=$t4 rh=$t5 i=$a3 j=$t2 sp=$t0
  *   blocks: {1 }29
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2SetRoom__Fii) */
-#if 0 /* m2c */
-void DRLG_L2SetRoom__Fii(s32 arg0, s32 arg1) {
-    s32 temp_t1;
-    s32 temp_v1;
-    s32 var_a2;
-    s32 var_a3;
-    s32 var_t2;
-    u8 *temp_v1_3;
-    u8 *var_t0;
-    u8 temp_t4;
-    u8 temp_t5;
-    u8 temp_v1_2;
-
-    var_t2 = 0;
-    temp_t4 = M2C_FIELD(pSetPiece, u8 *, 0);
-    temp_t5 = M2C_FIELD(pSetPiece, u8 *, 2);
-    setpc_x = arg0;
-    setpc_y = arg1;
-    setpc_w = (s32) temp_t4;
-    setpc_h = (s32) temp_t5;
-    var_t0 = pSetPiece + 4;
-    if (temp_t5 != 0) {
-        do {
-            var_a3 = 0;
-            if (temp_t4 != 0) {
-                temp_v1 = arg1 + var_t2;
-                temp_t1 = temp_v1 * 2;
-                var_a2 = arg0;
-                do {
-                    temp_v1_2 = *var_t0;
-                    if (temp_v1_2 != 0) {
-                        *(temp_t1 + ((var_a2 * 0x60) + &dungeon)) = (s16) temp_v1_2;
-                        temp_v1_3 = mydflags + ((temp_v1 * 0x28) + var_a2);
-                        *temp_v1_3 |= 0x80;
-                    } else {
-                        *(temp_t1 + ((var_a2 * 0x60) + &dungeon)) = 3;
-                    }
-                    var_t0 += 2;
-                    var_a3 += 1;
-                    var_a2 += 1;
-                } while (var_a3 < (s32) temp_t4);
-            }
-            var_t2 += 1;
-        } while (var_t2 < (s32) temp_t5);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2SetRoom__Fii);
 #if 0 /* ida */
 int __fastcall DRLG_L2SetRoom__Fii(int a1, int a2)
 {
@@ -1063,103 +652,12 @@ int __fastcall DRLG_L2SetRoom__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8014405C  DefineRoom__Fiiiii  DRLG_L2.CPP:1576-1619  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x8014405C  DefineRoom__Fiiiii  DRLG_L2.CPP:1576-1619  seg drlg_l2  fsize 0 ---- */
 /* void DefineRoom(int nX1, int nY1, int nX2, int nY2, int ForceHW)
  *   nX1=$t3 nY1=$t0 nX2=$t1 nY2=$a3 ForceHW=$a2 i=$a1 j=$v1 ft=$t5
  *   blocks: {1 }44
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DefineRoom__Fiiiii) */
-#if 0 /* m2c */
-void DefineRoom__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 temp_a2;
-    s32 temp_a3;
-    s32 temp_v0_3;
-    s32 temp_v1;
-    s32 var_a1;
-    s32 var_a1_2;
-    s32 var_a1_3;
-    s32 var_v0;
-    s32 var_v1;
-    s8 *temp_v0_5;
-    s8 *temp_v1_3;
-    s8 *var_a2;
-    s8 *var_t0;
-    u8 *temp_v1_2;
-    u8 temp_v0_4;
-    void *temp_v0;
-    void *temp_v0_2;
-    void *var_a0;
-    void *var_a0_2;
-
-    temp_v0 = (arg0 * 0x28) + &predungeon;
-    *(temp_v0 + arg1) = 0x43;
-    *(temp_v0 + arg3) = 0x45;
-    temp_v0_2 = (arg2 * 0x28) + &predungeon;
-    *(temp_v0_2 + arg1) = 0x42;
-    *(temp_v0_2 + arg3) = 0x41;
-    temp_v1 = nRoomCnt + 1;
-    temp_v0_3 = temp_v1 * 0x14;
-    *(&RoomList + temp_v0_3) = arg0;
-    *(&RoomList + 8 + temp_v0_3) = arg2;
-    *(&RoomList + 4 + temp_v0_3) = arg1;
-    *(&RoomList + 0xC + temp_v0_3) = arg3;
-    nRoomCnt = temp_v1;
-    var_a1 = arg0 + 1;
-    if (arg4 == 1) {
-        var_a1_2 = arg0;
-        if (var_a1_2 < arg2) {
-loop_4:
-            var_v0 = var_a1_2 < arg3;
-            do {
-                if (var_v0 != 0) {
-                    temp_v1_2 = mydflags + ((arg1 * 0x28) + var_a1_2);
-                    temp_v0_4 = *temp_v1_2;
-                    var_a1_2 += 1;
-                    *temp_v1_2 = temp_v0_4 | 0x80;
-                    goto loop_4;
-                }
-                var_a1_2 += 1;
-                var_v0 = var_a1_2 < arg3;
-            } while (var_a1_2 < arg2);
-        }
-        var_a1 = arg0 + 1;
-    }
-    temp_a2 = arg2 - 1;
-    if (temp_a2 >= var_a1) {
-        var_a0 = (var_a1 * 0x28) + &predungeon;
-        do {
-            temp_v0_5 = var_a0 + arg1;
-            temp_v1_3 = var_a0 + arg3;
-            var_a0 += 0x28;
-            var_a1 += 1;
-            *temp_v0_5 = 0x23;
-            *temp_v1_3 = 0x23;
-        } while (temp_a2 >= var_a1);
-    }
-    temp_a3 = arg3 - 1;
-    var_a1_3 = arg1 + 1;
-    if (temp_a3 >= var_a1_3) {
-        var_t0 = var_a1_3 + ((arg2 * 0x28) + &predungeon);
-        var_a2 = var_a1_3 + ((arg0 * 0x28) + &predungeon);
-        do {
-            var_v1 = arg0 + 1;
-            *var_a2 = 0x23;
-            *var_t0 = 0x23;
-            if (var_v1 < arg2) {
-                var_a0_2 = (var_v1 * 0x28) + &predungeon;
-                do {
-                    *(var_a0_2 + var_a1_3) = 0x2E;
-                    var_v1 += 1;
-                    var_a0_2 += 0x28;
-                } while (var_v1 < arg2);
-            }
-            var_t0 += 1;
-            var_a1_3 += 1;
-            var_a2 += 1;
-        } while (temp_a3 >= var_a1_3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DefineRoom__Fiiiii);
 #if 0 /* ida */
 BOOL __fastcall DefineRoom__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -1271,45 +769,12 @@ LABEL_8:
 }
 #endif
 
-/* ---- 0x80144260  CreateDoorType__Fii  DRLG_L2.CPP:1627-1649  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80144260  CreateDoorType__Fii  DRLG_L2.CPP:1627-1649  seg drlg_l2  fsize 0 ---- */
 /* void CreateDoorType(int nX, int nY)
  *   nX=$a0 nY=$a1 fDoneflag=$a2
  *   blocks: {1 }23
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", CreateDoorType__Fii) */
-#if 0 /* m2c */
-void CreateDoorType__Fii(s32 arg0, s32 arg1) {
-    s32 temp_v1;
-    s32 temp_v1_4;
-    s32 var_a2;
-    s32 var_v0;
-    u8 temp_v1_3;
-    void *temp_t0;
-    void *temp_v1_2;
-
-    temp_t0 = &RoomList + 0x62C;
-    temp_v1 = arg0 * 0x28;
-    var_a2 = *(temp_v1 + temp_t0 + arg1) == 0x44;
-    if (*(temp_v1 + (temp_t0 + 0x50) + arg1) == 0x44) {
-        var_a2 = 1;
-    }
-    temp_v1_2 = temp_v1 + (temp_t0 + 0x28) + arg1;
-    if (M2C_FIELD(temp_v1_2, s8 *, -1) == 0x44) {
-        var_a2 = 1;
-    }
-    if (M2C_FIELD(temp_v1_2, s8 *, 1) == 0x44) {
-        var_a2 = 1;
-    }
-    temp_v1_3 = M2C_FIELD(temp_v1_2, u8 *, 0);
-    temp_v1_4 = temp_v1_3 & 0xFF;
-    if (((u32) (temp_v1_3 - 0x42) < 2U) || (temp_v1_4 == 0x41) || (var_v0 = var_a2 & 0xFF, (temp_v1_4 == 0x45))) {
-        var_v0 = 1 & 0xFF;
-    }
-    if (var_v0 == 0) {
-        *((arg0 * 0x28) + &predungeon + arg1) = 0x44;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", CreateDoorType__Fii);
 #if 0 /* ida */
 int __fastcall CreateDoorType__Fii(int a1, int a2)
 {
@@ -1338,22 +803,12 @@ int __fastcall CreateDoorType__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x80144344  PlaceHallExt__Fii  DRLG_L2.CPP:1657-1659  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80144344  PlaceHallExt__Fii  DRLG_L2.CPP:1657-1659  seg drlg_l2  fsize 0 ---- */
 /* void PlaceHallExt(int nX, int nY)
  *   nX=$a0 nY=$a1
  *   blocks: {1 }3
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", PlaceHallExt__Fii) */
-#if 0 /* m2c */
-void PlaceHallExt__Fii(s32 arg0, s32 arg1) {
-    u8 *temp_a0;
-
-    temp_a0 = (arg0 * 0x28) + &predungeon + arg1;
-    if (*temp_a0 == 0x20) {
-        *temp_a0 = 0x2C;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", PlaceHallExt__Fii);
 #if 0 /* ida */
 int __fastcall PlaceHallExt__Fii(int a1, int a2)
 {
@@ -1368,45 +823,12 @@ int __fastcall PlaceHallExt__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8014437C  AddHall__Fiiiii  DRLG_L2.CPP:1668-1693  seg drlg_l2_1  fsize 40 ---- */
+/* ---- 0x8014437C  AddHall__Fiiiii  DRLG_L2.CPP:1668-1693  seg drlg_l2  fsize 40 ---- */
 /* void AddHall(int nX1, int nY1, int nX2, int nY2, int nHd)
  *   nX1=$s0 nY1=$s1 nX2=$s2 nY2=$s3 nHd=$s4 p1=$v1 p2=$a0
  *   blocks: {1 }26
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", AddHall__Fiiiii) */
-#if 0 /* m2c */
-void AddHall__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    void *temp_v0;
-    void *temp_v0_2;
-    void *var_v1;
-
-    if (pHallList == NULL) {
-        temp_v0 = DiabloAllocPtr__FUl(0x18);
-        pHallList = temp_v0;
-        M2C_FIELD(temp_v0, s32 *, 0) = arg0;
-        M2C_FIELD(temp_v0, s32 *, 4) = arg1;
-        M2C_FIELD(temp_v0, s32 *, 8) = arg2;
-        M2C_FIELD(temp_v0, s32 *, 0xC) = arg3;
-        M2C_FIELD(temp_v0, s32 *, 0x10) = arg4;
-        M2C_FIELD(temp_v0, s32 *, 0x14) = 0;
-        return;
-    }
-    temp_v0_2 = DiabloAllocPtr__FUl(0x18);
-    var_v1 = pHallList;
-    M2C_FIELD(temp_v0_2, s32 *, 0) = arg0;
-    M2C_FIELD(temp_v0_2, s32 *, 4) = arg1;
-    M2C_FIELD(temp_v0_2, s32 *, 8) = arg2;
-    M2C_FIELD(temp_v0_2, s32 *, 0xC) = arg3;
-    M2C_FIELD(temp_v0_2, s32 *, 0x10) = arg4;
-    M2C_FIELD(temp_v0_2, s32 *, 0x14) = 0;
-    if (M2C_FIELD(var_v1, s32 *, 0x14) != 0) {
-        do {
-            var_v1 = M2C_FIELD(var_v1, void **, 0x14);
-        } while (M2C_FIELD(var_v1, s32 *, 0x14) != 0);
-    }
-    M2C_FIELD(var_v1, void **, 0x14) = temp_v0_2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", AddHall__Fiiiii);
 #if 0 /* ida */
 _DWORD *__fastcall AddHall__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -1445,205 +867,12 @@ _DWORD *__fastcall AddHall__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 }
 #endif
 
-/* ---- 0x80144454  CreateRoom__Fiiiiiiiii  DRLG_L2.CPP:1702-1819  seg drlg_l2_1  fsize 144 ---- */
+/* ---- 0x80144454  CreateRoom__Fiiiiiiiii  DRLG_L2.CPP:1702-1819  seg drlg_l2  fsize 144 ---- */
 /* void CreateRoom(int nX1, int nY1, int nX2, int nY2, int nRDest, int nHDir, int ForceHW, int nH, int nW)
  *   nRDest=$s3 ForceHW=$fp nAw=$a0 nAh=$s0 nRw@sp-0x48 nRh@sp-0x40 nRx1=$s5 nRy1=$s4 nRx2=$s6 nRy2=$s7 nHx1@sp-0x38 nHy1@sp-0x30 nHx2=$s2 nHy2=$s1 nRid=$fp
  *   blocks: {1 }115
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", CreateRoom__Fiiiiiiiii) */
-#if 0 /* m2c */
-void CreateRoom__Fiiiiiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
-    s32 sp28;
-    s32 sp30;
-    s32 sp38;
-    s32 sp40;
-    s32 sp48;
-    s32 sp50;
-    s32 sp58;
-    s32 sp60;
-    s32 temp_a0;
-    s32 temp_fp;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s0_3;
-    s32 temp_s0_4;
-    s32 temp_s0_5;
-    s32 temp_s0_6;
-    s32 temp_s0_7;
-    s32 temp_s1;
-    s32 temp_s1_2;
-    s32 temp_s2;
-    s32 temp_s2_2;
-    s32 temp_s2_3;
-    s32 temp_s3;
-    s32 temp_s3_2;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_a0_3;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_a2_2;
-    s32 var_a3;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s4;
-    s32 var_s5;
-    s32 var_s6;
-    s32 var_s7;
-    s32 var_v0;
-
-    var_s2 = 0;
-    var_s1 = 0;
-    sp28 = arg0;
-    sp30 = arg1;
-    sp38 = arg2;
-    sp40 = arg3;
-    sp58 = 0;
-    sp60 = 0;
-    if (nRoomCnt < 0x50) {
-        temp_a0 = arg2 - arg0;
-        temp_s0 = arg3 - arg1;
-        if ((temp_a0 >= Area_Min) && (temp_s0 >= Area_Min)) {
-            if (Room_Max < temp_a0) {
-                var_a0 = Room_Max - Room_Min;
-                goto block_7;
-            }
-            if (Room_Min < temp_a0) {
-                var_a0 = temp_a0 - Room_Min;
-block_7:
-                sp48 = ENG_random__Fl(var_a0) + Room_Min;
-            } else {
-                sp48 = temp_a0;
-            }
-            if (Room_Max < temp_s0) {
-                var_a0_2 = Room_Max - Room_Min;
-                goto block_12;
-            }
-            var_a0_2 = temp_s0 - Room_Min;
-            if (Room_Min < temp_s0) {
-block_12:
-                sp50 = ENG_random__Fl(var_a0_2) + Room_Min;
-            } else {
-                sp50 = temp_s0;
-            }
-            if (arg6 == 1) {
-                sp48 = arg8;
-                sp50 = arg7;
-            }
-            var_s5 = ENG_random__Fl(sp38 - sp28) + sp28;
-            var_s4 = ENG_random__Fl(sp40 - sp30) + sp30;
-            var_s6 = var_s5 + sp48;
-            var_s7 = var_s4 + sp50;
-            if (sp38 < var_s6) {
-                var_s6 = sp38;
-                var_s5 = var_s6 - sp48;
-            }
-            if (sp40 < var_s7) {
-                var_s7 = sp40;
-                var_s4 = var_s7 - sp50;
-            }
-            if (var_s5 >= 0x26) {
-                var_s5 = 0x26;
-            }
-            if (var_s4 >= 0x26) {
-                var_s4 = 0x26;
-            }
-            if (var_s5 < 2) {
-                var_s5 = 1;
-            }
-            if (var_s4 < 2) {
-                var_s4 = 1;
-            }
-            if (var_s6 >= 0x26) {
-                var_s6 = 0x26;
-            }
-            if (var_s7 >= 0x26) {
-                var_s7 = 0x26;
-            }
-            if (var_s6 < 2) {
-                var_s6 = 1;
-            }
-            if (var_s7 < 2) {
-                var_s7 = 1;
-            }
-            DefineRoom__Fiiiii(var_s5, var_s4, var_s6, var_s7, arg6);
-            if (arg6 == 1) {
-                nSx1 = var_s5 + 2;
-                nSy1 = var_s4 + 2;
-                nSx2 = var_s6;
-                nSy2 = var_s7;
-            }
-            temp_fp = nRoomCnt;
-            *(&RoomList + 0x10 + (temp_fp * 0x14)) = arg4;
-            if (arg4 != 0) {
-                if (arg5 == 1) {
-                    temp_s0_2 = arg4 * 0x14;
-                    sp58 = ENG_random__Fl((var_s6 - var_s5) - 2) + var_s5 + 1;
-                    sp60 = var_s4;
-                    var_s1 = *(&RoomList + 0xC + temp_s0_2);
-                    var_s2 = ENG_random__Fl((*(&RoomList + 8 + temp_s0_2) - *(&RoomList + temp_s0_2)) - 2) + *(&RoomList + temp_s0_2) + 1;
-                }
-                if (arg5 == 3) {
-                    temp_s0_3 = arg4 * 0x14;
-                    sp58 = ENG_random__Fl((var_s6 - var_s5) - 2) + var_s5 + 1;
-                    sp60 = var_s7;
-                    var_s1 = *(&RoomList + 4 + temp_s0_3);
-                    var_s2 = ENG_random__Fl((*(&RoomList + 8 + temp_s0_3) - *(&RoomList + temp_s0_3)) - 2) + *(&RoomList + temp_s0_3) + 1;
-                }
-                if (arg5 == 2) {
-                    temp_s0_4 = arg4 * 0x14;
-                    sp60 = ENG_random__Fl((var_s7 - var_s4) - 2) + var_s4 + 1;
-                    var_s2 = *(&RoomList + temp_s0_4);
-                    temp_v0 = ENG_random__Fl((*(&RoomList + 0xC + temp_s0_4) - *(&RoomList + 4 + temp_s0_4)) - 2);
-                    sp58 = var_s6;
-                    var_s1 = temp_v0 + *(&RoomList + 4 + temp_s0_4) + 1;
-                }
-                var_a2 = var_s2;
-                if (arg5 == 4) {
-                    temp_s0_5 = arg4 * 0x14;
-                    sp60 = ENG_random__Fl((var_s7 - var_s4) - 2) + var_s4 + 1;
-                    temp_s2 = *(&RoomList + 8 + temp_s0_5);
-                    temp_v0_2 = ENG_random__Fl((*(&RoomList + 0xC + temp_s0_5) - *(&RoomList + 4 + temp_s0_5)) - 2);
-                    sp58 = var_s5;
-                    var_s1 = temp_v0_2 + *(&RoomList + 4 + temp_s0_5) + 1;
-                    var_a2 = temp_s2;
-                }
-                AddHall__Fiiiii(sp58, sp60, var_a2, var_s1, arg5);
-            }
-            if (sp48 < sp50) {
-                temp_s2_2 = sp28 + 2;
-                temp_s3 = sp30 + 2;
-                CreateRoom__Fiiiiiiiii(temp_s2_2, temp_s3, var_s5 - 2, var_s7 - 2, temp_fp, 2, 0, 0, 0);
-                temp_s1 = sp38 - 2;
-                temp_s0_6 = sp40 - 2;
-                CreateRoom__Fiiiiiiiii(var_s6 + 2, var_s4 + 2, temp_s1, temp_s0_6, temp_fp, 4, 0, 0, 0);
-                CreateRoom__Fiiiiiiiii(temp_s2_2, var_s7 + 2, var_s6 - 2, temp_s0_6, temp_fp, 1, 0, 0, 0);
-                var_a0_3 = var_s5 + 2;
-                var_a1 = temp_s3;
-                var_a2_2 = temp_s1;
-                var_a3 = var_s4 - 2;
-                var_v0 = 3;
-            } else {
-                temp_s2_3 = sp28 + 2;
-                temp_s3_2 = sp30 + 2;
-                CreateRoom__Fiiiiiiiii(temp_s2_3, temp_s3_2, var_s6 - 2, var_s4 - 2, temp_fp, 3, 0, 0, 0);
-                temp_s1_2 = sp38 - 2;
-                temp_s0_7 = sp40 - 2;
-                CreateRoom__Fiiiiiiiii(var_s5 + 2, var_s7 + 2, temp_s1_2, temp_s0_7, temp_fp, 1, 0, 0, 0);
-                CreateRoom__Fiiiiiiiii(temp_s2_3, var_s4 + 2, var_s5 - 2, temp_s0_7, temp_fp, 2, 0, 0, 0);
-                var_a0_3 = var_s6 + 2;
-                var_a1 = temp_s3_2;
-                var_a2_2 = temp_s1_2;
-                var_a3 = var_s7 - 2;
-                var_v0 = 4;
-            }
-            CreateRoom__Fiiiiiiiii(var_a0_3, var_a1, var_a2_2, var_a3, temp_fp, var_v0, 0, 0, 0);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", CreateRoom__Fiiiiiiiii);
 #if 0 /* ida */
 int __fastcall CreateRoom__Fiiiiiiiii(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
 {
@@ -1824,29 +1053,12 @@ LABEL_15:
 }
 #endif
 
-/* ---- 0x80144AC4  GetHall__FPiN40  DRLG_L2.CPP:1826-1836  seg drlg_l2_1  fsize 24 ---- */
+/* ---- 0x80144AC4  GetHall__FPiN40  DRLG_L2.CPP:1826-1836  seg drlg_l2  fsize 24 ---- */
 /* void GetHall(int *nX1, int *nY1, int *nX2, int *nY2, int *nHd)
  *   nX1=$a0 nY1=$a1 nX2=$a2 nY2=$a3 nHd=$t0 p1=$s0 p__p=$a0
  *   blocks: {1 {1 }1 }11
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", GetHall__FPiN40) */
-#if 0 /* m2c */
-void GetHall__FPiN40(s32 *arg0, s32 *arg1, s32 *arg2, s32 *arg3, s32 *arg4) {
-    void *temp_a0;
-    void *temp_s0;
-
-    temp_s0 = M2C_FIELD(pHallList, void **, 0x14);
-    *arg0 = M2C_FIELD(pHallList, s32 *, 0);
-    *arg1 = M2C_FIELD(pHallList, s32 *, 4);
-    *arg2 = M2C_FIELD(pHallList, s32 *, 8);
-    *arg3 = M2C_FIELD(pHallList, s32 *, 0xC);
-    *arg4 = M2C_FIELD(pHallList, s32 *, 0x10);
-    temp_a0 = pHallList;
-    pHallList = NULL;
-    mem_free_dbg__FPv(temp_a0);
-    pHallList = temp_s0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", GetHall__FPiN40);
 #if 0 /* ida */
 int __fastcall GetHall__FPiN40(_DWORD *a1, _DWORD *a2, _DWORD *a3, _DWORD *a4, _DWORD *a5)
 {
@@ -1868,275 +1080,12 @@ int __fastcall GetHall__FPiN40(_DWORD *a1, _DWORD *a2, _DWORD *a3, _DWORD *a4, _
 }
 #endif
 
-/* ---- 0x80144B5C  ConnectHall__Fiiiii  DRLG_L2.CPP:1844-1986  seg drlg_l2_1  fsize 104 ---- */
+/* ---- 0x80144B5C  ConnectHall__Fiiiii  DRLG_L2.CPP:1844-1986  seg drlg_l2  fsize 104 ---- */
 /* void ConnectHall(int nX1, int nY1, int nX2, int nY2, int nHd)
  *   nX1=$s2 nY1=$s3 nX2=$s6 nY2=$s7 nHd=$s0 fDoneflag@sp-0x58 fInroom@sp-0x50 nCurrd=$s1 nDx=$s5 nDy=$s4 nRp=$s0 nOrigX1@sp-0x48 nOrigY1@sp-0x40 fMinusFlag@sp-0x38 fPlusFlag@sp-0x30
  *   blocks: {1 }143
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", ConnectHall__Fiiiii) */
-#if 0 /* m2c */
-void ConnectHall__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    u8 sp10;
-    u8 sp18;
-    s32 sp20;
-    s32 sp28;
-    s32 sp30;
-    s32 sp38;
-    s32 temp_a0;
-    s32 temp_a1;
-    s32 temp_s5;
-    s32 temp_s6;
-    s32 temp_s7;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_a1;
-    s32 var_a1_2;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s3;
-    s32 var_v0;
-    s32 var_v0_10;
-    s32 var_v0_11;
-    s32 var_v0_12;
-    s32 var_v0_13;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s32 var_v0_4;
-    s32 var_v0_5;
-    s32 var_v0_6;
-    s32 var_v0_7;
-    s32 var_v0_8;
-    s32 var_v0_9;
-    u8 temp_v1;
-
-    var_s2 = arg0;
-    var_s3 = arg1;
-    sp10 = 0;
-    sp30 = ENG_random__Fl(0x64);
-    temp_v0 = ENG_random__Fl(0x64);
-    sp20 = var_s2;
-    sp28 = var_s3;
-    sp38 = temp_v0;
-    CreateDoorType__Fii(var_s2, var_s3);
-    CreateDoorType__Fii(arg2, arg3);
-    abs(arg2 - var_s2);
-    abs(arg3 - var_s3);
-    sp18 = 0;
-    var_s1 = arg4;
-    temp_v0_2 = var_s1 * 4;
-    temp_s6 = arg2 - *(&Dir_Xadd + temp_v0_2);
-    temp_s7 = arg3 - *(&Dir_Yadd + temp_v0_2);
-    *((temp_s6 * 0x28) + &predungeon + temp_s7) = 0x2C;
-    var_v0 = var_s2 < 0x26;
-    do {
-        if (var_v0 == 0) {
-            var_v0_2 = var_s3 < 0x26;
-            if (var_s1 == 2) {
-                var_s1 = 4;
-                goto block_4;
-            }
-        } else {
-block_4:
-            var_v0_2 = var_s3 < 0x26;
-        }
-        if (var_v0_2 == 0) {
-            var_v0_3 = var_s2 < 2;
-            if (var_s1 == 3) {
-                var_s1 = 1;
-                goto block_8;
-            }
-        } else {
-block_8:
-            var_v0_3 = var_s2 < 2;
-        }
-        if (var_v0_3 != 0) {
-            var_v0_4 = var_s3 < 2;
-            if (var_s1 == 4) {
-                var_s1 = 2;
-                goto block_12;
-            }
-        } else {
-block_12:
-            var_v0_4 = var_s3 < 2;
-        }
-        if (var_v0_4 != 0) {
-            var_v0_5 = var_s2 * 4;
-            if (var_s1 == 1) {
-                var_s1 = 3;
-                goto block_16;
-            }
-        } else {
-block_16:
-            var_v0_5 = var_s2 * 4;
-        }
-        if (*(((var_v0_5 + var_s2) * 8) + &predungeon + var_s3) == 0x43) {
-            if ((var_s1 == 1) || (var_v0_6 = var_s2 * 4, (var_s1 == 4))) {
-                var_s1 = 2;
-                goto block_21;
-            }
-        } else {
-block_21:
-            var_v0_6 = var_s2 * 4;
-        }
-        var_v0_7 = var_s2 * 4;
-        if (*(((var_v0_6 + var_s2) * 8) + &predungeon + var_s3) == 0x42) {
-            var_v0_7 = var_s2 * 4;
-            if ((u32) (var_s1 - 1) < 2U) {
-                var_s1 = 3;
-            }
-        }
-        var_v0_8 = var_s2 * 4;
-        if (*(((var_v0_7 + var_s2) * 8) + &predungeon + var_s3) == 0x45) {
-            var_v0_8 = var_s2 * 4;
-            if ((u32) (var_s1 - 3) < 2U) {
-                var_s1 = 1;
-            }
-        }
-        var_v0_9 = var_s1 * 4;
-        if (*(((var_v0_8 + var_s2) * 8) + &predungeon + var_s3) == 0x41) {
-            var_v0_9 = var_s1 * 4;
-            if ((u32) (var_s1 - 2) < 2U) {
-                var_s1 = 4;
-                var_v0_9 = 4 * 4;
-            }
-        }
-        temp_a0 = *(&Dir_Xadd + var_v0_9);
-        temp_a1 = *(&Dir_Yadd + var_v0_9);
-        var_s2 += temp_a0;
-        var_s3 += temp_a1;
-        temp_v1 = *((var_s2 * 0x28) + &predungeon + var_s3);
-        if (temp_v1 == 0x20) {
-            if (sp18 != 0) {
-                CreateDoorType__Fii(var_s2 - temp_a0, var_s3 - temp_a1);
-                var_v0_10 = var_s2 * 4;
-            } else {
-                if (sp30 < 0x4B) {
-                    if ((var_s1 == 1) || (var_a0 = var_s2, (var_s1 == 3))) {
-                        var_a0 = var_s2 - 1;
-                        var_a1 = var_s3;
-                    } else {
-                        var_a1 = var_s3 - 1;
-                    }
-                    PlaceHallExt__Fii(var_a0, var_a1);
-                }
-                if (sp38 < 0x4B) {
-                    if ((var_s1 == 1) || (var_a0_2 = var_s2, (var_s1 == 3))) {
-                        var_a0_2 = var_s2 + 1;
-                        var_a1_2 = var_s3;
-                    } else {
-                        var_a1_2 = var_s3 + 1;
-                    }
-                    PlaceHallExt__Fii(var_a0_2, var_a1_2);
-                }
-                var_v0_10 = var_s2 * 4;
-            }
-            *(((var_v0_10 + var_s2) * 8) + &predungeon + var_s3) = 0x2C;
-            sp18 = 0;
-        } else {
-            var_v0_11 = var_s2 * 4;
-            if (sp18 == 0) {
-                var_v0_11 = var_s2 * 4;
-                if (temp_v1 == 0x23) {
-                    CreateDoorType__Fii(var_s2, var_s3);
-                    var_v0_11 = var_s2 * 4;
-                }
-            }
-            if (*(((var_v0_11 + var_s2) * 8) + &predungeon + var_s3) != 0x2C) {
-                sp18 = 1;
-            }
-        }
-        temp_s5 = abs(temp_s6 - var_s2);
-        temp_v0_3 = abs(temp_s7 - var_s3);
-        var_s0 = temp_s5 * 2;
-        if (temp_v0_3 < temp_s5) {
-            if (var_s0 >= 0x1F) {
-                var_s0 = 0x1E;
-            }
-            if ((ENG_random__Fl(0x64) < var_s0) && (var_s1 = 4, ((var_s2 < temp_s6) != 0))) {
-                var_v0_12 = temp_v0_3 < 0xA;
-                if (var_s2 < 0x28) {
-                    var_s1 = 2;
-                }
-            } else {
-                goto block_66;
-            }
-        } else {
-            var_s0_2 = temp_v0_3 * 5;
-            if (var_s0_2 >= 0x51) {
-                var_s0_2 = 0x50;
-            }
-            if ((ENG_random__Fl(0x64) < var_s0_2) && (var_s1 = 1, ((var_s3 < temp_s7) != 0))) {
-                var_v0_12 = temp_v0_3 < 0xA;
-                if (var_s3 < 0x28) {
-                    var_s1 = 3;
-                    goto block_66;
-                }
-            } else {
-block_66:
-                var_v0_12 = temp_v0_3 < 0xA;
-            }
-        }
-        if ((var_v0_12 != 0) && (var_s2 == temp_s6)) {
-            if ((var_s1 == 2) || (var_v0_13 = temp_s5 < 0xA, (var_s1 == 4))) {
-                var_s1 = 1;
-                if (var_s3 < temp_s7) {
-                    var_v0_13 = temp_s5 < 0xA;
-                    if (var_s3 < 0x28) {
-                        var_s1 = 3;
-                        goto block_74;
-                    }
-                } else {
-                    goto block_74;
-                }
-            }
-        } else {
-block_74:
-            var_v0_13 = temp_s5 < 0xA;
-        }
-        if (var_v0_13 != 0) {
-            if (var_s3 == temp_s7) {
-                if (((var_s1 == 1) || (var_s1 == 3)) && (var_s1 = 4, ((var_s2 < temp_s6) != 0))) {
-                    if (var_s2 < 0x28) {
-                        var_s1 = 2;
-                    }
-                }
-            }
-        }
-        if ((temp_v0_3 == 1) && (temp_s5 >= 2) && ((var_s1 == 1) || (var_s1 == 3)) && (var_s1 = 4, ((var_s2 < temp_s6) != 0))) {
-            if (var_s2 < 0x28) {
-                var_s1 = 2;
-            }
-        }
-        if ((temp_s5 == 1) && (temp_v0_3 >= 2) && ((var_s1 == 2) || (var_s1 == 4))) {
-            var_s1 = 1;
-            if ((var_s3 < temp_s7) && (var_s2 < 0x28)) {
-                var_s1 = 3;
-            }
-        }
-        if ((temp_s5 == 0) && (*((var_s2 * 0x28) + &predungeon + var_s3) != 0x20) && ((var_s1 == 2) || (var_s1 == 4))) {
-            var_s1 = 1;
-            if ((sp20 < temp_s6) && (var_s2 < 0x28)) {
-                var_s1 = 3;
-            }
-        }
-        if ((temp_v0_3 == 0) && (*((var_s2 * 0x28) + &predungeon + var_s3) != 0x20) && ((var_s1 == 1) || (var_s1 == 3))) {
-            var_s1 = 4;
-            if ((sp28 < temp_s7) && (var_s3 < 0x28)) {
-                var_s1 = 2;
-            }
-        }
-        if ((var_s2 == temp_s6) && (var_s3 == temp_s7)) {
-            sp10 = 1;
-        }
-        var_v0 = var_s2 < 0x26;
-    } while (sp10 == 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", ConnectHall__Fiiiii);
 #if 0 /* ida */
 BOOL __fastcall ConnectHall__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -2423,12 +1372,12 @@ LABEL_76:
 }
 #endif
 
-/* ---- 0x801451BC  DoPatternCheck__Fii  DRLG_L2.CPP:1998-2067  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x801451BC  DoPatternCheck__Fii  DRLG_L2.CPP:1998-2067  seg drlg_l2  fsize 0 ---- */
 /* void DoPatternCheck(int i, int j)
  *   i=$t3 j=$a1 k=$t9 l=$t0 x=$a0 y=$a3 nOk=$a2
  *   blocks: {1 }70
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DoPatternCheck__Fii) */
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DoPatternCheck__Fii);
 #if 0 /* ida */
 int __fastcall DoPatternCheck__Fii(int a1, int a2)
 {
@@ -2543,80 +1492,12 @@ LABEL_29:
 }
 #endif
 
-/* ---- 0x80145494  L2TileFix__Fv  DRLG_L2.CPP:2075-2087  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80145494  L2TileFix__Fv  DRLG_L2.CPP:2075-2087  seg drlg_l2  fsize 0 ---- */
 /* void L2TileFix(void)
  *   j=$t1
  *   blocks: {1 }13
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", L2TileFix__Fv) */
-#if 0 /* m2c */
-void L2TileFix__Fv(void) {
-    M2C_UNK *var_a1;
-    s32 temp_a2;
-    s32 var_a3;
-    s32 var_t1;
-    u16 *temp_a0;
-    u16 *temp_a0_2;
-    u16 *temp_v1;
-    u16 *var_v0_2;
-    u16 *var_v0_3;
-    u16 *var_v1;
-    u16 var_v0;
-    void *temp_t2;
-
-    var_t1 = 0;
-    temp_t2 = &dungeon + 0x60;
-    do {
-        temp_a2 = var_t1 * 2;
-        var_a1 = &dungeon;
-        var_a3 = 0;
-loop_2:
-        var_v1 = temp_a2 + var_a1;
-        var_v0 = M2C_FIELD(var_v1, u16 *, 0);
-        if (var_v0 == 1) {
-            if (M2C_FIELD(var_v1, u16 *, 2) == 3) {
-                M2C_FIELD(var_v1, u16 *, 2) = 1U;
-                var_v1 = temp_a2 + var_a1;
-            }
-            var_v0 = *var_v1;
-        }
-        var_v0_2 = temp_a2 + var_a1;
-        if (var_v0 == 3) {
-            if (M2C_FIELD(var_v1, u16 *, 2) == 1) {
-                M2C_FIELD(var_v1, u16 *, 2) = 3U;
-            }
-            var_v0_2 = temp_a2 + var_a1;
-            if (M2C_FIELD(var_v1, u16 *, 0) == 3) {
-                temp_a0 = temp_a2 + (var_a3 + temp_t2);
-                var_v0_2 = temp_a2 + var_a1;
-                if (*temp_a0 == 7) {
-                    *temp_a0 = 3;
-                }
-            }
-        }
-        var_v0_3 = temp_a2 + var_a1;
-        if (*var_v0_2 == 2) {
-            temp_v1 = temp_a2 + (var_a3 + temp_t2);
-            var_v0_3 = temp_a2 + var_a1;
-            if (*temp_v1 == 3) {
-                *temp_v1 = 2;
-            }
-        }
-        if (*var_v0_3 == 0xB) {
-            temp_a0_2 = temp_a2 + (var_a3 + temp_t2);
-            if (*temp_a0_2 == 0xE) {
-                *temp_a0_2 = 0x10;
-            }
-        }
-        var_a1 += 0x60;
-        var_a3 += 0x60;
-        if ((s32) var_a1 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_t1 += 1;
-    } while (var_t1 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", L2TileFix__Fv);
 #if 0 /* ida */
 BOOL L2TileFix__Fv()
 {
@@ -2691,22 +1572,12 @@ BOOL L2TileFix__Fv()
 }
 #endif
 
-/* ---- 0x801455B8  DL2_Cont__FUcUcUcUc  DRLG_L2.CPP:2099-2103  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x801455B8  DL2_Cont__FUcUcUcUc  DRLG_L2.CPP:2099-2103  seg drlg_l2  fsize 0 ---- */
 /* unsigned char DL2_Cont(unsigned char x1f, unsigned char y1f, unsigned char x2f, unsigned char y2f)
  *   x1f=$a0 y1f=$a1 x2f=$a2 y2f=$a3
  *   blocks: {1 }5
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DL2_Cont__FUcUcUcUc) */
-#if 0 /* m2c */
-s32 DL2_Cont__FUcUcUcUc(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s32 var_v0;
-
-    if ((!(arg0 & 0xFF) || ((!(arg2 & 0xFF) || !(arg1 & 0xFF) || (var_v0 = 0, ((arg3 & 0xFF) == 0))) && (!(arg0 & 0xFF) || !(arg2 & 0xFF) || ((var_v0 = 1, ((arg1 & 0xFF) == 0)) && (var_v0 = 1, ((arg3 & 0xFF) == 0)))))) && (!(arg1 & 0xFF) || !(arg3 & 0xFF) || ((var_v0 = 1, ((arg0 & 0xFF) == 0)) && (var_v0 = 1, ((arg2 & 0xFF) == 0))))) {
-        var_v0 = 0;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DL2_Cont__FUcUcUcUc);
 #if 0 /* ida */
 int __fastcall DL2_Cont__FUcUcUcUc(char a1, char a2, char a3, char a4)
 {
@@ -2732,38 +1603,12 @@ int __fastcall DL2_Cont__FUcUcUcUc(char a1, char a2, char a3, char a4)
 }
 #endif
 
-/* ---- 0x80145638  DL2_NumNoChar__Fv  DRLG_L2.CPP:2111-2117  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80145638  DL2_NumNoChar__Fv  DRLG_L2.CPP:2111-2117  seg drlg_l2  fsize 0 ---- */
 /* int DL2_NumNoChar(void)
  *   t=$a2 ii=$a0 jj=$a1
  *   blocks: {1 }7
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DL2_NumNoChar__Fv) */
-#if 0 /* m2c */
-s32 DL2_NumNoChar__Fv(void) {
-    M2C_UNK *var_v1;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_a2;
-
-    var_a2 = 0;
-    var_a1 = 0;
-    do {
-        var_a0 = 0;
-        var_v1 = &predungeon;
-loop_2:
-        if (*(var_v1 + var_a1) == 0x20) {
-            var_a2 += 1;
-        }
-        var_a0 += 1;
-        var_v1 += 0x28;
-        if (var_a0 < 0x28) {
-            goto loop_2;
-        }
-        var_a1 += 1;
-    } while (var_a1 < 0x28);
-    return var_a2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DL2_NumNoChar__Fv);
 #if 0 /* ida */
 int DL2_NumNoChar__Fv()
 {
@@ -2790,66 +1635,12 @@ int DL2_NumNoChar__Fv()
 }
 #endif
 
-/* ---- 0x80145694  DL2_DrawRoom__Fiiii  DRLG_L2.CPP:2125-2138  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80145694  DL2_DrawRoom__Fiiii  DRLG_L2.CPP:2125-2138  seg drlg_l2  fsize 0 ---- */
 /* void DL2_DrawRoom(int x1, int y1, int x2, int y2)
  *   x1=$a0 y1=$a1 x2=$a2 y2=$a3 ii=$t0 jj=$t1
  *   blocks: {1 }14
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DL2_DrawRoom__Fiiii) */
-#if 0 /* m2c */
-void DL2_DrawRoom__Fiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s32 var_t0;
-    s32 var_t0_3;
-    s32 var_t1;
-    s32 var_t1_2;
-    s8 *temp_v0;
-    s8 *temp_v1;
-    s8 *var_t0_2;
-    s8 *var_v1_2;
-    void *var_a0;
-    void *var_v1;
-
-    var_t1 = arg1;
-    if (arg3 >= arg1) {
-        do {
-            var_t0 = arg0;
-            if (arg2 >= arg0) {
-                var_v1 = (var_t0 * 0x28) + &predungeon;
-                do {
-                    *(var_v1 + var_t1) = 0x2E;
-                    var_t0 += 1;
-                    var_v1 += 0x28;
-                } while (arg2 >= var_t0);
-            }
-            var_t1 += 1;
-        } while (arg3 >= var_t1);
-        var_t1_2 = arg1;
-        if (arg3 >= arg1) {
-            var_t0_2 = arg1 + ((arg2 * 0x28) + &predungeon);
-            var_v1_2 = arg1 + ((arg0 * 0x28) + &predungeon);
-            do {
-                *var_v1_2 = 0x23;
-                *var_t0_2 = 0x23;
-                var_t0_2 += 1;
-                var_t1_2 += 1;
-                var_v1_2 += 1;
-            } while (arg3 >= var_t1_2);
-        }
-    }
-    var_t0_3 = arg0;
-    if (arg2 >= var_t0_3) {
-        var_a0 = (var_t0_3 * 0x28) + &predungeon;
-        do {
-            temp_v0 = var_a0 + arg1;
-            temp_v1 = var_a0 + arg3;
-            var_a0 += 0x28;
-            var_t0_3 += 1;
-            *temp_v0 = 0x23;
-            *temp_v1 = 0x23;
-        } while (arg2 >= var_t0_3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DL2_DrawRoom__Fiiii);
 #if 0 /* ida */
 int __fastcall DL2_DrawRoom__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -2921,96 +1712,12 @@ int __fastcall DL2_DrawRoom__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x80145798  DL2_KnockWalls__Fiiii  DRLG_L2.CPP:2146-2160  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80145798  DL2_KnockWalls__Fiiii  DRLG_L2.CPP:2146-2160  seg drlg_l2  fsize 0 ---- */
 /* void DL2_KnockWalls(int x1, int y1, int x2, int y2)
  *   x1=$a0 y1=$a1 x2=$a2 y2=$a3 ii=$t0 jj=$t0
  *   blocks: {1 }15
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DL2_KnockWalls__Fiiii) */
-#if 0 /* m2c */
-void DL2_KnockWalls__Fiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
-    s32 temp_t0;
-    s32 temp_t4;
-    s32 temp_v0;
-    s32 var_t0_2;
-    s8 *var_a0;
-    s8 *var_t3;
-    u8 *var_a2;
-    u8 *var_t1_2;
-    u8 *var_v1;
-    void *temp_a1;
-    void *temp_t0_2;
-    void *temp_t0_3;
-    void *temp_t0_4;
-    void *temp_t5;
-    void *temp_v1;
-    void *var_t0;
-    void *var_t1;
-    void *var_v0;
-
-    temp_t0 = arg0 + 1;
-    if (temp_t0 < arg2) {
-        var_t1 = (temp_t0 * 0x28) + &predungeon;
-        var_t0 = var_t1 + arg1;
-        do {
-            if ((M2C_FIELD(var_t0, u8 *, -1) == 0x2E) && (M2C_FIELD(var_t0, u8 *, 1) == 0x2E)) {
-                M2C_FIELD(var_t0, s8 *, 0) = 0x2E;
-            }
-            temp_t0_2 = var_t1 + arg3;
-            if ((M2C_FIELD(temp_t0_2, u8 *, -1) == 0x2E) && (M2C_FIELD(temp_t0_2, u8 *, 1) == 0x2E)) {
-                M2C_FIELD(temp_t0_2, s8 *, 0) = 0x2E;
-            }
-            temp_t0_3 = var_t1 + arg1;
-            if (M2C_FIELD(temp_t0_3, u8 *, -1) == 0x44) {
-                M2C_FIELD(temp_t0_3, u8 *, -1) = 0x2EU;
-            }
-            temp_t0_4 = var_t1 + arg3;
-            if (M2C_FIELD(temp_t0_4, u8 *, 1) == 0x44) {
-                M2C_FIELD(temp_t0_4, u8 *, 1) = 0x2EU;
-            }
-            var_t1 += 0x28;
-            var_t0 = var_t1 + arg1;
-        } while ((s32) var_t1 < (s32) ((arg2 * 0x28) + &predungeon));
-    }
-    var_t0_2 = arg1 + 1;
-    if (var_t0_2 < arg3) {
-        temp_t5 = &RoomList + 0x62C;
-        temp_a1 = temp_t5 + 0x50;
-        temp_t4 = arg2 * 0x28;
-        var_t1_2 = var_t0_2 + (temp_t4 + temp_a1);
-        temp_v0 = arg0 * 0x28;
-        var_a2 = var_t0_2 + (temp_v0 + temp_t5);
-        temp_v1 = temp_t5 + 0x28;
-        var_t3 = var_t0_2 + (temp_t4 + temp_v1);
-        var_a0 = var_t0_2 + (temp_v0 + temp_v1);
-        var_v1 = var_t0_2 + (temp_v0 + temp_a1);
-        do {
-            var_v0 = temp_t4 + temp_t5;
-            if (*var_a2 == 0x2E) {
-                var_v0 = temp_t4 + temp_t5;
-                if (*var_v1 == 0x2E) {
-                    *var_a0 = 0x2E;
-                }
-            }
-            if ((*(var_v0 + var_t0_2) == 0x2E) && (*var_t1_2 == 0x2E)) {
-                *var_t3 = 0x2E;
-            }
-            if (*var_a2 == 0x44) {
-                *var_a2 = 0x2E;
-            }
-            if (*var_t1_2 == 0x44) {
-                *var_t1_2 = 0x2E;
-            }
-            var_t1_2 += 1;
-            var_a2 += 1;
-            var_t3 += 1;
-            var_a0 += 1;
-            var_t0_2 += 1;
-            var_v1 += 1;
-        } while (var_t0_2 < arg3);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DL2_KnockWalls__Fiiii);
 #if 0 /* ida */
 int __fastcall DL2_KnockWalls__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -3087,486 +1794,12 @@ int __fastcall DL2_KnockWalls__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x80145968  DL2_FillVoids__Fv  DRLG_L2.CPP:2206-2402  seg drlg_l2_1  fsize 80 ---- */
+/* ---- 0x80145968  DL2_FillVoids__Fv  DRLG_L2.CPP:2206-2402  seg drlg_l2  fsize 80 ---- */
 /* unsigned char DL2_FillVoids(void)
  *   ii=$a0 jj=$v1 xx=$s1 yy=$s3 x1=$s0 x2=$s2 y1=$s1 y2=$s3 xf1=$s7 xf2=$t1 yf1=$fp yf2=$t0 to@sp-0x40
  *   blocks: {1 }197
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DL2_FillVoids__Fv) */
-#if 0 /* m2c */
-s32 DL2_FillVoids__Fv(void) {
-    s32 sp10;
-    s32 sp18;
-    s32 sp1C;
-    s32 sp20;
-    s32 sp24;
-    s32 temp_a0;
-    s32 temp_a0_4;
-    s32 temp_a0_6;
-    s32 temp_s1;
-    s32 temp_s4;
-    s32 temp_s5;
-    s32 temp_s6;
-    s32 temp_v1_2;
-    s32 var_a0_4;
-    s32 var_a0_6;
-    s32 var_fp;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s3;
-    s32 var_s7;
-    s32 var_t0;
-    s32 var_t0_2;
-    s32 var_t1;
-    s32 var_t1_2;
-    s32 var_t2;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s32 var_v0_4;
-    s32 var_v0_5;
-    s32 var_v0_6;
-    s32 var_v0_7;
-    s32 var_v1;
-    s32 var_v1_2;
-    s32 var_v1_3;
-    u8 *var_a0;
-    u8 *var_a0_2;
-    u8 temp_a0_2;
-    u8 temp_a0_3;
-    u8 temp_a1;
-    u8 temp_a1_2;
-    u8 temp_a1_3;
-    u8 temp_a1_4;
-    u8 temp_v1_5;
-    u8 temp_v1_7;
-    void *temp_a0_5;
-    void *temp_a0_7;
-    void *temp_a2;
-    void *temp_a2_2;
-    void *temp_a2_3;
-    void *temp_a2_4;
-    void *temp_t3;
-    void *temp_v1;
-    void *temp_v1_3;
-    void *temp_v1_4;
-    void *temp_v1_6;
-    void *temp_v1_8;
-    void *temp_v1_9;
-    void *var_a0_3;
-    void *var_a0_5;
-    void *var_a1;
-    void *var_a1_2;
-    void *var_v1_4;
-    void *var_v1_5;
-    void *var_v1_6;
-    void *var_v1_7;
-
-    var_t2 = 0x20;
-    sp10 = 0;
-loop_1:
-    sp24 = var_t2;
-    if ((DL2_NumNoChar__Fv() >= 0x2BD) && (sp10 < 0x64)) {
-        sp24 = var_t2;
-        temp_s1 = ENG_random__Fl(0x26) + 1;
-        var_s3 = ENG_random__Fl(0x26) + 1;
-        temp_a0 = temp_s1 * 0x28;
-        var_t0 = 0;
-        if (*(temp_a0 + &predungeon + var_s3) == 0x23) {
-            var_fp = 0;
-            var_t1 = 0;
-            temp_a2 = temp_a0 + (&predungeon - 0x28) + var_s3;
-            var_s7 = 0;
-            if ((M2C_FIELD(temp_a2, u8 *, 0) == var_t2) && (temp_v1 = temp_a0 + (&predungeon + 0x28) + var_s3, temp_a1 = M2C_FIELD(temp_v1, u8 *, 0), (temp_a1 == 0x2E))) {
-                temp_a0_2 = M2C_FIELD(temp_v1, u8 *, -1);
-                if ((temp_a0_2 == temp_a1) && (M2C_FIELD(temp_v1, u8 *, 1) == temp_a0_2) && (M2C_FIELD(temp_a2, u8 *, -1) == var_t2)) {
-                    var_v1 = 0 & 0xFF;
-                    if (M2C_FIELD(temp_a2, u8 *, 1) == var_t2) {
-                        var_t0 = 1;
-                        var_fp = 1;
-                        var_s7 = 1;
-                        goto block_33;
-                    }
-                } else {
-                    goto block_33;
-                }
-            } else {
-                temp_v1_2 = temp_s1 * 0x28;
-                temp_t3 = &predungeon + 0x28;
-                temp_a2_2 = temp_v1_2 + temp_t3 + var_s3;
-                var_v0 = temp_s1 * 4;
-                if (M2C_FIELD(temp_a2_2, u8 *, 0) == var_t2) {
-                    temp_v1_3 = temp_v1_2 + (temp_t3 - 0x50) + var_s3;
-                    temp_a1_2 = M2C_FIELD(temp_v1_3, u8 *, 0);
-                    if (temp_a1_2 == 0x2E) {
-                        temp_a0_3 = M2C_FIELD(temp_v1_3, u8 *, -1);
-                        if ((temp_a0_3 == temp_a1_2) && (M2C_FIELD(temp_v1_3, u8 *, 1) == temp_a0_3) && (M2C_FIELD(temp_a2_2, u8 *, -1) == var_t2)) {
-                            var_v1 = 0 & 0xFF;
-                            if (M2C_FIELD(temp_a2_2, u8 *, 1) == var_t2) {
-                                var_t0 = 1;
-                                var_fp = 1;
-                                var_t1 = 1;
-                            }
-                        } else {
-                            goto block_33;
-                        }
-                    } else {
-                        var_v0 = temp_s1 * 4;
-                        goto block_19;
-                    }
-                } else {
-block_19:
-                    temp_a0_4 = (var_v0 + temp_s1) * 8;
-                    temp_v1_4 = temp_a0_4 + &predungeon + var_s3;
-                    var_v0_2 = temp_s1 * 4;
-                    if ((M2C_FIELD(temp_v1_4, u8 *, -1) == var_t2) && (temp_a1_3 = M2C_FIELD(temp_v1_4, u8 *, 1), var_v0_2 = temp_s1 * 4, (temp_a1_3 == 0x2E))) {
-                        temp_a2_3 = temp_a0_4 + (&predungeon - 0x28) + var_s3;
-                        temp_v1_5 = M2C_FIELD(temp_a2_3, u8 *, 1);
-                        if ((temp_v1_5 == temp_a1_3) && (temp_a0_5 = temp_a0_4 + (&predungeon + 0x28) + var_s3, (M2C_FIELD(temp_a0_5, u8 *, 1) == temp_v1_5)) && (M2C_FIELD(temp_a2_3, u8 *, -1) == var_t2)) {
-                            var_v1 = 0 & 0xFF;
-                            if (M2C_FIELD(temp_a0_5, u8 *, -1) == var_t2) {
-                                var_t1 = 1;
-                                var_s7 = 1;
-                                var_fp = 1;
-                                goto block_33;
-                            }
-                        } else {
-                            goto block_33;
-                        }
-                    } else {
-                        temp_a0_6 = (var_v0_2 + temp_s1) * 8;
-                        temp_v1_6 = temp_a0_6 + &predungeon + var_s3;
-                        if (M2C_FIELD(temp_v1_6, u8 *, 1) == var_t2) {
-                            temp_a1_4 = M2C_FIELD(temp_v1_6, u8 *, -1);
-                            var_v1 = 0 & 0xFF;
-                            if (temp_a1_4 == 0x2E) {
-                                temp_a2_4 = temp_a0_6 + (&predungeon - 0x28) + var_s3;
-                                temp_v1_7 = M2C_FIELD(temp_a2_4, u8 *, -1);
-                                if ((temp_v1_7 == temp_a1_4) && (temp_a0_7 = temp_a0_6 + (&predungeon + 0x28) + var_s3, (M2C_FIELD(temp_a0_7, u8 *, -1) == temp_v1_7)) && (M2C_FIELD(temp_a2_4, u8 *, 1) == var_t2)) {
-                                    var_v1 = 0 & 0xFF;
-                                    if (M2C_FIELD(temp_a0_7, u8 *, 1) == var_t2) {
-                                        var_t1 = 1;
-                                        var_s7 = 1;
-                                        var_t0 = 1;
-                                        goto block_33;
-                                    }
-                                } else {
-                                    goto block_33;
-                                }
-                            }
-                        } else {
-block_33:
-                            var_v1 = var_s7 & 0xFF;
-                        }
-                    }
-                }
-            }
-            temp_s5 = var_fp & 0xFF;
-            temp_s6 = var_t1 & 0xFF;
-            temp_s4 = var_t0 & 0xFF;
-            sp18 = var_v1;
-            sp1C = var_t0;
-            sp20 = var_t1;
-            sp24 = var_t2;
-            var_t0_2 = var_t0;
-            var_t1_2 = var_t1;
-            if (DL2_Cont__FUcUcUcUc(var_v1, temp_s5, temp_s6, temp_s4) & 0xFF) {
-                var_s0 = temp_s1;
-                if (var_v1 != 0) {
-                    var_s0 -= 1;
-                }
-                var_s2 = temp_s1;
-                if (temp_s6 != 0) {
-                    var_s2 += 1;
-                }
-                var_s1 = var_s3;
-                if (temp_s5 != 0) {
-                    var_s1 -= 1;
-                }
-                if (temp_s4 != 0) {
-                    var_s3 += 1;
-                }
-                if (var_v1 == 0) {
-                    if ((temp_s5 != 0) || (temp_s4 != 0)) {
-                        do {
-loop_46:
-                            if (var_s1 == 0) {
-                                var_fp = 0;
-                            }
-                            if (var_s3 == 0x27) {
-                                var_t0_2 = 0;
-                            }
-                            var_v0_3 = var_fp & 0xFF;
-                            if ((var_s3 - var_s1) >= 0xE) {
-                                var_fp = 0;
-                                var_t0_2 = 0;
-                                var_v0_3 = 0 & 0xFF;
-                            }
-                            if (var_v0_3 != 0) {
-                                var_s1 -= 1;
-                            }
-                            if (var_t0_2 & 0xFF) {
-                                var_s3 += 1;
-                            }
-                            temp_v1_8 = (var_s2 * 0x28) + &predungeon;
-                            if (*(temp_v1_8 + var_s1) != var_t2) {
-                                var_fp = 0;
-                            }
-                            if (*(temp_v1_8 + var_s3) != var_t2) {
-                                var_t0_2 = 0;
-                            }
-                            if (var_fp & 0xFF) {
-                                goto loop_46;
-                            }
-                        } while (var_t0_2 & 0xFF);
-                    }
-                    var_s1 += 2;
-                    var_s3 -= 2;
-                    if ((var_s3 - var_s1) >= 6) {
-                        if (var_t1_2 & 0xFF) {
-                            var_a1 = (var_s2 * 0x28) + &predungeon;
-loop_65:
-                            if (var_s2 == 0x27) {
-                                var_t1_2 = 0;
-                            }
-                            if ((var_s2 - var_s0) >= 0xC) {
-                                var_t1_2 = 0;
-                            }
-                            var_v1_2 = var_s1;
-                            if (var_s3 >= var_s1) {
-                                var_a0 = var_s1 + var_a1;
-                                do {
-                                    if (*var_a0 != var_t2) {
-                                        var_t1_2 = 0;
-                                    }
-                                    var_v1_2 += 1;
-                                    var_a0 += 1;
-                                } while (var_s3 >= var_v1_2);
-                            }
-                            var_a1 += 0x28;
-                            if (var_t1_2 & 0xFF) {
-                                var_s2 += 1;
-                                goto loop_65;
-                            }
-                        }
-                        var_s2 -= 2;
-                        var_v0_4 = var_s2 - var_s0;
-                        goto block_176;
-                    }
-                } else if (temp_s6 == 0) {
-                    if ((temp_s5 != 0) || (temp_s4 != 0)) {
-                        do {
-loop_80:
-                            if (var_s1 == 0) {
-                                var_fp = 0;
-                            }
-                            if (var_s3 == 0x27) {
-                                var_t0_2 = 0;
-                            }
-                            var_v0_5 = var_fp & 0xFF;
-                            if ((var_s3 - var_s1) >= 0xE) {
-                                var_fp = 0;
-                                var_t0_2 = 0;
-                                var_v0_5 = 0 & 0xFF;
-                            }
-                            if (var_v0_5 != 0) {
-                                var_s1 -= 1;
-                            }
-                            if (var_t0_2 & 0xFF) {
-                                var_s3 += 1;
-                            }
-                            temp_v1_9 = (var_s0 * 0x28) + &predungeon;
-                            if (*(temp_v1_9 + var_s1) != var_t2) {
-                                var_fp = 0;
-                            }
-                            if (*(temp_v1_9 + var_s3) != var_t2) {
-                                var_t0_2 = 0;
-                            }
-                            if (var_fp & 0xFF) {
-                                goto loop_80;
-                            }
-                        } while (var_t0_2 & 0xFF);
-                    }
-                    var_s1 += 2;
-                    var_s3 -= 2;
-                    if ((var_s3 - var_s1) >= 6) {
-                        if (var_s7 & 0xFF) {
-                            var_a1_2 = (var_s0 * 0x28) + &predungeon;
-loop_99:
-                            if (var_s0 == 0) {
-                                var_s7 = 0;
-                            }
-                            if ((var_s2 - var_s0) >= 0xC) {
-                                var_s7 = 0;
-                            }
-                            var_v1_3 = var_s1;
-                            if (var_s3 >= var_s1) {
-                                var_a0_2 = var_s1 + var_a1_2;
-                                do {
-                                    if (*var_a0_2 != var_t2) {
-                                        var_s7 = 0;
-                                    }
-                                    var_v1_3 += 1;
-                                    var_a0_2 += 1;
-                                } while (var_s3 >= var_v1_3);
-                            }
-                            var_a1_2 -= 0x28;
-                            if (var_s7 & 0xFF) {
-                                var_s0 -= 1;
-                                goto loop_99;
-                            }
-                        }
-                        var_s0 += 2;
-                        var_v0_4 = var_s2 - var_s0;
-                        goto block_176;
-                    }
-                } else if (temp_s5 == 0) {
-                    var_a0_3 = (var_s2 * 0x28) + &predungeon;
-                    var_v1_4 = (var_s0 * 0x28) + &predungeon;
-                    do {
-loop_113:
-                        if (var_s0 == 0) {
-                            var_s7 = 0;
-                        }
-                        if (var_s2 == 0x27) {
-                            var_t1_2 = 0;
-                        }
-                        var_v0_6 = var_s7 & 0xFF;
-                        if ((var_s2 - var_s0) >= 0xE) {
-                            var_s7 = 0;
-                            var_t1_2 = 0;
-                            var_v0_6 = 0 & 0xFF;
-                        }
-                        if (var_v0_6 != 0) {
-                            var_v1_4 -= 0x28;
-                            var_s0 -= 1;
-                        }
-                        if (var_t1_2 & 0xFF) {
-                            var_a0_3 += 0x28;
-                            var_s2 += 1;
-                        }
-                        if (*(var_v1_4 + var_s3) != var_t2) {
-                            var_s7 = 0;
-                        }
-                        if (*(var_a0_3 + var_s3) != var_t2) {
-                            var_t1_2 = 0;
-                        }
-                        if (var_s7 & 0xFF) {
-                            goto loop_113;
-                        }
-                    } while (var_t1_2 & 0xFF);
-                    var_s0 += 2;
-                    var_s2 -= 2;
-                    if ((var_s2 - var_s0) >= 6) {
-                        if (var_t0_2 & 0xFF) {
-loop_131:
-                            if (var_s3 == 0x27) {
-                                var_t0_2 = 0;
-                            }
-                            if ((var_s3 - var_s1) >= 0xC) {
-                                var_t0_2 = 0;
-                            }
-                            var_a0_4 = var_s0;
-                            if (var_s2 >= var_s0) {
-                                var_v1_5 = (var_s0 * 0x28) + &predungeon;
-                                do {
-                                    if (*(var_v1_5 + var_s3) != var_t2) {
-                                        var_t0_2 = 0;
-                                    }
-                                    var_a0_4 += 1;
-                                    var_v1_5 += 0x28;
-                                } while (var_s2 >= var_a0_4);
-                            }
-                            if (var_t0_2 & 0xFF) {
-                                var_s3 += 1;
-                                goto loop_131;
-                            }
-                        }
-                        var_s3 -= 2;
-                        goto block_175;
-                    }
-                } else if (temp_s4 == 0) {
-                    var_a0_5 = (var_s2 * 0x28) + &predungeon;
-                    var_v1_6 = (var_s0 * 0x28) + &predungeon;
-                    do {
-loop_145:
-                        if (var_s0 == 0) {
-                            var_s7 = 0;
-                        }
-                        if (var_s2 == 0x27) {
-                            var_t1_2 = 0;
-                        }
-                        var_v0_7 = var_s7 & 0xFF;
-                        if ((var_s2 - var_s0) >= 0xE) {
-                            var_s7 = 0;
-                            var_t1_2 = 0;
-                            var_v0_7 = 0 & 0xFF;
-                        }
-                        if (var_v0_7 != 0) {
-                            var_v1_6 -= 0x28;
-                            var_s0 -= 1;
-                        }
-                        if (var_t1_2 & 0xFF) {
-                            var_a0_5 += 0x28;
-                            var_s2 += 1;
-                        }
-                        if (*(var_v1_6 + var_s1) != var_t2) {
-                            var_s7 = 0;
-                        }
-                        if (*(var_a0_5 + var_s1) != var_t2) {
-                            var_t1_2 = 0;
-                        }
-                        if (var_s7 & 0xFF) {
-                            goto loop_145;
-                        }
-                    } while (var_t1_2 & 0xFF);
-                    var_s0 += 2;
-                    var_s2 -= 2;
-                    if ((var_s2 - var_s0) >= 6) {
-                        if (var_fp & 0xFF) {
-loop_163:
-                            if (var_s1 == 0) {
-                                var_fp = 0;
-                            }
-                            if ((var_s3 - var_s1) >= 0xC) {
-                                var_fp = 0;
-                            }
-                            var_a0_6 = var_s0;
-                            if (var_s2 >= var_s0) {
-                                var_v1_7 = (var_s0 * 0x28) + &predungeon;
-                                do {
-                                    if (*(var_v1_7 + var_s1) != var_t2) {
-                                        var_fp = 0;
-                                    }
-                                    var_a0_6 += 1;
-                                    var_v1_7 += 0x28;
-                                } while (var_s2 >= var_a0_6);
-                            }
-                            if (var_fp & 0xFF) {
-                                var_s1 -= 1;
-                                goto loop_163;
-                            }
-                        }
-                        var_s1 += 2;
-block_175:
-                        var_v0_4 = var_s3 - var_s1;
-block_176:
-                        if (var_v0_4 >= 6) {
-                            sp24 = var_t2;
-                            DL2_DrawRoom__Fiiii(var_s0, var_s1, var_s2, var_s3);
-                            DL2_KnockWalls__Fiiii(var_s0, var_s1, var_s2, var_s3);
-                        }
-                    }
-                }
-            }
-            sp10 += 1;
-        }
-        goto loop_1;
-    }
-    return DL2_NumNoChar__Fv() < 0x2BD;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DL2_FillVoids__Fv);
 #if 0 /* ida */
 BOOL DL2_FillVoids__Fv()
 {
@@ -4045,143 +2278,12 @@ LABEL_179:
 }
 #endif
 
-/* ---- 0x801462E4  CreateDungeon__Fv  DRLG_L2.CPP:2410-2487  seg drlg_l2_1  fsize 80 ---- */
+/* ---- 0x801462E4  CreateDungeon__Fv  DRLG_L2.CPP:2410-2487  seg drlg_l2  fsize 80 ---- */
 /* unsigned char CreateDungeon(void)
  *   i=$s0 j=$s1 nHx1@sp-0x28 nHy1@sp-0x24 nHx2@sp-0x20 nHy2@sp-0x1c nHd@sp-0x18 ForceH=$t0 ForceW=$t1 ForceHW=$t2
  *   blocks: {1 }78
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", CreateDungeon__Fv) */
-#if 0 /* m2c */
-s32 CreateDungeon__Fv(void) {
-    s32 sp28;
-    s32 sp2C;
-    s32 sp30;
-    s32 sp34;
-    s32 sp38;
-    M2C_UNK *var_t0_2;
-    s32 var_a0;
-    s32 var_a3;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_t0;
-    s32 var_t1;
-    s32 var_t2;
-    u8 *temp_a0;
-    void *temp_v1;
-    void *temp_v1_2;
-    void *temp_v1_3;
-
-    var_t1 = 0;
-    var_t0 = 0;
-    var_t2 = 0;
-    switch (currlevel) {                            /* irregular */
-    case 5:
-        if (M2C_FIELD(&quests, u8 *, 0xB6) != 0) {
-            var_t2 = 1;
-            var_t0 = 0x14;
-            var_t1 = 0xE;
-        }
-        break;
-    case 6:
-        if (M2C_FIELD(&quests, u8 *, 0x11A) != 0) {
-            var_t2 = 1;
-            var_t1 = 0xA;
-            var_t0 = 0xA;
-        }
-        break;
-    case 7:
-        if (M2C_FIELD(&quests, u8 *, 0xA2) != 0) {
-            var_t2 = 1;
-            var_t1 = 0xF;
-            var_t0 = 0xF;
-        }
-        break;
-    }
-    CreateRoom__Fiiiiiiiii(2, 2, 0x27, 0x27, 0, 0, var_t2, var_t0, var_t1);
-    if (pHallList != 0) {
-        do {
-            GetHall__FPiN40(&sp28, &sp2C, &sp30, &sp34, &sp38);
-            ConnectHall__Fiiiii(sp28, sp2C, sp30, sp34, sp38);
-        } while (pHallList != 0);
-    }
-    var_s1 = 0;
-    do {
-        var_s0 = 0;
-        var_t0_2 = &predungeon;
-        var_a3 = 0;
-loop_17:
-        temp_a0 = var_t0_2 + var_s1;
-        if (*temp_a0 == 0x43) {
-            *temp_a0 = 0x23;
-        }
-        if (*temp_a0 == 0x42) {
-            *temp_a0 = 0x23;
-        }
-        if (*temp_a0 == 0x45) {
-            *temp_a0 = 0x23;
-        }
-        if (*temp_a0 == 0x41) {
-            *temp_a0 = 0x23;
-        }
-        if (*temp_a0 == 0x2C) {
-            *temp_a0 = 0x2E;
-            temp_v1 = var_a3 + (&predungeon - 0x28) + var_s1;
-            if (M2C_FIELD(temp_v1, u8 *, -1) == 0x20) {
-                M2C_FIELD(temp_v1, u8 *, -1) = 0x23U;
-            }
-            if (M2C_FIELD(temp_v1, u8 *, 0) == 0x20) {
-                M2C_FIELD(temp_v1, u8 *, 0) = 0x23U;
-            }
-            if (M2C_FIELD(temp_v1, u8 *, 1) == 0x20) {
-                M2C_FIELD(temp_v1, u8 *, 1) = 0x23U;
-            }
-            temp_v1_2 = var_a3 + (&predungeon + 0x28) + var_s1;
-            if (M2C_FIELD(temp_v1_2, u8 *, -1) == 0x20) {
-                M2C_FIELD(temp_v1_2, u8 *, -1) = 0x23U;
-            }
-            if (M2C_FIELD(temp_v1_2, u8 *, 0) == 0x20) {
-                M2C_FIELD(temp_v1_2, u8 *, 0) = 0x23U;
-            }
-            if (M2C_FIELD(temp_v1_2, u8 *, 1) == 0x20) {
-                M2C_FIELD(temp_v1_2, u8 *, 1) = 0x23U;
-            }
-            temp_v1_3 = var_t0_2 + var_s1;
-            if (M2C_FIELD(temp_v1_3, u8 *, -1) == 0x20) {
-                M2C_FIELD(temp_v1_3, u8 *, -1) = 0x23U;
-            }
-            if (M2C_FIELD(temp_v1_3, u8 *, 1) == 0x20) {
-                M2C_FIELD(temp_v1_3, u8 *, 1) = 0x23U;
-            }
-        }
-        var_t0_2 += 0x28;
-        var_s0 += 1;
-        var_a3 += 0x28;
-        if (var_s0 < 0x29) {
-            goto loop_17;
-        }
-        var_s1 += 1;
-    } while (var_s1 < 0x29);
-    var_s1_2 = 0;
-    if (!(DL2_FillVoids__Fv(temp_a0, 0x23, 0x20, var_a3) & 0xFF)) {
-        return 0;
-    }
-    do {
-        var_s0_2 = 0;
-        var_a0 = 0;
-loop_47:
-        DoPatternCheck__Fii(var_a0, var_s1_2);
-        var_s0_2 += 1;
-        var_a0 = var_s0_2;
-        if (var_s0_2 < 0x28) {
-            goto loop_47;
-        }
-        var_s1_2 += 1;
-    } while (var_s1_2 < 0x28);
-    return 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", CreateDungeon__Fv);
 #if 0 /* ida */
 int CreateDungeon__Fv()
 {
@@ -4315,89 +2417,12 @@ int CreateDungeon__Fv()
 }
 #endif
 
-/* ---- 0x801465F0  DRLG_L2Pass3__Fv  DRLG_L2.CPP:2495-2595  seg drlg_l2_1  fsize 64 ---- */
+/* ---- 0x801465F0  DRLG_L2Pass3__Fv  DRLG_L2.CPP:2495-2595  seg drlg_l2  fsize 64 ---- */
 /* void DRLG_L2Pass3(void)
  *   i=$s4 j=$fp xx=$s1 yy=$s2 v1=$a3 v2=$s6 v3=$s5 v4=$s7 lv=$v0
  *   blocks: {1 }101
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2Pass3__Fv) */
-#if 0 /* m2c */
-void DRLG_L2Pass3__Fv(void) {
-    s32 sp10;
-    M2C_UNK *var_s3;
-    s16 temp_a3;
-    s16 temp_s5;
-    s16 temp_s5_2;
-    s16 temp_s6;
-    s16 temp_s6_2;
-    s16 temp_s7;
-    s16 temp_s7_2;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s3;
-    s32 temp_s4;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_fp;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s4;
-    u16 *temp_v0;
-
-    var_s2 = 0;
-    temp_s6 = M2C_FIELD(&pMegaTiles, s16 *, 0x5A) + 1;
-    temp_s4 = (M2C_FIELD(&pMegaTiles, s16 *, 0x58) + 1) << 0x10;
-    temp_s5 = M2C_FIELD(&pMegaTiles, s16 *, 0x5C) + 1;
-    temp_s7 = M2C_FIELD(&pMegaTiles, s16 *, 0x5E) + 1;
-    do {
-        var_s1 = 0;
-        temp_s3 = var_s2 + 1;
-        var_a0 = 0;
-loop_2:
-        SetDPiece__Fiis(var_a0, var_s2, temp_s4 >> 0x10);
-        temp_s0 = var_s1 + 1;
-        SetDPiece__Fiis(temp_s0, var_s2, (s32) temp_s6);
-        SetDPiece__Fiis(var_s1, temp_s3, (s32) temp_s5);
-        SetDPiece__Fiis(temp_s0, temp_s3, (s32) temp_s7);
-        var_s1 += 2;
-        var_a0 = var_s1;
-        if (var_s1 < 0x60) {
-            goto loop_2;
-        }
-        var_s2 += 2;
-        var_fp = 0;
-    } while (var_s2 < 0x60);
-    var_s2_2 = 0x10;
-    do {
-        var_s1_2 = 0x10;
-        var_s4 = 0;
-        sp10 = var_s2_2 + 1;
-        var_s3 = &dungeon;
-loop_6:
-        temp_v0 = (var_fp * 2) + var_s3;
-        var_s3 += 0x60;
-        var_s4 += 1;
-        temp_v0_2 = (*temp_v0 - 1) * 8;
-        temp_a3 = *(temp_v0_2 + &pMegaTiles) + 1;
-        temp_s6_2 = M2C_FIELD((&pMegaTiles + temp_v0_2), s16 *, 2) + 1;
-        temp_s5_2 = M2C_FIELD((&pMegaTiles + temp_v0_2), s16 *, 4) + 1;
-        temp_s7_2 = *(temp_v0_2 + (&pMegaTiles + 6)) + 1;
-        SetDPiece__Fiis(var_s1_2, var_s2_2, (s32) temp_a3, temp_a3);
-        temp_s0_2 = var_s1_2 + 1;
-        SetDPiece__Fiis(temp_s0_2, var_s2_2, (s32) temp_s6_2);
-        SetDPiece__Fiis(var_s1_2, sp10, (s32) temp_s5_2);
-        SetDPiece__Fiis(temp_s0_2, sp10, (s32) temp_s7_2);
-        var_s1_2 += 2;
-        if (var_s4 < 0x28) {
-            goto loop_6;
-        }
-        var_fp += 1;
-        var_s2_2 += 2;
-    } while (var_fp < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2Pass3__Fv);
 #if 0 /* ida */
 BOOL DRLG_L2Pass3__Fv()
 {
@@ -4475,100 +2500,12 @@ BOOL DRLG_L2Pass3__Fv()
 }
 #endif
 
-/* ---- 0x801467E8  DRLG_L2FTVR__Fiiiii  DRLG_L2.CPP:2603-2638  seg drlg_l2_1  fsize 80 ---- */
+/* ---- 0x801467E8  DRLG_L2FTVR__Fiiiii  DRLG_L2.CPP:2603-2638  seg drlg_l2  fsize 80 ---- */
 /* void DRLG_L2FTVR(int i, int j, int x, int y, int d)
  *   i=$s1 j=$s7 x=$s0 y=$fp d=$a1
  *   blocks: {1 }36
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2FTVR__Fiiiii) */
-#if 0 /* m2c */
-void DRLG_L2FTVR__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 sp18;
-    s32 sp20;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_s0;
-    s32 temp_s1;
-    s32 temp_s2;
-    s32 temp_s3;
-    s32 temp_s4;
-    s32 temp_s5;
-    s32 temp_t0;
-    s32 temp_t0_2;
-    s32 temp_t1;
-    s32 temp_t2;
-    s32 temp_v0;
-    s32 temp_v1;
-    s32 temp_v1_2;
-    u16 temp_s6;
-
-    temp_t1 = arg3 * 8;
-    temp_t2 = arg2 * 0x380;
-    temp_t0 = temp_t1 + temp_t2;
-    if (*(&dung_map + 7 + temp_t0) == 0) {
-        temp_s6 = *((arg1 * 2) + ((arg0 * 0x60) + &dungeon));
-        if (temp_s6 == 3) {
-            sp18 = arg0 + 1;
-            sp20 = arg2 + 2;
-            *(&dung_map + 7 + temp_t0) = TransVal;
-            temp_t0_2 = (arg2 + 1) * 0x380;
-            *(&dung_map + 7 + (temp_t1 + temp_t0_2)) = TransVal;
-            temp_v0 = (arg3 + 1) * 8;
-            *(&dung_map + 7 + (temp_v0 + temp_t2)) = TransVal;
-            *(&dung_map + 7 + (temp_v0 + temp_t0_2)) = TransVal;
-            DRLG_L2FTVR__Fiiiii(sp18, arg1, sp20, 1);
-            temp_s5 = arg0 - 1;
-            temp_s4 = arg2 - 2;
-            DRLG_L2FTVR__Fiiiii(temp_s5, arg1, temp_s4, arg3, 2);
-            temp_s3 = arg1 + 1;
-            temp_s2 = arg3 + 2;
-            DRLG_L2FTVR__Fiiiii(arg0, temp_s3, arg2, temp_s2, (s32) temp_s6);
-            temp_s1 = arg1 - 1;
-            temp_s0 = arg3 - 2;
-            DRLG_L2FTVR__Fiiiii(arg0, temp_s1, arg2, temp_s0, 4);
-            DRLG_L2FTVR__Fiiiii(temp_s5, temp_s1, temp_s4, temp_s0, 5);
-            DRLG_L2FTVR__Fiiiii(sp18, temp_s1, sp20, temp_s0, 6);
-            DRLG_L2FTVR__Fiiiii(temp_s5, temp_s3, temp_s4, temp_s2, 7);
-            DRLG_L2FTVR__Fiiiii(sp18, temp_s3, sp20, temp_s2, 8);
-            return;
-        }
-        goto block_4;
-    }
-block_4:
-    if (arg4 == 1) {
-        temp_v1 = arg2 * 0x380;
-        *(&dung_map + 7 + ((arg3 * 8) + temp_v1)) = TransVal;
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + temp_v1)) = TransVal;
-    }
-    if (arg4 == 2) {
-        temp_v1_2 = (arg2 + 1) * 0x380;
-        *(&dung_map + 7 + ((arg3 * 8) + temp_v1_2)) = TransVal;
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + temp_v1_2)) = TransVal;
-    }
-    if (arg4 == 3) {
-        temp_a0 = arg3 * 8;
-        *(&dung_map + 7 + (temp_a0 + (arg2 * 0x380))) = TransVal;
-        *(&dung_map + 7 + (temp_a0 + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 4) {
-        temp_a0_2 = (arg3 + 1) * 8;
-        *(&dung_map + 7 + (temp_a0_2 + (arg2 * 0x380))) = TransVal;
-        *(&dung_map + 7 + (temp_a0_2 + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 5) {
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 6) {
-        *(&dung_map + 7 + (((arg3 + 1) * 8) + (arg2 * 0x380))) = TransVal;
-    }
-    if (arg4 == 7) {
-        *(&dung_map + 7 + ((arg3 * 8) + ((arg2 + 1) * 0x380))) = TransVal;
-    }
-    if (arg4 == 8) {
-        *(&dung_map + 7 + ((arg3 * 8) + (arg2 * 0x380))) = TransVal;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2FTVR__Fiiiii);
 #if 0 /* ida */
 int __fastcall DRLG_L2FTVR__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -4642,45 +2579,12 @@ int __fastcall DRLG_L2FTVR__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 }
 #endif
 
-/* ---- 0x80146C70  DRLG_L2FloodTVal__Fv  DRLG_L2.CPP:2647-2662  seg drlg_l2_1  fsize 56 ---- */
+/* ---- 0x80146C70  DRLG_L2FloodTVal__Fv  DRLG_L2.CPP:2647-2662  seg drlg_l2  fsize 56 ---- */
 /* void DRLG_L2FloodTVal(void)
  *   i=$s0 j=$s4 xx=$s3 yy=$s5
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2FloodTVal__Fv) */
-#if 0 /* m2c */
-void DRLG_L2FloodTVal__Fv(void) {
-    M2C_UNK *var_s2;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s5;
-
-    var_s5 = 0x10;
-    var_s4 = 0;
-    do {
-        var_s3 = 0x10;
-        var_s0 = 0;
-        var_s2 = &dungeon;
-        var_s1 = (var_s5 * 8) + 0x3800;
-loop_2:
-        if ((*((var_s4 * 2) + var_s2) == 3) && (*(&dung_map + 7 + var_s1) == 0)) {
-            DRLG_L2FTVR__Fiiiii(var_s0, var_s4, var_s3, var_s5, 0);
-            TransVal += 1;
-        }
-        var_s1 += 0x700;
-        var_s3 += 2;
-        var_s0 += 1;
-        var_s2 += 0x60;
-        if (var_s0 < 0x28) {
-            goto loop_2;
-        }
-        var_s4 += 1;
-        var_s5 += 2;
-    } while (var_s4 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2FloodTVal__Fv);
 #if 0 /* ida */
 BOOL DRLG_L2FloodTVal__Fv()
 {
@@ -4721,82 +2625,12 @@ BOOL DRLG_L2FloodTVal__Fv()
 }
 #endif
 
-/* ---- 0x80146D68  DRLG_L2TransFix__Fv  DRLG_L2.CPP:2670-2702  seg drlg_l2_1  fsize 8 ---- */
+/* ---- 0x80146D68  DRLG_L2TransFix__Fv  DRLG_L2.CPP:2670-2702  seg drlg_l2  fsize 8 ---- */
 /* void DRLG_L2TransFix(void)
  *   j=$t5 yy=$t6
  *   blocks: {1 }33
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2TransFix__Fv) */
-#if 0 /* m2c */
-void DRLG_L2TransFix__Fv(void) {
-    M2C_UNK *var_a3;
-    s32 temp_t2;
-    s32 temp_t3;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_t0;
-    s32 var_t1;
-    s32 var_t4;
-    s32 var_t5;
-    s32 var_t6;
-    u16 *temp_a0_2;
-    u16 *var_v0;
-    void *temp_a0;
-
-    var_t6 = 0x10;
-    var_t5 = 0;
-    var_t0 = 0x88;
-    do {
-        temp_t2 = var_t5 * 2;
-        var_a3 = &dungeon;
-        var_t4 = 0;
-        var_t1 = var_t0 + 0x3800;
-        temp_t3 = var_t6 * 8;
-        var_a1 = temp_t3 + 0x3800;
-        var_a2 = 0x3B80;
-loop_2:
-        temp_a0 = temp_t2 + var_a3;
-        var_v0 = temp_t2 + var_a3;
-        if (M2C_FIELD(temp_a0, u16 *, 0) == 0xE) {
-            var_v0 = temp_t2 + var_a3;
-            if (M2C_FIELD(temp_a0, u16 *, -2) == 0xA) {
-                *(&dung_map + 7 + (temp_t3 + var_a2)) = *(&dung_map + 7 + var_a1);
-                *(&dung_map + 7 + (var_t0 + var_a2)) = *(&dung_map + 7 + var_a1);
-                var_v0 = temp_t2 + var_a3;
-            }
-        }
-        temp_a0_2 = temp_t2 + var_a3;
-        if ((*var_v0 == 0xF) && (*(temp_t2 + (var_t4 + (&dungeon + 0x60))) == 0xB)) {
-            *(&dung_map + 7 + var_t1) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t0 + var_a2)) = *(&dung_map + 7 + var_a1);
-        }
-        if (*temp_a0_2 == 0xA) {
-            *(&dung_map + 7 + (temp_t3 + var_a2)) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t0 + var_a2)) = *(&dung_map + 7 + var_a1);
-        }
-        if (*temp_a0_2 == 0xB) {
-            *(&dung_map + 7 + var_t1) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t0 + var_a2)) = *(&dung_map + 7 + var_a1);
-        }
-        if (*temp_a0_2 == 0x10) {
-            *(&dung_map + 7 + (temp_t3 + var_a2)) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + var_t1) = *(&dung_map + 7 + var_a1);
-            *(&dung_map + 7 + (var_t0 + var_a2)) = *(&dung_map + 7 + var_a1);
-        }
-        var_t1 += 0x700;
-        var_a1 += 0x700;
-        var_a2 += 0x700;
-        var_a3 += 0x60;
-        var_t4 += 0x60;
-        if ((s32) var_a3 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_t0 += 0x10;
-        var_t5 += 1;
-        var_t6 += 2;
-    } while (var_t5 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2TransFix__Fv);
 #if 0 /* ida */
 BOOL DRLG_L2TransFix__Fv()
 {
@@ -4880,77 +2714,12 @@ BOOL DRLG_L2TransFix__Fv()
 }
 #endif
 
-/* ---- 0x80146F94  L2DirtFix__Fv  DRLG_L2.CPP:2710-2725  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80146F94  L2DirtFix__Fv  DRLG_L2.CPP:2710-2725  seg drlg_l2  fsize 0 ---- */
 /* void L2DirtFix(void)
  *   j=$t1
  *   blocks: {1 }16
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", L2DirtFix__Fv) */
-#if 0 /* m2c */
-void L2DirtFix__Fv(void) {
-    M2C_UNK *var_a1;
-    s32 temp_a2;
-    s32 var_a3;
-    s32 var_t1;
-    u16 *var_v1;
-    u16 *var_v1_2;
-    u16 var_v0;
-    u16 var_v0_2;
-    void *temp_a0;
-    void *temp_t4;
-    void *temp_v1;
-    void *var_t0;
-
-    var_t1 = 0;
-    temp_t4 = &dungeon + 0x60;
-    do {
-        temp_a2 = var_t1 * 2;
-        var_a1 = &dungeon;
-        var_a3 = 0;
-        var_t0 = temp_t4;
-loop_2:
-        var_v1 = temp_a2 + var_a1;
-        var_v0 = *var_v1;
-        if (var_v0 == 0xD) {
-            if (*(temp_a2 + var_t0) != 0xB) {
-                *var_v1 = 0x92;
-                var_v1 = temp_a2 + var_a1;
-            }
-            var_v0 = *var_v1;
-        }
-        if ((var_v0 == 0xB) && (*(temp_a2 + (var_a3 + temp_t4)) != 0xB)) {
-            *var_v1 = 0x90;
-        }
-        var_v1_2 = temp_a2 + var_a1;
-        var_v0_2 = *var_v1_2;
-        if (var_v0_2 == 0xF) {
-            if (*(temp_a2 + (var_a3 + temp_t4)) != 0xB) {
-                *var_v1_2 = 0x94;
-                var_v1_2 = temp_a2 + var_a1;
-            }
-            var_v0_2 = *var_v1_2;
-        }
-        if ((var_v0_2 == 0xA) && (M2C_FIELD(var_v1_2, u16 *, 2) != 0xA)) {
-            M2C_FIELD(var_v1_2, u16 *, 0) = 0x8F;
-        }
-        temp_v1 = temp_a2 + var_a1;
-        temp_a0 = temp_a2 + var_a1;
-        if ((M2C_FIELD(temp_v1, u16 *, 0) == 0xD) && (M2C_FIELD(temp_v1, u16 *, 2) != 0xA)) {
-            M2C_FIELD(temp_v1, u16 *, 0) = 0x92U;
-        }
-        if ((M2C_FIELD(temp_a0, u16 *, 0) == 0xE) && (M2C_FIELD(temp_a0, u16 *, 2) != 0xF)) {
-            M2C_FIELD(temp_a0, u16 *, 0) = 0x93U;
-        }
-        var_a1 += 0x60;
-        var_a3 += 0x60;
-        var_t0 += 0x60;
-        if ((s32) var_a1 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_t1 += 1;
-    } while (var_t1 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", L2DirtFix__Fv);
 #if 0 /* ida */
 BOOL L2DirtFix__Fv()
 {
@@ -5018,200 +2787,12 @@ BOOL L2DirtFix__Fv()
 }
 #endif
 
-/* ---- 0x801470F4  L2LockoutFix__Fv  DRLG_L2.CPP:2733-2775  seg drlg_l2_1  fsize 8 ---- */
+/* ---- 0x801470F4  L2LockoutFix__Fv  DRLG_L2.CPP:2733-2775  seg drlg_l2  fsize 8 ---- */
 /* void L2LockoutFix(void)
  *   i=$t3 j=$t4 doorok=$t0
  *   blocks: {1 }43
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", L2LockoutFix__Fv) */
-#if 0 /* m2c */
-void L2LockoutFix__Fv(void) {
-    M2C_UNK *var_a0;
-    M2C_UNK *var_a3;
-    M2C_UNK *var_t7;
-    s32 temp_a1;
-    s32 temp_t1;
-    s32 var_a2;
-    s32 var_t0;
-    s32 var_t0_2;
-    s32 var_t1;
-    s32 var_t3;
-    s32 var_t3_2;
-    s32 var_t4;
-    s32 var_t4_2;
-    s32 var_t4_3;
-    s32 var_t8;
-    s32 var_t9;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    u16 *temp_a0_2;
-    u16 *temp_a2;
-    u16 *var_a0_2;
-    u16 *var_a1_3;
-    u16 *var_a3_2;
-    u16 *var_t2;
-    u16 *var_v1;
-    u16 temp_a0;
-    u16 temp_v0;
-    u16 temp_v0_2;
-    u16 temp_v0_3;
-    u16 temp_v0_4;
-    u16 temp_v0_5;
-    u16 temp_v0_6;
-    u16 temp_v1_2;
-    u16 temp_v1_3;
-    u16 var_v0;
-    void *temp_v1;
-    void *var_a1;
-    void *var_a1_2;
-    void *var_a2_2;
-    void *var_t6;
-    void *var_v1_2;
-
-    var_t4 = 0;
-    var_a2 = 0 * 2;
-    do {
-        var_a0 = &dungeon;
-        var_a1 = &dungeon - 0x60;
-loop_2:
-        var_v1 = var_a2 + var_a0;
-        var_v0 = *var_v1;
-        if (var_v0 == 4) {
-            if (*(var_a2 + var_a1) != 3) {
-                *var_v1 = 1;
-                var_v1 = var_a2 + var_a0;
-            }
-            var_v0 = *var_v1;
-        }
-        if ((var_v0 == 5) && (M2C_FIELD(var_v1, u16 *, -2) != 3)) {
-            M2C_FIELD(var_v1, u16 *, 0) = 2;
-        }
-        var_a0 += 0x60;
-        var_a1 += 0x60;
-        if ((s32) var_a0 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_t4 += 1;
-        var_a2 = var_t4 * 2;
-    } while (var_t4 < 0x28);
-    var_t4_2 = 1;
-    var_t8 = 0x28;
-    do {
-        var_t3 = 1;
-        temp_t1 = var_t4_2 * 2;
-        var_a3 = &dungeon;
-        var_a2_2 = &dungeon + 0x60;
-loop_13:
-        temp_v1 = temp_t1 + var_a2_2;
-        if (!(*(mydflags + (var_t8 + var_t3)) & 0x80) && ((temp_v0 = M2C_FIELD(temp_v1, u16 *, 0), (temp_v0 == 2)) || (temp_v0 == 5)) && (M2C_FIELD(temp_v1, u16 *, -2) == 3) && (M2C_FIELD(temp_v1, u16 *, 2) == 3)) {
-            var_a1_2 = (var_t3 * 0x60) + &dungeon;
-            temp_v0_2 = *(temp_t1 + var_a1_2);
-            var_t0 = 0;
-            if ((temp_v0_2 == 2) || (var_v0_2 = 0 & 0xFF, (temp_v0_2 == 5))) {
-loop_20:
-                var_v1_2 = temp_t1 + var_a1_2;
-loop_21:
-                temp_a0 = M2C_FIELD(var_v1_2, u16 *, -2);
-                var_v0_2 = var_t0 & 0xFF;
-                if (temp_a0 == 3) {
-                    var_v0_2 = var_t0 & 0xFF;
-                    if (M2C_FIELD(var_v1_2, u16 *, 2) == temp_a0) {
-                        if (M2C_FIELD(var_v1_2, u16 *, 0) == 5) {
-                            var_t0 = 1;
-                        }
-                        var_a1_2 += 0x60;
-                        var_a3 += 0x60;
-                        var_a2_2 += 0x60;
-                        temp_v0_3 = *(temp_t1 + var_a1_2);
-                        var_t3 += 1;
-                        if (temp_v0_3 != 2) {
-                            var_v1_2 = temp_t1 + var_a1_2;
-                            if (temp_v0_3 != 5) {
-                                var_v0_2 = var_t0 & 0xFF;
-                            } else {
-                                goto loop_21;
-                            }
-                        } else {
-                            goto loop_20;
-                        }
-                    }
-                }
-            }
-            if ((var_v0_2 == 0) && !(M2C_FIELD((var_t8 + var_t3 + mydflags), u8 *, -1) & 0x80)) {
-                *(temp_t1 + var_a3) = 5;
-            }
-        }
-        var_a3 += 0x60;
-        var_t3 += 1;
-        var_a2_2 += 0x60;
-        if (var_t3 < 0x27) {
-            goto loop_13;
-        }
-        var_t4_2 += 1;
-        var_t8 += 0x28;
-    } while (var_t4_2 < 0x27);
-    var_t3_2 = 1;
-    var_t7 = &dungeon;
-    var_t6 = &dungeon + 0x60;
-    var_t9 = 0x60;
-    do {
-        var_t4_3 = 1;
-        var_t2 = var_t6 + 2;
-        var_t1 = var_t3_2 + 0x28;
-loop_35:
-        if (!(*(mydflags + var_t1) & 0x80) && ((temp_v0_4 = *var_t2, temp_a1 = var_t4_3 * 2, (temp_v0_4 == 1)) || (temp_v0_4 == 4))) {
-            temp_a2 = temp_a1 + var_t7;
-            temp_v1_2 = *temp_a2;
-            if (temp_v1_2 == 3) {
-                temp_a0_2 = temp_a1 + (var_t9 + (&dungeon + 0x60));
-                var_t0_2 = 0;
-                if (*temp_a0_2 == temp_v1_2) {
-                    var_a1_3 = temp_a1 + var_t6;
-                    var_a3_2 = temp_a0_2;
-                    temp_v0_5 = *var_a1_3;
-                    var_a0_2 = temp_a2;
-                    if ((temp_v0_5 == 1) || (var_v0_3 = 0 & 0xFF, (temp_v0_5 == 4))) {
-loop_42:
-                        temp_v1_3 = *var_a0_2;
-                        var_v0_3 = var_t0_2 & 0xFF;
-                        if (temp_v1_3 == 3) {
-                            var_v0_3 = var_t0_2 & 0xFF;
-                            if (*var_a3_2 == temp_v1_3) {
-                                if (*var_a1_3 == 4) {
-                                    var_t0_2 = 1;
-                                }
-                                var_a1_3 += 2;
-                                var_a3_2 += 2;
-                                var_a0_2 += 2;
-                                var_t2 += 2;
-                                var_t1 += 0x28;
-                                temp_v0_6 = *var_a1_3;
-                                var_t4_3 += 1;
-                                if ((temp_v0_6 == 1) || (var_v0_3 = var_t0_2 & 0xFF, (temp_v0_6 == 4))) {
-                                    goto loop_42;
-                                }
-                            }
-                        }
-                    }
-                    if ((var_v0_3 == 0) && !(M2C_FIELD((var_t1 + mydflags), u8 *, -0x28) & 0x80)) {
-                        M2C_FIELD(var_t2, s16 *, -2) = 4;
-                    }
-                }
-            }
-        }
-        var_t2 += 2;
-        var_t4_3 += 1;
-        var_t1 += 0x28;
-        if (var_t4_3 < 0x27) {
-            goto loop_35;
-        }
-        var_t7 += 0x60;
-        var_t6 += 0x60;
-        var_t3_2 += 1;
-        var_t9 += 0x60;
-    } while (var_t3_2 < 0x27);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", L2LockoutFix__Fv);
 #if 0 /* ida */
 BOOL L2LockoutFix__Fv()
 {
@@ -5429,48 +3010,12 @@ LABEL_21:
 }
 #endif
 
-/* ---- 0x80147478  L2DoorFix__Fv  DRLG_L2.CPP:2781-2791  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80147478  L2DoorFix__Fv  DRLG_L2.CPP:2781-2791  seg drlg_l2  fsize 0 ---- */
 /* void L2DoorFix(void)
  *   j=$a3
  *   blocks: {1 }11
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", L2DoorFix__Fv) */
-#if 0 /* m2c */
-void L2DoorFix__Fv(void) {
-    s32 temp_a2;
-    s32 var_a1;
-    s32 var_a3;
-    u16 *var_v1;
-    u16 var_v0;
-    void *var_a0;
-
-    var_a3 = 1;
-    do {
-        temp_a2 = var_a3 * 2;
-        var_a0 = &dungeon + 0x60;
-        var_a1 = 0x60;
-loop_2:
-        var_v1 = temp_a2 + var_a0;
-        var_v0 = M2C_FIELD(var_v1, u16 *, 0);
-        if (var_v0 == 4) {
-            if (M2C_FIELD(var_v1, u16 *, -2) == 3) {
-                M2C_FIELD(var_v1, u16 *, 0) = 7;
-                var_v1 = temp_a2 + var_a0;
-            }
-            var_v0 = *var_v1;
-        }
-        if ((var_v0 == 5) && (*(temp_a2 + (var_a1 + &D_800E4064)) == 3)) {
-            *var_v1 = 9;
-        }
-        var_a0 += 0x60;
-        var_a1 += 0x60;
-        if ((s32) var_a0 < (s32) (&dungeon + 0xF00)) {
-            goto loop_2;
-        }
-        var_a3 += 1;
-    } while (var_a3 < 0x28);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", L2DoorFix__Fv);
 #if 0 /* ida */
 BOOL L2DoorFix__Fv()
 {
@@ -5512,72 +3057,12 @@ BOOL L2DoorFix__Fv()
 }
 #endif
 
-/* ---- 0x80147528  DRLG_L2SetWalls__Fv  DRLG_L2.CPP:2795-2827  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80147528  DRLG_L2SetWalls__Fv  DRLG_L2.CPP:2795-2827  seg drlg_l2  fsize 0 ---- */
 /* void DRLG_L2SetWalls(void)
  *   i=$t0 j=$t2 yy=$t6 v=$v1
  *   blocks: {1 {5 {7 {11 {11 }30 }31 }32 }33 }33
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2SetWalls__Fv) */
-#if 0 /* m2c */
-void DRLG_L2SetWalls__Fv(void) {
-    M2C_UNK *var_a3;
-    s32 temp_t1;
-    s32 temp_v1_2;
-    s32 temp_v1_3;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_t0;
-    s32 var_t2;
-    s32 var_t4;
-    s32 var_t6;
-    s32 var_v1;
-    s8 var_v0;
-    u16 temp_v1;
-
-    var_t6 = 0x10;
-    var_t2 = 0;
-    var_t4 = 0x88;
-loop_1:
-    var_t0 = 0;
-    if (var_t2 < 0x28) {
-        var_a3 = &dungeon;
-        var_a2 = var_t4 + 0x3800;
-        var_a1 = 0x3B80;
-        temp_t1 = var_t6 * 8;
-        var_a0 = temp_t1 + 0x3800;
-loop_3:
-        if (var_t0 < 0x28) {
-            temp_v1 = *((var_t2 * 2) + var_a3);
-            if ((temp_v1 == 3) || (temp_v1 == 0xC) || (temp_v1 == 0) || (temp_v1 == 0x4C) || (temp_v1 == 0x9F) || (temp_v1_2 = temp_t1 + var_a1, (temp_v1 == 0x32))) {
-                temp_v1_3 = temp_t1 + var_a1;
-                *(&dung_map + 6 + var_a0) = *(&dung_map + 6 + var_a0) | 0x20;
-                *(&dung_map + 6 + temp_v1_3) = *(&dung_map + 6 + temp_v1_3) | 0x20;
-                var_v1 = var_t4 + var_a1;
-                *(&dung_map + 6 + var_a2) = *(&dung_map + 6 + var_a2) | 0x20;
-                var_v0 = *(&dung_map + 6 + var_v1) | 0x20;
-            } else {
-                *(&dung_map + 6 + var_a0) = *(&dung_map + 6 + var_a0) & ~0x20;
-                *(&dung_map + 6 + temp_v1_2) = *(&dung_map + 6 + temp_v1_2) & ~0x20;
-                var_v1 = var_t4 + var_a1;
-                *(&dung_map + 6 + var_a2) = *(&dung_map + 6 + var_a2) & ~0x20;
-                var_v0 = *(&dung_map + 6 + var_v1) & ~0x20;
-            }
-            *(&dung_map + 6 + var_v1) = var_v0;
-            var_a2 += 0x700;
-            var_a1 += 0x700;
-            var_a0 += 0x700;
-            var_a3 += 0x60;
-            var_t0 += 1;
-            goto loop_3;
-        }
-        var_t4 += 0x10;
-        var_t6 += 2;
-        var_t2 += 1;
-        goto loop_1;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2SetWalls__Fv);
 #if 0 /* ida */
 BOOL DRLG_L2SetWalls__Fv()
 {
@@ -5641,207 +3126,12 @@ BOOL DRLG_L2SetWalls__Fv()
 }
 #endif
 
-/* ---- 0x801476E0  DRLG_L2__Fi  DRLG_L2.CPP:2834-3048  seg drlg_l2_1  fsize 64 ---- */
+/* ---- 0x801476E0  DRLG_L2__Fi  DRLG_L2.CPP:2834-3048  seg drlg_l2  fsize 64 ---- */
 /* void DRLG_L2(int entry)
  *   entry=$s3 i=$a2 j=$a3 doneflag=$s0
  *   blocks: {1 }215
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_L2__Fi) */
-#if 0 /* m2c */
-void DRLG_L2__Fi(s32 arg0) {
-    M2C_UNK *var_a0;
-    M2C_UNK *var_a1;
-    s32 var_a2;
-    s32 var_a3;
-    s32 var_s0;
-    s32 var_v0;
-    u16 *temp_v0;
-
-    var_s0 = 0;
-    do {
-        UPDATEPROGRESS__Fi(1);
-        nRoomCnt = 0;
-        InitDungeon__Fv();
-        DRLG_InitTrans__Fv();
-        var_v0 = var_s0 & 0xFF;
-        if (CreateDungeon__Fv() & 0xFF) {
-            L2TileFix__Fv();
-            if (setloadflag != 0) {
-                DRLG_L2SetRoom__Fii(nSx1, nSy1);
-            }
-            DRLG_L2FloodTVal__Fv();
-            DRLG_L2TransFix__Fv();
-            if (arg0 == 0) {
-                var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&USTAIRS, 1, 1, -1, -1, 1, 0);
-                if (var_s0 & 0xFF) {
-                    var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&DSTAIRS, 1, 1, -1, -1, 0, 1);
-                    if ((var_s0 & 0xFF) && (currlevel == 5)) {
-                        goto block_19;
-                    }
-                }
-                goto block_20;
-            }
-            if (arg0 == 1) {
-                var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&USTAIRS, 1, 1, -1, -1, 0, 0);
-                if (var_s0 & 0xFF) {
-                    var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&DSTAIRS, 1, 1, -1, -1, 1, 1);
-                    if ((var_s0 & 0xFF) && (currlevel == 5)) {
-                        var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&WARPSTAIRS, 1, 1, -1, -1, 0, 6);
-                    }
-                }
-                ViewX -= 1;
-                var_v0 = var_s0 & 0xFF;
-            } else {
-                var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&USTAIRS, 1, 1, -1, -1, 0, 0);
-                if (var_s0 & 0xFF) {
-                    var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&DSTAIRS, 1, 1, -1, -1, 0, 1);
-                    if ((var_s0 & 0xFF) && (currlevel == 5)) {
-block_19:
-                        var_s0 = DRLG_L2PlaceMiniSet__FPUciiiiii(&WARPSTAIRS, 1, 1, -1, 6);
-                    }
-                }
-block_20:
-                ViewY -= 2;
-                var_v0 = var_s0 & 0xFF;
-            }
-        }
-    } while (var_v0 == 0);
-    L2LockoutFix__Fv();
-    L2DoorFix__Fv();
-    L2DirtFix__Fv();
-    DRLG_PlaceThemeRooms__FiiiiUc(6, 0xA, 3, 0, 0);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR1, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR2, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR3, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR4, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR5, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR6, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR7, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CTRDOOR8, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH33, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH34, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH35, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH36, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH37, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH38, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH39, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH40, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH1, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH2, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH3, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH4, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH5, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH6, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH7, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH8, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH9, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH10, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH11, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH12, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH13, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH14, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH15, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH16, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH17, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH18, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH19, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH20, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH21, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH22, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH23, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH24, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH25, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH26, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH27, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH28, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH29, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH30, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH31, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&VARCH32, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH1, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH2, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH3, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH4, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH5, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH6, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH7, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH8, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH9, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH10, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH11, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH12, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH13, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH14, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH15, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH16, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH17, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH18, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH19, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH20, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH21, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH22, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH23, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH24, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH25, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH26, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH27, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH28, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH29, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH30, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH31, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH32, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH33, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH34, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH35, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH36, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH37, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH38, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH39, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&HARCH40, 0x64);
-    DRLG_L2PlaceRndSet__FPUci(&CRUSHCOL, 0x63);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS1, 0xA);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS2, 0xA);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS3, 0xA);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS4, 0xA);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS5, 0xA);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS6, 0xA);
-    DRLG_L2PlaceRndSet__FPUci(&RUINS7, 0x32);
-    DRLG_L2PlaceRndSet__FPUci(&PANCREAS1, 1);
-    DRLG_L2PlaceRndSet__FPUci(&PANCREAS2, 1);
-    DRLG_L2SetWalls__Fv();
-    DRLG_L2PlaceRndSet__FPUci(&BIG1, 3);
-    DRLG_L2PlaceRndSet__FPUci(&BIG2, 3);
-    DRLG_L2PlaceRndSet__FPUci(&BIG3, 3);
-    DRLG_L2PlaceRndSet__FPUci(&BIG4, 3);
-    DRLG_L2PlaceRndSet__FPUci(&BIG5, 3);
-    DRLG_L2PlaceRndSet__FPUci(&BIG6, 0x14);
-    DRLG_L2PlaceRndSet__FPUci(&BIG7, 0x14);
-    DRLG_L2PlaceRndSet__FPUci(&BIG8, 3);
-    DRLG_L2PlaceRndSet__FPUci(&BIG9, 0x14);
-    DRLG_L2PlaceRndSet__FPUci(&BIG10, 0x14);
-    DRLG_L2Subs__Fv();
-    DRLG_L2Shadows__Fv();
-    var_a3 = 0;
-    var_a2 = 0;
-    do {
-        var_a1 = &dungeon;
-        var_a0 = &pdungeon;
-loop_24:
-        temp_v0 = (var_a3 * 2) + var_a1;
-        var_a1 += 0x60;
-        var_a2 += 1;
-        *(var_a0 + var_a3) = (s8) *temp_v0;
-        var_a0 += 0x28;
-        if (var_a2 < 0x28) {
-            goto loop_24;
-        }
-        var_a3 += 1;
-        var_a2 = 0;
-    } while (var_a3 < 0x28);
-    DRLG_Init_Globals__Fv(var_a0, var_a1, 0, var_a3);
-    DRLG_CheckQuests__Fii(nSx1, nSy1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_L2__Fi);
 #if 0 /* ida */
 BOOL __fastcall DRLG_L2__Fi(int a1)
 {
@@ -6157,136 +3447,18 @@ LABEL_21:
 }
 #endif
 
-/* ---- 0x80148134  DRLG_InitL2Vals__Fv  DRLG_L2.CPP:3057-3091  seg drlg_l2_1  fsize 0 ---- */
+/* ---- 0x80148134  DRLG_InitL2Vals__Fv  DRLG_L2.CPP:3057-3091  seg drlg_l2  fsize 0 ---- */
 /* void DRLG_InitL2Vals(void)
  *   blocks: {1 }1
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", DRLG_InitL2Vals__Fv) */
-#if 0 /* m2c */
-void DRLG_InitL2Vals__Fv(void) {
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", DRLG_InitL2Vals__Fv);
 
-}
-#endif
-
-/* ---- 0x8014813C  LoadL2Dungeon__FPcii  DRLG_L2.CPP:3098-3181  seg drlg_l2_1  fsize 48 ---- */
+/* ---- 0x8014813C  LoadL2Dungeon__FPcii  DRLG_L2.CPP:3098-3181  seg drlg_l2  fsize 48 ---- */
 /* void LoadL2Dungeon(char *sFileName, int vx, int vy)
  *   sFileName=$s0 vx=$s1 vy=$s2 i=$a0 j=$a2 rw=$t3 rh=$t4 pLevelMap=$s0 lm=$t0
  *   blocks: {1 {44 }84 }84
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", LoadL2Dungeon__FPcii) */
-#if 0 /* m2c */
-void LoadL2Dungeon__FPcii(s32 arg0, s32 arg1, s32 arg2) {
-    M2C_UNK *var_a1;
-    M2C_UNK *var_a1_2;
-    M2C_UNK *var_v1;
-    s16 *temp_v0_2;
-    s32 temp_a3;
-    s32 temp_v0;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_a0_3;
-    s32 var_a0_4;
-    s32 var_a2;
-    s32 var_a2_2;
-    s32 var_a2_3;
-    s32 var_a3;
-    s32 var_t2;
-    u16 *temp_v1_3;
-    u8 *temp_v1_2;
-    u8 *var_t0;
-    u8 temp_t3;
-    u8 temp_t4;
-    u8 temp_v1;
-    void *temp_s0;
-    void *temp_t0;
-
-    InitDungeon__Fv();
-    DRLG_InitTrans__Fv();
-    temp_s0 = GRL_LoadFileInMemSig__FPCcPUl(arg0, 0);
-    temp_t0 = temp_s0;
-    var_a2 = 0;
-    var_a0 = 0;
-    do {
-        var_v1 = &dungeon;
-loop_2:
-        *((var_a2 * 2) + var_v1) = 0xC;
-        var_a0 += 1;
-        var_v1 += 0x60;
-        if (var_a0 < 0x28) {
-            goto loop_2;
-        }
-        var_a2 += 1;
-        var_a0 = 0;
-    } while (var_a2 < 0x28);
-    var_a2_2 = 0;
-    var_a3 = 0;
-    do {
-        var_a0_2 = 0;
-loop_6:
-        temp_v0 = var_a3 + var_a0_2;
-        var_a0_2 += 1;
-        *(mydflags + temp_v0) = 0;
-        if (var_a0_2 < 0x28) {
-            goto loop_6;
-        }
-        var_a2_2 += 1;
-        var_a3 += 0x28;
-    } while (var_a2_2 < 0x28);
-    temp_t3 = M2C_FIELD(temp_t0, u8 *, 0);
-    var_a2_3 = 0;
-    temp_t4 = M2C_FIELD(temp_t0, u8 *, 2);
-    var_t0 = temp_t0 + 2 + 2;
-    if (temp_t4 != 0) {
-        var_t2 = 0;
-        do {
-            var_a0_3 = 0;
-            if (temp_t3 != 0) {
-                var_a1 = &dungeon;
-                do {
-                    temp_v1 = *var_t0;
-                    temp_v0_2 = (var_a2_3 * 2) + var_a1;
-                    if (temp_v1 != 0) {
-                        *temp_v0_2 = (s16) temp_v1;
-                        temp_v1_2 = mydflags + (var_t2 + var_a0_3);
-                        *temp_v1_2 |= 0x80;
-                    } else {
-                        *temp_v0_2 = 3;
-                    }
-                    var_t0 += 2;
-                    var_a0_3 += 1;
-                    var_a1 += 0x60;
-                } while (var_a0_3 < (s32) temp_t3);
-            }
-            var_a2_3 += 1;
-            var_t2 += 0x28;
-        } while (var_a2_3 < (s32) temp_t4);
-        var_a2_3 = 0;
-    }
-    do {
-        var_a0_4 = 0;
-        temp_a3 = var_a2_3 * 2;
-        var_a1_2 = &dungeon;
-loop_20:
-        temp_v1_3 = temp_a3 + var_a1_2;
-        if (*temp_v1_3 == 0) {
-            *temp_v1_3 = 0xC;
-        }
-        var_a0_4 += 1;
-        var_a1_2 += 0x60;
-        if (var_a0_4 < 0x28) {
-            goto loop_20;
-        }
-        var_a2_3 += 1;
-    } while (var_a2_3 < 0x28);
-    DRLG_L2Pass3__Fv(var_a0_4, var_a1_2, var_a2_3, temp_a3);
-    DRLG_Init_Globals__Fv();
-    ViewX = arg1;
-    ViewY = arg2;
-    SetMapMonsters__FPUcii(temp_s0, 0, 0);
-    SetMapObjects__FPUcii(temp_s0, 0, 0);
-    mem_free_dbg__FPv(temp_s0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", LoadL2Dungeon__FPcii);
 #if 0 /* ida */
 int __fastcall LoadL2Dungeon__FPcii(int a1, int a2, int a3)
 {
@@ -6405,125 +3577,12 @@ int __fastcall LoadL2Dungeon__FPcii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x80148358  LoadPreL2Dungeon__FPcii  DRLG_L2.CPP:3189-3230  seg drlg_l2_1  fsize 40 ---- */
+/* ---- 0x80148358  LoadPreL2Dungeon__FPcii  DRLG_L2.CPP:3189-3230  seg drlg_l2  fsize 40 ---- */
 /* void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
  *   sFileName=$s0 vx=$a1 vy=$a2 i=$a1 j=$a3 rw=$t3 rh=$t4 pLevelMap=$t7 lm=$t0
  *   blocks: {1 {42 }42 }42
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", LoadPreL2Dungeon__FPcii) */
-#if 0 /* m2c */
-void LoadPreL2Dungeon__FPcii(s32 arg0) {
-    M2C_UNK *var_a0;
-    M2C_UNK *var_a0_2;
-    M2C_UNK *var_a0_3;
-    M2C_UNK *var_a2;
-    M2C_UNK *var_a2_2;
-    s16 *temp_v0;
-    s32 temp_v1;
-    s32 var_a1;
-    s32 var_a1_2;
-    s32 var_a1_3;
-    s32 var_a3;
-    s32 var_a3_2;
-    s32 var_a3_3;
-    s32 var_t2;
-    s32 var_t3;
-    u16 *temp_v0_2;
-    u16 *temp_v1_4;
-    u8 *temp_v1_3;
-    u8 *var_t0;
-    u8 temp_t3;
-    u8 temp_t4;
-    u8 temp_v1_2;
-    void *temp_t0;
-    void *temp_t7;
-
-    InitDungeon__Fv();
-    DRLG_InitTrans__Fv();
-    temp_t7 = GRL_LoadFileInMemSig__FPCcPUl(arg0, 0);
-    temp_t0 = temp_t7;
-    var_a3 = 0;
-    var_t3 = 0;
-    do {
-        var_a1 = 0;
-        var_a2 = &dungeon;
-loop_2:
-        temp_v1 = var_t3 + var_a1;
-        var_a1 += 1;
-        *((var_a3 * 2) + var_a2) = 0xC;
-        *(mydflags + temp_v1) = 0;
-        var_a2 += 0x60;
-        if (var_a1 < 0x28) {
-            goto loop_2;
-        }
-        var_a3 += 1;
-        var_t3 += 0x28;
-    } while (var_a3 < 0x28);
-    temp_t3 = M2C_FIELD(temp_t0, u8 *, 0);
-    var_a3_2 = 0;
-    temp_t4 = M2C_FIELD(temp_t0, u8 *, 2);
-    var_t0 = temp_t0 + 2 + 2;
-    if (temp_t4 != 0) {
-        var_t2 = 0;
-        do {
-            var_a1_2 = 0;
-            if (temp_t3 != 0) {
-                var_a0 = &dungeon;
-                do {
-                    temp_v1_2 = *var_t0;
-                    temp_v0 = (var_a3_2 * 2) + var_a0;
-                    if (temp_v1_2 != 0) {
-                        *temp_v0 = (s16) temp_v1_2;
-                        temp_v1_3 = mydflags + (var_t2 + var_a1_2);
-                        *temp_v1_3 |= 0x80;
-                    } else {
-                        *temp_v0 = 3;
-                    }
-                    var_t0 += 2;
-                    var_a1_2 += 1;
-                    var_a0 += 0x60;
-                } while (var_a1_2 < (s32) temp_t3);
-            }
-            var_a3_2 += 1;
-            var_t2 += 0x28;
-        } while (var_a3_2 < (s32) temp_t4);
-        var_a3_2 = 0;
-    }
-    var_a1_3 = 0;
-    do {
-        var_a0_2 = &dungeon;
-loop_16:
-        temp_v1_4 = (var_a3_2 * 2) + var_a0_2;
-        if (*temp_v1_4 == 0) {
-            *temp_v1_4 = 0xC;
-        }
-        var_a1_3 += 1;
-        var_a0_2 += 0x60;
-        if (var_a1_3 < 0x28) {
-            goto loop_16;
-        }
-        var_a3_2 += 1;
-        var_a1_3 = 0;
-    } while (var_a3_2 < 0x28);
-    var_a3_3 = 0;
-    do {
-        var_a2_2 = &dungeon;
-        var_a0_3 = &pdungeon;
-loop_22:
-        temp_v0_2 = (var_a3_3 * 2) + var_a2_2;
-        var_a2_2 += 0x60;
-        var_a1_3 += 1;
-        *(var_a0_3 + var_a3_3) = (s8) *temp_v0_2;
-        var_a0_3 += 0x28;
-        if (var_a1_3 < 0x28) {
-            goto loop_22;
-        }
-        var_a3_3 += 1;
-        var_a1_3 = 0;
-    } while (var_a3_3 < 0x28);
-    mem_free_dbg__FPv(temp_t7, 0, var_a2_2, var_a3_3);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", LoadPreL2Dungeon__FPcii);
 #if 0 /* ida */
 int __fastcall LoadPreL2Dungeon__FPcii(int a1)
 {
@@ -6646,49 +3705,12 @@ int __fastcall LoadPreL2Dungeon__FPcii(int a1)
 }
 #endif
 
-/* ---- 0x8014854C  CreateL2Dungeon__FUii  DRLG_L2.CPP:3238-3314  seg drlg_l2_1  fsize 40 ---- */
+/* ---- 0x8014854C  CreateL2Dungeon__FUii  DRLG_L2.CPP:3238-3314  seg drlg_l2  fsize 40 ---- */
 /* void CreateL2Dungeon(unsigned int rseed, int entry)
  *   rseed=$a2 entry=$s3
  *   blocks: {1 }77
  */
-/* linked from build/src/drlg_l2_1.c.o (segment drlg_l2_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/drlg_l2_1", CreateL2Dungeon__FUii) */
-#if 0 /* m2c */
-void CreateL2Dungeon__FUii(s32 arg0, M2C_UNK arg1) {
-    s32 *temp_s2;
-    s32 temp_a1;
-    s32 temp_s0;
-
-    temp_s0 = (currlevel - 4) * 0x10;
-    temp_s2 = temp_s0 + &nSxy;
-    temp_a1 = *temp_s2;
-    if (temp_a1 != -1) {
-        nSx1 = temp_a1;
-        nSy1 = M2C_FIELD((&nSxy + temp_s0), s32 *, 4);
-        nSx2 = M2C_FIELD((&nSxy + temp_s0), s32 *, 8);
-        nSy2 = M2C_FIELD((&nSxy + temp_s0), s32 *, 0xC);
-    }
-    pSetPiece = 0;
-    SetRndSeed__Fl(arg0, temp_a1, arg0);
-    dminx = 0x10;
-    dminy = 0x10;
-    dmaxx = 0x50;
-    dmaxy = 0x50;
-    DRLG_InitTrans__Fv();
-    DRLG_InitSetPC__Fv();
-    DRLG_LoadL2SP__Fv();
-    DRLG_L2__Fi(arg1);
-    DRLG_L2Pass3__Fv();
-    DRLG_FreeL2SP__Fv();
-    DRLG_InitL2Vals__Fv();
-    DRLG_SetPC__Fv();
-    if (*temp_s2 == -1) {
-        *temp_s2 = nSx1;
-        *(temp_s0 + (&nSxy + 4)) = nSy1;
-        *(temp_s0 + (&nSxy + 8)) = nSx2;
-        *(temp_s0 + (&nSxy + 0xC)) = nSy2;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/drlg_l2", CreateL2Dungeon__FUii);
 #if 0 /* ida */
 int __fastcall CreateL2Dungeon__FUii(int a1, int a2)
 {

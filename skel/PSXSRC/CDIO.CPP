@@ -196,7 +196,7 @@ int __fastcall CD_GetCdlFILE__FPCcP7CdlFILE(const char *a1, _DWORD *a2)
 #endif
 
 /* ---- 0x80086EE4  LoStreamFile__4CdIOPCciPFPUciib_bii  CDIO.CPP:292-373  seg cdio  fsize 80 ---- */
-/* BOOL CdIO::LoStreamFile(char *Name, int Slice, BOOL *(Func)(), int Offset, int Size)
+/* BOOL CdIO::LoStreamFile(char *Name, int Slice, BOOL (*Func)(), int Offset, int Size)
  *   this=$a0 Name=$s1 Slice=$s5 Offset=$s3 Size=$s2 Dest@sp-0x38 OrigSize@sp-0x30 Pos=$s3 sh=$s7 ah=$s0 Count=$s6 Lumpfile=$fp SizeToRead=$s1 ptr=$s4
  *   blocks: {1 {42 }77 }82
  */
@@ -329,7 +329,7 @@ int __fastcall LoStreamFile__4CdIOPCciPFPUciib_bii(int a1, char *a2, int a3, voi
 #endif
 
 /* ---- 0x8008710C  LoAsyncStreamFile__4CdIOPCciPFPUciib_bii  CDIO.CPP:382-422  seg cdio  fsize 48 ---- */
-/* BOOL CdIO::LoAsyncStreamFile(char *Name, int Slice, BOOL *(Func)(), int Offset, int Size)
+/* BOOL CdIO::LoAsyncStreamFile(char *Name, int Slice, BOOL (*Func)(), int Offset, int Size)
  *   this=$a0 Name=$s0 Slice=$s4 Func=$s6 Size=$s1 hndText=$s3 Dest=$s2 OrigSize=$s5 SizeToRead=$s0
  *   blocks: {1 {26 }35 }41
  */

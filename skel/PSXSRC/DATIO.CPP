@@ -222,7 +222,7 @@ int __fastcall LoSave__5DatIOPCcPUci(int a1, char *a2, char *a3, int a4)
 #endif
 
 /* ---- 0x80086A34  LoStreamFile__5DatIOPCciPFPUciib_bii  DATIO.CPP:173-220  seg datio  fsize 56 ---- */
-/* BOOL DatIO::LoStreamFile(char *Name, int Slice, BOOL *(Func)(), int Offset, int Size)
+/* BOOL DatIO::LoStreamFile(char *Name, int Slice, BOOL (*Func)(), int Offset, int Size)
  *   this=$a0 Name=$s0 Slice=$s4 Func=$fp Size=$s1 FileHnd=$s3 hnd=$s5 Dest=$s2 OrigSize=$s6 SizeToRead=$s0
  *   blocks: {1 {27 }37 }48
  */

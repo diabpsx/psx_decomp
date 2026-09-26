@@ -1832,7 +1832,7 @@ LABEL_44:
 #endif
 
 /* ---- 0x8008F098  IterateVisibleMap__7CBlocksiiPFP9CacheInfoP8map_infoii_ib  BLOCK.CPP:1350-1501  seg block  fsize 144 ---- */
-/* void CBlocks::IterateVisibleMap(int x, int y, int *(Func)(), BOOL VisCheck)
+/* void CBlocks::IterateVisibleMap(int x, int y, int (*Func)(), BOOL VisCheck)
  *   this=$t0 y=$a2 XPos@sp-0x70 YPos@sp-0x68 xx@sp-0x60 Infra=$v0 MyXShifter@sp-0x58 MyYShifter@sp-0x50 Total=$s2 DoVisCheck@sp-0x48 XPix=$a3 YPix=$a1 CRight@sp-0x40 ThisXPos=$fp ThisYPos=$s7 Height@sp-0x38 p0=$a1 p1=$s3 p2=$s6 p3@sp-0x30 myx=$s5 myy=$s4
  *   blocks: {1 {77 {90 {97 {98 }133 }133 }137 }148 }152
  */

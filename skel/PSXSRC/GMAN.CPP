@@ -4225,6 +4225,20 @@ int __fastcall GetSize__C6CBlock(_DWORD *a1)
  *   blocks: {1 {5 }6 }6
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", GM_Open__Fv) */
+#if 0 /* m2c */
+void GM_Open__Fv(void) {
+    s32 *var_v0;
+    s32 var_v1;
+
+    var_v1 = 0x173;
+    var_v0 = &AllDats + 0x5CC;
+    do {
+        *var_v0 = 0;
+        var_v1 -= 1;
+        var_v0 -= 4;
+    } while (var_v1 >= 0);
+}
+#endif
 #if 0 /* ida */
 _DWORD *GM_Open__Fv()
 {

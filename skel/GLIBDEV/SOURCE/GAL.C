@@ -1525,7 +1525,7 @@ _DWORD *__fastcall ReleaseMemHdrBlock(_DWORD *a1)
 #endif
 
 /* ---- 0x80022150  GAL_IterateEmptyMem  GAL.C:1295-1315  seg lib  fsize 32 ---- */
-/* void GAL_IterateEmptyMem(unsigned long MemType, void *(Func)())
+/* void GAL_IterateEmptyMem(unsigned long MemType, void (*Func)())
  *   MemType=$a0 Func=$s1 M=$v0 Block=$s0
  *   blocks: {1 {8 }17 }21
  */
@@ -1567,7 +1567,7 @@ int __fastcall GAL_IterateEmptyMem(int a1, int (__fastcall *a2)(_DWORD, _DWORD, 
 #endif
 
 /* ---- 0x800221D4  GAL_IterateUsedMem  GAL.C:1325-1345  seg lib  fsize 40 ---- */
-/* void GAL_IterateUsedMem(unsigned long MemType, void *(Func)())
+/* void GAL_IterateUsedMem(unsigned long MemType, void (*Func)())
  *   MemType=$a0 Func=$s1 M=$v0 Block=$s0
  *   blocks: {1 {8 }17 }21
  */
@@ -3181,7 +3181,7 @@ s32 GAL_GetLastTypeAlloced(void) {
 #endif
 
 /* ---- 0x8002309C  GAL_SetAllocFilter  GAL.C:2433-2440  seg lib  fsize 0 ---- */
-/* void *()() GAL_SetAllocFilter(void *(NewFilter)())
+/* void (*)() GAL_SetAllocFilter(void (*NewFilter)())
  *   NewFilter=$a0 OldFilter=$v0
  *   blocks: {2 }8
  */
@@ -3307,7 +3307,7 @@ BOOL __fastcall SortAddr(int a1, int a2)
 #endif
 
 /* ---- 0x8002317C  SortMemHdrList  GAL.C:2507-2556  seg lib  fsize 40 ---- */
-/* void SortMemHdrList(struct MEM_HDR **Head, unsigned char *(CompFunc)())
+/* void SortMemHdrList(struct MEM_HDR **Head, unsigned char (*CompFunc)())
  *   Head=$s3 CompFunc=$s4 DidASwap=$s2 CurHdr=$s0 NextHdr=$s1 OldPrev=$v1
  *   blocks: {1 {21 }40 }50
  */

@@ -97,7 +97,7 @@ int __fastcall TSK_OpenModule(int a1)
 #endif
 
 /* ---- 0x80020010  TSK_AddTask  TASKER.C:141-211  seg lib  fsize 72 ---- */
-/* struct TASK * TSK_AddTask(unsigned long Id, void *(Main)(), int StackSize, int DataSize)
+/* struct TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize)
  *   Id=$s2 Main=$s3 StackSize=$a2 DataSize=$s4 RetTask=$s0 hndTask=$s1 G@sp-0x38
  *   blocks: {1 }71
  */
@@ -537,7 +537,7 @@ BOOL __fastcall TSK_IsStackCorrupted(int a1)
 #endif
 
 /* ---- 0x80020624  TSK_JumpAndResetStack  TASKER.C:408-418  seg lib  fsize 24 ---- */
-/* void TSK_JumpAndResetStack(void *(RunFunc)())
+/* void TSK_JumpAndResetStack(void (*RunFunc)())
  *   RunFunc=$v1 T=$a2
  *   blocks: {1 }11
  */
@@ -571,7 +571,7 @@ int __fastcall TSK_JumpAndResetStack(int a1)
 #endif
 
 /* ---- 0x8002066C  TSK_RepointProc  TASKER.C:430-440  seg lib  fsize 24 ---- */
-/* void TSK_RepointProc(struct TASK *T, void *(Func)())
+/* void TSK_RepointProc(struct TASK *T, void (*Func)())
  *   T=$a0 Func=$a1
  */
 /* linked from build/src/lib.c.o (segment lib mixes several source files) — INCLUDE_ASM("asm/nonmatchings/lib", TSK_RepointProc) */
@@ -787,7 +787,7 @@ int __fastcall TSK_KillTasks(_DWORD *a1, int a2, int a3)
 #endif
 
 /* ---- 0x8002086C  TSK_IterateTasks  TASKER.C:594-610  seg lib  fsize 40 ---- */
-/* void TSK_IterateTasks(unsigned long Id, unsigned long Mask, void *(CallBack)())
+/* void TSK_IterateTasks(unsigned long Id, unsigned long Mask, void (*CallBack)())
  *   Id=$s1 Mask=$s2 CallBack=$s3 T=$a0 NextT=$s0
  *   blocks: {1 {8 }15 }17
  */
@@ -1063,7 +1063,7 @@ int __fastcall ExecuteTask(int a1)
 #endif
 
 /* ---- 0x80020A88  TSK_SetDoTasksPrologue  TASKER.C:756-762  seg lib  fsize 0 ---- */
-/* void *()() TSK_SetDoTasksPrologue(void *(Func)())
+/* void (*)() TSK_SetDoTasksPrologue(void (*Func)())
  *   Func=$a0 Old=$v0
  *   blocks: {2 }7
  */
@@ -1089,7 +1089,7 @@ int __fastcall TSK_SetDoTasksPrologue(int a1)
 #endif
 
 /* ---- 0x80020AA0  TSK_SetDoTasksEpilogue  TASKER.C:765-771  seg lib  fsize 0 ---- */
-/* void *()() TSK_SetDoTasksEpilogue(void *(Func)())
+/* void (*)() TSK_SetDoTasksEpilogue(void (*Func)())
  *   Func=$a0 Old=$v0
  *   blocks: {2 }7
  */
@@ -1115,7 +1115,7 @@ int __fastcall TSK_SetDoTasksEpilogue(int a1)
 #endif
 
 /* ---- 0x80020AB8  TSK_SetTaskPrologue  TASKER.C:775-781  seg lib  fsize 0 ---- */
-/* void *()() TSK_SetTaskPrologue(void *(Pro)())
+/* void (*)() TSK_SetTaskPrologue(void (*Pro)())
  *   Pro=$a0 Old=$v0
  *   blocks: {2 }7
  */
@@ -1141,7 +1141,7 @@ int (__fastcall *__fastcall TSK_SetTaskPrologue(int (__fastcall *a1)(_DWORD)))(_
 #endif
 
 /* ---- 0x80020AD0  TSK_SetTaskEpilogue  TASKER.C:784-790  seg lib  fsize 0 ---- */
-/* void *()() TSK_SetTaskEpilogue(void *(Epi)())
+/* void (*)() TSK_SetTaskEpilogue(void (*Epi)())
  *   Epi=$a0 Old=$v0
  *   blocks: {2 }7
  */
@@ -1223,7 +1223,7 @@ void __fastcall TSK_SetExtraStackProtection(char a1)
 #endif
 
 /* ---- 0x80020B44  TSK_SetStackFloodCallback  TASKER.C:819-826  seg lib  fsize 0 ---- */
-/* void *()() TSK_SetStackFloodCallback(void *(Func)())
+/* void (*)() TSK_SetStackFloodCallback(void (*Func)())
  *   Func=$a0 OldFunc=$v0
  *   blocks: {2 }8
  */

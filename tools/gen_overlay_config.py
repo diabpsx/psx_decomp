@@ -26,6 +26,9 @@ main_yaml = (ROOT / "configs" / "diabpsx.yaml").read_text()
 main_segs = set(re.findall(r"^\s+- \[0x[0-9A-F]+, (?:c|asm|data|rodata|sdata), (\w+)\]", main_yaml, re.M))
 main_syms = set(re.findall(r"^(\w+) = ", (ROOT / "configs" / "symbol_addrs.txt").read_text(), re.M))
 gp = re.search(r"gp_value: (0x[0-9A-F]+)", main_yaml).group(1)
+# true function extents (SYM function blocks) -- sizes for splat + the "is this func_ label inside a real
+# function" test (a func_ split inside a SYM function is a splat boundary guess, NOT data-as-code)
+FN_END = {(f["va"], f["name"]): f["end"] for f in json.load(open(ROOT.parent / "sym_fns.json"))}
 
 def sym_scope(ovid):
     """(va, name, is_func, size) records that sit under `set overlay $ovid` in the SYM"""
@@ -50,10 +53,16 @@ for ov, (ovid, group, image) in OVERLAYS.items():
     # The SYM names EVERY function of the game (full debug build), so code splat had to label `func_<va>`
     # inside an overlay is data-as-code (unsized tables, e.g. DRLG_L4 @0x8014D7F8): carve [va, next symbol).
     fn_vas = sorted(va for va, name, is_fn, size in recs if is_fn)
+    fn_spans = [(va, FN_END[(va, name)]) for va, name, is_fn, size in recs if is_fn and (va, name) in FN_END]
     all_vas = sorted(va for va, name, is_fn, size in recs)
-    for f in (ROOT / "asm" / "nonmatchings").rglob("func_*.s"):
-        va = int(f.stem[5:], 16)
+    # persisted list: a carved label has no .s after the next split, so remember every data-as-code VA ever seen
+    dac_file = ROOT / "configs" / "overlay_dataascode.txt"
+    dac = set(int(x, 16) for x in dac_file.read_text().split()) if dac_file.exists() else set()
+    dac |= set(int(f.stem[5:], 16) for f in (ROOT / "asm" / "nonmatchings").rglob("func_*.s"))
+    dac_file.write_text(chr(10).join(f"{v:08X}" for v in sorted(dac)) + chr(10))
+    for va in sorted(dac):
         if va < VRAM or va in fn_vas: continue
+        if any(a < va < b for a, b in fn_spans): continue      # mid-function split, real code
         seg_ok = any(x["group"] == group and x["start"] <= va <= x["stop"] for x in secs)
         if not seg_ok: continue
         nxt = min([v for v in all_vas if v > va] + [max(x["stop"] + 1 for x in secs if x["group"] == group)])
@@ -113,10 +122,12 @@ for ov, (ovid, group, image) in OVERLAYS.items():
     out = [f"// overlay {ov} (SYM id ${ovid:x}) symbols scoped by the SYM `set overlay` record; main-image symbols come from symbol_addrs.txt"]
     used = set(main_syms); n_fn = 0
     for va, name, is_fn, size in sorted(recs):
+        orig = name
         name = name.replace("_._", "___").replace("$", "_S_").replace(".", "_")
         if name in used: name = f"{name}_{va:08x}"
         used.add(name)
         if is_fn: n_fn += 1
-        out.append(f"{name} = 0x{va:08X}; //{' type:func' if is_fn else ''}{f' size:0x{size:X}' if size and not is_fn else ''}")
+        fsz = FN_END.get((va, orig), 0) - va if is_fn and (va, orig) in FN_END else 0
+        out.append(f"{name} = 0x{va:08X}; //{' type:func' if is_fn else ''}{f' size:0x{fsz:X}' if fsz else ''}{f' size:0x{size:X}' if size and not is_fn else ''}")
     (ROOT / "configs" / f"symbol_addrs_{ov}.txt").write_text("\n".join(out) + "\n")
     print(f"{ov}: {len(sub)} subsegments, {n_fn} fns + {len(recs) - n_fn} data syms -> configs/{ov}.yaml, symbol_addrs_{ov}.txt")

@@ -1254,6 +1254,13 @@ int __fastcall CheckActive__4CPad_800894d4(int a1)
  *   blocks: {1 }4
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", PA_Open__Fv) */
+#if 0 /* m2c */
+void PA_Open__Fv(void) {
+    D_8011C644 = 0;
+    D_8011C648 = 0;
+    TSK_AddTask(0x8000, &PauseTask__FP4TASK, 0x800, 0);
+}
+#endif
 #if 0 /* ida */
 int PA_Open__Fv()
 {

@@ -350,6 +350,11 @@ int __fastcall GetOverType__7Overlay(int a1)
  *   blocks: {1 }2
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", OVR_Open__Fv) */
+#if 0 /* m2c */
+void OVR_Open__Fv(void) {
+    ClearOutOverlays__Fv();
+}
+#endif
 #if 0 /* ida */
 void OVR_Open__Fv()
 {

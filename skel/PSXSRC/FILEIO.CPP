@@ -186,7 +186,7 @@ void __noreturn FileNotFound__6FileIOPCc()
 #endif
 
 /* ---- 0x80085B14  StreamFile__6FileIOPCciPFPUciib_bii  FILEIO.CPP:138-150  seg fileio  fsize 56 ---- */
-/* BOOL FileIO::StreamFile(char *Name, int Slice, BOOL *(Func)(), int Offset, int Size)
+/* BOOL FileIO::StreamFile(char *Name, int Slice, BOOL (*Func)(), int Offset, int Size)
  *   this=$s1 Name=$a1 Slice=$s3 Func=$s4 Offset=$s5 Size=$s0
  *   blocks: {1 }13
  */

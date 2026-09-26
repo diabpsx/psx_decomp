@@ -28,19 +28,7 @@ SECTIONS
         . = 0x7B8;   /* 0x8013A3B0 */
         build/asm/data/drlg_l1_rodata_8013a3b0.rodata.s.o(.rodata);
         . = 0x20B8;   /* 0x8013BCB0 */
-        build/src/drlg_l1.c.o(.text);
-        . = 0x2F58;   /* 0x8013CB50 */
-        build/asm/data/drlg_l1_rodata_8013cb50.rodata.s.o(.rodata);
-        . = 0x2FB0;   /* 0x8013CBA8 */
-        build/src/drlg_l1_1.c.o(.text);
-        . = 0x35A8;   /* 0x8013D1A0 */
-        build/asm/data/drlg_l1_rodata_8013d1a0.rodata.s.o(.rodata);
-        . = 0x3700;   /* 0x8013D2F8 */
-        build/src/drlg_l1_2.c.o(.text);
-        . = 0x45F4;   /* 0x8013E1EC */
-        build/asm/data/drlg_l1_rodata_8013e1ec.rodata.s.o(.rodata);
-        . = 0x4634;   /* 0x8013E22C */
-        build/src/drlg_l1_3.c.o(.text);
+        build/skel/SOURCE/DRLG_L1.CPP.o(.text);
         . = 0x72FC;   /* 0x80140EF4 */
         build/asm/data/drlg_l2_rodata_80140ef4.rodata.s.o(.rodata);
         . = 0x7344;   /* 0x80140F3C */
@@ -228,11 +216,7 @@ SECTIONS
         . = 0x7AD4;   /* 0x801416CC */
         build/asm/data/drlg_l2_rodata_801416cc.rodata.s.o(.rodata);
         . = 0x9810;   /* 0x80143408 */
-        build/src/drlg_l2.c.o(.text);
-        . = 0x99F0;   /* 0x801435E8 */
-        build/asm/data/drlg_l2_rodata_801435e8.rodata.s.o(.rodata);
-        . = 0x9BA0;   /* 0x80143798 */
-        build/src/drlg_l2_1.c.o(.text);
+        build/skel/SOURCE/DRLG_L2.CPP.o(.text);
         . = 0xEAAC;   /* 0x801486A4 */
         build/asm/data/drlg_l3_rodata_801486a4.rodata.s.o(.rodata);
         . = 0xEACC;   /* 0x801486C4 */
@@ -274,11 +258,7 @@ SECTIONS
         . = 0x1BE0C;   /* 0x80155A04 */
         build/skel/SOURCE/CHOOSEM.CPP.o(.text);
         . = 0x1C3E0;   /* 0x80155FD8 */
-        build/src/preobj.c.o(.text);
-        . = 0x1DAF4;   /* 0x801576EC */
-        build/asm/data/preobj_rodata_801576ec.rodata.s.o(.rodata);
-        . = 0x1DBB4;   /* 0x801577AC */
-        build/src/preobj_1.c.o(.text);
+        build/skel/SOURCE/PREOBJ.CPP.o(.text);
         . = 0x202E4;   /* 0x80159EDC */
         build/skel/SOURCE/GENDUNG.CPP.o(.text);
         . = 0x22014;   /* 0x8015BC0C */

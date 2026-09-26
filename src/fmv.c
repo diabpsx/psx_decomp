@@ -53,3 +53,37 @@ INCLUDE_ASM("asm/nonmatchings/fmv", is_frame_decoded);
 INCLUDE_ASM("asm/nonmatchings/fmv", init_mdec_polys);
 
 INCLUDE_ASM("asm/nonmatchings/fmv", set_mdec_poly_bright);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", init_mdec_stream);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", init_mdec_audio);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", kill_mdec_audio);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", stop_mdec_audio);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", play_mdec_audio);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", set_mdec_audio_volume);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", resync_audio);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", stop_mdec_stream);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", dequeue_stream);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", dequeue_animation);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", decode_mdec_stream);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", play_mdec_stream);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", clear_mdec_queue);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", StrClearVRAM);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", PlayFMVOverLay);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", LoPlayFMVOverLay);
+
+INCLUDE_ASM("asm/nonmatchings/fmv", GetDown__C4CPad_80158840);

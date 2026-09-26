@@ -1371,22 +1371,12 @@ _DWORD *__fastcall __6Dialog_800af000(_DWORD *a1)
 }
 #endif
 
-/* ---- 0x8013CA94  _._6Dialog  DIALOG.H:79-79  seg fe_6  fsize 24 ---- */
+/* ---- 0x8013CA94  _._6Dialog  DIALOG.H:79-79  seg fe  fsize 24 ---- */
 /* void Dialog::~Dialog(int __in_chrg)
  *   this=$a0 __in_chrg=$a1
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/fe_6.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void ___6Dialog_8013ca94(s32 arg1) {
-    s32 temp_a1;
-
-    temp_a1 = arg1 & 1;
-    if (temp_a1 != 0) {
-        __builtin_delete(temp_a1);
-    }
-}
-#endif
+/* linked from the including TU skeleton (PSXSRC/FE.CPP) — reading copy only */
 #if 0 /* ida */
 int __fastcall ___6Dialog_8013ca94(int a1, char a2)
 {
@@ -1398,27 +1388,12 @@ int __fastcall ___6Dialog_8013ca94(int a1, char a2)
 }
 #endif
 
-/* ---- 0x8013CABC  __6Dialog  DIALOG.H:62-75  seg fe_6  fsize 24 ---- */
+/* ---- 0x8013CABC  __6Dialog  DIALOG.H:62-75  seg fe  fsize 24 ---- */
 /* struct Dialog * Dialog::Dialog(void)
  *   this=$s0
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/fe_6.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void *__6Dialog_8013cabc(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 8) = 0x94;
-    M2C_FIELD(arg0, s32 *, 0) = 0x1A;
-    M2C_FIELD(arg0, s32 *, 4) = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    M2C_FIELD(arg0, s32 *, 0xC) = GetOverlayOtBase__7CBlocks_8013cb3c();
-    return arg0;
-}
-#endif
+/* linked from the including TU skeleton (PSXSRC/FE.CPP) — reading copy only */
 #if 0 /* ida */
 _DWORD *__fastcall __6Dialog_8013cabc(_DWORD *a1)
 {
@@ -1436,19 +1411,12 @@ _DWORD *__fastcall __6Dialog_8013cabc(_DWORD *a1)
 }
 #endif
 
-/* ---- 0x8015B878  SetRGB__6DialogUcUcUc  DIALOG.H:99-102  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B878  SetRGB__6DialogUcUcUc  DIALOG.H:99-102  seg dlg_2  fsize 0 ---- */
 /* void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
  *   this=$a0 R=$a1 G=$a2 B=$a3
  *   blocks: {1 }4
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-void SetRGB__6DialogUcUcUc_8015b878(s8 arg1, s8 arg2, s8 arg3) {
-    DialogRed = arg1;
-    DialogGreen = arg2;
-    DialogBlue = arg3;
-}
-#endif
 #if 0 /* ida */
 void __fastcall SetRGB__6DialogUcUcUc_8015b878(int a1, char a2, char a3, char a4)
 {
@@ -1458,17 +1426,12 @@ void __fastcall SetRGB__6DialogUcUcUc_8015b878(int a1, char a2, char a3, char a4
 }
 #endif
 
-/* ---- 0x8015B898  SetBack__6Dialogi  DIALOG.H:94-94  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B898  SetBack__6Dialogi  DIALOG.H:94-94  seg dlg_2  fsize 0 ---- */
 /* void Dialog::SetBack(int Type)
  *   this=$a0 Type=$a1
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-void SetBack__6Dialogi_8015b898(M2C_UNK *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 8) = arg1;
-}
-#endif
 #if 0 /* ida */
 void __fastcall SetBack__6Dialogi_8015b898(int a1, int a2)
 {
@@ -1476,17 +1439,12 @@ void __fastcall SetBack__6Dialogi_8015b898(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015B8A0  SetBorder__6Dialogi  DIALOG.H:91-91  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B8A0  SetBorder__6Dialogi  DIALOG.H:91-91  seg dlg_2  fsize 0 ---- */
 /* void Dialog::SetBorder(int Type)
  *   this=$a0 Type=$a1
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-void SetBorder__6Dialogi_8015b8a0(M2C_UNK *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 4) = arg1;
-}
-#endif
 #if 0 /* ida */
 void __fastcall SetBorder__6Dialogi_8015b8a0(int a1, int a2)
 {
@@ -1494,22 +1452,12 @@ void __fastcall SetBorder__6Dialogi_8015b8a0(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015B8A8  _._6Dialog  DIALOG.H:79-79  seg dlg  fsize 24 ---- */
+/* ---- 0x8015B8A8  _._6Dialog  DIALOG.H:79-79  seg dlg_2  fsize 24 ---- */
 /* void Dialog::~Dialog(int __in_chrg)
  *   this=$a0 __in_chrg=$a1
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-void ___6Dialog_8015b8a8(s32 arg1) {
-    s32 temp_a1;
-
-    temp_a1 = arg1 & 1;
-    if (temp_a1 != 0) {
-        __builtin_delete(temp_a1);
-    }
-}
-#endif
 #if 0 /* ida */
 int __fastcall ___6Dialog_8015b8a8(int a1, char a2)
 {
@@ -1521,27 +1469,12 @@ int __fastcall ___6Dialog_8015b8a8(int a1, char a2)
 }
 #endif
 
-/* ---- 0x8015B8D0  __6Dialog  DIALOG.H:62-75  seg dlg  fsize 24 ---- */
+/* ---- 0x8015B8D0  __6Dialog  DIALOG.H:62-75  seg dlg_2  fsize 24 ---- */
 /* struct Dialog * Dialog::Dialog(void)
  *   this=$s0
  *   blocks: {1 }1
  */
 /* linked from the including TU skeleton (PSXSRC/DLG.CPP) — reading copy only */
-#if 0 /* m2c */
-M2C_UNK *__6Dialog_8015b8d0(M2C_UNK *arg0) {
-    M2C_FIELD(arg0, s32 *, 8) = 0x94;
-    M2C_FIELD(arg0, s32 *, 0) = 0x1A;
-    M2C_FIELD(arg0, s32 *, 4) = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    M2C_FIELD(arg0, s32 *, 0xC) = GetOverlayOtBase__7CBlocks_8015b950();
-    return arg0;
-}
-#endif
 #if 0 /* ida */
 _DWORD *__fastcall __6Dialog_8015b8d0(_DWORD *a1)
 {
@@ -1559,19 +1492,12 @@ _DWORD *__fastcall __6Dialog_8015b8d0(_DWORD *a1)
 }
 #endif
 
-/* ---- 0x80161E58  SetRGB__6DialogUcUcUc  DIALOG.H:99-102  seg inv_1  fsize 0 ---- */
+/* ---- 0x80161E58  SetRGB__6DialogUcUcUc  DIALOG.H:99-102  seg inv  fsize 0 ---- */
 /* void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
  *   this=$a0 R=$a1 G=$a2 B=$a3
  *   blocks: {1 }4
  */
-/* linked from the including TU skeleton (src/inv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void SetRGB__6DialogUcUcUc_80161e58(s8 arg1, u8 arg2, u8 arg3) {
-    DialogRed = arg1;
-    DialogGreen = arg2;
-    DialogBlue = arg3;
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/INV.CPP) — reading copy only */
 #if 0 /* ida */
 void __fastcall SetRGB__6DialogUcUcUc_80161e58(int a1, char a2, char a3, char a4)
 {
@@ -1581,17 +1507,12 @@ void __fastcall SetRGB__6DialogUcUcUc_80161e58(int a1, char a2, char a3, char a4
 }
 #endif
 
-/* ---- 0x80161E78  SetBack__6Dialogi  DIALOG.H:94-94  seg inv_1  fsize 0 ---- */
+/* ---- 0x80161E78  SetBack__6Dialogi  DIALOG.H:94-94  seg inv  fsize 0 ---- */
 /* void Dialog::SetBack(int Type)
  *   this=$a0 Type=$a1
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/inv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void SetBack__6Dialogi_80161e78(M2C_UNK *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 8) = arg1;
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/INV.CPP) — reading copy only */
 #if 0 /* ida */
 void __fastcall SetBack__6Dialogi_80161e78(int a1, int a2)
 {
@@ -1599,22 +1520,12 @@ void __fastcall SetBack__6Dialogi_80161e78(int a1, int a2)
 }
 #endif
 
-/* ---- 0x80161E80  _._6Dialog  DIALOG.H:79-79  seg inv_1  fsize 24 ---- */
+/* ---- 0x80161E80  _._6Dialog  DIALOG.H:79-79  seg inv  fsize 24 ---- */
 /* void Dialog::~Dialog(int __in_chrg)
  *   this=$a0 __in_chrg=$a1
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/inv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-void ___6Dialog_80161e80(s32 arg1) {
-    s32 temp_a1;
-
-    temp_a1 = arg1 & 1;
-    if (temp_a1 != 0) {
-        __builtin_delete(temp_a1);
-    }
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/INV.CPP) — reading copy only */
 #if 0 /* ida */
 int __fastcall ___6Dialog_80161e80(int a1, char a2)
 {
@@ -1626,27 +1537,12 @@ int __fastcall ___6Dialog_80161e80(int a1, char a2)
 }
 #endif
 
-/* ---- 0x80161EA8  __6Dialog  DIALOG.H:62-75  seg inv_1  fsize 24 ---- */
+/* ---- 0x80161EA8  __6Dialog  DIALOG.H:62-75  seg inv  fsize 24 ---- */
 /* struct Dialog * Dialog::Dialog(void)
  *   this=$s0
  *   blocks: {1 }1
  */
-/* linked from the including TU skeleton (src/inv_1.c scaffold) — reading copy only */
-#if 0 /* m2c */
-M2C_UNK *__6Dialog_80161ea8(M2C_UNK *arg0) {
-    M2C_FIELD(arg0, s32 *, 8) = 0x94;
-    M2C_FIELD(arg0, s32 *, 0) = 0x1A;
-    M2C_FIELD(arg0, s32 *, 4) = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    M2C_FIELD(arg0, s32 *, 0xC) = GetOverlayOtBase__7CBlocks_80161f50();
-    return arg0;
-}
-#endif
+/* linked from the including TU skeleton (SOURCE/INV.CPP) — reading copy only */
 #if 0 /* ida */
 _DWORD *__fastcall __6Dialog_80161ea8(_DWORD *a1)
 {

@@ -38,6 +38,12 @@ char *__fastcall SlowMemMove__FPvT0Ul(char *a1, char *a2, int a3)
  *   blocks: {1 }3
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", MEM_SetupMem__Fv) */
+#if 0 /* m2c */
+void MEM_SetupMem__Fv(void) {
+    Gaz = &OPT_LinkerOpts;
+    SetupWorkRam__Fv();
+}
+#endif
 #if 0 /* ida */
 void MEM_SetupMem__Fv()
 {
@@ -53,6 +59,20 @@ void MEM_SetupMem__Fv()
  *   blocks: {1 }15
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", SetupWorkRam__Fv) */
+#if 0 /* m2c */
+void SetupWorkRam__Fv(void) {
+    D_800B7928 = 1;
+    D_800B7948 = (M2C_UNK *)0x1F800000;
+    D_800B794C = 0x400;
+    D_800B7950 = 2;
+    D_800B7920 = OPT_FreeMemStart;
+    D_800B7924 = OPT_FreeMemSize;
+    memset(OPT_FreeMemStart, 0, OPT_FreeMemSize);
+    GAL_AddMemType(&D_800B7948);
+    GAL_AddMemType(&D_800B7920);
+    GAL_SetVerbosity(1);
+}
+#endif
 #if 0 /* ida */
 void SetupWorkRam__Fv()
 {

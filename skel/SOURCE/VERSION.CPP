@@ -64,6 +64,39 @@ int __fastcall CharPair2Num__FPc(char *a1)
  *   blocks: {1 }24
  */
 /* linked from build/src/startup_1.c.o (segment startup_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup_1", GetVersionString__FPc) */
+#if 0 /* m2c */
+s32 GetVersionString__FPc(s32 arg0) {
+    s16 sp10;
+    s8 sp12;
+    s8 sp13;
+    s8 sp14;
+    s8 sp15;
+    s8 sp16;
+    s8 sp17;
+    u16 sp18;
+    s8 sp1A;
+    s8 sp1B;
+    s8 sp1C;
+
+    sp10 = D_80119464;
+    sp12 = D_80119466;
+    sp13 = D_8011946D;
+    sp14 = D_8011946E;
+    sp15 = D_80119468;
+    sp16 = D_80119469;
+    if (sp15 == 0x20) {
+        sp15 = 0x30;
+    }
+    sp17 = 0x2E;
+    sp18 = D_80119470;
+    sp1A = D_80119473;
+    sp1B = D_80119474;
+    sp1C = 0;
+    strupr__FPc(&sp10);
+    strcpy(arg0, &sp10);
+    return arg0;
+}
+#endif
 #if 0 /* ida */
 _BYTE *__fastcall GetVersionString__FPc(_BYTE *a1)
 {
@@ -82,6 +115,45 @@ _BYTE *__fastcall GetVersionString__FPc(_BYTE *a1)
  *   blocks: {1 {1 }25 }40
  */
 /* linked from build/src/startup_1.c.o (segment startup_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup_1", GetWord__FPc) */
+#if 0 /* m2c */
+s32 GetWord__FPc(void *arg0) {
+    s8 sp10;
+    s8 sp11;
+    s8 sp12;
+    s8 sp13;
+    s32 temp_s0;
+    s32 temp_s0_2;
+    s32 var_s0;
+    s32 var_s1;
+    s32 var_s2;
+
+    Year = CharPair2Num__FPc(arg0 + 3);
+    var_s1 = 0;
+    Day = CharPair2Num__FPc(arg0 + 5);
+    sp10 = M2C_FIELD(arg0, s8 *, 0);
+    sp11 = M2C_FIELD(arg0, s8 *, 1);
+    sp12 = M2C_FIELD(arg0, s8 *, 2);
+    var_s2 = 0;
+    var_s0 = 0;
+    sp13 = 0;
+loop_1:
+    if (strcmp(*(&MonDays + var_s0), &sp10) == 0) {
+        var_s2 = 1;
+    } else {
+        var_s1 += *(&MonDays + 4 + var_s0);
+    }
+    var_s0 += 8;
+    if ((var_s0 < 0x60) && (var_s2 == 0)) {
+        goto loop_1;
+    }
+    if (var_s2 == 0) {
+        DBG_Error(0, &D_8011947C, 0x145);
+    }
+    temp_s0_2 = (var_s1 + Day + (Year * 0x16D)) * 0x5A0;
+    temp_s0 = temp_s0_2 + (CharPair2Num__FPc(arg0 + 8) * 0x3C);
+    return *(&Words + ((((temp_s0 + CharPair2Num__FPc(arg0 + 0xA)) / 360) % 118) * 4));
+}
+#endif
 #if 0 /* ida */
 char *__fastcall GetWord__FPc(char *a1)
 {

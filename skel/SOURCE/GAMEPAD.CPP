@@ -518,7 +518,7 @@ void __fastcall SetMoveStyle__7GamePadc(int a1, char a2)
 #endif
 
 /* ---- 0x80078638  SetDownButton__7GamePadiPFi_v  GAMEPAD.CPP:450-453  seg gamepad  fsize 32 ---- */
-/* void GamePad::SetDownButton(int pad_val, void *(func)())
+/* void GamePad::SetDownButton(int pad_val, void (*func)())
  *   this=$s0 pad_val=$a1 func=$s1
  *   blocks: {1 }4
  */
@@ -540,7 +540,7 @@ int __fastcall SetDownButton__7GamePadiPFi_v(int a1, void *a2, int a3)
 #endif
 
 /* ---- 0x8007867C  SetComboDownButton__7GamePadiPFi_v  GAMEPAD.CPP:462-465  seg gamepad  fsize 32 ---- */
-/* void GamePad::SetComboDownButton(int pad_val, void *(func)())
+/* void GamePad::SetComboDownButton(int pad_val, void (*func)())
  *   this=$s0 pad_val=$a1 func=$s1
  *   blocks: {1 }4
  */
@@ -1023,7 +1023,7 @@ LABEL_36:
 #endif
 
 /* ---- 0x80078AE0  GetActionButton__7GamePadPFi_v  GAMEPAD.CPP:638-657  seg gamepad  fsize 0 ---- */
-/* int GamePad::GetActionButton(void *(func)())
+/* int GamePad::GetActionButton(void (*func)())
  *   this=$a0 func=$a1
  *   blocks: {1 {3 }19 }20
  */
@@ -1083,7 +1083,7 @@ int __fastcall GetActionButton__7GamePadPFi_v(int a1, int a2)
 #endif
 
 /* ---- 0x80078B3C  SetUpAction__7GamePadPFi_vT1  GAMEPAD.CPP:665-668  seg gamepad  fsize 32 ---- */
-/* void GamePad::SetUpAction(void *(func)(), void *(upfunc)())
+/* void GamePad::SetUpAction(void (*func)(), void (*upfunc)())
  *   this=$s0 func=$a1 upfunc=$s1
  *   blocks: {1 }4
  */

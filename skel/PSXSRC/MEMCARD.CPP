@@ -8,7 +8,7 @@
  *   b=$a0 byts=$a1 t=$v1
  *   blocks: {1 }5
  */
-/* linked from build/src/memcard.c.o (segment memcard mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard", endian_swap__FPUci) */
+INCLUDE_ASM("asm/nonmatchings/memcard", endian_swap__FPUci);
 #if 0 /* m2c */
 void endian_swap__FPUci(void *arg0, s32 arg1) {
     s32 temp_a1;
@@ -56,40 +56,14 @@ BOOL __fastcall endian_swap__FPUci(char *a1, int a2)
  *   b=$a0 byts=$a1 t=$v0
  *   blocks: {1 }11
  */
-/* linked from build/src/memcard.c.o (segment memcard mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard", sjis_endian_swap__FPUci) */
+INCLUDE_ASM("asm/nonmatchings/memcard", sjis_endian_swap__FPUci);
 
-/* ---- 0x80142774  to_sjis__Fc  MEMCARD.CPP:167-186  seg memcard_1  fsize 16 ---- */
+/* ---- 0x80142774  to_sjis__Fc  MEMCARD.CPP:167-186  seg memcard  fsize 16 ---- */
 /* unsigned short to_sjis(char asc)
  *   asc=$a0 sp=$a2
  *   blocks: {1 }20
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", to_sjis__Fc) */
-#if 0 /* m2c */
-s32 to_sjis__Fc(s8 arg0) {
-    s8 *var_a1;
-    s8 *var_a2;
-    u8 var_v1;
-
-    var_a2 = &sjis_table;
-    var_v1 = (u8) sjis_table;
-    if (sjis_table != 0) {
-        var_a1 = &sjis_table + 2;
-loop_2:
-        if ((arg0 >= (s8) var_v1) && (arg0 < ((s8) var_v1 + M2C_FIELD(var_a1, u8 *, -1)))) {
-            return M2C_FIELD(var_a1, u16 *, 0) + (arg0 - (s8) var_v1);
-        }
-        var_a2 += 4;
-        var_v1 = (u8) *var_a2;
-        var_a1 += 4;
-        if (*var_a2 == 0) {
-            goto block_6;
-        }
-        goto loop_2;
-    }
-block_6:
-    return 0x8148;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", to_sjis__Fc);
 #if 0 /* ida */
 int __fastcall to_sjis__Fc(char a1)
 {
@@ -113,43 +87,12 @@ int __fastcall to_sjis__Fc(char a1)
 }
 #endif
 
-/* ---- 0x801427F4  to_ascii__FUs  MEMCARD.CPP:200-218  seg memcard_1  fsize 16 ---- */
+/* ---- 0x801427F4  to_ascii__FUs  MEMCARD.CPP:200-218  seg memcard  fsize 16 ---- */
 /* char to_ascii(unsigned short sjis)
  *   sjis=$a0 sp=$t0
  *   blocks: {1 }19
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", to_ascii__FUs) */
-#if 0 /* m2c */
-s32 to_ascii__FUs(s32 arg0) {
-    s8 *var_a2;
-    s8 *var_t0;
-    u16 temp_a1;
-    u32 temp_v1;
-    u8 var_a3;
-
-    var_t0 = &sjis_table;
-    var_a3 = (u8) sjis_table;
-    if (sjis_table != 0) {
-        temp_v1 = arg0 & 0xFFFF;
-        var_a2 = &sjis_table + 1;
-loop_2:
-        temp_a1 = M2C_FIELD(var_a2, u16 *, 1);
-        if ((temp_v1 >= temp_a1) && ((s32) temp_v1 < (temp_a1 + (u8) M2C_FIELD(var_a2, s8 *, 0)))) {
-            return (s8) var_a3 + (temp_v1 - temp_a1);
-        }
-        var_t0 += 4;
-        var_a3 = (u8) *var_t0;
-        var_a2 += 4;
-        if (*var_t0 == 0) {
-            goto block_6;
-        }
-        goto loop_2;
-    }
-block_6:
-    to_ascii_invalid_char = 1;
-    return 0x3F;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", to_ascii__FUs);
 #if 0 /* ida */
 int __fastcall to_ascii__FUs(unsigned __int16 a1)
 {
@@ -177,40 +120,12 @@ int __fastcall to_ascii__FUs(unsigned __int16 a1)
 }
 #endif
 
-/* ---- 0x8014287C  ascii_to_sjis__FPUcPUs  MEMCARD.CPP:229-242  seg memcard_1  fsize 32 ---- */
+/* ---- 0x8014287C  ascii_to_sjis__FPUcPUs  MEMCARD.CPP:229-242  seg memcard  fsize 32 ---- */
 /* void ascii_to_sjis(unsigned char *asc, unsigned short *sjis)
  *   asc=$s1 sjis=$s0
  *   blocks: {1 }14
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", ascii_to_sjis__FPUcPUs) */
-#if 0 /* m2c */
-void ascii_to_sjis__FPUcPUs(u8 *arg0, s16 *arg1) {
-    s16 *var_s0;
-    u8 *var_s1;
-    u8 temp_v1;
-    u8 var_a0;
-
-    var_s1 = arg0;
-    var_a0 = *var_s1;
-    var_s0 = arg1;
-    if (var_a0 != 0) {
-        do {
-            if (var_a0 & 0x80) {
-                temp_v1 = M2C_FIELD(var_s1, u8 *, 1);
-                var_s1 += 2;
-                *var_s0 = temp_v1 | (var_a0 << 8);
-            } else {
-                var_s1 += 1;
-                *var_s0 = to_sjis__Fc((s8) var_a0);
-            }
-            var_a0 = *var_s1;
-            var_s0 += 2;
-        } while (var_a0 != 0);
-    }
-    M2C_FIELD(var_s0, s16 *, 0) = 0;
-    M2C_FIELD(var_s0, s16 *, 2) = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", ascii_to_sjis__FPUcPUs);
 #if 0 /* ida */
 void __fastcall ascii_to_sjis__FPUcPUs(unsigned __int8 *a1, _WORD *a2)
 {
@@ -245,50 +160,19 @@ void __fastcall ascii_to_sjis__FPUcPUs(unsigned __int8 *a1, _WORD *a2)
 }
 #endif
 
-/* ---- 0x80142904  is_sjis__FPUc  MEMCARD.CPP:246-247  seg memcard_1  fsize 0 ---- */
+/* ---- 0x80142904  is_sjis__FPUc  MEMCARD.CPP:246-247  seg memcard  fsize 0 ---- */
 /* int is_sjis(unsigned char *buf)
  *   buf=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", is_sjis__FPUc) */
-#if 0 /* m2c */
-u32 is_sjis__FPUc(u8 *arg0) {
-    return (u8) *arg0 >> 7;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", is_sjis__FPUc);
 
-/* ---- 0x80142910  sjis_to_ascii__FPUsPc  MEMCARD.CPP:251-270  seg memcard_1  fsize 32 ---- */
+/* ---- 0x80142910  sjis_to_ascii__FPUsPc  MEMCARD.CPP:251-270  seg memcard  fsize 32 ---- */
 /* int sjis_to_ascii(unsigned short *sjis, char *asc)
  *   sjis=$s0 asc=$s1
  *   blocks: {1 }20
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", sjis_to_ascii__FPUsPc) */
-#if 0 /* m2c */
-s32 sjis_to_ascii__FPUsPc(u16 *arg0, s8 *arg1) {
-    s8 *var_s1;
-    u16 *var_s0;
-    u16 var_a0;
-
-    var_s0 = arg0;
-    to_ascii_invalid_char = 0;
-    var_a0 = *var_s0;
-    var_s1 = arg1;
-    if (var_a0 & 0x8000) {
-        if (var_a0 != 0) {
-            do {
-                var_s0 += 2;
-                *var_s1 = to_ascii__FUs(var_a0);
-                var_a0 = *var_s0;
-                var_s1 += 1;
-            } while (var_a0 != 0);
-        }
-        *var_s1 = 0;
-    } else {
-        strcpy(var_s1, var_s0);
-    }
-    return to_ascii_invalid_char == 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", sjis_to_ascii__FPUsPc);
 #if 0 /* ida */
 BOOL __fastcall sjis_to_ascii__FPUsPc(unsigned __int16 *a1, _BYTE *a2)
 {
@@ -324,75 +208,12 @@ BOOL __fastcall sjis_to_ascii__FPUsPc(unsigned __int16 *a1, _BYTE *a2)
 }
 #endif
 
-/* ---- 0x80142998  read_card_directory__Fi  MEMCARD.CPP:280-402  seg memcard_1  fsize 152 ---- */
+/* ---- 0x80142998  read_card_directory__Fi  MEMCARD.CPP:280-402  seg memcard  fsize 152 ---- */
 /* void read_card_directory(int card_number)
  *   card_number=$s5 path@sp-0x88 dir=$s1 i=$s3 fh=$s1 r=$s2
  *   blocks: {1 }118
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", read_card_directory__Fi) */
-#if 0 /* m2c */
-void read_card_directory__Fi(s32 arg0) {
-    M2C_UNK sp10;
-    s32 sp60;
-    s32 *temp_s0_2;
-    s32 temp_s0;
-    s32 temp_s2;
-    s32 temp_v0;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s7;
-    void *temp_s0_3;
-    void *temp_s0_4;
-    void *temp_s1;
-    void *var_s1;
-
-    temp_s0 = arg0 * 4;
-    temp_s1 = (arg0 * 0x280) + &card_dir;
-    if (mem_card_event_handler != NULL) {
-        mem_card_event_handler(0, arg0, mem_card_event_handler);
-    }
-    if (*(&card_usable + temp_s0) != 0) {
-        sprintf(&sp10, &D_8011B3CC, arg0);
-        temp_s0_2 = temp_s0 + &card_files;
-        *temp_s0_2 = 0;
-        var_s4 = arg0 * 4;
-        if (firstfile(&sp10, temp_s1) != 0) {
-            var_s1 = temp_s1 + 0x28;
-            do {
-                *temp_s0_2 += 1;
-                var_s1 += 0x28;
-            } while (nextfile(var_s1) != 0);
-            var_s4 = arg0 * 4;
-        }
-        var_s3 = 0;
-        if (*(&card_files + var_s4) > 0) {
-            sp60 = arg0 << 0xD;
-            var_s7 = 0;
-loop_9:
-            sprintf(&sp10, &D_8013E1EC, arg0, ((var_s4 + arg0) << 7) + (var_s7 + &card_dir));
-            temp_v0 = open(&sp10, 1);
-            if ((temp_v0 == -1) || (temp_s0_3 = sp60 + ((var_s3 << 9) + &card_header), temp_s0_4 = temp_s0_3 + 4, temp_s2 = read(temp_v0, temp_s0_3, 0x200), endian_swap__FPUci(temp_s0_4, 0x40), sjis_to_ascii__FPUsPc(temp_s0_4, temp_s0_4), close(temp_v0), (temp_v0 == -1)) || (temp_s2 == -1)) {
-                card_removed__Fi(arg0);
-                PantsDelay__Fv();
-                return;
-            }
-            *(&card_changed + var_s4) = 1;
-            var_s3 += 1;
-            var_s7 += 0x28;
-            if (var_s3 >= *(&card_files + var_s4)) {
-                return;
-            }
-            goto loop_9;
-        }
-    } else if ((M2C_FIELD(&card_status, s32 *, 0) == 3) || (M2C_FIELD(&card_status, s32 *, 4) == 3)) {
-        if (arg0 == 1) {
-            M2C_FIELD(&card_dirty, s32 *, 0) = 1;
-            return;
-        }
-        M2C_FIELD(&card_dirty, s32 *, 4) = 1;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", read_card_directory__Fi);
 #if 0 /* ida */
 int __fastcall read_card_directory__Fi(int a1)
 {
@@ -476,43 +297,12 @@ int __fastcall read_card_directory__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80142BF4  test_card_format__Fi  MEMCARD.CPP:418-490  seg memcard_1  fsize 32 ---- */
+/* ---- 0x80142BF4  test_card_format__Fi  MEMCARD.CPP:418-490  seg memcard  fsize 32 ---- */
 /* int test_card_format(int card_number)
  *   card_number=$s0
  *   blocks: {1 }73
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", test_card_format__Fi) */
-#if 0 /* m2c */
-s32 test_card_format__Fi(s32 arg0) {
-    s32 var_v0;
-
-    _card_load(arg0 * 0x10);
-    _card_wait(arg0);
-    var_v0 = 1;
-    if (TestEvent(card_ev0) != 1) {
-        if (TestEvent(card_ev1) == 1) {
-            goto block_2;
-        }
-        if (TestEvent(card_ev2) != 1) {
-            if (TestEvent(card_ev3) == 1) {
-                var_v0 = 0;
-                if ((read_card_block__Fii(arg0, 0) != 0) && (M2C_FIELD(&block_buf, u8 *, 0) == 0x4D)) {
-                    return M2C_FIELD(&block_buf, u8 *, 1) == 0x43;
-                }
-                /* Duplicate return node #9. Try simplifying control flow for better match */
-                return var_v0;
-            }
-            var_v0 = 0;
-            /* Duplicate return node #9. Try simplifying control flow for better match */
-            return var_v0;
-        }
-block_2:
-        card_removed__Fi(arg0);
-        return 0;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", test_card_format__Fi);
 #if 0 /* ida */
 BOOL __fastcall test_card_format__Fi(int a1)
 {
@@ -546,33 +336,12 @@ BOOL __fastcall test_card_format__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80142CE4  checksum_data__FPci  MEMCARD.CPP:503-507  seg memcard_1  fsize 8 ---- */
+/* ---- 0x80142CE4  checksum_data__FPci  MEMCARD.CPP:503-507  seg memcard  fsize 8 ---- */
 /* int checksum_data(char *buf, int size)
  *   buf=$a0 size=$v1 chk=$a2
  *   blocks: {1 }5
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", checksum_data__FPci) */
-#if 0 /* m2c */
-s32 checksum_data__FPci(s8 *arg0, s32 arg1) {
-    s32 var_a2;
-    s32 var_v1;
-    s8 *var_a0;
-    s8 temp_v0;
-
-    var_a0 = arg0;
-    var_a2 = 0xDEADBEEF;
-    var_v1 = arg1 - 1;
-    if (arg1 != 0) {
-        do {
-            temp_v0 = *var_a0;
-            var_a0 += 1;
-            var_v1 -= 1;
-            var_a2 -= temp_v0;
-        } while (var_v1 != -1);
-    }
-    return var_a2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", checksum_data__FPci);
 #if 0 /* ida */
 int __fastcall checksum_data__FPci(char *a1, int a2)
 {
@@ -596,38 +365,12 @@ int __fastcall checksum_data__FPci(char *a1, int a2)
 }
 #endif
 
-/* ---- 0x80142D20  delete_card_file__Fii  MEMCARD.CPP:520-558  seg memcard_1  fsize 112 ---- */
+/* ---- 0x80142D20  delete_card_file__Fii  MEMCARD.CPP:520-558  seg memcard  fsize 112 ---- */
 /* int delete_card_file(int card_number, int file)
  *   card_number=$s0 file=$s1 path@sp-0x60
  *   blocks: {1 }39
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", delete_card_file__Fii) */
-#if 0 /* m2c */
-s32 delete_card_file__Fii(s32 arg0, s32 arg1) {
-    M2C_UNK sp10;
-    s32 temp_s2;
-
-    temp_s2 = arg0 * 4;
-    if (*(&card_usable + temp_s2) != 0) {
-        if (arg1 < *(&card_files + temp_s2)) {
-            if (mem_card_event_handler != NULL) {
-                mem_card_event_handler(5, arg0);
-            }
-            sprintf(&sp10, &D_8013E1EC, arg0, (arg0 * 0x280) + ((arg1 * 0x28) + &card_dir));
-            if (erase(&sp10) != 0) {
-                *(&card_dirty + temp_s2) = 1;
-                *(&card_changed + temp_s2) = 1;
-                return 1;
-            }
-            goto block_6;
-        }
-        /* Duplicate return node #7. Try simplifying control flow for better match */
-        return 0;
-    }
-block_6:
-    return 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", delete_card_file__Fii);
 #if 0 /* ida */
 int __fastcall delete_card_file__Fii(int a1, int a2)
 {
@@ -652,77 +395,12 @@ int __fastcall delete_card_file__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x80142E18  read_card_file__FiiiPc  MEMCARD.CPP:572-690  seg memcard_1  fsize 640 ---- */
+/* ---- 0x80142E18  read_card_file__FiiiPc  MEMCARD.CPP:572-690  seg memcard  fsize 640 ---- */
 /* int read_card_file(int card_number, int file, int id, char *buf)
  *   card_number=$s0 file=$s1 id=$a2 buf=$s5 okay=$s3 tries=$s4 fd=$s1 r=$v0 size=$s0 checksumerror=$s6 h@sp-0x270 path@sp-0x70
  *   blocks: {1 }119
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", read_card_file__FiiiPc) */
-#if 0 /* m2c */
-s32 read_card_file__FiiiPc(s32 arg0, s32 arg1, s32 arg2, M2C_UNK *arg3) {
-    M2C_UNK sp10;
-    M2C_UNK sp210;
-    s32 temp_s2;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v1;
-    s32 var_s0;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s6;
-    s32 var_v0;
-
-    var_s3 = 0;
-    var_s4 = 4;
-    temp_s2 = arg0 * 4;
-    var_s6 = 0;
-    if (*(&card_usable + temp_s2) != 0) {
-        if (arg1 < *(&card_files + temp_s2)) {
-            var_v0 = 2;
-            if (*(&card_header + 0x108 + ((arg1 << 9) + (arg0 << 0xD))) == arg2) {
-                if (mem_card_event_handler != NULL) {
-                    mem_card_event_handler(3, arg0);
-                }
-                sprintf(&sp210, &D_8013E1EC, arg0, (arg0 * 0x280) + ((arg1 * 0x28) + &card_dir));
-loop_6:
-                temp_v0 = open(&sp210, 1);
-                if (temp_v0 != -1) {
-                    if (read(temp_v0, &sp10, 0x200) != -1) {
-                        var_s0 = sp114;
-                        temp_v1 = (var_s0 + 0x200) & 0x7F;
-                        if (temp_v1 != 0) {
-                            var_s0 = (var_s0 + 0x80) - temp_v1;
-                        }
-                        temp_v0_2 = read(temp_v0, arg3, var_s0);
-                        if ((temp_v0_2 != -1) && (temp_v0_2 == var_s0)) {
-                            var_s3 = 1;
-                            if (checksum_data__FPci(arg3, sp114) != sp110) {
-                                var_s6 = 1;
-                            }
-                        }
-                    }
-                    close(temp_v0);
-                    if ((var_s3 != 0) || (var_s4 -= 1, (var_s4 == -1))) {
-                        var_v0 = -2;
-                        if (var_s6 == 0) {
-                            return var_s3 ^ 1;
-                        }
-                        /* Duplicate return node #21. Try simplifying control flow for better match */
-                        return var_v0;
-                    }
-                    goto loop_6;
-                }
-                return 1;
-            }
-            /* Duplicate return node #21. Try simplifying control flow for better match */
-            return var_v0;
-        }
-        return 2;
-    }
-    var_v0 = 3;
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", read_card_file__FiiiPc);
 #if 0 /* ida */
 int __fastcall read_card_file__FiiiPc(int a1, int a2, int a3, char *a4)
 {
@@ -787,37 +465,12 @@ int __fastcall read_card_file__FiiiPc(int a1, int a2, int a3, char *a4)
 }
 #endif
 
-/* ---- 0x80142FF4  format_card__Fi  MEMCARD.CPP:702-732  seg memcard_1  fsize 112 ---- */
+/* ---- 0x80142FF4  format_card__Fi  MEMCARD.CPP:702-732  seg memcard  fsize 112 ---- */
 /* int format_card(int card_number)
  *   card_number=$s1 path@sp-0x60
  *   blocks: {1 }31
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", format_card__Fi) */
-#if 0 /* m2c */
-s32 format_card__Fi(s32 arg0) {
-    M2C_UNK sp10;
-    s32 temp_s0;
-    s32 var_v0;
-
-    temp_s0 = arg0 * 4;
-    var_v0 = 0;
-    if (*(&card_status + temp_s0) == 0) {
-        *(&card_dirty + temp_s0) = 1;
-        *(&card_changed + temp_s0) = 1;
-        *(&card_files + temp_s0) = 0;
-        if (mem_card_event_handler != NULL) {
-            mem_card_event_handler(4, arg0);
-        }
-        sprintf(&sp10, &D_8011B3D4, arg0);
-        var_v0 = 0;
-        if (format(&sp10) != 0) {
-            var_v0 = test_card_format__Fi(arg0);
-            *(&card_usable + temp_s0) = var_v0;
-        }
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", format_card__Fi);
 #if 0 /* ida */
 BOOL __fastcall format_card__Fi(int a1)
 {
@@ -850,143 +503,12 @@ BOOL __fastcall format_card__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801430B8  write_card_file__FiiPcT2PUcPUsiT4  MEMCARD.CPP:757-890  seg memcard_1  fsize 648 ---- */
+/* ---- 0x801430B8  write_card_file__FiiPcT2PUcPUsiT4  MEMCARD.CPP:757-890  seg memcard  fsize 648 ---- */
 /* int write_card_file(int card_number, int id, char *name, char *title, unsigned char *icon, unsigned short *clut, int size, unsigned char *buf)
  *   card_number=$s2 id=$s5 name=$v0 title=$s3 clut=$s6 size=$s1 buf=$s7 h@sp-0x278 fd=$s0 failed=$s3 e=$s4 path@sp-0x78 Loop=$a0
  *   blocks: {1 {34 }45 }134
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", write_card_file__FiiPcT2PUcPUsiT4) */
-#if 0 /* m2c */
-s32 write_card_file__FiiPcT2PUcPUsiT4(s32 arg0, s32 arg1, M2C_UNK arg2, M2C_UNK arg3, s32 arg4, void *arg5, s32 arg6, s8 *arg7) {
-    s8 sp10;
-    s8 sp11;
-    s8 sp12;
-    s8 sp13;
-    M2C_UNK sp14;
-    s8 sp6F;
-    M2C_UNK sp70;
-    M2C_UNK sp74;
-    M2C_UNK sp78;
-    M2C_UNK sp7C;
-    M2C_UNK sp80;
-    M2C_UNK sp84;
-    M2C_UNK sp88;
-    M2C_UNK sp8C;
-    M2C_UNK sp90;
-    s32 sp110;
-    s32 sp114;
-    s32 sp118;
-    M2C_UNK sp210;
-    M2C_UNK *var_a3;
-    s32 temp_a0;
-    s32 temp_t0;
-    s32 temp_v0_2;
-    s32 temp_v1_2;
-    s32 var_a0;
-    s32 var_a2;
-    s32 var_s1;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_v0;
-    s8 *var_v1;
-    u32 temp_v0;
-    u32 temp_v1;
-
-    var_s4 = -1;
-    var_s1 = arg6;
-    sprintf(&sp210, &D_8013E1EC, arg0, arg2);
-    sp10 = 0x53;
-    sp11 = 0x43;
-    sp12 = 0x11;
-    temp_v0 = var_s1 + 0x200;
-    temp_v1 = temp_v0 >> 0xD;
-    if (temp_v0 & 0x1FFF) {
-        sp13 = temp_v1 + 1;
-    } else {
-        sp13 = (s8) temp_v1;
-    }
-    memset(&sp14, 0, 0x40);
-    ascii_to_sjis__FPUcPUs(arg3, &sp14);
-    endian_swap__FPUci(&sp14, 0x40);
-    sp70 = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 0));
-    sp74 = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 4));
-    sp78 = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 8));
-    sp7C = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 0xC));
-    sp80 = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 0x10));
-    sp84 = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 0x14));
-    sp88 = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 0x18));
-    sp8C = M2C_UNALIGNED32(M2C_FIELD(arg5, M2C_UNK *, 0x1C));
-    var_a2 = arg4;
-    var_a3 = &sp90;
-    temp_t0 = var_a2 + 0x180;
-    if ((var_a2 | (s32) var_a3) & 3) {
-        do {
-            M2C_FIELD(var_a3, M2C_UNK *, 0) = M2C_UNALIGNED32(M2C_FIELD(var_a2, M2C_UNK *, 0));
-            M2C_FIELD(var_a3, M2C_UNK *, 4) = M2C_UNALIGNED32(M2C_FIELD(var_a2, M2C_UNK *, 4));
-            M2C_FIELD(var_a3, M2C_UNK *, 8) = M2C_UNALIGNED32(M2C_FIELD(var_a2, M2C_UNK *, 8));
-            M2C_FIELD(var_a3, M2C_UNK *, 0xC) = M2C_UNALIGNED32(M2C_FIELD(var_a2, M2C_UNK *, 0xC));
-            var_a2 += 0x10;
-            var_a3 += 0x10;
-        } while (var_a2 != temp_t0);
-    } else {
-        do {
-            M2C_FIELD(var_a3, s32 *, 0) = (s32) M2C_FIELD(var_a2, s32 *, 0);
-            M2C_FIELD(var_a3, s32 *, 4) = (s32) M2C_FIELD(var_a2, s32 *, 4);
-            M2C_FIELD(var_a3, s32 *, 8) = (s32) M2C_FIELD(var_a2, s32 *, 8);
-            M2C_FIELD(var_a3, s32 *, 0xC) = (s32) M2C_FIELD(var_a2, s32 *, 0xC);
-            var_a2 += 0x10;
-            var_a3 += 0x10;
-        } while (var_a2 != temp_t0);
-    }
-    sp118 = arg1;
-    sp114 = var_s1;
-    var_a0 = 0x1B;
-    var_v1 = &sp6F;
-    sp110 = checksum_data__FPci(arg7, var_s1, (void *) var_a2, var_a3);
-    do {
-        *var_v1 = 0;
-        var_a0 -= 1;
-        var_v1 -= 1;
-    } while (var_a0 >= 0);
-    var_s3 = 1;
-    if (*(&card_usable + (arg0 * 4)) != 0) {
-        if (mem_card_event_handler != NULL) {
-            mem_card_event_handler(2, arg0);
-        }
-        temp_v0_2 = open(&sp210, (sp13 << 0x10) | 0x200);
-        if ((temp_v0_2 != -1) && (write(temp_v0_2, &sp10, 0x200) == 0x200)) {
-            temp_v1_2 = (var_s1 + 0x200) & 0x7F;
-            if (temp_v1_2 != 0) {
-                var_s1 = (var_s1 + 0x80) - temp_v1_2;
-            }
-            if (write(temp_v0_2, arg7, var_s1) == var_s1) {
-                var_s3 = 0;
-                close(temp_v0_2);
-            }
-        }
-        if (var_s3 != 0) {
-            if (-1 == -1) {
-                var_s4 = _get_errno();
-            }
-            if (temp_v0_2 != -1) {
-                close(temp_v0_2);
-            }
-            var_v0 = 1;
-            if (var_s4 == 0x1C) {
-                return 2;
-            }
-            goto block_27;
-        }
-        var_v0 = 0;
-block_27:
-        temp_a0 = arg0 * 4;
-        *(&card_dirty + temp_a0) = 1;
-        *(&card_changed + temp_a0) = 1;
-        return var_v0;
-    }
-    return 3;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", write_card_file__FiiPcT2PUcPUsiT4);
 #if 0 /* ida */
 int __fastcall write_card_file__FiiPcT2PUcPUsiT4(int a1, int a2, const char *a3, unsigned __int8 *a4, _DWORD *a5, int *a6, int a7, char *a8)
 {
@@ -1145,28 +667,12 @@ int __fastcall write_card_file__FiiPcT2PUcPUsiT4(int a1, int a2, const char *a3,
 }
 #endif
 
-/* ---- 0x8014340C  new_card__Fi  MEMCARD.CPP:900-932  seg memcard_1  fsize 24 ---- */
+/* ---- 0x8014340C  new_card__Fi  MEMCARD.CPP:900-932  seg memcard  fsize 24 ---- */
 /* void new_card(int card_number)
  *   card_number=$s0
  *   blocks: {1 }33
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", new_card__Fi) */
-#if 0 /* m2c */
-void new_card__Fi(s32 arg0) {
-    if (mem_card_event_handler != NULL) {
-        mem_card_event_handler(1, arg0);
-    }
-    _bu_init();
-    _card_clear(arg0 * 0x10);
-    _card_wait(arg0);
-    if (test_hw_event__Fv() == 0) {
-        *(&card_usable + (arg0 * 4)) = test_card_format__Fi(arg0);
-        read_card_directory__Fi(arg0);
-        return;
-    }
-    card_removed__Fi(arg0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/memcard", new_card__Fi);
 #if 0 /* ida */
 int __fastcall new_card__Fi(int a1)
 {
@@ -1182,12 +688,12 @@ int __fastcall new_card__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801434A0  service_card__Fi  MEMCARD.CPP:945-1034  seg memcard_1  fsize 32 ---- */
+/* ---- 0x801434A0  service_card__Fi  MEMCARD.CPP:945-1034  seg memcard  fsize 32 ---- */
 /* void service_card(int card_number)
  *   card_number=$s0 last_status=$a0
  *   blocks: {1 }90
  */
-/* linked from build/src/memcard_1.c.o (segment memcard_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/memcard_1", service_card__Fi) */
+INCLUDE_ASM("asm/nonmatchings/memcard", service_card__Fi);
 #if 0 /* ida */
 int __fastcall service_card__Fi(int a1)
 {

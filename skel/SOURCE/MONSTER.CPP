@@ -8,7 +8,7 @@
  *   i=$a0 temp=$a2
  *   blocks: {1 }8
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", DeleteMonster__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", DeleteMonster__Fi);
 #if 0 /* m2c */
 void DeleteMonster__Fi(s32 arg0) {
     s16 *temp_v0;
@@ -52,7 +52,7 @@ __int16 *__fastcall DeleteMonster__Fi(int a1)
  *   i=$a0
  *   blocks: {1 }3
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_GetDir__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_GetDir__Fi);
 #if 0 /* m2c */
 void M_GetDir__Fi(s32 arg0) {
     s32 temp_v0;
@@ -77,7 +77,7 @@ int __fastcall M_GetDir__Fi(int a1)
  *   i=$a0 len=$a1
  *   blocks: {1 }7
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartDelay__Fii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartDelay__Fii);
 #if 0 /* m2c */
 void M_StartDelay__Fii(s32 arg0, s16 arg1) {
     s32 temp_a0;
@@ -117,7 +117,7 @@ int __fastcall M_StartDelay__Fii(int a1, int a2)
  *   i=$s1 missile_type=$s3 dam=$s4 md=$s2 pmonster=$v0 _mx=$v1 _my=$a1
  *   blocks: {1 }23
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartRAttack__Fiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartRAttack__Fiii);
 #if 0 /* m2c */
 void M_StartRAttack__Fiii(s32 arg0, s16 arg1, s16 arg2) {
     s32 temp_s0;
@@ -179,7 +179,7 @@ int __fastcall M_StartRAttack__Fiii(int a1, __int16 a2, __int16 a3)
  *   i=$s1 missile_type=$s4 dam=$s6 md=$s5 pmonster=$v0 _mx=$s2 _my=$s3
  *   blocks: {1 }26
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartRSpAttack__Fiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartRSpAttack__Fiii);
 #if 0 /* m2c */
 void M_StartRSpAttack__Fiii(s32 arg0, s16 arg1, s16 arg2) {
     s32 temp_s0;
@@ -248,7 +248,7 @@ int __fastcall M_StartRSpAttack__Fiii(int a1, int a2, __int16 a3)
  *   i=$s1 md=$s2 pmonster=$v0 _mx=$v1 _my=$a1
  *   blocks: {1 }21
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartSpAttack__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartSpAttack__Fi);
 #if 0 /* m2c */
 void M_StartSpAttack__Fi(s32 arg0) {
     s32 temp_s0;
@@ -306,7 +306,7 @@ int __fastcall M_StartSpAttack__Fi(int a1)
  *   i=$s1 pmonster=$v0 _mx=$v1 _my=$a1
  *   blocks: {1 }17
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartEat__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartEat__Fi);
 #if 0 /* m2c */
 void M_StartEat__Fi(s32 arg0) {
     s32 temp_s0;
@@ -356,7 +356,7 @@ int __fastcall M_StartEat__Fi(int a1)
  *   i=$s4 d=$s1 pmonster=$s3 _mx=$s2 _my=$s1
  *   blocks: {1 {1 {8 }61 }61 }61
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_GetKnockback__Fii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_GetKnockback__Fii);
 #if 0 /* m2c */
 void M_GetKnockback__Fii(s32 arg0, s32 arg1) {
     s32 temp_s0;
@@ -455,7 +455,7 @@ int __fastcall M_GetKnockback__Fii(int a1, int a2)
  *   i=$s3 pnum=$s0 dam=$s2 pmonster=$v0 _moldx=$s1 _moldy=$s0
  *   blocks: {1 {39 {39 }57 }57 }57
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartHit__Fiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartHit__Fiii);
 #if 0 /* m2c */
 void M_StartHit__Fiii(s32 arg0, s8 arg1, s32 arg2) {
     s32 temp_s1;
@@ -594,7 +594,7 @@ int __fastcall M_StartHit__Fiii(int a1, int a2, int a3)
  *   i=$s5 sendmsg=$s0 Monst=$s6 pmonster=$fp _mx=$s2 _my=$s3 steps=$v1 j=$s4 k=$s3 _moldx=$s2 _moldy=$s1
  *   blocks: {1 {14 {17 {18 {19 }37 }37 }37 }39 }59
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_DiabloDeath__FiUci) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_DiabloDeath__FiUci);
 #if 0 /* m2c */
 void M_DiabloDeath__FiUci(s32 arg0, s32 arg1, s32 arg2) {
     s32 sp18;
@@ -765,7 +765,7 @@ int __fastcall M_DiabloDeath__FiUci(int a1, char a2, __int16 a3)
  *   mid=$s1 i=$s0 dam=$s3 pmonster=$v1 _mx=$s2 _my=$s3
  *   blocks: {1 }51
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M2MStartHit__Fiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M2MStartHit__Fiii);
 #if 0 /* m2c */
 void M2MStartHit__Fiii(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_s0;
@@ -884,7 +884,7 @@ int __fastcall M2MStartHit__Fiii(int a1, int a2, int a3)
  *   i=$s2 pnum=$s4 sendmsg=$s5 md=$v0 Monst=$s1 pmonster=$v1 _mx=$s0 _my=$s3 omp=$s0
  *   blocks: {1 {15 {16 }20 }20 }79
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", MonstStartKill__FiiUc) */
+INCLUDE_ASM("asm/nonmatchings/monster", MonstStartKill__FiiUc);
 #if 0 /* m2c */
 void MonstStartKill__FiiUc(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_s0;
@@ -1058,7 +1058,7 @@ int __fastcall MonstStartKill__FiiUc(int a1, int a2, unsigned __int8 a3)
  *   i=$s1 pnum=$s4 sendmsg=$s2 md=$v0 Monst=$s0 _mx=$s2 _my=$s3
  *   blocks: {1 }40
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", SyncMonstStartKill__FiiUc) */
+INCLUDE_ASM("asm/nonmatchings/monster", SyncMonstStartKill__FiiUc);
 #if 0 /* m2c */
 void SyncMonstStartKill__FiiUc(s32 arg0, s32 arg1, s32 arg2) {
     s8 temp_s2;
@@ -1162,7 +1162,7 @@ int __fastcall SyncMonstStartKill__FiiUc(int a1, int a2, unsigned __int8 a3)
  *   i=$s4 mid=$s2 md=$a2 pmonster=$s7 _mx=$s5 _my=$s6 omp=$s0
  *   blocks: {1 {16 {21 }25 }25 }64
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M2MStartKill__Fii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M2MStartKill__Fii);
 #if 0 /* m2c */
 void M2MStartKill__Fii(s32 arg0, s32 arg1) {
     s32 temp_s0;
@@ -1313,7 +1313,7 @@ int __fastcall M2MStartKill__Fii(int a1, int a2)
  *   i=$s0 pnum=$s3 pmonster=$v1 _mx=$s1 _my=$s2
  *   blocks: {1 }24
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartKill__Fii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartKill__Fii);
 #if 0 /* m2c */
 void M_StartKill__Fii(s32 arg0, s32 arg1) {
     M2C_UNK var_a1;
@@ -1371,7 +1371,7 @@ int __fastcall M_StartKill__Fii(int a1, int a2)
  *   i=$s1 x=$s2 y=$s3 pnum=$s4
  *   blocks: {1 }17
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_SyncStartKill__Fiiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_SyncStartKill__Fiiii);
 #if 0 /* m2c */
 void M_SyncStartKill__Fiiii(s32 arg0, s8 arg1, s8 arg2, M2C_UNK arg3) {
     s32 temp_s0;
@@ -1430,7 +1430,7 @@ int __fastcall M_SyncStartKill__Fiiii(int a1, int a2, int a3, int a4)
  *   i=$s0 md=$s2 backwards=$s1
  *   blocks: {1 }21
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartFadein__FiiUc) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartFadein__FiiUc);
 #if 0 /* m2c */
 void M_StartFadein__FiiUc(s32 arg0, s8 arg1, s32 arg2) {
     s16 temp_v0;
@@ -1506,7 +1506,7 @@ int __fastcall M_StartFadein__FiiUc(int a1, int a2, char a3)
  *   i=$s0 md=$s2 backwards=$s1
  *   blocks: {1 }19
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartFadeout__FiiUc) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartFadeout__FiiUc);
 #if 0 /* m2c */
 void M_StartFadeout__FiiUc(s32 arg0, s8 arg1, s32 arg2) {
     s32 temp_s3;
@@ -1574,7 +1574,7 @@ int __fastcall M_StartFadeout__FiiUc(int a1, int a2, char a3)
  *   i=$a0 Monst=$s0
  *   blocks: {1 }13
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_StartHeal__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartHeal__Fi);
 #if 0 /* m2c */
 void M_StartHeal__Fi(s32 arg0) {
     void *temp_s0;
@@ -1612,7 +1612,7 @@ int __fastcall M_StartHeal__Fi(int a1)
  *   monst=$a3 lx=$a1 ly=$a0 xm=$a2 ym=$t1 x2=$a1 y2=$a0 ox=$v0 oy=$a0 pmonster=$t2
  *   blocks: {1 }72
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_ChangeLightOffset__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_ChangeLightOffset__Fi);
 #if 0 /* m2c */
 void M_ChangeLightOffset__Fi(s32 arg0) {
     s32 temp_a0;
@@ -1695,7 +1695,7 @@ LABEL_6:
  *   i=$a0 Monst=$a0
  *   blocks: {1 }20
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_DoStand__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoStand__Fi);
 #if 0 /* m2c */
 s32 M_DoStand__Fi(s32 arg0) {
     void *temp_a0;
@@ -1716,7 +1716,7 @@ s32 M_DoStand__Fi(s32 arg0) {
  *   i=$s1 rv=$s0
  *   blocks: {1 }48
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_DoWalk__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoWalk__Fi);
 #if 0 /* m2c */
 s32 M_DoWalk__Fi(s32 arg0) {
     s16 temp_v1;
@@ -1830,7 +1830,7 @@ int __fastcall M_DoWalk__Fi(int a1)
  *   i=$s1 rv=$s0
  *   blocks: {1 }28
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_DoWalk2__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoWalk2__Fi);
 #if 0 /* m2c */
 s32 M_DoWalk2__Fi(s32 arg0) {
     s16 temp_v1;
@@ -1932,7 +1932,7 @@ int __fastcall M_DoWalk2__Fi(int a1)
  *   i=$s1 rv=$s0
  *   blocks: {1 }32
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_DoWalk3__Fi) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoWalk3__Fi);
 #if 0 /* m2c */
 s32 M_DoWalk3__Fi(s32 arg0) {
     s16 temp_v1;
@@ -2050,7 +2050,7 @@ int __fastcall M_DoWalk3__Fi(int a1)
  *   i=$s2 mid=$s1 hper=$s6 mind=$s5 maxd=$s7 hit=$s3 dam=$a2 ret@sp-0x30
  *   blocks: {1 }45
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_TryM2MHit__Fiiiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_TryM2MHit__Fiiiii);
 #if 0 /* m2c */
 void M_TryM2MHit__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
     M2C_UNK sp10;
@@ -2152,7 +2152,7 @@ LABEL_16:
  *   i=$s2 pnum=$s3 Hit=$s6 MinDam=$s5 ptrplr=$s1 hit=$s6 hper=$s0 tac=$a0 dam=$s0 dx=$s0 dy=$v0 blk=$a2 blkper=$v1 mdam=$a2 pMonster=$v0 _mx@sp-0x38 _my@sp-0x30 _px=$s7 _py=$fp KnockOk=$s4 newx=$s2 newy=$s0 plr2=$v1
  *   blocks: {1 {33 {35 {54 {54 {55 {58 {104 {107 {108 {111 {122 {126 }131 }131 }144 }144 }144 }144 }144 }144 }144 }144 }144 }144 }144
  */
-/* linked from build/src/monster.c.o (segment monster mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster", M_TryH2HHit__Fiiiii) */
+INCLUDE_ASM("asm/nonmatchings/monster", M_TryH2HHit__Fiiiii);
 #if 0 /* ida */
 int __fastcall M_TryH2HHit__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 {
@@ -2348,53 +2348,12 @@ int __fastcall M_TryH2HHit__Fiiiii(int a1, int a2, int a3, int a4, int a5)
 }
 #endif
 
-/* ---- 0x8014DA3C  M_DoAttack__Fi  MONSTER.CPP:1634-1673  seg monster_1  fsize 56 ---- */
+/* ---- 0x8014DA3C  M_DoAttack__Fi  MONSTER.CPP:1634-1673  seg monster  fsize 56 ---- */
 /* int M_DoAttack(int i)
  *   i=$s1 Monst=$s0 mMinDamage=$s5 mMaxDamage=$s3 mHit=$s4 _menemy=$s2
  *   blocks: {1 }40
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoAttack__Fi) */
-#if 0 /* m2c */
-s32 M_DoAttack__Fi(u8 arg0) {
-    s32 var_v0;
-    u8 temp_s2;
-    u8 temp_s3;
-    u8 temp_s4;
-    u8 temp_s5;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s5 = M2C_FIELD(temp_s0, u8 *, 0x51);
-    temp_s3 = M2C_FIELD(temp_s0, u8 *, 0x52);
-    temp_s4 = M2C_FIELD(temp_s0, u8 *, 0x50);
-    temp_s2 = M2C_FIELD(temp_s0, u8 *, 0x3D);
-    if (M2C_FIELD(temp_s0, s8 *, 0x41) == M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x64), u8 *, 0x26)) {
-        M_TryH2HHit__Fiiiii(temp_s2, temp_s4, temp_s5, (s32) temp_s3);
-        if (M2C_FIELD(temp_s0, u8 *, 0x4C) != 0x18) {
-            PlayEffect__Fii(arg0, 0);
-        }
-    }
-    if (((u32) (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) - 0x3C) < 4U) && (M2C_FIELD(temp_s0, s8 *, 0x41) == 9)) {
-        M_TryH2HHit__Fiiiii(arg0, temp_s2, temp_s4 + 0xA, temp_s5 - 2, temp_s3 - 2);
-        PlayEffect__Fii(arg0, 0);
-    }
-    if (((u32) (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) - 0x4C) < 4U) && (M2C_FIELD(temp_s0, s8 *, 0x41) == 0xD)) {
-        M_TryH2HHit__Fiiiii(arg0, temp_s2, temp_s4 - 0x14, temp_s5 + 4, temp_s3 + 4);
-        PlayEffect__Fii(arg0, 0);
-    }
-    if (M2C_FIELD(temp_s0, u8 *, 0x4C) == 0x18) {
-        if (M2C_FIELD(temp_s0, s8 *, 0x41) == 1) {
-            PlayEffect__Fii(arg0, 0);
-        }
-    }
-    var_v0 = 0;
-    if (M2C_FIELD(temp_s0, s8 *, 0x41) == M2C_FIELD(temp_s0, s8 *, 0x40)) {
-        M_StartStand__Fii(arg0, M2C_FIELD(temp_s0, s8 *, 0x3C));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoAttack__Fi);
 #if 0 /* ida */
 int __fastcall M_DoAttack__Fi(int a1)
 {
@@ -2451,51 +2410,12 @@ LABEL_14:
 }
 #endif
 
-/* ---- 0x8014DBE8  M_DoRAttack__Fi  MONSTER.CPP:1681-1703  seg monster_1  fsize 72 ---- */
+/* ---- 0x8014DBE8  M_DoRAttack__Fi  MONSTER.CPP:1681-1703  seg monster  fsize 72 ---- */
 /* int M_DoRAttack(int i)
  *   i=$s2 multimissiles=$s3 mi=$s1
  *   blocks: {1 }23
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoRAttack__Fi) */
-#if 0 /* m2c */
-s32 M_DoRAttack__Fi(s32 arg0) {
-    s16 temp_v1;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 var_s1;
-    s32 var_s3;
-    s32 var_v0;
-    s32 var_v0_2;
-
-    temp_a0 = arg0 * 0x68;
-    var_v0_2 = arg0 * 2;
-    if (*(&monster + 0x41 + temp_a0) == M2C_FIELD(*(&monster + 0x64 + temp_a0), u8 *, 0x26)) {
-        temp_v1 = *(&monster + 0x18 + temp_a0);
-        if (temp_v1 != -1) {
-            var_s3 = 1;
-            if (temp_v1 == 0x34) {
-                var_s3 = 3;
-            }
-            var_s1 = 0;
-            if (var_s3 != 0) {
-                do {
-                    var_s1 += 1;
-                    AddMissile__Fiiiiiiciii(*(&monster + 0x34 + temp_a0), *(&monster + 0x35 + temp_a0), *(&monster + 0x4A + temp_a0), *(&monster + 0x4B + temp_a0), (s32) *(&monster + 0x3C + temp_a0), (s32) *(&monster + 0x18 + temp_a0), 1, arg0, (s32) *(&monster + 0x1A + temp_a0), 0);
-                } while (var_s1 < var_s3);
-            }
-        }
-        PlayEffect__Fii((u8) arg0, 0);
-        var_v0_2 = arg0 * 2;
-    }
-    temp_a0_2 = (((var_v0_2 + arg0) * 4) + arg0) * 8;
-    var_v0 = 0;
-    if (*(&monster + 0x41 + temp_a0_2) == *(&monster + 0x40 + temp_a0_2)) {
-        M_StartStand__Fii((u8) arg0, *(&monster + 0x3C + temp_a0_2));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoRAttack__Fi);
 #if 0 /* ida */
 int __fastcall M_DoRAttack__Fi(int a1)
 {
@@ -2551,62 +2471,12 @@ int __fastcall M_DoRAttack__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014DD70  M_DoRSpAttack__Fi  MONSTER.CPP:1711-1733  seg monster_1  fsize 48 ---- */
+/* ---- 0x8014DD70  M_DoRSpAttack__Fi  MONSTER.CPP:1711-1733  seg monster  fsize 48 ---- */
 /* int M_DoRSpAttack(int i)
  *   i=$s0
  *   blocks: {1 }23
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoRSpAttack__Fi) */
-#if 0 /* m2c */
-s32 M_DoRSpAttack__Fi(s32 arg0) {
-    s16 temp_v0;
-    s16 var_v0_4;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_t0;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-
-    temp_t0 = arg0 * 0x68;
-    var_v0_2 = arg0 * 2;
-    if (*(&monster + 0x41 + temp_t0) == M2C_FIELD(*(&monster + 0x64 + temp_t0), u8 *, 0x2A)) {
-        var_v0_2 = arg0 * 2;
-        if (*(&monster + 0x3F + temp_t0) == 0) {
-            AddMissile__Fiiiiiiciii(*(&monster + 0x34 + temp_t0), *(&monster + 0x35 + temp_t0), *(&monster + 0x4A + temp_t0), *(&monster + 0x4B + temp_t0), (s32) *(&monster + 0x3C + temp_t0), (s32) *(&monster + 0x18 + temp_t0), 1, arg0, (s32) *(&monster + 0x1C + temp_t0), 0);
-            PlayEffect__Fii((u8) arg0, 3);
-            var_v0_2 = arg0 * 2;
-        }
-    }
-    temp_a0 = (((var_v0_2 + arg0) * 4) + arg0) * 8;
-    var_v0_3 = arg0 * 2;
-    if (*(&monster + 0x4C + temp_a0) == 0x1A) {
-        var_v0_3 = arg0 * 2;
-        if (*(&monster + 0x41 + temp_a0) == 3) {
-            temp_v0 = *(&monster + 0x1A + temp_a0) + 1;
-            *(&monster + 0x1A + temp_a0) = temp_v0;
-            if (temp_v0 == 1) {
-                var_v0_4 = *(&monster + 0x2C + temp_a0) | 4;
-                goto block_9;
-            }
-            var_v0_3 = arg0 * 2;
-            if (*(&monster + 0x1A + temp_a0) == 0xF) {
-                var_v0_4 = *(&monster + 0x2C + temp_a0) & 0xFFFB;
-block_9:
-                *(&monster + 0x2C + temp_a0) = var_v0_4;
-                var_v0_3 = arg0 * 2;
-            }
-        }
-    }
-    temp_a0_2 = (((var_v0_3 + arg0) * 4) + arg0) * 8;
-    var_v0 = 0;
-    if (*(&monster + 0x41 + temp_a0_2) == *(&monster + 0x40 + temp_a0_2)) {
-        M_StartStand__Fii((u8) arg0, *(&monster + 0x3C + temp_a0_2));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoRSpAttack__Fi);
 #if 0 /* ida */
 int __fastcall M_DoRSpAttack__Fi(int a1)
 {
@@ -2677,32 +2547,12 @@ LABEL_11:
 }
 #endif
 
-/* ---- 0x8014DF78  M_DoSAttack__Fi  MONSTER.CPP:1741-1751  seg monster_1  fsize 40 ---- */
+/* ---- 0x8014DF78  M_DoSAttack__Fi  MONSTER.CPP:1741-1751  seg monster  fsize 40 ---- */
 /* int M_DoSAttack(int i)
  *   i=$s1
  *   blocks: {1 }11
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoSAttack__Fi) */
-#if 0 /* m2c */
-s32 M_DoSAttack__Fi(u8 arg0) {
-    s32 temp_s0;
-    s32 var_v0;
-    s8 var_v1;
-
-    temp_s0 = arg0 * 0x68;
-    var_v1 = *(&monster + 0x41 + temp_s0);
-    if (var_v1 == M2C_FIELD(*(&monster + 0x64 + temp_s0), u8 *, 0x2A)) {
-        M_TryH2HHit__Fiiiii(*(&monster + 0x3D + temp_s0), *(&monster + 0x53 + temp_s0), *(&monster + 0x54 + temp_s0), (s32) *(&monster + 0x55 + temp_s0));
-        var_v1 = *(&monster + 0x41 + temp_s0);
-    }
-    var_v0 = 0;
-    if (var_v1 == *(&monster + 0x40 + temp_s0)) {
-        M_StartStand__Fii(arg0, *(&monster + 0x3C + temp_s0));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoSAttack__Fi);
 #if 0 /* ida */
 int __fastcall M_DoSAttack__Fi(int a1)
 {
@@ -2732,39 +2582,12 @@ int __fastcall M_DoSAttack__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014E054  M_DoFadein__Fi  MONSTER.CPP:1759-1768  seg monster_1  fsize 24 ---- */
+/* ---- 0x8014E054  M_DoFadein__Fi  MONSTER.CPP:1759-1768  seg monster  fsize 24 ---- */
 /* int M_DoFadein(int i)
  *   i=$a0
  *   blocks: {1 }10
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoFadein__Fi) */
-#if 0 /* m2c */
-s32 M_DoFadein__Fi(s16 arg0) {
-    s32 temp_a1;
-    s32 temp_s0;
-    s32 var_s0;
-    s32 var_v0;
-
-    temp_a1 = arg0 * 0x68;
-    if (*(&monster + 0x2C + temp_a1) & 2) {
-        var_s0 = arg0 * 2;
-        if (*(&monster + 0x41 + temp_a1) != 1) {
-            return 0;
-        }
-        goto block_5;
-    }
-    var_v0 = 0;
-    if (*(&monster + 0x41 + temp_a1) == *(&monster + 0x40 + temp_a1)) {
-        var_s0 = arg0 * 2;
-block_5:
-        temp_s0 = (((var_s0 + arg0) * 4) + arg0) * 8;
-        M_StartStand__Fii((u8) *(&monster + 0x3C + temp_s0));
-        *(&monster + 0x2C + temp_s0) = *(&monster + 0x2C + temp_s0) & 0xFFFD;
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoFadein__Fi);
 #if 0 /* ida */
 int __fastcall M_DoFadein__Fi(int a1)
 {
@@ -2794,45 +2617,12 @@ int __fastcall M_DoFadein__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014E134  M_DoFadeout__Fi  MONSTER.CPP:1775-1793  seg monster_1  fsize 24 ---- */
+/* ---- 0x8014E134  M_DoFadeout__Fi  MONSTER.CPP:1775-1793  seg monster  fsize 24 ---- */
 /* int M_DoFadeout(int i)
  *   i=$a0 mtype=$v0
  *   blocks: {1 }19
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoFadeout__Fi) */
-#if 0 /* m2c */
-s32 M_DoFadeout__Fi(s16 arg0) {
-    s16 var_v0_3;
-    s32 temp_a1;
-    s32 temp_v1;
-    s32 var_v0;
-    s32 var_v0_2;
-
-    temp_a1 = arg0 * 0x68;
-    if (*(&monster + 0x2C + temp_a1) & 2) {
-        var_v0_2 = arg0 * 2;
-        if (*(&monster + 0x41 + temp_a1) != 1) {
-            return 0;
-        }
-        goto block_5;
-    }
-    var_v0 = 0;
-    if (*(&monster + 0x41 + temp_a1) == *(&monster + 0x40 + temp_a1)) {
-        var_v0_2 = arg0 * 2;
-block_5:
-        temp_v1 = (((var_v0_2 + arg0) * 4) + arg0) * 8;
-        if ((u32) (M2C_FIELD(*(&monster + 0x60 + temp_v1), u8 *, 0x12) - 0x48) < 4U) {
-            var_v0_3 = *(&monster + 0x2C + temp_v1) & 0xFFFD;
-        } else {
-            var_v0_3 = (*(&monster + 0x2C + temp_v1) & 0xFFFD) | 1;
-        }
-        *(&monster + 0x2C + temp_v1) = var_v0_3;
-        M_StartStand__Fii((u8) *(&monster + 0x3C + (arg0 * 0x68)));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoFadeout__Fi);
 #if 0 /* ida */
 int __fastcall M_DoFadeout__Fi(int a1)
 {
@@ -2867,161 +2657,19 @@ int __fastcall M_DoFadeout__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014E260  M_DoHeal__Fi  MONSTER.CPP:1800-1820  seg monster_1  fsize 0 ---- */
+/* ---- 0x8014E260  M_DoHeal__Fi  MONSTER.CPP:1800-1820  seg monster  fsize 0 ---- */
 /* int M_DoHeal(int i)
  *   i=$a0 Monst=$a0
  *   blocks: {1 }21
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoHeal__Fi) */
-#if 0 /* m2c */
-s32 M_DoHeal__Fi(s16 arg0) {
-    s32 temp_a1;
-    s32 temp_v0;
-    s32 temp_v1;
-    void *temp_a0;
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoHeal__Fi);
 
-    temp_v0 = arg0 * 0x68;
-    temp_a0 = temp_v0 + &monster;
-    if (!(*(&monster + 0x2C + temp_v0) & 8) && (M2C_FIELD(temp_a0, s8 *, 0x41) == 1)) {
-        M2C_FIELD(temp_a0, u16 *, 0x2C) = (u16) ((M2C_FIELD(temp_a0, u16 *, 0x2C) & 0xFFFD) | 4);
-        temp_a1 = M2C_FIELD(temp_a0, s32 *, 0x14);
-        temp_v1 = M2C_FIELD(temp_a0, s32 *, 0x10) + M2C_FIELD(temp_a0, s16 *, 0x18);
-        if (temp_v1 < temp_a1) {
-            M2C_FIELD(temp_a0, s32 *, 0x10) = temp_v1;
-        } else {
-            M2C_FIELD(temp_a0, s32 *, 0x10) = temp_a1;
-            M2C_FIELD(temp_a0, s8 *, 0x33) = 7;
-            M2C_FIELD(temp_a0, u16 *, 0x2C) = (u16) (M2C_FIELD(temp_a0, u16 *, 0x2C) & 0xFFFB);
-        }
-    }
-    return 0;
-}
-#endif
-
-/* ---- 0x8014E2FC  M_DoTalk__Fi  MONSTER.CPP:1827-1934  seg monster_1  fsize 64 ---- */
+/* ---- 0x8014E2FC  M_DoTalk__Fi  MONSTER.CPP:1827-1934  seg monster  fsize 64 ---- */
 /* int M_DoTalk(int i)
  *   i=$s2 tren=$s0 Monst=$s0 _mx=$s4 _my=$s5 mName=$s3
  *   blocks: {1 }108
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoTalk__Fi) */
-#if 0 /* m2c */
-s32 M_DoTalk__Fi(s16 arg0) {
-    s32 temp_s0_2;
-    s32 temp_s0_3;
-    s32 temp_s0_5;
-    s32 temp_s1;
-    s32 temp_s1_2;
-    s32 temp_s3;
-    s32 temp_v0;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s8 temp_s0_4;
-    s8 temp_s4;
-    s8 temp_s5;
-    void *temp_s0;
-
-    temp_s1 = arg0 * 0x68;
-    temp_s0 = temp_s1 + &monster;
-    temp_s4 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s5 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    temp_s3 = M2C_FIELD(temp_s0, s32 *, 0x5C);
-    M_StartStand__Fii((u8) *(&monster + 0x3C + temp_s1));
-    M2C_FIELD(temp_s0, s8 *, 0x49) = 7;
-    if (!(effect_is_playing__Fi(*(&alltext + 8 + (*(&monster + temp_s1) * 0xC))) & 0xFF)) {
-        InitQTextMsg__Fi(*(&monster + temp_s1));
-        if (temp_s3 == M2C_FIELD(&UniqMonst, u16 *, 2)) {
-            var_v0 = arg0 * 2;
-            if (*(&monster + temp_s1) == 0x90) {
-                M2C_FIELD(&quests, s8 *, 0x2A) = 2;
-                M2C_FIELD(&quests, s8 *, 0x37) = 2;
-                M2C_FIELD(&quests, s8 *, 0x39) = 1;
-                var_v0 = arg0 * 2;
-                if (deltaload == 0) {
-                    NetSendCmdQuest__FUcUc(1, 2);
-                    var_v0 = arg0 * 2;
-                }
-            }
-            temp_s0_2 = (((var_v0 + arg0) * 4) + arg0) * 8;
-            if ((*(&monster + temp_s0_2) == 0x91) && !(*(&monster + 0x2C + temp_s0_2) & 0x40)) {
-                M2C_FIELD(&quests, s8 *, 0x37) = 3;
-                if (deltaload == 0) {
-                    NetSendCmdQuest__FUcUc(1, 2);
-                }
-                SpawnItem__FiiiUc(arg0, temp_s4 + 1, temp_s5 + 1, 1);
-                *(&monster + 0x2C + temp_s0_2) = *(&monster + 0x2C + temp_s0_2) | 0x40;
-            }
-        }
-        if (temp_s3 == M2C_FIELD(&UniqMonst, u16 *, 0x32)) {
-            temp_s0_3 = arg0 * 0x68;
-            if ((*(&monster + temp_s0_3) == 0x94) && !(*(&monster + 0x2C + temp_s0_3) & 0x40)) {
-                M2C_FIELD(&quests, s8 *, 0x3E) = 2;
-                M2C_FIELD(&quests, s8 *, 0x4D) = 1;
-                M2C_FIELD(&quests, s8 *, 0x4C) = 2;
-                if (deltaload == 0) {
-                    NetSendCmdQuest__FUcUc(1, 3);
-                    CreateTypeItem__FiiUciiUcUc(temp_s4 + 1, temp_s5 + 1, 0, 0, 0x18, 1, 0);
-                }
-                *(&monster + 0x2C + temp_s0_3) = *(&monster + 0x2C + temp_s0_3) | 0x40;
-            }
-        }
-        if (temp_s3 == M2C_FIELD(&UniqMonst, u16 *, 0x4A)) {
-            temp_s1_2 = arg0 * 0x68;
-            if ((*(&monster + temp_s1_2) == 0x14) && !(*(&monster + 0x2C + temp_s1_2) & 0x40)) {
-                ObjChangeMap__Fiiii(setpc_x, setpc_y, setpc_x + ((s32) setpc_w >> 1) + 2, (setpc_y + ((s32) setpc_h >> 1)) - 2);
-                temp_s0_4 = TransVal;
-                TransVal = 9;
-                DRLG_MRectTrans__Fiiii(setpc_x, setpc_y, setpc_x + ((s32) setpc_w >> 1) + 4, setpc_y + ((s32) setpc_h >> 1));
-                TransVal = temp_s0_4;
-                M2C_FIELD(&quests, s8 *, 0x9B) = 2;
-                if (M2C_FIELD(&quests, u8 *, 0x8E) == 1) {
-                    M2C_FIELD(&quests, u8 *, 0x8E) = 2U;
-                }
-                *(&monster + 0x2C + temp_s1_2) = *(&monster + 0x2C + temp_s1_2) | 0x40;
-                NetSendCmdQuest__FUcUc(1, 7);
-            }
-        }
-        if (temp_s3 == M2C_FIELD(&UniqMonst, u16 *, 0xAA)) {
-            var_v0_2 = arg0 * 2;
-            if (*(&monster + (arg0 * 0x68)) == 0x51) {
-                M2C_FIELD(&quests, s8 *, 0x52) = 2;
-                M2C_FIELD(&quests, s8 *, 0x61) = 1;
-                var_v0_2 = arg0 * 2;
-                if (deltaload == 0) {
-                    NetSendCmdQuest__FUcUc(1, 4);
-                    var_v0_2 = arg0 * 2;
-                }
-            }
-            temp_s0_5 = (((var_v0_2 + arg0) * 4) + arg0) * 8;
-            if ((*(&monster + temp_s0_5) == 0x53) && !(*(&monster + 0x2C + temp_s0_5) & 0x40)) {
-                SpawnUnique__Fiii(6, temp_s4 + 1, temp_s5 + 1);
-                *(&monster + 0x2C + temp_s0_5) = *(&monster + 0x2C + temp_s0_5) | 0x40;
-            }
-        }
-        if (temp_s3 == M2C_FIELD(&UniqMonst, u16 *, 0xC2)) {
-            M2C_FIELD(&quests, s8 *, 0xEB) = 2;
-            if (deltaload == 0) {
-                NetSendCmdQuest__FUcUc(1, 8);
-            }
-        }
-        if (temp_s3 == M2C_FIELD(&UniqMonst, u16 *, 0x62)) {
-            if (gbMaxPlayers != 1) {
-                M2C_FIELD(&quests, s8 *, 0x13B) = 6;
-                var_v0_3 = arg0 * 2;
-                if (deltaload == 0) {
-                    NetSendCmdQuest__FUcUc(1, 0xF);
-                    var_v0_3 = arg0 * 2;
-                }
-                temp_v0 = (((var_v0_3 + arg0) * 4) + arg0) * 8;
-                *(&monster + 0x49 + temp_v0) = 1;
-                *(&monster + 0x4E + temp_v0) = 0xFF;
-                *(&monster + temp_v0) = 0;
-            }
-        }
-    }
-    return 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoTalk__Fi);
 #if 0 /* ida */
 int __fastcall M_DoTalk__Fi(int a1)
 {
@@ -3176,81 +2824,12 @@ int __fastcall M_DoTalk__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014E8A0  M_Teleport__Fi  MONSTER.CPP:1944-1990  seg monster_1  fsize 80 ---- */
+/* ---- 0x8014E8A0  M_Teleport__Fi  MONSTER.CPP:1944-1990  seg monster  fsize 80 ---- */
 /* void M_Teleport(int i)
  *   i=$fp Monst=$s5 done=$s6 mulx@sp-0x40 muly=$v1 x=$s3 y=$s7 a=$s2 b=$s0 px=$s0 py@sp-0x38
  *   blocks: {1 }45
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_Teleport__Fi) */
-#if 0 /* m2c */
-void M_Teleport__Fi(s32 arg0) {
-    s32 sp10;
-    s32 sp18;
-    s32 sp20;
-    s32 var_s0;
-    s32 var_s2;
-    s32 var_s6;
-    s32 var_v1;
-    s8 temp_a1;
-    u8 temp_a3;
-    u8 temp_s0;
-    u8 var_s1;
-    u8 var_s3;
-    u8 var_s4;
-    u8 var_s7;
-    void *temp_s5;
-
-    var_s6 = 0;
-    var_s7 = 0;
-    temp_s5 = (arg0 * 0x68) + &monster;
-    var_s3 = 0;
-    if (M2C_FIELD(temp_s5, s8 *, 0x33) != 0xF) {
-        temp_s0 = M2C_FIELD(temp_s5, u8 *, 0x4A);
-        temp_a3 = M2C_FIELD(temp_s5, u8 *, 0x4B);
-        sp18 = (s32) temp_a3;
-        sp10 = (ENG_random__Fl(2, temp_a3) * 2) - 1;
-        var_v1 = (ENG_random__Fl(2) * 2) - 1;
-        var_s2 = -1;
-        var_s4 = temp_s0 - sp10;
-loop_2:
-        var_s0 = -1;
-        if (!(var_s6 & 0xFF)) {
-            var_s1 = sp18 - var_v1;
-loop_4:
-            if ((var_s2 != 0) || (var_s0 != 0)) {
-                var_s7 = var_s1;
-                var_s3 = var_s4;
-                if ((var_s1 < 0x62U) && (var_s3 < 0x62U) && (var_s3 != M2C_FIELD(temp_s5, s8 *, 0x34)) && (var_s7 != M2C_FIELD(temp_s5, s8 *, 0x35))) {
-                    sp20 = var_v1;
-                    if (PosOkMonst__Fiii(arg0, var_s3, var_s7) & 0xFF) {
-                        var_s6 = 1;
-                    }
-                }
-            }
-            var_s0 += 1;
-            var_s1 += var_v1;
-            if ((var_s0 <= 0) && !(var_s6 & 0xFF)) {
-                goto loop_4;
-            }
-        }
-        var_s2 += 1;
-        var_s4 += sp10;
-        if ((var_s2 < 2) && !(var_s6 & 0xFF)) {
-            goto loop_2;
-        }
-        if (var_s6 & 0xFF) {
-            M_ClearSquares__Fi(arg0);
-            temp_a1 = M2C_FIELD(temp_s5, s8 *, 0x34);
-            *(&dung_map + ((M2C_FIELD(temp_s5, s8 *, 0x35) * 8) + (temp_a1 * 0x380))) = 0;
-            *(&dung_map + ((var_s7 * 8) + (var_s3 * 0x380))) = arg0 + 1;
-            M2C_FIELD(temp_s5, u8 *, 0x38) = var_s3;
-            M2C_FIELD(temp_s5, u8 *, 0x39) = var_s7;
-            M2C_FIELD(temp_s5, u8 *, 0x3C) = M_GetDir__Fi(arg0, temp_a1);
-            M_CheckEFlag__Fi(arg0);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_Teleport__Fi);
 #if 0 /* ida */
 int __fastcall M_Teleport__Fi(int a1)
 {
@@ -3329,26 +2908,12 @@ int __fastcall M_Teleport__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014EAB4  M_DoGotHit__Fi  MONSTER.CPP:1996-2004  seg monster_1  fsize 24 ---- */
+/* ---- 0x8014EAB4  M_DoGotHit__Fi  MONSTER.CPP:1996-2004  seg monster  fsize 24 ---- */
 /* int M_DoGotHit(int i)
  *   i=$a0
  *   blocks: {1 }9
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoGotHit__Fi) */
-#if 0 /* m2c */
-s32 M_DoGotHit__Fi(s16 arg0) {
-    s32 temp_a1;
-    s32 var_v0;
-
-    temp_a1 = arg0 * 0x68;
-    var_v0 = 0;
-    if (*(&monster + 0x41 + temp_a1) == *(&monster + 0x40 + temp_a1)) {
-        M_StartStand__Fii((u8) *(&monster + 0x3C + temp_a1));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoGotHit__Fi);
 #if 0 /* ida */
 int __fastcall M_DoGotHit__Fi(int a1)
 {
@@ -3364,33 +2929,12 @@ int __fastcall M_DoGotHit__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014EB1C  DoEnding__Fi  MONSTER.CPP:2016-2061  seg monster_1  fsize 24 ---- */
+/* ---- 0x8014EB1C  DoEnding__Fi  MONSTER.CPP:2016-2061  seg monster  fsize 24 ---- */
 /* void DoEnding(int p)
  *   p=$a0
  *   blocks: {1 }46
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", DoEnding__Fi) */
-#if 0 /* m2c */
-void DoEnding__Fi(s32 arg0) {
-    M2C_UNK *var_a0;
-    s8 temp_v1;
-
-    myplr = arg0;
-    user_start = 0;
-    temp_v1 = *(&plr + 0xF6 + (arg0 * 0x19E8));
-    if (temp_v1 == 0) {
-        var_a0 = &D_8011A2DC;
-    } else {
-        var_a0 = &D_8011A2FC;
-        if (temp_v1 == 2) {
-            var_a0 = &D_8011A2EC;
-        }
-    }
-    play_movie(var_a0);
-    music_stop__Fv();
-    user_start = 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", DoEnding__Fi);
 #if 0 /* ida */
 int __fastcall DoEnding__Fi(int a1)
 {
@@ -3417,60 +2961,12 @@ int __fastcall DoEnding__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014EBC4  PrepDoEnding__Fi  MONSTER.CPP:2067-2090  seg monster_1  fsize 24 ---- */
+/* ---- 0x8014EBC4  PrepDoEnding__Fi  MONSTER.CPP:2067-2090  seg monster  fsize 24 ---- */
 /* void PrepDoEnding(int pnum)
  *   pnum=$a0 i=$a2
  *   blocks: {1 {11 }22 }24
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", PrepDoEnding__Fi) */
-#if 0 /* m2c */
-void PrepDoEnding__Fi(s16 arg0) {
-    M2C_UNK var_a0_2;
-    s32 *var_a1;
-    s32 *var_v1_2;
-    s32 temp_a1;
-    s32 var_a0;
-    s32 var_a2;
-    u32 temp_a0;
-    u32 var_v1;
-
-    gbDoEnding = arg0 + 1;
-    gbRunGame = 0;
-    deathflag = 0;
-    temp_a1 = myplr * 0x19E8;
-    var_v1 = *(&plr + 0x19E4 + temp_a1);
-    temp_a0 = gnDifficulty + 1;
-    if (var_v1 < temp_a0) {
-        var_v1 = temp_a0;
-    }
-    *(&plr + 0x19E4 + temp_a1) = var_v1;
-    var_a2 = 0;
-    var_v1_2 = &plr + 0x130;
-    var_a1 = var_v1_2 - 0x14;
-    var_a0 = 0;
-    do {
-        *(&plr + 0xD3 + var_a0) = 1;
-        *(&plr + var_a0) = 0xB;
-        if ((u8) gbMaxPlayers >= 2U) {
-            if (((s32) *var_a1 >> 6) == 0) {
-                *var_a1 = 0x40;
-            }
-            if (((s32) *var_v1_2 >> 6) == 0) {
-                *var_v1_2 = 0x40;
-            }
-        }
-        var_v1_2 += 0x19E8;
-        var_a1 += 0x19E8;
-        var_a2 += 1;
-        var_a0 += 0x19E8;
-    } while (var_a2 < 2);
-    var_a0_2 = 0x18;
-    if (FePlayerNo != 0) {
-        var_a0_2 = 0x30;
-    }
-    HappyMan__Fi(var_a0_2, var_a1, var_a2, 0x40);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", PrepDoEnding__Fi);
 #if 0 /* ida */
 int __fastcall PrepDoEnding__Fi(char a1)
 {
@@ -3518,71 +3014,12 @@ int __fastcall PrepDoEnding__Fi(char a1)
 }
 #endif
 
-/* ---- 0x8014ED0C  M_DoDeath__Fi  MONSTER.CPP:2097-2140  seg monster_1  fsize 40 ---- */
+/* ---- 0x8014ED0C  M_DoDeath__Fi  MONSTER.CPP:2097-2140  seg monster  fsize 40 ---- */
 /* int M_DoDeath(int i)
  *   i=$s1 pMonster=$v1 _mx=$s2 _my=$s3
  *   blocks: {1 {1 {12 }22 }41 }44
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoDeath__Fi) */
-#if 0 /* m2c */
-s32 M_DoDeath__Fi(s16 arg0) {
-    s32 temp_a0_2;
-    s32 temp_a1_2;
-    s32 temp_s0;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_v0;
-    s32 var_v0_2;
-    s8 temp_s2;
-    s8 temp_s3;
-    u8 temp_a0;
-    void *temp_a1;
-    void *temp_v1;
-
-    temp_s0 = arg0 * 0x68;
-    temp_v1 = temp_s0 + &monster;
-    temp_s2 = M2C_FIELD(temp_v1, s8 *, 0x34);
-    M2C_FIELD(temp_v1, s16 *, 0x18) = (s16) (*(&monster + 0x18 + temp_s0) + 1);
-    temp_a1 = *(&monster + 0x60 + temp_s0);
-    temp_s3 = M2C_FIELD(temp_v1, s8 *, 0x35);
-    temp_a0 = M2C_FIELD(temp_a1, u8 *, 0x12);
-    if (temp_a0 == 0x6E) {
-        temp_a1_2 = ViewX;
-        DiabloDieFlag = 1;
-        temp_v0 = temp_s2 - temp_a1_2;
-        if (temp_v0 >= 0) {
-            var_v0 = temp_a1_2 + (temp_v0 > 0);
-        } else {
-            var_v0 = temp_a1_2 - 1;
-        }
-        ViewX = var_v0;
-        temp_v0_2 = temp_s3 - ViewY;
-        if (temp_v0_2 >= 0) {
-            var_v0_2 = ViewY + (temp_v0_2 > 0);
-        } else {
-            var_v0_2 = ViewY - 1;
-        }
-        ViewY = var_v0_2;
-        temp_a0_2 = arg0 * 0x68;
-        if (*(&monster + 0x18 + temp_a0_2) == 0x8C) {
-            gbMaxPlayers = 1;
-            PrepDoEnding__Fi(*(&monster + 0x26 + temp_a0_2), temp_a1_2);
-            return 0;
-        }
-        /* Duplicate return node #13. Try simplifying control flow for better match */
-        return 0;
-    }
-    if (*(&monster + 0x41 + temp_s0) == *(&monster + 0x40 + temp_s0)) {
-        if (temp_a0 != 0x6D) {
-            AddDead__Fiici(temp_s2, temp_s3, M2C_FIELD(temp_a1, s8 *, 0x18), *(&monster + 0x3C + temp_s0));
-        }
-        *(&dung_map + ((temp_s3 * 8) + (temp_s2 * 0x380))) = 0;
-        *(&monster + 0x5B + temp_s0) = 1;
-        M_UpdateLeader__Fi(arg0);
-    }
-    return 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoDeath__Fi);
 #if 0 /* ida */
 int __fastcall M_DoDeath__Fi(int a1)
 {
@@ -3641,32 +3078,12 @@ int __fastcall M_DoDeath__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014EED0  M_DoSpStand__Fi  MONSTER.CPP:2147-2157  seg monster_1  fsize 32 ---- */
+/* ---- 0x8014EED0  M_DoSpStand__Fi  MONSTER.CPP:2147-2157  seg monster  fsize 32 ---- */
 /* int M_DoSpStand(int i)
  *   i=$s1
  *   blocks: {1 }11
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoSpStand__Fi) */
-#if 0 /* m2c */
-s32 M_DoSpStand__Fi(u8 arg0) {
-    s32 temp_s0;
-    s32 var_v0;
-    s8 var_v1;
-
-    temp_s0 = arg0 * 0x68;
-    var_v1 = *(&monster + 0x41 + temp_s0);
-    if (var_v1 == M2C_FIELD(*(&monster + 0x64 + temp_s0), u8 *, 0x2A)) {
-        PlayEffect__Fii(3U);
-        var_v1 = *(&monster + 0x41 + temp_s0);
-    }
-    var_v0 = 0;
-    if (var_v1 == *(&monster + 0x40 + temp_s0)) {
-        M_StartStand__Fii(arg0, *(&monster + 0x3C + temp_s0));
-        var_v0 = 1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoSpStand__Fi);
 #if 0 /* ida */
 int __fastcall M_DoSpStand__Fi(int a1)
 {
@@ -3691,46 +3108,12 @@ int __fastcall M_DoSpStand__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014EF7C  M_DoDelay__Fi  MONSTER.CPP:2162-2185  seg monster_1  fsize 32 ---- */
+/* ---- 0x8014EF7C  M_DoDelay__Fi  MONSTER.CPP:2162-2185  seg monster  fsize 32 ---- */
 /* int M_DoDelay(int i)
  *   i=$s0 tmp=$s0
  *   blocks: {1 {17 {17 }24 }24 }24
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoDelay__Fi) */
-#if 0 /* m2c */
-s32 M_DoDelay__Fi(u8 arg0) {
-    s16 temp_v0;
-    s32 temp_s1;
-    s32 temp_s1_2;
-    s32 var_v0;
-    s32 var_v0_2;
-    s8 temp_s0;
-
-    M_GetDir__Fi();
-    temp_s1 = arg0 * 0x68;
-    *(&monster + 0x5A + temp_s1) = 0;
-    M_Enemy__Fi(arg0);
-    var_v0_2 = arg0 * 2;
-    if (*(&monster + 0x4C + temp_s1) == 0x1C) {
-        var_v0_2 = arg0 * 2;
-        if ((u16) *(&monster + 0x1A + temp_s1) >= 9U) {
-            *(&monster + 0x1A + temp_s1) = 8;
-            var_v0_2 = arg0 * 2;
-        }
-    }
-    temp_s1_2 = (((var_v0_2 + arg0) * 4) + arg0) * 8;
-    temp_v0 = *(&monster + 0x1A + temp_s1_2) - 1;
-    *(&monster + 0x1A + temp_s1_2) = temp_v0;
-    var_v0 = 0;
-    if (temp_v0 == -1) {
-        temp_s0 = *(&monster + 0x41 + temp_s1_2);
-        M_StartStand__Fii(arg0, *(&monster + 0x3C + temp_s1_2));
-        var_v0 = 1;
-        *(&monster + 0x41 + temp_s1_2) = temp_s0;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoDelay__Fi);
 #if 0 /* ida */
 int __fastcall M_DoDelay__Fi(int a1)
 {
@@ -3774,96 +3157,19 @@ int __fastcall M_DoDelay__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014F090  M_DoStone__Fi  MONSTER.CPP:2192-2199  seg monster_1  fsize 0 ---- */
+/* ---- 0x8014F090  M_DoStone__Fi  MONSTER.CPP:2192-2199  seg monster  fsize 0 ---- */
 /* int M_DoStone(int i)
  *   i=$a0
  *   blocks: {1 }8
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DoStone__Fi) */
-#if 0 /* m2c */
-s32 M_DoStone__Fi(s16 arg0) {
-    s32 temp_a1;
+INCLUDE_ASM("asm/nonmatchings/monster", M_DoStone__Fi);
 
-    temp_a1 = arg0 * 0x68;
-    if (*(&monster + 0x10 + temp_a1) == 0) {
-        *(&dung_map + ((*(&monster + 0x35 + temp_a1) * 8) + (*(&monster + 0x34 + temp_a1) * 0x380))) = 0;
-        *(&monster + 0x5B + temp_a1) = 1;
-    }
-    return 0;
-}
-#endif
-
-/* ---- 0x8014F10C  M_WalkDir__Fii  MONSTER.CPP:2206-2265  seg monster_1  fsize 32 ---- */
+/* ---- 0x8014F10C  M_WalkDir__Fii  MONSTER.CPP:2206-2265  seg monster  fsize 32 ---- */
 /* void M_WalkDir(int i, int md)
  *   i=$a0 md=$a1 mwi=$v1
  *   blocks: {1 }60
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_WalkDir__Fii) */
-#if 0 /* m2c */
-void M_WalkDir__Fii(s32 arg0, u8 arg1) {
-    s16 var_a3;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v1;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_a2_2;
-
-    temp_v1 = M2C_FIELD(*(&monster + 0x60 + (arg0 * 0x68)), s8 *, 6) - 1;
-    switch (arg1) {
-    case 4:
-        var_a1 = 0;
-        var_a3 = -1;
-        var_a2 = *(&MWVel + 4 + (temp_v1 * 0xC));
-block_10:
-        var_a2_2 = -var_a2;
-block_11:
-        M_StartWalk__Fiiiiii(var_a1, var_a2_2, var_a3);
-        break;
-    case 5:
-        var_a3 = 0;
-        temp_v0 = temp_v1 * 0xC;
-        var_a1 = *(&MWVel + 4 + temp_v0);
-        var_a2 = *(&MWVel + temp_v0);
-        goto block_10;
-    case 6:
-        var_a2_2 = 0;
-        var_a3 = 1;
-        var_a1 = *(&MWVel + 8 + (temp_v1 * 0xC));
-        goto block_11;
-    case 7:
-        temp_v0_2 = temp_v1 * 0xC;
-        var_a3 = 1;
-        var_a1 = *(&MWVel + 4 + temp_v0_2);
-        var_a2_2 = *(&MWVel + temp_v0_2);
-        goto block_11;
-    case 0:
-        var_a1 = 0;
-        var_a3 = 1;
-        var_a2_2 = *(&MWVel + 4 + (temp_v1 * 0xC));
-        goto block_11;
-    case 1:
-        var_a3 = 0;
-        temp_v0_3 = temp_v1 * 0xC;
-        var_a2_2 = *(&MWVel + temp_v0_3);
-        var_a1 = -*(&MWVel + 4 + temp_v0_3);
-        goto block_11;
-    case 2:
-        var_a2_2 = 0;
-        var_a3 = -1;
-        var_a1 = -*(&MWVel + 8 + (temp_v1 * 0xC));
-        goto block_11;
-    case 3:
-        temp_v0_4 = temp_v1 * 0xC;
-        var_a3 = -1;
-        var_a2 = *(&MWVel + temp_v0_4);
-        var_a1 = -*(&MWVel + 4 + temp_v0_4);
-        goto block_10;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_WalkDir__Fii);
 #if 0 /* ida */
 int __fastcall M_WalkDir__Fii(int a1, unsigned int a2)
 {
@@ -3876,111 +3182,12 @@ int __fastcall M_WalkDir__Fii(int a1, unsigned int a2)
 }
 #endif
 
-/* ---- 0x8014F33C  GroupUnity__Fi  MONSTER.CPP:2274-2350  seg monster_1  fsize 72 ---- */
+/* ---- 0x8014F33C  GroupUnity__Fi  MONSTER.CPP:2274-2350  seg monster  fsize 72 ---- */
 /* void GroupUnity(int i)
  *   i=$s4 leader=$s3 tmp=$v1 m=$a1 pMonster=$s7 _mx=$s6 _my=$s5
  *   blocks: {1 }77
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", GroupUnity__Fi) */
-#if 0 /* m2c */
-void GroupUnity__Fi(s16 arg0) {
-    s16 *var_a2;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_a2;
-    s32 temp_s0;
-    s32 temp_s1;
-    s32 var_a1;
-    s32 var_s2;
-    s32 var_v0_2;
-    s8 temp_s5;
-    s8 temp_s6;
-    s8 var_v0;
-    u16 temp_v1;
-    u16 temp_v1_2;
-    u8 temp_v0_2;
-    u8 var_s3;
-    void *temp_v0;
-
-    temp_s1 = arg0 * 0x68;
-    temp_v0 = temp_s1 + &monster;
-    temp_s6 = M2C_FIELD(temp_v0, s8 *, 0x34);
-    temp_s5 = M2C_FIELD(temp_v0, s8 *, 0x35);
-    var_s3 = 0;
-    if (*(&monster + 0x57 + temp_s1) != 0) {
-        var_s3 = *(&monster + 0x56 + temp_s1);
-        temp_s0 = var_s3 * 0x68;
-        if (!(LineClearF__FPFii_Uciiii(CheckNoSolid__Fii, temp_s6, temp_s5, *(&monster + 0x36 + temp_s0), (s32) *(&monster + 0x37 + temp_s0)) & 0xFF)) {
-            if (*(&monster + 0x57 + temp_s1) == 1) {
-                M2C_FIELD((temp_s0 + &monster), s8 *, 0x58) = (s8) (*(&monster + 0x58 + temp_s0) - 1);
-                var_v0 = 2;
-                goto block_9;
-            }
-            goto block_10;
-        }
-        var_v0_2 = arg0 * 2;
-        if (*(&monster + 0x57 + temp_s1) == 2) {
-            var_s2 = 0;
-            if (abs(temp_s6 - *(&monster + 0x36 + temp_s0)) < 4) {
-                var_s2 = abs(temp_s5 - *(&monster + 0x37 + temp_s0)) < 4;
-            }
-            if (var_s2 != 0) {
-                M2C_FIELD((temp_s0 + &monster), s8 *, 0x58) = (s8) (*(&monster + 0x58 + temp_s0) + 1);
-                var_v0 = 1;
-block_9:
-                *(&monster + 0x57 + temp_s1) = var_v0;
-            }
-            goto block_10;
-        }
-    } else {
-block_10:
-        var_v0_2 = arg0 * 2;
-    }
-    temp_a2 = (((var_v0_2 + arg0) * 4) + arg0) * 8;
-    if (*(&monster + 0x57 + temp_a2) == 1) {
-        temp_a0 = var_s3 * 0x68;
-        if ((u8) *(&monster + 0x4E + temp_a0) < (u8) *(&monster + 0x4E + temp_a2)) {
-            *(&monster + 0x43 + temp_a0) = temp_s6;
-            *(&monster + 0x44 + temp_a0) = temp_s5;
-            *(&monster + 0x4E + temp_a0) = *(&monster + 0x4E + temp_a2) - 1;
-        }
-        if (*(&monster + 0x4C + temp_a0) == 0xC) {
-            temp_v1 = *(&monster + 0x2C + temp_a0);
-            if (temp_v1 & 4) {
-                *(&monster + 0x2C + temp_a0) = temp_v1 & 0xFFFB;
-                *(&monster + 0x33 + temp_a0) = 7;
-            }
-        }
-    } else {
-        temp_v0_2 = *(&monster + 0x4F + temp_a2);
-        if ((temp_v0_2 != 0) && (*(&UniqMonst + 0xE + ((temp_v0_2 - 1) * 0x18)) & 2)) {
-            var_a1 = 0;
-            if (nummonsters > 0) {
-                var_a2 = &monstactive;
-                do {
-                    temp_a0_2 = *var_a2 * 0x68;
-                    if ((*(&monster + 0x57 + temp_a0_2) == 1) && (*(&monster + 0x56 + temp_a0_2) == arg0)) {
-                        if ((u8) *(&monster + 0x4E + temp_a0_2) < (u8) *(&monster + 0x4E + temp_a2)) {
-                            *(&monster + 0x43 + temp_a0_2) = temp_s6;
-                            *(&monster + 0x44 + temp_a0_2) = temp_s5;
-                            *(&monster + 0x4E + temp_a0_2) = *(&monster + 0x4E + temp_a2) - 1;
-                        }
-                        if (*(&monster + 0x4C + temp_a0_2) == 0xC) {
-                            temp_v1_2 = *(&monster + 0x2C + temp_a0_2);
-                            if (temp_v1_2 & 4) {
-                                *(&monster + 0x2C + temp_a0_2) = temp_v1_2 & 0xFFFB;
-                                *(&monster + 0x33 + temp_a0_2) = 7;
-                            }
-                        }
-                    }
-                    var_a1 += 1;
-                    var_a2 += 2;
-                } while (var_a1 < nummonsters);
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", GroupUnity__Fi);
 #if 0 /* ida */
 int __fastcall GroupUnity__Fi(int a1)
 {
@@ -4115,79 +3322,12 @@ LABEL_12:
 }
 #endif
 
-/* ---- 0x8014F750  M_CallWalk__Fii  MONSTER.CPP:2359-2377  seg monster_1  fsize 40 ---- */
+/* ---- 0x8014F750  M_CallWalk__Fii  MONSTER.CPP:2359-2377  seg monster  fsize 40 ---- */
 /* unsigned char M_CallWalk(int i, int md)
  *   i=$s2 md=$s1 mdtemp=$s3 ok=$s0
  *   blocks: {1 }19
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_CallWalk__Fii) */
-#if 0 /* m2c */
-s32 M_CallWalk__Fii(s32 arg0, u8 arg1) {
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_v0;
-    u8 temp_s3;
-    u8 var_s1;
-
-    var_s1 = arg1;
-    temp_s0_2 = DirOK__Fii();
-    temp_s3 = var_s1;
-    temp_v0 = temp_s0_2 & 0xFF;
-    if (ENG_random__Fl(2) != 0) {
-        if (temp_v0 == 0) {
-            var_s1 = (var_s1 - 1) & 7;
-            if (!(DirOK__Fii(arg0, var_s1) & 0xFF)) {
-                var_s1 = (temp_s3 + 1) & 7;
-                goto block_7;
-            }
-        }
-        goto block_8;
-    }
-    if ((temp_v0 == 0) && (var_s1 = (var_s1 + 1) & 7, ((DirOK__Fii(arg0, var_s1) & 0xFF) == 0))) {
-        var_s1 = (temp_s3 - 1) & 7;
-block_7:
-        var_s0 = 0;
-        if (DirOK__Fii(arg0, var_s1) & 0xFF) {
-            goto block_8;
-        }
-    } else {
-block_8:
-        var_s0 = 1;
-    }
-    temp_v0_2 = var_s0 & 0xFF;
-    if (ENG_random__Fl(2) != 0) {
-        if (temp_v0_2 == 0) {
-            var_s1 = (((temp_s3 + 1) & 7) + 1) & 7;
-            if (!(DirOK__Fii(arg0, var_s1) & 0xFF)) {
-                var_v0 = ((temp_s3 - 1) & 7) - 1;
-                goto block_16;
-            }
-        }
-        goto block_17;
-    }
-    if ((temp_v0_2 == 0) && (var_s1 = (((temp_s3 - 1) & 7) - 1) & 7, ((DirOK__Fii(arg0, var_s1) & 0xFF) == 0))) {
-        var_v0 = ((temp_s3 + 1) & 7) + 1;
-block_16:
-        var_s1 = var_v0 & 7;
-        var_s0_2 = 0;
-        if (DirOK__Fii(arg0, var_s1) & 0xFF) {
-            goto block_17;
-        }
-    } else {
-block_17:
-        var_s0_2 = 1;
-    }
-    temp_s0 = var_s0_2 & 0xFF;
-    if (temp_s0 != 0) {
-        M_WalkDir__Fii(arg0, var_s1);
-    }
-    return temp_s0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_CallWalk__Fii);
 #if 0 /* ida */
 int __fastcall M_CallWalk__Fii(int a1, int a2)
 {
@@ -4260,53 +3400,12 @@ LABEL_19:
 }
 #endif
 
-/* ---- 0x8014F8F0  M_CallWalk2__Fii  MONSTER.CPP:2410-2423  seg monster_1  fsize 40 ---- */
+/* ---- 0x8014F8F0  M_CallWalk2__Fii  MONSTER.CPP:2410-2423  seg monster  fsize 40 ---- */
 /* unsigned char M_CallWalk2(int i, int md)
  *   i=$s2 md=$s1 mdtemp=$s4 ok=$s0
  *   blocks: {1 }14
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_CallWalk2__Fii) */
-#if 0 /* m2c */
-s32 M_CallWalk2__Fii(s32 arg0, u8 arg1) {
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_v0;
-    s32 var_s0;
-    u8 temp_s4;
-    u8 var_s1;
-
-    var_s1 = arg1;
-    temp_s0_2 = DirOK__Fii();
-    temp_s4 = var_s1;
-    temp_v0 = temp_s0_2 & 0xFF;
-    if (ENG_random__Fl(2) != 0) {
-        if (temp_v0 == 0) {
-            var_s1 = (var_s1 - 1) & 7;
-            if (!(DirOK__Fii(arg0, var_s1) & 0xFF)) {
-                var_s1 = (temp_s4 + 1) & 7;
-                goto block_7;
-            }
-        }
-        goto block_8;
-    }
-    if ((temp_v0 == 0) && (var_s1 = (var_s1 + 1) & 7, ((DirOK__Fii(arg0, var_s1) & 0xFF) == 0))) {
-        var_s1 = (temp_s4 - 1) & 7;
-block_7:
-        var_s0 = 0;
-        if (DirOK__Fii(arg0, var_s1) & 0xFF) {
-            goto block_8;
-        }
-    } else {
-block_8:
-        var_s0 = 1;
-    }
-    temp_s0 = var_s0 & 0xFF;
-    if (temp_s0 != 0) {
-        M_WalkDir__Fii(arg0, var_s1);
-    }
-    return temp_s0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_CallWalk2__Fii);
 #if 0 /* ida */
 int __fastcall M_CallWalk2__Fii(int a1, int a2)
 {
@@ -4350,23 +3449,12 @@ LABEL_10:
 }
 #endif
 
-/* ---- 0x8014F9E8  M_DumbWalk__Fii  MONSTER.CPP:2431-2438  seg monster_1  fsize 32 ---- */
+/* ---- 0x8014F9E8  M_DumbWalk__Fii  MONSTER.CPP:2431-2438  seg monster  fsize 32 ---- */
 /* unsigned char M_DumbWalk(int i, int md)
  *   i=$s0 md=$s2
  *   blocks: {1 }8
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_DumbWalk__Fii) */
-#if 0 /* m2c */
-s32 M_DumbWalk__Fii(s32 arg0, u8 arg1) {
-    s32 temp_s1;
-
-    temp_s1 = DirOK__Fii() & 0xFF;
-    if (temp_s1 != 0) {
-        M_WalkDir__Fii(arg0, arg1);
-    }
-    return temp_s1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_DumbWalk__Fii);
 #if 0 /* ida */
 int __fastcall M_DumbWalk__Fii(int a1, unsigned int a2)
 {
@@ -4379,62 +3467,12 @@ int __fastcall M_DumbWalk__Fii(int a1, unsigned int a2)
 }
 #endif
 
-/* ---- 0x8014FA3C  M_RoundWalk__FiiRi  MONSTER.CPP:2445-2477  seg monster_1  fsize 40 ---- */
+/* ---- 0x8014FA3C  M_RoundWalk__FiiRi  MONSTER.CPP:2445-2477  seg monster  fsize 40 ---- */
 /* unsigned char M_RoundWalk(int i, int md, int *dir)
  *   i=$s2 md=$s0 dir=$s4 mdtemp=$s3 ok=$s1
  *   blocks: {1 }33
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_RoundWalk__FiiRi) */
-#if 0 /* m2c */
-s32 M_RoundWalk__FiiRi(s32 arg0, u8 arg1, s32 *arg2) {
-    s32 var_s1;
-    s32 var_v0;
-    s32 var_v0_2;
-    u8 temp_s3;
-    u8 var_s0;
-
-    if (*arg2 != 0) {
-        var_v0 = ((arg1 - 1) & 7) - 1;
-    } else {
-        var_v0 = ((arg1 + 1) & 7) + 1;
-    }
-    var_s0 = var_v0 & 7;
-    temp_s3 = var_s0;
-    var_s1 = DirOK__Fii(arg0, temp_s3);
-    if (!(var_s1 & 0xFF)) {
-        var_s1 = 0;
-        if (*arg2 != 0) {
-            var_s0 = (temp_s3 + 1) & 7;
-            if (!(DirOK__Fii(arg0, var_s0) & 0xFF)) {
-                var_s0 = (var_s0 + 1) & 7;
-                goto block_9;
-            }
-            goto block_10;
-        }
-        var_s0 = (temp_s3 - 1) & 7;
-        if (!(DirOK__Fii(arg0, var_s0) & 0xFF)) {
-            var_s0 = (var_s0 - 1) & 7;
-block_9:
-            var_v0_2 = 0 & 0xFF;
-            if (DirOK__Fii(arg0, var_s0) & 0xFF) {
-                goto block_10;
-            }
-        } else {
-block_10:
-            var_s1 = 1;
-            var_v0_2 = 1 & 0xFF;
-        }
-        if (var_v0_2 != 0) {
-            goto block_12;
-        }
-        *arg2 = *arg2 == 0;
-        return M_CallWalk__Fii(arg0, (temp_s3 + 4) & 7) & 0xFF;
-    }
-block_12:
-    M_WalkDir__Fii(arg0, var_s0);
-    return var_s1 & 0xFF;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_RoundWalk__FiiRi);
 #if 0 /* ida */
 int __fastcall M_RoundWalk__FiiRi(int a1, char a2, _DWORD *a3)
 {
@@ -4494,62 +3532,12 @@ LABEL_13:
 }
 #endif
 
-/* ---- 0x8014FB88  MAI_Zombie__Fi  MONSTER.CPP:2489-2523  seg monster_1  fsize 48 ---- */
+/* ---- 0x8014FB88  MAI_Zombie__Fi  MONSTER.CPP:2489-2523  seg monster  fsize 48 ---- */
 /* void MAI_Zombie(int i)
  *   i=$s2 Monst=$s0 mx=$s1 my=$s3 md=$s4 v=$s6
  *   blocks: {1 }35
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Zombie__Fi) */
-#if 0 /* m2c */
-void MAI_Zombie__Fi(s32 arg0) {
-    s32 temp_s1_2;
-    s32 temp_s3_2;
-    s32 temp_s6;
-    s32 var_s1;
-    s32 var_s5;
-    s8 temp_s1;
-    s8 temp_s3;
-    s8 var_s4;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_s3 = M2C_FIELD(temp_s0, s8 *, 0x35);
-        temp_s1 = M2C_FIELD(temp_s0, s8 *, 0x34);
-        if (*(&dung_map + 6 + ((temp_s3 * 8) + (temp_s1 * 0x380))) & 4) {
-            var_s5 = 0;
-            var_s4 = M2C_FIELD(temp_s0, s8 *, 0x3C);
-            temp_s1_2 = temp_s1 - M2C_FIELD(temp_s0, u8 *, 0x4A);
-            temp_s3_2 = temp_s3 - M2C_FIELD(temp_s0, u8 *, 0x4B);
-            temp_s6 = ENG_random__Fl(0x64);
-            if (abs(temp_s1_2) < 2) {
-                var_s5 = abs(temp_s3_2) < 2;
-            }
-            if (var_s5 != 0) {
-                if (temp_s6 < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 0xA)) {
-                    M_StartAttack__Fi(arg0);
-                }
-            } else if (temp_s6 < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 0xA)) {
-                var_s1 = 0;
-                if (abs(temp_s1_2) < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 4)) {
-                    var_s1 = abs(temp_s3_2) < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 4);
-                }
-                if (var_s1 != 0) {
-                    M_CallWalk__Fii(arg0, M_GetDir__Fi(arg0));
-                } else {
-                    if (ENG_random__Fl(0x64) < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 0x14)) {
-                        var_s4 = ENG_random__Fl(8);
-                    }
-                    M_DumbWalk__Fii(arg0, (u8) var_s4);
-                }
-            }
-            if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-                M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Zombie__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Zombie__Fi(int a1)
 {
@@ -4621,60 +3609,12 @@ int __fastcall MAI_Zombie__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8014FD88  MAI_SkelSd__Fi  MONSTER.CPP:2532-2558  seg monster_1  fsize 40 ---- */
+/* ---- 0x8014FD88  MAI_SkelSd__Fi  MONSTER.CPP:2532-2558  seg monster  fsize 40 ---- */
 /* void MAI_SkelSd(int i)
  *   i=$s2 Monst=$s1 mx=$s0 my=$s3 md=$s0
  *   blocks: {1 }27
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_SkelSd__Fi) */
-#if 0 /* m2c */
-void MAI_SkelSd__Fi(s32 arg0) {
-    s32 temp_s0;
-    s32 temp_s3;
-    s32 var_a1;
-    s32 var_s4;
-    s32 var_v0;
-    s8 temp_a0;
-    s8 temp_a1;
-    u8 temp_v0;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-        var_s4 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0) {
-            temp_a0 = M2C_FIELD(temp_s1, s8 *, 0x34);
-            temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x35);
-            temp_s0 = temp_a0 - M2C_FIELD(temp_s1, u8 *, 0x4A);
-            temp_s3 = temp_a1 - M2C_FIELD(temp_s1, u8 *, 0x4B);
-            temp_v0 = GetDirection__Fiiii(temp_a0, temp_a1, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-            M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_v0;
-            if (abs(temp_s0) < 2) {
-                var_s4 = abs(temp_s3) < 2;
-            }
-            if (var_s4 != 0) {
-                if ((M2C_FIELD(temp_s1, s16 *, 0x18) == 0xD) || (ENG_random__Fl(0x64) < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x14))) {
-                    M_StartAttack__Fi(arg0);
-                } else {
-                    var_v0 = ENG_random__Fl(0xA);
-                    var_a1 = (M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) - 0xA;
-                    goto block_12;
-                }
-            } else if ((M2C_FIELD(temp_s1, s16 *, 0x18) != 0xD) && (ENG_random__Fl(0x64) < (0x23 - (M2C_FIELD(temp_s1, u8 *, 0x4D) * 4)))) {
-                var_v0 = ENG_random__Fl(0xA);
-                var_a1 = (M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) - 0xF;
-block_12:
-                M_StartDelay__Fii(arg0, var_v0 - var_a1);
-            } else {
-                M_CallWalk__Fii(arg0, temp_v0);
-            }
-            if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-                M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_SkelSd__Fi);
 #if 0 /* ida */
 int __fastcall MAI_SkelSd__Fi(int a1)
 {
@@ -4744,148 +3684,12 @@ LABEL_15:
 }
 #endif
 
-/* ---- 0x8014FF38  MAI_Snake__Fi  MONSTER.CPP:2570-2633  seg monster_1  fsize 88 ---- */
+/* ---- 0x8014FF38  MAI_Snake__Fi  MONSTER.CPP:2570-2633  seg monster  fsize 88 ---- */
 /* void MAI_Snake(int i)
  *   i=$s2 Monst=$s0 fx=$s3 fy=$s5 mx=$s4 my=$s7 md=$s6 pnum=$fp pattern@sp-0x30 tmp=$v1
  *   blocks: {1 }64
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Snake__Fi) */
-#if 0 /* m2c */
-void MAI_Snake__Fi(s32 arg0) {
-    s32 temp_a0_2;
-    s32 temp_a0_3;
-    s32 temp_s4;
-    s32 temp_s7;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v1;
-    s32 temp_v1_2;
-    s32 var_a1;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v1;
-    s32 var_v1_2;
-    s8 temp_a0;
-    s8 temp_a1;
-    u8 temp_fp;
-    u8 temp_s3;
-    u8 temp_s5;
-    u8 temp_v0;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_fp = M2C_FIELD(temp_s0, u8 *, 0x3D);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        var_s1 = 0;
-        if (M2C_FIELD(temp_s0, u8 *, 0x4E) != 0) {
-            temp_a0 = M2C_FIELD(temp_s0, s8 *, 0x34);
-            temp_a1 = M2C_FIELD(temp_s0, s8 *, 0x35);
-            temp_s3 = M2C_FIELD(temp_s0, u8 *, 0x4A);
-            temp_s5 = M2C_FIELD(temp_s0, u8 *, 0x4B);
-            temp_s4 = temp_a0 - temp_s3;
-            temp_s7 = temp_a1 - temp_s5;
-            temp_v0 = GetDirection__Fiiii(temp_a0, temp_a1, M2C_FIELD(temp_s0, s8 *, 0x43), M2C_FIELD(temp_s0, s8 *, 0x44));
-            M2C_FIELD(temp_s0, u8 *, 0x3C) = temp_v0;
-            if (abs(temp_s4) < 2) {
-                var_s1 = abs(temp_s7) < 2;
-            }
-            if (var_s1 != 0) {
-                if (((u32) (M2C_FIELD(temp_s0, u16 *, 0x18) - 0xD) < 2U) || (ENG_random__Fl(0x64) < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 0x14))) {
-                    M_StartAttack__Fi(arg0);
-                } else {
-                    var_v0 = ENG_random__Fl(0xA);
-                    var_a1 = M2C_FIELD(temp_s0, u8 *, 0x4D) - 0xA;
-                    goto block_20;
-                }
-            } else {
-                var_s1_2 = 0;
-                if ((abs(temp_s4) < 3) && (abs(temp_s7) < 3)) {
-                    var_s1_2 = (LineClearF1__FPFiii_Uciiiii(PosOkMonst__Fiii, arg0, M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), (s32) temp_s3, (s32) temp_s5) & 0xFF) != 0;
-                }
-                if (var_s1_2 != 0) {
-                    if ((s16) M2C_FIELD(temp_s0, u16 *, 0x18) != 0xE) {
-                        if (AddMissile__Fiiiiiiciii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), temp_s3, temp_s5, (s32) temp_v0, 0x14, (s32) (s8) temp_fp, arg0, 0, 0) != -1) {
-                            PlayEffect__Fii((u8) arg0, 0);
-                            *(&dung_map + ((M2C_FIELD(temp_s0, s8 *, 0x35) * 8) + (M2C_FIELD(temp_s0, s8 *, 0x34) * 0x380))) = ~arg0;
-                            M2C_FIELD(temp_s0, s8 *, 0x33) = 0xE;
-                        }
-                    } else {
-                        goto block_17;
-                    }
-                } else {
-block_17:
-                    if (((s16) M2C_FIELD(temp_s0, u16 *, 0x18) != 0xD) && (ENG_random__Fl(0x64) < (0x23 - (M2C_FIELD(temp_s0, u8 *, 0x4D) * 2)))) {
-                        var_v0 = ENG_random__Fl(0xA);
-                        var_a1 = M2C_FIELD(temp_s0, u8 *, 0x4D) - 0xF;
-block_20:
-                        M_StartDelay__Fii(arg0, var_v0 - var_a1);
-                    } else {
-                        temp_v0_2 = temp_v0 + M2C_FIELD((sp + M2C_FIELD(temp_s0, s32 *, 4)), s8 *, 0x28);
-                        var_v1 = temp_v0_2;
-                        if (temp_v0_2 < 0) {
-                            var_v1 = temp_v0_2 + 8;
-                        } else if (var_v1 >= 8) {
-                            var_v1 -= 8;
-                        }
-                        temp_v0_3 = M2C_FIELD(temp_s0, s32 *, 4) + 1;
-                        M2C_FIELD(temp_s0, s32 *, 4) = temp_v0_3;
-                        if (temp_v0_3 >= 6) {
-                            M2C_FIELD(temp_s0, s32 *, 4) = 0;
-                        }
-                        temp_v0_4 = var_v1 - M2C_FIELD(temp_s0, s32 *, 8);
-                        var_v1_2 = temp_v0_4;
-                        if (temp_v0_4 < 0) {
-                            var_v1_2 = temp_v0_4 + 8;
-                        } else if (var_v1_2 >= 8) {
-                            var_v1_2 -= 8;
-                        }
-                        if (var_v1_2 > 0) {
-                            if (var_v1_2 < 4) {
-                                temp_a0_2 = M2C_FIELD(temp_s0, s32 *, 8);
-                                temp_v1 = temp_a0_2 + 1;
-                                if (temp_v1 < 0) {
-                                    var_v0_2 = temp_a0_2 + 9;
-                                } else {
-                                    var_v0_2 = temp_v1;
-                                    if (temp_v1 >= 8) {
-                                        var_v0_2 = temp_a0_2 - 7;
-                                    }
-                                }
-                                goto block_43;
-                            }
-                            if (var_v1_2 == 4) {
-                                M2C_FIELD(temp_s0, s32 *, 8) = var_v1;
-                            } else {
-                                temp_a0_3 = M2C_FIELD(temp_s0, s32 *, 8);
-                                temp_v1_2 = temp_a0_3 - 1;
-                                if (temp_v1_2 < 0) {
-                                    var_v0_2 = temp_a0_3 + 7;
-                                } else {
-                                    var_v0_2 = temp_v1_2;
-                                    if (temp_v1_2 >= 8) {
-                                        var_v0_2 = temp_a0_3 - 9;
-                                    }
-                                }
-block_43:
-                                M2C_FIELD(temp_s0, s32 *, 8) = var_v0_2;
-                            }
-                        }
-                        if (!(M_DumbWalk__Fii(arg0, (u8) M2C_FIELD(temp_s0, s32 *, 8)) & 0xFF)) {
-                            M_CallWalk2__Fii(arg0, (u8) (s8) M2C_FIELD(temp_s0, u8 *, 0x3C));
-                        }
-                    }
-                }
-            }
-            if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-                M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Snake__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Snake__Fi(int a1)
 {
@@ -5067,96 +3871,12 @@ LABEL_45:
 }
 #endif
 
-/* ---- 0x80150334  MAI_Bat__Fi  MONSTER.CPP:2641-2714  seg monster_1  fsize 88 ---- */
+/* ---- 0x80150334  MAI_Bat__Fi  MONSTER.CPP:2641-2714  seg monster  fsize 88 ---- */
 /* void MAI_Bat(int i)
  *   i=$s2 Monst=$s0 mx=$s7 my=$fp md=$s3 v=$s4 pnum@sp-0x30 fx=$s1 fy=$s5
  *   blocks: {1 }74
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Bat__Fi) */
-#if 0 /* m2c */
-void MAI_Bat__Fi(s32 arg0) {
-    s32 sp28;
-    s16 temp_a0_3;
-    s32 temp_fp;
-    s32 temp_s4;
-    s32 temp_s7;
-    s32 var_a1;
-    s32 var_s1;
-    s32 var_s6;
-    s8 temp_a0;
-    s8 temp_a1;
-    u16 temp_v1;
-    u8 temp_a0_2;
-    u8 temp_s1;
-    u8 temp_s5;
-    u8 temp_v0;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    sp28 = (s32) M2C_FIELD(temp_s0, u8 *, 0x3D);
-    if ((M2C_FIELD(temp_s0, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s0, u8 *, 0x4E) != 0)) {
-        temp_a0 = M2C_FIELD(temp_s0, s8 *, 0x34);
-        temp_a1 = M2C_FIELD(temp_s0, s8 *, 0x35);
-        temp_s7 = temp_a0 - M2C_FIELD(temp_s0, u8 *, 0x4A);
-        temp_fp = temp_a1 - M2C_FIELD(temp_s0, u8 *, 0x4B);
-        temp_v0 = GetDirection__Fiiii(temp_a0, temp_a1, M2C_FIELD(temp_s0, s8 *, 0x43), M2C_FIELD(temp_s0, s8 *, 0x44));
-        M2C_FIELD(temp_s0, u8 *, 0x3C) = temp_v0;
-        temp_s4 = ENG_random__Fl(0x64);
-        if (M2C_FIELD(temp_s0, u8 *, 0x49) == 2) {
-            if (M2C_FIELD(temp_s0, s32 *, 4) == 0) {
-                M_CallWalk__Fii(arg0, (temp_v0 + 4) & 7);
-                M2C_FIELD(temp_s0, s32 *, 4) = (s32) (M2C_FIELD(temp_s0, s32 *, 4) + 1);
-                return;
-            }
-            if (ENG_random__Fl(2) != 0) {
-                var_a1 = temp_v0 - 1;
-            } else {
-                var_a1 = temp_v0 + 1;
-            }
-            M_CallWalk__Fii(arg0, var_a1 & 7);
-            M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-            return;
-        }
-        temp_s1 = M2C_FIELD(temp_s0, u8 *, 0x4A);
-        temp_s5 = M2C_FIELD(temp_s0, u8 *, 0x4B);
-        var_s6 = 0;
-        if ((M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) == 0x28) && ((abs(temp_s7) >= 5) || (abs(temp_fp) >= 5)) && (temp_s4 < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 4) + 0x21)) && (LineClearF1__FPFiii_Uciiiii(PosOkMonst__Fiii, arg0, M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), (s32) temp_s1, (s32) temp_s5) & 0xFF)) {
-            var_s6 = 1;
-        }
-        if (var_s6 != 0) {
-            if (AddMissile__Fiiiiiiciii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), temp_s1, temp_s5, (s32) temp_v0, 0x14, (s32) (s8) sp28, arg0, 0, 0) != -1) {
-                *(&dung_map + ((M2C_FIELD(temp_s0, s8 *, 0x35) * 8) + (M2C_FIELD(temp_s0, s8 *, 0x34) * 0x380))) = ~arg0;
-                M2C_FIELD(temp_s0, s8 *, 0x33) = 0xE;
-                M2C_FIELD(temp_s0, s8 *, 0x5A) = 5;
-            }
-        } else {
-            var_s1 = 0;
-            if (abs(temp_s7) < 2) {
-                var_s1 = abs(temp_fp) < 2;
-            }
-            if (var_s1 != 0) {
-                if (temp_s4 < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 4) + 8)) {
-                    M_StartAttack__Fi(arg0);
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 2U;
-                    M2C_FIELD(temp_s0, s32 *, 4) = 0;
-                    if (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) == 0x29) {
-                        temp_a0_2 = M2C_FIELD(temp_s0, u8 *, 0x4A);
-                        AddMissile__Fiiiiiiciii((s8) temp_a0_2, (s8) M2C_FIELD(temp_s0, u8 *, 0x4B), temp_a0_2 + 1, 0U, -1, 8, 1, arg0, ENG_random__Fl(0xA) + 1, 0);
-                    }
-                }
-            } else {
-                temp_a0_3 = M2C_FIELD(temp_s0, s16 *, 0x1A);
-                if (((temp_a0_3 >= 0x15) && (temp_s4 < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 0xD))) || (((temp_v1 = M2C_FIELD(temp_s0, u16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || ((s16) temp_v1 == 3)) && (temp_a0_3 == 0) && (temp_s4 < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 0x3F)))) {
-                    M_CallWalk__Fii(arg0, temp_v0);
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Bat__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Bat__Fi(int a1)
 {
@@ -5283,61 +4003,12 @@ int __fastcall MAI_Bat__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801506E8  MAI_SkelBow__Fi  MONSTER.CPP:2723-2759  seg monster_1  fsize 48 ---- */
+/* ---- 0x801506E8  MAI_SkelBow__Fi  MONSTER.CPP:2723-2759  seg monster  fsize 48 ---- */
 /* void MAI_SkelBow(int i)
  *   i=$s3 mx=$s0 my=$s2 md=$s5 fx=$s2 fy=$s4 walking=$s6 v=$s0 Monst=$s1
  *   blocks: {1 }37
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_SkelBow__Fi) */
-#if 0 /* m2c */
-void MAI_SkelBow__Fi(s32 arg0) {
-    s16 temp_a0;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s2;
-    s32 var_s0;
-    s32 var_s4;
-    s32 var_v0;
-    s8 temp_a1;
-    u16 temp_v1;
-    u8 temp_s2_2;
-    u8 temp_s4;
-    u8 temp_v0;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-        var_s4 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0) {
-            temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x35);
-            temp_s0 = M2C_FIELD(temp_s1, s8 *, 0x34) - M2C_FIELD(temp_s1, u8 *, 0x4A);
-            temp_s2 = temp_a1 - M2C_FIELD(temp_s1, u8 *, 0x4B);
-            temp_v0 = M_GetDir__Fi((s32) temp_a1);
-            M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_v0;
-            temp_s0_2 = ENG_random__Fl(0x64);
-            if (abs(temp_s0) < 4) {
-                var_s4 = abs(temp_s2) < 4;
-            }
-            var_v0 = 0 & 0xFF;
-            if ((var_s4 != 0) && (((temp_a0 = M2C_FIELD(temp_s1, s16 *, 0x1A), ((temp_a0 < 0x15) == 0)) && (temp_s0_2 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0xD))) || (((temp_v1 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || (var_v0 = 0 & 0xFF, ((s16) temp_v1 == 3))) && (var_v0 = 0 & 0xFF, (temp_a0 == 0)) && (var_v0 = 0 & 0xFF, ((temp_s0_2 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x3F)) != 0))))) {
-                var_v0 = M_DumbWalk__Fii(arg0, (temp_v0 + 4) & 7) & 0xFF;
-            }
-            temp_s2_2 = M2C_FIELD(temp_s1, u8 *, 0x4A);
-            temp_s4 = M2C_FIELD(temp_s1, u8 *, 0x4B);
-            var_s0 = 0;
-            if ((var_v0 == 0) && (ENG_random__Fl(0x64) < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 3))) {
-                var_s0 = (LineClear__Fiiii(M2C_FIELD(temp_s1, s8 *, 0x34), M2C_FIELD(temp_s1, s8 *, 0x35), temp_s2_2, temp_s4) & 0xFF) != 0;
-            }
-            if (var_s0 != 0) {
-                M_StartRAttack__Fiii(arg0, 0, 4);
-            }
-            if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-                M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_SkelBow__Fi);
 #if 0 /* ida */
 int __fastcall MAI_SkelBow__Fi(int a1)
 {
@@ -5400,58 +4071,12 @@ int __fastcall MAI_SkelBow__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801508DC  MAI_Fat__Fi  MONSTER.CPP:2767-2794  seg monster_1  fsize 48 ---- */
+/* ---- 0x801508DC  MAI_Fat__Fi  MONSTER.CPP:2767-2794  seg monster  fsize 48 ---- */
 /* void MAI_Fat(int i)
  *   i=$s2 mx=$s0 my=$s3 md=$s5 v=$s0 Monst=$s1
  *   blocks: {1 }28
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Fat__Fi) */
-#if 0 /* m2c */
-void MAI_Fat__Fi(s32 arg0) {
-    s16 temp_a0;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s3;
-    s32 temp_v1;
-    s32 var_s4;
-    s8 temp_a1;
-    u16 temp_v1_2;
-    u8 temp_v0;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-        var_s4 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0) {
-            temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x35);
-            temp_s0 = M2C_FIELD(temp_s1, s8 *, 0x34) - M2C_FIELD(temp_s1, u8 *, 0x4A);
-            temp_s3 = temp_a1 - M2C_FIELD(temp_s1, u8 *, 0x4B);
-            temp_v0 = M_GetDir__Fi((s32) temp_a1);
-            M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_v0;
-            temp_s0_2 = ENG_random__Fl(0x64);
-            if (abs(temp_s0) < 2) {
-                var_s4 = abs(temp_s3) < 2;
-            }
-            if (var_s4 != 0) {
-                temp_v1 = M2C_FIELD(temp_s1, u8 *, 0x4D) * 4;
-                if (temp_s0_2 < (temp_v1 + 0xF)) {
-                    M_StartAttack__Fi(arg0);
-                } else if (temp_s0_2 < (temp_v1 + 0x14)) {
-                    M_StartSpAttack__Fi(arg0);
-                }
-            } else {
-                temp_a0 = M2C_FIELD(temp_s1, s16 *, 0x1A);
-                if (((temp_a0 >= 0x15) && (temp_s0_2 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 4) + 0x14))) || (((temp_v1_2 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1_2 - 1) < 2U) != 0)) || ((s16) temp_v1_2 == 3)) && (temp_a0 == 0) && (temp_s0_2 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 4) + 0x46)))) {
-                    M_CallWalk__Fii(arg0, temp_v0);
-                }
-            }
-            if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-                M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Fat__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Fat__Fi(int a1)
 {
@@ -5513,116 +4138,12 @@ int __fastcall MAI_Fat__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80150AA4  MAI_Sneak__Fi  MONSTER.CPP:2803-2885  seg monster_1  fsize 56 ---- */
+/* ---- 0x80150AA4  MAI_Sneak__Fi  MONSTER.CPP:2803-2885  seg monster  fsize 56 ---- */
 /* void MAI_Sneak(int i)
  *   i=$s5 mx=$s4 my=$s6 md=$s2 v=$fp Monst=$s0 dist=$s7
  *   blocks: {1 }83
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Sneak__Fi) */
-#if 0 /* m2c */
-void MAI_Sneak__Fi(s32 arg0) {
-    s16 temp_a0;
-    s32 temp_fp;
-    s32 temp_s1;
-    s32 temp_s1_2;
-    s32 temp_s4;
-    s32 temp_s6;
-    s32 temp_s7;
-    s32 temp_v0;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s1_3;
-    s32 var_s3;
-    s32 var_s3_2;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    u16 temp_v1;
-    u8 var_s2;
-    u8 var_v0;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_s4 = M2C_FIELD(temp_s0, s8 *, 0x34) - M2C_FIELD(temp_s0, u8 *, 0x4A);
-        temp_s6 = M2C_FIELD(temp_s0, s8 *, 0x35) - M2C_FIELD(temp_s0, u8 *, 0x4B);
-        var_s2 = M_GetDir__Fi();
-        temp_s7 = 5 - M2C_FIELD(temp_s0, u8 *, 0x4D);
-        if (M2C_FIELD(temp_s0, s16 *, 0x18) == 5) {
-            var_v0 = 2;
-            goto block_8;
-        }
-        var_s3 = 0;
-        temp_s1 = temp_s7 + 3;
-        if ((abs(temp_s4) >= temp_s1) || (abs(temp_s6) >= temp_s1)) {
-            var_s3 = 1;
-        }
-        var_v0 = 1;
-        if ((var_s3 != 0) || (var_v0 = 1, ((M2C_FIELD(temp_s0, s32 *, 4) < 9) == 0))) {
-block_8:
-            M2C_FIELD(temp_s0, u8 *, 0x49) = var_v0;
-            M2C_FIELD(temp_s0, s32 *, 4) = 0;
-        }
-        if (M2C_FIELD(temp_s0, u8 *, 0x49) == 2) {
-            var_v0_2 = var_s2 + 4;
-            if (M2C_FIELD(temp_s0, u16 *, 0x2C) & 0x10) {
-                temp_v0 = M2C_FIELD(temp_s0, u8 *, 0x3D) * 0x19E8;
-                var_v0_2 = GetDirection__Fiiii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), (s8) *(&plr + 0x34 + temp_v0), (s8) *(&plr + 0x36 + temp_v0)) + 4;
-            }
-            var_s2 = var_v0_2 & 7;
-            if (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) == 0x1F) {
-                var_v0_3 = var_s2 - 1;
-                if (ENG_random__Fl(2) == 0) {
-                    var_v0_3 = var_s2 + 1;
-                }
-                var_s2 = var_v0_3 & 7;
-            }
-        }
-        M2C_FIELD(temp_s0, u8 *, 0x3C) = var_s2;
-        var_s1 = 0;
-        temp_fp = ENG_random__Fl(0x64);
-        if (abs(temp_s4) < temp_s7) {
-            var_s1 = abs(temp_s6) < temp_s7;
-        }
-        var_s3_2 = 0;
-        if ((var_s1 != 0) && (M2C_FIELD(temp_s0, u16 *, 0x2C) & 1)) {
-            M_StartFadein__FiiUc(arg0, var_s2, 0);
-        } else {
-            temp_s1_2 = temp_s7 + 1;
-            if ((abs(temp_s4) >= temp_s1_2) || (abs(temp_s6) >= temp_s1_2)) {
-                var_s3_2 = 1;
-            }
-            if ((var_s3_2 != 0) && !(M2C_FIELD(temp_s0, u16 *, 0x2C) & 1)) {
-                M_StartFadeout__FiiUc(arg0, var_s2, 1);
-            } else {
-                var_s1_2 = 0;
-                if (M2C_FIELD(temp_s0, u8 *, 0x49) != 2) {
-                    if ((abs(temp_s4) >= 2) || (abs(temp_s6) >= 2)) {
-                        var_s1_2 = 1;
-                    }
-                    if ((var_s1_2 != 0) && (((temp_a0 = M2C_FIELD(temp_s0, s16 *, 0x1A), ((temp_a0 < 0x15) == 0)) && (temp_fp < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 4) + 0xE))) || (((temp_v1 = (u16) M2C_FIELD(temp_s0, s16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || ((s16) temp_v1 == 3)) && (temp_a0 == 0) && (temp_fp < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 4) + 0x40))))) {
-                        goto block_38;
-                    }
-                } else {
-block_38:
-                    M2C_FIELD(temp_s0, s32 *, 4) = (s32) (M2C_FIELD(temp_s0, s32 *, 4) + 1);
-                    M_CallWalk__Fii(arg0, var_s2);
-                }
-            }
-        }
-        var_s1_3 = 0;
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            if (abs(temp_s4) < 2) {
-                var_s1_3 = abs(temp_s6) < 2;
-            }
-            if ((var_s1_3 != 0) && (temp_fp < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 4) + 0xA))) {
-                M_StartAttack__Fi(arg0);
-                return;
-            }
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Sneak__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Sneak__Fi(int a1)
 {
@@ -5748,90 +4269,12 @@ LABEL_39:
 }
 #endif
 
-/* ---- 0x80150E80  MAI_Fireman__Fi  MONSTER.CPP:2896-2972  seg monster_1  fsize 80 ---- */
+/* ---- 0x80150E80  MAI_Fireman__Fi  MONSTER.CPP:2896-2972  seg monster  fsize 80 ---- */
 /* void MAI_Fireman(int i)
  *   i=$s1 mx=$s6 my=$s7 md=$s4 pnum=$s5 fx=$s2 fy=$s3 Monst=$s0
  *   blocks: {1 }77
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Fireman__Fi) */
-#if 0 /* m2c */
-void MAI_Fireman__Fi(s32 arg0) {
-    s32 temp_s6;
-    s32 temp_s7;
-    s32 temp_v0;
-    s32 var_s2;
-    u8 temp_s2;
-    u8 temp_s3;
-    u8 temp_s4;
-    u8 temp_s5;
-    u8 temp_v1;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    if ((M2C_FIELD(temp_s0, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s0, u8 *, 0x4E) != 0)) {
-        temp_s2 = M2C_FIELD(temp_s0, u8 *, 0x4A);
-        temp_s3 = M2C_FIELD(temp_s0, u8 *, 0x4B);
-        temp_s5 = M2C_FIELD(temp_s0, u8 *, 0x3D);
-        temp_s6 = M2C_FIELD(temp_s0, s8 *, 0x34) - temp_s2;
-        temp_s7 = M2C_FIELD(temp_s0, s8 *, 0x35) - temp_s3;
-        temp_s4 = M_GetDir__Fi();
-        temp_v1 = M2C_FIELD(temp_s0, u8 *, 0x49);
-        switch (temp_v1) {                          /* irregular */
-        case 1:
-            if ((LineClear__Fiiii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), temp_s2, temp_s3) & 0xFF) && (AddMissile__Fiiiiiiciii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), temp_s2, temp_s3, (s32) temp_s4, 0x32, (s32) (s8) temp_s5, arg0, 0, 0) != -1)) {
-                M2C_FIELD(temp_s0, s8 *, 0x33) = 0xE;
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 5U;
-                M2C_FIELD(temp_s0, s32 *, 4) = 0;
-            }
-            break;
-        case 5:
-            if (M2C_FIELD(temp_s0, s32 *, 4) == 3) {
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                M_StartFadeout__FiiUc(arg0, temp_s4, 1);
-            } else {
-                if (LineClear__Fiiii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), temp_s2, temp_s3) & 0xFF) {
-                    M_StartRAttack__Fiii(arg0, 0x33, 4);
-                } else {
-                    M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 5);
-                }
-                M2C_FIELD(temp_s0, s32 *, 4) = (s32) (M2C_FIELD(temp_s0, s32 *, 4) + 1);
-            }
-            break;
-        case 2:
-            M_StartFadein__FiiUc(arg0, temp_s4, 0);
-            M2C_FIELD(temp_s0, u8 *, 0x49) = 5U;
-            break;
-        }
-        M2C_FIELD(temp_s0, u8 *, 0x3C) = temp_s4;
-        ENG_random__Fl(0x64);
-        var_s2 = 0;
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            if (abs(temp_s6) < 2) {
-                var_s2 = abs(temp_s7) < 2;
-            }
-            if (var_s2 != 0) {
-                if (M2C_FIELD(temp_s0, u8 *, 0x49) == 1) {
-                    temp_v0 = arg0 * 0x68;
-                    M_TryH2HHit__Fiiiii((u8) arg0, *(&monster + 0x3D + temp_v0), *(&monster + 0x50 + temp_v0), (s32) *(&monster + 0x51 + temp_v0), (s32) *(&monster + 0x52 + temp_v0));
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 2U;
-                    if (!(M_CallWalk__Fii(arg0, (temp_s4 + 4) & 7) & 0xFF)) {
-                        goto block_26;
-                    }
-                } else {
-                    goto block_24;
-                }
-            } else {
-block_24:
-                if (!(M_CallWalk__Fii(arg0, temp_s4) & 0xFF) && ((u32) (M2C_FIELD(temp_s0, u8 *, 0x49) - 1) < 2U)) {
-block_26:
-                    M_StartFadein__FiiUc(arg0, temp_s4, 0);
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 5U;
-                }
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Fireman__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Fireman__Fi(int a1)
 {
@@ -5952,111 +4395,12 @@ LABEL_26:
 }
 #endif
 
-/* ---- 0x80151184  MAI_Fallen__Fi  MONSTER.CPP:2984-3062  seg monster_1  fsize 32 ---- */
+/* ---- 0x80151184  MAI_Fallen__Fi  MONSTER.CPP:2984-3062  seg monster  fsize 32 ---- */
 /* void MAI_Fallen(int i)
  *   i=$s1 Monst=$s0 x=$a1 y=$a2 xpos=$a0 ypos=$v1 m=$v1 rad=$a3 my=$s0 aitype=$v0
  *   blocks: {1 }79
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Fallen__Fi) */
-#if 0 /* m2c */
-void MAI_Fallen__Fi(u8 arg0) {
-    s16 temp_v1_2;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_a1;
-    s32 temp_a3;
-    s32 temp_s0_2;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v1;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_s2;
-    s8 temp_a1_2;
-    u8 temp_v1_3;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s0, u8 *, 0x49) == 5) {
-        temp_v0 = M2C_FIELD(temp_s0, s32 *, 4);
-        if (temp_v0 != 0) {
-            M2C_FIELD(temp_s0, s32 *, 4) = (s32) (temp_v0 - 1);
-        } else {
-            M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-        }
-    }
-    if ((M2C_FIELD(temp_s0, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s0, u8 *, 0x4E) != 0)) {
-        if (M2C_FIELD(temp_s0, u8 *, 0x49) == 2) {
-            temp_v0_2 = M2C_FIELD(temp_s0, s32 *, 4) - 1;
-            M2C_FIELD(temp_s0, s32 *, 4) = temp_v0_2;
-            if (temp_v0_2 == -1) {
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                M_StartStand__Fii(arg0, (M2C_FIELD(temp_s0, s8 *, 0x3C) + 4) & 7);
-            }
-        }
-        if (M2C_FIELD(temp_s0, s8 *, 0x41) == M2C_FIELD(temp_s0, s8 *, 0x40)) {
-            if (ENG_random__Fl(4) == 0) {
-                if (!(*(&monster + 0x2C + (arg0 * 0x68)) & 8)) {
-                    M_StartSpStand__Fii(arg0, M2C_FIELD(temp_s0, s8 *, 0x3C));
-                    temp_a1 = M2C_FIELD(temp_s0, s32 *, 0x14);
-                    temp_a0 = M2C_FIELD(temp_s0, s32 *, 0x10);
-                    temp_v1 = M2C_FIELD(temp_s0, u8 *, 0x4D) * 2;
-                    if (((temp_a1 - 2) - temp_v1) >= temp_a0) {
-                        M2C_FIELD(temp_s0, s32 *, 0x10) = (s32) (temp_a0 + 2 + temp_v1);
-                    } else {
-                        M2C_FIELD(temp_s0, s32 *, 0x10) = temp_a1;
-                    }
-                }
-                temp_a3 = (M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 4;
-                var_a2 = -temp_a3;
-                if (temp_a3 >= var_a2) {
-                    var_a1 = -temp_a3;
-                    do {
-                        if (temp_a3 >= var_a1) {
-                            do {
-                                if (((u32) var_a2 < 0x62U) && ((u32) var_a1 < 0x62U)) {
-                                    temp_v1_2 = *(&dung_map + (((M2C_FIELD(temp_s0, s8 *, 0x35) + var_a2) * 8) + ((M2C_FIELD(temp_s0, s8 *, 0x34) + var_a1) * 0x380)));
-                                    if (temp_v1_2 > 0) {
-                                        temp_a0_2 = (temp_v1_2 - 1) * 0x68;
-                                        if (*(&monster + 0x4C + temp_a0_2) == 8) {
-                                            *(&monster + 0x49 + temp_a0_2) = 5;
-                                            *(&monster + 4 + temp_a0_2) = ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 2) + 7) * 0xF;
-                                        }
-                                    }
-                                }
-                                var_a1 += 1;
-                            } while (temp_a3 >= var_a1);
-                        }
-                        var_a2 += 1;
-                        var_a1 = -temp_a3;
-                    } while (temp_a3 >= var_a2);
-                }
-            }
-        } else {
-            temp_v1_3 = M2C_FIELD(temp_s0, u8 *, 0x49);
-            if (temp_v1_3 == 2) {
-                M_CallWalk__Fii((s32) arg0, (u8) M2C_FIELD(temp_s0, s8 *, 0x3C));
-                return;
-            }
-            var_s2 = 0;
-            if (temp_v1_3 == 5) {
-                temp_a1_2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-                temp_s0_2 = M2C_FIELD(temp_s0, s8 *, 0x35) - M2C_FIELD(temp_s0, u8 *, 0x4B);
-                if (abs(temp_a1_2 - M2C_FIELD(temp_s0, u8 *, 0x4A), temp_a1_2) < 2) {
-                    var_s2 = abs(temp_s0_2) < 2;
-                }
-                if (var_s2 != 0) {
-                    M_StartAttack__Fi((s32) arg0);
-                    return;
-                }
-                M_CallWalk__Fii((s32) arg0, M_GetDir__Fi((s32) arg0));
-                return;
-            }
-            MAI_SkelSd__Fi((s32) arg0);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Fallen__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Fallen__Fi(int a1)
 {
@@ -6198,47 +4542,12 @@ int __fastcall MAI_Fallen__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80151498  MAI_Cleaver__Fi  MONSTER.CPP:3070-3090  seg monster_1  fsize 40 ---- */
+/* ---- 0x80151498  MAI_Cleaver__Fi  MONSTER.CPP:3070-3090  seg monster  fsize 40 ---- */
 /* void MAI_Cleaver(int i)
  *   i=$s2 Monst=$s1 mx=$s0 my=$s3 md=$s0
  *   blocks: {1 }21
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Cleaver__Fi) */
-#if 0 /* m2c */
-void MAI_Cleaver__Fi(s32 arg0) {
-    s32 temp_s0;
-    s32 temp_s3;
-    s32 var_s4;
-    s8 temp_a0;
-    s8 temp_a1;
-    u8 temp_v0;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-        var_s4 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0) {
-            temp_a0 = M2C_FIELD(temp_s1, s8 *, 0x34);
-            temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x35);
-            temp_s0 = temp_a0 - M2C_FIELD(temp_s1, u8 *, 0x4A);
-            temp_s3 = temp_a1 - M2C_FIELD(temp_s1, u8 *, 0x4B);
-            temp_v0 = GetDirection__Fiiii(temp_a0, temp_a1, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-            M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_v0;
-            if (abs(temp_s0) < 2) {
-                var_s4 = abs(temp_s3) < 2;
-            }
-            if (var_s4 != 0) {
-                M_StartAttack__Fi(arg0);
-            } else {
-                M_CallWalk__Fii(arg0, temp_v0);
-            }
-            if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-                M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Cleaver__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Cleaver__Fi(int a1)
 {
@@ -6280,119 +4589,12 @@ int __fastcall MAI_Cleaver__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8015159C  MAI_Round__FiUc  MONSTER.CPP:3098-3171  seg monster_1  fsize 64 ---- */
+/* ---- 0x8015159C  MAI_Round__FiUc  MONSTER.CPP:3098-3171  seg monster  fsize 64 ---- */
 /* void MAI_Round(int i, unsigned char special)
  *   i=$s2 mx=$s4 my=$s5 md=$s7 v=$fp fx=$s3 fy=$s6 dist=$a0 Monst=$s1
  *   blocks: {1 }74
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Round__FiUc) */
-#if 0 /* m2c */
-void MAI_Round__FiUc(s32 arg0, u8 arg1) {
-    u8 sp10;
-    s16 temp_a0_3;
-    s32 temp_a0_2;
-    s32 temp_fp;
-    s32 temp_s0;
-    s32 temp_s4;
-    s32 temp_s5;
-    s32 temp_v0;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s8 temp_a0;
-    s8 temp_a1;
-    u16 temp_v1;
-    u8 temp_s3;
-    u8 temp_s6;
-    u8 temp_s7;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    sp10 = arg1;
-    if ((M2C_FIELD(temp_s1, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0)) {
-        temp_a0 = M2C_FIELD(temp_s1, s8 *, 0x34);
-        temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x35);
-        temp_s3 = M2C_FIELD(temp_s1, u8 *, 0x4A);
-        temp_s6 = M2C_FIELD(temp_s1, u8 *, 0x4B);
-        temp_s4 = temp_a0 - temp_s3;
-        temp_s5 = temp_a1 - temp_s6;
-        temp_s7 = GetDirection__Fiiii(temp_a0, temp_a1, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-        if ((u8) M2C_FIELD(temp_s1, u8 *, 0x4E) < 0xFFU) {
-            MonstCheckDoors__Fi(arg0);
-        }
-        var_s0 = 0;
-        temp_fp = ENG_random__Fl(0x64);
-        if (abs(temp_s4) < 2) {
-            var_s0 = abs(temp_s5) < 2;
-        }
-        if ((var_s0 == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) == 0xFF) && (*(&dung_map + 7 + ((M2C_FIELD(temp_s1, s8 *, 0x35) * 8) + (M2C_FIELD(temp_s1, s8 *, 0x34) * 0x380))) == *(&dung_map + 7 + ((temp_s6 * 8) + (temp_s3 * 0x380))))) {
-            var_s0_2 = 0;
-            if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                if (((abs(temp_s4) >= 4) || (abs(temp_s5) >= 4)) && (ENG_random__Fl(4) == 0)) {
-                    var_s0_2 = 1;
-                }
-                if (var_s0_2 != 0) {
-                    if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                        M2C_FIELD(temp_s1, s32 *, 4) = 0;
-                        M2C_FIELD(temp_s1, s32 *, 8) = ENG_random__Fl(2);
-                    }
-                    goto block_18;
-                }
-            } else {
-block_18:
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 4U;
-                temp_s0 = abs(temp_s4);
-                var_a0 = temp_s5;
-                if (abs(temp_s5) < temp_s0) {
-                    var_a0 = temp_s4;
-                }
-                temp_a0_2 = abs(var_a0);
-                temp_v0 = M2C_FIELD(temp_s1, s32 *, 4);
-                M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0 + 1);
-                var_a1 = 0;
-                if (temp_v0 >= (temp_a0_2 * 2)) {
-                    var_a1 = (DirOK__Fii(arg0, temp_s7) & 0xFF) != 0;
-                }
-                if ((var_a1 != 0) || (*(&dung_map + 7 + ((M2C_FIELD(temp_s1, s8 *, 0x35) * 8) + (M2C_FIELD(temp_s1, s8 *, 0x34) * 0x380))) != *(&dung_map + 7 + ((temp_s6 * 8) + (temp_s3 * 0x380))))) {
-                    goto block_24;
-                }
-                if (!(M_RoundWalk__FiiRi(arg0, temp_s7, temp_s1 + 8) & 0xFF)) {
-                    M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 0xA);
-                }
-            }
-        } else {
-block_24:
-            M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-        }
-        var_s0_3 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x49) == 1) {
-            if (abs(temp_s4) < 2) {
-                var_s0_3 = abs(temp_s5) < 2;
-            }
-            if (var_s0_3 != 0) {
-                if (temp_fp < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x17)) {
-                    M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_s7;
-                    if ((sp10 != 0) && (M2C_FIELD(temp_s1, s32 *, 0x10) < ((s32) M2C_FIELD(temp_s1, s32 *, 0x14) >> 1)) && (ENG_random__Fl(2) != 0)) {
-                        M_StartSpAttack__Fi(arg0);
-                    } else {
-                        M_StartAttack__Fi(arg0);
-                    }
-                }
-            } else {
-                temp_a0_3 = M2C_FIELD(temp_s1, s16 *, 0x1A);
-                if (((temp_a0_3 >= 0x15) && (temp_fp < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x1C))) || (((temp_v1 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || ((s16) temp_v1 == 3)) && (temp_a0_3 == 0) && (temp_fp < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x4E)))) {
-                    M_CallWalk__Fii(arg0, temp_s7);
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Round__FiUc);
 #if 0 /* ida */
 int __fastcall MAI_Round__FiUc(int a1, char a2)
 {
@@ -6515,17 +4717,12 @@ LABEL_27:
 }
 #endif
 
-/* ---- 0x801519DC  MAI_GoatMc__Fi  MONSTER.CPP:3176-3177  seg monster_1  fsize 24 ---- */
+/* ---- 0x801519DC  MAI_GoatMc__Fi  MONSTER.CPP:3176-3177  seg monster  fsize 24 ---- */
 /* void MAI_GoatMc(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_GoatMc__Fi) */
-#if 0 /* m2c */
-void MAI_GoatMc__Fi(void) {
-    MAI_Round__FiUc(1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_GoatMc__Fi);
 #if 0 /* ida */
 int __fastcall MAI_GoatMc__Fi(int a1)
 {
@@ -6533,68 +4730,12 @@ int __fastcall MAI_GoatMc__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801519FC  MAI_Ranged__FiiUc  MONSTER.CPP:3184-3237  seg monster_1  fsize 64 ---- */
+/* ---- 0x801519FC  MAI_Ranged__FiiUc  MONSTER.CPP:3184-3237  seg monster  fsize 64 ---- */
 /* void MAI_Ranged(int i, int missile_type, unsigned char special)
  *   i=$s3 missile_type=$fp fx=$s6 fy=$s7 mx=$s1 my=$s2 md=$s4 Monst=$s0
  *   blocks: {1 }54
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Ranged__FiiUc) */
-#if 0 /* m2c */
-void MAI_Ranged__FiiUc(s32 arg0, s32 arg1, u8 arg2) {
-    u8 sp10;
-    s32 temp_a0;
-    s32 temp_s1;
-    s32 temp_s2;
-    s32 var_s5;
-    u8 temp_s4;
-    u8 temp_s6;
-    u8 temp_s7;
-    u8 temp_v1;
-    void *temp_s0;
-
-    temp_a0 = arg0 * 0x68;
-    temp_s0 = temp_a0 + &monster;
-    sp10 = arg2;
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_v1 = M2C_FIELD(temp_s0, u8 *, 0x4E);
-        if ((temp_v1 == 0xFF) || (*(&monster + 0x2C + temp_a0) & 0x10)) {
-            temp_s6 = M2C_FIELD(temp_s0, u8 *, 0x4A);
-            temp_s7 = M2C_FIELD(temp_s0, u8 *, 0x4B);
-            temp_s1 = M2C_FIELD(temp_s0, s8 *, 0x34) - temp_s6;
-            temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x35) - temp_s7;
-            temp_s4 = M_GetDir__Fi(arg0);
-            if ((u8) M2C_FIELD(temp_s0, u8 *, 0x4E) < 0xFFU) {
-                MonstCheckDoors__Fi(arg0);
-            }
-            M2C_FIELD(temp_s0, u8 *, 0x3C) = temp_s4;
-            if (M2C_FIELD(temp_s0, s16 *, 0x18) == 0xA) {
-                M_StartDelay__Fii(arg0, ENG_random__Fl(0x14));
-            } else {
-                var_s5 = 0;
-                if ((abs(temp_s1) < 4) && (abs(temp_s2) < 4)) {
-                    var_s5 = ENG_random__Fl(0x64) < ((M2C_FIELD(temp_s0, u8 *, 0x4D) * 0xA) + 0x46);
-                }
-                if (var_s5 != 0) {
-                    M_CallWalk__Fii(arg0, (temp_s4 + 4) & 7);
-                }
-            }
-            if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-                if (LineClear__Fiiii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), temp_s6, temp_s7) & 0xFF) {
-                    if (sp10 != 0) {
-                        M_StartRSpAttack__Fiii(arg0, arg1, 4);
-                        return;
-                    }
-                    M_StartRAttack__Fiii(arg0, arg1, 4);
-                    return;
-                }
-                M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-            }
-        } else if (temp_v1 != 0) {
-            M_CallWalk__Fii(arg0, GetDirection__Fiiii(M2C_FIELD(temp_s0, s8 *, 0x34), M2C_FIELD(temp_s0, s8 *, 0x35), M2C_FIELD(temp_s0, s8 *, 0x43), M2C_FIELD(temp_s0, s8 *, 0x44)));
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Ranged__FiiUc);
 #if 0 /* ida */
 int __fastcall MAI_Ranged__FiiUc(int a1, int a2, char a3)
 {
@@ -6671,17 +4812,12 @@ int __fastcall MAI_Ranged__FiiUc(int a1, int a2, char a3)
 }
 #endif
 
-/* ---- 0x80151C20  MAI_GoatBow__Fi  MONSTER.CPP:3243-3244  seg monster_1  fsize 24 ---- */
+/* ---- 0x80151C20  MAI_GoatBow__Fi  MONSTER.CPP:3243-3244  seg monster  fsize 24 ---- */
 /* void MAI_GoatBow(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_GoatBow__Fi) */
-#if 0 /* m2c */
-void MAI_GoatBow__Fi(void) {
-    MAI_Ranged__FiiUc(0, 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_GoatBow__Fi);
 #if 0 /* ida */
 int __fastcall MAI_GoatBow__Fi(int a1)
 {
@@ -6689,17 +4825,12 @@ int __fastcall MAI_GoatBow__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80151C44  MAI_Succ__Fi  MONSTER.CPP:3248-3249  seg monster_1  fsize 24 ---- */
+/* ---- 0x80151C44  MAI_Succ__Fi  MONSTER.CPP:3248-3249  seg monster  fsize 24 ---- */
 /* void MAI_Succ(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Succ__Fi) */
-#if 0 /* m2c */
-void MAI_Succ__Fi(void) {
-    MAI_Ranged__FiiUc(0x18, 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Succ__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Succ__Fi(int a1)
 {
@@ -6707,17 +4838,12 @@ int __fastcall MAI_Succ__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80151C68  MAI_AcidUniq__Fi  MONSTER.CPP:3253-3254  seg monster_1  fsize 24 ---- */
+/* ---- 0x80151C68  MAI_AcidUniq__Fi  MONSTER.CPP:3253-3254  seg monster  fsize 24 ---- */
 /* void MAI_AcidUniq(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_AcidUniq__Fi) */
-#if 0 /* m2c */
-void MAI_AcidUniq__Fi(void) {
-    MAI_Ranged__FiiUc(0x39, 1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_AcidUniq__Fi);
 #if 0 /* ida */
 int __fastcall MAI_AcidUniq__Fi(int a1)
 {
@@ -6725,157 +4851,12 @@ int __fastcall MAI_AcidUniq__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80151C8C  MAI_Scav__Fi  MONSTER.CPP:3268-3354  seg monster_1  fsize 48 ---- */
+/* ---- 0x80151C8C  MAI_Scav__Fi  MONSTER.CPP:3268-3354  seg monster  fsize 48 ---- */
 /* void MAI_Scav(int i)
  *   i=$s4 Monst=$s2 x=$s1 y=$s0 done=$s3
  *   blocks: {1 }87
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Scav__Fi) */
-#if 0 /* m2c */
-void MAI_Scav__Fi(s32 arg0) {
-    s32 temp_a0;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v1;
-    s32 var_s0_2;
-    s32 var_s1_2;
-    s32 var_s3;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s8 temp_a1;
-    s8 temp_a1_2;
-    s8 temp_a2;
-    s8 temp_a2_2;
-    s8 temp_v0_3;
-    u32 var_s0;
-    u32 var_s0_3;
-    u32 var_s1;
-    void *temp_s2;
-
-    var_s3 = 0;
-    temp_a0 = arg0 * 0x68;
-    temp_s2 = temp_a0 + &monster;
-    var_s1 = 0;
-    if (M2C_FIELD(temp_s2, s8 *, 0x33) == 0) {
-        if (M2C_FIELD(temp_s2, s32 *, 0x10) < ((s32) M2C_FIELD(temp_s2, s32 *, 0x14) >> 1)) {
-            if (M2C_FIELD(temp_s2, u8 *, 0x49) != 3) {
-                if (*(&monster + 0x57 + temp_a0) != 0) {
-                    temp_v1 = *(&monster + 0x56 + temp_a0) * 0x68;
-                    M2C_FIELD((temp_v1 + &monster), s8 *, 0x58) = (s8) (*(&monster + 0x58 + temp_v1) - 1);
-                    *(&monster + 0x57 + temp_a0) = 0;
-                }
-                M2C_FIELD(temp_s2, u8 *, 0x49) = 3U;
-                M2C_FIELD(temp_s2, s32 *, 0xC) = 0xA;
-                goto block_6;
-            }
-            goto block_7;
-        }
-block_6:
-        if (M2C_FIELD(temp_s2, u8 *, 0x49) == 3) {
-block_7:
-            temp_v0 = M2C_FIELD(temp_s2, s32 *, 0xC);
-            if (temp_v0 != 0) {
-                M2C_FIELD(temp_s2, s32 *, 0xC) = (s32) (temp_v0 - 1);
-                if (GetdDead__Fii(M2C_FIELD(temp_s2, s8 *, 0x34), M2C_FIELD(temp_s2, s8 *, 0x35)) & 0xFF) {
-                    M_StartEat__Fi(arg0);
-                    if (!(*(&monster + 0x2C + (arg0 * 0x68)) & 8)) {
-                        M2C_FIELD(temp_s2, s32 *, 0x10) = (s32) (M2C_FIELD(temp_s2, s32 *, 0x10) + 0x40);
-                    }
-                    temp_v0_2 = M2C_FIELD(temp_s2, s32 *, 0x14);
-                    if (M2C_FIELD(temp_s2, s32 *, 0x10) >= ((temp_v0_2 >> 1) + (temp_v0_2 >> 2))) {
-                        M2C_FIELD(temp_s2, u8 *, 0x49) = 1U;
-                        M2C_FIELD(temp_s2, s32 *, 4) = 0;
-                        M2C_FIELD(temp_s2, s32 *, 8) = 0;
-                    }
-                } else if (M2C_FIELD(temp_s2, s32 *, 4) == 0) {
-                    var_v0 = 0 & 0xFF;
-                    if (ENG_random__Fl(2) != 0) {
-                        var_s0 = -4U;
-                        if (var_v0 == 0) {
-loop_16:
-                            var_s1 = -4U;
-                            if (var_v0 == 0) {
-                                var_v0_2 = var_s0 < 0x62U;
-loop_18:
-                                if ((var_v0_2 != 0) && (var_s1 < 0x62U)) {
-                                    var_s3 = 0;
-                                    if (GetdDead__Fii(M2C_FIELD(temp_s2, s8 *, 0x34) + var_s1, M2C_FIELD(temp_s2, s8 *, 0x35) + var_s0) & 0xFF) {
-                                        temp_a1 = M2C_FIELD(temp_s2, s8 *, 0x34);
-                                        temp_a2 = M2C_FIELD(temp_s2, s8 *, 0x35);
-                                        var_s3 = (LineClearF__FPFii_Uciiii(CheckNoSolid__Fii, temp_a1, temp_a2, temp_a1 + var_s1, temp_a2 + var_s0) & 0xFF) != 0;
-                                    }
-                                }
-                                var_s1 += 1;
-                                if ((s32) var_s1 < 5) {
-                                    var_v0_2 = var_s0 < 0x62U;
-                                    if (!(var_s3 & 0xFF)) {
-                                        goto loop_18;
-                                    }
-                                }
-                            }
-                            var_s0 += 1;
-                            var_v0 = var_s3 & 0xFF;
-                            if (((s32) var_s0 < 5) && (var_v0 == 0)) {
-                                goto loop_16;
-                            }
-                        }
-                        var_s1_2 = var_s1 - 1;
-                        var_s0_2 = var_s0 - 1;
-                    } else {
-                        var_s0_3 = 4;
-                        if (var_v0 == 0) {
-loop_28:
-                            var_s1 = 4;
-                            if (var_v0 == 0) {
-                                var_v0_3 = var_s0_3 < 0x62U;
-loop_30:
-                                if ((var_v0_3 != 0) && (var_s1 < 0x62U)) {
-                                    var_s3 = 0;
-                                    if (GetdDead__Fii(M2C_FIELD(temp_s2, s8 *, 0x34) + var_s1, M2C_FIELD(temp_s2, s8 *, 0x35) + var_s0_3) & 0xFF) {
-                                        temp_a1_2 = M2C_FIELD(temp_s2, s8 *, 0x34);
-                                        temp_a2_2 = M2C_FIELD(temp_s2, s8 *, 0x35);
-                                        var_s3 = (LineClearF__FPFii_Uciiii(CheckNoSolid__Fii, temp_a1_2, temp_a2_2, temp_a1_2 + var_s1, temp_a2_2 + var_s0_3) & 0xFF) != 0;
-                                    }
-                                }
-                                var_s1 -= 1;
-                                if ((s32) var_s1 >= -4) {
-                                    var_v0_3 = var_s0_3 < 0x62U;
-                                    if (!(var_s3 & 0xFF)) {
-                                        goto loop_30;
-                                    }
-                                }
-                            }
-                            var_s0_3 -= 1;
-                            var_v0 = var_s3 & 0xFF;
-                            if (((s32) var_s0_3 >= -4) && (var_v0 == 0)) {
-                                goto loop_28;
-                            }
-                        }
-                        var_s1_2 = var_s1 + 1;
-                        var_s0_2 = var_s0_3 + 1;
-                    }
-                    if (var_s3 & 0xFF) {
-                        M2C_FIELD(temp_s2, s32 *, 4) = (s32) (M2C_FIELD(temp_s2, s8 *, 0x34) + var_s1_2 + 1);
-                        M2C_FIELD(temp_s2, s32 *, 8) = (s32) (M2C_FIELD(temp_s2, s8 *, 0x35) + var_s0_2 + 1);
-                    }
-                    if (M2C_FIELD(temp_s2, s32 *, 4) != 0) {
-                        goto block_42;
-                    }
-                } else {
-block_42:
-                    temp_v0_3 = GetDirection__Fiiii(M2C_FIELD(temp_s2, s8 *, 0x34), M2C_FIELD(temp_s2, s8 *, 0x35), M2C_FIELD(temp_s2, s32 *, 4) - 1, M2C_FIELD(temp_s2, s32 *, 8) - 1);
-                    M2C_FIELD(temp_s2, s8 *, 0x3C) = temp_v0_3;
-                    M_CallWalk__Fii(arg0, (u8) temp_v0_3);
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s2, s8 *, 0x33) == 0) {
-            MAI_SkelSd__Fi(arg0);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Scav__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Scav__Fi(int a1)
 {
@@ -7037,64 +5018,12 @@ LABEL_41:
 }
 #endif
 
-/* ---- 0x80152050  MAI_Garg__Fi  MONSTER.CPP:3364-3404  seg monster_1  fsize 40 ---- */
+/* ---- 0x80152050  MAI_Garg__Fi  MONSTER.CPP:3364-3404  seg monster  fsize 40 ---- */
 /* void MAI_Garg(int i)
  *   i=$s2 Monst=$s0 mx=$s1 my=$s3 md=$s4
  *   blocks: {1 }41
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Garg__Fi) */
-#if 0 /* m2c */
-void MAI_Garg__Fi(u8 arg0) {
-    s32 temp_s1;
-    s32 temp_s3;
-    s32 temp_s3_2;
-    s32 var_s1;
-    s32 var_s1_2;
-    s8 temp_a1;
-    s8 temp_a1_2;
-    s8 temp_a2;
-    u8 temp_s4;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_a2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_a1 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    temp_s3 = temp_a1 - M2C_FIELD(temp_s0, s8 *, 0x44);
-    temp_s1 = temp_a2 - M2C_FIELD(temp_s0, s8 *, 0x43);
-    temp_s4 = M_GetDir__Fi((s32) temp_a1, temp_a2);
-    if ((M2C_FIELD(temp_s0, u8 *, 0x4E) != 0) && (M2C_FIELD(temp_s0, u16 *, 0x2C) & 4)) {
-        M_Enemy__Fi(arg0);
-        temp_a1_2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-        temp_s3_2 = M2C_FIELD(temp_s0, s8 *, 0x35) - M2C_FIELD(temp_s0, u8 *, 0x4B);
-        var_s1 = 0;
-        if (abs(temp_a1_2 - M2C_FIELD(temp_s0, u8 *, 0x4A), temp_a1_2) < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 2)) {
-            var_s1 = abs(temp_s3_2) < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 2);
-        }
-        if (var_s1 != 0) {
-            M2C_FIELD(temp_s0, u16 *, 0x2C) = (u16) (M2C_FIELD(temp_s0, u16 *, 0x2C) & 0xFFFB);
-        }
-    } else if ((M2C_FIELD(temp_s0, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s0, u8 *, 0x4E) != 0)) {
-        if (M2C_FIELD(temp_s0, s32 *, 0x10) < ((s32) M2C_FIELD(temp_s0, s32 *, 0x14) >> 1)) {
-            M2C_FIELD(temp_s0, u8 *, 0x49) = 2U;
-        }
-        if (M2C_FIELD(temp_s0, u8 *, 0x49) == 2) {
-            var_s1_2 = 0;
-            if (abs(temp_s1) < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 2)) {
-                var_s1_2 = abs(temp_s3) < (M2C_FIELD(temp_s0, u8 *, 0x4D) + 2);
-            }
-            if (var_s1_2 != 0) {
-                if (!(M_CallWalk__Fii((s32) arg0, (temp_s4 + 4) & 7) & 0xFF)) {
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                }
-            } else {
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                M_StartHeal__Fi(arg0);
-            }
-        }
-        MAI_Round__FiUc((s32) arg0, 0U);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Garg__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Garg__Fi(int a1)
 {
@@ -7170,137 +5099,12 @@ int __fastcall MAI_Garg__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80152230  MAI_RoundRanged__FiiUciUc  MONSTER.CPP:3417-3508  seg monster_1  fsize 88 ---- */
+/* ---- 0x80152230  MAI_RoundRanged__FiiUciUc  MONSTER.CPP:3417-3508  seg monster  fsize 88 ---- */
 /* void MAI_RoundRanged(int i, int missile_type, unsigned char checkdoors, int dam, int lessmissiles)
  *   i=$s2 checkdoors=$s0 lessmissiles@sp-0x38 fx=$s7 fy=$fp mx=$s5 my=$s6 md@sp-0x30 v=$s3 dist=$a0 Monst=$s1
  *   blocks: {1 }92
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_RoundRanged__FiiUciUc) */
-#if 0 /* m2c */
-void MAI_RoundRanged__FiiUciUc(s32 arg0, s32 arg1, s32 arg2, s32 arg3, u8 arg4) {
-    s32 sp10;
-    s32 sp18;
-    u8 sp20;
-    s32 sp28;
-    s32 temp_a0_2;
-    s32 temp_a0_3;
-    s32 temp_s0;
-    s32 temp_s3;
-    s32 temp_s5;
-    s32 temp_s6;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s32 var_s0_4;
-    s8 temp_a0;
-    s8 temp_a1;
-    u16 temp_v1;
-    u8 temp_fp;
-    u8 temp_s7;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    sp10 = arg1;
-    sp18 = arg3;
-    sp20 = arg4;
-    if ((M2C_FIELD(temp_s1, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0)) {
-        temp_a0 = M2C_FIELD(temp_s1, s8 *, 0x34);
-        temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x35);
-        temp_s7 = M2C_FIELD(temp_s1, u8 *, 0x4A);
-        temp_fp = M2C_FIELD(temp_s1, u8 *, 0x4B);
-        temp_s5 = temp_a0 - temp_s7;
-        temp_s6 = temp_a1 - temp_fp;
-        sp28 = GetDirection__Fiiii(temp_a0, temp_a1, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-        if ((arg2 & 0xFF) && ((u8) M2C_FIELD(temp_s1, u8 *, 0x4E) < 0xFFU)) {
-            MonstCheckDoors__Fi(arg0);
-        }
-        temp_s3 = ENG_random__Fl(0x2710);
-        var_s0 = 0;
-        if (abs(temp_s5) < 2) {
-            var_s0 = abs(temp_s6) < 2;
-        }
-        if ((var_s0 == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) == 0xFF) && (*(&dung_map + 7 + ((M2C_FIELD(temp_s1, s8 *, 0x35) * 8) + (M2C_FIELD(temp_s1, s8 *, 0x34) * 0x380))) == *(&dung_map + 7 + ((temp_fp * 8) + (temp_s7 * 0x380))))) {
-            var_s0_2 = 0;
-            if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                if (((abs(temp_s5) >= 3) || (abs(temp_s6) >= 3)) && (ENG_random__Fl(4 << sp20) == 0)) {
-                    var_s0_2 = 1;
-                }
-                if (var_s0_2 != 0) {
-                    if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                        M2C_FIELD(temp_s1, s32 *, 4) = 0;
-                        M2C_FIELD(temp_s1, s32 *, 8) = ENG_random__Fl(2);
-                    }
-                    goto block_19;
-                }
-            } else {
-block_19:
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 4U;
-                temp_s0 = abs(temp_s5);
-                var_a0 = temp_s6;
-                if (abs(temp_s6) < temp_s0) {
-                    var_a0 = temp_s5;
-                }
-                temp_a0_2 = abs(var_a0);
-                temp_v0 = M2C_FIELD(temp_s1, s32 *, 4);
-                M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0 + 1);
-                var_a1 = 0;
-                if (temp_v0 >= (temp_a0_2 * 2)) {
-                    var_a1 = (DirOK__Fii(arg0, (u8) sp28) & 0xFF) != 0;
-                }
-                if (var_a1 != 0) {
-                    goto block_24;
-                }
-                if (temp_s3 < ((s32) ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 0x1F4) + 0x1F4) >> sp20)) {
-                    if (LineClear__Fiiii(M2C_FIELD(temp_s1, s8 *, 0x34), M2C_FIELD(temp_s1, s8 *, 0x35), temp_s7, temp_fp) & 0xFF) {
-                        M_StartRSpAttack__Fiii(arg0, sp10, sp18);
-                    } else {
-                        goto block_29;
-                    }
-                } else {
-block_29:
-                    M_RoundWalk__FiiRi(arg0, (u8) sp28, temp_s1 + 8);
-                }
-            }
-        } else {
-block_24:
-            M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-        }
-        var_s0_3 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x49) == 1) {
-            if (((((abs(temp_s5) >= 3) || (abs(temp_s6) >= 3)) && (temp_s3 < ((s32) ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 0x1F4) + 0x3E8) >> sp20))) || (temp_s3 < ((s32) ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 0x1F4) + 0x1F4) >> sp20))) && (LineClear__Fiiii(M2C_FIELD(temp_s1, s8 *, 0x34), M2C_FIELD(temp_s1, s8 *, 0x35), temp_s7, temp_fp) & 0xFF)) {
-                var_s0_3 = 1;
-            }
-            var_s0_4 = 0;
-            if (var_s0_3 != 0) {
-                M_StartRSpAttack__Fiii(arg0, sp10, sp18);
-            } else {
-                if (abs(temp_s5) < 2) {
-                    var_s0_4 = abs(temp_s6) < 2;
-                }
-                if (var_s0_4 != 0) {
-                    if (temp_s3 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 0x3E8) + 0x1770)) {
-                        M2C_FIELD(temp_s1, u8 *, 0x3C) = (u8) sp28;
-                        M_StartAttack__Fi(arg0);
-                    }
-                } else {
-                    temp_v0_2 = ENG_random__Fl(0x64);
-                    temp_a0_3 = M2C_FIELD(temp_s1, u8 *, 0x4D) * 0x3E8;
-                    if ((temp_v0_2 < (temp_a0_3 + 0x1388)) || (((temp_v1 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || ((s16) temp_v1 == 3)) && (M2C_FIELD(temp_s1, s16 *, 0x1A) == 0) && (temp_v0_2 < (temp_a0_3 + 0x1F40)))) {
-                        M_CallWalk__Fii(arg0, (u8) sp28);
-                    }
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 5);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_RoundRanged__FiiUciUc);
 #if 0 /* ida */
 int __fastcall MAI_RoundRanged__FiiUciUc(int a1, int a2, char a3, __int16 a4, char a5)
 {
@@ -7454,17 +5258,12 @@ LABEL_30:
 }
 #endif
 
-/* ---- 0x80152720  MAI_Magma__Fi  MONSTER.CPP:3513-3514  seg monster_1  fsize 32 ---- */
+/* ---- 0x80152720  MAI_Magma__Fi  MONSTER.CPP:3513-3514  seg monster  fsize 32 ---- */
 /* void MAI_Magma(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Magma__Fi) */
-#if 0 /* m2c */
-void MAI_Magma__Fi(void) {
-    MAI_RoundRanged__FiiUciUc(0x15, 1, 4, 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Magma__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Magma__Fi(int a1)
 {
@@ -7472,17 +5271,12 @@ int __fastcall MAI_Magma__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8015274C  MAI_Storm__Fi  MONSTER.CPP:3518-3519  seg monster_1  fsize 32 ---- */
+/* ---- 0x8015274C  MAI_Storm__Fi  MONSTER.CPP:3518-3519  seg monster  fsize 32 ---- */
 /* void MAI_Storm(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Storm__Fi) */
-#if 0 /* m2c */
-void MAI_Storm__Fi(void) {
-    MAI_RoundRanged__FiiUciUc(0x16, 1, 4, 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Storm__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Storm__Fi(int a1)
 {
@@ -7490,17 +5284,12 @@ int __fastcall MAI_Storm__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80152778  MAI_Acid__Fi  MONSTER.CPP:3523-3524  seg monster_1  fsize 32 ---- */
+/* ---- 0x80152778  MAI_Acid__Fi  MONSTER.CPP:3523-3524  seg monster  fsize 32 ---- */
 /* void MAI_Acid(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Acid__Fi) */
-#if 0 /* m2c */
-void MAI_Acid__Fi(void) {
-    MAI_RoundRanged__FiiUciUc(0x39, 0, 4, 1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Acid__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Acid__Fi(int a1)
 {
@@ -7508,17 +5297,12 @@ int __fastcall MAI_Acid__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801527A8  MAI_Diablo__Fi  MONSTER.CPP:3529-3530  seg monster_1  fsize 32 ---- */
+/* ---- 0x801527A8  MAI_Diablo__Fi  MONSTER.CPP:3529-3530  seg monster  fsize 32 ---- */
 /* void MAI_Diablo(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Diablo__Fi) */
-#if 0 /* m2c */
-void MAI_Diablo__Fi(void) {
-    MAI_RoundRanged__FiiUciUc(0x43, 0, 0x28, 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Diablo__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Diablo__Fi(int a1)
 {
@@ -7526,148 +5310,12 @@ int __fastcall MAI_Diablo__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801527D4  MAI_RR2__Fiii  MONSTER.CPP:3534-3626  seg monster_1  fsize 72 ---- */
+/* ---- 0x801527D4  MAI_RR2__Fiii  MONSTER.CPP:3534-3626  seg monster  fsize 72 ---- */
 /* void MAI_RR2(int i, int mistype, int dam)
  *   i=$s4 fx=$s6 fy=$s7 mx=$s2 my=$s3 md=$fp v=$s5 dist=$a0 Monst=$s1
  *   blocks: {1 }93
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_RR2__Fiii) */
-#if 0 /* m2c */
-void MAI_RR2__Fiii(s32 arg0, s32 arg1, s32 arg2) {
-    s32 sp10;
-    s32 sp18;
-    s32 temp_a0_2;
-    s32 temp_a0_3;
-    s32 temp_s0;
-    s32 temp_s2;
-    s32 temp_s3;
-    s32 temp_s3_2;
-    s32 temp_s5;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s32 var_s0_4;
-    s32 var_s0_5;
-    s8 temp_a0;
-    s8 temp_a1;
-    s8 temp_a1_2;
-    u16 temp_v1;
-    u8 temp_fp;
-    u8 temp_s6;
-    u8 temp_s7;
-    void *temp_s1;
-
-    var_s0 = 0;
-    temp_s1 = (arg0 * 0x68) + &monster;
-    sp10 = arg1;
-    sp18 = arg2;
-    temp_a1 = M2C_FIELD(temp_s1, s8 *, 0x34);
-    temp_s3 = M2C_FIELD(temp_s1, s8 *, 0x35) - M2C_FIELD(temp_s1, u8 *, 0x4B);
-    if ((abs(temp_a1 - M2C_FIELD(temp_s1, u8 *, 0x4A), temp_a1) >= 5) || (abs(temp_s3) >= 5)) {
-        var_s0 = 1;
-    }
-    if (var_s0 != 0) {
-        MAI_SkelSd__Fi(arg0);
-        return;
-    }
-    if ((M2C_FIELD(temp_s1, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0)) {
-        temp_s7 = M2C_FIELD(temp_s1, u8 *, 0x4B);
-        temp_a1_2 = M2C_FIELD(temp_s1, s8 *, 0x35);
-        temp_a0 = M2C_FIELD(temp_s1, s8 *, 0x34);
-        temp_s6 = M2C_FIELD(temp_s1, u8 *, 0x4A);
-        temp_s3_2 = temp_a1_2 - temp_s7;
-        temp_s2 = temp_a0 - temp_s6;
-        temp_fp = GetDirection__Fiiii(temp_a0, temp_a1_2, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-        if ((u8) M2C_FIELD(temp_s1, u8 *, 0x4E) < 0xFFU) {
-            MonstCheckDoors__Fi(arg0);
-        }
-        temp_s5 = ENG_random__Fl(0x64);
-        var_s0_2 = 0;
-        if (abs(temp_s2) < 2) {
-            var_s0_2 = abs(temp_s3_2) < 2;
-        }
-        if ((var_s0_2 == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) == 0xFF) && (*(&dung_map + 7 + ((M2C_FIELD(temp_s1, s8 *, 0x35) * 8) + (M2C_FIELD(temp_s1, s8 *, 0x34) * 0x380))) == *(&dung_map + 7 + ((temp_s7 * 8) + (temp_s6 * 0x380))))) {
-            var_s0_3 = 0;
-            if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                if ((abs(temp_s2) >= 3) || (abs(temp_s3_2) >= 3)) {
-                    var_s0_3 = 1;
-                }
-                if (var_s0_3 != 0) {
-                    if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                        M2C_FIELD(temp_s1, s32 *, 4) = 0;
-                        M2C_FIELD(temp_s1, s32 *, 8) = ENG_random__Fl(2);
-                    }
-                    goto block_21;
-                }
-            } else {
-block_21:
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 4U;
-                M2C_FIELD(temp_s1, s32 *, 0xC) = 4;
-                temp_s0 = abs(temp_s2);
-                var_a0 = temp_s3_2;
-                if (abs(temp_s3_2) < temp_s0) {
-                    var_a0 = temp_s2;
-                }
-                temp_a0_2 = abs(var_a0);
-                temp_v0 = M2C_FIELD(temp_s1, s32 *, 4);
-                M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0 + 1);
-                var_a1 = 0;
-                if (temp_v0 >= (temp_a0_2 * 2)) {
-                    var_a1 = (DirOK__Fii(arg0, temp_fp) & 0xFF) != 0;
-                }
-                if (var_a1 != 0) {
-                    goto block_26;
-                }
-                if (temp_s5 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 5) + 0x50)) {
-                    M_RoundWalk__FiiRi(arg0, temp_fp, temp_s1 + 8);
-                }
-            }
-        } else {
-block_26:
-            M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-        }
-        var_s0_4 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x49) == 1) {
-            if (((((abs(temp_s2) >= 3) || (abs(temp_s3_2) >= 3)) && (temp_s5 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 5) + 0xA))) || (temp_s5 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 5) + 5)) || (M2C_FIELD(temp_s1, s32 *, 0xC) == 4)) && (LineClear__Fiiii(M2C_FIELD(temp_s1, s8 *, 0x34), M2C_FIELD(temp_s1, s8 *, 0x35), temp_s6, temp_s7) & 0xFF)) {
-                var_s0_4 = 1;
-            }
-            var_s0_5 = 0;
-            if (var_s0_4 == 0) {
-                if (abs(temp_s2) < 2) {
-                    var_s0_5 = abs(temp_s3_2) < 2;
-                }
-                if (var_s0_5 != 0) {
-                    if (ENG_random__Fl(0x64) < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 0xA) + 0x28)) {
-                        M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_fp;
-                        if (ENG_random__Fl(2) != 0) {
-                            M_StartAttack__Fi(arg0);
-                        } else {
-                            goto block_44;
-                        }
-                    }
-                } else {
-                    temp_v0_2 = ENG_random__Fl(0x64);
-                    temp_a0_3 = M2C_FIELD(temp_s1, u8 *, 0x4D) * 0xA;
-                    if ((temp_v0_2 < (temp_a0_3 + 0x32)) || (((temp_v1 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || ((s16) temp_v1 == 3)) && (M2C_FIELD(temp_s1, s16 *, 0x1A) == 0) && (temp_v0_2 < (temp_a0_3 + 0x50)))) {
-                        M_CallWalk__Fii(arg0, temp_fp);
-                    }
-                }
-            } else {
-block_44:
-                M_StartRSpAttack__Fiii(arg0, sp10, sp18);
-            }
-            M2C_FIELD(temp_s1, s32 *, 0xC) = 1;
-        }
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 5);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_RR2__Fiii);
 #if 0 /* ida */
 int __fastcall MAI_RR2__Fiii(int a1, int a2, __int16 a3)
 {
@@ -7826,17 +5474,12 @@ LABEL_53:
 }
 #endif
 
-/* ---- 0x80152CB8  MAI_Mega__Fi  MONSTER.CPP:3631-3632  seg monster_1  fsize 24 ---- */
+/* ---- 0x80152CB8  MAI_Mega__Fi  MONSTER.CPP:3631-3632  seg monster  fsize 24 ---- */
 /* void MAI_Mega(int i)
  *   i=$a0
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Mega__Fi) */
-#if 0 /* m2c */
-void MAI_Mega__Fi(void) {
-    MAI_RR2__Fiii(0x31, 0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Mega__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Mega__Fi(int a1)
 {
@@ -7844,145 +5487,12 @@ int __fastcall MAI_Mega__Fi(int a1)
 }
 #endif
 
-/* ---- 0x80152CDC  MAI_SkelKing__Fi  MONSTER.CPP:3639-3737  seg monster_1  fsize 72 ---- */
+/* ---- 0x80152CDC  MAI_SkelKing__Fi  MONSTER.CPP:3639-3737  seg monster  fsize 72 ---- */
 /* void MAI_SkelKing(int i)
  *   i=$s4 fx=$s3 fy@sp-0x38 mx=$s6 my=$s7 md=$s5 v=$fp dist=$a0 Monst=$s1 nx=$s2 ny=$s0 _mx=$s2 _my@sp-0x30
  *   blocks: {1 {1 {14 {58 {59 {61 {66 }78 }94 }94 }94 }99 }99 }99
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_SkelKing__Fi) */
-#if 0 /* m2c */
-void MAI_SkelKing__Fi(s32 arg0) {
-    s32 sp10;
-    s32 sp18;
-    s32 temp_a0;
-    s32 temp_fp;
-    s32 temp_s0;
-    s32 temp_s6;
-    s32 temp_s7;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_a1;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s32 var_s0_4;
-    s32 var_s3;
-    s32 var_v0;
-    s8 temp_s2;
-    u16 temp_v1_2;
-    u8 temp_a0_2;
-    u8 temp_s0_2;
-    u8 temp_s2_2;
-    u8 temp_s3;
-    u8 temp_s5;
-    u8 temp_t1;
-    u8 temp_v1;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    temp_s2 = M2C_FIELD(temp_s1, s8 *, 0x34);
-    sp18 = (s32) M2C_FIELD(temp_s1, s8 *, 0x35);
-    if ((M2C_FIELD(temp_s1, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0)) {
-        temp_s3 = M2C_FIELD(temp_s1, u8 *, 0x4A);
-        temp_t1 = M2C_FIELD(temp_s1, u8 *, 0x4B);
-        sp10 = (s32) temp_t1;
-        temp_s6 = temp_s2 - temp_s3;
-        temp_s5 = GetDirection__Fiiii(temp_s2, (s8) sp18, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-        temp_s7 = sp18 - temp_t1;
-        if ((u8) M2C_FIELD(temp_s1, u8 *, 0x4E) < 0xFFU) {
-            MonstCheckDoors__Fi(arg0);
-        }
-        temp_fp = ENG_random__Fl(0x64);
-        var_s0 = 0;
-        if (abs(temp_s6) < 2) {
-            var_s0 = abs(temp_s7) < 2;
-        }
-        if ((var_s0 == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) == 0xFF) && (*(&dung_map + 7 + ((sp18 * 8) + (temp_s2 * 0x380))) == *(&dung_map + 7 + ((sp10 * 8) + (temp_s3 * 0x380))))) {
-            var_s0_2 = 0;
-            if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                if (((abs(temp_s6) >= 3) || (abs(temp_s7) >= 3)) && (ENG_random__Fl(4) == 0)) {
-                    var_s0_2 = 1;
-                }
-                if (var_s0_2 != 0) {
-                    if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                        M2C_FIELD(temp_s1, s32 *, 4) = 0;
-                        M2C_FIELD(temp_s1, s32 *, 8) = ENG_random__Fl(2);
-                    }
-                    goto block_18;
-                }
-            } else {
-block_18:
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 4U;
-                temp_s0 = abs(temp_s6);
-                var_a0 = temp_s7;
-                if (abs(temp_s7) < temp_s0) {
-                    var_a0 = temp_s6;
-                }
-                temp_a0 = abs(var_a0);
-                temp_v0 = M2C_FIELD(temp_s1, s32 *, 4);
-                M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0 + 1);
-                var_a1 = 0;
-                if (temp_v0 >= (temp_a0 * 2)) {
-                    var_a1 = (DirOK__Fii(arg0, temp_s5) & 0xFF) != 0;
-                }
-                if ((var_a1 != 0) || (*(&dung_map + 7 + ((sp18 * 8) + (temp_s2 * 0x380))) != *(&dung_map + 7 + ((sp10 * 8) + (temp_s3 * 0x380))))) {
-                    goto block_24;
-                }
-                if (!(M_RoundWalk__FiiRi(arg0, temp_s5, temp_s1 + 8) & 0xFF)) {
-                    M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 0xA);
-                }
-            }
-        } else {
-block_24:
-            M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-        }
-        temp_v1 = M2C_FIELD(temp_s1, u8 *, 0x49);
-        if (temp_v1 == 1) {
-            var_s0_3 = 0;
-            if ((gbMaxPlayers == temp_v1) && ((((abs(temp_s6) >= 3) || (var_v0 = temp_fp < 6, ((abs(temp_s7) < 3) == 0))) && (var_v0 = temp_fp < 6, ((temp_fp < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 4) + 0x23)) != 0))) || (var_v0 != 0)) && (LineClear__Fiiii(temp_s2, (s8) sp18, temp_s3, (u8) sp10) & 0xFF)) {
-                var_s0_3 = 1;
-            }
-            var_s3 = 0;
-            if (var_s0_3 != 0) {
-                temp_s2_2 = temp_s2 + *(&offset_x + temp_s5);
-                temp_s0_2 = sp18 + *(&offset_y + temp_s5);
-                if ((PosOkMonst__Fiii(arg0, temp_s2_2, temp_s0_2) & 0xFF) && (nummonsters < 0xBE)) {
-                    var_s3 = (GetdDead__Fii((s8) temp_s2_2, (s8) temp_s0_2) & 0xFF) != 0;
-                }
-                if (var_s3 != 0) {
-                    if (M_SpawnSkel__Fiii(temp_s2_2, temp_s0_2, temp_s5) != -1U) {
-                        SetdDead__FiiUc(temp_s2_2, temp_s0_2, 0);
-                    }
-                    M_StartSpStand__Fii((u8) arg0, (s8) temp_s5);
-                }
-            } else {
-                var_s0_4 = 0;
-                if (abs(temp_s6) < 2) {
-                    var_s0_4 = abs(temp_s7) < 2;
-                }
-                if (var_s0_4 != 0) {
-                    if (temp_fp < (M2C_FIELD(temp_s1, u8 *, 0x4D) + 0x14)) {
-                        M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_s5;
-                        M_StartAttack__Fi(arg0);
-                    }
-                } else {
-                    temp_v0_2 = ENG_random__Fl(0x64);
-                    temp_a0_2 = M2C_FIELD(temp_s1, u8 *, 0x4D);
-                    if ((temp_v0_2 < (temp_a0_2 + 0x19)) || (((temp_v1_2 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1_2 - 1) < 2U) != 0)) || ((s16) temp_v1_2 == 3)) && (M2C_FIELD(temp_s1, s16 *, 0x1A) == 0) && (temp_v0_2 < (temp_a0_2 + 0x4B)))) {
-                        M_CallWalk__Fii(arg0, temp_s5);
-                    } else {
-                        M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 0xA);
-                    }
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_SkelKing__Fi);
 #if 0 /* ida */
 int __fastcall MAI_SkelKing__Fi(int a1)
 {
@@ -8149,133 +5659,12 @@ LABEL_27:
 }
 #endif
 
-/* ---- 0x80153218  MAI_Rhino__Fi  MONSTER.CPP:3746-3832  seg monster_1  fsize 96 ---- */
+/* ---- 0x80153218  MAI_Rhino__Fi  MONSTER.CPP:3746-3832  seg monster  fsize 96 ---- */
 /* void MAI_Rhino(int i)
  *   i=$s2 fx=$s6 fy@sp-0x38 mx=$s4 my=$s5 md@sp-0x30 v=$fp dist=$a0 Monst=$s1 _mx=$s3 _my=$s7 mi=$s0
  *   blocks: {1 {1 {13 {53 {54 {56 {58 }63 }82 }82 }82 }87 }87 }87
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Rhino__Fi) */
-#if 0 /* m2c */
-void MAI_Rhino__Fi(s32 arg0) {
-    s32 sp28;
-    s32 sp30;
-    s32 temp_a0;
-    s32 temp_a0_2;
-    s32 temp_fp;
-    s32 temp_s0;
-    s32 temp_s4;
-    s32 temp_s5;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 var_a0;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s32 var_s0_4;
-    s8 temp_s3;
-    s8 temp_s7;
-    u16 temp_v1;
-    u8 temp_s6;
-    u8 temp_t0;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    temp_s3 = M2C_FIELD(temp_s1, s8 *, 0x34);
-    temp_s7 = M2C_FIELD(temp_s1, s8 *, 0x35);
-    if ((M2C_FIELD(temp_s1, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0)) {
-        temp_s6 = M2C_FIELD(temp_s1, u8 *, 0x4A);
-        temp_t0 = M2C_FIELD(temp_s1, u8 *, 0x4B);
-        sp28 = (s32) temp_t0;
-        temp_s4 = temp_s3 - temp_s6;
-        sp30 = GetDirection__Fiiii(temp_s3, temp_s7, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-        temp_s5 = temp_s7 - temp_t0;
-        if ((u8) M2C_FIELD(temp_s1, u8 *, 0x4E) < 0xFFU) {
-            MonstCheckDoors__Fi(arg0);
-        }
-        temp_fp = ENG_random__Fl(0x64);
-        var_s0 = 0;
-        if (abs(temp_s4) < 2) {
-            var_s0 = abs(temp_s5) < 2;
-        }
-        if (var_s0 == 0) {
-            var_s0_2 = 0;
-            if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                if (((abs(temp_s4) >= 5) || (abs(temp_s5) >= 5)) && (ENG_random__Fl(4) != 0)) {
-                    var_s0_2 = 1;
-                }
-                if (var_s0_2 != 0) {
-                    if (M2C_FIELD(temp_s1, u8 *, 0x49) != 4) {
-                        M2C_FIELD(temp_s1, s32 *, 4) = 0;
-                        M2C_FIELD(temp_s1, s32 *, 8) = ENG_random__Fl(2);
-                    }
-                    goto block_16;
-                }
-            } else {
-block_16:
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 4U;
-                temp_s0 = abs(temp_s4);
-                var_a0 = temp_s5;
-                if (abs(temp_s5) < temp_s0) {
-                    var_a0 = temp_s4;
-                }
-                temp_a0 = abs(var_a0);
-                temp_v0 = M2C_FIELD(temp_s1, s32 *, 4);
-                M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0 + 1);
-                if ((temp_v0 >= (temp_a0 * 2)) || (*(&dung_map + 7 + ((temp_s7 * 8) + (temp_s3 * 0x380))) != *(&dung_map + 7 + ((sp28 * 8) + (temp_s6 * 0x380))))) {
-                    goto block_21;
-                }
-                if (!(M_RoundWalk__FiiRi(arg0, (u8) sp30, temp_s1 + 8) & 0xFF)) {
-                    M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 0xA);
-                }
-            }
-        } else {
-block_21:
-            M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-        }
-        var_s0_3 = 0;
-        if (M2C_FIELD(temp_s1, u8 *, 0x49) == 1) {
-            if (((abs(temp_s4) >= 5) || (abs(temp_s5) >= 5)) && (temp_fp < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x2B)) && (LineClearF1__FPFiii_Uciiiii(PosOkMonst__Fiii, arg0, temp_s3, temp_s7, (s32) temp_s6, sp28) & 0xFF)) {
-                var_s0_3 = 1;
-            }
-            if (var_s0_3 != 0) {
-                temp_v0_2 = AddMissile__Fiiiiiiciii(temp_s3, temp_s7, temp_s6, (u8) sp28, sp30, 0x14, (s32) M2C_FIELD(temp_s1, s8 *, 0x3D), arg0, 0, 0);
-                if (temp_v0_2 != -1) {
-                    if (M2C_FIELD(M2C_FIELD(temp_s1, void **, 0x64), u8 *, 6) != 0) {
-                        PlayEffect__Fii((u8) arg0, 3);
-                    }
-                    *(&dung_map + ((temp_s7 * 8) + (temp_s3 * 0x380))) = ~arg0;
-                    M2C_FIELD(temp_s1, s8 *, 0x33) = 0xE;
-                    M2C_FIELD(temp_s1, s8 *, 0x5A) = 5;
-                    M2C_FIELD(temp_s1, u8 *, 0x3C) = (u8) *(&missile + 0x3F + (temp_v0_2 * 0x4C));
-                }
-            } else {
-                var_s0_4 = 0;
-                if (abs(temp_s4) < 2) {
-                    var_s0_4 = abs(temp_s5) < 2;
-                }
-                if (var_s0_4 != 0) {
-                    if (temp_fp < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x1C)) {
-                        M2C_FIELD(temp_s1, u8 *, 0x3C) = (u8) sp30;
-                        M_StartAttack__Fi(arg0);
-                    }
-                } else {
-                    temp_v0_3 = ENG_random__Fl(0x64);
-                    temp_a0_2 = M2C_FIELD(temp_s1, u8 *, 0x4D) * 2;
-                    if ((temp_v0_3 < (temp_a0_2 + 0x21)) || (((temp_v1 = M2C_FIELD(temp_s1, u16 *, 0x18), (((u32) (temp_v1 - 1) < 2U) != 0)) || ((s16) temp_v1 == 3)) && (M2C_FIELD(temp_s1, s16 *, 0x1A) == 0) && (temp_v0_3 < (temp_a0_2 + 0x53)))) {
-                        M_CallWalk__Fii(arg0, (u8) sp30);
-                    } else {
-                        M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 0xA);
-                    }
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Rhino__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Rhino__Fi(int a1)
 {
@@ -8426,127 +5815,12 @@ LABEL_23:
 }
 #endif
 
-/* ---- 0x801536D4  MAI_Counselor__Fi  MONSTER.CPP:3841-3935  seg monster_1  fsize 112 ---- */
+/* ---- 0x801536D4  MAI_Counselor__Fi  MONSTER.CPP:3841-3935  seg monster  fsize 112 ---- */
 /* void MAI_Counselor(int i)
  *   i=$s2 counsmiss@0x8011C2C0 _mx=$s6 _my@sp-0x30 fx=$fp fy@sp-0x48 mx=$s3 my=$s5 md=$s4 v@sp-0x40 dist=$s7 Monst=$s1
  *   blocks: {1 }95
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Counselor__Fi) */
-#if 0 /* m2c */
-void MAI_Counselor__Fi(s32 arg0) {
-    s32 sp28;
-    s32 sp30;
-    s32 sp38;
-    s32 sp40;
-    s32 temp_s0;
-    s32 temp_s3;
-    s32 temp_s5;
-    s32 temp_s7_2;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_s0;
-    s32 var_s0_2;
-    s8 temp_s6;
-    u8 temp_fp;
-    u8 temp_s4;
-    u8 temp_s7;
-    u8 temp_t0;
-    u8 var_v0;
-    void *temp_s1;
-
-    sp38 = arg0 * 0x68;
-    temp_s1 = sp38 + &monster;
-    temp_s6 = M2C_FIELD(temp_s1, s8 *, 0x34);
-    sp40 = (s32) M2C_FIELD(temp_s1, s8 *, 0x35);
-    if ((M2C_FIELD(temp_s1, s8 *, 0x33) == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0)) {
-        temp_fp = M2C_FIELD(temp_s1, u8 *, 0x4A);
-        temp_t0 = M2C_FIELD(temp_s1, u8 *, 0x4B);
-        sp28 = (s32) temp_t0;
-        temp_s3 = temp_s6 - temp_fp;
-        temp_s4 = GetDirection__Fiiii(temp_s6, (s8) sp40, M2C_FIELD(temp_s1, s8 *, 0x43), M2C_FIELD(temp_s1, s8 *, 0x44));
-        temp_s5 = sp40 - temp_t0;
-        if ((u8) M2C_FIELD(temp_s1, u8 *, 0x4E) < 0xFFU) {
-            MonstCheckDoors__Fi(arg0);
-        }
-        sp30 = ENG_random__Fl(0x64);
-        temp_s7 = M2C_FIELD(temp_s1, u8 *, 0x49);
-        if (temp_s7 == 2) {
-            temp_v0 = M2C_FIELD(temp_s1, s32 *, 4);
-            M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0 + 1);
-            if (temp_v0 < 4) {
-                M_CallWalk__Fii(arg0, (temp_s4 + 4) & 7);
-            } else {
-                goto block_18;
-            }
-        } else if (temp_s7 == 4) {
-            temp_s0 = abs(temp_s3);
-            var_a0 = temp_s5;
-            if (abs(temp_s5) < temp_s0) {
-                var_a0 = temp_s3;
-            }
-            var_s0 = 0;
-            temp_s7_2 = abs(var_a0);
-            if (abs(temp_s3) < 2) {
-                var_s0 = abs(temp_s5) < 2;
-            }
-            if ((var_s0 == 0) && (M2C_FIELD(temp_s1, u8 *, 0x4E) == 0xFF) && (*(&dung_map + 7 + ((sp40 * 8) + (temp_s6 * 0x380))) == *(&dung_map + 7 + ((sp28 * 8) + (temp_fp * 0x380))))) {
-                temp_v0_2 = M2C_FIELD(temp_s1, s32 *, 4);
-                M2C_FIELD(temp_s1, s32 *, 4) = (s32) (temp_v0_2 + 1);
-                var_a0_2 = 0;
-                if (temp_v0_2 >= (temp_s7_2 * 2)) {
-                    var_a0_2 = (DirOK__Fii(arg0, temp_s4) & 0xFF) != 0;
-                }
-                if (var_a0_2 != 0) {
-block_18:
-                    goto block_19;
-                }
-                M_RoundWalk__FiiRi(arg0, temp_s4, temp_s1 + 8);
-            } else {
-block_19:
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-                M_StartFadein__FiiUc(arg0, temp_s4, 1);
-            }
-        } else {
-            var_s0_2 = 0;
-            if (temp_s7 == 1) {
-                if (abs(temp_s3) < 2) {
-                    var_s0_2 = abs(temp_s5) < 2;
-                }
-                if (var_s0_2 != 0) {
-                    M2C_FIELD(temp_s1, u8 *, 0x3C) = temp_s4;
-                    if (M2C_FIELD(temp_s1, s32 *, 0x10) < ((s32) M2C_FIELD(temp_s1, s32 *, 0x14) >> 1)) {
-                        var_v0 = 2;
-                        goto block_35;
-                    }
-                    if ((M2C_FIELD(temp_s1, s16 *, 0x18) == 0xD) || (ENG_random__Fl(0x64) < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) + 0x14))) {
-                        M_StartRAttack__Fiii(arg0, -1, 0);
-                        AddMissile__Fiiiiiiciii(temp_s6, (s8) sp40, 0U, 0U, (s32) *(&monster + 0x3C + sp38), 0xB, (s32) temp_s7, arg0, 4, 0);
-                        AddMissile__Fiiiiiiciii(temp_s6, (s8) sp40, 0U, 0U, (s32) *(&monster + 0x3C + sp38), 0xC, (s32) temp_s7, arg0, 4, 0);
-                    } else {
-                        goto block_36;
-                    }
-                } else if ((sp30 < ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 5) + 0x32)) && (LineClear__Fiiii(temp_s6, (s8) sp40, temp_fp, (u8) sp28) & 0xFF)) {
-                    M_StartRAttack__Fiii(arg0, (s32) *(&D_8011C2C0 + M2C_FIELD(temp_s1, u8 *, 0x4D)), ENG_random__Fl((M2C_FIELD(temp_s1, u8 *, 0x52) - M2C_FIELD(temp_s1, u8 *, 0x51)) + 1) + M2C_FIELD(temp_s1, u8 *, 0x51));
-                } else if (ENG_random__Fl(0x64) < 0x1E) {
-                    var_v0 = 4;
-block_35:
-                    M2C_FIELD(temp_s1, u8 *, 0x49) = var_v0;
-                    M2C_FIELD(temp_s1, s32 *, 4) = 0;
-                    M_StartFadeout__FiiUc(arg0, temp_s4, 0);
-                } else {
-block_36:
-                    M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) - ((M2C_FIELD(temp_s1, u8 *, 0x4D) * 2) - 0xA));
-                }
-            }
-        }
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M_StartDelay__Fii(arg0, ENG_random__Fl(0xA) + 5);
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Counselor__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Counselor__Fi(int a1)
 {
@@ -8708,73 +5982,12 @@ LABEL_35:
 }
 #endif
 
-/* ---- 0x80153B70  MAI_Garbud__Fi  MONSTER.CPP:3943-3982  seg monster_1  fsize 40 ---- */
+/* ---- 0x80153B70  MAI_Garbud__Fi  MONSTER.CPP:3943-3982  seg monster  fsize 40 ---- */
 /* void MAI_Garbud(int i)
  *   i=$s1 md=$s4 Monst=$s0 _mx=$s2 _my=$s3
  *   blocks: {1 }40
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Garbud__Fi) */
-#if 0 /* m2c */
-void MAI_Garbud__Fi(s32 arg0) {
-    s32 temp_a0;
-    s32 var_v0;
-    s8 temp_s2;
-    s8 temp_s3;
-    u8 temp_s4;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s3 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_a0 = M2C_FIELD(temp_s0, s32 *, 0);
-        temp_s4 = M_GetDir__Fi();
-        if ((u32) (temp_a0 - 0x90) < 3U) {
-            if (!(*(&dung_map + 6 + ((temp_s3 * 8) + (temp_s2 * 0x380))) & 4)) {
-                var_v0 = temp_s3 * 8;
-                if (M2C_FIELD(temp_s0, u8 *, 0x49) == 7) {
-                    M2C_FIELD(temp_s0, s32 *, 0) = (s32) (temp_a0 + 1);
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 6U;
-                    M2C_FIELD(&quests, s8 *, 0x37) = 5;
-                    M2C_FIELD(&quests, s8 *, 0x38) = (s8) M2C_FIELD(temp_s0, s32 *, 0);
-                    var_v0 = temp_s3 * 8;
-                    if (deltaload == 0) {
-                        NetSendCmdQuest__FUcUc(1, 2);
-                        goto block_6;
-                    }
-                }
-                goto block_7;
-            }
-            goto block_8;
-        }
-block_6:
-        var_v0 = temp_s3 * 8;
-block_7:
-        if (*(&dung_map + 6 + (var_v0 + (temp_s2 * 0x380))) & 4) {
-block_8:
-            if ((M2C_FIELD(temp_s0, s32 *, 0) == 0x93) && !(effect_is_playing__Fi(0x34D) & 0xFF)) {
-                if (M2C_FIELD(temp_s0, u8 *, 0x49) == 7) {
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                    M2C_FIELD(temp_s0, s8 *, 0x4E) = 0xFF;
-                    M2C_FIELD(temp_s0, s32 *, 0) = 0;
-                    M2C_FIELD(&quests, s8 *, 0x37) = 4;
-                    if (deltaload == 0) {
-                        NetSendCmdQuest__FUcUc(1, 2);
-                    }
-                }
-            }
-        }
-        if ((M2C_FIELD(temp_s0, u8 *, 0x49) == 1) || (M2C_FIELD(temp_s0, u8 *, 0x49) == 4)) {
-            MAI_Round__FiUc(arg0, 1U);
-        } else {
-            *(&monster + 0x3C + (arg0 * 0x68)) = temp_s4;
-        }
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Garbud__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Garbud__Fi(int a1)
 {
@@ -8845,73 +6058,12 @@ LABEL_15:
 }
 #endif
 
-/* ---- 0x80153D80  MAI_Zhar__Fi  MONSTER.CPP:3990-4023  seg monster_1  fsize 48 ---- */
+/* ---- 0x80153D80  MAI_Zhar__Fi  MONSTER.CPP:3990-4023  seg monster  fsize 48 ---- */
 /* void MAI_Zhar(int i)
  *   i=$s3 mx=$s4 my=$s2 md=$s5 Monst=$s1 _mx=$s0 _my=$s2
  *   blocks: {1 }34
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Zhar__Fi) */
-#if 0 /* m2c */
-void MAI_Zhar__Fi(s32 arg0) {
-    s32 temp_s0_2;
-    s32 temp_s2_2;
-    s32 temp_s4;
-    s32 var_a0;
-    s32 var_v0;
-    s32 var_v0_2;
-    s8 temp_s0;
-    s8 temp_s2;
-    u8 temp_s5;
-    u8 temp_v1;
-    void *temp_s1;
-
-    temp_s1 = (arg0 * 0x68) + &monster;
-    temp_s0 = M2C_FIELD(temp_s1, s8 *, 0x34);
-    temp_s2 = M2C_FIELD(temp_s1, s8 *, 0x35);
-    if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-        temp_s5 = M_GetDir__Fi();
-        var_v0 = temp_s2 * 8;
-        if (M2C_FIELD(temp_s1, s32 *, 0) == 0x94) {
-            if (!(*(&dung_map + 6 + (var_v0 + (temp_s0 * 0x380))) & 4)) {
-                var_v0 = temp_s2 * 8;
-                if (M2C_FIELD(temp_s1, u8 *, 0x49) == 7) {
-                    M2C_FIELD(temp_s1, s32 *, 0) = 0x95;
-                    M2C_FIELD(temp_s1, u8 *, 0x49) = 6U;
-                    var_v0 = temp_s2 * 8;
-                }
-                goto block_5;
-            }
-            goto block_6;
-        }
-block_5:
-        if (*(&dung_map + 6 + (var_v0 + (temp_s0 * 0x380))) & 4) {
-block_6:
-            temp_s4 = temp_s0 - M2C_FIELD(temp_s1, u8 *, 0x4A);
-            temp_s2_2 = temp_s2 - M2C_FIELD(temp_s1, u8 *, 0x4B);
-            temp_s0_2 = abs(temp_s4);
-            var_a0 = temp_s4;
-            if (abs(temp_s2_2) >= temp_s0_2) {
-                var_a0 = temp_s2_2;
-            }
-            abs(var_a0);
-            if ((M2C_FIELD(temp_s1, s32 *, 0) == 0x95) && !(effect_is_playing__Fi(0x35B) & 0xFF) && (M2C_FIELD(temp_s1, u8 *, 0x49) == 7)) {
-                M2C_FIELD(temp_s1, u8 *, 0x49) = 1U;
-                M2C_FIELD(temp_s1, s8 *, 0x4E) = 0xFF;
-                M2C_FIELD(temp_s1, s32 *, 0) = 0;
-            }
-        }
-        temp_v1 = M2C_FIELD(temp_s1, u8 *, 0x49);
-        if (((u32) (temp_v1 - 1) < 2U) || (var_v0_2 = arg0 * 2, ((temp_v1 & 0xFF) == 4))) {
-            MAI_Counselor__Fi(arg0);
-            var_v0_2 = arg0 * 2;
-        }
-        *(&monster + 0x3C + ((((var_v0_2 + arg0) * 4) + arg0) * 8)) = temp_s5;
-        if (M2C_FIELD(temp_s1, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s1, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Zhar__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Zhar__Fi(int a1)
 {
@@ -8981,70 +6133,12 @@ LABEL_13:
 }
 #endif
 
-/* ---- 0x80153F7C  MAI_SnotSpil__Fi  MONSTER.CPP:4031-4076  seg monster_1  fsize 40 ---- */
+/* ---- 0x80153F7C  MAI_SnotSpil__Fi  MONSTER.CPP:4031-4076  seg monster  fsize 40 ---- */
 /* void MAI_SnotSpil(int i)
  *   i=$s1 md=$s4 Monst=$s0 _mx=$s2 _my=$s3
  *   blocks: {1 {1 {13 {23 {23 {27 {27 }35 }35 }40 }40 }46 }46 }46
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_SnotSpil__Fi) */
-#if 0 /* m2c */
-void MAI_SnotSpil__Fi(u8 arg0) {
-    s32 var_v0;
-    s32 var_v0_2;
-    s8 temp_s2;
-    s8 temp_s3;
-    u8 temp_s4;
-    u8 temp_v1;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s3 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_s4 = M_GetDir__Fi();
-        if (M2C_FIELD(temp_s0, s32 *, 0) == 0x14) {
-            if (!(*(&dung_map + 6 + ((temp_s3 * 8) + (temp_s2 * 0x380))) & 4) && (M2C_FIELD(temp_s0, u8 *, 0x49) == 7)) {
-                M2C_FIELD(temp_s0, s32 *, 0) = 0x15;
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 6U;
-            }
-        }
-        var_v0 = temp_s3 * 8;
-        if (M2C_FIELD(temp_s0, s32 *, 0) == 0x15) {
-            var_v0 = temp_s3 * 8;
-            if (M2C_FIELD(&quests, u8 *, 0x9B) == 3) {
-                M2C_FIELD(temp_s0, s32 *, 0) = 0;
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                var_v0 = temp_s3 * 8;
-            }
-        }
-        if (*(&dung_map + 6 + (var_v0 + (temp_s2 * 0x380))) & 4) {
-            if ((M2C_FIELD(temp_s0, s32 *, 0) == 0x16) && !(effect_is_playing__Fi(0x357) & 0xFF) && (M2C_FIELD(temp_s0, u8 *, 0x49) == 7)) {
-                ObjChangeMap__Fiiii(setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1);
-                M2C_FIELD(&quests, u8 *, 0x9B) = 3U;
-                if (deltaload == 0) {
-                    NetSendCmdQuest__FUcUc(1, 7);
-                }
-                RedoPlayerVision__Fv();
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                M2C_FIELD(temp_s0, s8 *, 0x4E) = 0xFF;
-                M2C_FIELD(temp_s0, s32 *, 0) = 0;
-            }
-            var_v0_2 = arg0 * 2;
-            if ((M2C_FIELD(&quests, u8 *, 0x9B) == 3) && ((temp_v1 = M2C_FIELD(temp_s0, u8 *, 0x49), (temp_v1 == 1)) || (var_v0_2 = arg0 * 2, (temp_v1 == 5)))) {
-                MAI_Fallen__Fi(arg0);
-                goto block_20;
-            }
-        } else {
-block_20:
-            var_v0_2 = arg0 * 2;
-        }
-        *(&monster + 0x3C + ((((var_v0_2 + arg0) * 4) + arg0) * 8)) = temp_s4;
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_SnotSpil__Fi);
 #if 0 /* ida */
 int __fastcall MAI_SnotSpil__Fi(int a1)
 {
@@ -9128,80 +6222,12 @@ LABEL_22:
 }
 #endif
 
-/* ---- 0x801541CC  MAI_Lazurus__Fi  MONSTER.CPP:4084-4136  seg monster_1  fsize 40 ---- */
+/* ---- 0x801541CC  MAI_Lazurus__Fi  MONSTER.CPP:4084-4136  seg monster  fsize 40 ---- */
 /* void MAI_Lazurus(int i)
  *   i=$s3 md=$s1 Monst=$s0 _mx=$s2 _my=$s1
  *   blocks: {1 }53
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Lazurus__Fi) */
-#if 0 /* m2c */
-void MAI_Lazurus__Fi(s32 arg0) {
-    s32 temp_a0;
-    s32 temp_v1_2;
-    s32 var_v0;
-    s8 temp_s1;
-    s8 temp_s2;
-    s8 temp_v1_4;
-    u8 temp_s1_2;
-    u8 temp_v1;
-    u8 temp_v1_3;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s1 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_s1_2 = M_GetDir__Fi();
-        if (*(&dung_map + 6 + ((temp_s1 * 8) + (temp_s2 * 0x380))) & 4) {
-            temp_v1 = gbMaxPlayers;
-            if (temp_v1 == 1) {
-                temp_a0 = M2C_FIELD(temp_s0, s32 *, 0);
-                if (temp_a0 == 0x23) {
-                    if (M2C_FIELD(temp_s0, u8 *, 0x49) == 6) {
-                        temp_v1_2 = myplr * 0x19E8;
-                        if ((*(&plr + 0x30 + temp_v1_2) == temp_a0) && (*(&plr + 0x32 + temp_v1_2) == 0x2E)) {
-                            M2C_FIELD(temp_s0, s8 *, 0x33) = 0x11;
-                            M2C_FIELD(&quests, u8 *, 0x13B) = 5U;
-                            if (deltaload == 0) {
-                                NetSendCmdQuest__FUcUc(1, 0xF);
-                            }
-                        }
-                    }
-                    if ((M2C_FIELD(temp_s0, s32 *, 0) == 0x23) && !(effect_is_playing__Fi(0x352) & 0xFF) && (M2C_FIELD(temp_s0, u8 *, 0x49) == 7)) {
-                        ObjChangeMapResync__Fiiii(1, 0x12, 0x14, 0x18);
-                        RedoPlayerVision__Fv();
-                        M2C_FIELD(&quests, u8 *, 0x13B) = 6U;
-                        if (deltaload == 0) {
-                            NetSendCmdQuest__FUcUc(1, 0xF);
-                        }
-                        M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                        M2C_FIELD(temp_s0, s8 *, 0x4E) = 0xFF;
-                        M2C_FIELD(temp_s0, s32 *, 0) = 0;
-                    }
-                }
-                if (temp_v1 != 1) {
-                    goto block_17;
-                }
-            } else {
-block_17:
-                if ((M2C_FIELD(temp_s0, s32 *, 0) == 0x23) && (M2C_FIELD(temp_s0, u8 *, 0x49) == 6) && ((u8) M2C_FIELD(&quests, u8 *, 0x13B) < 4U)) {
-                    M2C_FIELD(temp_s0, s8 *, 0x33) = 0x11;
-                }
-            }
-        }
-        temp_v1_3 = M2C_FIELD(temp_s0, u8 *, 0x49);
-        if (((u32) (temp_v1_3 - 1) < 2U) || (var_v0 = arg0 * 2, ((temp_v1_3 & 0xFF) == 4))) {
-            MAI_Counselor__Fi(arg0);
-            var_v0 = arg0 * 2;
-        }
-        *(&monster + 0x3C + ((((var_v0 + arg0) * 4) + arg0) * 8)) = temp_s1_2;
-        temp_v1_4 = M2C_FIELD(temp_s0, s8 *, 0x33);
-        if ((temp_v1_4 == 0) || (temp_v1_4 == 0x11)) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Lazurus__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Lazurus__Fi(int a1)
 {
@@ -9274,45 +6300,12 @@ LABEL_20:
 }
 #endif
 
-/* ---- 0x80154470  MAI_Lazhelp__Fi  MONSTER.CPP:4144-4178  seg monster_1  fsize 40 ---- */
+/* ---- 0x80154470  MAI_Lazhelp__Fi  MONSTER.CPP:4144-4178  seg monster  fsize 40 ---- */
 /* void MAI_Lazhelp(int i)
  *   i=$s1 md=$a0 Monst=$s0 _mx=$s3 _my=$s2
  *   blocks: {1 }35
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Lazhelp__Fi) */
-#if 0 /* m2c */
-void MAI_Lazhelp__Fi(s32 arg0) {
-    s8 temp_s2;
-    s8 temp_s3;
-    u8 temp_a0;
-    u8 var_v0;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s3 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_a0 = M_GetDir__Fi();
-        if (*(&dung_map + 6 + ((temp_s2 * 8) + (temp_s3 * 0x380))) & 4) {
-            var_v0 = 1;
-            if ((gbMaxPlayers == 1) && (var_v0 = 6, (((u8) M2C_FIELD(&quests, u8 *, 0x13B) < 6U) == 0))) {
-                M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                M2C_FIELD(temp_s0, s32 *, 0) = 0;
-            } else {
-                M2C_FIELD(temp_s0, u8 *, 0x49) = var_v0;
-            }
-        }
-        if (M2C_FIELD(temp_s0, u8 *, 0x49) == 1) {
-            MAI_Succ__Fi(arg0);
-        } else {
-            *(&monster + 0x3C + (arg0 * 0x68)) = temp_a0;
-        }
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Lazhelp__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Lazhelp__Fi(int a1)
 {
@@ -9355,67 +6348,12 @@ int __fastcall MAI_Lazhelp__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801545A8  MAI_Lachdanan__Fi  MONSTER.CPP:4185-4219  seg monster_1  fsize 40 ---- */
+/* ---- 0x801545A8  MAI_Lachdanan__Fi  MONSTER.CPP:4185-4219  seg monster  fsize 40 ---- */
 /* void MAI_Lachdanan(int i)
  *   i=$s1 md=$s4 Monst=$s0 _mx=$s2 _my=$s3
  *   blocks: {1 }35
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Lachdanan__Fi) */
-#if 0 /* m2c */
-void MAI_Lachdanan__Fi(s32 arg0) {
-    s32 var_v0;
-    s32 var_v0_2;
-    s8 temp_s2;
-    s8 temp_s3;
-    u8 temp_s4;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s3 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_s4 = M_GetDir__Fi();
-        var_v0 = temp_s3 * 8;
-        if (M2C_FIELD(temp_s0, s32 *, 0) == 0x51) {
-            if (!(*(&dung_map + 6 + (var_v0 + (temp_s2 * 0x380))) & 4)) {
-                var_v0 = temp_s3 * 8;
-                if (M2C_FIELD(temp_s0, u8 *, 0x49) == 7) {
-                    M2C_FIELD(temp_s0, s32 *, 0) = 0x52;
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 6U;
-                    var_v0 = temp_s3 * 8;
-                }
-                goto block_5;
-            }
-            goto block_6;
-        }
-block_5:
-        var_v0_2 = arg0 * 2;
-        if (*(&dung_map + 6 + (var_v0 + (temp_s2 * 0x380))) & 4) {
-block_6:
-            var_v0_2 = arg0 * 2;
-            if (M2C_FIELD(temp_s0, s32 *, 0) == 0x53) {
-                var_v0_2 = arg0 * 2;
-                if (!(effect_is_playing__Fi(0x351) & 0xFF)) {
-                    var_v0_2 = arg0 * 2;
-                    if (M2C_FIELD(temp_s0, u8 *, 0x49) == 7) {
-                        M2C_FIELD(temp_s0, s32 *, 0) = 0;
-                        M2C_FIELD(&quests, s8 *, 0x52) = 3;
-                        if (deltaload == 0) {
-                            NetSendCmdQuest__FUcUc(1, 4);
-                        }
-                        M_StartKill__Fii(arg0, -1);
-                        var_v0_2 = arg0 * 2;
-                    }
-                }
-            }
-        }
-        *(&monster + 0x3C + ((((var_v0_2 + arg0) * 4) + arg0) * 8)) = temp_s4;
-        if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Lachdanan__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Lachdanan__Fi(int a1)
 {
@@ -9492,52 +6430,12 @@ LABEL_7:
 }
 #endif
 
-/* ---- 0x80154758  MAI_Warlord__Fi  MONSTER.CPP:4227-4261  seg monster_1  fsize 40 ---- */
+/* ---- 0x80154758  MAI_Warlord__Fi  MONSTER.CPP:4227-4261  seg monster  fsize 40 ---- */
 /* void MAI_Warlord(int i)
  *   i=$s1 md=$s2 Monst=$s0 _mx=$s3 _my=$s2
  *   blocks: {1 {1 {12 {13 {14 }26 }26 }35 }35 }35
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Warlord__Fi) */
-#if 0 /* m2c */
-void MAI_Warlord__Fi(s32 arg0) {
-    s32 temp_a0;
-    s32 var_v0;
-    s8 temp_s2;
-    s8 temp_s3;
-    s8 temp_v1;
-    u8 temp_s2_2;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s3 = M2C_FIELD(temp_s0, s8 *, 0x34);
-    temp_s2 = M2C_FIELD(temp_s0, s8 *, 0x35);
-    if (M2C_FIELD(temp_s0, s8 *, 0x33) == 0) {
-        temp_s2_2 = M_GetDir__Fi();
-        if ((*(&dung_map + 6 + ((temp_s2 * 8) + (temp_s3 * 0x380))) & 4) && (temp_a0 = M2C_FIELD(temp_s0, s32 *, 0), (temp_a0 == 0x6E))) {
-            if (M2C_FIELD(temp_s0, u8 *, 0x49) == 6) {
-                M2C_FIELD(temp_s0, s8 *, 0x33) = 0x11;
-            }
-            if ((M2C_FIELD(temp_s0, s32 *, 0) == temp_a0) && !(effect_is_playing__Fi(0x358) & 0xFF)) {
-                if (M2C_FIELD(temp_s0, u8 *, 0x49) == 7) {
-                    M2C_FIELD(temp_s0, u8 *, 0x49) = 1U;
-                    M2C_FIELD(temp_s0, s8 *, 0x4E) = 0xFF;
-                    M2C_FIELD(temp_s0, s32 *, 0) = 0;
-                }
-            }
-        }
-        var_v0 = arg0 * 2;
-        if (M2C_FIELD(temp_s0, u8 *, 0x49) == 1) {
-            MAI_SkelSd__Fi(arg0);
-            var_v0 = arg0 * 2;
-        }
-        *(&monster + 0x3C + ((((var_v0 + arg0) * 4) + arg0) * 8)) = temp_s2_2;
-        temp_v1 = M2C_FIELD(temp_s0, s8 *, 0x33);
-        if ((temp_v1 == 0) || (temp_v1 == 0x11)) {
-            M2C_FIELD(temp_s0, s8 *, 0x5A) = 0;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Warlord__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Warlord__Fi(int a1)
 {
@@ -9589,53 +6487,12 @@ LABEL_10:
 }
 #endif
 
-/* ---- 0x801548C0  DeleteMonsterList__Fv  MONSTER.CPP:4269-4292  seg monster_1  fsize 24 ---- */
+/* ---- 0x801548C0  DeleteMonsterList__Fv  MONSTER.CPP:4269-4292  seg monster  fsize 24 ---- */
 /* void DeleteMonsterList(void)
  *   i=$a0 mi=$v0
  *   blocks: {1 }24
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", DeleteMonsterList__Fv) */
-#if 0 /* m2c */
-void DeleteMonsterList__Fv(void) {
-    s16 *var_a1_2;
-    s32 var_a0;
-    s32 var_a0_2;
-    s32 var_v1;
-    s8 *var_a1;
-
-    var_a0 = 0;
-    var_a1 = &monster + 0x5B;
-    var_v1 = 0;
-    do {
-        if (*var_a1 != 0) {
-            *(&monster + 0x34 + var_v1) = 1;
-            *(&monster + 0x35 + var_v1) = 0;
-            *(&monster + 0x36 + var_v1) = 0;
-            *(&monster + 0x37 + var_v1) = 0;
-            *(&monster + 0x38 + var_v1) = 0;
-            *(&monster + 0x39 + var_v1) = 0;
-            *var_a1 = 0;
-        }
-        var_a1 += 0x68;
-        var_a0 += 1;
-        var_v1 += 0x68;
-    } while (var_a0 < 4);
-    var_a0_2 = 4;
-    if (nummonsters > 4) {
-        var_a1_2 = &monstactive + 8;
-        do {
-            var_a1_2 += 2;
-            if (*(&monster + 0x5B + (*var_a1_2 * 0x68)) != 0) {
-                DeleteMonster__Fi(var_a0_2, var_a1_2);
-                var_a1_2 = &monstactive;
-                var_a0_2 = 0;
-            } else {
-                var_a0_2 += 1;
-            }
-        } while (var_a0_2 < nummonsters);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", DeleteMonsterList__Fv);
 #if 0 /* ida */
 BOOL DeleteMonsterList__Fv()
 {
@@ -9694,204 +6551,12 @@ BOOL DeleteMonsterList__Fv()
 }
 #endif
 
-/* ---- 0x801549E4  ProcessMonsters__Fv  MONSTER.CPP:4300-4544  seg monster_1  fsize 64 ---- */
+/* ---- 0x801549E4  ProcessMonsters__Fv  MONSTER.CPP:4300-4544  seg monster  fsize 64 ---- */
 /* void ProcessMonsters(void)
  *   WipeCount@0x8011C2C4 DoWipe=$s7 Monst=$s1 oldmode=$v1 i=$s6 mi=$s2 raflag=$s3 mx=$s4 my=$s5 _menemy=$s0
  *   blocks: {1 }245
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", ProcessMonsters__Fv) */
-#if 0 /* m2c */
-void ProcessMonsters__Fv(void) {
-    s16 temp_s2;
-    s32 temp_a0;
-    s32 temp_a1;
-    s32 temp_s7;
-    s32 temp_v0_2;
-    s32 var_s3;
-    s32 var_s6;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s32 var_v0_4;
-    s32 var_v0_5;
-    s8 temp_s4;
-    s8 temp_s5;
-    s8 temp_v1_3;
-    u8 temp_a0_2;
-    u8 temp_v0;
-    u8 temp_v0_3;
-    u8 temp_v0_4;
-    u8 temp_v0_5;
-    u8 temp_v1;
-    u8 temp_v1_2;
-    u8 temp_v1_4;
-    u8 var_s0;
-    void *temp_s1;
-
-    DeleteMonsterList__Fv();
-    var_s6 = 0;
-    D_8011C2C4 += 1;
-    temp_s7 = ((D_8011C2C4 + 1) % 200) == 0;
-    if (nummonsters > 0) {
-        var_v0 = 0 * 2;
-        do {
-            temp_s2 = *(&monstactive + var_v0);
-            temp_s1 = (temp_s2 * 0x68) + &monster;
-            if (temp_s7 != 0) {
-                var_v0_2 = temp_s2 * 2;
-                if (temp_s2 >= 4) {
-                    M2C_FIELD(temp_s1, u16 *, 0x2C) = (u16) (M2C_FIELD(temp_s1, u16 *, 0x2C) & 0xFFEF);
-                    goto block_5;
-                }
-            } else {
-block_5:
-                var_v0_2 = temp_s2 * 2;
-            }
-            var_s0 = M2C_FIELD(temp_s1, u8 *, 0x3D);
-            temp_s4 = M2C_FIELD(temp_s1, s8 *, 0x34);
-            temp_s5 = M2C_FIELD(temp_s1, s8 *, 0x35);
-            var_s3 = 0;
-            if (!(*(&monster + 0x2C + ((((var_v0_2 + temp_s2) * 4) + temp_s2) * 8)) & 8) && (temp_a1 = M2C_FIELD(temp_s1, s32 *, 0x10), ((temp_a1 < M2C_FIELD(temp_s1, s32 *, 0x14)) != 0))) {
-                var_v0_3 = temp_s5 * 8;
-                if ((temp_a1 >> 6) > 0) {
-                    temp_v0 = M2C_FIELD(temp_s1, u8 *, 0x47);
-                    if ((s8) temp_v0 >= 2) {
-                        var_v0_4 = temp_a1 + ((s32) (temp_v0 << 0x18) >> 0x19);
-                    } else {
-                        var_v0_4 = temp_a1 + (s8) temp_v0;
-                    }
-                    M2C_FIELD(temp_s1, s32 *, 0x10) = var_v0_4;
-                    goto block_13;
-                }
-            } else {
-block_13:
-                var_v0_3 = temp_s5 * 8;
-            }
-            temp_v1 = *(&dung_map + 6 + (var_v0_3 + (temp_s4 * 0x380)));
-            if ((temp_v1 & 3) && (temp_v1 & 4) && (M2C_FIELD(temp_s1, u8 *, 0x4E) == 0) && (M2C_FIELD(M2C_FIELD(temp_s1, void **, 0x60), u8 *, 0x12) == 0x33)) {
-                PlaySFX__Fi(0x349);
-            }
-            if (M2C_FIELD(temp_s1, u16 *, 0x2C) & 0x10) {
-                temp_v0_2 = var_s0 * 0x68;
-                temp_v1_2 = *(&monster + 0x36 + temp_v0_2);
-                M2C_FIELD(temp_s1, u8 *, 0x43) = temp_v1_2;
-                M2C_FIELD(temp_s1, u8 *, 0x4A) = temp_v1_2;
-                temp_v0_3 = *(&monster + 0x37 + temp_v0_2);
-                M2C_FIELD(temp_s1, u8 *, 0x44) = temp_v0_3;
-                M2C_FIELD(temp_s1, u8 *, 0x4B) = temp_v0_3;
-            } else {
-                var_v0_5 = var_s0 * 2;
-                if (*(&plr + 0x1D + (var_s0 * 0x19E8)) == 0) {
-                    var_s0 ^= 1;
-                    M2C_FIELD(temp_s1, u8 *, 0x3D) = var_s0;
-                    var_v0_5 = var_s0 * 2;
-                }
-                temp_a0 = (((((((var_v0_5 + var_s0) * 4) + var_s0) * 0x10) - var_s0) * 4) + var_s0) * 8;
-                M2C_FIELD(temp_s1, u8 *, 0x4A) = (u8) *(&plr + 0x30 + temp_a0);
-                M2C_FIELD(temp_s1, u8 *, 0x4B) = (u8) *(&plr + 0x32 + temp_a0);
-                if (*(&dung_map + 6 + ((temp_s5 * 8) + (temp_s4 * 0x380))) & 3) {
-                    M2C_FIELD(temp_s1, u8 *, 0x4E) = 0xFFU;
-                    M2C_FIELD(temp_s1, u8 *, 0x43) = (u8) *(&plr + 0x30 + temp_a0);
-                    M2C_FIELD(temp_s1, u8 *, 0x44) = (u8) *(&plr + 0x32 + temp_a0);
-                } else {
-                    temp_a0_2 = M2C_FIELD(temp_s1, u8 *, 0x4E);
-                    if ((temp_a0_2 != 0) && (M2C_FIELD(temp_s1, u8 *, 0x4C) != 0x6E)) {
-                        M2C_FIELD(temp_s1, u8 *, 0x4E) = (u8) (temp_a0_2 - 1);
-                    }
-                }
-            }
-            if ((*(&dung_map + 6 + ((temp_s5 * 8) + (temp_s4 * 0x380))) & 3) || (M2C_FIELD(temp_s1, u8 *, 0x4E) != 0) || (var_s6 < 4)) {
-loop_31:
-                *(&AiProc + (M2C_FIELD(temp_s1, u8 *, 0x4C) * 4))(temp_s2);
-                temp_v1_3 = M2C_FIELD(temp_s1, s8 *, 0x33);
-                switch (temp_v1_3) {
-                case 0:
-                    var_s3 = M_DoStand__Fi(temp_s2);
-                    break;
-                case 1:
-                    var_s3 = M_DoWalk__Fi(temp_s2);
-                    break;
-                case 2:
-                    var_s3 = M_DoWalk2__Fi(temp_s2);
-                    break;
-                case 3:
-                    var_s3 = M_DoWalk3__Fi(temp_s2);
-                    break;
-                case 4:
-                    var_s3 = M_DoAttack__Fi((u8) temp_s2);
-                    break;
-                case 10:
-                    var_s3 = M_DoRAttack__Fi((s32) temp_s2);
-                    break;
-                case 5:
-                    var_s3 = M_DoGotHit__Fi(temp_s2);
-                    break;
-                case 6:
-                    var_s3 = M_DoDeath__Fi(temp_s2);
-                    break;
-                case 7:
-                    var_s3 = M_DoSAttack__Fi((u8) temp_s2);
-                    break;
-                case 8:
-                    var_s3 = M_DoFadein__Fi(temp_s2);
-                    break;
-                case 9:
-                    var_s3 = M_DoFadeout__Fi(temp_s2);
-                    break;
-                case 11:
-                    var_s3 = M_DoSpStand__Fi((u8) temp_s2);
-                    break;
-                case 12:
-                    var_s3 = M_DoRSpAttack__Fi((s32) temp_s2);
-                    break;
-                case 13:
-                    var_s3 = M_DoDelay__Fi((u8) temp_s2);
-                    break;
-                case 14:
-                    var_s3 = 0;
-                    break;
-                case 15:
-                    var_s3 = M_DoStone__Fi(temp_s2);
-                    break;
-                case 16:
-                    var_s3 = M_DoHeal__Fi(temp_s2);
-                    break;
-                case 17:
-                    var_s3 = M_DoTalk__Fi(temp_s2);
-                    break;
-                }
-                if (var_s3 != 0) {
-                    GroupUnity__Fi(temp_s2);
-                    goto loop_31;
-                }
-                if (M2C_FIELD(temp_s1, s8 *, 0x33) != 0xF) {
-                    temp_v1_4 = M2C_FIELD(temp_s1, u8 *, 0x3F) + 1;
-                    M2C_FIELD(temp_s1, u8 *, 0x3F) = temp_v1_4;
-                    if (!(M2C_FIELD(temp_s1, u16 *, 0x2C) & 4) && ((s8) temp_v1_4 >= M2C_FIELD(temp_s1, s8 *, 0x3E))) {
-                        M2C_FIELD(temp_s1, u8 *, 0x3F) = 0U;
-                        if (M2C_FIELD(temp_s1, u16 *, 0x2C) & 2) {
-                            temp_v0_4 = M2C_FIELD(temp_s1, u8 *, 0x41) - 1;
-                            M2C_FIELD(temp_s1, u8 *, 0x41) = temp_v0_4;
-                            if ((temp_v0_4 << 0x18) == 0) {
-                                M2C_FIELD(temp_s1, u8 *, 0x41) = (u8) M2C_FIELD(temp_s1, u8 *, 0x40);
-                            }
-                        } else {
-                            temp_v0_5 = M2C_FIELD(temp_s1, u8 *, 0x41) + 1;
-                            M2C_FIELD(temp_s1, u8 *, 0x41) = temp_v0_5;
-                            if ((s8) M2C_FIELD(temp_s1, u8 *, 0x40) < (s8) temp_v0_5) {
-                                M2C_FIELD(temp_s1, u8 *, 0x41) = 1U;
-                            }
-                        }
-                    }
-                }
-            }
-            var_s6 += 1;
-            var_v0 = var_s6 * 2;
-        } while (var_s6 < nummonsters);
-    }
-    DeleteMonsterList__Fv();
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", ProcessMonsters__Fv);
 #if 0 /* ida */
 BOOL ProcessMonsters__Fv()
 {
@@ -10045,75 +6710,12 @@ LABEL_6:
 }
 #endif
 
-/* ---- 0x80154FAC  DirOK__Fii  MONSTER.CPP:4553-4618  seg monster_1  fsize 32 ---- */
+/* ---- 0x80154FAC  DirOK__Fii  MONSTER.CPP:4553-4618  seg monster  fsize 32 ---- */
 /* unsigned char DirOK(int i, int mdir)
  *   i=$a2 mdir=$s2 fx=$s0 fy=$s1
  *   blocks: {1 }66
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", DirOK__Fii) */
-#if 0 /* m2c */
-s32 DirOK__Fii(s32 arg0, u8 arg1) {
-    s32 temp_v0;
-    s32 var_v0;
-    s32 var_v0_2;
-    u8 temp_s0;
-    u8 temp_s0_2;
-    u8 temp_s1;
-    u8 temp_s1_2;
-    u8 var_a1;
-
-    temp_v0 = arg0 * 0x68;
-    temp_s1 = *(&monster + 0x35 + temp_v0) + *(&offset_y + arg1);
-    temp_s0 = *(&monster + 0x34 + temp_v0) + *(&offset_x + arg1);
-    if ((temp_s1 < 0x62U) && (temp_s0 < 0x62U) && (PosOkMonst__Fiii(arg0, temp_s0, temp_s1) & 0xFF)) {
-        switch (arg1) {                             /* irregular */
-        case 6:
-            temp_s1_2 = temp_s1 + 1;
-            if (!(SolidLoc__Fii(temp_s0, temp_s1_2) & 0xFF)) {
-                var_v0_2 = *(&dung_map + 6 + ((temp_s1_2 * 8) + (temp_s0 * 0x380))) & 0x10;
-block_16:
-                var_v0 = 1;
-                if (var_v0_2 != 0) {
-                    goto block_17;
-                }
-            } else {
-                goto block_17;
-            }
-            break;
-        case 2:
-            temp_s0_2 = temp_s0 + 1;
-            if (!(SolidLoc__Fii(temp_s0_2, temp_s1) & 0xFF)) {
-                var_v0_2 = *(&dung_map + 6 + ((temp_s1 * 8) + (temp_s0_2 * 0x380))) & 0x10;
-                goto block_16;
-            }
-            goto block_17;
-        case 4:
-            var_v0 = 0;
-            if (!(SolidLoc__Fii(temp_s0 + 1, temp_s1) & 0xFF)) {
-                var_a1 = temp_s1 + 1;
-block_15:
-                var_v0_2 = SolidLoc__Fii(temp_s0, var_a1) & 0xFF;
-                goto block_16;
-            }
-            break;
-        default:
-            var_v0 = 1;
-            if (arg1 == 0) {
-                var_v0 = 0;
-                if (!(SolidLoc__Fii(temp_s0 - 1, temp_s1) & 0xFF)) {
-                    var_a1 = temp_s1 - 1;
-                    goto block_15;
-                }
-            }
-            break;
-        }
-    } else {
-block_17:
-        var_v0 = 0;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", DirOK__Fii);
 #if 0 /* ida */
 int __fastcall DirOK__Fii(int a1, int a2)
 {
@@ -10185,23 +6787,12 @@ LABEL_16:
 }
 #endif
 
-/* ---- 0x80155158  PosOkMissile__Fii  MONSTER.CPP:4625-4627  seg monster_1  fsize 32 ---- */
+/* ---- 0x80155158  PosOkMissile__Fii  MONSTER.CPP:4625-4627  seg monster  fsize 32 ---- */
 /* unsigned char PosOkMissile(int x, int y)
  *   x=$s0 y=$s1
  *   blocks: {1 }3
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", PosOkMissile__Fii) */
-#if 0 /* m2c */
-s32 PosOkMissile__Fii(s32 arg0, s32 arg1) {
-    s32 var_s2;
-
-    var_s2 = 0;
-    if ((GetMISSILE__Fii() ^ 1) != 0) {
-        var_s2 = (*(&dung_map + 6 + ((arg1 * 8) + (arg0 * 0x380))) & 0x10) == 0;
-    }
-    return var_s2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", PosOkMissile__Fii);
 #if 0 /* ida */
 BOOL __fastcall PosOkMissile__Fii(int a1, int a2)
 {
@@ -10214,17 +6805,12 @@ BOOL __fastcall PosOkMissile__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x801551D0  CheckNoSolid__Fii  MONSTER.CPP:4634-4636  seg monster_1  fsize 24 ---- */
+/* ---- 0x801551D0  CheckNoSolid__Fii  MONSTER.CPP:4634-4636  seg monster  fsize 24 ---- */
 /* unsigned char CheckNoSolid(int x, int y)
  *   x=$a0 y=$a1
  *   blocks: {1 }3
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", CheckNoSolid__Fii) */
-#if 0 /* m2c */
-s32 CheckNoSolid__Fii(void) {
-    return GetSOLID__Fii() ^ 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", CheckNoSolid__Fii);
 #if 0 /* ida */
 int CheckNoSolid__Fii()
 {
@@ -10232,154 +6818,12 @@ int CheckNoSolid__Fii()
 }
 #endif
 
-/* ---- 0x801551F0  LineClearF__FPFii_Uciiii  MONSTER.CPP:4663-4782  seg monster_1  fsize 80 ---- */
-/* unsigned char LineClearF(unsigned char *(Clear)(), int x1, int y1, int x2, int y2)
+/* ---- 0x801551F0  LineClearF__FPFii_Uciiii  MONSTER.CPP:4663-4782  seg monster  fsize 80 ---- */
+/* unsigned char LineClearF(unsigned char (*Clear)(), int x1, int y1, int x2, int y2)
  *   x1=$s4 y1=$s3 x2=$s7 y2=$fp dx=$s2 dy=$s1 d=$s0 dincH=$s6 dincD=$s2 xincD=$s1 yincD=$s1 xorg@sp-0x38 yorg@sp-0x30 done=$s5 tmp=$v0
  *   blocks: {1 }120
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", LineClearF__FPFii_Uciiii) */
-#if 0 /* m2c */
-s32 LineClearF__FPFii_Uciiii(s32 (*arg0)(s32, s32), s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 (*sp10)(s32, s32);
-    s32 sp18;
-    s32 sp20;
-    s32 temp_s0;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 var_fp;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s1_3;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s2_3;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s5;
-    s32 var_s7;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s32 var_v0_4;
-    s32 var_v0_5;
-
-    var_fp = arg4;
-    var_s4 = arg1;
-    var_s3 = arg2;
-    var_s7 = arg3;
-    var_s5 = 0;
-    var_s2 = var_s7 - var_s4;
-    sp10 = arg0;
-    var_s1 = var_fp - var_s3;
-    temp_s0 = abs(var_s2);
-    temp_v0 = abs(var_s1) < temp_s0;
-    sp18 = var_s4;
-    sp20 = var_s3;
-    if (temp_v0 != 0) {
-        if (var_s2 < 0) {
-            var_s4 = var_s7;
-            var_s3 = var_fp;
-            var_s2 = -var_s2;
-            var_s1 = -var_s1;
-            var_s7 = sp18;
-            var_fp = sp20;
-        }
-        temp_v0_2 = var_s1 * 2;
-        if (var_s1 > 0) {
-            var_s0 = temp_v0_2 - var_s2;
-            var_s2_2 = (var_s1 - var_s2) * 2;
-            var_s1_2 = 1;
-        } else {
-            var_s0 = temp_v0_2 + var_s2;
-            var_s2_2 = (var_s1 + var_s2) * 2;
-            var_s1_2 = -1;
-        }
-loop_6:
-        var_v0_2 = var_s5 & 0xFF;
-loop_7:
-        if ((var_v0_2 == 0) && ((var_s4 != var_s7) || (var_s3 != var_fp))) {
-            if (var_s1_2 < 0) {
-                var_v0_3 = var_s0 >= 1;
-            } else {
-                var_v0_3 = (var_s0 < 1) != 0;
-            }
-            if (var_v0_3 != 0) {
-                var_s0 += temp_v0_2;
-            } else {
-                var_s0 += var_s2_2;
-                var_s3 += var_s1_2;
-            }
-            var_s4 += 1;
-            if ((var_s4 != sp18) || (var_v0_2 = 0 & 0xFF, (var_s3 != sp20))) {
-                var_v0_2 = 0 & 0xFF;
-                if (!(sp10(var_s4, var_s3) & 0xFF)) {
-                    var_s5 = 1;
-                    goto loop_6;
-                }
-            }
-            goto loop_7;
-        }
-    } else {
-        temp_v0_3 = var_s3;
-        if (var_s1 < 0) {
-            var_s3 = var_fp;
-            var_fp = temp_v0_3;
-            temp_v0_4 = var_s4;
-            var_s4 = var_s7;
-            var_s7 = temp_v0_4;
-            var_s1 = -var_s1;
-            var_s2 = -var_s2;
-        }
-        temp_v0_5 = var_s2 * 2;
-        if (var_s2 > 0) {
-            var_s0_2 = temp_v0_5 - var_s1;
-            var_s2_3 = (var_s2 - var_s1) * 2;
-            var_s1_3 = 1;
-        } else {
-            var_s0_2 = temp_v0_5 + var_s1;
-            var_s2_3 = (var_s2 + var_s1) * 2;
-            var_s1_3 = -1;
-        }
-loop_37:
-        var_v0_4 = var_s5 & 0xFF;
-loop_38:
-        if (var_v0_4 == 0) {
-            if ((var_s3 != var_fp) || (var_s4 != var_s7)) {
-                if (var_s1_3 < 0) {
-                    var_v0_5 = var_s0_2 >= 1;
-                } else {
-                    var_v0_5 = (var_s0_2 < 1) != 0;
-                }
-                if (var_v0_5 != 0) {
-                    var_s0_2 += temp_v0_5;
-                } else {
-                    var_s0_2 += var_s2_3;
-                    var_s4 += var_s1_3;
-                }
-                var_s3 += 1;
-                if ((var_s3 != sp20) || (var_v0_4 = 0 & 0xFF, (var_s4 != sp18))) {
-                    var_v0_4 = 0 & 0xFF;
-                    if (!(sp10(var_s4, var_s3) & 0xFF)) {
-                        var_s5 = 1;
-                        goto loop_37;
-                    }
-                }
-                goto loop_38;
-            }
-        }
-    }
-    var_v0 = 0;
-    if (var_s4 == var_s7) {
-        var_v0 = var_s3 == var_fp;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", LineClearF__FPFii_Uciiii);
 #if 0 /* ida */
 BOOL __fastcall LineClearF__FPFii_Uciiii(unsigned __int8 (__fastcall *a1)(int, int), int a2, int a3, int a4, int a5)
 {
@@ -10547,17 +6991,12 @@ LABEL_7:
 }
 #endif
 
-/* ---- 0x80155478  LineClear__Fiiii  MONSTER.CPP:4790-4791  seg monster_1  fsize 32 ---- */
+/* ---- 0x80155478  LineClear__Fiiii  MONSTER.CPP:4790-4791  seg monster  fsize 32 ---- */
 /* unsigned char LineClear(int x1, int y1, int x2, int y2)
  *   x1=$v0 y1=$v1 x2=$t0 y2=$a3
  *   blocks: {1 }2
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", LineClear__Fiiii) */
-#if 0 /* m2c */
-s32 LineClear__Fiiii(s8 arg0, s8 arg1, s8 arg2, s32 arg3) {
-    return LineClearF__FPFii_Uciiii(PosOkMissile__Fii, arg0, arg1, arg2, arg3) & 0xFF;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", LineClear__Fiiii);
 #if 0 /* ida */
 BOOL __fastcall LineClear__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -10565,156 +7004,12 @@ BOOL __fastcall LineClear__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x801554B8  LineClearF1__FPFiii_Uciiiii  MONSTER.CPP:4802-4917  seg monster_1  fsize 88 ---- */
-/* unsigned char LineClearF1(unsigned char *(Clear)(), int monst, int x1, int y1, int x2, int y2)
+/* ---- 0x801554B8  LineClearF1__FPFiii_Uciiiii  MONSTER.CPP:4802-4917  seg monster  fsize 88 ---- */
+/* unsigned char LineClearF1(unsigned char (*Clear)(), int monst, int x1, int y1, int x2, int y2)
  *   x1=$s4 y1=$s3 x2=$s7 y2=$fp dx=$s2 dy=$s1 d=$s0 dincH=$s6 dincD=$s2 xincD=$s1 yincD=$s1 xorg@sp-0x38 yorg@sp-0x30 done=$s5 tmp=$v0
  *   blocks: {1 }116
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", LineClearF1__FPFiii_Uciiiii) */
-#if 0 /* m2c */
-s32 LineClearF1__FPFiii_Uciiiii(s32 (*arg0)(s32, s32, s32), s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    s32 (*sp10)(s32, s32, s32);
-    s32 sp18;
-    s32 sp20;
-    s32 sp28;
-    s32 temp_s0;
-    s32 temp_v0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 temp_v0_5;
-    s32 var_fp;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s1_3;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s2_3;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s5;
-    s32 var_s7;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s32 var_v0_4;
-    s32 var_v0_5;
-
-    var_s7 = arg4;
-    var_fp = arg5;
-    var_s4 = arg2;
-    var_s3 = arg3;
-    var_s5 = 0;
-    sp10 = arg0;
-    sp18 = arg1;
-    var_s2 = var_s7 - var_s4;
-    var_s1 = var_fp - var_s3;
-    temp_s0 = abs(var_s2);
-    temp_v0 = abs(var_s1) < temp_s0;
-    sp20 = var_s4;
-    sp28 = var_s3;
-    if (temp_v0 != 0) {
-        if (var_s2 < 0) {
-            var_s4 = var_s7;
-            var_s3 = var_fp;
-            var_s2 = -var_s2;
-            var_s1 = -var_s1;
-            var_s7 = sp20;
-            var_fp = sp28;
-        }
-        temp_v0_2 = var_s1 * 2;
-        if (var_s1 > 0) {
-            var_s0 = temp_v0_2 - var_s2;
-            var_s2_2 = (var_s1 - var_s2) * 2;
-            var_s1_2 = 1;
-        } else {
-            var_s0 = temp_v0_2 + var_s2;
-            var_s2_2 = (var_s1 + var_s2) * 2;
-            var_s1_2 = -1;
-        }
-loop_6:
-        var_v0_2 = var_s5 & 0xFF;
-loop_7:
-        if ((var_v0_2 == 0) && ((var_s4 != var_s7) || (var_s3 != var_fp))) {
-            if (var_s1_2 < 0) {
-                var_v0_3 = var_s0 >= 1;
-            } else {
-                var_v0_3 = (var_s0 < 1) != 0;
-            }
-            if (var_v0_3 != 0) {
-                var_s0 += temp_v0_2;
-            } else {
-                var_s0 += var_s2_2;
-                var_s3 += var_s1_2;
-            }
-            var_s4 += 1;
-            if ((var_s4 != sp20) || (var_v0_2 = 0 & 0xFF, (var_s3 != sp28))) {
-                var_v0_2 = 0 & 0xFF;
-                if (!(sp10(sp18, var_s4, var_s3) & 0xFF)) {
-                    var_s5 = 1;
-                    goto loop_6;
-                }
-            }
-            goto loop_7;
-        }
-    } else {
-        temp_v0_3 = var_s3;
-        if (var_s1 < 0) {
-            var_s3 = var_fp;
-            var_fp = temp_v0_3;
-            temp_v0_4 = var_s4;
-            var_s4 = var_s7;
-            var_s7 = temp_v0_4;
-            var_s1 = -var_s1;
-            var_s2 = -var_s2;
-        }
-        temp_v0_5 = var_s2 * 2;
-        if (var_s2 > 0) {
-            var_s0_2 = temp_v0_5 - var_s1;
-            var_s2_3 = (var_s2 - var_s1) * 2;
-            var_s1_3 = 1;
-        } else {
-            var_s0_2 = temp_v0_5 + var_s1;
-            var_s2_3 = (var_s2 + var_s1) * 2;
-            var_s1_3 = -1;
-        }
-loop_37:
-        var_v0_4 = var_s5 & 0xFF;
-loop_38:
-        if (var_v0_4 == 0) {
-            if ((var_s3 != var_fp) || (var_s4 != var_s7)) {
-                if (var_s1_3 < 0) {
-                    var_v0_5 = var_s0_2 >= 1;
-                } else {
-                    var_v0_5 = (var_s0_2 < 1) != 0;
-                }
-                if (var_v0_5 != 0) {
-                    var_s0_2 += temp_v0_5;
-                } else {
-                    var_s0_2 += var_s2_3;
-                    var_s4 += var_s1_3;
-                }
-                var_s3 += 1;
-                if ((var_s3 != sp28) || (var_v0_4 = 0 & 0xFF, (var_s4 != sp20))) {
-                    var_v0_4 = 0 & 0xFF;
-                    if (!(sp10(sp18, var_s4, var_s3) & 0xFF)) {
-                        var_s5 = 1;
-                        goto loop_37;
-                    }
-                }
-                goto loop_38;
-            }
-        }
-    }
-    var_v0 = 0;
-    if (var_s4 == var_s7) {
-        var_v0 = var_s3 == var_fp;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", LineClearF1__FPFiii_Uciiiii);
 #if 0 /* ida */
 BOOL __fastcall LineClearF1__FPFiii_Uciiiii(unsigned __int8 (__fastcall *a1)(int, int, int), int a2, int a3, int a4, int a5, int a6)
 {
@@ -10882,70 +7177,12 @@ LABEL_7:
 }
 #endif
 
-/* ---- 0x8015574C  M_FallenFear__Fii  MONSTER.CPP:5014-5054  seg monster_1  fsize 64 ---- */
+/* ---- 0x8015574C  M_FallenFear__Fii  MONSTER.CPP:5014-5054  seg monster  fsize 64 ---- */
 /* void M_FallenFear(int x, int y)
  *   x=$s6 y=$s7 i=$s4 mi=$a0 rundist=$s2 aitype=$v1
  *   blocks: {1 }41
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_FallenFear__Fii) */
-#if 0 /* m2c */
-void M_FallenFear__Fii(s8 arg0, s8 arg1) {
-    s16 temp_a0;
-    s32 temp_s0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s3;
-    s32 var_s4;
-    s32 var_s5;
-    u8 temp_v0;
-
-    var_s4 = 0;
-    if (nummonsters > 0) {
-        var_s3 = 0;
-        var_s5 = 0;
-        do {
-            temp_a0 = *(&monstactive + var_s5);
-            temp_v0 = M2C_FIELD(*(&monster + 0x60 + (temp_a0 * 0x68)), u8 *, 0x12);
-            var_s2 = 0;
-            switch (temp_v0) {
-            case 4:
-            case 12:
-                var_s2 = 7;
-                break;
-            case 5:
-            case 13:
-                var_s2 = 5;
-                break;
-            case 6:
-            case 14:
-                var_s2 = 3;
-                break;
-            case 7:
-            case 15:
-                var_s2 = 2;
-                break;
-            }
-            temp_s0 = temp_a0 * 0x68;
-            if (*(&monster + 0x4C + temp_s0) == 8) {
-                var_s1 = 0;
-                if (var_s2 != 0) {
-                    if (abs(arg0 - *(&monster + 0x34 + temp_s0)) < 5) {
-                        var_s1 = abs(arg1 - *(&monster + 0x35 + temp_s0)) < 5;
-                    }
-                    if ((var_s1 != 0) && (((s32) *(&monster + 0x10 + temp_s0) >> 6) > 0)) {
-                        *(&monster + 0x49 + temp_s0) = 2;
-                        *(&monster + 4 + temp_s0) = var_s2;
-                        *(&monster + 0x3C + temp_s0) = GetDirection__Fiiii(arg0, arg1, *(&monster + 0x34 + var_s3), *(&monster + 0x35 + var_s3));
-                    }
-                }
-            }
-            var_s3 += 0x68;
-            var_s4 += 1;
-            var_s5 += 2;
-        } while (var_s4 < nummonsters);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_FallenFear__Fii);
 #if 0 /* ida */
 int M_FallenFear__Fii()
 {
@@ -10977,82 +7214,12 @@ int M_FallenFear__Fii()
 }
 #endif
 
-/* ---- 0x80155934  PrintMonstHistory__Fi  MONSTER.CPP:5061-5144  seg monster_1  fsize 32 ---- */
+/* ---- 0x80155934  PrintMonstHistory__Fi  MONSTER.CPP:5061-5144  seg monster  fsize 32 ---- */
 /* void PrintMonstHistory(int mt)
  *   mt=$a0 res=$s0
  *   blocks: {1 }84
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", PrintMonstHistory__Fi) */
-#if 0 /* m2c */
-void PrintMonstHistory__Fi(s32 arg0) {
-    s32 temp_s1;
-    s32 temp_s1_2;
-    s32 var_s0;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-
-    if (*(&monstkills + (arg0 * 2)) >= 0xF) {
-        if (gnDifficulty != 2) {
-            var_s0 = *(&monsterdata + 0x30 + (arg0 * 0x3C)) & 0x3F;
-        } else {
-            var_s0 = *(&monsterdata + 0x32 + (arg0 * 0x3C)) & 0x3F;
-        }
-        if (var_s0 == 0) {
-            strcpy(&tempstr, GetStr__Fi(0x2CE));
-            goto block_29;
-        }
-        var_v0 = var_s0 & 0x38;
-        if (var_s0 & 7) {
-            strcpy(&tempstr, GetStr__Fi(0x35F));
-            temp_s1 = var_s0 & 1;
-            var_v0_2 = var_s0 & 2;
-            if (temp_s1 != 0) {
-                strcat(&tempstr, GetStr__Fi(0x273));
-                var_v0_2 = var_s0 & 2;
-            }
-            if (var_v0_2 != 0) {
-                if (temp_s1 != 0) {
-                    strcat(&tempstr, &D_8011C2C8);
-                }
-                strcat(&tempstr, GetStr__Fi(0x157));
-            }
-            if (var_s0 & 4) {
-                if (var_s0 & 2) {
-                    strcat(&tempstr, &D_8011C2C8);
-                }
-                strcat(&tempstr, GetStr__Fi(0x254));
-            }
-            AddPanelString__FPCci(&tempstr, 1);
-            var_v0 = var_s0 & 0x38;
-        }
-        if (var_v0 != 0) {
-            strcpy(&tempstr, GetStr__Fi(0x20D));
-            temp_s1_2 = var_s0 & 8;
-            var_v0_3 = var_s0 & 0x10;
-            if (temp_s1_2 != 0) {
-                strcat(&tempstr, GetStr__Fi(0x273));
-                var_v0_3 = var_s0 & 0x10;
-            }
-            if (var_v0_3 != 0) {
-                if (temp_s1_2 != 0) {
-                    strcat(&tempstr, &D_8011C2C8);
-                }
-                strcat(&tempstr, GetStr__Fi(0x157));
-            }
-            if (var_s0 & 0x20) {
-                if (var_s0 & 0x10) {
-                    strcat(&tempstr, &D_8011C2C8);
-                }
-                strcat(&tempstr, GetStr__Fi(0x254));
-            }
-block_29:
-            AddPanelString__FPCci(&tempstr, 1);
-        }
-    }
-    *(&_pinfoflag + sel_data) = 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", PrintMonstHistory__Fi);
 #if 0 /* ida */
 int __fastcall PrintMonstHistory__Fi(int a1)
 {
@@ -11147,40 +7314,12 @@ LABEL_31:
 }
 #endif
 
-/* ---- 0x80155BB8  PrintUniqueHistory__Fv  MONSTER.CPP:5151-5177  seg monster_1  fsize 32 ---- */
+/* ---- 0x80155BB8  PrintUniqueHistory__Fv  MONSTER.CPP:5151-5177  seg monster  fsize 32 ---- */
 /* void PrintUniqueHistory(void)
  *   res=$s0
  *   blocks: {1 }27
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", PrintUniqueHistory__Fv) */
-#if 0 /* m2c */
-void PrintUniqueHistory__Fv(void) {
-    M2C_UNK var_a0;
-    M2C_UNK var_a0_2;
-    s32 temp_s0;
-
-    temp_s0 = *(&monster + 0x30 + ((&_pcursmonst)[sel_data] * 0x68)) & 0x3F;
-    if (temp_s0 == 0) {
-        strcpy(&tempstr, GetStr__Fi(0x2D2));
-        AddPanelString__FPCci(&tempstr, 1);
-        var_a0 = 0x2CD;
-    } else {
-        var_a0_2 = 0x2D2;
-        if (temp_s0 & 7) {
-            var_a0_2 = 0x3E7;
-        }
-        strcpy(&tempstr, GetStr__Fi(var_a0_2));
-        AddPanelString__FPCci(&tempstr, 1);
-        var_a0 = 0x3E6;
-        if (!(temp_s0 & 0x38)) {
-            var_a0 = 0x2CD;
-        }
-    }
-    strcpy(&tempstr, GetStr__Fi(var_a0));
-    AddPanelString__FPCci(&tempstr, 1);
-    *(&_pinfoflag + sel_data) = 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", PrintUniqueHistory__Fv);
 #if 0 /* ida */
 int PrintUniqueHistory__Fv()
 {
@@ -11221,109 +7360,12 @@ int PrintUniqueHistory__Fv()
 }
 #endif
 
-/* ---- 0x80155CE4  MissToMonst__Fiii  MONSTER.CPP:5187-5289  seg monster_1  fsize 56 ---- */
+/* ---- 0x80155CE4  MissToMonst__Fiii  MONSTER.CPP:5187-5289  seg monster  fsize 56 ---- */
 /* void MissToMonst(int i, int x, int y)
  *   i=$a0 x=$a1 y=$a2 oldx=$s4 oldy=$s5 newx=$s0 newy=$s2 Miss=$v1 m=$s2 Monst=$s0 pnum=$s1 KnockOk=$s6 ptrplr=$a1 plr2=$a1
  *   blocks: {1 {39 {39 {40 {44 {45 {50 {57 {61 }67 }67 }80 }80 }80 }80 }80 }103 }103
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MissToMonst__Fiii) */
-#if 0 /* m2c */
-void MissToMonst__Fiii(s32 arg0, s8 arg1, s8 arg2) {
-    s16 temp_a1_2;
-    s16 temp_s2;
-    s32 temp_s0_2;
-    s32 temp_s1;
-    s32 temp_s2_2;
-    s32 temp_s3;
-    s32 temp_s3_2;
-    s32 temp_v0_2;
-    s32 var_s6;
-    s8 temp_s4;
-    s8 temp_s5;
-    s8 temp_v0;
-    s8 temp_v1_2;
-    u16 temp_a0_3;
-    u8 temp_a0;
-    u8 temp_a0_2;
-    u8 temp_a3;
-    u8 temp_s0_3;
-    u8 temp_s2_3;
-    void *temp_a1;
-    void *temp_s0;
-    void *temp_v1;
-    void *temp_v1_3;
-
-    temp_v1 = (arg0 * 0x4C) + &missile;
-    temp_s2 = M2C_FIELD(temp_v1, s16 *, 0x2E);
-    temp_s4 = M2C_FIELD(temp_v1, s8 *, 0x31);
-    temp_s5 = M2C_FIELD(temp_v1, s8 *, 0x32);
-    *(&dung_map + ((arg2 * 8) + (arg1 * 0x380))) = temp_s2 + 1;
-    temp_a3 = M2C_FIELD(temp_v1, u8 *, 0x3F);
-    temp_s0 = (temp_s2 * 0x68) + &monster;
-    M2C_FIELD(temp_s0, s8 *, 0x34) = arg1;
-    M2C_FIELD(temp_s0, s8 *, 0x35) = arg2;
-    M2C_FIELD(temp_s0, u8 *, 0x3C) = temp_a3;
-    M2C_FIELD(temp_s0, u8 *, 0x3A) = (u8) M2C_FIELD(temp_v1, u8 *, 0x33);
-    M2C_FIELD(temp_s0, u8 *, 0x3B) = (u8) M2C_FIELD(temp_v1, u8 *, 0x34);
-    M2C_FIELD(temp_s0, u8 *, 0x41) = (u8) M2C_FIELD(temp_v1, u8 *, 0x47);
-    M_StartStand__Fii((u8) temp_s2, (s8) M2C_FIELD(temp_s0, u8 *, 0x3C), temp_a3);
-    if ((u32) (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) - 0x48) < 4U) {
-        M_StartFadein__FiiUc((s32) temp_s2, (u8) (s8) M2C_FIELD(temp_s0, u8 *, 0x3C), 0);
-    } else if (!(M2C_FIELD(temp_s0, u16 *, 0x2C) & 0x10)) {
-        M_StartHit__Fiii(temp_s2, -1, 0);
-    } else {
-        M2MStartHit__Fiii(temp_s2, -1, 0);
-    }
-    if (!(M2C_FIELD(temp_s0, u16 *, 0x2C) & 0x10)) {
-        temp_s1 = (IsDplayer__Fii(temp_s4, temp_s5) & 0xFF) - 1;
-        if ((IsDplayer__Fii(temp_s4, temp_s5) & 0xFF) && (temp_a0 = M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12), ((temp_a0 & 0xFF) != 0x28)) && ((u32) (temp_a0 - 0x48) >= 4U) && (M_TryH2HHit__Fiiiii((u8) temp_s2, (IsDplayer__Fii(temp_s4, temp_s5) & 0xFF) - 1, 0x1F4U, (s32) M2C_FIELD(temp_s0, u8 *, 0x54), (s32) M2C_FIELD(temp_s0, u8 *, 0x55)), (temp_s1 == ((IsDplayer__Fii(temp_s4, temp_s5) & 0xFF) - 1))) && ((u32) (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) - 0x59) >= 4U)) {
-            temp_s3 = temp_s1 * 0x19E8;
-            var_s6 = 1;
-            if ((u32) (*(&plr + temp_s3) - 7) >= 2U) {
-                StartPlrHit__FiiUc(temp_s1, 0, 1);
-            }
-            temp_v1_2 = (s8) M2C_FIELD(temp_s0, u8 *, 0x3C);
-            temp_s0_2 = temp_s4 + *(&offset_x + temp_v1_2);
-            temp_s2_2 = temp_s5 + *(&offset_y + temp_v1_2);
-            if (FePlayerNo != 0) {
-                temp_a1 = ((temp_s1 ^ 1) * 0x19E8) + &plr;
-                if ((M2C_FIELD((temp_s3 + &plr), u8 *, 0x1D) != 0) && (M2C_FIELD(temp_a1, u8 *, 0x1D) != 0) && !(ChkPlrOffsets__Fiiii(temp_s0_2 * 8, temp_s2_2 * 8, M2C_FIELD(temp_a1, s32 *, 0x28), M2C_FIELD(temp_a1, s32 *, 0x2C)) & 0xFF)) {
-                    var_s6 = 0;
-                }
-            }
-            if ((var_s6 != 0) && (PosOkPlayer__Fiii(temp_s1, temp_s0_2, temp_s2_2) & 0xFF)) {
-                SetPlayerOld__Fi(temp_s1);
-                WorldToOffset__Fiii(temp_s1, (temp_s0_2 * 8) | 4, (temp_s2_2 * 8) | 4);
-            }
-        }
-    } else {
-        temp_s3_2 = (temp_s5 * 8) + (temp_s4 * 0x380);
-        temp_a1_2 = *(&dung_map + temp_s3_2);
-        if (temp_a1_2 > 0) {
-            temp_a0_2 = M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12);
-            if (((temp_a0_2 & 0xFF) != 0x28) && ((u32) (temp_a0_2 - 0x48) >= 4U)) {
-                M_TryM2MHit__Fiiiii(temp_s2, temp_a1_2 - 1, 0x1F4, M2C_FIELD(temp_s0, u8 *, 0x54), (s32) M2C_FIELD(temp_s0, u8 *, 0x55));
-                if ((u32) (M2C_FIELD(M2C_FIELD(temp_s0, void **, 0x60), u8 *, 0x12) - 0x59) >= 4U) {
-                    temp_v0 = (s8) M2C_FIELD(temp_s0, u8 *, 0x3C);
-                    temp_s0_3 = temp_s4 + *(&offset_x + temp_v0);
-                    temp_s2_3 = temp_s5 + *(&offset_y + temp_v0);
-                    if (PosOkMonst__Fiii(*(&dung_map + temp_s3_2) - 1, temp_s0_3, temp_s2_3) & 0xFF) {
-                        temp_a0_3 = *(&dung_map + temp_s3_2);
-                        temp_v0_2 = ((s16) temp_a0_3 - 1) * 0x68;
-                        *(&dung_map + ((temp_s2_3 * 8) + (temp_s0_3 * 0x380))) = temp_a0_3;
-                        temp_v1_3 = temp_v0_2 + &monster;
-                        *(&dung_map + temp_s3_2) = 0;
-                        M2C_FIELD(temp_v1_3, u8 *, 0x34) = temp_s0_3;
-                        *(&monster + 0x36 + temp_v0_2) = temp_s0_3;
-                        M2C_FIELD(temp_v1_3, u8 *, 0x35) = temp_s2_3;
-                        *(&monster + 0x37 + temp_v0_2) = temp_s2_3;
-                    }
-                }
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MissToMonst__Fiii);
 #if 0 /* ida */
 unsigned int __fastcall MissToMonst__Fiii(int a1, int a2, int a3)
 {
@@ -11487,106 +7529,12 @@ unsigned int __fastcall MissToMonst__Fiii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x801561B0  PosOkMonst3__Fiii  MONSTER.CPP:5353-5393  seg monster_1  fsize 56 ---- */
+/* ---- 0x801561B0  PosOkMonst3__Fiii  MONSTER.CPP:5353-5393  seg monster  fsize 56 ---- */
 /* unsigned char PosOkMonst3(int i, int x, int y)
  *   i=$s5 x=$s0 y=$s3 ret=$s2 oi=$v1 objtype=$a0 mi=$a0 fire=$s4 isdoor=$s1
  *   blocks: {1 }41
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", PosOkMonst3__Fiii) */
-#if 0 /* m2c */
-s32 PosOkMonst3__Fiii(s32 arg0, u8 arg1, u8 arg2) {
-    s16 *var_a1;
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_s1;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s4;
-    s32 var_v0;
-    s32 var_v0_2;
-    s32 var_v0_3;
-    s32 var_v0_4;
-    s32 var_v1;
-    s8 temp_a0;
-    s8 temp_v0;
-    s8 temp_v0_2;
-
-    var_s2 = 1;
-    var_s4 = 0;
-    temp_v0 = *(&dung_map + 3 + ((arg2 * 8) + (arg1 * 0x380)));
-    var_s1 = 0;
-    if (temp_v0 != 0) {
-        var_v1 = temp_v0 - 1;
-        if (temp_v0 <= 0) {
-            var_v1 = ~temp_v0;
-        }
-        temp_a0 = *(&object + 0x1E + (var_v1 * 0x2C));
-        var_s1 = 0;
-        if (((u32) (temp_a0 - 1) < 2U) || ((u32) (temp_a0 - 0x2A) < 2U) || (var_v0_2 = var_v1 * 2, (((u32) (temp_a0 - 0x4A) < 2U) != 0))) {
-            var_s1 = 1;
-            var_v0_2 = var_v1 * 2;
-        }
-        if (*(&object + 0x27 + ((((var_v0_2 + var_v1) * 4) - var_v1) * 4)) != 0) {
-            var_v0_3 = 1 & 0xFF;
-            if (!(var_s1 & 0xFF)) {
-                var_s2 = 0;
-                goto block_10;
-            }
-        } else {
-            goto block_10;
-        }
-    } else {
-block_10:
-        var_v0_3 = var_s2 & 0xFF;
-    }
-    var_v0 = var_s2;
-    if (var_v0_3 != 0) {
-        var_s2_2 = 0;
-        if (!(SolidLoc__Fii(arg1, arg2) & 0xFF) || (var_v0_4 = 0 & 0xFF, ((var_s1 & 0xFF) != 0))) {
-            var_v0_4 = 0 & 0xFF;
-            if (!(IsDplayer__Fii((s8) arg1, (s8) arg2) & 0xFF)) {
-                var_v0_4 = 0 & 0xFF;
-                if (*(&dung_map + ((arg2 * 8) + (arg1 * 0x380))) == 0) {
-                    var_s2_2 = 1;
-                    var_v0_4 = 1 & 0xFF;
-                }
-            }
-        }
-        if ((var_v0_4 != 0) && (temp_v0_2 = *(&dung_map + 5 + ((arg2 * 8) + (arg1 * 0x380))), (temp_v0_2 != 0)) && (arg0 >= 0)) {
-            if (temp_v0_2 > 0) {
-                if (*(&missile + 0x30 + (temp_v0_2 * 0x4C)) == 5) {
-                    var_s4 = 1;
-                } else {
-                    var_a0 = 0;
-                    if (nummissiles > 0) {
-                        var_a1 = &missileactive;
-                        do {
-                            if (*(&missile + 0x30 + (*var_a1 * 0x4C)) == 5) {
-                                var_s4 = 1;
-                            }
-                            var_a0 += 1;
-                            var_a1 += 2;
-                        } while (var_a0 < nummissiles);
-                    }
-                }
-            }
-            if (var_s4 & 0xFF) {
-                temp_v1 = arg0 * 0x68;
-                if (!(*(&monster + 0x30 + temp_v1) & 0x10) || (var_v0 = var_s2_2, (M2C_FIELD(*(&monster + 0x60 + temp_v1), u8 *, 0x12) == 0x6E))) {
-                    var_s2_2 = 0;
-                    goto block_32;
-                }
-            } else {
-                goto block_32;
-            }
-        } else {
-block_32:
-            var_v0 = var_s2_2;
-        }
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", PosOkMonst3__Fiii);
 #if 0 /* ida */
 int __fastcall PosOkMonst3__Fiii(int a1, int a2, int a3)
 {
@@ -11697,66 +7645,12 @@ LABEL_12:
 }
 #endif
 
-/* ---- 0x8015648C  M_SpawnSkel__Fiii  MONSTER.CPP:5406-5429  seg monster_1  fsize 72 ---- */
+/* ---- 0x8015648C  M_SpawnSkel__Fiii  MONSTER.CPP:5406-5429  seg monster  fsize 72 ---- */
 /* int M_SpawnSkel(int x, int y, int dir)
  *   x=$s5 y=$s6 dir=$s4 i=$s0 j=$s3 skeltypes=$s2 skel=$s0
  *   blocks: {1 }24
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_SpawnSkel__Fiii) */
-#if 0 /* m2c */
-u8 M_SpawnSkel__Fiii(u8 arg0, u8 arg1, s8 arg2) {
-    s32 temp_s3;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s2;
-    s32 var_s2_2;
-    u8 temp_v0;
-    u8 var_v0;
-
-    var_s2 = 0;
-    var_s0 = 0;
-    if (nummtypes > 0) {
-        var_s1 = 0;
-        do {
-            if (IsSkel__Fi(*(&Monsters + 0x12 + var_s1)) & 0xFF) {
-                var_s2 += 1;
-            }
-            var_s0 += 1;
-            var_s1 += 0x1C;
-        } while (var_s0 < nummtypes);
-    }
-    var_v0 = -1U;
-    if (var_s2 != 0) {
-        var_s2_2 = 0;
-        var_s0_2 = 0;
-        temp_s3 = ENG_random__Fl(var_s2);
-        if (nummtypes > 0) {
-            var_s1_2 = 0;
-loop_8:
-            if (temp_s3 >= var_s2_2) {
-                if (IsSkel__Fi(*(&Monsters + 0x12 + var_s1_2)) & 0xFF) {
-                    var_s2_2 += 1;
-                }
-                var_s0_2 += 1;
-                var_s1_2 += 0x1C;
-                if (var_s0_2 >= nummtypes) {
-
-                } else {
-                    goto loop_8;
-                }
-            }
-        }
-        temp_v0 = AddMonster__FiiiiUc(arg0, arg1, arg2, var_s0_2 - 1, 1);
-        if (temp_v0 != -1U) {
-            M_StartSpStand__Fii(temp_v0, arg2);
-        }
-        var_v0 = temp_v0;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_SpawnSkel__Fiii);
 #if 0 /* ida */
 int __fastcall M_SpawnSkel__Fiii(int a1, int a2, int a3)
 {
@@ -11819,37 +7713,12 @@ int __fastcall M_SpawnSkel__Fiii(int a1, int a2, int a3)
 }
 #endif
 
-/* ---- 0x801565DC  TalktoMonster__Fi  MONSTER.CPP:5445-5478  seg monster_1  fsize 40 ---- */
+/* ---- 0x801565DC  TalktoMonster__Fi  MONSTER.CPP:5445-5478  seg monster  fsize 40 ---- */
 /* void TalktoMonster(int i)
  *   i=$a0 pnum=$s1 itm@sp-0x18 Monst=$s0
  *   blocks: {1 }31
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", TalktoMonster__Fi) */
-#if 0 /* m2c */
-void TalktoMonster__Fi(s32 arg0) {
-    s32 sp10;
-    u8 temp_s1;
-    u8 temp_v1;
-    void *temp_s0;
-
-    temp_s0 = (arg0 * 0x68) + &monster;
-    temp_s1 = M2C_FIELD(temp_s0, u8 *, 0x3D);
-    if ((M2C_FIELD(temp_s0, s8 *, 0x33) != 0x11) && ((temp_v1 = M2C_FIELD(temp_s0, u8 *, 0x4C), M2C_FIELD(temp_s0, s8 *, 0x33) = 0x11, (temp_v1 == 0x17)) || (temp_v1 == 0x1E))) {
-        if ((QuestStatus__Fi(7) & 0xFF) && (M2C_FIELD(&quests, u8 *, 0x9B) == 2) && (PlrHasItem__FiiRi(temp_s1, 0xC, &sp10) != 0)) {
-            RemoveInvItem__Fii(temp_s1, sp10);
-            M2C_FIELD(&quests, s8 *, 0x8E) = 3;
-            M2C_FIELD(temp_s0, s32 *, 0) = 0x16;
-            M2C_FIELD(temp_s0, s8 *, 0x49) = 6;
-            NetSendCmdQuest__FUcUc(1, 7);
-        }
-        if ((QuestStatus__Fi(4) & 0xFF) && (M2C_FIELD(temp_s0, s32 *, 0) >= 0x51) && (PlrHasItem__FiiRi(temp_s1, 0xF, &sp10) != 0)) {
-            RemoveInvItem__Fii(temp_s1, sp10);
-            M2C_FIELD(temp_s0, s32 *, 0) = 0x53;
-            M2C_FIELD(temp_s0, s8 *, 0x49) = 6;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", TalktoMonster__Fi);
 #if 0 /* ida */
 int __fastcall TalktoMonster__Fi(int a1)
 {
@@ -11899,44 +7768,12 @@ int __fastcall TalktoMonster__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8015671C  SpawnGolum__Fiiii  MONSTER.CPP:5485-5512  seg monster_1  fsize 32 ---- */
+/* ---- 0x8015671C  SpawnGolum__Fiiii  MONSTER.CPP:5485-5512  seg monster  fsize 32 ---- */
 /* void SpawnGolum(int i, int x, int y, int mi)
  *   i=$a0 x=$a1 y=$a2 mi=$a3
  *   blocks: {1 }28
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", SpawnGolum__Fiiii) */
-#if 0 /* m2c */
-void SpawnGolum__Fiiii(s32 arg0, s8 arg1, s8 arg2, s32 arg3) {
-    s32 temp_a1;
-    s32 temp_s0;
-    s32 temp_t0;
-    s32 temp_v1;
-    s8 temp_a2;
-
-    *(&dung_map + ((arg2 * 8) + (arg1 * 0x380))) = arg0 + 1;
-    temp_s0 = arg0 * 0x68;
-    temp_v1 = arg0 * 0x19E8;
-    *(&monster + 0x34 + temp_s0) = arg1;
-    *(&monster + 0x35 + temp_s0) = arg2;
-    *(&monster + 0x36 + temp_s0) = arg1;
-    *(&monster + 0x37 + temp_s0) = arg2;
-    *(&monster + 0x38 + temp_s0) = arg1;
-    *(&monster + 0x39 + temp_s0) = arg2;
-    temp_t0 = arg3 * 0x4C;
-    temp_a2 = *(&missile + 0x40 + temp_t0);
-    *(&monster + 0x48 + temp_s0) = 0x19;
-    temp_a1 = ((*(&plr + 0x134 + temp_v1) / 3) * 2) + (temp_a2 * 0x280);
-    *(&monster + 0x14 + temp_s0) = temp_a1;
-    *(&monster + 0x10 + temp_s0) = temp_a1;
-    *(&monster + 0x50 + temp_s0) = (*(&plr + 0x13C + temp_v1) * 2) + 0x28 + (*(&missile + 0x40 + temp_t0) * 5);
-    *(&monster + 0x51 + temp_s0) = (*(&missile + 0x40 + temp_t0) * 2) + 8;
-    *(&monster + 0x3D + temp_s0) = 0;
-    *(&monster + 0x2C + temp_s0) = *(&monster + 0x2C + temp_s0) | 0x30;
-    *(&monster + 0x52 + temp_s0) = (*(&missile + 0x40 + temp_t0) * 2) + 0x10;
-    M_StartSpStand__Fii(0U, temp_a2 << 7);
-    NetSendCmdGolem__FUcUcUcUclUc(*(&monster + 0x34 + temp_s0), *(&monster + 0x35 + temp_s0), *(&monster + 0x3C + temp_s0), *(&monster + 0x3D + temp_s0), *(&monster + 0x10 + temp_s0), (s32) currlevel);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", SpawnGolum__Fiiii);
 #if 0 /* ida */
 int __fastcall SpawnGolum__Fiiii(int a1, int a2, int a3, int a4)
 {
@@ -11979,59 +7816,19 @@ int __fastcall SpawnGolum__Fiiii(int a1, int a2, int a3, int a4)
 }
 #endif
 
-/* ---- 0x8015694C  CanTalkToMonst__Fi  MONSTER.CPP:5519-5524  seg monster_1  fsize 0 ---- */
+/* ---- 0x8015694C  CanTalkToMonst__Fi  MONSTER.CPP:5519-5524  seg monster  fsize 0 ---- */
 /* unsigned char CanTalkToMonst(int m)
  *   m=$a0
  *   blocks: {1 }6
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", CanTalkToMonst__Fi) */
-#if 0 /* m2c */
-s32 CanTalkToMonst__Fi(s32 arg0) {
-    u8 temp_v1;
+INCLUDE_ASM("asm/nonmatchings/monster", CanTalkToMonst__Fi);
 
-    temp_v1 = *(&monster + 0x49 + (arg0 * 0x68));
-    if (temp_v1 == 6) {
-        return 1;
-    }
-    return temp_v1 == 7;
-}
-#endif
-
-/* ---- 0x8015698C  CheckMonsterHit__FiRUc  MONSTER.CPP:5531-5547  seg monster_1  fsize 0 ---- */
+/* ---- 0x8015698C  CheckMonsterHit__FiRUc  MONSTER.CPP:5531-5547  seg monster  fsize 0 ---- */
 /* unsigned char CheckMonsterHit(int m, unsigned char *ret)
  *   m=$a0 ret=$a1
  *   blocks: {1 }17
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", CheckMonsterHit__FiRUc) */
-#if 0 /* m2c */
-s32 CheckMonsterHit__FiRUc(s32 arg0, s8 *arg1) {
-    s32 temp_a2;
-    s32 temp_v1_2;
-    s32 var_v0;
-    u16 temp_v1;
-
-    temp_a2 = arg0 * 0x68;
-    var_v0 = arg0 * 2;
-    if (*(&monster + 0x4C + temp_a2) == 0xC) {
-        temp_v1 = *(&monster + 0x2C + temp_a2);
-        if (temp_v1 & 4) {
-            *(&monster + 0x2C + temp_a2) = temp_v1 & 0xFFFB;
-            *(&monster + 0x33 + temp_a2) = 7;
-            *arg1 = 1;
-            return 1;
-        }
-        var_v0 = arg0 * 2;
-        goto block_4;
-    }
-block_4:
-    temp_v1_2 = (((var_v0 + arg0) * 4) + arg0) * 8;
-    if (((u32) (M2C_FIELD(*(&monster + 0x60 + temp_v1_2), u8 *, 0x12) - 0x69) < 4U) && (*(&monster + 0x49 + temp_v1_2) != 1)) {
-        *arg1 = 0;
-        return 1;
-    }
-    return 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", CheckMonsterHit__FiRUc);
 #if 0 /* ida */
 int __fastcall CheckMonsterHit__FiRUc(int a1, _BYTE *a2)
 {
@@ -12068,22 +7865,12 @@ int __fastcall CheckMonsterHit__FiRUc(int a1, _BYTE *a2)
 }
 #endif
 
-/* ---- 0x80156A68  gSameRoom__Fii  MONSTER.CPP:5556-5562  seg monster_1  fsize 0 ---- */
+/* ---- 0x80156A68  gSameRoom__Fii  MONSTER.CPP:5556-5562  seg monster  fsize 0 ---- */
 /* BOOL gSameRoom(int m, int i)
  *   m=$a0 i=$a1 m1=$v0 m2=$v1
  *   blocks: {1 }7
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", gSameRoom__Fii) */
-#if 0 /* m2c */
-s32 gSameRoom__Fii(s32 arg0, s32 arg1) {
-    void *temp_v0;
-    void *temp_v1;
-
-    temp_v0 = (arg0 * 0x68) + &monster;
-    temp_v1 = (arg1 * 0x68) + &monster;
-    return *(&dung_map + 7 + ((M2C_FIELD(temp_v0, s8 *, 0x35) * 8) + (M2C_FIELD(temp_v0, s8 *, 0x34) * 0x380))) == *(&dung_map + 7 + ((M2C_FIELD(temp_v1, s8 *, 0x35) * 8) + (M2C_FIELD(temp_v1, s8 *, 0x34) * 0x380)));
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", gSameRoom__Fii);
 #if 0 /* ida */
 BOOL __fastcall gSameRoom__Fii(int a1, int a2)
 {
@@ -12091,169 +7878,12 @@ BOOL __fastcall gSameRoom__Fii(int a1, int a2)
 }
 #endif
 
-/* ---- 0x80156B00  MAI_Golum__Fi  MONSTER.CPP:5566-5741  seg monster_1  fsize 88 ---- */
+/* ---- 0x80156B00  MAI_Golum__Fi  MONSTER.CPP:5566-5741  seg monster  fsize 88 ---- */
 /* void MAI_Golum(int i)
  *   i=$s4 ok=$s2 j=$s0 k=$a1 mid=$v1 mx=$s0 my=$s5 md=$s1 cursm=$fp sdata@sp-0x40 omp=$s7 Monst=$s3 pMonster=$s1 nd=$v0
  *   blocks: {1 {33 {34 {35 {67 {69 {96 {101 {103 }114 }114 }119 }119 }119 }119 }119 }119 }175
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", MAI_Golum__Fi) */
-#if 0 /* m2c */
-void MAI_Golum__Fi(s32 arg0) {
-    s32 sp18;
-    s16 temp_v1_3;
-    s32 temp_a0_3;
-    s32 temp_a2;
-    s32 temp_fp;
-    s32 temp_s0;
-    s32 temp_s2;
-    s32 temp_s5;
-    s32 temp_s7;
-    s32 temp_v0_3;
-    s32 var_a1;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s2;
-    s32 var_s2_2;
-    s32 var_s6;
-    s32 var_v0;
-    s8 temp_a0;
-    s8 temp_a0_2;
-    s8 temp_a1;
-    u8 temp_s0_2;
-    u8 temp_v0_2;
-    u8 temp_v1;
-    u8 temp_v1_2;
-    u8 var_s0_3;
-    u8 var_s1;
-    void *temp_s3;
-    void *temp_v0;
-
-    temp_s7 = myplr;
-    sp18 = sel_data;
-    temp_s3 = (arg0 * 0x68) + &monster;
-    temp_fp = (&_pcursmonst)[sel_data];
-    if (M2C_FIELD(temp_s3, u16 *, 0x34) != 1) {
-        temp_a0 = M2C_FIELD(temp_s3, s8 *, 0x33);
-        if ((temp_a0 != 6) && (temp_a0 != 0xB) && ((u32) ((temp_a0 - 1) & 0xFF) >= 3U)) {
-            sel_data = 0;
-            myplr = -1;
-            _pcursmonst = -1;
-            temp_v1 = M2C_FIELD(temp_s3, u8 *, 0x3D);
-            if ((temp_v1 != 0) && (((s32) *(&monster + 0x10 + (temp_v1 * 0x68)) >> 6) <= 0)) {
-                M2C_FIELD(temp_s3, u8 *, 0x3D) = 0U;
-            }
-            if (M2C_FIELD(temp_s3, s8 *, 0x33) != 4) {
-                temp_v1_2 = M2C_FIELD(temp_s3, u8 *, 0x3D);
-                if (temp_v1_2 != 0) {
-                    var_s6 = 0;
-                    if (M2C_FIELD(temp_s3, u8 *, 0x4E) == 0) {
-                        goto block_11;
-                    }
-                    temp_s2 = temp_v1_2 * 0x68;
-                    temp_v0 = temp_s2 + &monster;
-                    temp_a0_2 = (s8) M2C_FIELD(temp_s3, u16 *, 0x34);
-                    temp_a1 = M2C_FIELD(temp_s3, s8 *, 0x35);
-                    temp_s0 = temp_a0_2 - M2C_FIELD(temp_v0, s8 *, 0x36);
-                    temp_s5 = temp_a1 - M2C_FIELD(temp_v0, s8 *, 0x37);
-                    var_s1 = GetDirection__Fiiii(temp_a0_2, temp_a1, M2C_FIELD(temp_v0, s8 *, 0x34), M2C_FIELD(temp_v0, s8 *, 0x35));
-                    M2C_FIELD(temp_s3, u8 *, 0x3C) = var_s1;
-                    if (abs(temp_s0) < 2) {
-                        var_s6 = abs(temp_s5) < 2;
-                    }
-                    if (var_s6 != 0) {
-                        if (*(&monster + 0x4E + temp_s2) == 0) {
-                            *(&monster + 0x4E + temp_s2) = 0xFF;
-                            var_s0 = 0;
-                            *(&monster + 0x43 + temp_s2) = (u8) M2C_FIELD(temp_s3, u16 *, 0x34);
-                            temp_a2 = arg0 * 0x68;
-                            *(&monster + 0x44 + temp_s2) = (u8) M2C_FIELD(temp_s3, s8 *, 0x35);
-                            var_a1 = 0;
-                            do {
-                                var_v0 = -2;
-loop_26:
-                                temp_v1_3 = *(&dung_map + (((*(&monster + 0x35 + temp_a2) + (var_s0 - 2)) * 8) + ((*(&monster + 0x34 + temp_a2) + var_v0) * 0x380)));
-                                if (temp_v1_3 > 0) {
-                                    *(&monster + 0x4E + (temp_v1_3 * 0x68)) = 0xFF;
-                                }
-                                var_a1 += 1;
-                                var_v0 = var_a1 - 2;
-                                if (var_a1 < 5) {
-                                    goto loop_26;
-                                }
-                                var_s0 += 1;
-                                var_a1 = 0;
-                            } while (var_s0 < 5);
-                        }
-                        M_StartAttack__Fi(arg0);
-                    } else {
-                        temp_v0_2 = M2C_FIELD(temp_s3, u8 *, 0x4E);
-                        if (temp_v0_2 != 0) {
-                            M2C_FIELD(temp_s3, u8 *, 0x4E) = (u8) (temp_v0_2 - 1);
-                        } else {
-                            M2C_FIELD(temp_s3, u8 *, 0x4E) = 0U;
-                        }
-                        var_s2 = 1;
-                        if (!(DirOK__Fii(arg0, var_s1) & 0xFF)) {
-                            var_s0_2 = (var_s1 + 1) & 7;
-                            var_s2 = 0;
-                            if (var_s0_2 != var_s1) {
-loop_36:
-                                temp_s0_2 = var_s0_2 & 7;
-                                var_s2 = DirOK__Fii(arg0, temp_s0_2) & 0xFF;
-                                if (var_s2 != 0) {
-                                    var_s1 = temp_s0_2;
-                                }
-                                var_s0_2 = temp_s0_2 + 1;
-                                if ((var_s0_2 != var_s1) && (var_s2 == 0)) {
-                                    goto loop_36;
-                                }
-                            }
-                        }
-                        if (var_s2 != 0) {
-                            goto block_41;
-                        }
-                        M2C_FIELD(temp_s3, u8 *, 0x3D) = 0U;
-                    }
-                } else {
-block_11:
-                    M2C_FIELD(temp_s3, u8 *, 0x4E) = 0xFAU;
-                    CheckArea__FiiiUci((s8) M2C_FIELD(temp_s3, u16 *, 0x34), M2C_FIELD(temp_s3, s8 *, 0x35), 4, 0, -1);
-                    temp_a0_3 = (&_pcursmonst)[sel_data];
-                    var_s2_2 = 1;
-                    if ((temp_a0_3 > 0) && (var_s2_2 = 1, (gSameRoom__Fii(temp_a0_3, arg0) != 0))) {
-                        M2C_FIELD(temp_s3, u8 *, 0x3D) = (u8) (&_pcursmonst)[sel_data];
-                        M2C_FIELD(temp_s3, u8 *, 0x4A) = (u8) M2C_FIELD((((&_pcursmonst)[sel_data] * 0x68) + &monster), u8 *, 0x36);
-                        M2C_FIELD(temp_s3, u8 *, 0x4B) = (u8) M2C_FIELD((((&_pcursmonst)[sel_data] * 0x68) + &monster), u8 *, 0x37);
-                    } else {
-                        M2C_FIELD(temp_s3, u8 *, 0x3D) = 0U;
-                        var_s1 = (u8) *(&plr + 0x42 + (arg0 * 0x19E8));
-                        if (!(DirOK__Fii(arg0, var_s1) & 0xFF)) {
-                            var_s0_3 = 0;
-loop_16:
-                            var_s1 = var_s0_3;
-                            var_s2_2 = DirOK__Fii(arg0, var_s1) & 0xFF;
-                            var_s0_3 = var_s1 + 1;
-                            if ((s32) var_s0_3 < 8) {
-                                if (var_s2_2 == 0) {
-                                    goto loop_16;
-                                }
-                            }
-                        }
-                        if (var_s2_2 != 0) {
-block_41:
-                            M_WalkDir__Fii(arg0, var_s1);
-                        }
-                    }
-                }
-            }
-            myplr = temp_s7;
-            temp_v0_3 = sel_data * 4;
-            sel_data = sp18;
-            *(&_pcursmonst + temp_v0_3) = temp_fp;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", MAI_Golum__Fi);
 #if 0 /* ida */
 int __fastcall MAI_Golum__Fi(int a1)
 {
@@ -12437,37 +8067,12 @@ LABEL_43:
 }
 #endif
 
-/* ---- 0x8015702C  M_StartAttack__Fi  MONSTER.CPP:5786-5806  seg monster_1  fsize 32 ---- */
+/* ---- 0x8015702C  M_StartAttack__Fi  MONSTER.CPP:5786-5806  seg monster  fsize 32 ---- */
 /* void M_StartAttack(int i)
  *   i=$s1 md=$s2 pmonster=$v0 _mx=$v1 _my=$a1
  *   blocks: {1 }21
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_StartAttack__Fi) */
-#if 0 /* m2c */
-void M_StartAttack__Fi(s32 arg0) {
-    s32 temp_s0;
-    s8 temp_a1;
-    s8 temp_v1;
-    u8 temp_v0;
-    void *temp_v0_2;
-
-    temp_v0 = M_GetDir__Fi();
-    temp_s0 = arg0 * 0x68;
-    NewMonsterAnim__FiR10AnimStructii(arg0, *(&monster + 0x60 + temp_s0) + 8, temp_v0, 2);
-    temp_v0_2 = temp_s0 + &monster;
-    temp_v1 = M2C_FIELD(temp_v0_2, s8 *, 0x34);
-    temp_a1 = M2C_FIELD(temp_v0_2, s8 *, 0x35);
-    *(&monster + 0x33 + temp_s0) = 4;
-    *(&monster + 0x3A + temp_s0) = 0;
-    *(&monster + 0x3B + temp_s0) = 0;
-    *(&monster + 0x3C + temp_s0) = temp_v0;
-    *(&monster + 0x36 + temp_s0) = temp_v1;
-    *(&monster + 0x37 + temp_s0) = temp_a1;
-    *(&monster + 0x38 + temp_s0) = temp_v1;
-    *(&monster + 0x39 + temp_s0) = temp_a1;
-    M_CheckEFlag__Fi(arg0, temp_a1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartAttack__Fi);
 #if 0 /* ida */
 int __fastcall M_StartAttack__Fi(int a1)
 {
@@ -12495,46 +8100,12 @@ int __fastcall M_StartAttack__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8015711C  M_StartWalk__Fiiiiii  MONSTER.CPP:5810-5841  seg monster_1  fsize 32 ---- */
+/* ---- 0x8015711C  M_StartWalk__Fiiiiii  MONSTER.CPP:5810-5841  seg monster  fsize 32 ---- */
 /* void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir)
  *   i=$s1 xvel=$a1 yvel=$a2 xadd=$a3 yadd=$t5 EndDir=$v1 fx=$t0 fy=$t3 pmonster=$v0 _mx=$t1 _my=$t2
  *   blocks: {1 }32
  */
-/* linked from build/src/monster_1.c.o (segment monster_1 mixes several source files) — INCLUDE_ASM("asm/nonmatchings/monster_1", M_StartWalk__Fiiiiii) */
-#if 0 /* m2c */
-void M_StartWalk__Fiiiiii(s32 arg0, s16 arg1, s16 arg2, s16 arg3, s32 arg4, s32 arg5) {
-    s32 temp_s0;
-    s8 temp_t0;
-    s8 temp_t1;
-    s8 temp_t2;
-    s8 temp_t3;
-    void *temp_v0;
-
-    temp_s0 = arg0 * 0x68;
-    temp_v0 = temp_s0 + &monster;
-    temp_t1 = M2C_FIELD(temp_v0, s8 *, 0x34);
-    temp_t2 = M2C_FIELD(temp_v0, s8 *, 0x35);
-    temp_t0 = temp_t1 + arg3;
-    temp_t3 = temp_t2 + arg4;
-    *(&dung_map + ((temp_t3 * 8) + (temp_t0 * 0x380))) = ~arg0;
-    *(&monster + 0x18 + temp_s0) = arg3;
-    *(&monster + 0x33 + temp_s0) = 1;
-    *(&monster + 0x38 + temp_s0) = temp_t1;
-    *(&monster + 0x39 + temp_s0) = temp_t2;
-    *(&monster + 0x36 + temp_s0) = temp_t0;
-    *(&monster + 0x37 + temp_s0) = temp_t3;
-    *(&monster + 0x28 + temp_s0) = arg1;
-    *(&monster + 0x2A + temp_s0) = arg2;
-    *(&monster + 0x1A + temp_s0) = (s16) arg4;
-    *(&monster + 0x1C + temp_s0) = (s16) arg5;
-    *(&monster + 0x3C + temp_s0) = (s8) arg5;
-    NewMonsterAnim__FiR10AnimStructii(*(&monster + 0x60 + temp_s0) + 6, arg5, 1U);
-    *(&monster + 0x22 + temp_s0) = 0;
-    *(&monster + 0x24 + temp_s0) = 0;
-    *(&monster + 0x26 + temp_s0) = 0;
-    M_CheckEFlag__Fi(arg0);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/monster", M_StartWalk__Fiiiiii);
 #if 0 /* ida */
 int __fastcall M_StartWalk__Fiiiiii(int a1, __int16 a2, __int16 a3, int a4, int a5, int a6)
 {

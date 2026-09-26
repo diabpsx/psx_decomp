@@ -790,6 +790,13 @@ _WORD *__fastcall __4CPadi(_WORD *a1, __int16 a2)
  *   blocks: {1 }8
  */
 /* linked from build/src/startup.c.o (segment startup mixes several source files) — INCLUDE_ASM("asm/nonmatchings/startup", PAD_Open__Fv) */
+#if 0 /* m2c */
+void PAD_Open__Fv(void) {
+    InitTAP(&RawPadData0, 0x22, &RawPadData1, 0x22);
+    StartTAP();
+    PadInit(1);
+}
+#endif
 #if 0 /* ida */
 void PAD_Open__Fv()
 {

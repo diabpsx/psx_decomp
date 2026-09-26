@@ -3,45 +3,12 @@
  * then the m2c and Hex-Rays drafts under #if 0.  Replace one INCLUDE_ASM at a time with C. */
 #include "common.h"
 
-/* ---- 0x80159590  GetFileNumber__FiPc  DLG.CPP:188-202  seg dlg  fsize 48 ---- */
+/* ---- 0x80159590  GetFileNumber__FiPc  DLG.CPP:188-202  seg dlg_2  fsize 48 ---- */
 /* int GetFileNumber(int side, char *file_name)
  *   side=$a0 file_name=$s4 i=$s0
  *   blocks: {1 }15
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetFileNumber__FiPc);
-#if 0 /* m2c */
-s32 GetFileNumber__FiPc(s32 arg0, s32 arg1) {
-    M2C_UNK *var_s1;
-    s32 *temp_a1;
-    s32 temp_v1;
-    s32 var_s0;
-    s32 var_v0;
-
-    temp_v1 = arg0 * 4;
-    if (*(&card_usable + temp_v1) == 0) {
-        return -1;
-    }
-    temp_a1 = temp_v1 + &card_files;
-    var_s0 = 0;
-    if (*temp_a1 > 0) {
-        var_s1 = &card_dir;
-loop_4:
-        var_v0 = var_s0;
-        if (strcmp((arg0 * 0x280) + var_s1, arg1) != 0) {
-            var_s0 += 1;
-            var_s1 += 0x28;
-            if (var_s0 >= *temp_a1) {
-                goto block_6;
-            }
-            goto loop_4;
-        }
-    } else {
-block_6:
-        var_v0 = -1;
-    }
-    return var_v0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetFileNumber__FiPc);
 #if 0 /* ida */
 int __fastcall GetFileNumber__FiPc(int a1, int a2)
 {
@@ -74,50 +41,18 @@ int __fastcall GetFileNumber__FiPc(int a1, int a2)
 }
 #endif
 
-/* ---- 0x80159650  DoSaveOptions__Fv  DLG.CPP:206-207  seg dlg  fsize 24 ---- */
+/* ---- 0x80159650  DoSaveOptions__Fv  DLG.CPP:206-207  seg dlg_2  fsize 24 ---- */
 /* int DoSaveOptions(void)
  *   blocks: {1 }2
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", DoSaveOptions__Fv);
-#if 0 /* m2c */
-void DoSaveOptions__Fv(void) {
-    PSX_OPT_SaveGame__FiPc(current_card, DiabloOptionFile);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", DoSaveOptions__Fv);
 
-/* ---- 0x80159678  DoSaveGame__Fv  DLG.CPP:214-252  seg dlg  fsize 104 ---- */
+/* ---- 0x80159678  DoSaveGame__Fv  DLG.CPP:214-252  seg dlg_2  fsize 104 ---- */
 /* int DoSaveGame(void)
  *   temp_name@sp-0x40 Classes@sp-0x20
  *   blocks: {1 }39
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", DoSaveGame__Fv);
-#if 0 /* m2c */
-void DoSaveGame__Fv(void) {
-    s32 sp48;
-    s32 sp4C;
-    s32 sp50;
-    s32 (*temp_s0_2)[];
-    s32 (*temp_s1)[];
-    s32 (*temp_s2)[];
-    s32 temp_s0;
-    s32 temp_s1_2;
-
-    sp48 = M2C_FIELD(&D_801436A0, s32 *, 0);
-    sp4C = M2C_FIELD(&D_801436A0, s32 *, 4);
-    sp50 = M2C_FIELD(&D_801436A0, s32 *, 8);
-    if (FePlayerNo == 0) {
-        temp_s0 = GetDiabloStr__Fv(M2C_FIELD(&D_801436A0, s32 *, 4), M2C_FIELD(&D_801436A0, s32 *, 8), &D_801436A0);
-        temp_s1 = GetStr__Fi(0x292);
-        sprintf((s32 (*)[]) &sp28[0], (s32 (*)[]) D_801436AC, temp_s0, temp_s1, GetStr__Fi(0x290), (s32) M2C_FIELD(&plr, s8 *, 0x13C), M2C_FIELD(&(&sp28[0])[M2C_FIELD(&plr, s8 *, 0xF6)], s32 (**)[], 0x20), (&plr + 0x13C) - 0x66);
-    } else {
-        temp_s1_2 = GetDiabloStr__Fv(M2C_FIELD(&D_801436A0, s32 *, 4), M2C_FIELD(&D_801436A0, s32 *, 8), &D_801436A0);
-        temp_s2 = GetStr__Fi(0x292);
-        temp_s0_2 = GetStr__Fi(0x290);
-        sprintf((s32 (*)[]) &sp28[0], (s32 (*)[]) D_801436C0, temp_s1_2, temp_s2, temp_s0_2, (s32) M2C_FIELD(&plr, s8 *, 0x13C), M2C_FIELD(&(&sp28[0])[M2C_FIELD(&plr, s8 *, 0xF6)], s32 (**)[], 0x20), GetStr__Fi(0x290), (s32) M2C_FIELD(&plr, s8 *, 0x1B24), M2C_FIELD(&(&sp28[0])[M2C_FIELD(&plr, s8 *, 0x1ADE)], s32 *, 0x20));
-    }
-    PSX_GM_SaveGame__FiPcT1(current_card, DiabloGameFile, &sp28[0]);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", DoSaveGame__Fv);
 #if 0 /* ida */
 int DoSaveGame__Fv()
 {
@@ -171,36 +106,12 @@ int DoSaveGame__Fv()
 }
 #endif
 
-/* ---- 0x801597F0  DoLoadGame__Fv  DLG.CPP:258-278  seg dlg  fsize 24 ---- */
+/* ---- 0x801597F0  DoLoadGame__Fv  DLG.CPP:258-278  seg dlg_2  fsize 24 ---- */
 /* void DoLoadGame(void)
  *   result=$v1
  *   blocks: {1 {1 {5 {6 }21 }21 }21 }21
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", DoLoadGame__Fv);
-#if 0 /* m2c */
-void DoLoadGame__Fv(void) {
-    s32 temp_v0;
-    s32 var_v0;
-
-    DoLoadedGame = 0;
-    if (GetLoadStatusMessage__FPc(DiabloGameFile) != 0) {
-        temp_v0 = PSX_GM_LoadGame__FUcii(1, current_card, GetFileNumber__FiPc(current_card, DiabloGameFile));
-        if (temp_v0 != 0) {
-            var_v0 = 0x25D;
-            if (temp_v0 == -2) {
-                var_v0 = 0x25C;
-            }
-            AlertTxt = var_v0;
-            DoLoadedGame = 0;
-            return;
-        }
-        AlertTxt = 0;
-        MemcardOFF__Fv();
-        DoLoadedGame = 1;
-        FeFlag = 2;
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", DoLoadGame__Fv);
 #if 0 /* ida */
 int DoLoadGame__Fv()
 {
@@ -241,25 +152,12 @@ int DoLoadGame__Fv()
 }
 #endif
 
-/* ---- 0x80159894  DoFrontEndLoadCharacter__Fi  DLG.CPP:286-297  seg dlg  fsize 32 ---- */
+/* ---- 0x80159894  DoFrontEndLoadCharacter__Fi  DLG.CPP:286-297  seg dlg_2  fsize 32 ---- */
 /* int DoFrontEndLoadCharacter(int slot)
  *   slot=$s1 result=$s0
  *   blocks: {1 {1 }7 }12
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", DoFrontEndLoadCharacter__Fi);
-#if 0 /* m2c */
-s32 DoFrontEndLoadCharacter__Fi(s32 arg0) {
-    s32 var_s0;
-
-    var_s0 = -1;
-    if (GetLoadStatusMessage__FPc(DiabloCharacterFile) != 0) {
-        PSX_CH_LoadGame__Fi(arg0);
-        var_s0 = 0;
-    }
-    MemcardOFF__Fv();
-    return var_s0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", DoFrontEndLoadCharacter__Fi);
 #if 0 /* ida */
 int __fastcall DoFrontEndLoadCharacter__Fi(int a1)
 {
@@ -277,53 +175,23 @@ int __fastcall DoFrontEndLoadCharacter__Fi(int a1)
 }
 #endif
 
-/* ---- 0x801598EC  McInitLoadCard1Menu__Fv  DLG.CPP:303-313  seg dlg  fsize 0 ---- */
+/* ---- 0x801598EC  McInitLoadCard1Menu__Fv  DLG.CPP:303-313  seg dlg_2  fsize 0 ---- */
 /* void McInitLoadCard1Menu(void)
  *   blocks: {1 }11
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", McInitLoadCard1Menu__Fv);
-#if 0 /* m2c */
-void McInitLoadCard1Menu__Fv(void) {
-    current_card = 0;
-    if (LoadType == 1) {
-        loadflag = 4;
-        return;
-    }
-    DoLoadedChar = 1;
-    FeFlag = 2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", McInitLoadCard1Menu__Fv);
 
-/* ---- 0x8015992C  McInitLoadCard2Menu__Fv  DLG.CPP:318-328  seg dlg  fsize 0 ---- */
+/* ---- 0x8015992C  McInitLoadCard2Menu__Fv  DLG.CPP:318-328  seg dlg_2  fsize 0 ---- */
 /* void McInitLoadCard2Menu(void)
  *   blocks: {1 }11
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", McInitLoadCard2Menu__Fv);
-#if 0 /* m2c */
-void McInitLoadCard2Menu__Fv(void) {
-    current_card = 1;
-    if (LoadType == 1) {
-        loadflag = 4;
-        return;
-    }
-    DoLoadedChar = 1;
-    FeFlag = 2;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", McInitLoadCard2Menu__Fv);
 
-/* ---- 0x8015996C  ChooseCardLoad__Fv  DLG.CPP:333-340  seg dlg  fsize 32 ---- */
+/* ---- 0x8015996C  ChooseCardLoad__Fv  DLG.CPP:333-340  seg dlg_2  fsize 32 ---- */
 /* void ChooseCardLoad(void)
  *   blocks: {1 }8
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ChooseCardLoad__Fv);
-#if 0 /* m2c */
-void ChooseCardLoad__Fv(void) {
-    fileinfoflag = 1;
-    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0, 1, 0x3B7, NULL, &LargeFont);
-    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0xC, 1, 0x288, &McLoadCard1Menu, &MediumFont);
-    FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont(0, 0x30, 1, 0x289, &McLoadCard2Menu, &MediumFont);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ChooseCardLoad__Fv);
 #if 0 /* ida */
 int ChooseCardLoad__Fv()
 {
@@ -336,23 +204,11 @@ int ChooseCardLoad__Fv()
 }
 #endif
 
-/* ---- 0x80159A08  McInitLoadGameMenu__Fv  DLG.CPP:344-356  seg dlg  fsize 24 ---- */
+/* ---- 0x80159A08  McInitLoadGameMenu__Fv  DLG.CPP:344-356  seg dlg_2  fsize 24 ---- */
 /* void McInitLoadGameMenu(void)
  *   blocks: {1 }13
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", McInitLoadGameMenu__Fv);
-#if 0 /* m2c */
-void McInitLoadGameMenu__Fv(void) {
-    FeBackX = 0x20;
-    FeBackY = 0x40;
-    FeBackW = 0x100;
-    FeBackH = 0x70;
-    fileinfoflag = 0;
-    loadflag = 0;
-    LoadType = 1;
-    ChooseCardLoad__Fv();
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", McInitLoadGameMenu__Fv);
 #if 0 /* ida */
 int McInitLoadGameMenu__Fv()
 {
@@ -369,98 +225,12 @@ int McInitLoadGameMenu__Fv()
 }
 #endif
 
-/* ---- 0x80159A6C  McMainKeyCtrl__Fv  DLG.CPP:366-467  seg dlg  fsize 48 ---- */
+/* ---- 0x80159A6C  McMainKeyCtrl__Fv  DLG.CPP:366-467  seg dlg_2  fsize 48 ---- */
 /* void McMainKeyCtrl(void)
  *   um@sp-0x18
  *   blocks: {1 }100
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", McMainKeyCtrl__Fv);
-#if 0 /* m2c */
-void McMainKeyCtrl__Fv(void) {
-    u16 sp18;
-    u16 sp1A;
-    s16 sp1C;
-    s16 sp1E;
-    s32 temp_a0;
-    s32 temp_a1;
-    s32 temp_v0;
-    s32 var_v0;
-    s32 var_v0_2;
-
-    sp1C = 0x140;
-    sp1E = 0xA0;
-    sp18 = -8U;
-    sp1A = 0x20;
-    if (cardondelay > 0) {
-        cardondelay -= 1;
-        ShowLoadingBox__Fi(0x348);
-        if (cardondelay == 0) {
-            ActivateMemcard__Fii(1, 1);
-            goto block_3;
-        }
-    } else {
-block_3:
-        temp_v0 = loadflag - 1;
-        if (loadflag != 0) {
-            loadflag = temp_v0;
-            if (temp_v0 == 0) {
-                DoLoadGame__Fv();
-                var_v0 = AlertTxt;
-                goto block_26;
-            }
-            ShowLoadingBox__Fi(*(&card_side_load + (current_card * 4)));
-            return;
-        }
-        if (AlertTxt != 0) {
-            ShowAlertBox__Fv();
-            if (DavesPad & 0x40) {
-                PlaySFX__Fi(0x33);
-                AlertTxt = 0;
-            }
-        } else {
-            ShowCardActionText__Fv();
-            if (fileinfoflag != 0) {
-                ShowGameFiles__FPciiG4RECTi(DiabloGameFile, 0, 0x12, sp18 | (sp1A << 0x10), M2C_UNALIGNED32(sp1C), 0xC);
-            }
-            if (DavesPad & 1) {
-                FeSelUp__Fi(1);
-            }
-            if (DavesPad & 2) {
-                FeSelDown__Fi(1);
-            }
-            if (DavesPad & 0x40) {
-                temp_a0 = FeGetCursor__Fv() - 1;
-                temp_a1 = temp_a0 * 4;
-                McMenuPos = temp_a0;
-                if (*(&card_status + temp_a1) == 2) {
-                    var_v0_2 = *(&card_side_empty + temp_a1);
-                    goto block_23;
-                }
-                if (*(&card_usable + temp_a1) == 0) {
-                    AlertTxt = 0x509;
-                    PlaySFX__Fi(0x3D3, temp_a1);
-                    return;
-                }
-                if (GetFileNumber__FiPc(temp_a0, DiabloGameFile) == -1) {
-                    var_v0_2 = *(&card_side_nogame + (McMenuPos * 4));
-block_23:
-                    AlertTxt = var_v0_2;
-                    PlaySFX__Fi(0x3D3);
-                    return;
-                }
-                FeSelect__Fv();
-                goto block_25;
-            }
-block_25:
-            var_v0 = DavesPad & 0x100;
-block_26:
-            if (var_v0 != 0) {
-                FePrevMenu__Fv();
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", McMainKeyCtrl__Fv);
 #if 0 /* ida */
 int McMainKeyCtrl__Fv()
 {
@@ -546,77 +316,12 @@ LABEL_27:
 }
 #endif
 
-/* ---- 0x80159D08  McCharCardMenuCtrl__Fv  DLG.CPP:490-547  seg dlg  fsize 32 ---- */
+/* ---- 0x80159D08  McCharCardMenuCtrl__Fv  DLG.CPP:490-547  seg dlg_2  fsize 32 ---- */
 /* void McCharCardMenuCtrl(void)
  *   P=$s0
  *   blocks: {1 }57
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", McCharCardMenuCtrl__Fv);
-#if 0 /* m2c */
-void McCharCardMenuCtrl__Fv(void) {
-    s32 var_s1;
-    s32 var_s1_2;
-    void *temp_s0;
-
-    temp_s0 = PAD_GetPad__FiUc(FePlayerNo, 0);
-    if (cardondelay > 0) {
-        cardondelay -= 1;
-        ShowLoadingBox__Fi(0x348);
-        if (cardondelay == 0) {
-            ActivateMemcard__Fii(1, 1);
-            goto block_3;
-        }
-    } else {
-block_3:
-        if (AlertTxt != 0) {
-            var_s1 = 0;
-            ShowAlertBox__Fv();
-            if ((GetDown__C4CPad_8015b840(temp_s0) & 0x40) || (GetDown__C4CPad_8015b840(temp_s0) & 0x10)) {
-                var_s1 = 1;
-            }
-            if (var_s1 != 0) {
-                PlaySFX__Fi(0x33);
-                AlertTxt = 0;
-            }
-        } else {
-            var_s1_2 = 0;
-            ShowCardActionText__Fv();
-            SetPadTick__4CPadUs_8015b870(temp_s0, 0xC);
-            SetPadTickMask__4CPadUs_8015b868(temp_s0, 3);
-            if ((GetDown__C4CPad_8015b840(temp_s0) & 0x40) || (GetDown__C4CPad_8015b840(temp_s0) & 0x10)) {
-                var_s1_2 = 1;
-            }
-            if (var_s1_2 != 0) {
-                if (*(&D_8011B3D8 + (FeGetCursor__Fv() * 4)) == 2) {
-                    PlaySFX__Fi(0x3D3);
-                    AlertTxt = (&DoLoadedGame)[FeGetCursor__Fv()];
-                    return;
-                }
-                if (*(&card_status + 4 + (FeGetCursor__Fv() * 4)) == 0) {
-                    PlaySFX__Fi(0x3D3);
-                    AlertTxt = 0x509;
-                    return;
-                }
-                countdownloadcharblock = 1;
-                cardondelay = 5;
-                FeSelect__Fv();
-                return;
-            }
-            if (GetTick__C4CPad_8015b818(temp_s0) & 1) {
-                FeSelUp__Fi(1);
-                return;
-            }
-            if (GetTick__C4CPad_8015b818(temp_s0) & 2) {
-                FeSelDown__Fi(1);
-                return;
-            }
-            if (GetDown__C4CPad_8015b840(temp_s0) & 0x100) {
-                FePrevMenu__Fv();
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", McCharCardMenuCtrl__Fv);
 #if 0 /* ida */
 int McCharCardMenuCtrl__Fv()
 {
@@ -700,119 +405,12 @@ int McCharCardMenuCtrl__Fv()
 }
 #endif
 
-/* ---- 0x80159F50  McMainCharKeyCtrl__Fv  DLG.CPP:550-703  seg dlg  fsize 72 ---- */
+/* ---- 0x80159F50  McMainCharKeyCtrl__Fv  DLG.CPP:550-703  seg dlg_2  fsize 72 ---- */
 /* void McMainCharKeyCtrl(void)
  *   Spacing=$s3 yoff=$s1 SelX=$s0 len=$s1 um@sp-0x30 P=$s2
  *   blocks: {1 }151
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", McMainCharKeyCtrl__Fv);
-#if 0 /* m2c */
-void McMainCharKeyCtrl__Fv(void) {
-    u16 sp18;
-    u16 sp1A;
-    u16 sp1C;
-    u16 sp1E;
-    M2C_UNK *var_a0;
-    s32 temp_a0;
-    s32 temp_s0;
-    s32 temp_v0_2;
-    s32 temp_v0_3;
-    s32 temp_v0_4;
-    s32 var_s0;
-    void *temp_v0;
-
-    sp1C = 0x140;
-    sp1E = 0xA0;
-    sp18 = 0;
-    sp1A = 0x20;
-    temp_v0 = PAD_GetPad__FiUc(FePlayerNo, 0);
-    SetPadTick__4CPadUs_8015b870(temp_v0, 0xC);
-    SetPadTickMask__4CPadUs_8015b868(temp_v0, 3);
-    if (cardondelay > 0) {
-        cardondelay -= 1;
-        if (countdownloadcharblock != 0) {
-            ShowLoadingBox__Fi(*(&card_side_read + (current_card * 4)));
-            return;
-        }
-        ShowLoadingBox__Fi(0x348);
-        return;
-    }
-    if (countdownloadcharblock != 0) {
-        ActivateCharacterMemcard__Fii(current_card == 0, current_card == 1);
-    }
-    temp_a0 = current_card * 4;
-    if (*(&card_status + temp_a0) == 2) {
-        AlertTxt = *(&card_side_empty + temp_a0);
-    }
-    if (AlertTxt != 0) {
-        ShowAlertBox__Fv(temp_a0);
-        if (GetDown__C4CPad_8015b840(temp_v0) & 0x40) {
-            AlertTxt = 0;
-            goto block_39;
-        }
-    } else {
-        ShowCardActionText__Fv(temp_a0);
-        if ((fileinfoflag != 0) && (*((current_card * 4) + &card_status) == 0)) {
-            ShowCharacterFiles__FiiG4RECTi(fileselect, 0x11, sp18 | (sp1A << 0x10), sp1C | (sp1E << 0x10), 0x4A);
-            temp_v0_2 = GetSpinnerWidth__Fi(fileselect);
-            temp_s0 = 0xA0 - (temp_v0_2 / 2);
-            DrawFeTwinkle__Fii(temp_s0 - 0xE, (fileselect * 0x11) + 0x4A);
-            DrawFeTwinkle__Fii(temp_s0 + (temp_v0_2 + 6), (fileselect * 0x11) + 0x4A);
-        }
-        if (GetTick__C4CPad_8015b818(temp_v0) & 1) {
-            temp_v0_3 = fileselect - 1;
-            fileselect = temp_v0_3;
-            if (temp_v0_3 == -1) {
-                fileselect = 5;
-            }
-            PlaySFX__Fi(0x32);
-        }
-        var_s0 = 0;
-        if (GetTick__C4CPad_8015b818(temp_v0) & 2) {
-            temp_v0_4 = fileselect + 1;
-            fileselect = temp_v0_4;
-            if (temp_v0_4 >= 6) {
-                fileselect = 0;
-            }
-            PlaySFX__Fi(0x32);
-            var_s0 = 0;
-        }
-        if ((GetDown__C4CPad_8015b840(temp_v0) & 0x40) || (GetDown__C4CPad_8015b840(temp_v0) & 0x10)) {
-            var_s0 = 1;
-        }
-        if (var_s0 != 0) {
-            if ((*(&card_status + (current_card * 4)) == 2) || (CharacterBlockLoaded == 0) || (*(&CharDataStruct + 0x478 + (fileselect * 0x4F8)) == 0)) {
-                PlaySFX__Fi(0x3D3);
-                return;
-            }
-            PlaySFX__Fi(0x33);
-            if (GetLoadStatusMessage__FPc(DiabloCharacterFile) != 0) {
-                if (DoFrontEndLoadCharacter__Fi(fileselect) != 0) {
-                    AlertTxt = 0x25D;
-                } else {
-                    DoLoadedChar = 1;
-                    *(&LoadedChar + (FePlayerNo * 4)) = 1;
-                    if (FeNoOfPlayers > 0) {
-                        var_a0 = &FeNewP2ClassMenu;
-                        FePlayerNo += 1;
-                        FeNoOfPlayers -= 1;
-                    } else {
-                        var_a0 = &FeDifficultyMenu;
-                    }
-                    FeNewMenu__FP7FeTable(var_a0, FePlayerNo, FeNoOfPlayers);
-                }
-            }
-            goto block_37;
-        }
-block_37:
-        if (GetDown__C4CPad_8015b840(temp_v0) & 0x100) {
-            CharacterBlockLoaded = 0;
-block_39:
-            FePrevMenu__Fv();
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", McMainCharKeyCtrl__Fv);
 #if 0 /* ida */
 int McMainCharKeyCtrl__Fv()
 {
@@ -928,55 +526,12 @@ int McMainCharKeyCtrl__Fv()
 }
 #endif
 
-/* ---- 0x8015A3BC  ShowAlertBox__Fv  DLG.CPP:706-745  seg dlg  fsize 128 ---- */
+/* ---- 0x8015A3BC  ShowAlertBox__Fv  DLG.CPP:706-745  seg dlg_2  fsize 128 ---- */
 /* void ShowAlertBox(void)
  *   SBack@sp-0x58 um@sp-0x48 W=$s1 H=$fp X=$v0 Y=$v0 otpos=$s0 oldBot@sp-0x40 oldTot@sp-0x38 lines=$s2 yprintpos=$s0
  *   blocks: {1 }40
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ShowAlertBox__Fv);
-#if 0 /* m2c */
-void ShowAlertBox__Fv(void) {
-    M2C_UNK sp28;
-    s16 sp38;
-    s16 sp3A;
-    s16 sp3C;
-    s16 sp3E;
-    s32 sp40;
-    s32 sp48;
-    s32 temp_s0;
-    s32 temp_s0_2;
-    s32 temp_s2;
-    u8 temp_s3;
-    u8 temp_s6;
-
-    __6Dialog_8015b8d0(&sp28);
-    sp38 = 0x2E;
-    sp3A = 0x5B;
-    sp3C = 0xE4;
-    sp3E = 0x3A;
-    temp_s0 = GetOverlayOtBase__7CBlocks_8015b950() + 8;
-    sp40 = SetOTpos__6Dialogi(&sp28, temp_s0);
-    sp48 = SetOTpos__5CFonti(&MediumFont, temp_s0);
-    SetOTpos__6Dialogi(&sp28, temp_s0);
-    SetOTpos__5CFonti(&MediumFont, temp_s0);
-    SetBorder__6Dialogi_8015b8a0(&sp28, 0x12);
-    SetBack__6Dialogi_8015b898(&sp28, 5);
-    SetRGB__6DialogUcUcUc_8015b878(&sp28, 0x50, 0x40, 0x40);
-    Back__6Dialogiiii(&sp28, 0x2E, 0x5B, 0xE4, 0x3A);
-    if (AlertTxt != 0x50C) {
-        strcpy((s32 (*)[]) AlertStr, GetStr__Fi(AlertTxt));
-    }
-    temp_s6 = WHITER;
-    temp_s3 = WHITEG;
-    temp_s2 = (GetStrWidth__5CFontPc(&MediumFont, (s32 (*)[]) AlertStr) / 228) + 1;
-    temp_s0_2 = ((s32) (0x3A - (temp_s2 * 0xC)) >> 1) + 3;
-    Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc(&MediumFont, 0, temp_s0_2, (s32 (*)[]) AlertStr, 1, &sp38, (s32) temp_s6, (s32) temp_s3, (s32) temp_s3);
-    Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc(&MediumFont, 0, temp_s0_2 + (temp_s2 * 0xD), GetStr__Fi(0x330), 1, &sp38, (s32) temp_s6, (s32) temp_s3, (s32) temp_s3);
-    SetOTpos__6Dialogi(&sp28, sp40);
-    SetOTpos__5CFonti(&MediumFont, sp48);
-    ___6Dialog_8015b8a8(&sp28, 2);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ShowAlertBox__Fv);
 #if 0 /* ida */
 int ShowAlertBox__Fv()
 {
@@ -1034,36 +589,12 @@ int ShowAlertBox__Fv()
 }
 #endif
 
-/* ---- 0x8015A5C8  GetLoadStatusMessage__FPc  DLG.CPP:751-769  seg dlg  fsize 24 ---- */
+/* ---- 0x8015A5C8  GetLoadStatusMessage__FPc  DLG.CPP:751-769  seg dlg_2  fsize 24 ---- */
 /* BOOL GetLoadStatusMessage(char *file_name)
  *   file_name=$a1
  *   blocks: {1 }19
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetLoadStatusMessage__FPc);
-#if 0 /* m2c */
-s32 GetLoadStatusMessage__FPc(s32 arg0) {
-    s32 temp_a2;
-    s32 var_v0;
-
-    temp_a2 = current_card * 4;
-    if ((*(&card_status + temp_a2) == 2) || (*(&card_dirty + temp_a2) != 0)) {
-        AlertTxt = *(&card_side_empty + temp_a2);
-        return 0;
-    }
-    var_v0 = 0x509;
-    if (*(&card_usable + temp_a2) != 0) {
-        if (GetFileNumber__FiPc(current_card, arg0, temp_a2) != -1) {
-            AlertTxt = 0;
-            return 1;
-        }
-        var_v0 = 0x2BE;
-        goto block_7;
-    }
-block_7:
-    AlertTxt = var_v0;
-    return 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetLoadStatusMessage__FPc);
 #if 0 /* ida */
 int __fastcall GetLoadStatusMessage__FPc(int a1)
 {
@@ -1098,57 +629,12 @@ int __fastcall GetLoadStatusMessage__FPc(int a1)
 }
 #endif
 
-/* ---- 0x8015A67C  GetSaveStatusMessage__FiPc  DLG.CPP:773-804  seg dlg  fsize 32 ---- */
+/* ---- 0x8015A67C  GetSaveStatusMessage__FiPc  DLG.CPP:773-804  seg dlg_2  fsize 32 ---- */
 /* BOOL GetSaveStatusMessage(int fileblocks, char *file_name)
  *   fileblocks=$s1 file_name=$a1 i=$a0 blocks=$a3
  *   blocks: {1 }32
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetSaveStatusMessage__FiPc);
-#if 0 /* m2c */
-s32 GetSaveStatusMessage__FiPc(s32 arg0, s32 arg2) {
-    s32 temp_a0;
-    s32 temp_s0;
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_a2;
-    s32 var_a3;
-    s32 var_v1;
-
-    var_a2 = arg2;
-    temp_a0 = current_card * 4;
-    var_a3 = 0;
-    if (*(&card_status + temp_a0) == 2) {
-        AlertTxt = *(&card_side_empty + temp_a0);
-        return 0;
-    }
-    if (*(&card_usable + temp_a0) != 0) {
-        temp_v1 = *(&card_files + temp_a0);
-        var_a0 = 0;
-        if (temp_v1 > 0) {
-            var_a2 = temp_v1;
-            var_v1 = current_card << 0xD;
-            do {
-                var_a0 += 1;
-                var_a3 += *(&card_header + 3 + var_v1);
-                var_v1 += 0x200;
-            } while (var_a0 < var_a2);
-        }
-        temp_s0 = 0xF - var_a3;
-        if (temp_s0 < arg0) {
-            if (GetFileNumber__FiPc(current_card, var_a2, var_a3) == -1) {
-                AlertTxt = 0x50C;
-                sprintf((s32 (*)[]) AlertStr, GetStr__Fi(0x50C), arg0, (s32 (*)[]) temp_s0);
-                return 0;
-            }
-            /* Duplicate return node #10. Try simplifying control flow for better match */
-            return 1;
-        }
-        /* Duplicate return node #10. Try simplifying control flow for better match */
-        return 1;
-    }
-    return 1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetSaveStatusMessage__FiPc);
 #if 0 /* ida */
 int __fastcall GetSaveStatusMessage__FiPc(int a1, int a2)
 {
@@ -1214,65 +700,12 @@ int __fastcall GetSaveStatusMessage__FiPc(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015A79C  ShowGameFiles__FPciiG4RECTi  DLG.CPP:808-832  seg dlg  fsize 72 ---- */
+/* ---- 0x8015A79C  ShowGameFiles__FPciiG4RECTi  DLG.CPP:808-832  seg dlg_2  fsize 72 ---- */
 /* void ShowGameFiles(char *filename, int saveflag, int Spacing, struct RECT ORect, int yoff)
  *   filename=$s5 saveflag=$a1 Spacing=$s4 yoff=$s6 i=$s1 FileNo=$a1
  *   blocks: {1 {5 {5 }23 }24 }24
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ShowGameFiles__FPciiG4RECTi);
-#if 0 /* m2c */
-void ShowGameFiles__FPciiG4RECTi(s32 arg0, s32 arg1, s32 arg2, s16 arg3, s32 arg5) {
-    s32 (**var_s2)[];
-    s32 (**var_v1)[];
-    s32 (*temp_a3)[];
-    s32 (*var_v0_2)[];
-    s32 temp_a1;
-    s32 temp_lo;
-    s32 var_a0;
-    s32 var_s0;
-    s32 var_s1;
-    s32 var_v0;
-
-    if (arg1 == 0) {
-        var_s1 = 0;
-        if (StatusTxt == 0) {
-            var_s2 = &McState;
-            var_s0 = 0;
-            var_v0 = 0 < 2;
-loop_3:
-            if (var_v0 != 0) {
-                temp_a1 = GetFileNumber__FiPc(var_s1, arg0);
-                var_a0 = 0x50D;
-                if ((*(&card_status + var_s0) != 2) && (*(&card_dirty + var_s0) == 0)) {
-                    if (temp_a1 != -1) {
-                        var_v0_2 = ReconstructSlotName__Fii(var_s1, temp_a1);
-                        var_v1 = var_s0 + &McState;
-                    } else {
-                        var_a0 = 0x509;
-                        if (*(&card_usable + var_s0) != 0) {
-                            var_a0 = 0x12C;
-                        }
-                        goto block_10;
-                    }
-                } else {
-block_10:
-                    var_v0_2 = GetStr__Fi(var_a0, temp_a1);
-                    var_v1 = var_s0 + &McState;
-                }
-                *var_v1 = var_v0_2;
-                temp_lo = ((var_s1 * 2) + 3) * arg2;
-                temp_a3 = *var_s2;
-                var_s2 += 4;
-                var_s0 += 4;
-                var_s1 += 1;
-                Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc(&MediumFont, 0, temp_lo + arg5, temp_a3, 1, &arg3, 0xA4, 0x70, 0x70);
-                var_v0 = var_s1 < 2;
-                goto loop_3;
-            }
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ShowGameFiles__FPciiG4RECTi);
 #if 0 /* ida */
 void ShowGameFiles__FPciiG4RECTi(int a1, int a2, int a3, ...)
 {
@@ -1341,65 +774,12 @@ LABEL_12:
 }
 #endif
 
-/* ---- 0x8015A90C  ShowCharacterFiles__FiiG4RECTi  DLG.CPP:835-884  seg dlg  fsize 152 ---- */
+/* ---- 0x8015A90C  ShowCharacterFiles__FiiG4RECTi  DLG.CPP:835-884  seg dlg_2  fsize 152 ---- */
 /* void ShowCharacterFiles(int cs, int Spacing, struct RECT ORect, int yoff)
  *   Spacing=$s5 yoff=$s0 sn=$a0 j=$s3 fileno=$v1 r=$s2 g=$s1 b=$s0 TempStr@sp-0x70
  *   blocks: {1 {15 {17 }40 }49 }49
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ShowCharacterFiles__FiiG4RECTi);
-#if 0 /* m2c */
-void ShowCharacterFiles__FiiG4RECTi(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
-    s32 sp68;
-    s32 temp_v1;
-    s32 var_a0;
-    s32 var_s3;
-    s32 var_s4;
-    u32 temp_fp;
-    u32 temp_s6;
-    u32 temp_s7;
-    u8 var_s0;
-    u8 var_s1;
-    u8 var_s2;
-
-    sp68 = arg0;
-    if (*(&card_status + (current_card * 4)) != 3) {
-        var_a0 = 0x289;
-        if (current_card == 0) {
-            var_a0 = 0x288;
-        }
-        var_s3 = 0;
-        Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc(&MediumFont, 0, arg4 - arg1, GetStr__Fi(var_a0, current_card), 1, NULL, (s32) GOLDR, (s32) GOLDG, (s32) GOLDB);
-        var_s4 = arg4;
-        temp_fp = (u8) WHITER >> 1;
-        temp_s6 = (u8) WHITEB >> 1;
-        temp_s7 = (u8) WHITEG >> 1;
-loop_4:
-        if (var_s3 < 6) {
-            temp_v1 = GetFileNumber__FiPc(current_card, DiabloCharacterFile);
-            if (var_s3 == sp68) {
-                var_s2 = GOLDR;
-                var_s1 = GOLDG;
-                var_s0 = GOLDB;
-            } else {
-                var_s2 = temp_fp & 0xFF;
-                if (temp_v1 != -1) {
-                    var_s2 = WHITER;
-                    var_s1 = WHITEG;
-                    var_s0 = WHITEB;
-                } else {
-                    var_s1 = temp_s7 & 0xFF;
-                    var_s0 = temp_s6 & 0xFF;
-                }
-            }
-            ConstructSlotName__FPci((s32 (*)[]) &sp28[0], var_s3);
-            Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc(&MediumFont, 0, var_s4, (s32 (*)[]) &sp28[0], 1, NULL, (s32) var_s2, (s32) var_s1, (s32) var_s0);
-            var_s4 += arg1;
-            var_s3 += 1;
-            goto loop_4;
-        }
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ShowCharacterFiles__FiiG4RECTi);
 #if 0 /* ida */
 int __fastcall ShowCharacterFiles__FiiG4RECTi(int a1, int a2, int a3, int a4, int a5)
 {
@@ -1473,37 +853,12 @@ int __fastcall ShowCharacterFiles__FiiG4RECTi(int a1, int a2, int a3, int a4, in
 }
 #endif
 
-/* ---- 0x8015AAEC  PackItem__FP12PkItemStructPC10ItemStruct  DLG.CPP:897-919  seg dlg  fsize 0 ---- */
+/* ---- 0x8015AAEC  PackItem__FP12PkItemStructPC10ItemStruct  DLG.CPP:897-919  seg dlg_2  fsize 0 ---- */
 /* void PackItem(struct PkItemStruct *id, struct ItemStruct *is)
  *   id=$t3 is=$t2
  *   blocks: {1 }23
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", PackItem__FP12PkItemStructPC10ItemStruct);
-#if 0 /* m2c */
-void PackItem__FP12PkItemStructPC10ItemStruct(void *arg0, void *arg1) {
-    u16 temp_t1;
-
-    if (M2C_FIELD(arg1, s16 *, 0x2C) == -1) {
-        M2C_FIELD(arg0, u16 *, 0xA) = 0xFFFFU;
-        return;
-    }
-    temp_t1 = M2C_FIELD(arg1, u16 *, 0x2E);
-    M2C_FIELD(arg0, s32 *, 4) = (s32) M2C_FIELD(arg1, s32 *, 0x10);
-    M2C_FIELD(arg0, u16 *, 8) = (u16) M2C_FIELD(arg1, u16 *, 0x24);
-    M2C_FIELD(arg0, u16 *, 0xA) = temp_t1;
-    M2C_FIELD(arg0, s8 *, 0x10) = (s8) M2C_FIELD(arg1, u16 *, 0x40);
-    M2C_FIELD(arg0, u8 *, 0x11) = (u8) M2C_FIELD(arg1, u8 *, 0x49);
-    M2C_FIELD(arg0, u8 *, 0x12) = (u8) M2C_FIELD(arg1, u8 *, 0x4B);
-    M2C_FIELD(arg0, s32 *, 0) = (s32) M2C_FIELD(arg1, s8 *, 0x65);
-    M2C_FIELD(arg0, s8 *, 0xE) = (s8) (M2C_FIELD(arg1, u8 *, 0x69) + (M2C_FIELD(arg1, u8 *, 0x51) * 2));
-    M2C_FIELD(arg0, s8 *, 0xF) = (s8) M2C_FIELD(arg1, u16 *, 0x3E);
-    if (temp_t1 == 0) {
-        M2C_FIELD(arg0, s16 *, 0xC) = (s16) M2C_FIELD(arg1, s32 *, 0x14);
-        return;
-    }
-    M2C_FIELD(arg0, s16 *, 0xC) = (s16) ((s8) M2C_FIELD(arg1, u8 *, 0x3C) | (s16) (M2C_FIELD(arg1, u8 *, 0x4A) << 8));
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", PackItem__FP12PkItemStructPC10ItemStruct);
 #if 0 /* ida */
 int __fastcall PackItem__FP12PkItemStructPC10ItemStruct(int a1, int a2)
 {
@@ -1553,105 +908,12 @@ int __fastcall PackItem__FP12PkItemStructPC10ItemStruct(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015AB98  PackPlayer__FP14PkPlayerStructi  DLG.CPP:929-989  seg dlg  fsize 48 ---- */
+/* ---- 0x8015AB98  PackPlayer__FP14PkPlayerStructi  DLG.CPP:929-989  seg dlg_2  fsize 48 ---- */
 /* void PackPlayer(struct PkPlayerStruct *pPack, int pnum)
  *   pPack=$s5 pnum=$v1 i=$s3 pki=$s1 pi=$s0 pPlayer=$s4
  *   blocks: {1 }61
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", PackPlayer__FP14PkPlayerStructi);
-#if 0 /* m2c */
-void PackPlayer__FP14PkPlayerStructi(void *arg0, s32 arg1) {
-    s32 temp_a3;
-    s32 var_s3;
-    s32 var_s3_2;
-    s32 var_s3_3;
-    s32 var_s3_4;
-    s32 var_s3_5;
-    u8 temp_a2;
-    u8 temp_v0;
-    u8 temp_v0_2;
-    void *temp_s4;
-    void *var_s0;
-    void *var_s0_2;
-    void *var_s0_3;
-    void *var_s1;
-    void *var_s1_2;
-    void *var_s1_3;
-    void *var_v1;
-    void *var_v1_2;
-
-    temp_s4 = (arg1 * 0x19E8) + &plr;
-    memset(0, 0x4F8);
-    temp_a2 = M2C_FIELD(temp_s4, u8 *, 0x20);
-    temp_a3 = M2C_FIELD(temp_s4, s32 *, 0x24);
-    M2C_FIELD(arg0, u8 *, 0x4E5) = (u8) M2C_FIELD(temp_s4, u8 *, 0x1E);
-    M2C_FIELD(arg0, u8 *, 0x4E6) = (u8) M2C_FIELD(temp_s4, u8 *, 0x1F);
-    M2C_FIELD(arg0, u8 *, 0x4E7) = temp_a2;
-    M2C_FIELD(arg0, s8 *, 0x4E8) = (s8) temp_a3;
-    strcpy(arg0 + 0x478, temp_s4 + 0xD6, temp_a2, temp_a3);
-    var_s3 = 0;
-    M2C_FIELD(arg0, u8 *, 0x4E9) = (u8) M2C_FIELD(temp_s4, u8 *, 0xF6);
-    M2C_FIELD(arg0, s8 *, 0x4EA) = (s8) M2C_FIELD(temp_s4, u16 *, 0xFA);
-    M2C_FIELD(arg0, s8 *, 0x4EB) = (s8) M2C_FIELD(temp_s4, u16 *, 0xFE);
-    M2C_FIELD(arg0, s8 *, 0x4EC) = (s8) M2C_FIELD(temp_s4, u16 *, 0x102);
-    M2C_FIELD(arg0, s8 *, 0x4ED) = (s8) M2C_FIELD(temp_s4, u16 *, 0x106);
-    M2C_FIELD(arg0, u8 *, 0x4EE) = (u8) M2C_FIELD(temp_s4, u8 *, 0x13C);
-    M2C_FIELD(arg0, s8 *, 0x4EF) = (s8) M2C_FIELD(temp_s4, s32 *, 0x108);
-    M2C_FIELD(arg0, u8 *, 0x4F0) = (u8) M2C_FIELD(temp_s4, u8 *, 0x5A);
-    M2C_FIELD(arg0, s32 *, 0x460) = (s32) M2C_FIELD(temp_s4, s32 *, 0x140);
-    M2C_FIELD(arg0, s32 *, 0x464) = (s32) M2C_FIELD(temp_s4, s32 *, 0x114);
-    M2C_FIELD(arg0, s32 *, 0x468) = (s32) M2C_FIELD(temp_s4, s32 *, 0x118);
-    M2C_FIELD(arg0, s32 *, 0x46C) = (s32) M2C_FIELD(temp_s4, s32 *, 0x128);
-    M2C_FIELD(arg0, s32 *, 0x470) = (s32) M2C_FIELD(temp_s4, s32 *, 0x12C);
-    M2C_FIELD(arg0, s32 *, 0x450) = (s32) M2C_FIELD(temp_s4, s32 *, 0xB8);
-    M2C_FIELD(arg0, s32 *, 0x454) = (s32) M2C_FIELD(temp_s4, s32 *, 0xBC);
-    M2C_FIELD(arg0, s32 *, 0x474) = (s32) M2C_FIELD(temp_s4, s32 *, 0x64);
-    M2C_FIELD(arg0, u8 *, 0x4F2) = (u8) M2C_FIELD(temp_s4, u8 *, 0x68);
-    var_v1 = arg0;
-    do {
-        temp_v0 = M2C_FIELD((temp_s4 + var_s3), u8 *, 0x71);
-        var_s3 += 1;
-        M2C_FIELD(var_v1, u8 *, 0x4C0) = temp_v0;
-        var_v1 = arg0 + var_s3;
-    } while (var_s3 < 0x25);
-    var_s1 = arg0 + 0xA0;
-    var_s0 = temp_s4 + 0x1B0;
-    var_s3_2 = 6;
-    do {
-        PackItem__FP12PkItemStructPC10ItemStruct(var_s1, var_s0);
-        var_s1 += 0x14;
-        var_s3_2 -= 1;
-        var_s0 += 0x6C;
-    } while (var_s3_2 != -1);
-    var_s1_2 = arg0 + 0x12C;
-    var_s0_2 = temp_s4 + 0x4A4;
-    var_s3_3 = 0x27;
-    do {
-        PackItem__FP12PkItemStructPC10ItemStruct(var_s1_2, var_s0_2);
-        var_s1_2 += 0x14;
-        var_s3_3 -= 1;
-        var_s0_2 += 0x6C;
-    } while (var_s3_3 != -1);
-    var_s3_4 = 0;
-    var_v1_2 = arg0;
-    do {
-        temp_v0_2 = M2C_FIELD((temp_s4 + var_s3_4), u8 *, 0x1588);
-        var_s3_4 += 1;
-        M2C_FIELD(var_v1_2, u8 *, 0x498) = temp_v0_2;
-        var_v1_2 = arg0 + var_s3_4;
-    } while (var_s3_4 < 0x28);
-    var_s1_3 = arg0;
-    var_s0_3 = temp_s4 + 0x15B0;
-    var_s3_5 = 7;
-    M2C_FIELD(var_s1_3, s8 *, 0x4F1) = (s8) M2C_FIELD(temp_s4, s32 *, 0x1584);
-    do {
-        PackItem__FP12PkItemStructPC10ItemStruct(var_s1_3, var_s0_3);
-        var_s1_3 += 0x14;
-        var_s3_5 -= 1;
-        var_s0_3 += 0x6C;
-    } while (var_s3_5 != -1);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", PackPlayer__FP14PkPlayerStructi);
 #if 0 /* ida */
 int __fastcall PackPlayer__FP14PkPlayerStructi(int a1, int a2)
 {
@@ -1785,55 +1047,12 @@ int __fastcall PackPlayer__FP14PkPlayerStructi(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015ADAC  UnPackItem__FPC12PkItemStructP10ItemStruct  DLG.CPP:996-1027  seg dlg  fsize 48 ---- */
+/* ---- 0x8015ADAC  UnPackItem__FPC12PkItemStructP10ItemStruct  DLG.CPP:996-1027  seg dlg_2  fsize 48 ---- */
 /* void UnPackItem(struct PkItemStruct *is, struct ItemStruct *id)
  *   is=$s0 id=$s3 AC=$v0
  *   blocks: {1 }32
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", UnPackItem__FPC12PkItemStructP10ItemStruct);
-#if 0 /* m2c */
-void UnPackItem__FPC12PkItemStructP10ItemStruct(void *arg0, void *arg1) {
-    u16 temp_s1;
-    u16 temp_s2;
-    u8 temp_v1;
-    void *temp_t0;
-    void *var_a2;
-    void *var_a3;
-
-    temp_s1 = M2C_FIELD(arg0, u16 *, 0xA);
-    if (temp_s1 == 0xFFFF) {
-        M2C_FIELD(arg1, s16 *, 0x2C) = -1;
-        return;
-    }
-    temp_s2 = M2C_FIELD(arg0, u16 *, 0xC);
-    RecreateItem__FiiUsiii(0x7F, temp_s1, M2C_FIELD(arg0, u16 *, 8), M2C_FIELD(arg0, s32 *, 4), (s32) temp_s2, M2C_FIELD(arg0, s32 *, 0));
-    temp_t0 = &item + 0x35E5;
-    temp_v1 = M2C_FIELD(arg0, u8 *, 0xE);
-    M2C_FIELD(&item, s8 *, 0x35E5) = (s8) (temp_v1 >> 1);
-    M2C_FIELD(&item, s8 *, 0x35FD) = (s8) (temp_v1 & 1);
-    M2C_FIELD(&item, s16 *, 0x35D4) = (s16) M2C_FIELD(arg0, u8 *, 0x10);
-    M2C_FIELD(&item, u8 *, 0x35DD) = (u8) M2C_FIELD(arg0, u8 *, 0x11);
-    M2C_FIELD(&item, u8 *, 0x35DF) = (u8) M2C_FIELD(arg0, u8 *, 0x12);
-    M2C_FIELD(&item, s16 *, 0x35D2) = (s16) M2C_FIELD(arg0, u8 *, 0xF);
-    if (temp_s1 != 0) {
-        M2C_FIELD(&item, s8 *, 0x35DE) = (s8) (temp_s2 >> 8);
-        M2C_FIELD(&item, s8 *, 0x35D0) = (s8) temp_s2;
-    }
-    var_a3 = arg1;
-    var_a2 = temp_t0 - 0x51;
-    do {
-        M2C_FIELD(var_a3, s32 *, 0) = (s32) M2C_FIELD(var_a2, s32 *, 0);
-        M2C_FIELD(var_a3, s32 *, 4) = (s32) M2C_FIELD(var_a2, s32 *, 4);
-        M2C_FIELD(var_a3, s32 *, 8) = (s32) M2C_FIELD(var_a2, s32 *, 8);
-        M2C_FIELD(var_a3, s32 *, 0xC) = (s32) M2C_FIELD(var_a2, s32 *, 0xC);
-        var_a2 += 0x10;
-        var_a3 += 0x10;
-    } while (var_a2 != (temp_t0 + 0xF));
-    M2C_FIELD(var_a3, s32 *, 0) = (s32) M2C_FIELD(var_a2, s32 *, 0);
-    M2C_FIELD(var_a3, s32 *, 4) = (s32) M2C_FIELD(var_a2, s32 *, 4);
-    M2C_FIELD(var_a3, s32 *, 8) = (s32) M2C_FIELD(var_a2, s32 *, 8);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", UnPackItem__FPC12PkItemStructP10ItemStruct);
 #if 0 /* ida */
 int __fastcall UnPackItem__FPC12PkItemStructP10ItemStruct(int a1, int a2)
 {
@@ -1902,44 +1121,12 @@ int __fastcall UnPackItem__FPC12PkItemStructP10ItemStruct(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015AEE0  VerifyGoldSeeds__FP12PlayerStruct  DLG.CPP:1035-1049  seg dlg  fsize 56 ---- */
+/* ---- 0x8015AEE0  VerifyGoldSeeds__FP12PlayerStruct  DLG.CPP:1035-1049  seg dlg_2  fsize 56 ---- */
 /* void VerifyGoldSeeds(struct PlayerStruct *pPlayer)
  *   pPlayer=$s1 i=$s2 j=$a1
  *   blocks: {1 }15
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", VerifyGoldSeeds__FP12PlayerStruct);
-#if 0 /* m2c */
-void VerifyGoldSeeds__FP12PlayerStruct(void *arg0) {
-    s32 var_a1;
-    s32 var_s2;
-    void *var_a0;
-    void *var_s3;
-
-    var_s2 = 0;
-    if (M2C_FIELD(arg0, s32 *, 0x1584) > 0) {
-        var_s3 = arg0;
-        do {
-            if (M2C_FIELD(var_s3, s16 *, 0x4D2) == 0) {
-                var_a1 = 0;
-                if (M2C_FIELD(arg0, s32 *, 0x1584) > 0) {
-                    var_a0 = arg0;
-                    do {
-                        if ((var_s2 != var_a1) && (M2C_FIELD(var_a0, s16 *, 0x4D2) == 0) && (M2C_FIELD(var_s3, s32 *, 0x4B4) == M2C_FIELD(var_a0, s32 *, 0x4B4))) {
-                            M2C_FIELD(var_s3, s32 *, 0x4B4) = GetRndSeed__Fv(var_a0, var_a1);
-                            var_a0 = arg0 - 0x6C;
-                            var_a1 = -1;
-                        }
-                        var_a1 += 1;
-                        var_a0 += 0x6C;
-                    } while (var_a1 < M2C_FIELD(arg0, s32 *, 0x1584));
-                }
-            }
-            var_s2 += 1;
-            var_s3 += 0x6C;
-        } while (var_s2 < M2C_FIELD(arg0, s32 *, 0x1584));
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", VerifyGoldSeeds__FP12PlayerStruct);
 #if 0 /* ida */
 void __fastcall VerifyGoldSeeds__FP12PlayerStruct(int a1)
 {
@@ -1985,136 +1172,12 @@ void __fastcall VerifyGoldSeeds__FP12PlayerStruct(int a1)
 }
 #endif
 
-/* ---- 0x8015AFB8  UnPackPlayer__FPC14PkPlayerStructiUc  DLG.CPP:1057-1142  seg dlg  fsize 48 ---- */
+/* ---- 0x8015AFB8  UnPackPlayer__FPC14PkPlayerStructiUc  DLG.CPP:1057-1142  seg dlg_2  fsize 48 ---- */
 /* void UnPackPlayer(struct PkPlayerStruct *pPack, int pnum, unsigned char killok)
  *   pPack=$s4 pnum=$s5 killok=$s0 pi=$s1 pki=$s2 pPlayer=$s3 i=$s0
  *   blocks: {1 }86
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", UnPackPlayer__FPC14PkPlayerStructiUc);
-#if 0 /* m2c */
-void UnPackPlayer__FPC14PkPlayerStructiUc(void *arg0, s32 arg1, s32 arg2) {
-    s32 temp_a0_2;
-    s32 var_s0;
-    s32 var_s0_2;
-    s32 var_s0_3;
-    s32 var_s0_4;
-    s32 var_s0_5;
-    s32 var_s0_6;
-    s32 var_v0;
-    u8 temp_a0;
-    u8 temp_a1;
-    u8 temp_a1_2;
-    u8 temp_a2;
-    u8 temp_v0;
-    u8 temp_v0_2;
-    u8 temp_v0_3;
-    void *temp_s3;
-    void *var_s1;
-    void *var_s1_2;
-    void *var_s1_3;
-    void *var_s2;
-    void *var_s2_2;
-    void *var_s2_3;
-    void *var_v1;
-    void *var_v1_2;
-
-    temp_a1 = M2C_FIELD(arg0, u8 *, 0x4E8);
-    temp_s3 = (arg1 * 0x19E8) + &plr;
-    M2C_FIELD(temp_s3, s32 *, 0x24) = (s32) temp_a1;
-    ClrPlrPath__Fi(arg1, temp_a1);
-    M2C_FIELD(temp_s3, s8 *, 0x1E) = -1;
-    strcpy(temp_s3 + 0xD6, arg0 + 0x478);
-    M2C_FIELD(temp_s3, u8 *, 0xF6) = (u8) M2C_FIELD(arg0, u8 *, 0x4E9);
-    InitPlayer__FiUc(arg1, 1);
-    temp_a0 = M2C_FIELD(arg0, u8 *, 0x4EB);
-    temp_a1_2 = M2C_FIELD(arg0, u8 *, 0x4EC);
-    temp_a2 = M2C_FIELD(arg0, u8 *, 0x4ED);
-    M2C_FIELD(temp_s3, u8 *, 0x13C) = (u8) M2C_FIELD(arg0, u8 *, 0x4EE);
-    temp_v0 = M2C_FIELD(arg0, u8 *, 0x4EA);
-    M2C_FIELD(temp_s3, s16 *, 0xFE) = (s16) temp_a0;
-    M2C_FIELD(temp_s3, s16 *, 0xFC) = (s16) temp_a0;
-    temp_a0_2 = M2C_FIELD(arg0, s32 *, 0x464);
-    M2C_FIELD(temp_s3, s16 *, 0x102) = (s16) temp_a1_2;
-    M2C_FIELD(temp_s3, s16 *, 0x100) = (s16) temp_a1_2;
-    M2C_FIELD(temp_s3, s16 *, 0x106) = (s16) temp_a2;
-    M2C_FIELD(temp_s3, s16 *, 0x104) = (s16) temp_a2;
-    M2C_FIELD(temp_s3, s32 *, 0x108) = (s32) M2C_FIELD(arg0, u8 *, 0x4EF);
-    M2C_FIELD(temp_s3, u8 *, 0x5A) = (u8) M2C_FIELD(arg0, u8 *, 0x4F0);
-    M2C_FIELD(temp_s3, s32 *, 0x140) = (s32) M2C_FIELD(arg0, s32 *, 0x460);
-    M2C_FIELD(temp_s3, s16 *, 0xFA) = (s16) temp_v0;
-    M2C_FIELD(temp_s3, s16 *, 0xF8) = (s16) temp_v0;
-    M2C_FIELD(temp_s3, s32 *, 0x114) = temp_a0_2;
-    M2C_FIELD(temp_s3, s32 *, 0x118) = (s32) M2C_FIELD(arg0, s32 *, 0x468);
-    M2C_FIELD(temp_s3, s32 *, 0x148) = (s32) *(&ExpLvlsTbl + ((s8) M2C_FIELD(temp_s3, u8 *, 0x13C) * 4));
-    if (!(arg2 & 0xFF) && ((temp_a0_2 >> 6) <= 0)) {
-        M2C_FIELD(temp_s3, s32 *, 0x114) = 0x40;
-    }
-    var_s0 = 0;
-    M2C_FIELD(temp_s3, s32 *, 0x12C) = (s32) M2C_FIELD(arg0, s32 *, 0x470);
-    M2C_FIELD(temp_s3, s32 *, 0x128) = (s32) M2C_FIELD(arg0, s32 *, 0x46C);
-    M2C_FIELD(temp_s3, s32 *, 0xB8) = (s32) M2C_FIELD(arg0, s32 *, 0x450);
-    M2C_FIELD(temp_s3, s32 *, 0xBC) = (s32) M2C_FIELD(arg0, s32 *, 0x454);
-    M2C_FIELD(temp_s3, s32 *, 0x64) = (s32) M2C_FIELD(arg0, s32 *, 0x474);
-    M2C_FIELD(temp_s3, u8 *, 0x68) = (u8) M2C_FIELD(arg0, u8 *, 0x4F2);
-    var_v1 = temp_s3;
-    do {
-        temp_v0_2 = M2C_FIELD((arg0 + var_s0), u8 *, 0x4C0);
-        var_s0 += 1;
-        M2C_FIELD(var_v1, u8 *, 0x71) = temp_v0_2;
-        var_v1 = temp_s3 + var_s0;
-    } while (var_s0 < 0x25);
-    var_s2 = arg0 + 0xA0;
-    var_s1 = temp_s3 + 0x1B0;
-    var_s0_2 = 6;
-    do {
-        UnPackItem__FPC12PkItemStructP10ItemStruct(var_s2, var_s1);
-        var_s2 += 0x14;
-        var_s0_2 -= 1;
-        var_s1 += 0x6C;
-    } while (var_s0_2 != -1);
-    var_s2_2 = arg0 + 0x12C;
-    var_s1_2 = temp_s3 + 0x4A4;
-    var_s0_3 = 0x27;
-    do {
-        UnPackItem__FPC12PkItemStructP10ItemStruct(var_s2_2, var_s1_2);
-        var_s2_2 += 0x14;
-        var_s0_3 -= 1;
-        var_s1_2 += 0x6C;
-    } while (var_s0_3 != -1);
-    var_s0_4 = 0;
-    var_v1_2 = temp_s3;
-    do {
-        temp_v0_3 = M2C_FIELD((arg0 + var_s0_4), u8 *, 0x498);
-        var_s0_4 += 1;
-        M2C_FIELD(var_v1_2, u8 *, 0x1588) = temp_v0_3;
-        var_v1_2 = temp_s3 + var_s0_4;
-    } while (var_s0_4 < 0x28);
-    var_s2_3 = arg0;
-    var_s1_3 = temp_s3 + 0x15B0;
-    var_s0_5 = 7;
-    M2C_FIELD(temp_s3, s32 *, 0x1584) = (s32) M2C_FIELD(var_s2_3, u8 *, 0x4F1);
-    VerifyGoldSeeds__FP12PlayerStruct(temp_s3);
-    do {
-        UnPackItem__FPC12PkItemStructP10ItemStruct(var_s2_3, var_s1_3);
-        var_s2_3 += 0x14;
-        var_s0_5 -= 1;
-        var_s1_3 += 0x6C;
-    } while (var_s0_5 != -1);
-    if (arg1 == myplr) {
-        var_s0_6 = 0x13;
-        var_v0 = (StorePlrNo * 0x870) + 0x804;
-        do {
-            *(&_witchitem + 0x2C + var_v0) = -1;
-            var_s0_6 -= 1;
-            var_v0 -= 0x6C;
-        } while (var_s0_6 >= 0);
-    }
-    CalcPlrInv__FiUc(arg1, 0);
-    M2C_FIELD(temp_s3, s8 *, 0x19E0) = 0;
-    M2C_FIELD(temp_s3, s8 *, 0x19E1) = 0;
-    M2C_FIELD(temp_s3, s8 *, 0x19E2) = 0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", UnPackPlayer__FPC14PkPlayerStructiUc);
 #if 0 /* ida */
 int __fastcall UnPackPlayer__FPC14PkPlayerStructiUc(int a1, int a2, char a3)
 {
@@ -2270,26 +1333,12 @@ int __fastcall UnPackPlayer__FPC14PkPlayerStructiUc(int a1, int a2, char a3)
 }
 #endif
 
-/* ---- 0x8015B284  ConstructSlotName__FPci  DLG.CPP:1148-1156  seg dlg  fsize 56 ---- */
+/* ---- 0x8015B284  ConstructSlotName__FPci  DLG.CPP:1148-1156  seg dlg_2  fsize 56 ---- */
 /* void ConstructSlotName(char *TempStr, int slot)
  *   TempStr=$s3 slot=$s2
  *   blocks: {1 }9
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ConstructSlotName__FPci);
-#if 0 /* m2c */
-void ConstructSlotName__FPci(s32 (*arg0)[], s32 arg1) {
-    s32 (*temp_s0)[];
-    s32 temp_s1;
-
-    temp_s1 = arg1 * 0x4F8;
-    if (*(&CharDataStruct + 0x478 + temp_s1) == 0) {
-        sprintf(arg0, (s32 (*)[]) D_8011B438, arg1 + 1, GetStr__Fi(0x12C));
-        return;
-    }
-    temp_s0 = GetStr__Fi(0x245);
-    sprintf(arg0, (s32 (*)[]) D_801436DC, arg1 + 1, temp_s1 + (&CharDataStruct + 0x478), temp_s0, (s32) *(&CharDataStruct + 0x4EE + temp_s1), GetStr__Fi(*(&ClassStrTbl + (*(&CharDataStruct + 0x4E9 + temp_s1) * 4))));
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ConstructSlotName__FPci);
 #if 0 /* ida */
 int __fastcall ConstructSlotName__FPci(int a1, int a2)
 {
@@ -2320,28 +1369,12 @@ int __fastcall ConstructSlotName__FPci(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015B37C  GetSpinnerWidth__Fi  DLG.CPP:1159-1176  seg dlg  fsize 88 ---- */
+/* ---- 0x8015B37C  GetSpinnerWidth__Fi  DLG.CPP:1159-1176  seg dlg_2  fsize 88 ---- */
 /* int GetSpinnerWidth(int j)
  *   j=$a1 TempStr@sp-0x48 len=$v0
  *   blocks: {1 }18
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetSpinnerWidth__Fi);
-#if 0 /* m2c */
-s32 GetSpinnerWidth__Fi(s32 arg0) {
-    s32 *var_a1;
-
-    if (*(&card_status + (current_card * 4)) == 2) {
-        return 0x200;
-    }
-    if (*(&CharDataStruct + 0x478 + (arg0 * 0x4F8)) != 0) {
-        ConstructSlotName__FPci((s32 (*)[]) &sp10[0], arg0);
-        var_a1 = &sp10[0];
-    } else {
-        var_a1 = GetStr__Fi(0x12C, arg0);
-    }
-    return GetStrWidth__5CFontPc(&MediumFont, (s32 (*)[]) var_a1) + 8;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetSpinnerWidth__Fi);
 #if 0 /* ida */
 int __fastcall GetSpinnerWidth__Fi(int a1)
 {
@@ -2364,12 +1397,12 @@ int __fastcall GetSpinnerWidth__Fi(int a1)
 }
 #endif
 
-/* ---- 0x8015B420  ReconstructSlotName__Fii  DLG.CPP:1190-1294  seg dlg  fsize 48 ---- */
+/* ---- 0x8015B420  ReconstructSlotName__Fii  DLG.CPP:1190-1294  seg dlg_2  fsize 48 ---- */
 /* char * ReconstructSlotName(int side, int file)
  *   side=$s5 file=$s6 i=$v1
  *   blocks: {1 {1 }5 }105
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ReconstructSlotName__Fii);
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ReconstructSlotName__Fii);
 #if 0 /* ida */
 char *__fastcall ReconstructSlotName__Fii(int a1, int a2)
 {
@@ -2519,20 +1552,12 @@ LABEL_13:
 }
 #endif
 
-/* ---- 0x8015B818  GetTick__C4CPad  PADS.H (header copy):127-131  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B818  GetTick__C4CPad  PADS.H (header copy):127-131  seg dlg_2  fsize 0 ---- */
 /* unsigned short CPad::GetTick(void) const
  *   this=$a0
  *   blocks: {1 }5
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetTick__C4CPad_8015b818);
-#if 0 /* m2c */
-u16 GetTick__C4CPad_8015b818(void *arg0) {
-    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
-        return M2C_FIELD(arg0, u16 *, 0xE);
-    }
-    return M2C_FIELD(arg0, u16 *, 0x18);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetTick__C4CPad_8015b818);
 #if 0 /* ida */
 int __fastcall GetTick__C4CPad_8015b818(int a1)
 {
@@ -2543,20 +1568,12 @@ int __fastcall GetTick__C4CPad_8015b818(int a1)
 }
 #endif
 
-/* ---- 0x8015B840  GetDown__C4CPad  PADS.H (header copy):120-124  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B840  GetDown__C4CPad  PADS.H (header copy):120-124  seg dlg_2  fsize 0 ---- */
 /* unsigned short CPad::GetDown(void) const
  *   this=$a0
  *   blocks: {1 }5
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetDown__C4CPad_8015b840);
-#if 0 /* m2c */
-u16 GetDown__C4CPad_8015b840(void *arg0) {
-    if (M2C_FIELD(arg0, u8 *, 0) == 0) {
-        return M2C_FIELD(arg0, u16 *, 0xC);
-    }
-    return M2C_FIELD(arg0, u16 *, 0x16);
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetDown__C4CPad_8015b840);
 #if 0 /* ida */
 int __fastcall GetDown__C4CPad_8015b840(int a1)
 {
@@ -2567,17 +1584,12 @@ int __fastcall GetDown__C4CPad_8015b840(int a1)
 }
 #endif
 
-/* ---- 0x8015B868  SetPadTickMask__4CPadUs  PADS.H (header copy):92-92  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B868  SetPadTickMask__4CPadUs  PADS.H (header copy):92-92  seg dlg_2  fsize 0 ---- */
 /* void CPad::SetPadTickMask(unsigned short mask)
  *   this=$a0 mask=$a1
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", SetPadTickMask__4CPadUs_8015b868);
-#if 0 /* m2c */
-void SetPadTickMask__4CPadUs_8015b868(void *arg0, s16 arg1) {
-    M2C_FIELD(arg0, s16 *, 4) = arg1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", SetPadTickMask__4CPadUs_8015b868);
 #if 0 /* ida */
 void __fastcall SetPadTickMask__4CPadUs_8015b868(int a1, __int16 a2)
 {
@@ -2585,17 +1597,12 @@ void __fastcall SetPadTickMask__4CPadUs_8015b868(int a1, __int16 a2)
 }
 #endif
 
-/* ---- 0x8015B870  SetPadTick__4CPadUs  PADS.H (header copy):91-91  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B870  SetPadTick__4CPadUs  PADS.H (header copy):91-91  seg dlg_2  fsize 0 ---- */
 /* void CPad::SetPadTick(unsigned short tick)
  *   this=$a0 tick=$a1
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", SetPadTick__4CPadUs_8015b870);
-#if 0 /* m2c */
-void SetPadTick__4CPadUs_8015b870(void *arg0, s8 arg1) {
-    M2C_FIELD(arg0, s8 *, 3) = arg1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", SetPadTick__4CPadUs_8015b870);
 #if 0 /* ida */
 void __fastcall SetPadTick__4CPadUs_8015b870(int a1, char a2)
 {
@@ -2603,19 +1610,12 @@ void __fastcall SetPadTick__4CPadUs_8015b870(int a1, char a2)
 }
 #endif
 
-/* ---- 0x8015B878  SetRGB__6DialogUcUcUc  DIALOG.H (header copy):99-102  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B878  SetRGB__6DialogUcUcUc  DIALOG.H (header copy):99-102  seg dlg_2  fsize 0 ---- */
 /* void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
  *   this=$a0 R=$a1 G=$a2 B=$a3
  *   blocks: {1 }4
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", SetRGB__6DialogUcUcUc_8015b878);
-#if 0 /* m2c */
-void SetRGB__6DialogUcUcUc_8015b878(s8 arg1, s8 arg2, s8 arg3) {
-    DialogRed = arg1;
-    DialogGreen = arg2;
-    DialogBlue = arg3;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", SetRGB__6DialogUcUcUc_8015b878);
 #if 0 /* ida */
 void __fastcall SetRGB__6DialogUcUcUc_8015b878(int a1, char a2, char a3, char a4)
 {
@@ -2625,17 +1625,12 @@ void __fastcall SetRGB__6DialogUcUcUc_8015b878(int a1, char a2, char a3, char a4
 }
 #endif
 
-/* ---- 0x8015B898  SetBack__6Dialogi  DIALOG.H (header copy):94-94  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B898  SetBack__6Dialogi  DIALOG.H (header copy):94-94  seg dlg_2  fsize 0 ---- */
 /* void Dialog::SetBack(int Type)
  *   this=$a0 Type=$a1
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", SetBack__6Dialogi_8015b898);
-#if 0 /* m2c */
-void SetBack__6Dialogi_8015b898(M2C_UNK *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 8) = arg1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", SetBack__6Dialogi_8015b898);
 #if 0 /* ida */
 void __fastcall SetBack__6Dialogi_8015b898(int a1, int a2)
 {
@@ -2643,17 +1638,12 @@ void __fastcall SetBack__6Dialogi_8015b898(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015B8A0  SetBorder__6Dialogi  DIALOG.H (header copy):91-91  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B8A0  SetBorder__6Dialogi  DIALOG.H (header copy):91-91  seg dlg_2  fsize 0 ---- */
 /* void Dialog::SetBorder(int Type)
  *   this=$a0 Type=$a1
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", SetBorder__6Dialogi_8015b8a0);
-#if 0 /* m2c */
-void SetBorder__6Dialogi_8015b8a0(M2C_UNK *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 4) = arg1;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", SetBorder__6Dialogi_8015b8a0);
 #if 0 /* ida */
 void __fastcall SetBorder__6Dialogi_8015b8a0(int a1, int a2)
 {
@@ -2661,22 +1651,12 @@ void __fastcall SetBorder__6Dialogi_8015b8a0(int a1, int a2)
 }
 #endif
 
-/* ---- 0x8015B8A8  _._6Dialog  DIALOG.H (header copy):79-79  seg dlg  fsize 24 ---- */
+/* ---- 0x8015B8A8  _._6Dialog  DIALOG.H (header copy):79-79  seg dlg_2  fsize 24 ---- */
 /* void Dialog::~Dialog(int __in_chrg)
  *   this=$a0 __in_chrg=$a1
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", ___6Dialog_8015b8a8);
-#if 0 /* m2c */
-void ___6Dialog_8015b8a8(s32 arg1) {
-    s32 temp_a1;
-
-    temp_a1 = arg1 & 1;
-    if (temp_a1 != 0) {
-        __builtin_delete(temp_a1);
-    }
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", ___6Dialog_8015b8a8);
 #if 0 /* ida */
 int __fastcall ___6Dialog_8015b8a8(int a1, char a2)
 {
@@ -2688,27 +1668,12 @@ int __fastcall ___6Dialog_8015b8a8(int a1, char a2)
 }
 #endif
 
-/* ---- 0x8015B8D0  __6Dialog  DIALOG.H (header copy):62-75  seg dlg  fsize 24 ---- */
+/* ---- 0x8015B8D0  __6Dialog  DIALOG.H (header copy):62-75  seg dlg_2  fsize 24 ---- */
 /* struct Dialog * Dialog::Dialog(void)
  *   this=$s0
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", __6Dialog_8015b8d0);
-#if 0 /* m2c */
-M2C_UNK *__6Dialog_8015b8d0(M2C_UNK *arg0) {
-    M2C_FIELD(arg0, s32 *, 8) = 0x94;
-    M2C_FIELD(arg0, s32 *, 0) = 0x1A;
-    M2C_FIELD(arg0, s32 *, 4) = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    M2C_FIELD(arg0, s32 *, 0xC) = GetOverlayOtBase__7CBlocks_8015b950();
-    return arg0;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", __6Dialog_8015b8d0);
 #if 0 /* ida */
 _DWORD *__fastcall __6Dialog_8015b8d0(_DWORD *a1)
 {
@@ -2726,16 +1691,11 @@ _DWORD *__fastcall __6Dialog_8015b8d0(_DWORD *a1)
 }
 #endif
 
-/* ---- 0x8015B950  GetOverlayOtBase__7CBlocks  BLOCK.H (header copy):174-174  seg dlg  fsize 0 ---- */
+/* ---- 0x8015B950  GetOverlayOtBase__7CBlocks  BLOCK.H (header copy):174-174  seg dlg_2  fsize 0 ---- */
 /* int CBlocks::GetOverlayOtBase(void)
  *   blocks: {1 }1
  */
-INCLUDE_ASM("asm/nonmatchings/dlg", GetOverlayOtBase__7CBlocks_8015b950);
-#if 0 /* m2c */
-s32 GetOverlayOtBase__7CBlocks_8015b950(void) {
-    return 0x1E8;
-}
-#endif
+INCLUDE_ASM("asm/nonmatchings/dlg_2", GetOverlayOtBase__7CBlocks_8015b950);
 #if 0 /* ida */
 int GetOverlayOtBase__7CBlocks_8015b950()
 {

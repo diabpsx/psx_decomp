@@ -10,31 +10,7 @@ SECTIONS
         . = 0x4;   /* 0x80139BFC */
         build/skel/PSXSRC/PRESONLY.CPP.o(.text);
         . = 0x2C;   /* 0x80139C24 */
-        build/src/fe.c.o(.text);
-        . = 0x1044;   /* 0x8013AC3C */
-        build/asm/data/fe_rodata_8013ac3c.rodata.s.o(.rodata);
-        . = 0x10B8;   /* 0x8013ACB0 */
-        build/src/fe_1.c.o(.text);
-        . = 0x1104;   /* 0x8013ACFC */
-        build/asm/data/fe_rodata_8013acfc.rodata.s.o(.rodata);
-        . = 0x126C;   /* 0x8013AE64 */
-        build/src/fe_2.c.o(.text);
-        . = 0x1280;   /* 0x8013AE78 */
-        build/asm/data/fe_rodata_8013ae78.rodata.s.o(.rodata);
-        . = 0x12F0;   /* 0x8013AEE8 */
-        build/src/fe_3.c.o(.text);
-        . = 0x1304;   /* 0x8013AEFC */
-        build/asm/data/fe_rodata_8013aefc.rodata.s.o(.rodata);
-        . = 0x1374;   /* 0x8013AF6C */
-        build/src/fe_4.c.o(.text);
-        . = 0x13F4;   /* 0x8013AFEC */
-        build/asm/data/fe_rodata_8013afec.rodata.s.o(.rodata);
-        . = 0x1844;   /* 0x8013B43C */
-        build/src/fe_5.c.o(.text);
-        . = 0x1AF4;   /* 0x8013B6EC */
-        build/asm/data/fe_rodata_8013b6ec.rodata.s.o(.rodata);
-        . = 0x1EBC;   /* 0x8013BAB4 */
-        build/src/fe_6.c.o(.text);
+        build/skel/PSXSRC/FE.CPP.o(.text);
         . = 0x2F58;   /* 0x8013CB50 */
         build/asm/data/credits_rodata_8013cb50.rodata.s.o(.rodata);
         . = 0x35BC;   /* 0x8013D1B4 */
@@ -42,13 +18,17 @@ SECTIONS
         . = 0x4560;   /* 0x8013E158 */
         build/asm/data/memcard_rodata_8013e158.rodata.s.o(.rodata);
         . = 0x8B00;   /* 0x801426F8 */
-        build/src/memcard.c.o(.text);
-        . = 0x8B54;   /* 0x8014274C */
-        build/asm/data/memcard_rodata_8014274c.rodata.s.o(.rodata);
-        . = 0x8B7C;   /* 0x80142774 */
-        build/src/memcard_1.c.o(.text);
+        build/skel/PSXSRC/MEMCARD.CPP.o(.text);
         . = 0x99F0;   /* 0x801435E8 */
         build/asm/data/dlg_rodata_801435e8.rodata.s.o(.rodata);
+        . = 0x9A0C;   /* 0x80143604 */
+        build/src/dlg.c.o(.text);
+        . = 0x9A54;   /* 0x8014364C */
+        build/asm/data/dlg_rodata_8014364c.rodata.s.o(.rodata);
+        . = 0x9AA8;   /* 0x801436A0 */
+        build/src/dlg_1.c.o(.text);
+        . = 0x9AF4;   /* 0x801436EC */
+        build/asm/data/dlg_rodata_801436ec.rodata.s.o(.rodata);
         . = 0x1F998;   /* 0x80159590 */
         build/skel/PSXSRC/DLG.CPP.o(.text);
         . = 0x21D60;   /* 0x8015B958 */

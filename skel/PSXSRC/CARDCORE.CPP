@@ -4,7 +4,7 @@
 #include "common.h"
 
 /* ---- 0x800A5004  init_mem_card__FPFii_vUc  CARDCORE.CPP:162-248  seg cardcore  fsize 32 ---- */
-/* void init_mem_card(void *(handler)(), unsigned char read_dir)
+/* void init_mem_card(void (*handler)(), unsigned char read_dir)
  *   handler=$s1 read_dir=$s0
  *   blocks: {1 }87
  */
