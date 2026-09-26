@@ -104,10 +104,11 @@ def mangled_params(name):
     while s:
         mm = re.match(r"(U|S)?([cislvbfdx])", s)
         if mm: out.append(mm.group(0)); s = s[mm.end():]; continue
-        mm = re.match(r"[PR]+(?:C)?(?:(U|S)?[cislvbfdx]|(\d+)(\w*))", s)
+        mm = re.match(r"([PR]+)(C)?(?:(U|S)?[cislvbfdx]|(\d+)(\w*))", s)
         if mm:
-            if mm.group(2): n = int(mm.group(2)); out.append(None); s = s[mm.start(2) + len(mm.group(2)) + n:]
-            else: out.append(None); s = s[mm.end():]
+            tok = "PC" if (mm.group(1) == "P" and mm.group(2)) else None
+            if mm.group(4): n = int(mm.group(4)); out.append(tok); s = s[mm.start(4) + len(mm.group(4)) + n:]
+            else: out.append(tok); s = s[mm.end():]
             continue
         mm = re.match(r"(\d+)", s)
         if mm: n = int(mm.group(1)); out.append(None); s = s[mm.end() + n:]; continue
@@ -124,6 +125,8 @@ def narrow_params(sig, name):
     for k, t in enumerate(toks):
         if t in _MANGLED_NARROW and re.match(r"^int \w+$", ps[k]):
             ps[k] = _MANGLED_NARROW[t] + " " + ps[k].split()[1]
+        elif t == "PC" and re.match(r"^[\w ]+ \*\w+$", ps[k]) and not ps[k].startswith("const "):
+            ps[k] = "const " + ps[k]   # SYM drops cv-qualifiers; the mangling keeps a const pointee
     return m.group(1) + ", ".join(ps) + m.group(3)
 
 def emit_protos(names):
