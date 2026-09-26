@@ -307,6 +307,95 @@ void S_StartNoItems(void)
     }
 }
 
+/* @0x80070748 */
+void TakePlrsMoney(long cost)
+{
+    int i;
+
+    plr[myplr]._pGold = CalculateGold(myplr) - cost;
+    for (i = 0; i < 8 && cost > 0; i++) {
+        if (plr[myplr].SpdList[i]._itype == 11 && plr[myplr].SpdList[i]._ivalue != 0x1388) {
+            if (cost < plr[myplr].SpdList[i]._ivalue) {
+                plr[myplr].SpdList[i]._ivalue -= cost;
+                SetSpdbarGoldCurs(myplr, i);
+                cost = 0;
+            } else {
+                cost -= plr[myplr].SpdList[i]._ivalue;
+                RemoveSpdBarItem(myplr, i);
+                i = -1;
+            }
+        }
+    }
+    if (cost > 0) {
+        for (i = 0; i < 8 && cost > 0; i++) {
+            if (plr[myplr].SpdList[i]._itype == 11) {
+                if (cost < plr[myplr].SpdList[i]._ivalue) {
+                    plr[myplr].SpdList[i]._ivalue -= cost;
+                    SetSpdbarGoldCurs(myplr, i);
+                    cost = 0;
+                } else {
+                    cost -= plr[myplr].SpdList[i]._ivalue;
+                    RemoveSpdBarItem(myplr, i);
+                    i = -1;
+                }
+            }
+        }
+    }
+    if (cost > 0) {
+        for (i = 0; i < plr[myplr]._pNumInv && cost > 0; i++) {
+            if (plr[myplr].InvList[i]._itype == 11 && plr[myplr].InvList[i]._ivalue != 0x1388) {
+                if (cost < plr[myplr].InvList[i]._ivalue) {
+                    plr[myplr].InvList[i]._ivalue -= cost;
+                    SetGoldCurs(myplr, i);
+                    cost = 0;
+                } else {
+                    cost -= plr[myplr].InvList[i]._ivalue;
+                    RemoveInvItem(myplr, i);
+                    i = -1;
+                }
+            }
+        }
+        if (cost > 0) {
+            for (i = 0; i < plr[myplr]._pNumInv && cost > 0; i++) {
+                if (plr[myplr].InvList[i]._itype == 11) {
+                    if (cost < plr[myplr].InvList[i]._ivalue) {
+                        plr[myplr].InvList[i]._ivalue -= cost;
+                        SetGoldCurs(myplr, i);
+                        cost = 0;
+                    } else {
+                        cost -= plr[myplr].InvList[i]._ivalue;
+                        RemoveInvItem(myplr, i);
+                        i = -1;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* @0x80071760 */
+void PlaceStoreGold(long v)
+{
+    int i, ii, xx, yy;
+    unsigned char done;
+
+    done = 0;
+    for (i = 0; i < 40 && !done; i++) {
+        yy = 10 * (i / 10);
+        xx = i % 10;
+        if (plr[myplr].InvGrid[xx + yy] == 0) {
+            ii = plr[myplr]._pNumInv;
+            GetGoldSeed(myplr, &golditem);
+            plr[myplr].InvList[ii] = golditem;
+            plr[myplr]._pNumInv++;
+            plr[myplr].InvGrid[xx + yy] = plr[myplr]._pNumInv;
+            plr[myplr].InvList[ii]._ivalue = v;
+            SetGoldCurs(myplr, ii);
+            done = 1;
+        }
+    }
+}
+
 /* @0x8006E624 */
 void S_StartStory(void)
 {

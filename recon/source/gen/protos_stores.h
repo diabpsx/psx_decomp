@@ -34,3 +34,9 @@ void S_StartBarMaid(void);
 void ReleaseStoreBtn(void);
 void PlaySFX(int i);
 void ClearSText(int s, int e);
+long CalculateGold(int pnum);   /* func_80160B64 */
+void RemoveSpdBarItem(int pnum, int idx);   /* func_8015D9AC */
+void RemoveInvItem(int pnum, int idx);   /* func_8015D6FC */
+void SetSpdbarGoldCurs(int pnum, int i);
+void SetGoldCurs(int pnum, int i);
+void GetGoldSeed(int pnum, ItemStruct *itm);
