@@ -1,0 +1,1 @@
+/* no structs owned by COREAUTO.CPP */
