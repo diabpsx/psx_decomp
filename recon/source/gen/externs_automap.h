@@ -19,7 +19,7 @@ extern unsigned char gbActivePlayers;   /* @0x8011B9A3 */
 extern unsigned char AmLTab[16];   /* @0x800E3BAC */
 extern unsigned char AmRTab[16];   /* @0x800E3BBC */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
-extern unsigned char GOLDR;   /* @0x8011ABDA */
-extern unsigned char GOLDG;   /* @0x8011ABDB */
-extern unsigned char GOLDB;   /* @0x8011ABDC */
+extern const unsigned char GOLDR;   /* @0x8011ABDA */
+extern const unsigned char GOLDG;   /* @0x8011ABDB */
+extern const unsigned char GOLDB;   /* @0x8011ABDC */
 extern struct CFont MediumFont;   /* @0x800B82D8 */

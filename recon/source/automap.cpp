@@ -178,7 +178,7 @@ void DrawAutoMapVertDoor(int X, int Y)
     scale = AutoMapScale;
     xs = X * scale;
     ys = Y * scale;
-    Ly = ys + xs + AMPlayerY;
+    Ly = xs + ys + AMPlayerY;
     Lx = (xs - ys) * 2 + AMPlayerX;
     L2 = AMGetLine(0x5F, 0x58, 0x38);
     Frac = AutoMapScale >> 1;
@@ -239,7 +239,7 @@ void DrawAutoMapHorzDoor(int X, int Y)
     scale = AutoMapScale;
     xs = X * scale;
     ys = Y * scale;
-    Ly = ys + xs + AMPlayerY;
+    Ly = xs + ys + AMPlayerY;
     Lx = (xs - ys) * 2 + AMPlayerX;
     L2 = AMGetLine(0x5F, 0x58, 0x38);
     Frac = AutoMapScale >> 1;
@@ -294,16 +294,15 @@ void DrawAutoMapVertGrate(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly;
-    int scale, xs, ys;
+    int xs, ys;
 
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
-    scale = AutoMapScale;
-    xs = X * scale;
-    ys = Y * scale;
-    Ly = ys + xs + AMPlayerY;
+    xs = X * AutoMapScale;
+    ys = Y * AutoMapScale;
+    Ly = xs + ys + AMPlayerY;
+    Lx = (xs - ys) * 2 + AMPlayerX;
     L2->y0 = Ly;
     L2->y1 = Ly + AutoMapScale;
-    Lx = (xs - ys) * 2 + AMPlayerX;
     L2->x0 = Lx;
     L2->x1 = Lx - AutoMapScale * 2;
 }
@@ -319,7 +318,7 @@ void DrawAutoMapHorzGrate(int X, int Y)
     scale = AutoMapScale;
     xs = X * scale;
     ys = Y * scale;
-    Ly = ys + xs + AMPlayerY;
+    Ly = xs + ys + AMPlayerY;
     L2->y0 = Ly;
     L2->y1 = Ly + AutoMapScale;
     Lx = (xs - ys) * 2 + AMPlayerX;
@@ -330,21 +329,18 @@ void DrawAutoMapHorzGrate(int X, int Y)
 /* line 467 @0x8016293C */
 void DrawAutoMapSquare(int X, int Y)
 {
-    /* TODO (open, next session): near-miss target only, not yet byte-verified -- see m2c draft
-     * refs/m2c/automap.c DrawAutoMapSquare__Fii for the exact register-level computation. */
     LINE_F2 *L2;
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
-    int scale, xs, ys;
+    int xs, ys;
 
-    scale = AutoMapScale;
-    xs = X * scale;
-    ys = Y * scale;
-    Frac = scale >> 1;
-    x3 = scale * 2;
-    y1 = (ys + xs - Frac) + AMPlayerY;
-    y0 = y1 + Frac;
-    y2 = y1 + scale;
-    Ly = (y1 + x3) - Frac;
+    xs = X * AutoMapScale;
+    ys = Y * AutoMapScale;
+    Frac = AutoMapScale >> 1;
+    Ly = (ys + xs - Frac) + AMPlayerY;
+    x3 = AutoMapScale * 2;
+    y0 = Ly + Frac;
+    y2 = Ly + AutoMapScale;
+    y1 = (Ly + x3) - Frac;
     Lx = (((xs - ys) * 2) - (Frac * 2)) + AMPlayerX;
     x1 = (Lx - x3) + (Frac * 2);
     x3 = (Lx + x3) - (Frac * 2);
@@ -359,11 +355,11 @@ void DrawAutoMapSquare(int X, int Y)
     L2->x0 = x1;
     L2->y0 = y2;
     L2->x1 = Lx;
-    L2->y1 = Ly;
+    L2->y1 = y1;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
     L2->x0 = Lx;
-    L2->y0 = Ly;
+    L2->y0 = y1;
     L2->x1 = x3;
     L2->y1 = y2;
 
@@ -481,7 +477,7 @@ void DrawAutoMapStairs(int X, int Y)
     scale = AutoMapScale;
     xs = X * scale;
     ys = Y * scale;
-    Ly = ys + xs + AMPlayerY;
+    Ly = xs + ys + AMPlayerY;
     y1 = Ly + scale;
     Lx = (xs - ys) * 2 + AMPlayerX;
     x1 = Lx - scale * 2;
