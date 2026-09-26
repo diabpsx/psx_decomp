@@ -1,0 +1,67 @@
+/* TU-owned globals (this is the segment that materializes them) */
+extern struct QuestStruct quests[16];    /* @0x800DDA40 */
+extern struct QuestData questlist[16];   /* @0x800DD908 */
+extern int QuestGroup1[3];               /* @0x800DDA1C */
+extern int QuestGroup2[3];               /* @0x800DDA28 */
+extern int QuestGroup3[3];               /* @0x800DDA34 */
+extern int QuestGroup4[2];               /* @0x8011BA30 */
+extern int qtopline;                     /* @0x8011BA70 */
+extern unsigned char questlog;                    /* @0x8011BA29 */
+extern unsigned char *pQLogCel;          /* @0x8011BA50 */
+extern int ALLQUESTS;                    /* @0x8011BA2C */
+extern BOOL WaterDone;                   /* @0x8011BA48 */
+
+/* other TUs */
+extern unsigned char gbMaxPlayers;       /* @0x8011B9A2 */
+extern unsigned char deltaload;          /* @0x8011B97D */
+extern unsigned char currlevel;          /* @0x8011C10C */
+extern unsigned char leveltype;          /* @0x8011C10D */
+extern unsigned char setlevel;           /* @0x8011C10E */
+extern unsigned char setlvlnum;          /* @0x8011C10F */
+extern unsigned char setlvltype;         /* @0x8011C110 */
+extern int ViewX;                        /* @0x8011C114 */
+extern int ViewY;                        /* @0x8011C118 */
+extern int ReturnLvlX;                   /* @0x8011BA54 */
+extern int ReturnLvlY;                   /* @0x8011BA58 */
+extern int ReturnLvl;                    /* @0x8011BA5C */
+extern int ReturnLvlT;                   /* @0x8011BA60 */
+extern int myplr;                        /* @0x8011BA08 */
+extern struct PlayerStruct plr[2];       /* @0x800DA538 */
+extern int setpc_x;                      /* @0x8011C0E4 */
+extern int setpc_y;                      /* @0x8011C0E8 */
+extern int setpc_w;                      /* @0x8011C0EC */
+extern int setpc_h;                      /* @0x8011C0F0 */
+extern int nummonsters;                  /* @0x8011C2CC */
+extern struct MonsterStruct monster[190]; /* @0x80105394 */
+extern unsigned char UniqMonst[0x900];   /* @0x8010C708 -- raw byte view, PSX-trimmed UniqMonData */
+extern int sfxdelay;                     /* @0x8011B850 */
+extern int sfxdnum;                      /* @0x8011B854 */
+extern unsigned char trigs[16][0x10];    /* @0x800E33CC (_tx,_ty,_tmsg,...) */
+extern int numtrigs;                     /* @0x8011BB78 */
+extern unsigned char objectactive[0x7F]; /* @0x800DA220 */
+extern int numobjects;                   /* @0x8011B9CC */
+extern int TransVal;                     /* @0x8011C148 */
+extern char offset_x[8];                 /* @0x8011C2A8 */
+extern char offset_y[8];                 /* @0x8011C2B0 */
+extern int questtrigstr[5];              /* @0x800DDA08 -- GetStr() text ids, not char* */
+extern int sel_data;                     /* @0x8011B72C */
+extern char _infostr[2][256];            /* @0x800CE810 */
+extern int cursmx;                       /* @0x8011B750 */
+extern int cursmy;                       /* @0x8011B754 */
+extern int Qtalklist[11][16];            /* @0x800CFBC0 */
+extern unsigned char Qfromoptions;                 /* @0x8011B228 */
+extern char **TextPtr;                      /* @0x8011BBF4 */
+extern int CDWAIT;                       /* @0x8011ADEC */
+extern unsigned char qtextflag;          /* @0x8011B960 */
+extern int qline;                        /* @0x8011BA68 */
+extern int numqlines;                    /* @0x8011BA6C */
+extern int options_pad;                  /* @0x8011B250 */
+extern struct CFont MediumFont;          /* @0x800B82D8 */
+extern unsigned char DialogRed, DialogGreen, DialogBlue;     /* @0x8011ABFD.. */
+extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;  /* @0x8011AC00.. */
+extern unsigned char WHITER, WHITEG, WHITEB;   /* @0x8011ABD1.. */
+extern unsigned char BLUER, BLUEG, BLUEB;      /* @0x8011ABD4.. */
+extern unsigned char REDR, REDG, REDB;         /* @0x8011ABD7.. */
+extern unsigned char GOLDR, GOLDG, GOLDB;      /* @0x8011ABDA.. */
+extern unsigned char BACKR, BACKG, BACKB;      /* @0x8011ABFA.. */
+extern unsigned char BORDERR, BORDERG, BORDERB;/* @0x8011ABF7.. */
