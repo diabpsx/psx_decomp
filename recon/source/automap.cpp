@@ -516,5 +516,63 @@ void DrawAutoMapStairs(int X, int Y)
  * in this TU is either sealed or has a concrete near-miss target. */
 void DrawAutomap(void)
 {
+    /* Setup block transcribed from refs/m2c/automap.c:791-835 (AMPlayerX/Y + per-player AMPx/AMPy
+     * split-screen offsets) -- structurally complete but NOT YET byte-verified in isolation.
+     * The leveltype==3 / else run-merge rasterizer bodies (refs/m2c/automap.c:836-1148, ~650 raw
+     * insns) and the draw_game_info-equivalent text tail (refs/m2c/automap.c:1148-1254) are TODO. */
+    if (PauseMode == 0 && (plr[0].plractive || plr[1].plractive)) {
+        int a1, a2, a3, t0;
+
+        D_8011C36C = CBlocks::GetOverlayOtBase();
+        a1 = plr[0]._px - 0x10;
+        a2 = plr[0]._py - 0x10;
+        a3 = plr[1]._px - 0x10;
+        t0 = plr[1]._py - 0x10;
+
+        if (!plr[1].plractive) {
+            AMPlayerX = (a1 - a2) * 2;
+            AMPlayerY = a1 + a2;
+            AMPx[0] = 0;
+            AMPy[0] = 0;
+        } else if (!plr[0].plractive) {
+            AMPlayerX = (a3 - t0) * 2;
+            AMPlayerY = a3 + t0;
+            AMPx[1] = 0;
+            AMPy[1] = 0;
+        } else {
+            int mx, my;
+
+            mx = (a1 + a3) >> 1;
+            my = (a2 + t0) >> 1;
+            AMPlayerX = (mx - my) * 2;
+            AMPlayerY = mx + my;
+            AMPx[0] = (a1 - mx) * 2;
+            AMPy[0] = (a2 - my) * 2;
+            AMPx[1] = (a3 - mx) * 2;
+            AMPy[1] = (t0 - my) * 2;
+        }
+
+        {
+            int lo, lo2;
+
+            lo = AMPlayerX * AutoMapScale;
+            lo2 = AMPlayerY * AutoMapScale;
+            AMPlayerX = (AutoMapXOfs + 0xA0) - (lo >> 1);
+            AMPlayerY = (AutoMapYOfs + 0x64) - (lo2 >> 1);
+        }
+
+        if (leveltype == 3) {
+            /* TODO (open): the horizontal wall/door/grate/arch run-merge pass over
+             * automapview[][]/dungeon[][]/automaptype[]/AmRTab[] for the 40x40 visible window --
+             * refs/m2c/automap.c:836-1077. */
+        } else {
+            /* TODO (open): the leveltype!=3 sibling pass using AmLTab[] +
+             * DrawAutoMapStairs/HorzDoor/HorzGrate/DrawHorzArch -- refs/m2c/automap.c:1078-1148. */
+        }
+    }
+
     DrawAutomapPlr();
+
+    /* TODO (open): draw_game_info-equivalent tail (MediumFont.Print/GetStr/sprintf/GOLDR,G,B) --
+     * refs/m2c/automap.c:1148-1254. */
 }
