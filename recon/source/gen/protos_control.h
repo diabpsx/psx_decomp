@@ -23,3 +23,9 @@ TextDat * GM_UseTexData(int Id);   /* @0x80093C10 GMAN.CPP:1312 */
 void InitDiabloMsg(char e);   /* @0x8003DC44 ERROR.CPP:156 */
 unsigned char CheckSpell(int id, int sn, char st, unsigned char manaonly);   /* @0x80077498 SPELLS.CPP:170 */
 void DrawInfoBox(RECT *InfoRect);   /* @0x80032FA4 CONTROL.CPP:2079 */
+void DrawLevelUpIcon(int pnum);   /* @0x80035C58 CONTROL.CPP:2993 */
+void DrawPlus(int n, int pnum);   /* @0x80033E90 CONTROL.CPP:2444 */
+void RedBack(void);   /* @0x800360F8 CONTROL.CPP:3112 */
+void ToggleSpell(int pnum);   /* @0x80031004 CONTROL.CPP:837 */
+void SetSpell(int pnum);   /* @0x80031D54 CONTROL.CPP:1255 */
+void DrawSpeedSpellTSK(TASK *T);   /* @0x80030ED4 CONTROL.CPP:811 */

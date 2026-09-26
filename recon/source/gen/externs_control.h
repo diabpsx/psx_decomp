@@ -28,3 +28,6 @@ extern unsigned char DialogTRed;   /* @0x8011AC00 */
 extern unsigned char DialogTGreen;   /* @0x8011AC01 */
 extern unsigned char DialogTBlue;   /* @0x8011AC02 */
 extern int D_801110FC[10];   /* rodata: DrawDurIcon4Item icon-frame table, unnamed in SYM */
+extern unsigned char leveltype;   /* @0x8011C10D */
+extern TASK *_spselflag[2];   /* @0x8011B650 */
+extern int force_redraw;   /* @0x8011B790 */
