@@ -363,18 +363,21 @@ int CheckBlock(int fx, int fy, int tx, int ty)
 
 int FindClosest(int sx, int sy, int rad)
 {
-    int j, i, mid, tx, ty, cr;
+    int cr, cidx, cent, cne, mid, tx, ty;
     int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
 
     if (rad > 19)
         rad = 19;
 
-    for (i = 1; i < rad; i++) {
-        cr = CrawlNum[i] + 2;
-        for (j = (unsigned char)CrawlTable[CrawlNum[i]]; j > 0; j--) {
-            tx = sx + CrawlTable[cr - 1];
-            ty = sy + CrawlTable[cr];
-            if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
+    for (cidx = 1; cidx < rad; cidx++) {
+        cent = CrawlNum[cidx];
+        cr = cent + 1;
+        for (cne = (unsigned char)CrawlTable[cent]; cne > 0; cne--) {
+            tx = sx + CrawlTable[cr];
+            ty = sy + CrawlTable[cr + 1];
+            /* PSX bounds against the raw dung_map array extent (112), not MAXDUNX/MAXDUNY (96) --
+             * same idiom as PutMissile/AddApoca/AddTeleport (retail sltiu ...,0x6F). */
+            if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
                 mid = dung_map[tx][ty].dMonster;
                 if (mid > 0 && !CheckBlock(sx, sy, tx, ty))
                     return mid - 1;
@@ -939,16 +942,18 @@ void AddFirebolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaste
 void AddTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, k, l, j, tx, ty;
-    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
 
     missile[mi]._miDelFlag = 1;
     for (k = 0; k < 6; k++) {
         l = CrawlNum[k];
         j = l + 1;
-        for (i = CrawlTable[l]; i > 0; i--) {
+        for (i = (unsigned char)CrawlTable[l]; i > 0; i--) {
             tx = dx + CrawlTable[j];
             ty = dy + CrawlTable[j + 1];
-            if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
+            /* PSX bounds tx/ty against the raw dung_map array extent (112), not the playable
+             * MAXDUNX/MAXDUNY (96) -- same idiom as PutMissile/AddApoca (retail sltiu ...,0x6F). */
+            if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
                 /* PSX drops the dItem/dMissile terms devilution's dPiece/dMonster/dObject/dPlayer
                  * check has, and substitutes GetSOLID/IsDplayer for nSolidTable[dPiece]/dPlayer. */
                 if ((GetSOLID(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject) == 0) {
@@ -1412,7 +1417,7 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, mx, k, j, l, tx, ty;
-    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
 
     missile[mi]._miDelFlag = 0;
     for (i = 0; i < nummissiles; i++) {
@@ -1426,10 +1431,10 @@ void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     for (k = 0; k < 6; k++) {
         l = CrawlNum[k];
         j = l + 1;
-        for (i = CrawlTable[l]; i > 0; i--) {
+        for (i = (unsigned char)CrawlTable[l]; i > 0; i--) {
             tx = dx + CrawlTable[j];
             ty = dy + CrawlTable[j + 1];
-            if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
+            if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {  /* AddGolem: retail uses the playable bound (0x5F=95) here, unlike the sibling crawl-search fns */
                 if (LineClear(sx, sy, tx, ty) && (GetSOLID(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject) == 0) {
                     missile[mi]._miVar1 = sx;
                     missile[mi]._miVar2 = sy;
@@ -1487,16 +1492,16 @@ void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void AddFirewallC(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, k, l, j, tx, ty, dir;
-    int const CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
 
     missile[mi]._miDelFlag = 1;
     for (k = 0; k < 6; k++) {
         l = CrawlNum[k];
         j = l + 1;
-        for (i = CrawlTable[l]; i > 0; i--) {
+        for (i = (unsigned char)CrawlTable[l]; i > 0; i--) {
             tx = dx + CrawlTable[j];
             ty = dy + CrawlTable[j + 1];
-            if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
+            if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {  /* raw dung_map extent, not MAXDUNX/MAXDUNY */
                 if (LineClear(sx, sy, tx, ty) && (sx != tx || sy != ty) && (GetSOLID(tx, ty) | dung_map[tx][ty].dObject) == 0) {
                     missile[mi]._miVar1 = tx;
                     missile[mi]._miVar2 = ty;
@@ -1675,7 +1680,7 @@ void MI_Rportal(int i)
 void MI_Golem(int i)
 {
     int id, pn, j, k, l, m, tx, ty;
-    int CrawlNum[19] = { 0, 3, 12, 45, 94, 159, 240, 337, 450, 579, 724, 885, 1062, 1255, 1464, 1689, 1930, 2187, 2460 };
+    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
 
     id = missile[i]._misource;
 
@@ -1683,10 +1688,10 @@ void MI_Golem(int i)
         for (k = 0; k < 6; k++) {
             l = CrawlNum[k];
             j = l + 1;
-            for (m = CrawlTable[l]; m > 0; m--) {
+            for (m = (unsigned char)CrawlTable[l]; m > 0; m--) {
                 tx = missile[i]._miVar4 + CrawlTable[j];
                 ty = missile[i]._miVar5 + CrawlTable[j + 1];
-                if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
+                if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {  /* raw dung_map extent, not MAXDUNX/MAXDUNY */
                     if (LineClear(missile[i]._miVar1, missile[i]._miVar2, tx, ty) && (GetSOLID(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject) == 0) {
                         k = 6;
                         SpawnGolum(id, tx, ty, i);
@@ -1750,23 +1755,25 @@ void MI_Nova(int i)
 
 void MI_Flash2(int i)
 {
-    if (missile[i]._micaster == TARGET_MONSTERS && missile[i]._misource != -1)
-        plr[missile[i]._misource]._pInvincible = 1;
-    missile[i]._mirange--;
+    MissileStruct *miss = &missile[i];
 
-    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix - 1, missile[i]._miy - 1, 1, 1);
-    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix, missile[i]._miy - 1, 1, 1);
-    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix + 1, missile[i]._miy - 1, 1, 1);
+    if (miss->_micaster == TARGET_MONSTERS && miss->_misource != -1)
+        plr[miss->_misource]._pInvincible = 1;
+    miss->_mirange--;
 
-    if (missile[i]._mirange == 0) {
-        missile[i]._miDelFlag = 1;
+    CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix - 1, miss->_miy - 1, 1, 1);
+    CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix, miss->_miy - 1, 1, 1);
+    CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix + 1, miss->_miy - 1, 1, 1);
+
+    if (miss->_mirange == 0) {
+        miss->_miDelFlag = 1;
         /* PSX-only: snapshot the current screen-fade RGB as a "restore point" (paired with the
          * fadetor/fadetog/fadetob writes in AddFlash2) -- no PC twin has this bookkeeping. */
         restore_r = fadetor;
         restore_g = fadetog;
         restore_b = fadetob;
-        if (missile[i]._micaster == TARGET_MONSTERS && missile[i]._misource != -1)
-            plr[missile[i]._misource]._pInvincible = 0;
+        if (miss->_micaster == TARGET_MONSTERS && miss->_misource != -1)
+            plr[miss->_misource]._pInvincible = 0;
     }
     PutMissile(i);
 }
