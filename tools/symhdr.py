@@ -94,6 +94,38 @@ def emit_externs(names):
         out.append(f"extern {ctype(r)};   /* @0x{r['val']:08X} */")
     return "\n".join(out)
 
+_MANGLED_NARROW = {"c": "char", "Uc": "unsigned char", "Sc": "signed char", "s": "short", "Us": "unsigned short", "b": "bool"}
+
+def mangled_params(name):
+    """builtin parameter tokens of a gcc-2 mangled free function (None where not a plain builtin)"""
+    m = re.search(r"__F(.*)$", name)
+    if not m: return None
+    s, out = m.group(1), []
+    while s:
+        mm = re.match(r"(U|S)?([cislvbfdx])", s)
+        if mm: out.append(mm.group(0)); s = s[mm.end():]; continue
+        mm = re.match(r"[PR]+(?:C)?(?:(U|S)?[cislvbfdx]|(\d+)(\w*))", s)
+        if mm:
+            if mm.group(2): n = int(mm.group(2)); out.append(None); s = s[mm.start(2) + len(mm.group(2)) + n:]
+            else: out.append(None); s = s[mm.end():]
+            continue
+        mm = re.match(r"(\d+)", s)
+        if mm: n = int(mm.group(1)); out.append(None); s = s[mm.end() + n:]; continue
+        return None
+    return [] if out == ["v"] else out
+
+def narrow_params(sig, name):
+    """rewrite `int x` params to the narrow type the mangled name records (SYM stores them promoted)"""
+    toks = mangled_params(name)
+    m = re.match(r"^(.*?\()(.*)(\).*)$", sig)
+    if not toks or not m or not m.group(2).strip(): return sig
+    ps = [p.strip() for p in m.group(2).split(",")]
+    if len(ps) != len(toks): return sig
+    for k, t in enumerate(toks):
+        if t in _MANGLED_NARROW and re.match(r"^int \w+$", ps[k]):
+            ps[k] = _MANGLED_NARROW[t] + " " + ps[k].split()[1]
+    return m.group(1) + ", ".join(ps) + m.group(3)
+
 def emit_protos(names):
     import gen_skeleton as GS
     out = []
@@ -101,7 +133,7 @@ def emit_protos(names):
         f = next((f for f in ST.fn_blocks() if f["name"] == n), None)
         fr = next((r for r in RECS if r["typ"].startswith("FCN") and r["name"] == n), None)
         if f is None: out.append(f"/* {n}: no SYM function block */"); continue
-        out.append(GS.signature(f, fr).replace("struct ", "") + f";   /* @0x{f['va']:08X} {f['file'].split(chr(92))[-1]}:{f['line']} */")
+        out.append(narrow_params(GS.signature(f, fr).replace("struct ", ""), n) + f";   /* @0x{f['va']:08X} {f['file'].split(chr(92))[-1]}:{f['line']} */")
     return "\n".join(out)
 
 if __name__ == "__main__":

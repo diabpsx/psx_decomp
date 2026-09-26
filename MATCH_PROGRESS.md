@@ -1,6 +1,6 @@
 # Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only
 
-**Main image: 121 / 3741 functions byte-matched (3.2%)**
+**Main image: 152 / 3741 functions byte-matched (4.1%)**
 
 ## coremon  (recon/source/coremon.cpp) — 16/17 PASS
 - ✅ M_CheckEFlag__Fi (2)
@@ -98,6 +98,39 @@
 - ✅ HasDat__C13CTextFileInfo (10)
 - ✅ HasTp__C13CTextFileInfo (10)
 - ✅ GetSize__C6CBlock (5)
+
+## themes  (recon/source/themes.cpp) — 31/31 PASS
+- ✅ TFit_Shrine__Fi (188)
+- ✅ TFit_Obj5__Fi (113)
+- ✅ TFit_SkelRoom__Fi (44)
+- ✅ TFit_GoatShrine__Fi (38)
+- ✅ CheckThemeObj3__Fiiii (83)
+- ✅ TFit_Obj3__Fi (48)
+- ✅ CheckThemeReqs__Fi (51)
+- ✅ SpecialThemeFit__Fii (119)
+- ✅ CheckThemeRoom__Fi (177)
+- ✅ InitThemes__Fv (211)
+- ✅ HoldThemeRooms__Fv (57)
+- ✅ PlaceThemeMonsts__Fii (97)
+- ✅ Theme_Barrel__Fi (87)
+- ✅ Theme_Shrine__Fi (58)
+- ✅ Theme_MonstPit__Fi (81)
+- ✅ Theme_SkelRoom__Fi (207)
+- ✅ Theme_Treasure__Fi (145)
+- ✅ Theme_Library__Fi (161)
+- ✅ Theme_Torture__Fi (86)
+- ✅ Theme_BloodFountain__Fi (29)
+- ✅ Theme_Decap__Fi (86)
+- ✅ Theme_PurifyingFountain__Fi (29)
+- ✅ Theme_ArmorStand__Fi (95)
+- ✅ Theme_GoatShrine__Fi (77)
+- ✅ Theme_Cauldron__Fi (29)
+- ✅ Theme_MurkyFountain__Fi (29)
+- ✅ Theme_TearFountain__Fi (29)
+- ✅ Theme_BrnCross__Fi (87)
+- ✅ Theme_WeaponRack__Fi (95)
+- ✅ UpdateL4Trans__Fv (23)
+- ✅ CreateThemeRooms__Fv (121)
 
 ## towners  (recon/source/towners.cpp) — 32/33 PASS
 - ✅ GetActiveTowner__Fi (21)
