@@ -17,6 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 import json
 _sm = ROOT / "skel" / "segments.json"
 SKEL_MAP = json.loads(_sm.read_text()) if _sm.exists() else {}   # seg -> skeleton file (1:1 link units)
+_rl = ROOT / "configs" / "recon_link.json"
+RECON_MAP = json.loads(_rl.read_text()) if _rl.exists() else {}   # seg -> recon TU whose .text replaces the skeleton (bytes-proven TUs)
 SECT = {"data": ".data", "rodata": ".rodata", "sdata": ".sdata", "bss": ".bss", "sbss": ".sbss"}
 
 def gen(name: str):
@@ -34,7 +36,10 @@ def gen(name: str):
         out.append(f"        . = 0x{off:X};   /* 0x{va:08X} */")   # inside an output section `.` is the offset from its start
         if kind == "c":
             skel = SKEL_MAP.get(n)
-            out.append(f"        build/skel/{skel}.o(.text);" if skel else f"        build/src/{n}.c.o(.text);")
+            if n in RECON_MAP:
+                out.append(f"        build/{RECON_MAP[n]}.o(.text);   /* reconstructed TU */")
+            else:
+                out.append(f"        build/skel/{skel}.o(.text);" if skel else f"        build/src/{n}.c.o(.text);")
         elif kind == "asm":
             out.append(f"        build/asm/{n}.s.o(.text);")
         elif kind in SECT:

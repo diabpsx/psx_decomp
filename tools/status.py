@@ -14,9 +14,16 @@ ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable
 
 def seg_functions(seg):
-    src = ROOT / "src" / f"{seg}.c"
-    if not src.exists(): return []
-    return re.findall(r'INCLUDE_ASM\("asm/nonmatchings/%s", (\w+)\);' % re.escape(seg), src.read_text())
+    """every function of the segment in VA order: the oracle .s files (splat writes trivial bodies such as an
+    empty `jr ra` function as C in src/<seg>.c, so the INCLUDE_ASM list alone undercounts)"""
+    d = ROOT / "asm" / "nonmatchings" / seg
+    if not d.is_dir(): return []
+    fns = []
+    for p in d.glob("*.s"):
+        m = re.search(r'/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s', p.read_text())
+        g = re.search(r'^glabel\s+(\S+)', p.read_text(), re.M)
+        if g: fns.append((int(m.group(1), 16) if m else 0, g.group(1)))
+    return [n for _, n in sorted(fns)]
 
 def recon_tus():
     out = {}

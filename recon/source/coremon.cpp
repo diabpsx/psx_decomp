@@ -50,6 +50,9 @@
 
 #define BFLAG_MONSTLR 0x10
 
+#define IMMUNE_FIRE 0x10
+#define MIS_FIREWALL 5
+
 #define MAXMONSTERS 190
 #define MAX_PLRS    2
 
@@ -284,10 +287,15 @@ int AddMonster(int x, int y, int dir, int mtype, unsigned char InMap)
     return -1;
 }
 
+/* SYM OPEN: bytes PASS, but retail has no record for `mode` (the mode load is scheduled before the
+ * pmonster loads while its store sinks after them -> an anonymous or copy-propagated temp in retail).
+ * Falsified: statement orders (12 perms), casts, comma forms, pmonster-based copy, int/uint/short/uchar/
+ * pointer temps, braced vs function scope.  Next angle: a copy chain that CSE folds (cf. GMAN StreamLoadTP Fs). */
 void M_StartStand(int i, int md)
 {
     MonsterStruct *pmonster;
     int _mx, _my;
+    char mode;
 
     ClearMVars(i);
     if (monster[i].MType->mtype == MT_GOLEM)
@@ -295,9 +303,10 @@ void M_StartStand(int i, int md)
     else
         NewMonsterAnim(i, monster[i].MType->Anims[MA_STAND], md, MA_STAND);
     pmonster = &monster[i];
+    mode = monster[i]._mmode;
     _mx = pmonster->_mx;
     _my = pmonster->_my;
-    monster[i]._mVar1 = monster[i]._mmode;
+    monster[i]._mVar1 = mode;
     monster[i]._mVar2 = 0;
     monster[i]._mmode = MM_STAND;
     monster[i]._mxoff = 0;
@@ -338,6 +347,61 @@ void ActivateSpawn(int i, int x, int y, int dir)
     M_StartSpStand(i, dir);
 }
 
+unsigned char SpawnSkeleton(int ii, int x, int y)
+{
+    int monstok[3][3];
+    int i;
+    int j;
+    int xx;
+    int yy;
+    int rs;
+    unsigned char savail;
+
+    if (ii == -1)
+        return 0;
+
+    if (PosOkMonst(-1, x, y)) {
+        ActivateSpawn(ii, x, y, GetDirection(x, y, x, y));
+        return 1;
+    }
+
+    savail = 0;
+    yy = 0;
+    for (j = y - 1; j <= y + 1; j++) {
+        xx = 0;
+        for (i = x - 1; i <= x + 1; i++) {
+            monstok[xx][yy] = PosOkMonst(-1, i, j);
+            savail |= monstok[xx][yy];
+            xx++;
+        }
+        yy++;
+    }
+    if (!savail)
+        return 0;
+
+    rs = ENG_random(15) + 1;
+    xx = 0;
+    yy = 0;
+    while (rs > 0) {
+        if (monstok[xx][yy])
+            rs--;
+        if (rs > 0) {
+            xx++;
+            if (xx == 3) {
+                xx = 0;
+                yy++;
+                if (yy == 3)
+                    yy = 0;
+            }
+        }
+    }
+
+    xx = xx + x - 1;
+    yy = yy + y - 1;
+    ActivateSpawn(ii, xx, yy, GetDirection(xx, yy, x, y));
+    return 1;
+}
+
 void M_StartSpStand(int i, int md)
 {
     MonsterStruct *pmonster;
@@ -356,6 +420,85 @@ void M_StartSpStand(int i, int md)
     monster[i]._moldy = _my;
     monster[i]._mdir = md;
     M_CheckEFlag(i);
+}
+
+unsigned char PosOkMonst(int i, int x, int y)
+{
+    unsigned char ret;
+    int oi;
+    int mi;
+    unsigned char fire;
+
+    fire = 0;
+    ret = !SolidLoc(x, y) && !IsDplayer(x, y) && dung_map[x][y].dMonster == 0;
+    if (ret && dung_map[x][y].dObject != 0) {
+        oi = dung_map[x][y].dObject > 0 ? dung_map[x][y].dObject - 1 : -(dung_map[x][y].dObject + 1);
+        if (object[oi]._oSolidFlag)
+            ret = 0;
+    }
+
+    if (ret && dung_map[x][y].dMissile != 0 && i >= 0) {
+        mi = dung_map[x][y].dMissile;
+        if (mi > 0) {
+            if (missile[mi]._mitype == MIS_FIREWALL) {
+                fire = 1;
+            } else {
+                for (mi = 0; mi < nummissiles; mi++) {
+                    if (missile[missileactive[mi]]._mitype == MIS_FIREWALL)
+                        fire = 1;
+                }
+            }
+        }
+        if (fire && (!(monster[i].mMagicRes & IMMUNE_FIRE) || monster[i].MType->mtype == MT_DIABLO))
+            ret = 0;
+    }
+
+    return ret;
+}
+
+unsigned char CanPut(int i, int j)
+{
+    int oi;
+
+    if (dung_map[i][j].dItem)
+        return 0;
+    if (GetSOLID(i, j))
+        return 0;
+
+    if (dung_map[i][j].dObject != 0) {
+        oi = dung_map[i][j].dObject > 0 ? dung_map[i][j].dObject - 1 : -(dung_map[i][j].dObject + 1);
+        if (object[oi]._oSolidFlag)
+            return 0;
+    }
+
+    if (dung_map[i + 1][j + 1].dObject > 0) {
+        oi = dung_map[i + 1][j + 1].dObject - 1;
+        if (object[oi]._oSelFlag != 0)
+            return 0;
+    }
+    if (dung_map[i + 1][j + 1].dObject < 0) {
+        oi = -(dung_map[i + 1][j + 1].dObject + 1);
+        if (object[oi]._oSelFlag != 0)
+            return 0;
+    }
+
+    if (dung_map[i + 1][j].dObject > 0 && dung_map[i][j + 1].dObject > 0) {
+        oi = dung_map[i + 1][j].dObject - 1;
+        if (object[oi]._oSelFlag != 0) {
+            oi = dung_map[i][j + 1].dObject - 1;
+            if (object[oi]._oSelFlag != 0)
+                return 0;
+        }
+    }
+
+    if (currlevel == 0) {
+        if (dung_map[i][j].dMonster != 0)
+            return 0;
+        if (dung_map[i + 1][j + 1].dMonster != 0)
+            return 0;
+    }
+
+    return 1;
 }
 
 int encode_enemy(int m)

@@ -434,5 +434,5 @@ struct MissileStruct {   /* sizeof 76 */
     char _miAnimCnt;   /* +0x45 */
     char _miAnimAdd;   /* +0x46 */
     char _miAnimFrame;   /* +0x47 */
-    void *(PrintPtr)();   /* +0x48 */
+    void (*PrintPtr)();   /* +0x48 */
 };

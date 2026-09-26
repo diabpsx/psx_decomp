@@ -36,12 +36,14 @@ def ctype(r):
     c = basemap.get(base, base)
     decl = r["name"]
     dims = list(r["dims"])
-    for mod in reversed(mods):
+    # SYM modifiers read left to right ("PTR FCN VOID" = pointer to function returning void):
+    # apply them outermost-first, parenthesising a pointer before a suffix declarator.
+    for mod in mods:
         if mod == "PTR": decl = "*" + decl
         elif mod == "ARY":
             d = dims.pop(0) if dims else 0
-            decl = f"{decl}[{d}]"
-        elif mod == "FCN": decl = f"({decl})()"
+            decl = f"({decl})[{d}]" if decl.startswith("*") else f"{decl}[{d}]"
+        elif mod == "FCN": decl = f"({decl})()" if decl.startswith("*") else f"{decl}()"
     return f"{c} {decl}"
 
 def struct(name):

@@ -1,6 +1,25 @@
 # Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only
 
-**Main image: 105 / 3660 functions byte-matched (2.9%)**
+**Main image: 121 / 3741 functions byte-matched (3.2%)**
+
+## coremon  (recon/source/coremon.cpp) — 16/17 PASS
+- ✅ M_CheckEFlag__Fi (2)
+- ✅ M_ClearSquares__Fi (80)
+- ✅ IsSkel__Fi (24)
+- ✅ NewMonsterAnim__FiR10AnimStructii (21)
+- ✅ M_Talker__Fi (26)
+- ✅ M_Enemy__Fi (134)
+- ✅ ClearMVars__Fi (31)
+- ✅ InitMonster__Fiiiii (353)
+- ✅ AddMonster__FiiiiUc (40)
+- 🟡 M_StartStand__Fii — bytes PASS, SYM differs
+- ✅ M_UpdateLeader__Fi (68)
+- ✅ ActivateSpawn__Fiiii (40)
+- ✅ SpawnSkeleton__Fiii (124)
+- ✅ M_StartSpStand__Fii (58)
+- ✅ PosOkMonst__Fiii (153)
+- ✅ CanPut__Fii (173)
+- ✅ encode_enemy__Fi (24)
 
 ## gman  (recon/psxsrc/gman.cpp) — 73/76 PASS
 - ✅ __7TextDat (13)
