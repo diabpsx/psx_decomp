@@ -26,6 +26,13 @@ struct QuestStruct {   /* sizeof 20 */
     unsigned char pad_for_laz;   /* +0x12 */
 };
 
+struct TriggerStruct {   /* sizeof 16 */
+    int _tx;    /* +0x0 */
+    int _ty;    /* +0x4 */
+    unsigned int _tmsg;  /* +0x8 */
+    int _tlvl;  /* +0xC */
+};
+
 struct RECT {   /* sizeof 8 */
     short x;   /* +0x0 */
     short y;   /* +0x2 */

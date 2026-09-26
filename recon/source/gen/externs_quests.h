@@ -36,7 +36,7 @@ extern struct MonsterStruct monster[190]; /* @0x80105394 */
 extern unsigned char UniqMonst[0x900];   /* @0x8010C708 -- raw byte view, PSX-trimmed UniqMonData */
 extern int sfxdelay;                     /* @0x8011B850 */
 extern int sfxdnum;                      /* @0x8011B854 */
-extern unsigned char trigs[16][0x10];    /* @0x800E33CC (_tx,_ty,_tmsg,...) */
+extern struct TriggerStruct trigs[16];
 extern int numtrigs;                     /* @0x8011BB78 */
 extern signed char objectactive[0x7F]; /* @0x800DA220 */
 extern int numobjects;                   /* @0x8011B9CC */

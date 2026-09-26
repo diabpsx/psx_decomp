@@ -275,81 +275,78 @@ unsigned char QuestStatus(int i)
     return 1;
 }
 
+#define MTIDX(m) (*(unsigned char *)((char *)monster[m].MType + 0x12))
+#define PCLASS(pnum) (*(signed char *)((char *)&plr[pnum] + 0xF6))
+
 void CheckQuestKill(int m, unsigned char sendmsg)
 {
-    struct MonsterStruct *mon = &monster[m];
-    void *MType = mon->MType;
-    unsigned char mtidx = *(unsigned char *)((char *)MType + 0x12);
-
-    if (mtidx == MT_SKING) {
+    if (MTIDX(m) == MT_SKING) {
         quests[Q_SKELKING]._qactive = QUEST_DONE;
         sfxdelay = 30;
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x324;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2B6;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x24E;
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x324;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2B6;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x24E;
         if (sendmsg) NetSendCmdQuest(1, Q_SKELKING);
-    } else if (mtidx == MT_CLEAVER) {
+    } else if (MTIDX(m) == MT_CLEAVER) {
         quests[Q_BUTCHER]._qactive = QUEST_DONE;
         sfxdelay = 30;
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x322;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2B4;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x24C;
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x322;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2B4;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x24C;
         if (sendmsg) NetSendCmdQuest(1, Q_BUTCHER);
-    } else if (mon->mName == *(int *)(UniqMonst + 2)) {
+    } else if (monster[m].mName == *(unsigned short *)(UniqMonst + 2)) {
         quests[Q_GARBUD]._qactive = QUEST_DONE;
         sfxdelay = 30;
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x30E;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2A0;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x238;
-    } else if (mon->mName == *(int *)(UniqMonst + 0x32)) {
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x30E;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2A0;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x238;
+    } else if (monster[m].mName == *(unsigned short *)(UniqMonst + 0x32)) {
         quests[Q_ZHAR]._qactive = QUEST_DONE;
         sfxdelay = 30;
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x30F;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2A1;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x239;
-    } else if (mon->mName == *(int *)(UniqMonst + 0x62) && gbMaxPlayers != 1) {
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x30F;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2A1;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x239;
+    } else if (monster[m].mName == *(unsigned short *)(UniqMonst + 0x62) && gbMaxPlayers != 1) {
         int i, j;
         quests[Q_BETRAYER]._qactive = QUEST_DONE;
         quests[Q_BETRAYER]._qvar1 = 7;
         sfxdelay = 30;
-        quests[Q_DIABLO]._qactive = QUEST_NOTACTIVE;
+        quests[Q_DIABLO]._qactive = QUEST_ACTIVE;
         for (j = 0; j < 96; j++) {
             for (i = 0; i < 96; i++) {
                 if (FindBlock(i, j) == 0x172) {
                     if (quests[Q_BETRAYER]._qactive == QUEST_DONE) {
-                        /* trigs[numtrigs] = {i, j, WM_DIABNEXTLVL} */
-                        *(int *)(trigs[numtrigs] + 0) = i;
-                        *(int *)(trigs[numtrigs] + 4) = j;
-                        *(int *)(trigs[numtrigs] + 8) = WM_DIABNEXTLVL;
+                        trigs[numtrigs]._tx = i;
+                        trigs[numtrigs]._ty = j;
+                        trigs[numtrigs]._tmsg = WM_DIABNEXTLVL;
                         numtrigs++;
                     }
                 }
             }
         }
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x325;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2B7;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x24F;
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x325;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2B7;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x24F;
         if (sendmsg) {
             NetSendCmdQuest(1, Q_BETRAYER);
             NetSendCmdQuest(1, Q_DIABLO);
         }
-    } else if (mon->mName == *(int *)(UniqMonst + 0x62) && gbMaxPlayers == 1) {
+    } else if (monster[m].mName == *(unsigned short *)(UniqMonst + 0x62) && gbMaxPlayers == 1) {
         quests[Q_BETRAYER]._qactive = QUEST_DONE;
         sfxdelay = 30;
         InitVPTriggers();
         quests[Q_BETRAYER]._qvar1 = 7;
         quests[Q_BETRAYER]._qvar2 = QS_VBRP4;
-        quests[Q_DIABLO]._qactive = QUEST_NOTACTIVE;
-        AddMissile(0x23, 0x20, 0x23, 0x20, 0, MIT_RPORTAL, MI_ENEMYMONST, myplr, 0, 0);
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x325;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2B7;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x24F;
-    } else if (mon->mName == *(int *)(UniqMonst + 0xC2)) {
+        quests[Q_DIABLO]._qactive = QUEST_ACTIVE;
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x325;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2B7;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x24F;
+    } else if (monster[m].mName == *(unsigned short *)(UniqMonst + 0xC2)) {
         quests[Q_WARLORD]._qactive = QUEST_DONE;
         sfxdelay = 30;
-        if (plr[myplr]._pad[0xF6] == CLASS_WARRIOR) sfxdnum = 0x330;
-        else if (plr[myplr]._pad[0xF6] == CLASS_ROGUE) sfxdnum = 0x2C2;
-        else if (plr[myplr]._pad[0xF6] == CLASS_SORCEROR) sfxdnum = 0x25A;
+        if (PCLASS(myplr) == CLASS_WARRIOR) sfxdnum = 0x330;
+        else if (PCLASS(myplr) == CLASS_ROGUE) sfxdnum = 0x2C2;
+        else if (PCLASS(myplr) == CLASS_SORCEROR) sfxdnum = 0x25A;
     }
 }
 
@@ -469,8 +466,9 @@ void ResyncQuests(void)
 
 void PrintQLString(int x, int y, unsigned char cjustflag, char *str, char col)
 {
-    int yp = x * 8;
+    int yp = y * 8;
     unsigned char r = 0, g = 0, b = 0;
+    int width, sx;
 
     switch (col) {
     case 0: r = WHITER; g = WHITEG; b = WHITEB; break;
@@ -478,7 +476,14 @@ void PrintQLString(int x, int y, unsigned char cjustflag, char *str, char col)
     case 2: r = REDR; g = REDG; b = REDB; break;
     case 3: r = GOLDR; g = GOLDG; b = GOLDB; break;
     }
-    MediumFont.Print(0, yp | 3, str, 1, (RECT *)&pQLogCel, r, g, b);
+    MediumFont.Print(0, yp | 3, str, 1, &QSRect, r, g, b);
+    if (qline == yp / 8) {
+        width = MediumFont.GetStrWidth(str);
+        sx = (QS_PW - width) / 2;
+        DrawSpinner((sx + QS_PX) - 0xB, yp + QS_PY + 3, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+        DrawSpinner(sx + width + QS_PX + 3, yp + QS_PY + 3, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+    }
+    (void)x;
     (void)cjustflag;
 }
 
