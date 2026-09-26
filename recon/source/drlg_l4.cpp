@@ -196,19 +196,17 @@ static void DRLG_L4Shadows()
 /* @0x8014F56C */
 static void InitL4Dungeon()
 {
-    int i, j;
-
     memset(L4dungeon, 0, sizeof(L4dungeon));
 
     /* clears the whole physical 48x48 dungeon array, not just the DMAXX/DMAXY logical area */
-    for (i = 0; i < 48; i++) {
-        for (j = 0; j < 48; j++) {
-            dungeon[i][j] = (short)30;
+    for (int j = 0; j < 48; j++) {
+        for (int i = 0; i < 48; i++) {
+            dungeon[i][j] = 30; // L4_DIRT;DIRT_PIC
         }
     }
 
-    for (j = 0; j < DMAXY; j++) {
-        for (i = 0; i < DMAXX; i++) {
+    for (int j = 0; j < DMAXY; j++) {
+        for (int i = 0; i < DMAXX; i++) {
             DFLAGS(i, j) = 0;
         }
     }
@@ -291,9 +289,8 @@ static void L4makeDmt()
 /* @0x8014F898 */
 static int L4HWallOk(int i, int j)
 {
-    int wallok;
     int x;
-    int val;
+    int wallok;
 
     x = 1;
     while (dungeon[i + x][j] == 6 && DFLAGS(i + x, j) == 0
@@ -301,28 +298,27 @@ static int L4HWallOk(int i, int j)
         x++;
     }
 
-    val = dungeon[i + x][j];
     wallok = 0;
 
-    if (val == 10) {
+    if (dungeon[i + x][j] == 10) {
         wallok = 1;
     }
-    if (val == 12) {
+    if (dungeon[i + x][j] == 12) {
         wallok = 1;
     }
-    if (val == 13) {
+    if (dungeon[i + x][j] == 13) {
         wallok = 1;
     }
-    if (val == 15) {
+    if (dungeon[i + x][j] == 15) {
         wallok = 1;
     }
-    if (val == 16) {
+    if (dungeon[i + x][j] == 16) {
         wallok = 1;
     }
-    if (val == 21) {
+    if (dungeon[i + x][j] == 21) {
         wallok = 1;
     }
-    if (val == 22) {
+    if (dungeon[i + x][j] == 22) {
         wallok = 1;
     }
     if (x <= 3) {
@@ -1735,13 +1731,12 @@ void DRLG_L4GeneralFix()
  * dung_map per dungeon tile (set for a wall-open tile #6 or an unset tile #0, cleared otherwise). */
 static void DRLG_L4SetWalls()
 {
-    int i, j;
     int xx, yy;
 
     yy = 16;
-    for (j = 0; j < DMAXY; j++) {
+    for (int j = 0; j < DMAXY; j++) {
         xx = 16;
-        for (i = 0; i < DMAXX; i++) {
+        for (int i = 0; i < DMAXX; i++) {
             if (dungeon[i][j] == 6 || dungeon[i][j] == 0) {
                 dung_map[xx][yy].dFlags |= 0x20;
             } else {

@@ -54,8 +54,8 @@ void InitAutomap(void)
     default:
         return;
     }
-
-    if (Name != NULL) {
+    if (Name != NULL)
+    {
         int Len;
         unsigned char b1, b2;
 
@@ -65,17 +65,11 @@ void InitAutomap(void)
 
         FIO->ReadAtAddr(Name, AmpBuffer, -1);
         pTmp = AmpBuffer;
-
         dwTiles = (unsigned long)Len >> 1;
-        if (dwTiles != 0) {
-            unsigned long d;
-            d = 1;
-            do {
-                b1 = *pTmp++;
-                b2 = *pTmp++;
-                automaptype[d] = b1 + (b2 << 8);
-                d++;
-            } while (d <= dwTiles);
+        for (unsigned long d = 1; d <= dwTiles; d++) {
+            b1 = *pTmp++;
+            b2 = *pTmp++;
+            automaptype[d] = b1 + (b2 << 8);
         }
 
         for (j = 0; j < 40; j++)
@@ -85,7 +79,6 @@ void InitAutomap(void)
         for (y = 0; y < 96; y++)
             for (i = 0; i < 96; i++)
                 dung_map[i][y].dFlags &= ~BFLAG_EXPLORED;
-
         AutoMapXOfs = 0;
         AutoMapYOfs = 0;
     }
