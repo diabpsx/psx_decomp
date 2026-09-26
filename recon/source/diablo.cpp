@@ -58,13 +58,11 @@ void start_game(unsigned int uMsg)
 
 void free_game(void)
 {
-    int i;
-
     FreeControlPan();
     FreeInvGFX();
     FreeQuestText();
     FreeStoreMem();
-    for (i = 0; i < MAX_PLRS; i++)
+    for (int i = 0; i < MAX_PLRS; i++)
         FreePlayerGFX(i);
     FreeItemGFX();
     FreeCursor();
@@ -188,46 +186,46 @@ void run_game_loop(unsigned int uMsg)
 
 BOOL TryIconCurs(void)
 {
-    int curs = _pcurs[myplr];
-    signed char tspell;
-
-    if (curs == 8) {                            /* CURSOR_RESURRECT */
+    if (_pcurs[myplr] == 8) {                   /* CURSOR_RESURRECT */
         NetSendCmdParam1(1, 0x1A, _pcursplr[sel_data]);
         return 1;
     }
-    if (curs == 0xA) {                          /* CURSOR_HEALOTHER */
+    if (_pcurs[myplr] == 0xA) {                 /* CURSOR_HEALOTHER */
         NetSendCmdParam1(1, 0x4D, _pcursplr[sel_data]);
         return 1;
     }
-    if (curs == 7) {                            /* CURSOR_TELEKINESIS */
+    if (_pcurs[myplr] == 7) {                   /* CURSOR_TELEKINESIS */
         DoTelekinesis();
         return 1;
     }
-    if (curs == 3) {                            /* CURSOR_IDENTIFY */
+    if (_pcurs[myplr] == 2) {                   /* CURSOR_IDENTIFY */
         if (_pcursinvitem[sel_data] != -1)
             CheckIdentify(myplr, _pcursinvitem[sel_data]);
-        return 1;
-    }
-    if (curs == 4) {                            /* CURSOR_REPAIR */
-        if (_pcursinvitem[sel_data] != -1)
-            DoRepair(myplr, _pcursinvitem[sel_data]);
-        return 1;
-    }
-    if (curs == 9) {                            /* CURSOR_RECHARGE */
-        if (_pcursinvitem[sel_data] != -1)
-            DoRecharge(myplr, _pcursinvitem[sel_data]);
-        return 1;
-    }
-    if (curs == 5) {                            /* CURSOR_TELEPORT */
-        tspell = plr[myplr]._pTSpell;
-        if (_pcursplr[sel_data] != -1)
-            NetSendCmdParam3(1, 0x19, _pcursplr[sel_data], tspell, GetSpellLevel(myplr, tspell));
-        else
-            NetSendCmdLocParam2(1, 0xF, cursmx, cursmy, tspell, GetSpellLevel(myplr, tspell));
         NewCursor(1);
         return 1;
     }
-    if (curs == 0 && _pcursobj[sel_data] == -1) {
+    if (_pcurs[myplr] == 3) {                   /* CURSOR_REPAIR */
+        if (_pcursinvitem[sel_data] != -1)
+            DoRepair(myplr, _pcursinvitem[sel_data]);
+        NewCursor(1);
+        return 1;
+    }
+    if (_pcurs[myplr] == 4) {                   /* CURSOR_RECHARGE */
+        if (_pcursinvitem[sel_data] != -1)
+            DoRecharge(myplr, _pcursinvitem[sel_data]);
+        NewCursor(1);
+        return 1;
+    }
+    if (_pcurs[myplr] == 9) {                   /* CURSOR_TELEPORT / TARGET */
+        if (_pcursplr[sel_data] != -1)
+            NetSendCmdParam3(1, 0x19, _pcursplr[sel_data], plr[myplr]._pTSpell, GetSpellLevel(myplr, plr[myplr]._pTSpell));
+        else
+            NetSendCmdLocParam2(1, 0xF, cursmx, cursmy, plr[myplr]._pTSpell, GetSpellLevel(myplr, plr[myplr]._pTSpell));
+        NewCursor(1);
+        return 1;
+    }
+    if (_pcurs[myplr] == 5 && _pcursobj[sel_data] == -1) {   /* CURSOR_DISARM */
+        NewCursor(1);
         return 1;
     }
     return 0;
@@ -318,46 +316,39 @@ void CreateLevel(int lvldir)
 void LoCreateLevel(void *)
 {
     int lvldir = D_8011C7B0;
-    int result;   /* SYM OPEN: bytes need this as a SEPARATE var from lvldir (else the final
-                    * LoadRndLvlPal(lvldir) call colors into $a1, not the oracle's $a0); retail's
-                    * SYM has no local record here at all (a copy-propagated single "lvldir" that
-                    * the debugger dropped). Falsified: reusing lvldir directly for both roles
-                    * (byte diff, wrong reg); next angle: an early-return/goto-shared-tail form
-                    * that lets gcc fold this into one pseudo without a separate DECL. */
 
     if (leveltype < 5) {
         switch (leveltype) {
         case 0:
             CreateTown(lvldir);
             InitTownTriggers();
-            result = 0;
+            LoadRndLvlPal(0);
             break;
         case 1:
             CreateL5Dungeon(glSeedTbl[currlevel], lvldir);
             InitL1Triggers();
             Freeupstairs();
-            result = 1;
+            LoadRndLvlPal(1);
             break;
         case 2:
             CreateL2Dungeon(glSeedTbl[currlevel], lvldir);
             InitL2Triggers();
             Freeupstairs();
-            result = 2;
+            LoadRndLvlPal(2);
             break;
         case 3:
             CreateL3Dungeon(glSeedTbl[currlevel], lvldir);
             InitL3Triggers();
             Freeupstairs();
-            result = 3;
+            LoadRndLvlPal(3);
             break;
         case 4:
             CreateL4Dungeon(glSeedTbl[currlevel], lvldir);
             InitL4Triggers();
             Freeupstairs();
-            result = 4;
+            LoadRndLvlPal(4);
             break;
         }
-        LoadRndLvlPal(result);
     }
     longjmp(D_8012EC28, 1);
 }
@@ -381,10 +372,12 @@ void ClearOutDungeonMap(void)
 
     for (x = 0; x < 112; x++) {
         for (y = 0; y < 112; y++) {
+            dung_map[x][y].dBits = 0;
             dung_map[x][y].dObject = 0;
             dung_map[x][y].dItem = 0;
             dung_map[x][y].dMissile = 0;
             dung_map[x][y].dFlags = 0;
+            dung_map[x][y].dTransVal = 0;
             dung_map[x][y].dMonster = 0;
         }
     }
@@ -423,25 +416,31 @@ void FillCrapBits(void)
 
     switch (currlevel) {
     case 3:
-        if (!setlevel && quests[12]._qactive) {        /* Q_SKELKING */
-            AllSolid(quests[12]._qtx - 1, quests[12]._qty);
-            AllSolid(quests[12]._qtx - 1, quests[12]._qty - 2);
+        if (!setlevel) {                               /* Q_SKELKING */
+            if (quests[12]._qactive) {
+                AllSolid(quests[12]._qtx - 1, quests[12]._qty);
+                AllSolid(quests[12]._qtx - 1, quests[12]._qty - 2);
+            }
         }
         break;
     case 15:
         qs = &quests[15];                              /* Q_BETRAYER */
-        if (setlevel && qs->_qactive && setlvlnum == qs->_qslvl) {
-            for (y = 18; y < 62; y++)
-                for (x = 56; x < 58; x++)
-                    AllSolid(x, y);
-            for (y = 60; y < 62; y++)
-                for (x = 40; x < 46; x++)
-                    AllSolid(x, y);
-            if (qs->_qvar1 < 4) {
-                AllSolid(0x20, 0x30);
-                AllSolid(0x21, 0x30);
-                AllSolid(0x20, 0x31);
-                AllSolid(0x21, 0x31);
+        if (setlevel) {
+            if (qs->_qactive) {
+                if (setlvlnum == qs->_qslvl) {
+                    for (y = 18; y < 62; y++)
+                        for (x = 56; x < 58; x++)
+                            AllSolid(x, y);
+                    for (y = 60; y < 62; y++)
+                        for (x = 40; x < 46; x++)
+                            AllSolid(x, y);
+                    if (qs->_qvar1 < 4) {
+                        AllSolid(0x20, 0x30);
+                        AllSolid(0x21, 0x30);
+                        AllSolid(0x20, 0x31);
+                        AllSolid(0x21, 0x31);
+                    }
+                }
             }
         }
         break;
