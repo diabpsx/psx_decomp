@@ -244,26 +244,32 @@ void DrawQTextBack(void)
     RECT ClipRect;
     int oldot;
     int H;
+    int h;
 
     QBack.SetBorder(0x1A);
     QBack.SetRGB(BORDERR, BORDERG, BORDERB);
-    if ((stextflag != 0 && qtextflag == 0) || FeFlag == 0) {
-        QBack.Back(0x14, 0x14, 0x118, (stextflag != 0 && qtextflag == 0) ? 0xCD : 0xBD);
-        return;
+    if (stextflag != 0 && qtextflag == 0) {
+        h = 0xCD;
+    } else {
+        if (FeFlag != 0) {
+            strcpy(BookName, GetStr(iBookName));
+            ClipRect.x = 0x14;
+            ClipRect.w = 0x118;
+            ClipRect.h = 0xB9;
+            ClipRect.y = 0;
+            QBack.Back(0x14, 0x40, 0x118, 0x91);
+            oldot = LargeFont.SetOTpos(0x80);
+            if (LargeFont.GetStrWidth(BookName) < 0x118)
+                H = 0x32;
+            else
+                H = 0x28;
+            LargeFont.Print(0, H, BookName, JustCentre, &ClipRect, BLUER, BLUEG, BLUEB);
+            LargeFont.SetOTpos(oldot);
+            return;
+        }
+        h = 0xBD;
     }
-    strcpy(BookName, GetStr(iBookName));
-    ClipRect.x = 0x14;
-    ClipRect.w = 0x118;
-    ClipRect.h = 0xB9;
-    ClipRect.y = 0;
-    QBack.Back(0x14, 0x40, 0x118, 0x91);
-    oldot = LargeFont.SetOTpos(0x80);
-    if (LargeFont.GetStrWidth(BookName) < 0x118)
-        H = 0x32;
-    else
-        H = 0x28;
-    LargeFont.Print(0, H, BookName, JustCentre, &ClipRect, BLUER, BLUEG, BLUEB);
-    LargeFont.SetOTpos(oldot);
+    QBack.Back(0x14, 0x14, 0x118, h);
 }
 
 Dialog::Dialog()

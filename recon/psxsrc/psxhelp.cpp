@@ -39,7 +39,7 @@ public:
         DialogOTpos = CBlocks::GetOverlayOtBase();
     }
     ~Dialog() {}
-    void SetBorder(int Border) { BorderGfx = Border; }
+    void SetBorder(int Type) { BorderGfx = Type; }
     void SetRGB(unsigned char R, unsigned char G, unsigned char B)
     {
         DialogRed = R;
@@ -48,6 +48,8 @@ public:
     }
     void Bevels(int Type);
     void Display(int x, int y, int W, int H);
+    void Back(int x, int y, int w, int h);
+    int SetOTpos(int OT);
 };
 
 class CPad {
@@ -110,18 +112,23 @@ public:
     unsigned char data[540];
     int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
     int GetStrWidth(char *Str);
+    int SetOTpos(int OT);
 };
 
 extern CFont MediumFont;
+extern CFont LargeFont;
 extern char tempstr[256];
 extern unsigned char REDR, REDG, REDB;
 /* the colour globals are const in the retail headers: gcc hoists their loads across calls */
 extern const unsigned char WHITER, WHITEG, WHITEB;
 extern const unsigned char GOLDR, GOLDG, GOLDB;
+extern const unsigned char BLUER, BLUEG, BLUEB;
+extern const unsigned char BORDERR, BORDERG, BORDERB;
+void PrintSelectBack(unsigned short Id);
 char *GetStr(int StrId);
 void DrawFeTwinkle(int x, int y);
 void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, int SinStep);
-int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp);
+static int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp);
 extern "C" int sprintf(char *buf, const char *fmt, ...);
 
 extern struct KEY_ASSIGNS txt_actions[20];
@@ -135,7 +142,7 @@ void PlaySFX(int psfx);
 int get_key_pad(int n);
 void PostGamePad(int val, int var1, int var2, int var3);
 
-void RemoveHelp(void);
+static void RemoveHelp(void);
 
 static struct RECT HelpRect;
 static unsigned char HelpTop;
@@ -145,15 +152,18 @@ static Dialog HelpBack;
 static BOOL helpflag;
 extern struct HelpStruct HelpList[25];
 
+/* Only DrawHelp is public (OPTIONS calls it): the helpers are file statics, which is why the
+ * static-object thunks are named _GLOBAL__I/D_DrawHelp__Fv. */
+
 /* @0x800AE38C PSXHELP.CPP:72 */
-void RemoveHelp(void)
+static void RemoveHelp(void)
 {
     helpflag = 0;
     cmenu = 0;
 }
 
 /* @0x800AE3A0 PSXHELP.CPP:80 */
-void HelpPad(void)
+static void HelpPad(void)
 {
     CPad *Pad = PAD_GetPad(options_pad, 0);
 
@@ -211,7 +221,7 @@ void HelpPad(void)
 }
 
 /* @0x800AE648 PSXHELP.CPP:156 */
-int GetControlKey(int str, BOOL *iscombo)
+static int GetControlKey(int str, BOOL *iscombo)
 {
     struct KEY_ASSIGNS *ta = txt_actions;
 
@@ -230,7 +240,7 @@ int GetControlKey(int str, BOOL *iscombo)
 }
 
 /* @0x800AE6F0 PSXHELP.CPP:228 */
-void InitHelp(void)
+static void InitHelp(void)
 {
     PostGamePad(0xB, options_pad, (int)txt_actions, 0);
     helpflag = 1;
@@ -240,7 +250,7 @@ void InitHelp(void)
 }
 
 /* @0x800AE73C PSXHELP.CPP:294 */
-int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp)
+static int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp)
 {
     int eln;
 
@@ -280,7 +290,7 @@ int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStr
 }
 
 /* @0x800AE950 PSXHELP.CPP:346 */
-void DisplayHelp(void)
+static void DisplayHelp(void)
 {
     struct HelpStruct *hp = HelpList;
     int y = 16;
@@ -317,4 +327,45 @@ void DisplayHelp(void)
         if (y >= 155)
             break;
     }
+}
+
+/* @0x800AECD0 PSXHELP.CPP:415 */
+void DrawHelp(void)
+{
+    static Dialog txtBack;
+    int otpos = CBlocks::GetOverlayOtBase();
+    int oldDot = HelpBack.SetOTpos(otpos);
+    int OldPrintOT = MediumFont.SetOTpos(otpos + 1);
+
+    if (!helpflag)
+        InitHelp();
+
+    if (FeFlag)
+        LargeFont.Print(0, 46, GetStr(0x1E5), JustCentre, NULL, BLUER, BLUEG, BLUEB);
+    else {
+        HelpRect.x = 16;
+        HelpRect.y = 32;
+        HelpRect.w = 273;
+        HelpRect.h = 16;
+        HelpBack.Back(16, 32, 282, 16);
+        MediumFont.Print(0, 11, GetStr(0x1E5), JustCentre, &HelpRect, GOLDR, GOLDG, GOLDB);
+    }
+
+    HelpBack.SetBorder(0x12);
+    HelpBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    HelpBack.Back(16, 52, 281, 154);
+    HelpRect.x = 32;
+    HelpRect.y = 52;
+    HelpRect.w = 257;
+    HelpRect.h = 154;
+    HelpPad();
+    DisplayHelp();
+
+    if (HelpList[help_select_line].DisplayType == 3 && !displayinghelp)
+        PrintSelectBack(0x4E6);
+    else
+        PrintSelectBack(0x4A0);
+
+    HelpBack.SetOTpos(oldDot);
+    MediumFont.SetOTpos(OldPrintOT);
 }

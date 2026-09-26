@@ -282,15 +282,15 @@ void sound_stop(void)
     stream_stop();
     sfx_stop();
 
-    for (int mi = 0; mi < nummtypes; mi++)
-        for (int mode = 0; mode < 4; mode++) {
-            int nr = 0;
-            while (1) {
-                if (!(nr < 2)) break;
-                snd_stop_snd((TSFX *)0);
-                nr++;
+    int mi, mode, nr;
+    for (mi = 0; mi < nummtypes; mi++) {
+        for (mode = 0; mode < 4; mode++) {
+            for (nr = 0; nr < 2; nr++) {
+                TSFX *pSnd = (TSFX *)0;
+                snd_stop_snd(pSnd);
             }
         }
+    }
 }
 
 /* line 576 @0x8003D8C8 */
@@ -309,45 +309,27 @@ static void priv_sound_init(unsigned char bLoadMask)
     unsigned char bCharMask = bLoadMask & sfx_CHAR_MASK;
     bLoadMask ^= bCharMask;
 
-    unsigned int d = 0;
-    do {
-        unsigned char bFlags = *((unsigned char *)sgSFX + d + 1);
-        if (bFlags & sfx_STREAM) goto next;
-        if (bLoadMask && !(bFlags & bLoadMask)) goto next;
-        if (bFlags & sfx_CHAR_MASK) {
-            if (!(bFlags & bCharMask)) goto next;
+    for (unsigned long d = 0; d < NUM_SFX; d++) {
+        if (sgSFX[d].bFlags & sfx_STREAM) continue;
+        if (bLoadMask && !(sgSFX[d].bFlags & bLoadMask)) continue;
+        if (sgSFX[d].bFlags & sfx_CHAR_MASK) {
+            if (!(sgSFX[d].bFlags & bCharMask)) continue;
         }
-    next:
-        d += sizeof(TSFX);
-    } while (d < sizeof(sgSFX));
+    }
 }
 
 /* line 631 @0x8003D940 */
 void sound_init(void)
 {
     unsigned char bLoadMask = 0;
-    char pClass;
-
-    if (gbMaxPlayers < 2) goto singleplayer;
-    bLoadMask = 0x70;
-    goto call;
-
-singleplayer:
-    pClass = plr[myplr]._pClass;
-    if (pClass != 0) goto rogue_check;
-    bLoadMask = sfx_WARRIOR;
-    goto call;
-
-rogue_check:
-    if (pClass != 1) goto sorceror_check;
-    bLoadMask = sfx_ROGUE;
-    goto call;
-
-sorceror_check:
-    if (pClass != 2) goto call;
-    bLoadMask = sfx_SORCEROR;
-
-call:
+    if (gbMaxPlayers > 1)
+        bLoadMask = 0x70;
+    else if (plr[myplr]._pClass == 0)
+        bLoadMask = sfx_WARRIOR;
+    else if (plr[myplr]._pClass == 1)
+        bLoadMask = sfx_ROGUE;
+    else if (plr[myplr]._pClass == 2)
+        bLoadMask = sfx_SORCEROR;
     priv_sound_init(bLoadMask);
 }
 
