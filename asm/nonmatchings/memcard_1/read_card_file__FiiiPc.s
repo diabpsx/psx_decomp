@@ -49,8 +49,8 @@ glabel read_card_file__FiiiPc
     /* 92C8 80142EC0 21280002 */   addu      $a1, $s0, $zero
   .L80142EC4:
     /* 92CC 80142EC4 1002A427 */  addiu      $a0, $sp, 0x210
-    /* 92D0 80142EC8 1480053C */  lui        $a1, %hi(func_8013E1EC)
-    /* 92D4 80142ECC ECE1A524 */  addiu      $a1, $a1, %lo(func_8013E1EC)
+    /* 92D0 80142EC8 1480053C */  lui        $a1, %hi(D_8013E1EC)
+    /* 92D4 80142ECC ECE1A524 */  addiu      $a1, $a1, %lo(D_8013E1EC)
     /* 92D8 80142ED0 21300002 */  addu       $a2, $s0, $zero
     /* 92DC 80142ED4 21104602 */  addu       $v0, $s2, $a2
     /* 92E0 80142ED8 C0110200 */  sll        $v0, $v0, 7

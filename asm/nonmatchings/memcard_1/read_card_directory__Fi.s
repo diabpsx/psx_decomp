@@ -72,8 +72,8 @@ glabel read_card_directory__Fi
     /* 8E98 80142A90 21B80000 */  addu       $s7, $zero, $zero
   .L80142A94:
     /* 8E9C 80142A94 1000A427 */  addiu      $a0, $sp, 0x10
-    /* 8EA0 80142A98 1480053C */  lui        $a1, %hi(func_8013E1EC)
-    /* 8EA4 80142A9C ECE1A524 */  addiu      $a1, $a1, %lo(func_8013E1EC)
+    /* 8EA0 80142A98 1480053C */  lui        $a1, %hi(D_8013E1EC)
+    /* 8EA4 80142A9C ECE1A524 */  addiu      $a1, $a1, %lo(D_8013E1EC)
     /* 8EA8 80142AA0 2130A002 */  addu       $a2, $s5, $zero
     /* 8EAC 80142AA4 21B08002 */  addu       $s6, $s4, $zero
     /* 8EB0 80142AA8 2110D502 */  addu       $v0, $s6, $s5

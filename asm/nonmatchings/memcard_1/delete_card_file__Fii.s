@@ -34,8 +34,8 @@ glabel delete_card_file__Fii
     /* 9194 80142D8C 21280002 */   addu      $a1, $s0, $zero
   .L80142D90:
     /* 9198 80142D90 1000A427 */  addiu      $a0, $sp, 0x10
-    /* 919C 80142D94 1480053C */  lui        $a1, %hi(func_8013E1EC)
-    /* 91A0 80142D98 ECE1A524 */  addiu      $a1, $a1, %lo(func_8013E1EC)
+    /* 919C 80142D94 1480053C */  lui        $a1, %hi(D_8013E1EC)
+    /* 91A0 80142D98 ECE1A524 */  addiu      $a1, $a1, %lo(D_8013E1EC)
     /* 91A4 80142D9C 21105002 */  addu       $v0, $s2, $s0
     /* 91A8 80142DA0 C0110200 */  sll        $v0, $v0, 7
     /* 91AC 80142DA4 80381100 */  sll        $a3, $s1, 2

@@ -45,6 +45,12 @@ def link(name: str):
             newest = max([src.stat().st_mtime] + [f.stat().st_mtime for f in seg_dir.glob("*.s")] if seg_dir.exists() else [src.stat().st_mtime])
             if not op.exists() or op.stat().st_mtime < newest:
                 B.compile_any(src)
+        elif o.startswith("build/skel/"):
+            src = ROOT / o[len("build/"):-2]
+            seg_dirs = [ROOT / "asm" / "nonmatchings" / d for d in re.findall(r'INCLUDE_ASM\("asm/nonmatchings/(\w+)"', src.read_text(encoding="utf-8"))]
+            newest = max([src.stat().st_mtime] + [f.stat().st_mtime for d in set(seg_dirs) for f in d.glob("*.s")])
+            if not op.exists() or op.stat().st_mtime < newest:
+                B.compile_any(src)
         else:
             sys.exit(f"unknown object in ld script: {o}")
     extra = [ROOT / "linkers" / f"undefined_syms_auto{'' if name == 'diabpsx' else '_' + name}.txt",

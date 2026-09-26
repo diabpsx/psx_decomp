@@ -66,7 +66,7 @@ def run(cmd, **kw):
 
 
 def _maspsx_assemble(s_file: Path, obj: Path, g_value: str, rel):
-    arch = AS_ARCH_SCAFFOLD if str(rel).replace("\\", "/").startswith("src/") else AS_ARCH
+    arch = AS_ARCH_SCAFFOLD if str(rel).replace("\\", "/").split("/")[0] in ("src", "skel") else AS_ARCH
     cmd = [PY, MASPSX, f"--aspsx-version={ASPSX_VERSION}",
            "--run-assembler", f"--gnu-as-path={AS}", *arch, f"-G{g_value}",
            "-I", INCLUDE, "-I", ROOT, "-o", obj]
@@ -119,7 +119,7 @@ def compile_cpp(src: Path, skip_asm: bool = False) -> Path:
 
 
 def compile_any(src: Path, skip_asm=False) -> Path:
-    return compile_c(src, skip_asm) if src.suffix == ".c" else compile_cpp(src, skip_asm)
+    return compile_c(src, skip_asm) if src.suffix.lower() == ".c" else compile_cpp(src, skip_asm)
 
 
 def main():

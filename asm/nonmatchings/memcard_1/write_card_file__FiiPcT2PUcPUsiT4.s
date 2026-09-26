@@ -17,8 +17,8 @@ glabel write_card_file__FiiPcT2PUcPUsiT4
     /* 94E8 801430E0 1002A427 */  addiu      $a0, $sp, 0x210
     /* 94EC 801430E4 6402B1AF */  sw         $s1, 0x264($sp)
     /* 94F0 801430E8 A002B18F */  lw         $s1, 0x2A0($sp)
-    /* 94F4 801430EC 1480053C */  lui        $a1, %hi(func_8013E1EC)
-    /* 94F8 801430F0 ECE1A524 */  addiu      $a1, $a1, %lo(func_8013E1EC)
+    /* 94F4 801430EC 1480053C */  lui        $a1, %hi(D_8013E1EC)
+    /* 94F8 801430F0 ECE1A524 */  addiu      $a1, $a1, %lo(D_8013E1EC)
     /* 94FC 801430F4 7802B6AF */  sw         $s6, 0x278($sp)
     /* 9500 801430F8 9C02B68F */  lw         $s6, 0x29C($sp)
     /* 9504 801430FC 21304002 */  addu       $a2, $s2, $zero
