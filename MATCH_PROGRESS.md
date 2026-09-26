@@ -1,6 +1,6 @@
 # Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only
 
-**Main image: 73 / 3660 functions byte-matched (2.0%)**
+**Main image: 105 / 3660 functions byte-matched (2.9%)**
 
 ## gman  (recon/psxsrc/gman.cpp) — 73/76 PASS
 - ✅ __7TextDat (13)
@@ -79,4 +79,39 @@
 - ✅ HasDat__C13CTextFileInfo (10)
 - ✅ HasTp__C13CTextFileInfo (10)
 - ✅ GetSize__C6CBlock (5)
+
+## towners  (recon/source/towners.cpp) — 32/33 PASS
+- ✅ GetActiveTowner__Fi (21)
+- ✅ SetTownerGPtrs__FPUcPPUc (8)
+- ✅ NewTownerAnim__FiPUcii (20)
+- ✅ InitTownerInfo__FilUciiici (86)
+- ✅ InitQstSnds__Fi (48)
+- ✅ InitSmith__Fv (76)
+- ✅ InitBarOwner__Fv (78)
+- ✅ InitTownDead__Fv (77)
+- ✅ InitWitch__Fv (77)
+- ✅ InitBarmaid__Fv (77)
+- ✅ InitBoy__Fv (79)
+- ✅ InitHealer__Fv (77)
+- ✅ InitTeller__Fv (77)
+- ✅ InitDrunk__Fv (77)
+- ✅ InitCows__Fv (166)
+- ✅ InitTowners__Fv (35)
+- ✅ FreeTownerGFX__Fv (41)
+- ✅ TownCtrlMsg__Fi (58)
+- ✅ TownBlackSmith__Fv (35)
+- ✅ TownBarOwner__Fv (39)
+- ✅ TownDead__Fv (58)
+- ✅ TownHealer__Fv (10)
+- ✅ TownStory__Fv (10)
+- ✅ TownDrunk__Fv (10)
+- ✅ TownBoy__Fv (10)
+- ✅ TownWitch__Fv (10)
+- ✅ TownBarMaid__Fv (10)
+- ✅ TownCow__Fv (10)
+- ✅ ProcessTowners__Fv (148)
+- ✅ PlrHasItem__FiiRi (53)
+- ✅ CowSFX__Fi (71)
+- ✅ TownerTalk__Fii (16)
+- 🟡 TalkToTowner__Fii — bytes PASS, SYM differs
 
