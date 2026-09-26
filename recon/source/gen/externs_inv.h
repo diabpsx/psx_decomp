@@ -1,0 +1,29 @@
+extern struct PlayerStruct plr[2];   /* @0x800DA538 */
+extern struct SpellData spelldata[37];   /* @0x800DDB80 */
+extern struct QuestStruct quests[16];   /* @0x800DDA40 */
+extern int myplr;   /* @0x8011BA08 */
+extern unsigned char invflag;   /* @0x8011C32C */
+extern unsigned char drawsbarflag;   /* @0x8011C32D */
+extern int force_redraw;   /* @0x8011B790 */
+extern unsigned char leveltype;   /* @0x8011C10D */
+extern int MouseX;   /* @0x8011B7E4 */
+extern int MouseY;   /* @0x8011B7E8 */
+extern int cursmx;   /* @0x8011B750 */
+extern int cursmy;   /* @0x8011B754 */
+extern unsigned char dropGoldFlag;   /* @0x8011B6B4 */
+extern int dropGoldValue;   /* @0x8011B6C8 */
+extern int initialDropGoldIndex;   /* @0x8011B6D0 */
+extern int initialDropGoldValue;   /* @0x8011B6CC */
+extern int _pcurs[2];   /* @0x8011B730 */
+extern char _pcursinvitem[2];   /* @0x8011B768 */
+extern int sel_data;   /* @0x8011B72C */
+extern char offset_x[8];   /* @0x8011C2A8 */
+extern char offset_y[8];   /* @0x8011C2B0 */
+extern char _pcursobj[2];   /* @0x8011B760 */
+extern char _pcursitem[2];   /* @0x8011B764 */
+extern int _pcursmonst[2];   /* @0x8011B758 */
+extern struct ItemStruct item[128];   /* @0x800D1D54 */
+extern long numitems;   /* @0x8011B888 */
+extern char itemactive[127];   /* @0x800D5354 */
+extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
+extern struct MonsterStruct monster[190];   /* @0x80105394 */
