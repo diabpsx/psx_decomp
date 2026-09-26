@@ -85,8 +85,10 @@ def link(obj: Path) -> Path:
 # ---- record model ---------------------------------------------------------------------------
 REC = re.compile(r"^[0-9a-f]+: \$([0-9a-f]{8}) (9[46]) Def2? class (\w+) type (.*?) size (\d+)(?: dims (\d+)((?: \d+)*))?(?: tag (\S*))? name (\S+)$")
 
-def functions(txt: str):
-    """{name: {hdr:{}, start, recs:[...], blocks:[(rel_addr, kind)]}} from a dumpsym text"""
+def functions(txt: str, every=False):
+    """{name: {hdr:{}, start, recs:[...], blocks:[(rel_addr, kind)]}} from a dumpsym text
+    (every=True: {name: [copy, ...]} -- header inlines are emitted out of line once per TU, so the
+    retail SYM holds several same-named functions at different VAs)"""
     out, cur = {}, None
     for ln in txt.splitlines():
         m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) 8c Function start", ln)
@@ -111,8 +113,17 @@ def functions(txt: str):
         m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) 8e Function end", ln)
         if m:
             cur["end"] = int(m[1], 16) - cur["start"]
-            out.setdefault(cur["hdr"].get("name"), cur); cur = None
+            if every: out.setdefault(cur["hdr"].get("name"), []).append(cur)
+            else: out.setdefault(cur["hdr"].get("name"), cur)
+            cur = None
     return out
+
+def oracle_va(seg: str, board: str):
+    """start VA of this segment's copy of `board` (from its asm/nonmatchings oracle), or None"""
+    p = ROOT / "asm" / "nonmatchings" / seg / (board + ".s")
+    if not p.is_file(): return None
+    m = re.search(r"/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s", p.read_text())
+    return int(m.group(1), 16) if m else None
 
 def norm_tag(t):
     return re.sub(r"^\._\d+$", "<anon>", t)
@@ -152,7 +163,8 @@ def main():
     obj = compile_g(src)
     txt = link(obj)
     ours = functions(txt.read_text(encoding="utf-8", errors="replace"))
-    retail = functions(RETAIL.read_text(encoding="latin-1"))
+    retail_all = functions(RETAIL.read_text(encoding="latin-1"), every=True)
+    retail = {k: v[0] for k, v in retail_all.items()}
     names = want or [n for n in ours if not n.startswith(("__maspsx", "_GLOBAL__"))]   # static-init thunks have no retail SYM
     n_ok = 0
     for n0 in names:
@@ -162,9 +174,13 @@ def main():
         if n not in ours: print(f"  {n0}: NOT IN OBJECT"); continue
         rn = n if n in retail else ("_._" + n[3:] if n.startswith("___") and ("_._" + n[3:]) in retail else None)   # cfront dtor spelling
         if rn is None: print(f"  {n0}: NO RETAIL SYM"); continue
-        ok, msg = compare(ours[n], retail[rn])
+        rf = retail[rn]
+        if len(retail_all[rn]) > 1:     # same-named copies: take the one at this segment's oracle VA
+            va = oracle_va(src.stem.lower(), n0)
+            rf = next((c for c in retail_all[rn] if c["start"] == va), rf)
+        ok, msg = compare(ours[n], rf)
         if os.environ.get("SYM_BLOCKS"):
-            msg += chr(10) + "      ours:   " + show(ours[n]) + chr(10) + "      retail: " + show(retail[n])
+            msg += chr(10) + "      ours:   " + show(ours[n]) + chr(10) + "      retail: " + show(rf)
         n_ok += ok
         print(f"  {n0}: {'SYM ok' if ok else 'SYM DIFF — ' + msg}")
     print(f"SYM: {n_ok}/{len(names)} ok  ({txt})")
