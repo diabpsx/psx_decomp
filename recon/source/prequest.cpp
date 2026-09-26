@@ -25,7 +25,6 @@
 void InitQuests(void)
 {
     int i, gri, deltaq;
-    ItemStruct *Item;
 
     if (gbMaxPlayers == 1) {
         for (i = 0; i < MAXQUESTS; i++) {
@@ -95,14 +94,12 @@ void InitQuests(void)
         quests[Q_ROCK]._qvar2 = 2;
     quests[Q_LTBANNER]._qvar1 = 1;
 
-    if (gbMaxPlayers != 1) {
+    if (gbMaxPlayers != 1)
         quests[Q_BETRAYER]._qvar1 = 2;
-        return;
-    }
-
-    Item = PlrHasItem(0, IDI_SPECELIX, i);
-    if (Item != NULL && quests[Q_MUSHROOM]._qactive != QUEST_DONE) {
-        AllItemsUseable[Item->IDidx] = 0;
+    if (gbMaxPlayers == 1) {
+        ItemStruct *Item = PlrHasItem(0, IDI_SPECELIX, i);
+        if (Item != NULL && quests[Q_MUSHROOM]._qactive != QUEST_DONE)
+            AllItemsUseable[Item->IDidx] = 0;
     }
 }
 

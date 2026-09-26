@@ -1751,9 +1751,9 @@ static void DRLG_L4SetWalls()
 /* @0x801546E0 */
 static void DRLG_L4(int entry)
 {
+    unsigned char doneflag;
     int i, j, spi, spj;
     long ar;
-    int doneflag;
 
     do {
         UPDATEPROGRESS(1);
@@ -1921,12 +1921,12 @@ static void DRLG_L4Pass3()
     v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
     v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
 
-    for (j = 0; j < 96; j += 2) {
-        for (i = 0; i < 96; i += 2) {
-            SetDPiece(i, j, v1);
-            SetDPiece(i + 1, j, v2);
-            SetDPiece(i, j + 1, v3);
-            SetDPiece(i + 1, j + 1, v4);
+    for (yy = 0; yy < 96; yy += 2) {
+        for (xx = 0; xx < 96; xx += 2) {
+            SetDPiece(xx, yy, v1);
+            SetDPiece(xx + 1, yy, v2);
+            SetDPiece(xx, yy + 1, v3);
+            SetDPiece(xx + 1, yy + 1, v4);
         }
     }
 
