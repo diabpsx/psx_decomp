@@ -642,9 +642,9 @@ void TextDat::PrepareGt3(POLY_GT3 *GT3, int Frm, int X, int Y)
     if (Fr->InVRAM) {
         SetUVTpGT3(Fr, GT3);
     } else {
-        RECT R;
         int DecX = 0x141;
         int DecY = 0x101;
+        RECT R;
         DecompFrame(Fr);
         R.x = DecX;
         R.y = DecY;
@@ -667,6 +667,7 @@ void TextDat::PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YF
     FRAME_HDR *Fr;
     int W;
     int H;
+    unsigned char sw;
 
     Fr = GetFr(Frm & 0xffff);
     W = Fr->W;
@@ -710,9 +711,9 @@ void TextDat::PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YF
     if (Fr->InVRAM) {
         SetUVTpGT4(Fr, GT4, XFlip, YFlip);
     } else {
-        RECT R;
         int DecX = 0x141;
         int DecY = 0x101;
+        RECT R;
         DecompFrame(Fr);
         R.x = DecX;
         R.y = DecY;
@@ -729,7 +730,6 @@ void TextDat::PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YF
         GT4->v3 = H + 1;
         GT4->tpage = GetTPage(1, 0, DecX, DecY);
         if (YFlip) {
-            unsigned char sw;
             sw = GT4->v0;
             GT4->v0 = GT4->v2;
             GT4->v2 = sw;
