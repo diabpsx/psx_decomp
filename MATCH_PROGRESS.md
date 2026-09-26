@@ -1,6 +1,6 @@
 # Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only
 
-**Main image: 152 / 3741 functions byte-matched (4.1%)**
+**Main image: 166 / 3741 functions byte-matched (4.4%)**
 
 ## coremon  (recon/source/coremon.cpp) — 16/17 PASS
 - ✅ M_CheckEFlag__Fi (2)
@@ -20,6 +20,24 @@
 - ✅ PosOkMonst__Fiii (153)
 - ✅ CanPut__Fii (173)
 - ✅ encode_enemy__Fi (24)
+
+## gendung  (recon/source/gendung.cpp) — 14/16 PASS
+- ✅ FillSolidBlockTbls__Fv (99)
+- ✅ SetDungeonMicros__Fv (2)
+- ✅ DRLG_InitTrans__Fv (29)
+- ✅ DRLG_RectTrans__Fiiii (29)
+- ✅ DRLG_CopyTrans__Fiiii (18)
+- ✅ DRLG_ListTrans__FiPUc (29)
+- ✅ DRLG_AreaTrans__FiPUc (36)
+- ✅ DRLG_InitSetPC__Fv (6)
+- ✅ DRLG_SetPC__Fv (40)
+- ✅ Make_SetPC__Fiiii (36)
+- ✅ DRLG_WillThemeRoomFit__FiiiiiPiT5 (178)
+- ❌ DRLG_CreateThemeRoom__Fi — 236 diffs (ours 1025)
+- ❌ DRLG_PlaceThemeRooms__FiiiiUc — 104 diffs (ours 168)
+- ✅ DRLG_HoldThemeRooms__Fv (105)
+- ✅ SkipThemeRoom__Fii (51)
+- ✅ InitLevels__Fv (17)
 
 ## gman  (recon/psxsrc/gman.cpp) — 73/76 PASS
 - ✅ __7TextDat (13)
