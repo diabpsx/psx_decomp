@@ -95,7 +95,7 @@ public:
     }
 };
 
-struct mdec_queue_entry {   /* sizeof 20 -- one queued PlayFMVOverLay-less streamed movie request */
+struct _mdecanim {   /* sizeof 20 -- one queued PlayFMVOverLay-less streamed movie request */
     char *name;
     int speed;
     int start;
@@ -253,7 +253,7 @@ static unsigned char DiabEnd;   /* SYM: STAT UCHAR DiabEnd @0x8011b4e8; movie-en
  * instead, a wrong-global bug). */
 
 /* ---------------------------------------------------------------- movie-play queue */
-struct mdec_queue_entry mdec_queue[16];
+struct _mdecanim mdec_queue[16];
 static int mdec_head, mdec_tail, mdecs_queued, mdecs_waiting, mdec_waiting_tail;
 static int mdec_sectors_per_frame, mdec_framecount, mdec_last_frame, mdec_speed;
 static int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a placeholder
@@ -1075,7 +1075,8 @@ extern "C" int stop_mdec_stream(void)
 /* @0x80157D54 FMV.CPP:1460 */
 extern "C" int dequeue_stream(void)
 {
-    struct mdec_queue_entry *a = &mdec_queue[mdec_head];
+    struct _mdecanim *a = &mdec_queue[mdec_head];
+    int len;
 
     if (mdecs_waiting != 0) {
         if (a->start == -1) {
@@ -1085,7 +1086,7 @@ extern "C" int dequeue_stream(void)
              * (a->end) here -- NOT a->flag/a->start as the field names might suggest at a glance;
              * confirmed via play_mdec_stream's struct-store offsets (0x0/0x4/0x8/0xC/0x10 =
              * name/speed/start/end/flag). a->flag=1 happens once, common to both arms, below. */
-            int len = open_cdstream(a->name, 0, -1);
+            len = open_cdstream(a->name, 0, -1);
             a->start = 1;
             a->end = len / (mdec_sectors_per_frame << 11);
         } else {
@@ -1100,7 +1101,6 @@ extern "C" int dequeue_stream(void)
          * confirms the source is `% 0x10`, not `& 0xF`, for this counter. */
         mdec_head = (mdec_head + 1) % 0x10;
     }
-    return mdec_head;
 }
 
 /* @0x80157E40 FMV.CPP:1486 */
@@ -1134,7 +1134,7 @@ extern "C" int dequeue_animation(void)
      *   - the `mdecs_queued == 0` early-out never sets $v0 at all in the raw (its delay slot only
      *     computes `a`'s address); kept `return 0;` here since omitting it would be a stronger,
      *     unverified UB-reliant claim than the 1-diff residual it might save. */
-    struct mdec_queue_entry *a = &mdec_queue[mdec_tail];
+    struct _mdecanim *a = &mdec_queue[mdec_tail];
 
     if (mdecs_queued != 0) {
         /* a->start is read-only in this function (never written) and stays live across the
@@ -1241,7 +1241,7 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
 /* @0x801581D0 FMV.CPP:1626 */
 extern "C" int play_mdec_stream(char *filename, int speed, int start, int end)
 {
-    struct mdec_queue_entry *a = &mdec_queue[mdec_tail];
+    struct _mdecanim *a = &mdec_queue[mdec_tail];
 
     if (mdecs_queued >= 16)
         return 0;

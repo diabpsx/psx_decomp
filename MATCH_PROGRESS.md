@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2431 / 2727 functions PASS (89.1%) — 837 PsyQ SDK functions excluded**
+**Game code: 2436 / 2727 functions PASS (89.3%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -830,7 +830,7 @@
 - ✅ SearchPathExists__6FileIO (5)
 - ✅ Save__6FileIOPCcPUci (15)
 
-## fmv  (recon/psxsrc/fmv.cpp) — 23/44 PASS
+## fmv  (recon/psxsrc/fmv.cpp) — 24/44 PASS
 - ✅ _cd_seek (14)
 - ✅ init_cdstream (10)
 - ❌ flush_cdstream — 9 diffs (ours 21)
@@ -866,7 +866,7 @@
 - 🟡 set_mdec_audio_volume — bytes PASS, SYM differs
 - ✅ resync_audio (4)
 - ✅ stop_mdec_stream (17)
-- ❌ dequeue_stream — 1 diffs (ours 59)
+- ✅ dequeue_stream (59)
 - ❌ dequeue_animation — 23 diffs (ours 108)
 - ❌ decode_mdec_stream — 7 diffs (ours 120)
 - ❌ play_mdec_stream — 31 diffs (ours 39)
@@ -963,7 +963,7 @@
 - ✅ SkipThemeRoom__Fii (51)
 - ✅ InitLevels__Fv (17)
 
-## glue  (recon/psxsrc/glue.cpp) — 24/28 PASS
+## glue  (recon/psxsrc/glue.cpp) — 25/28 PASS
 - ✅ GLUE_SetMonsterList__Fi (3)
 - ✅ GLUE_GetMonsterList__Fv (3)
 - ✅ GLUE_SuspendGame__Fv (21)
@@ -984,7 +984,7 @@
 - ✅ FindPlayerChar__FPc (38)
 - ✅ FindPlayerChar__Fiii (23)
 - ✅ FindPlayerChar__FP12PlayerStruct (12)
-- 🟡 FindPlayerChar__FP12PlayerStructb — bytes PASS, SYM differs
+- ✅ FindPlayerChar__FP12PlayerStructb (51)
 - ✅ MakeSurePlayerDressedProperly__FR7CPlayerR12PlayerStructbT2 (44)
 - 🟡 GLUE_GetCurrentList__Fi — bytes PASS, SYM differs
 - 🟡 GLUE_StartGameExit__Fv — bytes PASS, SYM differs
@@ -1071,11 +1071,11 @@
 - ✅ HasTp__C13CTextFileInfo (10)
 - ✅ GetSize__C6CBlock (5)
 
-## gpanel  (recon/psxsrc/gpanel.cpp) — 7/13 PASS
+## gpanel  (recon/psxsrc/gpanel.cpp) — 8/13 PASS
 - ✅ GetPal__6GPaneli (17)
 - ✅ __6GPaneli (25)
 - ❌ DrawFlask__6GPanelP7PanelXYP12PlayerStruct — 451 diffs (ours 285)
-- 🟡 SpdTrimCol__Fs — bytes PASS, SYM differs
+- ✅ SpdTrimCol__Fs (14)
 - ❌ DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct — 390 diffs (ours 459)
 - ❌ DrawSpell__6GPanelP7PanelXYP12PlayerStruct — 80 diffs (ours 103)
 - ✅ DrawMsgWindow__6GPanelP7PanelXYP12PlayerStruct (20)
@@ -1493,10 +1493,10 @@
 - ✅ GetNumOfFrames__7TextDat (5)
 - ✅ GetFr__7TextDati_8007d5dc (7)
 
-## missiles  (recon/source/missiles.cpp) — 75/115 PASS
+## missiles  (recon/source/missiles.cpp) — 76/115 PASS
 - ❌ GetDamageAmt__FiPiT1 — 712 diffs (ours 382)
 - ✅ CheckBlock__Fiiii (45)
-- 🟡 FindClosest__Fiii — bytes PASS, SYM differs
+- ✅ FindClosest__Fiii (99)
 - ✅ GetSpellLevel__Fii (29)
 - ✅ GetDirection8__Fiiii (135)
 - ✅ GetDirection16__Fiiii (135)
@@ -1847,7 +1847,7 @@
 - ✅ InitNewSeed__Fl (29)
 - ✅ NetInit__FUcPUc (164)
 
-## objects  (recon/source/objects.cpp) — 68/96 PASS
+## objects  (recon/source/objects.cpp) — 69/96 PASS
 - ✅ PostAddL1Door__Fiiii (58)
 - ✅ PostAddL2Door__Fiiii (83)
 - ✅ PostAddArmorStand__Fi (34)
@@ -1937,7 +1937,7 @@
 - ✅ SyncPedistal__Fi (2)
 - ❌ SyncL2Doors__Fi — 36 diffs (ours 90)
 - ❌ SyncL3Doors__Fi — 38 diffs (ours 75)
-- 🟡 SyncObjectAnim__Fi — bytes PASS, SYM differs
+- ✅ SyncObjectAnim__Fi (80)
 - ❌ GetObjectStr__Fi — 101 diffs (ours 303)
 - ✅ AddLamp__Fiii (16)
 - ❌ RestoreObjectLight__Fv — 60 diffs (ours 115)
