@@ -2404,11 +2404,17 @@ void MI_Weapexp(int i)
 
     CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
 
+    /* PSX: ExpLight[] is still built but unused -- fixed radii per element (fire 0x94, lightning 0x244). */
     if (missile[i]._miVar1 == 0) {
-        missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar1]);
-    } else {
-        if (missile[i]._mirange != 0)
-            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar1]);
+        if (missile[i]._miVar2 == 1)
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, 0x94);
+        else
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, 0x244);
+    } else if (missile[i]._mirange != 0) {
+        if (missile[i]._miVar2 == 1)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 0x94);
+        else
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 0x244);
     }
 
     missile[i]._miVar1++;
