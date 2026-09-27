@@ -557,18 +557,18 @@ void ObjL2Special(int x1, int y1, int x2, int y2)
 
 void SyncCrux(int i)
 {
-    int j, ot, type;
-    unsigned char found;
+    int j, ot, oi;
+    unsigned char mapflag;
 
-    found = 1;
+    mapflag = 1;
     for (j = 0; j < numobjects; j++) {
-        ot = objectactive[j];
-        type = object[ot]._otype;
-        if ((type == OBJ_CRUX1 || type == OBJ_CRUX2 || type == OBJ_CRUX3)
-            && object[i]._oVar8 == object[ot]._oVar8 && object[ot]._oBreak != -1)
-            found = 0;
+        oi = objectactive[j];
+        ot = object[oi]._otype;
+        if ((ot == OBJ_CRUX1 || ot == OBJ_CRUX2 || ot == OBJ_CRUX3)
+            && object[i]._oVar8 == object[oi]._oVar8 && object[oi]._oBreak != -1)
+            mapflag = 0;
     }
-    if (found)
+    if (mapflag)
         ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
 }
 
@@ -600,30 +600,35 @@ void SyncL1Doors(int i)
 void SyncL3Doors(int i)
 {
     int x, y;
+    int otm;
 
     object[i]._oMissFlag = 1;
     object[i]._oSelFlag = 2;
     x = object[i]._ox;
     y = object[i]._oy;
+    otm = -1;
     if (object[i]._otype == 0x4A) {
         if (object[i]._oVar4 == 0) {
-            ObjSetMicro(x, y, 0x213);
+            otm = 0x213;
         } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            ObjSetMicro(x, y, 0x21A);
+            otm = 0x21A;
         }
     }
     if (object[i]._otype == 0x4B) {
         if (object[i]._oVar4 == 0) {
-            ObjSetMicro(x, y, 0x216);
+            otm = 0x216;
         } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            ObjSetMicro(x, y, 0x21D);
+            otm = 0x21D;
         }
     }
+    if (otm != -1)
+        ObjSetMicro(x, y, otm);
 }
 
 void SyncL2Doors(int i)
 {
     int x, y;
+    int otm;
 
     if (object[i]._oVar4 == 0)
         object[i]._oMissFlag = 0;
@@ -632,20 +637,23 @@ void SyncL2Doors(int i)
     x = object[i]._ox;
     object[i]._oSelFlag = 2;
     y = object[i]._oy;
+    otm = -1;
     if (object[i]._otype == 0x2A) {
         if (object[i]._oVar4 == 0) {
-            ObjSetMicro(x, y, 0x21A);
+            otm = 0x21A;
         } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            ObjSetMicro(x, y, 0xD);
+            otm = 0xD;
         }
     }
     if (object[i]._otype == 0x2B) {
         if (object[i]._oVar4 == 0) {
-            ObjSetMicro(x, y, 0x21C);
+            otm = 0x21C;
         } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            ObjSetMicro(x, y, 0x11);
+            otm = 0x11;
         }
     }
+    if (otm != -1)
+        ObjSetMicro(x, y, otm);
 }
 
 void SyncLever(int i)
@@ -666,6 +674,51 @@ void SyncQSTLever(int i)
             TransVal = 9;
             DRLG_MRectTrans(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
             TransVal = tren;
+        }
+    }
+}
+
+void RestoreObjectLight(void)
+{
+    int m;
+    int p;
+    int j, oi, ot, ox, oy;
+
+    InitLighting();
+    for (m = 0; m < nummonsters; m++) {
+        if (monster[monstactive[m]]._uniqtype) {
+            AddLight(monster[monstactive[m]]._mx, monster[monstactive[m]]._my, 0x23F4);
+        }
+    }
+    if (FePlayerNo >= 0) {
+        p = 0;
+        do {
+            plr[p]._plid = AddLight(plr[p]._px, plr[p]._py, plr[p]._pLightRad + 0x23F0);
+            p++;
+        } while (p <= FePlayerNo);
+    }
+    for (j = 0; j < numobjects; j++) {
+        oi = objectactive[j];
+        ot = object[oi]._otype;
+        ox = object[oi]._ox;
+        oy = object[oi]._oy;
+        switch (ot) {
+        case 3:
+        case 8:
+        case 9:
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+        case 65:
+        case 87:
+            AddLamp(ox, oy, 0x3F3);
+            break;
+        case 0:
+        case 26:
+        case 91:
+            AddLamp(ox, oy, 0x1B8);
+            break;
         }
     }
 }
@@ -691,6 +744,38 @@ struct CCreatureHdr *TextDat::GetCreature(int Creature)
 int TextDat::GetNumOfFrames(int Creature, int Action)
 {
     return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
+}
+
+int FindValidShrine(int i)
+{
+    int rv;
+    int cl;
+    unsigned char done;
+
+    done = 0;
+    do {
+        rv = ENG_random(0x1A);
+        cl = currlevel;
+        if (cl != 0) {
+            if (rv == 7) {
+                if (cl < 9 && rv != 8)
+                    done = 1;
+            } else {
+                if (cl < 0x11 && rv != 8)
+                    done = 1;
+            }
+        }
+        if (done) {
+            if (gbMaxPlayers != 1 && shrineavail[rv] == 1) {
+                done = 0;
+            } else if (gbMaxPlayers == 1) {
+                done = 1;
+                if (shrineavail[rv] == 2)
+                    done = 0;
+            }
+        }
+    } while (!done);
+    return rv;
 }
 
 void OperateCauldron(int pnum, int i, int sType)
@@ -758,6 +843,65 @@ void OperateL3Door(int pnum, int i, unsigned char sendflag)
         OperateL3LDoor(pnum, i, sendflag);
     if (dpx < 2 && dpy == 1 && object[i]._otype == 0x4A)
         OperateL3RDoor(pnum, i, sendflag);
+}
+
+void OperateL1LDoor(int pnum, int i, unsigned char sendflag)
+{
+    int dx, dy;
+    unsigned char dok;
+    int oVar1, micro, pn;
+
+    if (object[i]._oVar4 == 2) {
+        if (!deltaload)
+            PlaySfxLoc(0x13, object[i]._ox, object[i]._oy);
+        return;
+    }
+    dy = object[i]._oy;
+    dx = object[i]._ox;
+    if (object[i]._oVar4 != 0) {
+        if (!deltaload)
+            PlaySfxLoc(0x13, dx, dy);
+        dok = dung_map[dx][dy].dMonster == 0;
+        if (dung_map[dx][dy].dItem != 0)
+            dok = 0;
+        if (GetdDead(dx, dy) != 0)
+            dok = 0;
+        if (dok) {
+            if (pnum == myplr && sendflag)
+                NetSendCmdParam1(1, 0x2C, i);
+            object[i]._oVar4 = 0;
+            object[i]._oSelFlag = 3;
+            oVar1 = object[i]._oVar1;
+            if (oVar1 == 0x32) {
+                pn = FindBlock(dx - 1, dy);
+                if (pn == 0x18C)
+                    micro = 0x19B;
+                else
+                    micro = object[i]._oVar2;
+            } else {
+                micro = object[i]._oVar2;
+            }
+            ObjSetMicro(dx - 1, dy, micro);
+            object[i]._oPreFlag = 0;
+            RedoPlayerVision();
+        } else {
+            object[i]._oVar4 = 2;
+        }
+    } else {
+        if (pnum == myplr && sendflag)
+            NetSendCmdParam1(1, 0x2B, i);
+        if (!deltaload)
+            PlaySfxLoc(0x14, dx, dy);
+        if (object[i]._oVar1 == 0xD6)
+            ObjSetMicro(dx, dy, 0x198);
+        else
+            ObjSetMicro(dx, dy, 0x189);
+        object[i]._oPreFlag = 1;
+        DoorSet(i, dx, dy - 1);
+        object[i]._oVar4 = 1;
+        object[i]._oSelFlag = 2;
+        RedoPlayerVision();
+    }
 }
 
 #define IT_ARMOR 6
@@ -986,6 +1130,101 @@ void SyncOpL3Door(int pnum, int cmd, int i)
     }
 }
 
+void SyncOpObject(int pnum, int cmd, int i)
+{
+    switch ((char)((unsigned char)object[i]._otype - 1)) {
+    case 0:
+    case 1:
+        SyncOpL1Door(pnum, cmd, i);
+        break;
+    case 41:
+    case 42:
+        SyncOpL2Door(pnum, cmd, i);
+        break;
+    case 73:
+    case 74:
+        SyncOpL3Door(pnum, cmd, i);
+        break;
+    case 3:
+    case 27:
+        OperateLever(pnum, i);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 67:
+    case 68:
+    case 69:
+        OperateChest(pnum, i, 0);
+        break;
+    case 47:
+        OperateSarc(pnum, i, 0);
+        break;
+    case 70:
+    case 71:
+    case 87:
+        OperateBookLever(pnum, i);
+        break;
+    case 58:
+    case 59:
+        OperateShrine(pnum, i, 0x2C);
+        break;
+    case 60:
+    case 63:
+        OperateSkelBook(pnum, i, 0);
+        break;
+    case 61:
+    case 62:
+        OperateBookCase(pnum, i, 0);
+        break;
+    case 24:
+        OperateBook(pnum, i);
+        break;
+    case 66:
+        OperateDecap(pnum, i, 0);
+        break;
+    case 76:
+    case 88:
+        OperateArmorStand(pnum, i, 0);
+        break;
+    case 78:
+        OperateGoatShrine(pnum, i, 0x5D);
+        break;
+    case 79:
+        OperateCauldron(pnum, i, 0x4C);
+        break;
+    case 80:
+    case 81:
+        OperateFountains(pnum, i);
+        break;
+    case 85:
+        OperateStoryBook(pnum, i);
+        break;
+    case 72:
+        OperatePedistal(pnum, i);
+        break;
+    case 89:
+    case 91:
+        OperateWeaponRack(pnum, i, 0);
+        break;
+    case 93:
+        OperateMushPatch(pnum, i);
+        break;
+    case 95:
+        OperateSlainHero(pnum, i, 0);
+        break;
+    case 96:
+        OperateInnSignChest(pnum, i);
+        break;
+    case 40:
+        OperateSChambBk(pnum, i);
+        break;
+    case 94:
+        OperateLazStand(pnum, i);
+        break;
+    }
+}
+
 void SyncObjectAnim(int o)
 {
     int ai, ot;
@@ -1032,25 +1271,25 @@ void SyncObjectAnim(int o)
 void Obj_Door(int i)
 {
     int dx, dy;
-    int dok;
+    unsigned char dok;
 
     if (object[i]._oVar4 == 0) {
         object[i]._oSelFlag = 3;
         object[i]._oMissFlag = 0;
-        return;
+    } else {
+        dy = object[i]._oy;
+        dx = object[i]._ox;
+        dok = dung_map[dx][dy].dMonster == 0;
+        if (dung_map[dx][dy].dItem != 0)
+            dok = 0;
+        if (GetdDead(dx, dy) != 0)
+            dok = 0;
+        if (IsDplayer(dx, dy) != 0)
+            dok = 0;
+        object[i]._oSelFlag = 2;
+        object[i]._oVar4 = dok ? 1 : 2;
+        object[i]._oMissFlag = 1;
     }
-    dy = object[i]._oy;
-    dx = object[i]._ox;
-    dok = dung_map[dx][dy].dMonster == 0;
-    if (dung_map[dx][dy].dItem != 0)
-        dok = 0;
-    if (GetdDead(dx, dy) != 0)
-        dok = 0;
-    if (IsDplayer(dx, dy) != 0)
-        dok = 0;
-    object[i]._oSelFlag = 2;
-    object[i]._oVar4 = dok ? 1 : 2;
-    object[i]._oMissFlag = 1;
 }
 
 void Obj_Light(int i, int lr)
@@ -1340,18 +1579,17 @@ struct MiniTileDef {
 
 void ObjSetMini(int x, int y, int v)
 {
+    long v2, v3, v4;
     int xx, yy;
-    long v1, v2, v3, v4;
     struct MiniTileDef *def;
 
     def = (struct MiniTileDef *)((char *)DebugMonsters + 0x20) + v;
-    v1 = def->v1 + 1;
+    xx = 2 * x + 16;
+    yy = 2 * y + 16;
     v2 = def->v2 + 1;
     v3 = def->v3 + 1;
     v4 = def->v4 + 1;
-    xx = 2 * x + 16;
-    yy = 2 * y + 16;
-    ObjSetMicro(xx, yy, v1);
+    ObjSetMicro(xx, yy, def->v1 + 1);
     ObjSetMicro(xx + 1, yy, v2);
     ObjSetMicro(xx, yy + 1, v3);
     ObjSetMicro(xx + 1, yy + 1, v4);

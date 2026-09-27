@@ -247,6 +247,23 @@ void ShowCharacterFiles(int idx, int Spacing, RECT R, int Height);   /* @0x8015A
                                                                         * into 2 words per the SYM
                                                                         * "G4RECT" mangling) */
 int PSX_CH_SaveGame(int a, int b);   /* @0x8015C3B0 -- another module */
+int read_card_block(int card, int block);   /* @0x800A56C8 CARDCORE.CPP */
+int CountdownLoad(int a);   /* @0x800A5B6C CARDCORE.CPP */
+int CountdownSave(int a);   /* @0x800A5D7C CARDCORE.CPP */
+int test_card_format(int card);   /* @0x80142BF4 -- another module */
+int GetFileNumber(int card, char *Name);   /* @0x80159590 -- another module */
+void ShowGameFiles(char *Name, int idx, int Spacing, RECT R, int Height);   /* @0x8015A79C --
+                                                                               * another module, RECT
+                                                                               * passed BY VALUE */
+extern char *DiabloOptionFile;
+extern char *DiabloGameFile;
+extern char *Savefilename;
+extern char *Loadfilename;
+extern int save_blocks;
+extern unsigned char block_buf[128];
+extern int card_side_load[2];
+extern int card_side_nogame[2];
+extern int card_side_noopt[2];
 void ShowLoadingBox(int Str);   /* @0x800A5E5C CARDCORE.CPP */
 int format_card(int card);   /* @0x80142FF4 -- another module, real fn (not a BIOS syscall) */
 void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstructed in this TU */
@@ -271,5 +288,6 @@ void FormatPad(void);   /* @0x800AAB74 OPTIONS.CPP:3234 */
 void SaveOverwritePad(void);   /* @0x800AAE7C OPTIONS.CPP:3350 */
 void CharCardSelectMemcardPad(void);   /* @0x800AB0B8 OPTIONS.CPP:3432 */
 void CharacterLoadPad(void);   /* @0x800A839C OPTIONS.CPP:1522 */
+void MemcardPad(void);   /* @0x800A88F0 OPTIONS.CPP:1719 */
 
 #endif

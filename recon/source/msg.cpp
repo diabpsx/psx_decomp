@@ -363,10 +363,13 @@ BOOL delta_quest_inited(int i)
  * to the NetSendCmdGItem/network-record family; this local delta-record uses a different field). */
 void DeltaAddItem(int ii)
 {
-    DLevel *Dl = GetDLevel(currlevel, setlevel);
-    TCmdPItem *pD = Dl->item;
-    unsigned char bc;
+    TCmdPItem *pD;
+    TCmdPItem *OpD;
+    DLevel *Dl;
     int i;
+    unsigned char bc;
+    Dl = GetDLevel(currlevel, setlevel);
+    pD = Dl->item;
     for (i = 0; i < MAXITEMS; i++, pD++) {
         bc = pD->bCmd;
         if (bc == 0xFF)
@@ -383,23 +386,23 @@ void DeltaAddItem(int ii)
         }
     }
 
-    pD = Dl->item;
-    for (i = 0; i < MAXITEMS; i++, pD++) {
-        if (pD->bCmd == 0xFF) {
+    OpD = Dl->item;
+    for (i = 0; i < MAXITEMS; i++, OpD++) {
+        if (OpD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
-            pD->bCmd = 0;
-            pD->x = item[ii]._ix;
-            pD->y = item[ii]._iy;
-            pD->wIndx = item[ii].IDidx;
-            pD->wCI = item[ii]._iCreateInfo;
-            pD->dwSeed = item[ii]._iSeed;
-            pD->bId = item[ii]._iIdentified;
-            pD->bDur = (unsigned char)item[ii]._iDurability;
-            pD->bMDur = (unsigned char)item[ii]._iMaxDur;
-            pD->bCh = item[ii]._iCharges;
-            pD->bMCh = item[ii]._iMaxCharges;
-            pD->wValue = (unsigned short)item[ii]._ivalue;
-            pD->dwBuff = item[ii]._PlrCreate;
+            OpD->bCmd = 0;
+            OpD->x = item[ii]._ix;
+            OpD->y = item[ii]._iy;
+            OpD->wIndx = item[ii].IDidx;
+            OpD->wCI = item[ii]._iCreateInfo;
+            OpD->dwSeed = item[ii]._iSeed;
+            OpD->bId = item[ii]._iIdentified;
+            OpD->bDur = (unsigned char)item[ii]._iDurability;
+            OpD->bMDur = (unsigned char)item[ii]._iMaxDur;
+            OpD->bCh = item[ii]._iCharges;
+            OpD->bMCh = item[ii]._iMaxCharges;
+            OpD->wValue = (unsigned short)item[ii]._ivalue;
+            OpD->dwBuff = item[ii]._PlrCreate;
             break;
         }
     }
@@ -797,32 +800,30 @@ void On_REQUESTGITEM(const TCmd *pCmd, int pnum)
 void On_GETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
-    int ii = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
-    unsigned char bLevel = p->bLevel;
-    BOOL ok = delta_get_item(p, bLevel);
-    if (!ok) {
-        NetSendCmdGItem2(1, 8, p->bMaster, p->bPnum, p);
-        return;
-    }
-    if (currlevel != bLevel) {
-        if (p->bPnum != myplr)
+    int nIndex = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
+    unsigned char ok = delta_get_item(p, p->bLevel);
+    if (ok) {
+        if (currlevel != p->bLevel) {
+            if (p->bPnum != myplr)
+                return;
+        }
+        if (p->bMaster == myplr)
             return;
-    }
-    if (p->bMaster == myplr)
-        return;
-    if (p->bPnum != myplr) {
-        SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
-        return;
-    }
-    if (currlevel == bLevel) {
-        InvGetItem(p->bPnum, ii);
-        return;
-    }
-    {
-        int result = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI, p->dwSeed,
-                                  p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
-        if (result != -1)
-            InvGetItem(myplr, result);
+        if (p->bPnum == myplr) {
+            if (currlevel != p->bLevel) {
+                int hitem = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI,
+                                         p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue,
+                                         p->dwBuff);
+                if (hitem != -1)
+                    InvGetItem(myplr, hitem);
+            } else {
+                InvGetItem(p->bPnum, nIndex);
+            }
+        } else {
+            SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
+        }
+    } else {
+        NetSendCmdGItem2(1, 8, p->bMaster, p->bPnum, p);
     }
 }
 
@@ -853,32 +854,30 @@ void On_REQUESTAGITEM(const TCmd *pCmd, int pnum)
 void On_AGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
-    int ii = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
-    unsigned char bLevel = p->bLevel;
-    BOOL ok = delta_get_item(p, bLevel);
-    if (!ok) {
-        NetSendCmdGItem2(1, 9, p->bMaster, p->bPnum, p);
-        return;
-    }
-    if (currlevel != bLevel) {
-        if (p->bPnum != myplr)
+    FindGetItem(p->wIndx, p->wCI, p->dwSeed);
+    unsigned char ok = delta_get_item(p, p->bLevel);
+    if (ok) {
+        if (currlevel != p->bLevel) {
+            if (p->bPnum != myplr)
+                return;
+        }
+        if (p->bMaster == myplr)
             return;
-    }
-    if (p->bMaster == myplr)
-        return;
-    if (p->bPnum != myplr) {
-        SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
-        return;
-    }
-    if (currlevel == bLevel) {
-        AutoGetItem(p->bPnum, p->bCursitem);
-        return;
-    }
-    {
-        int result = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI, p->dwSeed,
-                                  p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
-        if (result != -1)
-            AutoGetItem(myplr, result);
+        if (p->bPnum == myplr) {
+            if (currlevel != p->bLevel) {
+                int hitem = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI,
+                                         p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue,
+                                         p->dwBuff);
+                if (hitem != -1)
+                    AutoGetItem(myplr, hitem);
+            } else {
+                AutoGetItem(p->bPnum, p->bCursitem);
+            }
+        } else {
+            SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
+        }
+    } else {
+        NetSendCmdGItem2(1, 9, p->bMaster, p->bPnum, p);
     }
 }
 
@@ -917,15 +916,14 @@ void On_SATTACKXY(const TCmd *pCmd, int pnum)
 /* @0x80050C24 MSG.CPP:1866 */
 void On_SPELLXYD(const TCmd *pCmd, int pnum)
 {
-    const TCmdSpellXY *p = (const TCmdSpellXY *)pCmd;
-    unsigned short spell = p->wParam1;
+    unsigned short spell = ((const TCmdSpellXY *)pCmd)->wParam1;
     ClrPlrPath(pnum);
     plr[pnum].destAction = 0x1A;
     plr[pnum]._pSplFrom = 0;
-    plr[pnum].destParam1 = (char)p->x;
-    plr[pnum].destParam2 = (char)p->y;
-    plr[pnum].destParam3 = (char)p->wParam2;
-    plr[pnum].destParam4 = (char)p->wParam3;
+    plr[pnum].destParam1 = (char)((const TCmdSpellXY *)pCmd)->x;
+    plr[pnum].destParam2 = (char)((const TCmdSpellXY *)pCmd)->y;
+    plr[pnum].destParam3 = (char)((const TCmdSpellXY *)pCmd)->wParam2;
+    plr[pnum].destParam4 = (char)((const TCmdSpellXY *)pCmd)->wParam3;
     plr[pnum]._pSpell = (char)spell;
     plr[pnum]._pSplType = plr[pnum]._pRSplType;
 }
@@ -1105,14 +1103,14 @@ void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 /* @0x80051A40 MSG.CPP:2216 */
 void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 {
-    const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
     if (pnum != myplr) {
-        monster[p->wParam1].mWhoHit |= (1 << pnum);
-        if (monster[p->wParam1]._mhitpoints != 0) {
-            monster[p->wParam1]._mhitpoints -= p->wParam2;
-            if ((monster[p->wParam1]._mhitpoints >> 6) <= 0)
-                monster[p->wParam1]._mhitpoints = 0x40;
-            delta_monster_hp(p->wParam1, monster[p->wParam1]._mhitpoints, plr[pnum].plrlevel);
+        monster[((const TCmdParam2 *)pCmd)->wParam1].mWhoHit |= (1 << pnum);
+        if (monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints != 0) {
+            monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints -= ((const TCmdParam2 *)pCmd)->wParam2;
+            if ((monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints >> 6) <= 0)
+                monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints = 0x40;
+            delta_monster_hp(((const TCmdParam2 *)pCmd)->wParam1, monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints,
+                              plr[pnum].plrlevel);
         }
     }
 }
@@ -1133,19 +1131,20 @@ void On_PLRDEAD(const TCmd *pCmd, int pnum)
  * received-vs-buffered ordering check (gbBufferMsgs) and a 0x2EE00 (fixed-point) sanity bound. */
 void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
 {
-    const TCmdDamage *p = (const TCmdDamage *)pCmd;
-    /* the delta is applied to plr[p->bPlr] (the player index embedded in the COMMAND), but the
+    /* the delta is applied to plr[pCmd->bPlr] (the player index embedded in the COMMAND), but the
      * kill-check right below is against plr[pnum] (ParseCmd's own index) -- confirmed asymmetry,
-     * both read straight off the raw. */
-    PlayerStruct *pp = &plr[p->bPlr];
-    if (currlevel != 0 && gbBufferMsgs != 1 && pp->plrlevel == currlevel && p->dwDam <= 0x2EE00) {
-        if ((pp->_pHitPoints >> 6) > 0) {
-            pp->_pHitPoints -= p->dwDam;
-            if (pp->_pMaxHP < pp->_pHitPoints) {
-                pp->_pHPBase = pp->_pMaxHPBase;
-                pp->_pHitPoints = pp->_pMaxHP;
+     * both read straight off the raw. retail's SYM has exactly one named local ('player'); no
+     * separate TCmdDamage* pointer -- every command field is an inline pCmd cast. */
+    PlayerStruct *player = &plr[((const TCmdDamage *)pCmd)->bPlr];
+    if (currlevel != 0 && gbBufferMsgs != 1 && player->plrlevel == currlevel &&
+        ((const TCmdDamage *)pCmd)->dwDam <= 0x2EE00) {
+        if ((player->_pHitPoints >> 6) > 0) {
+            player->_pHitPoints -= ((const TCmdDamage *)pCmd)->dwDam;
+            if (player->_pMaxHP < player->_pHitPoints) {
+                player->_pHPBase = player->_pMaxHPBase;
+                player->_pHitPoints = player->_pMaxHP;
             } else {
-                pp->_pHPBase -= p->dwDam;
+                player->_pHPBase -= ((const TCmdDamage *)pCmd)->dwDam;
             }
         }
     }
@@ -1288,21 +1287,19 @@ void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
  * marks them active on our copy of their slot and re-syncs their local-visibility state). */
 void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 {
-    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     plr[pnum]._pLvlChanging = 0;
     if (plr[pnum].plractive && pnum) {
         plr[pnum]._pGFXLoad = 0;
-        plr[pnum]._px = p->x;
-        plr[pnum]._py = p->y;
-        plr[pnum].plrlevel = p->wParam1;
+        plr[pnum]._px = ((const TCmdLocParam1 *)pCmd)->x;
+        plr[pnum]._py = ((const TCmdLocParam1 *)pCmd)->y;
+        plr[pnum].plrlevel = ((const TCmdLocParam1 *)pCmd)->wParam1;
         SyncInitPlr(pnum);
         if ((plr[pnum]._pHitPoints >> 6) > 0) {
             StartStand(pnum, 0);
         } else {
-            int numFrames = plr[pnum]._pDFrames;
             plr[pnum]._pgfxnum = 0;
             plr[pnum]._pmode = (enum PLR_MODE)8;
-            NewPlrAnim(pnum, 1, numFrames, 1);
+            NewPlrAnim(pnum, 1, plr[pnum]._pDFrames, 1);
             plr[pnum]._pAnimFrame = plr[pnum]._pAnimLen - 1;
             plr[pnum]._pVar8 = plr[pnum]._pAnimLen * 2;
         }

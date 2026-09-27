@@ -70,23 +70,32 @@ void AlterBirdPos(BIRDSTRUCT *b, unsigned char rnd)
     int offsx = offset_x[b->dir];
     int offsy = offset_y[b->dir];
 
-    if (rnd)
+    if (rnd) {
         b->flyvar -= 2;
-    else
+    } else {
         b->flyvar--;
+    }
     if (b->flyvar <= 0) {
-        b->flyvar = ENG_random(BirdFrig ? 5 : 10) + 5;
+        if (BirdFrig) {
+            b->flyvar = ENG_random(5) + 5;
+        } else {
+            b->flyvar = ENG_random(10) + 5;
+        }
         if (b->newdir != b->dir) {
-            if (rnd)
+            if (rnd) {
                 b->dir += b->rnddir;
-            else if (b->dir < b->newdir)
-                b->dir++;
-            else if (b->newdir < b->dir)
-                b->dir--;
-            if (b->dir < 0)
+            } else {
+                if (b->dir < b->newdir) {
+                    b->dir++;
+                } else if (b->dir > b->newdir) {
+                    b->dir--;
+                }
+            }
+            if (b->dir < 0) {
                 b->dir += 8;
-            else if (b->dir >= 8)
+            } else if (b->dir > 7) {
                 b->dir -= 8;
+            }
         }
     }
     b->WorldX += offsx;

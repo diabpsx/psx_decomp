@@ -28,6 +28,7 @@ extern char level_lamp[5];   /* @0x8011B90C */
 extern unsigned char leveltype;   /* @0x8011C10D */
 extern short monstactive[190];   /* @0x8010A0C4 */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
+extern short monstactive[190];   /* @0x8010A0C4 */
 extern int myplr;   /* @0x8011BA08 */
 extern unsigned char nBlockTable[2049];   /* @0x800E5904 */
 extern unsigned char nMissileTable[2049];   /* @0x800E690C */

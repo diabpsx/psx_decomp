@@ -55,6 +55,8 @@ int D_8011C2FC;
 int D_8011C2F8;
 int D_8011C304;
 struct RECT BRect;
+int D_8011C300;
+int CursGlow;
 
 void FreeInvGFX(void)
 {
@@ -1732,6 +1734,162 @@ void DrawInvMsg(void)
     MediumFont.SetOTpos(OldOt);
 
     PRIM_Clip(&InfoRect, OldOt);
+}
+
+void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag)
+{
+    struct POLY_FT4 *Ft4;
+
+    Ft4 = InvPanelTData->PrintFt4(0x94, X, Y, 0, D_8011C300, 0);
+
+    Ft4->x0 = X + 0x81;
+    W = W + 0x7F;
+    X = X + W;
+    Ft4->x1 = X;
+    Ft4->x2 = Ft4->x0;
+    Ft4->x3 = X;
+    H = H + 0x1F;
+    Y = Y - InvBackY;
+    Ft4->y0 = Y + 0x21;
+    Ft4->y1 = Ft4->y0;
+    Y = Y + H;
+    Ft4->y2 = Y;
+    Ft4->y3 = Y;
+    Ft4->tpage = Ft4->tpage | 0x40;
+    Ft4->u1 = Ft4->u0 + 1;
+    Ft4->u3 = Ft4->u0 + 1;
+    Ft4->v2 = Ft4->v0 + 1;
+    Ft4->v3 = Ft4->v0 + 1;
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+
+    if (Flag == 1) {
+        Ft4->r0 = 0xD0;
+        Ft4->g0 = 0;
+        Ft4->b0 = 0;
+        Ft4->tpage = Ft4->tpage | 0x20;
+        return;
+    }
+
+    if (Flag < 2) {
+        if (Flag == 0) {
+            Ft4->r0 = 0x20;
+            Ft4->g0 = 0x20;
+            Ft4->b0 = 0x20;
+            Ft4->tpage = Ft4->tpage | 0x40;
+        }
+        return;
+    }
+
+    if (Flag == 2) {
+        int cursor;
+
+        Ft4->tpage = Ft4->tpage | 0x20;
+        cursor = _pcurs[myplr];
+        if (cursor == Flag) {
+            Ft4->r0 = 0;
+            Ft4->g0 = 0;
+            Ft4->b0 = CursGlow - 0x80;
+            return;
+        }
+        if (cursor == 3) {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->b0 = 0;
+            Ft4->g0 = CursGlow - 0x80;
+            return;
+        }
+        if (cursor == 4) {
+            Ft4->g0 = 0;
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->b0 = CursGlow - 0x80;
+            return;
+        }
+        if (cursor < 0xC) {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = CursGlow - 0x80;
+            Ft4->b0 = CursGlow - 0x80;
+            return;
+        }
+        Ft4->r0 = CursGlow - 0x80;
+        Ft4->g0 = (CursGlow + 0x80) >> 2;
+        Ft4->b0 = (CursGlow + 0x80) >> 2;
+        return;
+    }
+
+    if (Flag == 3) {
+        Ft4->r0 = 0x80;
+        Ft4->g0 = (CursGlow >> 2) + 0x20;
+        Ft4->tpage = Ft4->tpage | 0x20;
+        Ft4->b0 = (CursGlow >> 2) + 0x20;
+    }
+}
+
+void DrawInvHelpTxt(void)
+{
+    char TempStr[128];
+    char *s0;
+
+    TempStr[0] = 0;
+    if (LANG_GetLang() == 1) {
+        if (_pcurs[myplr] == 2) {
+            GetStr(0x331);
+            s0 = GetStr(0x208);
+            sprintf(TempStr, "%s %s (1)", s0, s0);
+            goto done;
+        }
+        if (_pcurs[myplr] == 3) {
+            GetStr(0x331);
+            s0 = GetStr(0x35A);
+            sprintf(TempStr, "%s %s (2)", s0, s0);
+            goto done;
+        }
+        if (_pcurs[myplr] < 0xC)
+            goto special;
+        GetStr(0x4E6);
+        s0 = GetStr(0x11D);
+        sprintf(TempStr, "%s %s (3)", s0, s0);
+        goto done;
+    } else {
+        if (_pcurs[myplr] == 2) {
+            GetStr(0x208);
+            s0 = GetStr(0x331);
+            sprintf(TempStr, "%s %s (4)", s0, s0);
+            goto done;
+        }
+        if (_pcurs[myplr] == 3) {
+            GetStr(0x35A);
+            s0 = GetStr(0x331);
+            sprintf(TempStr, "%s %s (5)", s0, s0);
+            goto done;
+        }
+        if (_pcurs[myplr] < 0xC)
+            goto special;
+        GetStr(0x11D);
+        s0 = GetStr(0x4E6);
+        sprintf(TempStr, "%s %s (6)", s0, s0);
+        goto done;
+    }
+
+special:
+    s0 = GetStr(0x4E6);
+    sprintf(TempStr, "%s", s0);
+
+done:
+    if (InvBackY == 0) {
+        MediumFont.SetChar(0x2E, 0x80);
+        s0 = GetStr(0x2FE);
+    } else {
+        MediumFont.SetChar(0x2E, 0x7F);
+        s0 = GetStr(0x132);
+    }
+    sprintf(TempStr, "%s", s0);
+
+    if (InvPageFlag) {
+        s0 = GetStr(0x2A4);
+        sprintf(TempStr, "%s", s0);
+    }
+
+    MediumFont.Print(0, 0xE0, TempStr, JustCentre, &BRect, WHITER, WHITEG, WHITEB);
+    MediumFont.SetChar(0x2E, 0x6D);
 }
 
 void DrawInvBack(void)

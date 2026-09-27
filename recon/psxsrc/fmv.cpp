@@ -136,10 +136,10 @@ void PA_SetPauseOk(int on);
 }
 
 /* ---------------------------------------------------------------- CD stream ring buffer state */
-static int stream_chunksize;
-static unsigned char *stream_bufh;
-static int stream_bufsize;
-static unsigned char *stream_buf;
+static volatile int stream_chunksize;   /* ISR-shared (CdReadyCallback) */
+static unsigned char *volatile stream_bufh;   /* ISR-shared (CdReadyCallback) */
+static volatile int stream_bufsize;   /* ISR-shared (CdReadyCallback) */
+static unsigned char *volatile stream_buf;   /* ISR-shared (CdReadyCallback) */
 static int stream_chunks_borrowed;
 static volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
 static int stream_out;
@@ -149,20 +149,20 @@ static int _discard_count;
 static int _get_count;
 static volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
 static volatile int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
-static int stream_handler_installed;
-static void *old_cdready_handler;
+static volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
+static void *volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
 static volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
 static volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
-static int time_in_frames;
+static volatile int time_in_frames;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
-static int stream_last_sector;
+static volatile int stream_last_sector;   /* ISR-shared (CdReadyCallback) */
 static volatile int D_8011C74C;   /* idx: chunk index of the sector about to be read */
 static volatile int D_8011C754;   /* sec: CdPosToInt() result of the drive's actual position */
-static CdlLOC D_80121C98;   /* subcode: scratch CdlLOC for CdGetSector/CdPosToInt */
+static volatile CdlLOC D_80121C98;   /* subcode: scratch CdlLOC for CdGetSector/CdPosToInt; ISR-shared (CdReadyCallback) */
 static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movie filename buffer;
                                       * LoPlayFMVOverLay strcpy's "DIABEND*.MOV" into it before queuing
                                       * a play_mdec_stream/dequeue_animation request. Gap to the next
@@ -435,19 +435,11 @@ extern "C" void wait_cdstream(void)
                        * 13A "SYM-LOCAL STAGING LAW"): its declared-but-unused presence supplies the
                        * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
     int wait = 1;
-    int busy;
 
-    start_wait = time_in_frames;
-loop_1:
-    busy = 0;
-    if ((stream_open != 0) || (stream_ending != 0))
-        busy = 1;
-    if ((busy != 0) && (wait != 0))
-        goto loop_1;
-    busy = 0;
-    if ((stream_open != 0) || (stream_ending != 0))
-        busy = 1;
-    if (busy != 0) {
+    while (((stream_open != 0) || (stream_ending != 0)) && wait) {
+        /* spin -- volatile stream_open/stream_ending force a fresh reload each pass */
+    }
+    if ((stream_open != 0) || (stream_ending != 0)) {
         printf("Warning: timeout in wait_cdstream()...\n");
         stream_stalled = 0;
         stream_ending = stream_stalled;
@@ -579,7 +571,12 @@ extern "C" void init_mdec_buffer(char *buf, int size)
 /* tmdc_pol_offs -- per-(mbuf,half,poly) {x,y} anchor pair rebuild_mdec_polys re-adds the camera scroll
  * to on every frame (sizeof matches: 2 mbuf * 2 halves * 10 polys * 2 shorts = 0x320 bytes... symbol_addrs
  * lists 0x640 for the whole thing at one address, i.e. this table AND its "y" companion interleaved). */
-static short tmdc_pol_offs[2][2][10][2];   /* [mbuf][half][poly][0]=x_off [1]=y_off */
+/* [mbuf][col][row][0]=x_off [1]=y_off -- derived directly from split_poly_area's raw address math:
+ * byte offset = 800*mbuf + 80*col + 8*row (+2 for the y half of the pair). A poly's 4 corners are
+ * FOUR ADJACENT grid points: TL=off[mbuf][col][row], TR=off[mbuf][col+1][row], BL=off[mbuf][col][row+1],
+ * BR=off[mbuf][col+1][row+1] (byte deltas +80/+8/+88 confirmed against TL). rebuild_mdec_polys re-adds
+ * the CURRENT camera pan (x,y) to each cached corner every frame instead of re-tiling from scratch. */
+static short tmdc_pol_offs[2][10][10][2];
 
 /* WIP -- NOT byte-verified yet (deep GTE/MDEC polygon-tiler internals, no PC twin to cross-check
  * against). Faithful transcription of the m2c draft (skel/PSXSRC/FMV.CPP) with M2C_FIELD resolved to
@@ -660,22 +657,27 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
 /* WIP -- NOT byte-verified (see split_poly_area note). @0x80156DD4 FMV.CPP:1009 */
 extern "C" void rebuild_mdec_polys(int x, int y)
 {
-    POLY_FT4 *p = &tmdc_pol[mbuf][0][0];
+    /* tmdc_pol is [half][mbuf][poly] (half outer, confirmed against draw_mdec_polys's own +0x320
+     * half-copy stride); rebuild always (re)writes the CURRENT decode buffer's half-0 copy. */
+    POLY_FT4 *p = &tmdc_pol[0][mbuf][0];
 
-    for (int py = 0; py < mdec_ph[mbuf]; py++) {
-        for (int px = 0; px < mdec_pw[mbuf]; px++) {
-            short *off = tmdc_pol_offs[mbuf][0][px];
-            p->x0 = off[0] + x; p->y0 = off[1] + y;
-            p->x1 = off[0] + x; p->y1 = off[1] + y;
-            p->x2 = off[0] + x; p->y2 = off[1] + y;
-            p->x3 = off[0] + x; p->y3 = off[1] + y;
+    for (int row = 0; row < mdec_ph[mbuf]; row++) {
+        for (int col = 0; col < mdec_pw[mbuf]; col++) {
+            short *tl = tmdc_pol_offs[mbuf][col][row];
+            short *tr = tmdc_pol_offs[mbuf][col + 1][row];
+            short *bl = tmdc_pol_offs[mbuf][col][row + 1];
+            short *br_ = tmdc_pol_offs[mbuf][col + 1][row + 1];
+            p->x0 = tl[0] + x; p->y0 = tl[1] + y;
+            p->x1 = tr[0] + x; p->y1 = tr[1] + y;
+            p->x2 = bl[0] + x; p->y2 = bl[1] + y;
+            p->x3 = br_[0] + x; p->y3 = br_[1] + y;
             p += 1;
         }
     }
 }
 
 /* WIP -- NOT byte-verified (see split_poly_area note). @0x80156FB4 FMV.CPP:1044 */
-extern "C" int draw_mdec_polys(int bright)
+extern "C" int draw_mdec_polys(signed char bright)
 {
     int screen = PRIM_GetCurrentScreen();
 

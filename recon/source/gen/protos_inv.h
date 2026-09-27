@@ -52,3 +52,4 @@ void PRIM_FullScreen(int Depth);   /* @0x80083B20 PRIMPOOL.CPP:257 */
 struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
 void DrawInvTSK(struct TASK *T);   /* @0x801590FC INV.CPP:1049 */
 void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */
+int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */

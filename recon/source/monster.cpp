@@ -2980,3 +2980,69 @@ void M2MStartKill(int i, int mid)
     if (monster[mid].MType->mtype >= MT_NACID && monster[mid].MType->mtype <= MT_XACID)
         AddMissile(monster[mid]._mx, monster[mid]._my, 0, 0, 0, MIT_ACIDPUD, TARGET_PLAYERS, mid, monster[mid]._mint + 1, 0);
 }
+
+/* SYM OPEN (length 0x214 vs 0x238); bytes OPEN (51 diffs, ours 133 / oracle
+ * 142, 9 insns short). Logic/call-list verified against hellfire: dropped
+ * the MAXMONSTERS/MType==NULL asserts (release build), kept the
+ * MT_ILLWEAV+MG_RUN_AWAY early-out, `hit=ENG_random(100)` zeroed for
+ * MM_STONE, `CheckMonsterHit(mid,&ret)` early-out, the damage-roll `dam=
+ * (ENG_random(maxd-mind+1)+mind)<<6`, and the MM_STONE-preserving
+ * M2MStartKill/M2MStartHit dispatch (call then re-set _mmode=MM_STONE only
+ * when it was ALREADY stone, matching hellfire's literal redundant-reassign
+ * shape). One genuine PSX-only addition confirmed from raw bytes: after
+ * applying damage, `_mFlags |= MFLAG_TARGETS_MONSTER` unconditionally, then
+ * on death (`hitpoints>>6<=0`) it's CLEARED again unless `mtype==MT_GOLEM`
+ * -- present in neither twin. Register-swap oddity found but not resolved:
+ * SYM wants i=$s2/hit=$s3, ours produces i=$s3/hit=$s2 (simple swap) EXCEPT
+ * at one point deep in the death branch ours recomputes a full `x*104`
+ * MonsterStruct stride using the register holding `hit`'s value, which
+ * makes no source-level sense (hit is never used as an array index) --
+ * likely a second live-range reusing the same hard register for a
+ * different purpose after `hit`'s natural lifetime ends elsewhere in
+ * ours vs oracle's differently-scheduled version. Needs a dedicated
+ * register-lifetime trace, not a quick lever. */
+void M_TryM2MHit(int i, int mid, int hper, int mind, int maxd)
+{
+    int hit;
+    int dam;
+    unsigned char ret;
+
+    if ((monster[mid]._mhitpoints >> 6) <= 0)
+        return;
+    if (monster[mid].MType->mtype == MT_ILLWEAV && monster[mid]._mgoal == MG_RUN_AWAY)
+        return;
+
+    hit = ENG_random(100);
+    if (monster[mid]._mmode == MM_STONE)
+        hit = 0;
+
+    if (CheckMonsterHit(mid, ret)) {
+        return;
+    } else {
+        if (hit < hper) {
+            dam = ENG_random(maxd - mind + 1) + mind;
+            dam = dam << 6;
+
+            monster[mid]._mhitpoints -= dam;
+            monster[mid]._mFlags |= MFLAG_TARGETS_MONSTER;
+            if ((monster[mid]._mhitpoints >> 6) <= 0) {
+                if (monster[mid].MType->mtype != MT_GOLEM)
+                    monster[mid]._mFlags &= ~MFLAG_TARGETS_MONSTER;
+                if (monster[mid]._mmode == MM_STONE) {
+                    M2MStartKill(i, mid);
+                    monster[mid]._mmode = MM_STONE;
+                } else {
+                    M2MStartKill(i, mid);
+                }
+            } else {
+                if (monster[mid]._mmode == MM_STONE) {
+                    M2MStartHit(mid, i, dam);
+                    monster[mid]._mmode = MM_STONE;
+                } else {
+                    M2MStartHit(mid, i, dam);
+                }
+            }
+        }
+    }
+    return;
+}

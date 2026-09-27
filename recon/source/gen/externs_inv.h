@@ -56,3 +56,4 @@ extern int InvGfxTable[168];   /* @0x8010D278 */
 extern const unsigned char WHITER;   /* @0x8011ABD1 */
 extern const unsigned char WHITEG;   /* @0x8011ABD2 */
 extern struct CFont MediumFont;   /* @0x800B82D8 */
+extern const unsigned char WHITEB;   /* @0x8011ABD3 */
