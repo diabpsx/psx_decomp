@@ -196,41 +196,48 @@ extern const int D_8011A030[6];
 
 void GetDamageAmt(int i, int *mind, int *maxd)
 {
+    /* PSX caches the caster's stats in locals up front (retail SYM: plr, _pMagic, _pLevel,
+     * _pClass), shadowing the global plr[] with a local base pointer. */
     int k, sl;
-    PlayerStruct *plr_ = &plr[myplr];
+    PlayerStruct *plr = ::plr;
+    int _pMagic;
+    char _pLevel, _pClass;
 
-    sl = plr_->_pSplLvl[i] + plr_->_pISplLvlAdd;
+    sl = plr[myplr]._pSplLvl[i] + plr[myplr]._pISplLvlAdd;
+    _pMagic = plr[myplr]._pMagic;
+    _pLevel = plr[myplr]._pLevel;
+    _pClass = plr[myplr]._pClass;
 
     switch (i) {
     case SPL_FIREBOLT:
-        *mind = (plr_->_pMagic >> 3) + sl + 1;
-        *maxd = (plr_->_pMagic >> 3) + sl + 10;
+        *mind = (_pMagic >> 3) + 1 + sl;
+        *maxd = (_pMagic >> 3) + 10 + sl;
         break;
     case SPL_HEAL:
-        *mind = plr_->_pLevel + sl + 1;
-        if (plr_->_pClass == PC_WARRIOR)
+        *mind = _pLevel + 1 + sl;
+        if (_pClass == PC_WARRIOR)
             *mind <<= 1;
-        if (plr_->_pClass == PC_ROGUE)
+        if (_pClass == PC_ROGUE)
             *mind += *mind >> 1;
         *maxd = 10;
-        for (k = 0; k < plr_->_pLevel; k++)
+        for (k = 0; k < _pLevel; k++)
             *maxd += 4;
         for (k = 0; k < sl; k++)
             *maxd += 6;
-        if (plr_->_pClass == PC_WARRIOR)
+        if (_pClass == PC_WARRIOR)
             *maxd <<= 1;
-        if (plr_->_pClass == PC_ROGUE)
+        if (_pClass == PC_ROGUE)
             *maxd += *maxd >> 1;
         *mind = -1;
         *maxd = -1;
         break;
     case SPL_LIGHTNING:
         *mind = 2;
-        *maxd = plr_->_pLevel + 2;
+        *maxd = _pLevel + 2;
         break;
     case SPL_FLASH:
-        *mind = plr_->_pLevel;
-        for (k = 0; k < sl; k++)
+        *mind = _pLevel;
+        for (k = sl; k > 0; k--)
             *mind += *mind >> 3;
         *mind += *mind >> 1;
         *maxd = *mind * 2;
@@ -257,46 +264,46 @@ void GetDamageAmt(int i, int *mind, int *maxd)
         *maxd = -1;
         break;
     case SPL_FIREWALL:
-        *mind = (4 * plr_->_pLevel + 8) >> 1;
-        *maxd = (4 * plr_->_pLevel + 80) >> 1;
+        *mind = (_pLevel + 2) << 1;
+        *maxd = (_pLevel + 20) << 1;
         break;
     case SPL_FIREBALL:
-        *mind = 2 * plr_->_pLevel + 4;
-        for (k = 0; k < sl; k++)
+        *mind = 2 * _pLevel + 4;
+        for (k = sl; k > 0; k--)
             *mind += *mind >> 3;
-        *maxd = 2 * plr_->_pLevel + 40;
-        for (k = 0; k < sl; k++)
+        *maxd = 2 * _pLevel + 40;
+        for (k = sl; k > 0; k--)
             *maxd += *maxd >> 3;
         break;
     case SPL_GUARDIAN:
-        *mind = (plr_->_pLevel >> 1) + 1;
-        for (k = 0; k < sl; k++)
+        *mind = (_pLevel >> 1) + 1;
+        for (k = sl; k > 0; k--)
             *mind += *mind >> 3;
-        *maxd = (plr_->_pLevel >> 1) + 10;
-        for (k = 0; k < sl; k++)
+        *maxd = (_pLevel >> 1) + 10;
+        for (k = sl; k > 0; k--)
             *maxd += *maxd >> 3;
         break;
     case SPL_CHAIN:
         *mind = 4;
-        *maxd = 2 * plr_->_pLevel + 4;
+        *maxd = 2 * _pLevel + 4;
         break;
     case SPL_WAVE:
-        *mind = 6 * (plr_->_pLevel + 1);
-        *maxd = 6 * (plr_->_pLevel + 10);
+        *mind = (_pLevel + 1) * 4 + (_pLevel + 1) * 2;
+        *maxd = (_pLevel + 10) * 4 + (_pLevel + 10) * 2;
         break;
     case SPL_NOVA:
-        *mind = (plr_->_pLevel + 5) >> 1;
-        for (k = 0; k < sl; k++)
+        *mind = (_pLevel + 5) >> 1;
+        for (k = sl; k > 0; k--)
             *mind += *mind >> 3;
         *mind *= 5;
-        *maxd = (plr_->_pLevel + 30) >> 1;
-        for (k = 0; k < sl; k++)
+        *maxd = (_pLevel + 30) >> 1;
+        for (k = sl; k > 0; k--)
             *maxd += *maxd >> 3;
         *maxd *= 5;
         break;
     case SPL_FLAME:
         *mind = 3;
-        *maxd = plr_->_pLevel + 4;
+        *maxd = _pLevel + 4;
         *maxd += *maxd >> 1;
         break;
     case SPL_GOLEM:
@@ -305,48 +312,48 @@ void GetDamageAmt(int i, int *mind, int *maxd)
         break;
     case SPL_APOCA:
         *mind = 0;
-        for (k = 0; k < plr_->_pLevel; k++)
+        for (k = 0; k < _pLevel; k++)
             *mind += 1;
         *maxd = 0;
-        for (k = 0; k < plr_->_pLevel; k++)
+        for (k = 0; k < _pLevel; k++)
             *maxd += 6;
         break;
     case SPL_ELEMENT:
-        *mind = 2 * plr_->_pLevel + 4;
-        for (k = 0; k < sl; k++)
+        *mind = 2 * _pLevel + 4;
+        for (k = sl; k > 0; k--)
             *mind += *mind >> 3;
-        *maxd = 2 * plr_->_pLevel + 40;
-        for (k = 0; k < sl; k++)
+        *maxd = 2 * _pLevel + 40;
+        for (k = sl; k > 0; k--)
             *maxd += *maxd >> 3;
         break;
     case SPL_CBOLT:
         *mind = 1;
-        *maxd = (plr_->_pMagic >> 2) + 1;
+        *maxd = (_pMagic >> 2) + 1;
         break;
     case SPL_HBOLT:
-        *mind = plr_->_pLevel + 9;
-        *maxd = plr_->_pLevel + 18;
+        *mind = _pLevel + 9;
+        *maxd = _pLevel + 18;
         break;
     case SPL_HEALOTHER:
-        *mind = plr_->_pLevel + sl + 1;
-        if (plr_->_pClass == PC_WARRIOR)
+        *mind = _pLevel + 1 + sl;
+        if (_pClass == PC_WARRIOR)
             *mind <<= 1;
-        if (plr_->_pClass == PC_ROGUE)
+        if (_pClass == PC_ROGUE)
             *mind += *mind >> 1;
         *maxd = 10;
-        for (k = 0; k < plr_->_pLevel; k++)
+        for (k = 0; k < _pLevel; k++)
             *maxd += 4;
         for (k = 0; k < sl; k++)
             *maxd += 6;
-        if (plr_->_pClass == PC_WARRIOR)
+        if (_pClass == PC_WARRIOR)
             *maxd <<= 1;
-        if (plr_->_pClass == PC_ROGUE)
+        if (_pClass == PC_ROGUE)
             *maxd += *maxd >> 1;
         *mind = -1;
         *maxd = -1;
         break;
     case SPL_FLARE:
-        *mind = (plr_->_pMagic >> 1) + 3 * sl - (plr_->_pMagic >> 3);
+        *mind = (_pMagic >> 1) - (_pMagic >> 3) + 2 * sl + sl;
         *maxd = *mind;
         break;
     }
