@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2616 / 2727 functions PASS (95.9%) — 837 PsyQ SDK functions excluded**
+**Game code: 2622 / 2727 functions PASS (96.1%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1493,8 +1493,8 @@
 - ✅ GetNumOfFrames__7TextDat (5)
 - ✅ GetFr__7TextDati_8007d5dc (7)
 
-## missiles  (recon/source/missiles.cpp) — 107/115 PASS
-- ❌ GetDamageAmt__FiPiT1 — 712 diffs (ours 382)
+## missiles  (recon/source/missiles.cpp) — 112/115 PASS
+- ✅ GetDamageAmt__FiPiT1 (382)
 - ✅ CheckBlock__Fiiii (45)
 - ✅ FindClosest__Fiii (99)
 - ✅ GetSpellLevel__Fii (29)
@@ -1502,14 +1502,14 @@
 - ✅ GetDirection16__Fiiii (135)
 - ✅ DeleteMissile__Fii (40)
 - ✅ GetMissileVel__Fiiiiii (111)
-- ❌ PutMissile__Fi — 17 diffs (ours 151)
+- ❌ PutMissile__Fi — 12 diffs (ours 151)
 - ✅ GetMissilePos__Fi (77)
 - ✅ MoveMissilePos__Fi (94)
 - ✅ MonsterTrapHit__FiiiiiUc (225)
 - ✅ MonsterMHit__FiiiiiiUc (496)
-- ❌ PlayerMHit__FiiiiiiUcUc — 507 diffs (ours 663)
-- ❌ Plr2PlrMHit__FiiiiiiUc — 377 diffs (ours 487)
-- ❌ CheckMissileCol__FiiiUciiUcb — 332 diffs (ours 332)
+- ✅ PlayerMHit__FiiiiiiUcUc (663)
+- ✅ Plr2PlrMHit__FiiiiiiUc (487)
+- 🟡 CheckMissileCol__FiiiUciiUcb — bytes PASS, SYM differs
 - ✅ GetTableValue__FUci (37)
 - ✅ SetMissAnim__Fii (54)
 - ✅ SetMissDir__Fii (19)
@@ -1564,12 +1564,12 @@
 - ✅ AddBoneSpirit__Fiiiiiicii (129)
 - ✅ AddRportal__Fiiiiiicii (75)
 - ✅ AddDiabApoca__Fiiiiiicii (81)
-- ❌ AddMissile__Fiiiiiiciii — 84 diffs (ours 291)
+- ✅ AddMissile__Fiiiiiiciii (291)
 - ✅ Sentfire__Fiii (122)
 - ✅ MI_Dummy__Fi (2)
 - ✅ MI_Golem__Fi (159)
 - ✅ MI_SetManashield__Fi (17)
-- ❌ MI_LArrow__Fi — 6 diffs (ours 517)
+- ✅ MI_LArrow__Fi (517)
 - ✅ MI_Arrow__Fi (145)
 - ✅ MI_Firebolt__Fi (453)
 - ✅ MI_Lightball__Fi (174)
@@ -1617,7 +1617,7 @@
 - ✅ ML_SetList__Fii (44)
 - ✅ ML_GetPresetMonsters__FiPiUl (124)
 
-## monster  (recon/source/monster.cpp) — 101/105 PASS
+## monster  (recon/source/monster.cpp) — 102/105 PASS
 - ✅ DeleteMonster__Fi (14)
 - ✅ M_GetDir__Fi (25)
 - ✅ M_StartDelay__Fii (20)
@@ -1716,7 +1716,7 @@
 - ✅ PosOkMonst3__Fiii (183)
 - ✅ M_SpawnSkel__Fiii (84)
 - ✅ TalktoMonster__Fi (80)
-- ❌ SpawnGolum__Fiiii — 112 diffs (ours 140)
+- ✅ SpawnGolum__Fiiii (140)
 - ✅ CanTalkToMonst__Fi (16)
 - ✅ CheckMonsterHit__FiRUc (55)
 - ✅ gSameRoom__Fii (38)
