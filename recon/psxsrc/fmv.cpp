@@ -432,21 +432,16 @@ extern "C" int cdstream_is_last_chunk(void)
 /* @0x801563E0 FMV.CPP:628 */
 extern "C" void cdstream_discard_chunk(void)
 {
-    int underrun;
-
     EnterCriticalSection();
-    stream_chunks_in -= 1;
-    stream_chunks_borrowed -= 1;
+    stream_chunks_in--;
+    stream_chunks_borrowed--;
     ExitCriticalSection();
-    _discard_count += 1;
-    if (_get_count < _discard_count)
+    _discard_count++;
+    if (_discard_count > _get_count)
         printf("discarded more than got\n");
-    if (stream_chunks_in < stream_chunks_borrowed)
+    if (stream_chunks_borrowed > stream_chunks_in)
         printf("overdraught ran out\n");
-    underrun = 0;
     if (stream_chunks_in < 0 || stream_chunks_borrowed < 0)
-        underrun = 1;
-    if (underrun != 0)
         printf("underrun in discard (in=%d borrowed=%d)\n", stream_chunks_in, stream_chunks_borrowed);
     if (stream_stalled != 0) {
         _cd_seek(stream_secnum);
