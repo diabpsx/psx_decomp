@@ -2084,35 +2084,34 @@ void S_ScrollSPBuy(int idx)
 {
     int boughtitems;
     int l;
-    int nidx;
 
     ClearSText(5, 0x15);
     boughtitems = idx;
     stextup = 5;
-    nidx = 0;
+    idx = 0;
     if (boughtitems != 0) {
         do {
-            if (_premiumitem[StorePlrNo][nidx]._itype != -1) {
+            if (_premiumitem[StorePlrNo][idx]._itype != -1) {
                 boughtitems--;
             }
-            nidx++;
+            idx++;
         } while (boughtitems != 0);
     }
-    for (l = 5; l < 0xF && nidx < 6; nidx++, l += 8) {
-        if (_premiumitem[StorePlrNo][nidx]._itype == -1) {
+    for (l = 5; l < 0xF && idx < 6; idx++, l += 8) {
+        if (_premiumitem[StorePlrNo][idx]._itype == -1) {
             l -= 8;
         } else {
             char iclr;
             char *StrPtr;
 
-            iclr = _premiumitem[StorePlrNo][nidx]._iMagical != 0;
-            if (_premiumitem[StorePlrNo][nidx]._iStatFlag == 0) {
+            iclr = _premiumitem[StorePlrNo][idx]._iMagical != 0;
+            if (_premiumitem[StorePlrNo][idx]._iStatFlag == 0) {
                 iclr = 2;
             }
-            StrPtr = MakeItemStr(&_premiumitem[StorePlrNo][nidx], _premiumitem[StorePlrNo][nidx]._iIName, 0x100);
+            StrPtr = MakeItemStr(&_premiumitem[StorePlrNo][idx], _premiumitem[StorePlrNo][idx]._iIName, 0x100);
             AddSText(0xC, l, 0, StrPtr, iclr, 1);
-            AddSTextVal(l, _premiumitem[StorePlrNo][nidx]._iIvalue);
-            PrintStoreItem(&_premiumitem[StorePlrNo][nidx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
+            AddSTextVal(l, _premiumitem[StorePlrNo][idx]._iIvalue);
+            PrintStoreItem(&_premiumitem[StorePlrNo][idx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
             stextdown = l;
         }
     }

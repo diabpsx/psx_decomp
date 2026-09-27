@@ -445,17 +445,17 @@ void AddStoryBook(int i)
     int bookframe;
 
     SetRndSeed(glSeedTbl[16]);
-    bookframe = ENG_random(3);
-    object[i]._oVar1 = bookframe;
+    object[i]._oVar1 = ENG_random(3);
     if (currlevel == 4)
         object[i]._oVar2 = StoryText[object[i]._oVar1][0];
     if (currlevel == 8)
         object[i]._oVar2 = StoryText[object[i]._oVar1][1];
     if (currlevel == 12)
         object[i]._oVar2 = StoryText[object[i]._oVar1][2];
+    bookframe = 3 * object[i]._oVar1;
+    object[i]._oVar3 = (currlevel >> 2) - 1 + bookframe;
     object[i]._oAnimFrame = 1;
     object[i]._oVar4 = 2;
-    object[i]._oVar3 = (currlevel >> 2) + 3 * object[i]._oVar1 - 1;
 }
 
 void AddWeaponRack(int i)

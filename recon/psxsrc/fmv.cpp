@@ -664,7 +664,6 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
             yoff += rowh;
             sy = (short)(sy + rowh);
             area_ph += 1;
-            rows += 1;
             y += rowh;
         } while (hleft != 0);
     }

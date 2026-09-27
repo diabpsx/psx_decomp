@@ -3213,20 +3213,26 @@ void MissToMonst(int i, int x, int y)
  * produces fx=$s5,fy=$s6 -- the anonymous compiler-generated boolean flag
  * for the 3-way `&&` missile-check condition takes $s1 in retail but a
  * different slot in ours, one small ripple from the same "unnamed compiler
- * temp" class seen in GroupUnity/M_TryM2MHit. Not chased further (parked
- * per current throughput-first priority). */
+ * temp" class seen in GroupUnity/M_TryM2MHit.
+ * FALSIFIED this pass: hoisting `fx = Monst->_menemyx; fy = Monst->_menemyy;`
+ * to the top (speculative-read-before-guard lever, reusing them for the
+ * `mx`/`my` subtractions instead of re-reading `Monst->_menemyx/_menemyy`)
+ * made it WORSE (24->40 diffs) -- retail genuinely re-reads the fields
+ * separately in the two spots rather than caching across the guard, unlike
+ * the _mx/_my lever elsewhere in this file. Reverted. NEXT ANGLE (untried):
+ * this is register-coloring/permuter territory, not a structural miss --
+ * would need permuter-style search over equivalent statement permutations
+ * of the 3-way `&&` MT_GLOOM/abs/LineClearF1 condition. */
 void MAI_Bat(int i)
 {
     MonsterStruct *Monst = &monster[i];
     int mx, my, md, v, pnum;
     int fx, fy;
 
-    fx = Monst->_menemyx;
-    fy = Monst->_menemyy;
     pnum = Monst->_menemy;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
-        mx = Monst->_mx - fx;
-        my = Monst->_my - fy;
+        mx = Monst->_mx - Monst->_menemyx;
+        my = Monst->_my - Monst->_menemyy;
         md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
         Monst->_mdir = md;
         v = ENG_random(100);
@@ -3242,6 +3248,8 @@ void MAI_Bat(int i)
                 Monst->_mgoal = MG_ATTACK;
             }
         } else {
+            fx = Monst->_menemyx;
+            fy = Monst->_menemyy;
             if (Monst->MType->mtype == MT_GLOOM
                 && (abs(mx) < 5 && abs(my) < 5 && v < 33 + 4 * Monst->_mint)
                 && LineClearF1(PosOkMonst, i, Monst->_mx, Monst->_my, fx, fy)) {

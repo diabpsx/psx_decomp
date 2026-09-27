@@ -141,7 +141,8 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     RECT R;
     long vol;
 
-    *plVolume = (sglSoundVolume * sglMasterVolume) >> 8;
+    volume = (sglSoundVolume * sglMasterVolume) >> 8;
+    *plVolume = volume;
     *plPan = 0x8000;
 
     if (!dung_map[x][y].dFlags)
@@ -156,11 +157,12 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     gblocks->GetScrXY(R, x * 20, y * 20, 0, 0);
 
     scrx = R.x;
+    scry = R.y;
 
     if (scrx < gnScreenX) return 0;
     if (gnScreenX + gnScreenWidth < scrx) return 0;
-    if (R.y < gnScreenY) return 0;
-    if (gnScreenY + gnScreenHeight < R.y) return 0;
+    if (scry < gnScreenY) return 0;
+    if (gnScreenY + gnScreenHeight < scry) return 0;
 
     if (MONO) return 1;
 
@@ -169,7 +171,8 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     if (pan > 0x10000) pan = 0x10000;
 
     vol = (sglSoundVolume * sglMasterVolume) << 8;
-    scry = gnScreenWidth / 2;
+    scry = gnScreenWidth;
+    scry /= 2;
     if (scry < scrx)
         scrx = gnScreenWidth - scrx;
     scrx *= 2;
