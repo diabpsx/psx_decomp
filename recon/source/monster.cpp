@@ -1962,8 +1962,11 @@ void MAI_Zhar(int i)
     }
 }
 
-/* OPEN: bytes far-miss (128 diffs, 185 vs 199 insns -- 14 insns short, likely missing/misordered
- * logic).  Confirmed against the RAW ORACLE (not hellfire, which #if-0's most of this out; used
+/* PASS+SYM. Rebuilt from retail SLD/SYM: the missing 14 insns were the PSX experience hand-off --
+ * `{ int omp = myplr; myplr = pnum; AddPlrMonstExper(...); myplr = omp; }` for pnum < 2 && i >= 3
+ * (AddPlrMonstExper reads the global myplr) -- plus the SpawnItem gate being `i >= 4`; the old
+ * position is read as `pmonster = monster; _mx = pmonster[i]._moldx;` before the md choice.
+ * Older notes: confirmed against the RAW ORACLE (not hellfire, which #if-0's most of this out; used
  * devilution's non-HELLFIRE branch as the base twin instead): Q_GARBUD=2/UMT_GARBUD=0 unique-item
  * check, `SetRndSeed(ENG_random(GetRndSeed()))` (a PSX-specific re-seed, NOT `SetRndSeed(_mRndSeed)`
  * -- MonsterStruct has no such field), a `stream_stop()` call gated on `_uniqtype!=0` with no
@@ -1974,30 +1977,42 @@ void MAI_Zhar(int i)
 void MonstStartKill(int i, int pnum, unsigned char sendmsg)
 {
     int md;
-    MonsterStruct *Monst = &monster[i];
+    MonsterStruct *Monst;
+    MonsterStruct *pmonster;
     int _mx, _my;
+
+    Monst = &monster[i];
 
     if (pnum >= 0)
         Monst->mWhoHit = 1 << pnum;
-    if (pnum < 2 && i > 2)
+
+    if (pnum < 2 && i >= 3) {
+        int omp = myplr;
+        myplr = pnum;
         AddPlrMonstExper(Monst->mLevel, Monst->mExp, Monst->mWhoHit);
+        myplr = omp;
+    }
+
     monstkills[Monst->MType->mtype]++;
     Monst->_mhitpoints = 0;
     RemoveStoneMissiles(i, Monst->_mx, Monst->_my);
     SetRndSeed(ENG_random(GetRndSeed()));
-    if (QuestStatus(Q_GARBUD) && Monst->mName == UniqMonst[UMT_GARBUD].mName) {
+    if (QuestStatus(Q_GARBUD) && Monst->mName == UniqMonst[UMT_GARBUD].mName)
         CreateTypeItem(Monst->_mx + 1, Monst->_my + 1, 1, ITYPE_MACE, IMISC_NONE, 1, 0);
-    } else if (i > 1) {
+    else if (i >= 4)
         SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
-    }
 
-    if (Monst->_uniqtype != 0)
+    if (Monst->_uniqtype)
         stream_stop();
 
     if (Monst->MType->mtype == MT_DIABLO)
         M_DiabloDeath(i, 1, pnum);
     else
         PlayEffect(i, 2);
+
+    pmonster = monster;
+    _mx = pmonster[i]._moldx;
+    _my = pmonster[i]._moldy;
 
     if (pnum >= 0)
         md = M_GetDir(i);
@@ -2010,8 +2025,6 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
         Monst->_mxoff = 0;
         Monst->_myoff = 0;
     }
-    _mx = Monst->_moldx;
-    _my = Monst->_moldy;
     Monst->_mVar1 = 0;
     Monst->_mx = _mx;
     Monst->_my = _my;
@@ -2024,7 +2037,7 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
     dung_map[_mx][_my].dMonster = i + 1;
     CheckQuestKill(i, sendmsg);
     M_FallenFear(_mx, _my);
-    if (Monst->MType->mtype - MT_NACID < 4)
+    if (Monst->MType->mtype >= MT_NACID && Monst->MType->mtype <= MT_NACID + 3)
         AddMissile(_mx, _my, 0, 0, 0, MIT_ACIDPUD, 1, i, Monst->_mint + 1, 0);
 }
 
