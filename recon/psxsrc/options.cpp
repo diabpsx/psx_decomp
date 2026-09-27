@@ -35,6 +35,7 @@ TASK *DrawOptionsTask;
 int ReturnMenu;                 /* gp_rel in FormatPad's oracle -> owned here */
 BOOL CharacterBlockLoaded;      /* gp_rel in FormatPad's oracle -> owned here */
 int ReturnCards;                /* gp_rel in SaveOverwritePad's oracle -> owned here */
+int MonoX = 178;                 /* gp_rel only in PrintMono -> owned here */
 BOOL OptionsSetSeed;            /* gp_rel in DrawOptions's oracle -> owned here */
 static int lastlastcs;          /* D_8011B238 -- SYM name "lastlastcs" */
 static int Spacing;             /* D_8011B22C -- SYM name "Spacing" */

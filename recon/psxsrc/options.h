@@ -177,7 +177,7 @@ extern long sglSoundVolume;
 extern long sglSpeechVolume;
 extern int sgnMusicTrack;
 extern BOOL MONO;
-extern int MonoX;
+extern int MonoX;   /* defined in options.cpp (gp_rel only here) */
 /* MasterVol/MusicVol/SoundVol/SpeechVol: SYM class EXT = external linkage; this TU's oracle reaches
  * them via %gp_rel -> OPTIONS.CPP owns the definitions (see options.cpp), not extern here. */
 extern CFont MediumFont;

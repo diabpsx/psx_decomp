@@ -120,21 +120,20 @@ static void PrintOBJ_FIRE(int ScrX, int ScrY, int OtPos)
     TextDat *ThisDat;
     int diff;
     CINDER *C;
-    int i;
 
     ThisDat = GM_UseTexData(0);
-    diff = VID_GetTick() - lasttick;
+    diff = VID_GetTick();
+    diff -= lasttick;
     lasttick = VID_GetTick();
     C = Cinders;
-    for (i = 0; i < 16; i++) {
+    for (int i = 0; i < 16; i++) {
         unsigned short fx = C->x;
         unsigned short fy = C->y;
         unsigned short fyi = C->yinc;
         Ft4a = ThisDat->PrintFt4(0xD9, ScrX + fx, ScrY - (unsigned short)(fy >> 8), 0, OtPos + 1, 0);
-        int c1 = 16 - (unsigned short)(fy >> 8);
-        Ft4a->b0 = 16 - (fy >> 8);
-        Ft4a->r0 = c1 << 3;
+        Ft4a->r0 = (16 - (unsigned short)(fy >> 8)) * 8;
         Ft4a->g0 = (16 - (unsigned short)(fy >> 8)) * 5;
+        Ft4a->b0 = 16 - (fy >> 8);
         Ft4a->code = (Ft4a->code | 2) & ~1;
         Ft4a->tpage |= 0x20;
         if (!PauseMode && FirstFire) {
