@@ -2350,10 +2350,11 @@ void OperateShrine(int pnum, int i, int sType)
                     r = ENG_random(37);
                     lv <<= r;
                     if (plr[pnum]._pMemSpells & lv) {
-                        if (plr[pnum]._pSplLvl[r + 1] < 2)
-                            plr[pnum]._pSplLvl[r + 1] = 0;
-                        else
+                        if (plr[pnum]._pSplLvl[r + 1] >= 2)
                             plr[pnum]._pSplLvl[r + 1] -= 2;
+                        else
+                            plr[pnum]._pSplLvl[r + 1] = 0;
+                        done = 1;
                         break;
                     }
                 }
