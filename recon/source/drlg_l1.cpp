@@ -98,15 +98,15 @@ BOOL L5checkRoom(int x, int y, int width, int height)
 
 void L5roomGen(int x, int y, int w, int h, int dir)
 {
-    int dirProb;
+    int num, dirProb;
+    BOOL ran, ran2;
+    int width, height, rx, ry, ry2;
+    int cw, ch, cx1, cy1, cx2;
 
     dirProb = ENG_random(4);
 
     switch (dir == 1 ? dirProb != 0 : dirProb == 0) {
     case FALSE: {
-        int num, cw, ch, cx1, cy1, cx2;
-        BOOL ran, ran2;
-
         num = 0;
         do {
             cw = (ENG_random(5) + 2) & 0xFFFFFFFE;
@@ -130,9 +130,6 @@ void L5roomGen(int x, int y, int w, int h, int dir)
         break;
     }
     case TRUE: {
-        int num, width, height, rx, ry, ry2;
-        BOOL ran, ran2;
-
         num = 0;
         do {
             width = (ENG_random(5) + 2) & 0xFFFFFFFE;
@@ -879,7 +876,20 @@ void L5FillChambers(void)
 
 void DRLG_L5FTVR(int i, int j, int x, int y, int d)
 {
-    if (dung_map[x][y].dTransVal || dungeon[i][j] != 13) {
+    if (!dung_map[x][y].dTransVal && dungeon[i][j] == 13) {
+        dung_map[x][y].dTransVal = TransVal;
+        dung_map[x + 1][y].dTransVal = TransVal;
+        dung_map[x][y + 1].dTransVal = TransVal;
+        dung_map[x + 1][y + 1].dTransVal = TransVal;
+        DRLG_L5FTVR(i + 1, j, x + 2, y, 1);
+        DRLG_L5FTVR(i - 1, j, x - 2, y, 2);
+        DRLG_L5FTVR(i, j + 1, x, y + 2, 3);
+        DRLG_L5FTVR(i, j - 1, x, y - 2, 4);
+        DRLG_L5FTVR(i - 1, j - 1, x - 2, y - 2, 5);
+        DRLG_L5FTVR(i + 1, j - 1, x + 2, y - 2, 6);
+        DRLG_L5FTVR(i - 1, j + 1, x - 2, y + 2, 7);
+        DRLG_L5FTVR(i + 1, j + 1, x + 2, y + 2, 8);
+    } else {
         if (d == 1) {
             dung_map[x][y].dTransVal = TransVal;
             dung_map[x][y + 1].dTransVal = TransVal;
@@ -904,19 +914,6 @@ void DRLG_L5FTVR(int i, int j, int x, int y, int d)
             dung_map[x + 1][y].dTransVal = TransVal;
         if (d == 8)
             dung_map[x][y].dTransVal = TransVal;
-    } else {
-        dung_map[x][y].dTransVal = TransVal;
-        dung_map[x + 1][y].dTransVal = TransVal;
-        dung_map[x][y + 1].dTransVal = TransVal;
-        dung_map[x + 1][y + 1].dTransVal = TransVal;
-        DRLG_L5FTVR(i + 1, j, x + 2, y, 1);
-        DRLG_L5FTVR(i - 1, j, x - 2, y, 2);
-        DRLG_L5FTVR(i, j + 1, x, y + 2, 3);
-        DRLG_L5FTVR(i, j - 1, x, y - 2, 4);
-        DRLG_L5FTVR(i - 1, j - 1, x - 2, y - 2, 5);
-        DRLG_L5FTVR(i + 1, j - 1, x + 2, y - 2, 6);
-        DRLG_L5FTVR(i - 1, j + 1, x - 2, y + 2, 7);
-        DRLG_L5FTVR(i + 1, j + 1, x + 2, y + 2, 8);
     }
 }
 
@@ -942,7 +939,7 @@ void DRLG_L5FloodTVal(void)
 
 void DRLG_L5TransFix(void)
 {
-    int xx, yy, i, j;
+    int i, j, xx, yy, c;
 
     yy = 16;
 
@@ -950,26 +947,58 @@ void DRLG_L5TransFix(void)
         xx = 16;
 
         for (i = 0; i < DMAXX; i++) {
-            if (dungeon[i][j] == 23 && dungeon[i][j - 1] == 18) {
+            c = dungeon[i][j];
+
+            if (c == 23 && dungeon[i][j - 1] == 18) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (dungeon[i][j] == 24 && dungeon[i + 1][j] == 19) {
+            if (c == 24 && dungeon[i + 1][j] == 19) {
                 dung_map[xx][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (dungeon[i][j] == 18) {
+            if (c == 18) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (dungeon[i][j] == 19) {
+            if (c == 19) {
                 dung_map[xx][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (dungeon[i][j] == 20) {
+            if (c == 20) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
+            }
+            if (c == 24 && dungeon[i][j - 1] == 6) {
+                dung_map[xx][yy].dTransVal = dung_map[xx][yy - 2].dTransVal;
+            }
+            if (c == 6) {
+                if (dungeon[i - 1][j] == 2)
+                    dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
+                if (dungeon[i - 1][j] == 37)
+                    dung_map[xx][yy].dTransVal = dung_map[xx][yy + 1].dTransVal;
+            }
+            if (c == 27 && dungeon[i - 1][j] == 2) {
+                dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
+            }
+            if (c == 23) {
+                if (dungeon[i - 1][j] == 7)
+                    dung_map[xx][yy].dTransVal = -1;
+                if (dungeon[i - 1][j] == 13)
+                    dung_map[xx][yy].dTransVal = dung_map[xx - 1][yy - 1].dTransVal;
+            }
+            if (c == 7 && dungeon[i - 1][j] == 13) {
+                dung_map[xx][yy].dTransVal = -1;
+            }
+            if (c == 12 && dungeon[i - 1][j] == 2) {
+                dung_map[xx][yy].dTransVal = -1;
+            }
+            if (c == 7 && dungeon[i][j - 1] == 1) {
+                dung_map[xx][yy].dTransVal = -1;
+            }
+            if (c == 21 && dungeon[i][j - 1] == 1) {
+                dung_map[xx][yy].dTransVal = -1;
             }
             xx += 2;
         }
@@ -1344,8 +1373,8 @@ void DRLG_InitL1Vals(void)
 
 void LoadL1Dungeon(char *sFileName, int vx, int vy)
 {
-    int i, j, rw, rh;
-    unsigned char *pLevelMap, *lm;
+    int i, j;
+    unsigned char *pLevelMap;
 
     dminx = 16;
     dminy = 16;
@@ -1354,41 +1383,45 @@ void LoadL1Dungeon(char *sFileName, int vx, int vy)
 
     DRLG_InitTrans();
     pLevelMap = GRL_LoadFileInMemSig(sFileName, 0);
-    lm = pLevelMap;
 
-    for (j = 0; j < DMAXY; j++) {
-        for (i = 0; i < DMAXX; i++) {
-            dungeon[i][j] = 22;
-            mydflags[i + j * DMAXX] = 0;
-        }
-    }
+    {
+        int rw, rh;
+        unsigned char *lm = pLevelMap;
 
-    rw = *lm;
-    lm += 2;
-    rh = *lm;
-    lm += 2;
-
-    for (j = 0; j < rh; j++) {
-        for (i = 0; i < rw; i++) {
-            if (*lm != 0) {
-                dungeon[i][j] = *lm;
-                mydflags[i + j * DMAXX] |= DLRG_PROTECTED;
-            } else {
-                dungeon[i][j] = 13;
+        for (j = 0; j < DMAXY; j++) {
+            for (i = 0; i < DMAXX; i++) {
+                dungeon[i][j] = 22;
+                mydflags[i + j * DMAXX] = 0;
             }
-            lm += 2;
         }
-    }
 
-    DRLG_L1Floor();
-    ViewX = vx;
-    ViewY = vy;
-    DRLG_L1Pass3();
-    DRLG_Init_Globals();
-    DRLG_InitL1Vals();
-    SetMapMonsters(pLevelMap, 0, 0);
-    SetMapObjects(pLevelMap, 0, 0);
-    mem_free_dbg(pLevelMap);
+        rw = *lm;
+        lm += 2;
+        rh = *lm;
+        lm += 2;
+
+        for (j = 0; j < rh; j++) {
+            for (i = 0; i < rw; i++) {
+                if (*lm != 0) {
+                    dungeon[i][j] = *lm;
+                    mydflags[i + j * DMAXX] |= DLRG_PROTECTED;
+                } else {
+                    dungeon[i][j] = 13;
+                }
+                lm += 2;
+            }
+        }
+
+        DRLG_L1Floor();
+        ViewX = vx;
+        ViewY = vy;
+        DRLG_L1Pass3();
+        DRLG_Init_Globals();
+        DRLG_InitL1Vals();
+        SetMapMonsters(pLevelMap, 0, 0);
+        SetMapObjects(pLevelMap, 0, 0);
+        mem_free_dbg(pLevelMap);
+    }
 }
 
 void LoadPreL1Dungeon(char *sFileName, int vx, int vy)
@@ -1436,7 +1469,10 @@ void LoadPreL1Dungeon(char *sFileName, int vx, int vy)
         }
     }
 
-    mem_free_dbg(pLevelMap);
+    {
+        int dummy;
+        mem_free_dbg(pLevelMap);
+    }
 }
 
 static const struct ShadowStruct SPATS[37] = {
@@ -1597,13 +1633,13 @@ void DRLG_L1Shadows(void)
  * dungeon tile is passable floor/dirt (13/22) at the 2x-scaled dung_map resolution. */
 void DRLG_SetWalls(void)
 {
-    int i, j, xx, yy;
+    int yy = 16;
 
-    yy = 16;
-    for (j = 0; j < DMAXY; j++) {
-        xx = 16;
-        for (i = 0; i < DMAXX; i++) {
-            if (dungeon[i][j] == 13 || dungeon[i][j] == 22)
+    for (int i = 0; i < DMAXY; i++) {
+        int xx = 16;
+        for (int j = 0; j < DMAXX; j++) {
+            int v = dungeon[j][i];
+            if (v == 13 || v == 22 || v == 0)
                 dung_map[xx][yy].dFlags |= 0x20;
             else
                 dung_map[xx][yy].dFlags &= ~0x20;
