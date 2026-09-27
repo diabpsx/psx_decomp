@@ -270,8 +270,8 @@ void DRLG_L3FillSingles(void)
 void DRLG_L3FillStraights(void)
 {
     int i, j;
-    int xc, xs;
-    int yc, ys;
+    int xc, xs = 0;
+    int yc, ys = 0;
     int k, rv;
 
     for (j = 0; j < DMAXY - 1; j++) {
@@ -811,31 +811,35 @@ void DRLG_L3Pool(void)
 void DRLG_L3PoolFix(void)
 {
     int dunx, duny;
+    unsigned short *p0, *p1, *p2;
 
     for (dunx = 0; dunx < DMAXX; dunx++) {
+        p0 = dungeon[dunx - 1];
+        p1 = dungeon[dunx];
+        p2 = dungeon[dunx + 1];
         for (duny = 0; duny < DMAXY; duny++) {
-            if (dungeon[dunx][duny] == 8) {
-                if ((dungeon[dunx - 1][duny - 1] >= 25 && dungeon[dunx - 1][duny - 1] <= 41)
-                    && (dungeon[dunx][duny - 1] >= 25 && dungeon[dunx][duny - 1] <= 41)
-                    && (dungeon[dunx + 1][duny - 1] >= 25 && dungeon[dunx + 1][duny - 1] <= 41)
-                    && (dungeon[dunx - 1][duny] >= 25 && dungeon[dunx - 1][duny] <= 41)
-                    && (dungeon[dunx + 1][duny] >= 25 && dungeon[dunx + 1][duny] <= 41)
-                    && (dungeon[dunx - 1][duny + 1] >= 25 && dungeon[dunx - 1][duny + 1] <= 41)
-                    && (dungeon[dunx][duny + 1] >= 25 && dungeon[dunx][duny + 1] <= 41)
-                    && (dungeon[dunx + 1][duny + 1] >= 25 && dungeon[dunx + 1][duny + 1] <= 41)) {
-                    dungeon[dunx][duny] = 33;
+            if (p1[duny] == 8) {
+                if ((p0[duny - 1] >= 25 && p0[duny - 1] <= 41)
+                    && (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
+                    && (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
+                    && (p0[duny] >= 25 && p0[duny] <= 41)
+                    && (p2[duny] >= 25 && p2[duny] <= 41)
+                    && (p0[duny + 1] >= 25 && p0[duny + 1] <= 41)
+                    && (p1[duny + 1] >= 25 && p1[duny + 1] <= 41)
+                    && (p2[duny + 1] >= 25 && p2[duny + 1] <= 41)) {
+                    p1[duny] = 33;
                 }
             }
-            if (dungeon[dunx][duny] == 8) {
-                if ((dungeon[dunx - 1][duny - 1] >= 25 && dungeon[dunx - 1][duny - 1] <= 41)
-                    && (dungeon[dunx][duny - 1] >= 25 && dungeon[dunx][duny - 1] <= 41)
-                    && (dungeon[dunx + 1][duny - 1] >= 25 && dungeon[dunx + 1][duny - 1] <= 41)
-                    && (dungeon[dunx - 1][duny] >= 25 && dungeon[dunx - 1][duny] <= 41)
-                    && (dungeon[dunx + 1][duny] >= 25 && dungeon[dunx + 1][duny] <= 41)
-                    && (dungeon[dunx - 1][duny + 1] >= 25 && dungeon[dunx - 1][duny + 1] <= 41)
-                    && (dungeon[dunx][duny + 1] >= 25 && dungeon[dunx][duny + 1] <= 41)
-                    && (dungeon[dunx + 1][duny + 1] >= 25 && dungeon[dunx + 1][duny + 1] <= 41)) {
-                    dungeon[dunx][duny] = 33;
+            if (p1[duny] == 8) {
+                if ((p0[duny - 1] >= 25 && p0[duny - 1] <= 41)
+                    && (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
+                    && (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
+                    && (p0[duny] >= 25 && p0[duny] <= 41)
+                    && (p2[duny] >= 25 && p2[duny] <= 41)
+                    && (p0[duny + 1] >= 25 && p0[duny + 1] <= 41)
+                    && (p1[duny + 1] >= 25 && p1[duny + 1] <= 41)
+                    && (p2[duny + 1] >= 25 && p2[duny + 1] <= 41)) {
+                    p1[duny] = 33;
                 }
             }
         }
@@ -1463,6 +1467,8 @@ unsigned char DRLG_L3Lockout(void)
 {
     int i, j, t, fx, fy;
 
+    fx = 0;
+    fy = 0;
     t = 0;
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
@@ -1510,14 +1516,15 @@ void DRLG_L3SetWalls(void)
 void DRLG_L3(int entry)
 {
     int x1, y1, x2, y2, sx1, sy1, i, j;
-    int found, genok;
+    unsigned char found;
+    int genok;
 
     lavapool = false;
 
+    UPDATEPROGRESS(1);
     do {
         do {
             do {
-                UPDATEPROGRESS(1);
                 InitL3Dungeon();
                 x1 = ENG_random(20) + 10;
                 y1 = ENG_random(20) + 10;
@@ -1604,6 +1611,7 @@ void DRLG_L3(int entry)
 
     DRLG_PlaceThemeRooms(5, 10, 7, 0, 0);
 
+    FixL3Dungeon();
     DRLG_L3Wood();
     DRLG_L3PlaceRndSet(L3TITE1, 10);
     DRLG_L3PlaceRndSet(L3TITE2, 10);
@@ -1612,10 +1620,10 @@ void DRLG_L3(int entry)
     DRLG_L3PlaceRndSet(L3TITE8, 20);
     DRLG_L3PlaceRndSet(L3TITE9, 20);
     DRLG_L3PlaceRndSet(L3TITE10, 20);
-    DRLG_L3PlaceRndSet(L3TITE11, 20);
-    DRLG_L3PlaceRndSet(L3TITE12, 30);
+    DRLG_L3PlaceRndSet(L3TITE11, 30);
+    DRLG_L3PlaceRndSet(L3TITE12, 20);
     DRLG_L3PlaceRndSet(L3TITE13, 20);
-    DRLG_L3PlaceRndSet(L3CREV1, 20);
+    DRLG_L3PlaceRndSet(L3CREV1, 30);
     DRLG_L3PlaceRndSet(L3CREV2, 30);
     DRLG_L3PlaceRndSet(L3CREV3, 30);
     DRLG_L3PlaceRndSet(L3CREV4, 30);
