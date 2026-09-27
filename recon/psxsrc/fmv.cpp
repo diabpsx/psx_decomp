@@ -724,7 +724,7 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
     return rows;
 }
 
-/* WIP -- NOT byte-verified (see split_poly_area note). @0x80156DD4 FMV.CPP:1009 */
+/* @0x80156DD4 FMV.CPP:1009 */
 extern "C" void rebuild_mdec_polys(int x, int y)
 {
     /* tmdc_pol is [half][mbuf][poly] (half outer, confirmed against draw_mdec_polys's own +0x320
@@ -734,19 +734,19 @@ extern "C" void rebuild_mdec_polys(int x, int y)
      * running += accumulator across outer iterations, not recomputed; the mbuf*800 term is computed
      * once per INNER iteration and reused for both corners on that row; col*80 and (col+1)*80 are
      * each computed once per inner iteration and reused for both corners on that column edge. */
-    POLY_FT4 *p = &tmdc_pol[0][mbuf][0];
-    int row = 0;
+    int px;
+    int py;
+    POLY_FT4 *p;
 
-    for (; row < mdec_ph[mbuf]; row++) {
-        if (mdec_pw[mbuf] > 0) {
-            for (int col = 0; col < mdec_pw[mbuf]; col++) {
-                setXY4_(p,
-                        (short)(TMDC_OFFS(mbuf, col, row).vx + x), (short)(TMDC_OFFS(mbuf, col, row).vy + y),
-                        (short)(TMDC_OFFS(mbuf, col + 1, row).vx + x), (short)(TMDC_OFFS(mbuf, col + 1, row).vy + y),
-                        (short)(TMDC_OFFS(mbuf, col, row + 1).vx + x), (short)(TMDC_OFFS(mbuf, col, row + 1).vy + y),
-                        (short)(TMDC_OFFS(mbuf, col + 1, row + 1).vx + x), (short)(TMDC_OFFS(mbuf, col + 1, row + 1).vy + y));
-                p += 1;
-            }
+    p = &tmdc_pol[0][mbuf][0];
+    for (py = 0; py < mdec_ph[mbuf]; py++) {
+        for (px = 0; px < mdec_pw[mbuf]; px++) {
+            setXY4_(p,
+                    TMDC_OFFS(mbuf, px, py).vx + x, TMDC_OFFS(mbuf, px, py).vy + y,
+                    TMDC_OFFS(mbuf, px + 1, py).vx + x, TMDC_OFFS(mbuf, px + 1, py).vy + y,
+                    TMDC_OFFS(mbuf, px, py + 1).vx + x, TMDC_OFFS(mbuf, px, py + 1).vy + y,
+                    TMDC_OFFS(mbuf, px + 1, py + 1).vx + x, TMDC_OFFS(mbuf, px + 1, py + 1).vy + y);
+            p++;
         }
     }
 }
