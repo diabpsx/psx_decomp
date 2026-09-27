@@ -2922,55 +2922,58 @@ void MAI_Lazurus(int i)
  * picked leader here to match the earlier-confirmed `packsize` pMonster
  * usage). Still 7 saved regs vs retail's 8 (`sp-64` vs `sp-72`) -- one
  * persistent variable's worth of register pressure still unaccounted for.
- * Close but not solved; needs a slower register-by-register walk. */
+ * NOW PASS+SYM, rebuilt from the retail SYM/SLD: pMonster is only the (const)
+ * base for the up-front _mx/_my reads, everything else is monster[...];
+ * `tmp` is both the LineClearF result and the monstactive[] entry in the
+ * pack loop (m is the loop index); the leader-link test is
+ * `if (!tmp && flag == 1) {--} else if (tmp && flag == 2 && (DIST)) {++}`. */
 void GroupUnity(int i)
 {
     int leader;
     int tmp;
     int m;
-    MonsterStruct *pMonster = monster;
-    int _mx;
-    int _my;
+    const MonsterStruct *pMonster;
+    int _mx, _my;
 
+    pMonster = monster;
     _mx = pMonster[i]._mx;
     _my = pMonster[i]._my;
 
+    leader = 0;
     if (monster[i].leaderflag) {
         leader = monster[i].leader;
-
         tmp = LineClearF(CheckNoSolid, _mx, _my, monster[leader]._mfutx, monster[leader]._mfuty);
-
-        if (!tmp && monster[i].leaderflag == PACK_MEMBER) {
-            pMonster[leader].packsize--;
-            monster[i].leaderflag = PACK_NOMEMBER;
-        } else if (tmp && monster[i].leaderflag == PACK_NOMEMBER
-                   && abs(_mx - monster[leader]._mfutx) < 4
-                   && abs(_my - monster[leader]._mfuty) < 4) {
-            pMonster[leader].packsize++;
-            monster[i].leaderflag = PACK_MEMBER;
+        if (!tmp && monster[i].leaderflag == 1) {
+            monster[leader].packsize--;
+            monster[i].leaderflag = 2;
+        } else if (tmp && monster[i].leaderflag == 2
+            && (abs(_mx - monster[leader]._mfutx) < 4 && abs(_my - monster[leader]._mfuty) < 4)) {
+            monster[leader].packsize++;
+            monster[i].leaderflag = 1;
         }
     }
 
-    if (monster[i].leaderflag == PACK_MEMBER) {
-        if (monster[i]._msquelch > pMonster[leader]._msquelch) {
-            pMonster[leader]._lastx = _mx;
-            pMonster[leader]._lasty = _my;
-            pMonster[leader]._msquelch = monster[i]._msquelch - 1;
+    if (monster[i].leaderflag == 1) {
+        if (monster[i]._msquelch > monster[leader]._msquelch) {
+            monster[leader]._lastx = _mx;
+            monster[leader]._lasty = _my;
+            monster[leader]._msquelch = monster[i]._msquelch - 1;
         }
-        if (pMonster[leader]._mAi == AI_GARG && (pMonster[leader]._mFlags & MFLAG_STILL)) {
-            pMonster[leader]._mFlags &= ~MFLAG_STILL;
-            pMonster[leader]._mmode = MM_SATTACK;
+        if (monster[leader]._mAi == AI_GARG && (monster[leader]._mFlags & MFLAG_ALLOW_SPECIAL)) {
+            monster[leader]._mFlags &= ~MFLAG_ALLOW_SPECIAL;
+            monster[leader]._mmode = MM_SATTACK;
         }
-    } else if (monster[i]._uniqtype && (UniqMonst[monster[i]._uniqtype - 1].mUnqAttr & UN_STICK)) {
+    } else if (monster[i]._uniqtype && (UniqMonst[monster[i]._uniqtype - 1].mUnqAttr & 2)) {
         for (m = 0; m < nummonsters; m++) {
-            if (monster[tmp = monstactive[m]].leaderflag == PACK_MEMBER && monster[tmp].leader == i) {
+            tmp = monstactive[m];
+            if (monster[tmp].leaderflag == 1 && monster[tmp].leader == i) {
                 if (monster[i]._msquelch > monster[tmp]._msquelch) {
                     monster[tmp]._lastx = _mx;
                     monster[tmp]._lasty = _my;
                     monster[tmp]._msquelch = monster[i]._msquelch - 1;
                 }
-                if (monster[tmp]._mAi == AI_GARG && (monster[tmp]._mFlags & MFLAG_STILL)) {
-                    monster[tmp]._mFlags &= ~MFLAG_STILL;
+                if (monster[tmp]._mAi == AI_GARG && (monster[tmp]._mFlags & MFLAG_ALLOW_SPECIAL)) {
+                    monster[tmp]._mFlags &= ~MFLAG_ALLOW_SPECIAL;
                     monster[tmp]._mmode = MM_SATTACK;
                 }
             }
