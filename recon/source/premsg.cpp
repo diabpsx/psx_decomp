@@ -10,32 +10,22 @@
 
 void DefragItems(unsigned char *ilist, int num)
 {
-    int p;
-    unsigned char *end;
+    int p = 0;
 
-    p = 0;
-    end = ilist + num;
-    if (num > 0) {
-        do {
-            if (*ilist != 0xFF) {
-                itemactive[p] = *ilist;
-                p++;
-            }
-            ilist++;
-        } while ((int)ilist < (int)end);
+    for (int i = 0; i < num; i++) {
+        if (ilist[i] != 0xFF) {
+            itemactive[p] = ilist[i];
+            p++;
+        }
     }
 }
 
 void removellist(unsigned char *ilist, unsigned char val)
 {
-    unsigned char *end;
-
-    end = ilist + 0x7F;
-    do {
-        if (*ilist == val)
-            *ilist = 0xFF;
-        ilist++;
-    } while ((int)ilist < (int)end);
+    for (int i = 0; i < 127; i++) {
+        if (ilist[i] == val)
+            ilist[i] = 0xFF;
+    }
 }
 
 void DeltaLoadLevel(void)
