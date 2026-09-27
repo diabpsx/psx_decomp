@@ -3520,20 +3520,11 @@ void MissToMonst(int i, int x, int y)
  * missile-transform tail sets `dung_map[...].dMonster=~i` (bitwise NOT,
  * matches devilution's `-(i+1)`) AND `Monst->Action=5` (a PSX-only "flying"
  * render-state marker, absent from both twins, confirmed from raw bytes).
- * Remaining gap is a register-naming artifact: SYM wants fx=$s1,fy=$s5, ours
- * produces fx=$s5,fy=$s6 -- the anonymous compiler-generated boolean flag
- * for the 3-way `&&` missile-check condition takes $s1 in retail but a
- * different slot in ours, one small ripple from the same "unnamed compiler
- * temp" class seen in GroupUnity/M_TryM2MHit.
- * FALSIFIED this pass: hoisting `fx = Monst->_menemyx; fy = Monst->_menemyy;`
- * to the top (speculative-read-before-guard lever, reusing them for the
- * `mx`/`my` subtractions instead of re-reading `Monst->_menemyx/_menemyy`)
- * made it WORSE (24->40 diffs) -- retail genuinely re-reads the fields
- * separately in the two spots rather than caching across the guard, unlike
- * the _mx/_my lever elsewhere in this file. Reverted. NEXT ANGLE (untried):
- * this is register-coloring/permuter territory, not a structural miss --
- * would need permuter-style search over equivalent statement permutations
- * of the 3-way `&&` MT_GLOOM/abs/LineClearF1 condition. */
+ * NOW PASS+SYM: the missile check's distance test was inverted -- retail
+ * (like devilution) fires the gloom missile only when the target is FAR:
+ * `(abs(mx) >= 5 || abs(my) >= 5) && v < 4 * _mint + 33`. The old
+ * "register-naming artifact" was just that logic bug. Note: retail re-reads
+ * _menemyx/_menemyy separately in the two spots (hoisting made it worse). */
 void MAI_Bat(int i)
 {
     MonsterStruct *Monst = &monster[i];
@@ -3562,7 +3553,7 @@ void MAI_Bat(int i)
             fx = Monst->_menemyx;
             fy = Monst->_menemyy;
             if (Monst->MType->mtype == MT_GLOOM
-                && (abs(mx) < 5 && abs(my) < 5 && v < 33 + 4 * Monst->_mint)
+                && (abs(mx) >= 5 || abs(my) >= 5) && v < 4 * Monst->_mint + 33
                 && LineClearF1(PosOkMonst, i, Monst->_mx, Monst->_my, fx, fy)) {
                 if (AddMissile(Monst->_mx, Monst->_my, fx, fy, md, MIT_RHINO, pnum, i, 0, 0) != -1) {
                     dung_map[Monst->_mx][Monst->_my].dMonster = ~i;
