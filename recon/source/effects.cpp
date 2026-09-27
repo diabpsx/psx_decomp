@@ -163,14 +163,12 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     if (pan < 0) pan = 0;
     if (pan > 0x10000) pan = 0x10000;
 
-    int half = gnScreenWidth / 2;
     long vol = (sglSoundVolume * sglMasterVolume) << 8;
-    if (half < scrx)
-        scrx = (gnScreenWidth - scrx) * 2;
-    else
-        scrx = scrx * 2;
+    scry = gnScreenWidth / 2;
+    if (scry < scrx)
+        scrx = gnScreenWidth - scrx;
 
-    *plVolume = (scrx * (vol / half)) >> 16;
+    *plVolume = (scrx * 2 * (vol / scry)) >> 16;
     *plPan = pan;
     return 1;
 }
