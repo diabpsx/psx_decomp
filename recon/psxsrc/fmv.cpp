@@ -206,7 +206,7 @@ static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movi
                                       * undefined_syms_auto_fmv.txt symbol (D_80121D08) is exactly 0x20. */
 static int stream_opened;
 static int stream_startsec;
-static int stream_got_chunks;
+static volatile int stream_got_chunks;
 static int stream_last_chunk;
 static int sector_dma_in;
 static int sector_dma;
@@ -407,20 +407,21 @@ extern "C" void cdstream_service(void)
 /* @0x801562B0 FMV.CPP:581 */
 extern "C" int cdstream_get_chunk(unsigned char **data, StHEADER **h)
 {
-    if ((stream_chunks_in - stream_chunks_borrowed) < 0)
+    if (stream_chunks_in - stream_chunks_borrowed < 0)
         printf("underrun in get_chunk\n");
     if (stream_chunks_in != stream_chunks_borrowed) {
-        *data = stream_buf + (stream_out * stream_chunksize * 0x7E0);
-        *h = (StHEADER *)(stream_bufh + ((stream_out * stream_chunksize) << 5));
+        *data = stream_buf + stream_out * stream_chunksize * 0x7E0;
+        *h = (StHEADER *)(stream_bufh + stream_out * stream_chunksize * 32);
+        _get_count++;
         stream_out = (stream_out + 1) % stream_bufsize;
-        stream_chunks_borrowed += 1;
-        stream_got_chunks += 1;
-        _get_count += 1;
+        stream_chunks_borrowed++;
+        stream_got_chunks++;
         return 1;
+    } else {
+        *data = 0;
+        *h = 0;
+        return 0;
     }
-    *data = 0;
-    *h = 0;
-    return 0;
 }
 
 /* @0x801563C8 FMV.CPP:616 */
