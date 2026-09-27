@@ -2591,27 +2591,27 @@ void PrintStat(int Y, int Txt0, char *Txt1, unsigned char Col)
 
 void DrawInvMsg(void)
 {
-    Dialog InvBack;
+    struct POLY_FT4 *Ft4;
     RECT InfoRect;
     int InfoY;
+    int InfoW;
     int InfoH;
+    Dialog InvBack;
     int OldOt;
-    struct POLY_FT4 *Ft4;
 
     OldOt = MediumFont.SetOTpos(0xFA);
     MediumFont.SetOTpos(OldOt - 1);
     PRIM_FullScreen(OldOt);
 
-    InfoRect.x = 0x80;
-    InfoRect.y = 0x81;
-    InfoRect.w = 0xB0;
-    InfoRect.h = 0x4E;
-    InfoH = 0x50;
-
     InfoY = 0x80;
-    if (invflag) {
+    InfoW = 0xB0;
+    InfoH = 0x50;
+    InfoRect.x = InfoY;
+    InfoRect.y = InfoY + 1;
+    InfoRect.w = InfoW;
+    InfoRect.h = InfoH - 2;
+    if (invflag)
         DrawInfoBox(&InfoRect);
-    }
 
     InvBack.SetOTpos(0xF9);
     InvBack.SetBack(5);
@@ -2627,10 +2627,10 @@ void DrawInvMsg(void)
     Ft4->b0 = 0x20;
     Ft4->x1 = 0x130;
     Ft4->x3 = 0x130;
-    Ft4->x0 = InfoY;
-    Ft4->y0 = InfoY;
-    Ft4->y1 = InfoY;
-    Ft4->x2 = InfoY;
+    Ft4->x0 = 0x80;
+    Ft4->y0 = 0x80;
+    Ft4->y1 = 0x80;
+    Ft4->x2 = 0x80;
     Ft4->tpage = Ft4->tpage | 0x40;
     Ft4->u1 = Ft4->u0 + 1;
     Ft4->u3 = Ft4->u0 + 1;
