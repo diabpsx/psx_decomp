@@ -3074,15 +3074,9 @@ void M2MStartKill(int i, int mid)
  * shape). One genuine PSX-only addition confirmed from raw bytes: after
  * applying damage, `_mFlags |= MFLAG_TARGETS_MONSTER` unconditionally, then
  * on death (`hitpoints>>6<=0`) it's CLEARED again unless `mtype==MT_GOLEM`
- * -- present in neither twin. Register-swap oddity found but not resolved:
- * SYM wants i=$s2/hit=$s3, ours produces i=$s3/hit=$s2 (simple swap) EXCEPT
- * at one point deep in the death branch ours recomputes a full `x*104`
- * MonsterStruct stride using the register holding `hit`'s value, which
- * makes no source-level sense (hit is never used as an array index) --
- * likely a second live-range reusing the same hard register for a
- * different purpose after `hit`'s natural lifetime ends elsewhere in
- * ours vs oracle's differently-scheduled version. Needs a dedicated
- * register-lifetime trace, not a quick lever. */
+ * -- present in neither twin. NOW PASS+SYM: that death-path flag clear
+ * (and its MT_GOLEM test) is on the ATTACKER `monster[i]`, not `mid` -- the
+ * "x*104 stride of the wrong register" oddity was exactly this. */
 void M_TryM2MHit(int i, int mid, int hper, int mind, int maxd)
 {
     int hit;
@@ -3108,8 +3102,8 @@ void M_TryM2MHit(int i, int mid, int hper, int mind, int maxd)
             monster[mid]._mhitpoints -= dam;
             monster[mid]._mFlags |= MFLAG_TARGETS_MONSTER;
             if ((monster[mid]._mhitpoints >> 6) <= 0) {
-                if (monster[mid].MType->mtype != MT_GOLEM)
-                    monster[mid]._mFlags &= ~MFLAG_TARGETS_MONSTER;
+                if (monster[i].MType->mtype != MT_GOLEM)
+                    monster[i]._mFlags &= ~MFLAG_TARGETS_MONSTER;
                 if (monster[mid]._mmode == MM_STONE) {
                     M2MStartKill(i, mid);
                     monster[mid]._mmode = MM_STONE;
