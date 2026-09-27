@@ -282,42 +282,41 @@ GM_SPEEDS AlterSpeedMenu(GM_SPEEDS gs)
 
 void GameSpeedPad(void)
 {
-    int keys;
-    int slower, faster, toggle;
+    int cp;
+    BOOL exit_flag;
 
-    toggle = 0;
-    keys = PAD_GetPad(options_pad, 0)->GetDown() & 0xFFFF;
+    exit_flag = 0;
+    cp = PAD_GetPad(options_pad, 0)->GetDown() & 0xFFFF;
     AlterSpeedMenu(GetSpeed());
-    faster = keys & 2;
-    if (keys & 0x100) {
+    if (cp & 0x100) {
         PlaySFX(0x33);
-        toggle = 1;
-        faster = keys & 2;
+        exit_flag = 1;
     }
-    slower = keys & 1;
-    if (faster != 0) {
+    if (cp & 2) {
         PlaySFX(0x32);
         cs = cs + 1;
-        slower = keys & 1;
         if (cs >= 3) {
             cs = 1;
-            slower = keys & 1;
         }
     }
-    if (slower != 0) {
+    if (cp & 1) {
         PlaySFX(0x32);
         cs = cs - 1;
         if (cs == 0)
             cs = 2;
     }
-    if (keys & 0x40) {
+    if (cp & 0x40) {
         PlaySFX(0x33);
-        if (cs == 1)
+        switch (cs) {
+        case 1:
             SetSpeed(GM_SPEED_NORMAL);
-        else if (cs == 2)
+            break;
+        case 2:
             SetSpeed(GM_SPEED_FAST);
+            break;
+        }
     }
-    if (toggle != 0) {
+    if (exit_flag != 0) {
         cmenu = 1;
         cs = 0xA;
     }
@@ -745,9 +744,10 @@ void CharacterLoadPad(void)
     {
         int pressed;
 
-        pressed = 0;
         if (card_status[current_card] == 0) {
             ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
+            pressed = 0;
+        } else {
             pressed = 0;
         }
         if (P->GetDown() & 0x40)
@@ -1917,43 +1917,52 @@ void DrawMenu(int MenuNo)
                     char *Str;
                     int x2;
 
-                    if (FeFlag == 0) {
-                        if (i == 0 || cmenu != 2) {
-                            Str = GetStr(iptr[i].Text);
-                            x2 = 0;
-                            goto shared_print;
+                    if (FeFlag != 0) {
+                        if (i != 0)
+                            goto fe_nz_inz;
+                        /* Block1: FeFlag != 0, i == 0 */
+                        ORect.y = ORect.y - 0x20;
+                        if (iptr[i].Text == 0x3B6) {
+                            ORect.x = ORect.x - 0x40;
+                            ORect.w = ORect.w + 0x80;
                         }
+                        Str = GetStr(iptr[i].Text);
+                        LargeFont.Print(0, iptr[i].y * Spacing + len + 0x22, Str, iptr[i].Just, &ORect, BLUER, BLUEG, BLUEB);
+                        if (iptr[i].Text == 0x3B6) {
+                            ORect.x = ORect.x + 0x40;
+                            ORect.w = ORect.w - 0x80;
+                        }
+                        ORect.y = ORect.y + 0x20;
+                        goto next_item;
+fe_nz_inz:
+                        if (cmenu != 2)
+                            goto fe_nz_shared;
+                        /* Block2: FeFlag != 0, i != 0, cmenu == 2 */
+                        Str = GetStr(iptr[i].Text);
+                        MediumFont.Print(0, iptr[i].y * Spacing + len + 0x20, Str, iptr[i].Just, &ORect, r, g, b);
+                        if (i == 5)
+                            PrintMono(iptr[i].y * Spacing + len + 0x20);
+                        goto next_item;
+fe_nz_shared:
+                        /* Block3: FeFlag != 0, i != 0, cmenu != 2 -> shared print, x=8 */
+                        Str = GetStr(iptr[i].Text);
+                        x2 = 8;
+                        goto shared_print;
+                    } else {
+                        if (i == 0 || cmenu != 2)
+                            goto fe_z_shared;
+                        /* Block4: FeFlag == 0, i != 0, cmenu == 2 */
                         Str = GetStr(iptr[i].Text);
                         MediumFont.Print(8, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
                         if (i == 5)
                             PrintMono(iptr[i].y * Spacing + len);
                         goto next_item;
-                    } else {
-                        if (i == 0) {
-                            ORect.y = ORect.y - 0x20;
-                            if (iptr[i].Text == 0x3B6) {
-                                ORect.x = ORect.x - 0x40;
-                                ORect.w = ORect.w + 0x80;
-                            }
-                            Str = GetStr(iptr[i].Text);
-                            LargeFont.Print(0, iptr[i].y * Spacing + len + 0x22, Str, iptr[i].Just, &ORect, BLUER, BLUEG, BLUEB);
-                            if (iptr[i].Text == 0x3B6) {
-                                ORect.x = ORect.x + 0x40;
-                                ORect.w = ORect.w - 0x80;
-                            }
-                            ORect.y = ORect.y + 0x20;
-                        } else if (cmenu != 2) {
-                            Str = GetStr(iptr[i].Text);
-                            x2 = 8;
-                            goto shared_print;
-                        } else {
-                            Str = GetStr(iptr[i].Text);
-                            MediumFont.Print(0, iptr[i].y * Spacing + len + 0x20, Str, iptr[i].Just, &ORect, r, g, b);
-                            if (i == 5)
-                                PrintMono(iptr[i].y * Spacing + len + 0x20);
-                        }
+fe_z_shared:
+                        /* Block5: FeFlag == 0, (i == 0 || cmenu != 2) -> shared print, x=0 */
+                        Str = GetStr(iptr[i].Text);
+                        x2 = 0;
+                        goto shared_print;
                     }
-                    goto next_item;
 shared_print:
                     MediumFont.Print(x2, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
                 }
