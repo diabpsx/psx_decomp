@@ -87,7 +87,7 @@ void GameTask(TASK *T)
         TSK_Sleep(5);
         if (gbDoEnding != 0) {
             MSG_ClearOutCompMap();
-            unsigned char end2 = gbDoEnding;
+            const int end2 = gbDoEnding;
             gbDoEnding = 0;
             DoEnding(end2 - 1);
         }

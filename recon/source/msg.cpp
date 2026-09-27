@@ -924,7 +924,7 @@ void On_SATTACKXY(const TCmd *pCmd, int pnum)
 /* @0x80050C24 MSG.CPP:1866 */
 void On_SPELLXYD(const TCmd *pCmd, int pnum)
 {
-    unsigned short spell = ((const TCmdSpellXY *)pCmd)->wParam1;
+    const int spell = ((const TCmdSpellXY *)pCmd)->wParam1;
     ClrPlrPath(pnum);
     plr[pnum].destAction = 0x1A;
     plr[pnum]._pSplFrom = 0;
@@ -939,8 +939,8 @@ void On_SPELLXYD(const TCmd *pCmd, int pnum)
 /* @0x80050D0C MSG.CPP:1890 */
 void On_SPELLXY(const TCmd *pCmd, int pnum)
 {
-    const TCmdSpellXY *p = (const TCmdSpellXY *)pCmd;
-    unsigned short spell = p->wParam1;
+    const TCmdSpellXY *const p = (const TCmdSpellXY *)pCmd;
+    const int spell = p->wParam1;
     ClrPlrPath(pnum);
     plr[pnum].destAction = 0xC;
     plr[pnum]._pSplFrom = 0;
@@ -954,8 +954,8 @@ void On_SPELLXY(const TCmd *pCmd, int pnum)
 /* @0x80050DE4 MSG.CPP:1912 */
 void On_TSPELLXY(const TCmd *pCmd, int pnum)
 {
-    const TCmdSpellXY *p = (const TCmdSpellXY *)pCmd;
-    unsigned short spell = p->wParam1;
+    const TCmdSpellXY *const p = (const TCmdSpellXY *)pCmd;
+    const int spell = p->wParam1;
     ClrPlrPath(pnum);
     plr[pnum].destAction = 0xC;
     plr[pnum]._pSplFrom = 2;
@@ -969,8 +969,8 @@ void On_TSPELLXY(const TCmd *pCmd, int pnum)
 /* @0x80051208 MSG.CPP:2003 */
 void On_SPELLID(const TCmd *pCmd, int pnum)
 {
-    const TCmdSpellID *p = (const TCmdSpellID *)pCmd;
-    unsigned short spell = p->wParam2;
+    const TCmdSpellID *const p = (const TCmdSpellID *)pCmd;
+    const int spell = p->wParam2;
     ClrPlrPath(pnum);
     plr[pnum].destAction = 0x18;
     plr[pnum]._pSplFrom = 0;
