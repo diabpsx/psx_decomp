@@ -40,10 +40,15 @@ struct FRAME_HDR {   /* size 12; only .W accessed here */
         Floor : 1, Cycle : 1, pad : 1;
     unsigned int W : 9, H : 9, PentaGram : 1, pad2 : 13;
 };
-struct TextDat {
+struct TextDat {   /* sizeof 112 (SYM); only Frames is named */
+    unsigned char _pad0[0x24];
+    FRAME_HDR *Frames;   /* +0x24 */
+    unsigned char _rest[112 - 0x28];
+
     POLY_FT4 * PrintFt4(int a, int b, int c, int d, int e, int f);
     POLY_GT4 * PrintGt4(int a, int b, int c, int d, int e, int f);
-    FRAME_HDR * GetFr(int frame);
+    /* GMAN.H in-class inline; -fno-inline emits the out-of-line copy (GetFr__7TextDati_800ab694) here */
+    FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
 };
 TextDat * GM_UseTexData(int idx);   /* @0x80093C10 */
 void GM_FinishedUsing(TextDat *td);   /* @0x80093D80 */

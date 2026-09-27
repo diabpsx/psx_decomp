@@ -41,10 +41,25 @@ public:
 extern unsigned char DialogRed, DialogGreen, DialogBlue;
 extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
-class CBlocks {
+struct MonstList;
+class CBlocks {   /* sizeof 264 (SYM); only the fields BLOCK.H's inline DumpMonsters touches are named */
 public:
+    unsigned char _pad0[0x70];
+    struct TextDat *MonstTexDat;    /* +0x70 */
+    struct TextDat *ObjTexDat;      /* +0x74 */
+    struct MonstList *MonsterList;  /* +0x78 */
+    int RndX, RndY;                 /* +0x7C, +0x80 */
+    int MonstTexId;                 /* +0x84 */
+    unsigned char _rest[264 - 0x88];
+
     static int GetOverlayOtBase() { return 0x1E8; }
-    void DumpMonsters();
+    void DumpGraphics(struct TextDat **TDat, int *Id);   /* BLOCK.CPP */
+    /* BLOCK.H:228 -- in-class inline; -fno-inline emits the out-of-line copy (DumpMonsters__7CBlocks_80161f28) here */
+    void DumpMonsters()
+    {
+        MonsterList = NULL;
+        DumpGraphics(&MonstTexDat, &MonstTexId);
+    }
     void SetTownersGraphics();
 };
 
