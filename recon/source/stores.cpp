@@ -376,6 +376,56 @@ void S_StartSmith(void)
     storenumh = 0x14;
 }
 
+/* @0x8006BDD4 */
+void S_StartSRepair(void)
+{
+    int i;
+    unsigned char repairok;
+
+    SItemListFlag = 2;
+    stextsize = 1;
+    repairok = 0;
+    storenumh = 0;
+    for (i = 0; i < 48; i++)
+        storehold[i]._itype = -1;
+    if (plr[myplr].InvBody[0]._itype != -1 && plr[myplr].InvBody[0]._iDurability != plr[myplr].InvBody[0]._iMaxDur) {
+        repairok = 1;
+        AddStoreHoldRepair(&plr[myplr].InvBody[0], -1);
+    }
+    if (plr[myplr].InvBody[6]._itype != -1 && plr[myplr].InvBody[6]._iDurability != plr[myplr].InvBody[6]._iMaxDur) {
+        repairok = 1;
+        AddStoreHoldRepair(&plr[myplr].InvBody[6], -2);
+    }
+    if (plr[myplr].InvBody[4]._itype != -1 && plr[myplr].InvBody[4]._iDurability != plr[myplr].InvBody[4]._iMaxDur) {
+        repairok = 1;
+        AddStoreHoldRepair(&plr[myplr].InvBody[4], -3);
+    }
+    if (plr[myplr].InvBody[5]._itype != -1 && plr[myplr].InvBody[5]._iDurability != plr[myplr].InvBody[5]._iMaxDur) {
+        repairok = 1;
+        AddStoreHoldRepair(&plr[myplr].InvBody[5], -4);
+    }
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (SmithRepairOk(i)) {
+            repairok = 1;
+            AddStoreHoldRepair(&plr[myplr].InvList[i], i);
+        }
+    }
+    if (!repairok) {
+        stextscrl = 0;
+        sprintf(tempstr, GetStr(0x4EE), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+    } else {
+        stextscrl = 1;
+        stextsval = 0;
+        stextsmax = plr[myplr]._pNumInv;
+        sprintf(tempstr, GetStr(0x35C), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+        S_ScrollSSell(stextsval);
+    }
+}
+
 /* @0x8006C2A4 */
 void S_StartWitch(void)
 {
