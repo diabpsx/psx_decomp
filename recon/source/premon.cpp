@@ -492,10 +492,10 @@ void PlaceQuestMonsters(void)
 /* --------------------------------------------------------------------- */
 void SetMapMonsters(unsigned char *pMap, int startx, int starty)
 {
+    int i, j;
     unsigned short rw, rh;
     unsigned short *lm;
-    int i, j;
-    int mtype;
+    int mt;
 
     AddMonsterType(MT_GOLEM, 2);
     AddMonster(1, 0, 0, 0, 0);
@@ -523,11 +523,10 @@ void SetMapMonsters(unsigned char *pMap, int startx, int starty)
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*lm != 0) {
-                mtype = *lm;
-                mtype = MonstConvTbl[mtype - 1];
-                SwapMonsterType(&mtype);
-                mtype = AddMonsterType(mtype, MPFLAG_SPECIAL);
-                PlaceMonster(nummonsters++, mtype, startx + 16 + i, starty + 16 + j);
+                mt = *lm;
+                mt = MonstConvTbl[mt - 1];
+                SwapMonsterType(&mt);
+                PlaceMonster(nummonsters++, AddMonsterType(mt, MPFLAG_SPECIAL), i + 16 + startx, j + 16 + starty);
             }
             lm++;
         }

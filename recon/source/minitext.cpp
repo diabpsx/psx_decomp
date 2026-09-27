@@ -396,19 +396,21 @@ void DrawQText(void)
     doneflag = 0;
     p = (char *)qtextptr;
     ty = qtexty;
-    for (;;) {
-        if (doneflag)
-            break;
+    while (!doneflag) {
+        char c;
+
         l = 0;
         SpacePtr = NULL;
         LetterCount = 0;
         KanjiCount = 0;
         t = tempstr;
         do {
-            if (*p == '
-' || *p == 0)
+            c = *p;
+            if (c == '
+' || c == 0)
                 break;
-            *t = *p++;
+            *t = c;
+            p++;
             l += MediumFont.GetCharWidth(*t);
             if (*t == ' ') {
                 SpacePtr = p - 1;
@@ -450,8 +452,7 @@ void DrawQText(void)
             long diff;
 
             currTime = VID_GetTick();
-            diff = -0x10000;
-            scrolltexty += diff;
+            scrolltexty -= 0x10000;
             sgLastScroll = currTime;
             qtexty = scrolltexty >> 16;
             if (TextWait >= qtexty)
@@ -505,7 +506,10 @@ void DrawQText(void)
         if (sghStream != NULL && qtextonflag == 0)
             qtextonflag = 1;
     }
-    strcpy(MtPrevText, GetStr(FeFlag == 0 ? 0x10C1 : 0x2000));
+    if (FeFlag != 0)
+        strcpy(MtPrevText, GetStr(0x2000));
+    else
+        strcpy(MtPrevText, GetStr(0x10C1));
     MediumFont.Print((0x100 - MediumFont.GetStrWidth(MtPrevText)) / 2 + 0x20, 0xE0, MtPrevText, JustLeft, NULL,
                      WHITER, WHITEG, WHITEB);
     MediumFont.SetOTpos(OldOt);

@@ -366,16 +366,14 @@ void ToggleOptions(void)
 void PrintSelectBack(unsigned short Str)
 {
     char *S;
-    int y;
 
     if (Str == 0x49E) {
         S = GetStr(0x49E);
-        y = 0xDE;
+        MediumFont.Print(0, 0xDE, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
     } else {
         S = GetStr(Str);
-        y = 0xE0;
+        MediumFont.Print(0, 0xE0, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
     }
-    MediumFont.Print(0, y, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
 }
 
 void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H)
@@ -742,9 +740,8 @@ void CharacterLoadPad(void)
     {
         int pressed;
 
-        if (card_status[current_card] != 0) {
-            pressed = 0;
-        } else {
+        pressed = 0;
+        if (card_status[current_card] == 0) {
             ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
             pressed = 0;
         }
