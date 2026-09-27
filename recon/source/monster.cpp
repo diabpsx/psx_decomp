@@ -3265,100 +3265,112 @@ void M_TryM2MHit(int i, int mid, int hper, int mind, int maxd)
  * 227->186 diffs and 42->8 insns. callaudit: 0/102 mismatches tree-wide.
  * jtcheck: N/A (no switch in this fn; the 2 pre-existing mismatches
  * flagged for monster.cpp are M_WalkDir/ProcessMonsters, untouched by this
- * pass). Residual (186 diffs, 8 short): `pnum`/`Hit`/`MinDam` still land on
- * the wrong registers (ours s4/fp/s7 vs retail's s3/s6/s5) -- same
- * whole-function register-coloring class documented elsewhere in this file;
- * not chased further this pass (landing a near-miss, not a seal, per the
- * priority). */
+ * pass). NOW PASS+SYM, rebuilt from the retail SYM/SLD: all locals at the top
+ * (ptrplr/hit/hper/tac/dam/dx/dy/blk/blkper/mdam/pMonster/_mx/_my/_px/_py);
+ * `hit` is the roll and `hper` the threshold (devilution naming), `blk` the
+ * roll and `blkper` the computed chance (PSX swaps devilution's names); the
+ * early-outs are plain returns; the knockback tail mirrors MissToMonst
+ * (bool KnockOk + newx/newy, plr2 in the FePlayerNo block). */
 void M_TryH2HHit(int i, int pnum, int Hit, int MinDam, int MaxDam)
 {
-    PlayerStruct *ptrplr = &plr[pnum];
+    PlayerStruct *ptrplr;
+    int hit, hper, tac;
+    long dam;
+    int dx, dy;
+    int blk, blkper;
+    int mdam;
+    const MonsterStruct *pMonster;
+    int _mx, _my;
+    int _px, _py;
+
+    ptrplr = &plr[pnum];
 
     if (monster[i]._mFlags & MFLAG_TARGETS_MONSTER) {
         M_TryM2MHit(i, pnum, Hit, MinDam, MaxDam);
-    } else {
-        long hp = ptrplr->_pHitPoints;
-        int _mx = monster[i]._mx;
-        int _my = monster[i]._my;
-        int _px = ptrplr->_px;
-        int _py = ptrplr->_py;
+        return;
+    }
 
-        if ((hp >> 6) > 0 && !ptrplr->_pInvincible && !(ptrplr->_pSpellFlags & 1)) {
-            int dx = abs(_mx - _px);
-            int dy = abs(_my - _py);
+    pMonster = monster;
+    _mx = pMonster[i]._mx;
+    _my = pMonster[i]._my;
+    _px = ptrplr->_px;
+    _py = ptrplr->_py;
 
-            if (dx < 2 && dy < 2) {
-                int hper = ENG_random(100);
-                int tac = ptrplr->_pIAC + ptrplr->_pIBonusAC;
-                int hit = Hit - (tac + ptrplr->_pDexterity / 5 - 30) + (monster[i].mLevel - ptrplr->_pLevel) * 2;
-                int blk, blkper;
+    if ((ptrplr->_pHitPoints >> 6) <= 0)
+        return;
+    if (ptrplr->_pInvincible)
+        return;
+    if (ptrplr->_pSpellFlags & 1)
+        return;
 
-                if (hit < 15)
-                    hit = 15;
-                if (currlevel == 14 && hit < 20)
-                    hit = 20;
-                if (currlevel == 15 && hit < 25)
-                    hit = 25;
-                if (currlevel == 16 && hit < 30)
-                    hit = 30;
-
-                if ((ptrplr->_pmode == PM_STAND || ptrplr->_pmode == PM_ATTACK) && ptrplr->_pBlockFlag)
-                    blkper = ENG_random(100);
-                else
-                    blkper = 100;
-                blk = ptrplr->_pDexterity + ptrplr->_pBaseToBlk - (monster[i].mLevel - ptrplr->_pLevel) * 2;
-                if (blk < 0)
-                    blk = 0;
-                if (blk > 100)
-                    blk = 100;
-
-                if (hper < hit) {
-                    if (blkper < blk) {
-                        int dir = GetDirection(_px, _py, _mx, _my);
-                        StartPlrBlock(ptrplr, dir);
-                    } else {
-                        long dam = ENG_random((MaxDam - MinDam + 1) << 6) + (MinDam << 6) + (ptrplr->_pIGetHit << 6);
-                        long mdam;
-
-                        if (dam < 64)
-                            dam = 64;
-                        ptrplr->_pHitPoints -= dam;
-                        ptrplr->_pHPBase -= dam;
-                        if (ptrplr->_pIFlags & 0x4000000) {
-                            mdam = (ENG_random(3) + 1) << 6;
-                            monster[i]._mhitpoints -= mdam;
-                            if ((monster[i]._mhitpoints >> 6) < 1)
-                                M_StartKill(i, pnum);
-                            else
-                                M_StartHit(i, pnum, mdam);
-                        }
-                        if (!(monster[i]._mFlags & MFLAG_NOLIFESTEAL) && monster[i].MType->mtype == MT_SKING && gbMaxPlayers != 1)
-                            monster[i]._mhitpoints += dam;
-                        if (ptrplr->_pHitPoints > ptrplr->_pMaxHP) {
-                            ptrplr->_pHitPoints = ptrplr->_pMaxHP;
-                            ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
-                        }
-                        if ((ptrplr->_pHitPoints >> 6) < 1) {
-                            StartPlrKill(ptrplr, 0);
-                        } else {
-                            StartPlrHit(ptrplr, dam, 0);
-                            if (monster[i]._mFlags & MFLAG_KNOCKBACK) {
-                                unsigned char knockOk = 1;
-
-                                if (ptrplr->_pmode != PM_GOTHIT)
-                                    StartPlrHit(pnum, 0, 1);
-                                _px += offset_x[monster[i]._mdir];
-                                _py += offset_y[monster[i]._mdir];
-                                if (FePlayerNo && ptrplr->plractive) {
-                                    PlayerStruct *plr2 = &plr[pnum ^ 1];
-                                    if (plr2->plractive && !ChkPlrOffsets(_px << 3, _py << 3, plr2->WorldX, plr2->WorldY))
-                                        knockOk = 0;
-                                }
-                                if (knockOk && PosOkPlayer(ptrplr, _px, _py)) {
-                                    SetPlayerOld(ptrplr);
-                                    WorldToOffset(plrind(ptrplr), (_px << 3) | 4, (_py << 3) | 4);
-                                }
+    dx = abs(_mx - _px);
+    dy = abs(_my - _py);
+    if (dx < 2 && dy < 2) {
+        hit = ENG_random(100);
+        tac = ptrplr->_pIAC + ptrplr->_pIBonusAC + ptrplr->_pDexterity / 5;
+        hper = Hit + 30 - tac + (monster[i].mLevel - ptrplr->_pLevel) * 2;
+        if (hper < 15)
+            hper = 15;
+        if (currlevel == 14 && hper < 20)
+            hper = 20;
+        if (currlevel == 15 && hper < 25)
+            hper = 25;
+        if (currlevel == 16 && hper < 30)
+            hper = 30;
+        if ((ptrplr->_pmode == PM_STAND || ptrplr->_pmode == PM_ATTACK) && ptrplr->_pBlockFlag)
+            blk = ENG_random(100);
+        else
+            blk = 100;
+        blkper = ptrplr->_pBaseToBlk + ptrplr->_pDexterity - (monster[i].mLevel - ptrplr->_pLevel) * 2;
+        if (blkper < 0)
+            blkper = 0;
+        if (blkper > 100)
+            blkper = 100;
+        if (hit < hper) {
+            if (blk < blkper) {
+                StartPlrBlock(ptrplr, GetDirection(_px, _py, _mx, _my));
+            } else {
+                dam = ENG_random((MaxDam - MinDam + 1) << 6) + (MinDam << 6);
+                dam += ptrplr->_pIGetHit << 6;
+                if (dam < 64)
+                    dam = 64;
+                ptrplr->_pHitPoints -= dam;
+                ptrplr->_pHPBase -= dam;
+                if (ptrplr->_pIFlags & 0x4000000) {
+                    mdam = (ENG_random(3) + 1) << 6;
+                    monster[i]._mhitpoints -= mdam;
+                    if ((monster[i]._mhitpoints >> 6) <= 0)
+                        M_StartKill(i, pnum);
+                    else
+                        M_StartHit(i, pnum, mdam);
+                }
+                if (!(monster[i]._mFlags & MFLAG_NOLIFESTEAL) && monster[i].MType->mtype == MT_SKING && gbMaxPlayers != 1)
+                    monster[i]._mhitpoints += dam;
+                if (ptrplr->_pHitPoints > ptrplr->_pMaxHP) {
+                    ptrplr->_pHitPoints = ptrplr->_pMaxHP;
+                    ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
+                }
+                if ((ptrplr->_pHitPoints >> 6) <= 0) {
+                    StartPlrKill(ptrplr, 0);
+                } else {
+                    StartPlrHit(ptrplr, dam, 0);
+                    if (monster[i]._mFlags & MFLAG_KNOCKBACK) {
+                        bool KnockOk = 1;
+                        int newx, newy;
+                        if (plr[pnum]._pmode != PM_GOTHIT)
+                            StartPlrHit(pnum, 0, 1);
+                        newx = _px + offset_x[monster[i]._mdir];
+                        newy = _py + offset_y[monster[i]._mdir];
+                        if (FePlayerNo) {
+                            PlayerStruct *plr2 = &plr[pnum ^ 1];
+                            if (ptrplr->plractive && plr2->plractive) {
+                                if (!ChkPlrOffsets(newx << 3, newy << 3, plr2->WorldX, plr2->WorldY))
+                                    KnockOk = 0;
                             }
+                        }
+                        if (KnockOk && PosOkPlayer(ptrplr, newx, newy)) {
+                            SetPlayerOld(ptrplr);
+                            WorldToOffset(plrind(ptrplr), (newx << 3) | 4, (newy << 3) | 4);
                         }
                     }
                 }
