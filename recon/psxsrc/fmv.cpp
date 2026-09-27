@@ -1330,7 +1330,6 @@ extern "C" short PlayFMVOverLay(char *filename, int w, int h)
 }
 
 /* @0x801583E0 FMV.CPP:1737 -- see near-miss note: main FMV playback loop, uses ~15 other-TU helpers. */
-static unsigned char D_8011B4E8;   /* language-variant byte for the DIABEND ending movie picker */
 
 extern "C" void LoPlayFMVOverLay(void *)
 {
@@ -1356,27 +1355,27 @@ extern "C" void LoPlayFMVOverLay(void *)
         for (i = 0; i < 100; i++)
             systemtask(0);
     }
-    D_8011B4E8 = 0;
+    DiabEnd = 0;
     if (strcmp("DIABEND.MOV", filename) == 0) {
         switch (LANG_GetLang()) {
         case LANG_ENGLISH:
-            D_8011B4E8 = 1;
+            DiabEnd = 1;
             sprintf(g_movie_filename, "DIABEND1.MOV");
             break;
         case LANG_FRENCH:
-            D_8011B4E8 = 2;
+            DiabEnd = 2;
             sprintf(g_movie_filename, "DIABEND1.MOV");
             break;
         case LANG_GERMAN:
-            D_8011B4E8 = 1;
+            DiabEnd = 1;
             sprintf(g_movie_filename, "DIABEND2.MOV");
             break;
         case LANG_SPANISH:
-            D_8011B4E8 = 2;
+            DiabEnd = 2;
             sprintf(g_movie_filename, "DIABEND2.MOV");
             break;
         case LANG_ITALIAN:
-            D_8011B4E8 = 1;
+            DiabEnd = 1;
             sprintf(g_movie_filename, "DIABEND3.MOV");
             break;
         case LANG_JAPANESE:
