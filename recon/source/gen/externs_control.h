@@ -51,3 +51,8 @@ extern unsigned char REDG;   /* @0x8011ABD8 */
 extern unsigned char REDB;   /* @0x8011ABD9 */
 extern struct RECT CSRect;   /* @0x8011B6F4 */
 extern class CFont MediumFont;   /* @0x800B82D8 */
+extern int MaxStats[3][4];   /* @0x800DA438 */
+extern char _infoclr[2];   /* @0x8011B6BC */
+extern unsigned char BLUER;   /* @0x8011ABD4 */
+extern unsigned char BLUEG;   /* @0x8011ABD5 */
+extern unsigned char BLUEB;   /* @0x8011ABD6 */

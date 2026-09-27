@@ -50,3 +50,8 @@ void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
 void DrawSpellBookTSK(TASK *T);   /* @0x80030D44 CONTROL.CPP:754 */
 int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */
 void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff);   /* @0x800361F0 CONTROL.CPP:3133 */
+void ChrCheckValidButton(int move);   /* @0x80034028 CONTROL.CPP:2500 */
+void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1);   /* @0x8004F834 MSG.CPP:964 */
+void BuildChr(void);   /* @0x80034434 CONTROL.CPP:2596 */
+void CheckChrBtns(void);   /* @0x80035CEC CONTROL.CPP:3006 */
+static void CPrintString(int No, char *pszStr, int Just);

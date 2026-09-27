@@ -26,6 +26,7 @@ unsigned char CrossCount[2];
 unsigned char chrbtnactive;
 unsigned char chrflag;
 unsigned char sbookflag;
+unsigned char chrbtn[2][4];
 int _pSpell[2];
 int _pSplType[2];
 int my_cur_spel[2];
@@ -507,6 +508,124 @@ void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char br
         }
     }
     MediumFont.Print(x, y, (char *)pszStr, TXT_LEFT, &CSRect, r, g, b);
+}
+
+void ChrCheckValidButton(int move)
+{
+    int i;
+    int pc;
+    int count;
+
+    lus = lus + move;
+    pc = plr[options_pad]._pClass;
+    for (i = 0; i < 4; i++) {
+        switch (i) {
+        case 0:
+            chrbtn[options_pad][0] = (plr[options_pad]._pBaseStr == MaxStats[pc][0]);
+            break;
+        case 1:
+            chrbtn[options_pad][1] = (plr[options_pad]._pBaseMag == MaxStats[pc][1]);
+            break;
+        case 2:
+            chrbtn[options_pad][2] = (plr[options_pad]._pBaseDex == MaxStats[pc][2]);
+            break;
+        case 3:
+            chrbtn[options_pad][3] = (plr[options_pad]._pBaseVit == MaxStats[pc][3]);
+            break;
+        }
+    }
+    if (move == 0)
+        move = -1;
+    if (lus < 0)
+        lus = 3;
+    if (lus >= 4)
+        lus = 0;
+    if (chrbtn[myplr][lus] != 0) {
+        for (count = 0; count < 4; count++) {
+            lus = lus + move;
+            if (lus < 0)
+                lus = 3;
+            if (lus >= 4)
+                lus = 0;
+            if (chrbtn[myplr][lus] == 0)
+                break;
+        }
+    }
+}
+
+void CheckChrBtns(void)
+{
+    int pc;
+    int statval;
+    int sendcode;
+
+    if (CS_XOFF != 0x140)
+        return;
+    if (!chrbtnactive)
+        return;
+    if (plr[options_pad]._pStatPts == 0)
+        return;
+
+    ChrCheckValidButton(0);
+    if (chrbtn[myplr][lus] == 0) {
+        PlaySFX(0x33);
+        plr[options_pad]._pStatPts--;
+    }
+    pc = plr[options_pad]._pClass;
+    switch (lus) {
+    case 0:
+        sendcode = 3;
+        statval = plr[options_pad]._pBaseStr;
+        break;
+    case 1:
+        sendcode = 4;
+        statval = plr[options_pad]._pBaseMag;
+        break;
+    case 2:
+        sendcode = 5;
+        statval = plr[options_pad]._pBaseDex;
+        break;
+    case 3:
+    default:
+        sendcode = 6;
+        statval = plr[options_pad]._pBaseVit;
+        break;
+    }
+    NetSendCmdParam1(1, sendcode, 1);
+    chrbtn[options_pad][lus] = (statval == MaxStats[pc][lus]);
+    ChrCheckValidButton(0);
+    BuildChr();
+}
+
+static void CPrintString(int No, char *pszStr, int Just)
+{
+    unsigned char R, G, B;
+    TXT_JUST Justify;
+
+    Justify = (TXT_JUST)Just;
+    switch (_infoclr[sel_data]) {
+    case 0:
+        R = WHITER;
+        G = WHITEG;
+        B = WHITEB;
+        break;
+    case 1:
+        R = BLUER;
+        G = BLUEG;
+        B = BLUEB;
+        break;
+    case 2:
+        R = REDR;
+        G = REDG;
+        B = REDB;
+        break;
+    default:
+        R = GOLDR;
+        G = GOLDG;
+        B = GOLDB;
+        break;
+    }
+    MediumFont.Print(0, No * 13 + 10, pszStr, Justify, InfoBoxRect, R, G, B);
 }
 
 void DrawLevelUpIcon(int pnum)
