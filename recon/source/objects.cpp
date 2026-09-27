@@ -838,60 +838,64 @@ void PostAddObject(int ot, int ox, int oy)
 
     if (numobjects >= 0x7F)
         return;
-    if (QuestStatus(9) && (oi = dung_map[ox][oy].dObject) != 0) {
-        oi--;
-        if (ot == 0x2A) {
-            if (!deltaload) {
-                if (object[oi]._oVar4 == 1)
-                    NetSendCmdParam1(1, 0x2C, oi);
-                ObjSetMicro(ox, oy, 0x21A);
-                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
-                object[oi]._oSelFlag = 1;
-                object[oi]._oVar4 = 0;
-            } else {
-                if (object[oi]._oVar4 != 0) {
-                    ObjSetMicro(ox, oy, 0x11);
-                    dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x99;
-                    object[oi]._oSelFlag = 4;
-                    object[oi]._oVar4 = 1;
-                } else {
+
+    if (QuestStatus(9)) {
+        oi = dung_map[ox][oy].dObject;
+        if (oi != 0) {
+            oi--;
+            if (ot == 0x2A) {
+                if (!deltaload) {
+                    if (object[oi]._oVar4 == 1)
+                        NetSendCmdParam1(1, 0x2C, oi);
                     ObjSetMicro(ox, oy, 0x21A);
                     dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
                     object[oi]._oSelFlag = 1;
                     object[oi]._oVar4 = 0;
-                }
-            }
-        } else if (ot == 0x2B) {
-            if (!deltaload) {
-                if (object[oi]._oVar4 == 1)
-                    NetSendCmdParam1(1, 0x2C, oi);
-                ObjSetMicro(ox, oy, 0x21C);
-                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
-                object[oi]._oSelFlag = 2;
-                object[oi]._oVar4 = 0;
-            } else {
-                if (object[oi]._oVar4 != 0) {
-                    ObjSetMicro(ox, oy, 0xD);
-                    dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x98;
-                    object[oi]._oSelFlag = 3;
-                    object[oi]._oVar4 = 1;
                 } else {
+                    if (object[oi]._oVar4 == 0) {
+                        ObjSetMicro(ox, oy, 0x21A);
+                        dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
+                        object[oi]._oSelFlag = 1;
+                        object[oi]._oVar4 = 0;
+                    } else {
+                        ObjSetMicro(ox, oy, 0x11);
+                        dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x99;
+                        object[oi]._oSelFlag = 4;
+                        object[oi]._oVar4 = 1;
+                    }
+                }
+                return;
+            }
+            if (ot == 0x2B) {
+                if (!deltaload) {
+                    if (object[oi]._oVar4 == 1)
+                        NetSendCmdParam1(1, 0x2C, oi);
                     ObjSetMicro(ox, oy, 0x21C);
                     dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
                     object[oi]._oSelFlag = 2;
                     object[oi]._oVar4 = 0;
+                } else {
+                    if (object[oi]._oVar4 == 0) {
+                        ObjSetMicro(ox, oy, 0x21C);
+                        dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
+                        object[oi]._oSelFlag = 2;
+                        object[oi]._oVar4 = 0;
+                    } else {
+                        ObjSetMicro(ox, oy, 0xD);
+                        dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x98;
+                        object[oi]._oSelFlag = 3;
+                        object[oi]._oVar4 = 1;
+                    }
                 }
+                return;
             }
-        } else {
-            goto create_new;
         }
-        return;
     }
-create_new:
+
     oi = objectavail[0];
     objectavail[0] = objectavail[0x7E - numobjects];
-    object[oi]._olid = -1;
     objectactive[numobjects] = oi;
+    object[oi]._olid = -1;
     dung_map[ox][oy].dObject = oi + 1;
     SetupObject(oi, ox, oy, ot);
     if (ot != 0x53)
