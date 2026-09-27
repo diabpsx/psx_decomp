@@ -5,5 +5,5 @@ rom/*.BIN
 *.o
 *.i
 __pycache__/
-scratch/
+/scratch/
 tools/maspsx/__pycache__/

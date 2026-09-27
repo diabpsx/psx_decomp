@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2594 / 2702 functions PASS (96.0%) — 837 PsyQ SDK functions excluded**
+**Game code: 2619 / 2727 functions PASS (96.0%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -2574,6 +2574,33 @@
 - ✅ ___6Dialog_8006926c (10)
 - ✅ __6Dialog_80069294 (32)
 - ✅ GetOverlayOtBase__7CBlocks_80069314 (2)
+
+## scratch  (recon/psxsrc/scratch.cpp) — 25/25 PASS
+- ✅ SCR_GetBlackClut__Fv (3)
+- ✅ SCR_Open__Fv (14)
+- ✅ SCR_DumpClut__Fv (29)
+- ✅ SCR_NeedHighlightPal__FUsUsi (13)
+- ✅ Init__13PalCollectionPC7InitPos (36)
+- ✅ FindPal__13PalCollectionUsUsi (55)
+- ✅ NewPal__13PalCollectionUsUsi (32)
+- ✅ MakePal__8PalEntryUsUsi (40)
+- ✅ GetHighlightPal__13PalCollectionUsUsi (18)
+- ✅ UpdatePals__13PalCollection (29)
+- ✅ SCR_Handler__Fv (10)
+- ✅ GetNumOfObjs__t10Collection2Z8PalEntryi20 (2)
+- ✅ GetObj__t10Collection2Z8PalEntryi20 (15)
+- ✅ Init__t10Collection2Z8PalEntryi20 (25)
+- ✅ MoveFromUsedToUnused__t10Collection2Z8PalEntryi20P8PalEntry (22)
+- ✅ MoveFromUnusedToUsed__t10Collection2Z8PalEntryi20P8PalEntry (22)
+- ✅ Set__8PalEntryUsUsi (5)
+- ✅ Set__8PalEntryRC7InitPos (11)
+- ✅ SetJustUsed__8PalEntryb (2)
+- ✅ Init__8PalEntry (2)
+- ✅ GetClut__C8PalEntry (3)
+- ✅ IsEqual__C8PalEntryUsUsi (14)
+- ✅ GetNext__Ct11TLinkedList1Z8PalEntry (3)
+- ✅ AddToList__t11TLinkedList1Z8PalEntryPP8PalEntry (8)
+- ✅ DetachFromList__t11TLinkedList1Z8PalEntryPP8PalEntry (19)
 
 ## scrollrt  (recon/source/scrollrt.cpp) — 2/2 PASS
 - ✅ DrawView__Fii (109)
