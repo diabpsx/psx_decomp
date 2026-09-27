@@ -53,6 +53,14 @@ void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */
 int func_80159F24(int pnum, int i, int x, int y, int seed);
 int func_8015A24C(int pnum, int i, int x, int y, int seed);
 void S_HBuyEnter(void);
+int StoreAutoPlace(void);
+int CalcPlrInv(int pnum, unsigned char loadgfx);
+void SmithBuyItem(void);
+void WitchRechargeItem(void);
+void StoryIdItem(void);
+void BoyBuyItem(void);
+void HealerBuyItem(void);
+void SmithRepairItem(void);
 void S_WitchEnter(void);
 void S_HealerEnter(void);
 void S_StoryEnter(void);

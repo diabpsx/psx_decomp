@@ -865,8 +865,8 @@ void ClrPlrPath(PlayerStruct *ptrplr)
  * applies whichever one worked (or the last one tried, HELLFIRE-style unconditional apply). */
 void SyncInitPlrPos(PlayerStruct *ptrplr)
 {
+    int i;
     if (gbMaxPlayers != 1) {
-        int i;
         for (i = 0; i < 8; i++) {
             if (PosOkPlayer(ptrplr, ptrplr->_px + plrxoff2[i], ptrplr->_py + plryoff2[i]))
                 break;
@@ -1085,19 +1085,245 @@ int PM_DoNewLvl(PlayerStruct *ptrplr)
 int PM_DoGotHit(PlayerStruct *ptrplr)
 {
     int rv;
-    if (ptrplr->_pVar8 != ptrplr->_pHFrames) {
-        ptrplr->_pVar8++;
-        rv = 0;
-    } else {
+    if (ptrplr->_pVar8 == ptrplr->_pHFrames) {
         StartStand(ptrplr, ptrplr->_pdir);
         ClearPlrPVars(ptrplr);
-        rv = 1;
-        if (ENG_random(4) == 0) {
+        if (ENG_random(4) != 0) {
             ArmorDur(ptrplr);
         }
+        rv = 1;
+    } else {
+        ptrplr->_pVar8++;
+        rv = 0;
     }
     ChangeLightColour(ptrplr->_plid, 0x23F0);
     return rv;
+}
+
+#define ISPL_FASTBLOCK 0x1000000
+
+int PM_DoBlock(PlayerStruct *ptrplr)
+{
+    if ((ptrplr->_pIFlags & ISPL_FASTBLOCK) && ptrplr->_pAnimFrame != 1) {
+        ptrplr->_pAnimFrame = ptrplr->_pBFrames;
+    }
+
+    if (ptrplr->_pAnimFrame >= ptrplr->_pBFrames) {
+        StartStand(ptrplr, ptrplr->_pdir);
+        ClearPlrPVars(ptrplr);
+
+        if (ENG_random(10) == 0) {
+            ShieldDur(ptrplr);
+        }
+        return 1;
+    }
+    return 0;
+}
+
+#define ISPL_FIRE_ARROWS 0x8
+#define ISPL_LIGHT_ARROWS 0x2000000
+#define MIS_ARROW 0
+#define MIS_FARROW 0x1B
+#define MIS_LARROW 0x38
+
+/* PSX drops devilution's ISPL_QUICKATTACK/ISPL_FASTATTACK origFrame-skip logic entirely (goes
+ * straight from entry to the `_pAnimFrame==_pAFNum` fire check). */
+int PM_DoRangeAttack(PlayerStruct *ptrplr)
+{
+    if (ptrplr->_pAnimFrame == ptrplr->_pAFNum) {
+        int mistype = (ptrplr->_pIFlags & ISPL_FIRE_ARROWS) ? MIS_FARROW : MIS_ARROW;
+        if (ptrplr->_pIFlags & ISPL_LIGHT_ARROWS) {
+            mistype = MIS_LARROW;
+        }
+        int id = plrind(ptrplr);
+        AddMissile(ptrplr->_px, ptrplr->_py, ptrplr->_pVar1, ptrplr->_pVar2, ptrplr->_pdir, mistype, 0, id, 4, 0);
+
+        PlaySfxLoc(4, ptrplr->_px, ptrplr->_py);
+
+        if (WeaponDur(ptrplr, 40)) {
+            StartStand(ptrplr, ptrplr->_pdir);
+            ClearPlrPVars(ptrplr);
+            return 1;
+        }
+    }
+
+    if (ptrplr->_pAnimFrame >= ptrplr->_pAFrames) {
+        StartStand(ptrplr, ptrplr->_pdir);
+        ClearPlrPVars(ptrplr);
+        return 1;
+    }
+    return 0;
+}
+
+#define ICLASS_WEAPON 1
+
+unsigned char WeaponDur(PlayerStruct *ptrplr, int durrnd)
+{
+    if (!ismyplr(ptrplr) || ENG_random(durrnd) != 0) {
+        return FALSE;
+    }
+
+    /* PSX adds a DUR_INDESTRUCTIBLE guard for the weapon case too (devilution's non-Hellfire
+     * WeaponDur decrements weapon durability unconditionally, without checking indestructible) --
+     * and it's an EARLY RETURN (return FALSE immediately), not a "skip to the next slot" guard. */
+    if (ptrplr->InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE && ptrplr->InvBody[INVLOC_HAND_LEFT]._iClass == ICLASS_WEAPON) {
+        if (ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability == DUR_INDESTRUCTIBLE) {
+            return FALSE;
+        }
+        ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability--;
+        if (ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability == 0) {
+            NetSendCmdDelItem(TRUE, INVLOC_HAND_LEFT);
+            ptrplr->InvBody[INVLOC_HAND_LEFT]._itype = ITYPE_NONE;
+            CalcPlrInv(ptrplr, TRUE);
+            return TRUE;
+        }
+    }
+
+    if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype != ITYPE_NONE && ptrplr->InvBody[INVLOC_HAND_RIGHT]._iClass == ICLASS_WEAPON) {
+        if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability == DUR_INDESTRUCTIBLE) {
+            return FALSE;
+        }
+        ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability--;
+        if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability == 0) {
+            NetSendCmdDelItem(TRUE, INVLOC_HAND_RIGHT);
+            ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype = ITYPE_NONE;
+            CalcPlrInv(ptrplr, TRUE);
+            return TRUE;
+        }
+    }
+
+    if (ptrplr->InvBody[INVLOC_HAND_LEFT]._itype == ITYPE_NONE && ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype == ITYPE_SHIELD) {
+        if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability == DUR_INDESTRUCTIBLE) {
+            return FALSE;
+        }
+        ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability--;
+        if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability == 0) {
+            NetSendCmdDelItem(TRUE, INVLOC_HAND_RIGHT);
+            ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype = ITYPE_NONE;
+            CalcPlrInv(ptrplr, TRUE);
+            return TRUE;
+        }
+    }
+
+    if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype == ITYPE_NONE && ptrplr->InvBody[INVLOC_HAND_LEFT]._itype == ITYPE_SHIELD) {
+        if (ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability == DUR_INDESTRUCTIBLE) {
+            return FALSE;
+        }
+        ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability--;
+        if (ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability == 0) {
+            NetSendCmdDelItem(TRUE, INVLOC_HAND_LEFT);
+            ptrplr->InvBody[INVLOC_HAND_LEFT]._itype = ITYPE_NONE;
+            CalcPlrInv(ptrplr, TRUE);
+            return TRUE;
+        }
+    }
+
+    return FALSE;
+}
+
+/* PSX-only death sequencing: D_8011C878[plrind(ptrplr)] is a small per-player post-death countdown
+ * (unnamed in the SYM, TU-owned) that must count down to exactly 1 before this player's vision/
+ * cursor/active-count cleanup actually runs; not present in devilution's PM_DoDeath at all. */
+int PM_DoDeath(PlayerStruct *ptrplr)
+{
+    int pind = plrind(ptrplr);
+    TryDropPlayerItems(ptrplr);
+
+    if (ptrplr->_pVar8 < ptrplr->_pDFrames * 2) {
+        if (D_8011C878[pind] >= 2 && ismyplr(ptrplr) && --D_8011C878[pind] == 1) {
+            RemovePlrFromMap(ptrplr);
+            ptrplr->plractive = 0;
+            if (--gbActivePlayers == 0) {
+                deathflag = 1;
+                PA_SetPauseOk(FALSE);
+            } else {
+                dovision = 0;
+                int foundIdx = 0;
+                for (int i = 0; i < numvision; i++) {
+                    if (VisionList[i]._lid == ptrplr->_plid) {
+                        foundIdx = i;
+                        VisionList[i]._ldel = 1;
+                        dovision = 1;
+                    }
+                    if (dovision) {
+                        break;
+                    }
+                }
+                DoUnVision(VisionList[foundIdx]._lx, VisionList[foundIdx]._ly, VisionList[foundIdx]._lradius, pind);
+                ptrplr->_plid = -1;
+            }
+            ClrCursor(plrind(ptrplr));
+        }
+        ptrplr->_pAnimDelay = 10000;
+        ptrplr->_pAnimFrame = ptrplr->_pAnimLen;
+    }
+
+    if (ptrplr->_pVar8 < 100) {
+        ptrplr->_pVar8++;
+    }
+    return 0;
+}
+
+void StartPlayerKill(PlayerStruct *ptrplr, int earflag)
+{
+    automapflag = 0;
+    if (gbActivePlayers == 1) {
+        automapflag = 0;
+        PA_SetPauseOk(FALSE);
+    }
+
+    if (ptrplr->_pHitPoints == 0 && ptrplr->_pmode == PM_DEATH) {
+        return;
+    }
+
+    if (ptrplr->_pClass == 0) {
+        PlaySfxLoc(0xB, ptrplr->_px, ptrplr->_py);
+    } else if (ptrplr->_pClass == 1) {
+        PlaySfxLoc(0x2AB, ptrplr->_px, ptrplr->_py);
+    } else if (ptrplr->_pClass == 2) {
+        PlaySfxLoc(0x243, ptrplr->_px, ptrplr->_py);
+    }
+
+    if (gbActivePlayers == 1) {
+        GLUE_SetHomingScrollFlag(FALSE);
+    }
+
+    int pind = plrind(ptrplr);
+    TASK **slot = &_spselflag[pind];
+    if (*slot) {
+        TSK_Kill(*slot);
+        PauseMode = 1;
+    } else {
+        PauseMode = 0;
+    }
+    *slot = 0;
+
+    int sleepArg = 2;
+    do {
+        TSK_Sleep(sleepArg);
+        sleepArg = 1;
+    } while (sghStream != 0);
+    PauseMode = 0;
+
+    if (ptrplr->_pgfxnum) {
+        ptrplr->_pgfxnum = 0;
+        SetPlrAnims(ptrplr);
+        ptrplr->_pGFXLoad = 0;
+    }
+
+    NewPlrAnim(ptrplr, 1, ptrplr->_pDFrames, 1);
+    ptrplr->_pmode = PM_DEATH;
+    ptrplr->_pBlockFlag = 0;
+    ptrplr->_pInvincible = 1;
+    SetPlayerHitPoints(ptrplr, 0);
+    ptrplr->DeadLevel = currlevel;
+    ptrplr->_pVar8 = 1;
+    SetPlayerOld(ptrplr);
+    drawhpflag = 1;
+
+    pind = plrind(ptrplr);
+    D_8011C878[pind] = 30;
+    StartPlayerDropItems(ptrplr, earflag);
 }
 
 void AddPlrMonstExper(int lvl, long exp, char pmask)

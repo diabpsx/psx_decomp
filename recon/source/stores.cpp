@@ -890,6 +890,181 @@ void S_WSellEnter(void)
     }
 }
 
+/* @0x80070B94 */
+void SmithBuyItem(void)
+{
+    int idx;
+
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    if (plr[myplr].HoldItem._iMagical == 0) {
+        plr[myplr].HoldItem._iIdentified = 0;
+    }
+    StoreAutoPlace();
+    idx = (stextlhold - stextup) / 4 + stextvhold;
+    if (idx == 0x13) {
+        _smithitem[StorePlrNo][19]._itype = -1;
+    } else {
+        if (_smithitem[StorePlrNo][idx + 1]._itype != -1) {
+            do {
+                _smithitem[StorePlrNo][idx] = _smithitem[StorePlrNo][idx + 1];
+                idx++;
+            } while (_smithitem[StorePlrNo][idx + 1]._itype != -1);
+        }
+        _smithitem[StorePlrNo][idx]._itype = -1;
+    }
+    CalcPlrInv(myplr, 1);
+}
+
+/* @0x80072958 -- offset 0x3A9 (fixed, no idx multiply) decodes to InvBody[4] per byte-offset math;
+ * matches the "equipped, not in list" sentinel path when storehidx[idx] < 0. */
+void WitchRechargeItem(void)
+{
+    int i;
+    int idx;
+
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    idx = (stextlhold - stextup) / 8 + stextvhold;
+    storehold[idx]._iCharges = storehold[idx]._iMaxCharges;
+    i = storehidx[idx];
+    if (i < 0) {
+        plr[myplr].InvBody[4]._iCharges = plr[myplr].InvBody[4]._iMaxCharges;
+    } else {
+        plr[myplr].InvList[i]._iCharges = plr[myplr].InvList[i]._iMaxCharges;
+    }
+    CalcPlrInv(myplr, 1);
+}
+
+/* @0x800733B0 -- irregular fallthrough switch transcribed literally from the m2c/raw shape: each
+ * "case -N" is really an independent re-test of i, but since only one can match, chained
+ * fallthrough-if is functionally identical to the retail's Duff's-device-style codegen. */
+void StoryIdItem(void)
+{
+    int i;
+    int idx;
+
+    idx = (stextlhold - stextup) / 8 + stextvhold;
+    i = storehidx[idx];
+    switch (i) {
+    case -1:
+        plr[myplr].InvBody[0]._iIdentified = 1;
+        if (i == -2) {
+    case -2:
+            plr[myplr].InvBody[6]._iIdentified = 1;
+        }
+        if (i == -3) {
+    case -3:
+            plr[myplr].InvBody[4]._iIdentified = 1;
+        }
+        if (i == -4) {
+    case -4:
+            plr[myplr].InvBody[5]._iIdentified = 1;
+        }
+        if (i == -5) {
+    case -5:
+            plr[myplr].InvBody[1]._iIdentified = 1;
+        }
+        if (i == -6) {
+    case -6:
+            plr[myplr].InvBody[2]._iIdentified = 1;
+        }
+        if (i == -7) {
+    case -7:
+            plr[myplr].InvBody[3]._iIdentified = 1;
+        }
+        break;
+    default:
+        plr[myplr].InvList[i]._iIdentified = 1;
+        break;
+    }
+    plr[myplr].HoldItem._iIdentified = 1;
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    CalcPlrInv(myplr, 1);
+}
+
+/* @0x80072DD0 */
+void BoyBuyItem(void)
+{
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    StoreAutoPlace();
+    stextshold = 0xC;
+    _boyitem[StorePlrNo]._itype = -1;
+    CalcPlrInv(myplr, 1);
+}
+
+/* @0x80072E70 */
+void HealerBuyItem(void)
+{
+    int idx;
+    int cond;
+
+    idx = (stextlhold - stextup) / 4 + stextvhold;
+    cond = idx < 3;
+    if (gbMaxPlayers == 1) {
+        cond = idx < 2;
+    }
+    if (cond) {
+        plr[myplr].HoldItem._iSeed = GetRndSeed();
+    }
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    if (plr[myplr].HoldItem._iMagical == 0) {
+        plr[myplr].HoldItem._iIdentified = 0;
+    }
+    StoreAutoPlace();
+    CalcPlrInv(myplr, 1);
+    cond = idx < 3;
+    if (gbMaxPlayers == 1) {
+        cond = idx < 2;
+    }
+    if (!cond) {
+        idx = (stextlhold - stextup) / 4 + stextvhold;
+        if (idx == 0x13) {
+            _healitem[StorePlrNo][19]._itype = -1;
+        } else {
+            if (_healitem[StorePlrNo][idx + 1]._itype != -1) {
+                do {
+                    _healitem[StorePlrNo][idx] = _healitem[StorePlrNo][idx + 1];
+                    idx++;
+                } while (_healitem[StorePlrNo][idx + 1]._itype != -1);
+            }
+            _healitem[StorePlrNo][idx]._itype = -1;
+        }
+        CalcPlrInv(myplr, 1);
+    }
+}
+
+/* @0x80071E54 */
+void SmithRepairItem(void)
+{
+    int i;
+    int idx;
+
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    idx = (stextlhold - stextup) / 8 + stextvhold;
+    storehold[idx]._iDurability = storehold[idx]._iMaxDur;
+    i = storehidx[idx];
+    switch (i) {
+    case -1:
+        plr[myplr].InvBody[0]._iDurability = plr[myplr].InvBody[0]._iMaxDur;
+        if (i == -2) {
+    case -2:
+            plr[myplr].InvBody[6]._iDurability = plr[myplr].InvBody[6]._iMaxDur;
+        }
+        if (i == -3) {
+    case -3:
+            plr[myplr].InvBody[4]._iDurability = plr[myplr].InvBody[4]._iMaxDur;
+        }
+        if (i == -4) {
+    case -4:
+            plr[myplr].InvBody[5]._iDurability = plr[myplr].InvBody[5]._iMaxDur;
+            return;
+        }
+        return;
+    default:
+        plr[myplr].InvList[i]._iDurability = plr[myplr].InvList[i]._iMaxDur;
+        break;
+    }
+}
+
 /* @0x800738B4 */
 void S_HBuyEnter(void)
 {
