@@ -2247,6 +2247,48 @@ void S_ScrollSSell(int idx)
     }
 }
 
+/* @0x8006B70C */
+void S_StartSSell(void)
+{
+    int i;
+    unsigned char sellok;
+
+    SItemListFlag = 2;
+    stextsize = 1;
+    sellok = 0;
+    storenumh = 0;
+    for (i = 0; i < 48; i++)
+        storehold[i]._itype = -1;
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (SmithSellOk(i)) {
+            sellok = 1;
+            storehold[storenumh] = plr[myplr].InvList[i];
+            if (storehold[storenumh]._iMagical && storehold[storenumh]._iIdentified)
+                storehold[storenumh]._ivalue = storehold[storenumh]._iIvalue;
+            storehold[storenumh]._ivalue >>= 2;
+            if (!storehold[storenumh]._ivalue)
+                storehold[storenumh]._ivalue = 1;
+            storehold[storenumh]._iIvalue = storehold[storenumh]._ivalue;
+            storehidx[storenumh] = i;
+            storenumh++;
+        }
+    }
+    if (!sellok) {
+        stextscrl = 0;
+        sprintf(tempstr, GetStr(0x4EB), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+    } else {
+        stextscrl = 1;
+        stextsval = 0;
+        stextsmax = plr[myplr]._pNumInv;
+        sprintf(tempstr, GetStr(0x4CF), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+        S_ScrollSSell(stextsval);
+    }
+}
+
 /* @0x8006C4D0 */
 void S_ScrollWBuy(int idx)
 {
