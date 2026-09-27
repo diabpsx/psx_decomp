@@ -751,42 +751,44 @@ extern "C" void rebuild_mdec_polys(int x, int y)
     }
 }
 
-/* WIP -- NOT byte-verified (see split_poly_area note). @0x80156FB4 FMV.CPP:1044 */
-extern "C" int draw_mdec_polys(int bright)
-{
-    int screen = PRIM_GetCurrentScreen();
+extern unsigned long *ThisOt;   /* @0x8011AAB4 (gman.cpp's current ordering table) */
 
-    if (frame_decoded == 0)
-        return screen;
-    int state = screen & 0xFF;
-    if (move_request != 0) {
-        state = screen & 0xFF;
-        if (mbuf != last_move_mbuf) {
-            mdec_cx = move_x;
-            mdec_cy = move_y;
-            rebuild_mdec_polys(move_x, move_y);
-            move_request -= 1;
-            last_move_mbuf = mbuf;
-            tmdc_pol_dirty[mbuf] = 1;
-            state = screen & 0xFF;
+/* @0x80156FB4 FMV.CPP:1044 -- SYM: FCN VOID; locals i (REG), cdbuf (REG UCHAR). */
+extern "C" void draw_mdec_polys(int bright)
+{
+    int i;
+    unsigned char cdbuf;
+
+    cdbuf = PRIM_GetCurrentScreen();
+
+    if (!frame_decoded)
+        return;
+
+    if (move_request && mbuf != last_move_mbuf) {
+        rebuild_mdec_polys(mdec_cx = move_x, mdec_cy = move_y);
+        move_request--;
+        last_move_mbuf = mbuf;
+
+        tmdc_pol_dirty[mbuf] = 1;
+    }
+
+    if (cdbuf == 1) {
+        if (tmdc_pol_dirty[mbuf]) {
+            tmdc_pol_dirty[mbuf] = 0;
+            for (i = 0; i < num_pol[mbuf]; i++) {
+                tmdc_pol[1][mbuf][i] = tmdc_pol[0][mbuf][i];
+                br[1][mbuf][i] = br[0][mbuf][i];
+            }
         }
     }
-    if (state == 1 && tmdc_pol_dirty[mbuf] != 0) {
-        tmdc_pol_dirty[mbuf] = 0;
-        for (int i = 0; i < num_pol[mbuf]; i++) {
-            tmdc_pol[1][mbuf][i] = tmdc_pol[0][mbuf][i];
-            br[1][mbuf][i] = br[0][mbuf][i];
-        }
+
+    for (i = 0; i < num_pol[mbuf]; i++) {
+        setRGB0_(&tmdc_pol[cdbuf][mbuf][i], bright, bright, bright);
+        addPrim(ThisOt + 5, &tmdc_pol[cdbuf][mbuf][i]);
     }
-    for (int i = 0; i < num_pol[mbuf]; i++) {
-        POLY_FT4 *pp = &tmdc_pol[screen & 0xFF][mbuf][i];
-        setRGB0_(pp, bright, bright, bright);
-        /* addPrim(ThisOt, pp) -- other TU's ordering-table head; left as a documented gap. */
-    }
-    int r = do_brightness;
-    if (r != 0)
+
+    if (do_brightness)
         do_brightness = 0;
-    return r;
 }
 
 /* WIP -- NOT byte-verified (see split_poly_area note). @0x8015734C FMV.CPP:1111 */
