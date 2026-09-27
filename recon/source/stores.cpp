@@ -2843,8 +2843,9 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
         sprintf(sstr, "%s:%i-%i", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
     if (x->_iClass == 2)
         sprintf(sstr, GetStr(0x2F), x->_iAC);
+    int first = sstr[0];
     if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
-        if (sstr[0])
+        if (first)
             strcat(sstr, ",  ");
         strcat(sstr, GetStr(0x218));
     } else {
