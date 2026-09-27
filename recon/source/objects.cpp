@@ -1308,61 +1308,43 @@ void SyncL1Doors(int i)
 
 void SyncL3Doors(int i)
 {
-    int x, y;
-    int otm;
+    int dx, dy;
 
     object[i]._oMissFlag = 1;
+    dx = object[i]._ox;
+    dy = object[i]._oy;
     object[i]._oSelFlag = 2;
-    x = object[i]._ox;
-    y = object[i]._oy;
-    otm = -1;
-    if (object[i]._otype == 0x4A) {
-        if (object[i]._oVar4 == 0) {
-            otm = 0x213;
-        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            otm = 0x21A;
-        }
+    if (object[i]._otype == 0x4A && object[i]._oVar4 == 0) {
+        ObjSetMicro(dx, dy, 0x213);
+    } else if (object[i]._otype == 0x4A && (object[i]._oVar4 == 1 || object[i]._oVar4 == 2)) {
+        ObjSetMicro(dx, dy, 0x21A);
+    } else if (object[i]._otype == 0x4B && object[i]._oVar4 == 0) {
+        ObjSetMicro(dx, dy, 0x216);
+    } else if (object[i]._otype == 0x4B && (object[i]._oVar4 == 1 || object[i]._oVar4 == 2)) {
+        ObjSetMicro(dx, dy, 0x21D);
     }
-    if (object[i]._otype == 0x4B) {
-        if (object[i]._oVar4 == 0) {
-            otm = 0x216;
-        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            otm = 0x21D;
-        }
-    }
-    if (otm != -1)
-        ObjSetMicro(x, y, otm);
 }
 
 void SyncL2Doors(int i)
 {
-    int otm;
-    int x, y;
+    int dx, dy;
 
     if (object[i]._oVar4 == 0)
         object[i]._oMissFlag = 0;
     else
         object[i]._oMissFlag = 1;
-    x = object[i]._ox;
+    dx = object[i]._ox;
+    dy = object[i]._oy;
     object[i]._oSelFlag = 2;
-    y = object[i]._oy;
-    otm = -1;
-    if (object[i]._otype == 0x2A) {
-        if (object[i]._oVar4 == 0) {
-            otm = 0x21A;
-        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            otm = 0xD;
-        }
+    if (object[i]._otype == 0x2A && object[i]._oVar4 == 0) {
+        ObjSetMicro(dx, dy, 0x21A);
+    } else if (object[i]._otype == 0x2A && (object[i]._oVar4 == 1 || object[i]._oVar4 == 2)) {
+        ObjSetMicro(dx, dy, 0xD);
+    } else if (object[i]._otype == 0x2B && object[i]._oVar4 == 0) {
+        ObjSetMicro(dx, dy, 0x21C);
+    } else if (object[i]._otype == 0x2B && (object[i]._oVar4 == 1 || object[i]._oVar4 == 2)) {
+        ObjSetMicro(dx, dy, 0x11);
     }
-    if (object[i]._otype == 0x2B) {
-        if (object[i]._oVar4 == 0) {
-            otm = 0x21C;
-        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
-            otm = 0x11;
-        }
-    }
-    if (otm != -1)
-        ObjSetMicro(x, y, otm);
 }
 
 void SyncLever(int i)
