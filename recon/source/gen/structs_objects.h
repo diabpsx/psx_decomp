@@ -1,4 +1,30 @@
-struct POLY_FT4;
+struct POLY_FT4 {   /* sizeof 40 */
+    unsigned long tag;   /* +0x0 */
+    unsigned char r0;   /* +0x4 */
+    unsigned char g0;   /* +0x5 */
+    unsigned char b0;   /* +0x6 */
+    unsigned char code;   /* +0x7 */
+    short x0;   /* +0x8 */
+    short y0;   /* +0xA */
+    unsigned char u0;   /* +0xC */
+    unsigned char v0;   /* +0xD */
+    unsigned short clut;   /* +0xE */
+    short x1;   /* +0x10 */
+    short y1;   /* +0x12 */
+    unsigned char u1;   /* +0x14 */
+    unsigned char v1;   /* +0x15 */
+    unsigned short tpage;   /* +0x16 */
+    short x2;   /* +0x18 */
+    short y2;   /* +0x1A */
+    unsigned char u2;   /* +0x1C */
+    unsigned char v2;   /* +0x1D */
+    unsigned short pad1;   /* +0x1E */
+    short x3;   /* +0x20 */
+    short y3;   /* +0x22 */
+    unsigned char u3;   /* +0x24 */
+    unsigned char v3;   /* +0x25 */
+    unsigned short pad2;   /* +0x26 */
+};
 
 struct ObjectStruct {   /* sizeof 44 */
     short _olid;   /* +0x0 */
