@@ -69,6 +69,7 @@ struct SFXHDR {   /* sizeof 132 */
 class CBlocks {
 public:
     void GetScrXY(RECT &R, int x, int y, int sxoff, int syoff);
+    char _pad[264];   /* SYM sizeof 264: pointer records carry the pointee size */
 };
 
 struct AnimStruct {   /* sizeof 2 */

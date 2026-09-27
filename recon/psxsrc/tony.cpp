@@ -238,9 +238,9 @@ void SetDemoPlayer()
 }
 
 /* @0x8009B4EC TONY.CPP:178
- * OPEN (bytes 33 diffs): block tree exact (`while (1) { int demo_char; ...` keeps the demo_finish
- * exit test from being duplicated).  Residual: demo_which % 5 is computed in a0 then andi'd into s0
- * (retail computes it in s0), plus SetQSpell arg scheduling. */
+ * `while (1) { int demo_char; ...` keeps the demo_finish exit test from being duplicated; the
+ * in-place `demo_char %= 5u` + uchar truncation keeps the mod in s0; statement order after
+ * SetQSpell (_pgfxnum first, _pLevel after _pDexterity) is retail's schedule. */
 void print_demo_task(TASK *T)
 {
     while (1) {
@@ -267,19 +267,21 @@ void print_demo_task(TASK *T)
         }
         for (int x = 63; x >= 0; x--)
             *(p = &plr->_pSplLvl[x]) = 100;
-        demo_char = demo_which % 5;
+        demo_char = demo_which;
+        demo_char %= 5u;
+        demo_char = (unsigned char)demo_char;
         plr[0]._pRSpell = demo_level_spell1[demo_char];
         plr[0]._pRSplType = 1;
         plr[0]._pTSpell = 4;
         plr[0]._pTSplType = 0;
         SetQSpell(0, demo_level_spell2[demo_char], 1);
+        plr[0]._pgfxnum |= demo_level_clothe[demo_char];
         plr[0]._pMemSpells = -1;
         plr[0]._pStrength = 100;
         plr[0]._pBaseStr = 100;
         plr[0]._pBaseDex = 100;
-        plr[0]._pgfxnum |= demo_level_clothe[demo_char];
-        plr[0]._pLevel = 5;
         plr[0]._pDexterity = demo_level_dex[demo_char];
+        plr[0]._pLevel = 5;
         plr[0]._pDamageMod = demo_level_dam[demo_char];
         allspellsflag = 1;
         TSK_Sleep(1);

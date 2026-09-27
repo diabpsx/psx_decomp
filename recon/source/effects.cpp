@@ -141,8 +141,7 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     RECT R;
     long vol;
 
-    volume = (sglSoundVolume * sglMasterVolume) >> 8;
-    *plVolume = volume;
+    *plVolume = (sglSoundVolume * sglMasterVolume) >> 8;
     *plPan = 0x8000;
 
     if (!dung_map[x][y].dFlags)
@@ -171,12 +170,19 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     if (pan > 0x10000) pan = 0x10000;
 
     vol = (sglSoundVolume * sglMasterVolume) << 8;
-    scry = gnScreenWidth;
-    scry /= 2;
+    scry = gnScreenWidth / 2;
     if (scry < scrx)
         scrx = gnScreenWidth - scrx;
-    scrx *= 2;
-    *plVolume = (scrx * (vol / scry)) >> 16;
+    /* Identical arms: jump2 cross-jumps them after register allocation, so the test costs no code,
+     * but the extra scry reference lifts scry's allocation priority above scrx (retail a0/a1). */
+    if (scry) {
+        scrx *= 2;
+        volume = scrx * (vol / scry);   /* SYM: volume REG $-1 = lives in LO (the mult result) */
+    } else {
+        scrx *= 2;
+        volume = scrx * (vol / scry);
+    }
+    *plVolume = volume >> 16;
     *plPan = pan;
     return 1;
 }

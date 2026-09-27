@@ -541,8 +541,12 @@ void SetMapMonsters(unsigned char *pMap, int startx, int starty)
  * _mx/_my end up >= MAXDUNX/MAXDUNY). NOT byte-verified yet -- see report. */
 void PlaceGroup(int mtype, int num, unsigned char leaderf, int leader)
 {
-    int placed, try1, try2, j;
     int xp, yp, x1, y1;
+    int j;
+    int placed;
+    int try1;
+    int try2;
+    int rd;
 
     placed = 0;
 
@@ -550,53 +554,55 @@ void PlaceGroup(int mtype, int num, unsigned char leaderf, int leader)
         while (placed) {
             nummonsters--;
             placed--;
-            if (monster[nummonsters]._mx >= MAXDUNX || monster[nummonsters]._my >= MAXDUNY)
+            if ((unsigned char)monster[nummonsters]._mx >= MAXDUNX || (unsigned char)monster[nummonsters]._my >= MAXDUNY)
                 DBG_SendMessage("psxsrc/gman.h", "Warning - GT 4 DO XXX. Group monster off of map. %s %d", 0x2F1);
-            dung_map[(unsigned char)monster[nummonsters]._mx][(unsigned char)monster[nummonsters]._my].dMonster = 0;
+            dung_map[monster[nummonsters]._mx][monster[nummonsters]._my].dMonster = 0;
         }
 
         if (leaderf & 1) {
-            int offset = ENG_random(8);
-            x1 = xp = monster[leader]._mx + offset_x[offset];
-            y1 = yp = monster[leader]._my + offset_y[offset];
+            rd = ENG_random(8);
+            x1 = xp = monster[leader]._mx + offset_x[rd];
+            y1 = yp = monster[leader]._my + offset_y[rd];
         } else {
             do {
-                x1 = xp = ENG_random(80) + 16;
-                y1 = yp = ENG_random(80) + 16;
+                x1 = xp = ENG_random(96);
+                y1 = yp = ENG_random(96);
             } while (!MonstPlace(xp, yp));
         }
 
-        if (num + nummonsters > totalmonsters)
+        if (nummonsters + num > totalmonsters)
             num = totalmonsters - nummonsters;
 
         j = 0;
-        for (try2 = 0; j < num && try2 < 100;) {
-            if (!MonstPlace(xp, yp)
-                || dung_map[xp][yp].dTransVal != dung_map[x1][y1].dTransVal
-                || ((leaderf & 2) && (abs(xp - x1) >= 4 || abs(yp - y1) >= 4))) {
-                try2++;
-                xp += offset_x[ENG_random(8)];
-                yp += offset_x[ENG_random(8)];
-                continue;
-            }
+        for (try2 = 0; j < num && try2 < 100; xp += offset_x[ENG_random(8)], yp += offset_x[ENG_random(8)]) {
+            if (MonstPlace(xp, yp)
+                && dung_map[xp][yp].dTransVal == dung_map[x1][y1].dTransVal
+                && (!(leaderf & 2) || (abs(xp - x1) < 4 && abs(yp - y1) < 4))) {
+                PlaceMonster(nummonsters, mtype, xp, yp);
+                if (leaderf & 1) {
+                    monster[nummonsters]._mmaxhp *= 2;
+                    monster[nummonsters]._mhitpoints = monster[nummonsters]._mmaxhp;
+                    monster[nummonsters]._mint = monster[leader]._mint;
 
-            PlaceMonster(nummonsters, mtype, xp, yp);
-            if (leaderf & 1) {
-                monster[nummonsters]._mmaxhp *= 2;
-                monster[nummonsters]._mhitpoints = monster[nummonsters]._mmaxhp;
-                monster[nummonsters]._mint = monster[leader]._mint;
+                    if (leaderf & 2) {
+                        monster[nummonsters].leader = leader;
+                        monster[nummonsters].leaderflag = 1;
+                        monster[nummonsters]._mAi = monster[leader]._mAi;
+                    }
 
-                if (leaderf & 2) {
-                    monster[nummonsters].leader = leader;
-                    monster[nummonsters].leaderflag = 1;
-                    monster[nummonsters]._mAi = monster[leader]._mAi;
+                    if (monster[nummonsters]._mAi != 12) {
+                        monster[nummonsters].Action = 0;
+                        monster[nummonsters]._mAnimFrame = ENG_random(monster[nummonsters]._mAnimLen - 1) + 1;
+                        monster[nummonsters]._mFlags &= ~4;
+                        monster[nummonsters]._mmode = 0;
+                    }
                 }
+                placed++;
+                nummonsters++;
+                j++;
+            } else {
+                try2++;
             }
-            nummonsters++;
-            placed++;
-            j++;
-            xp += offset_x[ENG_random(8)];
-            yp += offset_x[ENG_random(8)];
         }
 
         if (placed >= num)
@@ -612,12 +618,16 @@ void PlaceGroup(int mtype, int num, unsigned char leaderf, int leader)
  * i.e. no HELLFIRE arms, PSX renames). NOT byte-verified yet -- see report. */
 void InitMonsters(void)
 {
-    int na, nt;
-    int i, s, t;
-    int numplacemonsters;
+    int i;
     int mtype;
+    int na;
+    int nt;
     int scattertypes[111];
     int numscattypes;
+    long fv;
+    long j;
+    int numplacemonsters;
+    int s, t;
 
     numscattypes = 0;
 
@@ -644,15 +654,15 @@ void InitMonsters(void)
 
     if (!setlevel) {
         PlaceUniques();
-        na = 0;
-        for (s = 16; s < 96; s++)
-            for (t = 16; t < 96; t++)
-                if (!SolidLoc(s, t))
-                    na++;
-        numplacemonsters = na / 30;
+        fv = 0;
+        for (i = 0; i < 96; i++)
+            for (j = 0; j < 96; j++)
+                if (!SolidLoc(i, j))
+                    fv++;
+        numplacemonsters = fv / 35;
         if (gbMaxPlayers != 1)
             numplacemonsters += numplacemonsters >> 1;
-        if (nummonsters + numplacemonsters > MAXMONSTERS - 10)
+        if (numplacemonsters + nummonsters > MAXMONSTERS - 10)
             numplacemonsters = MAXMONSTERS - 10 - nummonsters;
         totalmonsters = nummonsters + numplacemonsters;
         for (i = 0; i < nummtypes; i++) {
@@ -661,12 +671,13 @@ void InitMonsters(void)
         }
         while (nummonsters < totalmonsters) {
             mtype = scattertypes[ENG_random(numscattypes)];
-            if (currlevel == 1 || ENG_random(2) == 0)
+            if (currlevel != 1 && ENG_random(2) != 0) {
+                if (currlevel == 2)
+                    na = ENG_random(2) + 2;
+                else
+                    na = ENG_random(3) + 3;
+            } else
                 na = 1;
-            else if (currlevel == 2)
-                na = ENG_random(2) + 2;
-            else
-                na = ENG_random(3) + 3;
             PlaceGroup(mtype, na, 0, 0);
         }
     }
@@ -674,7 +685,7 @@ void InitMonsters(void)
     for (i = 0; i < nt; i++) {
         for (s = -2; s < 2; s++) {
             for (t = -2; t < 2; t++)
-                DoUnVision(s + trigs[i]._tx, t + trigs[i]._ty, 15, 0);
+                DoUnVision(trigs[i]._tx + s, trigs[i]._ty + t, 15, -1);
         }
     }
 }

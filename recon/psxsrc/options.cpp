@@ -153,7 +153,8 @@ void PrintMono(int ypos)
         String = GetStr(0x29A);
     else
         String = GetStr(0x29C);
-    len = MediumFont.GetStrWidth(String) >> 1;
+    len = MediumFont.GetStrWidth(String);
+    len = len >> 1;
     MediumFont.Print(MonoX - len, ypos, String, JustLeft, &ORect, WHITER, WHITEG, WHITEB);
 }
 
