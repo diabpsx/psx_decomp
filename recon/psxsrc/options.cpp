@@ -428,15 +428,10 @@ void CentrePad(void)
         sy = 0;
     }
     if ((P->GetDown() & 0x100) && Adjust == 0) {
-        int n;
-        int link;
-
         PlaySFX(0x33);
-        n = MenuList[cmenu].NoEntries - 1;
-        link = iptr[n].Link;
-        cs = n;
-        if (link != -2) {
-            cmenu = link - 1;
+        cs = MenuList[cmenu].NoEntries - 1;
+        if (iptr[cs].Link != -2) {
+            cmenu = iptr[cs].Link - 1;
             Adjust = 0;
             cs = lastcs;
         }
@@ -511,8 +506,6 @@ void FormatPad(void)
     }
 
     if (formatflag == 0) {
-        int pressed;
-
         P = PAD_GetPad(options_pad, 0);
         LAMBO_MovePad(P);
         if (P->GetDown() & 0x100) {
@@ -524,12 +517,7 @@ void FormatPad(void)
             cmenu = ReturnMenu;
             return;
         }
-        pressed = 0;
-        if (P->GetDown() & 0x40)
-            pressed = 1;
-        else if (P->GetDown() & 0x10)
-            pressed = 1;
-        if (pressed) {
+        if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             PlaySFX(0x33);
             if (cs == 1) {
                 formatflag = cs;
@@ -574,7 +562,6 @@ void SaveOverwritePad(void)
     CPad *P;
     char *S;
     int sn;
-    int pressed;
 
     P = PAD_GetPad(options_pad, 0);
     LAMBO_MovePad(P);
@@ -594,12 +581,7 @@ void SaveOverwritePad(void)
         return;
     }
 
-    pressed = 0;
-    if (P->GetDown() & 0x40)
-        pressed = 1;
-    else if (P->GetDown() & 0x10)
-        pressed = 1;
-    if (pressed) {
+    if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
         PlaySFX(0x33);
         if (cs == 2) {
             if (ReturnCards == 1)
