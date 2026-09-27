@@ -640,15 +640,17 @@ void InvAlignObject(void)
 unsigned char UseInvItem(int pnum, int cii)
 {
     int c;
+    int idata;
+    int it;
     ItemStruct *Item;
     unsigned char speedlist;
 
     if (plr[pnum]._pInvincible && plr[pnum]._pHitPoints == 0 && pnum == myplr)
         return 1;
     if (_pcurs[myplr] != CURSOR_HAND)
-        return 0;
+        return 1;
     if (stextflag)
-        return 0;
+        return 1;
     if (cii < 6)
         return 0;
 
@@ -664,7 +666,8 @@ unsigned char UseInvItem(int pnum, int cii)
         speedlist = 1;
     }
 
-    switch (Item->IDidx) {
+    it = Item->IDidx;
+    switch (it) {
     case 0x11 /* IDI_MUSHROOM */:
         sfxdelay = 10;
         if (plr[pnum]._pClass == 0)
@@ -686,7 +689,7 @@ unsigned char UseInvItem(int pnum, int cii)
         return 1;
     }
 
-    if (!AllItemsUseable[Item->IDidx])
+    if (!AllItemsUseable[it])
         return 0;
 
     if (!Item->_iStatFlag) {
@@ -696,8 +699,6 @@ unsigned char UseInvItem(int pnum, int cii)
             PlaySFX(0x270);
         else if (plr[pnum]._pClass == 2)
             PlaySFX(0x208);
-        else
-            return 0;
         return 1;
     }
 
@@ -710,31 +711,25 @@ unsigned char UseInvItem(int pnum, int cii)
         dropGoldValue = 0;
     }
 
-    if (Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) {
-        if (gbMaxPlayers == 2 && Item->_iSpell == 0x20) {
-            if (plr[pnum ^ 1].plractive)
-                return 0;
-        }
-        if (currlevel == 0 && !spelldata[Item->_iSpell].sTownSpell) {
-            if (plr[pnum]._pClass == 0)
-                PlaySFX(0x2EC);
-            else if (plr[pnum]._pClass == 1)
-                PlaySFX(0x27E);
-            else if (plr[pnum]._pClass == 2)
-                PlaySFX(0x216);
-            else
-                return 0;
-            return 0;
-        }
+    if ((Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) && gbMaxPlayers == 2
+        && Item->_iSpell == 0x20 && plr[pnum ^ 1].plractive)
+        return 0;
+    if ((Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) && currlevel == 0
+        && !spelldata[Item->_iSpell].sTownSpell) {
+        if (plr[pnum]._pClass == 0)
+            PlaySFX(0x2EC);
+        else if (plr[pnum]._pClass == 1)
+            PlaySFX(0x27E);
+        else if (plr[pnum]._pClass == 2)
+            PlaySFX(0x216);
+        return 0;
     }
 
-    {
-        int idata = ItemCAnimTbl[Item->_iCurs];
-        if (Item->_iMiscId == IMISC_BOOK)
-            PlaySFX(0x2E /* IS_RBOOK */);
-        else if (pnum == myplr)
-            PlaySFX(ItemInvSnds[idata]);
-    }
+    idata = ItemCAnimTbl[Item->_iCurs];
+    if (Item->_iMiscId == IMISC_BOOK)
+        PlaySFX(0x2E /* IS_RBOOK */);
+    else if (pnum == myplr)
+        PlaySFX(ItemInvSnds[idata]);
 
     UseItem(pnum, Item->_iMiscId, Item->_iSpell);
 
