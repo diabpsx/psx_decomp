@@ -314,8 +314,12 @@ int read_card_file(int card_number, int file, int id, char *buf)
                         if ((size + 512) & 127) size += 128 - ((size + 512) & 127);
                         r = read(fd, buf, size);
                         if (r != -1 && r == size) {
-                            okay = 1;
-                            if (checksum_data(buf, h.size) != h.chksum) checksumerror = 1;
+                            if (checksum_data(buf, h.size) != h.chksum) {
+                                okay = 1;
+                                checksumerror = 1;
+                            } else {
+                                okay = 1;
+                            }
                         }
                     }
                     close(fd);

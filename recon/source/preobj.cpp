@@ -566,18 +566,26 @@ void InitRndLocObj(int min, int max, int objtype)
         while (1) {
             xp = ENG_random(0x40) + 16;
             yp = ENG_random(0x40) + 16;
-            if (RndLocOk(xp - 1, yp - 1)
-                && RndLocOk(xp, yp - 1)
-                && RndLocOk(xp + 1, yp - 1)
-                && RndLocOk(xp - 1, yp)
-                && RndLocOk(xp, yp)
-                && RndLocOk(xp + 1, yp)
-                && RndLocOk(xp - 1, yp + 1)
-                && RndLocOk(xp, yp + 1)
-                && RndLocOk(xp + 1, yp + 1)) {
-                AddObject(objtype, xp, yp);
-                break;
-            }
+            if (!RndLocOk(xp - 1, yp - 1))
+                continue;
+            if (!RndLocOk(xp, yp - 1))
+                continue;
+            if (!RndLocOk(xp + 1, yp - 1))
+                continue;
+            if (!RndLocOk(xp - 1, yp))
+                continue;
+            if (!RndLocOk(xp, yp))
+                continue;
+            if (!RndLocOk(xp + 1, yp))
+                continue;
+            if (!RndLocOk(xp - 1, yp + 1))
+                continue;
+            if (!RndLocOk(xp, yp + 1))
+                continue;
+            if (!RndLocOk(xp + 1, yp + 1))
+                continue;
+            AddObject(objtype, xp, yp);
+            break;
         }
     }
 }
@@ -591,21 +599,32 @@ void InitRndLocBigObj(int min, int max, int objtype)
         while (1) {
             xp = ENG_random(0x40) + 16;
             yp = ENG_random(0x40) + 16;
-            if (RndLocOk(xp - 1, yp - 2)
-                && RndLocOk(xp, yp - 2)
-                && RndLocOk(xp + 1, yp - 2)
-                && RndLocOk(xp - 1, yp - 1)
-                && RndLocOk(xp, yp - 1)
-                && RndLocOk(xp + 1, yp - 1)
-                && RndLocOk(xp - 1, yp)
-                && RndLocOk(xp, yp)
-                && RndLocOk(xp + 1, yp)
-                && RndLocOk(xp - 1, yp + 1)
-                && RndLocOk(xp, yp + 1)
-                && RndLocOk(xp + 1, yp + 1)) {
-                AddObject(objtype, xp, yp);
-                break;
-            }
+            if (!RndLocOk(xp - 1, yp - 2))
+                continue;
+            if (!RndLocOk(xp, yp - 2))
+                continue;
+            if (!RndLocOk(xp + 1, yp - 2))
+                continue;
+            if (!RndLocOk(xp - 1, yp - 1))
+                continue;
+            if (!RndLocOk(xp, yp - 1))
+                continue;
+            if (!RndLocOk(xp + 1, yp - 1))
+                continue;
+            if (!RndLocOk(xp - 1, yp))
+                continue;
+            if (!RndLocOk(xp, yp))
+                continue;
+            if (!RndLocOk(xp + 1, yp))
+                continue;
+            if (!RndLocOk(xp - 1, yp + 1))
+                continue;
+            if (!RndLocOk(xp, yp + 1))
+                continue;
+            if (!RndLocOk(xp + 1, yp + 1))
+                continue;
+            AddObject(objtype, xp, yp);
+            break;
         }
     }
 }
@@ -806,38 +825,35 @@ void AddBookLever(int lx1, int ly1, int lx2, int ly2, int x1, int y1, int x2, in
 
 void InitRndBarrels()
 {
-    int numobjs;
     int xp, yp;
     int o;
-    unsigned char found;
-    int p;
-    int dir;
-    int t;
     int c;
-    int i;
+    int t;
+    int numobjs;
+    int dir;
 
     numobjs = ENG_random(5) + 3;
-    for (i = 0; i < numobjs; i++) {
+    for (int i = 0; i < numobjs; i++) {
+        unsigned char found;
         do {
             xp = ENG_random(0x40) + 16;
             yp = ENG_random(0x40) + 16;
         } while (!RndLocOk(xp, yp));
         o = (ENG_random(4) != 0) ? OBJ_BARREL : OBJ_BARRELEX;
         AddObject(o, xp, yp);
-        found = 1;
-        p = 0;
         c = 1;
-        while (ENG_random(p) == 0 && found) {
+        found = 1;
+        while (ENG_random(c >> 1) == 0 && found) {
             t = 0;
             found = 0;
             while (1) {
                 if (t >= 3)
                     break;
                 dir = ENG_random(8);
+                t++;
                 xp += bxadd[dir];
                 yp += byadd[dir];
                 found = RndLocOk(xp, yp);
-                t++;
                 if (found)
                     break;
             }
@@ -846,7 +862,6 @@ void InitRndBarrels()
                 AddObject(o, xp, yp);
                 c++;
             }
-            p = c >> 1;
         }
     }
 }
@@ -898,7 +913,7 @@ void AddL3Objs(int x1, int y1, int x2, int y2)
     }
 }
 
-BOOL WallTrapLocOk(int xp, int yp)
+unsigned char WallTrapLocOk(int xp, int yp)
 {
     if (dung_map[xp][yp].dFlags & BFLAG_POPULATED)
         return 0;
@@ -941,11 +956,13 @@ void AddL2Torches()
 
 void AddObjTraps()
 {
-    char oi_trap, oi;
     int i, j;
-    int xp, yp;
+    int x, y;
     int rndv;
+    char oi;
+    char oi_trap;
 
+    rndv = 0;
     if (currlevel == 1)
         rndv = 10;
     if (currlevel >= 2)
@@ -963,33 +980,31 @@ void AddObjTraps()
             if (!AllObjects[object[oi]._otype].oTrapFlag)
                 continue;
 
+            x = i;
+            y = j;
             if (ENG_random(2) == 0) {
-                xp = i - 1;
-                while (!GetSOLID(xp, j))
-                    xp--;
+                x = i - 1;
+                while (!GetSOLID(x, y))
+                    x--;
 
-                if (!WallTrapLocOk(xp, j) || i - xp <= 1)
+                if (!WallTrapLocOk(x, y) || i - x <= 1)
                     continue;
 
-                AddObject(OBJ_TRAPL, xp, j);
-                oi_trap = dung_map[xp][j].dObject - 1;
-                object[oi_trap]._oVar1 = i;
-                object[oi_trap]._oVar2 = j;
-                object[oi]._oTrapFlag = 1;
+                AddObject(OBJ_TRAPL, x, y);
             } else {
-                yp = j - 1;
-                while (!GetSOLID(i, yp))
-                    yp--;
+                y = j - 1;
+                while (!GetSOLID(x, y))
+                    y--;
 
-                if (!WallTrapLocOk(i, yp) || j - yp <= 1)
+                if (!WallTrapLocOk(x, y) || j - y <= 1)
                     continue;
 
-                AddObject(OBJ_TRAPR, i, yp);
-                oi_trap = dung_map[i][yp].dObject - 1;
-                object[oi_trap]._oVar1 = i;
-                object[oi_trap]._oVar2 = j;
-                object[oi]._oTrapFlag = 1;
+                AddObject(OBJ_TRAPR, x, y);
             }
+            oi_trap = dung_map[x][y].dObject - 1;
+            object[oi_trap]._oVar1 = i;
+            object[oi_trap]._oVar2 = j;
+            object[oi]._oTrapFlag = 1;
         }
     }
 }
@@ -1105,37 +1120,33 @@ void AddHookedBodies(int freq)
     int i, j, ii, jj;
 
     for (j = 0; j < DMAXY; j++) {
-        jj = 16 + j * 2;
         for (i = 0; i < DMAXX; i++) {
-            ii = 16 + i * 2;
             if (dungeon[i][j] != 1 && dungeon[i][j] != 2)
                 continue;
-            if (ENG_random(freq) != 0)
-                continue;
-            if (!SkipThemeRoom(i, j))
-                continue;
-            if (dungeon[i][j] == 1 && dungeon[i + 1][j] == 6) {
-                switch (ENG_random(3)) {
-                case 0:
-                    AddObject(OBJ_TORTURE1, ii + 1, jj);
-                    break;
-                case 1:
-                    AddObject(OBJ_TORTURE2, ii + 1, jj);
-                    break;
-                case 2:
-                    AddObject(OBJ_TORTURE5, ii + 1, jj);
-                    break;
-                }
-                continue;
-            }
-            if (dungeon[i][j] == 2 && dungeon[i][j + 1] == 6) {
-                switch (ENG_random(2)) {
-                case 0:
-                    AddObject(OBJ_TORTURE3, ii, jj);
-                    break;
-                case 1:
-                    AddObject(OBJ_TORTURE4, ii, jj);
-                    break;
+            if (ENG_random(freq) == 0 && SkipThemeRoom(i, j)) {
+                ii = 16 + i * 2;
+                jj = 16 + j * 2;
+                if (dungeon[i][j] == 1 && dungeon[i + 1][j] == 6) {
+                    switch (ENG_random(3)) {
+                    case 0:
+                        AddObject(OBJ_TORTURE1, ii + 1, jj);
+                        break;
+                    case 1:
+                        AddObject(OBJ_TORTURE2, ii + 1, jj);
+                        break;
+                    case 2:
+                        AddObject(OBJ_TORTURE5, ii + 1, jj);
+                        break;
+                    }
+                } else if (dungeon[i][j] == 2 && dungeon[i][j + 1] == 6) {
+                    switch (ENG_random(2)) {
+                    case 0:
+                        AddObject(OBJ_TORTURE3, ii, jj);
+                        break;
+                    case 1:
+                        AddObject(OBJ_TORTURE4, ii, jj);
+                        break;
+                    }
                 }
             }
         }

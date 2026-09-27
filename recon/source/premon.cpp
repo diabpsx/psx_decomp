@@ -812,18 +812,29 @@ void PlaceUniques(void)
 {
     int u, mt;
     unsigned char done;
-    int monsttype;
 
     for (u = 0; UniqMonst[u].mtype != -1; u++) {
-        if (UniqMonst[u].mlevel != currlevel)
-            continue;
-        done = 0;
-        monsttype = UniqMonst[u].mtype;
-        SwapMonsterType(&monsttype);
-        for (mt = 0; mt < nummtypes && !done; mt++)
-            done = (Monsters[mt].mtype == monsttype);
-        mt--;
-        if (done)
-            PlaceUniqueMonst(u, mt, 8);
+        if (UniqMonst[u].mlevel == currlevel) {
+            int monsttype;
+
+            done = 0;
+            monsttype = UniqMonst[u].mtype;
+            SwapMonsterType(&monsttype);
+            for (mt = 0; mt < nummtypes && !done; mt++)
+                done = (Monsters[mt].mtype == monsttype);
+            mt--;
+            if (u == 0 && quests[2]._qactive == QUEST_NOTAVAIL)
+                done = 0;
+            if (u == 2 && quests[3]._qactive == QUEST_NOTAVAIL)
+                done = 0;
+            if (u == 3 && quests[7]._qactive == QUEST_NOTAVAIL)
+                done = 0;
+            if (u == 7 && quests[4]._qactive == QUEST_NOTAVAIL)
+                done = 0;
+            if (u == 8 && quests[11]._qactive == QUEST_NOTAVAIL)
+                done = 0;
+            if (done)
+                PlaceUniqueMonst(u, mt, 8);
+        }
     }
 }
