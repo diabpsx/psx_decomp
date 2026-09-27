@@ -87,7 +87,12 @@
 #define Q_VEIL      4
 #define IDI_BANNER  0xC
 #define IDI_GLDNELIX 0xF
+#define TXT_BOL1    0x14
+#define TXT_BOL2    0x15
 #define TXT_BOL3    0x16
+#define USFX_SNOT3  0x357
+#define TXT_VB1     0x23
+#define USFX_LAZ1   0x352
 #define TXT_VEIL1   0x51
 #define TXT_VEIL3   0x53
 #define TXT_WARLRD1 0x6E
@@ -95,6 +100,9 @@
 #define TXT_ZHAR2   0x95
 #define QUEST_DONE  3
 #define USFX_LACH3  0x351
+#define TXT_GARB1   0x90
+#define TXT_GARB4   0x93
+#define USFX_GARBUD4 0x34D
 #define USFX_ZHAR2  0x35B
 #define USFX_WARLRD1 0x358
 #define Q_BETRAYER      15
@@ -108,6 +116,7 @@
 #define MFLAG_STILL           0x04
 #define MFLAG_NOHEAL          0x08
 #define MFLAG_TARGETS_MONSTER 0x10
+#define MFLAG_MKILLER         0x20
 
 #define MT_INCIN    0x48
 #define MT_NMAGMA   0x3C
@@ -2527,6 +2536,218 @@ void MAI_Lachdanan(int i)
 
         monster[i]._mdir = md;
         if (Monst->_mmode == MM_STAND)
+            Monst->Action = 0;
+    }
+}
+
+/* SYM ok, bytes OPEN (4 diffs, 132==132 insns exact): same prologue
+ * register-SAVE-ORDER residual as MAI_Lachdanan (retail saves/loads s2
+ * for _mx before saving ra/s4/s3; ours saves ra/s4/s3 first). Semantics
+ * fully verified: hellfire's mtalkmsg-advance/TXT_GARB4-effect/MAI_Round
+ * dispatch shape, PLUS a genuine PSX-only addition confirmed from raw
+ * bytes -- both the advance path and the GARB4 path also write
+ * quests[Q_GARBUD]._qvar1 (5 then 4) and (advance path only) _qvar2, each
+ * followed by `if (!deltaload) NetSendCmdQuest(1, Q_GARBUD)` (multiplayer
+ * quest-state sync neither twin has). Also found: the MAI_Round dispatch
+ * is a real if/else (`if(goal==ATTACK||WALK_AROUND1) MAI_Round(...); else
+ * monster[i]._mdir=md;`) -- NOT hellfire's unconditional _mdir=md after an
+ * if-only MAI_Round call; this fixed a real 1-insn/1-branch-target gap. */
+void MAI_Garbud(int i)
+{
+    int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx;
+    int _my;
+
+    _mx = Monst->_mx;
+    _my = Monst->_my;
+
+    if (Monst->_mmode == MM_STAND) {
+        md = M_GetDir(i);
+
+        if (Monst->mtalkmsg < TXT_GARB4 && Monst->mtalkmsg > TXT_GARB1 - 1
+            && !(dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) && Monst->_mgoal == MG_WAITTOTALK) {
+            Monst->mtalkmsg = Monst->mtalkmsg + 1;
+            Monst->_mgoal = MG_TALK;
+            quests[Q_GARBUD]._qvar1 = 5;
+            quests[Q_GARBUD]._qvar2 = Monst->mtalkmsg;
+            if (!deltaload)
+                NetSendCmdQuest(1, Q_GARBUD);
+        }
+
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+            if (Monst->mtalkmsg == TXT_GARB4 && !effect_is_playing(USFX_GARBUD4) && Monst->_mgoal == MG_WAITTOTALK) {
+                Monst->_mgoal = MG_ATTACK;
+                Monst->_msquelch = 255;
+                Monst->mtalkmsg = 0;
+                quests[Q_GARBUD]._qvar1 = 4;
+                if (!deltaload)
+                    NetSendCmdQuest(1, Q_GARBUD);
+            }
+        }
+
+        if (Monst->_mgoal == MG_ATTACK || Monst->_mgoal == MG_WALK_AROUND1) {
+            MAI_Round(i, 1);
+        } else {
+            monster[i]._mdir = md;
+        }
+
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = 0;
+    }
+}
+
+/* SYM not checked; bytes OPEN (112 diffs, 140==140 insns exact): logic fully
+ * verified against devilution field-by-field (formulas for _mmaxhp/mHit/
+ * mMinDamage/mMaxDamage match exactly; confirmed PSX drops _pathcount=0,
+ * replaces M_Enemy(i) with a hardcoded `_menemy=0`, ORs _mFlags with
+ * MFLAG_TARGETS_MONSTER|MFLAG_MKILLER as one combined write, and calls
+ * NetSendCmdGolem unconditionally with no `if(i==myplr)` gate -- all
+ * confirmed from the raw oracle, no branches in this fn so every diff here
+ * is pure temp-register choice, not control flow). Falsified: swapping the
+ * mmaxhp addition operand order. This is a bigger scheduling mismatch than
+ * the single-swap class (112 of 140 insns differ only in temp reg identity:
+ * t0 vs t1, and ra-save position) -- likely the whole function's temp-reg
+ * numbering is offset by one somewhere near the top; needs a slower
+ * side-by-side register-by-register walk, not a quick lever. */
+void SpawnGolum(int i, int x, int y, int mi)
+{
+    dung_map[x][y].dMonster = i + 1;
+    monster[i]._mx = x;
+    monster[i]._my = y;
+    monster[i]._mfutx = x;
+    monster[i]._mfuty = y;
+    monster[i]._moldx = x;
+    monster[i]._moldy = y;
+    monster[i]._mmaxhp = 2 * (320 * missile[mi]._mispllvl + plr[i]._pMaxMana / 3);
+    monster[i]._mhitpoints = monster[i]._mmaxhp;
+    monster[i].mArmorClass = 25;
+    monster[i].mHit = 5 * (missile[mi]._mispllvl + 8) + 2 * plr[i]._pLevel;
+    monster[i].mMinDamage = 2 * (missile[mi]._mispllvl + 4);
+    monster[i].mMaxDamage = 2 * (missile[mi]._mispllvl + 8);
+    monster[i]._menemy = 0;
+    monster[i]._mFlags |= (MFLAG_TARGETS_MONSTER | MFLAG_MKILLER);
+    M_StartSpStand(i, 0);
+    NetSendCmdGolem(monster[i]._mx, monster[i]._my, monster[i]._mdir, monster[i]._menemy, monster[i]._mhitpoints, currlevel);
+}
+
+/* SYM ok, bytes OPEN (4 diffs, 148==148 insns exact): same prologue
+ * register-SAVE-ORDER residual as MAI_Lachdanan/MAI_Garbud. NEW LAW FOUND:
+ * ObjChangeMap (NOT ObjChangeMapResync, and NOT RedoPlayerVision -- both of
+ * those stay prototyped, needed flat/ok for MAI_Lazurus) must stay
+ * UN-prototyped in protos_monster.h (retail's SYM block tree here is 7-deep
+ * nested, matching a g++2.7 implicit-declaration-per-call artifact for this
+ * ONE specific OBJECTS.CPP call -- adding its prototype collapses the tree to
+ * flat and breaks SYM; removing it reproduced retail's exact nesting with
+ * ZERO bytes-side effect). This is the opposite of the earlier
+ * M_CheckEFlag/M_Enemy/M_ClearSquares law (there, MISSING protos caused
+ * spurious nesting that had to be fixed by ADDING them) -- so the "always
+ * prototype every callee" rule is not universal and is not even per-function
+ * (ObjChangeMap vs ObjChangeMapResync, two overloads-of-a-theme, need
+ * OPPOSITE treatment): match retail's SYM tree shape first, then decide instead
+ * of reflexively adding a proto for every new callee. */
+void MAI_SnotSpil(int i)
+{
+    int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx;
+    int _my;
+
+    _mx = Monst->_mx;
+    _my = Monst->_my;
+
+    if (Monst->_mmode == MM_STAND) {
+        md = M_GetDir(i);
+
+        if (Monst->mtalkmsg == TXT_BOL1 && !(dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) && Monst->_mgoal == MG_WAITTOTALK) {
+            Monst->mtalkmsg = TXT_BOL2;
+            Monst->_mgoal = MG_TALK;
+        }
+
+        if (Monst->mtalkmsg == TXT_BOL2 && quests[Q_LTBANNER]._qvar1 == 3) {
+            Monst->mtalkmsg = 0;
+            Monst->_mgoal = MG_ATTACK;
+        }
+
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+            if (Monst->mtalkmsg == TXT_BOL3 && !effect_is_playing(USFX_SNOT3) && Monst->_mgoal == MG_WAITTOTALK) {
+                ObjChangeMap(setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1);
+                quests[Q_LTBANNER]._qvar1 = 3;
+                if (!deltaload)
+                    NetSendCmdQuest(1, Q_LTBANNER);
+                RedoPlayerVision();
+                Monst->_mgoal = MG_ATTACK;
+                Monst->_msquelch = 255;
+                Monst->mtalkmsg = 0;
+            }
+
+            if (quests[Q_LTBANNER]._qvar1 == 3) {
+                if (Monst->_mgoal == MG_ATTACK || Monst->_mgoal == MG_ATTACK2)
+                    MAI_Fallen(i);
+            }
+        }
+
+        monster[i]._mdir = md;
+        if (Monst->_mmode == MM_STAND)
+            Monst->Action = 0;
+    }
+}
+
+/* SYM ok, bytes OPEN (4 diffs, 169==169 insns exact): same prologue
+ * register-SAVE-ORDER residual as the other MAI_* mtalkmsg-quest functions.
+ * Two real bugs found and fixed during transcription: (1) a missing
+ * `if(!deltaload) NetSendCmdQuest(1,Q_BETRAYER)` after the FIRST
+ * quests[Q_BETRAYER]._qvar1=5 write (easy to miss since the movie-trigger
+ * PlayInGameMovie call itself IS dropped on PSX, but the network sync after
+ * it is NOT); (2) the tail `Action=0` gate is `_mmode==MM_STAND ||
+ * _mmode==MM_TALK` (not just MM_STAND) -- this function can set _mmode to
+ * MM_TALK earlier in its own body, so retail re-checks for that value too. */
+void MAI_Lazurus(int i)
+{
+    int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx;
+    int _my;
+
+    _mx = Monst->_mx;
+    _my = Monst->_my;
+
+    if (Monst->_mmode == MM_STAND) {
+        md = M_GetDir(i);
+
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+            if (gbMaxPlayers == 1) {
+                if (Monst->mtalkmsg == TXT_VB1 && Monst->_mgoal == MG_TALK
+                    && plr[myplr]._px == 35 && plr[myplr]._py == 46) {
+                    Monst->_mmode = MM_TALK;
+                    quests[Q_BETRAYER]._qvar1 = 5;
+                    if (!deltaload)
+                        NetSendCmdQuest(1, Q_BETRAYER);
+                }
+
+                if (Monst->mtalkmsg == TXT_VB1 && !effect_is_playing(USFX_LAZ1) && Monst->_mgoal == MG_WAITTOTALK) {
+                    ObjChangeMapResync(1, 18, 20, 24);
+                    RedoPlayerVision();
+                    quests[Q_BETRAYER]._qvar1 = 6;
+                    if (!deltaload)
+                        NetSendCmdQuest(1, Q_BETRAYER);
+                    Monst->_mgoal = MG_ATTACK;
+                    Monst->_msquelch = 255;
+                    Monst->mtalkmsg = 0;
+                }
+            }
+
+            if (gbMaxPlayers != 1 && Monst->mtalkmsg == TXT_VB1 && Monst->_mgoal == MG_TALK && quests[Q_BETRAYER]._qvar1 < 4) {
+                Monst->_mmode = MM_TALK;
+            }
+        }
+
+        if (Monst->_mgoal == MG_ATTACK || Monst->_mgoal == MG_RUN_AWAY || Monst->_mgoal == MG_WALK_AROUND1) {
+            MAI_Counselor(i);
+        }
+
+        monster[i]._mdir = md;
+        if (Monst->_mmode == MM_STAND || Monst->_mmode == MM_TALK)
             Monst->Action = 0;
     }
 }
