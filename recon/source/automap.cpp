@@ -312,21 +312,18 @@ void DrawAutoMapSquare(int X, int Y)
     LINE_F2 *L2;
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
 
+    Frac = AutoMapScale >> 1;
     X *= AutoMapScale;
     Y *= AutoMapScale;
-    Frac = AutoMapScale >> 1;
-    Ly = Y + X;
     Lx = (X - Y) * 2;
+    Ly = Y + X;
     Lx -= Frac * 2;
     Ly -= Frac;
-    Ly += AMPlayerY;
-    x3 = AutoMapScale * 2;
+    Lx += AMPlayerX; Ly += AMPlayerY;
     y0 = Ly + Frac;
-    y1 = Ly + AutoMapScale;
-    y2 = (Ly + x3) - Frac;
-    Lx += AMPlayerX;
-    x1 = (Lx - x3) + (Frac * 2);
-    x3 = (Lx + x3) - (Frac * 2);
+    x1 = Lx - AutoMapScale * 2 + Frac * 2; y1 = Ly + AutoMapScale;
+    y2 = Ly + AutoMapScale * 2 - Frac;
+    x3 = Lx + AutoMapScale * 2 - Frac * 2;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
     L2->x0 = Lx;
