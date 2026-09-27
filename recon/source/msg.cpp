@@ -1146,7 +1146,8 @@ void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
      * kill-check right below is against plr[pnum] (ParseCmd's own index) -- confirmed asymmetry,
      * both read straight off the raw. retail's SYM has exactly one named local ('player'); no
      * separate TCmdDamage* pointer -- every command field is an inline pCmd cast. */
-    PlayerStruct *player = &plr[((const TCmdDamage *)pCmd)->bPlr];
+    PlayerStruct *P = &plr[0];
+    PlayerStruct *player = &P[((const TCmdDamage *)pCmd)->bPlr];
     if (currlevel != 0 && gbBufferMsgs != 1 && player->plrlevel == currlevel &&
         ((const TCmdDamage *)pCmd)->dwDam <= 0x2EE00) {
         if ((player->_pHitPoints >> 6) > 0) {
@@ -1158,8 +1159,8 @@ void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
             }
         }
     }
-    if ((plr[pnum]._pHitPoints >> 6) <= 0)
-        StartPlrKill(&plr[pnum], 1);
+    if ((P[pnum]._pHitPoints >> 6) <= 0)
+        StartPlrKill(&P[pnum], 1);
 }
 
 /* @0x80050EC0 MSG.CPP:1934 */
