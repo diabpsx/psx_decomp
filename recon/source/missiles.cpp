@@ -567,8 +567,8 @@ void PutMissile(int i)
             if (dMiss < 0) {
                 if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][(dMiss & 0x60) >> 5] - 1]._mitype)
                     return;
-                if (((dMiss & 0x60) >> 5) + 1 < 4) {
-                    dMissArray[dMiss & 0x1F][((dMiss & 0x60) >> 5) + 1] = i + 1;
+                if ((char)(((dMiss & 0x60) >> 5) + 1) < 4) {
+                    dMissArray[dMiss & 0x1F][(char)(((dMiss & 0x60) >> 5) + 1)] = i + 1;
                     dung_map[mx][my].dMissile += 0x20;
                 }
             } else {
