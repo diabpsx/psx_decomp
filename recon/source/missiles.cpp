@@ -549,35 +549,34 @@ void PutMissile(int i)
      * the same tile. Decoded from the raw oracle (no PC twin); best-effort transcription, not yet
      * byte-verified -- this is one of the largest remaining near-misses to grind. Bound check here
      * is against the dung_map ARRAY bound (112), not the playable MAXDUNX/MAXDUNY (96). */
-    int x, y;
-    signed char old;
-    int row, group;
+    int mx, my;
+    char m;
 
-    x = missile[i]._mix;
-    y = missile[i]._miy;
-    if (x <= 0 || y <= 0 || x >= 112 || y >= 112)
+    mx = missile[i]._mix;
+    my = missile[i]._miy;
+    if (mx <= 0 || my <= 0 || mx >= 112 || my >= 112)
         missile[i]._miDelFlag = 1;
     if (!missile[i]._miDelFlag) {
-        dung_map[x][y].dFlags |= BFLAG_MISSILE;
-        old = dung_map[x][y].dMissile;
-        if (old == 0) {
-            dung_map[x][y].dMissile = i + 1;
-        } else if (old >= 0) {
-            row = 0;
-            while (dMissArray[row][0] != 0 && row < 32)
-                row++;
-            if (row < 32) {
-                dMissArray[row][0] = old;
-                dMissArray[row][1] = i + 1;
-                dung_map[x][y].dMissile = (char)(0x20 - row);
-            }
+        dung_map[mx][my].dFlags |= BFLAG_MISSILE;
+        if (dung_map[mx][my].dMissile == 0) {
+            dung_map[mx][my].dMissile = i + 1;
         } else {
-            group = (old & 0x60) >> 5;
-            row = old & 0x1F;
-            if (missile[dMissArray[row][group] - 1]._mitype != missile[i]._mitype) {
-                if (group + 1 < 4) {
-                    dMissArray[row][group + 1] = i + 1;
-                    dung_map[x][y].dFlags += 0x20;
+            char dMiss = dung_map[mx][my].dMissile;
+            if (dMiss < 0) {
+                if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][(dMiss & 0x60) >> 5] - 1]._mitype)
+                    return;
+                if (((dMiss & 0x60) >> 5) + 1 < 4) {
+                    dMissArray[dMiss & 0x1F][((dMiss & 0x60) >> 5) + 1] = i + 1;
+                    dung_map[mx][my].dMissile += 0x20;
+                }
+            } else {
+                for (m = 0; m < 32; m++) {
+                    if (dMissArray[m][0] == 0) {
+                        dMissArray[m][0] = dMiss;
+                        dMissArray[m][1] = i + 1;
+                        dung_map[mx][my].dMissile = m - 0x60;
+                        break;
+                    }
                 }
             }
         }
