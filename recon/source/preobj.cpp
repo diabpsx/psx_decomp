@@ -664,6 +664,7 @@ void SetMapObjects(unsigned char *pMap, int startx, int starty)
 {
     int i, j;
     int rw, rh;
+    int ox, oy;
     unsigned char *lm, *h;
     long mapoff;
     int ot;
@@ -694,7 +695,8 @@ void SetMapObjects(unsigned char *pMap, int startx, int starty)
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*lm) {
-                ot = ObjTypeConv[*lm];
+                ot = *lm;
+                ot = ObjTypeConv[ot];
                 fileload[AllObjects[ot].ofindex] = 1;
             }
             lm += 2;
@@ -711,8 +713,12 @@ void SetMapObjects(unsigned char *pMap, int startx, int starty)
     lm = h;
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
-            if (*lm)
-                AddObject(ObjTypeConv[*lm], i + 16 + startx, j + 16 + starty);
+            if (*lm) {
+                ot = *lm;
+                ox = i + 16 + startx;
+                oy = j + 16 + starty;
+                AddObject(ObjTypeConv[ot], ox, oy);
+            }
             lm += 2;
         }
     }
