@@ -3006,12 +3006,9 @@ void Obj_Door(int i)
         dy = object[i]._oy;
         dx = object[i]._ox;
         dok = dung_map[dx][dy].dMonster == 0;
-        if (dung_map[dx][dy].dItem != 0)
-            dok = 0;
-        if (GetdDead(dx, dy) != 0)
-            dok = 0;
-        if (IsDplayer(dx, dy) != 0)
-            dok = 0;
+        dok = dok & !dung_map[dx][dy].dItem;
+        dok = dok & !GetdDead(dx, dy);
+        dok = dok & !IsDplayer(dx, dy);
         object[i]._oSelFlag = 2;
         object[i]._oVar4 = dok ? 1 : 2;
         object[i]._oMissFlag = 1;
