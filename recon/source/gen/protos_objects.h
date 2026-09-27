@@ -161,3 +161,4 @@ unsigned char SpawnSkeleton(int ii, int x, int y);
 void StartPlrKill(int pnum, int val);
 void StartStand(int pnum, int dir);
 void mem_free_dbg(void *p);
+void func_80159C74(int ot, int ox, int oy, int oi);   /* unnamed helper, not in this TU/segment */

@@ -75,18 +75,16 @@ void DeleteObject(int oi, int i)
 
 void SetupObject(int i, int x, int y, int ot)
 {
-    int j, ofi;
+    int ai, j;
 
     object[i]._otype = ot;
     object[i]._ox = x;
     object[i]._oy = y;
-    ofi = AllObjects[ot].ofindex;
-    j = 0;
-    while (ObjFileList[j] != ofi) {
-        j++;
+    ai = AllObjects[ot].ofindex;
+    for (j = 0; ObjFileList[j] != ai; j++) {
     }
     object[i]._oAnimFlag = AllObjects[ot].oAnimFlag;
-    if (AllObjects[ot].oAnimFlag) {
+    if (object[i]._oAnimFlag) {
         object[i]._oAnimDelay = AllObjects[ot].oAnimDelay;
         object[i]._oAnimCnt = ENG_random(AllObjects[ot].oAnimDelay);
         object[i]._oAnimLen = AllObjects[ot].oAnimLen;
@@ -191,9 +189,9 @@ void PostObjObjAddSwitch(int ot, int ox, int oy, int oi)
     case 43:
         PostAddL2Door(oi, ox, oy, ot);
         break;
-    case 1:
-    case 2:
-        PostAddL1Door(oi, ox, oy, ot);
+    case 77:
+    case 89:
+        PostAddArmorStand(oi);
         break;
     case 44:
     case 45:
@@ -201,9 +199,9 @@ void PostObjObjAddSwitch(int ot, int ox, int oy, int oi)
     case 47:
         PostAddObjLight(oi, 0x1B6);
         break;
-    case 77:
-    case 89:
-        PostAddArmorStand(oi);
+    case 1:
+    case 2:
+        PostAddL1Door(oi, ox, oy, ot);
         break;
     case 90:
     case 92:
@@ -222,6 +220,336 @@ void SyncPedistal(int i)
 {
 }
 
+int ItemMiscIdIdx(int imiscid)
+{
+    int i;
+
+    i = 0;
+    while (AllItemsList[i].iRnd == 0 || AllItemsList[i].iMiscId != imiscid) {
+        i++;
+    }
+    return i;
+}
+
+void DrawObjExpl(struct ObjectStruct *obj, int ScrX, int ScrY, int ot)
+{
+    int f;
+
+    f = obj->_oAnimFrame - 1;
+    if (f != obj->_oAnimLen - 1) {
+        DrawExpl(ScrX, ScrY, f, ot, 0x200, 0, 0, 0);
+    } else {
+        if (obj->_olid)
+            AddUnLight(obj->_olid);
+    }
+}
+
+void DRLG_MRectTrans(int x1, int y1, int x2, int y2)
+{
+    int i, j;
+
+    x1 = x1 * 2 + 17;
+    y1 = y1 * 2 + 17;
+    x2 = x2 * 2 + 16;
+    y2 = y2 * 2 + 16;
+    for (j = y1; j <= y2; j++) {
+        for (i = x1; i <= x2; i++) {
+            dung_map[i][j].dTransVal = TransVal;
+        }
+    }
+    TransVal++;
+}
+
+void RedoPlayerVision(void)
+{
+    int p;
+
+    for (p = 0; p < 2; p++) {
+        if (plr[p].plractive && currlevel == plr[p].plrlevel) {
+            ChangeVisionXY(plr[p]._pvid, plr[p]._px, plr[p]._py);
+        }
+    }
+}
+
+void ActivateTrapLine(int ttype, int tid)
+{
+    int i, oi;
+
+    for (i = 0; i < numobjects; i++) {
+        oi = objectactive[i];
+        if (object[oi]._otype == ttype && object[oi]._oVar1 == tid) {
+            object[oi]._oVar4 = 1;
+            object[oi]._oAnimFlag = 1;
+            object[oi]._oAnimDelay = 1;
+            object[oi]._olid = AddLight(object[oi]._ox, object[oi]._oy, 294);
+        }
+    }
+}
+
+void LoadMapObjs(unsigned char *pMap, int startx, int starty)
+{
+    int rw, rh;
+    int i, j;
+    unsigned char *lm;
+    long mapoff;
+
+    InitObjFlag = 1;
+    lm = pMap;
+    rw = *lm;
+    lm += 2;
+    rh = *lm;
+    mapoff = (rw * rh + 1) * 2;
+    rw <<= 1;
+    rh <<= 1;
+    mapoff += 2 * rw * rh * 2;
+    lm += mapoff;
+
+    for (j = 0; j < rh; j++) {
+        for (i = 0; i < rw; i++) {
+            if (*lm) {
+                AddObject(ObjTypeConv[*lm], startx + 16 + i, starty + 16 + j);
+            }
+            lm += 2;
+        }
+    }
+}
+
+void AddObject(int ot, int ox, int oy)
+{
+    int oi;
+
+    if (numobjects < 0x7F && dung_map[ox][oy].dObject == 0) {
+        oi = objectavail[0];
+        objectavail[0] = objectavail[0x7E - numobjects];
+        object[oi]._olid = -1;
+        objectactive[numobjects] = oi;
+        dung_map[ox][oy].dObject = oi + 1;
+        SetupObject(oi, ox, oy, ot);
+        if (ot != 0x53)
+            func_80159C74(ot, ox, oy, oi);
+        numobjects++;
+    }
+}
+
+void BreakObject(int pnum, int oi)
+{
+    int mind, maxd, objdam;
+
+    if (pnum != -1) {
+        mind = plr[pnum]._pIMinDam;
+        maxd = plr[pnum]._pIMaxDam;
+        objdam = ENG_random(maxd - mind + 1) + mind;
+        objdam += plr[pnum]._pDamageMod + plr[pnum]._pIBonusDamMod + plr[pnum]._pIBonusDam * objdam / 100;
+    } else {
+        objdam = 10;
+    }
+    if (object[oi]._otype < 0x14)
+        return;
+    if (object[oi]._otype < 0x17) {
+        BreakCrux(pnum, oi);
+        return;
+    }
+    if (object[oi]._otype >= 0x3B)
+        return;
+    if (object[oi]._otype >= 0x39)
+        BreakBarrel(pnum, oi, objdam, 0, 1);
+}
+
+void TryDisarm(int pnum, int i)
+{
+    int j, oi, oti;
+    int trapdisper;
+    unsigned char checkflag;
+
+    if (pnum == myplr)
+        NewCursor(1);
+    if (object[i]._oTrapFlag) {
+        trapdisper = 2 * plr[pnum]._pDexterity - 5 * currlevel;
+        if (trapdisper >= ENG_random(100)) {
+            for (j = 0; j < numobjects; j++) {
+                oi = objectactive[j];
+                checkflag = 0;
+                if (object[oi]._otype == 0x35)
+                    checkflag = 1;
+                if (object[oi]._otype == 0x36)
+                    checkflag = 1;
+                if (checkflag) {
+                    oti = dung_map[object[oi]._oVar1][object[oi]._oVar2].dObject - 1;
+                    if (oti == i) {
+                        object[oi]._oVar4 = 1;
+                        object[i]._oTrapFlag = 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void PostAddL1Objs(int x1, int y1, int x2, int y2)
+{
+    int i, j;
+    int pn;
+
+    for (j = y1; j < y2; j++) {
+        for (i = x1; i < x2; i++) {
+            pn = FindBlock(i, j);
+            if (pn == 0x10E)
+                PostAddObject(0, i, j);
+            if (pn == 0x2C || pn == 0x33 || pn == 0xD6)
+                PostAddObject(1, i, j);
+            if (pn == 0x2E || pn == 0x38)
+                PostAddObject(2, i, j);
+        }
+    }
+}
+
+void PostAddL2Objs(int x1, int y1, int x2, int y2)
+{
+    int i, j;
+    int pn;
+
+    for (j = y1; j < y2; j++) {
+        for (i = x1; i < x2; i++) {
+            pn = FindBlock(i, j);
+            if (pn == 0xD || pn == 0x21D)
+                PostAddObject(0x2A, i, j);
+            if (pn == 0x11 || pn == 0x21E)
+                PostAddObject(0x2B, i, j);
+        }
+    }
+}
+
+void ObjChangeMap(int x1, int y1, int x2, int y2)
+{
+    int i, j;
+
+    for (j = y1; j <= y2; j++) {
+        for (i = x1; i <= x2; i++) {
+            ObjSetMini(i, j, pdungeon[i][j]);
+            dungeon[i][j] = pdungeon[i][j];
+        }
+    }
+    if (leveltype == 1) {
+        ObjL1Special(2 * x1 + 16, 2 * y1 + 16, 2 * x2 + 17, 2 * y2 + 17);
+        PostAddL1Objs(2 * x1 + 16, 2 * y1 + 16, 2 * x2 + 17, 2 * y2 + 17);
+    }
+    if (leveltype == 2) {
+        ObjL2Special(2 * x1 + 16, 2 * y1 + 16, 2 * x2 + 17, 2 * y2 + 17);
+        PostAddL2Objs(2 * x1 + 16, 2 * y1 + 16, 2 * x2 + 17, 2 * y2 + 17);
+    }
+}
+
+void ObjChangeMapResync(int x1, int y1, int x2, int y2)
+{
+    int i, j;
+
+    for (j = y1; j <= y2; j++) {
+        for (i = x1; i <= x2; i++) {
+            ObjSetMini(i, j, pdungeon[i][j]);
+            dungeon[i][j] = pdungeon[i][j];
+        }
+    }
+    if (leveltype == 1) {
+        ObjL1Special(2 * x1 + 16, 2 * y1 + 16, 2 * x2 + 17, 2 * y2 + 17);
+    }
+    if (leveltype == 2) {
+        ObjL2Special(2 * x1 + 16, 2 * y1 + 16, 2 * x2 + 17, 2 * y2 + 17);
+    }
+    FillCrapBits();
+}
+
+void BreakCrux(int pnum, int i)
+{
+    int j, ot, oi;
+    unsigned char mapflag;
+
+    if (object[i]._oSelFlag) {
+        object[i]._oAnimFlag = 1;
+        object[i]._oAnimFrame = 1;
+        object[i]._oSolidFlag = 1;
+        object[i]._oMissFlag = 1;
+        object[i]._oBreak = -1;
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimDelay = 1;
+        mapflag = 1;
+        for (j = 0; j < numobjects; j++) {
+            oi = objectactive[j];
+            ot = object[oi]._otype;
+            if (ot != 0x14 && ot != 0x15 && ot != 0x16)
+                continue;
+            if (object[i]._oVar8 != object[oi]._oVar8 || object[oi]._oBreak == -1)
+                continue;
+            mapflag = 0;
+        }
+        if (mapflag) {
+            if (!deltaload)
+                PlaySfxLoc(0x2B, object[i]._ox, object[i]._oy);
+            ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
+        }
+        if (!deltaload)
+            NetSendCmdParam2(0, 0x2F, pnum, i);
+    }
+}
+
+void OperateLever(int pnum, int i)
+{
+    unsigned char mapflag;
+    int j, oi, ot;
+
+    if (object[i]._oSelFlag != 0) {
+        if (!deltaload)
+            PlaySfxLoc(0x2B, object[i]._ox, object[i]._oy);
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame++;
+        mapflag = 1;
+        if (currlevel == 16) {
+            for (j = 0; j < numobjects; j++) {
+                oi = objectactive[j];
+                ot = object[oi]._otype;
+                if (ot == 0x1C
+                    && object[i]._oVar8 == object[oi]._oVar8
+                    && object[oi]._oSelFlag != 0) {
+                    mapflag = 0;
+                }
+            }
+        }
+        if (mapflag)
+            ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
+        if (!deltaload)
+            NetSendCmdParam1(0, 0x2D, i);
+    }
+}
+
+void OperateSarc(int pnum, int i, unsigned char sendmsg)
+{
+    if (object[i]._oSelFlag != 0) {
+        if (!deltaload)
+            PlaySfxLoc(0x2F, object[i]._ox, object[i]._oy);
+        object[i]._oSelFlag = 0;
+        if (deltaload) {
+            object[i]._oAnimFrame = object[i]._oAnimLen;
+        } else {
+            object[i]._oAnimFlag = 1;
+            object[i]._oAnimDelay = 3;
+            SetRndSeed(object[i]._oRndSeed);
+            if (object[i]._oVar1 <= 2)
+                CreateRndItem(object[i]._ox, object[i]._oy, 0, sendmsg, 0);
+            if (object[i]._oVar1 >= 8)
+                SpawnSkeleton(object[i]._oVar2, object[i]._ox, object[i]._oy);
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void ObjL1Special(int x1, int y1, int x2, int y2)
+{
+}
+
+void ObjL2Special(int x1, int y1, int x2, int y2)
+{
+}
+
 #define OBJ_CRUX1 0x14
 #define OBJ_CRUX2 0x15
 #define OBJ_CRUX3 0x16
@@ -236,14 +564,88 @@ void SyncCrux(int i)
     for (j = 0; j < numobjects; j++) {
         ot = objectactive[j];
         type = object[ot]._otype;
-        if (type != OBJ_CRUX1 && type != OBJ_CRUX2 && type != OBJ_CRUX3)
-            continue;
-        if (object[i]._oVar8 != object[ot]._oVar8 || object[ot]._oBreak == -1)
-            continue;
-        found = 0;
+        if ((type == OBJ_CRUX1 || type == OBJ_CRUX2 || type == OBJ_CRUX3)
+            && object[i]._oVar8 == object[ot]._oVar8 && object[ot]._oBreak != -1)
+            found = 0;
     }
     if (found)
         ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
+}
+
+void SyncL1Doors(int i)
+{
+    int dx, dy;
+
+    if (object[i]._oVar4 == 0) {
+        object[i]._oMissFlag = 0;
+        return;
+    }
+    object[i]._oMissFlag = 1;
+    object[i]._oSelFlag = 2;
+    dx = object[i]._ox;
+    dy = object[i]._oy;
+    if (object[i]._otype == 1) {
+        if (object[i]._oVar1 == 0xD6)
+            ObjSetMicro(dx, dy, 0x198);
+        else
+            ObjSetMicro(dx, dy, 0x189);
+        dy--;
+    } else {
+        ObjSetMicro(dx, dy, 0x18B);
+        dx--;
+    }
+    DoorSet(i, dx, dy);
+}
+
+void SyncL3Doors(int i)
+{
+    int x, y;
+
+    object[i]._oMissFlag = 1;
+    object[i]._oSelFlag = 2;
+    x = object[i]._ox;
+    y = object[i]._oy;
+    if (object[i]._otype == 0x4A) {
+        if (object[i]._oVar4 == 0) {
+            ObjSetMicro(x, y, 0x213);
+        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
+            ObjSetMicro(x, y, 0x21A);
+        }
+    }
+    if (object[i]._otype == 0x4B) {
+        if (object[i]._oVar4 == 0) {
+            ObjSetMicro(x, y, 0x216);
+        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
+            ObjSetMicro(x, y, 0x21D);
+        }
+    }
+}
+
+void SyncL2Doors(int i)
+{
+    int x, y;
+
+    if (object[i]._oVar4 == 0)
+        object[i]._oMissFlag = 0;
+    else
+        object[i]._oMissFlag = 1;
+    x = object[i]._ox;
+    object[i]._oSelFlag = 2;
+    y = object[i]._oy;
+    if (object[i]._otype == 0x2A) {
+        if (object[i]._oVar4 == 0) {
+            ObjSetMicro(x, y, 0x21A);
+        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
+            ObjSetMicro(x, y, 0xD);
+        }
+    }
+    if (object[i]._otype == 0x2B) {
+        if (object[i]._oVar4 == 0) {
+            ObjSetMicro(x, y, 0x21C);
+        } else if (object[i]._oVar4 == 1 || object[i]._oVar4 == 2) {
+            ObjSetMicro(x, y, 0x11);
+        }
+    }
 }
 
 void SyncLever(int i)
@@ -581,6 +983,139 @@ void SyncOpL3Door(int pnum, int cmd, int i)
             OperateL3RDoor(-1, i, 0);
         if (object[i]._otype == 0x4B)
             OperateL3LDoor(-1, i, 0);
+    }
+}
+
+void SyncObjectAnim(int o)
+{
+    int ai, ot;
+
+    ai = AllObjects[object[o]._otype].ofindex;
+    ot = 0;
+    while (ObjFileList[ot] != ai) {
+        ot++;
+    }
+    switch (object[o]._otype) {
+    case 1:
+    case 2:
+        SyncL1Doors(o);
+        break;
+    case 42:
+    case 43:
+        SyncL2Doors(o);
+        break;
+    case 74:
+    case 75:
+        SyncL3Doors(o);
+        break;
+    case 20:
+    case 21:
+    case 22:
+        SyncCrux(o);
+        break;
+    case 4:
+    case 25:
+    case 28:
+        SyncLever(o);
+        break;
+    case 41:
+    case 71:
+    case 88:
+        SyncQSTLever(o);
+        break;
+    case 73:
+        SyncPedistal(o);
+        break;
+    }
+}
+
+void Obj_Door(int i)
+{
+    int dx, dy;
+    int dok;
+
+    if (object[i]._oVar4 == 0) {
+        object[i]._oSelFlag = 3;
+        object[i]._oMissFlag = 0;
+        return;
+    }
+    dy = object[i]._oy;
+    dx = object[i]._ox;
+    dok = dung_map[dx][dy].dMonster == 0;
+    if (dung_map[dx][dy].dItem != 0)
+        dok = 0;
+    if (GetdDead(dx, dy) != 0)
+        dok = 0;
+    if (IsDplayer(dx, dy) != 0)
+        dok = 0;
+    object[i]._oSelFlag = 2;
+    object[i]._oVar4 = dok ? 1 : 2;
+    object[i]._oMissFlag = 1;
+}
+
+void Obj_Light(int i, int lr)
+{
+    int ox, oy;
+    int dx, dy;
+    int p;
+    int tr;
+    unsigned char turnon;
+
+    if (level_lamp[leveltype]) {
+        if (object[i]._oVar1 != -1) {
+            tr = (lr & 0xF) + 6;
+            turnon = 0;
+            ox = object[i]._ox;
+            oy = object[i]._oy;
+            for (p = 0; p < 2 && !turnon; p++) {
+                if (plr[p].plractive) {
+                    if (currlevel == plr[p].plrlevel) {
+                        dx = abs(plr[p]._px - ox);
+                        dy = abs(plr[p]._py - oy);
+                        if (dx < tr && dy < tr)
+                            turnon = 1;
+                    }
+                }
+            }
+            if (turnon) {
+                if (object[i]._oVar1 == 0)
+                    object[i]._olid = AddLight(ox, oy, lr);
+                object[i]._oVar1 = 1;
+            } else {
+                if (object[i]._oVar1 == 1)
+                    AddUnLight(object[i]._olid);
+                object[i]._oVar1 = 0;
+            }
+        }
+    }
+}
+
+void Obj_BCrossDamage(int i)
+{
+    int resist;
+    int damage[4] = { 6, 8, 10, 12 };
+
+    for (int pnum = 0; pnum < 2; pnum++) {
+        if (plr[pnum]._pmode == PM_DEATH)
+            continue;
+        resist = plr[pnum]._pFireResist;
+        if (resist > 0)
+            damage[leveltype - 1] -= damage[leveltype - 1] * resist / 100;
+        if (plr[pnum]._px == object[i]._ox && plr[pnum]._py == object[i]._oy - 1) {
+            plr[pnum]._pHitPoints -= damage[leveltype - 1];
+            plr[pnum]._pHPBase -= damage[leveltype - 1];
+            if (plr[pnum]._pHitPoints >> 6 <= 0) {
+                StartPlrKill(pnum, 0);
+            } else {
+                if (plr[pnum]._pClass == PC_WARRIOR)
+                    PlaySfxLoc(0x315, plr[pnum]._px, plr[pnum]._py);
+                else if (plr[pnum]._pClass == PC_ROGUE)
+                    PlaySfxLoc(0x2A7, plr[pnum]._px, plr[pnum]._py);
+                else if (plr[pnum]._pClass == PC_SORCERER)
+                    PlaySfxLoc(0x23F, plr[pnum]._px, plr[pnum]._py);
+            }
+            drawhpflag = 1;
+        }
     }
 }
 

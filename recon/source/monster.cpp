@@ -2437,20 +2437,17 @@ int M_SpawnSkel(int x, int y, int dir)
     return -1;
 }
 
-/* SYM+bytes OPEN (205 vs 186 insns): semantically correct (call list, mtype
- * ranges MT_SNEAK..MT_ILLWEAV / MT_NSCAV..MT_YSCAV, MT_BLINK, MGOAL_NORMAL,
- * and the PSX-specific reordering where the pnum>=0 enemy-assignment runs
- * UNCONDITIONALLY -- confirmed from the raw oracle, NOT wrapped by the
- * severity-if like devilution/hellfire -- are all verified against the raw
- * bytes), but register allocation is scrambled (oracle: i=$s3, pnum=$s0,
- * dam=$s2, plus a short-lived caller-saved `pmonster` pointer at $v0 with no
- * named local for a cached `mtype`; ours picks different physical regs
- * throughout). Falsified: caching mtype into a local, reordering the pnum
- * block relative to the severity-return. Next angle: try introducing an
- * explicit `MonsterStruct *pmonster = &monster[i];` used ONLY for the
- * `_mhitpoints` read in the delta_monster_hp call (matching SYM's
- * short-lived pmonster local) while keeping every other access as
- * `monster[i].field`. */
+/* SOLVED (was OPEN, 205 vs 186 insns): the fix was the `pmonster` pointer --
+ * it is a real but narrowly-scoped local, declared with its initializer
+ * INSIDE the `if (_mmode != MM_STONE)` block (not at function top), used
+ * ONLY to read `_moldx`/`_moldy` as a single two-field pointer dereference
+ * right after the NewMonsterAnim call and BEFORE the _mmode/_mxoff/_myoff
+ * writes. Declaring it (and `_moldx`/`_moldy`) block-scoped-with-initializer
+ * inside the if, in that exact position, both matched the byte count AND
+ * opened the two nested SYM levels retail's block tree has (both start at
+ * the same line -- one level per block-scoped decl). Everywhere else in the
+ * function plain `monster[i].field` indexing is correct; a full
+ * function-wide `Monst` pointer over-optimizes (128 insns, way short). */
 void M_StartHit(int i, int pnum, int dam)
 {
     if (pnum >= 0)
@@ -2480,18 +2477,21 @@ void M_StartHit(int i, int pnum, int dam)
 
     if (monster[i]._mmode != MM_STONE) {
         NewMonsterAnim(i, monster[i].MType->Anims[MA_GOTHIT], monster[i]._mdir, MA_GOTHIT);
+        MonsterStruct *pmonster = &monster[i];
+        int _moldx = pmonster->_moldx;
+        int _moldy = pmonster->_moldy;
         monster[i]._mmode = MM_GOTHIT;
         monster[i]._mxoff = 0;
         monster[i]._myoff = 0;
-        monster[i]._mx = monster[i]._moldx;
-        monster[i]._my = monster[i]._moldy;
-        monster[i]._mfutx = monster[i]._mx;
-        monster[i]._mfuty = monster[i]._my;
-        monster[i]._moldx = monster[i]._mx;
-        monster[i]._moldy = monster[i]._my;
+        monster[i]._mx = _moldx;
+        monster[i]._my = _moldy;
+        monster[i]._mfutx = _moldx;
+        monster[i]._mfuty = _moldy;
+        monster[i]._moldx = _moldx;
+        monster[i]._moldy = _moldy;
         M_CheckEFlag(i);
         M_ClearSquares(i);
-        dung_map[monster[i]._mx][monster[i]._my].dMonster = i + 1;
+        dung_map[_moldx][_moldy].dMonster = i + 1;
     }
 }
 
@@ -2508,11 +2508,8 @@ void MAI_Lachdanan(int i)
 {
     int md;
     MonsterStruct *Monst = &monster[i];
-    int _mx;
-    int _my;
-
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    int _mx = Monst->_mx;
+    int _my = Monst->_my;
 
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
