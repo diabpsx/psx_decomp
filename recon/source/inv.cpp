@@ -584,14 +584,12 @@ int SwapItem(ItemStruct *a, ItemStruct *b)
 
 void InvGetItemWH(int Pos)
 {
-    int v;
-
-    v = plr[myplr].InvGrid[Pos];
-    if (v == 0)
+    if (plr[myplr].InvGrid[Pos] == 0)
         return;
-    if (v <= 0)
-        v = -v;
-    ItemNo = v;
+    if (plr[myplr].InvGrid[Pos] > 0)
+        ItemNo = plr[myplr].InvGrid[Pos];
+    else
+        ItemNo = -plr[myplr].InvGrid[Pos];
     ItemNo = plr[myplr].InvList[ItemNo - 1]._iCurs;
     ItemW = InvItemWidth[ItemNo + 12] >> 4;
     ItemH = InvItemHeight[ItemNo + 12] >> 4;
