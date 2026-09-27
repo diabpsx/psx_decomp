@@ -2076,7 +2076,6 @@ void MI_Town(int i)
 {
     int p;
     int ExpLight[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15 };
-    PlayerStruct *player;
 
     if (missile[i]._mirange > 1)
         missile[i]._mirange--;
@@ -2096,7 +2095,7 @@ void MI_Town(int i)
      * match it always calls ClrPlrPath/PutMissile/NetSendCmdParam1(cmd=0x1F, not 34) and returns
      * immediately, skipping the rest of the loop and the mirange/AddUnLight cleanup below. */
     for (p = 0; p < MAX_PLRS; p++) {
-        player = &plr[p];
+        PlayerStruct *player = &plr[p];
         if (player->plractive && player->_px == missile[i]._mix && player->_py == missile[i]._miy && !qtextflag && !PauseMode) {
             if (gbMaxPlayers != 2 || !plr[p ^ 1].plractive || plr[p ^ 1].destAction != 13) {
                 ClrPlrPath(p);
