@@ -2295,41 +2295,39 @@ end:
 
 void DrawInvTSK(struct TASK *T)
 {
-    int omp = myplr;
-    int osel = sel_data;
+    int omp;
+    int osel;
     CBlocks *BgBlocks;
     int ThisIsShit;
     int OldPad;
-    int OldOt;
 
+    osel = sel_data;
+    omp = myplr;
     if (!invflag || options_pad == -1) {
         D_8011C324 = 0;
         invflag = 0;
         options_pad = -1;
-        goto end;
+        return;
     }
 
     myplr = options_pad;
-    PAD_GetPad(0, 0)->Flush();
+    PAD_GetPad(options_pad, 0)->Flush();
     CDWAIT = 1;
     PauseMode = 1;
     GLUE_SuspendGame();
-    if (sghMusic && sghMusic->sec_num < 4) {
-        OldOt = 1;
-        do {
-            PauseMode = OldOt;
+    if (sghMusic) {
+        while (sghMusic->sec_num < 4) {
+            PauseMode = 1;
             GLUE_SuspendGame();
             TSK_Sleep(1);
-        } while (sghMusic->sec_num < 4);
+        }
     }
     GLUE_SetShowPanelFlag(0);
     TSK_Sleep(1);
     stream_stop();
-    if (SFXTab[1].used) {
-        do {
-            stream_stop();
-            TSK_Sleep(1);
-        } while (SFXTab[1].used);
+    while (SFXTab[1].used) {
+        stream_stop();
+        TSK_Sleep(1);
     }
     GLUE_SuspendGame();
     GLUE_SetShowGameScreenFlag(0);
@@ -2359,70 +2357,59 @@ void DrawInvTSK(struct TASK *T)
     PauseMode = 0;
     OldPad = options_pad;
 
-mainloop:
-    if (ThisIsShit == 0)
-        goto cleanup;
-    ThisIsShit = 0;
-    options_pad = OldPad;
-    invflag = 1;
+    while (ThisIsShit) {
+        ThisIsShit = 0;
+        options_pad = OldPad;
+        invflag = 1;
+        while (invflag && options_pad >= 0) {
+            int OldOt = MediumFont.SetOTpos(0xFC);
+            myplr = options_pad;
+            sel_data = options_pad;
+            ControlInv();
+            if (options_pad != -1) {
+                myplr = options_pad;
+                sel_data = options_pad;
+                DoThatDrawInv();
+            }
+            MediumFont.SetOTpos(OldOt);
+            GLUE_SuspendGame();
+            TSK_Sleep(1);
+            if (plr[options_pad]._pHitPoints >> 6 <= 0) {
+                PostGamePad(5, 0, 0, 0);
+                options_pad = -1;
+                break;
+            }
+        }
 
-padloop:
-    if (!invflag)
-        goto after_pad;
-    if (options_pad < 0)
-        goto after_pad;
-    OldOt = MediumFont.SetOTpos(0xFC);
-    myplr = options_pad;
-    sel_data = options_pad;
-    ControlInv();
-    if (options_pad != -1) {
-        myplr = options_pad;
-        sel_data = options_pad;
-        DoThatDrawInv();
+        if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4)
+            _pcurs[myplr] = 1;
+
+        if (_pcurs[myplr] >= 0xC) {
+            if (!TryInvPut()) {
+                if (StoreAutoPlace())
+                    continue;
+                if (numitems >= 0x7A) {
+                    PlaySFX(0x3D3);
+                    ThisIsShit = 1;
+                    continue;
+                }
+            }
+            NetSendCmdPItem(1, 0xA, 0, 0);
+        }
     }
-    MediumFont.SetOTpos(OldOt);
-    GLUE_SuspendGame();
-    TSK_Sleep(1);
-    if (plr[options_pad]._pHitPoints >> 6 > 0)
-        goto padloop;
-    PostGamePad(5, 0, 0, 0);
-    options_pad = -1;
 
-after_pad:
-    if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4)
-        _pcurs[myplr] = 1;
-
-    if (_pcurs[myplr] < 0xC)
-        goto mainloop;
-    if (TryInvPut())
-        goto send;
-    if (StoreAutoPlace())
-        goto mainloop;
-    if (numitems < 0x7A)
-        goto send;
-    PlaySFX(0x3D3);
-    ThisIsShit = 1;
-    goto mainloop;
-
-send:
-    NetSendCmdPItem(1, 0xA, 0, 0);
-    goto mainloop;
-
-cleanup:
     ClearPanel();
     stream_stop();
-    if (SFXTab[1].used) {
-        do {
-            stream_stop();
-            TSK_Sleep(1);
-        } while (SFXTab[1].used);
+    while (SFXTab[1].used) {
+        stream_stop();
+        TSK_Sleep(1);
     }
     VID_SetDBuffer(1);
     CDWAIT = 1;
     PauseMode = 1;
     GM_FinishedUsing(InvGfxTData);
     InvGfxTData = 0;
-    if (leveltype == 0) {
+    if (leveltype != 0) {
         GM_ForceTpLoad(0xD0);
     } else {
         BgBlocks->SetTownersGraphics();
@@ -2448,8 +2435,6 @@ cleanup:
     GLUE_SetShowPanelFlag(1);
     GLUE_SetShowGameScreenFlag(1);
     GLUE_SetHomingScrollFlag(1);
-
-end:;
 }
 
 void CheckInvCut(int pnum, int mx, int my)
