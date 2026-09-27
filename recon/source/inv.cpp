@@ -561,13 +561,14 @@ unsigned char WeaponAutoPlace(int pnum)
             plr[pnum].InvBody[INVLOC_HAND_RIGHT] = plr[pnum].HoldItem;
             return 1;
         }
-    } else if (plr[pnum].InvBody[INVLOC_HAND_LEFT]._itype == ITYPE_NONE && plr[pnum].InvBody[INVLOC_HAND_RIGHT]._itype == ITYPE_NONE) {
-        NetSendCmdChItem(1, INVLOC_HAND_LEFT);
-        plr[pnum].InvBody[INVLOC_HAND_LEFT] = plr[pnum].HoldItem;
-        return 1;
+        return 0;
     }
 
-    return 0;
+    if (plr[pnum].InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE || plr[pnum].InvBody[INVLOC_HAND_RIGHT]._itype != ITYPE_NONE)
+        return 0;
+    NetSendCmdChItem(1, INVLOC_HAND_LEFT);
+    plr[pnum].InvBody[INVLOC_HAND_LEFT] = plr[pnum].HoldItem;
+    return 1;
 }
 
 int SwapItem(ItemStruct *a, ItemStruct *b)
