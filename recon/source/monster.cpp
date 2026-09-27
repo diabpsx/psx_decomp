@@ -1667,17 +1667,41 @@ void MAI_RoundRanged(int i, int missile_type, unsigned char checkdoors, int dam,
     }
 }
 
-/* OPEN: bytes near-miss (129 diffs, 254 vs 247 insns) -- logic transcribed from hellfire with 2
- * confirmed PSX simplifications read off the raw oracle: (1) the `dLight[mx][my]!=lightmax`
- * visibility guard at the top is ABSENT entirely (PSX runs the whole AI unconditionally once
- * mmode==MM_STAND); (2) the MG_RUN_AWAY check drops hellfire's `&& !(_mFlags&MFLAG_NOENEMY)`
- * term.  Residual is mostly register-letter noise (s4 vs s5 for `i8) -- declaration-order swap
- * (dist before/after Monst) made no difference. */
+/* OPEN: bytes near-miss (113 diffs, ours 244 / oracle 247 insns, 3 short). Logic transcribed from
+ * hellfire with confirmed PSX simplifications read off the raw oracle: (1) the
+ * `dLight[mx][my]!=lightmax` visibility guard at the top is ABSENT entirely (PSX runs the whole AI
+ * unconditionally once mmode==MM_STAND); (2) the MG_RUN_AWAY check drops hellfire's
+ * `&& !(_mFlags&MFLAG_NOENEMY)` term.
+ * TWO MORE REAL BUGS found+fixed this pass, both confirmed byte-for-byte against the raw oracle
+ * disasm (asm/nonmatchings/monster/MAI_Sneak__Fi.s):
+ * (a) callaudit.py flagged a call-ORDER mismatch (17 calls vs retail's 18) -- the fadein guard
+ *     `abs(mx) < dist && (flags&MFLAG_HIDDEN)` was missing the DIST-macro's second half
+ *     (hellfire's `DIST(mx,my,dist)` = `abs(mx)<d && abs(my)<d`, MISSILES.CPP:1952) -- fixed to
+ *     `abs(mx) < dist && abs(my) < dist && (...)`. callaudit now reports 0 mismatches tree-wide.
+ * (b) the MG_RUN_AWAY block's GetDirection call was structured as a two-way branch (monster-coords
+ *     vs player-coords) copied from hellfire's `if(MFLAG_MID) monster-pos else player-pos`, but the
+ *     raw oracle only has ONE conditional call -- when `_mFlags & MFLAG_TARGETS_MONSTER` (PSX's name
+ *     for the same 0x10 bit) is SET, it calls GetDirection with PLAYER coords only (`Monst->_mx,
+ *     Monst->_my, plr[_menemy]._pownerx, plr[_menemy]._pownery`); when CLEAR, `md` keeps its prior
+ *     value (from `M_GetDir(i)` at the top) with NO call at all -- fixed by dropping the
+ *     monster-coords branch entirely (confirmed against both the raw bytes and the JAP Ghidra
+ *     decompile at this exact VA, which shows the identical single-branch shape). This alone cut
+ *     131->113 diffs and 260->244 insns (was 13 OVER length, now 3 short).
+ * Residual (3 short, 113 diffs): a whole-function register-coloring swap -- retail assigns `i`'s
+ * transient home (before `Monst` is computed) to $s5 exactly where SYM says `i` permanently lives;
+ * ours puts it in $s4 (the register `mx` will later use), cascading an s4<->s5 / s6<->fp swap through
+ * the whole body (content-identical instructions, different register letters throughout). FALSIFIED:
+ * swapping `dist`/`Monst` declaration order to match SYM's local-record order (i,mx,my,md,v,Monst,
+ * dist) -- no byte change. NEXT ANGLE (untried): this is register-coloring/permuter territory per
+ * the methodology doc; the 3-insn length gap suggests there may also be a genuine missing/extra
+ * instruction hiding under the register noise -- worth a careful line-by-line reread of the tail
+ * (offsets 80150D0C-80150DE4, the attack-check block) against the current C once the coloring noise
+ * is untangled. */
 void MAI_Sneak(int i)
 {
     int mx, my, md, v;
-    int dist;
     MonsterStruct *Monst = &monster[i];
+    int dist;
 
     if (Monst->_mmode == MM_STAND) {
         mx = Monst->_mx - Monst->_menemyx;
@@ -1697,9 +1721,6 @@ void MAI_Sneak(int i)
         if (Monst->_mgoal == MG_RUN_AWAY) {
             if (Monst->_mFlags & MFLAG_TARGETS_MONSTER) {
                 md = GetDirection(Monst->_mx, Monst->_my,
-                    monster[Monst->_menemy]._mx, monster[Monst->_menemy]._my);
-            } else {
-                md = GetDirection(Monst->_mx, Monst->_my,
                     plr[Monst->_menemy]._pownerx, plr[Monst->_menemy]._pownery);
             }
             md = (md + 4) & 7;
@@ -1714,7 +1735,7 @@ void MAI_Sneak(int i)
         Monst->_mdir = md;
 
         v = ENG_random(100);
-        if (abs(mx) < dist && (Monst->_mFlags & MFLAG_HIDDEN))
+        if (abs(mx) < dist && abs(my) < dist && (Monst->_mFlags & MFLAG_HIDDEN))
             M_StartFadein(i, md, 0);
         else if (!(abs(mx) < dist + 1 && abs(my) < dist + 1) && !(Monst->_mFlags & MFLAG_HIDDEN))
             M_StartFadeout(i, md, 1);
