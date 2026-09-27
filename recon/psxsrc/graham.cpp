@@ -67,6 +67,111 @@ unsigned short water_clut;
 unsigned short penta_clut;
 BOOL penta_cycle;
 
+/* @0x8009DCB0 GRAHAM.CPP:233 */
+void color_cycle(struct TASK *T)
+{
+    struct RECT ClutR;
+    int cx, cy;
+    unsigned short ORIGPal[16];
+    unsigned short VRAMPal[16];
+    unsigned short CLUTPal[16];
+    int paloffset;
+    int y;
+    BOOL ch;
+
+    paloffset = 0;
+    penta_clut = 0;
+    water_clut = 0;
+    do {
+        if (GLUE_Finished())
+            return;
+        TSK_Sleep(1);
+    } while (!water_clut);
+
+    cx = (water_clut & 0x3F) << 4;
+    ClutR.x = cx;
+    cy = water_clut >> 6;
+    ClutR.y = cy;
+    ClutR.w = 16;
+    ClutR.h = 1;
+    DrawSync(0);
+    StoreImage(&ClutR, (unsigned long *)ORIGPal);
+    y = 0;
+    for (int i = 0; i < 16; i++) {
+        unsigned short col1 = ORIGPal[i];
+        unsigned char r = col1 & 0x1F;
+        unsigned char g = (col1 >> 5) & 0x1F;
+        unsigned char b = (col1 >> 10) & 0x1F;
+        if (setlevel && setlvlnum == 4) {
+            if (y < 8)
+                r = g = y + 8;
+            else
+                r = g = 24 - y;
+            b = 0;
+            y++;
+        }
+        VRAMPal[i] = r | (g << 5) | (b << 10) | (col1 & 0x8000);
+    }
+
+    ch = 1;
+    while (!GLUE_Finished()) {
+        if (water_clut && DoDrawBg && !PauseMode) {
+            if (WaterDone && ch && setlevel && setlvlnum == 4) {
+                ch = 0;
+                for (int i = 1; i < 16; i++) {
+                    unsigned short col1 = ORIGPal[i];
+                    unsigned short col2 = VRAMPal[i];
+                    unsigned char sb = col1 & 0x1F;
+                    unsigned char sg = (col1 >> 5) & 0x1F;
+                    unsigned char dr = col2 & 0x1F;
+                    unsigned char dg = (col2 >> 5) & 0x1F;
+                    unsigned char db = (col2 >> 10) & 0x1F;
+                    if (dr < ((col1 >> 10) & 0x1F)) {
+                        dr++;
+                        ch = 1;
+                    }
+                    if (((col1 >> 10) & 0x1F) < dr) {
+                        dr--;
+                        ch = 1;
+                    }
+                    if (dg < sg) {
+                        dg++;
+                        ch = 1;
+                    }
+                    if (sg < dg) {
+                        dg--;
+                        ch = 1;
+                    }
+                    if (db < sb) {
+                        db++;
+                        ch = 1;
+                    }
+                    if (sb < db) {
+                        db--;
+                        ch = 1;
+                    }
+                    if (db < sb) {
+                        db++;
+                        ch = 1;
+                    }
+                    if (sb < db) {
+                        db--;
+                        ch = 1;
+                    }
+                    VRAMPal[i] = dr + (dg << 5) + (db << 10) + (col1 & 0x8000);
+                }
+            }
+            for (int i = 0; i < 15; i++)
+                CLUTPal[i + 1] = VRAMPal[(paloffset + i) % 15 + 1];
+            CLUTPal[0] = 0;
+            LoadImage(&ClutR, (unsigned long *)CLUTPal);
+            paloffset++;
+            paloffset %= 15;
+        }
+        TSK_Sleep(4);
+    }
+}
+
 /* @0x8009E070 GRAHAM.CPP:331 */
 void penta_cycle_task(struct TASK *T)
 {
