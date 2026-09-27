@@ -331,9 +331,9 @@ void PrepDoEnding(int pnum)
     deathflag = 0;
 
     plr[myplr].pDiabloKillLevel =
-        plr[myplr].pDiabloKillLevel > (unsigned long)(gnDifficulty + 1)
+        plr[myplr].pDiabloKillLevel > gnDifficulty + 1UL
             ? plr[myplr].pDiabloKillLevel
-            : (unsigned long)(gnDifficulty + 1);
+            : gnDifficulty + 1UL;
 
     for (int i = 0; i < 2; i++) {
         plr[i]._pmode = PM_QUIT;
@@ -751,9 +751,15 @@ void PrintUniqueHistory(void)
         strcpy(tempstr, GetStr(0x2CD));
         AddPanelString(tempstr, 1);
     } else {
-        strcpy(tempstr, GetStr((res & 7) ? 0x3E7 : 0x2D2));
+        if (res & 7)
+            strcpy(tempstr, GetStr(0x3E7));
+        else
+            strcpy(tempstr, GetStr(0x2D2));
         AddPanelString(tempstr, 1);
-        strcpy(tempstr, GetStr((res & 0x38) ? 0x3E6 : 0x2CD));
+        if (res & 0x38)
+            strcpy(tempstr, GetStr(0x3E6));
+        else
+            strcpy(tempstr, GetStr(0x2CD));
         AddPanelString(tempstr, 1);
     }
     _pinfoflag[sel_data] = 1;
@@ -1261,22 +1267,21 @@ void MAI_Ranged(int i, int missile_type, unsigned char special)
     }
 }
 
-/* OPEN: bytes near-miss (11 diffs, 77 vs 78 insns) -- scheduling-only (which of two independent
- * instructions the sw/lb pair emits first) + one register choice (a0 vs s2 for md across the
- * M_CheckEFlag-analog call).  Declaration order swap (md first vs last) made no difference. */
+/* PASS+SYM: const-view _mx/_my read (see MAI_Lachdanan) fixes the prologue
+ * order; the MAI_Succ dispatch is an if/else with `_mdir = md` in the else
+ * (as in MAI_Garbud), which keeps md out of a callee-saved reg. */
 void MAI_Lazhelp(int i)
 {
-    int mx, my;
-    MonsterStruct *Monst = &monster[i];
     int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx;
+    int _my;
 
-    mx = Monst->_mx;
-    my = Monst->_my;
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
-        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
-            mx = Monst->_mx - Monst->_menemyx;
-            my = Monst->_my - Monst->_menemyy;
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
             if (gbMaxPlayers == 1) {
                 if (quests[Q_BETRAYER]._qvar1 <= 5)
                     Monst->_mgoal = MG_TALK;
@@ -1290,8 +1295,9 @@ void MAI_Lazhelp(int i)
         }
         if (Monst->_mgoal == MG_ATTACK) {
             MAI_Succ(i);
+        } else {
+            monster[i]._mdir = md;
         }
-        monster[i]._mdir = md;
     }
     if (Monst->_mmode == MM_STAND)
         Monst->Action = MA_STAND;
@@ -4263,6 +4269,7 @@ void PrintMonstHistory(int mt)
 
         if (res == 0) {
             strcpy(tempstr, GetStr(0x2CE));
+            AddPanelString(tempstr, 1);
         } else {
             if (res & (RESIST_MAGIC | RESIST_FIRE | RESIST_LIGHTNING)) {
                 strcpy(tempstr, GetStr(0x35F));
