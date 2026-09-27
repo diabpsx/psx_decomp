@@ -269,8 +269,8 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
     char *Str = GetStr(StrNo);
 
     while (*Str) {
-        Width = 0;
         EndPtr = Str;
+        Width = 0;
         while (*EndPtr && *EndPtr != '|') {
             Width += LargeFont.GetCharWidth(*EndPtr);
             EndPtr++;
@@ -288,8 +288,8 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
                 Width = LargeFont.GetCharWidth(' ');
             else {
                 Width = LargeFont.PrintChar(X, Y, *Str, 128, 128, 128);
-                setSemiTrans(CharFt4, 1);
                 CharFt4->tpage |= 0x20;
+                setSemiTrans(CharFt4, 1);
                 setShadeTex(CharFt4, 0);
                 Fr = FeTData->GetFr(CharFrm);
                 x0 = CharFt4->x0;
@@ -300,10 +300,10 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
                     CharFt4->x0 = x0 + CreditsTable[127 - Fade];
                     CharFt4->x1 = x1 + CreditsTable[131 - Fade];
                     CharFt4->x2 = x2 + CreditsTable[127 - Fade];
-                    CharFt4->y2 = CharFt4->y0 + 2;
-                    CharFt4->u2 = CharFt4->u0 + 2;
                     CharFt4->x3 = x3 + CreditsTable[131 - Fade];
+                    CharFt4->y2 = CharFt4->y0 + 2;
                     CharFt4->y3 = CharFt4->y1 + 2;
+                    CharFt4->u2 = CharFt4->u0 + 2;
                     CharFt4->u3 = CharFt4->u1 + 2;
                     Loop = 2;
                     CharFt4->r0 = Fade & RFlag;
@@ -312,20 +312,20 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
                     CharHeight = LargeFont.GetCharHeight(*Str);
                     for (; Loop < CharHeight - 1; Loop += 2) {
                         Fade++;
-                        if (Fade - Loop > 0) {
-                            if ((unsigned)Fade > 127)
+                        if ((Col = Fade - Loop) > 0) {
+                            if (Fade & ~127)
                                 Fade = 127;
                             PRIM_GetPrim(&Ft4);
                             *Ft4 = *CharFt4;
                             Ft4->x0 = x0 + CreditsTable[127 - Fade];
                             Ft4->y0 += Loop;
-                            Ft4->y1 += Loop;
                             Ft4->x1 = x1 + CreditsTable[131 - Fade];
-                            Ft4->y2 += Loop;
+                            Ft4->y1 += Loop;
                             Ft4->x2 = x2 + CreditsTable[127 - Fade];
+                            Ft4->y2 += Loop;
+                            Ft4->x3 = x3 + CreditsTable[131 - Fade];
                             Ft4->y3 += Loop;
                             Ft4->u0 += Loop;
-                            Ft4->x3 = x3 + CreditsTable[131 - Fade];
                             Ft4->u1 += Loop;
                             Ft4->u2 += Loop;
                             Ft4->u3 += Loop;
@@ -342,10 +342,10 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
                     CharFt4->x0 = x0 + CreditsTable[127 - Fade];
                     CharFt4->x1 = x1 + CreditsTable[131 - Fade];
                     CharFt4->x2 = x2 + CreditsTable[127 - Fade];
-                    CharFt4->y2 = CharFt4->y0 + 2;
-                    CharFt4->v2 = CharFt4->v0 + 2;
                     CharFt4->x3 = x3 + CreditsTable[131 - Fade];
+                    CharFt4->y2 = CharFt4->y0 + 2;
                     CharFt4->y3 = CharFt4->y1 + 2;
+                    CharFt4->v2 = CharFt4->v0 + 2;
                     CharFt4->v3 = CharFt4->v1 + 2;
                     Loop = 1;
                     CharFt4->r0 = Fade & RFlag;
@@ -354,20 +354,20 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
                     CharHeight = LargeFont.GetCharHeight(*Str);
                     for (; Loop < CharHeight - 1; Loop += 2) {
                         Fade++;
-                        if (Fade - Loop > 0) {
-                            if ((unsigned)Fade > 127)
+                        if ((Col = Fade - Loop) > 0) {
+                            if (Fade & ~127)
                                 Fade = 127;
                             PRIM_GetPrim(&Ft4);
                             *Ft4 = *CharFt4;
                             Ft4->x0 = x0 + CreditsTable[127 - Fade];
                             Ft4->y0 += Loop;
-                            Ft4->y1 += Loop;
                             Ft4->x1 = x1 + CreditsTable[131 - Fade];
-                            Ft4->y2 += Loop;
+                            Ft4->y1 += Loop;
                             Ft4->x2 = x2 + CreditsTable[127 - Fade];
+                            Ft4->y2 += Loop;
+                            Ft4->x3 = x3 + CreditsTable[131 - Fade];
                             Ft4->y3 += Loop;
                             Ft4->v0 += Loop;
-                            Ft4->x3 = x3 + CreditsTable[131 - Fade];
                             Ft4->v1 += Loop;
                             Ft4->v2 += Loop;
                             Ft4->v3 += Loop;
