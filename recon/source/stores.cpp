@@ -334,6 +334,65 @@ unsigned char WitchSellOk(int i)
     return rv;
 }
 
+/* @0x8006CBB4 */
+void S_StartWSell(void)
+{
+    int i;
+    unsigned char sellok;
+
+    if (WStaffFlag)
+        SItemListFlag = 2;
+    else
+        SItemListFlag = 1;
+    stextsize = 1;
+    sellok = 0;
+    storenumh = 0;
+    for (i = 0; i < 48; i++)
+        storehold[i]._itype = -1;
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (WitchSellOk(i)) {
+            sellok = 1;
+            storehold[storenumh] = plr[myplr].InvList[i];
+            if (storehold[storenumh]._iMagical && storehold[storenumh]._iIdentified)
+                storehold[storenumh]._ivalue = storehold[storenumh]._iIvalue;
+            storehold[storenumh]._ivalue >>= 2;
+            if (!storehold[storenumh]._ivalue)
+                storehold[storenumh]._ivalue = 1;
+            storehold[storenumh]._iIvalue = storehold[storenumh]._ivalue;
+            storehidx[storenumh] = i;
+            storenumh++;
+        }
+    }
+    for (i = 0; i < 8; i++) {
+        if (plr[myplr].SpdList[i]._itype != -1 && WitchSellOk(-(i + 1))) {
+            sellok = 1;
+            storehold[storenumh] = plr[myplr].SpdList[i];
+            if (storehold[storenumh]._iMagical && storehold[storenumh]._iIdentified)
+                storehold[storenumh]._ivalue = storehold[storenumh]._iIvalue;
+            storehold[storenumh]._ivalue >>= 2;
+            if (!storehold[storenumh]._ivalue)
+                storehold[storenumh]._ivalue = 1;
+            storehold[storenumh]._iIvalue = storehold[storenumh]._ivalue;
+            storehidx[storenumh] = -(i + 1);
+            storenumh++;
+        }
+    }
+    if (!sellok) {
+        stextscrl = 0;
+        sprintf(tempstr, GetStr(0x4EB), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+    } else {
+        stextscrl = 1;
+        stextsval = 0;
+        stextsmax = plr[myplr]._pNumInv;
+        sprintf(tempstr, GetStr(0x4CF), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+        S_ScrollSSell(stextsval);
+    }
+}
+
 /* @0x8006D22C */
 unsigned char WitchRechargeOk(int i)
 {
