@@ -35,6 +35,40 @@ extern "C" void SPU_Init(void);
 extern "C" void MSG_ClearOutCompMap(void);
 extern unsigned char plr[];   /* PlayerStruct plr[2] -- only address-of used here */
 
+/* Minimal PlayerStruct field slice (offsets from recon/source/gen/structs_player.h). */
+struct PlayerStruct {
+    int _pmode;                /* +0x0 */
+    unsigned char pad0[0x1D - 0x4];
+    unsigned char plractive;   /* +0x1D */
+    unsigned char pad1[0x42 - 0x1E];
+    char _pdir;                /* +0x42 */
+    unsigned char _pgfxnum;    /* +0x43 */
+    unsigned char pad2[0xF6 - 0x44];
+    char _pClass;              /* +0xF6 */
+    unsigned char pad3[6632 - 0xF7];   /* sizeof PlayerStruct = 6632 per retail SYM */
+};
+
+/* PlayerInfo[i]: only .Id (a char* at +0) is read here; sizeof 12 per retail stride (0xC). */
+struct PInf {
+    char *Id;
+    unsigned short w4, w6, w8;
+};
+extern struct PInf PlayerInfo[0x51];
+extern "C" int strcmp(const char *, const char *);
+extern "C" int sprintf(char *, const char *, ...);
+extern const char D_8011AFF8[];    /* "%c%c%c" */
+extern const char D_8011B00C[];    /* class-char lookup */
+extern const char D_8011B008[];
+extern const char D_80110B68[];
+extern int FePlayerNo;
+extern "C" void StartStand__FP12PlayerStructi(struct PlayerStruct *P, int Dir);
+
+struct GPanel { unsigned char pad[28]; };   /* sizeof 28 per retail SYM; opaque here */
+struct PanelXY;
+extern struct PanelXY DefP1PanelXY, DefP2PanelXY, DefP1PanelXY2, DefP2PanelXY2;
+extern int sel_data;
+extern "C" void Print__6GPanelP7PanelXYP12PlayerStruct(struct GPanel *P, struct PanelXY *XY, void *Plr);
+
 /* Minimal local layouts (this TU only touches these fields; matches davel.cpp's CPlayer). */
 class CPlayer {
 public:
@@ -43,6 +77,8 @@ public:
     unsigned char pad1[144 - 0x84];   /* sizeof CPlayer = 144 per retail SYM */
 
     int GetTexId(void);
+    void Load(int Id);
+    void NonBlockingLoadNewGFX(int Id);
 };
 
 class CBlocks {
@@ -196,10 +232,11 @@ struct MonstListLevel *GLUE_GetCurrentList(int Level)
 
 void GLUE_StartGameExit(void)
 {
-    int i;
-
-    for (i = 0x19E8; i >= 0; i -= 0x19E8) {
-        plr[0x1D + i] = 0;
+    {
+        int i;
+        for (i = 0x19E8; i >= 0; i -= 0x19E8) {
+            plr[0x1D + i] = 0;
+        }
     }
     GLUE_SuspendGame();
     GLUE_SetFinished(1);
@@ -228,4 +265,125 @@ void CBlocks::MoveToScrollTarget(void)
 {
     ScrollX = ScrollTargetX;
     ScrollY = ScrollTargetY;
+}
+
+struct PInf *FindPlayerChar(char *Id)
+{
+    struct PInf *f;
+    int i;
+    int idx;
+
+    i = 0;
+    f = PlayerInfo;
+    idx = 0;
+    for (;;) {
+        i++;
+        if (strcmp(*(char **)((char *)PlayerInfo + idx), Id) == 0) {
+            return f;
+        }
+        f = (struct PInf *)((char *)f + 0xC);
+        idx += 0xC;
+        if (i >= 0x51) {
+            DBG_Error(0, D_80110B58, 0x288);
+            return 0;
+        }
+    }
+}
+
+struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
+{
+    char TxBuff[20];
+
+    sprintf(TxBuff, D_8011AFF8, D_8011B00C[Char], D_8011B008[Arm], D_80110B68[Wep]);
+    return FindPlayerChar(TxBuff);
+}
+
+struct PInf *FindPlayerChar(struct PlayerStruct *P)
+{
+    unsigned char temp_a1;
+
+    temp_a1 = P->_pgfxnum;
+    return FindPlayerChar((int)P->_pClass, temp_a1 & 0xF, (int)(temp_a1 << 24) >> 28);
+}
+
+unsigned short FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
+{
+    char Class;
+    struct PInf *Inf;
+
+    if (P->_pmode == 8) {
+        Class = P->_pClass;
+        if (Class == 1) {
+            return 0x126;
+        }
+        if (Class < 2) {
+            if (Class == 0) {
+                return 0x124;
+            }
+            DBG_Error(0, D_80110B58, 0x2AF);
+            return (unsigned short)-1;
+        }
+        if (Class == 2) {
+            return 0x125;
+        }
+        DBG_Error(0, D_80110B58, 0x2AF);
+        return (unsigned short)-1;
+    }
+    Inf = FindPlayerChar(P);
+    if (InTown != 0) {
+        return Inf->w6;
+    }
+    if (FePlayerNo != 0) {
+        return Inf->w8;
+    }
+    return Inf->w4;
+}
+
+void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
+{
+    unsigned short Id;
+
+    Id = FindPlayerChar(&Plr, InTown);
+    if (Id != Player.GetTexId()) {
+        if (Blocking != 0) {
+            Player.Load(Id);
+        } else {
+            Player.NonBlockingLoadNewGFX(Id);
+        }
+        if (Plr.plractive != 0 && Plr._pmode != 8) {
+            StartStand__FP12PlayerStructi(&Plr, Plr._pdir);
+        }
+    }
+}
+
+void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
+{
+    struct GPanel *P;
+    struct PanelXY *XY;
+    void *Plr;
+
+    P = P1;
+    if (plr[0x1D] != 0) {
+        if (plr[0x1A05] != 0) {
+            sel_data = 0;
+            Print__6GPanelP7PanelXYP12PlayerStruct(P1, &DefP1PanelXY2, &plr[0]);
+            P = P2;
+            XY = &DefP2PanelXY2;
+            sel_data = 1;
+            Plr = &plr[0x19E8];
+        } else {
+            sel_data = 0;
+            XY = &DefP1PanelXY;
+            Plr = &plr[0];
+        }
+        Print__6GPanelP7PanelXYP12PlayerStruct(P, XY, Plr);
+        return;
+    }
+    if (plr[0x1A05] != 0) {
+        sel_data = 1;
+        P = P2;
+        XY = &DefP2PanelXY;
+        Plr = &plr[0x19E8];
+        Print__6GPanelP7PanelXYP12PlayerStruct(P, XY, Plr);
+    }
 }
