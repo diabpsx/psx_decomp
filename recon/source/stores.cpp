@@ -454,6 +454,27 @@ void S_StartBoy(void)
     }
 }
 
+/* @0x8006E130 */
+void S_StartHealer(void)
+{
+    if (plr[myplr]._pHitPoints != plr[myplr]._pMaxHP) {
+        PlaySFX(0x3F);
+        plr[myplr]._pHitPoints = plr[myplr]._pMaxHP;
+        plr[myplr]._pHPBase = plr[myplr]._pMaxHPBase;
+    }
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x4CA), 3, 0);
+    AddSText(0, 2, 1, GetStr(0x1B4), 3, 0);
+    AddSText(0, 7, 1, GetStr(0x4DF), 3, 0);
+    AddSText(0, 9, 1, GetStr(0x42C), 1, 1);
+    AddSText(0, 11, 1, GetStr(0x96), 0, 1);
+    AddSText(0, 13, 1, GetStr(0x23F), 0, 1);
+    AddSLine(3);
+    storenumh = 20;
+}
+
 /* @0x8006979C -- the two RECT* branches (`(RECT*)((short*)&Field.y - 2)`) are transcribed literally
  * from the oracle's raw pointer arithmetic (StoreBackRect/StoreBackRectClipper are 8 bytes apart,
  * confirmed adjacent in the SYM); this reads 4 bytes BEFORE the named .y field on purpose, per the
