@@ -1617,8 +1617,13 @@ void MI_LArrow(int i)
             missile[i]._mitxoff -= missile[i]._mixvel;
             missile[i]._mityoff -= missile[i]._miyvel;
             GetMissilePos(i);
-            SetMissAnim(i, missile[i]._mitype != MIS_LARROW ? 5 /* MF_EXP1 */ : 0x1A /* MF_CBOLT */);
-            missile[i]._mirange = missile[i]._miAnimLen - 1;
+            if (missile[i]._mitype == MIS_LARROW) {
+                SetMissAnim(i, 0x1A);
+                missile[i]._mirange = missile[i]._miAnimLen - 1;
+            } else {
+                SetMissAnim(i, 5);
+                missile[i]._mirange = missile[i]._miAnimLen - 1;
+            }
         } else {
             if (missile[i]._mix != missile[i]._miVar1 || missile[i]._miy != missile[i]._miVar2) {
                 missile[i]._miVar1 = missile[i]._mix;
