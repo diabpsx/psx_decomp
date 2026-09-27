@@ -376,12 +376,12 @@ int FindClosest(int sx, int sy, int rad)
     if (rad > 19)
         rad = 19;
 
-    for (cidx = 1; cidx < rad; cidx++) {
-        cent = CrawlNum[cidx];
-        cr = cent + 1;
-        for (cne = (unsigned char)CrawlTable[cent]; cne > 0; cne--) {
-            tx = sx + CrawlTable[cr];
-            ty = sy + CrawlTable[cr + 1];
+    for (cr = 1; cr < rad; cr++) {
+        cidx = CrawlNum[cr];
+        cent = cidx + 1;
+        for (cne = (unsigned char)CrawlTable[cidx]; cne > 0; cne--) {
+            tx = sx + CrawlTable[cent];
+            ty = sy + CrawlTable[cent + 1];
             /* PSX bounds against the raw dung_map array extent (112), not MAXDUNX/MAXDUNY (96) --
              * same idiom as PutMissile/AddApoca/AddTeleport (retail sltiu ...,0x6F). */
             if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
@@ -389,7 +389,7 @@ int FindClosest(int sx, int sy, int rad)
                 if (mid > 0 && !CheckBlock(sx, sy, tx, ty))
                     return mid - 1;
             }
-            cr += 2;
+            cent += 2;
         }
     }
     return -1;
