@@ -589,6 +589,27 @@ typedef struct { short vx, vy, vz, pad; } SVECTOR;   /* PsyQ libgte.h, sizeof 8 
 static SVECTOR tmdc_pol_offs[2][10][10];
 #define TMDC_OFFS(mb, col, row) (tmdc_pol_offs[mb][col][row])
 
+/* Verbatim from Spongebob_SuperSponge/tools/psyq/include/LIBGPU.H (real PsyQ 4.0 header shipped with
+ * Climax's own retail source -- confirmed sibling: source/fmv/fmv.cpp's header says "nicked from
+ * SBK && POP && Diablo && TPW"). Copied here (not into the shared psyq.h, whose setPolyFT4 etc. are
+ * paraphrased, not verbatim) so this TU's prim writes can use retail's ACTUAL macro text. */
+#define setRGB0_(p,_r0,_g0,_b0)						\
+	(p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setXY4_(p,_x0,_y0,_x1,_y1,_x2,_y2,_x3,_y3) 			\
+	(p)->x0 = (_x0), (p)->y0 = (_y0),				\
+	(p)->x1 = (_x1), (p)->y1 = (_y1),				\
+	(p)->x2 = (_x2), (p)->y2 = (_y2),				\
+	(p)->x3 = (_x3), (p)->y3 = (_y3)
+#define setUV4_(p,_u0,_v0,_u1,_v1,_u2,_v2,_u3,_v3) 			\
+	(p)->u0 = (_u0), (p)->v0 = (_v0),				\
+	(p)->u1 = (_u1), (p)->v1 = (_v1),				\
+	(p)->u2 = (_u2), (p)->v2 = (_v2),				\
+	(p)->u3 = (_u3), (p)->v3 = (_v3)
+#define setTPage_(p,tp,abr,x,y) \
+	((p)->tpage = getTPage(tp,abr,x,y))
+#define setSemiTrans_(p, abe) \
+	((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
+
 /* WIP -- NOT byte-verified yet (deep GTE/MDEC polygon-tiler internals, no PC twin to cross-check
  * against). Faithful transcription of the m2c draft (skel/PSXSRC/FMV.CPP) with M2C_FIELD resolved to
  * POLY_FT4/RECT members; next angle if it doesn't match on the first verify_asm pass: pull the raw
@@ -634,26 +655,20 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
                         colw = wleft;
                     wleft -= colw;
                     SetPolyFT4(p);
-                    p->r0 = 0x80; p->g0 = 0x80; p->b0 = 0x80;
-                    p->u0 = (unsigned char)xb; p->v0 = (unsigned char)y;
-                    p->x0 = (short)x_run; p->y0 = sy;
-                    p->u1 = (unsigned char)(xb + colw); p->v1 = (unsigned char)y;
-                    p->x1 = (short)(x_run + colw); p->y1 = sy;
+                    setRGB0_(p, 0x80, 0x80, 0x80);
+                    setXY4_(p, (short)x_run, sy, (short)(x_run + colw), sy,
+                            (short)x_run, (short)(sy + rowh), (short)(x_run + colw), (short)(sy + rowh));
+                    setUV4_(p, (unsigned char)xb, (unsigned char)y, (unsigned char)(xb + colw), (unsigned char)y,
+                            (unsigned char)xb, (unsigned char)y2, (unsigned char)(xb + colw), (unsigned char)y2);
                     p->tpage = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
-                    p->u2 = (unsigned char)xb; p->x2 = (short)x_run; p->y2 = (short)(sy + rowh);
-                    p->v2 = (unsigned char)y2;
-                    p->u3 = (unsigned char)(xb + colw); p->v3 = (unsigned char)y2;
-                    p->x3 = (short)(x_run + colw); p->y3 = (short)(sy + rowh);
                     if (bp != 0) {
                         POLY_FT4 *dst = bp;
                         POLY_FT4 *src = p;
                         while (src != p + 1)
                             *dst++ = *src++;
-                        bp->r0 = (unsigned char)ENG_random(correct);
-                        bp->g0 = (unsigned char)ENG_random(correct);
-                        bp->b0 = (unsigned char)ENG_random(correct);
-                        bp->x0 = x; bp->y0 = y; bp->x1 = x + colw; bp->y1 = y;
-                        bp->x2 = x; bp->y2 = y2; bp->x3 = x + colw; bp->y3 = y2;
+                        setRGB0_(bp, (unsigned char)ENG_random(correct), (unsigned char)ENG_random(correct),
+                                 (unsigned char)ENG_random(correct));
+                        setXY4_(bp, x, y, x + colw, y, x, y2, x + colw, y2);
                         bp += 1;
                     }
                     x += colw;
@@ -689,14 +704,11 @@ extern "C" void rebuild_mdec_polys(int x, int y)
     for (; row < mdec_ph[mbuf]; row++) {
         if (mdec_pw[mbuf] > 0) {
             for (int col = 0; col < mdec_pw[mbuf]; col++) {
-                p->x0 = TMDC_OFFS(mbuf, col, row).vx + x;
-                p->y0 = TMDC_OFFS(mbuf, col, row).vy + y;
-                p->x1 = TMDC_OFFS(mbuf, col + 1, row).vx + x;
-                p->y1 = TMDC_OFFS(mbuf, col + 1, row).vy + y;
-                p->x2 = TMDC_OFFS(mbuf, col, row + 1).vx + x;
-                p->y2 = TMDC_OFFS(mbuf, col, row + 1).vy + y;
-                p->x3 = TMDC_OFFS(mbuf, col + 1, row + 1).vx + x;
-                p->y3 = TMDC_OFFS(mbuf, col + 1, row + 1).vy + y;
+                setXY4_(p,
+                        (short)(TMDC_OFFS(mbuf, col, row).vx + x), (short)(TMDC_OFFS(mbuf, col, row).vy + y),
+                        (short)(TMDC_OFFS(mbuf, col + 1, row).vx + x), (short)(TMDC_OFFS(mbuf, col + 1, row).vy + y),
+                        (short)(TMDC_OFFS(mbuf, col, row + 1).vx + x), (short)(TMDC_OFFS(mbuf, col, row + 1).vy + y),
+                        (short)(TMDC_OFFS(mbuf, col + 1, row + 1).vx + x), (short)(TMDC_OFFS(mbuf, col + 1, row + 1).vy + y));
                 p += 1;
             }
         }
@@ -732,7 +744,7 @@ extern "C" int draw_mdec_polys(signed char bright)
     }
     for (int i = 0; i < num_pol[mbuf]; i++) {
         POLY_FT4 *pp = &tmdc_pol[screen & 0xFF][mbuf][i];
-        pp->r0 = bright; pp->g0 = bright; pp->b0 = bright;
+        setRGB0_(pp, bright, bright, bright);
         /* addPrim(ThisOt, pp) -- other TU's ordering-table head; left as a documented gap. */
     }
     int r = do_brightness;
@@ -798,17 +810,22 @@ extern "C" int is_frame_decoded(void)
 }
 
 /* @0x801576DC FMV.CPP:1159 */
-extern "C" void set_mdec_poly_bright(unsigned char br_val)
+extern "C" void set_mdec_poly_bright(int br)
 {
-    for (int b = 0; b < 2; b++) {
-        for (int half = 0; half < 2; half++) {
-            for (int i = 0; i < 10; i++) {
-                tmdc_pol[b][half][i].r0 = br_val;
-                tmdc_pol[b][half][i].g0 = br_val;
-                tmdc_pol[b][half][i].b0 = br_val;
-            }
-        }
-    }
+    int a, b, c;
+    a = 0;
+    do {
+        b = 0;
+        do {
+            c = 0;
+            do {
+                setRGB0_(&tmdc_pol[a][b][c], br, br, br);
+                c++;
+            } while (c < 10);
+            b++;
+        } while (b < 2);
+        a++;
+    } while (a < 2);
 }
 
 /* @0x80157744 FMV.CPP:1180 */
