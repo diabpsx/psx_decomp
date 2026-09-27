@@ -395,6 +395,44 @@ void S_StartWitch(void)
     storenumh = 0x14;
 }
 
+/* @0x8006D440 */
+void S_StartWRecharge(void)
+{
+    int i;
+    unsigned char rechargeok;
+
+    SItemListFlag = 2;
+    stextsize = 1;
+    rechargeok = 0;
+    storenumh = 0;
+    for (i = 0; i < 48; i++)
+        storehold[i]._itype = -1;
+    if (plr[myplr].InvBody[4]._itype == 10 && plr[myplr].InvBody[4]._iCharges != plr[myplr].InvBody[4]._iMaxCharges) {
+        rechargeok = 1;
+        AddStoreHoldRecharge(plr[myplr].InvBody[4], -1);
+    }
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (WitchRechargeOk(i)) {
+            rechargeok = 1;
+            AddStoreHoldRecharge(plr[myplr].InvList[i], i);
+        }
+    }
+    if (!rechargeok) {
+        stextscrl = 0;
+        sprintf(tempstr, GetStr(0x4ED), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+    } else {
+        stextscrl = 1;
+        stextsval = 0;
+        stextsmax = plr[myplr]._pNumInv;
+        sprintf(tempstr, GetStr(0x34E), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+        S_ScrollSSell(stextsval);
+    }
+}
+
 /* @0x8006D870 */
 void S_StartNoMoney(void)
 {
