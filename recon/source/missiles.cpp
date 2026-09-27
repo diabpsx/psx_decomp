@@ -3046,10 +3046,11 @@ void AddLightning(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
 
 unsigned char Plr2PlrMHit(int pnum, int p, int mindam, int maxdam, int dist, int mtype, unsigned char shift)
 {
-    /* Structurally reconstructed from devilution's non-hellfire Plr2PlrMHit -- NOT yet
-     * byte-verified. Reuses the resist-switch/hper-formula/`m>=4`-free shape already established
-     * for PlayerMHit/MonsterMHit in this TU. */
-    int dam, blk, blkper, hper, hit, resper;
+    /* PSX: no pnum == myplr gate on the damage send, class-specific hit sfx ids, and the retail
+     * names swap devilution's: `hit` is the roll, `hper` the chance. */
+    int hit, hper, tac;
+    long dam;
+    int blk, blkper, resper;
 
     if (plr[p]._pInvincible)
         return 0;
@@ -3058,51 +3059,65 @@ unsigned char Plr2PlrMHit(int pnum, int p, int mindam, int maxdam, int dist, int
     if ((plr[p]._pSpellFlags & 1) && missiledata[mtype].mType == 0)
         return 0;
 
-    if (missiledata[mtype].mResist == MISR_FIRE)
+    /* raw mResist values (devilution numbering: 1 fire, 2 lightning, 3 magic, 4 acid);
+     * this TU's MISR_* defines use a different order, so literals here. */
+    switch (missiledata[mtype].mResist) {
+    case 1:
         resper = plr[p]._pFireResist;
-    else if (missiledata[mtype].mResist == MISR_LIGHTNING)
+        break;
+    case 2:
         resper = plr[p]._pLghtResist;
-    else if (missiledata[mtype].mResist == MISR_MAGIC || missiledata[mtype].mResist == MISR_ACID)
+        break;
+    case 3:
+    case 4:
         resper = plr[p]._pMagResist;
-    else
+        break;
+    default:
         resper = 0;
-
-    hper = ENG_random(100);
-    if (missiledata[mtype].mType == 0) {
-        hit = plr[pnum]._pIBonusToHit + plr[pnum]._pLevel - ((mindam * mindam) >> 1) - plr[p]._pDexterity / 5 - plr[p]._pIBonusAC - plr[p]._pIAC + plr[pnum]._pDexterity + 50;
-        if (plr[pnum]._pClass == PC_ROGUE)
-            hit += 20;
-        if (plr[pnum]._pClass == PC_WARRIOR)
-            hit += 10;
-    } else {
-        hit = plr[pnum]._pMagic - (plr[p]._pLevel << 1) - dist + 50;
-        if (plr[pnum]._pClass == PC_SORCERER)
-            hit += 20;
+        break;
     }
-    if (hit < 5)
-        hit = 5;
-    if (hit > 95)
-        hit = 95;
 
-    if (hper < hit) {
+    hit = ENG_random(100);
+    if (missiledata[mtype].mType == 0) {
+        tac = plr[p]._pIAC + plr[p]._pIBonusAC + plr[p]._pDexterity / 5;
+        hper = plr[pnum]._pLevel + 50 - tac;
+        hper += (plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit);
+        hper -= ((dist * dist) >> 1);
+        if (plr[pnum]._pClass == PC_ROGUE)
+            hper += 20;
+        if (plr[pnum]._pClass == PC_WARRIOR)
+            hper += 10;
+    } else {
+        hper = plr[pnum]._pMagic + 50 - (plr[p]._pLevel << 1) - dist;
+        if (plr[pnum]._pClass == PC_SORCERER)
+            hper += 20;
+    }
+    if (hper < 5)
+        hper = 5;
+    if (hper > 95)
+        hper = 95;
+
+    if (hit < hper) {
         if ((plr[p]._pmode == PM_STAND || plr[p]._pmode == PM_ATTACK) && plr[p]._pBlockFlag)
-            blkper = ENG_random(100);
+            blk = ENG_random(100);
         else
-            blkper = 100;
-        if (shift)
-            blkper = 100;
-        blk = plr[p]._pDexterity + plr[p]._pBaseToBlk + (plr[p]._pLevel << 1) - (plr[pnum]._pLevel << 1);
-        if (blk < 0)
-            blk = 0;
-        if (blk > 100)
             blk = 100;
+        if (shift == 1)
+            blk = 100;
+        blkper = plr[p]._pBaseToBlk + plr[p]._pDexterity - ((plr[pnum]._pLevel - plr[p]._pLevel) << 1);
+        if (blkper < 0)
+            blkper = 0;
+        if (blkper > 100)
+            blkper = 100;
 
         if (mtype == MIS_BONESPIRIT) {
             dam = plr[p]._pHitPoints / 3;
         } else {
-            dam = mindam + ENG_random(maxdam - mindam + 1);
-            if (missiledata[mtype].mType == 0)
-                dam += plr[pnum]._pIBonusDamMod + plr[pnum]._pDamageMod + dam * plr[pnum]._pIBonusDam / 100;
+            dam = ENG_random(maxdam - mindam + 1) + mindam;
+            if (missiledata[mtype].mType == 0) {
+                dam += dam * plr[pnum]._pIBonusDam / 100;
+                dam += plr[pnum]._pIBonusDamMod + plr[pnum]._pDamageMod;
+            }
             if (!shift)
                 dam <<= 6;
         }
@@ -3110,26 +3125,22 @@ unsigned char Plr2PlrMHit(int pnum, int p, int mindam, int maxdam, int dist, int
             dam >>= 1;
 
         if (resper > 0) {
-            dam -= (dam * resper) / 100;
-            if (pnum == myplr)
-                NetSendCmdDamage(1, p, dam);
+            NetSendCmdDamage(1, p, dam - dam * resper / 100);
             if (plr[pnum]._pClass == PC_WARRIOR)
-                PlaySfxLoc(0, plr[pnum]._px, plr[pnum]._py);
+                PlaySfxLoc(0x316, plr[pnum]._px, plr[pnum]._py);
             else if (plr[pnum]._pClass == PC_ROGUE)
-                PlaySfxLoc(1, plr[pnum]._px, plr[pnum]._py);
+                PlaySfxLoc(0x2A8, plr[pnum]._px, plr[pnum]._py);
             else if (plr[pnum]._pClass == PC_SORCERER)
-                PlaySfxLoc(2, plr[pnum]._px, plr[pnum]._py);
-            return 1;
-        } else {
-            if (blkper < blk) {
-                StartPlrBlock(p, GetDirection(plr[p]._px, plr[p]._py, plr[pnum]._px, plr[pnum]._py));
-            } else {
-                if (pnum == myplr)
-                    NetSendCmdDamage(1, p, dam);
-                StartPlrHit(p, dam, 0);
-            }
+                PlaySfxLoc(0x240, plr[pnum]._px, plr[pnum]._py);
             return 1;
         }
+        if (blk < blkper) {
+            StartPlrBlock(p, GetDirection(plr[p]._px, plr[p]._py, plr[pnum]._px, plr[pnum]._py));
+        } else {
+            NetSendCmdDamage(1, p, dam);
+            StartPlrHit(p, dam, 0);
+        }
+        return 1;
     }
     return 0;
 }
