@@ -454,6 +454,34 @@ void S_StartBoy(void)
     }
 }
 
+/* @0x8006DEFC */
+void S_StartBBoy(void)
+{
+    int iclr;
+    char *StrPtr;
+
+    SItemListFlag = 2;
+    stextsize = 1;
+    stextscrl = 0;
+    sprintf(tempstr, GetStr(0x22A), plr[myplr]._pGold);
+    AddSText(0, 1, 1, tempstr, 3, 0);
+    AddSLine(2);
+
+    SetItemMinStats(&plr[options_pad], &boyitem);
+    iclr = boyitem._iMagical ? 1 : 0;
+    if (!boyitem._iStatFlag) iclr = 2;
+
+    if (boyitem._iMagical)
+        StrPtr = MakeItemStr(&boyitem, boyitem._iIName, 0x100);
+    else
+        StrPtr = MakeItemStr(&boyitem, boyitem._iName, 0x100);
+
+    AddSText(12, 5, 0, StrPtr, iclr, 1);
+
+    AddSTextVal(5, boyitem._iIvalue + (boyitem._iIvalue >> 1));
+    PrintStoreItem(&boyitem, MediumFont.GetWrap(StrPtr, &StoreBackRectClipper) + 5, iclr);
+}
+
 /* @0x8006E130 */
 void S_StartHealer(void)
 {
