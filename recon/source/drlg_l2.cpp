@@ -209,26 +209,26 @@ static void DRLG_L2Subs(void)
                 c = BTYPESL2[(unsigned char)dungeon[x][y]];
                 if (c != 0) {
                     rv = ENG_random(16);
-                    k = -1;
+                    i = -1;
                     while (rv >= 0) {
-                        k++;
-                        if (k == sizeof(BTYPESL2)) {
-                            k = 0;
+                        i++;
+                        if (i == sizeof(BTYPESL2)) {
+                            i = 0;
                         }
-                        if (c == BTYPESL2[k]) {
+                        if (c == BTYPESL2[i]) {
                             rv--;
                         }
                     }
                     for (j = y - 2; j < y + 2; j++) {
-                        for (i = x - 2; i < x + 2; i++) {
-                            if (dungeon[i][j] == k) {
+                        for (k = x - 2; k < x + 2; k++) {
+                            if (dungeon[k][j] == i) {
                                 j = y + 3;
-                                i = x + 2;
+                                k = x + 2;
                             }
                         }
                     }
                     if (j < y + 3) {
-                        dungeon[x][y] = k;
+                        dungeon[x][y] = i;
                     }
                 }
             }
@@ -285,9 +285,9 @@ void InitDungeon(void)
 
     /* PSX oracle: only clears predungeon -- unlike devilution's InitDungeon this build does NOT also
      * zero mydflags here (LoadL2Dungeon/LoadPreL2Dungeon each clear mydflags themselves instead). */
-    for (j = 0; j < DMAXY; j++) {
-        for (i = 0; i < DMAXX; i++) {
-            predungeon[i][j] = 32;
+    for (i = 0; i < DMAXY; i++) {
+        for (j = 0; j < DMAXX; j++) {
+            predungeon[j][i] = 32;
         }
     }
 }
@@ -433,18 +433,18 @@ static void AddHall(int nX1, int nY1, int nX2, int nY2, int nHd)
         pHallList->nHalldir = nHd;
         pHallList->pNext = 0;
     } else {
-        p1 = (struct NODE *)DiabloAllocPtr(sizeof(*pHallList));
-        p1->nHallx1 = nX1;
-        p1->nHally1 = nY1;
-        p1->nHallx2 = nX2;
-        p1->nHally2 = nY2;
-        p1->nHalldir = nHd;
-        p1->pNext = 0;
-        p2 = pHallList;
-        while (p2->pNext != 0) {
-            p2 = p2->pNext;
+        p2 = (struct NODE *)DiabloAllocPtr(sizeof(*pHallList));
+        p2->nHallx1 = nX1;
+        p2->nHally1 = nY1;
+        p2->nHallx2 = nX2;
+        p2->nHally2 = nY2;
+        p2->nHalldir = nHd;
+        p2->pNext = 0;
+        p1 = pHallList;
+        while (p1->pNext != 0) {
+            p1 = p1->pNext;
         }
-        p2->pNext = p1;
+        p1->pNext = p2;
     }
 }
 
