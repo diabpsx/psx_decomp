@@ -220,6 +220,81 @@ void SyncPedistal(int i)
 {
 }
 
+void DoorSet(int oi, int dx, int dy)
+{
+    int pn;
+    struct ObjectStruct *op;
+
+    pn = FindBlock(dx, dy);
+    if (pn == 0x2B) {
+        ObjSetMicro(dx, dy, 0x188);
+        pn = 0x2D;
+    }
+    if (pn == 0x2D) {
+        ObjSetMicro(dx, dy, 0x18A);
+        pn = 0x32;
+    }
+    if (pn == 0x32) {
+        op = &object[oi];
+        if (op->_otype == 1)
+            ObjSetMicro(dx, dy, 0x19B);
+        if (op->_otype == 2)
+            ObjSetMicro(dx, dy, 0x19C);
+        pn = 0x36;
+    }
+    if (pn == 0x36) {
+        ObjSetMicro(dx, dy, 0x18D);
+        pn = 0x37;
+    }
+    if (pn == 0x37) {
+        ObjSetMicro(dx, dy, 0x18E);
+        pn = 0x3D;
+    }
+    if (pn == 0x3D) {
+        ObjSetMicro(dx, dy, 0x18F);
+        pn = 0x43;
+    }
+    if (pn == 0x43) {
+        ObjSetMicro(dx, dy, 0x190);
+        pn = 0x44;
+    }
+    if (pn == 0x44) {
+        ObjSetMicro(dx, dy, 0x191);
+        pn = 0x45;
+    }
+    if (pn == 0x45) {
+        ObjSetMicro(dx, dy, 0x193);
+        pn = 0x46;
+    }
+    if (pn == 0x46) {
+        ObjSetMicro(dx, dy, 0x194);
+        pn = 0x48;
+    }
+    if (pn == 0x48) {
+        ObjSetMicro(dx, dy, 0x196);
+        pn = 0xD4;
+    }
+    if (pn == 0xD4) {
+        ObjSetMicro(dx, dy, 0x197);
+        pn = 0x162;
+    }
+    if (pn == 0x162) {
+        ObjSetMicro(dx, dy, 0x199);
+        pn = 0x163;
+    }
+    if (pn == 0x163) {
+        ObjSetMicro(dx, dy, 0x19A);
+        pn = 0x19B;
+    }
+    if (pn == 0x19B) {
+        ObjSetMicro(dx, dy, 0x18C);
+        pn = 0x19C;
+    }
+    if (pn == 0x19C) {
+        ObjSetMicro(dx, dy, 0x18C);
+    }
+}
+
 int ItemMiscIdIdx(int imiscid)
 {
     int i;
@@ -1581,15 +1656,13 @@ void ObjSetMini(int x, int y, int v)
 {
     long v2, v3, v4;
     int xx, yy;
-    struct MiniTileDef *def;
 
-    def = (struct MiniTileDef *)((char *)DebugMonsters + 0x20) + v;
     xx = 2 * x + 16;
     yy = 2 * y + 16;
-    v2 = def->v2 + 1;
-    v3 = def->v3 + 1;
-    v4 = def->v4 + 1;
-    ObjSetMicro(xx, yy, def->v1 + 1);
+    v2 = *(short *)((char *)DebugMonsters + 0x22 + v * 8) + 1;
+    v3 = *(short *)((char *)DebugMonsters + 0x24 + v * 8) + 1;
+    v4 = *(short *)((char *)DebugMonsters + 0x26 + v * 8) + 1;
+    ObjSetMicro(xx, yy, *(short *)((char *)DebugMonsters + 0x20 + v * 8) + 1);
     ObjSetMicro(xx + 1, yy, v2);
     ObjSetMicro(xx, yy + 1, v3);
     ObjSetMicro(xx + 1, yy + 1, v4);
