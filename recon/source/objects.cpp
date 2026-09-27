@@ -276,74 +276,64 @@ int ItemMiscIdIdx(int imiscid)
 
 void DrawExpl(int sx, int sy, int f, int ot, int scale, char rtint, char gtint, char btint)
 {
-    struct TextDat *pTex;
-    struct POLY_FT4 *poly;
-    int numFrames;
-    int frm;
-    int frameDiv;
+    struct POLY_FT4 *Ft4;
+    int PhysFrame;
+    struct TextDat *ObjDat;
+    int temp;
     int bright;
-    int spinScale;
-    int dx9, dy9;
-    int isSmallScale;
-    int otpos2;
+    int W;
+    int H;
 
-    pTex = GM_UseTexData(0xCE);
-    BL_GetCurrentBlocks()->GetOtPos(sy + 0x18);
-    numFrames = pTex->GetNumOfFrames(0, 0);
-    if (!(f < numFrames))
-        DBG_Error(0, "source/OBJECTS.cpp", 0x387);
+    ObjDat = GM_UseTexData(0xCE);
     bright = 0xF0;
-    if (f == 1) {
-        spinScale = scale;
-        if (scale < 0)
-            spinScale = scale + 3;
-        DrawSpinner(sx, sy - 0xA, ~rtint & 0xFF, ~gtint & 0xFF, ~btint & 0xFF,
-                    spinScale >> 2, 0x40, 4, 0, numFrames + 2, f, 0, 8);
-    }
-    isSmallScale = scale < 0x101;
-    if (!isSmallScale)
-        bright = bright >> 1;
+    ot = BL_GetCurrentBlocks()->GetOtPos(sy + 0x18);
+    if (!(f < ObjDat->GetNumOfFrames(0, 0) || !"EXPLOSION FRAME TOO BIG"))
+        DBG_Error(0, "source/OBJECTS.cpp", 0x387);
+    if (f == 1)
+        DrawSpinner(sx, sy - 0xA, ~rtint, ~gtint, ~btint, scale / 4, 0x40, 4, 0, ot + 2, f, 0, 8);
+    if (scale > 0x100)
+        bright >>= 1;
     sy -= f << 2;
-    frm = pTex->GetFrNum(0, 0, 0, f);
-    otpos2 = numFrames + 1;
-    poly = pTex->PrintFt4(frm, sx, sy, 0, otpos2, 0);
-    frameDiv = (f * 3) >> 2;
-    if (frameDiv == 0)
-        frameDiv = 1;
-    bright = bright / frameDiv;
-    dx9 = (poly->x1 - poly->x0) * scale >> 9;
-    dy9 = (poly->y2 - poly->y0) * scale >> 9;
-    poly->x1 = sx + dx9;
-    poly->x3 = sx + dx9;
-    poly->code = (poly->code | 2) & 0xFE;
-    poly->x0 = sx - dx9;
-    poly->x2 = sx - dx9;
-    poly->y0 = sy - dy9;
-    poly->y1 = sy - dy9;
-    poly->y2 = sy + dy9;
-    poly->y3 = sy + dy9;
-    poly->r0 = bright;
-    poly->g0 = bright;
-    poly->b0 = bright;
-    if (!isSmallScale) {
-        sy -= frameDiv << 2;
-        poly = pTex->PrintFt4(frm, sx, sy, 0, otpos2, 0);
+    PhysFrame = ObjDat->GetFrNum(0, 0, 0, f);
+    Ft4 = ObjDat->PrintFt4(PhysFrame, sx, sy, 0, ot + 1, 0);
+    f = (f * 3) >> 2;
+    if (f == 0)
+        f = 1;
+    bright /= f;
+    Ft4->r0 = bright; Ft4->g0 = bright; Ft4->b0 = bright;
+    Ft4->code |= 2;
+    Ft4->code &= ~1;
+    W = Ft4->x1 - Ft4->x0;
+    H = Ft4->y2 - Ft4->y0;
+    temp = (W * scale) >> 9;
+    Ft4->x0 = sx - temp;
+    Ft4->x1 = sx + temp;
+    Ft4->x2 = sx - temp;
+    Ft4->x3 = sx + temp;
+    temp = (H * scale) >> 9;
+    Ft4->y0 = sy - temp;
+    Ft4->y1 = sy - temp;
+    Ft4->y2 = sy + temp;
+    Ft4->y3 = sy + temp;
+    if (scale > 0x100) {
+        Ft4 = ObjDat->PrintFt4(PhysFrame, sx, sy - (f << 2), 0, ot + 1, 0);
+        Ft4->r0 = bright; Ft4->g0 = bright; Ft4->b0 = bright;
+        Ft4->code |= 2;
+        Ft4->code &= ~1;
         sx++;
         sy++;
-        poly->x0 = sx - dx9;
-        poly->x2 = sx - dx9;
-        poly->y0 = sy - dy9;
-        poly->y1 = sy - dy9;
-        poly->x1 = sx + dx9;
-        poly->x3 = sx + dx9;
-        poly->y2 = sy + dy9;
-        poly->y3 = sy + dy9;
-        poly->r0 = bright;
-        poly->g0 = bright;
-        poly->b0 = bright;
-        poly->code = (poly->code | 2) & 0xFE;
+        temp = (W * scale) >> 9;
+        Ft4->x0 = sx - temp;
+        Ft4->x1 = sx + temp;
+        Ft4->x2 = sx - temp;
+        Ft4->x3 = sx + temp;
+        temp = (H * scale) >> 9;
+        Ft4->y0 = sy - temp;
+        Ft4->y1 = sy - temp;
+        Ft4->y2 = sy + temp;
+        Ft4->y3 = sy + temp;
     }
-    GM_FinishedUsing(pTex);
+    GM_FinishedUsing(ObjDat);
 }
 
 void DrawObjExpl(struct ObjectStruct *obj, int ScrX, int ScrY, int ot)

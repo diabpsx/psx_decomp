@@ -120,7 +120,7 @@ void CreateRndUseful(int pnum, int x, int y, unsigned char sendmsg);
 void CreateSpellBook(int x, int y, int ispell, unsigned char sendmsg, unsigned char delta);
 void CreateTypeItem(int x, int y, unsigned char onlygood, int itype, int imisc, unsigned char sendmsg, unsigned char delta);
 void DBG_Error(char *Text, char *File, int Line);
-void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, int SinStep);
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, unsigned char SinStep);
 long ENG_random(long v);
 void FillCrapBits(void);
 int FindBlock(int x, int y);
