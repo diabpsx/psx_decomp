@@ -449,11 +449,11 @@ void DrawQText(void)
     }
     if (FileSYS == 2) {
         if (sghStream == NULL && qtexty > TextWait) {
-            long diff;
+            unsigned long diff;
 
             currTime = VID_GetTick();
-            diff = -0x10000;
-            scrolltexty += diff;
+            diff = 0x10000;
+            scrolltexty -= diff;
             sgLastScroll = currTime;
             qtexty = scrolltexty >> 16;
             if (TextWait >= qtexty)
