@@ -433,6 +433,71 @@ void S_StartNoItems(void)
     }
 }
 
+/* @0x8006D9EC */
+void S_StartConfirm(void)
+{
+    char iclr;
+    unsigned char idprint;
+    char *StrPtr;
+
+    StartStore(stextshold);
+    SItemListFlag = 2;
+    stextscrl = 0;
+    ClearSText(5, 23);
+
+    iclr = 0;
+    if (plr[myplr].HoldItem._iMagical) iclr = 1;
+    if (!plr[myplr].HoldItem._iStatFlag) iclr = 2;
+    if (plr[myplr].HoldItem._iMagical == 2) iclr = 3;
+
+    idprint = plr[myplr].HoldItem._iMagical != 0;
+
+    if (stextshold == 17)
+        idprint = 0;
+    if (plr[myplr].HoldItem._iMagical != 0 && !plr[myplr].HoldItem._iIdentified) {
+        if (stextshold == 3) idprint = 0;
+        if (stextshold == 7) idprint = 0;
+        if (stextshold == 4) idprint = 0;
+        if (stextshold == 8) idprint = 0;
+    }
+    if (idprint)
+        StrPtr = MakeItemStr(&plr[myplr].HoldItem, plr[myplr].HoldItem._iIName, 0x100);
+    else
+        StrPtr = MakeItemStr(&plr[myplr].HoldItem, plr[myplr].HoldItem._iName, 0x100);
+
+    AddSText(12, 5, 0, StrPtr, iclr, 0);
+    AddSTextVal(5, plr[myplr].HoldItem._iIvalue);
+    PrintStoreItem(&plr[myplr].HoldItem, MediumFont.GetWrap(StrPtr, &StoreBackRectClipper) + 5, iclr);
+
+    switch (stextshold) {
+    case 2:
+    case 6:
+    case 16:
+    case 18:
+        strcpy(tempstr, GetStr(0x21));
+        break;
+    case 3:
+    case 7:
+        strcpy(tempstr, GetStr(0x25));
+        break;
+    case 4:
+        strcpy(tempstr, GetStr(0x24));
+        break;
+    case 8:
+        strcpy(tempstr, GetStr(0x23));
+        break;
+    case 13:
+        strcpy(tempstr, GetStr(0x116));
+        break;
+    case 17:
+        strcpy(tempstr, GetStr(0x22));
+        break;
+    }
+    AddSText(0, 14, 1, tempstr, 0, 0);
+    AddSText(0, 17, 1, GetStr(0x4E7), 0, 1);
+    AddSText(0, 18, 1, GetStr(0x2C9), 0, 1);
+}
+
 /* @0x8006DD54 */
 void S_StartBoy(void)
 {
