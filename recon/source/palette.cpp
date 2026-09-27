@@ -18,6 +18,8 @@ public:
 #include "source/gen/externs_palette.h"
 #include "source/gen/protos_palette.h"
 #include "source/diablo.h"
+#define P_setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)
+#define P_setXYWH(p, _x0, _y0, _w, _h) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x0)+(_w), (p)->y1 = (_y0), (p)->x2 = (_x0), (p)->y2 = (_y0)+(_h), (p)->x3 = (_x0)+(_w), (p)->y3 = (_y0)+(_h)
 
 /* file statics (SYM: sgbFadedIn/screenbright/faderate/fading/FADE_OT/FadeCoords/FadeCoords2) -- all
  * TU-owned, gp-rel in the oracle -> tentative definitions here. */
@@ -44,17 +46,13 @@ void ResetPal(void)
 void SetFadeLevel(int fadeval)
 {
     int nval;
-    BOOL ok;
 
     nval = 0x80 - fadeval;
-    ok = nval < 0x81;
-    if (nval < 0) {
+    if (nval < 0)
         nval = 0;
-        ok = nval < 0x81;
-    }
-    if (!ok)
+    if (nval > 0x80)
         nval = 0x80;
-    screenbright = (unsigned char)nval;
+    screenbright = nval;
 }
 
 BOOL GetFadeState(void)
@@ -66,41 +64,36 @@ void SetPolyXY(POLY_GT4 *gt4, unsigned char *coords)
 {
     unsigned char bright1;
     unsigned char bright2;
-    unsigned char u1;
-    unsigned char u3;
 
-    bright2 = (unsigned char)((screenbright * 8) / 6);
-    gt4->x0 = *coords++ * 2;
-    u1 = gt4->u1;
     bright1 = screenbright;
+    bright2 = (bright1 * 8) / 6;
+    gt4->x0 = *coords++ * 2;
     gt4->y0 = *coords++ * 2;
-    u1 -= 1;
     gt4->x1 = *coords++ * 2;
     gt4->y1 = *coords++ * 2;
     gt4->x2 = *coords++ * 2;
     gt4->y2 = *coords++ * 2;
-    gt4->x3 = coords[0] * 2;
-    u3 = gt4->u3;
-    u3 -= 1;
+    gt4->x3 = *coords++ * 2;
+    gt4->y3 = *coords * 2;
     gt4->r0 = bright1;
-    gt4->r1 = bright1;
-    gt4->r2 = bright1;
-    gt4->r3 = bright1;
-    gt4->u1 = u1;
-    gt4->tpage |= 0x40;
-    gt4->y3 = coords[1] * 2;
     gt4->g0 = bright2;
     gt4->b0 = bright2;
+    gt4->r1 = bright1;
     gt4->g1 = bright2;
     gt4->b1 = bright2;
+    gt4->r2 = bright1;
     gt4->g2 = bright2;
     gt4->b2 = bright2;
+    gt4->r3 = bright1;
     gt4->g3 = bright2;
     gt4->b3 = bright2;
-    gt4->u3 = u3;
-    gt4->v2 -= 1;
-    gt4->v3 -= 1;
-    gt4->code = (gt4->code | 2) & 0xFE;
+    gt4->u1--;
+    gt4->tpage |= 0x40;
+    gt4->u3--;
+    gt4->v2--;
+    gt4->v3--;
+    gt4->code |= 2;
+    gt4->code &= ~1;
 }
 
 
@@ -125,44 +118,20 @@ void DrawFadedScreen(void)
 void BlackPalette(void)
 {
     POLY_FT4 *FT4;
-    unsigned char u1, u3, v2, v3, code;
 
     FADE_OT = CBlocks::GetMaxOtPos();
     FT4 = GM_UseTexData(0)->PrintFt4(0xD8, 0, 0, 0, FADE_OT, 0);
-    u1 = FT4->u1;
-    u3 = FT4->u3;
-    v2 = FT4->v2;
-    v3 = FT4->v3;
-    code = FT4->code;
-    FT4->r0 = 0;
-    FT4->g0 = 0;
-    FT4->b0 = 0;
-    u1 -= 1;
-    u3 -= 1;
-    v2 -= 1;
-    v3 -= 1;
-    code &= 0xFC;
-    FT4->u1 = u1;
-    FT4->u3 = u3;
-    FT4->v2 = v2;
-    FT4->v3 = v3;
-    FT4->code = code;
-    if (TitleFlag == 0) {
-        FT4->x0 = 0;
-        FT4->y0 = 0;
-        FT4->x1 = 0x160;
-        FT4->y1 = 0;
-        FT4->y2 = 0xF0;
-    } else {
-        FT4->y0 = 0xB0;
-        FT4->y1 = 0xB0;
-        FT4->x0 = 0;
-        FT4->x1 = 0x160;
-        FT4->y2 = 0x1A0;
-    }
-    FT4->x2 = 0;
-    FT4->x3 = FT4->x1;
-    FT4->y3 = FT4->y2;
+    P_setRGB0(FT4, 0, 0, 0);
+    FT4->u1--;
+    FT4->u3--;
+    FT4->v2--;
+    FT4->v3--;
+    FT4->code &= ~2;
+    FT4->code &= ~1;
+    if (TitleFlag == 0)
+        P_setXYWH(FT4, 0, 0, 0x160, 0xF0);
+    else
+        P_setXYWH(FT4, 0, 0xB0, 0x160, 0xF0);
     TSK_Sleep(1);
 }
 
@@ -173,10 +142,11 @@ void PaletteFadeInTask(TASK *T)
     i = 0;
     VID_GetTick();
     while (i < 0x81) {
+        int dummy;   /* dead local: retail SYM keeps a record-less level at the loop test */
         SetFadeLevel(i);
         DrawFadedScreen();
-        TSK_Sleep(1);
         i += faderate;
+        TSK_Sleep(1);
     }
     SetFadeLevel(0x80);
     DrawFadedScreen();
@@ -200,11 +170,11 @@ BOOL PaletteFadeIn(int fr)
 
 void PaletteFadeOutTask(TASK *T)
 {
-    int i;
+    int i = 0x80;
 
-    i = 0x80;
     VID_GetTick();
     while (i >= 0) {
+        int dummy;   /* dead local: retail SYM keeps a record-less level at the loop test */
         SetFadeLevel(i);
         SmearScreen();
         DrawFadedScreen();

@@ -21,12 +21,12 @@
 
 /* PSX-only per-call-persistent state for the coloured light engine (all gp-rel D_<va> in the
  * oracle, none exported/named in the SYM -- file-owned tentative defs per the gp-rel lever). */
-int g_lightfx_dr;    /* @D_8011C7E4: SetLightFX's d_r<<8 (dest-red target, accumulated by weird-cheat) */
-int g_lightfx_sr;    /* @D_8011C7E8: SetLightFX's s_r (signed source-red delta) */
-int g_lightfx_dg;    /* @D_8011C7EC: SetLightFX's d_g<<8 */
-int g_lightfx_sg;    /* @D_8011C7F0: SetLightFX's s_g */
-int g_lightfx_db;    /* @D_8011C7F4: SetLightFX's d_b<<8 */
-int g_lightfx_sb;    /* @D_8011C7F8: SetLightFX's s_b */
+static int disp_tab_r;    /* @D_8011C7E4: SetLightFX's d_r<<8 (dest-red target, accumulated by weird-cheat) */
+static int dispy_r;    /* @D_8011C7E8: SetLightFX's s_r (signed source-red delta) */
+static int disp_tab_g;    /* @D_8011C7EC: SetLightFX's d_g<<8 */
+static int dispy_g;    /* @D_8011C7F0: SetLightFX's s_g */
+static int disp_tab_b;    /* @D_8011C7F4: SetLightFX's d_b<<8 */
+static int dispy_b;    /* @D_8011C7F8: SetLightFX's s_b */
 int g_light_amp;      /* @D_8011C7FC: per-DoLighting-call colour amplitude (from D_800D62E0[radius]) */
 int g_light_amp2;     /* @D_8011C800: per-DoLighting-call secondary amplitude (from D_800D62F0[radius]) */
 int g_light_clamp;    /* @D_8011C804: per-DoLighting-call colour clamp ceiling */
@@ -62,14 +62,8 @@ int veclen2(int ix, int iy)
 {
     int t;
 
-    t = ix;
-    if (t < 0)
-        t = -t;
-    ix = t;
-    t = iy;
-    if (t < 0)
-        t = -t;
-    iy = t;
+    ix = ix < 0 ? -ix : ix;
+    iy = iy < 0 ? -iy : iy;
     if (ix < iy) {
         ix ^= iy;
         iy ^= ix;
@@ -109,12 +103,12 @@ void set_light_bands(void)
 
 void SetLightFX(int x, int y, short s_r, short s_g, short s_b, unsigned char d_r, unsigned char d_g, unsigned char d_b)
 {
-    g_lightfx_sr = s_r;
-    g_lightfx_sg = s_g;
-    g_lightfx_db = d_b << 8;
-    g_lightfx_dg = d_g << 8;
-    g_lightfx_dr = d_r << 8;
-    g_lightfx_sb = s_b;
+    disp_tab_r = d_r << 8;
+    disp_tab_g = d_g << 8;
+    disp_tab_b = d_b << 8;
+    dispy_r = s_r;
+    dispy_g = s_g;
+    dispy_b = s_b;
     AddLight(x, y, 0x6070);
 }
 
@@ -123,15 +117,15 @@ void SetWeirdFX(void)
     if (weird_cheat)
         return;
 
-    g_lightfx_dr = 0x4000;
-    g_lightfx_dg = 0x2000;
-    g_lightfx_db = 0x1000;
-    g_lightfx_sr = 0xA80;
-    g_lightfx_sg = -0xA10;
+    disp_tab_r = 0x4000;
+    disp_tab_g = 0x2000;
+    disp_tab_b = 0x1000;
+    dispy_r = 0xA80;
+    dispy_g = -0xA10;
     restore_b = 0;
     restore_g = 0;
     restore_r = 0;
-    g_lightfx_sb = 0xAA0;
+    dispy_b = 0xAA0;
     ChangeLightColour(plr[0]._plid, 0xE070);
     weird_cheat = 1;
 }
@@ -190,10 +184,10 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
             g_light_amp = 0x40;
             g_light_amp2 = 4;
             g_light_clamp = 0xFF;
-            scr_x = g_lightfx_dr + g_lightfx_sr;
-            g_lightfx_dr = scr_x;
-            g_lightfx_dg += g_lightfx_sg;
-            g_lightfx_db += g_lightfx_sb;
+            scr_x = disp_tab_r + dispy_r;
+            disp_tab_r = scr_x;
+            disp_tab_g += dispy_g;
+            disp_tab_b += dispy_b;
             if (!cont && scr_x > 0xC800) {
                 g_weirdy_prev = 0;
                 LightList[Lnum]._ldel = 1;
@@ -243,7 +237,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                     if (nXPos >= 0 && nXPos < 0x30) {
                                         if (colour_mask & 1) {
                                             if (weirdy)
-                                                val = g_lightband[(radius_block + (g_lightfx_dr >> 8)) & g_lightband_mask] * g_light_amp2;
+                                                val = g_lightband[(radius_block + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
                                             else
                                                 val = radius_block * g_light_amp2;
                                             val = dung_map_r[nXPos][nYPos] + (val & 0xFF);
@@ -253,7 +247,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                         }
                                         if (colour_mask & 2) {
                                             if (weirdy)
-                                                val = g_lightband[(radius_block + (g_lightfx_dg >> 8)) & g_lightband_mask] * g_light_amp2;
+                                                val = g_lightband[(radius_block + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
                                             else
                                                 val = radius_block * g_light_amp2;
                                             val = dung_map_g[nXPos][nYPos] + (val & 0xFF);
@@ -263,7 +257,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                         }
                                         if (colour_mask & 4) {
                                             if (weirdy)
-                                                val = g_lightband[(radius_block + (g_lightfx_db >> 8)) & g_lightband_mask] * g_light_amp2;
+                                                val = g_lightband[(radius_block + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
                                             else
                                                 val = radius_block * g_light_amp2;
                                             val = dung_map_b[nXPos][nYPos] + (val & 0xFF);
@@ -342,7 +336,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                 radius_block = 0;
                             if (colour_mask & 1) {
                                 if (weirdy)
-                                    val = g_lightband[(radius_block + (g_lightfx_dr >> 8)) & g_lightband_mask] * g_light_amp2;
+                                    val = g_lightband[(radius_block + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
                                 else
                                     val = radius_block * g_light_amp2;
                                 val = dung_map_r[nXPos][nYPos] + (val & 0xFF);
@@ -352,7 +346,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                             }
                             if (colour_mask & 2) {
                                 if (weirdy)
-                                    val = g_lightband[(radius_block + (g_lightfx_dg >> 8)) & g_lightband_mask] * g_light_amp2;
+                                    val = g_lightband[(radius_block + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
                                 else
                                     val = radius_block * g_light_amp2;
                                 val = dung_map_g[nXPos][nYPos] + (val & 0xFF);
@@ -362,7 +356,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                             }
                             if (colour_mask & 4) {
                                 if (weirdy)
-                                    val = g_lightband[(radius_block + (g_lightfx_db >> 8)) & g_lightband_mask] * g_light_amp2;
+                                    val = g_lightband[(radius_block + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
                                 else
                                     val = radius_block * g_light_amp2;
                                 val = dung_map_b[nXPos][nYPos] + (val & 0xFF);
@@ -443,47 +437,40 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
  * an approximation. Still not byte-verified past this structural derivation. */
 void DoUnLight(void)
 {
-    int nXPos, nYPos, x, y, max_x, max_y;
+    int x, y, max_x, max_y, nXPos, nYPos;
+    unsigned char *r, *g, *b;
+    int radius_block_x, radius_block_y;
 
-    nXPos = ((gr_scrxoff >> 16) / 40) - 0x9;
-    nYPos = ((gr_scryoff >> 16) / 40) - 0xD;
-    if (leveltype == 0) {
-        nXPos = ((gr_scrxoff >> 16) / 40) - 1;
-        nYPos = ((gr_scryoff >> 16) / 40) - 5;
+    nXPos = (gr_scrxoff >> 16) / 40 - 9;
+    nYPos = (gr_scryoff >> 16) / 40 - 13;
+    if (!leveltype) {
+        nXPos = (gr_scrxoff >> 16) / 40 - 1;
+        nYPos = (gr_scryoff >> 16) / 40 - 5;
     }
-
-    max_x = 0x30;
-    max_y = 0x30;
-    if (nYPos < 0) {
-        if (nYPos + 0xE > max_y)
-            return;
-    } else if (nYPos + max_y < nXPos) {
-        /* unreachable in practice (algebraically always false -- confirmed against the oracle's
-         * own dead `slt v1,t1` compare) -- literal transcription of the oracle's branch shape. */
-    }
-    if (nXPos < 0) {
-        if (nXPos + 0xD <= max_x)
-            goto negx;
-        return;
-    }
-
-    for (x = nXPos; x < nXPos + 0xD; x++) {
-        for (y = nYPos; y < nYPos + 0xE; y++) {
-            if (x >= 0 && x < max_x && y >= 0 && y < max_y) {
-                dung_map_r[x][y] = restore_r;
-                dung_map_g[x][y] = restore_g;
-                dung_map_b[x][y] = restore_b;
+    radius_block_x = 13;
+    radius_block_y = 14;
+    max_x = 48;
+    max_y = 48;
+    if (nYPos < 0 || nYPos + radius_block_y > max_y || nXPos < 0 || nXPos + radius_block_x > max_y) {
+        for (x = nXPos; x <= nXPos + radius_block_x; x++) {
+            for (y = nYPos; y <= nYPos + radius_block_y; y++) {
+                if (x >= 0 && x <= max_x && y >= 0 && y <= max_y) {
+                    dung_map_r[x][y] = restore_r;
+                    dung_map_g[x][y] = restore_g;
+                    dung_map_b[x][y] = restore_b;
+                }
             }
         }
-    }
-    return;
-
-negx:
-    for (x = nXPos; x < nXPos + 0xD; x++) {
-        for (y = nYPos; y < nYPos + 0xE; y++) {
-            dung_map_r[x][y] = restore_r;
-            dung_map_g[x][y] = restore_g;
-            dung_map_b[x][y] = restore_b;
+    } else {
+        for (x = nXPos; x <= nXPos + radius_block_x; x++) {
+            r = &dung_map_r[x][nYPos];
+            g = &dung_map_g[x][nYPos];
+            b = &dung_map_b[x][nYPos];
+            for (y = nYPos; y <= nYPos + radius_block_y; y++) {
+                *r++ = restore_r;
+                *g++ = restore_g;
+                *b++ = restore_b;
+            }
         }
     }
 }
@@ -491,16 +478,17 @@ negx:
 void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
 {
     int i, j, x1, y1, x2, y2;
+    int vis_flag;
 
     switch (num) {
     case 0:
-        num = 1;
+        vis_flag = 1;
         break;
     case 1:
-        num = 2;
+        vis_flag = 2;
         break;
     default:
-        num = 3;
+        vis_flag = 3;
         break;
     }
     nRadius++;
@@ -516,17 +504,12 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
         x1 = 0;
     if (x2 > 0x60)
         x2 = 0x60;
-
     for (i = x1; i < x2; i++) {
         for (j = y1; j < y2; j++) {
-            if (dung_map[i][j].dFlags & 1) {
-                if (dung_map[i][j].dFlags & 2)
-                    dung_map[i][j].dFlags &= ~num;
-                else
-                    dung_map[i][j].dFlags &= ~(num | 4);
-            } else {
-                dung_map[i][j].dFlags &= ~(num | 4);
-            }
+            if ((dung_map[i][j].dFlags & 1) && (dung_map[i][j].dFlags & 2))
+                dung_map[i][j].dFlags &= ~vis_flag;
+            else
+                dung_map[i][j].dFlags &= ~(vis_flag | 4);
         }
     }
 }
@@ -544,7 +527,7 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
  * own oracle AND in missiles.cpp's oracle (which already `extern`s vCrawlTable, non-static) --
  * defined here (non-static, real initializer) as the true owner; missiles.cpp's existing extern
  * decl is unchanged and now resolves against this definition. */
-extern unsigned char GetBLOCK(int x, int y);
+BOOL GetBLOCK(int x, int y);
 
 unsigned char vCrawlTable[23][30] = {
     { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15, 0 },
@@ -579,90 +562,79 @@ void DoVision(int nXPos, int nYPos, int nRadius, unsigned char doautomap, unsign
     int nCrawlX = 0, nCrawlY = 0;
     int nLineLen;
     int nBlockerFlag;
-    int j, k, v;
+    int i, j, k, v;
     int x1adj, x2adj, y1adj, y2adj;
     int vis_flag;
-    int nTrans;
 
     vis_flag = visible + 1;
-
-    if ((unsigned)nXPos < 0x61 && (unsigned)nYPos < 0x61) {
+    if (nXPos >= 0 && nXPos <= 96 && nYPos >= 0 && nYPos <= 96) {
         if (doautomap) {
             if (dung_map[nXPos][nYPos].dFlags >= 0)
                 SetAutomapView(nXPos, nXPos);
             dung_map[nXPos][nYPos].dFlags |= 0x80;
         }
-        dung_map[nXPos][nYPos].dFlags |= vis_flag | 4;
+        dung_map[nXPos][nYPos].dFlags = dung_map[nXPos][nYPos].dFlags | vis_flag | 4;
     }
-
-    for (j = 0; j < 23; j++) {
-        nLineLen = 2 * (nRadius - RadiusAdj[j]);
-        if (nLineLen > 0) {
-            for (v = 0; v < 4; v++) {
-                nBlockerFlag = 0;
+    for (k = 0; k < 4; k++) {
+        for (j = 0; j < 23; j++) {
+            nBlockerFlag = 0;
+            nLineLen = (nRadius - RadiusAdj[j]) << 1;
+            for (i = 0; i < nLineLen && !nBlockerFlag; i += 2) {
                 x1adj = 0;
                 x2adj = 0;
                 y1adj = 0;
                 y2adj = 0;
-                for (k = 0; k < nLineLen; k += 2) {
-                    x1adj = 0;
-                    x2adj = 0;
-                    y1adj = 0;
-                    y2adj = 0;
-                    switch (v) {
-                    case 0:
-                        nCrawlX = nXPos + vCrawlTable[j][k];
-                        nCrawlY = nYPos + vCrawlTable[j][k + 1];
-                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
-                            x1adj = -1;
-                            y2adj = -1;
-                        }
-                        break;
-                    case 1:
-                        nCrawlX = nXPos - vCrawlTable[j][k];
-                        nCrawlY = nYPos - vCrawlTable[j][k + 1];
-                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
-                            y1adj = 1;
-                            x2adj = 1;
-                        }
-                        break;
-                    case 2:
-                        nCrawlX = nXPos + vCrawlTable[j][k];
-                        nCrawlY = nYPos - vCrawlTable[j][k + 1];
-                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
-                            x1adj = -1;
-                            y2adj = 1;
-                        }
-                        break;
-                    default:
-                        nCrawlX = nXPos - vCrawlTable[j][k];
-                        nCrawlY = nYPos + vCrawlTable[j][k + 1];
-                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
-                            y1adj = -1;
-                            x2adj = 1;
-                        }
-                        break;
+                switch (k) {
+                case 0:
+                    nCrawlX = nXPos + vCrawlTable[j][i];
+                    nCrawlY = nYPos + vCrawlTable[j][i + 1];
+                    if (vCrawlTable[j][i] && vCrawlTable[j][i + 1]) {
+                        x1adj = -1;
+                        y2adj = -1;
                     }
-                    if ((unsigned)nCrawlX < 0x61 && (unsigned)nCrawlY < 0x61) {
-                        nBlockerFlag = GetBLOCK(nCrawlX, nCrawlY);
-                        if (!GetBLOCK(nCrawlX + x1adj, nCrawlY + y1adj) || !GetBLOCK(nCrawlX + x2adj, nCrawlY + y2adj)) {
-                            if (doautomap) {
-                                if (dung_map[nCrawlX][nCrawlY].dFlags >= 0) {
-                                    SetAutomapView(nCrawlX, nCrawlY);
-                                    SetAutomapView(nCrawlX + 1, nCrawlY);
-                                }
-                                dung_map[nCrawlX][nCrawlY].dFlags |= 0x80;
+                    break;
+                case 1:
+                    nCrawlX = nXPos - vCrawlTable[j][i];
+                    nCrawlY = nYPos - vCrawlTable[j][i + 1];
+                    if (vCrawlTable[j][i] && vCrawlTable[j][i + 1]) {
+                        y1adj = 1;
+                        x2adj = 1;
+                    }
+                    break;
+                case 2:
+                    nCrawlX = nXPos + vCrawlTable[j][i];
+                    nCrawlY = nYPos - vCrawlTable[j][i + 1];
+                    if (vCrawlTable[j][i] && vCrawlTable[j][i + 1]) {
+                        x1adj = -1;
+                        y2adj = 1;
+                    }
+                    break;
+                case 3:
+                    nCrawlX = nXPos - vCrawlTable[j][i];
+                    nCrawlY = nYPos + vCrawlTable[j][i + 1];
+                    if (vCrawlTable[j][i] && vCrawlTable[j][i + 1]) {
+                        y1adj = -1;
+                        x2adj = 1;
+                    }
+                    break;
+                }
+                if (nCrawlX >= 0 && nCrawlX <= 96 && nCrawlY >= 0 && nCrawlY <= 96) {
+                    nBlockerFlag = GetBLOCK(nCrawlX, nCrawlY);
+                    if (!GetBLOCK(nCrawlX + x1adj, nCrawlY + y1adj) || !GetBLOCK(nCrawlX + x2adj, nCrawlY + y2adj)) {
+                        if (doautomap) {
+                            if (dung_map[nCrawlX][nCrawlY].dFlags >= 0) {
+                                SetAutomapView(nCrawlX, nCrawlY);
+                                SetAutomapView(nCrawlX + 1, nCrawlY);
                             }
-                            dung_map[nCrawlX][nCrawlY].dFlags |= vis_flag | 4;
-                            if (!nBlockerFlag) {
-                                nTrans = dung_map[nCrawlX][nCrawlY].dTransVal;
-                                if (nTrans != 0)
-                                    TransList[nTrans] = 1;
-                            }
+                            dung_map[nCrawlX][nCrawlY].dFlags |= 0x80;
+                        }
+                        dung_map[nCrawlX][nCrawlY].dFlags = dung_map[nCrawlX][nCrawlY].dFlags | vis_flag | 4;
+                        if (!nBlockerFlag) {
+                            v = dung_map[nCrawlX][nCrawlY].dTransVal;
+                            if (v != 0)
+                                TransList[v] = 1;
                         }
                     }
-                    if (nBlockerFlag)
-                        break;
                 }
             }
         }
@@ -790,29 +762,23 @@ void ProcessLightList(void)
     int i, j;
     unsigned char temp;
     struct LightListStruct2 *ll;
-    unsigned char *p;
 
     DoUnLight();
-    for (i = 0; i < numlights; i++) {
-        j = lightactive[i];
-        ll = &LightList[j];
+    for (j = 0; j < numlights; j++) {
+        i = lightactive[j];
+        ll = &LightList[i];
         if (!ll->_ldel)
-            DoLighting(ll->_lx, ll->_ly, ll->_lradius, j);
+            DoLighting(ll->_lx, ll->_ly, ll->_lradius, i);
     }
-    i = 0;
-    p = lightactive;
-    while (i < numlights) {
-        j = *p;
-        ll = &LightList[j];
+    for (j = 0; j < numlights;) {
+        i = lightactive[j];
+        ll = &LightList[i];
         if (ll->_ldel) {
-            numlights--;
-            temp = lightactive[numlights];
-            lightactive[numlights] = *p;
-            *p = temp;
-        } else {
-            i++;
-            p++;
-        }
+            temp = lightactive[--numlights];
+            lightactive[numlights] = lightactive[j];
+            lightactive[j] = temp;
+        } else
+            j++;
     }
 }
 
@@ -895,36 +861,34 @@ void ProcessVisionList(void)
     unsigned char delflag;
     struct LightListStruct *vl;
 
-    if (!dovision) {
-        dovision = 0;
-        return;
-    }
-    for (i = 0; i < numvision; i++) {
-        vl = &VisionList[i];
-        if (vl->_ldel)
-            DoUnVision(vl->_lx, vl->_ly, vl->_lradius, vl->_lflags);
-        if (vl->_lunflag) {
-            DoUnVision(vl->_lunx, vl->_luny, vl->_lunr, 1);
-            vl->_lunflag = 0;
-        }
-    }
-    for (i = 0; i < TransVal; i++)
-        TransList[i] = 0;
-    for (i = 0; i < numvision; i++) {
-        vl = &VisionList[i];
-        if (!vl->_ldel)
-            DoVision(vl->_lx, vl->_ly, vl->_lradius, 1, vl->_lflags);
-    }
-    do {
-        delflag = 0;
-        for (i = 0; i < numvision; i++) {
-            if (VisionList[i]._ldel) {
-                numvision--;
-                if (numvision > 0 && i != numvision)
-                    VisionList[i] = VisionList[numvision];
-                delflag = 1;
+    if (dovision) {
+        vl = VisionList;
+        for (i = 0; i < numvision; vl++, i++) {
+            if (vl->_ldel)
+                DoUnVision(vl->_lx, vl->_ly, vl->_lradius, vl->_lflags);
+            if (vl->_lunflag) {
+                DoUnVision(vl->_lunx, vl->_luny, vl->_lunr, vl->_lflags);
+                vl->_lunflag = 0;
             }
         }
-    } while (delflag);
+        for (i = 0; i < TransVal; i++)
+            TransList[i] = 0;
+        vl = VisionList;
+        for (i = 0; i < numvision; vl++, i++)
+            if (!vl->_ldel)
+                DoVision(vl->_lx, vl->_ly, vl->_lradius, 1, vl->_lflags);
+        do {
+            delflag = 0;
+            vl = VisionList;
+            for (i = 0; i < numvision; vl++, i++) {
+                if (vl->_ldel) {
+                    numvision--;
+                    if (numvision > 0 && i != numvision)
+                        *vl = VisionList[numvision];
+                    delflag = 1;
+                }
+            }
+        } while (delflag);
+    }
     dovision = 0;
 }
