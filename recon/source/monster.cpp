@@ -3221,10 +3221,12 @@ void MAI_Bat(int i)
     int mx, my, md, v, pnum;
     int fx, fy;
 
+    fx = Monst->_menemyx;
+    fy = Monst->_menemyy;
     pnum = Monst->_menemy;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
-        mx = Monst->_mx - Monst->_menemyx;
-        my = Monst->_my - Monst->_menemyy;
+        mx = Monst->_mx - fx;
+        my = Monst->_my - fy;
         md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
         Monst->_mdir = md;
         v = ENG_random(100);
@@ -3240,8 +3242,6 @@ void MAI_Bat(int i)
                 Monst->_mgoal = MG_ATTACK;
             }
         } else {
-            fx = Monst->_menemyx;
-            fy = Monst->_menemyy;
             if (Monst->MType->mtype == MT_GLOOM
                 && (abs(mx) < 5 && abs(my) < 5 && v < 33 + 4 * Monst->_mint)
                 && LineClearF1(PosOkMonst, i, Monst->_mx, Monst->_my, fx, fy)) {

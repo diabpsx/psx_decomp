@@ -794,14 +794,12 @@ void CharacterLoadPad(void)
             saveflag = saveflag + 1;
             if (saveflag == 0xA) {
                 saveflag = 0;
-                if (GetSaveStatusMessage(1, DiabloCharacterFile) == 0) {
-                    /* nothing */
-                } else {
-                    if (PSX_CH_SaveGame(current_card, cs - 1) == 0) {
-                        AlertTxt = 0x506;
+                if (GetSaveStatusMessage(1, DiabloCharacterFile) != 0) {
+                    if (PSX_CH_SaveGame(current_card, cs - 1) != 0) {
+                        AlertTxt = 0x50F;
                         ActivateMemcard(0, 0);
                     } else {
-                        AlertTxt = 0x50F;
+                        AlertTxt = 0x506;
                         ActivateMemcard(0, 0);
                     }
                 }

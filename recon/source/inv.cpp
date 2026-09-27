@@ -1978,6 +1978,7 @@ void CheckInvPaste(int pnum, int mx, int my)
     long gt;
     struct ItemStruct tempitem;
 
+    cn = CURSOR_HAND;
     SetICursor(plr[pnum].HoldItem._iCurs + 12);
     i = mx + (icursW >> 1);
     j = my + (icursH >> 1);
@@ -2001,7 +2002,7 @@ void CheckInvPaste(int pnum, int mx, int my)
             j += 14;
     }
     if (!done)
-        return;
+        goto end;
 
     il = 7;
     if (r >= 0 && r <= 3)
@@ -2084,7 +2085,7 @@ void CheckInvPaste(int pnum, int mx, int my)
     }
 
     if (!done)
-        return;
+        goto end;
 
     if (il != 7 && il != 8 && !plr[pnum].HoldItem._iStatFlag) {
         done = 0;
@@ -2097,14 +2098,12 @@ void CheckInvPaste(int pnum, int mx, int my)
     }
 
     if (!done) {
-        PlaySFX(0x3D3);
-        return;
+        goto end;
     }
 
     if (pnum == myplr)
         PlaySFX(ItemInvSnds[ItemCAnimTbl[plr[pnum].HoldItem._iCurs]]);
 
-    cn = CURSOR_HAND;
     switch (il) {
     case 4: /* head */
         NetSendCmdChItem(0, 0);
@@ -2202,7 +2201,7 @@ void CheckInvPaste(int pnum, int mx, int my)
             else
                 SetICursor(plr[pnum].HoldItem._iCurs + 12);
             if (!done2h)
-                return;
+                goto end;
             if (plr[pnum].InvBody[5]._itype == 3)
                 plr[pnum].InvBody[5]._itype = ITYPE_NONE;
             else
@@ -2355,9 +2354,12 @@ void CheckInvPaste(int pnum, int mx, int my)
         break;
     }
 
+end:
     CalcPlrInv(pnum, 1);
     if (pnum == myplr)
         SetCursor(cn);
+    if (!done)
+        PlaySFX(0x3D3);
 }
 
 void DrawInvTSK(struct TASK *T)

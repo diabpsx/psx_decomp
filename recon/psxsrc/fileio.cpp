@@ -190,9 +190,8 @@ char *FileIO::CopyPathItem(char *Dst, const char *Src)
     Len = Ptr - Src;
     if (Len) {
         memcpy(Dst, Src, Len);
-        int c = *Ptr;
         Dst[Len] = 0;
-        if (c)
+        if (*Ptr)
             return (char *)Ptr + 1;
         return (char *)Ptr;
     }

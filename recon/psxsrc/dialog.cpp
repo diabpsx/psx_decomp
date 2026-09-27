@@ -585,8 +585,7 @@ void Dialog::Line(int DX, int DY, int DW)
         GShadeX++;
         Bx = Xr;
         if (DialogBorderTW < DW) {
-            DW -= Xr;
-            for (Xl = 0; Xl < DW / DialogBorderTW; Xl++) {
+            for (Xl = 0; Xl < (DW - Xr) / DialogBorderTW; Xl++) {
                 GShadeY = 1;
                 DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, DialogBorderTW, DialogBorderTH, DialogBorderTW, DialogBorderTH, 0, 0, trans);
                 GShadeX++;

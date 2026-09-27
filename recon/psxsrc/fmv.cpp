@@ -624,7 +624,6 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
             short x = r->x;
             if (wleft != 0) {
                 short y2 = y + rowh;
-                short yoff2 = yoff + rowh;
                 do {
                     signed char xb = (signed char)(x & 0x3F);
                     short colw = 0x40 - xb;
@@ -665,6 +664,7 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
             yoff += rowh;
             sy = (short)(sy + rowh);
             area_ph += 1;
+            rows += 1;
             y += rowh;
         } while (hleft != 0);
     }
