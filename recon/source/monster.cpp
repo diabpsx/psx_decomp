@@ -1925,21 +1925,29 @@ void MAI_Fireman(int i)
 /* OPEN: bytes near-miss (165 diffs, 298 vs 295 insns) -- logic transcribed from hellfire; the
  * `D_8011C2C0[]` static rodata table (values {1,52,7,6} read directly from the ROM image at
  * 0x8011C2C0) confirmed as `counsmiss[] = {MIT_FIREBOLT,MIT_CBOLT,MIT_LIGHTCTRL,MIT_FIREBALL}`.
- * Residual is the base-pointer-cache lever not fully landing (oracle keeps &monster[i] in a saved
- * reg the whole function, ours spills to stack in places) -- not chased further (time budget). */
+ * NOW bytes PASS: the retail stack-slot order (fy < v < i*104 spill < _my) shows counsmiss/_mx/_my
+ * are declared AFTER the `Monst = &monster[i];` statement; _mx/_my are read through the const view
+ * (see MAI_Lachdanan); AddMissile takes the cached _mx/_my; conditions follow the retail flags.
+ * SYM OPEN: retail lists exactly those late-declared counsmiss/_mx/_my at FUNCTION level (before
+ * the body block) -- same artifact as ProcessMonsters; our compile keeps them inside the block. */
 void MAI_Counselor(int i)
 {
     int fx, fy, mx, my, md, v;
     int dist;
-    MonsterStruct *Monst = &monster[i];
-    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
+    MonsterStruct *Monst;
 
+    Monst = &monster[i];
+    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
+    int _mx, _my;
+
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;
-        mx = Monst->_mx - fx;
-        my = Monst->_my - fy;
-        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+        mx = _mx - fx;
+        my = _my - fy;
+        md = GetDirection(_mx, _my, Monst->_lastx, Monst->_lasty);
 
         if (Monst->_msquelch < 255)
             MonstCheckDoors(i);
@@ -1954,31 +1962,31 @@ void MAI_Counselor(int i)
         } else if (Monst->_mgoal == MG_WALK_AROUND1) {
             dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
 
-            if (abs(mx) < 2 && abs(my) < 2
+            if ((abs(mx) < 2 && abs(my) < 2)
                 || Monst->_msquelch != 255
-                || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+                || dung_map[_mx][_my].dTransVal != dung_map[fx][fy].dTransVal) {
                 Monst->_mgoal = MG_ATTACK;
                 M_StartFadein(i, md, 1);
-            } else if (Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md)) {
+            } else if ((Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md))) {
                 Monst->_mgoal = MG_ATTACK;
                 M_StartFadein(i, md, 1);
             } else
                 M_RoundWalk(i, md, Monst->_mgoalvar2);
         } else if (Monst->_mgoal == MG_ATTACK) {
-            if (abs(mx) < 2 && abs(my) < 2) {
+            if ((abs(mx) < 2 && abs(my) < 2)) {
                 Monst->_mdir = md;
                 if (Monst->_mhitpoints < (Monst->_mmaxhp >> 1)) {
                     Monst->_mgoal = MG_RUN_AWAY;
                     Monst->_mgoalvar1 = 0;
                     M_StartFadeout(i, md, 0);
-                } else if (Monst->_mVar1 == MM_DELAY || ENG_random(100) < 20 + 2 * Monst->_mint) {
+                } else if (Monst->_mVar1 == MM_DELAY || ENG_random(100) < 2 * Monst->_mint + 20) {
                     M_StartRAttack(i, -1, 0);
-                    AddMissile(monster[i]._mx, monster[i]._my, 0, 0, monster[i]._mdir, MIT_FLASH, 1, i, 4, 0);
-                    AddMissile(monster[i]._mx, monster[i]._my, 0, 0, monster[i]._mdir, MIT_FLASH2, 1, i, 4, 0);
+                    AddMissile(_mx, _my, 0, 0, monster[i]._mdir, MIT_FLASH, 1, i, 4, 0);
+                    AddMissile(_mx, _my, 0, 0, monster[i]._mdir, MIT_FLASH2, 1, i, 4, 0);
                 } else
                     M_StartDelay(i, ENG_random(10) + 10 - 2 * Monst->_mint);
-            } else if (v < 50 + 5 * Monst->_mint
-                && LineClear(Monst->_mx, Monst->_my, fx, fy)) {
+            } else if (v < 5 * Monst->_mint + 50
+                && LineClear(_mx, _my, fx, fy)) {
                 M_StartRAttack(i, counsmiss[Monst->_mint], ENG_random(Monst->mMaxDamage - Monst->mMinDamage + 1) + Monst->mMinDamage);
             } else if (ENG_random(100) < 30) {
                 Monst->_mgoal = MG_WALK_AROUND1;
