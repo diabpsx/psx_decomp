@@ -2311,7 +2311,7 @@ unsigned char PosOkMonst3(int i, int x, int y)
 void ProcessMonsters(void)
 {
     static unsigned int WipeCount;
-    unsigned char DoWipe;
+    bool DoWipe;
     MonsterStruct *Monst;
     int oldmode;
     int i;
@@ -2323,17 +2323,17 @@ void ProcessMonsters(void)
 
     DeleteMonsterList();
 
-    /* SYM+bytes OPEN (372 vs 370 insns): the (++WipeCount % 200)==0 magic-divide
-     * codegen picks scratch regs v1/a0 swapped vs retail and needs one extra
-     * "addu s7,v1,zero" move retail doesn't have (retail's final sltiu writes
-     * s7 directly). Tried: post-increment vs pre-increment, split statements,
-     * if/else literal assignment, explicit temp -- all produce the identical
-     * ours-side codegen. Falsified: statement-order/temp-naming levers here.
-     * Next angle: try declaring WipeCount as `long` (not `unsigned int`) to
-     * see if the divide routine selection changes register preference, or
-     * revisit once a similar magic-divide near-miss elsewhere in the tree is
-     * solved (M_ChangeLightOffset has the same open class). */
-    DoWipe = (++WipeCount % 200) == 0;
+    /* bytes PASS: DoWipe is `bool` (SYM type BOOL, int-sized -- no andi 0xff
+     * on the test), set by `DoWipe = 0; if (...) DoWipe = 1;`, and raflag is
+     * zeroed per monster right after the mx/my reads (fills the NOHEAL branch
+     * delay slot). SYM OPEN: retail lists WipeCount/DoWipe/Monst/oldmode at
+     * FUNCTION level (before the body block) and i..._menemy inside it; the
+     * same split shows in MAI_Counselor (counsmiss/_mx/_my) -- every retail
+     * function with a static local has it. Not reproduced yet: extra nested
+     * block, decl-after-statement, static initializer all falsified. */
+    DoWipe = 0;
+    if (++WipeCount % 200 == 0)
+        DoWipe = 1;
     for (i = 0; i < nummonsters; i++) {
         mi = monstactive[i];
         Monst = &monster[mi];
@@ -2346,6 +2346,7 @@ void ProcessMonsters(void)
         _menemy = Monst->_menemy;
         mx = Monst->_mx;
         my = Monst->_my;
+        raflag = 0;
 
         if (!(monster[mi]._mFlags & MFLAG_NOHEAL) && Monst->_mhitpoints < Monst->_mmaxhp && (Monst->_mhitpoints >> 6) > 0) {
             if (Monst->mLevel > 1)
