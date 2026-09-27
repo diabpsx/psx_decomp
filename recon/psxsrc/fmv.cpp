@@ -249,9 +249,9 @@ extern "C" void init_cdstream(int chunksize, unsigned char *buf, int bufsize)
 extern "C" void flush_cdstream(void)
 {
     stream_chunks_borrowed = 0;
-    stream_in = stream_chunks_borrowed;
-    stream_out = stream_in;
-    stream_chunks_total = stream_out;
+    stream_out = stream_chunks_borrowed;
+    stream_in = stream_out;
+    stream_chunks_total = stream_in;
     stream_chunks_in = stream_chunks_total;
     _discard_count = stream_chunks_in;
     _get_count = _discard_count;
@@ -438,7 +438,10 @@ extern "C" void wait_cdstream(void)
     int start_wait;   /* SYM AUTO local; unreferenced in the raw -- a genuine frame-hole (see catalog
                        * 13A "SYM-LOCAL STAGING LAW"): its declared-but-unused presence supplies the
                        * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
-    int wait = 1;
+    int wait = 1;   /* NB: SYM shows one spurious REG record for this local that retail's SYM lacks --
+                     * tried register/const/static/for-scope/comma/global-const variants, all either
+                     * keep the record or break the bytes (see project notes); kept as the only form
+                     * that reproduces the exact 46/46 bytes. Parked per orchestrator instruction. */
 
     (void)&start_wait;
     while (((stream_open != 0) || (stream_ending != 0)) && wait) {
