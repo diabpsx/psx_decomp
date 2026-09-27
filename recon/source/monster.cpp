@@ -4217,9 +4217,9 @@ void M_DiabloDeath(int i, unsigned char sendmsg, int pnum)
     int _mx, _my;
     int steps;
 
-    /* bytes OPEN (14 diffs, 202==202): only the ternary arm temps -- retail loads ViewX/ViewY
-     * straight into $a0 for the third abs() call, ours via $v0. SYM ok: the retail block tree
-     * {j {k {} {_moldx,_moldy}}} is a bare block + while loop (a for loop adds a level). */
+    /* PASS+SYM. The retail block tree {j {k {} {_moldx,_moldy}}} is a bare block + while loop (a
+     * for loop adds a level); the distance is `abs(dx) > abs(dy) ? abs(dx) : abs(dy)` (the two
+     * trailing abs() calls get cross-jumped into one, loading ViewX/ViewY straight into $a0). */
     PlaySFX(USFX_DIABLOD);
     quests[Q_DIABLO]._qactive = QUEST_DONE;
     if (sendmsg)
@@ -4260,7 +4260,7 @@ void M_DiabloDeath(int i, unsigned char sendmsg, int pnum)
     Monst->mlid = AddLight(Monst->_mx, Monst->_my, 3);
     DoVision(_mx, _my, 8, 0, 1);
 
-    steps = abs(abs(ViewX - _mx) > abs(ViewY - _my) ? ViewX - _mx : ViewY - _my);
+    steps = abs(ViewX - _mx) > abs(ViewY - _my) ? abs(ViewX - _mx) : abs(ViewY - _my);
     steps = steps > 20 ? 20 : steps;
 
     Monst->_mVar3 = 0;
