@@ -732,6 +732,31 @@ void S_StartStory(void)
     AddSLine(3);
 }
 
+/* @0x8006F2C4 */
+void S_StartIdShow(void)
+{
+    char iclr;
+    char *StrPtr;
+
+    StartStore(stextshold);
+    SItemListFlag = 0;
+    stextscrl = 0;
+    ClearSText(5, 23);
+    iclr = plr[myplr].HoldItem._iMagical ? 1 : 0;
+    if (!plr[myplr].HoldItem._iStatFlag) iclr = 2;
+    if (plr[myplr].HoldItem._iMagical == 2) iclr = 3;
+
+    AddSText(0, 5, 1, GetStr(0x483), 0, 0);
+
+    StrPtr = MakeItemStr(&plr[myplr].HoldItem, plr[myplr].HoldItem._iIName, 0x100);
+    AddSText(12, 8, 0, StrPtr, iclr, 0);
+    AddSTextVal(8, 0);
+    PrintStoreItem(&plr[myplr].HoldItem, MediumFont.GetWrap(StrPtr, &StoreBackRectClipper) + 8, iclr);
+
+    AddSText(0, 15, 1, GetStr(0x108), 0, 1);
+    OffsetSTextY(1, -4);
+}
+
 /* @0x8006F6CC */
 void S_StartTavern(void)
 {
