@@ -2957,6 +2957,182 @@ void AddLightning(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._mlid = AddLight(missile[mi]._mix, missile[mi]._miy, 579); /* PSX radius literal, not devilution's 4 */
 }
 
+unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
+{
+    int hit, hper, dam, mor, mir;
+    unsigned char resist, ret;
+
+    resist = 0;
+    if (monster[m].mtalkmsg)
+        return 0;
+    if ((monster[m]._mhitpoints >> 6) <= 0)
+        return 0;
+    if (monster[m].MType->mtype == 0x20 /* MT_ILLWEAV */ && monster[m]._mgoal == 2 /* MGOAL_RETREAT */)
+        return 0;
+    if (monster[m]._mmode == 14 /* MM_CHARGE (raw oracle literal) */)
+        return 0;
+
+    mir = missiledata[t].mResist;
+    mor = monster[m].mMagicRes;
+    /* PSX monster.mMagicRes bit layout confirmed via raw oracle: IMMUNE bits are
+     * 0x8=LIGHTNING(mir==3), 0x10=MAGIC(mir==1), 0x20=FIRE(mir==2); RESIST bits are
+     * 0x1=LIGHTNING(mir==3), 0x2=MAGIC(mir==1), 0x4=FIRE(mir==2) -- NOT this TU's
+     * IMMUNE_MAGIC/RESIST_MAGIC #defines (those are for a different bit layout). */
+    if ((mor & 0x8 && mir == MISR_LIGHTNING) || (mor & 0x10 && mir == MISR_MAGIC) || (mor & 0x20 && mir == MISR_FIRE))
+        return 0;
+
+    if ((mor & 0x1 && mir == MISR_LIGHTNING) || (mor & 0x2 && mir == MISR_MAGIC) || (mor & 0x4 && mir == MISR_FIRE))
+        resist = 1;
+
+    hit = ENG_random(100);
+    hper = 90 - monster[m].mArmorClass - dist;
+    if (hper < 5)
+        hper = 5;
+    if (hper > 95)
+        hper = 95;
+    if (CheckMonsterHit(m, &ret))
+        return ret;
+
+    if (hit < hper || monster[m]._mmode == MM_STONE) {
+        dam = mindam + ENG_random(maxdam - mindam + 1);
+        if (!shift)
+            dam <<= 6;
+        if (resist)
+            monster[m]._mhitpoints -= dam >> 2;
+        else
+            monster[m]._mhitpoints -= dam;
+        if ((monster[m]._mhitpoints >> 6) <= 0) {
+            if (monster[m]._mmode == MM_STONE) {
+                M_StartKill(m, -1);
+                monster[m]._mmode = MM_STONE;
+            } else {
+                M_StartKill(m, -1);
+            }
+        } else {
+            if (resist) {
+                PlayEffect(m, 1);
+            } else if (monster[m]._mmode == MM_STONE) {
+                if (m > MAX_PLRS - 1)
+                    M_StartHit(m, -1, dam);
+                monster[m]._mmode = MM_STONE;
+            } else {
+                if (m > MAX_PLRS - 1)
+                    M_StartHit(m, -1, dam);
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
+
+void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx, int my, unsigned char nodel, BOOL HurtPlr)
+{
+    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
+     * byte-verified (332 insns, genuinely different branch structure from both devilution and
+     * hellfire's CheckMissileCol; the top-level discriminator is `_miAnimType==MFILE_FIREWAL(4)`
+     * combined with `_misource!=-1`, not simply `_micaster==TARGET_MONSTERS`). Depends on
+     * MonsterMHit/PlayerMHit/Plr2PlrMHit which are themselves not yet implemented, so this cannot
+     * be verify_asm'd meaningfully until at least one of those exists. Documented per-branch below. */
+    MissileStruct *miss = &missile[i];
+    unsigned char hit;
+    int mid, oi;
+
+    if (mx >= 112 || my >= 112) {
+        miss->_miDelFlag = 1;
+        AddUnLight(miss->_mlid);
+        return;
+    }
+
+    if (miss->_miAnimType == 4 /* MFILE_FIREWAL */ || miss->_misource != -1) {
+        if (dung_map[mx][my].dMonster > 0) {
+            if (miss->_miAnimType == 4)
+                hit = MonsterMHit(miss->_misource, dung_map[mx][my].dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+            else
+                hit = MonsterTrapHit(dung_map[mx][my].dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+            if (hit) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        }
+        if (IsDplayer(mx, my) && HurtPlr) {
+            hit = PlayerMHit(IsDplayer(mx, my) - 1, -1, miss->_midist, mindam, maxdam, miss->_mitype, shift, (miss->_miAnimType == 4));
+            if (hit) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        }
+    } else if (miss->_micaster != 0) {
+        if ((monster[miss->_misource]._mFlags & 0x10) && dung_map[mx][my].dMonster > 0 && (monster[dung_map[mx][my].dMonster - 1]._mFlags & 0x20)) {
+            hit = MonsterTrapHit(dung_map[mx][my].dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+            if (hit) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        }
+        if (IsDplayer(mx, my) && HurtPlr) {
+            hit = PlayerMHit(IsDplayer(mx, my) - 1, miss->_misource, miss->_midist, mindam, maxdam, miss->_mitype, shift, 0);
+            if (hit) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        }
+    } else {
+        if (dung_map[mx][my].dMonster > 0) {
+            mid = dung_map[mx][my].dMonster - 1;
+            hit = MonsterMHit(miss->_misource, mid, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+            if (hit) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        } else if (dung_map[mx][my].dMonster < 0) {
+            mid = ~dung_map[mx][my].dMonster;
+            if (monster[mid]._mmode == MM_STONE) {
+                hit = MonsterMHit(miss->_misource, mid, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+                if (hit) {
+                    if (!nodel)
+                        miss->_mirange = 0;
+                    miss->_miHitFlag = 1;
+                }
+            }
+        }
+        if (IsDplayer(mx, my) && (IsDplayer(mx, my) - 1) != miss->_misource && HurtPlr) {
+            hit = Plr2PlrMHit(miss->_misource, IsDplayer(mx, my) - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+            if (hit) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        }
+    }
+
+    if (dung_map[mx][my].dObject != 0) {
+        oi = dung_map[mx][my].dObject > 0 ? dung_map[mx][my].dObject - 1 : ~dung_map[mx][my].dObject;
+        if (object[oi]._oMissFlag == 0) {
+            if (object[oi]._oBreak == 1)
+                BreakObject(-1, oi);
+            miss->_miHitFlag = 0;
+            if (!nodel)
+                miss->_mirange = 0;
+        }
+    }
+
+    if (GetMISSILE(mx, my)) {
+        miss->_miHitFlag = 0;
+        if (!nodel)
+            miss->_mirange = 0;
+    }
+
+    if (miss->_mirange == 0) {
+        if (missiledata[miss->_mitype].miSFX != -1)
+            PlaySfxLoc(missiledata[miss->_mitype].miSFX, miss->_mix, miss->_miy);
+    }
+}
+
 void MI_Rportal(int i)
 {
     int ExpLight[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15 };

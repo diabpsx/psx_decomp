@@ -126,6 +126,8 @@ void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short w
 void ClrPlrPath(int pnum);   /* PLAYER.CPP:372 */
 void NetSendCmd(unsigned char bHiPri, unsigned char bCmd);   /* MSG.CPP:419 */
 void SetPlayerHitPoints(int pnum, int val);   /* PLAYER.CPP:282 */
+unsigned char ChkPlrOffsets(int wx1, int wy1, int wx2, int wy2);   /* @0x80062568 PLAYER.CPP:2562 (SYM: ChkPlrOffsets__Fiiii) */
+void BreakObject(int pnum, int oi);   /* @0x8005EB40 OBJECTS.CPP (SYM: BreakObject__Fii) */
 void ChangeLightXY(int i, int x, int y);   /* @0x8004D384 LIGHTING.CPP */
 void MissToMonst(int i, int x, int y);   /* @0x80155CE4 MONSTER.CPP */
 void UseMana(int id, int sn);   /* @0x80077308 SPELLS.CPP:110 */
