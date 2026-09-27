@@ -9,5 +9,4 @@ void Init_GamePad(void);   /* @0x8007AE50 GAMEPAD.CPP:2014 */
 void InitGamePadVars(void);   /* @0x8007AE80 GAMEPAD.CPP:2021 */
 void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP:1952 */
 void GamePadTask(struct TASK *T);   /* @0x8007AC34 GAMEPAD.CPP:1914 */
-void Handle(struct GamePad *pad);   /* @0x8007A578 GAMEPAD.CPP:1554 */
-int pad_UpIsUpRight(int pval, char other);   /* @0x800784C0 GAMEPAD.CPP:351 */
+char pad_UpIsUpRight(int pval, char other);   /* @0x800784C0 GAMEPAD.CPP:351 */
