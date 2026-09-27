@@ -3504,7 +3504,7 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
             }
         }
         if (IsDplayer(mx, my) && HurtPlr) {
-            unsigned char earflag = miss->_miAnimType == 4;
+            const unsigned char earflag = miss->_miAnimType == 4;
             if (PlayerMHit(IsDplayer(mx, my) - 1, -1, miss->_midist, mindam, maxdam, miss->_mitype, shift, earflag)) {
                 if (!nodel)
                     miss->_mirange = 0;
