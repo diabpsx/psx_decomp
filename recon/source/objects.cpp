@@ -348,7 +348,7 @@ void LoadMapObjs(unsigned char *pMap, int startx, int starty)
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*lm) {
-                AddObject(ObjTypeConv[*lm], startx + 16 + i, starty + 16 + j);
+                PostAddObject(ObjTypeConv[*lm], startx + 16 + i, starty + 16 + j);
             }
             lm += 2;
         }
@@ -881,9 +881,9 @@ void OperateL3Door(int pnum, int i, unsigned char sendflag)
     dpx = abs(object[i]._ox - plr[pnum]._px);
     dpy = abs(object[i]._oy - plr[pnum]._py);
     if (dpx == 1 && dpy < 2 && object[i]._otype == 0x4B)
-        OperateL3LDoor(pnum, i, sendflag);
-    if (dpx < 2 && dpy == 1 && object[i]._otype == 0x4A)
         OperateL3RDoor(pnum, i, sendflag);
+    if (dpx < 2 && dpy == 1 && object[i]._otype == 0x4A)
+        OperateL3LDoor(pnum, i, sendflag);
 }
 
 void OperateL1LDoor(int pnum, int i, unsigned char sendflag)
@@ -1165,9 +1165,9 @@ void SyncOpL3Door(int pnum, int cmd, int i)
         opok = 1;
     if (opok) {
         if (object[i]._otype == 0x4A)
-            OperateL3RDoor(-1, i, 0);
-        if (object[i]._otype == 0x4B)
             OperateL3LDoor(-1, i, 0);
+        if (object[i]._otype == 0x4B)
+            OperateL3RDoor(-1, i, 0);
     }
 }
 
@@ -1367,6 +1367,121 @@ void Obj_Light(int i, int lr)
                 object[i]._oVar1 = 0;
             }
         }
+    }
+}
+
+void Obj_Circle(int i)
+{
+    int p;
+    unsigned char found;
+    int ox, oy;
+    int px, py;
+    int ot;
+    char *pxp, *pyp, *pdirp;
+
+    found = 0;
+    ox = object[i]._ox;
+    oy = object[i]._oy;
+    pxp = (char *)&plr[0]._px;
+    pyp = pxp + 2;
+    pdirp = pxp + 0x12;
+    for (p = 0; p < 2 && !found; p++, pxp += sizeof(struct PlayerStruct), pyp += sizeof(struct PlayerStruct), pdirp += sizeof(struct PlayerStruct)) {
+        px = *(short *)pxp;
+        py = *(short *)pyp;
+        if ((px == ox && py == oy) || deltaload) {
+            found = 1;
+            ot = object[i]._otype;
+            if (ot == 0x54) {
+                object[i]._oAnimFrame = 2;
+                ot = object[i]._otype;
+            }
+            if (ot == 0x55)
+                object[i]._oAnimFrame = 4;
+            if (ox == 0x2D && oy == 0x2F)
+                object[i]._oVar6 = 2;
+            else if (ox == 0x1A && oy == 0x2E)
+                object[i]._oVar6 = 1;
+            else
+                object[i]._oVar6 = 0;
+            if (object[i]._oVar5 >= 3 && ((ox == 0x23 && oy == 0x24) || deltaload)) {
+                object[i]._oVar6 = 4;
+                ObjChangeMapResync(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
+                if (quests[15]._qactive == 2) {
+                    if (quests[15]._qvar1 < 5) {
+                        quests[15]._qvar1 = 4;
+                        if (!deltaload)
+                            NetSendCmdQuest(1, 15);
+                    }
+                }
+                AddMissile(px, py, 0x23, 0x2E, *pdirp, 3, 0, p, 0, 0);
+                ClrPlrPath(p);
+                StartStand(p, 0);
+            }
+        } else {
+            if (object[i]._otype == 0x54)
+                object[i]._oAnimFrame = 1;
+            if (object[i]._otype == 0x55)
+                object[i]._oAnimFrame = 3;
+            object[i]._oVar6 = 0;
+        }
+    }
+}
+
+void Obj_Trap(int i)
+{
+    int oti;
+    unsigned char otrig;
+    int sx, sy, dx, dy;
+    int ax, ay;
+    int x, y;
+    int mdir;
+
+    if (object[i]._oVar4 != 0)
+        return;
+    oti = dung_map[object[i]._oVar1][object[i]._oVar2].dObject - 1;
+    otrig = 0;
+    switch ((char)((unsigned char)object[oti]._otype - 1)) {
+    case 0:
+    case 1:
+    case 41:
+    case 42:
+    case 73:
+    case 74:
+        if (object[oti]._oVar4 != 0)
+            otrig = 1;
+        break;
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 27:
+    case 47:
+        if (object[oti]._oSelFlag == 0)
+            otrig = 1;
+        break;
+    }
+    if (otrig) {
+        object[i]._oVar4 = 1;
+        sx = object[i]._ox;
+        sy = object[i]._oy;
+        dx = object[oti]._ox;
+        dy = object[oti]._oy;
+        ax = dx;
+        ay = dy;
+        for (y = ay - 1; y <= ay + 1; y++) {
+            for (x = ax - 1; x <= ax + 1; x++) {
+                if (IsDplayer(x, y) != 0) {
+                    dx = x;
+                    dy = y;
+                }
+            }
+        }
+        if (!deltaload) {
+            mdir = GetDirection(sx, sy, dx, dy);
+            AddMissile(sx, sy, dx, dy, mdir, object[i]._oVar3, 1, -1, 0, 0);
+            PlaySfxLoc(0x35, object[oti]._ox, object[oti]._oy);
+        }
+        object[oti]._oTrapFlag = 0;
     }
 }
 
