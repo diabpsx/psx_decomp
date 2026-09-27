@@ -1503,10 +1503,8 @@ int M_DoDeath(int i)
     return 0;
 }
 
-/* OPEN: bytes near-miss (40 diffs, 131 vs 133 insns) -- logic transcribed directly from hellfire
- * (nested a/b search loop, InBounds unrolled to explicit 0<=y<98 etc bound checks matching the
- * DirOK/M_GetKnockback precedent).  Residual is register-init ORDER for the s3/s4/s6/s7 saved regs
- * (which zero-init happens first) -- not yet resolved (time budget). */
+/* PASS+SYM. Logic from hellfire (nested a/b search loop, InBounds unrolled to explicit bound
+ * checks). PSX zero-inits y then x up front (retail line 1955; the s7/s3 zeroing in the prologue). */
 void M_Teleport(int i)
 {
     MonsterStruct *Monst = &monster[i];
@@ -1515,6 +1513,9 @@ void M_Teleport(int i)
     int x, y;
     int a, b;
     int px, py;
+
+    y = 0;
+    x = 0;
 
     if (Monst->_mmode == MM_STONE)
         return;
