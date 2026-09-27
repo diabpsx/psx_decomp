@@ -1476,16 +1476,17 @@ void OperateCauldron(int pnum, int i, int sType)
 
 unsigned char OperateFountains(int pnum, int i)
 {
-    int rv;
-    int statVal, saveRnd, status, rndVal, ii;
+    int ii;
+    unsigned char rv;
 
     rv = 0;
     SetRndSeed(object[i]._oRndSeed);
-    if (object[i]._otype == 0x4C) {
+    switch (object[i]._otype) {
+    case 0x4C:
         if (deltaload)
-            return rv;
+            return 0;
         if (pnum != myplr)
-            return rv;
+            return 0;
         if (plr[pnum]._pMana < plr[pnum]._pMaxMana) {
             PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
             plr[pnum]._pMana += 0x40;
@@ -1495,18 +1496,14 @@ unsigned char OperateFountains(int pnum, int i)
                 plr[pnum]._pManaBase = plr[pnum]._pMaxManaBase;
             }
             rv = 1;
-        } else {
-            if (!deltaload)
-                PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
-        }
-        force_redraw = 0xFF;
-        return rv;
-    }
-    if (object[i]._otype == 0x42) {
+        } else
+            PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
+        break;
+    case 0x42:
         if (deltaload)
-            return rv;
+            return 0;
         if (pnum != myplr)
-            return rv;
+            return 0;
         if (plr[pnum]._pHitPoints < plr[pnum]._pMaxHP) {
             PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
             plr[pnum]._pHitPoints += 0x40;
@@ -1516,31 +1513,27 @@ unsigned char OperateFountains(int pnum, int i)
                 plr[pnum]._pHPBase = plr[pnum]._pMaxHPBase;
             }
             rv = 1;
-        } else {
-            if (!deltaload)
-                PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
-        }
-        force_redraw = 0xFF;
-        return rv;
-    }
-    if (object[i]._otype == 0x51) {
+        } else
+            PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
+        break;
+    case 0x51:
         if (object[i]._oSelFlag != 0) {
             if (!deltaload)
                 PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
             object[i]._oSelFlag = 0;
             if (deltaload)
-                return rv;
+                return 0;
             AddMissile(plr[pnum]._px, plr[pnum]._py, plr[pnum]._px, plr[pnum]._py,
                        plr[pnum]._pdir, 0x27, -1, pnum, 0, leveltype << 1);
             rv = 1;
             if (pnum == myplr)
                 NetSendCmdParam1(0, 0x2D, i);
         }
-        force_redraw = 0xFF;
-        return rv;
-    }
-    if (object[i]._otype == 0x52) {
+        break;
+    case 0x52:
         if (object[i]._oSelFlag != 0) {
+            int rndVal, statVal, saveRnd, status;
+
             statVal = -1;
             saveRnd = -1;
             status = 0;
@@ -1549,9 +1542,9 @@ unsigned char OperateFountains(int pnum, int i)
                 PlaySfxLoc(0x5A, object[i]._ox, object[i]._oy);
             object[i]._oSelFlag = 0;
             if (deltaload)
-                return rv;
+                return 0;
             if (pnum != myplr)
-                return rv;
+                return 0;
             do {
                 rndVal = ENG_random(4);
                 if (rndVal != saveRnd) {
@@ -1577,12 +1570,13 @@ unsigned char OperateFountains(int pnum, int i)
                     status = 1;
             } while (!status);
             CheckStats(pnum);
+            rv = 1;
             if (pnum == myplr)
                 NetSendCmdParam1(0, 0x2D, i);
         }
-        force_redraw = 0xFF;
-        return rv;
+        break;
     }
+    force_redraw = 0xFF;
     return rv;
 }
 
