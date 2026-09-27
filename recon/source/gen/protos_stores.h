@@ -100,3 +100,10 @@ void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 void DoThatDrawSText(void);
 void DrawSLine(int y);
 void DrawStoreArrows(void);
+char *MakeItemStr(struct ItemStruct *ItemPtr, unsigned short ItemNo, unsigned short MaxLen);   /* @0x80049198 ITEMS.CPP:5246 */
+void PrintStoreItem(struct ItemStruct *x, int l, signed char iclr);
+void S_ScrollSBuy(int idx);
+void S_ScrollSSell(int idx);
+void S_ScrollWBuy(int idx);
+void S_ScrollHBuy(int idx);
+void S_ScrollSPBuy(int idx);

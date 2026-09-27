@@ -1767,8 +1767,10 @@ void DrawStoreHelpText(void)
     case 19:
     case 21:
     case 22:
-    case 24:
+    case 23:
         MediumFont.Print(0, 0xDE, GetStr(0x4E6), JustCentre, 0, WHITER, WHITEG, WHITEB);
+        break;
+    case 24:
         break;
     }
 }
@@ -1830,14 +1832,16 @@ void DrawStoreArrows(void)
 {
     int otpos;
     int show;
+    int v1;
     struct TextDat *td;
     struct POLY_FT4 *ft4;
 
     otpos = CBlocks::GetOverlayOtBase() + 0xA;
+    v1 = (unsigned char)stextflag;
     show = 0;
-    if ((unsigned int)(stextflag - 2) < 2 || (signed char)stextflag == 4 ||
-        (unsigned int)(stextflag - 6) < 2 || (signed char)stextflag == 8 ||
-        (unsigned int)(stextflag - 0x10) < 2 || (signed char)stextflag == 0x12) {
+    if ((unsigned int)(v1 - 2) < 2 || (signed char)v1 == 4 ||
+        (unsigned int)(v1 - 6) < 2 || (signed char)v1 == 8 ||
+        (unsigned int)(v1 - 0x10) < 2 || (signed char)v1 == 0x12) {
         show = 1;
     }
     if (show != 0 && storenumh != 0) {
@@ -1856,6 +1860,199 @@ void DrawStoreArrows(void)
             ft4->g0 = GOLDG;
             ft4->b0 = GOLDB;
         }
+    }
+}
+
+/* @0x8006ABD8 -- hellfire's S_ScrollSBuy (STORES.CPP:568) is the twin; PSX macro `smithitem` =
+ * _smithitem[StorePlrNo] (see the per-player macro block above). MakeItemStr's 3rd arg is a real
+ * MaxLen param (confirmed via items.cpp's already-reconstructed MakeItemStr), not an m2c mis-count. */
+void S_ScrollSBuy(int idx)
+{
+    int l;
+    int ls;
+    signed char iclr;
+
+    ClearSText(5, 0x15);
+    stextup = 5;
+    l = 5;
+    do {
+        if (_smithitem[StorePlrNo][idx]._itype != -1) {
+            ls = l;
+            iclr = _smithitem[StorePlrNo][idx]._iMagical != 0;
+            if (_smithitem[StorePlrNo][idx]._iStatFlag == 0) {
+                iclr = 2;
+            }
+            if (_smithitem[StorePlrNo][idx]._iMagical) {
+                AddSText(0xC, l, 0, MakeItemStr(&_smithitem[StorePlrNo][idx], _smithitem[StorePlrNo][idx]._iIName, (StoreBackRect.w - 0x44) & 0xFFFF), iclr, 1);
+            } else {
+                AddSText(0xC, l, 0, MakeItemStr(&_smithitem[StorePlrNo][idx], _smithitem[StorePlrNo][idx]._iName, (StoreBackRect.w - 0x44) & 0xFFFF), iclr, 1);
+            }
+            AddSTextVal(l, _smithitem[StorePlrNo][idx]._iIvalue);
+            PrintStoreItem(&_smithitem[StorePlrNo][idx], l + 1, iclr);
+            stextdown = ls;
+            idx++;
+        }
+        l += 4;
+    } while (l < 0xF);
+    if (!stext[stextsel]._ssel && stextsel != 0x16) {
+        stextsel = stextdown;
+    }
+}
+
+/* @0x8006B4B8 */
+void S_ScrollSSell(int idx)
+{
+    int l;
+    int v;
+    int iclr;
+    int step;
+    char *str;
+
+    step = 8;
+    if (SItemListFlag == 1) {
+        step = 4;
+    }
+    ClearSText(5, 0x15);
+    stextup = 5;
+    l = 5;
+    while (l < 0xF && idx < storenumh) {
+        if (storehold[idx]._itype != -1) {
+            iclr = storehold[idx]._iMagical != 0;
+            if (storehold[idx]._iMagical == 2) {
+                iclr = 3;
+            }
+            if (storehold[idx]._iStatFlag == 0) {
+                iclr = 2;
+            }
+            if (storehold[idx]._iMagical != 0 && storehold[idx]._iIdentified != 0) {
+                v = storehold[idx]._iIvalue;
+                str = MakeItemStr(&storehold[idx], storehold[idx]._iIName, 0x100);
+            } else {
+                str = MakeItemStr(&storehold[idx], storehold[idx]._iName, 0x100);
+                v = storehold[idx]._ivalue;
+            }
+            AddSText(0xC, l, 0, str, iclr, 1);
+            AddSTextVal(l, v);
+            PrintStoreItem(&storehold[idx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
+            stextdown = l;
+        }
+        idx++;
+        l += step;
+    }
+    stextsmax = storenumh - 2;
+    if (WStaffFlag == 0 && WFlag != 0) {
+        stextsmax = storenumh - 3;
+    }
+    if (stextsmax < 0) {
+        stextsmax = 0;
+    }
+}
+
+/* @0x8006C4D0 */
+void S_ScrollWBuy(int idx)
+{
+    int l;
+    int iclr;
+    int step;
+    char *str;
+
+    step = 4;
+    if (WStaffFlag != 0) {
+        step = 8;
+    }
+    ClearSText(5, 0x15);
+    stextup = 5;
+    l = 5;
+    while (l < 0xF) {
+        if (_witchitem[StorePlrNo][idx]._itype != -1) {
+            iclr = _witchitem[StorePlrNo][idx]._iMagical != 0;
+            if (_witchitem[StorePlrNo][idx]._iStatFlag == 0) {
+                iclr = 2;
+            }
+            if (_witchitem[StorePlrNo][idx]._iMagical) {
+                str = MakeItemStr(&_witchitem[StorePlrNo][idx], _witchitem[StorePlrNo][idx]._iIName, 0x100);
+            } else {
+                str = MakeItemStr(&_witchitem[StorePlrNo][idx], _witchitem[StorePlrNo][idx]._iName, 0x100);
+            }
+            AddSText(0xC, l, 0, str, iclr, 1);
+            AddSTextVal(l, _witchitem[StorePlrNo][idx]._iIvalue);
+            PrintStoreItem(&_witchitem[StorePlrNo][idx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
+            stextdown = l;
+            idx++;
+        }
+        l += step;
+    }
+    if (!stext[stextsel]._ssel && stextsel != 0x16) {
+        stextsel = stextdown;
+    }
+}
+
+/* @0x8006E304 */
+void S_ScrollHBuy(int idx)
+{
+    int l;
+    int iclr;
+    char *str;
+
+    ClearSText(5, 0x15);
+    stextup = 5;
+    for (l = 5; l < 0xF; l += 4) {
+        if (_healitem[StorePlrNo][idx]._itype != -1) {
+            iclr = (_healitem[StorePlrNo][idx]._iStatFlag == 0) * 2;
+            str = MakeItemStr(&_healitem[StorePlrNo][idx], _healitem[StorePlrNo][idx]._iName, (StoreBackRect.w - 0x44) & 0xFFFF);
+            AddSText(0xC, l, 0, str, iclr, 1);
+            AddSTextVal(l, _healitem[StorePlrNo][idx]._iIvalue);
+            PrintStoreItem(&_healitem[StorePlrNo][idx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
+            stextdown = l;
+            idx++;
+        }
+    }
+    if (!stext[stextsel]._ssel && stextsel != 0x16) {
+        stextsel = stextdown;
+    }
+}
+
+/* @0x8006AFB0 */
+void S_ScrollSPBuy(int idx)
+{
+    int boughtitems;
+    int l;
+    int iclr;
+    int nidx;
+    char *str;
+
+    ClearSText(5, 0x15);
+    boughtitems = idx;
+    stextup = 5;
+    nidx = 0;
+    if (boughtitems != 0) {
+        do {
+            if (_premiumitem[StorePlrNo][nidx]._itype != -1) {
+                boughtitems--;
+            }
+            nidx++;
+        } while (boughtitems != 0);
+    }
+    l = 5;
+    while (l < 0xF && nidx < 6) {
+        if (_premiumitem[StorePlrNo][nidx]._itype == -1) {
+            l -= 8;
+        } else {
+            iclr = _premiumitem[StorePlrNo][nidx]._iMagical != 0;
+            if (_premiumitem[StorePlrNo][nidx]._iStatFlag == 0) {
+                iclr = 2;
+            }
+            str = MakeItemStr(&_premiumitem[StorePlrNo][nidx], _premiumitem[StorePlrNo][nidx]._iIName, 0x100);
+            AddSText(0xC, l, 0, str, iclr, 1);
+            AddSTextVal(l, _premiumitem[StorePlrNo][nidx]._iIvalue);
+            PrintStoreItem(&_premiumitem[StorePlrNo][nidx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
+            stextdown = l;
+        }
+        nidx++;
+        l += 8;
+    }
+    if (!stext[stextsel]._ssel && stextsel != 0x16) {
+        stextsel = stextdown;
     }
 }
 

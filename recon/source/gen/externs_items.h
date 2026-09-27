@@ -1,4 +1,4 @@
-extern struct ItemDataStruct AllItemsList[157];   /* @0x801113A4 */
+extern const struct ItemDataStruct AllItemsList[157];   /* @0x801113A4 */
 extern BOOL CDWAIT;   /* @0x8011ADEC */
 extern int FePlayerNo;   /* @0x8011B378 */
 extern unsigned char ItemAnimLs[35];   /* @0x800D1C8C */
@@ -6,14 +6,14 @@ int *ItemAnimSnds;   /* @0x8011B890 */  /* TU-owned tentative def, %gp_rel-reach
 extern unsigned char ItemCAnimTbl[169];   /* @0x800D1BE0 */
 extern struct CFont MediumFont;   /* @0x800B82D8 */
 extern char OutStr[128];   /* @0x800D54D4 */
-extern struct PLStruct PL_Prefix[84];   /* @0x80112744 */
-extern struct PLStruct PL_Suffix[96];   /* @0x80113464 */
+extern const struct PLStruct PL_Prefix[84];   /* @0x80112744 */
+extern const struct PLStruct PL_Suffix[96];   /* @0x80113464 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
 extern int ScrollFlag[2];   /* @0x8011B8B8 */
 extern short SinTab[32];   /* @0x80116178 */
 extern int StorePlrNo;   /* @0x8011BAB4 */
 extern unsigned char UniqueItemFlag[128];   /* @0x800D5454 */
-extern struct UItemStruct UniqueItemList[91];   /* @0x80114364 */
+extern const struct UItemStruct UniqueItemList[91];   /* @0x80114364 */
 extern struct ItemStruct _boyitem[2];   /* @0x800E0AF8 */
 extern int _boylevel[2];   /* @0x8011BAD8 */
 extern struct ItemStruct _golditem[2];   /* @0x800E1CB0 */
@@ -60,3 +60,7 @@ unsigned char uitemflag;   /* @0x8011B8DC */  /* TU-owned tentative def, %gp_rel
 extern struct ObjectStruct object[127];   /* @0x800D8C4C */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
 static unsigned short Item2Frm[35];   /* @0x801161F4 SYM: STAT ARY SHORT[35] */
+extern struct SpellData spelldata[37];   /* @0x800DDB80 */
+extern struct QuestStruct quests[16];   /* @0x800DDA40 */
+extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */
+extern struct MissileStruct missile[125];   /* @0x80102C58 */

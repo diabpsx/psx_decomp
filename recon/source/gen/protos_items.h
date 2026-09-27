@@ -116,3 +116,21 @@ void UseItem(int p, int Mid, int spl);   /* @0x800476F0 ITEMS.CPP:4313 */
 void WitchBookLevel(int ii);   /* @0x800485AC ITEMS.CPP:4683 */
 unsigned char WitchItemOk(int i);   /* @0x80049774 ITEMS.CPP:5487 */
 unsigned char IsDplayer(int x, int y);   /* @0x8005FD10 PLAYER.CPP:262 */
+char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
+void AddPanelString(const char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
+int sprintf(char *buf, const char *fmt, ...);
+char * get_pieces_str(int nGold);   /* @0x8003751C CONTROL.CPP:3563 */
+BOOL TargetingSpell(int sp);   /* @0x800A17D4 PADFUNCS.CPP:482 */
+void InitTargetCursor(int pnum);   /* @0x800A1758 PADFUNCS.CPP:458 */
+void StartSpell(PlayerStruct *ptrplr, int d, int cx, int cy);   /* @0x80061140 PLAYER.CPP:1807 */
+int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (enum LANG_TYPE) */
+unsigned char AutoPlace(int pnum, int ii, int sx, int sy, unsigned char saveflag);   /* @0x80159F24 INV.CPP:1518 */
+void ModifyPlrStr(int p, int l);   /* @0x80065DA0 PLAYER.CPP:4417 */
+void ModifyPlrMag(int p, int l);   /* @0x80065EBC PLAYER.CPP:4437 */
+void ModifyPlrDex(int p, int l);   /* @0x80065FA8 PLAYER.CPP:4462 */
+void ModifyPlrVit(int p, int l);   /* @0x8006608C PLAYER.CPP:4480 */
+void ClrPlrPath(int pnum);   /* @0x80067254 PLAYER.CPP:4704 */
+void ChangeLightRadius(int i, int r);   /* @0x8004D364 LIGHTING.CPP:1218 */
+void ChangeVisionRadius(int id, int r);   /* @0x8004D61C LIGHTING.CPP:1475 */
+void SetPlayerHitPoints(int pnum, int val);   /* @0x80066CF0 PLAYER.CPP:4684 */
+void SetPlrAnims(int pnum);   /* @0x80067208 PLAYER.CPP:4703 */

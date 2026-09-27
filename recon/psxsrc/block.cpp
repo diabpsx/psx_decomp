@@ -1270,8 +1270,8 @@ void CBlocks::PrintDead(int x, int y)
                 FRAME_HDR *Fr = ObjTexDat->GetFr(TransPals[transfile * 2 + 1]);
                 ObjTexDat->SetPal(Fr, Ft4);
             }
-            bx = ((unsigned)dx >> 1) - 16;
-            by = ((unsigned)dy >> 1) - 16;
+            bx = (dx >> 1) - 16;
+            by = (dy >> 1) - 16;
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];

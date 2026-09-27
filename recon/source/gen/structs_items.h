@@ -304,6 +304,7 @@ struct CFont {   /* sizeof 540 */
     int Width;   /* +0x210 */
     struct TextDat *ThisDat;   /* +0x214 */
     unsigned char FontHeight;   /* +0x218 */
+    int GetStrWidth(char *Str);   /* @0x8008AAA4 PRINTY.CPP:1196 */
 };
 
 struct map_info {   /* sizeof 8 */
@@ -447,4 +448,84 @@ struct MonsterData {   /* sizeof 60 */
     unsigned short mTreasure;   /* +0x34 */
     char mSelFlag;   /* +0x36 */
     unsigned short mExp;   /* +0x38 */
+};
+struct SpellData {   /* sizeof 52 */
+    unsigned char sName;   /* +0x0 */
+    unsigned char sManaCost;   /* +0x1 */
+    unsigned char sType;   /* +0x2 */
+    int sNameText;   /* +0x4 */
+    int sSkillText;   /* +0x8 */
+    int sBookLvl;   /* +0xC */
+    int sStaffLvl;   /* +0x10 */
+    unsigned char sTargeted;   /* +0x14 */
+    unsigned char sTownSpell;   /* +0x15 */
+    int sMinInt;   /* +0x18 */
+    unsigned char sSFX;   /* +0x1C */
+    unsigned char sMissiles[3];   /* +0x1D */
+    unsigned char sManaAdj;   /* +0x20 */
+    unsigned char sMinMana;   /* +0x21 */
+    int sStaffMin;   /* +0x24 */
+    int sStaffMax;   /* +0x28 */
+    int sBookCost;   /* +0x2C */
+    int sStaffCost;   /* +0x30 */
+};
+struct QuestStruct {   /* sizeof 20 */
+    unsigned char _qlevel;   /* +0x0 */
+    unsigned char _qtype;   /* +0x1 */
+    unsigned char _qactive;   /* +0x2 */
+    unsigned char _qlvltype;   /* +0x3 */
+    int _qtx;   /* +0x4 */
+    int _qty;   /* +0x8 */
+    unsigned char _qslvl;   /* +0xC */
+    unsigned char _qidx;   /* +0xD */
+    unsigned char _qmsg;   /* +0xE */
+    unsigned char _qvar1;   /* +0xF */
+    unsigned char _qvar2;   /* +0x10 */
+    unsigned char _qlog;   /* +0x11 */
+    unsigned char pad_for_laz;   /* +0x12 */
+};
+struct MissileStruct {   /* sizeof 76 */
+    long _mixvel;   /* +0x0 */
+    long _miyvel;   /* +0x4 */
+    long _mitxoff;   /* +0x8 */
+    long _mityoff;   /* +0xC */
+    int _midam;   /* +0x10 */
+    int _mirnd;   /* +0x14 */
+    unsigned short _mirange;   /* +0x18 */
+    unsigned short _micaster;   /* +0x1A */
+    short _midist;   /* +0x1C */
+    short _miVar1;   /* +0x1E */
+    short _miVar2;   /* +0x20 */
+    short _miVar3;   /* +0x22 */
+    short _miVar4;   /* +0x24 */
+    short _miVar5;   /* +0x26 */
+    short _miVar6;   /* +0x28 */
+    short _miVar7;   /* +0x2A */
+    short _miVar8;   /* +0x2C */
+    short _misource;   /* +0x2E */
+    char _mitype;   /* +0x30 */
+    char _mix;   /* +0x31 */
+    char _miy;   /* +0x32 */
+    char _mixoff;   /* +0x33 */
+    char _miyoff;   /* +0x34 */
+    char _misx;   /* +0x35 */
+    char _misy;   /* +0x36 */
+    unsigned char _miAnimType;   /* +0x37 */
+    unsigned char _miDelFlag;   /* +0x38 */
+    unsigned char _miAnimFlags;   /* +0x39 */
+    unsigned char _miDrawFlag;   /* +0x3A */
+    unsigned char _miLightFlag;   /* +0x3B */
+    unsigned char _miPreFlag;   /* +0x3C */
+    unsigned char _miHitFlag;   /* +0x3D */
+    char _mlid;   /* +0x3E */
+    char _mimfnum;   /* +0x3F */
+    char _mispllvl;   /* +0x40 */
+    char _miAnimDelay;   /* +0x41 */
+    char _miAnimLen;   /* +0x42 */
+    char _miAnimWidth;   /* +0x43 */
+    char _miAnimWidth2;   /* +0x44 */
+    char _miAnimCnt;   /* +0x45 */
+    char _miAnimAdd;   /* +0x46 */
+    char _miAnimFrame;   /* +0x47 */
+    void (*PrintPtr)();   /* +0x48 */
 };

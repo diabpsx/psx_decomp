@@ -46,6 +46,23 @@ void InvMoveCursUp(void);   /* @0x80161958 INV.CPP:4261 */
 void InvMoveCursDown(void);   /* @0x80161B50 INV.CPP:4359 */
 unsigned char TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
 void NetSendCmdDelItem(unsigned char bHiPri, unsigned char bLoc);   /* @0x8004FD98 MSG.CPP:1212 */
+CPad *PAD_GetPad(int PadNum, unsigned char both);   /* @0x800897F4 PADS.CPP:251 */
+void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
+void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
+void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
+BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
+void VID_SetDBuffer(BOOL DBuf);   /* @0x80084190 VID.CPP:313 */
+void TSK_Kill(struct TASK *T);   /* @0x80020548 TASKER.C:350 */
+CBlocks *BL_GetCurrentBlocks(void);   /* @0x800919EC BLOCK.CPP:2805 */
+struct TextDat *GM_UseTexData(int Id);   /* @0x80093C10 GMAN.CPP:1312 */
+void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP:1952 */
+unsigned char StoreAutoPlace(void);   /* @0x8006A408 STORES.CPP:611 */
+void GM_FinishedUsing(struct TextDat *Fin);   /* @0x80093D80 GMAN.CPP:1349 */
+void GM_ForceTpLoad(int Id);   /* @0x80093D44 GMAN.CPP:1337 */
+void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
+BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
+void DoThatDrawInv(void);   /* @0x80159714 INV.CPP:1274 */
 void DrawInfoBox(RECT *InfoRect);   /* @0x80032FA4 CONTROL.CPP:2079 */
 void PRIM_Clip(RECT *R, int Depth);   /* @0x800839EC PRIMPOOL.CPP:216 */
 void PRIM_FullScreen(int Depth);   /* @0x80083B20 PRIMPOOL.CPP:257 */

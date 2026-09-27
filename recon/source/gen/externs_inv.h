@@ -57,3 +57,12 @@ extern const unsigned char WHITER;   /* @0x8011ABD1 */
 extern const unsigned char WHITEG;   /* @0x8011ABD2 */
 extern struct CFont MediumFont;   /* @0x800B82D8 */
 extern const unsigned char WHITEB;   /* @0x8011ABD3 */
+extern struct SFXHDR SFXTab[2];   /* @0x800B9BE0 */
+extern struct SFXHDR *sghMusic;   /* @0x8011BBB4 */
+extern BOOL CDWAIT;   /* @0x8011ADEC */
+extern unsigned char PauseMode;   /* @0x8011B7A4 */
+extern int ScrollFlag[2];   /* @0x8011B8B8 */
+extern struct TASK *_spselflag[2];   /* @0x8011B650 */
+extern unsigned char _trigflag[2];   /* @0x8011BB74 */
+extern struct InvXY InvRect[73];   /* @0x8010D030 */
+extern unsigned char InvSlotTable[73];   /* @0x8010D680 */

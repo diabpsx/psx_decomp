@@ -61,6 +61,8 @@ struct CFont {   /* sizeof 540 */
     unsigned char FontHeight;   /* +0x218 */
 
     int Print(int X, int Y, char *Str, int Justify, struct RECT *TextWindow, int R, int G, int B);
+    int GetStrWidth(char *Str);
+    int GetWrap(char *Str, struct RECT *TextWindow);
 };
 
 enum TXT_JUST {

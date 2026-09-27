@@ -57,6 +57,7 @@ int D_8011C304;
 struct RECT BRect;
 int D_8011C300;
 int CursGlow;
+int CursGlowDx;
 
 void FreeInvGFX(void)
 {
@@ -1524,6 +1525,213 @@ tail3:
         PlaySFX(0x32);
 }
 
+void InvDrawSlots(void)
+{
+    int Bx, By;
+
+    CursGlow = CursGlow + CursGlowDx;
+    if (CursGlow <= 0) {
+        CursGlow = 0;
+        CursGlowDx = -8;
+    }
+    if (CursGlow < -0x7F) {
+        CursGlow = -0x7F;
+        CursGlowDx = 8;
+    }
+
+    InvDrawSlot(InvRect[0].X, InvRect[0].Y, 0x5C);
+    InvDrawSlotBack(InvRect[0].X, InvRect[0].Y, 0x20, 0x20, InvSlotTable[0]);
+
+    InvDrawSlot(InvRect[4].X, InvRect[4].Y, 0x5B);
+    InvDrawSlotBack(InvRect[4].X, InvRect[4].Y, 0x10, 0x10, InvSlotTable[1]);
+
+    InvDrawSlot(InvRect[5].X, InvRect[5].Y, 0x5B);
+    InvDrawSlotBack(InvRect[5].X, InvRect[5].Y, 0x10, 0x10, InvSlotTable[2]);
+
+    InvDrawSlot(InvRect[6].X, InvRect[6].Y, 0x5B);
+    InvDrawSlotBack(InvRect[6].X, InvRect[6].Y, 0x10, 0x10, InvSlotTable[3]);
+
+    InvDrawSlot(InvRect[7].X, InvRect[7].Y, 0x5D);
+    InvDrawSlotBack(InvRect[7].X, InvRect[7].Y, 0x20, 0x30, InvSlotTable[4]);
+
+    InvDrawSlot(InvRect[13].X, InvRect[13].Y, 0x5D);
+    InvDrawSlotBack(InvRect[13].X, InvRect[13].Y, 0x20, 0x30, InvSlotTable[5]);
+
+    InvDrawSlot(InvRect[19].X, InvRect[19].Y, 0x5D);
+    InvDrawSlotBack(InvRect[19].X, InvRect[19].Y, 0x20, 0x30, InvSlotTable[6]);
+
+    InvDrawSlot(InvRect[25].X, InvRect[25].Y, 0x5F);
+
+    for (Bx = 25; Bx < 65; Bx++) {
+        InvDrawSlotBack(InvRect[Bx].X, InvRect[Bx].Y, 0x10, 0x10, InvSlotTable[Bx]);
+    }
+
+    InvDrawSlot(InvRect[65].X, InvRect[65].Y, 0x5E);
+
+    for (By = 65; By < 73; By++) {
+        InvDrawSlotBack(InvRect[By].X, InvRect[By].Y, 0x10, 0x10, InvSlotTable[By]);
+    }
+}
+
+void DrawInvTSK(struct TASK *T)
+{
+    int omp = myplr;
+    int osel = sel_data;
+    CBlocks *BgBlocks;
+    int ThisIsShit;
+    int OldPad;
+    int OldOt;
+
+    if (!invflag || options_pad == -1) {
+        D_8011C324 = 0;
+        invflag = 0;
+        options_pad = -1;
+        goto end;
+    }
+
+    myplr = options_pad;
+    PAD_GetPad(0, 0)->Flush();
+    CDWAIT = 1;
+    PauseMode = 1;
+    GLUE_SuspendGame();
+    if (sghMusic && sghMusic->sec_num < 4) {
+        OldOt = 1;
+        do {
+            PauseMode = OldOt;
+            GLUE_SuspendGame();
+            TSK_Sleep(1);
+        } while (sghMusic->sec_num < 4);
+    }
+    GLUE_SetShowPanelFlag(0);
+    TSK_Sleep(1);
+    stream_stop();
+    if (SFXTab[1].used) {
+        do {
+            stream_stop();
+            TSK_Sleep(1);
+        } while (SFXTab[1].used);
+    }
+    GLUE_SuspendGame();
+    GLUE_SetShowGameScreenFlag(0);
+    TSK_Sleep(1);
+    VID_SetDBuffer(1);
+    if (_spselflag[0])
+        TSK_Kill(_spselflag[0]);
+    if (_spselflag[1])
+        TSK_Kill(_spselflag[1]);
+    _spselflag[0] = 0;
+    _spselflag[1] = 0;
+    _trigflag[sel_data] = 0;
+    ClrCursor(0);
+    ClrCursor(1);
+    BgBlocks = BL_GetCurrentBlocks();
+    if (leveltype == 0)
+        BgBlocks->DumpMonsters();
+    if (!InvGfxTData)
+        InvGfxTData = GM_UseTexData(0xCF);
+    if (_pcurs[myplr] == 9)
+        _pcurs[myplr] = 1;
+    InvSetItemCurs();
+    ThisIsShit = 1;
+    VID_SetDBuffer(0);
+    TSK_Sleep(1);
+    CDWAIT = 0;
+    PauseMode = 0;
+    OldPad = options_pad;
+
+mainloop:
+    if (ThisIsShit == 0)
+        goto cleanup;
+    ThisIsShit = 0;
+    options_pad = OldPad;
+    invflag = 1;
+
+padloop:
+    if (!invflag)
+        goto after_pad;
+    if (options_pad < 0)
+        goto after_pad;
+    OldOt = MediumFont.SetOTpos(0xFC);
+    myplr = options_pad;
+    sel_data = options_pad;
+    ControlInv();
+    if (options_pad != -1) {
+        myplr = options_pad;
+        sel_data = options_pad;
+        DoThatDrawInv();
+    }
+    MediumFont.SetOTpos(OldOt);
+    GLUE_SuspendGame();
+    TSK_Sleep(1);
+    if (plr[options_pad]._pHitPoints >> 6 > 0)
+        goto padloop;
+    PostGamePad(5, 0, 0, 0);
+    options_pad = -1;
+
+after_pad:
+    if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4)
+        _pcurs[myplr] = 1;
+
+    if (_pcurs[myplr] < 0xC)
+        goto mainloop;
+    if (TryInvPut())
+        goto send;
+    if (StoreAutoPlace())
+        goto mainloop;
+    if (numitems < 0x7A)
+        goto send;
+    PlaySFX(0x3D3);
+    ThisIsShit = 1;
+    goto mainloop;
+
+send:
+    NetSendCmdPItem(1, 0xA, 0, 0);
+    goto mainloop;
+
+cleanup:
+    ClearPanel();
+    stream_stop();
+    if (SFXTab[1].used) {
+        do {
+            stream_stop();
+            TSK_Sleep(1);
+        } while (SFXTab[1].used);
+    }
+    VID_SetDBuffer(1);
+    CDWAIT = 1;
+    PauseMode = 1;
+    GM_FinishedUsing(InvGfxTData);
+    InvGfxTData = 0;
+    if (leveltype == 0) {
+        GM_ForceTpLoad(0xD0);
+    } else {
+        BgBlocks->SetTownersGraphics();
+        GM_ForceTpLoad(0xCD);
+    }
+    CDWAIT = 0;
+    PauseMode = 0;
+    VID_SetDBuffer(0);
+    ClearPanel();
+    D_8011C324 = 0;
+    if (options_pad >= 0 && ScrollFlag[options_pad]) {
+        PostGamePad(5, 0, 0, 0);
+        options_pad = -1;
+    } else {
+        _pcurs[myplr] = 1;
+    }
+    ClrCursor(0);
+    ClrCursor(1);
+    myplr = omp;
+    sel_data = osel;
+    invflag = 0;
+    GLUE_ResumeGame();
+    GLUE_SetShowPanelFlag(1);
+    GLUE_SetShowGameScreenFlag(1);
+    GLUE_SetHomingScrollFlag(1);
+
+end:;
+}
+
 void CheckInvCut(int pnum, int mx, int my)
 {
     int r;
@@ -1833,39 +2041,39 @@ void DrawInvHelpTxt(void)
         if (_pcurs[myplr] == 2) {
             GetStr(0x331);
             s0 = GetStr(0x208);
-            sprintf(TempStr, "%s %s (1)", s0, s0);
+            sprintf(TempStr, "%s  _ %s", s0, s0);
             goto done;
         }
         if (_pcurs[myplr] == 3) {
             GetStr(0x331);
             s0 = GetStr(0x35A);
-            sprintf(TempStr, "%s %s (2)", s0, s0);
+            sprintf(TempStr, "%s  _ %s", s0, s0);
             goto done;
         }
         if (_pcurs[myplr] < 0xC)
             goto special;
         GetStr(0x4E6);
         s0 = GetStr(0x11D);
-        sprintf(TempStr, "%s %s (3)", s0, s0);
+        sprintf(TempStr, "%s  < %s", s0, s0);
         goto done;
     } else {
         if (_pcurs[myplr] == 2) {
             GetStr(0x208);
             s0 = GetStr(0x331);
-            sprintf(TempStr, "%s %s (4)", s0, s0);
+            sprintf(TempStr, "_ %s  %s", s0, s0);
             goto done;
         }
         if (_pcurs[myplr] == 3) {
             GetStr(0x35A);
             s0 = GetStr(0x331);
-            sprintf(TempStr, "%s %s (5)", s0, s0);
+            sprintf(TempStr, "_ %s  %s", s0, s0);
             goto done;
         }
         if (_pcurs[myplr] < 0xC)
             goto special;
         GetStr(0x11D);
         s0 = GetStr(0x4E6);
-        sprintf(TempStr, "%s %s (6)", s0, s0);
+        sprintf(TempStr, "< %s  %s", s0, s0);
         goto done;
     }
 
@@ -1881,11 +2089,11 @@ done:
         MediumFont.SetChar(0x2E, 0x7F);
         s0 = GetStr(0x132);
     }
-    sprintf(TempStr, "%s", s0);
+    sprintf(TempStr, "%s  . %s ", TempStr, s0);
 
     if (InvPageFlag) {
         s0 = GetStr(0x2A4);
-        sprintf(TempStr, "%s", s0);
+        sprintf(TempStr, "%s  | %s ", TempStr, s0);
     }
 
     MediumFont.Print(0, 0xE0, TempStr, JustCentre, &BRect, WHITER, WHITEG, WHITEB);
