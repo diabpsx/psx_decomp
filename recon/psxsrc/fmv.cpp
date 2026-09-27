@@ -204,10 +204,10 @@ static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movi
                                       * LoPlayFMVOverLay strcpy's "DIABEND*.MOV" into it before queuing
                                       * a play_mdec_stream/dequeue_animation request. Gap to the next
                                       * undefined_syms_auto_fmv.txt symbol (D_80121D08) is exactly 0x20. */
-static int stream_opened;
-static int stream_startsec;
+static volatile int stream_opened;
+static volatile int stream_startsec;
 static volatile int stream_got_chunks;
-static int stream_last_chunk;
+static volatile int stream_last_chunk;
 static int sector_dma_in;
 static int sector_dma;
 
@@ -487,8 +487,8 @@ extern "C" void wait_cdstream(void)
 /* @0x801565F8 FMV.CPP:718 */
 extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
 {
-    CdlFILE RetFile;
     int len;
+    CdlFILE RetFile;
 
     if (fileexists(fname) == 0)
         DBG_Error(0, "psxsrc/FMV.CPP", 726);
