@@ -2957,6 +2957,109 @@ void AddLightning(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._mlid = AddLight(missile[mi]._mix, missile[mi]._miy, 579); /* PSX radius literal, not devilution's 4 */
 }
 
+unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
+{
+    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
+     * byte-verified given the size (496 insns). PSX confirmed to include hellfire's MIS_HBOLT/
+     * MT_DIABLO/MC_UNDEAD immunity check (a MC_UNDEAD value of 0 is assumed from the oracle's
+     * bare `!= 0` test), and drops devilution's `if (pnum == myplr)` gate on the hitpoint
+     * deduction (unconditional here). The `m >= 4` checks (not `m > MAX_PLRS - 1`) match the
+     * same literal-4 finding already confirmed in MonsterTrapHit. */
+    int hit, hper;
+    long dam;
+    int mor, mir;
+    unsigned char resist, ret;
+
+    resist = 0;
+    if (monster[m].mtalkmsg
+        || (monster[m]._mhitpoints >> 6) <= 0
+        || (t == MIS_HBOLT && monster[m].MType->mtype != 0x6E /* MT_DIABLO */ && monster[m].MData->mMonstClass != 0 /* MC_UNDEAD */))
+        return 0;
+    if (monster[m].MType->mtype == 0x20 /* MT_ILLWEAV */ && monster[m]._mgoal == 2 /* MGOAL_RETREAT */)
+        return 0;
+    if (monster[m]._mmode == 14 /* MM_CHARGE */)
+        return 0;
+
+    mor = monster[m].mMagicRes;
+    mir = missiledata[t].mResist;
+    if ((mor & 0x8 && mir == MISR_LIGHTNING) || (mor & 0x10 && mir == MISR_MAGIC) || (mor & 0x20 && mir == MISR_FIRE) || (mor & 0x80 && mir == MISR_ACID))
+        return 0;
+    if ((mor & 0x1 && mir == MISR_LIGHTNING) || (mor & 0x2 && mir == MISR_MAGIC) || (mor & 0x4 && mir == MISR_FIRE))
+        resist = 1;
+
+    hit = ENG_random(100);
+    if (missiledata[t].mType == 0) {
+        hper = plr[pnum]._pIBonusToHit - (monster[m].mArmorClass - 50) - plr[pnum]._pIEnAc + plr[pnum]._pDexterity + plr[pnum]._pLevel - ((dist * dist) >> 1);
+        if (plr[pnum]._pClass == PC_ROGUE)
+            hper += 20;
+        else if (plr[pnum]._pClass == PC_WARRIOR)
+            hper += 10;
+    } else {
+        hper = plr[pnum]._pMagic - (monster[m].mLevel << 1) + 50 - dist;
+        if (plr[pnum]._pClass == PC_SORCERER)
+            hper += 20;
+    }
+    if (hper < 5)
+        hper = 5;
+    if (hper > 95)
+        hper = 95;
+    if (monster[m]._mmode == MM_STONE)
+        hit = 0;
+    if (CheckMonsterHit(m, &ret))
+        return ret;
+
+    if (hit < hper) {
+        if (t == MIS_BONESPIRIT)
+            dam = (monster[m]._mhitpoints / 3) >> 6;
+        else
+            dam = mindam + ENG_random(maxdam - mindam + 1);
+        if (missiledata[t].mType == 0) {
+            dam = plr[pnum]._pIBonusDamMod + dam * plr[pnum]._pIBonusDam / 100 + dam;
+            if (plr[pnum]._pClass == PC_ROGUE)
+                dam += plr[pnum]._pDamageMod;
+            else
+                dam += plr[pnum]._pDamageMod >> 1;
+        }
+        if (!shift)
+            dam <<= 6;
+        if (resist)
+            dam >>= 2;
+        monster[m]._mhitpoints -= dam;
+        if (plr[pnum]._pIFlags & 0x100 /* ISPL_NOHEALMON */)
+            monster[m]._mFlags |= 0x8 /* MFLAG_NOHEAL */;
+
+        if ((monster[m]._mhitpoints >> 6) <= 0) {
+            if (monster[m]._mmode == MM_STONE) {
+                M_StartKill(m, pnum);
+                monster[m]._mmode = MM_STONE;
+            } else {
+                M_StartKill(m, pnum);
+            }
+        } else {
+            if (resist) {
+                PlayEffect(m, 1);
+            } else if (monster[m]._mmode == MM_STONE) {
+                if (m >= 4)
+                    M_StartHit(m, pnum, dam);
+                monster[m]._mmode = MM_STONE;
+            } else {
+                if (missiledata[t].mType == 0 && (plr[pnum]._pIFlags & 0x800 /* ISPL_KNOCKBACK */))
+                    M_GetKnockback(m, GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my));
+                if (m >= 4)
+                    M_StartHit(m, pnum, dam);
+            }
+        }
+
+        if (monster[m]._msquelch == 0) {
+            monster[m]._msquelch = 0xFF;
+            monster[m]._lastx = plr[pnum]._px;
+            monster[m]._lasty = plr[pnum]._py;
+        }
+        return 1;
+    }
+    return 0;
+}
+
 unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
 {
     int hit, hper, dam, mor, mir;
@@ -3012,11 +3115,11 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
             if (resist) {
                 PlayEffect(m, 1);
             } else if (monster[m]._mmode == MM_STONE) {
-                if (m > MAX_PLRS - 1)
+                if (m >= 4)
                     M_StartHit(m, -1, dam);
                 monster[m]._mmode = MM_STONE;
             } else {
-                if (m > MAX_PLRS - 1)
+                if (m >= 4)
                     M_StartHit(m, -1, dam);
             }
         }
@@ -3034,6 +3137,7 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
      * MonsterMHit/PlayerMHit/Plr2PlrMHit which are themselves not yet implemented, so this cannot
      * be verify_asm'd meaningfully until at least one of those exists. Documented per-branch below. */
     MissileStruct *miss = &missile[i];
+    struct map_info *dm = &dung_map[mx][my];
     unsigned char hit;
     int mid, oi;
 
@@ -3044,11 +3148,11 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
     }
 
     if (miss->_miAnimType == 4 /* MFILE_FIREWAL */ || miss->_misource != -1) {
-        if (dung_map[mx][my].dMonster > 0) {
+        if (dm->dMonster > 0) {
             if (miss->_miAnimType == 4)
-                hit = MonsterMHit(miss->_misource, dung_map[mx][my].dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+                hit = MonsterMHit(miss->_misource, dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
             else
-                hit = MonsterTrapHit(dung_map[mx][my].dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+                hit = MonsterTrapHit(dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
             if (hit) {
                 if (!nodel)
                     miss->_mirange = 0;
@@ -3064,8 +3168,8 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
             }
         }
     } else if (miss->_micaster != 0) {
-        if ((monster[miss->_misource]._mFlags & 0x10) && dung_map[mx][my].dMonster > 0 && (monster[dung_map[mx][my].dMonster - 1]._mFlags & 0x20)) {
-            hit = MonsterTrapHit(dung_map[mx][my].dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
+        if ((monster[miss->_misource]._mFlags & 0x10) && dm->dMonster > 0 && (monster[dm->dMonster - 1]._mFlags & 0x20)) {
+            hit = MonsterTrapHit(dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
             if (hit) {
                 if (!nodel)
                     miss->_mirange = 0;
@@ -3081,16 +3185,16 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
             }
         }
     } else {
-        if (dung_map[mx][my].dMonster > 0) {
-            mid = dung_map[mx][my].dMonster - 1;
+        if (dm->dMonster > 0) {
+            mid = dm->dMonster - 1;
             hit = MonsterMHit(miss->_misource, mid, mindam, maxdam, miss->_midist, miss->_mitype, shift);
             if (hit) {
                 if (!nodel)
                     miss->_mirange = 0;
                 miss->_miHitFlag = 1;
             }
-        } else if (dung_map[mx][my].dMonster < 0) {
-            mid = ~dung_map[mx][my].dMonster;
+        } else if (dm->dMonster < 0) {
+            mid = ~dm->dMonster;
             if (monster[mid]._mmode == MM_STONE) {
                 hit = MonsterMHit(miss->_misource, mid, mindam, maxdam, miss->_midist, miss->_mitype, shift);
                 if (hit) {
@@ -3110,8 +3214,8 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
         }
     }
 
-    if (dung_map[mx][my].dObject != 0) {
-        oi = dung_map[mx][my].dObject > 0 ? dung_map[mx][my].dObject - 1 : ~dung_map[mx][my].dObject;
+    if (dm->dObject != 0) {
+        oi = dm->dObject > 0 ? dm->dObject - 1 : ~dm->dObject;
         if (object[oi]._oMissFlag == 0) {
             if (object[oi]._oBreak == 1)
                 BreakObject(-1, oi);
