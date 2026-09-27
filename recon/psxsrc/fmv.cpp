@@ -189,7 +189,7 @@ static int vbuf;
 unsigned char map_buf[0x19000];   /* mdc bitstream work area (symbol_addrs_fmv.txt: size 0x19000); a
                                     * pointer jump table (void*[]) lives at byte offset 0x18FFC (see
                                     * start_mdec_decode/DCT_out_handler). */
-#define MAP_BUF_JTAB ((void **)(map_buf + 0x18FFC))
+#define MAP_BUF_JTAB ((void **)&map_buf[0x18FFC])
 static int mdc_bufstart, mdc_buftop, mdc_buftotal, mdc_bufleft, num_mdcs;
 static int frame_decoded;
 static int last_fn, last_mdc;
@@ -360,8 +360,11 @@ extern "C" void cdstream_service(void)
         install_stream_handlers();
         cdstream_resetsec = stream_secnum;
         reset_cdstream();
-        first_handler_event = 0;
-        last_handler_event = time_in_frames;
+        {
+            int t = time_in_frames;
+            first_handler_event = 0;
+            last_handler_event = t;
+        }
         stream_opened = time_in_frames;
     }
 }
@@ -493,19 +496,15 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
 /* @0x80156720 FMV.CPP:791 */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
-    int count, total;
     unsigned long *dst = (unsigned long *)imgbuf;
+    int count = 0;
 
-    total = 0;
-    count = 0;
     do {
-        *dst = (unsigned long)p;
+        dst[count] = (unsigned long)p;
         p += 0x1900;
-        total += 0x1900;
         count++;
-        dst++;
     } while (count < 0x15);
-    return total;
+    return 0x15 * 0x1900;
 }
 
 /* @0x80156754 FMV.CPP:816 */
@@ -524,7 +523,7 @@ extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int 
     slices_to_do = w / slice.w + ((w % slice.w) > 0);
     slnum = slices_to_do;
     rem = h & 0xF;
-    slice_size = (slice.w * (rem != 0 ? (h + 0x10 - rem) : h)) >> 1;
+    slice_size = (slice.w * (rem == 0 ? h : h + 0x10 - rem)) >> 1;
     slice_inc = (w & 0xF) ? (w & 0xF) : 0x10;
     func_8013ADA0(vlcbuf[vbuf], 2);
     func_8013AE1C(MAP_BUF_JTAB[slices_to_do], slice_size);
@@ -537,7 +536,7 @@ extern "C" void DCT_out_handler(void)
     int OldGp = ReloadGP();
 
     LoadImage(&slice, (u_long *)MAP_BUF_JTAB[slices_to_do]);
-    slice.x = (short)(slice.x + slice_inc);
+    slice.x += slice_inc;
     slices_to_do -= 1;
     if (slices_to_do != 0) {
         slice_inc = slice.w;
@@ -578,7 +577,17 @@ extern "C" void init_mdec_buffer(char *buf, int size)
  * FOUR ADJACENT grid points: TL=off[mbuf][col][row], TR=off[mbuf][col+1][row], BL=off[mbuf][col][row+1],
  * BR=off[mbuf][col+1][row+1] (byte deltas +80/+8/+88 confirmed against TL). rebuild_mdec_polys re-adds
  * the CURRENT camera pan (x,y) to each cached corner every frame instead of re-tiling from scratch. */
+/* The confirmed byte-offset formula from the raw is 800*mbuf + 80*col + 8*row (+2 for the y half of
+ * the {x,y} pair) -- row's own stride (8 bytes) is TWICE an {x,y} pair's size (4 bytes), so this
+ * table is NOT expressible as a clean short[2][10][10][2] (that gives row stride 4, col stride 40,
+ * mbuf stride 400 -- exactly half of every real coefficient; a genuine open question, possibly an
+ * interleaved/duplicated-row storage this TU doesn't otherwise reveal). A flat byte-addressed
+ * TMDC_OFFS() macro reproducing the real addresses compiles WORSE (98/117 vs 119/117 insns) than
+ * indexing the (address-wrong) short[2][10][10][2] array directly -- kept the array form since this
+ * WIP function is being tuned for byte-match, but the two READ sites (here and split_poly_area's
+ * WRITE site) must be changed together if the real dimensionality is ever nailed down. */
 static short tmdc_pol_offs[2][10][10][2];
+#define TMDC_OFFS(mb, col, row) (tmdc_pol_offs[mb][col][row])
 
 /* WIP -- NOT byte-verified yet (deep GTE/MDEC polygon-tiler internals, no PC twin to cross-check
  * against). Faithful transcription of the m2c draft (skel/PSXSRC/FMV.CPP) with M2C_FIELD resolved to
@@ -650,8 +659,8 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
                     }
                     x += colw;
                     x_run += colw;
-                    tmdc_pol_offs[offs][area_pw][area_ph][0] = xoff;
-                    tmdc_pol_offs[offs][area_pw][area_ph][1] = yoff;
+                    TMDC_OFFS(offs, area_pw, area_ph)[0] = xoff;
+                    TMDC_OFFS(offs, area_pw, area_ph)[1] = yoff;
                     area_pw += 1;
                     p += 1;
                 } while (wleft != 0);
@@ -677,27 +686,21 @@ extern "C" void rebuild_mdec_polys(int x, int y)
      * each computed once per inner iteration and reused for both corners on that column edge. */
     POLY_FT4 *p = &tmdc_pol[0][mbuf][0];
     int row = 0;
-    int row1_8 = 8;   /* (row+1)*8 */
 
     for (; row < mdec_ph[mbuf]; row++) {
         if (mdec_pw[mbuf] > 0) {
-            int row8 = row * 8;
             for (int col = 0; col < mdec_pw[mbuf]; col++) {
-                int c80 = col * 80;
-                int mb800 = mbuf * 800;
-                short *tl = (short *)((char *)tmdc_pol_offs + row8 + c80 + mb800);
-                p->x0 = tl[0] + x; p->y0 = tl[1] + y;
-                int c80n = (col + 1) * 80;
-                short *tr = (short *)((char *)tmdc_pol_offs + row8 + c80n + mb800);
-                p->x1 = tr[0] + x; p->y1 = tr[1] + y;
-                short *bl = (short *)((char *)tmdc_pol_offs + row1_8 + c80 + mb800);
-                p->x2 = bl[0] + x; p->y2 = bl[1] + y;
-                short *br_ = (short *)((char *)tmdc_pol_offs + row1_8 + c80n + mb800);
-                p->x3 = br_[0] + x; p->y3 = br_[1] + y;
+                p->x0 = TMDC_OFFS(mbuf, col, row)[0] + x;
+                p->y0 = TMDC_OFFS(mbuf, col, row)[1] + y;
+                p->x1 = TMDC_OFFS(mbuf, col + 1, row)[0] + x;
+                p->y1 = TMDC_OFFS(mbuf, col + 1, row)[1] + y;
+                p->x2 = TMDC_OFFS(mbuf, col, row + 1)[0] + x;
+                p->y2 = TMDC_OFFS(mbuf, col, row + 1)[1] + y;
+                p->x3 = TMDC_OFFS(mbuf, col + 1, row + 1)[0] + x;
+                p->y3 = TMDC_OFFS(mbuf, col + 1, row + 1)[1] + y;
                 p += 1;
             }
         }
-        row1_8 += 8;
     }
 }
 
