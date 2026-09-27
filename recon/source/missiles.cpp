@@ -1154,14 +1154,13 @@ void AddRportal(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
 {
     /* PSX-only prologue: shrinks/re-places any pre-existing portal missile occupying this tile
      * before placing the new one -- no PC twin has this. */
-    int oldidx;
-    signed char dm;
+    int m2 = dung_map[sx][sy].dMissile;
 
-    dm = dung_map[sx][sy].dMissile;
-    if (dm > 0) {
-        oldidx = dm - 1;
-        missile[oldidx]._miy--;
-        PutMissile(oldidx);
+    if (m2 > 0) {
+        m2--;
+        MissileStruct *miss = &missile[m2];
+        miss->_miy--;
+        PutMissile(m2);
     }
 
     missile[mi]._mix = sx;
@@ -1169,8 +1168,8 @@ void AddRportal(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
     missile[mi]._misx = sx;
     missile[mi]._misy = sy;
     missile[mi]._mirange = 100;
-    missile[mi]._miVar2 = 0;
     missile[mi]._miVar1 = missile[mi]._mirange - missile[mi]._miAnimLen;
+    missile[mi]._miVar2 = 0;
     PutMissile(mi);
 }
 
