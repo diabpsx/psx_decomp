@@ -64,3 +64,23 @@ struct CharDataStructDef {   /* sizeof 7648 */
     char ToggleSave[6];   /* +0x1DD0 */
     char spltypesave[6];   /* +0x1DD6 */
 };
+
+struct PlayerStruct {   /* sizeof 6632 -- opaque; RestoreLoadedData only bulk-copies it (the last 4
+                         * bytes, pDiabloKillLevel, are NOT part of the save-file record -- retail
+                         * copies sizeof(PlayerStruct)-4 bytes per slot, see the memcpy comment). */
+    unsigned char _opaque[6632];
+};
+
+struct PortalStruct {   /* sizeof 12 */
+    int ltype;   /* +0x0 */
+    char x;   /* +0x4 */
+    char y;   /* +0x5 */
+    char level;   /* +0x6 */
+    char setlvlnum;   /* +0x7 */
+    unsigned char open;   /* +0x8 */
+    unsigned char setlvl;   /* +0x9 */
+};
+
+struct LocalLevel {   /* sizeof 200 */
+    unsigned char automapsv[5][40];   /* +0x0 */
+};

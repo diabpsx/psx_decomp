@@ -107,6 +107,107 @@ void SaveQuest(int i)
     tbuff += sizeof(struct QuestStruct);
 }
 
+/* @0x8015BC5C */
+int PSX_GM_SaveGame(int card_number, char *name, char *title)
+{
+    int i = 0;
+    int result;
+    int tries;
+    unsigned char *SaveBuff;
+    int SaveSize;
+    int delete_file_number;
+    unsigned char *icon;
+    unsigned short *clut;
+    int savesize;
+    unsigned char *endptr;
+
+    SaveBuff = save_buffer;
+    tbuff = SaveBuff;
+    GetIcon();
+    DeltaSaveLevel();
+    ISave(-1);
+    ISave(FePlayerNo);
+    tries = 4;
+    ISave(gbActivePlayers);
+    ISave(currlevel);
+    ISave(leveltype);
+    ISave(setlevel);
+    ISave(setlvlnum);
+    tbuff += DeltaExportData(tbuff);
+
+    for (; i < 4; i++) {
+        memcpy(tbuff, &portal[i], sizeof(struct PortalStruct));
+        tbuff += sizeof(struct PortalStruct);
+    }
+
+    for (i = 0; i < FePlayerNo + 1; i++) {
+        memcpy(tbuff, &plr[i], sizeof(struct PlayerStruct) - 4);
+        tbuff += sizeof(struct PlayerStruct) - 4;
+        BSave(QSpell[i]);
+        BSave(_spltotype[i]);
+    }
+
+    for (i = 0; i < 17; i++) {
+        ISave(glSeedTbl[i]);
+    }
+
+    for (i = 0; i < 16; i++) {
+        BSave(MlTab[i]);
+        BSave(QlTab[i]);
+    }
+
+    ISave(orgseed);
+
+    for (i = 0; i < 16; i++) {
+        SaveQuest(i);
+    }
+
+    SaveOptions();
+
+    for (i = 0; i < 22; i++) {
+        memcpy(tbuff, &sgLocals[i], sizeof(struct LocalLevel));
+        tbuff += sizeof(struct LocalLevel);
+    }
+
+    ISave(gnDifficulty);
+
+    for (i = 0; i < 17; i++) {
+        BSave(LevPals[i]);
+    }
+
+    ISave(_numpremium[StorePlrNo]);
+    ISave(_premiumlevel[StorePlrNo]);
+    ISave(ViewX);
+    ISave(ViewY);
+    BSave((char)GetSpeed());
+
+    endptr = tbuff;
+    tbuff = SaveBuff;
+    SaveSize = endptr - SaveBuff;
+    ISave(SaveSize);
+    tbuff = endptr;
+
+    savesize = SaveSize;
+    if (savesize <= 0x13FFF) {
+        savesize = 0x13E00;
+    }
+
+    icon = IconBuffer + 0x28;
+    clut = (unsigned short *)(icon - 0x20);
+
+    do {
+        delete_file_number = GetFileNumber(current_card, DiabloGameFile);
+        if (delete_file_number != -1) {
+            delete_card_file(current_card, delete_file_number);
+        }
+        result = write_card_file(card_number, 0x3001, name, title, icon, clut, savesize, SaveBuff);
+        tries--;
+    } while (tries != -1 && result != 0);
+
+    gbValidSaveFile = 1;
+    return result;
+}
+
 /* @0x8015C2E8 */
 void PSX_CH_LoadGame(int slot)
 {
@@ -279,4 +380,109 @@ void SaveOptions(void)
     StorePads();
     BSave(MONO);
     BSave((char)GetSpeed());
+}
+
+/* @0x8015C1BC */
+int PSX_GM_LoadGame(unsigned char firstflag, int card_number, int file)
+{
+    unsigned char *LoadBuff;
+    int result;
+
+    LoadBuff = save_buffer;
+    tbuff = LoadBuff;
+    FreeGameMem();
+    result = read_card_file(card_number, file, 0x3001, (char *)LoadBuff);
+    if (result != 0)
+        return result;
+
+    gbRunGame = 0;
+    delta_init();
+    GLUE_SetShowGameScreenFlag(0);
+    result = RestoreLoadedData(firstflag != 0);
+    if (result != (int)(tbuff - LoadBuff)) {
+        VID_SetXYOff(0, 0);
+        return -2;
+    }
+
+    gbMaxPlayers = FePlayerNo + 1;
+    SetReturnLvlPos();
+    ResyncQuests();
+    SetLoadedVolumes();
+    CalcVolumes();
+    ClearQuestFlags();
+    gbProcessPlayers = 1;
+    *(int *)((char *)&plr[0] + 0x64) = -1;
+    *(int *)((char *)&plr[1] + 0x64) = -1;
+    options_pad = -1;
+    deathflag = 0;
+    return 0;
+}
+
+/* @0x8015C9CC */
+int RestoreLoadedData(BOOL firstflag)
+{
+    unsigned char *LoadBuff;
+    int DataSize;
+    int i;
+
+    LoadBuff = save_buffer;
+    tbuff = LoadBuff;
+
+    DataSize = ILoad();
+    FePlayerNo = ILoad();
+    ILoad();
+    currlevel = ILoad();
+    leveltype = ILoad();
+    setlevel = ILoad();
+    setlvlnum = ILoad();
+
+    tbuff += DeltaImportData(tbuff);
+
+    for (i = 0; i < 4; i++) {
+        memcpy(&portal[i], tbuff, sizeof(struct PortalStruct));
+        tbuff += sizeof(struct PortalStruct);
+    }
+
+    for (i = 0; i < FePlayerNo + 1; i++) {
+        memcpy(&plr[i], tbuff, sizeof(struct PlayerStruct) - 4);
+        tbuff += sizeof(struct PlayerStruct) - 4;
+        QSpell[i] = BLoad();
+        _spltotype[i] = BLoad();
+    }
+
+    for (i = 0; i < 17; i++) {
+        glSeedTbl[i] = ILoad();
+    }
+
+    for (i = 0; i < 16; i++) {
+        MlTab[i] = BLoad();
+        QlTab[i] = BLoad();
+    }
+
+    orgseed = ILoad();
+
+    for (i = 0; i < 16; i++) {
+        LoadQuest(i);
+    }
+
+    LoadOptions();
+
+    for (i = 0; i < 22; i++) {
+        memcpy(&sgLocals[i], tbuff, sizeof(struct LocalLevel));
+        tbuff += sizeof(struct LocalLevel);
+    }
+
+    gnDifficulty = ILoad();
+
+    for (i = 0; i < 17; i++) {
+        LevPals[i] = BLoad();
+    }
+
+    _numpremium[StorePlrNo] = ILoad();
+    _premiumlevel[StorePlrNo] = ILoad();
+    ViewX = ILoad();
+    ViewY = ILoad();
+    SetSpeed((enum GM_SPEEDS)BLoad());
+
+    return DataSize;
 }
