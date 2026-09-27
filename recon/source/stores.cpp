@@ -622,6 +622,27 @@ void PlaceStoreGold(long v)
     }
 }
 
+/* @0x8006E4EC */
+void S_StartHBuy(void)
+{
+    int i;
+
+    SItemListFlag = 1;
+    stextsize = 1;
+    stextscrl = 1;
+    stextsval = 0;
+    sprintf(tempstr, GetStr(0x228), plr[myplr]._pGold);
+
+    AddSText(0, 1, 1, tempstr, 3, 0);
+    AddSLine(2);
+    S_ScrollHBuy(stextsval);
+
+    storenumh = 0;
+    for (i = 0; healitem[i]._itype != -1; i++) storenumh++;
+    stextsmax = storenumh - 3;
+    if (stextsmax < 0) stextsmax = 0;
+}
+
 /* @0x8006E624 */
 void S_StartStory(void)
 {
