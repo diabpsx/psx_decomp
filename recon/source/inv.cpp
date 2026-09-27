@@ -1478,9 +1478,10 @@ void InvMoveCursUp(void)
 void InvDrawSlots(void)
 {
     int Bx, By;
+    int i;
 
-    CursGlow = CursGlow + CursGlowDx;
-    if (CursGlow <= 0) {
+    CursGlow += CursGlowDx;
+    if (CursGlow > 0) {
         CursGlow = 0;
         CursGlowDx = -8;
     }
@@ -1489,37 +1490,53 @@ void InvDrawSlots(void)
         CursGlowDx = 8;
     }
 
-    InvDrawSlot(InvRect[0].X, InvRect[0].Y, 0x5C);
-    InvDrawSlotBack(InvRect[0].X, InvRect[0].Y, 0x20, 0x20, InvSlotTable[0]);
+    Bx = InvRect[0].X;
+    By = InvRect[0].Y;
+    InvDrawSlot(Bx, By, 0x5C);
+    InvDrawSlotBack(Bx, By, 0x20, 0x20, InvSlotTable[0]);
 
-    InvDrawSlot(InvRect[4].X, InvRect[4].Y, 0x5B);
-    InvDrawSlotBack(InvRect[4].X, InvRect[4].Y, 0x10, 0x10, InvSlotTable[1]);
+    Bx = InvRect[4].X;
+    By = InvRect[4].Y;
+    InvDrawSlot(Bx, By, 0x5B);
+    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[4]);
 
-    InvDrawSlot(InvRect[5].X, InvRect[5].Y, 0x5B);
-    InvDrawSlotBack(InvRect[5].X, InvRect[5].Y, 0x10, 0x10, InvSlotTable[2]);
+    Bx = InvRect[5].X;
+    By = InvRect[5].Y;
+    InvDrawSlot(Bx, By, 0x5B);
+    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[5]);
 
-    InvDrawSlot(InvRect[6].X, InvRect[6].Y, 0x5B);
-    InvDrawSlotBack(InvRect[6].X, InvRect[6].Y, 0x10, 0x10, InvSlotTable[3]);
+    Bx = InvRect[6].X;
+    By = InvRect[6].Y;
+    InvDrawSlot(Bx, By, 0x5B);
+    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[6]);
 
-    InvDrawSlot(InvRect[7].X, InvRect[7].Y, 0x5D);
-    InvDrawSlotBack(InvRect[7].X, InvRect[7].Y, 0x20, 0x30, InvSlotTable[4]);
+    Bx = InvRect[7].X;
+    By = InvRect[7].Y;
+    InvDrawSlot(Bx, By, 0x5D);
+    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[7]);
 
-    InvDrawSlot(InvRect[13].X, InvRect[13].Y, 0x5D);
-    InvDrawSlotBack(InvRect[13].X, InvRect[13].Y, 0x20, 0x30, InvSlotTable[5]);
+    Bx = InvRect[13].X;
+    By = InvRect[13].Y;
+    InvDrawSlot(Bx, By, 0x5D);
+    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[13]);
 
-    InvDrawSlot(InvRect[19].X, InvRect[19].Y, 0x5D);
-    InvDrawSlotBack(InvRect[19].X, InvRect[19].Y, 0x20, 0x30, InvSlotTable[6]);
+    Bx = InvRect[19].X;
+    By = InvRect[19].Y;
+    InvDrawSlot(Bx, By, 0x5D);
+    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[19]);
 
     InvDrawSlot(InvRect[25].X, InvRect[25].Y, 0x5F);
-
-    for (Bx = 25; Bx < 65; Bx++) {
-        InvDrawSlotBack(InvRect[Bx].X, InvRect[Bx].Y, 0x10, 0x10, InvSlotTable[Bx]);
+    for (i = 0; i < 40; i++) {
+        Bx = InvRect[i + 25].X;
+        By = InvRect[i + 25].Y;
+        InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[i + 25]);
     }
 
     InvDrawSlot(InvRect[65].X, InvRect[65].Y, 0x5E);
-
-    for (By = 65; By < 73; By++) {
-        InvDrawSlotBack(InvRect[By].X, InvRect[By].Y, 0x10, 0x10, InvSlotTable[By]);
+    for (i = 0; i < 8; i++) {
+        Bx = InvRect[i + 65].X;
+        By = InvRect[i + 65].Y;
+        InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[i + 65]);
     }
 }
 
