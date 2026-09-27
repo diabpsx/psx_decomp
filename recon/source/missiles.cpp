@@ -2795,7 +2795,7 @@ void AddStone(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void MI_Rhino(int i)
 {
     int mix, miy;
-    int mix2, miy2;
+    int mix2 = 0, miy2 = 0;
     int omx, omy;
     int monst;
 
@@ -2839,12 +2839,8 @@ void MI_Rhino(int i)
 
     if (PosOkMonst(monst, mix, miy) && (monster[monst]._mAi != 24 /* AI_SNAKE */ || PosOkMonst(monst, mix2, miy2))) {
         dung_map[mix][miy].dMonster = ~monst;
-        monster[monst]._mfutx = mix;
-        monster[monst]._moldx = mix;
-        monster[monst]._mx = mix;
-        monster[monst]._mfuty = miy;
-        monster[monst]._moldy = miy;
-        monster[monst]._my = miy;
+        monster[monst]._mx = monster[monst]._moldx = monster[monst]._mfutx = mix;
+        monster[monst]._my = monster[monst]._moldy = monster[monst]._mfuty = miy;
         /* PSX-only: also carries the missile's sub-tile pixel offset onto the monster -- no PC
          * twin, confirmed via the raw oracle (missile+0x33/0x34 -> monster+0x3A/0x3B). */
         monster[monst]._mxoff = missile[i]._mixoff;
