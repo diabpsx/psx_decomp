@@ -2811,81 +2811,44 @@ void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag)
 void DrawInvHelpTxt(void)
 {
     char TempStr[128];
-    char *s0;
 
     TempStr[0] = 0;
     if (LANG_GetLang() == 1) {
-        if (_pcurs[myplr] == 2) {
-            GetStr(0x331);
-            s0 = GetStr(0x208);
-            sprintf(TempStr, "%s  _ %s", s0, s0);
-            goto done;
-        }
-        if (_pcurs[myplr] == 3) {
-            GetStr(0x331);
-            s0 = GetStr(0x35A);
-            sprintf(TempStr, "%s  _ %s", s0, s0);
-            goto done;
-        }
-        if (_pcurs[myplr] == 4) {
-            GetStr(0x331);
-            s0 = GetStr(0x34C);
-            sprintf(TempStr, "%s  _ %s", s0, s0);
-            goto done;
-        }
-        if (_pcurs[myplr] < 0xC)
-            goto special;
-        GetStr(0x4E6);
-        s0 = GetStr(0x11D);
-        sprintf(TempStr, "%s  < %s", s0, s0);
-        goto done;
+        if (_pcurs[myplr] == 2)
+            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x208));
+        else if (_pcurs[myplr] == 3)
+            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x35A));
+        else if (_pcurs[myplr] == 4)
+            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x34C));
+        else if (_pcurs[myplr] >= 0xC)
+            sprintf(TempStr, "%s  < %s", GetStr(0x4E6), GetStr(0x11D));
+        else
+            sprintf(TempStr, "%s", GetStr(0x4E6));
     } else {
-        if (_pcurs[myplr] == 2) {
-            GetStr(0x208);
-            s0 = GetStr(0x331);
-            sprintf(TempStr, "_ %s  %s", s0, s0);
-            goto done;
-        }
-        if (_pcurs[myplr] == 3) {
-            GetStr(0x35A);
-            s0 = GetStr(0x331);
-            sprintf(TempStr, "_ %s  %s", s0, s0);
-            goto done;
-        }
-        if (_pcurs[myplr] == 4) {
-            GetStr(0x34C);
-            s0 = GetStr(0x331);
-            sprintf(TempStr, "_ %s  %s", s0, s0);
-            goto done;
-        }
-        if (_pcurs[myplr] < 0xC)
-            goto special;
-        GetStr(0x11D);
-        s0 = GetStr(0x4E6);
-        sprintf(TempStr, "< %s  %s", s0, s0);
-        goto done;
+        if (_pcurs[myplr] == 2)
+            sprintf(TempStr, "_ %s  %s", GetStr(0x208), GetStr(0x331));
+        else if (_pcurs[myplr] == 3)
+            sprintf(TempStr, "_ %s  %s", GetStr(0x35A), GetStr(0x331));
+        else if (_pcurs[myplr] == 4)
+            sprintf(TempStr, "_ %s  %s", GetStr(0x34C), GetStr(0x331));
+        else if (_pcurs[myplr] >= 0xC)
+            sprintf(TempStr, "< %s  %s", GetStr(0x11D), GetStr(0x4E6));
+        else
+            sprintf(TempStr, "%s", GetStr(0x4E6));
     }
 
-special:
-    s0 = GetStr(0x4E6);
-    sprintf(TempStr, "%s", s0);
-
-done:
     if (InvBackY == 0) {
         MediumFont.SetChar(0x2E, 0x80);
-        s0 = GetStr(0x2FE);
+        sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x2FE));
     } else {
         MediumFont.SetChar(0x2E, 0x7F);
-        s0 = GetStr(0x132);
-    }
-    sprintf(TempStr, "%s  . %s ", TempStr, s0);
-
-    if (InvPageFlag) {
-        s0 = GetStr(0x2A4);
-        sprintf(TempStr, "%s  | %s ", TempStr, s0);
+        sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x132));
     }
 
-    MediumFont.Print(0, 0xE0, TempStr, JustCentre, &BRect, WHITER, WHITEG, WHITEB);
+    if (InvPageFlag)
+        sprintf(TempStr, "%s  | %s ", TempStr, GetStr(0x2A4));
+
+    MediumFont.Print(0, 0xE0, TempStr, JustCentre, NULL, WHITER, WHITEG, WHITEB);
     MediumFont.SetChar(0x2E, 0x6D);
 }
 
