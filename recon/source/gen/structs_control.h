@@ -1,3 +1,14 @@
+struct CSDATA {   /* sizeof 40 */
+    int x;   /* +0x0 */
+    int y;   /* +0x4 */
+    int w;   /* +0x8 */
+    int Text1;   /* +0xC */
+    int Text2;   /* +0x10 */
+    int Text3;   /* +0x14 */
+    char String[15];   /* +0x18 */
+    char col;   /* +0x27 */
+};
+
 struct DEF_ARGS {   /* sizeof 16 */
     unsigned long a0;   /* +0x0 */
     unsigned long a1;   /* +0x4 */

@@ -20,7 +20,14 @@ void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
 void STR_SoundCommand(SFXHDR *sfh, int Command);   /* @0x80099388 STREAM.CPP:876 */
 void STR_setvolume(SFXHDR *sfh);   /* @0x80099010 STREAM.CPP:736 */
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
-void DrawQTextTSK(TASK *T);   /* @0x8004E068 MINITEXT.CPP:439 -- not yet reconstructed in this TU */
+void DrawQTextTSK(TASK *T);   /* @0x8004E068 MINITEXT.CPP:439 */
+void DrawQText(void);   /* @0x8004E390 MINITEXT.CPP:587 */
+BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
+BOOL IsKanjiLoaded(void);   /* @0x800AD718 KANJI.CPP:294 */
+CPad * PAD_GetPad(int PadNum, unsigned char both);   /* @0x800897F4 PADS.CPP:251 */
+void LANG_ReloadMainTXT(void);   /* @0x8007B5A4 LANG.CPP:204 */
+void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP:1952 */
+unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */
 
 #ifdef __cplusplus
 extern "C" {

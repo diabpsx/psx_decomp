@@ -120,6 +120,12 @@ void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */
 BOOL GetMISSILE(int x, int y);   /* @0x80082E40 DPIECE.CPP:219 */
 BOOL GetSOLID(int x, int y);   /* @0x80082CE0 DPIECE.CPP:194 */
 long ENG_random(long v);   /* @0x8003DB24 ENGINE.CPP:113 */
+int veclen2(int dx, int dy);   /* @0x8004BC68 ENGINE.CPP; integer distance approximation, NOT sqrt(dx*dx+dy*dy) -- confirmed via raw oracle jal target */
+void SpawnGolum(int id, int x, int y, int mi);   /* @0x8015671C MONSTER.CPP (SYM: SpawnGolum__Fiiii, VOID) */
+void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1);   /* MSG.CPP:487 */
+void ClrPlrPath(int pnum);   /* PLAYER.CPP:372 */
+void NetSendCmd(unsigned char bHiPri, unsigned char bCmd);   /* MSG.CPP:419 */
+void SetPlayerHitPoints(int pnum, int val);   /* PLAYER.CPP:282 */
 void UseMana(int id, int sn);   /* @0x80077308 SPELLS.CPP:110 */
 void NewCursor(int i);   /* @0x80037804 CURSOR.CPP:179 */
 void AddUnLight(int i);   /* @0x8004D340 LIGHTING.CPP:1207 */

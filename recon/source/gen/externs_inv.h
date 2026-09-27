@@ -38,3 +38,9 @@ extern int sfxdnum;   /* @0x8011B854 */
 extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */
 extern unsigned char ItemCAnimTbl[169];   /* @0x800D1BE0 */
 extern int ItemInvSnds[35];   /* @0x800D1CB0 */
+extern char _infostr[2][256];   /* @0x800CE810 */
+extern char _infoclr[2];   /* @0x8011B6BC */
+extern int icursW28;   /* @0x8011B748 */
+extern int icursH28;   /* @0x8011B74C */
+extern int AP2x2Tbl[10];   /* @0x8010D008 */
+extern char itemavail[127];   /* @0x800D53D4 */

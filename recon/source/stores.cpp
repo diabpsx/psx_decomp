@@ -65,6 +65,7 @@ static int gossipstart;
 static int gossipend;
 static struct RECT StoreBackRect;
 static struct RECT StoreBackRectClipper;
+static int talker;   /* @0x8011C8C4 */
 
 /* @0x800695A4 -- empty on PSX: the PC's 3 DiabloFreePtr calls are gone */
 void FreeStoreMem(void)
@@ -305,6 +306,96 @@ void S_StartNoItems(void)
         ClearSText(5, 0x17);
         AddSText(0, 0xA, 1, GetStr(0x2BD), 0, 1);
     }
+}
+
+/* @0x8006979C -- the two RECT* branches (`(RECT*)((short*)&Field.y - 2)`) are transcribed literally
+ * from the oracle's raw pointer arithmetic (StoreBackRect/StoreBackRectClipper are 8 bytes apart,
+ * confirmed adjacent in the SYM); this reads 4 bytes BEFORE the named .y field on purpose, per the
+ * oracle -- not a bug in the reconstruction. */
+void PrintSString(int x, int y, unsigned char cjustflag, char *str, char col, int val)
+{
+    char valstr[32];
+    int sy;
+    int spinY;
+    int printY;
+    unsigned char R, G, B;
+    RECT *clipRect;
+
+    SWrapCount = 0;
+    StoreBackRect.x += x;
+    StoreBackRectClipper.x += x;
+    switch (SItemListFlag) {
+    case 0:
+        SStringY = SStringYNorm;
+        break;
+    case 1:
+        SStringY = SStringYBuy0;
+        break;
+    case 2:
+        SStringY = SStringYBuy1;
+        break;
+    }
+    GM_UseTexData(0);
+    if (y >= 5) {
+        y -= 1;
+    }
+    if (stextsel - 1 == y) {
+        col = (col != 3) ? 3 : 0;
+    }
+    switch (col) {
+    case 0:
+        R = WHITER;
+        G = WHITEG;
+        B = WHITEB;
+        break;
+    case 1:
+        R = BLUER;
+        G = BLUEG;
+        B = BLUEB;
+        break;
+    case 2:
+        R = REDR;
+        G = REDG;
+        B = REDB;
+        break;
+    default:
+        R = GOLDR;
+        G = GOLDG;
+        B = GOLDB;
+        break;
+    }
+    StoreBackRectClipper.y -= 4;
+    sy = SStringY[y] + stext[y]._syoff;
+    spinY = sy + StoreBackRect.y;
+    StoreBackRect.y -= 4;
+    StoreBackRect.h += 4;
+    StoreBackRectClipper.h += 4;
+    printY = sy + 3;
+    if (val >= 0) {
+        clipRect = (RECT *)((short *)&StoreBackRectClipper.y - 2);
+    } else {
+        clipRect = (RECT *)((short *)&StoreBackRect.y - 2);
+    }
+    SWrapCount = MediumFont.Print(0, printY, str, (TXT_JUST)cjustflag, clipRect, R, G, B);
+    if (stextsel - 1 == y) {
+        DrawSpinner(MediumFont.MinX - 8, spinY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+    }
+    if (val > 0) {
+        sprintf(valstr, GetStr(0x4FD), val);
+        StoreBackRect.w -= 0x1C;
+        MediumFont.Print(0, printY, valstr, JustRight, &StoreBackRect, R, G, B);
+        StoreBackRect.w += 0x1C;
+    }
+    if (stextsel - 1 == y) {
+        DrawSpinner(MediumFont.MaxX + 4, spinY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+    }
+    SStringY = SStringYNorm;
+    StoreBackRectClipper.x -= x;
+    StoreBackRect.x -= x;
+    StoreBackRectClipper.y += 4;
+    StoreBackRect.y += 4;
+    StoreBackRectClipper.h -= 4;
+    StoreBackRect.h -= 4;
 }
 
 /* @0x80070748 */
@@ -601,4 +692,238 @@ void ReleaseStoreBtn(void)
 {
     stextscrlubtn = -1;
     stextscrldbtn = -1;
+}
+
+/* @0x80070570 */
+void S_SmithEnter(void)
+{
+    WFlag = 0;
+    switch (stextsel) {
+    case 8:
+        stextshold = 1;
+        stextlhold = 8;
+        gossipstart = 0xBD;
+        talker = 0;
+        gossipend = 0xC7;
+        StartStore(0x13);
+        break;
+    case 9:
+        StartStore(2);
+        break;
+    case 10:
+        StartStore(0x12);
+        break;
+    case 11:
+        StartStore(3);
+        break;
+    case 12:
+        StartStore(4);
+        break;
+    case 13:
+        stextflag = 0;
+        break;
+    }
+    if ((signed char)stextflag == 0) {
+        options_pad = -1;
+    }
+}
+
+/* @0x8007222C */
+void S_WitchEnter(void)
+{
+    WFlag = 1;
+    if (stextsel - 8 < 0 || stextsel - 8 > 6) {
+        return;
+    }
+    switch (stextsel - 8) {
+    case 0:
+        talker = 6;
+        stextshold = 5;
+        stextlhold = 8;
+        gossipstart = 0xD5;
+        gossipend = 0xDF;
+        StartStore(0x13);
+        break;
+    case 1:
+        WStaffFlag = 0;
+        StartStore(6);
+        break;
+    case 2:
+        WStaffFlag = 1;
+        StartStore(6);
+        break;
+    case 3:
+        WStaffFlag = 0;
+        StartStore(7);
+        break;
+    case 4:
+        WStaffFlag = 1;
+        StartStore(7);
+        break;
+    case 5:
+        StartStore(8);
+        break;
+    case 6:
+        stextflag = 0;
+        break;
+    }
+}
+
+/* @0x8007381C */
+void S_HealerEnter(void)
+{
+    switch (stextsel) {
+    case 9:
+        talker = 1;
+        stextshold = 0xE;
+        gossipstart = 0xAA;
+        stextlhold = stextsel;
+        gossipend = 0xB2;
+        StartStore(0x13);
+        return;
+    case 11:
+        StartStore(0x10);
+        return;
+    case 13:
+        stextflag = 0;
+        return;
+    }
+}
+
+/* @0x80071D44 */
+void S_SSellEnter(void)
+{
+    int idx;
+
+    stextshold = 3;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    idx = (stextsel - stextup) / 8 + stextsval;
+    plr[myplr].HoldItem = storehold[idx];
+    SellIdx = idx;
+    if (StoreGoldFit(idx)) {
+        StartStore(0xB);
+    } else {
+        StartStore(0xA);
+    }
+}
+
+/* @0x80072AD4 */
+void S_WRechargeEnter(void)
+{
+    int idx;
+
+    stextshold = 8;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    idx = (stextsel - stextup) / 8 + stextsval;
+    plr[myplr].HoldItem = storehold[idx];
+    SellIdx = idx;
+    if (plr[myplr]._pGold < storehold[idx]._iIvalue) {
+        StartStore(9);
+    } else {
+        StartStore(0xB);
+    }
+}
+
+/* @0x80073B84 */
+void S_SIDEnter(void)
+{
+    int idx;
+
+    if (stextsel == 0x16) {
+        StartStore(0xF);
+        stextsel = 0xE;
+        return;
+    }
+    stextshold = 0x11;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    idx = (stextsel - stextup) / 8 + stextsval;
+    plr[myplr].HoldItem = storehold[idx];
+    SellIdx = idx;
+    if (plr[myplr]._pGold < storehold[idx]._iIvalue) {
+        StartStore(9);
+    } else {
+        StartStore(0xB);
+    }
+}
+
+/* @0x80073AE8 */
+void S_StoryEnter(void)
+{
+    WFlag = 0;
+    switch (stextsel) {
+    case 7:
+        talker = 4;
+        stextshold = 0xF;
+        gossipstart = 0x97;
+        stextlhold = stextsel;
+        gossipend = 0x9F;
+        StartStore(0x13);
+        return;
+    case 9:
+        StartStore(0x11);
+        return;
+    case 11:
+        stextflag = 0;
+        return;
+    }
+}
+
+/* @0x80073F08 */
+void S_TavernEnter(void)
+{
+    WFlag = 0;
+    switch (stextsel) {
+    case 9:
+        talker = 3;
+        stextshold = 0x15;
+        gossipstart = 0xA1;
+        stextlhold = stextsel;
+        gossipend = 0xA8;
+        StartStore(0x13);
+        return;
+    case 11:
+        stextflag = 0;
+        return;
+    }
+}
+
+/* @0x80073F7C */
+void S_BarmaidEnter(void)
+{
+    WFlag = 0;
+    switch (stextsel) {
+    case 9:
+        talker = 7;
+        stextshold = 0x17;
+        gossipstart = 0xB4;
+        stextlhold = stextsel;
+        gossipend = 0xBB;
+        StartStore(0x13);
+        return;
+    case 11:
+        stextflag = 0;
+        return;
+    }
+}
+
+/* @0x80073FF0 */
+void S_DrunkEnter(void)
+{
+    WFlag = 0;
+    switch (stextsel) {
+    case 9:
+        talker = 5;
+        stextshold = 0x16;
+        gossipstart = 0xC9;
+        stextlhold = stextsel;
+        gossipend = 0xD3;
+        StartStore(0x13);
+        return;
+    case 11:
+        stextflag = 0;
+        return;
+    }
 }

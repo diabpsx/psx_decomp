@@ -40,6 +40,8 @@
 
 #define IMID_SCROLL 21
 #define IMID_TSCROLL 22
+#define IMID_STAFF 23
+#define IMID_BOOK 24
 #define IMID_ESTR 10
 #define IMID_EMAG 11
 #define IMID_EDEX 12
@@ -61,6 +63,12 @@
 #define GLOVE_CURS 1
 #define IS_REPAIR 0x42
 #define IRND_DOUBLE 2
+#define SPL_PHASE 10
+#define SPL_TELE 23
+#define IDI_GOLD 0
+#define T_U 0x8000
+#define T_NONE 0x4000
+#define T_MASK 0x0fff
 
 #ifndef TRUE
 #define TRUE 1
@@ -502,7 +510,9 @@ void DoRepair(int pnum, int cii)
     PlayerStruct *p = &plr[pnum];
     PlaySfxLoc(IS_REPAIR, p->_px, p->_py);
 
-    RepairItem(&p->InvBody[cii], p->_pLevel);
+    ItemStruct *pi;
+    pi = &p->InvBody[cii];
+    RepairItem(pi, p->_pLevel);
     CalcPlrInv(pnum, TRUE);
 
     if (pnum == myplr)
@@ -540,6 +550,184 @@ int RndSmithItem(int lvl)
         }
     }
     return ril[ENG_random(ri)] + 1;
+}
+
+/* @0x80049F18 ITEMS.CPP:5417 — PSX drops the `ri < 512` bounds check */
+int RndHealerItem(int lvl)
+{
+    int ril[512];
+    int ri, i;
+
+    ri = 0;
+    for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iRnd && HealerItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) ril[ri++] = i;
+    }
+    return ril[ENG_random(ri)] + 1;
+}
+
+/* @0x80049804 ITEMS.CPP:5075 — PSX rewrite, no hellfire equivalent of this shape: a pre-pass finds the
+ * first IMID_PMANA item (network-safe substitute); the main loop swaps SPL_RESURRECT/SPL_HEALOTHER (when
+ * FePlayerNo==0, i.e. host) or SPL_PHASE/SPL_TELE (when FePlayerNo!=0, i.e. client) scroll ids for that
+ * substitute item so the two sides of a multiplayer game don't roll different randoms for quest-critical
+ * scrolls */
+int RndWitchItem(int lvl)
+{
+    int ril[512];
+    int ri, i, manaItem;
+
+    manaItem = -1;
+    for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iMiscId == IMID_PMANA && manaItem == -1) manaItem = i;
+    }
+
+    ri = 0;
+    for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iRnd && WitchItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) {
+            int val = i;
+            if (FePlayerNo == 0) {
+                if (AllItemsList[i].iSpell == SPL_RESURRECT || AllItemsList[i].iSpell == SPL_HEALOTHER) val = manaItem;
+            } else {
+                if (AllItemsList[i].iSpell == SPL_PHASE || AllItemsList[i].iSpell == SPL_TELE) val = manaItem;
+            }
+            ril[ri++] = val;
+        }
+    }
+    return ril[ENG_random(ri)] + 1;
+}
+
+/* @0x80049C48 ITEMS.CPP:5215 — PSX adds `if (lvl==0) lvl=1;` and a DBG_Error assert when no candidate
+ * was found (ri==0) before indexing ril[] */
+int RndBoyItem(int lvl)
+{
+    int ril[512];
+    int ri, i;
+
+    if (lvl == 0) lvl = 1;
+
+    ri = 0;
+    for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iRnd && PremiumItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) ril[ri++] = i;
+    }
+    if (ri == 0) DBG_Error(NULL, "source/ITEMS.cpp", 0x160B);
+    return ril[ENG_random(ri)] + 1;
+}
+
+/* @0x80047E14 ITEMS.CPP:4876 */
+int RndPremiumItem(int minlvl, int maxlvl)
+{
+    int ril[512];
+    int ri, i;
+
+    ri = 0;
+    for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iRnd && PremiumItemOk(i) &&
+            (AllItemsList[i].iMinMLvl >= minlvl) &&
+            (AllItemsList[i].iMinMLvl <= maxlvl)) {
+            ril[ri++] = i;
+        }
+    }
+    return ril[ENG_random(ri)] + 1;
+}
+
+/* @0x80043ADC ITEMS.CPP:2706 — PSX inlines GetEffLevel() as plain `currlevel` (no call) and, instead of
+ * substituting an item id like RndWitchItem, decrements `ri` (drops a just-added candidate) for
+ * SPL_RESURRECT/SPL_HEALOTHER when FePlayerNo==0 (host) and SPL_TELE/SPL_PHASE when FePlayerNo!=0 (client)
+ * — the same network-safety scroll exclusion, applied per-candidate instead of per-substitution */
+int RndAllItems(void)
+{
+    int ril[512];
+    int ri, i;
+
+    if (ENG_random(100) >= 26) return IDI_GOLD;
+
+    ri = 0;
+    for (i = 0; AllItemsList[i].iLoc != -1; i++) {
+        if (AllItemsList[i].iRnd && ((currlevel << 1) >= AllItemsList[i].iMinMLvl)) ril[ri++] = i;
+        if (AllItemsList[i].iSpell == SPL_RESURRECT && FePlayerNo == 0) ri--;
+        if (AllItemsList[i].iSpell == SPL_HEALOTHER && FePlayerNo == 0) ri--;
+        if (AllItemsList[i].iSpell == SPL_TELE && FePlayerNo != 0) ri--;
+        if (AllItemsList[i].iSpell == SPL_PHASE && FePlayerNo != 0) ri--;
+    }
+    return ril[ENG_random(ri)];
+}
+
+/* @0x80043660 ITEMS.CPP:2626 — PSX drops the CHEATS block entirely; the SPL_RESURRECT/HEALOTHER
+ * (FePlayerNo==0) / SPL_TELE/SPL_PHASE (FePlayerNo!=0) network-safety decrements are the same as
+ * RndAllItems/RndWitchItem */
+int RndItem(int m)
+{
+    int ril[512];
+    int ri, i;
+
+    if (monster[m].MData->mTreasure & T_U)
+        return -((monster[m].MData->mTreasure & T_MASK) + 1);
+    if (monster[m].MData->mTreasure & T_NONE) return 0;
+
+    if (ENG_random(100) > 40) return 0;
+    if (ENG_random(100) > 25) return IDI_GOLD + 1;
+
+    ri = 0;
+    for (i = 0; AllItemsList[i].iLoc != -1; i++) {
+        if ((AllItemsList[i].iRnd == IRND_DOUBLE) && (monster[m].mLevel >= AllItemsList[i].iMinMLvl)) ril[ri++] = i;
+        if (AllItemsList[i].iRnd && (monster[m].mLevel >= AllItemsList[i].iMinMLvl)) ril[ri++] = i;
+        if (AllItemsList[i].iSpell == SPL_RESURRECT && FePlayerNo == 0) ri--;
+        if (AllItemsList[i].iSpell == SPL_HEALOTHER && FePlayerNo == 0) ri--;
+        if (AllItemsList[i].iSpell == SPL_TELE && FePlayerNo != 0) ri--;
+        if (AllItemsList[i].iSpell == SPL_PHASE && FePlayerNo != 0) ri--;
+    }
+    return ril[ENG_random(ri)] + 1;
+}
+
+/* @0x80043C40 ITEMS.CPP:2735 — PSX drops the `level` param (uses `currlevel` directly like RndAllItems)
+ * and adds a client-only (FePlayerNo!=0) exclusion: for scroll/staff/book-category queries (imid in
+ * {IMID_SCROLL,IMID_TSCROLL,IMID_STAFF,IMID_BOOK}) whose iMiscId matches, drop items whose spell is
+ * SPL_TELE/SPL_PHASE (same network-safety family as RndItem/RndAllItems/RndWitchItem) */
+int RndTypeItems(int itype, int imid)
+{
+    int ril[512];
+    int ri, i;
+
+    ri = 0;
+    for (i = 0; AllItemsList[i].iLoc != -1; i++) {
+        unsigned char okflag = AllItemsList[i].iRnd != 0;
+        if ((currlevel << 1) < AllItemsList[i].iMinMLvl) okflag = FALSE;
+        if (AllItemsList[i].itype != itype) okflag = FALSE;
+        if ((imid != -1) && (AllItemsList[i].iMiscId != imid)) okflag = FALSE;
+
+        if (FePlayerNo != 0) {
+            if (imid == IMID_SCROLL || imid == IMID_TSCROLL || imid == IMID_STAFF || imid == IMID_BOOK) {
+                if (AllItemsList[i].iMiscId == imid) {
+                    if (AllItemsList[i].iSpell == SPL_TELE || AllItemsList[i].iSpell == SPL_PHASE) okflag = FALSE;
+                }
+            }
+        }
+
+        if (okflag) ril[ri++] = i;
+    }
+    return ril[ENG_random(ri)];
+}
+
+/* @0x8004B700 ITEMS.CPP:4808 — PSX uses the per-player `_smithitem[StorePlrNo]` array in place of
+ * hellfire's flat `smithitem` global */
+void SortSmith(void)
+{
+    int j, k;
+    unsigned char sorted;
+    ItemStruct *smithitem = _smithitem[StorePlrNo];
+
+    for (k = 0; smithitem[k + 1]._itype != -1; k++)
+        ;
+    sorted = FALSE;
+    while ((k > 0) && (!sorted)) {
+        sorted = TRUE;
+        for (j = 0; j < k; j++) {
+            if (smithitem[j].IDidx > smithitem[j + 1].IDidx) {
+                BubbleSwapItem(&smithitem[j], &smithitem[j + 1]);
+                sorted = FALSE;
+            }
+        }
+        k--;
+    }
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */

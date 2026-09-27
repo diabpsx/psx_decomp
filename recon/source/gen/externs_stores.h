@@ -29,3 +29,20 @@ void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP */
 
 /* STORES.CPP's OWN globals (EXT/STAT in SYM, all owned by this TU) are tentative-defined
  * directly in the .cpp, NOT declared extern here -- see the top of stores.cpp. */
+
+extern struct CFont MediumFont;   /* @0x800B82D8 */
+extern unsigned char WHITER;   /* @0x8011ABD1 */
+extern unsigned char WHITEG;   /* @0x8011ABD2 */
+extern unsigned char WHITEB;   /* @0x8011ABD3 */
+extern unsigned char BLUER;   /* @0x8011ABD4 */
+extern unsigned char BLUEG;
+extern unsigned char BLUEB;
+extern unsigned char REDR;
+extern unsigned char REDG;
+extern unsigned char REDB;
+extern unsigned char GOLDR;   /* @0x8011ABDA */
+extern unsigned char GOLDG;
+extern unsigned char GOLDB;
+extern int SStringYNorm[20];   /* @0x800DE314 */
+extern int SStringYBuy0[20];   /* @0x800DE364 */
+extern int SStringYBuy1[20];   /* @0x800DE3B4 */

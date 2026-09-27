@@ -472,6 +472,64 @@ void OperateWeaponRack(int pnum, int i, unsigned char sendmsg)
         NetSendCmdParam1(0, 0x2D, i);
 }
 
+void OperateTrapLvr(int i)
+{
+    int j, oi;
+
+    if (object[i]._oAnimFrame == 1) {
+        object[i]._oAnimFrame++;
+        for (j = 0; j < numobjects; j++) {
+            oi = objectactive[j];
+            if (object[oi]._otype == object[i]._oVar2 && object[oi]._oVar1 == object[i]._oVar1) {
+                object[oi]._oVar2 = 1;
+                object[oi]._oAnimFlag = 0;
+            }
+        }
+    } else {
+        object[i]._oAnimFrame--;
+        for (j = 0; j < numobjects; j++) {
+            oi = objectactive[j];
+            if (object[oi]._otype == object[i]._oVar2 && object[oi]._oVar1 == object[i]._oVar1) {
+                object[oi]._oVar2 = 0;
+                if (object[oi]._oVar4 != 0)
+                    object[oi]._oAnimFlag = 1;
+            }
+        }
+    }
+}
+
+void Obj_Sarc(int i)
+{
+    if (object[i]._oAnimFrame == object[i]._oAnimLen)
+        object[i]._oAnimFlag = 0;
+}
+
+void Obj_StopAnim(int i)
+{
+    if (object[i]._oAnimFrame == object[i]._oAnimLen) {
+        object[i]._oAnimCnt = 0;
+        object[i]._oAnimDelay = 1000;
+        object[i]._oAnimFlag = 0;
+    }
+}
+
+void SyncBreakObj(int pnum, int oi)
+{
+    int type;
+
+    type = object[oi]._otype;
+    if (type < 0x14)
+        return;
+    if (type < 0x17) {
+        BreakCrux(pnum, oi);
+        return;
+    }
+    if (type >= 0x3B)
+        return;
+    if (type >= 0x39)
+        BreakBarrel(pnum, oi, 0, 1, 0);
+}
+
 void OperateStoryBook(int pnum, int i)
 {
     if (object[i]._oSelFlag) {

@@ -14,6 +14,16 @@
 #define MT_COUNSLR  0x69
 #define MT_ADVOCATE 0x6C
 
+/* object types (door pairs, retail values) */
+#define OBJ_L1DOORL 1
+#define OBJ_L1DOORR 2
+#define OBJ_L2DOORL 42
+#define OBJ_L2DOORR 43
+#define OBJ_L3DOORL 74
+#define OBJ_L3DOORR 75
+
+#define IMMUNE_FIRE 0x10
+
 /* AI ids */
 #define AI_GARG     12
 #define AI_LAZURUS  28
@@ -331,6 +341,7 @@ int M_DoStand(int i)
 #define MIT_DIABAPOCA    0x43
 #define MIT_FLAMEC       0x31
 #define MIT_CBOLT        0x34
+#define MIT_FIREWALL     0x5
 #define MIT_FIREMAN      0x32
 #define MIT_KRULL        0x33
 #define MIT_FIREBOLT     1
@@ -2129,4 +2140,88 @@ void TalktoMonster(int i)
             Monst->_mgoal = MG_TALK;
         }
     }
+}
+
+void SyncMonstStartKill(int i, int pnum, unsigned char sendmsg)
+{
+    int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx, _my;
+
+    if (pnum >= 0)
+        Monst->mWhoHit = 1 << pnum;
+
+    Monst->_mhitpoints = 0;
+    SetRndSeed(ENG_random(GetRndSeed()));
+
+    if (i >= 4)
+        SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+
+    _mx = Monst->_moldx;
+    _my = Monst->_moldy;
+
+    if (pnum >= 0)
+        md = M_GetDir(i);
+    else
+        md = Monst->_mdir;
+    Monst->_mdir = md;
+    NewMonsterAnim(i, Monst->MType->Anims[MA_DEATH], md, MA_DEATH);
+    Monst->_mmode = MM_DEATH;
+    if (i >= 4) {
+        Monst->_mxoff = 0;
+        Monst->_myoff = 0;
+    }
+    Monst->_mVar1 = 0;
+    Monst->_mx = _mx;
+    Monst->_my = _my;
+    Monst->_mfutx = _mx;
+    Monst->_mfuty = _my;
+    Monst->_moldx = _mx;
+    Monst->_moldy = _my;
+    M_ClearSquares(i);
+    dung_map[_mx][_my].dMonster = i + 1;
+}
+
+unsigned char PosOkMonst3(int i, int x, int y)
+{
+    unsigned char ret;
+    int oi;
+    int objtype;
+    int mi;
+    unsigned char fire;
+    unsigned char isdoor;
+
+    ret = 1;
+    fire = 0;
+    isdoor = 0;
+
+    if (ret && dung_map[x][y].dObject != 0) {
+        oi = dung_map[x][y].dObject > 0 ? dung_map[x][y].dObject - 1 : -(dung_map[x][y].dObject + 1);
+        objtype = object[oi]._otype;
+        isdoor = objtype == OBJ_L1DOORL || objtype == OBJ_L1DOORR
+            || objtype == OBJ_L2DOORL || objtype == OBJ_L2DOORR
+            || objtype == OBJ_L3DOORL || objtype == OBJ_L3DOORR;
+        if (object[oi]._oSolidFlag && !isdoor)
+            ret = 0;
+    }
+    if (ret) {
+        ret = (!SolidLoc(x, y) || isdoor) && !IsDplayer(x, y) && !dung_map[x][y].dMonster;
+    }
+    if (ret && dung_map[x][y].dMissile != 0 && i >= 0) {
+        mi = dung_map[x][y].dMissile;
+        if (mi > 0) {
+            if (missile[mi]._mitype == MIT_FIREWALL) {
+                fire = 1;
+            } else {
+                for (mi = 0; mi < nummissiles; mi++) {
+                    if (missile[missileactive[mi]]._mitype == MIT_FIREWALL)
+                        fire = 1;
+                }
+            }
+        }
+        if (fire && (!(monster[i].mMagicRes & IMMUNE_FIRE) || monster[i].MType->mtype == MT_DIABLO))
+            ret = 0;
+    }
+
+    return ret;
 }

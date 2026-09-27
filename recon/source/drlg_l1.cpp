@@ -98,15 +98,15 @@ BOOL L5checkRoom(int x, int y, int width, int height)
 
 void L5roomGen(int x, int y, int w, int h, int dir)
 {
-    int num, dirProb;
-    BOOL ran, ran2;
-    int width, height, rx, ry, ry2;
-    int cw, ch, cx1, cy1, cx2;
+    int dirProb;
 
     dirProb = ENG_random(4);
 
     switch (dir == 1 ? dirProb != 0 : dirProb == 0) {
-    case FALSE:
+    case FALSE: {
+        int num, cw, ch, cx1, cy1, cx2;
+        BOOL ran, ran2;
+
         num = 0;
         do {
             cw = (ENG_random(5) + 2) & 0xFFFFFFFE;
@@ -128,7 +128,11 @@ void L5roomGen(int x, int y, int w, int h, int dir)
         if (ran2 == TRUE)
             L5roomGen(cx2, cy1, cw, ch, 1);
         break;
-    case TRUE:
+    }
+    case TRUE: {
+        int num, width, height, rx, ry, ry2;
+        BOOL ran, ran2;
+
         num = 0;
         do {
             width = (ENG_random(5) + 2) & 0xFFFFFFFE;
@@ -151,12 +155,14 @@ void L5roomGen(int x, int y, int w, int h, int dir)
             L5roomGen(rx, ry2, width, height, 0);
         break;
     }
+    }
 }
 
 void L5firstRoom(void)
 {
-    int ys, ye, y;
-    int xs, xe, x;
+    int x, y;
+    int xs, xe;
+    int ys, ye;
 
     if (ENG_random(2) == 0) {
         ys = 1;
@@ -356,22 +362,22 @@ int L5VWallOk(int i, int j)
 void L5HorizWall(int i, int j, char p, int dx)
 {
     int xx;
-    char wt, dt = 0;
+    char wt = 0, dt;
 
     switch (ENG_random(4)) {
     case 0:
     case 1:
-        dt = 2;
+        wt = 2;
         break;
     case 2:
-        dt = 12;
+        wt = 12;
         if (p == 2)
             p = 12;
         if (p == 4)
             p = 10;
         break;
     case 3:
-        dt = 36;
+        wt = 36;
         if (p == 2)
             p = 36;
         if (p == 4)
@@ -380,22 +386,22 @@ void L5HorizWall(int i, int j, char p, int dx)
     }
 
     if (ENG_random(6) == 5)
-        wt = 12;
+        dt = 12;
     else
-        wt = 26;
-    if (dt == 12)
-        wt = 12;
+        dt = 26;
+    if (wt == 12)
+        dt = 12;
 
     dungeon[i][j] = p;
 
     for (xx = 1; xx < dx; xx++) {
-        dungeon[i + xx][j] = dt;
+        dungeon[i + xx][j] = wt;
     }
 
     xx = ENG_random(dx - 1) + 1;
 
-    if (wt == 12) {
-        dungeon[i + xx][j] = wt;
+    if (dt == 12) {
+        dungeon[i + xx][j] = dt;
     } else {
         dungeon[i + xx][j] = 2;
         mydflags[(i + xx) + j * DMAXX] |= DLRG_HDOOR;
@@ -405,22 +411,22 @@ void L5HorizWall(int i, int j, char p, int dx)
 void L5VertWall(int i, int j, char p, int dy)
 {
     int yy;
-    char wt, dt = 0;
+    char wt = 0, dt;
 
     switch (ENG_random(4)) {
     case 0:
     case 1:
-        dt = 1;
+        wt = 1;
         break;
     case 2:
-        dt = 11;
+        wt = 11;
         if (p == 1)
             p = 11;
         if (p == 4)
             p = 14;
         break;
     case 3:
-        dt = 35;
+        wt = 35;
         if (p == 1)
             p = 35;
         if (p == 4)
@@ -429,22 +435,22 @@ void L5VertWall(int i, int j, char p, int dy)
     }
 
     if (ENG_random(6) == 5)
-        wt = 11;
+        dt = 11;
     else
-        wt = 25;
-    if (dt == 11)
-        wt = 11;
+        dt = 25;
+    if (wt == 11)
+        dt = 11;
 
     dungeon[i][j] = p;
 
     for (yy = 1; yy < dy; yy++) {
-        dungeon[i][j + yy] = dt;
+        dungeon[i][j + yy] = wt;
     }
 
     yy = ENG_random(dy - 1) + 1;
 
-    if (wt == 11) {
-        dungeon[i][j + yy] = wt;
+    if (dt == 11) {
+        dungeon[i][j + yy] = dt;
     } else {
         dungeon[i][j + yy] = 1;
         mydflags[i + (j + yy) * DMAXX] |= DLRG_VDOOR;
@@ -916,7 +922,7 @@ void DRLG_L5FTVR(int i, int j, int x, int y, int d)
 
 void DRLG_L5FloodTVal(void)
 {
-    int xx, yy, i, j;
+    int i, j, xx, yy;
 
     yy = 16;
 
@@ -1031,9 +1037,12 @@ void CreateL5Dungeon(unsigned int rseed, int entry)
 
 void DRLG_PlaceDoor(int x, int y)
 {
+    unsigned char c;
+    unsigned char df;
+
     if ((mydflags[x + y * DMAXX] & DLRG_PROTECTED) == 0) {
-        unsigned char df = mydflags[x + y * DMAXX] & 0x7F;
-        unsigned char c = dungeon[x][y];
+        c = dungeon[x][y];
+        df = mydflags[x + y * DMAXX] & 0x7F;
 
         if (df == 1) {
             if (y != 1 && c == 2)
@@ -1285,13 +1294,13 @@ void DRLG_L1Pass3(void)
 
 void set_restore_lighting(void)
 {
-    int i, j;
+    int x, y;
 
-    for (j = 0; j < 48; j++) {
-        for (i = 0; i < 48; i++) {
-            dung_map_r[i][j] = restore_r;
-            dung_map_g[i][j] = restore_g;
-            dung_map_b[i][j] = restore_b;
+    for (y = 0; y < 48; y++) {
+        for (x = 0; x < 48; x++) {
+            dung_map_r[x][y] = restore_r;
+            dung_map_g[x][y] = restore_g;
+            dung_map_b[x][y] = restore_b;
         }
     }
 }
@@ -1322,9 +1331,11 @@ void DRLG_LoadL1SP(void)
 
 void DRLG_FreeL1SP(void)
 {
-    void *p__p = pSetPiece;
-    pSetPiece = 0;
-    mem_free_dbg(p__p);
+    {
+        void *p__p = pSetPiece;
+        pSetPiece = 0;
+        mem_free_dbg(p__p);
+    }
 }
 
 void DRLG_InitL1Vals(void)

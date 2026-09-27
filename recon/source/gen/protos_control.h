@@ -31,3 +31,13 @@ void SetSpell(int pnum);   /* @0x80031D54 CONTROL.CPP:1255 */
 void DrawSpeedSpellTSK(TASK *T);   /* @0x80030ED4 CONTROL.CPP:811 */
 void AddPanelString(const char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void DrawArrows(void);   /* @0x80034334 CONTROL.CPP:2564 */
+void ADD_PlrStringXY(const char *pszStr, char col);   /* @0x80033DE8 CONTROL.CPP:2398 */
+BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
+BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
+void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
+void stream_pause(void);   /* @0x8003CFB8 EFFECTS.CPP:127 */
+void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+void DrawChr(void);   /* @0x80035698 CONTROL.CPP:2808 */
+void stream_resume(void);   /* @0x8003D01C EFFECTS.CPP:148 */
+void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
+void DrawChrTSK(TASK *T);   /* @0x80035B48 CONTROL.CPP:2959 */

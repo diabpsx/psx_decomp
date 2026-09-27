@@ -303,3 +303,60 @@ unsigned short CPad::GetDown() const
         return both_Down;
     return Down;
 }
+
+void DrawQTextTSK(TASK *T)
+{
+    int *args;
+    int pnum;
+    unsigned char stextflagsave;
+    char Name[16];
+
+    args = (int *)T->Data;
+    stextflagsave = stextflag;
+    pnum = args[0];
+    GLUE_SuspendGame();
+    GLUE_SetHomingScrollFlag(0);
+    GLUE_SetShowPanelFlag(0);
+    qtextptr = GetStr(*(int *)&alltext[args[1]]);
+    while (IsKanjiLoaded() != 1)
+        TSK_Sleep(1);
+    sprintf(Name, "%04X", alltext[args[1]].sfxnr);
+    CalcTextSpeed(Name);
+    stextflag = 0;
+    qtextonflag = qtextflag != 0;
+    sgLastScroll = VID_GetTick();
+    if (qtextonflag != 0) {
+        do {
+            DrawQText();
+            TSK_Sleep(1);
+            if (FeFlag != 0) {
+                if (PAD_GetPad(0, 1)->GetDown() & 0x100)
+                    qtextonflag = 0;
+            } else if (PAD_GetPad(pnum, 0)->GetDown() & 0x100) {
+                ignore_buttons = 1;
+                qtextonflag = 0;
+            }
+            if (qtextonflag != 0 && CDWAIT != 0)
+                qtextonflag = 1;
+        } while (qtextonflag != 0);
+    }
+    CDWAIT = 1;
+    PauseMode = 1;
+    qtextonflag = 0;
+    ignore_buttons = 1;
+    PlaySFX(0x33);
+    stream_stop();
+    if (FadeState == 0)
+        TSK_AddTask(0, (void (*)())FadeMusicTSK, 0x800, 0);
+    FadeState = 2;
+    stextflag = stextflagsave;
+    if (stextflagsave == 0)
+        options_pad = -1;
+    if (stextflagsave == 0 && questlog == 0) {
+        PostGamePad(5, 0, 0, 0);
+        GLUE_SetHomingScrollFlag(1);
+        GLUE_SetShowPanelFlag(1);
+    }
+    ignore_buttons = 1;
+    LANG_ReloadMainTXT();
+}

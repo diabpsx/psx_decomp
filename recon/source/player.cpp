@@ -726,6 +726,349 @@ void StartPlrKill(PlayerStruct *ptrplr, int val)
     StartPlayerKill(ptrplr, val);
 }
 
+/* PSX drops the myplr NetSendCmdParam1(CMD_SETSTR,...) network-sync tail every Modify/SetPlr* stat
+ * function has in devilution (no netcode on this build). */
+void ModifyPlrStr(int p, int l)
+{
+    int max = MaxStats[plr[p]._pClass][0];
+    if (plr[p]._pBaseStr + l > max) {
+        l = max - plr[p]._pBaseStr;
+    }
+    plr[p]._pStrength += l;
+    plr[p]._pBaseStr += l;
+
+    if (plr[p]._pClass == CLASS_ROGUE) {
+        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pStrength + plr[p]._pDexterity) / 200;
+    } else {
+        plr[p]._pDamageMod = plr[p]._pLevel * plr[p]._pStrength / 100;
+    }
+
+    CalcPlrInv(p, TRUE);
+}
+
+void ModifyPlrMag(int p, int l)
+{
+    int max = MaxStats[plr[p]._pClass][1];
+    if (plr[p]._pBaseMag + l > max) {
+        l = max - plr[p]._pBaseMag;
+    }
+    plr[p]._pMagic += l;
+    plr[p]._pBaseMag += l;
+
+    int ms = l << 6;
+    if (plr[p]._pClass == CLASS_SORCERER) {
+        ms <<= 1;
+    }
+    plr[p]._pMaxManaBase += ms;
+    plr[p]._pMaxMana += ms;
+    if (!(plr[p]._pIFlags & ISPL_NOMANA)) {
+        plr[p]._pManaBase += ms;
+        plr[p]._pMana += ms;
+    }
+
+    CalcPlrInv(p, TRUE);
+}
+
+void ModifyPlrDex(int p, int l)
+{
+    int max = MaxStats[plr[p]._pClass][2];
+    if (plr[p]._pBaseDex + l > max) {
+        l = max - plr[p]._pBaseDex;
+    }
+    plr[p]._pDexterity += l;
+    plr[p]._pBaseDex += l;
+    CalcPlrInv(p, TRUE);
+
+    if (plr[p]._pClass == CLASS_ROGUE) {
+        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pDexterity + plr[p]._pStrength) / 200;
+    }
+}
+
+void ModifyPlrVit(int p, int l)
+{
+    int max = MaxStats[plr[p]._pClass][3];
+    if (plr[p]._pBaseVit + l > max) {
+        l = max - plr[p]._pBaseVit;
+    }
+    plr[p]._pVitality += l;
+    plr[p]._pBaseVit += l;
+
+    int ms = l << 6;
+    if (plr[p]._pClass == CLASS_WARRIOR) {
+        ms <<= 1;
+    }
+    plr[p]._pHPBase += ms;
+    plr[p]._pMaxHPBase += ms;
+    plr[p]._pHitPoints += ms;
+    plr[p]._pMaxHP += ms;
+
+    CalcPlrInv(p, TRUE);
+}
+
+void SetPlrStr(int p, int v)
+{
+    plr[p]._pBaseStr = v;
+    CalcPlrInv(p, TRUE);
+
+    if (plr[p]._pClass == CLASS_ROGUE) {
+        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pStrength + plr[p]._pDexterity) / 200;
+    } else {
+        plr[p]._pDamageMod = plr[p]._pLevel * plr[p]._pStrength / 100;
+    }
+}
+
+void SetPlrMag(int p, int v)
+{
+    plr[p]._pBaseMag = v;
+
+    int m = v << 6;
+    if (plr[p]._pClass == CLASS_SORCERER) {
+        m <<= 1;
+    }
+    plr[p]._pMaxManaBase = m;
+    plr[p]._pMaxMana = m;
+    CalcPlrInv(p, TRUE);
+}
+
+void SetPlrDex(int p, int v)
+{
+    plr[p]._pBaseDex = v;
+    CalcPlrInv(p, TRUE);
+
+    if (plr[p]._pClass == CLASS_ROGUE) {
+        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pStrength + plr[p]._pDexterity) / 200;
+    } else {
+        plr[p]._pDamageMod = plr[p]._pStrength * plr[p]._pLevel / 100;
+    }
+}
+
+void SetPlrVit(int p, int v)
+{
+    plr[p]._pBaseVit = v;
+
+    int hp = v << 6;
+    if (plr[p]._pClass == CLASS_WARRIOR) {
+        hp <<= 1;
+    }
+    plr[p]._pHPBase = hp;
+    plr[p]._pMaxHPBase = hp;
+    CalcPlrInv(p, TRUE);
+}
+
+void ClrPlrPath(PlayerStruct *ptrplr)
+{
+    memset(ptrplr->walkpath, 0xFF, 25);
+}
+
+/* PSX drops the whole devilution PosOkPortal fallback-search spiral, the dPlayer occupancy write,
+ * and the myplr/_ptargx/_ptargy/ViewX/ViewY block entirely -- just probes the 8 ring offsets and
+ * applies whichever one worked (or the last one tried, HELLFIRE-style unconditional apply). */
+void SyncInitPlrPos(PlayerStruct *ptrplr)
+{
+    if (gbMaxPlayers != 1) {
+        int i;
+        for (i = 0; i < 8; i++) {
+            if (PosOkPlayer(ptrplr, ptrplr->_px + plrxoff2[i], ptrplr->_py + plryoff2[i]))
+                break;
+        }
+        ptrplr->_px += plrxoff2[i];
+        ptrplr->_py += plryoff2[i];
+    }
+}
+
+/* PSX has no persistent dPlayer[][]/dMonster[][]/dObject[][] arrays -- dMonster/dObject are FIELDS
+ * of dung_map[x][y], and the player-occupancy grid is replaced by calling IsDplayer(x,y) in place
+ * of every `dPlayer[x][y]` read (literally, textually -- the source keeps devilution's `>0 ? -1 :
+ * -(+1)` decode even though IsDplayer can never return negative, hence the seemingly-redundant
+ * repeated calls: retail really does call IsDplayer(x,y) four times, never caching it).
+ * Also drops the whole bounds-check (x>=0 etc, callers already clamp). */
+unsigned char PosOkPlayer(PlayerStruct *ptrplr, int x, int y)
+{
+    if (SolidLoc(x, y)) {
+        return FALSE;
+    }
+
+    if (IsDplayer(x, y)) {
+        int p;
+        if (IsDplayer(x, y) > 0) {
+            p = IsDplayer(x, y) - 1;
+        } else {
+            p = -(IsDplayer(x, y) + 1);
+        }
+        if (p != plrind(ptrplr) && plr[p]._pHitPoints != 0) {
+            return FALSE;
+        }
+    }
+
+    if (dung_map[x][y].dMonster != 0) {
+        if (currlevel == 0) {
+            return FALSE;
+        }
+        if (dung_map[x][y].dMonster <= 0) {
+            return FALSE;
+        }
+        if ((monster[dung_map[x][y].dMonster - 1]._mhitpoints >> 6) > 0) {
+            return FALSE;
+        }
+    }
+
+    if (dung_map[x][y].dObject != 0) {
+        char bv;
+        if (dung_map[x][y].dObject > 0) {
+            bv = dung_map[x][y].dObject - 1;
+        } else {
+            bv = -(dung_map[x][y].dObject + 1);
+        }
+        if (object[bv]._oSolidFlag) {
+            return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+unsigned char PlrDeathModeOK(int p)
+{
+    if (p != myplr) {
+        return TRUE;
+    }
+    if (plr[p]._pmode == PM_DEATH) {
+        return TRUE;
+    } else if (plr[p]._pmode == PM_QUIT) {
+        return TRUE;
+    } else if (plr[p]._pmode == PM_NEWLVL) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* PSX narrows the class cascade to 3 (warrior/rogue/sorcerer), matching the rest of the file. */
+void CheckStats(int p)
+{
+    int c = 0;
+    if (plr[p]._pClass == CLASS_WARRIOR) {
+        c = CLASS_WARRIOR;
+    } else if (plr[p]._pClass == CLASS_ROGUE) {
+        c = CLASS_ROGUE;
+    } else if (plr[p]._pClass == CLASS_SORCERER) {
+        c = CLASS_SORCERER;
+    }
+
+    for (int i = 0; i < 4; i++) {
+        switch (i) {
+        case 0:
+            if (plr[p]._pBaseStr > MaxStats[c][0]) {
+                plr[p]._pBaseStr = MaxStats[c][0];
+            } else if (plr[p]._pBaseStr < 0) {
+                plr[p]._pBaseStr = 0;
+            }
+            break;
+        case 1:
+            if (plr[p]._pBaseMag > MaxStats[c][1]) {
+                plr[p]._pBaseMag = MaxStats[c][1];
+            } else if (plr[p]._pBaseMag < 0) {
+                plr[p]._pBaseMag = 0;
+            }
+            break;
+        case 2:
+            if (plr[p]._pBaseDex > MaxStats[c][2]) {
+                plr[p]._pBaseDex = MaxStats[c][2];
+            } else if (plr[p]._pBaseDex < 0) {
+                plr[p]._pBaseDex = 0;
+            }
+            break;
+        case 3:
+            if (plr[p]._pBaseVit > MaxStats[c][3]) {
+                plr[p]._pBaseVit = MaxStats[c][3];
+            } else if (plr[p]._pBaseVit < 0) {
+                plr[p]._pBaseVit = 0;
+            }
+            break;
+        }
+    }
+}
+
+#define INVLOC_HEAD 0
+#define INVLOC_HAND_LEFT 4
+#define INVLOC_HAND_RIGHT 5
+#define ITYPE_NONE (-1)
+#define ITYPE_SHIELD 5
+#define DUR_INDESTRUCTIBLE 255
+
+/* PSX replaces the `pnum != myplr` early-out with `!ismyplr(ptrplr)` (ptr form). */
+void ShieldDur(PlayerStruct *ptrplr)
+{
+    if (!ismyplr(ptrplr)) {
+        return;
+    }
+
+    if (ptrplr->InvBody[INVLOC_HAND_LEFT]._itype == ITYPE_SHIELD) {
+        if (ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability == DUR_INDESTRUCTIBLE) {
+            return;
+        }
+        ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability--;
+        if (ptrplr->InvBody[INVLOC_HAND_LEFT]._iDurability == 0) {
+            NetSendCmdDelItem(TRUE, INVLOC_HAND_LEFT);
+            ptrplr->InvBody[INVLOC_HAND_LEFT]._itype = ITYPE_NONE;
+            CalcPlrInv(ptrplr, TRUE);
+        }
+    }
+
+    if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype == ITYPE_SHIELD) {
+        if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability != DUR_INDESTRUCTIBLE) {
+            ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability--;
+            if (ptrplr->InvBody[INVLOC_HAND_RIGHT]._iDurability == 0) {
+                NetSendCmdDelItem(TRUE, INVLOC_HAND_RIGHT);
+                ptrplr->InvBody[INVLOC_HAND_RIGHT]._itype = ITYPE_NONE;
+                CalcPlrInv(ptrplr, TRUE);
+            }
+        }
+    }
+}
+
+#define INVLOC_CHEST 6
+
+void ArmorDur(PlayerStruct *ptrplr)
+{
+    if (!ismyplr(ptrplr)) {
+        return;
+    }
+    if (ptrplr->InvBody[INVLOC_CHEST]._itype == ITYPE_NONE && ptrplr->InvBody[INVLOC_HEAD]._itype == ITYPE_NONE) {
+        return;
+    }
+
+    int a = ENG_random(3);
+    if (ptrplr->InvBody[INVLOC_CHEST]._itype != ITYPE_NONE && ptrplr->InvBody[INVLOC_HEAD]._itype == ITYPE_NONE) {
+        a = 1;
+    }
+    if (ptrplr->InvBody[INVLOC_CHEST]._itype == ITYPE_NONE && ptrplr->InvBody[INVLOC_HEAD]._itype != ITYPE_NONE) {
+        a = 0;
+    }
+
+    ItemStruct *pi;
+    if (a != 0) {
+        pi = ptrplr->InvBody + INVLOC_CHEST;
+    } else {
+        pi = ptrplr->InvBody + INVLOC_HEAD;
+    }
+    if (pi->_iDurability == DUR_INDESTRUCTIBLE) {
+        return;
+    }
+
+    pi->_iDurability--;
+    if (pi->_iDurability != 0) {
+        return;
+    }
+
+    if (a != 0) {
+        NetSendCmdDelItem(TRUE, INVLOC_CHEST);
+    } else {
+        NetSendCmdDelItem(TRUE, INVLOC_HEAD);
+    }
+    pi->_itype = ITYPE_NONE;
+    CalcPlrInv(ptrplr, TRUE);
+}
+
 void AddPlrMonstExper(int lvl, long exp, char pmask)
 {
     int totplrs = 0;

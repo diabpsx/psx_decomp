@@ -510,11 +510,9 @@ void GetRndObjLoc(int randarea, int &xx, int &yy)
 
 void AddMushPatch()
 {
-    int i;
-    int y, x;
-
     if (numobjects < MAXOBJECTS) {
-        i = objectavail[0];
+        int x, y;
+        int i = objectavail[0];
         GetRndObjLoc(5, x, y);
         dung_map[x + 1][y + 1].dObject = -1 - i;
         dung_map[x + 2][y + 1].dObject = -1 - i;
@@ -559,10 +557,10 @@ BOOL TrapLocOk(int xp, int yp)
 
 void InitRndLocObj(int min, int max, int objtype)
 {
-    int i, xp, yp, numobjs;
+    int xp, yp, numobjs;
 
     numobjs = ENG_random(max - min) + min;
-    for (i = 0; i < numobjs; i++) {
+    for (int i = 0; i < numobjs; i++) {
         while (1) {
             xp = ENG_random(0x40) + 16;
             yp = ENG_random(0x40) + 16;
@@ -584,10 +582,10 @@ void InitRndLocObj(int min, int max, int objtype)
 
 void InitRndLocBigObj(int min, int max, int objtype)
 {
-    int i, xp, yp, numobjs;
+    int xp, yp, numobjs;
 
     numobjs = ENG_random(max - min) + min;
-    for (i = 0; i < numobjs; i++) {
+    for (int i = 0; i < numobjs; i++) {
         while (1) {
             xp = ENG_random(0x40) + 16;
             yp = ENG_random(0x40) + 16;
@@ -614,10 +612,10 @@ void InitRndLocObj5x5(int min, int max, int objtype)
 {
     int xp, yp, xx, yy, cnt;
     unsigned char done;
-    int numobjs, i;
+    int numobjs;
 
     numobjs = ENG_random(max - min) + min;
-    for (i = 0; i < numobjs; i++) {
+    for (int i = 0; i < numobjs; i++) {
         cnt = 0;
         done = 0;
         while (!done) {

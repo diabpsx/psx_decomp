@@ -170,11 +170,13 @@ void PaletteFadeInTask(TASK *T)
 {
     int i;
 
+    i = 0;
     VID_GetTick();
-    for (i = 0; i < 0x81; i += faderate) {
+    while (i < 0x81) {
         SetFadeLevel(i);
         DrawFadedScreen();
         TSK_Sleep(1);
+        i += faderate;
     }
     SetFadeLevel(0x80);
     DrawFadedScreen();

@@ -40,3 +40,17 @@ void RemoveInvItem(int pnum, int idx);   /* func_8015D6FC */
 void SetSpdbarGoldCurs(int pnum, int i);
 void SetGoldCurs(int pnum, int i);
 void GetGoldSeed(int pnum, ItemStruct *itm);
+struct TextDat * GM_UseTexData(int Id);
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, bool Sparkle, int OtPos, bool cross, bool iso, int SinStep);
+int sprintf(char *buf, const char *fmt, ...);
+void S_SmithEnter(void);
+void S_SSellEnter(void);
+void S_WRechargeEnter(void);
+void S_SIDEnter(void);
+void S_WitchEnter(void);
+void S_HealerEnter(void);
+void S_StoryEnter(void);
+void S_TavernEnter(void);
+void S_BarmaidEnter(void);
+void S_DrunkEnter(void);
+unsigned char StoreGoldFit(int idx);

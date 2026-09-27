@@ -1,6 +1,5 @@
 /* pregame-overlay data tables (carved into asm/data/drlg_l3_rodata_*.rodata.s, symbol_addrs_pregame.txt) */
 extern unsigned char spawntable[15];   /* @0x801486B4 */
-extern unsigned char spawntable_801486c4[15];   /* @0x801486C4 (2nd static local named spawntable -- case/name collision suffix) */
 extern unsigned char poolsub[15];   /* @0x801486D4 */
 extern unsigned char L3ConvTbl[16];   /* @0x801486E4 */
 extern unsigned char L3UP[20];   /* @0x801486F4 */

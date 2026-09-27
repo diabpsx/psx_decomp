@@ -21,6 +21,10 @@ int lus;
 char plusanim;
 int _pnumlines[2];
 int CS_XOFF;
+int CsNo;
+unsigned char CrossCount[2];
+unsigned char chrbtnactive;
+unsigned char chrflag;
 int _pSpell[2];
 int _pSplType[2];
 int my_cur_spel[2];
@@ -225,16 +229,18 @@ char GetSBookTrans(int ii, unsigned char townok)
 void CheckSBook(void)
 {
     int cspel;
-    unsigned long long tspls;
+    unsigned long long spl;
+    unsigned long tspls;
     char st;
 
     RemoveTargetCursor(options_pad);
     cspel = SpellPages[sbooktab][cur_spel[options_pad]];
-    tspls = plr[options_pad]._pMemSpells | plr[options_pad]._pISpells | plr[options_pad]._pAblSpells;
-    if (cspel != -1 && ((tspls >> (cspel - 1)) & 1)) {
+    spl = plr[options_pad]._pMemSpells | plr[options_pad]._pISpells | plr[options_pad]._pAblSpells;
+    tspls = (unsigned long)(spl >> (cspel - 1));
+    if (cspel != -1 && (tspls & 1)) {
         my_cur_spel[options_pad] = cspel;
         st = 1;
-        if ((plr[options_pad]._pISpells >> (cspel - 1)) & 1)
+        if (plr[options_pad]._pISpells & (1 << (cspel - 1)))
             st = 3;
         if (plr[options_pad]._pAblSpells & (1 << (cspel - 1)))
             st = 0;
@@ -273,6 +279,100 @@ void DrawArrows(void)
     Ft4->g0 = 0;
     Ft4->b0 = 0;
     Ft4->code = (Ft4->code | 2) & ~1;
+}
+
+void ADD_PlrStringXY(const char *pszStr, char col)
+{
+    CSDATA *ptr;
+
+    ptr = &CS_Tab[CsNo];
+    strcpy(ptr->String, pszStr);
+    ptr->col = col;
+    CsNo = CsNo + 1;
+    if (CS_Tab[CsNo].w == 0) {
+        CS_Tab[CsNo].String[0] = 0;
+        CsNo++;
+    }
+}
+
+void DrawPlus(int n, int pnum)
+{
+    int otpos;
+    TextDat *ThisDat;
+    POLY_FT4 *Ft4;
+    int x, y;
+    int frm;
+
+    ThisDat = GM_UseTexData(0);
+    otpos = CBlocks::GetOverlayOtBase() + 4;
+    if (n == 4) {
+        CrossCount[pnum]++;
+        if (CrossCount[pnum] & 1) {
+            if (pnum == 0) {
+                frm = ((unsigned)VID_GetTick() >> 3 & 3) + 1;
+                x = 0x19;
+            } else {
+                frm = ((unsigned)VID_GetTick() >> 3 & 3) + 1;
+                x = 0x127;
+            }
+            Ft4 = ThisDat->PrintFt4(frm, x, 0x64, 0, otpos, 0);
+            Ft4->r0 = 0xA0;
+            Ft4->g0 = 0xA0;
+            Ft4->b0 = 0xA0;
+            Ft4->code = (Ft4->code | 2) & ~1;
+        }
+    } else {
+        chrbtnactive = 1;
+        x = CS_Tab[n + 20].x + 0x42 + CS_XOFF;
+        y = CS_Tab[n + 20].y + 0x22;
+        Ft4 = ThisDat->PrintFt4(0x83, x, y, 0, otpos, 0);
+        if (lus == n) {
+            Ft4->r0 = 0x80;
+            Ft4->g0 = 0x80;
+            Ft4->b0 = 0x80;
+        } else {
+            Ft4->r0 = 0x20;
+            Ft4->g0 = 0x20;
+            Ft4->b0 = 0x20;
+        }
+        Ft4->code &= 0xFC;
+    }
+}
+
+void DrawChrTSK(TASK *T)
+{
+    int omp;
+
+    GLUE_SetHomingScrollFlag(0);
+    GLUE_SetShowGameScreenFlag(0);
+    GLUE_SetShowPanelFlag(0);
+    GLUE_SuspendGame();
+    stream_pause();
+    PostGamePad(2, 0, 0, 0);
+    omp = myplr;
+    myplr = options_pad;
+    TSK_Sleep(2);
+    goto test;
+    for (;;) {
+        if (options_pad >= 0) {
+            DrawChr();
+            TSK_Sleep(1);
+test:
+            if (chrflag)
+                continue;
+        }
+        break;
+    }
+    myplr = omp;
+    PostGamePad(5, 0, 0, 0);
+    PauseMode = 1;
+    TSK_Sleep(2);
+    PauseMode = 0;
+    stream_resume();
+    GLUE_ResumeGame();
+    GLUE_SetShowPanelFlag(1);
+    GLUE_SetShowGameScreenFlag(1);
+    GLUE_SetHomingScrollFlag(1);
 }
 
 void DrawLevelUpIcon(int pnum)

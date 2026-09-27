@@ -35,14 +35,14 @@ void InitL3Dungeon(void)
 {
     int i, j;
 
-    for (j = 0; j < 48; j++) {
-        for (i = 0; i < 48; i++) {
-            dungeon[i][j] = 0;
+    for (i = 0; i < 48; i++) {
+        for (j = 0; j < 48; j++) {
+            dungeon[j][i] = 0;
         }
     }
-    for (j = 0; j < DMAXY; j++) {
-        for (i = 0; i < DMAXX; i++) {
-            mydflags[i + j * DMAXX] = 0;
+    for (i = 0; i < DMAXX; i++) {
+        for (j = 0; j < DMAXY; j++) {
+            mydflags[j + i * DMAXX] = 0;
         }
     }
 }
@@ -407,7 +407,7 @@ void DRLG_L3MakeMegas(void)
             }
             dungeon[i][j] = L3ConvTbl[v];
         }
-        dungeon[DMAXX - 1][j] = 8;
+        dungeon[46][j] = 8;
     }
     for (i = 0; i < DMAXX; i++) {
         dungeon[i][DMAXY - 1] = 8;
@@ -708,6 +708,7 @@ int DRLG_L3SpawnEdge(int x, int y, int *totarea)
 int DRLG_L3Spawn(int x, int y, int *totarea)
 {
     unsigned char i;
+    static const unsigned char spawntable[15] = {0x00, 0x0A, 0x03, 0x05, 0x0C, 0x06, 0x09, 0x00, 0x00, 0x0C, 0x03, 0x06, 0x09, 0x0A, 0x05};
 
     if (*totarea > 40) {
         return true;
@@ -724,16 +725,16 @@ int DRLG_L3Spawn(int x, int y, int *totarea)
     *totarea += 1;
 
     if (i != 8) {
-        if (spawntable_801486c4[i] & 8 && DRLG_L3SpawnEdge(x, y - 1, totarea) == true) {
+        if (spawntable[i] & 8 && DRLG_L3SpawnEdge(x, y - 1, totarea) == true) {
             return true;
         }
-        if (spawntable_801486c4[i] & 4 && DRLG_L3SpawnEdge(x, y + 1, totarea) == true) {
+        if (spawntable[i] & 4 && DRLG_L3SpawnEdge(x, y + 1, totarea) == true) {
             return true;
         }
-        if (spawntable_801486c4[i] & 2 && DRLG_L3SpawnEdge(x + 1, y, totarea) == true) {
+        if (spawntable[i] & 2 && DRLG_L3SpawnEdge(x + 1, y, totarea) == true) {
             return true;
         }
-        if (spawntable_801486c4[i] & 1 && DRLG_L3SpawnEdge(x - 1, y, totarea) == true) {
+        if (spawntable[i] & 1 && DRLG_L3SpawnEdge(x - 1, y, totarea) == true) {
             return true;
         }
     } else {
@@ -756,8 +757,9 @@ int DRLG_L3Spawn(int x, int y, int *totarea)
 
 void DRLG_L3Pool(void)
 {
-    int i, j, dunx, duny, totarea, poolchance;
-    int found;
+    int i, j, found;
+    int dunx, duny;
+    int totarea, poolchance;
     unsigned char k;
 
     for (duny = 0; duny < DMAXY; duny++) {
@@ -1503,6 +1505,7 @@ void DRLG_L3(int entry)
     do {
         do {
             do {
+                UPDATEPROGRESS(1);
                 InitL3Dungeon();
                 x1 = ENG_random(20) + 10;
                 y1 = ENG_random(20) + 10;
@@ -1619,6 +1622,9 @@ void DRLG_L3(int entry)
     DRLG_L3PlaceRndSet(L3XTRA4, 25);
     DRLG_L3PlaceRndSet(L3XTRA5, 25);
 
+    DRLG_L3SetWalls();
+    SetBlankL3Dungeon();
+
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
             pdungeon[i][j] = dungeon[i][j];
@@ -1734,7 +1740,7 @@ void LoadL3Dungeon(char *sFileName, int vx, int vy)
     SetMapMonsters(pLevelMap, 0, 0);
     SetMapObjects(pLevelMap, 0, 0);
 
-    mem_free_dbg(pLevelMap);
+    MemFreeDbg(pLevelMap);
 }
 
 void LoadPreL3Dungeon(char *sFileName, int vx, int vy)
@@ -1772,5 +1778,5 @@ void LoadPreL3Dungeon(char *sFileName, int vx, int vy)
 
     memcpy(pdungeon, dungeon, sizeof(pdungeon));
 
-    mem_free_dbg(pLevelMap);
+    MemFreeDbg(pLevelMap);
 }

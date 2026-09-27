@@ -58,3 +58,4 @@ extern unsigned char setlevel;   /* @0x8011C10E */
 extern char tempstr[256];   /* @0x800CEA10 */
 unsigned char uitemflag;   /* @0x8011B8DC */  /* TU-owned tentative def, %gp_rel-reached */
 extern struct ObjectStruct object[127];   /* @0x800D8C4C */
+extern struct MonsterStruct monster[190];   /* @0x80105394 */

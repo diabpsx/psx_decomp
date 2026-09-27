@@ -797,3 +797,312 @@ void CheckQuestItem(int pnum)
             sfxdnum = 0x257;
     }
 }
+
+char CheckInvHLight(void)
+{
+    int r;
+    unsigned int u;
+    char rv;
+    ItemStruct *pi;
+    PlayerStruct *p;
+    int nGold;
+
+    r = InvCursPos;
+    if (r >= 0x49)
+        return -1;
+
+    _infoclr[sel_data] = 0;
+    p = &plr[myplr];
+    ClearPanel();
+    rv = -1;
+
+    if (_pcurs[myplr] < 12 /* CURSOR_FIRSTITEM */) {
+        nGold = 0;
+        pi = &p->HoldItem;
+        goto tail;
+    }
+
+    u = r;
+    if (u < 4) {
+        rv = 0;
+        pi = &p->InvBody[0];
+    } else if (u == 4) {
+        rv = 1;
+        pi = &p->InvBody[1];
+    } else if (u == 5) {
+        rv = 2;
+        pi = &p->InvBody[2];
+    } else if (u == 6) {
+        rv = 3;
+        pi = &p->InvBody[3];
+    } else if (u - 7 < 6) {
+        rv = 4;
+        pi = &p->InvBody[4];
+    } else if (u - 13 < 6) {
+        pi = &p->InvBody[4];
+        if (pi->_itype == ITYPE_NONE) {
+            rv = 5;
+        } else if (pi->_iLoc == ILOC_TWOHAND) {
+            rv = 4;
+        } else {
+            rv = 5;
+        }
+        pi = &p->InvBody[5];
+    } else if (u - 0x13 < 6) {
+        rv = 6;
+        pi = &p->InvBody[6];
+    } else if (u - 25 < 40) {
+        r = abs(p->InvGrid[u - 25]);
+        if (r == 0)
+            return -1;
+        r--;
+        rv = r + 7;
+        pi = &p->InvList[r];
+    } else if (u < 0x41) {
+        goto tail;
+    } else {
+        r = u - 0x41;
+        pi = &p->SpdList[r];
+        drawsbarflag = 1;
+        if (pi->_itype == ITYPE_NONE)
+            return -1;
+        rv = r + 0x2F;
+    }
+
+tail:
+    if (pi->_itype == ITYPE_NONE)
+        return -1;
+
+    if (pi->_itype == ITYPE_GOLD) {
+        nGold = pi->_ivalue;
+        sprintf(_infostr[sel_data], GetStr(0x4FF), nGold, get_pieces_str(nGold));
+        return rv;
+    }
+
+    if (invflag && !pi->_iStatFlag) {
+        _infoclr[sel_data] = 2;
+    } else if (pi->_iMagical == 1) {
+        _infoclr[sel_data] = 1;
+    } else if (pi->_iMagical == 2) {
+        _infoclr[sel_data] = 3;
+    }
+
+    strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iName, 0x100));
+    if (pi->_iIdentified) {
+        strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iIName, 0x100));
+        PrintItemDetails(pi);
+    } else {
+        PrintItemDur(pi);
+    }
+
+    return rv;
+}
+
+void AutoGetItem(int pnum, int ii)
+{
+    int i, idx;
+    int w, h;
+    unsigned char done;
+
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+
+    if (ii != 0x7F /* MAXITEMS */) {
+        if (dung_map[item[ii]._ix][item[ii]._iy].dItem == 0)
+            return;
+    }
+
+    item[ii]._iCreateInfo &= 0x7FFF /* ~CF_PREGEN */;
+    plr[pnum].HoldItem = item[ii];
+    CheckQuestItem(pnum);
+    CheckBookLevel(pnum);
+    CheckItemStats(pnum);
+    SetICursor(plr[pnum].HoldItem._iCurs + 12 /* CURSOR_FIRSTITEM */);
+    PlaySFX(0x32);
+    if (plr[pnum].HoldItem._itype == ITYPE_GOLD) {
+        done = GoldAutoPlace(pnum);
+    } else {
+        done = 0;
+        if ((unsigned int)(plr[pnum]._pgfxnum & 0xF) < 2 /* ANIM_ID_UNARMED or _SHIELD */
+            && plr[pnum]._pmode <= 3 /* PM_WALK3 */) {
+            if (plr[pnum].HoldItem._iStatFlag) {
+                if (plr[pnum].HoldItem._iClass == ICLASS_WEAPON) {
+                    done = WeaponAutoPlace(pnum);
+                    if (done)
+                        CalcPlrInv(pnum, 1);
+                }
+            }
+        }
+        if (!done) {
+            w = icursW28;
+            h = icursH28;
+            if (w == 1 && h == 1) {
+                idx = plr[pnum].HoldItem.IDidx;
+                if (plr[pnum].HoldItem._iStatFlag && AllItemsUseable[idx]) {
+                    for (i = 0; i < MAXBELTITEMS && !done; i++) {
+                        if (plr[pnum].SpdList[i]._itype == ITYPE_NONE) {
+                            plr[pnum].SpdList[i] = plr[pnum].HoldItem;
+                            CalcPlrScrolls(pnum);
+                            drawsbarflag = 1;
+                            done = 1;
+                        }
+                    }
+                }
+                for (i = 30; i <= 39 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 20; i <= 29 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 10; i <= 19 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 0; i <= 9 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 1 && h == 2) {
+                for (i = 29; i >= 20 && !done; i--) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 9; i >= 0 && !done; i--) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 19; i >= 10 && !done; i--) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 1 && h == 3) {
+                for (i = 0; i < 20 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 2 && h == 2) {
+                for (i = 0; i < 10 && !done; i++) {
+                    done = AutoPlace(pnum, AP2x2Tbl[i], w, h, 1);
+                }
+                for (i = 21; i < 29 && !done; i += 2) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 1; i < 9 && !done; i += 2) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 10; i < 19 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 2 && h == 3) {
+                for (i = 0; i < 9 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 10; i < 19 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+        }
+    }
+    if (done) {
+        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
+        i = 0;
+        while (i < numitems) {
+            if (itemactive[i] == ii) {
+                DeleteItem(itemactive[i], i);
+                i = 0;
+            } else {
+                i++;
+            }
+        }
+    } else {
+        if (pnum == myplr) {
+            if (plr[pnum]._pClass == 0)
+                PlaySFX(ENG_random(3) + 0x2D9);
+            else if (plr[pnum]._pClass == 1)
+                PlaySFX(ENG_random(3) + 0x271);
+            else if (plr[pnum]._pClass == 2)
+                PlaySFX(ENG_random(3) + 0x209);
+        }
+        plr[pnum].HoldItem = item[ii];
+        RespawnItem(ii, 1);
+        NetSendCmdPItem(1, 0xB /* CMD_RESPAWNITEM */, item[ii]._ix, item[ii]._iy);
+        plr[pnum].HoldItem._itype = ITYPE_NONE;
+    }
+}
+
+int InvPutItem(int pnum, int x, int y)
+{
+    int ii;
+    unsigned char done;
+    int Dist, d;
+
+    if (numitems >= 0x7A) {
+        PlaySFX(0x3D3);
+        return -1;
+    }
+
+    if (FindGetItem(plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed) != -1) {
+        SyncGetItem(x, y, plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed);
+    }
+
+    x = plr[pnum]._px;
+    y = plr[pnum]._py;
+    if (!CanPut(x, y)) {
+        done = 0;
+        for (Dist = 1; Dist < 8 && !done; Dist++) {
+            for (d = 0; d < 8 && !done; d++) {
+                x = plr[myplr]._px + offset_x[d] * Dist;
+                y = plr[myplr]._py + offset_y[d] * Dist;
+                if (CanPut(x, y))
+                    done = 1;
+            }
+        }
+    }
+    if (!CanPut(x, y))
+        return -1;
+
+    ii = itemavail[0];
+    dung_map[x][y].dItem = ii + 1;
+    itemavail[0] = itemavail[0x7E - numitems];
+    itemactive[numitems] = ii;
+    item[ii] = plr[pnum].HoldItem;
+    item[ii]._ix = x;
+    item[ii]._iy = y;
+    RespawnItem(ii, 1);
+    numitems++;
+    NewCursor(CURSOR_HAND);
+    PlaySFX(0x1F);
+    return ii;
+}
+
+void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed)
+{
+    int ii;
+
+    if (dung_map[x][y].dItem) {
+        ii = dung_map[x][y].dItem - 1;
+        if (item[ii].IDidx == idx && item[ii]._iSeed == iseed && item[ii]._iCreateInfo == ci) {
+            /* ii already correct */
+        } else {
+            ii = FindGetItem(idx, ci, iseed);
+        }
+    } else {
+        ii = FindGetItem(idx, ci, iseed);
+    }
+
+    if (ii != -1) {
+        int j, jj;
+
+        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
+        j = 0;
+        while (j < numitems) {
+            jj = itemactive[j];
+            if (jj == ii) {
+                DeleteItem(jj, j);
+                j = 0;
+            } else {
+                j++;
+            }
+        }
+    }
+}

@@ -38,3 +38,5 @@ extern int options_pad;   /* @0x8011B250 */
 extern unsigned char GOLDR;   /* @0x8011ABDA */
 extern unsigned char GOLDG;   /* @0x8011ABDB */
 extern unsigned char GOLDB;   /* @0x8011ABDC */
+extern struct CSDATA CS_Tab[28];   /* @0x800CE3B0 */
+extern unsigned char PauseMode;   /* @0x8011B7A4 */

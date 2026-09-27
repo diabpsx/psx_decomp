@@ -342,12 +342,11 @@ void GetLevelMTypes(void)
         if (QuestStatus(0xA))
             QuestMask |= CM_QuestToBitPattern(0xA);
 
-        if (currlevel == 15 && gbMaxPlayers == 1)
+        if (currlevel == 15 && gbMaxPlayers == 2)
             QuestMask |= CM_QuestToBitPattern(0xF);
 
-        if (gbMaxPlayers == 1 || currlevel == quests[0xC]._qlevel) {
-            if (currlevel == quests[0xC]._qlevel)
-                QuestMask |= CM_QuestToBitPattern(0xC);
+        if (gbMaxPlayers != 1 && currlevel == quests[0xC]._qlevel) {
+            QuestMask |= CM_QuestToBitPattern(0xC);
             AddMonsterType(0x32, 4);
 
             numskeltypes = 0;
@@ -362,29 +361,41 @@ void GetLevelMTypes(void)
             AddMonsterType(skeltypes[ENG_random(numskeltypes)], MPFLAG_SCATTER);
         }
 
-        GetMonsterTypes(QuestMask);
+        nt = ML_GetPresetMonsters(currlevel, typelist, QuestMask);
+        if (monstdebug) {
+            for (i = 0; i < debugmonsttypes; i++) {
+                SwapMonsterType(&DebugMonsters[i]);
+                AddMonsterType(DebugMonsters[i], MPFLAG_SCATTER);
+            }
+        } else {
+            while (nt > 0 && nummtypes < MAX_LVLMTYPES) {
+                mt = ENG_random(nt);
+                SwapMonsterType(&typelist[mt]);
+                AddMonsterType(typelist[mt], MPFLAG_SCATTER);
+                typelist[mt] = typelist[--nt];
+            }
+        }
         return;
     }
 
     switch (setlvlnum) {
+    case 2:
+        QuestMask |= CM_QuestToBitPattern(0xE);
+        break;
     case 1:
         QuestMask |= CM_QuestToBitPattern(0xC);
         AddMonsterType(0x32, 4);
-        GetMonsterTypes(QuestMask);
-        return;
+        break;
     case 4:
-        GetMonsterTypes(CM_QuestToBitPattern(0xE));
-        return;
+        QuestMask |= CM_QuestToBitPattern(0xD);
+        break;
     case 5:
-        GetMonsterTypes(CM_QuestToBitPattern(0xD));
-        return;
-    case 0:
-        GetMonsterTypes(CM_QuestToBitPattern(0xF));
-        return;
+        QuestMask |= CM_QuestToBitPattern(0xF);
+        break;
     default:
-        GetMonsterTypes(QuestMask);
-        return;
+        break;
     }
+    GetMonsterTypes(QuestMask);
 }
 
 /* --------------------------------------------------------------------- */
@@ -398,15 +409,11 @@ void PlaceQuestMonsters(void)
             PlaceUniqueMonst(9, 0, 0);
 
         if (currlevel == quests[12]._qlevel && gbMaxPlayers != 1) {
-            int dummy;
-            {
-                int dummy2;
-                for (skeltype = 0; skeltype < nummtypes; skeltype++) {
-                    if (IsSkel(Monsters[skeltype].mtype))
-                        break;
-                }
-                PlaceUniqueMonst(1, skeltype, 30);
+            for (skeltype = 0; skeltype < nummtypes; skeltype++) {
+                if (IsSkel(Monsters[skeltype].mtype))
+                    break;
             }
+            PlaceUniqueMonst(1, skeltype, 30);
         }
 
         if (QuestStatus(7)) {

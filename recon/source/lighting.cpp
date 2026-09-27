@@ -135,12 +135,154 @@ void SetWeirdFX(void)
     weird_cheat = 1;
 }
 
-/* OPEN -- PSX-only coloured radial light-fill; no PC twin (retail dropped the crawl-table/lightblock
- * approach devilution/hellfire both use and replaced it with a colour_mask/shift_mask/weirdy/cont
- * bitfield-packed nRadius + a per-screen-pixel dung_map_r/g/b paint). Not yet attempted -- see the
- * m2c/IDA drafts kept in skel/SOURCE/LIGHTING.CPP for the decoded shape. */
+/* OPEN, INCOMPLETE -- PSX-only coloured radial light-fill; no PC twin (retail dropped the
+ * crawl-table/lightblock approach devilution/hellfire both use and replaced it with a
+ * colour_mask/shift_mask/weirdy/cont bitfield-packed nRadius + a per-screen-pixel dung_map_r/g/b
+ * paint). Built incrementally from the skel m2c draft (skel/SOURCE/LIGHTING.CPP) + the raw oracle:
+ * the header (bitfield unpack, radius/light_level/D_800D62E0+F0 lookup, the "weirdy" cheat-colour
+ * override + early-return, the xoff/yoff/block_x/block_y screen-position setup, and the screen-
+ * visibility clip test) plus ONE of the four inner paint arms (unclipped, shift_mask==0) are
+ * transcribed below; the other three arms (clipped shift_mask==0, clipped shift_mask!=0, unclipped
+ * shift_mask!=0) are TODO stubs -- see asm/nonmatchings/lighting/DoLighting__Fiiii.s for their
+ * bodies (each is a near-twin of the implemented arm with an added per-channel shift_mask
+ * sub-blend: bits 1/8 -> >>1 / *2 additions gated per channel). NOT YET BYTE-VERIFIED against the
+ * oracle -- this is a structural draft, not a gated pass. Field-offset uncertainty flagged inline. */
 void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
 {
+    int xoff, yoff;
+    int colour_mask, shift_mask, weirdy, cont;
+    int radius;
+    int amp_idx;
+    int light_x, light_y;
+    int block_x, block_y;
+    int scr_x, scr_y;
+    int v, max_x;
+    int mult;
+    int x, y;
+    int radius_block;
+    int val;
+
+    xoff = 0;
+    yoff = 0;
+    colour_mask = (nRadius >> 4) & 7;
+    shift_mask = (nRadius >> 7) & 0x3F;
+    weirdy = (nRadius >> 0xE) & 1;
+
+    if (weirdy || g_weirdy_prev != 1) {
+        if (weirdy == 1)
+            g_weirdy_prev = weirdy;
+        radius = nRadius & 0xF;
+        cont = (nRadius >> 0xF) & 1;
+        if (leveltype == 3) {
+            /* FIELD OFFSET UNCERTAIN: oracle reads plr+0x1D/plr+0x1A05 (== plr[1]+0x1D by struct
+             * size) with NO myplr multiply -- i.e. it tests plr[0] and plr[1] directly (2-player
+             * PSX split-screen?), not plr[myplr]. Named plractive/_ 1plid mechanically from the
+             * struct layout; semantic role (co-op infra-vision boost?) not confirmed. */
+            if (plr[0].plractive != 0 && Lnum == plr[0]._plid)
+                radius = 0xA;
+            if (plr[1].plractive != 0 && Lnum == plr[1]._plid)
+                radius = 0xA;
+        }
+        amp_idx = radius + light_level[leveltype];
+        if (amp_idx >= 0x10)
+            amp_idx = 0xF;
+        g_light_amp = D_800D62E0[amp_idx];
+        g_light_amp2 = D_800D62F0[amp_idx];
+        if (weirdy) {
+            g_light_amp = 0x40;
+            g_light_amp2 = 4;
+            g_light_clamp = 0xFF;
+            scr_x = g_lightfx_dr + g_lightfx_sr;
+            g_lightfx_dr = scr_x;
+            g_lightfx_dg += g_lightfx_sg;
+            g_lightfx_db += g_lightfx_sb;
+            if (!cont && scr_x > 0xC800) {
+                g_weirdy_prev = 0;
+                LightList[Lnum]._ldel = 1;
+                g_light_clamp = 0x80;
+                return;
+            }
+        }
+        if (Lnum >= 0) {
+            xoff = LightList[Lnum]._xoff + 8;
+            yoff = LightList[Lnum]._yoff + 8;
+        }
+        if (leveltype != 0) {
+            nXPos = (nXPos - 0x10) / 2;
+            nYPos = (nYPos - 0x10) / 2;
+            block_x = (nXPos * 0x10 | xoff) - 8;
+            block_y = (nYPos * 0x10 | yoff) - 8;
+        } else {
+            nXPos = (nXPos + 2) / 2 - 2;
+            nYPos = (nYPos + 2) / 2 - 2;
+            block_x = (nXPos * 0x10 | xoff) + 4;
+            block_y = (nYPos * 0x10 | yoff) + 4;
+        }
+
+        if (radius >= 0) {
+            /* NOTE: the oracle's "shake"(GU_GetRnd jitter) arm is dead code in this build (the
+             * gate that would enable it is a compiled-out `1==0`) -- omitted, matches retail. */
+            x = nXPos;
+            y = nYPos;
+            v = gr_scrxoff / 2621440;
+            light_y = y - (g_light_amp >> 4);
+            max_x = gr_scryoff / 2621440;
+            light_x = x - (g_light_amp >> 4);
+            if (leveltype == 0) {
+                x -= 6;
+                y -= 8;
+            }
+            if ((v - 2) < (x + 8) && x < (v + 6) && (max_x - 8) < (y + 8) && y < max_x) {
+                mult = g_light_amp >> 3;
+                if (light_y < 0 || (light_y + mult) > 0x30 || light_x < 0 || (light_x + mult) > 0x30) {
+                    if (shift_mask == 0) {
+                        /* TODO clipped, shift_mask==0 arm -- see .L8004C1CC in the oracle. */
+                    } else {
+                        /* TODO clipped, shift_mask!=0 arm -- see .L8004C414 in the oracle. */
+                    }
+                } else {
+                    /* Unclipped arm, shift_mask==0 (the arm this draft implements). */
+                    for (y = light_y; y < light_y + mult; y++) {
+                        for (x = light_x; x < light_x + mult; x++) {
+                            radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                            if (radius_block < 0)
+                                radius_block = 0;
+                            if (colour_mask & 1) {
+                                if (weirdy)
+                                    val = g_lightband[(radius_block + (g_lightfx_dr >> 8)) & g_lightband_mask] * g_light_amp2;
+                                else
+                                    val = radius_block * g_light_amp2;
+                                val = dung_map_r[x][y] + (val & 0xFF);
+                                if (val > g_light_clamp)
+                                    val = g_light_clamp;
+                                dung_map_r[x][y] = val;
+                            }
+                            if (colour_mask & 2) {
+                                if (weirdy)
+                                    val = g_lightband[(radius_block + (g_lightfx_dg >> 8)) & g_lightband_mask] * g_light_amp2;
+                                else
+                                    val = radius_block * g_light_amp2;
+                                val = dung_map_g[x][y] + (val & 0xFF);
+                                if (val > g_light_clamp)
+                                    val = g_light_clamp;
+                                dung_map_g[x][y] = val;
+                            }
+                            if (colour_mask & 4) {
+                                if (weirdy)
+                                    val = g_lightband[(radius_block + (g_lightfx_db >> 8)) & g_lightband_mask] * g_light_amp2;
+                                else
+                                    val = radius_block * g_light_amp2;
+                                val = dung_map_b[x][y] + (val & 0xFF);
+                                if (val > g_light_clamp)
+                                    val = g_light_clamp;
+                                dung_map_b[x][y] = val;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /* Best-effort transcription from the oracle (PSX-only screen-space colour restore; no PC twin --
@@ -152,11 +294,11 @@ void DoUnLight(void)
 {
     int nXPos, nYPos, x, y, max_x, max_y;
 
-    nYPos = ((gr_scryoff >> 16) / 5) - 0xD;
-    nXPos = ((gr_scrxoff >> 16) / 5) - 0x9;
+    nXPos = ((gr_scrxoff >> 16) / 40) - 0x9;
+    nYPos = ((gr_scryoff >> 16) / 40) - 0xD;
     if (leveltype == 0) {
-        nXPos = ((gr_scrxoff >> 16) / 5) - 1;
-        nYPos = ((gr_scryoff >> 16) / 5) - 5;
+        nXPos = ((gr_scrxoff >> 16) / 40) - 1;
+        nYPos = ((gr_scryoff >> 16) / 40) - 5;
     }
 
     max_x = 0x30;
@@ -209,7 +351,6 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
         num = 3;
         break;
     }
-
     nRadius++;
     y1 = nYPos - nRadius;
     y2 = nYPos + nRadius;

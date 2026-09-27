@@ -31,6 +31,14 @@
 extern "C" int crunch(const unsigned char *Src, unsigned char *Dest, int SrcLen, int WindowSize);
 extern "C" void decrunch(const unsigned char *Src, unsigned char *Dest, int SrcLen);
 
+/* explicit initializer (not a tentative def), declared as EARLY as possible in the TU -- gcc-2.7
+ * names the _GLOBAL_.I/.D static-init thunk after the FIRST global with an explicit `=` initializer
+ * in declaration order (proved in QUESTS.CPP); this must be that first initialized global, ahead of
+ * the CompClass objects further down. */
+unsigned char deltaload = 0;
+static DJunk sgJunk;
+static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-owned tentative def */
+
 /* --- delta item/object marker values (confirmed via delta_get_item's literal compares) --- */
 #define MAXITEMS 127
 
@@ -149,10 +157,6 @@ int CompressedLevs::GetSize(void)
 
 /* the three compressor strategy objects + the level-map cache, default strategy = Pak (matches the
  * retail _GLOBAL_.I.deltaload ctor thunk: NoComp, PakComp, CrunchComp, then GameMaps(CompPakComp)). */
-static DJunk sgJunk;
-static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-owned tentative def */
-static unsigned char D_8011C82C;        /* ParseCmd's last-dispatched-bCmd tracker, gp-rel */
-unsigned char deltaload;                /* tentative def placed HERE to anchor the _GLOBAL_.I/.D name */
 static NoComp CompNoComp;
 static PakComp CompPakComp;
 static CrunchComp CompCrunchComp;
@@ -173,9 +177,11 @@ void delta_init(void)
 /* @0x8004EAF4 MSG.CPP:284 */
 void delta_kill_monster(int mi, unsigned char x, unsigned char y, unsigned char bLevel)
 {
+    DMonsterStr *p;
+    DLevel *Dl;
     sgbDeltaChanged = 1;
-    DLevel *Dl = GetDLevel(bLevel, setlevel);
-    DMonsterStr *p = &Dl->monster[mi];
+    Dl = GetDLevel(bLevel, setlevel);
+    p = &Dl->monster[mi];
     p->_mx = x;
     p->_my = y;
     p->_mdir = monster[mi]._mdir;
@@ -186,9 +192,11 @@ void delta_kill_monster(int mi, unsigned char x, unsigned char y, unsigned char 
 /* @0x8004EB90 MSG.CPP:312 */
 void delta_monster_hp(int mi, long hp, unsigned char bLevel)
 {
+    DMonsterStr *p;
+    DLevel *Dl;
     sgbDeltaChanged = 1;
-    DLevel *Dl = GetDLevel(bLevel, setlevel);
-    DMonsterStr *p = &Dl->monster[mi];
+    Dl = GetDLevel(bLevel, setlevel);
+    p = &Dl->monster[mi];
     if (p->_mhitpoints > hp)
         p->_mhitpoints = hp;
     ReleaseDLevel(Dl);
@@ -202,11 +210,12 @@ void delta_leave_sync(unsigned char bLevel)
     if (currlevel != 0) {
         DLevel *Dl = GetDLevel(bLevel, setlevel);
         int i;
+        DMonsterStr *pD;
         for (i = 0; i < nummonsters; i++) {
             int ii = monstactive[i];
             if (monster[ii]._mhitpoints != 0) {
+                pD = &Dl->monster[ii];
                 sgbDeltaChanged = 1;
-                DMonsterStr *pD = &Dl->monster[ii];
                 pD->_mx = monster[ii]._mx;
                 pD->_my = monster[ii]._my;
                 pD->_mdir = monster[ii]._mdir;
@@ -404,10 +413,10 @@ int DeltaImportData(char *Src)
 /* @0x8004F5D4 MSG.CPP:780 */
 void DeltaSaveLevel(void)
 {
-    int i;
-    for (i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++) {
         if (i != myplr)
             plr[i]._pGFXLoad = 0;
+    }
     if (!setlevel)
         plr[myplr]._pLvlVisited[currlevel] = 1;
     else
@@ -514,7 +523,7 @@ void NetSendCmdParam3(unsigned char bHiPri, unsigned char bCmd, unsigned short w
 }
 
 /* @0x8004F8C8 MSG.CPP:998 */
-void NetSendCmdQuest(unsigned char unused, unsigned char q)
+void NetSendCmdQuest(unsigned char bHiPri, unsigned char q)
 {
     TCmdQuest cmd;
     cmd.bCmd = 0x58; /* confirmed literal, NOT the ParseCmd-position-derived CMD_SYNCQUEST */
@@ -596,7 +605,7 @@ void NetSendCmdPItem(unsigned char bHiPri, unsigned char bCmd, unsigned char x, 
 }
 
 /* @0x8004FCF4 MSG.CPP:1192 -- bCmd param is UNUSED; the command byte is hardcoded 0x30 (CMD_CHANGEINVITEMS). */
-void NetSendCmdChItem(unsigned char bCmd, unsigned char bLoc)
+void NetSendCmdChItem(unsigned char bHiPri, unsigned char bLoc)
 {
     TCmdChItem cmd;
     cmd.bCmd = 0x30;
@@ -638,7 +647,7 @@ void NetSendCmdDItem(unsigned char bCmd, int ii)
 }
 
 /* @0x8004FEF0 MSG.CPP:1274 */
-BOOL i_own_level(int i)
+BOOL i_own_level(int nReqLevel)
 {
     return 1;
 }
@@ -1018,8 +1027,10 @@ void On_MONSTDEATH(const TCmd *pCmd, int pnum)
 void On_KILLGOLEM(const TCmd *pCmd, int pnum)
 {
     const TCmdLoc *p = (const TCmdLoc *)pCmd;
-    if (pnum != myplr)
-        delta_kill_monster(pnum, p->x, p->y, plr[pnum].plrlevel);
+    if (pnum != myplr) {
+        unsigned char bLevel = plr[pnum].plrlevel;
+        delta_kill_monster(pnum, p->x, p->y, bLevel);
+    }
 }
 
 /* @0x80051920 MSG.CPP:2187 -- spawn/refresh the awakened golem missile unless one already targets
@@ -1062,10 +1073,12 @@ void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 void On_PLRDEAD(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    if (pnum != myplr)
-        SyncPlrKill(pnum, p->wParam1);
-    else
+    if (pnum != myplr) {
+        unsigned short rid = p->wParam1;
+        SyncPlrKill(pnum, rid);
+    } else {
         check_update_plr(pnum);
+    }
 }
 
 /* @0x80051B78 MSG.CPP:2260 -- damage-over-time application to another player, clamped against a
@@ -1114,11 +1127,10 @@ void On_DISARMXY(const TCmd *pCmd, int pnum)
 void On_ATTACKID(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    int mi = p->wParam1;
-    int dx = abs(plr[pnum]._px - monster[mi]._mfutx);
-    int dy = abs(plr[pnum]._py - monster[mi]._mfuty);
+    int dx = abs(plr[pnum]._px - monster[p->wParam1]._mfutx);
+    int dy = abs(plr[pnum]._py - monster[p->wParam1]._mfuty);
     if (dx >= 2 || dy >= 2)
-        MakePlrPath(pnum, monster[mi]._mfutx, monster[mi]._mfuty, 0);
+        MakePlrPath(pnum, monster[p->wParam1]._mfutx, monster[p->wParam1]._mfuty, 0);
     plr[pnum].destAction = 0x14;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
@@ -1126,10 +1138,10 @@ void On_ATTACKID(const TCmd *pCmd, int pnum)
 /* @0x80051518 MSG.CPP:2078 */
 void On_KNOCKBACK(const TCmd *pCmd, int pnum)
 {
-    int mi = ((const TCmdParam1 *)pCmd)->wParam1;
-    int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[mi]._mx, monster[mi]._my);
-    M_GetKnockback(mi, dir);
-    M_StartHit(mi, pnum, 0);
+    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+    int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[p->wParam1]._mx, monster[p->wParam1]._my);
+    M_GetKnockback(p->wParam1, dir);
+    M_StartHit(p->wParam1, pnum, 0);
 }
 
 /* @0x80051C8C MSG.CPP:2323 -- the literal 0x2B passed to SyncOpObject/delta_sync_object is NOT this
@@ -1138,25 +1150,22 @@ void On_KNOCKBACK(const TCmd *pCmd, int pnum)
  * immediates since it doesn't correlate with the CMD_* dispatch numbering above. */
 void On_OPENDOOR(const TCmd *pCmd, int pnum)
 {
-    int oi = ((const TCmdParam1 *)pCmd)->wParam1;
-    SyncOpObject(pnum, 0x2B, oi);
-    delta_sync_object(oi, 0x2B, plr[pnum].plrlevel);
+    SyncOpObject(pnum, 0x2B, ((const TCmdParam1 *)pCmd)->wParam1);
+    delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2B, plr[pnum].plrlevel);
 }
 
 /* @0x80051D08 MSG.CPP:2336 */
 void On_CLOSEDOOR(const TCmd *pCmd, int pnum)
 {
-    int oi = ((const TCmdParam1 *)pCmd)->wParam1;
-    SyncOpObject(pnum, 0x2C, oi);
-    delta_sync_object(oi, 0x2C, plr[pnum].plrlevel);
+    SyncOpObject(pnum, 0x2C, ((const TCmdParam1 *)pCmd)->wParam1);
+    delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2C, plr[pnum].plrlevel);
 }
 
 /* @0x80051D84 MSG.CPP:2349 */
 void On_OPERATEOBJ(const TCmd *pCmd, int pnum)
 {
-    int oi = ((const TCmdParam1 *)pCmd)->wParam1;
-    SyncOpObject(pnum, 0x2D, oi);
-    delta_sync_object(oi, 0x2D, plr[pnum].plrlevel);
+    SyncOpObject(pnum, 0x2D, ((const TCmdParam1 *)pCmd)->wParam1);
+    delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2D, plr[pnum].plrlevel);
 }
 
 /* @0x80051E00 MSG.CPP:2362 -- TCmdParam2 shape (wParam1@+2 = the acting player index embedded in
@@ -1164,9 +1173,8 @@ void On_OPERATEOBJ(const TCmd *pCmd, int pnum)
 void On_PLROPOBJ(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
-    int oi = p->wParam2;
-    SyncOpObject(p->wParam1, 0x2E, oi);
-    delta_sync_object(oi, 0x2E, plr[pnum].plrlevel);
+    SyncOpObject(p->wParam1, 0x2E, p->wParam2);
+    delta_sync_object(p->wParam2, 0x2E, plr[pnum].plrlevel);
 }
 
 /* @0x80051E7C MSG.CPP:2374 -- both SyncBreakObj args come from the command (TCmdParam2 shape:
@@ -1174,9 +1182,8 @@ void On_PLROPOBJ(const TCmd *pCmd, int pnum)
 void On_BREAKOBJ(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
-    int oi = p->wParam2;
-    SyncBreakObj(p->wParam1, oi);
-    delta_sync_object(oi, 0x2F, plr[pnum].plrlevel);
+    SyncBreakObj(p->wParam1, p->wParam2);
+    delta_sync_object(p->wParam2, 0x2F, plr[pnum].plrlevel);
 }
 
 /* @0x80050898 MSG.CPP:1741 */
@@ -1326,7 +1333,8 @@ void On_SYNCQUEST(const TCmd *pCmd, int pnum)
  * Case order and CMD_ values are read directly from jtbl_80116868 (see the #defines above). */
 int ParseCmd(int pnum, const TCmd *pCmd)
 {
-    D_8011C82C = pCmd->bCmd;
+    static unsigned char sbLastCmd;
+    sbLastCmd = pCmd->bCmd;
     switch (pCmd->bCmd) {
     case CMD_WALKXY:           On_WALKXY(pCmd, pnum); break;
     case CMD_ADDSTR:           On_ADDSTR(pCmd, pnum); break;
