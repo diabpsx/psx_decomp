@@ -1718,16 +1718,9 @@ void MAI_RoundRanged(int i, int missile_type, unsigned char checkdoors, int dam,
  *     entirely, going straight to the final attack-check; only the FAR case falls through to test
  *     COND1/COND2) -- fixed to `!(abs(mx)<2 && abs(my)<2) && (...)`. This closed the length gap
  *     exactly: 244->247 insns (now byte-count EXACT), 113->108 diffs.
- * Residual (108 diffs, length now EXACT): a whole-function register-coloring swap -- retail assigns
- * `i`'s transient home (before `Monst` is computed) to $s5 exactly where SYM says `i` permanently
- * lives; ours puts it in $s4 (the register `mx` will later use), cascading an s4<->s5 / s6<->fp swap
- * through the whole body (content-identical instructions, different register letters throughout,
- * confirmed via symlane: ours has `i` on physical reg $20/s4, retail on $21/s5). FALSIFIED:
- * swapping `dist`/`Monst` declaration order to match SYM's local-record order (i,mx,my,md,v,Monst,
- * dist) -- no byte change, both before and after fix (c). NEXT ANGLE (untried): pure permuter/
- * register-coloring territory now that the length is exact and every structural/logic angle is
- * closed -- would need a statement-permutation search over the whole function body per the
- * methodology doc's "PERMUTER PLATEAU is a SMELL" class. */
+ * NOW PASS+SYM: the whole-function s4/s5 coloring swap came from `mx`/`my` being built in two
+ * steps -- retail SLD shows `mx = Monst->_mx; my = Monst->_my;` (L9/L10) and the enemy subtraction
+ * as separate later statements (L16/L17). */
 void MAI_Sneak(int i)
 {
     int mx, my, md, v;
@@ -1735,8 +1728,10 @@ void MAI_Sneak(int i)
     int dist;
 
     if (Monst->_mmode == MM_STAND) {
-        mx = Monst->_mx - Monst->_menemyx;
-        my = Monst->_my - Monst->_menemyy;
+        mx = Monst->_mx;
+        my = Monst->_my;
+        mx -= Monst->_menemyx;
+        my -= Monst->_menemyy;
         md = M_GetDir(i);
 
         dist = 5 - Monst->_mint;
