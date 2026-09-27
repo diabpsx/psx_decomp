@@ -1254,13 +1254,15 @@ void AddElement(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
 void AddCbolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaster, int id, int dam)
 {
     if (micaster == TARGET_MONSTERS) {
-        missile[mi]._mirnd = ENG_random(15) + 1;
-        dam = ENG_random(plr[id]._pMagic >> 2) + 1;
+        if (id == myplr)
+            missile[mi]._mirnd = ENG_random(15) + 1;
+        else
+            missile[mi]._mirnd = ENG_random(15) + 1;
+        missile[mi]._midam = ENG_random(plr[id]._pMagic >> 2) + 1;
     } else {
         missile[mi]._mirnd = ENG_random(15) + 1;
-        dam = 15;
+        missile[mi]._midam = 15;
     }
-    missile[mi]._midam = dam;
 
     if (sx == dx && sy == dy) {
         dx += XDirAdd[midir];
