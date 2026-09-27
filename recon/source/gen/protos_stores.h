@@ -61,6 +61,8 @@ void StoryIdItem(void);
 void BoyBuyItem(void);
 void HealerBuyItem(void);
 void SmithRepairItem(void);
+void SpawnPremium(int lvl);
+void SmithBuyPItem(void);
 void S_WitchEnter(void);
 void S_HealerEnter(void);
 void S_StoryEnter(void);

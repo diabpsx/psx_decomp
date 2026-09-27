@@ -995,14 +995,9 @@ void BoyBuyItem(void)
 void HealerBuyItem(void)
 {
     int idx;
-    int cond;
 
     idx = (stextlhold - stextup) / 4 + stextvhold;
-    cond = idx < 3;
-    if (gbMaxPlayers == 1) {
-        cond = idx < 2;
-    }
-    if (cond) {
+    if (gbMaxPlayers == 1 ? idx < 2 : idx < 3) {
         plr[myplr].HoldItem._iSeed = GetRndSeed();
     }
     TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
@@ -1011,12 +1006,7 @@ void HealerBuyItem(void)
     }
     StoreAutoPlace();
     CalcPlrInv(myplr, 1);
-    cond = idx < 3;
-    if (gbMaxPlayers == 1) {
-        cond = idx < 2;
-    }
-    if (!cond) {
-        idx = (stextlhold - stextup) / 4 + stextvhold;
+    if (!(gbMaxPlayers == 1 ? idx < 2 : idx < 3)) {
         if (idx == 0x13) {
             _healitem[StorePlrNo][19]._itype = -1;
         } else {
@@ -1063,6 +1053,35 @@ void SmithRepairItem(void)
         plr[myplr].InvList[i]._iDurability = plr[myplr].InvList[i]._iMaxDur;
         break;
     }
+}
+
+/* @0x80071078 */
+void SmithBuyPItem(void)
+{
+    int idx;
+    int i;
+    int xx;
+
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    if (plr[myplr].HoldItem._iMagical == 0) {
+        plr[myplr].HoldItem._iIdentified = 0;
+    }
+    StoreAutoPlace();
+    idx = (stextlhold - stextup) / 8 + stextvhold;
+    xx = 0;
+    i = 0;
+    if (idx >= 0) {
+        do {
+            if (_premiumitem[StorePlrNo][i]._itype != -1) {
+                idx--;
+                xx = i;
+            }
+            i++;
+        } while (idx >= 0);
+    }
+    _premiumitem[StorePlrNo][xx]._itype = -1;
+    _numpremium[StorePlrNo]--;
+    SpawnPremium(plr[myplr]._pLevel);
 }
 
 /* @0x800738B4 */

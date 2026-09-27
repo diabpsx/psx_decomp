@@ -323,7 +323,7 @@ void AddBarrel(int i, int ot)
 void AddShrine(int i)
 {
     unsigned char slist[NUM_SHRINETYPE];
-    unsigned int j;
+    int j;
     int val;
 
     object[i]._oPreFlag = 1;
