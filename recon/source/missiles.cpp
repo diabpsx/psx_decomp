@@ -521,24 +521,19 @@ void GetMissileVel(int i, int sx, int sy, int dx, int dy, int v)
      * the jal targets directly (no `sqrt` symbol exists anywhere in the retail SYM at all). Also
      * clamps each of dxp/dyp/dr away from exact zero before dividing (avoids a div-by-zero /
      * degenerate direction), which the PC twin does not do explicitly. */
-    long dxp, dyp, dr;
-    long xd, yd;
+    long long dxp, dyp, dr;
 
-    /* retail computes (dx-sx)<<5 and (dy-sy)<<5 SEPARATELY, then combines and shifts by 16 more
-     * (NOT a single combined <<21) -- confirmed instruction-for-instruction via the raw oracle. */
-    xd = (dx - sx) << 5;
-    yd = (dy - sy) << 5;
-    dxp = (xd - yd) << 16;
-    dyp = (xd + yd) << 16;
-    if (dxp == 0)
-        dxp = 1;
-    if (dyp == 0)
-        dyp = 1;
+    dxp = (((dx - sx) << 5) - ((dy - sy) << 5)) << 16;
+    dyp = (((dx - sx) << 5) + ((dy - sy) << 5)) << 16;
     dr = veclen2(dxp, dyp);
+    if (dxp == 0)
+        dxp++;
+    if (dyp == 0)
+        dyp++;
     if (dr == 0)
-        dr = 1;
-    missile[i]._mixvel = (long)(((long long)dxp * (long long)(v << 16)) / (long long)dr);
-    missile[i]._miyvel = (long)(((long long)dyp * (long long)(v << 15)) / (long long)dr);
+        dr++;
+    missile[i]._mixvel = (v << 16) * dxp / dr;
+    missile[i]._miyvel = (v << 15) * dyp / dr;
 }
 
 void PutMissile(int i)
@@ -549,35 +544,34 @@ void PutMissile(int i)
      * the same tile. Decoded from the raw oracle (no PC twin); best-effort transcription, not yet
      * byte-verified -- this is one of the largest remaining near-misses to grind. Bound check here
      * is against the dung_map ARRAY bound (112), not the playable MAXDUNX/MAXDUNY (96). */
-    int x, y;
-    signed char old;
-    int row, group;
+    int mx, my;
+    char m;
 
-    x = missile[i]._mix;
-    y = missile[i]._miy;
-    if (x <= 0 || y <= 0 || x >= 112 || y >= 112)
+    mx = missile[i]._mix;
+    my = missile[i]._miy;
+    if (mx <= 0 || my <= 0 || mx >= 112 || my >= 112)
         missile[i]._miDelFlag = 1;
     if (!missile[i]._miDelFlag) {
-        dung_map[x][y].dFlags |= BFLAG_MISSILE;
-        old = dung_map[x][y].dMissile;
-        if (old == 0) {
-            dung_map[x][y].dMissile = i + 1;
-        } else if (old >= 0) {
-            row = 0;
-            while (dMissArray[row][0] != 0 && row < 32)
-                row++;
-            if (row < 32) {
-                dMissArray[row][0] = old;
-                dMissArray[row][1] = i + 1;
-                dung_map[x][y].dMissile = (char)(0x20 - row);
-            }
+        dung_map[mx][my].dFlags |= BFLAG_MISSILE;
+        if (dung_map[mx][my].dMissile == 0) {
+            dung_map[mx][my].dMissile = i + 1;
         } else {
-            group = (old & 0x60) >> 5;
-            row = old & 0x1F;
-            if (missile[dMissArray[row][group] - 1]._mitype != missile[i]._mitype) {
-                if (group + 1 < 4) {
-                    dMissArray[row][group + 1] = i + 1;
-                    dung_map[x][y].dFlags += 0x20;
+            char dMiss = dung_map[mx][my].dMissile;
+            if (dMiss < 0) {
+                if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][(dMiss & 0x60) >> 5] - 1]._mitype)
+                    return;
+                if (((dMiss & 0x60) >> 5) + 1 < 4) {
+                    dMissArray[dMiss & 0x1F][((dMiss & 0x60) >> 5) + 1] = i + 1;
+                    dung_map[mx][my].dMissile += 0x20;
+                }
+            } else {
+                for (m = 0; m < 32; m++) {
+                    if (dMissArray[m][0] == 0) {
+                        dMissArray[m][0] = dMiss;
+                        dMissArray[m][1] = i + 1;
+                        dung_map[mx][my].dMissile = m - 0x60;
+                        break;
+                    }
                 }
             }
         }
@@ -669,18 +663,20 @@ unsigned char GetTableValue(unsigned char code, int dir)
 {
     unsigned char hicode = (code & 0xF0) >> 4;
     unsigned char locode = code & 0xF;
-    unsigned char limit;
 
     if (code == 0)
         return 0;
     if (hicode < 10) {
-        limit = hicode != 0 ? hicode : 16;
-        if (dir < limit)
+        if (hicode == 0)
+            hicode = 16;
+        if (dir < hicode)
             return ValueTable[locode];
         return 0;
     }
-    if (dir < locode)
-        return StringTable[hicode - 10][dir];
+    if (dir < locode) {
+        hicode -= 10;
+        return StringTable[hicode][dir];
+    }
     return 0;
 }
 
@@ -723,19 +719,9 @@ void ClearMissileSpot(int mi)
 
 void RemoveStoneMissiles(int mon, int mx, int my)
 {
-    /* near-miss: oracle loop keeps `mon` live in $a0 for the whole loop (no saved-reg spill) and
-     * tests i<nummissiles via a gp-rel load each iteration; ours spills mon to a callee-saved reg.
-     * Falsified: direct-index form (no pointer local, worse: 39/34), pointer-to-missile local
-     * (36/34, kept below as closest). Next angle: hoist `nummissiles` into a local copy before the
-     * loop (oracle re-reads it via $gp each pass -- may need the read INSIDE the loop condition
-     * written differently, e.g. `while` with the test as the raw condition vs a `for`). */
-    int i;
-    int mi;
-    MissileStruct *pmissile;
-
-    for (i = 0; i < nummissiles; i++) {
-        mi = missileactive[i];
-        pmissile = &missile[mi];
+    for (int i = 0; i < nummissiles; i++) {
+        int mi = missileactive[i];
+        MissileStruct *pmissile = &missile[mi];
         if (pmissile->_mitype == MIS_STONE && pmissile->_miVar2 == mon)
             pmissile->_miDelFlag = 1;
     }
@@ -886,12 +872,12 @@ void AddLightctrl(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
 
 void GetVileMissPos(int mi, int dx, int dy)
 {
-    int xx, yy, l, j, i;
+    int xx, yy;
 
-    for (l = 1; l < 50; l++) {
-        for (j = -l; j <= l; j++) {
+    for (int l = 1; l < 50; l++) {
+        for (int j = -l; j <= l; j++) {
             yy = dy + j;
-            for (i = -l; i <= l; i++) {
+            for (int i = -l; i <= l; i++) {
                 xx = dx + i;
                 if (PosOkPlayer(myplr, xx, yy)) {
                     missile[mi]._mix = xx;
@@ -1026,7 +1012,9 @@ void AddLightball(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
         missile[mi]._miVar1 = plr[id]._px;
         missile[mi]._miVar2 = plr[id]._py;
     }
-    /* PSX-only addition: missile slots with bit 1 set receive a light source here. */
+    /* PSX-only addition (no PC twin): the raw tests bit 1 of the missile *index* ($s2 = mi,
+     * `andi v0,s2,2`), not mienemy -- mienemy is never loaded (no REG record in SYM). Only every
+     * other pair of lightball slots gets a light source. */
     if (mi & 2)
         missile[mi]._mlid = AddLight(sx, sy, 0x243);
 }
@@ -1036,17 +1024,17 @@ void AddFirewall(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy
     /* PSX drops hellfire's `if (mienemy != MI_ENEMYMONST || id < 0) mirange += currlevel;` branch
      * entirely -- always applies the pISplDur-scaled adjustment (confirmed: no currlevel add
      * anywhere in the oracle, just one unconditional mult/mflo/sra-7 sequence). */
-    int k;
+    int i;
 
     missile[mi]._midam = ((ENG_random(10) + ENG_random(10) + 2 + plr[id]._pLevel) << 4) >> 1;
     GetMissileVel(mi, sx, sy, dx, dy, 16);
-    missile[mi]._miVar2 = 0;
     missile[mi]._mirange = 10;
-    for (k = missile[mi]._mispllvl; k > 0; k--)
+    for (i = missile[mi]._mispllvl; i > 0; i--)
         missile[mi]._mirange += 10;
-    missile[mi]._mirange = missile[mi]._mirange + ((plr[id]._pISplDur * missile[mi]._mirange) >> 7);
-    missile[mi]._mirange = missile[mi]._mirange << 4;
+    missile[mi]._mirange += (plr[id]._pISplDur * missile[mi]._mirange) >> 7;
+    missile[mi]._mirange <<= 4;
     missile[mi]._miVar1 = missile[mi]._mirange - missile[mi]._miAnimLen;
+    missile[mi]._miVar2 = 0;
 }
 
 void AddFireball(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
@@ -1160,14 +1148,13 @@ void AddRportal(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
 {
     /* PSX-only prologue: shrinks/re-places any pre-existing portal missile occupying this tile
      * before placing the new one -- no PC twin has this. */
-    int oldidx;
-    signed char dm;
+    int m2 = dung_map[sx][sy].dMissile;
 
-    dm = dung_map[sx][sy].dMissile;
-    if (dm > 0) {
-        oldidx = dm - 1;
-        missile[oldidx]._miy--;
-        PutMissile(oldidx);
+    if (m2 > 0) {
+        m2--;
+        MissileStruct *miss = &missile[m2];
+        miss->_miy--;
+        PutMissile(m2);
     }
 
     missile[mi]._mix = sx;
@@ -1175,8 +1162,8 @@ void AddRportal(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
     missile[mi]._misx = sx;
     missile[mi]._misy = sy;
     missile[mi]._mirange = 100;
-    missile[mi]._miVar2 = 0;
     missile[mi]._miVar1 = missile[mi]._mirange - missile[mi]._miAnimLen;
+    missile[mi]._miVar2 = 0;
     PutMissile(mi);
 }
 
@@ -1283,7 +1270,9 @@ void AddCbolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaster, 
     }
 
     missile[mi]._miAnimFrame = ENG_random(8) + 1;
-    missile[mi]._mlid = AddLight(sx, sy, 5);
+    /* PSX-only: like AddLightball, only every other group of missile slots (mi & 4) gets a light. */
+    if (mi & 4)
+        missile[mi]._mlid = AddLight(sx, sy, 0x242);
     GetMissileVel(mi, sx, sy, dx, dy, 8);
 
     missile[mi]._miVar1 = 5;
@@ -1340,13 +1329,10 @@ void AddMagmaball(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._mitxoff += 3 * missile[mi]._mixvel;
     missile[mi]._mityoff += 3 * missile[mi]._miyvel;
     GetMissilePos(mi);
-    if ((missile[mi]._mixvel >> 16) == 0 && (missile[mi]._miyvel >> 16) == 0)
-        missile[mi]._mirange = 1;
-    else
-        missile[mi]._mirange = 256;
+    missile[mi]._mirange = 256;
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
-    missile[mi]._mlid = AddLight(sx, sy, 8);
+    missile[mi]._mlid = AddLight(sx, sy, 0x97);
 }
 
 void MI_Boom(int i)
@@ -1430,19 +1416,21 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
 
-    if (missile[mi]._miAnimType == 0x28) {
-        missile[mi]._mlid = AddLight(sx, sy, 0x243);
-    } else if (missile[mi]._miAnimType < 0x29) {
-        if (missile[mi]._miAnimType == 0x16)
-            missile[mi]._mlid = AddLight(sx, sy, 0x93);
-        else if ("wtf? never heard of this missile")
-            DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
-    } else if (missile[mi]._miAnimType == 0x2A) {
-        missile[mi]._mlid = AddLight(sx, sy, 0x1B3);
-    } else if (missile[mi]._miAnimType == 0x2C) {
+    switch (missile[mi]._miAnimType) {
+    case 0x16:
+    case 0x2C:
         missile[mi]._mlid = AddLight(sx, sy, 0x93);
-    } else if ("wtf? never heard of this missile") {
-        DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
+        break;
+    case 0x28:
+        missile[mi]._mlid = AddLight(sx, sy, 0x243);
+        break;
+    case 0x2A:
+        missile[mi]._mlid = AddLight(sx, sy, 0x1B3);
+        break;
+    default:
+        if ("wtf? never heard of this missile")
+            DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
+        break;
     }
 
     if (mienemy == TARGET_MONSTERS) {
@@ -1466,7 +1454,7 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 
 void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    int i, mx, k, j, l, tx, ty;
+    int i, mx;
     int CrawlNum[6];
 
     memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
@@ -1480,20 +1468,19 @@ void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
         }
     }
 
-    for (k = 0; k < 6; k++) {
-        l = CrawlNum[k];
-        j = l + 1;
+    for (int k = 0; k < 6; k++) {
+        int l = CrawlNum[k];
+        int j = l + 1;
         for (i = (unsigned char)CrawlTable[l]; i > 0; i--) {
-            tx = dx + CrawlTable[j];
-            ty = dy + CrawlTable[j + 1];
+            int tx = dx + CrawlTable[j];
+            int ty = dy + CrawlTable[j + 1];
             if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {  /* AddGolem: retail uses the playable bound (0x5F=95) here, unlike the sibling crawl-search fns */
                 if (LineClear(sx, sy, tx, ty) && (GetSOLID(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject | IsDplayer(tx, ty)) == 0) {
                     missile[mi]._miVar1 = sx;
                     missile[mi]._miVar2 = sy;
-                    missile[mi]._miVar4 = tx;
-                    missile[mi]._miVar5 = ty;
-                    /* PSX oracle has AND here, not hellfire's OR -- confirmed, a real behavior delta. */
-                    if (monster[id]._mx == 1 && monster[id]._my != 0 && id == myplr)
+                    missile[mi]._miVar4 = dx;
+                    missile[mi]._miVar5 = dy;
+                    if ((monster[id]._mx != 1 || monster[id]._my != 0) && id == myplr)
                         M_StartKill(id, id);
                     UseMana(id, SPL_GOLEM);
                     k = 6;
@@ -1588,11 +1575,9 @@ void AddDiabApoca(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
      * hellfire does, and reads plr[]._px/_py (there is no _pfutx/_pfuty in the PSX struct). */
     int pnum;
 
-    if (FePlayerNo >= 0) {
-        for (pnum = 0; pnum <= FePlayerNo; pnum++) {
-            if (plr[pnum].plractive && LineClear(sx, sy, plr[pnum]._px, plr[pnum]._py))
-                AddMissile(0, 0, plr[pnum]._px, plr[pnum]._py, 0, 0x42, mienemy, id, dam, 0);
-        }
+    for (pnum = 0; pnum <= FePlayerNo; pnum++) {
+        if (plr[pnum].plractive && LineClear(sx, sy, plr[pnum]._px, plr[pnum]._py))
+            AddMissile(plr[pnum]._px, plr[pnum]._py, plr[pnum]._px, plr[pnum]._py, 0, 0x42, mienemy, id, dam, 0);
     }
     missile[mi]._miDelFlag = 1;
 }
@@ -1632,22 +1617,23 @@ void MI_LArrow(int i)
             missile[i]._mitxoff -= missile[i]._mixvel;
             missile[i]._mityoff -= missile[i]._miyvel;
             GetMissilePos(i);
-            if (missile[i]._mitype == MIS_LARROW) {
-                SetMissAnim(i, 0x1A /* MF_CBOLT */);
-                missile[i]._mirange = missile[i]._miAnimLen - 1;
-            } else {
-                SetMissAnim(i, 5 /* MF_EXP1 */);
-                missile[i]._mirange = missile[i]._miAnimLen - 1;
-            }
+            SetMissAnim(i, missile[i]._mitype != MIS_LARROW ? 5 /* MF_EXP1 */ : 0x1A /* MF_CBOLT */);
+            missile[i]._mirange = missile[i]._miAnimLen - 1;
         } else {
             if (missile[i]._mix != missile[i]._miVar1 || missile[i]._miy != missile[i]._miVar2) {
                 missile[i]._miVar1 = missile[i]._mix;
                 missile[i]._miVar2 = missile[i]._miy;
-                ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 5);
+                if (missile[i]._mitype == MIS_LARROW)
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x365);
+                else
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x95);
             }
         }
     } else {
-        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 5 + missile[i]._miAnimFrame);
+        if (missile[i]._mitype == MIS_LARROW)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, missile[i]._miAnimFrame + 0x360);
+        else
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, missile[i]._miAnimFrame + 0x90);
         rst = missiledata[missile[i]._mitype].mResist;
         if (missile[i]._mitype == MIS_LARROW) {
             if (p != -1) {
@@ -1658,7 +1644,7 @@ void MI_LArrow(int i)
                 maxd = currlevel * 2 + ENG_random(10) + 1;
             }
             missiledata[MIS_LARROW].mResist = 2; /* MIMT_LGHT */
-            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 1, 1);
+            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
         }
         if (missile[i]._mitype == 27 /* MIT_FARROW -- no MIS_FARROW slot in this build's MIS_ table */) {
             if (p != -1) {
@@ -1669,7 +1655,7 @@ void MI_LArrow(int i)
                 maxd = currlevel * 2 + ENG_random(10) + 1;
             }
             missiledata[27].mResist = 1; /* MIMT_FIRE */
-            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 1, 1);
+            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
         }
         missiledata[missile[i]._mitype].mResist = rst;
     }
@@ -1714,21 +1700,22 @@ void MI_Arrow(int i)
 void MI_Lightning(int i)
 {
     int j;
+    MissileStruct *miss = &missile[i];
 
-    missile[i]._mirange--;
-    j = missile[i]._mirange;
-    if (missile[i]._mix != missile[i]._misx || missile[i]._miy != missile[i]._misy)
-        CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix, missile[i]._miy, 0, 1);
-    if (missile[i]._miHitFlag == 1)
-        missile[i]._mirange = j;
+    miss->_mirange--;
+    j = miss->_mirange;
+    if (miss->_mix != miss->_misx || miss->_miy != miss->_misy)
+        CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix, miss->_miy, 0, 1);
+    if (miss->_miHitFlag == 1)
+        miss->_mirange = j;
 
     /* PSX-only: re-centers the light on the missile's current tile every tick (hellfire doesn't
      * call ChangeLight in MI_Lightning at all); radius 0x243=579 not devilution's animation-based. */
-    ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 0x243);
+    ChangeLight(miss->_mlid, miss->_mix, miss->_miy, 0x243);
 
-    if (missile[i]._mirange == 0) {
-        missile[i]._miDelFlag = 1;
-        AddUnLight(missile[i]._mlid);
+    if (miss->_mirange == 0) {
+        miss->_miDelFlag = 1;
+        AddUnLight(miss->_mlid);
     }
     PutMissile(i);
 }
@@ -1792,6 +1779,7 @@ void MI_Firebolt(int i)
 {
     int omx, omy, d, p;
 
+    d = 0;
     missile[i]._mirange--;
     /* PSX (like hellfire's source shape) checks the bonespirit-impact early-out FIRST,
      * not as a trailing else-if the way devilution's source reads. */
@@ -1814,17 +1802,22 @@ void MI_Firebolt(int i)
     p = missile[i]._misource;
     if (p != -1) {
         if (missile[i]._micaster == TARGET_MONSTERS) {
-            if (missile[i]._mitype == MIS_FIREBOLT)
-                d = ENG_random(10) + (plr[p]._pMagic >> 3) + missile[i]._mispllvl + 1;
-            else if (missile[i]._mitype == MIS_FLARE)
-                d = 3 * missile[i]._mispllvl - (plr[p]._pMagic >> 3) + (plr[p]._pMagic >> 1);
-            else if (missile[i]._mitype == MIS_BONESPIRIT)
+            switch (missile[i]._mitype) {
+            case MIS_FLARE:
+                d = (plr[p]._pMagic >> 1) - (plr[p]._pMagic >> 3) + 2 * missile[i]._mispllvl + missile[i]._mispllvl;
+                break;
+            case MIS_FIREBOLT:
+                d = ENG_random(10) + 1 + (plr[p]._pMagic >> 3) + missile[i]._mispllvl;
+                break;
+            case MIS_BONESPIRIT:
                 d = 0;
+                break;
+            }
         } else {
-            d = monster[p].mMinDamage + ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1);
+            d = ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1) + monster[p].mMinDamage;
         }
     } else {
-        d = currlevel + ENG_random(2 * currlevel);
+        d = ENG_random(2 * currlevel) + currlevel;
     }
     if (missile[i]._mix != missile[i]._misx || missile[i]._miy != missile[i]._misy)
         CheckMissileCol(i, d, d, 0, missile[i]._mix, missile[i]._miy, 0, 1);
@@ -1833,13 +1826,18 @@ void MI_Firebolt(int i)
         missile[i]._mitxoff = omx;
         missile[i]._mityoff = omy;
         GetMissilePos(i);
-        if (missile[i]._mitype == MIS_FIREBOLT || missile[i]._mitype == MIS_MAGMABALL)
-            AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP, missile[i]._micaster, missile[i]._misource, 0, 0);
-        else if (missile[i]._mitype == MIS_FLARE)
+        switch (missile[i]._mitype) {
+        case MIS_FLARE:
             AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP2, missile[i]._micaster, missile[i]._misource, 0, 0);
-        else if (missile[i]._mitype == MIS_ACID)
+            break;
+        case MIS_FIREBOLT:
+        case MIS_MAGMABALL:
+            AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP, missile[i]._micaster, missile[i]._misource, 0, 0);
+            break;
+        case MIS_ACID:
             AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP3, missile[i]._micaster, missile[i]._misource, 0, 0);
-        else if (missile[i]._mitype == MIS_BONESPIRIT) {
+            break;
+        case MIS_BONESPIRIT:
             SetMissDir(i, 8);
             missile[i]._mirange = 7;
             missile[i]._miDelFlag = 0;
@@ -1853,8 +1851,19 @@ void MI_Firebolt(int i)
         if (missile[i]._mix != missile[i]._miVar1 || missile[i]._miy != missile[i]._miVar2) {
             missile[i]._miVar1 = missile[i]._mix;
             missile[i]._miVar2 = missile[i]._miy;
-            if (missile[i]._mlid >= 0)
-                ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 8);
+            if (missile[i]._mlid >= 0) {
+                switch (missile[i]._miAnimType) {
+                case 0x28:
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x243);
+                    break;
+                case 0x2A:
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x1B3);
+                    break;
+                default:
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x95);
+                    break;
+                }
+            }
         }
         PutMissile(i);
     }
@@ -1871,7 +1880,7 @@ void MI_Lightball(int i)
     missile[i]._mityoff += missile[i]._miyvel;
     GetMissilePos(i);
     j = missile[i]._mirange;
-    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 0, missile[i]._mix, missile[i]._miy, 0, 1);
+    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 0, missile[i]._mix, missile[i]._miy, 0, 0);
     if (missile[i]._miHitFlag == 1)
         missile[i]._mirange = j;
 
@@ -1880,7 +1889,7 @@ void MI_Lightball(int i)
             oi = dung_map[tx][ty].dObject - 1;
         else
             oi = ~dung_map[tx][ty].dObject;
-        if ((unsigned char)(object[oi]._otype - 59) < 2) /* OBJ_SHRINEL(59)/OBJ_SHRINER(60) */
+        if (object[oi]._otype == 59 /* OBJ_SHRINEL */ || object[oi]._otype == 60 /* OBJ_SHRINER */)
             missile[i]._mirange = j;
     }
 
@@ -1914,12 +1923,16 @@ void MI_Firewall(int i)
     CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix, missile[i]._miy, 1, 1);
     if (missile[i]._mirange == 0) {
         missile[i]._miDelFlag = 1;
-        AddUnLight(missile[i]._mlid);
+        if ((unsigned char)i)
+            AddUnLight(missile[i]._mlid);
     }
     if (missile[i]._mimfnum != 0 && missile[i]._mirange != 0 && missile[i]._miAnimAdd != -1 && missile[i]._miVar2 < 12) {
-        if (missile[i]._miVar2 == 0)
-            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, ExpLight[0]);
-        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar2]);
+        if (missile[i]._miVar2 == 0) {
+            if ((unsigned char)i)
+                missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 3) + 16);
+        }
+        if ((unsigned char)i)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar2] >> 2) + 16);
         missile[i]._miVar2++;
     }
     PutMissile(i);
@@ -2008,17 +2021,15 @@ void MI_Lightctrl(int i)
     int dam, p, mx, my;
     MissileStruct *miss = &missile[i];
 
-    /* was missing entirely -- confirmed via raw oracle as literally the first instruction
-     * (mirange loaded/decremented/stored before anything else). */
     miss->_mirange--;
 
-    if (miss->_misource != -1) {
+    p = miss->_misource;
+    if (p != -1) {
         if (miss->_micaster == TARGET_MONSTERS) {
-            p = miss->_misource;
-            dam = (ENG_random(2) + ENG_random(plr[p]._pLevel) + 2) << 6;
+            dam = ENG_random(plr[p]._pLevel) + ENG_random(2) + 2;
+            dam <<= 6;
         } else {
-            p = miss->_misource;
-            dam = 2 * (monster[p].mMinDamage + ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1));
+            dam = 2 * (ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1) + monster[p].mMinDamage);
         }
     } else {
         dam = ENG_random(currlevel) + 2 * currlevel;
@@ -2032,36 +2043,28 @@ void MI_Lightctrl(int i)
     my = miss->_miy;
 
     /* PSX bounds against the raw dung_map extent (112) AFTER the position update, with an early
-     * AddUnLight+return -- no PC twin has this gate at all. Confirmed via raw oracle: the check
-     * uses the freshly-updated mx/my (post-GetMissilePos), not the pre-move _mix/_miy. */
+     * AddUnLight+return -- no PC twin has this gate at all. */
     if (mx >= 112 || my >= 112) {
-        AddUnLight(miss->_mlid);
         miss->_miDelFlag = 1;
+        AddUnLight(miss->_mlid);
         return;
     }
 
-    if (miss->_misource == -1) {
-        if ((mx != miss->_misx || my != miss->_misy) && GetMISSILE(mx, my))
-            miss->_mirange = 0;
-    } else if (GetMISSILE(mx, my)) {
+    if ((miss->_misource != -1 || mx != miss->_misx || my != miss->_misy) && GetMISSILE(mx, my))
         miss->_mirange = 0;
-    }
     if (!GetMISSILE(mx, my)) {
         if ((mx != miss->_miVar1 || my != miss->_miVar2) && mx > 0 && my > 0 && mx < 112 && my < 112) {
-            /* PSX-only: if the owning monster's type falls in either of two ranges
-             * (MType->mtype in [0x4C,0x4F] or [0x6B,0x6E]), use MIS_LIGHTNING2(0x17) instead of
-             * MIS_LIGHTNING(8) -- confirmed via raw oracle; only reached when _misource != -1 and
-             * _micaster == TARGET_PLAYERS. No PC twin equivalent for the second range. */
-            int mistype = MIS_LIGHTNING;
-            if (miss->_misource != -1 && miss->_micaster == TARGET_PLAYERS) {
-                unsigned char mt = monster[miss->_misource].MType->mtype;
-                if ((unsigned char)(mt - 0x4C) < 4 || (unsigned char)(mt - 0x6B) < 4)
-                    mistype = 0x17; /* MIS_LIGHTNING2 */
+            /* PSX-only: monster casters of type [0x4C,0x4F] or [0x6B,0x6E] spawn MIS_LIGHTNING2
+             * (0x17) and play the cast SFX on the first tick; everything else MIS_LIGHTNING. */
+            if (miss->_misource != -1 && miss->_micaster == TARGET_PLAYERS
+                && ((monster[miss->_misource].MType->mtype >= 0x4C && monster[miss->_misource].MType->mtype <= 0x4F)
+                    || (monster[miss->_misource].MType->mtype >= 0x6B && monster[miss->_misource].MType->mtype <= 0x6E))) {
+                AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, 0x17 /* MIS_LIGHTNING2 */, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
+                if (miss->_mirange >= 254)
+                    PlaySfxLoc(0x50, miss->_mix, miss->_miy);
+            } else {
+                AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, MIS_LIGHTNING, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
             }
-            AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, mistype, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
-            /* PSX-only: on the very first tick (mirange >= 254) plays a cast SFX -- no PC twin. */
-            if (miss->_mirange >= 254)
-                PlaySfxLoc(0x50, miss->_mix, miss->_miy);
             miss->_miVar1 = miss->_mix;
             miss->_miVar2 = miss->_miy;
         }
@@ -2074,7 +2077,6 @@ void MI_Town(int i)
 {
     int p;
     int ExpLight[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15 };
-    PlayerStruct *player;
 
     if (missile[i]._mirange > 1)
         missile[i]._mirange--;
@@ -2094,7 +2096,7 @@ void MI_Town(int i)
      * match it always calls ClrPlrPath/PutMissile/NetSendCmdParam1(cmd=0x1F, not 34) and returns
      * immediately, skipping the rest of the loop and the mirange/AddUnLight cleanup below. */
     for (p = 0; p < MAX_PLRS; p++) {
-        player = &plr[p];
+        PlayerStruct *player = &plr[p];
         if (player->plractive && player->_px == missile[i]._mix && player->_py == missile[i]._miy && !qtextflag && !PauseMode) {
             if (gbMaxPlayers != 2 || !plr[p ^ 1].plractive || plr[p ^ 1].destAction != 13) {
                 ClrPlrPath(p);
@@ -2125,30 +2127,26 @@ void MI_Flash(int i)
     CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix + 1, miss->_miy + 1, 1, 1);
     if (miss->_mirange == 0) {
         miss->_miDelFlag = 1;
+        restore_r = fadetor;
+        restore_g = fadetog;
+        restore_b = fadetob;
         if (miss->_micaster == TARGET_MONSTERS && miss->_misource != -1)
             plr[miss->_misource]._pInvincible = 0;
     }
 
     /* PSX-only: unlike MI_Flash2's plain snapshot, MI_Flash blends a fade-out gradient into
-     * restore_r/g/b -- `(19 - _miAnimFrame) / 9` (confirmed: raw oracle's multiply-by-0x38E38E39
-     * is the standard unsigned reciprocal for division by 9) scaled by 240 and added to the
+     * restore_r/g/b -- `(19 - _miAnimFrame) / 18` (raw: multiply-by-0x38E38E39, mfhi >> 2) scaled by 240 and added to the
      * current fadetor/fadetog/fadetob, then clamped to 255. Runs unconditionally (both mirange
      * paths reach it). No PC twin has this; reconstructed instruction-by-instruction. */
-    {
-        int d;
-        d = (19 - miss->_miAnimFrame) / 9;
-        restore_r = fadetor + d * 240;
-        d = (19 - miss->_miAnimFrame) / 9;
-        restore_g = fadetog + d * 240;
-        d = (19 - miss->_miAnimFrame) / 9;
-        restore_b = fadetob + d * 240;
-        if (restore_r >= 256)
-            restore_r = 255;
-        if (restore_g >= 256)
-            restore_g = 255;
-        if (restore_b >= 256)
-            restore_b = 255;
-    }
+    restore_r = fadetor + (19 - miss->_miAnimFrame) / 18 * 240;
+    restore_g = fadetog + (19 - miss->_miAnimFrame) / 18 * 240;
+    restore_b = fadetob + (19 - miss->_miAnimFrame) / 18 * 240;
+    if (restore_r >= 256)
+        restore_r = 255;
+    if (restore_g >= 256)
+        restore_g = 255;
+    if (restore_b >= 256)
+        restore_b = 255;
 
     PutMissile(i);
 }
@@ -2180,14 +2178,14 @@ void MI_Firemove(int i)
     }
     if (miss->_mimfnum == 0 && miss->_mirange != 0) {
         if (miss->_miVar2 == 0)
-            miss->_mlid = AddLight(miss->_mix, miss->_miy, ExpLight[0]);
-        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, ExpLight[miss->_miVar2]);
+            miss->_mlid = AddLight(miss->_mix, miss->_miy, (ExpLight[0] >> 1) + 144);
+        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, (ExpLight[miss->_miVar2] >> 1) + 144);
         miss->_miVar2++;
     } else {
         if (miss->_mix != miss->_miVar3 || miss->_miy != miss->_miVar4) {
             miss->_miVar3 = miss->_mix;
             miss->_miVar4 = miss->_miy;
-            ChangeLight(miss->_mlid, miss->_miVar3, miss->_miVar4, 8);
+            ChangeLight(miss->_mlid, miss->_miVar3, miss->_miVar4, 148);
         }
     }
     miss->_mix++;
@@ -2298,32 +2296,38 @@ void MI_Guardian(int i)
 
     if (!(miss->_mirange % 16)) {
         ex = 0;
-        for (j = 0; j < 23 && ex != -1; j++) {
-            for (k = 10; ex != -1 && k >= 0 && (vCrawlTable[j][k] != 0 || vCrawlTable[j][k + 1] != 0); k -= 2) {
-                if (sx1 == vCrawlTable[j][k] && sy1 == vCrawlTable[j][k + 1])
+        for (k = 0; k < 23; k++) {
+            if (ex == -1)
+                break;
+            for (j = 10; j >= 0; j -= 2) {
+                if (ex == -1)
+                    break;
+                if (vCrawlTable[k][j] == 0 && vCrawlTable[k][j + 1] == 0)
+                    break;
+                if (sx1 == vCrawlTable[k][j] && sy1 == vCrawlTable[k][j + 1])
                     continue;
-                sx = miss->_mix + vCrawlTable[j][k];
-                sy = miss->_miy + vCrawlTable[j][k + 1];
+                sx = miss->_mix + vCrawlTable[k][j];
+                sy = miss->_miy + vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx = miss->_mix - vCrawlTable[j][k];
-                sy = miss->_miy - vCrawlTable[j][k + 1];
+                sx = miss->_mix - vCrawlTable[k][j];
+                sy = miss->_miy - vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx = miss->_mix + vCrawlTable[j][k];
-                sy = miss->_miy - vCrawlTable[j][k + 1];
+                sx = miss->_mix + vCrawlTable[k][j];
+                sy = miss->_miy - vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx = miss->_mix - vCrawlTable[j][k];
-                sy = miss->_miy + vCrawlTable[j][k + 1];
+                sx = miss->_mix - vCrawlTable[k][j];
+                sy = miss->_miy + vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx1 = vCrawlTable[j][k];
-                sy1 = vCrawlTable[j][k + 1];
+                sx1 = vCrawlTable[k][j];
+                sy1 = vCrawlTable[k][j + 1];
             }
         }
     }
@@ -2338,7 +2342,7 @@ void MI_Guardian(int i)
     if (miss->_miVar3 > 15) {
         miss->_miVar3 = 15;
     } else if (miss->_miVar3 > 0) {
-        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, miss->_miVar3);
+        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, 148);
     }
 
     if (miss->_mirange == 0) {
@@ -2408,11 +2412,17 @@ void MI_Weapexp(int i)
 
     CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
 
+    /* PSX: ExpLight[] is still built but unused -- fixed radii per element (fire 0x94, lightning 0x244). */
     if (missile[i]._miVar1 == 0) {
-        missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar1]);
-    } else {
-        if (missile[i]._mirange != 0)
-            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar1]);
+        if (missile[i]._miVar2 == 1)
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, 0x94);
+        else
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, 0x244);
+    } else if (missile[i]._mirange != 0) {
+        if (missile[i]._miVar2 == 1)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 0x94);
+        else
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 0x244);
     }
 
     missile[i]._miVar1++;
@@ -2445,19 +2455,29 @@ void MI_Misexp(int i)
     }
 
     if (missile[i]._miVar1 == 0) {
-        if (missile[i]._miAnimType == 0x28)
+        switch (missile[i]._miAnimType) {
+        case 0x28:
             AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 0x240);
-        else if (missile[i]._miAnimType == 0x2A)
+            break;
+        case 0x2A:
             AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 0x1B0);
-        else
-            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 0x90);
+            break;
+        default:
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x90);
+            break;
+        }
     } else {
-        if (missile[i]._miAnimType == 0x28)
+        switch (missile[i]._miAnimType) {
+        case 0x28:
             ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x240);
-        else if (missile[i]._miAnimType == 0x2A)
+            break;
+        case 0x2A:
             ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x1B0);
-        else
+            break;
+        default:
             ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x90);
+            break;
+        }
     }
 
     missile[i]._miVar1++;
@@ -2805,7 +2825,7 @@ void AddStone(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void MI_Rhino(int i)
 {
     int mix, miy;
-    int mix2, miy2;
+    int mix2 = 0, miy2 = 0;
     int omx, omy;
     int monst;
 
@@ -2849,12 +2869,8 @@ void MI_Rhino(int i)
 
     if (PosOkMonst(monst, mix, miy) && (monster[monst]._mAi != 24 /* AI_SNAKE */ || PosOkMonst(monst, mix2, miy2))) {
         dung_map[mix][miy].dMonster = ~monst;
-        monster[monst]._mfutx = mix;
-        monster[monst]._moldx = mix;
-        monster[monst]._mx = mix;
-        monster[monst]._mfuty = miy;
-        monster[monst]._moldy = miy;
-        monster[monst]._my = miy;
+        monster[monst]._mx = monster[monst]._moldx = monster[monst]._mfutx = mix;
+        monster[monst]._my = monster[monst]._moldy = monster[monst]._mfuty = miy;
         /* PSX-only: also carries the missile's sub-tile pixel offset onto the monster -- no PC
          * twin, confirmed via the raw oracle (missile+0x33/0x34 -> monster+0x3A/0x3B). */
         monster[monst]._mxoff = missile[i]._mixoff;
@@ -3250,8 +3266,9 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
 
 unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
 {
-    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
-     * byte-verified given the size (496 insns). PSX confirmed to include hellfire's MIS_HBOLT/
+    /* Byte + SYM matched. The retail SYM's chain of empty nested blocks comes from g++'s implicit
+     * if/else scopes, kept alive by the block-scoped `dir` temp in the knockback call (a v0-only
+     * local, so it gets no record of its own). PSX confirmed to include hellfire's MIS_HBOLT/
      * MT_DIABLO/MC_UNDEAD immunity check (a MC_UNDEAD value of 0 is assumed from the oracle's
      * bare `!= 0` test), and drops devilution's `if (pnum == myplr)` gate on the hitpoint
      * deduction (unconditional here). The `m >= 4` checks (not `m > MAX_PLRS - 1`) match the
@@ -3280,13 +3297,15 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
 
     hit = ENG_random(100);
     if (missiledata[t].mType == 0) {
-        hper = plr[pnum]._pLevel - (monster[m].mArmorClass - 50) - plr[pnum]._pIEnAc + plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit - ((dist * dist) >> 1);
+        hper = plr[pnum]._pLevel + 50 - monster[m].mArmorClass - plr[pnum]._pIEnAc;
+        hper += plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit;
+        hper -= ((dist * dist) >> 1);
         if (plr[pnum]._pClass == PC_ROGUE)
             hper += 20;
-        else if (plr[pnum]._pClass == PC_WARRIOR)
+        if (plr[pnum]._pClass == PC_WARRIOR)
             hper += 10;
     } else {
-        hper = plr[pnum]._pMagic - (monster[m].mLevel << 1) + 50 - dist;
+        hper = plr[pnum]._pMagic + 50 - (monster[m].mLevel << 1) - dist;
         if (plr[pnum]._pClass == PC_SORCERER)
             hper += 20;
     }
@@ -3298,14 +3317,14 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
         hit = 0;
     if (CheckMonsterHit(m, &ret))
         return ret;
-
-    if (hit < hper) {
+    else if (hit < hper) {
         if (t == MIS_BONESPIRIT)
             dam = (monster[m]._mhitpoints / 3) >> 6;
         else
-            dam = mindam + ENG_random(maxdam - mindam + 1);
+            dam = ENG_random(maxdam - mindam + 1) + mindam;
         if (missiledata[t].mType == 0) {
-            dam = plr[pnum]._pIBonusDamMod + dam * plr[pnum]._pIBonusDam / 100 + dam;
+            dam += dam * plr[pnum]._pIBonusDam / 100;
+            dam += plr[pnum]._pIBonusDamMod;
             if (plr[pnum]._pClass == PC_ROGUE)
                 dam += plr[pnum]._pDamageMod;
             else
@@ -3334,8 +3353,10 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
                     M_StartHit(m, pnum, dam);
                 monster[m]._mmode = MM_STONE;
             } else {
-                if (missiledata[t].mType == 0 && (plr[pnum]._pIFlags & 0x800 /* ISPL_KNOCKBACK */))
-                    M_GetKnockback(m, GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my));
+                if (missiledata[t].mType == 0 && (plr[pnum]._pIFlags & 0x800 /* ISPL_KNOCKBACK */)) {
+                    int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my);
+                    M_GetKnockback(m, dir);
+                }
                 if (m >= 4)
                     M_StartHit(m, pnum, dam);
             }
@@ -3347,13 +3368,15 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
             monster[m]._lasty = plr[pnum]._py;
         }
         return 1;
-    }
-    return 0;
+    } else
+        return 1;
 }
 
 unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
 {
-    int hit, hper, dam, mor, mir;
+    int hit, hper;
+    long dam;
+    int mor, mir;
     unsigned char resist, ret;
 
     resist = 0;
@@ -3373,7 +3396,7 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
      * 0x1=LIGHTNING(mir==3), 0x2=MAGIC(mir==1), 0x4=FIRE(mir==2) -- NOT this TU's
      * IMMUNE_MAGIC/RESIST_MAGIC #defines (those are for a different bit layout). */
     if ((mor & 0x8 && mir == MISR_LIGHTNING) || (mor & 0x10 && mir == MISR_MAGIC) || (mor & 0x20 && mir == MISR_FIRE))
-        return 0;
+        return 1;
 
     if ((mor & 0x1 && mir == MISR_LIGHTNING) || (mor & 0x2 && mir == MISR_MAGIC) || (mor & 0x4 && mir == MISR_FIRE))
         resist = 1;
@@ -3388,7 +3411,7 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
         return ret;
 
     if (hit < hper || monster[m]._mmode == MM_STONE) {
-        dam = mindam + ENG_random(maxdam - mindam + 1);
+        dam = ENG_random(maxdam - mindam + 1) + mindam;
         if (!shift)
             dam <<= 6;
         if (resist)
@@ -3414,9 +3437,8 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
                     M_StartHit(m, -1, dam);
             }
         }
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx, int my, unsigned char nodel, BOOL HurtPlr)
@@ -3530,23 +3552,16 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
 
 void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
-     * byte-verified. PSX adds a co-op safety check with no PC twin: when `mienemy==0`
-     * (TARGET_MONSTERS) it also rejects candidate tiles that `ChkPlrOffsets` (PLAYER.CPP) flags
-     * as overlapping the OTHER player's (`id^1`) screen/view, using `plr[id^1].WorldX/WorldY`.
-     * The `plr+0x1A05` gate field is not yet named in this TU's struct -- read via raw offset. */
-    int pn, r1, r2, tries, ok;
-    int other, tx, ty, oi;
+    /* PSX adds a co-op check with no PC twin: a player's phase (mienemy == 0) re-rolls the
+     * offset while ChkPlrOffsets says the landing tile would leave the OTHER player's (id^1)
+     * screen. The plractive / +0x1A05 gate reads plr[0] literally in the raw. */
+    int r1, r2;
+    unsigned char dirok;
+    int nTries;
 
-    tries = 0;
+    nTries = 1;
     for (;;) {
-        /* retail recomputes ok=1 and other=id^1 only once per OUTER (tile) attempt; the
-         * co-op-position INNER retry (redo r1/r2 only, no tries++/500 check) is a distinct,
-         * uncounted loop reached only when the gate below actually rejects a candidate --
-         * confirmed via raw oracle: two separate loop-back targets (.L8013D9A4 outer vs
-         * .L8013D9D4 inner). */
-        ok = 1;
-        other = id ^ 1;
+        dirok = 1;
         do {
             r1 = ENG_random(3) + 4;
             r2 = ENG_random(3) + 4;
@@ -3554,29 +3569,26 @@ void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mien
                 r1 = -r1;
             if (ENG_random(2) == 1)
                 r2 = -r2;
-            if (mienemy == 0 && plr[other].plractive && *((unsigned char *)&plr[other] + 0x1A05))
-                ok = ChkPlrOffsets((sx + r1) << 3, (sy + r2) << 3, plr[other].WorldX, plr[other].WorldY);
-        } while (!ok);
+            if (mienemy == 0 && plr[0].plractive && *((unsigned char *)&plr[0] + 0x1A05))
+                dirok = ChkPlrOffsets((sx + r1) << 3, (sy + r2) << 3, plr[id ^ 1].WorldX, plr[id ^ 1].WorldY);
+        } while (!dirok);
 
-        tx = sx + r1;
-        ty = sy + r2;
-        if (GetSOLID(tx, ty) || dung_map[tx][ty].dObject != 0 || dung_map[tx][ty].dMonster != 0) {
-            if (++tries > 500) {
+        if (GetSOLID(sx + r1, sy + r2) || dung_map[sx + r1][sy + r2].dObject || dung_map[sx + r1][sy + r2].dMonster) {
+            if (++nTries > 500) {
                 r1 = 0;
                 r2 = 0;
                 break;
             }
-            continue;
-        }
-        break;
+        } else
+            break;
     }
 
     missile[mi]._mirange = 2;
     missile[mi]._miVar1 = 0;
 
     if (setlevel && setlvlnum == 5) {
-        oi = dung_map[dx][dy].dObject - 1;
-        if ((unsigned char)(object[oi]._otype - 0x54) < 2 /* OBJ_MCIRCLE1/2 */) {
+        int oi = dung_map[dx][dy].dObject - 1;
+        if (object[oi]._otype == 0x54 /* OBJ_MCIRCLE1 */ || object[oi]._otype == 0x55 /* OBJ_MCIRCLE2 */) {
             missile[mi]._mix = dx;
             missile[mi]._miy = dy;
             if (!PosOkPlayer(myplr, dx, dy))
@@ -3596,16 +3608,16 @@ void ProcessMissiles(void)
      * `MissileStruct *miss` and a `short *pmissileactive` pointer-walk reused across the
      * dFlags/dMissile-clear loop AND the mProc-dispatch loop. */
     short i, j;
-    unsigned short mi;
+    short mi;
     struct MissileStruct *miss;
-    unsigned short *pmissileactive;
+    short *pmissileactive;
 
     pmissileactive = missileactive;
     for (i = 0; i < nummissiles; i++) {
-        miss = &missile[*pmissileactive];
+        mi = *pmissileactive++;
+        miss = &missile[mi];
         dung_map[miss->_mix][miss->_miy].dFlags &= ~0x40; /* BFLAG_MISSILE -- oracle imm is -0x41 == ~0x40, not ~0x41 */
         dung_map[miss->_mix][miss->_miy].dMissile = 0;
-        pmissileactive++;
     }
 
     /* PSX-only: zeroes the whole dMissArray[32][4] table every frame -- no PC twin. Confirmed via
@@ -3626,17 +3638,15 @@ void ProcessMissiles(void)
         }
     }
 
+    pmissileactive = missileactive;
     MissilePreFlag = 0;
     ManashieldFlag = 0;
     ManashieldFlag2 = 0;
-
-    pmissileactive = missileactive;
     {
-        struct MissileData *mdata = missiledata;
         for (i = 0; i < nummissiles; i++) {
-            mi = *pmissileactive;
-            miss = missile + (short)mi;
-            ((void (*)(int))mdata[miss->_mitype].mProc)((short)mi);
+            mi = *pmissileactive++;
+            miss = &missile[mi];
+            ((void (*)(int))(&missiledata[miss->_mitype])->mProc)(mi);
             if (!(miss->_miAnimFlags & 0x2 /* MFLAG_LOCK_ANIMATION */)) {
                 miss->_miAnimCnt++;
                 if (miss->_miAnimCnt >= miss->_miAnimDelay) {
@@ -3648,7 +3658,6 @@ void ProcessMissiles(void)
                         miss->_miAnimFrame = miss->_miAnimLen;
                 }
             }
-            pmissileactive++;
         }
     }
 
@@ -3672,17 +3681,17 @@ void ProcessMissiles(void)
 
 void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* Structurally reconstructed from the raw oracle -- NOT yet byte-verified (0x480 = 288 insns).
-     * PSX-specific bound (112, confirmed via raw sltiu 0x6F) and the established
-     * GetSOLID|GetMISSILE|IsDplayer|dObject|dMissile OR-chain idiom. The trailing
-     * `myplr = id;` write is a real, surprising finding -- confirmed via a direct `sw` to the
-     * myplr global at the very end, UNCONDITIONALLY (not gated by `id == myplr` at all, unlike
-     * devilution/hellfire's read-only comparison there). */
-    int i, pn, k, l, j, tx, ty, mx;
+    /* PSX: 112-wide bound (dung_map extent), dMonster joins the occupancy OR-chain, and the
+     * CMD_ACTIVATEPORTAL send is made with myplr temporarily switched to the caster (omp saves /
+     * restores it) -- both arms send currlevel; only the trailing bSetLvl flag differs. */
+    int i, k, l, j, tx, ty, mx;
     int CrawlNum[6];
+    int omp;
 
     memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
+    tx = 0;
+    ty = 0;
     if (currlevel != 0) {
         missile[mi]._miDelFlag = 1;
         for (k = 0; k < 6; k++) {
@@ -3692,7 +3701,7 @@ void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
                 tx = dx + CrawlTable[j];
                 ty = dy + CrawlTable[j + 1];
                 if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
-                    if ((GetSOLID(tx, ty) | dung_map[tx][ty].dObject | GetMISSILE(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMissile) == 0 && !CheckIfTrig(tx, ty)) {
+                    if ((GetSOLID(tx, ty) | dung_map[tx][ty].dObject | GetMISSILE(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMissile | dung_map[tx][ty].dMonster) == 0 && !CheckIfTrig(tx, ty)) {
                         missile[mi]._mix = tx;
                         missile[mi]._miy = ty;
                         missile[mi]._misx = tx;
@@ -3727,14 +3736,15 @@ void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
 
     PutMissile(mi);
 
+    omp = myplr;
+    myplr = id;
     if (!missile[mi]._miDelFlag && currlevel != 0) {
         if (!setlevel)
             NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, currlevel, leveltype, 0);
         else
-            NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, setlvlnum, leveltype, 1);
+            NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, currlevel, leveltype, 1);
     }
-
-    myplr = id;
+    myplr = omp;
 }
 
 void MI_Wave(int i)
@@ -4027,10 +4037,10 @@ void AddAcid(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
      * _mimfnum unset. */
     GetMissileVel(mi, sx, sy, dx, dy, 16);
     SetMissDir(mi, GetDirection8(sx, sy, dx, dy));
+    missile[mi]._mirange = 5 * (monster[id]._mint + 1) + 15;
     missile[mi]._mlid = -1;
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
-    missile[mi]._mirange = 15 + 5 * (monster[id]._mint + 1);
     PutMissile(mi);
 }
 
@@ -4191,8 +4201,11 @@ void AddArrow(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl)
 {
     int mi;
+    /* PSX-only: per-direction sub-tile offsets (x, y pairs) for a player-cast missile's start
+     * position -- rodata template D_8011A080. */
+    int xyoffs[16] = { 0, 0, 0, 6, 0, 6, 0, 0, 12, 0, 0, 4, 0, 12, 0, 12 };
 
-    if (nummissiles >= MAXMISSILES - 1)
+    if (nummissiles >= MAXMISSILES)
         return -1;
 
     mi = missileavail[0];
@@ -4205,36 +4218,41 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
     missile[mi]._misource = id;
     missile[mi].PrintPtr = MissPrintRoutines[mitype];
     missile[mi]._miAnimType = missiledata[mitype].mFileNum;
-    missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
     missile[mi]._mispllvl = spllvl;
     missile[mi]._mimfnum = midir;
+    missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
 
-    if (missile[mi]._miAnimType != 0xFF && misfiledata[missile[mi]._miAnimType].mAnimFAmt >= 8)
-        SetMissDir(mi, midir);
-    else
+    if (missile[mi]._miAnimType == 0xFF || misfiledata[missile[mi]._miAnimType].mAnimFAmt < 8)
         SetMissDir(mi, 0);
-
-    /* PSX-only positional-offset block decoded from the raw: gated on `micaster != 0 && mitype !=
-     * MIS_APOCA(0x2C) && mitype != MIS_FLAMEC(0x31)`, computing _mitxoff/_mityoff from
-     * plr[id] fields at +0x3C/+0x3D/+0x42 (role not fully attributed -- open item) instead of the
-     * flat 0 devilution/hellfire always use. Both arms currently write 0 pending that attribution,
-     * so this fn is NOT byte-verified for that branch; everything else below is. */
-    missile[mi]._mitxoff = 0;
-    missile[mi]._mityoff = 0;
+    else
+        SetMissDir(mi, midir);
 
     missile[mi]._mix = sx;
     missile[mi]._miy = sy;
-    missile[mi]._mixoff = 0;
-    missile[mi]._miyoff = 0;
     missile[mi]._misx = sx;
     missile[mi]._misy = sy;
+
+    /* PSX-only: a player's missile starts half a direction-offset away from the caster's current
+     * sub-tile offset (apocalypse and flame-wave excepted). */
+    if (micaster == TARGET_MONSTERS && mitype != 0x2C /* MIS_APOCA */ && mitype != 0x31 /* MIS_FLAMEC */) {
+        missile[mi]._miVar6 = (plr[id]._pxoff + xyoffs[plr[id]._pdir * 2]) >> 1;
+        missile[mi]._miVar7 = (plr[id]._pyoff + xyoffs[plr[id]._pdir * 2 + 1]) >> 1;
+    } else {
+        missile[mi]._miVar6 = 0;
+        missile[mi]._miVar7 = 0;
+    }
+
+    missile[mi]._mitxoff = 0;
+    missile[mi]._mityoff = 0;
+    missile[mi]._mixoff = 0;
+    missile[mi]._miyoff = 0;
     missile[mi]._miDelFlag = 0;
     missile[mi]._miAnimAdd = 1;
     missile[mi]._miLightFlag = 0;
     missile[mi]._miPreFlag = 0;
+    missile[mi]._mlid = -1;
     missile[mi]._miHitFlag = 0;
     missile[mi]._midist = 0;
-    missile[mi]._mlid = -1;
     missile[mi]._mirnd = 0;
     missile[mi]._midam = v3;
 
@@ -4245,3 +4263,9 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
 
     return mi;
 }
+
+/* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each
+ * conflict hunk, kept for reference. Winner = PASS (bytes+SYM) first, then SLD line agreement. ---- */
+#if 0 /* MERGE ALT AddLightball: master side -- lost because: both PASS; branch SLD span 17 == retail 17, master 15 */
+    /* PSX-only addition: missile slots with bit 1 set receive a light source here. */
+#endif

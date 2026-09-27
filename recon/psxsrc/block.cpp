@@ -1042,18 +1042,27 @@ void CBlocks::GetGCol(int x, int y, unsigned char *Rgb, RGBData *Data)
         x = 0;
     if (y < 0)
         y = 0;
-    rgb_leftr = ((y * Data->rgb_ity1.r) >> 16) + Data->rgbb.r1;
-    rgb_rightr = ((y * Data->rgb_ity2.r) >> 16) + Data->rgbb.r2;
-    rgb_leftg = ((y * Data->rgb_ity1.g) >> 16) + Data->rgbb.g1;
-    rgb_rightg = ((y * Data->rgb_ity2.g) >> 16) + Data->rgbb.g2;
-    rgb_leftb = ((y * Data->rgb_ity1.b) >> 16) + Data->rgbb.b1;
-    rgb_rightb = ((y * Data->rgb_ity2.b) >> 16) + Data->rgbb.b2;
+    rgb_leftr = (y * Data->rgb_ity1.r) >> 16;
+    rgb_leftr += Data->rgbb.r1;
+    rgb_rightr = (y * Data->rgb_ity2.r) >> 16;
+    rgb_rightr += Data->rgbb.r2;
+    rgb_leftg = (y * Data->rgb_ity1.g) >> 16;
+    rgb_leftg += Data->rgbb.g1;
+    rgb_rightg = (y * Data->rgb_ity2.g) >> 16;
+    rgb_rightg += Data->rgbb.g2;
+    rgb_leftb = (y * Data->rgb_ity1.b) >> 16;
+    rgb_leftb += Data->rgbb.b1;
+    rgb_rightb = (y * Data->rgb_ity2.b) >> 16;
+    rgb_rightb += Data->rgbb.b2;
     rgb_itxr = (rgb_rightr - rgb_leftr) << 10;
-    rgb_cordr = ((x * rgb_itxr) >> 16) + rgb_leftr;
     rgb_itxg = (rgb_rightg - rgb_leftg) << 10;
-    rgb_cordg = ((x * rgb_itxg) >> 16) + rgb_leftg;
     rgb_itxb = (rgb_rightb - rgb_leftb) << 10;
-    rgb_cordb = ((x * rgb_itxb) >> 16) + rgb_leftb;
+    rgb_cordr = (x * rgb_itxr) >> 16;
+    rgb_cordr += rgb_leftr;
+    rgb_cordg = (x * rgb_itxg) >> 16;
+    rgb_cordg += rgb_leftg;
+    rgb_cordb = (x * rgb_itxb) >> 16;
+    rgb_cordb += rgb_leftb;
     Rgb[0] = rgb_cordr;
     Rgb[1] = rgb_cordg;
     Rgb[2] = rgb_cordb;
@@ -1263,22 +1272,20 @@ void CBlocks::PrintDead(int x, int y)
             int blockb;
 
             Creature = FindCreature(Mg);
-            dx = InfoList->Items[f].uDStr.x;
-            dy = InfoList->Items[f].uDStr.y;
+            dx = InfoList->Items[f].uDStr.x + 16;
+            dy = InfoList->Items[f].uDStr.y + 16;
             Frame = MonstTexDat->GetNumOfFrames(Creature, 4) - 1;
-            Sx = Cx + WorldToScrX(dx * 20, dy * 20) - Wx;
-            Sy = Cy + WorldToScrY(dx * 20, dy * 20) - Wy;
+            Sx = Cx + WorldToScrX((dx - 16) * 20, (dy - 16) * 20) - Wx;
+            Sy = Cy + WorldToScrY((dx - 16) * 20, (dy - 16) * 20) - Wy;
             GetOtPos(Sy);
             Ft4 = MonstTexDat->PrintMonster(Creature, 4, 0, Frame, Sx, Sy, 4);
-            int hx = dx + 16;   /* record-less carriers across the transfile if: keep dx/dy block-local (retail s2/s3) */
-            int hy = dy + 16;
             transfile = MyMonst->MData->TransFile;
             if (transfile) {
                 FRAME_HDR *Fr = ObjTexDat->GetFr(TransPals[transfile * 2 + 1]);
                 ObjTexDat->SetPal(Fr, Ft4);
             }
-            bx = hx / 2 - 16;
-            by = hy / 2 - 16;
+            bx = dx / 2 - 16;
+            by = dy / 2 - 16;
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];

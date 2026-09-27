@@ -8,7 +8,7 @@ import os, re, sys, subprocess, struct
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MIPS = Path(r'C:/Tools/mips-ps1/mips/bin')
-OBJD = str(MIPS / 'mipsel-none-elf-objdump.exe')
+OBJD = os.environ.get('DIAB_OBJDUMP', str(MIPS / 'mipsel-none-elf-objdump.exe'))
 
 cpp = ROOT / sys.argv[1]
 funcs = sys.argv[2].split(',')

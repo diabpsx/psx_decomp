@@ -11,9 +11,9 @@
 #include "psyq.h"
 
 /* ---------------------------------------------------------------- types (SYM / libcd.h) */
-typedef struct { u_char minute, second, sector, track; } CdlLOC;   /* sizeof 4 */
+typedef struct CdlLOC { u_char minute, second, sector, track; } CdlLOC;   /* sizeof 4 */
 typedef struct CdlFILE { CdlLOC pos; u_int size; char name[16]; } CdlFILE;  /* sizeof 24 */
-typedef struct {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
+typedef struct strheader {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     u_short id, type, secCount, nSectors;
     u_int   frameCount, frameSize;
     short width, height;
@@ -117,7 +117,7 @@ void CD_GetCdlFILE(const char *name, CdlFILE *p);   /* mangled CD_GetCdlFILE__FP
 int ReloadGP(void);
 void SetGP(int gp);
 void DBG_Error(int code, const char *file, int line);
-void DBG_Halt(int code);
+void DBG_Halt(void);
 void EnterCriticalSection(void);
 void ExitCriticalSection(void);
 int printf(const char *fmt, ...);
@@ -175,9 +175,9 @@ static volatile int stream_chunksize;   /* ISR-shared (CdReadyCallback) */
 static unsigned char *volatile stream_bufh;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_bufsize;   /* ISR-shared (CdReadyCallback) */
 static unsigned char *volatile stream_buf;   /* ISR-shared (CdReadyCallback) */
-static int stream_chunks_borrowed;
+static volatile int stream_chunks_borrowed;
 static volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
-static int stream_out;
+static volatile int stream_out;
 static volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
 static volatile int _discard_count;   /* USER RULING (this session): volatile allowed for exactly this
@@ -185,29 +185,26 @@ static volatile int _discard_count;   /* USER RULING (this session): volatile al
  * never touches them -- NOT a general policy widening, this pair only. */
 static volatile int _get_count;   /* see _discard_count ruling comment above */
 static volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
-static volatile int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
+static int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
 static void *volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
 static volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
 static volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
-static volatile int time_in_frames;   /* ISR-shared (CdReadyCallback) */
+static int time_in_frames;   /* written by the main loop (VID_GetTick), read by the handler */
 static volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_last_sector;   /* ISR-shared (CdReadyCallback) */
-static volatile int D_8011C74C;   /* idx: chunk index of the sector about to be read */
-static volatile int D_8011C754;   /* sec: CdPosToInt() result of the drive's actual position */
-static volatile CdlLOC D_80121C98;   /* subcode: scratch CdlLOC for CdGetSector/CdPosToInt; ISR-shared (CdReadyCallback) */
 static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movie filename buffer;
                                       * LoPlayFMVOverLay strcpy's "DIABEND*.MOV" into it before queuing
                                       * a play_mdec_stream/dequeue_animation request. Gap to the next
                                       * undefined_syms_auto_fmv.txt symbol (D_80121D08) is exactly 0x20. */
-static int stream_opened;
-static int stream_startsec;
-static int stream_got_chunks;
-static int stream_last_chunk;
+static volatile int stream_opened;
+static volatile int stream_startsec;
+static volatile int stream_got_chunks;
+static volatile int stream_last_chunk;
 static int sector_dma_in;
 static int sector_dma;
 
@@ -217,7 +214,7 @@ static int mbuf;
 static void *vlctab;
 static void *vlcbuf[2];
 static RECT slice;
-static int slices_to_do;
+static volatile int slices_to_do;
 static int slnum;
 static int slice_size;
 static int slice_inc;
@@ -260,11 +257,11 @@ static int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a p
  * "mdec_waiting_tail_unused" -- renamed: confirmed via SYM ($8011b5b4 EXT INT last_stream_frame) and
  * cross-refs in dequeue_animation.s + decode_mdec_stream.s (both use this exact bss slot). */
 static int streampos;
-static int user_start;
+BOOL user_start;
 static void *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
 static void *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
 static void *vlc_tab;      /* Tmalloc'd MDEC VLC table buffer, ditto */
-unsigned char imgbuf[0x15][4];   /* set_mdec_img_buffer: 21 x (u32 ptr) */
+unsigned short *imgbuf[21];   /* set_mdec_img_buffer: 21 MDEC slice buffers */
 
 /* @0x80155E1C FMV.CPP:295 */
 extern "C" void _cd_seek(int sec)
@@ -289,13 +286,7 @@ extern "C" void init_cdstream(int chunksize, unsigned char *buf, int bufsize)
 /* @0x80155E7C FMV.CPP:328 */
 extern "C" void flush_cdstream(void)
 {
-    stream_chunks_borrowed = 0;
-    stream_out = stream_chunks_borrowed;
-    stream_in = stream_out;
-    stream_chunks_total = stream_in;
-    stream_chunks_in = stream_chunks_total;
-    _discard_count = stream_chunks_in;
-    _get_count = _discard_count;
+    _get_count = _discard_count = stream_chunks_in = stream_chunks_total = stream_out = stream_in = stream_chunks_borrowed = 0;
 }
 
 /* @0x80155ED0 FMV.CPP:366 */
@@ -318,48 +309,57 @@ extern "C" void kill_stream_handlers(void)
 /* @0x80155F30 FMV.CPP:384 */
 extern "C" void stream_cdready_handler(unsigned char status, unsigned char *result)
 {
-    int OldGp = ReloadGP();
+    static int idx;   /* retail SYM: function statics idx/i/sec/subcode (sbss/bss @0x8011C74C..) */
+    static int i;
+    static int sec;
+    static CdlLOC subcode[3];
+    unsigned long OldGp = ReloadGP();
 
     if (stream_ending == 0)
         first_handler_event = 1;
     last_handler_event = time_in_frames;
-    D_8011C74C = stream_in * stream_chunksize + (stream_subsec % stream_chunksize);
-    if (cdstream_resetting == 0 && stream_open != 0) {
-        if ((status & 0xFF) != 1) {
-            cdstream_resetting = 1;
+    idx = stream_in * stream_chunksize + (stream_subsec % stream_chunksize);
+    if (cdstream_resetting == 0)
+    if (stream_open != 0) {
+        if (status != 1) {
             cdstream_resetsec = stream_secnum - 1;
-        } else if (stream_ending != 0) {
+            cdstream_resetting = 1;
+            SetGP(OldGp);
+            return;
+        }
+        if (stream_ending != 0) {
             kill_stream_handlers();
             first_handler_event = 0;
             stream_ending = 0;
             stream_open = 0;
-        } else if (stream_stalled == 0) {
-            CdGetSector(&D_80121C98, 3);
-            D_8011C754 = CdPosToInt(&D_80121C98);
-            if (D_8011C754 != stream_secnum) {
+            SetGP(OldGp);
+            return;
+        }
+        if (stream_stalled == 0) {
+            CdGetSector(subcode, 3);
+            sec = CdPosToInt(subcode);
+            if (sec != stream_secnum) {
                 cdstream_resetting = 1;
                 cdstream_resetsec = stream_secnum;
-            } else {
-                CdGetSector(stream_bufh + (D_8011C74C << 5), 8);
-                CdGetSector(stream_buf + (D_8011C74C * 0x7E0), 0x1F8);
-                stream_secnum += 1;
-                stream_subsec += 1;
-                if (stream_subsec == stream_chunksize) {
-                    stream_subsec = 0;
-                    stream_chunks_in += 1;
-                    stream_chunks_total += 1;
-                    stream_in = (stream_in + 1) % stream_bufsize;
-                    if (stream_chunks_in == stream_bufsize)
-                        stream_stalled = 1;
-                }
-                if (stream_secnum == stream_last_sector) {
-                    /* NB: retail passes the saved GP value (not a real reason code) to DBG_Halt here --
-                     * a1/a0 register reuse artifact at the branch's shared delay slot, kept literally. */
-                    DBG_Halt(OldGp);
-                    kill_stream_handlers();
-                    stream_ending = 0;
-                    stream_open = 0;
-                }
+                return;
+            }
+            CdGetSector(stream_bufh + (idx << 5), 8);
+            CdGetSector(stream_buf + (idx * 0x7E0), 0x1F8);
+            stream_secnum++;
+            stream_subsec += 1;
+            if (stream_subsec == stream_chunksize) {
+                stream_subsec = 0;
+                stream_chunks_in++;
+                stream_chunks_total++;
+                stream_in = (stream_in + 1) % stream_bufsize;
+                if (stream_chunks_in == stream_bufsize)
+                    stream_stalled = 1;
+            }
+            if (stream_secnum == stream_last_sector) {
+                DBG_Halt();
+                kill_stream_handlers();
+                stream_ending = 0;
+                stream_open = 0;
             }
         }
     }
@@ -401,32 +401,29 @@ extern "C" void cdstream_service(void)
         install_stream_handlers();
         cdstream_resetsec = stream_secnum;
         reset_cdstream();
-        {
-            int t = time_in_frames;
-            first_handler_event = 0;
-            last_handler_event = t;
-        }
-        stream_opened = time_in_frames;
+        first_handler_event = 0;
+        stream_opened = last_handler_event = time_in_frames;
     }
 }
 
 /* @0x801562B0 FMV.CPP:581 */
 extern "C" int cdstream_get_chunk(unsigned char **data, StHEADER **h)
 {
-    if ((stream_chunks_in - stream_chunks_borrowed) < 0)
+    if (stream_chunks_in - stream_chunks_borrowed < 0)
         printf("underrun in get_chunk\n");
     if (stream_chunks_in != stream_chunks_borrowed) {
-        *data = stream_buf + (stream_out * stream_chunksize * 0x7E0);
-        *h = (StHEADER *)(stream_bufh + ((stream_out * stream_chunksize) << 5));
+        *data = stream_buf + stream_out * stream_chunksize * 0x7E0;
+        *h = (StHEADER *)(stream_bufh + stream_out * stream_chunksize * 32);
+        _get_count++;
         stream_out = (stream_out + 1) % stream_bufsize;
-        stream_chunks_borrowed += 1;
-        stream_got_chunks += 1;
-        _get_count += 1;
+        stream_chunks_borrowed++;
+        stream_got_chunks++;
         return 1;
+    } else {
+        *data = 0;
+        *h = 0;
+        return 0;
     }
-    *data = 0;
-    *h = 0;
-    return 0;
 }
 
 /* @0x801563C8 FMV.CPP:616 */
@@ -438,21 +435,16 @@ extern "C" int cdstream_is_last_chunk(void)
 /* @0x801563E0 FMV.CPP:628 */
 extern "C" void cdstream_discard_chunk(void)
 {
-    int underrun;
-
     EnterCriticalSection();
-    stream_chunks_in -= 1;
-    stream_chunks_borrowed -= 1;
+    stream_chunks_in--;
+    stream_chunks_borrowed--;
     ExitCriticalSection();
-    _discard_count += 1;
-    if (_get_count < _discard_count)
+    _discard_count++;
+    if (_discard_count > _get_count)
         printf("discarded more than got\n");
-    if (stream_chunks_in < stream_chunks_borrowed)
+    if (stream_chunks_borrowed > stream_chunks_in)
         printf("overdraught ran out\n");
-    underrun = 0;
     if (stream_chunks_in < 0 || stream_chunks_borrowed < 0)
-        underrun = 1;
-    if (underrun != 0)
         printf("underrun in discard (in=%d borrowed=%d)\n", stream_chunks_in, stream_chunks_borrowed);
     if (stream_stalled != 0) {
         _cd_seek(stream_secnum);
@@ -501,8 +493,8 @@ extern "C" void wait_cdstream(void)
 /* @0x801565F8 FMV.CPP:718 */
 extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
 {
-    CdlFILE RetFile;
     int len;
+    CdlFILE RetFile;
 
     if (fileexists(fname) == 0)
         DBG_Error(0, "psxsrc/FMV.CPP", 726);
@@ -540,44 +532,38 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
 /* @0x80156720 FMV.CPP:791 */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
-    /* Raw oracle keeps TWO separate induction registers through the loop: $a1 (the trip counter,
-     * compared `slti $a1,0x15`) AND $a2 (a running byte-length accumulator, `addiu $a2,0x1900` each
-     * iter, returned as-is via `addu $v0,$a2,zero` -- no final multiply/constant-fold at the end).
-     * A `len` local accumulated the same way here (`len += 0x1900;` each iter) still folds to the
-     * `lui/ori` literal-constant form (GCC 2.7.2's IV final-value-replacement collapses an
-     * unused-inside-the-loop linear accumulator into count*step) -- the compiler can't be talked out
-     * of it from C alone since len is never read before the loop exits; same 7-diff result either way.
-     * Falsified as a source-level lever; would need a per-TU compiler-flag change, which is out of
-     * scope (no compiler-source/flag changes rule). Left in the simpler literal-multiply form. */
-    unsigned long *dst = (unsigned long *)imgbuf;
-    int count = 0;
+    int i;
+    int tsz;
 
-    do {
-        dst[count] = (unsigned long)p;
+    tsz = 0;
+    for (i = 0; i < 21; i++) {
+        imgbuf[i] = (unsigned short *)p;
         p += 0x1900;
-        count++;
-    } while (count < 0x15);
-    return 0x15 * 0x1900;
+        tsz += 0x1900;
+    }
+    return tsz;
 }
 
 /* @0x80156754 FMV.CPP:816 */
 extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int h)
 {
-    int rem;
-
     while (slices_to_do != 0) {
         /* spin */
     }
     func_8013B3B0(data, vlcbuf[vbuf], vlctab);
     func_8013AD94(data);
-    slice.x = (short)x;
-    slice.y = (short)y;
-    slice.h = (short)h;
-    slices_to_do = w / slice.w + ((w % slice.w) > 0);
-    slnum = slices_to_do;
-    rem = h & 0xF;
-    slice_size = (slice.w * (rem == 0 ? h : h + 0x10 - rem)) >> 1;
-    slice_inc = (w & 0xF) ? (w & 0xF) : 0x10;
+    slnum = slices_to_do = w / slice.w + ((w % slice.w) > 0);
+    slice.x = x;
+    slice.y = y;
+    slice.h = h;
+    if (h & 0xF)
+        slice_size = (slice.w * (slice.h + (0x10 - (h & 0xF)))) >> 1;
+    else
+        slice_size = (slice.w * slice.h) >> 1;
+    if (w & 0xF)
+        slice_inc = w & 0xF;
+    else
+        slice_inc = 0x10;
     func_8013ADA0(vlcbuf[vbuf], 2);
     func_8013AE1C(MAP_BUF_JTAB[slices_to_do], slice_size);
     vbuf ^= 1;
@@ -586,7 +572,7 @@ extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int 
 /* @0x801568B0 FMV.CPP:860 */
 extern "C" void DCT_out_handler(void)
 {
-    int OldGp = ReloadGP();
+    unsigned long OldGp = ReloadGP();
 
     LoadImage(&slice, (u_long *)MAP_BUF_JTAB[slices_to_do]);
     slice.x += slice_inc;
@@ -660,85 +646,88 @@ static SVECTOR tmdc_pol_offs[2][10][10];
 #define setSemiTrans_(p, abe) \
 	((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
 
-/* WIP -- NOT byte-verified yet (deep GTE/MDEC polygon-tiler internals, no PC twin to cross-check
- * against). Faithful transcription of the m2c draft (skel/PSXSRC/FMV.CPP) with M2C_FIELD resolved to
- * POLY_FT4/RECT members; next angle if it doesn't match on the first verify_asm pass: pull the raw
- * oracle (asm/nonmatchings/fmv/split_poly_area.s, 0x3E8 bytes) and diff block-by-block.
- * @0x801569EC FMV.CPP:925 */
-/* Field mapping confirmed byte-offset-by-byte against POLY_FT4 (tag=0,r0=4,g0=5,b0=6,code=7,x0=8,y0=10,
- * u0=12,v0=13,clut=14,x1=16,y1=18,u1=20,v1=21,tpage=22,x2=24,y2=26,u2=28,v2=29,pad1=30,x3=32,y3=34,
- * u3=36,v3=37,pad2=38) against the raw's cursor `s0 = p+0x20` (i.e. s0's offsets are ABSOLUTE-32):
- *   r0/g0/b0 = 0x80 (neutral tint); x0=sx, y0=sy (screen-space anchor, SHORT); x1=x_run+colw, y1=sy;
- *   x2=sx, y2=sy+rowh; x3=x_run+colw, y3=sy+rowh; u0=xb, v0=(byte)y; u1=xb+colw, v1=(byte)y;
- *   u2=xb, u3=xb+colw, v2=(byte)y2, v3=(byte)y2; tpage=GetTPage(2,0,x&0xFFC0,y&0xFF00).
- * `x_run` (the raw's $fp) is reset to the `sx` PARAMETER once per OUTER (row) iteration and accumulates
- * by `colw` every INNER (column) iteration -- distinct from `sy`, which only advances by `rowh` once
- * per outer iteration and never resets. */
-extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int sx, short sy, int correct)
+/* @0x801569EC FMV.CPP:925 -- SYM: all-INT params (sy too) and locals xx,x,y,xs,ys,w,h,n,ox,oy in
+ * retail order; statement order per SLD (tmdc_pol_offs grid corners written before the x/xx/n/p
+ * advances). Tiles RECT r into <=64x256 POLY_FT4 texture-page chunks. */
+extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int sx, int sy, int correct)
 {
-    int rows = 0;
-    short y = r->y;
-    short h = r->h;
-    short w = r->w;
-    int hleft = (short)h;
-    short yoff = -(h >> 1);
-    short xoff = -(w >> 1);
+    int xx;
+    int x;
+    int y;
+    int xs;
+    int ys;
+    int w;
+    int h;
+    int n;
+    int ox;
+    int oy;
 
-    area_pw = 0;
+    y = r->y;
+    ys = r->h;
+
+    n = 0;
+    ox = -(r->w >> 1);
+    oy = -(r->h >> 1);
+
     area_ph = 0;
-    if (h != 0) {
-        do {
-            int rowh = 256 - (y & 0xFF);
-            if (hleft < rowh)
-                rowh = hleft;
-            int x_run = sx;
-            hleft -= rowh;
-            area_pw = 0;
-            short wleft = r->w;
-            short x = r->x;
-            if (wleft != 0) {
-                short y2 = y + rowh;
-                do {
-                    signed char xb = (signed char)(x & 0x3F);
-                    short colw = 0x40 - xb;
-                    if (wleft < colw)
-                        colw = wleft;
-                    wleft -= colw;
-                    SetPolyFT4(p);
-                    setRGB0_(p, 0x80, 0x80, 0x80);
-                    setXY4_(p, (short)x_run, sy, (short)(x_run + colw), sy,
-                            (short)x_run, (short)(sy + rowh), (short)(x_run + colw), (short)(sy + rowh));
-                    setUV4_(p, (unsigned char)xb, (unsigned char)y, (unsigned char)(xb + colw), (unsigned char)y,
-                            (unsigned char)xb, (unsigned char)y2, (unsigned char)(xb + colw), (unsigned char)y2);
-                    p->tpage = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
-                    if (bp != 0) {
-                        POLY_FT4 *dst = bp;
-                        POLY_FT4 *src = p;
-                        while (src != p + 1)
-                            *dst++ = *src++;
-                        setRGB0_(bp, (unsigned char)ENG_random(correct), (unsigned char)ENG_random(correct),
-                                 (unsigned char)ENG_random(correct));
-                        setXY4_(bp, x, y, x + colw, y, x, y2, x + colw, y2);
-                        bp += 1;
-                    }
-                    x += colw;
-                    x_run += colw;
-                    TMDC_OFFS(offs, area_pw, area_ph).vx = xoff;
-                    TMDC_OFFS(offs, area_pw, area_ph).vy = yoff;
-                    area_pw += 1;
-                    p += 1;
-                } while (wleft != 0);
+    while (ys) {
+        h = 256 - (y & 0xFF);
+        if (h > ys)
+            h = ys;
+        ys -= h;
+
+        x = r->x;
+        xs = r->w;
+        xx = sx;
+        area_pw = 0;
+
+        while (xs) {
+            w = 64 - (x & 0x3F);
+            if (w > xs)
+                w = xs;
+            xs -= w;
+
+            SetPolyFT4(p);
+            setRGB0_(p, 128, 128, 128);
+            setUV4_(p, x & 0x3F, y, (x & 0x3F) + w, y, x & 0x3F, y + h, (x & 0x3F) + w, y + h);
+            setXY4_(p, xx, sy, xx + w, sy, xx, sy + h, xx + w, sy + h);
+
+            p->tpage = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
+
+            if (bp) {
+                *bp = *p;
+                setRGB0_(bp, ENG_random(correct), ENG_random(correct), ENG_random(correct));
+                setXY4_(bp, x, y, x + w, y, x, y + h, x + w, y + h);
+                bp++;
             }
-            yoff += rowh;
-            sy = (short)(sy + rowh);
-            area_ph += 1;
-            y += rowh;
-        } while (hleft != 0);
+
+            TMDC_OFFS(offs, area_pw, area_ph).vx = ox;
+            TMDC_OFFS(offs, area_pw, area_ph).vy = oy;
+            TMDC_OFFS(offs, area_pw + 1, area_ph).vx = ox + w;
+            TMDC_OFFS(offs, area_pw + 1, area_ph).vy = oy;
+            TMDC_OFFS(offs, area_pw, area_ph + 1).vx = ox;
+            TMDC_OFFS(offs, area_pw, area_ph + 1).vy = oy + h;
+            TMDC_OFFS(offs, area_pw + 1, area_ph + 1).vx = ox + w;
+            TMDC_OFFS(offs, area_pw + 1, area_ph + 1).vy = oy + h;
+
+            ox += w;
+            x += w;
+            xx += w;
+            n++;
+            p++;
+            area_pw++;
+        }
+
+        oy += h;
+        sy += h;
+        area_ph++;
+        y += h;
     }
-    return rows;
+
+    return n;
 }
 
-/* WIP -- NOT byte-verified (see split_poly_area note). @0x80156DD4 FMV.CPP:1009 */
+/* @0x80156DD4 FMV.CPP:1009 */
 extern "C" void rebuild_mdec_polys(int x, int y)
 {
     /* tmdc_pol is [half][mbuf][poly] (half outer, confirmed against draw_mdec_polys's own +0x320
@@ -748,94 +737,111 @@ extern "C" void rebuild_mdec_polys(int x, int y)
      * running += accumulator across outer iterations, not recomputed; the mbuf*800 term is computed
      * once per INNER iteration and reused for both corners on that row; col*80 and (col+1)*80 are
      * each computed once per inner iteration and reused for both corners on that column edge. */
-    POLY_FT4 *p = &tmdc_pol[0][mbuf][0];
-    int row = 0;
+    int px;
+    int py;
+    POLY_FT4 *p;
 
-    for (; row < mdec_ph[mbuf]; row++) {
-        if (mdec_pw[mbuf] > 0) {
-            for (int col = 0; col < mdec_pw[mbuf]; col++) {
-                setXY4_(p,
-                        (short)(TMDC_OFFS(mbuf, col, row).vx + x), (short)(TMDC_OFFS(mbuf, col, row).vy + y),
-                        (short)(TMDC_OFFS(mbuf, col + 1, row).vx + x), (short)(TMDC_OFFS(mbuf, col + 1, row).vy + y),
-                        (short)(TMDC_OFFS(mbuf, col, row + 1).vx + x), (short)(TMDC_OFFS(mbuf, col, row + 1).vy + y),
-                        (short)(TMDC_OFFS(mbuf, col + 1, row + 1).vx + x), (short)(TMDC_OFFS(mbuf, col + 1, row + 1).vy + y));
-                p += 1;
+    p = &tmdc_pol[0][mbuf][0];
+    for (py = 0; py < mdec_ph[mbuf]; py++) {
+        for (px = 0; px < mdec_pw[mbuf]; px++) {
+            setXY4_(p,
+                    TMDC_OFFS(mbuf, px, py).vx + x, TMDC_OFFS(mbuf, px, py).vy + y,
+                    TMDC_OFFS(mbuf, px + 1, py).vx + x, TMDC_OFFS(mbuf, px + 1, py).vy + y,
+                    TMDC_OFFS(mbuf, px, py + 1).vx + x, TMDC_OFFS(mbuf, px, py + 1).vy + y,
+                    TMDC_OFFS(mbuf, px + 1, py + 1).vx + x, TMDC_OFFS(mbuf, px + 1, py + 1).vy + y);
+            p++;
+        }
+    }
+}
+
+extern unsigned long *ThisOt;   /* @0x8011AAB4 (gman.cpp's current ordering table) */
+
+/* @0x80156FB4 FMV.CPP:1044 -- SYM: FCN VOID; locals i (REG), cdbuf (REG UCHAR). */
+extern "C" void draw_mdec_polys(int bright)
+{
+    int i;
+    unsigned char cdbuf;
+
+    cdbuf = PRIM_GetCurrentScreen();
+
+    if (!frame_decoded)
+        return;
+
+    if (move_request && mbuf != last_move_mbuf) {
+        rebuild_mdec_polys(mdec_cx = move_x, mdec_cy = move_y);
+        move_request--;
+        last_move_mbuf = mbuf;
+
+        tmdc_pol_dirty[mbuf] = 1;
+    }
+
+    if (cdbuf == 1) {
+        if (tmdc_pol_dirty[mbuf]) {
+            tmdc_pol_dirty[mbuf] = 0;
+            for (i = 0; i < num_pol[mbuf]; i++) {
+                tmdc_pol[1][mbuf][i] = tmdc_pol[0][mbuf][i];
+                br[1][mbuf][i] = br[0][mbuf][i];
             }
         }
     }
-}
 
-/* WIP -- NOT byte-verified (see split_poly_area note). @0x80156FB4 FMV.CPP:1044 */
-extern "C" int draw_mdec_polys(signed char bright)
-{
-    int screen = PRIM_GetCurrentScreen();
+    for (i = 0; i < num_pol[mbuf]; i++) {
+        setRGB0_(&tmdc_pol[cdbuf][mbuf][i], bright, bright, bright);
+        addPrim(ThisOt + 5, &tmdc_pol[cdbuf][mbuf][i]);
+    }
 
-    if (frame_decoded == 0)
-        return screen;
-    int state = screen & 0xFF;
-    if (move_request != 0) {
-        state = screen & 0xFF;
-        if (mbuf != last_move_mbuf) {
-            mdec_cx = move_x;
-            mdec_cy = move_y;
-            rebuild_mdec_polys(move_x, move_y);
-            move_request -= 1;
-            last_move_mbuf = mbuf;
-            tmdc_pol_dirty[mbuf] = 1;
-            state = screen & 0xFF;
-        }
-    }
-    if (state == 1 && tmdc_pol_dirty[mbuf] != 0) {
-        tmdc_pol_dirty[mbuf] = 0;
-        for (int i = 0; i < num_pol[mbuf]; i++) {
-            tmdc_pol[1][mbuf][i] = tmdc_pol[0][mbuf][i];
-            br[1][mbuf][i] = br[0][mbuf][i];
-        }
-    }
-    for (int i = 0; i < num_pol[mbuf]; i++) {
-        POLY_FT4 *pp = &tmdc_pol[screen & 0xFF][mbuf][i];
-        setRGB0_(pp, bright, bright, bright);
-        /* addPrim(ThisOt, pp) -- other TU's ordering-table head; left as a documented gap. */
-    }
-    int r = do_brightness;
-    if (r != 0)
+    if (do_brightness)
         do_brightness = 0;
-    return r;
 }
 
-/* WIP -- NOT byte-verified (see split_poly_area note). @0x8015734C FMV.CPP:1111 */
+/* @0x8015734C FMV.CPP:1111 -- SYM: w/h decremented in place, RECT r + int i, separate copy loops. */
 extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, int bx2, int by2, int correct)
 {
-    short w1 = w - 1, h1 = h - 1;
-    RECT rr;
+    RECT r;
+    int i;
+
+    w--;
+    h--;
 
     frame_decoded = 0;
-    mdc_buf[0].w = w1; mdc_buf[0].h = h1;
-    mdc_buf[1].w = w1; mdc_buf[1].h = h1;
-    mdc_buf[0].x = (short)bx1; mdc_buf[0].y = (short)by1;
-    mdc_buf[1].x = (short)bx2; mdc_buf[1].y = (short)by2;
-    rr.x = (short)bx1; rr.y = (short)by1; rr.w = w1; rr.h = h1;
-    num_pol[0] = split_poly_area(&tmdc_pol[0][0][0], (POLY_FT4 *)&br[0][0][0], 0, &rr,
-                                  x - (w1 >> 1), (unsigned short)(y - (h1 >> 1)), correct);
+
+    mdc_buf[0].x = bx1;
+    mdc_buf[0].y = by1;
+    mdc_buf[0].w = w;
+    mdc_buf[0].h = h;
+    mdc_buf[1].x = bx2;
+    mdc_buf[1].y = by2;
+    mdc_buf[1].w = w;
+    mdc_buf[1].h = h;
+
+    r.x = bx1;
+    r.y = by1;
+    r.w = w;
+    r.h = h;
+    num_pol[0] = split_poly_area(&tmdc_pol[0][0][0], &br[0][0][0], 0, &r, x - (r.w >> 1), y - (r.h >> 1), correct);
     mdec_pw[0] = area_pw;
     mdec_ph[0] = area_ph;
-    for (int i = 0; i < num_pol[0]; i++) {
+    for (i = 0; i < num_pol[0]; i++)
         tmdc_pol[1][0][i] = tmdc_pol[0][0][i];
+    for (i = 0; i < num_pol[0]; i++)
         br[1][0][i] = br[0][0][i];
-    }
-    rr.x = (short)bx2; rr.y = (short)by2; rr.w = w1; rr.h = h1;
-    num_pol[1] = split_poly_area(&tmdc_pol[0][1][0], (POLY_FT4 *)&br[0][1][0], 1, &rr,
-                                  x - (w1 >> 1), (unsigned short)(y - (h1 >> 1)), correct);
+
+    r.x = bx2;
+    r.y = by2;
+
+    num_pol[1] = split_poly_area(&tmdc_pol[0][1][0], &br[0][1][0], 1, &r, x - (r.w >> 1), y - (r.h >> 1), correct);
     mdec_pw[1] = area_pw;
     mdec_ph[1] = area_ph;
-    for (int i = 0; i < num_pol[1]; i++) {
+    for (i = 0; i < num_pol[1]; i++)
         tmdc_pol[1][1][i] = tmdc_pol[0][1][i];
+    for (i = 0; i < num_pol[1]; i++)
         br[1][1][i] = br[0][1][i];
-    }
-    mdec_w = w1;
-    mdec_h = h1;
+
+    mdec_w = w;
+    mdec_h = h;
     mdec_cx = x;
     mdec_cy = y;
+
     last_mdc = -1;
     last_fn = -1;
 }
@@ -945,7 +951,6 @@ extern "C" int init_mdec_audio(int rate)
     return SpuIsTransferCompleted(1);
 }
 
-/* WIP -- NOT byte-verified (SPU double-buffer feed; no PC twin). @0x80157900 FMV.CPP:1298 */
 /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/play_mdec_audio.s) -- confirmed
  * field-by-field, same method as init_mdec_audio/set_mdec_audio_volume:
  *   - the first loop's dispatch reads `mdec_audio_sec`, NOT `mdec_audio_playing` (the two globals
@@ -965,66 +970,93 @@ extern "C" int init_mdec_audio(int rate)
  *     slot=(mdec_audio_sec>=3)?mdec_audio_sec-3:mdec_audio_sec+7 -- none of which resemble the
  *     previous fabricated {mask,l,r,pitch,adsr1..4} shape. On loop completion mdec_audio_playing is
  *     set to -1 (not left alone). */
-#define SPU_VOICE_ADSR_MASK_ALL 0xFF93
+/* SYM: `asec` (STRUCT size 8: int id, int size) -- the audio-sector header play_mdec_audio is handed. */
+typedef struct asec {
+    int id;
+    int size;
+} asec;
 
-extern "C" int play_mdec_audio(unsigned char *data, StHEADER *h)
+/* @0x80157900 FMV.CPP:1298 -- SYM: FCN VOID; locals i, b, offs, voice_attr (AUTO), dp. */
+extern "C" void play_mdec_audio(unsigned char *data, asec *h)
 {
-    unsigned char *b = data;
-    unsigned char *data0 = data;
+    int i;
+    int b;
+    int offs;
+    SpuVoiceAttr voice_attr;
+    unsigned char *dp;
 
-    for (int i = 0; i < 2; i++) {
+    dp = data;
+    for (b = 0; b < 2; b++) {
         if (mdec_audio_sec == 0) {
-            b[1] |= 6;
-            for (int j = 16; j < (int)h->frameSize; j += 16)
-                (data + j)[1] |= 2;
+            dp[1] |= 6;
+            for (i = 16; i < h->size; i += 16)
+                dp[i + 1] |= 2;
         } else if (mdec_audio_sec == 9) {
-            int j = 0;
-            for (; j < (int)h->frameSize - 16; j += 16)
-                (data + j)[1] |= 2;
-            (data + j)[1] = 3;
+            for (i = 0; i < h->size - 16; i += 16)
+                dp[i + 1] |= 2;
+            dp[i + 1] = 3;
         } else {
-            for (int j = 0; j < (int)h->frameSize; j += 16)
-                (data + j)[1] |= 2;
+            for (i = 0; i < h->size; i += 16)
+                dp[i + 1] |= 2;
         }
-        b += 2016;
-        data += 2016;
+        dp += 2016;
     }
+
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[0] + mdec_audio_offs);
-    SpuWrite(DiabEnd ? data0 + (DiabEnd - 1) * 2016 : data0, h->frameSize);
+    if (DiabEnd)
+        SpuWrite(data + (DiabEnd - 1) * 2016, h->size);
+    else
+        SpuWrite(data, h->size);
     SpuIsTransferCompleted(1);
+
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[1] + mdec_audio_offs);
-    SpuWrite(DiabEnd ? data0 + (DiabEnd - 1) * 2016 : data0 + 2016, h->frameSize);
+    if (DiabEnd)
+        SpuWrite(data + (DiabEnd - 1) * 2016, h->size);
+    else
+        SpuWrite(data + 2016, h->size);
     SpuIsTransferCompleted(1);
-    mdec_audio_offs += (int)h->frameSize;
-    if (mdec_audio_playing == 0) {
-        SpuVoiceAttr attr;
-        int slot = (mdec_audio_sec - 3 >= 0) ? mdec_audio_sec - 3 : mdec_audio_sec + 7;
-        int base = slot * (int)h->frameSize;
 
-        for (int v = 0; v < 2; v++) {
-            attr.mask = SPU_VOICE_ADSR_MASK_ALL;
-            attr.sl = 0xF;
-            attr.a_mode = 1;
-            attr.s_mode = 1;
-            attr.r_mode = 3;
-            attr.ar = 0;
-            attr.dr = 0;
-            attr.sr = 0;
-            attr.rr = 3;
-            attr.voice = 1 << v;
-            attr.volume.left = (v == 0) ? 0x3FFF : 0;
-            attr.volume.right = (v == 1) ? 0x3FFF : 0;
-            attr.pitch = (unsigned short)(0xFFA >> mdec_audio_rate_shift);
-            attr.addr = mdec_audio_buffer[v] + base;
-            SpuSetKeyOnWithAttr(&attr);
+    mdec_audio_sec++;
+    streampos += h->size;
+    if (mdec_audio_sec == 10) {
+        mdec_audio_offs = 0;
+        mdec_audio_sec = 0;
+    } else
+        mdec_audio_offs += h->size;
+
+    if (!mdec_audio_playing) {
+        offs = mdec_audio_sec - 3;
+        if (offs < 0)
+            offs += 10;
+        offs *= h->size;
+
+        for (i = 0; i < 2; i++) {
+            voice_attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR | SPU_VOICE_PITCH | SPU_VOICE_WDSA |
+                              SPU_VOICE_ADSR_AMODE | SPU_VOICE_ADSR_SMODE | SPU_VOICE_ADSR_RMODE |
+                              SPU_VOICE_ADSR_AR | SPU_VOICE_ADSR_DR | SPU_VOICE_ADSR_SR |
+                              SPU_VOICE_ADSR_RR | SPU_VOICE_ADSR_SL;
+            voice_attr.a_mode = 1;
+            voice_attr.s_mode = 1;
+            voice_attr.r_mode = 3;
+            voice_attr.ar = 0;
+            voice_attr.dr = 0;
+            voice_attr.sr = 0;
+            voice_attr.rr = 3;
+            voice_attr.sl = 0xF;
+
+            voice_attr.voice = 1 << i;
+
+            voice_attr.volume.left = (i == 0) ? 0x3FFF : 0;
+            voice_attr.volume.right = (i == 1) ? 0x3FFF : 0;
+            voice_attr.pitch = 0xFFA >> mdec_audio_rate_shift;
+            voice_attr.addr = mdec_audio_buffer[i] + offs;
+            SpuSetKeyOnWithAttr(&voice_attr);
         }
         mdec_audio_playing = -1;
-    } else {
-        mdec_audio_playing -= 1;
-    }
-    return 0;
+    } else
+        mdec_audio_playing--;
 }
 
 /* @0x80157D00 FMV.CPP:1437 */
@@ -1073,9 +1105,9 @@ extern "C" int stop_mdec_stream(void)
 }
 
 /* @0x80157D54 FMV.CPP:1460 */
-extern "C" int dequeue_stream(void)
+extern "C" void dequeue_stream(void)
 {
-    struct _mdecanim *a = &mdec_queue[mdec_head];
+    struct _mdecanim *a = &mdec_queue[mdec_waiting_tail];
     int len;
 
     if (mdecs_waiting != 0) {
@@ -1090,21 +1122,17 @@ extern "C" int dequeue_stream(void)
             a->start = 1;
             a->end = len / (mdec_sectors_per_frame << 11);
         } else {
-            /* Raw computes a real (if functionally dead) seclen here too:
-             * (a->end - a->start) * mdec_sectors_per_frame, not a bare 0. */
             open_cdstream(a->name, a->start * mdec_sectors_per_frame,
                           (a->end - a->start) * mdec_sectors_per_frame);
         }
         a->flag = 1;
         mdecs_waiting -= 1;
-        /* raw uses the branchy sign-safe "% 0x10" idiom (bgez/+16/sra4/sll4/subu), not a plain andi --
-         * confirms the source is `% 0x10`, not `& 0xF`, for this counter. */
-        mdec_head = (mdec_head + 1) % 0x10;
+        mdec_waiting_tail = (mdec_waiting_tail + 1) % 0x10;
     }
 }
 
 /* @0x80157E40 FMV.CPP:1486 */
-extern "C" int dequeue_animation(void)
+extern "C" void dequeue_animation(void)
 {
     /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/dequeue_animation.s) -- prior
      * reconstruction indexed off mdec_head and wrote several fields to the wrong globals/struct
@@ -1113,7 +1141,7 @@ extern "C" int dequeue_animation(void)
      * Corrections, each confirmed against its own store site's %gp_rel comment / struct offset in the
      * raw (offsets 0x0/0x4/0x8/0xC/0x10 = name/speed/start/end/flag, confirmed via play_mdec_stream):
      *   - indexes/advances `mdec_tail`, not `mdec_head` (this is the "animation" dequeue counterpart
-     *     to dequeue_stream's mdec_head; the two queues are read from opposite ends).
+     *     to dequeue_stream's mdec_waiting_tail; the two queues are read from opposite ends).
      *   - `mdec_tail = (mdec_tail+1) % 0x10;` happens immediately after computing `a`, not at the end.
      *   - start==-1 arm: unlike dequeue_stream, this arm writes NEITHER a->start NOR a->end -- the
      *     computed quotient goes straight to `last_stream_frame` and mdec_last_frame reads the SAME
@@ -1131,24 +1159,17 @@ extern "C" int dequeue_animation(void)
      *     register as `mdec_streaming = 1;`), and stores `a->speed` into `mdec_speed`, not
      *     `user_start` (decode_mdec_stream's raw confirms it reads mdec_speed, not user_start, for
      *     its own frame-time accumulator -- user_start appears to be a phantom/unused global here).
-     *   - the `mdecs_queued == 0` early-out never sets $v0 at all in the raw (its delay slot only
-     *     computes `a`'s address); kept `return 0;` here since omitting it would be a stronger,
-     *     unverified UB-reliant claim than the 1-diff residual it might save. */
+     *   - retail SYM types this function VOID (FCN VOID) with `a` as its only local: the start == -1
+     *     arm's `mdec_last_frame = -1` reuses the compared a->start register (s1) via cse. */
     struct _mdecanim *a = &mdec_queue[mdec_tail];
 
     if (mdecs_queued != 0) {
-        /* a->start is read-only in this function (never written) and stays live across the
-         * flush_cdstream/open_cdstream calls, so the raw keeps it in a callee-saved register ($s1,
-         * spilled/restored in the prologue/epilogue) instead of reloading from memory after each call
-         * -- caching it in a local reproduces that register class. */
         mdec_tail = (mdec_tail + 1) % 0x10;
-        int start = a->start;
-        if (start == -1) {
+        if (a->start == -1) {
             flush_cdstream();
-            int len = open_cdstream(a->name, 0, -1);
+            last_stream_frame = open_cdstream(a->name, 0, -1) / (mdec_sectors_per_frame << 11) - 1;
             mdec_framecount = 0;
-            mdec_last_frame = start;
-            last_stream_frame = len / (mdec_sectors_per_frame << 11) - 1;
+            mdec_last_frame = -1;
             mdec_waiting_tail = (mdec_waiting_tail + 1) % 0x10;
             mdecs_waiting -= 1;
         } else {
@@ -1160,20 +1181,18 @@ extern "C" int dequeue_animation(void)
                 mdecs_waiting -= 1;
             }
             last_stream_frame = a->end;
-            mdec_framecount = a->start << 12;
             mdec_last_frame = a->start - 1;
+            mdec_framecount = a->start << 12;
         }
-        mdec_speed = a->speed;
         mdec_streaming = 1;
         mdec_stream_starting = 1;
+        mdec_speed = a->speed;
         mdecs_queued -= 1;
-        return 1;
     }
-    return 0;
 }
 
 /* @0x80157FF0 FMV.CPP:1548 */
-extern "C" int decode_mdec_stream(int frames_elapsed)
+extern "C" void decode_mdec_stream(int frames_elapsed)
 {
     /* Content-bug sweep (raw oracle vs prior reconstruction) -- verify_asm.py's %gp_rel(SYM)->0
      * normalization makes wrong-global substitutions byte-invisible to the diff gate as long as the
@@ -1192,24 +1211,24 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
      *     `mdec_stream_starting = 0;` (mdec_waiting_tail never appears anywhere in this function's raw). */
     unsigned char *data = 0;
     StHEADER *h;
-    int want_frame;
+    int req_frame;
 
     if (mdecs_waiting != 0 && stream_open == 0)
         dequeue_stream();
     cdstream_service();
     if (!mdec_streaming)
-        return 0;
+        return;
     if (stream_chunks_in == 0)
-        return stream_chunks_in;
+        return;
     if (mdec_stream_starting == 0) {
-        want_frame = (mdec_framecount + mdec_speed * frames_elapsed) >> 12;
+        req_frame = (mdec_framecount + mdec_speed * frames_elapsed) >> 12;
         mdec_framecount += mdec_speed * frames_elapsed;
-        if (mdec_last_frame < want_frame) {
+        if (mdec_last_frame < req_frame) {
             for (;;) {
                 cdstream_get_chunk(&data, &h);
                 if (!mdec_streaming)
                     break;
-                if (h->frameCount == last_stream_frame || (int)h->frameCount >= want_frame)
+                if (h->frameCount == last_stream_frame || (int)h->frameCount >= req_frame)
                     break;
                 if (stream_chunks_in < 2)
                     break;
@@ -1222,40 +1241,38 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
     if (data != 0) {
         mdec_stream_starting = 0;
         mdec_last_frame = h->frameCount;
-        start_mdec_decode(data + 32, mdc_buf[mbuf].x, mdc_buf[mbuf].y, h->width, h->height);
+        start_mdec_decode(data, mdc_buf[mbuf].x, mdc_buf[mbuf].y, h->width, h->height);
         frame_decoded = 1;
         do_brightness = 1;
         mbuf ^= 1;
-        play_mdec_audio(data + 0x3F00, (StHEADER *)((char *)h + 256));
+        play_mdec_audio(data + 0x3F00, (asec *)((char *)h + 256));
         cdstream_discard_chunk();
         if (h->frameCount == last_stream_frame) {
             if (mdecs_queued != 0)
-                return dequeue_animation();
+                dequeue_animation();
             else
-                return stop_mdec_stream();
+                stop_mdec_stream();
         }
     }
-    return stream_chunks_in;
 }
 
 /* @0x801581D0 FMV.CPP:1626 */
-extern "C" int play_mdec_stream(char *filename, int speed, int start, int end)
+extern "C" void play_mdec_stream(char *filename, int speed, int start, int end)
 {
-    struct _mdecanim *a = &mdec_queue[mdec_tail];
+    struct _mdecanim *a = &mdec_queue[mdec_head];
 
-    if (mdecs_queued >= 16)
-        return 0;
-    a->name = filename;
-    a->speed = speed;
-    a->start = start;
-    a->end = end;
-    a->flag = 0;
-    mdecs_queued += 1;
-    mdecs_waiting += 1;
-    mdec_tail = (mdec_tail + 1) & 0xF;
-    if (!mdec_streaming)
-        return dequeue_animation();
-    return 1;
+    if (mdecs_queued < 16) {
+        a->name = filename;
+        a->speed = speed;
+        a->start = start;
+        a->end = end;
+        a->flag = 0;
+        mdecs_queued++;
+        mdecs_waiting++;
+        mdec_head = (mdec_head + 1) % 16;
+        if (!mdec_streaming)
+            dequeue_animation();
+    }
 }
 
 /* @0x8015826C FMV.CPP:1652 */
@@ -1318,51 +1335,57 @@ extern "C" short PlayFMVOverLay(char *filename, int w, int h)
 }
 
 /* @0x801583E0 FMV.CPP:1737 -- see near-miss note: main FMV playback loop, uses ~15 other-TU helpers. */
-static unsigned char D_8011B4E8;   /* language-variant byte for the DIABEND ending movie picker */
 
 extern "C" void LoPlayFMVOverLay(void *)
 {
+    int start = -1;
+    int end = -1;
+    int start_time = -1;
+    int br = 0x80;
+    int fade = 0;
+    int user_quit;
+    RECT r;   /* SYM AUTO local (sp-0x30); unreferenced in the raw -- same frame-hole class as
+               * wait_cdstream's start_wait (catalog 13A). */
+    CPad *P1;
+    CPad *P2;
     char *filename = D_8011C758;
     int w = D_8011C75C;
     int h = D_8011C760;
-    int start = -1;
-    int end = -1;
-    int bright = 0x80;
-    int fade = 0;
-    int start_time = -1;
-    RECT r;   /* SYM AUTO local (sp-0x30); unreferenced in the raw -- same frame-hole class as
-               * wait_cdstream's start_wait (catalog 13A). */
-    int i;
+    long vm;
 
-    time_in_frames = VID_GetTick();
-    for (i = 0; i < 100; i++)
-        systemtask(0);
-    D_8011B4E8 = 0;
-    if (strcmp("DIABEND.MOV", filename) != 0) {
-        {
-            int lang = LANG_GetLang();
-            int v;
-            switch (lang) {
-            case LANG_ENGLISH: v = 1; goto set1;
-            case LANG_FRENCH:  v = 2;
-            set1:
-                D_8011B4E8 = v;
-                sprintf(g_movie_filename, "DIABEND1.MOV");
-                break;
-            case LANG_GERMAN: v = 1; goto set2;
-            case LANG_SPANISH: v = 2;
-            set2:
-                D_8011B4E8 = v;
-                sprintf(g_movie_filename, "DIABEND2.MOV");
-                break;
-            case LANG_ITALIAN:
-                D_8011B4E8 = 1;
-                sprintf(g_movie_filename, "DIABEND3.MOV");
-                break;
-            case LANG_JAPANESE:
-                DBG_Error(0, "psxsrc/FMV.CPP", 1790);
-                break;
-            }
+    {
+        int i;
+
+        time_in_frames = VID_GetTick();
+        for (i = 0; i < 100; i++)
+            systemtask(0);
+    }
+    DiabEnd = 0;
+    if (strcmp("DIABEND.MOV", filename) == 0) {
+        switch (LANG_GetLang()) {
+        case LANG_ENGLISH:
+            DiabEnd = 1;
+            sprintf(g_movie_filename, "DIABEND1.MOV");
+            break;
+        case LANG_FRENCH:
+            DiabEnd = 2;
+            sprintf(g_movie_filename, "DIABEND1.MOV");
+            break;
+        case LANG_GERMAN:
+            DiabEnd = 1;
+            sprintf(g_movie_filename, "DIABEND2.MOV");
+            break;
+        case LANG_SPANISH:
+            DiabEnd = 2;
+            sprintf(g_movie_filename, "DIABEND2.MOV");
+            break;
+        case LANG_ITALIAN:
+            DiabEnd = 1;
+            sprintf(g_movie_filename, "DIABEND3.MOV");
+            break;
+        case LANG_JAPANESE:
+            DBG_Error(0, "psxsrc/FMV.CPP", 1790);
+            break;
         }
     } else {
         strcpy(g_movie_filename, filename);
@@ -1385,7 +1408,8 @@ extern "C" void LoPlayFMVOverLay(void *)
      * Modeling case 0 with the DEFAULT arm's literal (0x1333) and case 1 with the "real" 0x1000
      * reproduces this byte-for-byte closer than the semantically-tidier 0x1000/0x1000 split (case 1's
      * "stale" value happens to coincide with whatever the case-0/default combination leaves behind). */
-    switch (GetVideoMode()) {
+    vm = GetVideoMode();
+    switch (vm) {
     case 0:
         play_mdec_stream(g_movie_filename, 0x1000, start, end);
         break;
@@ -1402,25 +1426,26 @@ extern "C" void LoPlayFMVOverLay(void *)
         if (start_time < time_in_frames) {
             TICK_Update();
             PAD_Handler();
-            draw_mdec_polys((signed char)bright);
+            draw_mdec_polys(br);
             if (fade != 0) {
-                bright -= 8;
-                set_mdec_audio_volume((short)(bright << 7));
+                br -= 8;
+                set_mdec_audio_volume((short)(br << 7));
             }
             VID_AfterDisplay();
         }
         decode_mdec_stream(1);
         if (start_time == -1 && mdec_last_frame != -1)
             start_time = time_in_frames;
-        CPad *P1 = PAD_GetPad(0, 1);
-        CPad *P2 = PAD_GetPad(0, 2);
-        if ((P1->GetDown() & 0x10) != 0 || (P2->GetDown() & 0x10) != 0) {
-            user_start = 1;
+        P1 = PAD_GetPad(0, 1);
+        P2 = PAD_GetPad(0, 2);
+        if ((P1->GetDown() & 0x10) || (P2->GetDown() & 0x10)) {
+            user_quit = 1;
+            user_start = user_quit;
             fade = 1;
         }
-        if ((P1->GetDown() & 0x40) != 0 || (P2->GetDown() & 0x40) != 0)
+        if ((P1->GetDown() & 0x40) || (P2->GetDown() & 0x40))
             fade = 1;
-    } while (mdec_streaming != 0 && bright >= 0);
+    } while (mdec_streaming != 0 && br >= 0);
     stop_mdec_stream();
     wait_cdstream();
     kill_mdec_audio();
@@ -1435,3 +1460,19 @@ extern "C" void LoPlayFMVOverLay(void *)
     longjmp(D_80121D08, 1);
 }
 
+/* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each
+ * conflict hunk, kept for reference. Winner = PASS (bytes+SYM) first, then SLD line agreement. ---- */
+#if 0 /* MERGE ALT dequeue_stream: master side -- lost because: retail indexes mdec_waiting_tail (%gp_rel in the oracle); master's mdec_head was a wrong-global pass */
+    struct _mdecanim *a = &mdec_queue[mdec_head];
+#endif
+#if 0 /* MERGE ALT dequeue_stream: claude/cool-knuth-frvuxm side -- lost because: comment-only hunk; master's longer block gives SLD block span 22 (retail 20) vs branch 17 */
+            /* seclen (3rd arg) is dead inside open_cdstream, but the raw passes -1 / computes it */
+#endif
+#if 0 /* MERGE ALT dequeue_animation: master side -- lost because: both PASS; branch SLD block span 55 vs master 56 (retail 44) */
+     *   - the `mdecs_queued == 0` early-out never sets $v0 at all in the raw (its delay slot only
+     *     computes `a`'s address); kept `return 0;` here since omitting it would be a stronger,
+     *     unverified UB-reliant claim than the 1-diff residual it might save. */
+#endif
+#if 0 /* MERGE ALT play_mdec_stream: master side -- lost because: branch PASS + SYM ok; master FAIL 31 */
+    struct _mdecanim *a = &mdec_queue[mdec_tail];
+#endif

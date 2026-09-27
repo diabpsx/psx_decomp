@@ -397,7 +397,7 @@ void DrawQText(void)
     p = (char *)qtextptr;
     ty = qtexty;
     while (!doneflag) {
-        char c;
+        char c;     /* unused leftover: no SYM record, but its scope keeps the retail loop shape */
 
         l = 0;
         SpacePtr = NULL;
@@ -405,11 +405,9 @@ void DrawQText(void)
         KanjiCount = 0;
         t = tempstr;
         do {
-            c = *p;
-            if (c == '
-' || c == 0)
+            if (*p == '\n' || *p == 0)
                 break;
-            *t = c;
+            *t = *p;
             p++;
             l += MediumFont.GetCharWidth(*t);
             if (*t == ' ') {
@@ -449,16 +447,20 @@ void DrawQText(void)
     }
     if (FileSYS == 2) {
         if (sghStream == NULL && qtexty > TextWait) {
-            int diff = -0x10000;
+            int diff;
 
-            sgLastScroll = VID_GetTick();
-            scrolltexty = scrolltexty + diff;
+            currTime = VID_GetTick();
+            diff = currTime - sgLastScroll;
+            if (diff < 0)
+                diff = -diff;
+            scrolltexty -= 0x10000;
             qtexty = scrolltexty >> 16;
+            sgLastScroll = currTime;
             if (TextWait >= qtexty)
                 PlaySFX(alltext[TextNum].sfxnr);
         }
         if (sghStream != NULL) {
-            long diff;
+            int diff;
 
             currTime = VID_GetTick();
             diff = currTime - sgLastScroll;
@@ -471,7 +473,7 @@ void DrawQText(void)
                 qtbodge = 1;
         } else {
             if (qtbodge != 0) {
-                long diff;
+                int diff;
 
                 currTime = VID_GetTick();
                 diff = currTime - sgLastScroll;

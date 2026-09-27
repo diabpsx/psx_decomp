@@ -21,8 +21,9 @@ sys.path.insert(0, str(ROOT / "tools"))
 import build as B
 
 PSYQ = Path("C:/Temp/nfs3-clean/psyq400/PSYQ")
-ASPSX, PSYLINK = PSYQ / "ASPSX.EXE", PSYQ / "PSYLINK.EXE"
-DUMPSYM = Path("C:/Temp/claud/dumpsym_clean/dumpsym_src/dumpsym.exe")
+ASPSX = Path(os.environ.get("DIAB_ASPSX", PSYQ / "ASPSX.EXE"))
+PSYLINK = Path(os.environ.get("DIAB_PSYLINK", PSYQ / "PSYLINK.EXE"))
+DUMPSYM = Path(os.environ.get("DIAB_DUMPSYM", "C:/Temp/claud/dumpsym_clean/dumpsym_src/dumpsym.exe"))
 RETAIL = ROOT / "rom" / "DIABPSX-SYM.txt"
 OUT = ROOT / "build" / "sn"
 ENV = dict(os.environ, MSYS2_ARG_CONV_EXCL="*")

@@ -40,9 +40,9 @@ extern unsigned char BLUEB;
 extern unsigned char REDR;
 extern unsigned char REDG;
 extern unsigned char REDB;
-extern unsigned char GOLDR;   /* @0x8011ABDA */
-extern unsigned char GOLDG;
-extern unsigned char GOLDB;
+extern const unsigned char GOLDR;   /* @0x8011ABDA */
+extern const unsigned char GOLDG;
+extern const unsigned char GOLDB;
 extern int SStringYNorm[20];   /* @0x800DE314 */
 extern int SStringYBuy0[20];   /* @0x800DE364 */
 extern int SStringYBuy1[20];   /* @0x800DE3B4 */

@@ -169,12 +169,8 @@ GPanel::GPanel(int Ofs)
 
 short SpdTrimCol(short col)
 {
-    if ((col << 16) < 0) {
-        col = 0;
-    }
-    if (col >= 0x100) {
-        col = 0xFF;
-    }
+    if (col < 0) col = 0;
+    if (col > 255) col = 255;
     return col;
 }
 
@@ -590,3 +586,14 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4b->code = (Ft4b->code | 2) & 0xFE;
     }
 }
+
+/* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each
+ * conflict hunk, kept for reference. Winner = PASS (bytes+SYM) first, then SLD line agreement. ---- */
+#if 0 /* MERGE ALT SpdTrimCol: master side -- lost because: both PASS; branch SLD span 4 == retail 4, master 8 */
+    if ((col << 16) < 0) {
+        col = 0;
+    }
+    if (col >= 0x100) {
+        col = 0xFF;
+    }
+#endif
