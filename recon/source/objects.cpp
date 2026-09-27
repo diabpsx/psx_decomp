@@ -1985,186 +1985,178 @@ void OperateL1RDoor(int pnum, int oi, unsigned char sendflag)
     }
 }
 
-void OperateL2LDoor(int pnum, int i, unsigned char sendflag)
+void OperateL2LDoor(int pnum, int oi, unsigned char sendflag)
 {
     int dx, dy;
     unsigned char dok;
 
-    if (object[i]._oVar4 == 2) {
+    if (object[oi]._oVar4 == 2) {
         if (!deltaload)
-            PlaySfxLoc(0x13, object[i]._ox, object[i]._oy);
+            PlaySfxLoc(0x13, object[oi]._ox, object[oi]._oy);
         return;
     }
-    dx = object[i]._ox;
-    dy = object[i]._oy;
-    if (object[i]._oVar4 == 0) {
+    dx = object[oi]._ox;
+    dy = object[oi]._oy;
+    if (object[oi]._oVar4 == 0) {
         if (pnum == myplr && sendflag)
-            NetSendCmdParam1(1, 0x2B, i);
+            NetSendCmdParam1(1, 0x2B, oi);
         if (!deltaload)
-            PlaySfxLoc(0x14, dx, dy);
+            PlaySfxLoc(0x14, object[oi]._ox, object[oi]._oy);
         ObjSetMicro(dx, dy, 0xD);
-        dungeon[(dx - 16) / 2][(dy - 16) / 2] = 0x98;
-        object[i]._oAnimFrame = 3;
-        object[i]._oPreFlag = 1;
-        object[i]._oVar4 = 1;
-        object[i]._oSelFlag = 2;
+        dungeon[(dx - 16) >> 1][(dy - 16) >> 1] = 0x98;
+        object[oi]._oAnimFrame = 3;
+        object[oi]._oPreFlag = 1;
+        object[oi]._oVar4 = 1;
+        object[oi]._oSelFlag = 2;
         RedoPlayerVision();
     } else {
         if (!deltaload)
             PlaySfxLoc(0x13, dx, dy);
         dok = dung_map[dx][dy].dMonster == 0;
-        if (dung_map[dx][dy].dItem != 0)
-            dok = 0;
-        if (GetdDead(dx, dy) != 0)
-            dok = 0;
+        dok = dok & !dung_map[dx][dy].dItem;
+        dok = dok & !GetdDead(dx, dy);
         if (dok) {
             if (pnum == myplr && sendflag)
-                NetSendCmdParam1(1, 0x2C, i);
-            object[i]._oVar4 = 0;
-            object[i]._oSelFlag = 3;
+                NetSendCmdParam1(1, 0x2C, oi);
+            object[oi]._oVar4 = 0;
+            object[oi]._oSelFlag = 3;
             ObjSetMicro(dx, dy, 0x21A);
-            dungeon[(dx - 16) / 2][(dy - 16) / 2] = 0x96;
-            object[i]._oAnimFrame = 1;
-            object[i]._oPreFlag = 0;
+            dungeon[(dx - 16) >> 1][(dy - 16) >> 1] = 0x96;
+            object[oi]._oAnimFrame = 1;
+            object[oi]._oPreFlag = 0;
             RedoPlayerVision();
         } else {
-            object[i]._oVar4 = 2;
+            object[oi]._oVar4 = 2;
         }
     }
 }
 
-void OperateL2RDoor(int pnum, int i, unsigned char sendflag)
+void OperateL2RDoor(int pnum, int oi, unsigned char sendflag)
 {
     int dx, dy;
     unsigned char dok;
 
-    if (object[i]._oVar4 == 2) {
+    if (object[oi]._oVar4 == 2) {
         if (!deltaload)
-            PlaySfxLoc(0x13, object[i]._ox, object[i]._oy);
+            PlaySfxLoc(0x13, object[oi]._ox, object[oi]._oy);
         return;
     }
-    dx = object[i]._ox;
-    dy = object[i]._oy;
-    if (object[i]._oVar4 == 0) {
+    dx = object[oi]._ox;
+    dy = object[oi]._oy;
+    if (object[oi]._oVar4 == 0) {
         if (pnum == myplr && sendflag)
-            NetSendCmdParam1(1, 0x2B, i);
+            NetSendCmdParam1(1, 0x2B, oi);
         if (!deltaload)
-            PlaySfxLoc(0x14, dx, dy);
+            PlaySfxLoc(0x14, object[oi]._ox, object[oi]._oy);
         ObjSetMicro(dx, dy, 0x11);
-        dungeon[(dx - 16) / 2][(dy - 16) / 2] = 0x99;
-        object[i]._oAnimFrame = 4;
-        object[i]._oPreFlag = 1;
-        object[i]._oVar4 = 1;
-        object[i]._oSelFlag = 2;
+        dungeon[(dx - 16) >> 1][(dy - 16) >> 1] = 0x99;
+        object[oi]._oAnimFrame = 4;
+        object[oi]._oPreFlag = 1;
+        object[oi]._oVar4 = 1;
+        object[oi]._oSelFlag = 2;
         RedoPlayerVision();
     } else {
         if (!deltaload)
             PlaySfxLoc(0x13, dx, dy);
         dok = dung_map[dx][dy].dMonster == 0;
-        if (dung_map[dx][dy].dItem != 0)
-            dok = 0;
-        if (GetdDead(dx, dy) != 0)
-            dok = 0;
+        dok = dok & !dung_map[dx][dy].dItem;
+        dok = dok & !GetdDead(dx, dy);
         if (dok) {
             if (pnum == myplr && sendflag)
-                NetSendCmdParam1(1, 0x2C, i);
-            object[i]._oVar4 = 0;
-            object[i]._oSelFlag = 3;
+                NetSendCmdParam1(1, 0x2C, oi);
+            object[oi]._oVar4 = 0;
+            object[oi]._oSelFlag = 3;
             ObjSetMicro(dx, dy, 0x21C);
-            dungeon[(dx - 16) / 2][(dy - 16) / 2] = 0x97;
-            object[i]._oAnimFrame = 2;
-            object[i]._oPreFlag = 0;
+            dungeon[(dx - 16) >> 1][(dy - 16) >> 1] = 0x97;
+            object[oi]._oAnimFrame = 2;
+            object[oi]._oPreFlag = 0;
             RedoPlayerVision();
         } else {
-            object[i]._oVar4 = 2;
+            object[oi]._oVar4 = 2;
         }
     }
 }
 
-void OperateL3LDoor(int pnum, int i, unsigned char sendflag)
+void OperateL3LDoor(int pnum, int oi, unsigned char sendflag)
 {
     int dx, dy;
     unsigned char dok;
 
-    if (object[i]._oVar4 == 2) {
+    if (object[oi]._oVar4 == 2) {
         if (!deltaload)
-            PlaySfxLoc(0x13, object[i]._ox, object[i]._oy);
+            PlaySfxLoc(0x13, object[oi]._ox, object[oi]._oy);
         return;
     }
-    dx = object[i]._ox;
-    dy = object[i]._oy;
-    if (object[i]._oVar4 == 0) {
+    dx = object[oi]._ox;
+    dy = object[oi]._oy;
+    if (object[oi]._oVar4 == 0) {
         if (pnum == myplr && sendflag)
-            NetSendCmdParam1(1, 0x2B, i);
+            NetSendCmdParam1(1, 0x2B, oi);
         if (!deltaload)
-            PlaySfxLoc(0x14, dx, dy);
+            PlaySfxLoc(0x14, object[oi]._ox, object[oi]._oy);
         ObjSetMicro(dx, dy, 0x21A);
-        object[i]._oPreFlag = 1;
-        object[i]._oVar4 = 1;
-        object[i]._oSelFlag = 2;
+        object[oi]._oPreFlag = 1;
+        object[oi]._oVar4 = 1;
+        object[oi]._oSelFlag = 2;
         RedoPlayerVision();
     } else {
         if (!deltaload)
             PlaySfxLoc(0x13, dx, dy);
         dok = dung_map[dx][dy].dMonster == 0;
-        if (dung_map[dx][dy].dItem != 0)
-            dok = 0;
-        if (GetdDead(dx, dy) != 0)
-            dok = 0;
+        dok = dok & !dung_map[dx][dy].dItem;
+        dok = dok & !GetdDead(dx, dy);
         if (dok) {
             if (pnum == myplr && sendflag)
-                NetSendCmdParam1(1, 0x2C, i);
-            object[i]._oVar4 = 0;
-            object[i]._oSelFlag = 3;
+                NetSendCmdParam1(1, 0x2C, oi);
+            object[oi]._oVar4 = 0;
+            object[oi]._oSelFlag = 3;
             ObjSetMicro(dx, dy, 0x213);
-            object[i]._oPreFlag = 0;
+            object[oi]._oPreFlag = 0;
             RedoPlayerVision();
         } else {
-            object[i]._oVar4 = 2;
+            object[oi]._oVar4 = 2;
         }
     }
 }
 
-void OperateL3RDoor(int pnum, int i, unsigned char sendflag)
+void OperateL3RDoor(int pnum, int oi, unsigned char sendflag)
 {
     int dx, dy;
     unsigned char dok;
 
-    if (object[i]._oVar4 == 2) {
+    if (object[oi]._oVar4 == 2) {
         if (!deltaload)
-            PlaySfxLoc(0x13, object[i]._ox, object[i]._oy);
+            PlaySfxLoc(0x13, object[oi]._ox, object[oi]._oy);
         return;
     }
-    dx = object[i]._ox;
-    dy = object[i]._oy;
-    if (object[i]._oVar4 == 0) {
+    dx = object[oi]._ox;
+    dy = object[oi]._oy;
+    if (object[oi]._oVar4 == 0) {
         if (pnum == myplr && sendflag)
-            NetSendCmdParam1(1, 0x2B, i);
+            NetSendCmdParam1(1, 0x2B, oi);
         if (!deltaload)
-            PlaySfxLoc(0x14, dx, dy);
+            PlaySfxLoc(0x14, object[oi]._ox, object[oi]._oy);
         ObjSetMicro(dx, dy, 0x21D);
-        object[i]._oPreFlag = 1;
-        object[i]._oVar4 = 1;
-        object[i]._oSelFlag = 2;
+        object[oi]._oPreFlag = 1;
+        object[oi]._oVar4 = 1;
+        object[oi]._oSelFlag = 2;
         RedoPlayerVision();
     } else {
         if (!deltaload)
             PlaySfxLoc(0x13, dx, dy);
         dok = dung_map[dx][dy].dMonster == 0;
-        if (dung_map[dx][dy].dItem != 0)
-            dok = 0;
-        if (GetdDead(dx, dy) != 0)
-            dok = 0;
+        dok = dok & !dung_map[dx][dy].dItem;
+        dok = dok & !GetdDead(dx, dy);
         if (dok) {
             if (pnum == myplr && sendflag)
-                NetSendCmdParam1(1, 0x2C, i);
-            object[i]._oVar4 = 0;
-            object[i]._oSelFlag = 3;
+                NetSendCmdParam1(1, 0x2C, oi);
+            object[oi]._oVar4 = 0;
+            object[oi]._oSelFlag = 3;
             ObjSetMicro(dx, dy, 0x216);
-            object[i]._oPreFlag = 0;
+            object[oi]._oPreFlag = 0;
             RedoPlayerVision();
         } else {
-            object[i]._oVar4 = 2;
+            object[oi]._oVar4 = 2;
         }
     }
 }
