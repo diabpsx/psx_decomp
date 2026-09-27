@@ -36,9 +36,19 @@ int LZNP_Decode(unsigned char *in, unsigned char *out)
                 else
                     j += 3;
             }
-            i = -i;
+            /* OPEN (7 diffs, 52/53): retail strength-reduces out - i into a walking pointer that
+             * reuses i's register (negu in the beqz delay slot, then addu); ours recomputes
+             * subu per byte.  Falsified: i = -i + out[i] (i/j swap), i as an int pointer (swap),
+             * *(out - i), for/do/while(j--) loop forms, *out++ = out[-i].
+             * 2026-09-27: `i = -i; while (j) { *out = out[i]; out++; j--; }` gives retail's exact 53-insn
+             * stream (negu in the beqz slot + addu + walking pointer) -- cse no longer folds out-(i) to a
+             * MINUS, so loop.c reduces the giv -- but i/j swap registers (ours i=v1 j=a2, retail i=a2 j=v1):
+             * greg priority giv 4.71 > i 4.52 > j 4.18 (floor_log2(refs)*refs/live).  Retail allocated j
+             * first.  Next angle: a spelling that raises j's refs/shortens its live range without new code
+             * (or lowers i's refs under 16); falsified: j/i decl order, register, unsigned j, j+=3 spellings,
+             * do/while(--j), for(i=-i;j;j--), statement order in both length arms. */
             while (j) {
-                *out = out[i];
+                *out = out[-i];
                 out++;
                 j--;
             }

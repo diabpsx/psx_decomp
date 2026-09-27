@@ -3610,17 +3610,35 @@ void MAI_RR2(int i, int mistype, int dam)
  * established "speculative read before guard" lever from M_StartHit/
  * M2MStartHit -- confirmed from the raw oracle (`lb s2,0x34(s1); lb
  * t0,0x35(s1)` happen BEFORE the `_mmode` check), then reused everywhere
- * `Monst->_mx`/`_my` would otherwise be re-read. SYM OPEN (length 0x52c vs
- * retail 0x53c, frame size now correct); bytes OPEN (116 diffs, ours 331 /
- * oracle 335, 4 short -- down from 232 diffs before this fix). Remaining
- * gap is the familiar i=$s3-vs-$s4 register-naming class plus a minor
- * save-order tie. Confirmed PSX-specific from the JAP decompile (absent
- * from hellfire): the skeleton-spawn is gated on `GetdDead(nx,ny)` (a
- * corpse must be present at the spawn tile) and, on success,
- * `SetdDead(nx,ny,0)` clears it -- hellfire spawns unconditionally once
- * `PosOkMonst && nummonsters<MAXMONSTERS` pass, with no corpse requirement
- * at all; `M_StartSpStand(i,md)` only fires inside the `GetdDead` branch,
- * not unconditionally after `PosOkMonst`. */
+ * `Monst->_mx`/`_my` would otherwise be re-read. Confirmed PSX-specific
+ * from the JAP decompile (absent from hellfire): the skeleton-spawn is
+ * gated on `GetdDead(nx,ny)` (a corpse must be present at the spawn tile)
+ * and, on success, `SetdDead(nx,ny,0)` clears it -- hellfire spawns
+ * unconditionally once `PosOkMonst && nummonsters<MAXMONSTERS` pass, with
+ * no corpse requirement at all; `M_StartSpStand(i,md)` only fires inside
+ * the `GetdDead` branch, not unconditionally after `PosOkMonst`.
+ * REAL BUG FOUND+FIXED this pass (post-git-stash-incident merge damage,
+ * same class as MAI_Rhino): the `_mx`/`_my` cache lines had regressed to a
+ * no-op self-assignment `_mx = _mx; _my = _my;` (compiler treats it as dead
+ * -- _mx/_my held UNINITIALIZED garbage at every use site: dung_map[][]
+ * indexing, LineClear, nx/ny offset math -- a real correctness bug, not
+ * just a coloring artifact) -- fixed to `_mx = Monst->_mx; _my = Monst->_my;`.
+ * This makes insn COUNT exact (335/335, was 331/335 wrong-length) but the
+ * newly-live real values raise register pressure enough that gcc's
+ * allocator diverges further from retail's choices: SYM DIFF (`i` lands on
+ * $s3 not retail's $s4 -- register numbering shifted by one across the
+ * whole function) and bytes regressed to 168 diffs (was 116 with the
+ * broken/dead version, which was closer only by chance since the "cache"
+ * was inert). OPEN. FALSIFIED: no reordering attempted yet beyond
+ * confirming declaration order already matches SYM (fx,fy,mx,my,md,v,dist,
+ * Monst,nx,ny,_mx,_my). NEXT ANGLE: retail spills `_my`/`fy` to the stack
+ * (SYM AUTO, not REG) while ours may be keeping different locals in
+ * registers under the new (correct) live-range pressure -- try forcing
+ * `nx`/`ny` (SYM wants them as REG $s2/$s0, ours currently spills them to
+ * sp+24/sp+16 per the raw diff) back into registers by shrinking their
+ * live range or restructuring the `GetdDead`/`SetdDead`/`M_StartSpStand`
+ * block; this is permuter/register-coloring territory per the methodology
+ * doc's "PERMUTER PLATEAU is a SMELL" class, not a structural miss. */
 void MAI_SkelKing(int i)
 {
     int fx, fy, mx, my, md, v;

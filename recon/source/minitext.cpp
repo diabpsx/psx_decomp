@@ -452,7 +452,8 @@ void DrawQText(void)
             long diff;
 
             currTime = VID_GetTick();
-            scrolltexty -= 0x10000;
+            diff = -0x10000;
+            scrolltexty += diff;
             sgLastScroll = currTime;
             qtexty = scrolltexty >> 16;
             if (TextWait >= qtexty)
