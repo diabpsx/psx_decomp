@@ -1260,15 +1260,13 @@ void AddElement(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
 void AddCbolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaster, int id, int dam)
 {
     if (micaster == TARGET_MONSTERS) {
-        if (id == myplr)
-            missile[mi]._mirnd = ENG_random(15) + 1;
-        else
-            missile[mi]._mirnd = ENG_random(15) + 1;
-        missile[mi]._midam = ENG_random(plr[id]._pMagic >> 2) + 1;
+        missile[mi]._mirnd = ENG_random(15) + 1;
+        dam = ENG_random(plr[id]._pMagic >> 2) + 1;
     } else {
         missile[mi]._mirnd = ENG_random(15) + 1;
-        missile[mi]._midam = 15;
+        dam = 15;
     }
+    missile[mi]._midam = dam;
 
     if (sx == dx && sy == dy) {
         dx += XDirAdd[midir];
@@ -1276,7 +1274,9 @@ void AddCbolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaster, 
     }
 
     missile[mi]._miAnimFrame = ENG_random(8) + 1;
-    missile[mi]._mlid = AddLight(sx, sy, 5);
+    /* PSX-only: like AddLightball, only every other group of missile slots (mi & 4) gets a light. */
+    if (mi & 4)
+        missile[mi]._mlid = AddLight(sx, sy, 0x242);
     GetMissileVel(mi, sx, sy, dx, dy, 8);
 
     missile[mi]._miVar1 = 5;
