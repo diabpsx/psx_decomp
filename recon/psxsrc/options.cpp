@@ -622,8 +622,8 @@ void SaveOverwritePad(void)
 
 void CharCardSelectMemcardPad(void)
 {
-    CPad *P;
     OMENUITEM *iptr;
+    CPad *P;
 
     iptr = MenuList[cmenu].Item;
     P = PAD_GetPad(options_pad, 0);
@@ -645,14 +645,12 @@ void CharCardSelectMemcardPad(void)
     LAMBO_MovePad(P);
     if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
         if (D_8011B3D8[cs] != 2) {
-            int oldcs;
             int link;
 
-            oldcs = cs;
-            link = iptr[oldcs].Link;
             countdownloadcharblock = 1;
             cardondelay = 5;
             PlaySFX(0x33);
+            link = iptr[cs].Link;
             cs = 1;
             lastcs = 1;
             current_card = 0;
