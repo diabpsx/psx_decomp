@@ -36,6 +36,7 @@ int ReturnMenu;                 /* gp_rel in FormatPad's oracle -> owned here */
 BOOL CharacterBlockLoaded;      /* gp_rel in FormatPad's oracle -> owned here */
 int ReturnCards;                /* gp_rel in SaveOverwritePad's oracle -> owned here */
 static int lastlastcs;          /* D_8011B238 -- SYM name "lastlastcs" */
+static int Spacing;             /* D_8011B22C -- SYM name "Spacing" */
 
 /* ---------------------------------------------------------------- header-copy methods ---- */
 unsigned short CPad::GetDown() const
@@ -692,6 +693,163 @@ void CharCardSelectMemcardPad(void)
         if (link != -2) {
             cmenu = link - 1;
             cs = 3;
+        }
+    }
+}
+
+void CharacterLoadPad(void)
+{
+    OMENUITEM *iptr;
+    CPad *P;
+
+    iptr = MenuList[cmenu].Item;
+    if (cardondelay > 0) {
+        cardondelay = cardondelay - 1;
+        if (countdownloadcharblock != 0)
+            ShowLoadingBox(card_side_read[current_card]);
+        else
+            ShowLoadingBox(0x348);
+        return;
+    }
+    if (countdownloadcharblock != 0)
+        ActivateCharacterMemcard(current_card == 0, (current_card ^ 1) == 0);
+    if (CharacterBlockLoaded == 0)
+        ActivateCharacterMemcard(current_card == 0, (current_card ^ 1) == 0);
+    P = PAD_GetPad(options_pad, 0);
+    if (AlertTxt != 0) {
+        int pressed;
+
+        ShowAlertBox();
+        pressed = 0;
+        if (P->GetDown() & 0x40)
+            pressed = 1;
+        else if (P->GetDown() & 0x10)
+            pressed = 1;
+        if (pressed) {
+            int n, link;
+
+            n = MenuList[cmenu].NoEntries - 1;
+            cs = n;
+            link = iptr[n].Link;
+            if (link != -2) {
+                cmenu = link - 1;
+                cs = 3;
+                CharacterBlockLoaded = 0;
+            }
+            PlaySFX(0x33);
+            AlertTxt = 0;
+            StatusTxt = 0;
+            loadflag = 0;
+            saveflag = 0;
+        }
+        return;
+    }
+
+    if (card_status[current_card] == 2) {
+        AlertTxt = card_side_empty[current_card];
+        return;
+    }
+    ShowCardActionText();
+    {
+        int pressed;
+
+        pressed = 0;
+        if (card_status[current_card] == 0) {
+            ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
+            pressed = 0;
+        }
+        if (P->GetDown() & 0x40)
+            pressed = 1;
+        else if (P->GetDown() & 0x10)
+            pressed = 1;
+        if (pressed) {
+            int n, link;
+
+            n = MenuList[cmenu].NoEntries - 1;
+            cs = n;
+            link = iptr[n].Link;
+            if (link != -2) {
+                cmenu = link - 1;
+                cs = 3;
+                CharacterBlockLoaded = 0;
+            }
+            PlaySFX(0x33);
+            AlertTxt = 0;
+            StatusTxt = 0;
+            loadflag = 0;
+            saveflag = 0;
+            return;
+        }
+        if (saveflag == 0) {
+            if (card_status[current_card] == 2) {
+                PlaySFX(0x3D3);
+                return;
+            }
+            PlaySFX(0x33);
+            if (GetSaveStatusMessage(1, DiabloCharacterFile) != 0) {
+                saveflag = 1;
+                if (card_usable[current_card] != 0) {
+                    int idx;
+
+                    idx = cs - 1;
+                    if (D_80157B68[1272 * idx] != 0) {
+                        int oldcmenu, oldcs;
+
+                        oldcmenu = cmenu;
+                        oldcs = cs;
+                        ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
+                        ReturnCards = 1;
+                        cmenu = 0x13;
+                        cs = 2;
+                        ReturnMenu = oldcmenu;
+                        lastlastcs = oldcs;
+                        return;
+                    }
+                } else {
+                    int oldcmenu, oldcs;
+
+                    oldcmenu = cmenu;
+                    oldcs = cs;
+                    cmenu = 0x10;
+                    formatflag = 0;
+                    cs = 2;
+                    ReturnMenu = oldcmenu;
+                    lastcs = oldcs;
+                    return;
+                }
+            }
+        }
+        if (saveflag < 3)
+            ShowLoadingBox(card_side_save[current_card]);
+        if (saveflag != 0) {
+            saveflag = saveflag + 1;
+            if (saveflag == 0xA) {
+                saveflag = 0;
+                if (GetSaveStatusMessage(1, DiabloCharacterFile) != 0) {
+                    if (PSX_CH_SaveGame(current_card, cs - 1) != 0) {
+                        AlertTxt = 0x50F;
+                        ActivateMemcard(0, 0);
+                    } else {
+                        AlertTxt = 0x506;
+                        ActivateMemcard(0, 0);
+                    }
+                }
+            }
+            return;
+        }
+        LAMBO_MovePad(P);
+        if (P->GetDown() & 0x100) {
+            int n, link;
+
+            PlaySFX(0x33);
+            n = MenuList[cmenu].NoEntries - 1;
+            CharacterBlockLoaded = 0;
+            cs = n;
+            link = iptr[n].Link;
+            if (link != -2) {
+                cmenu = link - 1;
+                cs = current_card + 1;
+            }
         }
     }
 }

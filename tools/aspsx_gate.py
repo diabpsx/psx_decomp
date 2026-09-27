@@ -55,6 +55,8 @@ def oracle(seg, board):
             out.append((w, m.group(3).strip()))
     return out
 
+RELOC_OPS = {0x09, 0x0F, 0x20, 0x21, 0x23, 0x24, 0x25, 0x28, 0x29, 0x2B}   # addiu lui lb lh lw lbu lhu sb sh sw
+
 def mask_for(text, word):
     op = word >> 26
     if op in (2, 3): return 0xFC000000                      # j / jal: absolute target
@@ -78,17 +80,24 @@ def main():
         if ora is None: print(f"  {n0}: NO ORACLE"); continue
         f = ours.get(n)
         if f is None: print(f"  {n0}: NOT IN OBJECT"); continue
-        data = fetch(mem, f["start"], len(ora) * 4)
-        if data is None: print(f"  {n0}: NOT IN CPE"); continue
-        words = struct.unpack(f"<{len(ora)}I", data)
-        bad = [(i, w, o, t) for i, (w, (o, t)) in enumerate(zip(words, ora)) if (w ^ o) & mask_for(t, o)]
         ours_len = f.get("end", 0) // 4        # SYM 'Function end' offset = function length
+        data = fetch(mem, f["start"], ours_len * 4)
+        if data is None: print(f"  {n0}: NOT IN CPE"); continue
+        words = struct.unpack(f"<{ours_len}I", data)
+        bad = [(i, w, o, t) for i, (w, (o, t)) in enumerate(zip(words, ora)) if (w ^ o) & mask_for(t, o)]
         if not bad and ours_len == len(ora):
             print(f"  {n0}: PASS ({len(ora)} insns)"); n_ok += 1
         else:
-            print(f"  {n0}: FAIL {len(bad)} diffs (ours {ours_len} / oracle {len(ora)})")
-            for i, w, o, t in bad[:6]:
-                print(f"      [{i:3}] ours {w:08x}  oracle {o:08x}  {t}")
+            # sequence-aligned view (positional compare cascades after one insert/delete)
+            import difflib
+            key = lambda w: w & (0xFC000000 if (w >> 26) in (2, 3) else 0xFFFF0000 if (w >> 26) in RELOC_OPS else 0xFFFFFFFF)
+            sm = difflib.SequenceMatcher(None, [key(w) for w in words], [key(o) for o, _ in ora], autojunk=False)
+            ops = [op for op in sm.get_opcodes() if op[0] != "equal"]
+            n = sum(max(i2 - i1, j2 - j1) for _, i1, i2, j1, j2 in ops)
+            print(f"  {n0}: FAIL {n} aligned diffs (ours {ours_len} / oracle {len(ora)})")
+            for tag, i1, i2, j1, j2 in ops[:5]:
+                print(f"      {tag} ours[{i1}:{i2}] oracle[{j1}:{j2}]: " +
+                      " ".join(f"{w:08x}" for w in words[i1:i2][:3]) + " | " + "; ".join(t for _, t in ora[j1:j2][:3]))
     print(f"ASPSX: {n_ok}/{len(names)} PASS")
 
 if __name__ == "__main__":

@@ -235,6 +235,18 @@ extern int D_8011B3D8[];   /* SYM has no name for this address (gap between Cred
                              * elsewhere. Indexed [cs]. */
 extern BOOL DoLoadedGame[];
 extern int countdownloadcharblock;
+extern int card_side_read[2];
+extern int card_side_save[2];
+extern int card_usable[2];
+extern char *DiabloCharacterFile;
+extern signed char D_80157B68[];   /* SYM has no name; big per-slot table, indexed by a 1272-byte
+                                     * stride (cs-1) and read signed-byte -- owned elsewhere. */
+BOOL GetSaveStatusMessage(int a, char *Name);   /* @0x8015A67C -- another module */
+void ShowCharacterFiles(int idx, int Spacing, RECT R, int Height);   /* @0x8015A90C -- another module,
+                                                                        * RECT passed BY VALUE (packed
+                                                                        * into 2 words per the SYM
+                                                                        * "G4RECT" mangling) */
+int PSX_CH_SaveGame(int a, int b);   /* @0x8015C3B0 -- another module */
 void ShowLoadingBox(int Str);   /* @0x800A5E5C CARDCORE.CPP */
 int format_card(int card);   /* @0x80142FF4 -- another module, real fn (not a BIOS syscall) */
 void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstructed in this TU */
@@ -258,5 +270,6 @@ void LAMBO_MovePad(CPad *P);   /* @0x800AB300 OPTIONS.CPP:3508 */
 void FormatPad(void);   /* @0x800AAB74 OPTIONS.CPP:3234 */
 void SaveOverwritePad(void);   /* @0x800AAE7C OPTIONS.CPP:3350 */
 void CharCardSelectMemcardPad(void);   /* @0x800AB0B8 OPTIONS.CPP:3432 */
+void CharacterLoadPad(void);   /* @0x800A839C OPTIONS.CPP:1522 */
 
 #endif
