@@ -124,7 +124,7 @@ int NoComp::DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) co
 
 void NoComp::DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const
 {
-    memcpy(Dest, Src, DstLen);
+    memcpy(Dest, Src, SrcLen);
 }
 
 int PakComp::DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const
@@ -236,44 +236,48 @@ void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 {
     sgbDeltaChanged = 1;
     DLevel *Dl = GetDLevel(bLevel, setlevel);
-    Dl->object[oi].bCmd = bCmd;
+    DObjectStr *p = &Dl->object[oi];
+    p->bCmd = bCmd;
     ReleaseDLevel(Dl);
 }
 
 /* @0x8004EF98 MSG.CPP:439 */
 BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
 {
-    int i;
     DLevel *Dl = GetDLevel(bLevel, setlevel);
     TCmdPItem *pD = Dl->item;
-    for (i = 0; i < MAXITEMS; i++, pD++) {
-        if (pD->bCmd == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
+    unsigned char *pB = (unsigned char *)pD;
+    int i;
+    unsigned char bc;
+    for (i = 0; i < MAXITEMS; i++, pD++, pB += sizeof(TCmdPItem)) {
+        bc = *pB;
+        if (bc == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
             continue;
 
-        if (pD->bCmd == CMD_WALKXY) {
+        if (bc == CMD_WALKXY) {
             ReleaseDLevel(Dl);
             return 1;
         }
-        if (pD->bCmd == CMD_STAND) {
+        if (bc == CMD_STAND) {
             sgbDeltaChanged = 1;
-            pD->bCmd = CMD_WALKXY;
+            *pB = CMD_WALKXY;
             ReleaseDLevel(Dl);
             return 1;
         }
-        if (pD->bCmd == CMD_ACK_PLRINFO) {
+        if (bc == CMD_ACK_PLRINFO) {
             sgbDeltaChanged = 1;
-            pD->bCmd = 0xFF;
+            *pB = 0xFF;
             ReleaseDLevel(Dl);
             return 1;
         }
         break;
     }
+    ReleaseDLevel(Dl);
 
-    if (pI->wCI & 0x8000) {
-        ReleaseDLevel(Dl);
+    if (!(pI->wCI & 0x8000))
         return 1;
-    }
 
+    Dl = GetDLevel(bLevel, setlevel);
     pD = Dl->item;
     for (i = 0; i < MAXITEMS; i++, pD++) {
         if (pD->bCmd == 0xFF) {
@@ -298,43 +302,45 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
     return 1;
 }
 
-/* @0x8004F164 MSG.CPP:568 */
+/* @0x8004F164 MSG.CPP:568 -- re-derived from the raw: the first loop only early-returns when a
+ * matching record's bCmd is EXACTLY CMD_ACK_PLRINFO(2) -- a match with any other live bCmd just
+ * keeps scanning (not an early-out) -- and a SEPARATE GetDLevel/ReleaseDLevel pair brackets each of
+ * the two loops (not one shared acquisition). The free-slot write is a raw struct copy (*pD = *pI)
+ * with bCmd/x/y overwritten afterward from the CALLER's own x/y (not pI's). */
 void delta_put_item(const TCmdPItem *pI, int x, int y, unsigned char bLevel)
 {
-    int i;
     DLevel *Dl = GetDLevel(bLevel, setlevel);
     TCmdPItem *pD = Dl->item;
+    int i;
+    unsigned char bc;
     for (i = 0; i < MAXITEMS; i++, pD++) {
-        if (pD->bCmd != CMD_WALKXY
-            && pD->bCmd != 0xFF
-            && pD->wIndx == pI->wIndx
-            && pD->wCI == pI->wCI
-            && pD->dwSeed == pI->dwSeed) {
+        bc = pD->bCmd;
+        if (bc == CMD_WALKXY || bc == 0xFF)
+            continue;
+        if (pD->wIndx != pI->wIndx)
+            continue;
+        if (pD->wCI != pI->wCI)
+            continue;
+        if (pD->dwSeed != pI->dwSeed)
+            continue;
+        if (bc == CMD_ACK_PLRINFO) {
             ReleaseDLevel(Dl);
             return;
         }
     }
+    ReleaseDLevel(Dl);
 
+    Dl = GetDLevel(bLevel, setlevel);
     pD = Dl->item;
     for (i = 0; i < MAXITEMS; i++, pD++) {
         if (pD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
-            pD->x = pI->x;
-            pD->y = pI->y;
-            pD->wIndx = pI->wIndx;
-            pD->wCI = pI->wCI;
-            pD->dwSeed = pI->dwSeed;
-            pD->bId = pI->bId;
-            pD->bDur = pI->bDur;
-            pD->bMDur = pI->bMDur;
-            pD->bCh = pI->bCh;
-            pD->bMCh = pI->bMCh;
-            pD->wValue = pI->wValue;
-            pD->dwBuff = pI->dwBuff;
+            *pD = *pI;
             pD->bCmd = CMD_ACK_PLRINFO;
             pD->x = x;
             pD->y = y;
-            break;
+            ReleaseDLevel(Dl);
+            return;
         }
     }
     ReleaseDLevel(Dl);
@@ -352,18 +358,26 @@ BOOL delta_quest_inited(int i)
     return sgJunk.quests[i].qstate != 0xFF;
 }
 
-/* @0x8004F338 MSG.CPP:655 */
+/* @0x8004F338 MSG.CPP:655 -- re-derived from the raw: the free-slot write's dwBuff source is
+ * item[ii]._PlrCreate (offset 0x65, sign-extended byte) -- NOT _iMagical (that mapping is specific
+ * to the NetSendCmdGItem/network-record family; this local delta-record uses a different field). */
 void DeltaAddItem(int ii)
 {
-    int i;
     DLevel *Dl = GetDLevel(currlevel, setlevel);
     TCmdPItem *pD = Dl->item;
+    unsigned char bc;
+    int i;
     for (i = 0; i < MAXITEMS; i++, pD++) {
-        if (pD->bCmd != 0xFF
-            && pD->wIndx == item[ii].IDidx
-            && pD->wCI == item[ii]._iCreateInfo
-            && pD->dwSeed == item[ii]._iSeed
-            && pD->bCmd < 2) {
+        bc = pD->bCmd;
+        if (bc == 0xFF)
+            continue;
+        if (pD->wIndx != item[ii].IDidx)
+            continue;
+        if (pD->wCI != item[ii]._iCreateInfo)
+            continue;
+        if (pD->dwSeed != item[ii]._iSeed)
+            continue;
+        if (bc < 2) {
             ReleaseDLevel(Dl);
             return;
         }
@@ -374,18 +388,18 @@ void DeltaAddItem(int ii)
         if (pD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
             pD->bCmd = 0;
-            pD->bId = item[ii]._iIdentified;
-            pD->bDur = item[ii]._iDurability;
+            pD->x = item[ii]._ix;
+            pD->y = item[ii]._iy;
             pD->wIndx = item[ii].IDidx;
             pD->wCI = item[ii]._iCreateInfo;
             pD->dwSeed = item[ii]._iSeed;
-            pD->bMDur = item[ii]._iMaxDur;
-            pD->x = item[ii]._ix;
-            pD->y = item[ii]._iy;
+            pD->bId = item[ii]._iIdentified;
+            pD->bDur = (unsigned char)item[ii]._iDurability;
+            pD->bMDur = (unsigned char)item[ii]._iMaxDur;
             pD->bCh = item[ii]._iCharges;
             pD->bMCh = item[ii]._iMaxCharges;
-            pD->wValue = item[ii]._ivalue;
-            pD->dwBuff = item[ii]._iFlags;
+            pD->wValue = (unsigned short)item[ii]._ivalue;
+            pD->dwBuff = item[ii]._PlrCreate;
             break;
         }
     }
@@ -395,10 +409,7 @@ void DeltaAddItem(int ii)
 /* @0x8004F560 MSG.CPP:731 */
 void DeltaExportData(char *Dst)
 {
-    CompressedLevs Levs;
-    GameMaps.ExportData((unsigned char *)&Levs.Offset[0]);
-    Levs.Version = 0;
-    memcpy(Dst, &Levs, Levs.GetSize());
+    GameMaps.ExportData((unsigned char *)Dst);
 }
 
 /* @0x8004F58C MSG.CPP:754 -- single-arg (char *Src is reinterpreted straight as CompressedLevs*);
@@ -541,46 +552,58 @@ void NetSendCmdGItem(unsigned char bHiPri, unsigned char bCmd, unsigned char mas
     cmd.bCmd = bCmd;
     cmd.bPnum = pnum;
     cmd.bMaster = mast;
-    cmd.bLevel = currlevel;
-    cmd.bCursitem = ii;
     cmd.dwTime = 0;
+    cmd.bCursitem = ii;
+    cmd.bLevel = currlevel;
     cmd.x = item[ii]._ix;
     cmd.y = item[ii]._iy;
     cmd.wIndx = item[ii].IDidx;
     cmd.wCI = item[ii]._iCreateInfo;
     cmd.dwSeed = item[ii]._iSeed;
     cmd.bId = item[ii]._iIdentified;
-    cmd.bDur = item[ii]._iDurability;
-    cmd.bMDur = item[ii]._iMaxDur;
+    cmd.bDur = (unsigned char)item[ii]._iDurability;
+    cmd.bMDur = (unsigned char)item[ii]._iMaxDur;
     cmd.bCh = item[ii]._iCharges;
     cmd.bMCh = item[ii]._iMaxCharges;
-    cmd.wValue = item[ii]._ivalue;
-    cmd.dwBuff = item[ii]._iFlags;
+    cmd.wValue = (unsigned short)item[ii]._ivalue;
+    /* dwBuff is really (long)(signed char)_iMagical, NOT _iFlags -- confirmed via the raw's `lb`
+     * (signed byte load) + `sw` (sign-extended to a full word) sequence. */
+    cmd.dwBuff = (signed char)item[ii]._iMagical;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FA84 MSG.CPP:1069 */
 void NetSendCmdGItem2(unsigned char usonly, unsigned char bCmd, unsigned char mast, unsigned char pnum, const TCmdGItem *p)
 {
-    TCmdGItem cmd;
-    memcpy(&cmd, p, sizeof(cmd));
+    TCmdGItem cmd = *p;
     cmd.bCmd = bCmd;
     cmd.bPnum = pnum;
     cmd.bMaster = mast;
-    NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
+    if (!usonly) {
+        cmd.dwTime = 0;
+        NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
+    }
 }
 
 /* @0x8004FB08 MSG.CPP:1100 */
+/* builds a local copy but never actually SENDS it (no NetSendLoPri call) -- dead-looking but that is
+ * exactly what the raw does; always returns 1. */
 unsigned char NetSendCmdReq2(unsigned char bCmd, unsigned char mast, unsigned char pnum, const TCmdGItem *p)
 {
-    NetSendCmdGItem2(0, bCmd, mast, pnum, p);
+    TCmdGItem cmd = *p;
+    cmd.bCmd = bCmd;
+    cmd.bPnum = pnum;
+    cmd.bMaster = mast;
     return 1;
 }
 
 /* @0x8004FB68 MSG.CPP:1126 */
 void NetSendCmdExtra(const TCmdGItem *p)
 {
-    NetSendCmdGItem2(0, CMD_ITEMEXTRA, p->bMaster, p->bPnum, p);
+    TCmdGItem cmd = *p;
+    cmd.bCmd = 0x55; /* confirmed literal (not CMD_ITEMEXTRA's ParseCmd-position value) */
+    cmd.dwTime = 0;
+    NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FBD8 MSG.CPP:1138 -- reads plr[myplr].HoldItem (the currently-held/dragged item), NOT
@@ -600,7 +623,7 @@ void NetSendCmdPItem(unsigned char bHiPri, unsigned char bCmd, unsigned char x, 
     cmd.bCh = plr[myplr].HoldItem._iCharges;
     cmd.bMCh = plr[myplr].HoldItem._iMaxCharges;
     cmd.wValue = plr[myplr].HoldItem._ivalue;
-    cmd.dwBuff = plr[myplr].HoldItem._iFlags;
+    cmd.dwBuff = (signed char)plr[myplr].HoldItem._iMagical;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -618,19 +641,19 @@ void NetSendCmdChItem(unsigned char bHiPri, unsigned char bLoc)
 }
 
 /* @0x8004FD98 MSG.CPP:1212 */
-void NetSendCmdDelItem(unsigned char bLoc, unsigned char bCmd)
+void NetSendCmdDelItem(unsigned char bHiPri, unsigned char bLoc)
 {
     TCmdDelItem cmd;
-    cmd.bCmd = bCmd;
+    cmd.bCmd = 0x31; /* confirmed literal, bHiPri param unused */
     cmd.bLoc = bLoc;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FDC8 MSG.CPP:1223 */
-void NetSendCmdDItem(unsigned char bCmd, int ii)
+void NetSendCmdDItem(unsigned char bHiPri, int ii)
 {
     TCmdPItem cmd;
-    cmd.bCmd = bCmd;
+    cmd.bCmd = 0x34; /* confirmed literal, bHiPri param unused */
     cmd.x = item[ii]._ix;
     cmd.y = item[ii]._iy;
     cmd.wIndx = item[ii].IDidx;
@@ -642,7 +665,7 @@ void NetSendCmdDItem(unsigned char bCmd, int ii)
     cmd.bCh = item[ii]._iCharges;
     cmd.bMCh = item[ii]._iMaxCharges;
     cmd.wValue = item[ii]._ivalue;
-    cmd.dwBuff = item[ii]._iFlags;
+    cmd.dwBuff = (signed char)item[ii]._iMagical;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -722,11 +745,10 @@ void On_ADDVIT(const TCmd *pCmd, int pnum)
  * (cmd->wParam1) and the PLAYER's own currently-set splType (plr[pnum]._pSplType), not the cmd's. */
 void On_SBSPELL(const TCmd *pCmd, int pnum)
 {
-    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    plr[pnum]._pSplType = plr[pnum]._pRSplType;
+    plr[pnum]._pSplFrom = 1;
     plr[pnum].destAction = 0xC;
-    plr[pnum].destParam1 = (char)p->wParam1;
-    plr[pnum].destParam2 = plr[pnum]._pRSplType;
+    plr[pnum]._pSpell = (char)((const TCmdParam1 *)pCmd)->wParam1;
+    plr[pnum]._pSplType = plr[pnum]._pRSplType;
 }
 
 /* @0x80050128 MSG.CPP:1469 */
@@ -751,14 +773,15 @@ void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
 void On_REQUESTGITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
-    if (i_own_level(plr[pnum].plrlevel)) {
+    unsigned char own = i_own_level(plr[pnum].plrlevel);
+    if (own) {
         int ii = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
         if (ii != -1) {
             NetSendCmdGItem2(0, 8, myplr, p->bPnum, p);
-            if (p->bPnum == myplr)
-                InvGetItem(p->bPnum, ii);
-            else
+            if (p->bPnum != myplr)
                 SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
+            else
+                InvGetItem(p->bPnum, ii);
         } else {
             if (!NetSendCmdReq2(0x27, myplr, p->bPnum, p))
                 NetSendCmdExtra(p);
@@ -766,30 +789,40 @@ void On_REQUESTGITEM(const TCmd *pCmd, int pnum)
     }
 }
 
-/* @0x800502F0 MSG.CPP:1532 -- UNVERIFIED against the raw byte-for-byte (the branch tree here is the
- * deepest in the TU); the semantic shape (delta_get_item gate, then InvGetItem for the local pnum
- * vs SyncGetItem/AutoGetItem echo for a remote one, then NetSendCmdGItem2 re-broadcast when the
- * delta says "not mine") matches devilution's On_GETITEM but the exact branch nesting/early-outs
- * were not individually re-derived from every raw compare -- FLAG for a follow-up verify_asm pass. */
+/* @0x800502F0 MSG.CPP:1532 -- re-derived instruction-by-instruction from the raw (the deepest branch
+ * tree in the TU): the "currlevel==bLevel" skip and the "bMaster==myplr => do nothing" gate are BOTH
+ * real, and the not-mine SyncGetItem echo re-reads wIndx from a register that survived from the
+ * bPnum check (not the bLevel-equal arm at all) -- goto/labels used to guarantee the exact retail
+ * block layout rather than risk the compiler re-threading an equivalent if/else differently. */
 void On_GETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     int ii = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
-    unsigned char master = p->bMaster;
-    BOOL ok = delta_get_item(p, p->bLevel);
-    if (ok) {
-        if (currlevel == p->bLevel && (p->bPnum == myplr || master == myplr)) {
-            if (p->bPnum == myplr)
-                InvGetItem(myplr, ii);
-            else if (currlevel == p->bLevel)
-                SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
-            else
-                InvGetItem(myplr, ii);
-        } else {
-            SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
-        }
-    } else {
-        NetSendCmdGItem2(1, 8, master, p->bPnum, p);
+    unsigned char bLevel = p->bLevel;
+    BOOL ok = delta_get_item(p, bLevel);
+    if (!ok) {
+        NetSendCmdGItem2(1, 8, p->bMaster, p->bPnum, p);
+        return;
+    }
+    if (currlevel != bLevel) {
+        if (p->bPnum != myplr)
+            return;
+    }
+    if (p->bMaster == myplr)
+        return;
+    if (p->bPnum != myplr) {
+        SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
+        return;
+    }
+    if (currlevel == bLevel) {
+        InvGetItem(p->bPnum, ii);
+        return;
+    }
+    {
+        int result = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI, p->dwSeed,
+                                  p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
+        if (result != -1)
+            InvGetItem(myplr, result);
     }
 }
 
@@ -797,42 +830,55 @@ void On_GETITEM(const TCmd *pCmd, int pnum)
 void On_REQUESTAGITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
-    if (i_own_level(plr[pnum].plrlevel)) {
+    unsigned char own = i_own_level(plr[pnum].plrlevel);
+    if (own) {
         int ii = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
         if (ii != -1) {
             NetSendCmdGItem2(0, 9, myplr, p->bPnum, p);
-            if (p->bPnum == myplr)
-                AutoGetItem(p->bPnum, ii);
-            else
+            if (p->bPnum != myplr)
                 SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
+            else
+                AutoGetItem(p->bPnum, p->bCursitem);
         } else {
-            if (!NetSendCmdReq2(0x27, myplr, p->bPnum, p))
+            if (!NetSendCmdReq2(0x28, myplr, p->bPnum, p))
                 NetSendCmdExtra(p);
         }
     }
 }
 
-/* @0x80050680 MSG.CPP:1654 -- UNVERIFIED (same caveat as On_GETITEM; the auto-pickup twin, using
- * AutoGetItem instead of InvGetItem for the local-pnum arm). */
+/* @0x80050680 MSG.CPP:1654 -- re-derived instruction-by-instruction like On_GETITEM: same branch
+ * skeleton (delta_get_item gate / currlevel-vs-bLevel / bMaster==myplr no-op / bPnum-not-mine echo),
+ * but the currlevel==bLevel direct-pickup arm calls AutoGetItem(bPnum,bCursitem) -- NOT ii -- while
+ * the SyncPutItem fallback arm still calls AutoGetItem(myplr,result) same as On_GETITEM's InvGetItem. */
 void On_AGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     int ii = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
-    unsigned char master = p->bMaster;
-    BOOL ok = delta_get_item(p, p->bLevel);
-    if (ok) {
-        if (currlevel == p->bLevel && (p->bPnum == myplr || master == myplr)) {
-            if (p->bPnum == myplr)
-                AutoGetItem(myplr, ii);
-            else if (currlevel == p->bLevel)
-                SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
-            else
-                AutoGetItem(myplr, ii);
-        } else {
-            SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
-        }
-    } else {
-        NetSendCmdGItem2(1, 9, master, p->bPnum, p);
+    unsigned char bLevel = p->bLevel;
+    BOOL ok = delta_get_item(p, bLevel);
+    if (!ok) {
+        NetSendCmdGItem2(1, 9, p->bMaster, p->bPnum, p);
+        return;
+    }
+    if (currlevel != bLevel) {
+        if (p->bPnum != myplr)
+            return;
+    }
+    if (p->bMaster == myplr)
+        return;
+    if (p->bPnum != myplr) {
+        SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
+        return;
+    }
+    if (currlevel == bLevel) {
+        AutoGetItem(p->bPnum, p->bCursitem);
+        return;
+    }
+    {
+        int result = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI, p->dwSeed,
+                                  p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
+        if (result != -1)
+            AutoGetItem(myplr, result);
     }
 }
 
@@ -918,12 +964,13 @@ void On_TSPELLXY(const TCmd *pCmd, int pnum)
 void On_SPELLID(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellID *p = (const TCmdSpellID *)pCmd;
+    unsigned short spell = p->wParam2;
     ClrPlrPath(pnum);
-    plr[pnum]._pSpell = (char)p->wParam2;
     plr[pnum].destAction = 0x18;
     plr[pnum]._pSplFrom = 0;
     plr[pnum].destParam1 = (char)p->wParam1;
     plr[pnum].destParam2 = (char)p->wParam3;
+    plr[pnum]._pSpell = (char)spell;
     plr[pnum]._pSplType = plr[pnum]._pRSplType;
 }
 
@@ -933,6 +980,7 @@ void On_SPELLPID(const TCmd *pCmd, int pnum)
     const TCmdSpellID *p = (const TCmdSpellID *)pCmd;
     ClrPlrPath(pnum);
     plr[pnum].destAction = 0x19;
+    plr[pnum]._pSplFrom = 0;
     plr[pnum].destParam1 = (char)p->wParam1;
     plr[pnum].destParam2 = (char)p->wParam3;
     plr[pnum]._pSpell = (char)p->wParam2;
@@ -1018,11 +1066,10 @@ void On_WARP(const TCmd *pCmd, int pnum)
 void On_MONSTDEATH(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    int mi = p->wParam1;
     if (pnum != myplr) {
-        if (plr[pnum].plrlevel == currlevel)
-            M_SyncStartKill(mi, p->x, p->y, pnum);
-        delta_kill_monster(mi, p->x, p->y, plr[pnum].plrlevel);
+        if (currlevel == plr[pnum].plrlevel)
+            M_SyncStartKill(p->wParam1, p->x, p->y, pnum);
+        delta_kill_monster(p->wParam1, p->x, p->y, plr[pnum].plrlevel);
     }
 }
 
@@ -1040,17 +1087,18 @@ void On_KILLGOLEM(const TCmd *pCmd, int pnum)
  * this player's golem (the loop over missileactive[] guards against a duplicate MIS_GOLEM(0x21)). */
 void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 {
-    const TCmdGolem *p = (const TCmdGolem *)pCmd;
     if (pnum != myplr) {
-        BOOL spawn = 1;
+        unsigned char addok = 1;
         int i;
         for (i = 0; i < nummissiles; i++) {
             int mi = missileactive[i];
             if (missile[mi]._mitype == 0x21 && missile[mi]._misource == pnum)
-                spawn = 0;
+                addok = 0;
         }
-        if (spawn)
+        if (addok) {
+            const TCmdGolem *p = (const TCmdGolem *)pCmd;
             AddMissile(plr[pnum]._px, plr[pnum]._py, p->_mx, p->_my, p->_mdir, 0x21, 0, pnum, 0, 1);
+        }
     }
 }
 
@@ -1059,15 +1107,12 @@ void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
     if (pnum != myplr) {
-        int mi = p->wParam1;
-        monster[mi].mWhoHit |= (1 << pnum);
-        if (monster[mi]._mhitpoints != 0) {
-            long hp = monster[mi]._mhitpoints - p->wParam2;
-            monster[mi]._mhitpoints = hp;
-            if ((hp >> 6) <= 0)
-                monster[mi]._mhitpoints = 0x40;
-            else
-                delta_monster_hp(mi, monster[mi]._mhitpoints, plr[pnum].plrlevel);
+        monster[p->wParam1].mWhoHit |= (1 << pnum);
+        if (monster[p->wParam1]._mhitpoints != 0) {
+            monster[p->wParam1]._mhitpoints -= p->wParam2;
+            if ((monster[p->wParam1]._mhitpoints >> 6) <= 0)
+                monster[p->wParam1]._mhitpoints = 0x40;
+            delta_monster_hp(p->wParam1, monster[p->wParam1]._mhitpoints, plr[pnum].plrlevel);
         }
     }
 }
@@ -1089,16 +1134,18 @@ void On_PLRDEAD(const TCmd *pCmd, int pnum)
 void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
 {
     const TCmdDamage *p = (const TCmdDamage *)pCmd;
-    if (currlevel != 0 && gbBufferMsgs != 1
-        && plr[pnum].plrlevel == currlevel
-        && p->dwDam <= 0x2EE00) {
-        if ((plr[pnum]._pHitPoints >> 6) > 0) {
-            plr[pnum]._pHitPoints -= p->dwDam;
-            if (plr[pnum]._pMaxHP < plr[pnum]._pHitPoints) {
-                plr[pnum]._pHPBase = plr[pnum]._pMaxHPBase;
-                plr[pnum]._pHitPoints = plr[pnum]._pMaxHP;
+    /* the delta is applied to plr[p->bPlr] (the player index embedded in the COMMAND), but the
+     * kill-check right below is against plr[pnum] (ParseCmd's own index) -- confirmed asymmetry,
+     * both read straight off the raw. */
+    PlayerStruct *pp = &plr[p->bPlr];
+    if (currlevel != 0 && gbBufferMsgs != 1 && pp->plrlevel == currlevel && p->dwDam <= 0x2EE00) {
+        if ((pp->_pHitPoints >> 6) > 0) {
+            pp->_pHitPoints -= p->dwDam;
+            if (pp->_pMaxHP < pp->_pHitPoints) {
+                pp->_pHPBase = pp->_pMaxHPBase;
+                pp->_pHitPoints = pp->_pMaxHP;
             } else {
-                plr[pnum]._pHPBase -= p->dwDam;
+                pp->_pHPBase -= p->dwDam;
             }
         }
     }
@@ -1110,20 +1157,24 @@ void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
 void On_OPOBJXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    int oi = p->wParam1;
-    MakePlrPath(pnum, p->x, p->y, object[oi]._oSolidFlag == 0 && object[oi]._oDoorFlag == 0);
+    if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
+        MakePlrPath(pnum, p->x, p->y, 1);
+    else
+        MakePlrPath(pnum, p->x, p->y, 0);
     plr[pnum].destAction = 0xD;
-    plr[pnum].destParam1 = (char)oi;
+    plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x80050FA0 MSG.CPP:1952 */
 void On_DISARMXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    int oi = p->wParam1;
-    MakePlrPath(pnum, p->x, p->y, object[oi]._oSolidFlag == 0 && object[oi]._oDoorFlag == 0);
+    if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
+        MakePlrPath(pnum, p->x, p->y, 1);
+    else
+        MakePlrPath(pnum, p->x, p->y, 0);
     plr[pnum].destAction = 0xE;
-    plr[pnum].destParam1 = (char)oi;
+    plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x800510CC MSG.CPP:1984 */
@@ -1205,24 +1256,31 @@ void On_PUTITEM(const TCmd *pCmd, int pnum)
     check_update_plr(pnum);
 }
 
-/* @0x80050978 MSG.CPP:1795 -- UNVERIFIED: raw asm not individually re-derived (large fn, fsize 72);
- * best-effort from devilution's On_SYNCPUTITEM (SyncPutItem echoes a full item description at x,y
- * for a remote drop so it appears identically on this machine). */
+/* @0x80050978 MSG.CPP:1795 -- re-derived from the raw: check_update_plr(pnum) is ALWAYS called after
+ * a successful SyncPutItem (was previously missing), same "delta_put_item echoes the placed item's
+ * own _ix/_iy" pattern as On_PUTITEM. */
 void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
     int ii = SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
-    if (ii != -1)
-        delta_put_item((const TCmdPItem *)p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
+    if (ii != -1) {
+        delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
+        check_update_plr(pnum);
+    }
 }
 
-/* @0x80050A7C MSG.CPP:1834 -- UNVERIFIED (same caveat); a dropped/respawned item echo (no delta
- * record -- these are transient floor items, e.g. monster drops the other player already deltas). */
+/* @0x80050A7C MSG.CPP:1794 -- re-derived from the raw: a plrlevel==currlevel gate wraps the
+ * SyncPutItem echo (previously missing), and delta_put_item is ALWAYS called afterward regardless
+ * of that gate, with the target player's (unsigned char)plrlevel as the bLevel arg. */
 void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
-    if (pnum != myplr)
-        SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
+    if (currlevel == plr[pnum].plrlevel) {
+        if (pnum != myplr)
+            SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh,
+                        p->wValue, p->dwBuff);
+    }
+    delta_put_item(p, p->x, p->y, (unsigned char)plr[pnum].plrlevel);
 }
 
 /* @0x80051F64 MSG.CPP:2428 -- UNVERIFIED (fsize 32, non-trivial fn not individually re-derived);
@@ -1231,12 +1289,31 @@ void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
 void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    plr[pnum].plractive = 1;
-    plr[pnum]._px = p->x;
-    plr[pnum]._py = p->y;
-    plr[pnum].plrlevel = p->wParam1;
-    if (pnum != myplr)
+    plr[pnum]._pLvlChanging = 0;
+    if (plr[pnum].plractive && pnum) {
+        plr[pnum]._pGFXLoad = 0;
+        plr[pnum]._px = p->x;
+        plr[pnum]._py = p->y;
+        plr[pnum].plrlevel = p->wParam1;
         SyncInitPlr(pnum);
+        if ((plr[pnum]._pHitPoints >> 6) > 0) {
+            StartStand(pnum, 0);
+        } else {
+            int numFrames = plr[pnum]._pDFrames;
+            plr[pnum]._pgfxnum = 0;
+            plr[pnum]._pmode = (enum PLR_MODE)8;
+            NewPlrAnim(pnum, 1, numFrames, 1);
+            plr[pnum]._pAnimFrame = plr[pnum]._pAnimLen - 1;
+            plr[pnum]._pVar8 = plr[pnum]._pAnimLen * 2;
+        }
+        if (plr[pnum]._pvid == -1)
+            plr[pnum]._pvid = (char)AddVision(plr[pnum]._px, plr[pnum]._py, 10, pnum);
+        gbActivePlayers = 0;
+        if (plr[pnum].plractive)
+            gbActivePlayers = 1;
+        if (plr[1].plractive)
+            gbActivePlayers = gbActivePlayers + 1;
+    }
 }
 
 /* @0x8005216C MSG.CPP:2487 -- UNVERIFIED. */
@@ -1247,28 +1324,38 @@ void On_ACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800521B0 MSG.CPP:2526 -- UNVERIFIED. */
+/* @0x800521B0 MSG.CPP:2494 -- re-derived: pnum is unused for anything BUT reused in place as the
+ * 0..1 portal-index loop counter (SYM lists it at s0, matching the raw's loop register). */
 void On_DEACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 {
-    if (PortalOnLevel(pnum))
-        RemovePortalMissile(pnum);
-    DeactivatePortal(pnum);
-    delta_close_portal(pnum);
+    for (pnum = 0; pnum < 2; pnum++) {
+        if (PortalOnLevel(pnum))
+            RemovePortalMissile(pnum);
+        DeactivatePortal(pnum);
+        delta_close_portal(pnum);
+    }
 }
 
 /* @0x80052210 MSG.CPP:2542 -- UNVERIFIED. */
 void On_RETOWN(const TCmd *pCmd, int pnum)
 {
-    if (pnum != myplr)
-        RestartTownLvl(pnum);
-    else
-        check_update_plr(pnum);
+    if (pnum == myplr)
+        deathflag = 0;
+    RestartTownLvl(pnum);
 }
 
 /* @0x80052390 MSG.CPP:2624 -- UNVERIFIED (fsize 40, not individually re-derived). */
 void On_ENDSHIELD(const TCmd *pCmd, int pnum)
 {
-    if (pnum != myplr)
-        check_update_plr(pnum);
+    if (pnum != myplr) {
+        for (int i = 0; i < nummissiles; i++) {
+            int mi = missileactive[i];
+            if (missile[mi]._mitype == 0xD && missile[mi]._misource == pnum) {
+                ClearMissileSpot(mi);
+                DeleteMissile(mi, i);
+            }
+        }
+    }
 }
 
 /* @0x80051EF4 MSG.CPP:2385 -- no-op: PSX has no cross-player inventory transfer command. */
@@ -1329,7 +1416,9 @@ void On_SETVIT(const TCmd *pCmd, int pnum)
 void On_SYNCQUEST(const TCmd *pCmd, int pnum)
 {
     const TCmdQuest *p = (const TCmdQuest *)pCmd;
-    SetMultiQuest(p->q, p->qstate, p->qlog, p->qvar1);
+    if (pnum != myplr)
+        SetMultiQuest(p->q, p->qstate, p->qlog, p->qvar1);
+    sgbDeltaChanged = 1;
 }
 
 /* @0x80052468 MSG.CPP:2676 -- bare switch(pCmd->bCmd) dispatch; no bLen/plractive validation.
