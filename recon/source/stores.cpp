@@ -1054,6 +1054,68 @@ void S_StartStory(void)
     AddSLine(3);
 }
 
+/* @0x8006E824 */
+void S_StartSIdentify(void)
+{
+    int i;
+    unsigned char idok;
+
+    SItemListFlag = 2;
+    stextsize = 1;
+    idok = 0;
+    storenumh = 0;
+    for (i = 0; i < 48; i++)
+        storehold[i]._itype = -1;
+    if (IdItemOk(&plr[myplr].InvBody[0])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[0], -1);
+    }
+    if (IdItemOk(&plr[myplr].InvBody[6])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[6], -2);
+    }
+    if (IdItemOk(&plr[myplr].InvBody[4])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[4], -3);
+    }
+    if (IdItemOk(&plr[myplr].InvBody[5])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[5], -4);
+    }
+    if (IdItemOk(&plr[myplr].InvBody[1])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[1], -5);
+    }
+    if (IdItemOk(&plr[myplr].InvBody[2])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[2], -6);
+    }
+    if (IdItemOk(&plr[myplr].InvBody[3])) {
+        idok = 1;
+        AddStoreHoldId(plr[myplr].InvBody[3], -7);
+    }
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (IdItemOk(&plr[myplr].InvList[i])) {
+            idok = 1;
+            AddStoreHoldId(plr[myplr].InvList[i], i);
+        }
+    }
+    if (!idok) {
+        stextscrl = 0;
+        sprintf(tempstr, GetStr(0x4EC), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+    } else {
+        stextscrl = 1;
+        stextsval = 0;
+        stextsmax = plr[myplr]._pNumInv;
+        sprintf(tempstr, GetStr(0x209), plr[myplr]._pGold);
+        AddSText(0, 1, 1, tempstr, 3, 0);
+        AddSLine(2);
+        S_ScrollSSell(stextsval);
+    }
+}
+
 /* @0x8006F2C4 */
 void S_StartIdShow(void)
 {
