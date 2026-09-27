@@ -11,7 +11,7 @@
 #include "psyq.h"
 
 /* ---------------------------------------------------------------- types (SYM / libcd.h) */
-typedef struct { u_char minute, second, sector, track; } CdlLOC;   /* sizeof 4 */
+typedef struct CdlLOC { u_char minute, second, sector, track; } CdlLOC;   /* sizeof 4 */
 typedef struct CdlFILE { CdlLOC pos; u_int size; char name[16]; } CdlFILE;  /* sizeof 24 */
 typedef struct strheader {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     u_short id, type, secCount, nSectors;
@@ -117,7 +117,7 @@ void CD_GetCdlFILE(const char *name, CdlFILE *p);   /* mangled CD_GetCdlFILE__FP
 int ReloadGP(void);
 void SetGP(int gp);
 void DBG_Error(int code, const char *file, int line);
-void DBG_Halt(int code);
+void DBG_Halt(void);
 void EnterCriticalSection(void);
 void ExitCriticalSection(void);
 int printf(const char *fmt, ...);
@@ -185,7 +185,7 @@ static volatile int _discard_count;   /* USER RULING (this session): volatile al
  * never touches them -- NOT a general policy widening, this pair only. */
 static volatile int _get_count;   /* see _discard_count ruling comment above */
 static volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
-static volatile int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
+static int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
 static void *volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
@@ -197,9 +197,6 @@ static volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_last_sector;   /* ISR-shared (CdReadyCallback) */
-static volatile int D_8011C74C;   /* idx: chunk index of the sector about to be read */
-static volatile int D_8011C754;   /* sec: CdPosToInt() result of the drive's actual position */
-static volatile CdlLOC D_80121C98;   /* subcode: scratch CdlLOC for CdGetSector/CdPosToInt; ISR-shared (CdReadyCallback) */
 static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movie filename buffer;
                                       * LoPlayFMVOverLay strcpy's "DIABEND*.MOV" into it before queuing
                                       * a play_mdec_stream/dequeue_animation request. Gap to the next
@@ -312,48 +309,57 @@ extern "C" void kill_stream_handlers(void)
 /* @0x80155F30 FMV.CPP:384 */
 extern "C" void stream_cdready_handler(unsigned char status, unsigned char *result)
 {
+    static int idx;   /* retail SYM: function statics idx/i/sec/subcode (sbss/bss @0x8011C74C..) */
+    static int i;
+    static int sec;
+    static CdlLOC subcode[3];
     unsigned long OldGp = ReloadGP();
 
     if (stream_ending == 0)
         first_handler_event = 1;
     last_handler_event = time_in_frames;
-    D_8011C74C = stream_in * stream_chunksize + (stream_subsec % stream_chunksize);
-    if (cdstream_resetting == 0 && stream_open != 0) {
-        if ((status & 0xFF) != 1) {
-            cdstream_resetting = 1;
+    idx = stream_in * stream_chunksize + (stream_subsec % stream_chunksize);
+    if (cdstream_resetting == 0)
+    if (stream_open != 0) {
+        if (status != 1) {
             cdstream_resetsec = stream_secnum - 1;
-        } else if (stream_ending != 0) {
+            cdstream_resetting = 1;
+            SetGP(OldGp);
+            return;
+        }
+        if (stream_ending != 0) {
             kill_stream_handlers();
             first_handler_event = 0;
             stream_ending = 0;
             stream_open = 0;
-        } else if (stream_stalled == 0) {
-            CdGetSector(&D_80121C98, 3);
-            D_8011C754 = CdPosToInt(&D_80121C98);
-            if (D_8011C754 != stream_secnum) {
+            SetGP(OldGp);
+            return;
+        }
+        if (stream_stalled == 0) {
+            CdGetSector(subcode, 3);
+            sec = CdPosToInt(subcode);
+            if (sec != stream_secnum) {
                 cdstream_resetting = 1;
                 cdstream_resetsec = stream_secnum;
-            } else {
-                CdGetSector(stream_bufh + (D_8011C74C << 5), 8);
-                CdGetSector(stream_buf + (D_8011C74C * 0x7E0), 0x1F8);
-                stream_secnum += 1;
-                stream_subsec += 1;
-                if (stream_subsec == stream_chunksize) {
-                    stream_subsec = 0;
-                    stream_chunks_in += 1;
-                    stream_chunks_total += 1;
-                    stream_in = (stream_in + 1) % stream_bufsize;
-                    if (stream_chunks_in == stream_bufsize)
-                        stream_stalled = 1;
-                }
-                if (stream_secnum == stream_last_sector) {
-                    /* NB: retail passes the saved GP value (not a real reason code) to DBG_Halt here --
-                     * a1/a0 register reuse artifact at the branch's shared delay slot, kept literally. */
-                    DBG_Halt(OldGp);
-                    kill_stream_handlers();
-                    stream_ending = 0;
-                    stream_open = 0;
-                }
+                return;
+            }
+            CdGetSector(stream_bufh + (idx << 5), 8);
+            CdGetSector(stream_buf + (idx * 0x7E0), 0x1F8);
+            stream_secnum++;
+            stream_subsec += 1;
+            if (stream_subsec == stream_chunksize) {
+                stream_subsec = 0;
+                stream_chunks_in++;
+                stream_chunks_total++;
+                stream_in = (stream_in + 1) % stream_bufsize;
+                if (stream_chunks_in == stream_bufsize)
+                    stream_stalled = 1;
+            }
+            if (stream_secnum == stream_last_sector) {
+                DBG_Halt();
+                kill_stream_handlers();
+                stream_ending = 0;
+                stream_open = 0;
             }
         }
     }
