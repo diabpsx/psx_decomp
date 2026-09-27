@@ -446,13 +446,14 @@ void AddObject(int ot, int ox, int oy)
 
 void BreakObject(int pnum, int oi)
 {
-    int mind, maxd, objdam;
+    int objdam, mind, maxd;
 
     if (pnum != -1) {
         mind = plr[pnum]._pIMinDam;
         maxd = plr[pnum]._pIMaxDam;
         objdam = ENG_random(maxd - mind + 1) + mind;
-        objdam += plr[pnum]._pDamageMod + plr[pnum]._pIBonusDamMod + plr[pnum]._pIBonusDam * objdam / 100;
+        objdam += objdam * plr[pnum]._pIBonusDam / 100;
+        objdam += plr[pnum]._pIBonusDamMod + plr[pnum]._pDamageMod;
     } else {
         objdam = 10;
     }
