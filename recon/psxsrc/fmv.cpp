@@ -175,9 +175,9 @@ static volatile int stream_chunksize;   /* ISR-shared (CdReadyCallback) */
 static unsigned char *volatile stream_bufh;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_bufsize;   /* ISR-shared (CdReadyCallback) */
 static unsigned char *volatile stream_buf;   /* ISR-shared (CdReadyCallback) */
-static int stream_chunks_borrowed;
+static volatile int stream_chunks_borrowed;
 static volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
-static int stream_out;
+static volatile int stream_out;
 static volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
 static volatile int _discard_count;   /* USER RULING (this session): volatile allowed for exactly this
@@ -264,7 +264,7 @@ static int user_start;
 static void *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
 static void *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
 static void *vlc_tab;      /* Tmalloc'd MDEC VLC table buffer, ditto */
-unsigned char imgbuf[0x15][4];   /* set_mdec_img_buffer: 21 x (u32 ptr) */
+unsigned short *imgbuf[21];   /* set_mdec_img_buffer: 21 MDEC slice buffers */
 
 /* @0x80155E1C FMV.CPP:295 */
 extern "C" void _cd_seek(int sec)
@@ -289,13 +289,7 @@ extern "C" void init_cdstream(int chunksize, unsigned char *buf, int bufsize)
 /* @0x80155E7C FMV.CPP:328 */
 extern "C" void flush_cdstream(void)
 {
-    stream_chunks_borrowed = 0;
-    stream_out = stream_chunks_borrowed;
-    stream_in = stream_out;
-    stream_chunks_total = stream_in;
-    stream_chunks_in = stream_chunks_total;
-    _discard_count = stream_chunks_in;
-    _get_count = _discard_count;
+    _get_count = _discard_count = stream_chunks_in = stream_chunks_total = stream_out = stream_in = stream_chunks_borrowed = 0;
 }
 
 /* @0x80155ED0 FMV.CPP:366 */
@@ -540,24 +534,16 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
 /* @0x80156720 FMV.CPP:791 */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
-    /* Raw oracle keeps TWO separate induction registers through the loop: $a1 (the trip counter,
-     * compared `slti $a1,0x15`) AND $a2 (a running byte-length accumulator, `addiu $a2,0x1900` each
-     * iter, returned as-is via `addu $v0,$a2,zero` -- no final multiply/constant-fold at the end).
-     * A `len` local accumulated the same way here (`len += 0x1900;` each iter) still folds to the
-     * `lui/ori` literal-constant form (GCC 2.7.2's IV final-value-replacement collapses an
-     * unused-inside-the-loop linear accumulator into count*step) -- the compiler can't be talked out
-     * of it from C alone since len is never read before the loop exits; same 7-diff result either way.
-     * Falsified as a source-level lever; would need a per-TU compiler-flag change, which is out of
-     * scope (no compiler-source/flag changes rule). Left in the simpler literal-multiply form. */
-    unsigned long *dst = (unsigned long *)imgbuf;
-    int count = 0;
+    int i;
+    int tsz;
 
-    do {
-        dst[count] = (unsigned long)p;
+    tsz = 0;
+    for (i = 0; i < 21; i++) {
+        imgbuf[i] = (unsigned short *)p;
         p += 0x1900;
-        count++;
-    } while (count < 0x15);
-    return 0x15 * 0x1900;
+        tsz += 0x1900;
+    }
+    return tsz;
 }
 
 /* @0x80156754 FMV.CPP:816 */
