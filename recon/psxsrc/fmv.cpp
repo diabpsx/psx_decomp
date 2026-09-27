@@ -217,7 +217,7 @@ static int mbuf;
 static void *vlctab;
 static void *vlcbuf[2];
 static RECT slice;
-static int slices_to_do;
+static volatile int slices_to_do;
 static int slnum;
 static int slice_size;
 static int slice_inc;
@@ -312,7 +312,7 @@ extern "C" void kill_stream_handlers(void)
 /* @0x80155F30 FMV.CPP:384 */
 extern "C" void stream_cdready_handler(unsigned char status, unsigned char *result)
 {
-    int OldGp = ReloadGP();
+    unsigned long OldGp = ReloadGP();
 
     if (stream_ending == 0)
         first_handler_event = 1;
@@ -564,7 +564,7 @@ extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int 
 /* @0x801568B0 FMV.CPP:860 */
 extern "C" void DCT_out_handler(void)
 {
-    int OldGp = ReloadGP();
+    unsigned long OldGp = ReloadGP();
 
     LoadImage(&slice, (u_long *)MAP_BUF_JTAB[slices_to_do]);
     slice.x += slice_inc;
