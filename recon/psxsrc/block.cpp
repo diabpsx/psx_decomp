@@ -1263,22 +1263,20 @@ void CBlocks::PrintDead(int x, int y)
             int blockb;
 
             Creature = FindCreature(Mg);
-            dx = InfoList->Items[f].uDStr.x;
-            dy = InfoList->Items[f].uDStr.y;
+            dx = InfoList->Items[f].uDStr.x + 16;
+            dy = InfoList->Items[f].uDStr.y + 16;
             Frame = MonstTexDat->GetNumOfFrames(Creature, 4) - 1;
-            Sx = Cx + WorldToScrX(dx * 20, dy * 20) - Wx;
-            Sy = Cy + WorldToScrY(dx * 20, dy * 20) - Wy;
+            Sx = Cx + WorldToScrX((dx - 16) * 20, (dy - 16) * 20) - Wx;
+            Sy = Cy + WorldToScrY((dx - 16) * 20, (dy - 16) * 20) - Wy;
             GetOtPos(Sy);
             Ft4 = MonstTexDat->PrintMonster(Creature, 4, 0, Frame, Sx, Sy, 4);
-            int hx = dx + 16;   /* record-less carriers across the transfile if: keep dx/dy block-local (retail s2/s3) */
-            int hy = dy + 16;
             transfile = MyMonst->MData->TransFile;
             if (transfile) {
                 FRAME_HDR *Fr = ObjTexDat->GetFr(TransPals[transfile * 2 + 1]);
                 ObjTexDat->SetPal(Fr, Ft4);
             }
-            bx = hx / 2 - 16;
-            by = hy / 2 - 16;
+            bx = dx / 2 - 16;
+            by = dy / 2 - 16;
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];
