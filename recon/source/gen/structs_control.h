@@ -396,6 +396,22 @@ struct RgbBlockInf {   /* sizeof 24 */
     int ToValB;   /* +0x14 */
 };
 
+enum TXT_JUST { TXT_LEFT = 0 };
+
+class CFont {
+public:
+    int TextureId;   /* +0x0 */
+    unsigned short FontTab[256];   /* +0x4 */
+    int PrintyOTpos;   /* +0x204 */
+    int MinX;   /* +0x208 */
+    int MaxX;   /* +0x20C */
+    int Width;   /* +0x210 */
+    struct TextDat *ThisDat;   /* +0x214 */
+    unsigned char FontHeight;   /* +0x218 */
+
+    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, RECT *TextWindow, int R, int G, int B);
+};
+
 class CBlocks {
 public:
     struct TextDat TextDat;   /* +0x0 */

@@ -25,6 +25,7 @@ int CsNo;
 unsigned char CrossCount[2];
 unsigned char chrbtnactive;
 unsigned char chrflag;
+unsigned char sbookflag;
 int _pSpell[2];
 int _pSplType[2];
 int my_cur_spel[2];
@@ -386,7 +387,9 @@ void DrawSpeedSpellTSK(TASK *T)
     args = (DEF_ARGS *)T->Data;
     pnum = args->a0;
     TSK_Sleep(1);
-    while (alive) {
+    for (;;) {
+        if (!alive)
+            break;
         if (GLUE_Finished())
             break;
         old_opts = options_pad;
@@ -401,6 +404,109 @@ void DrawSpeedSpellTSK(TASK *T)
             alive = 0;
     }
     _spselflag[pnum] = 0;
+}
+
+void DrawSpellBookTSK(TASK *T)
+{
+    int CountDown;
+    int omp;
+
+    CountDown = 3;
+    if (!Qfromoptions) {
+        PostGamePad(2, 0, 0, 0);
+        stream_stop();
+        GLUE_SuspendGame();
+    }
+    stream_pause();
+    if (!Qfromoptions) {
+        for (int i = 1; i != -1; i--) {
+            ignore_buttons = 1;
+            TSK_Sleep(1);
+        }
+    }
+    while (1) {
+        if (!sbookflag)
+            break;
+        if (options_pad < 0)
+            break;
+        omp = myplr;
+        myplr = options_pad;
+        DrawSpellBook((unsigned)CountDown < 1);
+        if (CountDown != 0)
+            CountDown--;
+        myplr = omp;
+        TSK_Sleep(1);
+    }
+    PlaySFX(0x33);
+    if (!Qfromoptions) {
+        PostGamePad(5, 0, 0, 0);
+        stream_resume();
+        GLUE_ResumeGame();
+        GLUE_SetShowPanelFlag(1);
+        GLUE_SetShowGameScreenFlag(1);
+        GLUE_SetHomingScrollFlag(1);
+    } else {
+        GLUE_SetShowGameScreenFlag(1);
+        TSK_Sleep(1);
+        Qfromoptions = 4;
+        ToggleOptions();
+    }
+}
+
+void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff)
+{
+    unsigned char r, g, b;
+
+    y = y + 2;
+    if (plr[options_pad]._pRSplType == 2)
+        cspel = -1;
+
+    if (LANG_GetLang() == 4) {
+        if (cspel == my_cur_spel[options_pad]) {
+            if (bright == 0x80) {
+                r = 0xC8;
+                g = 0;
+                b = 0;
+            } else {
+                r = GOLDR;
+                g = GOLDG;
+                b = 0;
+            }
+        } else {
+            if (bright != 0x80) {
+                r = GOLDR;
+                g = GOLDG;
+                b = 0;
+            } else {
+                g = 0x80;
+                r = 0x80;
+                b = 0x80;
+            }
+        }
+    } else {
+        if (cspel == my_cur_spel[options_pad]) {
+            if (Staff != 0) {
+                r = ((int)WHITER * bright) >> 8;
+                g = ((int)WHITEG * bright) >> 2;
+                b = 0;
+            } else {
+                r = ((int)REDR * bright) >> 8;
+                g = ((int)REDG * bright) >> 8;
+                b = ((int)REDB * bright) >> 8;
+            }
+        } else {
+            if (Staff != 0) {
+                r = ((int)WHITER * bright) >> 8;
+                g = ((int)WHITEG * bright) >> 1;
+                b = 0;
+            } else {
+                r = ((int)WHITER * bright) >> 8;
+                g = ((int)WHITEG * bright) >> 8;
+                b = ((int)WHITEB * bright) >> 8;
+            }
+        }
+    }
+    MediumFont.Print(x, y, (char *)pszStr, TXT_LEFT, &CSRect, r, g, b);
 }
 
 void DrawLevelUpIcon(int pnum)

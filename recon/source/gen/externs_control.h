@@ -2,7 +2,6 @@ extern BOOL optionsflag;   /* @0x8011B248 */
 extern BOOL DoShowPanel;   /* @0x8011B000 */
 extern char stextflag;   /* @0x8011BAE0 */
 extern unsigned char qtextflag;   /* @0x8011B960 */
-extern unsigned char sbookflag;   /* @0x8011B6C6 */
 extern unsigned char _pinfoflag[2];   /* @0x8011B6B8 */
 extern int sel_data;   /* @0x8011B72C */
 extern unsigned char currlevel;   /* @0x8011C10C */
@@ -42,3 +41,13 @@ extern struct CSDATA CS_Tab[28];   /* @0x800CE3B0 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
 extern unsigned char invflag;   /* @0x8011C32C */
 extern unsigned char questlog;   /* @0x8011BA29 */
+extern unsigned char Qfromoptions;   /* @0x8011B228 */
+extern BOOL ignore_buttons;   /* @0x8011BBD0 */
+extern unsigned char WHITER;   /* @0x8011ABD1 */
+extern unsigned char WHITEG;   /* @0x8011ABD2 */
+extern unsigned char WHITEB;   /* @0x8011ABD3 */
+extern unsigned char REDR;   /* @0x8011ABD7 */
+extern unsigned char REDG;   /* @0x8011ABD8 */
+extern unsigned char REDB;   /* @0x8011ABD9 */
+extern struct RECT CSRect;   /* @0x8011B6F4 */
+extern class CFont MediumFont;   /* @0x800B82D8 */

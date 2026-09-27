@@ -44,3 +44,9 @@ void DrawChrTSK(TASK *T);   /* @0x80035B48 CONTROL.CPP:2959 */
 BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
 BOOL SelectorActive(void);   /* @0x800A336C PADFUNCS.CPP:1146 */
 void DrawSpellList(void);   /* @0x800310B8 CONTROL.CPP:895 */
+void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
+void DrawSpellBook(BOOL DrawBg);   /* @0x800366D8 CONTROL.CPP:3253 */
+void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
+void DrawSpellBookTSK(TASK *T);   /* @0x80030D44 CONTROL.CPP:754 */
+int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */
+void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff);   /* @0x800361F0 CONTROL.CPP:3133 */
