@@ -4166,24 +4166,30 @@ void MAI_SkelKing(int i)
  * not a structural miss (checked: `Monst = &monster[i]` is ALREADY declared
  * before `omp`/`sdata`/`cursm`, so the statement order already matches the
  * oracle's -- this is allocator/scheduler-internal, not source-order-
- * controllable via the angles tried so far). */
+ * controllable via the angles tried so far).
+ * NOW PASS+SYM, rebuilt from the retail SYM/SLD: the enemy index is cached
+ * in `mid` right inside the MM_ATTACK test (that register value is what the
+ * retail keeps across the GetDirection/abs calls); `ok = 1` opens the
+ * not-found branch; `pMonster` is the plain monster base; the squelch wake
+ * loop indexes `_mx - 2 + k`; `int nd = md + 1` seeds the direction search. */
 void MAI_Golum(int i)
 {
-    MonsterStruct *Monst = &monster[i];
-    int mx, my, md;
     int ok, j, k, mid;
+    int mx, my, md;
     int cursm;
     int sdata;
     int omp;
-    int nd;
+    MonsterStruct *Monst;
+    MonsterStruct *pMonster;
 
-    omp = myplr;
-    sdata = sel_data;
     cursm = _pcursmonst[sel_data];
+    sdata = sel_data;
+    omp = myplr;
+
+    Monst = &monster[i];
 
     if (Monst->_mx == 1 && Monst->_my == 0)
         return;
-
     if (Monst->_mmode == MM_DEATH)
         return;
     if (Monst->_mmode == MM_SPSTAND)
@@ -4195,87 +4201,79 @@ void MAI_Golum(int i)
     myplr = -1;
     _pcursmonst[0] = -1;
 
-    if (Monst->_menemy != 0 && (monster[Monst->_menemy]._mhitpoints >> 6) < 1)
+    pMonster = monster;
+    if (Monst->_menemy && (monster[Monst->_menemy]._mhitpoints >> 6) <= 0)
         Monst->_menemy = 0;
 
     if (Monst->_mmode != MM_ATTACK) {
-        if (Monst->_menemy == 0 || Monst->_msquelch == 0) {
+        mid = Monst->_menemy;
+        if (!mid || !Monst->_msquelch) {
             Monst->_msquelch = 250;
             CheckArea(Monst->_mx, Monst->_my, 4, 0, -1);
             if (_pcursmonst[sel_data] > 0 && gSameRoom(_pcursmonst[sel_data], i)) {
                 Monst->_menemy = _pcursmonst[sel_data];
-                Monst->_menemyx = monster[_pcursmonst[sel_data]]._mfutx;
-                Monst->_menemyy = monster[_pcursmonst[sel_data]]._mfuty;
-                goto skip_walk;
+                Monst->_menemyx = pMonster[_pcursmonst[sel_data]]._mfutx;
+                Monst->_menemyy = pMonster[_pcursmonst[sel_data]]._mfuty;
+            } else {
+                ok = 1;
+                Monst->_menemy = 0;
+                md = plr[i]._pdir;
+                if (!DirOK(i, md)) {
+                    j = 0;
+                    do {
+                        md = j;
+                        ok = DirOK(i, md);
+                        j = md + 1;
+                    } while (j < 8 && !ok);
+                }
+                if (ok)
+                    M_WalkDir(i, md);
             }
-            nd = 1;
-            Monst->_menemy = 0;
-            md = plr[i]._pdir;
-            ok = DirOK(i, md);
-            if (!ok) {
-                mid = 0;
-                nd = 0;
-                do {
-                    md = mid;
-                    nd = DirOK(i, md);
-                    if (mid + 1 > 7)
-                        break;
-                    mid = md + 1;
-                } while (!nd);
-            }
-            if (!nd)
-                goto skip_walk;
         } else {
-            MonsterStruct *pMonster = monster;
-
-            mx = Monst->_mx - pMonster[Monst->_menemy]._mfutx;
-            my = Monst->_my - pMonster[Monst->_menemy]._mfuty;
-            md = GetDirection(Monst->_mx, Monst->_my, pMonster[Monst->_menemy]._mx, pMonster[Monst->_menemy]._my);
+            mx = Monst->_mx - pMonster[mid]._mfutx;
+            my = Monst->_my - pMonster[mid]._mfuty;
+            md = GetDirection(Monst->_mx, Monst->_my, pMonster[mid]._mx, pMonster[mid]._my);
             Monst->_mdir = md;
-
-            if (abs(mx) < 2 && abs(my) < 2) {
-                if (pMonster[Monst->_menemy]._msquelch == 0) {
-                    pMonster[Monst->_menemy]._msquelch = 255;
-                    pMonster[Monst->_menemy]._lastx = Monst->_mx;
-                    pMonster[Monst->_menemy]._lasty = Monst->_my;
+            if ((abs(mx) < 2 && abs(my) < 2)) {
+                if (monster[mid]._msquelch == 0) {
+                    monster[mid]._msquelch = 255;
+                    monster[mid]._lastx = Monst->_mx;
+                    monster[mid]._lasty = Monst->_my;
                     for (j = 0; j < 5; j++) {
                         for (k = 0; k < 5; k++) {
-                            mid = dung_map[Monst->_mx - 2 + k][Monst->_my - 2 + j].dMonster;
+                            mid = dung_map[monster[i]._mx - 2 + k][monster[i]._my - 2 + j].dMonster;
                             if (mid > 0)
-                                pMonster[mid]._msquelch = 255;
+                                monster[mid]._msquelch = 255;
                         }
                     }
                 }
                 M_StartAttack(i);
-                goto skip_walk;
-            }
-            if (pMonster[Monst->_menemy]._msquelch == 0)
-                pMonster[Monst->_menemy]._msquelch = 0;
-            else
-                pMonster[Monst->_menemy]._msquelch--;
-
-            ok = DirOK(i, md);
-            if (!ok) {
-                mid = (md + 1) & 7;
-                ok = 0;
-                if (mid != md) {
-                    do {
-                        mid = mid & 7;
-                        ok = DirOK(i, mid);
+            } else {
+                if (Monst->_msquelch)
+                    Monst->_msquelch--;
+                else
+                    Monst->_msquelch = 0;
+                ok = 1;
+                if (!DirOK(i, md)) {
+                    int nd = md + 1;
+                    j = nd & 7;
+                    ok = 0;
+                    while (j != md && !ok) {
+                        j &= 7;
+                        ok = DirOK(i, j);
                         if (ok)
-                            md = mid;
-                        mid++;
-                    } while (mid != md && !ok);
+                            md = j;
+                        j++;
+                    }
                 }
-            }
-            if (!ok) {
-                Monst->_menemy = 0;
-                goto skip_walk;
+                if (ok)
+                    M_WalkDir(i, md);
+                else
+                    Monst->_menemy = 0;
             }
         }
-        M_WalkDir(i, md);
     }
-skip_walk:
+
     _pcursmonst[sel_data] = cursm;
     sel_data = sdata;
     myplr = omp;
