@@ -597,42 +597,25 @@ void InvGetItemWH(int Pos)
 
 void InvAlignObject(void)
 {
-    int w, h;
-
-    if ((unsigned int)(InvCursPos - 25) >= 40)
+    if (InvCursPos < 25 || InvCursPos > 64)
         return;
     if (_pcurs[myplr] < 12)
         return;
 
     ItemNo = plr[myplr].HoldItem._iCurs;
-    w = (InvItemWidth[ItemNo + 12] >> 4) - 1;
-    ItemW = w;
-    h = (InvItemHeight[ItemNo + 12] >> 4) - 1;
-    ItemH = h;
+    ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
+    ItemH = (InvItemHeight[ItemNo + 12] >> 4) - 1;
 
-    if ((unsigned int)(InvCursPos - 25) < 10) {
-        if (InvCursPos + w < 0x23) {
-            InvCursPos = 0x22 - w;
-        }
-    }
-    if ((unsigned int)(InvCursPos - 0x23) < 10) {
-        if (InvCursPos + w < 0x2D) {
-            InvCursPos = 0x2C - w;
-        }
-    }
-    if ((unsigned int)(InvCursPos - 0x2D) < 10) {
-        if (InvCursPos + w < 0x37) {
-            InvCursPos = 0x36 - w;
-        }
-    }
-    if ((unsigned int)(InvCursPos - 0x37) < 10) {
-        if (InvCursPos + w < 0x41) {
-            InvCursPos = 0x40 - w;
-        }
-    }
-    while (InvCursPos + h * 10 < 0x41) {
+    if (InvCursPos >= 25 && InvCursPos <= 34 && InvCursPos + ItemW > 34)
+        InvCursPos = 34 - ItemW;
+    if (InvCursPos >= 35 && InvCursPos <= 44 && InvCursPos + ItemW > 44)
+        InvCursPos = 44 - ItemW;
+    if (InvCursPos >= 45 && InvCursPos <= 54 && InvCursPos + ItemW > 54)
+        InvCursPos = 54 - ItemW;
+    if (InvCursPos >= 55 && InvCursPos <= 64 && InvCursPos + ItemW > 64)
+        InvCursPos = 64 - ItemW;
+    while (InvCursPos + ItemH * 10 > 64)
         InvCursPos -= 10;
-    }
 }
 
 unsigned char UseInvItem(int pnum, int cii)
