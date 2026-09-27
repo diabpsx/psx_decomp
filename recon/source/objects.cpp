@@ -97,13 +97,13 @@ void SetupObject(int i, int x, int y, int ot)
     }
     object[i]._oSolidFlag = AllObjects[ot].oSolidFlag;
     object[i]._oMissFlag = AllObjects[ot].oMissFlag;
-    object[i]._oDelFlag = 0;
     object[i]._oLight = AllObjects[ot].oLightFlag;
+    object[i]._oDelFlag = 0;
     object[i]._oBreak = AllObjects[ot].oBreak;
+    object[i]._oSelFlag = AllObjects[ot].oSelFlag;
     object[i]._oPreFlag = 0;
     object[i]._oTrapFlag = 0;
     object[i]._oDoorFlag = 0;
-    object[i]._oSelFlag = AllObjects[ot].oSelFlag;
 }
 
 void SetObjMapRange(int i, int x1, int y1, int x2, int y2, int v)
