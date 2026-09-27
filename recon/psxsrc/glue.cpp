@@ -22,11 +22,14 @@ extern unsigned long ghMainWnd;
 extern const char D_80110B58[];   /* @0x80110B58 -- "GLUE.CPP" (DBG_Error filename literal) */
 
 extern int NumOfMonsterListLevels;
-struct MonstListLevel {   /* sizeof 8 */
-    int Count;
-    void *List;
+struct MonstListLevel {   /* sizeof 16 */
+    unsigned char _opaque[16];
 };
-extern struct MonstListLevel AllLevels[];
+struct MonstLevel {   /* sizeof 8 */
+    int Count;
+    struct MonstListLevel *List;
+};
+extern struct MonstLevel AllLevels[];
 
 struct TASK;
 extern void BgTask(struct TASK *T);
@@ -268,20 +271,19 @@ void GLUE_DoQuake(int Time, int Amount)
 
 struct MonstListLevel *GLUE_GetCurrentList(int Level)
 {
-    int MLev;
-    struct MonstListLevel *List;
-    int Cur;
+    struct MonstLevel *MLev;
+    int List;
 
-    MLev = Level - 1;
-    if (MLev < 0 || !(MLev < NumOfMonsterListLevels)) {
+    Level--;
+    if (Level < 0 || !(Level < NumOfMonsterListLevels)) {
         DBG_Error(0, D_80110B58, 0x2EC);
     }
-    List = &AllLevels[MLev];
-    Cur = GLUE_GetMonsterList();
-    if (Cur < 0 || List->Count < Cur) {
+    MLev = &AllLevels[Level];
+    List = GLUE_GetMonsterList();
+    if (List < 0 || MLev->Count < List) {
         DBG_Error(0, D_80110B58, 0x2EF);
     }
-    return (struct MonstListLevel *)((char *)List->List + Cur * 0x10);
+    return &MLev->List[List];
 }
 
 void GLUE_StartGameExit(void)
