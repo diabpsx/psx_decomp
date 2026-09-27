@@ -1839,7 +1839,7 @@ void DrawInvStats(void)
     c = plr[options_pad]._pIBonusToHit > 0;
     if (plr[options_pad]._pIBonusToHit < 0)
         c = 2;
-    hper = plr[options_pad]._pIBonusToHit + 50 + (plr[options_pad]._pDexterity >> 1);
+    hper = 50 + (plr[options_pad]._pDexterity >> 1) + plr[options_pad]._pIBonusToHit;
     sprintf(chrstr, GetStr(0x503), hper);
     PrintStat(0x40, 0x495, chrstr, c);
 
@@ -1849,13 +1849,25 @@ void DrawInvStats(void)
     mind = plr[options_pad]._pIMinDam;
     mind += mind * plr[options_pad]._pIBonusDam / 100;
     mind += plr[options_pad]._pIBonusDamMod;
-    mind += (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass != 1)
-        ? plr[options_pad]._pDamageMod >> 1 : plr[options_pad]._pDamageMod;
+    if (plr[options_pad].InvBody[4]._itype == 3) {
+        if (plr[options_pad]._pClass == 1)
+            mind += plr[options_pad]._pDamageMod;
+        else
+            mind += plr[options_pad]._pDamageMod >> 1;
+    } else {
+        mind += plr[options_pad]._pDamageMod;
+    }
     maxd = plr[options_pad]._pIMaxDam;
     maxd += maxd * plr[options_pad]._pIBonusDam / 100;
     maxd += plr[options_pad]._pIBonusDamMod;
-    maxd += (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass != 1)
-        ? plr[options_pad]._pDamageMod >> 1 : plr[options_pad]._pDamageMod;
+    if (plr[options_pad].InvBody[4]._itype == 3) {
+        if (plr[options_pad]._pClass == 1)
+            maxd += plr[options_pad]._pDamageMod;
+        else
+            maxd += plr[options_pad]._pDamageMod >> 1;
+    } else {
+        maxd += plr[options_pad]._pDamageMod;
+    }
     sprintf(chrstr, GetStr(0x501), mind, maxd);
     PrintStat(0x4D, 0xE1, chrstr, c);
 
