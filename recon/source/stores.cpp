@@ -210,6 +210,29 @@ int CheckWitchItem(int idx)
     }
 }
 
+/* @0x8006CA68 */
+unsigned char WitchSellOk(int i)
+{
+    unsigned char rv;
+    ItemStruct *pI;
+
+    rv = 0;
+    if (i >= 0)
+        pI = &plr[myplr].InvList[i];
+    else
+        pI = &plr[myplr].SpdList[~i];
+
+    if (pI->_itype == 0 && !WStaffFlag) rv = 1;
+    if (pI->_itype == 10 && WStaffFlag == 1) rv = 1;
+    if (pI->_iMagical && pI->_iIdentified) {
+        if (pI->_iIvalue == 0) rv = 0;
+    }
+    if (pI->IDidx >= 6 && pI->IDidx <= 22)
+        rv = 0;
+    if (pI->IDidx == 0x21) rv = 0;
+    return rv;
+}
+
 /* @0x8006D22C */
 unsigned char WitchRechargeOk(int i)
 {
