@@ -1099,19 +1099,19 @@ void SmithBuyPItem(void)
         plr[myplr].HoldItem._iIdentified = 0;
     }
     StoreAutoPlace();
-    xx = 0;
-    idx = (stextlhold - stextup) / 8 + stextvhold;
+    idx = 0;
+    xx = (stextlhold - stextup) / 8 + stextvhold;
     i = 0;
-    if (idx >= 0) {
+    if (xx >= 0) {
         do {
             if (_premiumitem[StorePlrNo][i]._itype != -1) {
-                idx--;
-                xx = i;
+                xx--;
+                idx = i;
             }
             i++;
-        } while (idx >= 0);
+        } while (xx >= 0);
     }
-    _premiumitem[StorePlrNo][xx]._itype = -1;
+    _premiumitem[StorePlrNo][idx]._itype = -1;
     _numpremium[StorePlrNo]--;
     SpawnPremium(plr[myplr]._pLevel);
 }
