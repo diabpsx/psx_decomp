@@ -2172,14 +2172,15 @@ void OperateShrine(int pnum, int i, int sType)
         return;
     SetRndSeed(object[i]._oRndSeed);
     object[i]._oSelFlag = 0;
-    if (deltaload) {
-        object[i]._oAnimFrame = object[i]._oAnimLen;
-        object[i]._oAnimFlag = 0;
-        return;
-    } else {
+    if (!deltaload) {
         PlaySfxLoc(sType, object[i]._ox, object[i]._oy);
         object[i]._oAnimFlag = 1;
         object[i]._oAnimDelay = 1;
+    } else {
+        object[i]._oAnimFrame = object[i]._oAnimLen;
+        object[i]._oAnimFlag = 0;
+        return;
+    }
         switch (object[i]._oVar1) {
         case 0:
             ModifyPlrStr(pnum, -1);
@@ -2228,7 +2229,7 @@ void OperateShrine(int pnum, int i, int sType)
                             plr[pnum].InvBody[r]._iDurability = 1;
                         if (plr[pnum].InvBody[r]._iMaxDur <= 0)
                             plr[pnum].InvBody[r]._iMaxDur = 1;
-                        done = 1;
+                        break;
                     }
                 } while (!done);
             }
@@ -2327,14 +2328,14 @@ void OperateShrine(int pnum, int i, int sType)
             InitDiabloMsg(0x12);
             break;
         case 7:
-            t = 0;
+            sc = 0;
             lv = 1;
             for (r = 1; r < 38; r++) {
                 if (plr[pnum]._pMemSpells & lv)
-                    t++;
+                    sc++;
                 lv <<= 1;
             }
-            if (t > 1) {
+            if (sc > 1) {
                 lv = 1;
                 for (r = 1; r < 38; r++) {
                     if (plr[pnum]._pMemSpells & lv) {
@@ -2344,7 +2345,7 @@ void OperateShrine(int pnum, int i, int sType)
                     lv <<= 1;
                 }
                 done = 0;
-                do {
+                while (!done) {
                     lv = 1;
                     r = ENG_random(37);
                     lv <<= r;
@@ -2353,9 +2354,9 @@ void OperateShrine(int pnum, int i, int sType)
                             plr[pnum]._pSplLvl[r + 1] = 0;
                         else
                             plr[pnum]._pSplLvl[r + 1] -= 2;
-                        done = 1;
+                        break;
                     }
-                } while (!done);
+                }
             }
             InitDiabloMsg(0x13);
             break;
@@ -2440,7 +2441,7 @@ void OperateShrine(int pnum, int i, int sType)
             InitDiabloMsg(0x19);
             break;
         case 14:
-            if (currlevel < 4) {
+            if (2 * currlevel < 7) {
                 CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 7, 1, 0);
                 CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 2, 1, 0);
             } else {
@@ -2592,7 +2593,6 @@ void OperateShrine(int pnum, int i, int sType)
             CheckStats(pnum ^ 1);
             break;
         }
-    }
     CalcPlrInv(pnum, 1);
     force_redraw = 0xFF;
     NetSendCmdParam2(0, 0x2E, pnum, i);
