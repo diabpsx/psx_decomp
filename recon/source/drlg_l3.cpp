@@ -810,7 +810,7 @@ void DRLG_L3Pool(void)
 
 void DRLG_L3PoolFix(void)
 {
-    int dunx, duny;
+    int duny, dunx;
     unsigned short *p0, *p1, *p2;
 
     for (dunx = 0; dunx < DMAXX; dunx++) {
@@ -1495,7 +1495,7 @@ unsigned char DRLG_L3Lockout(void)
 void DRLG_L3SetWalls(void)
 {
     int i, j, xx, yy;
-    unsigned short v;
+    int v;
 
     yy = 16;
     for (j = 0; j < DMAXX; j++) {
