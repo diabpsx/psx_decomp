@@ -2477,6 +2477,7 @@ void CheckInvCut(int pnum, int mx, int my)
 {
     int r;
     int ii, iv;
+    int i, j;
 
     if (dropGoldFlag) {
         dropGoldFlag = 0;
@@ -2536,12 +2537,13 @@ void CheckInvCut(int pnum, int mx, int my)
         }
     }
 
-    if ((unsigned int)(r - 25) < 40) {
+    if (r >= 25 && r <= 64) {
         ii = plr[pnum].InvGrid[r - 25];
         if (ii != 0) {
-            int i;
-
-            iv = (ii > 0) ? ii : -ii;
+            if (ii > 0)
+                iv = ii;
+            else
+                iv = -ii;
             for (i = 0; i < 40; i++) {
                 if (plr[pnum].InvGrid[i] == iv || plr[pnum].InvGrid[i] == -iv)
                     plr[pnum].InvGrid[i] = 0;
@@ -2549,14 +2551,13 @@ void CheckInvCut(int pnum, int mx, int my)
             iv--;
             plr[pnum].HoldItem = plr[pnum].InvList[iv];
             plr[pnum]._pNumInv--;
-            ii = plr[pnum]._pNumInv;
-            if (ii > 0 && ii != iv) {
-                plr[pnum].InvList[iv] = plr[pnum].InvList[ii];
-                for (i = 0; i < 40; i++) {
-                    if (plr[pnum].InvGrid[i] == ii + 1)
-                        plr[pnum].InvGrid[i] = iv + 1;
-                    if (plr[pnum].InvGrid[i] == -(ii + 1))
-                        plr[pnum].InvGrid[i] = -(iv + 1);
+            if (plr[pnum]._pNumInv > 0 && plr[pnum]._pNumInv != iv) {
+                plr[pnum].InvList[iv] = plr[pnum].InvList[plr[pnum]._pNumInv];
+                for (j = 0; j < 40; j++) {
+                    if (plr[pnum].InvGrid[j] == plr[pnum]._pNumInv + 1)
+                        plr[pnum].InvGrid[j] = iv + 1;
+                    if (plr[pnum].InvGrid[j] == -(plr[pnum]._pNumInv + 1))
+                        plr[pnum].InvGrid[j] = -(iv + 1);
                 }
             }
         }
