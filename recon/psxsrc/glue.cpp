@@ -351,17 +351,12 @@ int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
 
     if (P->_pmode == 8) {
         Class = P->_pClass;
-        if (Class == 1) {
+        switch (Class) {
+        case 1:
             return 0x126;
-        }
-        if (Class < 2) {
-            if (Class == 0) {
-                return 0x124;
-            }
-            DBG_Error(0, D_80110B58, 0x2AF);
-            return -1;
-        }
-        if (Class == 2) {
+        case 0:
+            return 0x124;
+        case 2:
             return 0x125;
         }
         DBG_Error(0, D_80110B58, 0x2AF);
@@ -371,10 +366,10 @@ int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
     if (InTown != 0) {
         return Inf->w6;
     }
-    if (FePlayerNo != 0) {
-        return Inf->w8;
+    if (FePlayerNo == 0) {
+        return Inf->w4;
     }
-    return Inf->w4;
+    return Inf->w8;
 }
 
 void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
