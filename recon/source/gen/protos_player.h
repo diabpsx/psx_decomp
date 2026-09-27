@@ -146,7 +146,7 @@ void ChangeLightColour(int i, int c);   /* @0x8004D40C LIGHTING.CPP:1299 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */
 void ChangeLightXY(int i, int x, int y);   /* @0x8004D384 LIGHTING.CPP:1234 */
 void ChangeVisionXY(int id, int x, int y);   /* @0x8004D6D0 LIGHTING.CPP:1493 */
-unsigned char CheckMonsterHit(int m, unsigned char *ret);   /* @0x8015698C MONSTER.CPP:5531 */
+unsigned char CheckMonsterHit(int m, unsigned char &ret);   /* @0x8015698C MONSTER.CPP:5531 */
 unsigned char CheckSpell(int id, int sn, char st, unsigned char manaonly);   /* @0x80077498 SPELLS.CPP:170 */
 void ClearMissileSpot(int mi);   /* @0x8014AAC0 MISSILES.CPP:5885 */
 void ClrCursor(int num);   /* @0x80077F90 GAMEPAD.CPP:113 */

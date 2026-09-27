@@ -30,7 +30,7 @@ extern unsigned char automapflag;   /* @0x8011C37B */
 extern unsigned char currlevel;   /* @0x8011C10C */
 extern int cursmx;   /* @0x8011B750 */
 extern int cursmy;   /* @0x8011B754 */
-extern unsigned char deathflag;   /* @0x8011BA0C */
+unsigned char deathflag;   /* @0x8011BA0C -- TENTATIVE DEF: only player oracles reach it gp-relative */
 extern unsigned char dovision;   /* @0x8011B920 */
 extern unsigned char drawhpflag;   /* @0x8011B6BE */
 extern unsigned char drawmanaflag;   /* @0x8011B6BF */
@@ -44,7 +44,7 @@ extern struct ItemStruct item[128];   /* @0x800D1D54 */
 extern char itemactive[127];   /* @0x800D5354 */
 extern char itemavail[127];   /* @0x800D53D4 */
 extern unsigned char leveltype;   /* @0x8011C10D */
-extern char light_rad;   /* @0x8011BA0D */
+char light_rad;   /* @0x8011BA0D -- TENTATIVE DEF: only player oracles reach it gp-relative */
 extern struct MissileStruct missile[125];   /* @0x80102C58 */
 extern short missileactive[125];   /* @0x80102A60 */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */

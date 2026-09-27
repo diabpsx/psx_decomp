@@ -302,9 +302,58 @@ struct ObjectStruct {   /* sizeof 44 */
     unsigned char _oDoorFlag;   /* +0x2B */
 };
 
-struct CMonster;
+struct MonsterData {   /* sizeof 60 */
+    unsigned short GraphicType;   /* +0x0 */
+    unsigned char has_special;   /* +0x2 */
+    unsigned short sndfile;   /* +0x4 */
+    unsigned char snd_special;   /* +0x6 */
+    char TransFile;   /* +0x7 */
+    char Frames[6];   /* +0x8 */
+    char Rate[6];   /* +0xE */
+    int mName;   /* +0x14 */
+    char mMinDLvl;   /* +0x18 */
+    char mMaxDLvl;   /* +0x19 */
+    char mLevel;   /* +0x1A */
+    short mMinHP;   /* +0x1C */
+    short mMaxHP;   /* +0x1E */
+    unsigned char mAi;   /* +0x20 */
+    unsigned short mFlags;   /* +0x22 */
+    unsigned char mInt;   /* +0x24 */
+    unsigned char mHit;   /* +0x25 */
+    unsigned char mAFNum;   /* +0x26 */
+    unsigned char mMinDamage;   /* +0x27 */
+    unsigned char mMaxDamage;   /* +0x28 */
+    unsigned char mHit2;   /* +0x29 */
+    unsigned char mAFNum2;   /* +0x2A */
+    unsigned char mMinDamage2;   /* +0x2B */
+    unsigned char mMaxDamage2;   /* +0x2C */
+    char mArmorClass;   /* +0x2D */
+    char mMonstClass;   /* +0x2E */
+    unsigned short mMagicRes;   /* +0x30 */
+    unsigned short mMagicRes2;   /* +0x32 */
+    unsigned short mTreasure;   /* +0x34 */
+    char mSelFlag;   /* +0x36 */
+    unsigned short mExp;   /* +0x38 */
+};
 
-struct MonsterData;
+struct AnimStruct {   /* sizeof 2 */
+    char Frames;   /* +0x0 */
+    char Rate;   /* +0x1 */
+};
+
+struct CMonster {   /* sizeof 28 */
+    struct MonsterData *MData;   /* +0x0 */
+    struct AnimStruct Anims[6];   /* +0x4 */
+    unsigned short Snds;   /* +0x10 */
+    unsigned char mtype;   /* +0x12 */
+    unsigned char mPlaceFlags;   /* +0x13 */
+    unsigned char mMinHP;   /* +0x14 */
+    unsigned char mMaxHP;   /* +0x15 */
+    unsigned char has_special;   /* +0x16 */
+    unsigned char mAFNum;   /* +0x17 */
+    char mdeadval;   /* +0x18 */
+};
+
 
 struct MonsterStruct {   /* sizeof 104 */
     int mtalkmsg;   /* +0x0 */
