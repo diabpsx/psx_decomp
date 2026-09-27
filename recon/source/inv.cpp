@@ -1812,94 +1812,73 @@ void DrawInvStats(void)
     BRect.w = 0x72;
     BRect.h = 0xB0;
 
-    c = (plr[options_pad]._pBaseStr < plr[options_pad]._pStrength) ? 1 : 0;
+    c = plr[options_pad]._pStrength > plr[options_pad]._pBaseStr;
     if (plr[options_pad]._pStrength < plr[options_pad]._pBaseStr)
         c = 2;
     sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pStrength);
     PrintStat(0xC, 0x419, chrstr, c);
 
-    c = (plr[options_pad]._pBaseMag < plr[options_pad]._pMagic) ? 1 : 0;
+    c = plr[options_pad]._pMagic > plr[options_pad]._pBaseMag;
     if (plr[options_pad]._pMagic < plr[options_pad]._pBaseMag)
         c = 2;
     sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pMagic);
     PrintStat(0x19, 0x26F, chrstr, c);
 
-    c = (plr[options_pad]._pBaseDex < plr[options_pad]._pDexterity) ? 1 : 0;
+    c = plr[options_pad]._pDexterity > plr[options_pad]._pBaseDex;
     if (plr[options_pad]._pDexterity < plr[options_pad]._pBaseDex)
         c = 2;
     sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pDexterity);
     PrintStat(0x26, 0xFF, chrstr, c);
 
-    c = (plr[options_pad]._pBaseVit < plr[options_pad]._pVitality) ? 1 : 0;
+    c = plr[options_pad]._pVitality > plr[options_pad]._pBaseVit;
     if (plr[options_pad]._pVitality < plr[options_pad]._pBaseVit)
         c = 2;
     sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pVitality);
     PrintStat(0x32, 0x4B7, chrstr, c);
 
+    c = plr[options_pad]._pIBonusToHit > 0;
     if (plr[options_pad]._pIBonusToHit < 0)
         c = 2;
-    else
-        c = (0 < plr[options_pad]._pIBonusToHit) ? 1 : 0;
-    hper = 0x32 + (plr[options_pad]._pDexterity >> 1) + plr[options_pad]._pIBonusToHit;
+    hper = plr[options_pad]._pIBonusToHit + 50 + (plr[options_pad]._pDexterity >> 1);
     sprintf(chrstr, GetStr(0x503), hper);
     PrintStat(0x40, 0x495, chrstr, c);
 
+    c = plr[options_pad]._pIBonusDam > 0;
     if (plr[options_pad]._pIBonusDam < 0)
         c = 2;
-    else
-        c = (0 < plr[options_pad]._pIBonusDam) ? 1 : 0;
-
     mind = plr[options_pad]._pIMinDam;
-    mind = mind + (mind * plr[options_pad]._pIBonusDam) / 100;
-    mind = mind + plr[options_pad]._pIBonusDamMod;
-    if (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass == 1) {
-        mind = mind + plr[options_pad]._pDamageMod;
-    } else if (plr[options_pad].InvBody[4]._itype == 3) {
-        mind = mind + (plr[options_pad]._pDamageMod >> 1);
-    } else {
-        mind = mind + plr[options_pad]._pDamageMod;
-    }
-
+    mind += mind * plr[options_pad]._pIBonusDam / 100;
+    mind += plr[options_pad]._pIBonusDamMod;
+    mind += (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass != 1)
+        ? plr[options_pad]._pDamageMod >> 1 : plr[options_pad]._pDamageMod;
     maxd = plr[options_pad]._pIMaxDam;
-    maxd = maxd + (maxd * plr[options_pad]._pIBonusDam) / 100;
-    maxd = maxd + plr[options_pad]._pIBonusDamMod;
-    if (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass == 1) {
-        maxd = maxd + plr[options_pad]._pDamageMod;
-    } else if (plr[options_pad].InvBody[4]._itype == 3) {
-        maxd = maxd + (plr[options_pad]._pDamageMod >> 1);
-    } else {
-        maxd = maxd + plr[options_pad]._pDamageMod;
-    }
-
+    maxd += maxd * plr[options_pad]._pIBonusDam / 100;
+    maxd += plr[options_pad]._pIBonusDamMod;
+    maxd += (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass != 1)
+        ? plr[options_pad]._pDamageMod >> 1 : plr[options_pad]._pDamageMod;
     sprintf(chrstr, GetStr(0x501), mind, maxd);
     PrintStat(0x4D, 0xE1, chrstr, c);
 
-    c = 0;
-    if (plr[options_pad]._pHitPoints != plr[options_pad]._pMaxHP) {
-        c = (plr[options_pad]._pMaxHPBase < plr[options_pad]._pMaxHP) ? 1 : 0;
-    }
+    c = plr[options_pad]._pMaxHP > plr[options_pad]._pMaxHPBase;
+    if (plr[options_pad]._pHitPoints != plr[options_pad]._pMaxHP)
+        c = 2;
     sprintf(chrstr, "%li/%li", plr[options_pad]._pHitPoints >> 6, plr[options_pad]._pMaxHP >> 6);
     PrintStat(0x5C, 0x24D, chrstr, c);
 
-    c = 0;
-    if (plr[options_pad]._pMana != plr[options_pad]._pMaxMana) {
-        c = (plr[options_pad]._pMaxManaBase < plr[options_pad]._pMaxMana) ? 1 : 0;
-    }
+    c = plr[options_pad]._pMaxMana > plr[options_pad]._pMaxManaBase;
+    if (plr[options_pad]._pMana != plr[options_pad]._pMaxMana)
+        c = 2;
     sprintf(chrstr, "%li/%li", plr[options_pad]._pMana >> 6, plr[options_pad]._pMaxMana >> 6);
     PrintStat(0x68, 0x27A, chrstr, c);
 
+    c = plr[options_pad]._pIBonusAC > 0;
     if (plr[options_pad]._pIBonusAC < 0)
         c = 2;
-    else
-        c = (0 < plr[options_pad]._pIBonusAC) ? 1 : 0;
-    ac = plr[options_pad]._pIAC + plr[options_pad]._pIBonusAC + plr[options_pad]._pDexterity / 5;
+    ac = plr[options_pad]._pIAC + plr[options_pad]._pIBonusAC + (short)(plr[options_pad]._pDexterity / 5);
     sprintf(chrstr, GetStr(0x4FD), ac);
     PrintStat(0x75, 0x2A, chrstr, c);
 
-    if (plr[options_pad]._pMagResist > 0)
-        c = 1;
-    else
-        c = 0;
+    c = plr[options_pad]._pMagResist != 0;
     if (plr[options_pad]._pMagResist < 0x4B) {
         sprintf(chrstr, GetStr(0x503), plr[options_pad]._pMagResist);
     } else {
@@ -1908,10 +1887,7 @@ void DrawInvStats(void)
     }
     PrintStat(0x84, 0x273, chrstr, c);
 
-    if (plr[options_pad]._pFireResist > 0)
-        c = 1;
-    else
-        c = 0;
+    c = plr[options_pad]._pFireResist != 0;
     if (plr[options_pad]._pFireResist < 0x4B) {
         sprintf(chrstr, GetStr(0x503), plr[options_pad]._pFireResist);
     } else {
@@ -1920,10 +1896,7 @@ void DrawInvStats(void)
     }
     PrintStat(0x91, 0x157, chrstr, c);
 
-    if (plr[options_pad]._pLghtResist > 0)
-        c = 1;
-    else
-        c = 0;
+    c = plr[options_pad]._pLghtResist != 0;
     if (plr[options_pad]._pLghtResist < 0x4B) {
         sprintf(chrstr, GetStr(0x503), plr[options_pad]._pLghtResist);
     } else {
