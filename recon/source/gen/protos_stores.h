@@ -63,6 +63,17 @@ void HealerBuyItem(void);
 void SmithRepairItem(void);
 void SpawnPremium(int lvl);
 void SmithBuyPItem(void);
+void StoreSellItem(void);
+void WitchBuyItem(void);
+void S_ConfirmEnter(void);
+void S_SBuyEnter(void);
+void S_WBuyEnter(void);
+void S_BBuyEnter(void);
+void S_BoyEnter(void);
+void STextUp(void);
+void STextDown(void);
+void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
+void STextESC(void);
 void S_WitchEnter(void);
 void S_HealerEnter(void);
 void S_StoryEnter(void);

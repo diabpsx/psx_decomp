@@ -1067,8 +1067,8 @@ void SmithBuyPItem(void)
         plr[myplr].HoldItem._iIdentified = 0;
     }
     StoreAutoPlace();
-    idx = (stextlhold - stextup) / 8 + stextvhold;
     xx = 0;
+    idx = (stextlhold - stextup) / 8 + stextvhold;
     i = 0;
     if (idx >= 0) {
         do {
@@ -1082,6 +1082,476 @@ void SmithBuyPItem(void)
     _premiumitem[StorePlrNo][xx]._itype = -1;
     _numpremium[StorePlrNo]--;
     SpawnPremium(plr[myplr]._pLevel);
+}
+
+/* @0x80071A00 */
+void StoreSellItem(void)
+{
+    int idx;
+    int i;
+    long cost;
+
+    if (WFlag != 0 && WStaffFlag == 0) {
+        idx = (stextlhold - stextup) / 4 + stextvhold;
+    } else {
+        idx = (stextlhold - stextup) / 8 + stextvhold;
+    }
+    i = storehidx[idx];
+    if (i >= 0) {
+        RemoveInvItem(myplr, i);
+    } else {
+        RemoveSpdBarItem(myplr, ~i);
+    }
+    cost = storehold[idx]._iIvalue;
+    storenumh--;
+    if (idx != storenumh && idx < storenumh) {
+        for (i = idx; i < storenumh; i++) {
+            storehold[i] = storehold[i + 1];
+            storehidx[i] = storehidx[i + 1];
+        }
+    }
+    plr[myplr]._pGold += cost;
+    i = 0;
+    if (plr[myplr]._pNumInv > 0) {
+        while (cost > 0) {
+            if (plr[myplr].InvList[i]._itype == 11) {
+                if (plr[myplr].InvList[i]._ivalue != 5000) {
+                    if (cost + plr[myplr].InvList[i]._ivalue < 5001) {
+                        plr[myplr].InvList[i]._ivalue = cost + plr[myplr].InvList[i]._ivalue;
+                        SetGoldCurs(myplr, i);
+                        cost = 0;
+                    } else {
+                        cost = cost - 5000 + plr[myplr].InvList[i]._ivalue;
+                        plr[myplr].InvList[i]._ivalue = 5000;
+                        SetGoldCurs(myplr, i);
+                    }
+                }
+            }
+            i++;
+            if (i >= plr[myplr]._pNumInv) {
+                goto block_26;
+            }
+        }
+    } else {
+block_26:
+        if (cost > 0) {
+            while (cost >= 5001) {
+                PlaceStoreGold(5000);
+                cost -= 5000;
+            }
+            PlaceStoreGold(cost);
+        }
+    }
+}
+
+/* @0x8007230C */
+void WitchBuyItem(void)
+{
+    int idx;
+
+    idx = SellIdx;
+    if (WStaffFlag == 0 && idx < 3) {
+        plr[myplr].HoldItem._iSeed = GetRndSeed();
+    }
+    TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+    StoreAutoPlace();
+    if (WStaffFlag != 0 || idx >= 3) {
+        if (idx == 0x13) {
+            _witchitem[StorePlrNo][19]._itype = -1;
+        } else {
+            if (_witchitem[StorePlrNo][idx + 1]._itype != -1) {
+                do {
+                    _witchitem[StorePlrNo][idx] = _witchitem[StorePlrNo][idx + 1];
+                    idx++;
+                } while (_witchitem[StorePlrNo][idx + 1]._itype != -1);
+            }
+            _witchitem[StorePlrNo][idx]._itype = -1;
+        }
+    }
+    CalcPlrInv(myplr, 1);
+}
+
+/* @0x80073700 -- literal transcription of the m2c irregular switch: case 2 has no break and falls
+ * through into the shared "default" tail (StartStore(stextshold); return;), which is also reached
+ * via goto from every other buy/sell case. */
+void S_ConfirmEnter(void)
+{
+    if (stextsel == 0x11) {
+        switch (stextshold) {
+        case 2:
+            SmithBuyItem();
+            StartStore(stextshold);
+            return;
+        case 18:
+            SmithBuyPItem();
+            StartStore(stextshold);
+            return;
+        case 3:
+        case 7:
+            StoreSellItem();
+            StartStore(stextshold);
+            return;
+        case 4:
+            SmithRepairItem();
+            StartStore(stextshold);
+            return;
+        case 6:
+            WitchBuyItem();
+            StartStore(stextshold);
+            return;
+        case 8:
+            WitchRechargeItem();
+            StartStore(stextshold);
+            return;
+        case 13:
+            BoyBuyItem();
+            StartStore(stextshold);
+            return;
+        case 16:
+            HealerBuyItem();
+            StartStore(stextshold);
+            return;
+        case 17:
+            StoryIdItem();
+            StartStore(0x14);
+            return;
+        default:
+            StartStore(stextshold);
+            return;
+        }
+    } else {
+        StartStore(stextshold);
+        stextsel = stextlhold;
+        stextsval = stextvhold;
+    }
+}
+
+/* @0x80070E14 */
+void S_SBuyEnter(void)
+{
+    int idx;
+    int i;
+    int done;
+    int w, h;
+
+    if (SmithItemCount == 0) {
+        StartStore(1);
+        return;
+    }
+    stextshold = 2;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    if (SItemListFlag == 1) {
+        idx = (stextsel - stextup) / 4;
+    } else {
+        idx = (stextsel - stextup) / 8;
+    }
+    idx += stextsval;
+    if (plr[myplr]._pGold < _smithitem[StorePlrNo][idx]._iIvalue) {
+        StartStore(9);
+        return;
+    }
+    plr[myplr].HoldItem = _smithitem[StorePlrNo][idx];
+    SellIdx = idx;
+    SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
+    i = 0;
+    do {
+        w = cursW;
+        if (w < 0) {
+            w += 0xF;
+        }
+        h = cursH;
+        if (h < 0) {
+            h += 0xF;
+        }
+        done = func_80159F24(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+    } while (i < 0x28 && done == 0);
+    StartStore(done != 0 ? 0xB : 0xA);
+    SetCursor(1);
+}
+
+/* @0x80072590 */
+void S_WBuyEnter(void)
+{
+    int idx;
+    int i;
+    int done;
+    int w, h;
+
+    if (_NoWitchItems[StorePlrNo] == 0) {
+        StartStore(5);
+        return;
+    }
+    stextshold = 6;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    if (WStaffFlag != 0) {
+        idx = (stextsel - stextup) / 8;
+    } else {
+        idx = (stextsel - stextup) / 4;
+    }
+    idx += stextsval + _WitchIdxOfs[StorePlrNo];
+    if (plr[myplr]._pGold < _witchitem[StorePlrNo][idx]._iIvalue) {
+        StartStore(9);
+        return;
+    }
+    plr[myplr].HoldItem = _witchitem[StorePlrNo][idx];
+    SellIdx = idx;
+    SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
+    i = 0;
+    do {
+        w = cursW;
+        if (w < 0) {
+            w += 0xF;
+        }
+        h = cursH;
+        if (h < 0) {
+            h += 0xF;
+        }
+        done = func_8015A24C(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+    } while (i < 0x28 && done == 0);
+    StartStore(done != 0 ? 0xB : 0xA);
+    SetCursor(1);
+}
+
+/* @0x8007319C */
+void S_BBuyEnter(void)
+{
+    int i;
+    int done;
+    int w, h;
+    long half;
+
+    if (stextsel == 5) {
+        stextlhold = stextsel;
+        stextshold = 0xD;
+        stextvhold = stextsval;
+        if (plr[myplr]._pGold < _boyitem[StorePlrNo]._iIvalue + (_boyitem[StorePlrNo]._iIvalue >> 1)) {
+            StartStore(9);
+            return;
+        }
+        plr[myplr].HoldItem = _boyitem[StorePlrNo];
+        half = plr[myplr].HoldItem._iIvalue >> 1;
+        plr[myplr].HoldItem._iIvalue += half;
+        SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
+        i = 0;
+        do {
+            w = cursW;
+            if (w < 0) {
+                w += 0xF;
+            }
+            h = cursH;
+            if (h < 0) {
+                h += 0xF;
+            }
+            done = func_80159F24(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+        } while (i < 0x28 && done == 0);
+        StartStore(done != 0 ? 0xB : 0xA);
+        SetCursor(1);
+        return;
+    }
+    stextflag = 0;
+}
+
+/* @0x80072C38 -- m2c/ida both mis-detect this as taking an int arg; the raw oracle shows a genuine
+ * void(void) function (TakePlrsMoney's second m2c "arg" is also spurious -- it's the known
+ * single-arg TakePlrsMoney(long)). */
+void S_BoyEnter(void)
+{
+    if (_boyitem[StorePlrNo]._itype != -1 && stextsel == 0xC) {
+        if (plr[myplr]._pGold < 0x32) {
+            stextshold = 0xC;
+            stextlhold = 0xC;
+            stextvhold = stextsval;
+            StartStore(9);
+            return;
+        }
+        TakePlrsMoney(0x32);
+        StartStore(0xD);
+        return;
+    }
+    if ((stextsel == 6 && _boyitem[StorePlrNo]._itype != -1) ||
+        (stextsel == 8 && _boyitem[StorePlrNo]._itype == -1)) {
+        talker = 8;
+        stextshold = 0xC;
+        gossipstart = 0xE1;
+        gossipend = 0xEA;
+        stextlhold = stextsel;
+        StartStore(0x13);
+        return;
+    }
+    stextflag = 0;
+}
+
+/* @0x80070258 */
+void STextUp(void)
+{
+    if (stextsel != -1) {
+        if (stextscrl != 0) {
+            if (stextsel == stextup) {
+                if (stextsval != 0) {
+                    stextsval -= 1;
+                }
+            } else {
+                stextsel -= 1;
+                if (((unsigned char)stext[stextsel]._sx) == 0) {
+                    do {
+                        if (stextsel == 0) {
+                            stextsel = 0x17;
+                        } else {
+                            stextsel -= 1;
+                        }
+                    } while (((unsigned char)stext[stextsel]._sx) == 0);
+                }
+            }
+        } else {
+            if (stextsel == 0) {
+                stextsel = 0x17;
+            } else {
+                stextsel -= 1;
+            }
+            if (((unsigned char)stext[stextsel]._sx) == 0) {
+                do {
+                    if (stextsel == 0) {
+                        stextsel = 0x17;
+                    } else {
+                        stextsel -= 1;
+                    }
+                } while (((unsigned char)stext[stextsel]._sx) == 0);
+            }
+        }
+    }
+    PlaySFX(0x32);
+}
+
+/* @0x800703DC */
+void STextDown(void)
+{
+    if (stextsel != -1) {
+        if (stextscrl != 0) {
+            if (stextsel == stextdown) {
+                if (stextsval < stextsmax) {
+                    stextsval += 1;
+                }
+            } else {
+                stextsel += 1;
+                if ((unsigned char)stext[stextsel]._sx == 0) {
+                    do {
+                        if (stextsel == 0x17) {
+                            stextsel = 0;
+                        } else {
+                            stextsel += 1;
+                        }
+                    } while ((unsigned char)stext[stextsel]._sx == 0);
+                }
+            }
+        } else {
+            if (stextsel == 0x17) {
+                stextsel = 0;
+            } else {
+                stextsel += 1;
+            }
+            if ((unsigned char)stext[stextsel]._sx == 0) {
+                do {
+                    if (stextsel == 0x17) {
+                        stextsel = 0;
+                    } else {
+                        stextsel += 1;
+                    }
+                } while ((unsigned char)stext[stextsel]._sx == 0);
+            }
+        }
+    }
+    PlaySFX(0x32);
+}
+
+/* @0x800700B4 -- switch on stextflag (1-indexed, per the raw/ida decode -- the m2c draft's case
+ * labels are off-by-one, "stextflag - 1", and its second "case 23" is actually ida's case 24 (0x18);
+ * transcribed from ida's values directly). Shared tail blocks are written out literally at each
+ * convergence point (no goto/label) so gcc's tail-merge collapses the duplicates, per the
+ * S_ConfirmEnter lesson (an explicit C label emits an extra debug LABEL record retail doesn't have). */
+void STextESC(void)
+{
+    PlaySFX(0x33);
+    switch (stextflag) {
+    case 1:
+    case 5:
+    case 12:
+    case 14:
+    case 15:
+    case 21:
+    case 22:
+    case 23:
+        stextflag = 0;
+        options_pad = -1;
+        stream_stop();
+        return;
+    case 2:
+        StartStore(1);
+        stextsel = 9;
+        return;
+    case 3:
+        StartStore(1);
+        stextsel = 0xB;
+        return;
+    case 4:
+        StartStore(1);
+        stextsel = 0xC;
+        return;
+    case 6:
+        StartStore(5);
+        if (WStaffFlag != 0) {
+            stextsel = 0xA;
+        } else {
+            stextsel = 9;
+        }
+        return;
+    case 7:
+        StartStore(5);
+        if (WStaffFlag == 0) {
+            stextsel = 0xB;
+        } else {
+            stextsel = 0xC;
+        }
+        return;
+    case 8:
+        StartStore(5);
+        stextsel = 0xD;
+        return;
+    case 9:
+    case 10:
+    case 11:
+    case 24:
+        StartStore(stextshold);
+        stextsel = stextlhold;
+        stextsval = stextvhold;
+        return;
+    case 13:
+        StartStore(0xC);
+        stextsel = 6;
+        return;
+    case 16:
+        StartStore(0xE);
+        stextsel = 0xB;
+        return;
+    case 17:
+        StartStore(0xF);
+        stextsel = 9;
+        return;
+    case 18:
+        StartStore(1);
+        stextsel = 0xA;
+        return;
+    case 19:
+        StartStore(stextshold);
+        stextsel = stextlhold;
+        return;
+    case 20:
+        StartStore(0x11);
+        return;
+    default:
+        return;
+    }
 }
 
 /* @0x800738B4 */
