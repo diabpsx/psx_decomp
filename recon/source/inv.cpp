@@ -48,6 +48,8 @@ int ItemH;
 int InvPageNo;
 int InvPageFlag;
 int InvBackAY;
+unsigned char invflag;
+unsigned char drawsbarflag;
 
 void FreeInvGFX(void)
 {
@@ -1225,7 +1227,6 @@ void InvMoveCursLeft(void)
 {
     int ItemInc;
     int OldPos;
-    int newpos, rem;
 
     OldPos = InvCursPos;
 
@@ -1279,20 +1280,23 @@ void InvMoveCursLeft(void)
         }
     }
 
-    if (InvCursPos >= 25)
+    if ((unsigned int)(InvCursPos - 25) < 40) {
         ItemInc = 1;
+    } else if (InvCursPos < 0x41) {
+        /* nothing */
+    } else {
+        ItemInc = 1;
+    }
 
 after:
     if ((unsigned int)(InvCursPos - 25) < 40) {
-        newpos = InvCursPos - ItemInc;
-        InvCursPos = newpos;
-        rem = (newpos - 25) % 10;
-        if (rem == 9 || rem == -1) {
-            InvCursPos = newpos + 10;
+        InvCursPos -= ItemInc;
+        if ((InvCursPos - 25) % 10 == 9 || (InvCursPos - 25) % 10 == -1) {
+            InvCursPos += 10;
         }
     } else if (InvCursPos < 0x41) {
         /* nothing */
-    } else if (InvCursPos == 0x41) {
+    } else if (InvCursPos < 0x42) {
         InvCursPos = InvCursPos + 7;
     } else {
         InvCursPos = InvCursPos - ItemInc;
@@ -1339,9 +1343,8 @@ void InvMoveCursRight(void)
         }
 
         if ((unsigned int)(InvCursPos - 25) < 40) {
-            int gi = plr[myplr].InvGrid[InvCursPos - 25];
             ItemInc = 1;
-            if (gi != 0) {
+            if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
                 InvGetItemWH(InvCursPos - 25);
                 ItemInc = ItemW;
             }
@@ -1375,9 +1378,8 @@ void InvMoveCursRight(void)
         }
 
         if ((unsigned int)(InvCursPos - 25) < 40) {
-            int gi = plr[myplr].InvGrid[InvCursPos - 25];
             ItemInc = 1;
-            if (gi != 0) {
+            if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
                 InvGetItemWH(InvCursPos - 25);
                 ItemInc = ItemW;
             }
@@ -1387,8 +1389,6 @@ void InvMoveCursRight(void)
 
 tail2:
     if ((unsigned int)(InvCursPos - 25) < 40) {
-        int a1, a0;
-
         if (_pcurs[myplr] < 12) {
             ItemW = 0;
         } else {
@@ -1396,11 +1396,9 @@ tail2:
             ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
         }
 
-        a1 = InvCursPos + ItemInc;
-        a0 = a1 + (ItemW - 25);
-        InvCursPos = a1;
-        if (a0 % 10 == 0) {
-            InvCursPos = a1 - 10 + ItemW;
+        InvCursPos = InvCursPos + ItemInc;
+        if ((InvCursPos + ItemW - 25) % 10 == 0) {
+            InvCursPos = InvCursPos - 10 + ItemW;
         }
     } else if (InvCursPos >= 0x41) {
         if (InvCursPos < 0x48) {
@@ -1409,6 +1407,217 @@ tail2:
             InvCursPos = InvCursPos - 7;
         }
     }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
+}
+
+void InvMoveCursUp(void)
+{
+    int ItemInc;
+    int OldPos;
+
+    OldPos = InvCursPos;
+
+    if (_pcurs[myplr] < 12) {
+        ItemInc = 0;
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+                goto tail3;
+            case 4:
+            case 6:
+            case 7:
+                InvCursPos = 0;
+                goto tail3;
+            case 5:
+                InvCursPos = 6;
+                goto tail3;
+            case 13:
+            case 19:
+                InvCursPos = 6;
+                goto tail3;
+            default:
+                break;
+            }
+        }
+
+        if ((unsigned int)(InvCursPos - 25) < 40) {
+            if (InvCursPos < 35) {
+                InvCursPos = 19;
+            } else {
+                ItemInc = 1;
+                goto tail3;
+            }
+        } else if (InvCursPos < 0x41) {
+            /* nothing */
+        } else {
+            InvCursPos = InvCursPos - 9;
+        }
+    } else {
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 13:
+            case 19:
+                goto tail3;
+            default:
+                break;
+            }
+        }
+
+        if ((unsigned int)(InvCursPos - 25) < 40) {
+            ItemInc = 1;
+            goto tail3;
+        } else if (InvCursPos < 0x41) {
+            /* nothing */
+        } else {
+            InvCursPos = InvCursPos - 9;
+        }
+    }
+
+tail3:
+    if ((unsigned int)(InvCursPos - 25) < 40 && ItemInc != 0) {
+        if (InvCursPos < 35) {
+            int key = (signed char)(plr[myplr].HoldItem._iLoc - 1);
+            if ((unsigned int)key < 8) {
+                switch (key) {
+                case 0:
+                case 1:
+                    InvCursPos = 7;
+                    break;
+                case 2:
+                    InvCursPos = 19;
+                    break;
+                case 3:
+                    InvCursPos = 0;
+                    break;
+                case 4:
+                    InvCursPos = 4;
+                    break;
+                case 5:
+                    InvCursPos = 6;
+                    break;
+                default:
+                    break;
+                }
+            }
+        } else {
+            InvCursPos = InvCursPos - 10;
+        }
+    }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
+}
+
+void InvMoveCursDown(void)
+{
+    int ItemInc;
+    int OldPos;
+
+    OldPos = InvCursPos;
+    ItemInc = 0;
+
+    if (_pcurs[myplr] < 12) {
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+                InvCursPos = 6;
+                goto tail4;
+            case 4:
+            case 7:
+                InvCursPos = 25;
+                goto tail4;
+            case 5:
+            case 13:
+                InvCursPos = 34;
+                goto tail4;
+            case 6:
+                InvCursPos = 19;
+                goto tail4;
+            case 19:
+                InvCursPos = 29;
+                goto tail4;
+            default:
+                break;
+            }
+        }
+
+        if ((unsigned int)(InvCursPos - 25) < 40) {
+            if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+                InvGetItemWH(InvCursPos - 25);
+                if (InvCursPos < 0x39) {
+                    InvCursPos = InvCursPos + ItemH * 10;
+                } else {
+                    InvCursPos = InvCursPos + ItemH * 9;
+                }
+                goto tail4;
+            } else {
+                if (InvCursPos < 0x38) {
+                    InvCursPos = InvCursPos + 10;
+                } else if (InvCursPos < 0x41) {
+                    InvCursPos = InvCursPos + 9;
+                }
+                goto tail4;
+            }
+        }
+    } else {
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+            case 6:
+            case 19:
+                InvCursPos = 29;
+                goto tail4;
+            case 4:
+            case 7:
+                InvCursPos = 25;
+                goto tail4;
+            case 5:
+            case 13:
+                InvCursPos = 34;
+                goto tail4;
+            default:
+                break;
+            }
+        }
+
+        if ((unsigned int)(InvCursPos - 25) < 40) {
+            ItemInc = 1;
+            goto tail4;
+        } else if (InvCursPos < 0x41) {
+            /* nothing */
+        } else {
+            ItemInc = 0;
+        }
+    }
+
+tail4:
+    if ((unsigned int)(InvCursPos - 25) < 40 && ItemInc != 0) {
+        ItemNo = plr[myplr].HoldItem._iCurs;
+        ItemW = InvItemWidth[ItemNo + 12] >> 4;
+        ItemH = InvItemHeight[ItemNo + 12] >> 4;
+
+        if (InvCursPos < 0x38) {
+            if (InvCursPos + (ItemH - 1) * 10 < 0x37) {
+                InvCursPos = InvCursPos + 10;
+            }
+        } else if (InvCursPos != 0x37) {
+            InvCursPos = InvCursPos + 9;
+        } else {
+            InvCursPos = 0x41;
+        }
+    }
+
+    if (InvCursPos >= 0x49)
+        InvCursPos = 0x48;
 
     InvSetItemCurs();
     if (OldPos != InvCursPos)
@@ -1434,9 +1643,9 @@ void ControlInv(void)
         invflag = 0;
 
     if (InvCursPos < 0x19)
-        InvBackAY = 0x60;
-    else
         InvBackAY = 0;
+    else
+        InvBackAY = 0x60;
 
     if (InvBackAY < InvBackY) {
         InvBackY -= 0x10;

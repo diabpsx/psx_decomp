@@ -1,9 +1,8 @@
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 extern struct SpellData spelldata[37];   /* @0x800DDB80 */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
+extern unsigned char uitemflag;   /* @0x8011B8DC (owned by ITEMS.CPP: absolute-addressed everywhere in inv/) */
 extern int myplr;   /* @0x8011BA08 */
-extern unsigned char invflag;   /* @0x8011C32C */
-extern unsigned char drawsbarflag;   /* @0x8011C32D */
 extern int force_redraw;   /* @0x8011B790 */
 extern unsigned char leveltype;   /* @0x8011C10D */
 extern int MouseX;   /* @0x8011B7E4 */
@@ -48,6 +47,5 @@ extern unsigned short DavesPad;   /* @0x8011AB12 */
 extern int InvPageFlag;   /* @0x8011C33C */
 extern int InvPageNo;   /* @0x8011C338 */
 extern int InvBackAY;   /* @0x8011C340 */
-extern unsigned char uitemflag;   /* @0x8011B8DC */
 extern int options_pad;   /* @0x8011B250 */
 extern BOOL ignore_buttons;   /* @0x8011BBD0 */
