@@ -2155,98 +2155,74 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
 
     li = 0;
     sstr[0] = 0;
-    if (x->_iIdentified != 0) {
-        if (x->_iMagical != 2) {
-            if (x->_iPrePower != -1) {
-                PrintItemPower(PL_Prefix[x->_iPrePower].PLPower, x);
-                if (tempstr[0] != 0) {
-                    strcat(sstr, tempstr);
-                }
-            }
+    if (x->_iIdentified) {
+        if (x->_iMagical != 2 && x->_iPrePower != -1) {
+            PrintItemPower(PL_Prefix[x->_iPrePower].PLPower, x);
+            if (tempstr[0])
+                strcat(sstr, tempstr);
         }
         if (x->_iSufPower != -1) {
             PrintItemPower(PL_Suffix[x->_iSufPower].PLPower, x);
-            if (sstr[0] != 0) {
-                if (tempstr[0] != 0) {
-                    strcat(sstr, ",  ");
-                    li += 1;
-                    goto block_9;
-                }
-            }
-            if (tempstr[0] != 0) {
-                strcat(sstr, tempstr);
-            }
-block_9:;
-        }
-    }
-    if (x->_iMiscId == 0x17) {
-        if (x->_iMaxCharges != 0) {
-            sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
-            if (sstr[0] != 0) {
+            if (sstr[0] && tempstr[0]) {
                 strcat(sstr, ",  ");
-                li += 1;
+                li++;
             }
-            strcat(sstr, tempstr);
+            if (tempstr[0])
+                strcat(sstr, tempstr);
         }
     }
-    if (sstr[0] != 0) {
-        AddSText(0xC, l, 0, sstr, iclr, 0);
-        int t = l + 1;
-        l = t + li;
-        li = 0;
-    }
-    sstr[0] = 0;
-    if (x->_iClass == 1) {
-        sprintf(sstr, "%s:%i-%i", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
-    }
-    if (x->_iClass == 2) {
-        sprintf(sstr, GetStr(0x2F), x->_iAC);
-    }
-    if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
-        if (sstr[0] != 0) {
+    if (x->_iMiscId == 0x17 && x->_iMaxCharges) {
+        sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
+        if (sstr[0]) {
             strcat(sstr, ",  ");
-        }
-        strcat(sstr, GetStr(0x218));
-    } else {
-        sprintf(tempstr, GetStr(0x11F), x->_iDurability, x->_iMaxDur);
-        if (((short)StoreBackRect.w * 2) - 0x44 >= MediumFont.GetStrWidth(tempstr) + MediumFont.GetStrWidth(sstr)) {
-            strcat(sstr, " ");
+            li++;
         }
         strcat(sstr, tempstr);
     }
-    if (x->_itype == 0) {
+    if (sstr[0]) {
+        AddSText(0xC, l, 0, sstr, iclr, 0);
+        l += li + 1;
+        li = 0;
+    }
+    sstr[0] = 0;
+    if (x->_iClass == 1)
+        sprintf(sstr, "%s:%i-%i", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
+    if (x->_iClass == 2)
+        sprintf(sstr, GetStr(0x2F), x->_iAC);
+    if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
+        if (sstr[0])
+            strcat(sstr, ",  ");
+        strcat(sstr, GetStr(0x218));
+    } else {
+        sprintf(tempstr, GetStr(0x11F), x->_iDurability, x->_iMaxDur);
+        if (MediumFont.GetStrWidth(tempstr) + MediumFont.GetStrWidth(sstr) <= StoreBackRect.w * 2 - 0x44)
+            strcat(sstr, " ");
+        if (tempstr)
+            strcat(sstr, tempstr);
+    }
+    if (x->_itype == 0)
         sstr[0] = 0;
-    }
-    if ((unsigned int)(x->_iMiscId - 0x15) >= 2 && (unsigned int)(x->_iMiscId - 2) >= 2 &&
-        (unsigned int)(x->_iMiscId - 4) >= 2 && (unsigned int)(x->_iMiscId - 6) >= 2 &&
-        (unsigned int)(x->_iMiscId - 0xA) >= 2 && (unsigned int)(x->_iMiscId - 0xC) >= 2 &&
-        (unsigned int)(x->_iMiscId - 0xE) >= 2 && (unsigned int)(x->_iMiscId - 0x10) >= 2 &&
-        (unsigned int)(x->_iMiscId - 0x12) >= 2 && x->_iMiscId != 0x18) {
+    if (!(x->_iMiscId == 0x15 || x->_iMiscId == 0x16 || x->_iMiscId == 0x2 || x->_iMiscId == 0x3 || x->_iMiscId == 0x4 || x->_iMiscId == 0x5 || x->_iMiscId == 0x6 || x->_iMiscId == 0x7 || x->_iMiscId == 0xA || x->_iMiscId == 0xB || x->_iMiscId == 0xC || x->_iMiscId == 0xD || x->_iMiscId == 0xE || x->_iMiscId == 0xF || x->_iMiscId == 0x10 || x->_iMiscId == 0x11 || x->_iMiscId == 0x12 || x->_iMiscId == 0x13 || x->_iMiscId == 0x18))
         strcat(sstr, ",  ");
-    }
     if (x->_iMinStr + x->_iMinMag + x->_iMinDex == 0) {
         strcat(sstr, GetStr(0x2D1));
     } else {
         strcpy(tempstr, GetStr(0x35D));
-        if (x->_iMinStr != 0) {
+        if (x->_iMinStr)
             sprintf(tempstr, GetStr(0x51C), tempstr, x->_iMinStr);
-        }
-        if (x->_iMinMag != 0) {
+        if (x->_iMinMag)
             sprintf(tempstr, GetStr(0x51B), tempstr, x->_iMinMag);
-        }
-        if (x->_iMinDex != 0) {
+        if (x->_iMinDex)
             sprintf(tempstr, GetStr(0x51A), tempstr, x->_iMinDex);
-        }
         strcat(sstr, tempstr);
     }
     AddSText(0xC, l, 0, sstr, iclr, 0);
-    l = l + 2 + li;
-    if (x->_iMagical == 2 && x->_iIdentified != 0) {
-        if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
+    l += li + 2;
+    if (x->_iMagical == 2 && x->_iIdentified) {
+        if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0)
             AddSText(0xC, l + 1, 0, GetStr(0x4A3), iclr, 0);
-        } else {
+        else
             AddSText(0xC, l, 0, GetStr(0x4A3), iclr, 0);
-        }
     }
 }
 
