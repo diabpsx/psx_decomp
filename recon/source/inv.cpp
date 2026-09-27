@@ -2649,83 +2649,63 @@ void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag)
     Ft4 = InvPanelTData->PrintFt4(0x94, X, Y, 0, D_8011C300, 0);
 
     Ft4->x0 = X + 0x81;
-    W = W + 0x7F;
-    X = X + W;
-    Ft4->x1 = X;
-    Ft4->x2 = Ft4->x0;
-    Ft4->x3 = X;
-    H = H + 0x1F;
-    Y = Y - InvBackY;
-    Ft4->y0 = Y + 0x21;
-    Ft4->y1 = Ft4->y0;
-    Y = Y + H;
-    Ft4->y2 = Y;
-    Ft4->y3 = Y;
-    Ft4->tpage = Ft4->tpage | 0x40;
+    Ft4->y0 = Y - InvBackY + 0x21;
+    Ft4->x1 = X + 0x81 + (W - 2);
+    Ft4->y1 = Y - InvBackY + 0x21;
+    Ft4->x2 = X + 0x81;
+    Ft4->y2 = Y - InvBackY + 0x21 + (H - 2);
+    Ft4->x3 = X + 0x81 + (W - 2);
+    Ft4->y3 = Y - InvBackY + 0x21 + (H - 2);
+    Ft4->tpage |= 0x40;
     Ft4->u1 = Ft4->u0 + 1;
     Ft4->u3 = Ft4->u0 + 1;
     Ft4->v2 = Ft4->v0 + 1;
     Ft4->v3 = Ft4->v0 + 1;
     Ft4->code = (Ft4->code | 2) & 0xFE;
 
-    if (Flag == 1) {
+    switch (Flag) {
+    case 0:
+        Ft4->r0 = 0x20;
+        Ft4->g0 = 0x20;
+        Ft4->b0 = 0x20;
+        Ft4->tpage |= 0x40;
+        break;
+    case 1:
         Ft4->r0 = 0xD0;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
-        Ft4->tpage = Ft4->tpage | 0x20;
-        return;
-    }
-
-    if (Flag < 2) {
-        if (Flag == 0) {
-            Ft4->r0 = 0x20;
-            Ft4->g0 = 0x20;
-            Ft4->b0 = 0x20;
-            Ft4->tpage = Ft4->tpage | 0x40;
-        }
-        return;
-    }
-
-    if (Flag == 2) {
-        int cursor;
-
-        Ft4->tpage = Ft4->tpage | 0x20;
-        cursor = _pcurs[myplr];
-        if (cursor == Flag) {
+        Ft4->tpage |= 0x20;
+        break;
+    case 2:
+        Ft4->tpage |= 0x20;
+        if (_pcurs[myplr] == 2) {
             Ft4->r0 = 0;
             Ft4->g0 = 0;
             Ft4->b0 = CursGlow - 0x80;
-            return;
-        }
-        if (cursor == 3) {
+        } else if (_pcurs[myplr] == 3) {
             Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = CursGlow - 0x80;
             Ft4->b0 = 0;
-            Ft4->g0 = CursGlow - 0x80;
-            return;
-        }
-        if (cursor == 4) {
+        } else if (_pcurs[myplr] == 4) {
+            Ft4->r0 = CursGlow - 0x80;
             Ft4->g0 = 0;
-            Ft4->r0 = CursGlow - 0x80;
             Ft4->b0 = CursGlow - 0x80;
-            return;
-        }
-        if (cursor < 0xC) {
+        } else if (_pcurs[myplr] < 12) {
             Ft4->r0 = CursGlow - 0x80;
             Ft4->g0 = CursGlow - 0x80;
             Ft4->b0 = CursGlow - 0x80;
-            return;
+        } else {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = (CursGlow + 0x80) >> 2;
+            Ft4->b0 = (CursGlow + 0x80) >> 2;
         }
-        Ft4->r0 = CursGlow - 0x80;
-        Ft4->g0 = (CursGlow + 0x80) >> 2;
-        Ft4->b0 = (CursGlow + 0x80) >> 2;
-        return;
-    }
-
-    if (Flag == 3) {
+        break;
+    case 3:
         Ft4->r0 = 0x80;
         Ft4->g0 = (CursGlow >> 2) + 0x20;
-        Ft4->tpage = Ft4->tpage | 0x20;
         Ft4->b0 = (CursGlow >> 2) + 0x20;
+        Ft4->tpage |= 0x20;
+        break;
     }
 }
 
