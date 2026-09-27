@@ -300,7 +300,7 @@ extern "C" void cdstream_service(void)
         reset_cdstream();
         first_handler_event = 0;
         last_handler_event = time_in_frames;
-        stream_opened = last_handler_event;
+        stream_opened = time_in_frames;
     }
 }
 
@@ -309,18 +309,18 @@ extern "C" int cdstream_get_chunk(unsigned char **data, StHEADER **h)
 {
     if ((stream_chunks_in - stream_chunks_borrowed) < 0)
         printf("underrun in get_chunk\n");
-    if (stream_chunks_in == stream_chunks_borrowed) {
-        *data = 0;
-        *h = 0;
-        return 0;
+    if (stream_chunks_in != stream_chunks_borrowed) {
+        *data = stream_buf + (stream_out * stream_chunksize * 0x7E0);
+        *h = (StHEADER *)(stream_bufh + ((stream_out * stream_chunksize) << 5));
+        _get_count += 1;
+        stream_out = (stream_out + 1) % stream_bufsize;
+        stream_chunks_borrowed += 1;
+        stream_got_chunks += 1;
+        return 1;
     }
-    *data = stream_buf + (stream_out * stream_chunksize * 0x7E0);
-    *h = (StHEADER *)(stream_bufh + ((stream_out * stream_chunksize) << 5));
-    _get_count += 1;
-    stream_out = (stream_out + 1) % stream_bufsize;
-    stream_chunks_borrowed += 1;
-    stream_got_chunks += 1;
-    return 1;
+    *data = 0;
+    *h = 0;
+    return 0;
 }
 
 /* @0x801563C8 FMV.CPP:616 */
@@ -370,10 +370,23 @@ extern "C" void close_cdstream(void)
 /* @0x80156540 FMV.CPP:691 */
 extern "C" void wait_cdstream(void)
 {
-    while ((stream_open != 0) || (stream_ending != 0)) {
-        /* spin */
-    }
-    if ((stream_open != 0) || (stream_ending != 0)) {
+    int start_wait;   /* SYM AUTO local; unreferenced in the raw -- a genuine frame-hole (see catalog
+                       * 13A "SYM-LOCAL STAGING LAW"): its declared-but-unused presence supplies the
+                       * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
+    int wait = 1;
+    int busy;
+
+    start_wait = time_in_frames;
+loop_1:
+    busy = 0;
+    if ((stream_open != 0) || (stream_ending != 0))
+        busy = 1;
+    if ((busy != 0) && (wait != 0))
+        goto loop_1;
+    busy = 0;
+    if ((stream_open != 0) || (stream_ending != 0))
+        busy = 1;
+    if (busy != 0) {
         printf("Warning: timeout in wait_cdstream()...\n");
         stream_stalled = 0;
         stream_ending = stream_stalled;
