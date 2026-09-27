@@ -27,6 +27,8 @@
 
 #define NUMSTLINES 24
 
+extern "C" void DBG_Error(char *Text, char *File, int Line);
+
 /* SpellData layout (from DIABPSX.SYM; not emitted into the stores headers) */
 struct SpellData {   /* sizeof 52 */
     unsigned char sName;   /* +0x0 */
@@ -233,6 +235,31 @@ unsigned char SmithRepairOk(int i)
         return 0;
     }
     return 1;
+}
+
+/* @0x8006BBEC */
+void AddStoreHoldRepair(ItemStruct *itm, int i)
+{
+    int v;
+
+    if (itm->_iMaxDur <= 0) DBG_Error(0, "source/STORES.cpp", 1031);
+
+    storehold[storenumh] = *itm;
+    itm = &storehold[storenumh];
+    if (itm->_iMagical && itm->_iIdentified)
+        itm->_ivalue = 30 * itm->_iIvalue / 100;
+    v = 100 * (itm->_iMaxDur - itm->_iDurability) / itm->_iMaxDur;
+    v = v * itm->_ivalue / 100;
+    if (v == 0) {
+        if (itm->_iMagical && itm->_iIdentified)
+            return;
+        v = 1;
+    }
+    if (v > 1)
+        v >>= 1;
+    itm->_iIvalue = v;
+    itm->_ivalue = v;
+    storehidx[storenumh++] = i;
 }
 
 /* @0x8006C42C */
