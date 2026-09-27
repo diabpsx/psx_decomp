@@ -1,4 +1,22 @@
-struct TASK;
+struct TASK {   /* sizeof 92 */
+    struct TASK *Next;   /* +0x0 */
+    struct TASK *Prev;   /* +0x4 */
+    unsigned long Id;   /* +0x8 */
+    unsigned long SleepTime;   /* +0xC */
+    unsigned long fToInit : 1;
+    unsigned long fToDie : 1;
+    unsigned long fKillable : 1;
+    unsigned long fActive : 1;
+    unsigned long fXtraStack : 1;
+    void *Stack;   /* +0x14 */
+    unsigned long StackSize;   /* +0x18 */
+    void *Data;   /* +0x1C */
+    int TskEnv[12];   /* +0x20 */
+    void (*Main)();   /* +0x50 */
+    long hndTask;   /* +0x54 */
+    unsigned short XtraLongs;   /* +0x58 */
+    unsigned short MaxStackSizeBytes;   /* +0x5A */
+};
 
 struct PlayerStruct {
     char _pad000[0x1D];
@@ -48,6 +66,47 @@ struct SpellTarget {   /* sizeof 72 */
     int spotid;   /* +0x24 */
     short lastx[8];   /* +0x28 */
     short lasty[8];   /* +0x38 */
+
+    BOOL Active() { return active; }
+};
+
+struct CPad {   /* sizeof 236 */
+    unsigned char get_both;   /* +0x0 */
+    unsigned char active;   /* +0x1 */
+    unsigned char PadType;   /* +0x2 */
+    unsigned char PADTICK;   /* +0x3 */
+    unsigned short PADTICKMASK;   /* +0x4 */
+    unsigned short PadNum;   /* +0x6 */
+    unsigned short Cur;   /* +0x8 */
+    unsigned short Up;   /* +0xA */
+    unsigned short Down;   /* +0xC */
+    unsigned short Tick;   /* +0xE */
+    unsigned short Old;   /* +0x10 */
+    unsigned short both_Cur;   /* +0x12 */
+    unsigned short both_Up;   /* +0x14 */
+    unsigned short both_Down;   /* +0x16 */
+    unsigned short both_Tick;   /* +0x18 */
+    unsigned short both_Old;   /* +0x1A */
+    BOOL TickDown[16];   /* +0x1C */
+    BOOL TickBoth[16];   /* +0x5C */
+    unsigned char TickCount[16];   /* +0x9C */
+    unsigned short BothTickCount[16];   /* +0xAC */
+    unsigned short GazTickCount[16];   /* +0xCC */
+
+    unsigned short GetCur() { return get_both ? both_Cur : Cur; }
+    unsigned short GetUp() { return get_both ? both_Up : Up; }
+    unsigned short GetDown() { return get_both ? both_Down : Down; }
+};
+
+struct CBlocks {   /* sizeof 264 */
+    char _pad000[0xC8];
+    int StX;   /* +0xC8 */
+    int StY;   /* +0xCC */
+    int Mx;    /* +0xD0 */
+    int My;    /* +0xD4 */
+    char _pad0d8[264 - 0xD8];
+
+    void MoveToScrollTarget() { Mx = StX; My = StY; }
 };
 
 struct CPad;
@@ -78,6 +137,13 @@ struct GamePad {   /* sizeof 212 */
     int CheckDirs(int dir);
     int CheckSide(int dir);
     void RunFunc(int key);
+
+    GamePad() {}
+    GamePad(int pnum);
+    unsigned char CheckCentre(int dir);
+    unsigned char newDirOk(int dir);
+    void TestButtons(void);
+    void ButtonDown(int button);
 };
 
 struct KEY_ASSIGNS {   /* sizeof 16 */
