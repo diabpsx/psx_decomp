@@ -3431,14 +3431,32 @@ void MAI_Scav(int i)
  * before the `_mmode`/`_msquelch` guard, confirmed from the raw oracle
  * (`lb s3,0x34(s1)` for `_mx` happens right after establishing `Monst`,
  * before the mode check) -- same "speculative read before guard" lever as
- * M_StartHit/M2MStartHit/MAI_SkelKing. SYM OPEN (length 0x4b8 vs retail
- * 0x4bc, close); bytes OPEN (79 diffs, ours 302 / oracle 303, only 1 short
- * now -- was 189 diffs/304 before this fix). Confirmed PSX-specific from
+ * M_StartHit/M2MStartHit/MAI_SkelKing. Confirmed PSX-specific from
  * the JAP decompile (absent from hellfire): on a successful missile
  * launch, `Monst->Action=5` (the same "flying" marker seen in
  * MAI_Bat/MAI_Snake/M2MStartHit) and `Monst->_mdir = missile[mi]._mimfnum`
  * (re-read from the just-spawned missile, NOT the local `md` used for the
- * AddMissile call itself). */
+ * AddMissile call itself).
+ * FURTHER THIS PASS: found and fixed a real bug -- the cache lines had been
+ * left as a no-op self-assignment `_mx = _mx; _my = _my;` (never actually
+ * reading `Monst->_mx`/`_my`); fixed to `_mx = Monst->_mx; _my = Monst->_my;`
+ * -- this alone dropped 79->12 diffs. Also fixed store ORDER on the missile
+ * branch: retail sets `Monst->_mdir = missile[mi]._mimfnum;` BEFORE
+ * `Monst->Action = 5;` (opposite of the read order suggested by hellfire) --
+ * 12->4 diffs. OPEN residual (4 diffs, insn count EXACT 303/303): oracle
+ * schedules the `_mx` register-save + load (`sw s3,68(sp); lb s3,52(s1)`)
+ * immediately after computing `Monst`, BEFORE all other callee-saved-reg
+ * prologue stores (ra/fp/s7/s6/s5/s4/s0); ours schedules the identical pair
+ * AFTER those saves. FALSIFIED: reordering _mx/_my statement order, merging
+ * the `int _mx = Monst->_mx;` declaration+init, splitting decl/assign like
+ * the MAI_Scav lever -- none changed the scheduling (gcc's own prologue
+ * store-batching, not source-order-controllable via these angles). SYM: bytes
+ * are content-identical (0 real differences) but the SYM block-tree also
+ * disagrees -- retail nests 7 lexical blocks (L13/53/54/56/58/63/82) for the
+ * if/else-if chain that ours flattens into 1; NEXT ANGLE (untried): rewrite
+ * the `else if` chain as literal nested `{ if (...) { ... } else { ... } }`
+ * blocks matching the SYM's block start/end line numbers exactly (same class
+ * as other block-tree-driven near-misses in this file). */
 void MAI_Rhino(int i)
 {
     int fx, fy, mx, my, md, v;
