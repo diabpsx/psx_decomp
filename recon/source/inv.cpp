@@ -2620,23 +2620,23 @@ void DrawInvMsg(void)
 
     Ft4 = InvPanelTData->PrintFt4(0x94, 0, 0, 0, OldOt, 0);
 
-    Ft4->y2 = 0xD0;
-    Ft4->y3 = 0xD0;
-    Ft4->r0 = 0x20;
-    Ft4->g0 = 0x20;
-    Ft4->b0 = 0x20;
-    Ft4->x1 = 0x130;
-    Ft4->x3 = 0x130;
     Ft4->x0 = 0x80;
     Ft4->y0 = 0x80;
+    Ft4->x1 = 0x80 + 0xB0;
     Ft4->y1 = 0x80;
     Ft4->x2 = 0x80;
-    Ft4->tpage = Ft4->tpage | 0x40;
+    Ft4->y2 = 0x80 + 0x50;
+    Ft4->x3 = 0x80 + 0xB0;
+    Ft4->y3 = 0x80 + 0x50;
+    Ft4->tpage |= 0x40;
     Ft4->u1 = Ft4->u0 + 1;
     Ft4->u3 = Ft4->u0 + 1;
     Ft4->v2 = Ft4->v0 + 1;
     Ft4->v3 = Ft4->v0 + 1;
     Ft4->code = (Ft4->code | 2) & 0xFE;
+    Ft4->r0 = 0x20;
+    Ft4->g0 = 0x20;
+    Ft4->b0 = 0x20;
     MediumFont.SetOTpos(OldOt);
 
     PRIM_Clip(&InfoRect, OldOt);
