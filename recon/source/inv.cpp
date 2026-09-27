@@ -400,10 +400,10 @@ unsigned char AutoPlace(int pnum, int ii, int sx, int sy, unsigned char saveflag
                 xx = 0;
             }
             for (i = 0; i < sx; i++) {
-                if (i != 0 || j != sy - 1) {
-                    plr[pnum].InvGrid[xx + yy] = -plr[pnum]._pNumInv;
-                } else {
+                if (i == 0 && j == sy - 1) {
                     plr[pnum].InvGrid[xx + yy] = plr[pnum]._pNumInv;
+                } else {
+                    plr[pnum].InvGrid[xx + yy] = -plr[pnum]._pNumInv;
                 }
                 xx++;
             }
@@ -467,10 +467,10 @@ unsigned char SpecialAutoPlace(int pnum, int ii, int sx, int sy, unsigned char s
                 xx = 0;
             }
             for (i = 0; i < sx; i++) {
-                if (i != 0 || j != sy - 1) {
-                    plr[pnum].InvGrid[xx + yy] = -plr[pnum]._pNumInv;
-                } else {
+                if (i == 0 && j == sy - 1) {
                     plr[pnum].InvGrid[xx + yy] = plr[pnum]._pNumInv;
+                } else {
+                    plr[pnum].InvGrid[xx + yy] = -plr[pnum]._pNumInv;
                 }
                 xx++;
             }
