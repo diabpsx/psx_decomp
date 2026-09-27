@@ -296,13 +296,14 @@ unsigned char IsGoat(int mt)
  * oracle (they do not line up with devilution's Q_/UMT_ enumerators 1:1). */
 void GetLevelMTypes(void)
 {
-    int typelist[MAX_LVLMTYPES + 174];
-    int i, nt, tidx, mt;
+    int i;
     int minl, maxl;
+    int typelist[MAX_LVLMTYPES + 174];
+    int mt;
+    int nt;
     char mamask;
     unsigned long QuestMask;
-    int skeltypes[111];
-    int numskeltypes;
+    int idx;
 
     QuestMask = 0;
     AddMonsterType(0x6D, MPFLAG_SPECIAL);   /* MT_GOLEM */
@@ -350,14 +351,17 @@ void GetLevelMTypes(void)
             QuestMask |= CM_QuestToBitPattern(0xF);
 
         if (gbMaxPlayers != 1 && currlevel == quests[0xC]._qlevel) {
+            int skeltypes[111];
+            int numskeltypes;
+
             QuestMask |= CM_QuestToBitPattern(0xC);
             AddMonsterType(0x32, 4);
 
             numskeltypes = 0;
             for (i = 8; i < 0x1C; i++) {
                 if (IsSkel(i)) {
-                    minl = ((char)(monsterdata[i].mMinDLvl * 2) >> 1) + 1;
-                    maxl = ((char)(monsterdata[i].mMaxDLvl * 2) >> 1) + 1;
+                    minl = (char)monsterdata[i].mMinDLvl / 2 + 1;
+                    maxl = (char)monsterdata[i].mMaxDLvl / 2 + 1;
                     if (currlevel >= minl && currlevel <= maxl && (MonstAvailTbl[i] & mamask))
                         skeltypes[numskeltypes++] = i;
                 }
@@ -373,33 +377,36 @@ void GetLevelMTypes(void)
             }
         } else {
             while (nt > 0 && nummtypes < MAX_LVLMTYPES) {
-                mt = ENG_random(nt);
-                SwapMonsterType(&typelist[mt]);
-                AddMonsterType(typelist[mt], MPFLAG_SCATTER);
-                typelist[mt] = typelist[--nt];
+                if (nt == 0)
+                    break;
+                idx = ENG_random(nt);
+                mt = typelist[idx];
+                SwapMonsterType(&mt);
+                AddMonsterType(mt, MPFLAG_SCATTER);
+                typelist[idx] = typelist[--nt];
             }
         }
         return;
+    } else {
+        switch (setlvlnum) {
+        case 1:
+            QuestMask |= CM_QuestToBitPattern(0xC);
+            AddMonsterType(0x32, 4);
+            break;
+        case 2:
+            QuestMask |= CM_QuestToBitPattern(0xE);
+            break;
+        case 4:
+            QuestMask |= CM_QuestToBitPattern(0xD);
+            break;
+        case 5:
+            QuestMask |= CM_QuestToBitPattern(0xF);
+            break;
+        default:
+            break;
+        }
+        GetMonsterTypes(QuestMask);
     }
-
-    switch (setlvlnum) {
-    case 2:
-        QuestMask |= CM_QuestToBitPattern(0xE);
-        break;
-    case 1:
-        QuestMask |= CM_QuestToBitPattern(0xC);
-        AddMonsterType(0x32, 4);
-        break;
-    case 4:
-        QuestMask |= CM_QuestToBitPattern(0xD);
-        break;
-    case 5:
-        QuestMask |= CM_QuestToBitPattern(0xF);
-        break;
-    default:
-        break;
-    }
-    GetMonsterTypes(QuestMask);
 }
 
 /* --------------------------------------------------------------------- */
@@ -699,49 +706,101 @@ void InitMonsters(void)
  * based on and the next angles. */
 void PlaceUniqueMonst(int uniqindex, int miniontype, int unpackfilesize)
 {
-    int xp, yp, x, y, i;
-    int uniqtype;
-    int count2;
-    char filestr[64];
-    unsigned char zharflag, done;
     struct UniqMonstStruct *Uniq;
     struct MonsterStruct *Monst;
+    int xp, yp, x, y;
+    unsigned char done;
     int count;
+    int count2;
+    char filestr[64];
+    int uniqtype;
+    int i;
+    unsigned char zharflag;
     int mMinDamage, mMaxDamage;
-    int monstype;
 
+    Uniq = &UniqMonst[uniqindex];
     Monst = &monster[nummonsters];
     count2 = 0;
     zharflag = 1;
-    Uniq = &UniqMonst[uniqindex];
 
-    if ((uniquetrans + 19) << 8 >= 0x1B00)
+    if (uniquetrans * 256 + 0x1300 >= 0x1B00)
         return;
 
     for (uniqtype = 0; uniqtype < nummtypes; uniqtype++) {
-        monstype = Uniq->mtype;
+        int monstype = UniqMonst[uniqindex].mtype;
         SwapMonsterType(&monstype);
         if (Monsters[uniqtype].mtype == monstype)
             break;
     }
 
-    count = 0;
     do {
         xp = ENG_random(64) + 16;
         yp = ENG_random(64) + 16;
-        count2 = 0;
+        count = 0;
         for (x = xp - 3; x < xp + 3; x++) {
             for (y = yp - 3; y < yp + 3; y++) {
-                if ((unsigned)x < MAXDUNX && (unsigned)y < MAXDUNY && MonstPlace(x, y))
-                    count2++;
+                if (y >= 0 && y < 98 && x >= 0 && x < 98 && MonstPlace(x, y))
+                    count++;
             }
         }
-        if (count2 < 9) {
-            count++;
-            if (count < 1000)
-                continue;
+    } while ((count < 9 && ++count2 < 1000) || !MonstPlace(xp, yp));
+
+    if (uniqindex == 3) {
+        xp = 2 * setpc_x + 24;
+        yp = 2 * setpc_y + 28;
+    }
+    if (uniqindex == 8) {
+        xp = 2 * setpc_x + 22;
+        yp = 2 * setpc_y + 23;
+    }
+    if (uniqindex == 2) {
+        for (i = 0; i < themeCount; i++) {
+            if (i == zharlib && zharflag == 1) {
+                zharflag = 0;
+                xp = 2 * themeLoc[i].x + 20;
+                yp = 2 * themeLoc[i].y + 20;
+            }
         }
-    } while (!MonstPlace(xp, yp));
+    }
+    if (gbMaxPlayers == 1) {
+        if (uniqindex == 4) {
+            xp = 32;
+            yp = 46;
+        }
+        if (uniqindex == 5) {
+            xp = 40;
+            yp = 45;
+        }
+        if (uniqindex == 6) {
+            xp = 38;
+            yp = 49;
+        }
+        if (uniqindex == 1) {
+            xp = 35;
+            yp = 47;
+        }
+    } else {
+        if (uniqindex == 4) {
+            xp = 2 * setpc_x + 19;
+            yp = 2 * setpc_y + 22;
+        }
+        if (uniqindex == 5) {
+            xp = 2 * setpc_x + 21;
+            yp = 2 * setpc_y + 19;
+        }
+        if (uniqindex == 6) {
+            xp = 2 * setpc_x + 21;
+            yp = 2 * setpc_y + 25;
+        }
+    }
+    if (uniqindex == 9) {
+        done = 0;
+        for (yp = 0; yp < 96 && !done; yp++) {
+            for (xp = 0; xp < 96 && !done; xp++) {
+                done = GetDPiece(xp, yp) == 367;
+            }
+        }
+    }
 
     PlaceMonster(nummonsters, uniqtype, xp, yp);
     Monst->_uniqtype = uniqindex + 1;
@@ -761,43 +820,98 @@ void PlaceUniqueMonst(int uniqindex, int miniontype, int unpackfilesize)
             Monst->_mmaxhp = 64;
     }
 
+    mMinDamage = Uniq->mMinDamage;
+    mMaxDamage = Uniq->mMaxDamage;
     Monst->_mhitpoints = Monst->_mmaxhp;
     Monst->_mAi = Uniq->mAi;
     Monst->_mint = Uniq->mint;
-    mMinDamage = Uniq->mMinDamage;
-    mMaxDamage = Uniq->mMaxDamage;
     Monst->mMinDamage = mMinDamage;
     Monst->mMaxDamage = mMaxDamage;
     Monst->mMinDamage2 = mMinDamage;
     Monst->mMaxDamage2 = mMaxDamage;
     Monst->mMagicRes = Uniq->mMagicRes;
     Monst->mtalkmsg = Uniq->mtalkmsg;
-    Monst->mlid = AddLight(Monst->_mx, Monst->_my, 3);
+    Monst->mlid = AddLight(Monst->_mx, Monst->_my, 0x23F4);
 
-    if (gbMaxPlayers != 1) {
-        if (Monst->mtalkmsg)
-            Monst->_mgoal = 1;
-    }
+    if (gbMaxPlayers != 1 && Monst->_mAi == 29)
+        Monst->mtalkmsg = 0;
+    if (Monst->mtalkmsg)
+        Monst->_mgoal = 6;
 
     if (gnDifficulty == 1) {
-        Monst->_mmaxhp = 3 * Monst->_mmaxhp + 64;
+        Monst->_mmaxhp = 3 * Monst->_mmaxhp + 100;
+        Monst->_mhitpoints = Monst->_mmaxhp;
         Monst->mLevel += 15;
-        Monst->_mhitpoints = Monst->_mmaxhp;
-        Monst->mExp = 2 * (Monst->mExp + 1000);
-        Monst->mMinDamage = 2 * (Monst->mMinDamage + 2);
-        Monst->mMaxDamage = 2 * (Monst->mMaxDamage + 2);
-        Monst->mMinDamage2 = 2 * (Monst->mMinDamage2 + 2);
-        Monst->mMaxDamage2 = 2 * (Monst->mMaxDamage2 + 2);
-    } else if (gnDifficulty == 2) {
-        Monst->_mmaxhp = 4 * Monst->_mmaxhp + 192;
-        Monst->mLevel += 30;
-        Monst->_mhitpoints = Monst->_mmaxhp;
-        Monst->mExp = 4 * (Monst->mExp + 1000);
-        Monst->mMinDamage = 4 * Monst->mMinDamage + 6;
-        Monst->mMaxDamage = 4 * Monst->mMaxDamage + 6;
-        Monst->mMinDamage2 = 4 * Monst->mMinDamage2 + 6;
-        Monst->mMaxDamage2 = 4 * Monst->mMaxDamage2 + 6;
+        Monst->mExp = 2 * Monst->mExp + 2000;
+        Monst->mMinDamage = 2 * mMinDamage + 4;
+        Monst->mMaxDamage = 2 * mMaxDamage + 4;
+        Monst->mMinDamage2 = 2 * mMinDamage + 4;
+        Monst->mMaxDamage2 = 2 * mMaxDamage + 4;
     }
+    if (gnDifficulty == 2) {
+        Monst->_mmaxhp = 4 * Monst->_mmaxhp + 200;
+        Monst->_mhitpoints = Monst->_mmaxhp;
+        Monst->mLevel += 30;
+        Monst->mExp = 4 * Monst->mExp + 4000;
+        Monst->mMinDamage = 4 * mMinDamage + 6;
+        Monst->mMaxDamage = 4 * mMaxDamage + 6;
+        Monst->mMinDamage2 = 4 * mMinDamage + 6;
+        Monst->mMaxDamage2 = 4 * mMaxDamage + 6;
+    }
+
+    if (uniqindex == 3) {
+        if (quests[7]._qvar1 == 2) {
+            Monst->mtalkmsg = 0x15;
+            Monst->_mFlags |= 0x40;
+        }
+        if (quests[7]._qvar1 == 3) {
+            Monst->_msquelch = 255;
+            Monst->mtalkmsg = 0;
+            Monst->_mgoal = 1;
+        }
+    }
+    if (uniqindex == 8) {
+        if (quests[4]._qactive == 3) {
+            Monst->mtalkmsg = 0;
+            Monst->_mFlags |= 0x40;
+        }
+    }
+    if (uniqindex == 0) {
+        if (quests[2]._qvar1 == 3) {
+            Monst->_mFlags |= 0x40;
+            Monst->mtalkmsg = quests[2]._qvar2;
+        }
+        if (quests[2]._qvar1 == 4) {
+            Monst->_mgoal = 1;
+            Monst->_msquelch = 255;
+            Monst->mtalkmsg = 0;
+        }
+        if (quests[2]._qvar1 == 5) {
+            Monst->_mgoal = 6;
+            Monst->mtalkmsg = quests[2]._qvar2;
+        }
+    }
+    if (uniqindex == 2) {
+        if (quests[3]._qvar2 == 2)
+            Monst->_mFlags |= 0x40;
+        if (quests[3]._qvar2 == 3) {
+            Monst->_mgoal = 1;
+            Monst->_msquelch = 255;
+            Monst->mtalkmsg = 0;
+        }
+    }
+    if (uniqindex == 4) {
+        if (quests[15]._qvar1 == 6) {
+            if (gbMaxPlayers == 1)
+                ObjChangeMapResync(1, 18, 20, 24);
+            RedoPlayerVision();
+            Monst->_mgoal = 1;
+            Monst->_msquelch = 255;
+            Monst->mtalkmsg = 0;
+        }
+    }
+
+    uniquetrans++;
 
     if (Uniq->mUnqAttr & 4) {
         Monst->mHit = Uniq->mUnqVar1;
@@ -811,11 +925,12 @@ void PlaceUniqueMonst(int uniqindex, int miniontype, int unpackfilesize)
     if (Uniq->mUnqAttr & 1)
         PlaceGroup(miniontype, unpackfilesize, Uniq->mUnqAttr, nummonsters - 1);
 
-    ObjChangeMapResync(0, 0, 0, 0);
-    RedoPlayerVision();
-    (void)filestr;
-    (void)done;
-    (void)zharflag;
+    if (Monst->_mAi != 12) {
+        Monst->Action = 0;
+        Monst->_mAnimFrame = ENG_random(Monst->_mAnimLen - 1) + 1;
+        Monst->_mFlags &= ~4;
+        Monst->_mmode = 0;
+    }
 }
 
 /* --------------------------------------------------------------------- */

@@ -5,54 +5,54 @@
  * Distance 0 ends the stream; returns the decoded size. */
 #include "diabpsx_types.h"
 
+/* Constants and body verbatim from Nick Pelling's unlznp.c (Climax SBSPSS source/utils/lznp.cpp). */
+#define SMALLEST_LEN    2                           /* smallest len usable at all */
+#define MIN_LEN         3                           /* smallest short length encodable */
+#define MAX_LEN         (MIN_LEN + 6 - 2)           /* largest  short length encodable */
+#define MIN_SUPERLEN    (MIN_LEN + 6 - 1)           /* shortest long length encodable */
+#define MAX_SUPERLEN    (MIN_SUPERLEN + 254)        /* largest  long length encodable */
+#define SUPERLEN_CODE   (MIN_SUPERLEN - MIN_LEN)    /* means "read superlength" */
+
 /* @0x800881D4 LZNP.CPP */
 int LZNP_Decode(unsigned char *in, unsigned char *out)
 {
     int i, j;
-    unsigned int flags;
-    unsigned char *OriginalOut;
+    unsigned int flags;                         /* now works with 16-bit ints */
+    unsigned char *OriginalOut = out;
 
-    OriginalOut = out;
-    flags = 0;
-    for (;;) {
-        flags >>= 1;
-        if ((flags & 0xFF00) == 0)
-            flags = *in++ | 0xFF00;
-        if ((flags & 1) == 0) {
+    for (flags = 0;;) {
+        if (((flags >>= 1) & 0xff00) == 0) {
+            flags = (*in++) | 0xff00;           /* uses higher byte cleverly (to count eight) */
+        }
+
+        if (!(flags & 1)) {
             *out++ = *in++;
         } else {
             i = *in++;
+
             if (i >= 0x60) {
-                i = 0x100 - i;
-                j = 2;
+                i = 0x100 - i;                  /* i = copy offset */
+                j = SMALLEST_LEN;               /* j = copy length */
             } else {
                 j = i >> 4;
-                i = (i & 0xF) << 8;
+                i = (i & 0x0F) << 8;
                 i |= *in++;
-                if (i == 0)
+
+                if (i == 0)                     /* offset of zero terminates LZNP data */
                     break;
-                if (j == 5)
-                    j = *in++ + 8;
+
+                if (j != SUPERLEN_CODE)
+                    j += MIN_LEN;
                 else
-                    j += 3;
+                    j = MIN_SUPERLEN + (*in++);
             }
-            /* OPEN (7 diffs, 52/53): retail strength-reduces out - i into a walking pointer that
-             * reuses i's register (negu in the beqz delay slot, then addu); ours recomputes
-             * subu per byte.  Falsified: i = -i + out[i] (i/j swap), i as an int pointer (swap),
-             * *(out - i), for/do/while(j--) loop forms, *out++ = out[-i].
-             * 2026-09-27: `i = -i; while (j) { *out = out[i]; out++; j--; }` gives retail's exact 53-insn
-             * stream (negu in the beqz slot + addu + walking pointer) -- cse no longer folds out-(i) to a
-             * MINUS, so loop.c reduces the giv -- but i/j swap registers (ours i=v1 j=a2, retail i=a2 j=v1):
-             * greg priority giv 4.71 > i 4.52 > j 4.18 (floor_log2(refs)*refs/live).  Retail allocated j
-             * first.  Next angle: a spelling that raises j's refs/shortens its live range without new code
-             * (or lowers i's refs under 16); falsified: j/i decl order, register, unsigned j, j+=3 spellings,
-             * do/while(--j), for(i=-i;j;j--), statement order in both length arms. */
-            while (j) {
-                *out = out[-i];
-                out++;
-                j--;
+
+            for (i = -i, j++; --j; out++) {
+                out[0] = out[i];
             }
         }
     }
-    return out - OriginalOut;
+
+    /* Return size */
+    return (out - OriginalOut);
 }

@@ -564,7 +564,7 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
 
         if (leveltype) {
             Lsaveplrpos();
-            if (!firstflag && (plr[myplr]._pLvlVisited[currlevel] || lvldir == 4)) {
+            if (!firstflag && lvldir != 4 && plr[myplr]._pLvlVisited[currlevel] || !firstflag && lvldir == 4) {
                 HoldThemeRooms();
                 GetRndSeed();
                 ConvertdPiece();
@@ -604,7 +604,7 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
             InitItems(1);
             InitMissiles();
             InitBird();
-            if (!firstflag && (lvldir == 4 || plr[myplr]._pLvlVisited[currlevel]))
+            if (!firstflag && lvldir != 4 && plr[myplr]._pLvlVisited[currlevel] || !firstflag && lvldir == 4)
                 DeltaLoadLevel();
         }
         ResyncQuests();

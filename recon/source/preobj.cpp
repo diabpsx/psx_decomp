@@ -991,6 +991,10 @@ void AddObjTraps()
                     continue;
 
                 AddObject(OBJ_TRAPL, x, y);
+                oi_trap = dung_map[x][y].dObject - 1;
+                object[oi_trap]._oVar1 = i;
+                object[oi_trap]._oVar2 = j;
+                object[oi]._oTrapFlag = 1;
             } else {
                 y = j - 1;
                 while (!GetSOLID(x, y))
@@ -1000,11 +1004,11 @@ void AddObjTraps()
                     continue;
 
                 AddObject(OBJ_TRAPR, x, y);
+                oi_trap = dung_map[x][y].dObject - 1;
+                object[oi_trap]._oVar1 = i;
+                object[oi_trap]._oVar2 = j;
+                object[oi]._oTrapFlag = 1;
             }
-            oi_trap = dung_map[x][y].dObject - 1;
-            object[oi_trap]._oVar1 = i;
-            object[oi_trap]._oVar2 = j;
-            object[oi]._oTrapFlag = 1;
         }
     }
 }

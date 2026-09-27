@@ -59,59 +59,63 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
     unsigned char *theptr, *ptr1, *ptr2, *ptr3;
     struct block theblock;
     int inpos;
-    int maxlen = 255;
-    int (&data)[128] = theblock.data;
+    int FORWARDDIST = 255;   /* Climax lowLevelPak (SBSPSS Utils pak.cpp): constant-initialised, no SYM record */
 
-    theblock.blocksize = 0;
-    theblock.data[0] = buffer[0];
-    inpos = 1;
-    theblock.blocksize = inpos;
     theblock.Dest = Dest;
     theblock.outsize = 0;
     theblock.blockrep = 0;
-    theblock.data[1] = buffer[1];
-    inpos++;
+    inpos = 0;
+    theblock.blocksize = -1;
+    theblock.data[++theblock.blocksize] = buffer[inpos++];
+    theblock.data[++theblock.blocksize] = buffer[inpos++];
     while (inpos < insize) {
         begin = -inpos;
         end = insize - inpos;
         if (begin < -128)
             begin = -128;
-        if (end > maxlen)
-            end = maxlen;
+        if (end > FORWARDDIST)
+            end = FORWARDDIST;
         bestoffset = begin;
         bestlength = 1;
-        ptr1 = (unsigned char *)&buffer[inpos + bestoffset];
-        offset = begin;
-        theptr = (unsigned char *)&buffer[inpos];
-        for (; offset < 0; offset++, ptr1++) {
-            if (*ptr1 == *theptr && !memcmp(ptr1, theptr, bestlength + 1)) {
-                bestlength++;
-                bestoffset = offset;
-                ptr2 = ptr1 + bestlength;
-                ptr3 = theptr + bestlength;
-                while (*ptr2 == *ptr3) {
-                    ptr2++;
+        theptr = (unsigned char *)buffer + (inpos);
+        ptr1 = (unsigned char *)buffer + (inpos + begin);
+        for (offset = begin; offset < 0; offset++) {
+            if (*ptr1 == *theptr) {
+                if (!memcmp(ptr1, theptr, bestlength + 1)) {
                     bestlength++;
-                    if (bestlength >= end)
-                        break;
-                    ptr3++;
+                    bestoffset = offset;
+                    ptr2 = ptr1 + bestlength;
+                    ptr3 = theptr + bestlength;
+                    while (*ptr2 == *ptr3) {
+                        ptr2++;
+                        ptr3++;
+                        bestlength++;
+                        if (bestlength >= end)
+                            break;
+                    }
                 }
             }
             if (bestlength >= end) {
                 bestlength = end;
                 break;
             }
+            ptr1++;
         }
         if (bestlength < 3) {
-            if (theblock.blockrep || theblock.blocksize >= 127)
+            if (theblock.blockrep) {
                 writeblock(&theblock);
-            data[++theblock.blocksize] = buffer[inpos++];
+                theblock.data[++theblock.blocksize] = buffer[inpos++];
+            } else {
+                if (theblock.blocksize >= 127)
+                    writeblock(&theblock);
+                theblock.data[++theblock.blocksize] = buffer[inpos++];
+            }
         } else {
             writeblock(&theblock);
-            inpos += bestlength;
             theblock.blockrep = 1;
             theblock.blocksize = bestlength;
             theblock.blockoffset = bestoffset;
+            inpos += bestlength;
         }
     }
     writeblock(&theblock);

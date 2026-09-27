@@ -2114,11 +2114,14 @@ unsigned char PlrHitMonst(PlayerStruct *ptrplr, int m)
 /* PsyQ libgpu primitive macros (psxsrc/psyq.h spelling; that header's POLY_FT4 typedef clashes with
  * gen/structs_player.h, so the few macros this TU needs are restated here). */
 struct P_TAG { unsigned addr : 24; unsigned len : 8; unsigned char r0, g0, b0, code; };
-#define setaddr(p, _addr) (((P_TAG *)(p))->addr = (unsigned long)(_addr))
-#define getaddr(p) (((P_TAG *)(p))->addr)
-#define addPrim(ot, p) setaddr(p, getaddr(ot)), setaddr(ot, p)
-#define setSemiTrans(p, abe) ((abe) ? (((P_TAG *)(p))->code |= 0x02) : (((P_TAG *)(p))->code &= ~0x02))
-#define setShadeTex(p, tge) ((tge) ? (((P_TAG *)(p))->code |= 0x01) : (((P_TAG *)(p))->code &= ~0x01))
+/* verbatim PsyQ 4.0 LIBGPU.H primitive-handling macros (u_char/u_long spelled out) */
+#define setaddr(p, _addr)	(((P_TAG *)(p))->addr = (unsigned long)(_addr))
+#define setcode(p, _code)	(((P_TAG *)(p))->code = (unsigned char)(_code))
+#define getcode(p)   		(unsigned char)(((P_TAG *)(p))->code)
+#define getaddr(p)   		(unsigned long)(((P_TAG *)(p))->addr)
+#define addPrim(ot, p)		setaddr(p, getaddr(ot)), setaddr(ot, p)
+#define setSemiTrans(p, abe) 	((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
+#define setShadeTex(p, tge) 	((tge)?setcode(p, getcode(p)|0x01):setcode(p, getcode(p)&~0x01))
 #define setRGB0(p, _r0, _g0, _b0) (p)->r0 = _r0, (p)->g0 = _g0, (p)->b0 = _b0
 
 void do_spell_anim(int aframe, int spell, int clss, PlayerStruct *ptrplr)

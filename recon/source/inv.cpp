@@ -36,8 +36,22 @@
 #define ICURS_GOLD_MEDIUM 5
 #define ICURS_GOLD_LARGE 6
 
-#define setSemiTrans(p, abe) ((abe) ? ((p)->code |= 0x02) : ((p)->code &= ~0x02))
-#define setShadeTex(p, tge)  ((tge) ? ((p)->code |= 0x01) : ((p)->code &= ~0x01))
+/* verbatim PsyQ 4.0 LIBGPU.H primitive macros */
+struct P_TAG {
+    unsigned addr : 24;
+    unsigned len : 8;
+    unsigned char r0, g0, b0, code;
+};
+typedef unsigned char u_char;
+typedef unsigned long u_long;
+#define setlen(p, _len)   (((P_TAG *)(p))->len  = (u_char)(_len))
+#define setcode(p, _code) (((P_TAG *)(p))->code = (u_char)(_code))
+#define getlen(p)         (u_char)(((P_TAG *)(p))->len)
+#define getcode(p)        (u_char)(((P_TAG *)(p))->code)
+#define setSemiTrans(p, abe) \
+	((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
+#define setShadeTex(p, tge) \
+	((tge)?setcode(p, getcode(p)|0x01):setcode(p, getcode(p)&~0x01))
 #define setRGB0(p, _r0, _g0, _b0) (p)->r0 = _r0, (p)->g0 = _g0, (p)->b0 = _b0
 
 /* TU data (.sdata, tentative definitions) — this TU owns these (every %gp_rel oracle reference
@@ -1426,17 +1440,15 @@ tail2:
 
 void InvMoveCursUp(void)
 {
-    int ItemInc;
+    int ItemInc = 0;
     int OldPos;
 
     OldPos = InvCursPos;
 
     if (_pcurs[myplr] < 12) {
-        ItemInc = 0;
         if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
-                goto tail3;
             case 4:
             case 6:
             case 7:

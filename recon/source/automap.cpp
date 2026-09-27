@@ -353,7 +353,7 @@ void DrawAutoMapSquare(int X, int Y)
     L2->y1 = y0;
 }
 
-/* line 507 @0x80162A70 -- TODO (open): near-miss target only, not yet byte-verified.  Twin: hellfire
+/* line 507 @0x80162A70 -- Twin: hellfire
  * AUTOMAP.CPP's DrawAMShape AMS_ARCHL/AMS_ARCHR square block, factored into its own function with a
  * PSX-specific fixed +-8/+-4 pixel nudge on the diamond corners. */
 void DrawVertArch(int X, int Y)
@@ -405,7 +405,7 @@ void DrawVertArch(int X, int Y)
     L2->y1 = y0;
 }
 
-/* line 546 @0x80162BA4 -- TODO (open): near-miss target only, not yet byte-verified; mirror of
+/* line 546 @0x80162BA4 -- mirror of
  * DrawVertArch (x-offsets negated). */
 void DrawHorzArch(int X, int Y)
 {
