@@ -101,9 +101,11 @@ void DoThatDrawSText(void);
 void DrawSLine(int y);
 void DrawStoreArrows(void);
 char *MakeItemStr(struct ItemStruct *ItemPtr, unsigned short ItemNo, unsigned short MaxLen);   /* @0x80049198 ITEMS.CPP:5246 */
-void PrintStoreItem(struct ItemStruct *x, int l, signed char iclr);
+void PrintItemPower(char plidx, const struct ItemStruct *x);   /* @0x80046258 ITEMS.CPP:3637 */
+void PrintStoreItem(const struct ItemStruct *x, int l, char iclr);
 void S_ScrollSBuy(int idx);
 void S_ScrollSSell(int idx);
 void S_ScrollWBuy(int idx);
 void S_ScrollHBuy(int idx);
 void S_ScrollSPBuy(int idx);
+void DrawQTextBack(void);   /* @0x8004DECC MINITEXT.CPP:397 */

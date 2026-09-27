@@ -90,6 +90,7 @@ int printf(const char *fmt, ...);
 int fileexists(char *name);
 int filesize(char *name);
 int PRIM_GetCurrentScreen(void);
+void SetPolyFT4(POLY_FT4 *p);
 int LANG_GetLang(void);
 void ClearImage(RECT *rect, u_char r, u_char g, u_char b);
 int SpuMalloc(int size);
@@ -584,6 +585,15 @@ static short tmdc_pol_offs[2][10][10][2];
  * POLY_FT4/RECT members; next angle if it doesn't match on the first verify_asm pass: pull the raw
  * oracle (asm/nonmatchings/fmv/split_poly_area.s, 0x3E8 bytes) and diff block-by-block.
  * @0x801569EC FMV.CPP:925 */
+/* Field mapping confirmed byte-offset-by-byte against POLY_FT4 (tag=0,r0=4,g0=5,b0=6,code=7,x0=8,y0=10,
+ * u0=12,v0=13,clut=14,x1=16,y1=18,u1=20,v1=21,tpage=22,x2=24,y2=26,u2=28,v2=29,pad1=30,x3=32,y3=34,
+ * u3=36,v3=37,pad2=38) against the raw's cursor `s0 = p+0x20` (i.e. s0's offsets are ABSOLUTE-32):
+ *   r0/g0/b0 = 0x80 (neutral tint); x0=sx, y0=sy (screen-space anchor, SHORT); x1=x_run+colw, y1=sy;
+ *   x2=sx, y2=sy+rowh; x3=x_run+colw, y3=sy+rowh; u0=xb, v0=(byte)y; u1=xb+colw, v1=(byte)y;
+ *   u2=xb, u3=xb+colw, v2=(byte)y2, v3=(byte)y2; tpage=GetTPage(2,0,x&0xFFC0,y&0xFF00).
+ * `x_run` (the raw's $fp) is reset to the `sx` PARAMETER once per OUTER (row) iteration and accumulates
+ * by `colw` every INNER (column) iteration -- distinct from `sy`, which only advances by `rowh` once
+ * per outer iteration and never resets. */
 extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int sx, short sy, int correct)
 {
     int rows = 0;
@@ -604,7 +614,7 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
             int x_run = sx;
             hleft -= rowh;
             area_pw = 0;
-            short wleft = w;
+            short wleft = r->w;
             short x = r->x;
             if (wleft != 0) {
                 short y2 = y + rowh;
@@ -615,16 +625,17 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
                     if (wleft < colw)
                         colw = wleft;
                     wleft -= colw;
-                    setPolyFT4(p);
+                    SetPolyFT4(p);
                     p->r0 = 0x80; p->g0 = 0x80; p->b0 = 0x80;
-                    p->x0 = xb; p->y0 = (signed char)y;
-                    p->x1 = xb + colw; p->y1 = (signed char)y;
-                    p->x2 = xb; p->y2 = (unsigned char)y2;
-                    p->x3 = xb + colw; p->y3 = (unsigned char)y2;
-                    p->u0 = (unsigned short)x_run; p->v0 = (unsigned short)(x_run + colw);
-                    p->clut = sy; p->tpage = sy;
-                    p->u1 = (unsigned short)x_run; p->u2 = sy + rowh; p->u3 = sy + rowh;
-                    p->pad1 = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
+                    p->u0 = (unsigned char)xb; p->v0 = (unsigned char)y;
+                    p->x0 = (short)x_run; p->y0 = sy;
+                    p->u1 = (unsigned char)(xb + colw); p->v1 = (unsigned char)y;
+                    p->x1 = (short)(x_run + colw); p->y1 = sy;
+                    p->tpage = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
+                    p->u2 = (unsigned char)xb; p->x2 = (short)x_run; p->y2 = (short)(sy + rowh);
+                    p->v2 = (unsigned char)y2;
+                    p->u3 = (unsigned char)(xb + colw); p->v3 = (unsigned char)y2;
+                    p->x3 = (short)(x_run + colw); p->y3 = (short)(sy + rowh);
                     if (bp != 0) {
                         POLY_FT4 *dst = bp;
                         POLY_FT4 *src = p;
@@ -883,6 +894,23 @@ extern "C" int play_mdec_audio(unsigned char *data, StHEADER *h)
     SpuWrite(mdec_audio_sec ? data - 2016 + 2016 * mdec_audio_sec : data - 2016, h->frameSize);
     SpuIsTransferCompleted(1);
     mdec_audio_offs += (int)h->frameSize;
+    /* WIP: retail's raw calls SpuSetKeyOnWithAttr once more here (callaudit-confirmed, byte shape not
+     * yet verified) -- per the earlier ida draft, a 2-iteration loop builds a per-voice attr struct
+     * (pitch=0x3FFF/adsr literals seen in set_mdec_audio_volume's own attr) and keys both voices on. */
+    {
+        struct { unsigned short mask; short l, r; short pitch, adsr1, adsr2, adsr3, adsr4; } attr;
+        for (int v = 0; v < 2; v++) {
+            attr.mask = 1 << v;
+            attr.pitch = 0x3FFF;
+            attr.l = (v == 0) ? 0x3FFF : 0;
+            attr.r = (v == 1) ? 0x3FFF : 0;
+            attr.adsr1 = 1;
+            attr.adsr2 = 1;
+            attr.adsr3 = 3;
+            attr.adsr4 = 0;
+            SpuSetKeyOnWithAttr(&attr);
+        }
+    }
     return 0;
 }
 
@@ -1176,10 +1204,10 @@ extern "C" void LoPlayFMVOverLay(void *)
      * "stale" value happens to coincide with whatever the case-0/default combination leaves behind). */
     switch (GetVideoMode()) {
     case 0:
-        play_mdec_stream(g_movie_filename, 0x1333, start, end);
+        play_mdec_stream(g_movie_filename, 0x1000, start, end);
         break;
     case 1:
-        play_mdec_stream(g_movie_filename, 0x1000, start, end);
+        play_mdec_stream(g_movie_filename, 0x1333, start, end);
         break;
     default:
         break;

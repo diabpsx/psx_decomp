@@ -1816,6 +1816,59 @@ void DrawSTextTSK(struct TASK *T)
     }
 }
 
+/* @0x8006FEAC -- switch on stextflag (real values, not the m2c "stextflag-2" offset labels); the
+ * `if (stext[i+1]._sval > 0) { }` in the m2c draft has an empty body (dead compare retained by the
+ * oracle's compiler); transcribed as omitted since it has no observable effect either way. */
+void DoThatDrawSText(void)
+{
+    int i;
+
+    StoreBackRect.y = 0x18;
+    StoreBackRectClipper.y = 0x18;
+    StoreBackRect.w = 0x118;
+    StoreBackRect.x = 0x14;
+    StoreBackRect.h = 0xC9;
+    StoreBackRectClipper.x = 0x14;
+    StoreBackRectClipper.w = 0xBC;
+    StoreBackRectClipper.h = 0xC9;
+    if (stextscrl != 0) {
+        switch (stextflag) {
+        case 2:
+            S_ScrollSBuy(stextsval);
+            break;
+        case 18:
+            S_ScrollSPBuy(stextsval);
+            break;
+        case 3:
+        case 4:
+        case 7:
+        case 8:
+        case 17:
+            S_ScrollSSell(stextsval);
+            break;
+        case 6:
+            S_ScrollWBuy(stextsval + _WitchIdxOfs[StorePlrNo]);
+            break;
+        case 16:
+            S_ScrollHBuy(stextsval);
+            break;
+        }
+    }
+    i = 0;
+    do {
+        if (stext[i]._sline) {
+            DrawSLine(i);
+        }
+        if (stext[i]._sstr[0] != 0) {
+            PrintSString(stext[i]._sx, i, stext[i]._sjust, stext[i]._sstr, stext[i]._sclr, stext[i]._sval);
+        }
+        i++;
+    } while (i < 0x18);
+    DrawQTextBack();
+    DrawStoreArrows();
+    DrawStoreHelpText();
+}
+
 /* @0x80069C44 */
 void DrawSLine(int y)
 {
@@ -1996,7 +2049,8 @@ void S_ScrollHBuy(int idx)
 
     ClearSText(5, 0x15);
     stextup = 5;
-    for (l = 5; l < 0xF; l += 4) {
+    l = 5;
+    do {
         if (_healitem[StorePlrNo][idx]._itype != -1) {
             iclr = (_healitem[StorePlrNo][idx]._iStatFlag == 0) * 2;
             str = MakeItemStr(&_healitem[StorePlrNo][idx], _healitem[StorePlrNo][idx]._iName, (StoreBackRect.w - 0x44) & 0xFFFF);
@@ -2006,7 +2060,8 @@ void S_ScrollHBuy(int idx)
             stextdown = l;
             idx++;
         }
-    }
+        l += 4;
+    } while (l < 0xF);
     if (!stext[stextsel]._ssel && stextsel != 0x16) {
         stextsel = stextdown;
     }
@@ -2053,6 +2108,108 @@ void S_ScrollSPBuy(int idx)
     }
     if (!stext[stextsel]._ssel && stextsel != 0x16) {
         stextsel = stextdown;
+    }
+}
+
+/* @0x80069ECC -- twin: hellfire STORES.CPP:436 PrintStoreItem, PSX deltas: localized GetStr() ids
+ * instead of literal C strings, an added "Required:" separator-comma gate keyed off _iMiscId, and a
+ * word-wrap-aware padding-space insert before the printed durability text (GetStrWidth check against
+ * StoreBackRect.w). D_8011BAAC/D_8011BAB0 are un-named oracle string constants; transcribed as their
+ * evident literal content (",  " and " ") since the oracle only exposes their addresses, not source
+ * names. */
+void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
+{
+    char sstr[128];
+    int li;
+
+    li = 0;
+    sstr[0] = 0;
+    if (x->_iIdentified != 0) {
+        if (x->_iMagical != 2) {
+            if (x->_iPrePower != -1) {
+                PrintItemPower(x->_iPrePower, x);
+                if (tempstr[0] != 0) {
+                    strcat(sstr, tempstr);
+                }
+            }
+        }
+        if (x->_iSufPower != -1) {
+            PrintItemPower(x->_iSufPower, x);
+            if (sstr[0] != 0 && tempstr[0] != 0) {
+                strcat(sstr, ",  ");
+                li = 1;
+            } else if (tempstr[0] != 0) {
+                strcat(sstr, tempstr);
+            }
+        }
+    }
+    if (x->_iMiscId == 0x17) {
+        if (x->_iMaxCharges != 0) {
+            sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
+            if (sstr[0] != 0) {
+                strcat(sstr, ",  ");
+                li += 1;
+            }
+            strcat(sstr, tempstr);
+        }
+    }
+    if (sstr[0] != 0) {
+        AddSText(0xC, l, 0, sstr, iclr, 0);
+        l = l + 1 + li;
+        li = 0;
+    }
+    sstr[0] = 0;
+    if (x->_iClass == 1) {
+        sprintf(sstr, "%s:%i-%i", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
+    }
+    if (x->_iClass == 2) {
+        sprintf(sstr, GetStr(0x2F), x->_iAC);
+    }
+    if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
+        if (sstr[0] != 0) {
+            strcat(sstr, ",  ");
+        }
+        strcat(sstr, GetStr(0x218));
+    } else {
+        sprintf(tempstr, GetStr(0x11F), x->_iDurability, x->_iMaxDur);
+        if (((short)StoreBackRect.w * 2) - 0x44 >= MediumFont.GetStrWidth(tempstr) + MediumFont.GetStrWidth(sstr)) {
+            strcat(sstr, " ");
+        }
+        strcat(sstr, tempstr);
+    }
+    if (x->_itype == 0) {
+        sstr[0] = 0;
+    }
+    if ((unsigned int)(x->_iMiscId - 0x15) >= 2 && (unsigned int)(x->_iMiscId - 2) >= 2 &&
+        (unsigned int)(x->_iMiscId - 4) >= 2 && (unsigned int)(x->_iMiscId - 6) >= 2 &&
+        (unsigned int)(x->_iMiscId - 0xA) >= 2 && (unsigned int)(x->_iMiscId - 0xC) >= 2 &&
+        (unsigned int)(x->_iMiscId - 0xE) >= 2 && (unsigned int)(x->_iMiscId - 0x10) >= 2 &&
+        (unsigned int)(x->_iMiscId - 0x12) >= 2 && x->_iMiscId != 0x18) {
+        strcat(sstr, ",  ");
+    }
+    if (x->_iMinStr + x->_iMinMag + x->_iMinDex == 0) {
+        strcat(sstr, GetStr(0x2D1));
+    } else {
+        strcpy(tempstr, GetStr(0x35D));
+        if (x->_iMinStr != 0) {
+            sprintf(tempstr, GetStr(0x51C), tempstr, x->_iMinStr);
+        }
+        if (x->_iMinMag != 0) {
+            sprintf(tempstr, GetStr(0x51B), tempstr, x->_iMinMag);
+        }
+        if (x->_iMinDex != 0) {
+            sprintf(tempstr, GetStr(0x51A), tempstr, x->_iMinDex);
+        }
+        strcat(sstr, tempstr);
+    }
+    AddSText(0xC, l, 0, sstr, iclr, 0);
+    l = l + 2 + li;
+    if (x->_iMagical == 2 && x->_iIdentified != 0) {
+        if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
+            AddSText(0xC, l + 1, 0, GetStr(0x4A3), iclr, 0);
+        } else {
+            AddSText(0xC, l, 0, GetStr(0x4A3), iclr, 0);
+        }
     }
 }
 

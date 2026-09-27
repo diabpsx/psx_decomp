@@ -374,6 +374,21 @@ void PostGamePad(int val, int var1, int var2, int var3);   /* GAMEPAD.CPP:1952 *
 void PrintSelectBack(unsigned short Str);   /* OPTIONS.CPP:817 */
 void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, unsigned char SinStep);   /* OPTIONS.CPP:898 */
 
+void pad_func_Attack(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Action(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Cast_Spell(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Quick_Spell(int pnum);   /* PADFUNCS.CPP */
+void pad_func_SpellBook(int pnum);   /* PADFUNCS.CPP */
+void pad_func_AutoMap(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Quick_Use_Health(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Quick_Use_Mana(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Use_Item(int pnum);   /* PADFUNCS.CPP */
+void pad_func_BeltList(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Inv(int pnum);   /* PADFUNCS.CPP */
+void pad_func_Chr(int pnum);   /* PADFUNCS.CPP */
+void pad_func_SplBook(int pnum);   /* PADFUNCS.CPP */
+void pad_func_QLog(int pnum);   /* PADFUNCS.CPP */
+
 /* this TU */
 void SetDemoKeys(int *buffer);
 void RestoreDemoKeys(int *buffer);
@@ -408,7 +423,7 @@ extern const unsigned char BLUER, BLUEG, BLUEB;
 extern const unsigned char REDR, REDG, REDB;
 extern const unsigned char BORDERR, BORDERG, BORDERB;
 
-/* CTRL-owned initialised .data tables (%hi-addressed) */
+/* CTRL-owned initialised .data tables (%hi-addressed; defined in ctrl.cpp) */
 extern struct KEY_ASSIGNS txt_actions[20];
 extern struct pad_assigns pad_txt[14];
 

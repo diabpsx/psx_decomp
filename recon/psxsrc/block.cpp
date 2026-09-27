@@ -1034,14 +1034,14 @@ void CBlocks::GetGCol(int x, int y, unsigned char *Rgb, RGBData *Data)
         y = 0;
     rgb_leftr = ((y * Data->rgb_ity1.r) >> 16) + Data->rgbb.r1;
     rgb_rightr = ((y * Data->rgb_ity2.r) >> 16) + Data->rgbb.r2;
-    rgb_itxr = (rgb_rightr - rgb_leftr) << 10;
-    rgb_cordr = ((x * rgb_itxr) >> 16) + rgb_leftr;
     rgb_leftg = ((y * Data->rgb_ity1.g) >> 16) + Data->rgbb.g1;
     rgb_rightg = ((y * Data->rgb_ity2.g) >> 16) + Data->rgbb.g2;
-    rgb_itxg = (rgb_rightg - rgb_leftg) << 10;
-    rgb_cordg = ((x * rgb_itxg) >> 16) + rgb_leftg;
     rgb_leftb = ((y * Data->rgb_ity1.b) >> 16) + Data->rgbb.b1;
     rgb_rightb = ((y * Data->rgb_ity2.b) >> 16) + Data->rgbb.b2;
+    rgb_itxr = (rgb_rightr - rgb_leftr) << 10;
+    rgb_cordr = ((x * rgb_itxr) >> 16) + rgb_leftr;
+    rgb_itxg = (rgb_rightg - rgb_leftg) << 10;
+    rgb_cordg = ((x * rgb_itxg) >> 16) + rgb_leftg;
     rgb_itxb = (rgb_rightb - rgb_leftb) << 10;
     rgb_cordb = ((x * rgb_itxb) >> 16) + rgb_leftb;
     Rgb[0] = rgb_cordr;
@@ -1270,8 +1270,10 @@ void CBlocks::PrintDead(int x, int y)
                 FRAME_HDR *Fr = ObjTexDat->GetFr(TransPals[transfile * 2 + 1]);
                 ObjTexDat->SetPal(Fr, Ft4);
             }
-            bx = (dx >> 1) - 16;
-            by = (dy >> 1) - 16;
+            dx >>= 1;
+            dy >>= 1;
+            bx = dx - 16;
+            by = dy - 16;
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];
@@ -1858,11 +1860,12 @@ void CBlocks::PrintMonsters(int x, int y)
     int Cy;
     TextDat *GolemGraphics;
     BOOL MyInfraFlag;
+    CachedInfoList *InfoList = (CachedInfoList *)0x1F800000;
 
     IterateVisibleMap(x, y, AddMonst, 1);
     x -= 7;
     y -= 11;
-    Total = ((CachedInfoList *)0x1F800000)->NumOfItems;
+    Total = InfoList->NumOfItems;
     CMonstGraphics = MonstTexDat;
     Wx = WorldToScrX(x, y);
     Wy = WorldToScrY(x, y);
@@ -1872,7 +1875,7 @@ void CBlocks::PrintMonsters(int x, int y)
     for (int f = 0; f < Total; f++) {
         int Index;
 
-        Index = ((CachedInfoList *)0x1F800000)->Items[f].uMStr.Index;
+        Index = InfoList->Items[f].uMStr.Index;
         if (Index < 4) {
             MonsterStruct *MyMonst;
             int Frame;
@@ -1893,14 +1896,15 @@ void CBlocks::PrintMonsters(int x, int y)
             int OtPos;
 
             StartAnim = 0;
-            MyMonst = (MonsterStruct *)(((CachedInfoList *)0x1F800000)->Items[f].uMStr.MyMonst | 0x80000000);
-            ScrXOff = MyMonst->_mxoff;
-            ScrYOff = MyMonst->_myoff;
+            MyMonst = (MonsterStruct *)(InfoList->Items[f].uMStr.MyMonst | 0x80000000);
             x = MyMonst->_mx * 20;
             y = MyMonst->_my * 20;
+            ScrXOff = MyMonst->_mxoff * 625 / 1000;
+            ScrYOff = MyMonst->_myoff * 625 / 1000;
+            bx = MyMonst->_mx / 2 - 8;
             by = MyMonst->_my / 2 - 8;
-            Sx = Cx + WorldToScrX(x, y) + ScrXOff * 625 / 1000 - Wx;
-            Sy = Cy + WorldToScrY(x, y) + ScrYOff * 625 / 1000 - Wy;
+            Sx = Cx + WorldToScrX(x, y) + ScrXOff - Wx;
+            Sy = Cy + WorldToScrY(x, y) + ScrYOff - Wy;
             OtPos = GetOtPos(Sy);
             Action = MyMonst->Action;
             Frame = MyMonst->_mAnimFrame - 1;
@@ -1911,13 +1915,15 @@ void CBlocks::PrintMonsters(int x, int y)
                 if (Frame == 0)
                     AddVal[Index] = 0;
             }
-            if (Action < GolemGraphics->GetNumOfActions(Creature)) {
+            if (!(Action < GolemGraphics->GetNumOfActions(Creature))) {
+                if (Frame == 1)
+                    StartPartJump(Index, 0, 0x8000, 0x606060, OtPos);
+            } else {
                 int blockr;
                 int blockg;
                 int blockb;
 
                 Dir = MyMonst->_mdir;
-                bx = MyMonst->_mx / 2 - 8;
                 blockg = dung_map_g[bx][by];
                 blockr = dung_map_r[bx][by];
                 blockb = dung_map_b[bx][by];
@@ -1941,8 +1947,7 @@ void CBlocks::PrintMonsters(int x, int y)
                 ShadFt4 = PRIM_GetCopy(Ft4);
                 ShadScaleSkew(ShadFt4);
                 addPrim(&ThisOt[OtPos], ShadFt4);
-            } else if (Frame == 1)
-                StartPartJump(Index, 0, 0x8000, 0x606060, OtPos);
+            }
         }
     }
     GM_FinishedUsing(GolemGraphics);
@@ -1964,9 +1969,9 @@ void CBlocks::PrintMonsters(int x, int y)
             int transfile;
             int Mg;
 
-            Index = ((CachedInfoList *)0x1F800000)->Items[f].uMStr.Index;
+            Index = InfoList->Items[f].uMStr.Index;
             if (Index >= 4) {
-                MonsterStruct *MyMonst = (MonsterStruct *)(((CachedInfoList *)0x1F800000)->Items[f].uMStr.MyMonst | 0x80000000);
+                MonsterStruct *MyMonst = (MonsterStruct *)(InfoList->Items[f].uMStr.MyMonst | 0x80000000);
                 if (!(MyMonst->_mFlags & 1)) {
                     int bx;
                     int by;
@@ -1975,8 +1980,8 @@ void CBlocks::PrintMonsters(int x, int y)
                     BOOL PrintIt;
                     BOOL Compressed;
 
-                    ScrXOff = MyMonst->_mxoff;
-                    ScrYOff = MyMonst->_myoff;
+                    ScrXOff = MyMonst->_mxoff * 625 / 1000;
+                    ScrYOff = MyMonst->_myoff * 625 / 1000;
                     Frame = MyMonst->_mAnimFrame - 1;
                     Mg = MyMonst->MData->GraphicType;
                     mx = MyMonst->_mx;
@@ -1997,7 +2002,7 @@ void CBlocks::PrintMonsters(int x, int y)
                     Compressed = CMonstGraphics->IsCompressed(Creature, Action, Dir, Frame);
                     PrintIt = Compressed != 0;
                     if (!DoCompress)
-                        PrintIt = !PrintIt;
+                        PrintIt ^= 1;
                     if (PrintIt) {
                         int OtPos;
                         POLY_FT4 *Ft4;
@@ -2009,16 +2014,22 @@ void CBlocks::PrintMonsters(int x, int y)
                         int Col;
 
                         if (Compressed) {
-                            if (MaxDecompress-- == 0) {
-                                if (CMonstGraphics->GetNumOfFrames(Creature, Action) != 1) {
-                                    if (Frame-- == 0)
+                            if (MaxDecompress)
+                                MaxDecompress--;
+                            else {
+                                int NumFrames = CMonstGraphics->GetNumOfFrames(Creature, Action);
+                                if (NumFrames != 1) {
+                                    if (Frame)
+                                        Frame--;
+                                    else
                                         Frame = 1;
                                 }
                             }
                         }
+                        bx = mx / 2 - 8;
                         by = my / 2 - 8;
-                        Sx = Cx + WorldToScrX(mx * 20, my * 20) + ScrXOff * 625 / 1000 - Wx;
-                        Sy = Cy + WorldToScrY(mx * 20, my * 20) + ScrYOff * 625 / 1000 - Wy;
+                        Sx = Cx + WorldToScrX(mx * 20, my * 20) + ScrXOff - Wx;
+                        Sy = Cy + WorldToScrY(mx * 20, my * 20) + ScrYOff - Wy;
                         OtPos = GetOtPos(Sy);
                         Ft4 = CMonstGraphics->PrintMonster(Creature, Action, Dir, Frame, Sx, Sy, OtPos);
                         if (!(dung_map[mx][my].dFlags & 3) && MyInfraFlag) {
@@ -2026,7 +2037,6 @@ void CBlocks::PrintMonsters(int x, int y)
                             blockg = 0;
                             blockb = 0;
                         } else {
-                            bx = mx / 2 - 8;
                             blockr = dung_map_r[bx][by];
                             blockg = dung_map_g[bx][by];
                             blockb = dung_map_b[bx][by];
