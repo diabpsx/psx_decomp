@@ -1031,15 +1031,14 @@ void S_WSellEnter(void)
 {
     int idx;
 
+    stextshold = 7;
     stextlhold = stextsel;
     stextvhold = stextsval;
-    stextshold = 7;
     if (WStaffFlag != 0) {
-        idx = (stextsel - stextup) / 8;
+        idx = (stextsel - stextup) / 8 + stextsval;
     } else {
-        idx = (stextsel - stextup) / 4;
+        idx = (stextsel - stextup) / 4 + stextsval;
     }
-    idx += stextsval;
     plr[myplr].HoldItem = storehold[idx];
     SellIdx = idx;
     if (StoreGoldFit(idx)) {
