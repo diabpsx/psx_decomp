@@ -233,30 +233,28 @@ void SetLoadedVolumes(void)
 
 void GetVolumes(void)
 {
-    int m;
-    OMENULIST *ml;
     int i;
-    char *p;
-    unsigned long *var;
-    int val;
 
     SetLoadedVolumes();
-    for (m = 0; m < 10; m++) {
-        ml = &MenuList[m];
-        i = 0;
-        if (ml->NoEntries > 0) {
-            p = (char *)ml->Item + 0xC;
+    for (i = 0; i < 10; i++) {
+        OMENULIST *mptr;
+        OMENUITEM *iptr;
+
+        mptr = &MenuList[i];
+        iptr = mptr->Item;
+        if (mptr->NoEntries > 0) {
+            int s;
+
+            s = 0;
             do {
-                var = *(unsigned long **)(p + 4);
-                if (var != NULL) {
-                    val = *var;
-                    *(int *)p = val;
-                    if (sw < val)
-                        *(int *)p = sw;
+                if (iptr->var != NULL) {
+                    iptr->len = *iptr->var;
+                    if (sw < iptr->len)
+                        iptr->len = sw;
                 }
-                i++;
-                p += 0x18;
-            } while (i < ml->NoEntries);
+                s++;
+                iptr++;
+            } while (s < mptr->NoEntries);
         }
     }
 }
