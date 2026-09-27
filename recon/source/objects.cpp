@@ -2951,12 +2951,13 @@ void SyncOpObject(int pnum, int cmd, int i)
 
 void SyncObjectAnim(int o)
 {
-    int ai, ot;
+    int ai, ot, j;
 
-    ai = AllObjects[object[o]._otype].ofindex;
-    ot = 0;
-    while (ObjFileList[ot] != ai) {
-        ot++;
+    ot = object[o]._otype;
+    ai = AllObjects[ot].ofindex;
+    j = 0;
+    while (ObjFileList[j] != ai) {
+        j++;
     }
     switch (object[o]._otype) {
     case 1:
