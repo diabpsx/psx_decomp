@@ -1880,15 +1880,17 @@ void DrawSTextTSK(struct TASK *T)
 void DoThatDrawSText(void)
 {
     int i;
+    int YOfs;
 
-    StoreBackRect.y = 0x18;
-    StoreBackRectClipper.y = 0x18;
-    StoreBackRect.w = 0x118;
     StoreBackRect.x = 0x14;
+    StoreBackRect.y = 0x18;
+    StoreBackRect.w = 0x118;
     StoreBackRect.h = 0xC9;
     StoreBackRectClipper.x = 0x14;
+    StoreBackRectClipper.y = 0x18;
     StoreBackRectClipper.w = 0xBC;
     StoreBackRectClipper.h = 0xC9;
+    YOfs = 0;
     if (stextscrl != 0) {
         switch (stextflag) {
         case 2:
@@ -1912,18 +1914,11 @@ void DoThatDrawSText(void)
             break;
         }
     }
-    i = 0;
-    do {
-        if (stext[i]._sline) {
-            DrawSLine(i);
-        }
-        if (stext[i]._sstr[0] != 0) {
-            PrintSString(stext[i]._sx, i, stext[i]._sjust, stext[i]._sstr, stext[i]._sclr, stext[i]._sval);
-        }
-        i++;
-        if (stext[i]._sval > 0) {
-        }
-    } while (i < 0x18);
+    for (i = 0; i < 0x18; i++) {
+        if (stext[i]._sline) DrawSLine(i);
+        if (stext[i]._sstr[0]) PrintSString(stext[i]._sx, i + YOfs, stext[i]._sjust, stext[i]._sstr, stext[i]._sclr, stext[i]._sval);
+        if (stext[i + 1]._sval > 0) YOfs = 0;
+    }
     DrawQTextBack();
     DrawStoreArrows();
     DrawStoreHelpText();
