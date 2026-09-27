@@ -16,6 +16,7 @@
 #define MT_SNEAK    0x1D
 #define MT_ILLWEAV  0x20
 #define MT_BLINK    0x27
+#define MT_SKING    0x32
 #define MT_CLEAVER  0x33
 #define MT_COUNSLR  0x69
 #define MT_ADVOCATE 0x6C
@@ -120,6 +121,10 @@
 #define USFX_DIABLOD 0x35C
 #define USFX_LACH3  0x351
 #define TXT_GARB1   0x90
+#define TXT_GARB2   0x91
+#define Q_ZHAR      3
+#define UMT_ZHAR    2
+#define MFLAG_DROP  0x40
 #define TXT_GARB4   0x93
 #define USFX_GARBUD4 0x34D
 #define USFX_ZHAR2  0x35B
@@ -136,6 +141,8 @@
 #define MFLAG_NOHEAL          0x08
 #define MFLAG_TARGETS_MONSTER 0x10
 #define MFLAG_MKILLER         0x20
+#define MFLAG_KNOCKBACK       0x80
+#define MFLAG_NOLIFESTEAL     0x1000
 
 #define MT_GLOOM    0x28
 #define MT_FAMILIAR 0x29
@@ -3085,6 +3092,279 @@ void M_TryM2MHit(int i, int mid, int hper, int mind, int maxd)
         }
     }
     return;
+}
+
+/* NEW function this pass, drafted from devilution's non-HELLFIRE branch,
+ * PSX-specific deltas confirmed from the JAP_1998_05_29 Ghidra decompile at
+ * this exact VA (full body available, unlike most functions which only
+ * have partial coverage). Confirmed PSX-specific vs devilution: (1) NO
+ * MAXMONSTERS/MType==NULL asserts (release build, consistent with every
+ * other fn in this file); (2) the "did I hit" check (`hper>=hit -> return`)
+ * is NOT an early return -- it's a big nested `if (hper < hit) { ... }`
+ * wrapping the whole rest of the function, matching this file's established
+ * nested-if-over-early-return style; (3) NO MT_YZOMBIE/manashield branch at
+ * all (Hellfire-only end-game mechanic, absent from base PSX Diablo --
+ * confirmed by its total absence from the Ghidra decompile, no missile-scan
+ * loop locals in the SYM either); (4) damage/HP updates are applied
+ * UNCONDITIONALLY, not gated behind `pnum==myplr` (devilution's Hellfire-era
+ * netcode gate doesn't exist yet in this PSX build); (5) the IPL_THORNS
+ * check uses the raw literal `_pIFlags & 0x4000000` (matches the bare-literal
+ * style already used for this same bit in items.cpp/player.cpp, no #define
+ * in this codebase for it); (6) the SKING no-heal-steal-exempt check reads
+ * `_mFlags & MFLAG_NOLIFESTEAL` (new define, PSX bit 0x1000) not devilution's
+ * differently-named flag; (7) the knockback tail is gated by `_mFlags &
+ * MFLAG_KNOCKBACK` (new define, PSX bit 0x80) and reuses the EXACT KnockOk/
+ * FePlayerNo/ChkPlrOffsets/PosOkPlayer/SetPlayerOld/WorldToOffset shape
+ * MissToMonst's own knockback tail already established in this file (same
+ * idiom, confirmed independently here) -- but ends with `WorldToOffset(
+ * plrind(ptrplr), ...)` (pointer-to-index via `plrind`) rather than a plain
+ * `pnum`, since this function threads a `PlayerStruct *ptrplr = &plr[pnum];`
+ * throughout instead of re-indexing `plr[pnum]` repeatedly (matching SYM's
+ * `ptrplr`/`_mx`/`_my`/`_px`/`_py` cached-pointer/value locals). Added
+ * MFLAG_KNOCKBACK/MFLAG_NOLIFESTEAL/MT_SKING defines and the pointer-taking
+ * StartPlrHit/StartPlrBlock/StartPlrKill/PosOkPlayer/SetPlayerOld/plrind
+ * prototypes to protos_monster.h (bodies already exist in player.cpp).
+ * BYTE-VERIFIED this pass: SYM OPEN (length 0x5f4 vs retail 0x614, 8 insns
+ * short); bytes OPEN (186 diffs, ours 381 / oracle 389). Two structural
+ * fixes found from the diff/callaudit: (1) the M_TryM2MHit dispatch must be
+ * an early-branch (`if (flags&MFLAG_TARGETS_MONSTER) { M_TryM2MHit(...); }
+ * else { ... }`) not an if/else with the M2M call in the tail `else` --
+ * callaudit flagged the call ORDER (M_TryM2MHit appearing before `abs` in
+ * the linear call list, a branch-layout artifact) confirming the M2M path
+ * is retail's "cold"/early-checked branch, not a late one; (2) SYM's
+ * `pMonster` is a CALLER-SAVED transient ($v0), NOT a function-lifetime
+ * persistent pointer -- introducing a real `MonsterStruct *pMonster =
+ * &monster[i];` local (kept alive across the whole body) pushed `i` itself
+ * out of its natural $s2 slot (SYM: i=$s2) into $s6, cascading a
+ * whole-function register mismatch; switching every `pMonster->field` back
+ * to direct `monster[i].field` (matching devilution's literal style, no
+ * cached pointer at all) let the compiler re-derive the pointer on demand
+ * exactly like retail and fixed `i` back onto $s2 -- alone this closed
+ * 227->186 diffs and 42->8 insns. callaudit: 0/102 mismatches tree-wide.
+ * jtcheck: N/A (no switch in this fn; the 2 pre-existing mismatches
+ * flagged for monster.cpp are M_WalkDir/ProcessMonsters, untouched by this
+ * pass). Residual (186 diffs, 8 short): `pnum`/`Hit`/`MinDam` still land on
+ * the wrong registers (ours s4/fp/s7 vs retail's s3/s6/s5) -- same
+ * whole-function register-coloring class documented elsewhere in this file;
+ * not chased further this pass (landing a near-miss, not a seal, per the
+ * priority). */
+void M_TryH2HHit(int i, int pnum, int Hit, int MinDam, int MaxDam)
+{
+    PlayerStruct *ptrplr = &plr[pnum];
+
+    if (monster[i]._mFlags & MFLAG_TARGETS_MONSTER) {
+        M_TryM2MHit(i, pnum, Hit, MinDam, MaxDam);
+    } else {
+        int _mx = monster[i]._mx;
+        int _my = monster[i]._my;
+        int _px = ptrplr->_px;
+        int _py = ptrplr->_py;
+        long hp = ptrplr->_pHitPoints;
+
+        if ((hp >> 6) > 0 && !ptrplr->_pInvincible && !(ptrplr->_pSpellFlags & 1)) {
+            int dx = abs(_mx - _px);
+            int dy = abs(_my - _py);
+
+            if (dx < 2 && dy < 2) {
+                int hper = ENG_random(100);
+                int tac = ptrplr->_pIAC + ptrplr->_pIBonusAC;
+                int hit = Hit - (tac + ptrplr->_pDexterity / 5 - 30) + (monster[i].mLevel - ptrplr->_pLevel) * 2;
+                int blk, blkper;
+
+                if (hit < 15)
+                    hit = 15;
+                if (currlevel == 14 && hit < 20)
+                    hit = 20;
+                if (currlevel == 15 && hit < 25)
+                    hit = 25;
+                if (currlevel == 16 && hit < 30)
+                    hit = 30;
+
+                if ((ptrplr->_pmode == PM_STAND || ptrplr->_pmode == PM_ATTACK) && ptrplr->_pBlockFlag)
+                    blkper = ENG_random(100);
+                else
+                    blkper = 100;
+                blk = ptrplr->_pDexterity + ptrplr->_pBaseToBlk - (monster[i].mLevel - ptrplr->_pLevel) * 2;
+                if (blk < 0)
+                    blk = 0;
+                if (blk > 100)
+                    blk = 100;
+
+                if (hper < hit) {
+                    if (blkper < blk) {
+                        int dir = GetDirection(_px, _py, _mx, _my);
+                        StartPlrBlock(ptrplr, dir);
+                    } else {
+                        long dam = ENG_random((MaxDam - MinDam + 1) << 6) + (MinDam << 6) + (ptrplr->_pIGetHit << 6);
+                        long mdam;
+
+                        if (dam < 64)
+                            dam = 64;
+                        ptrplr->_pHitPoints -= dam;
+                        ptrplr->_pHPBase -= dam;
+                        if (ptrplr->_pIFlags & 0x4000000) {
+                            mdam = (ENG_random(3) + 1) << 6;
+                            monster[i]._mhitpoints -= mdam;
+                            if ((monster[i]._mhitpoints >> 6) < 1)
+                                M_StartKill(i, pnum);
+                            else
+                                M_StartHit(i, pnum, mdam);
+                        }
+                        if (!(monster[i]._mFlags & MFLAG_NOLIFESTEAL) && monster[i].MType->mtype == MT_SKING && gbMaxPlayers != 1)
+                            monster[i]._mhitpoints += dam;
+                        if (ptrplr->_pHitPoints > ptrplr->_pMaxHP) {
+                            ptrplr->_pHitPoints = ptrplr->_pMaxHP;
+                            ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
+                        }
+                        if ((ptrplr->_pHitPoints >> 6) < 1) {
+                            StartPlrKill(ptrplr, 0);
+                        } else {
+                            StartPlrHit(ptrplr, dam, 0);
+                            if (monster[i]._mFlags & MFLAG_KNOCKBACK) {
+                                unsigned char knockOk = 1;
+
+                                if (ptrplr->_pmode != PM_GOTHIT)
+                                    StartPlrHit(pnum, 0, 1);
+                                _px += offset_x[monster[i]._mdir];
+                                _py += offset_y[monster[i]._mdir];
+                                if (FePlayerNo && ptrplr->plractive) {
+                                    PlayerStruct *plr2 = &plr[pnum ^ 1];
+                                    if (plr2->plractive && !ChkPlrOffsets(_px << 3, _py << 3, plr2->WorldX, plr2->WorldY))
+                                        knockOk = 0;
+                                }
+                                if (knockOk && PosOkPlayer(ptrplr, _px, _py)) {
+                                    SetPlayerOld(ptrplr);
+                                    WorldToOffset(plrind(ptrplr), (_px << 3) | 4, (_py << 3) | 4);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* NEW function this pass, transcribed directly from the JAP_1998_05_29
+ * Ghidra decompile at this exact VA (full body available -- a much more
+ * reliable source than hellfire's here, since PSX drops several
+ * Hellfire-only unique-monster quest branches: hellfire's MU_SNOTSPIL/BOL
+ * and MU_WARLORD blocks are ABSENT entirely, confirmed by their total
+ * absence from the decompile). Quest/unique indices, MFLAG_DROP=0x40, and
+ * the numeric literals for `_qactive`/`_qvar1`/`_qvar2` are transcribed
+ * literally from the decompile (`'\x02'`, `'\x03'`, etc render as plain
+ * ints here, matching this file's own established style of not naming
+ * every qvar magic number -- see MAI_Round's `quests[Q_GARBUD]._qvar1=5`
+ * for precedent). One Ghidra-decompiler subtlety resolved by hand: the
+ * `UMT_INDEX8`/quest-11 block prints as `if (cond1 && (write, cond2))
+ * NetSendCmdQuest(...)` -- a comma-operator artifact of a C construct like
+ * `if (mName==...) { quests[11]._qvar1=2; if(!deltaload)
+ * NetSendCmdQuest(1,8); }`: the qvar1 WRITE is unconditional once the name
+ * matches, only the network send is deltaload-gated (confirmed by the
+ * write executing whether or not deltaload is set, per the comma-operator
+ * semantics of C's `a, b` evaluating `a` unconditionally). Two
+ * struct/extern additions needed: `TextDataStruct` (12-byte PSX layout,
+ * already used by minitext.cpp) added to structs_monster.h for `alltext[]`,
+ * plus `extern char TransVal;`/`extern struct TextDataStruct alltext[269];`
+ * to externs_monster.h and SpawnUnique/InitQTextMsg/DRLG_MRectTrans/
+ * ObjChangeMap prototypes to protos_monster.h (bodies live in
+ * items.cpp/minitext.cpp/objects.cpp). BYTE-VERIFIED this pass: SYM OPEN
+ * (length 0x5b0 vs retail 0x5a4, 3 over); bytes OPEN (143 diffs, ours 364
+ * / oracle 361) -- a strong first-pass landing for a 361-insn function
+ * transcribed cold. callaudit: 0/103 mismatches tree-wide (call list/order
+ * exact on the first try). Tried introducing a persistent `MonsterStruct
+ * *Monst = &monster[i];` (SYM lists a `Monst` REG local sharing $s0 with
+ * `tren` in disjoint scopes, suggesting a real pointer) and rewriting every
+ * `monster[i].field` to `Monst->field` -- made it drastically WORSE (143->
+ * 365 diffs, insn count fell to 280, far under target) -- reverted. Same
+ * lesson as M_TryH2HHit's `pMonster`: whatever SYM's `Monst`/$s0 really is,
+ * it is NOT a function-lifetime cached pointer the source can spell as a
+ * literal `MonsterStruct*` local; direct `monster[i].field` indexing
+ * (letting the compiler re-derive/CSE the pointer on demand) is closer to
+ * retail's real codegen. Residual (143 diffs, 3 over): whole-function
+ * register-coloring, same class as every other near-miss in this file --
+ * not chased further this pass (landing a near-miss, not a seal, per the
+ * priority). */
+int M_DoTalk(int i)
+{
+    int _mx = monster[i]._mx;
+    int _my = monster[i]._my;
+    unsigned int mName = monster[i].mName;
+
+    M_StartStand(i, monster[i]._mdir);
+    monster[i]._mgoal = MG_WAITTOTALK;
+    if (!effect_is_playing(alltext[monster[i].mtalkmsg].sfxnr)) {
+        InitQTextMsg(monster[i].mtalkmsg);
+
+        if (mName == (unsigned int)UniqMonst[UMT_GARBUD].mName) {
+            if (monster[i].mtalkmsg == TXT_GARB1) {
+                quests[Q_GARBUD]._qactive = 2;
+                quests[Q_GARBUD]._qvar1 = 2;
+                quests[Q_GARBUD]._qlog = 1;
+                if (!deltaload)
+                    NetSendCmdQuest(1, Q_GARBUD);
+            }
+            if (monster[i].mtalkmsg == TXT_GARB2 && !(monster[i]._mFlags & MFLAG_DROP)) {
+                quests[Q_GARBUD]._qvar1 = 3;
+                if (!deltaload)
+                    NetSendCmdQuest(1, Q_GARBUD);
+                SpawnItem(i, _mx + 1, _my + 1, 1);
+                monster[i]._mFlags |= MFLAG_DROP;
+            }
+        }
+        if (mName == (unsigned int)UniqMonst[UMT_ZHAR].mName && monster[i].mtalkmsg == TXT_ZHAR1
+            && !(monster[i]._mFlags & MFLAG_DROP)) {
+            quests[Q_ZHAR]._qactive = 2;
+            quests[Q_ZHAR]._qlog = 1;
+            quests[Q_ZHAR]._qvar2 = 2;
+            if (!deltaload) {
+                NetSendCmdQuest(1, Q_ZHAR);
+                CreateTypeItem(_mx + 1, _my + 1, 0, 0, 0x18, 1, 0);
+            }
+            monster[i]._mFlags |= MFLAG_DROP;
+        }
+        if (mName == (unsigned int)UniqMonst[3].mName && monster[i].mtalkmsg == TXT_BOL1
+            && !(monster[i]._mFlags & MFLAG_DROP)) {
+            char tren;
+
+            ObjChangeMap(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 2, setpc_y + (setpc_h >> 1) - 2);
+            tren = TransVal;
+            TransVal = 9;
+            DRLG_MRectTrans(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 4, setpc_y + (setpc_h >> 1));
+            quests[Q_LTBANNER]._qvar1 = 2;
+            if (quests[Q_LTBANNER]._qactive == 1)
+                quests[Q_LTBANNER]._qactive = 2;
+            TransVal = tren;
+            monster[i]._mFlags |= MFLAG_DROP;
+            NetSendCmdQuest(1, Q_LTBANNER);
+        }
+        if (mName == (unsigned int)UniqMonst[7].mName) {
+            if (monster[i].mtalkmsg == TXT_VEIL1) {
+                quests[Q_VEIL]._qactive = 2;
+                quests[Q_VEIL]._qlog = 1;
+                if (!deltaload)
+                    NetSendCmdQuest(1, Q_VEIL);
+            }
+            if (monster[i].mtalkmsg == TXT_VEIL3 && !(monster[i]._mFlags & MFLAG_DROP)) {
+                SpawnUnique(6, _mx + 1, _my + 1);
+                monster[i]._mFlags |= MFLAG_DROP;
+            }
+        }
+        if (mName == (unsigned int)UniqMonst[8].mName) {
+            quests[11]._qvar1 = 2;
+            if (!deltaload)
+                NetSendCmdQuest(1, 8);
+        }
+        if (mName == (unsigned int)UniqMonst[4].mName && gbMaxPlayers != 1) {
+            quests[Q_BETRAYER]._qvar1 = 6;
+            if (!deltaload)
+                NetSendCmdQuest(1, Q_BETRAYER);
+            monster[i]._mgoal = MG_ATTACK;
+            monster[i]._msquelch = 255;
+            monster[i].mtalkmsg = 0;
+        }
+    }
+    return 0;
 }
 
 /* NEW function this pass. SYM OPEN (length 0x4dc vs 0x4cc); bytes OPEN (46

@@ -377,9 +377,10 @@ BOOL delta_quest_inited(int i)
 void DeltaAddItem(int ii)
 {
     DLevel *Dl;
+    TCmdPItem *pD, *OpD;
     Dl = GetDLevel(currlevel, setlevel);
+    OpD = pD = Dl->item;
     {
-        TCmdPItem *pD = Dl->item;
         unsigned char bc;
         for (int i = 0; i < MAXITEMS; i++, pD++) {
             bc = pD->bCmd;
@@ -399,7 +400,6 @@ void DeltaAddItem(int ii)
     }
 
     {
-    TCmdPItem *OpD = Dl->item;
     for (int i = 0; i < MAXITEMS; i++, OpD++) {
         if (OpD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;

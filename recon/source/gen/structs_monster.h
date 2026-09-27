@@ -2,6 +2,12 @@ struct CMonster;
 
 struct MonsterData;
 
+struct TextDataStruct {   /* PSX layout: 12 bytes (no txtspd field -- speed is computed by CalcTextSpeed) */
+    char *txtstr;
+    unsigned char scrlltxt;
+    int sfxnr;
+};
+
 struct MonsterStruct {   /* sizeof 104 */
     int mtalkmsg;   /* +0x0 */
     int _mgoalvar1;   /* +0x4 */

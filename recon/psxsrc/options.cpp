@@ -242,7 +242,7 @@ void GetVolumes(void)
 
         mptr = &MenuList[i];
         iptr = mptr->Item;
-        if (mptr->NoEntries > 0) {
+        if ((signed char)mptr->NoEntries > 0) {
             int s;
 
             s = 0;
@@ -660,14 +660,10 @@ void CharCardSelectMemcardPad(void)
         }
     }
     if (P->GetDown() & 0x100) {
-        int n, link;
-
         PlaySFX(0x33);
-        n = MenuList[cmenu].NoEntries - 1;
-        cs = n;
-        link = iptr[n].Link;
-        if (link != -2) {
-            cmenu = link - 1;
+        cs = MenuList[cmenu].NoEntries - 1;
+        if (iptr[cs].Link != -2) {
+            cmenu = iptr[cs].Link - 1;
             cs = 3;
         }
     }

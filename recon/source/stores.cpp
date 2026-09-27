@@ -1027,7 +1027,7 @@ void HealerBuyItem(void)
 {
     int idx;
 
-    idx = (stextlhold - stextup) / 4 + stextvhold;
+    idx = ((stextlhold - stextup) >> 2) + stextvhold;
     if (gbMaxPlayers == 1 ? idx < 2 : idx < 3) {
         plr[myplr].HoldItem._iSeed = GetRndSeed();
     }
@@ -1038,6 +1038,7 @@ void HealerBuyItem(void)
     StoreAutoPlace();
     CalcPlrInv(myplr, 1);
     if (!(gbMaxPlayers == 1 ? idx < 2 : idx < 3)) {
+        idx = ((stextlhold - stextup) >> 2) + stextvhold;
         if (idx == 0x13) {
             _healitem[StorePlrNo][19]._itype = -1;
         } else {

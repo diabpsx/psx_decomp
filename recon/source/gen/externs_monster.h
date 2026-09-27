@@ -41,3 +41,5 @@ extern short monstkills[190];   /* @0x8010A240 */
 extern struct MonsterData monsterdata[];   /* @0x8010AB9C */
 extern char D_8011C2C8[];   /* @0x8011C2C8 */
 extern struct UniqMonstStruct UniqMonst[96];   /* @0x8010C708 */
+extern char TransVal;   /* @0x8011C148 */
+extern struct TextDataStruct alltext[269];   /* @0x80117C20 */
