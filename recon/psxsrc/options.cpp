@@ -35,11 +35,15 @@ TASK *DrawOptionsTask;
 int ReturnMenu;                 /* gp_rel in FormatPad's oracle -> owned here */
 BOOL CharacterBlockLoaded;      /* gp_rel in FormatPad's oracle -> owned here */
 int ReturnCards;                /* gp_rel in SaveOverwritePad's oracle -> owned here */
+BOOL OptionsSetSeed;            /* gp_rel in DrawOptions's oracle -> owned here */
 static int lastlastcs;          /* D_8011B238 -- SYM name "lastlastcs" */
 static int Spacing;             /* D_8011B22C -- SYM name "Spacing" */
 static unsigned char KeyPos;    /* D_8011B270 -- SYM name "KeyPos" */
 static BOOL debounce;           /* D_8011B26C -- SYM name "debounce" */
 static LANG_TYPE OldLang;       /* D_8011C708 -- SYM name "OldLang" */
+static TextDat *Slider;         /* D_8011C6F0 -- SYM name "Slider" */
+static unsigned char qspin;     /* D_8011C701 -- SYM name "qspin" */
+static unsigned char lqspin;    /* D_8011C702 -- SYM name "lqspin" */
 
 /* ---------------------------------------------------------------- header-copy methods ---- */
 unsigned short CPad::GetDown() const
@@ -752,7 +756,8 @@ void CharacterLoadPad(void)
                 if (card_status[current_card] != 2) {
                     PlaySFX(0x33);
                     if (GetSaveStatusMessage(1, DiabloCharacterFile) == 0) {
-                        /* nothing */
+                        PlaySFX(0x3D3);
+                        return;
                     } else {
                         saveflag = 1;
                         if (card_usable[current_card] == 0) {
@@ -878,14 +883,15 @@ void MemcardPad(void)
     if (P->GetDown() & 0x100) {
         int n, link;
 
+        PlaySFX(0x33);
         n = MenuList[cmenu].NoEntries - 1;
         link = iptr[n].Link;
         if (link != -2) {
             cmenu = link - 1;
             cardondelay = 5;
             cs = lastcs;
+            return;
         }
-        return;
     }
 
     if (!(P->GetDown() & 0x40))
@@ -1313,4 +1319,659 @@ void SoundPad(void)
         return;
     }
     PlaySFX(0x3D3);
+}
+
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB,
+                  int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross,
+                  BOOL iso, unsigned char SinStep)
+{
+    TextDat *ThisDat;
+    POLY_FT4 *FT4;
+    POLY_GT4 *GT4;
+    unsigned char rand;
+    int f;
+    unsigned short bright;
+    unsigned short r, g, b;
+    unsigned short r2, g2, b2;
+    int x1, y1, x2, y2, x3, y3;
+    int radius;
+    int i;
+
+    if (OtPos == 0xFFFF) {
+        OtPos = CBlocks::GetOverlayOtBase();
+        OtPos = OtPos + 4;
+    }
+    ThisDat = GM_UseTexData(0);
+    if (PauseMode == 0 || Sparkle != 0) {
+        rand = GU_GetRnd() & 0x1F;
+        f = (VID_GetTick() >> 2) & 7;
+    } else {
+        rand = 0x10;
+        f = 4;
+    }
+    bright = rand + spinbright;
+    spinradius = spinradius >> 1;
+    if ((int)(bright << 16) < 0)
+        bright = 0;
+    bright = bright & 0xFFFF;
+    r = (SpinR * bright) >> 8;
+    g = (SpinG * bright) >> 8;
+    b = ((SpinB & 0xFF) * bright) >> 8;
+    if (((SpinR * bright) >> 8) > 0xFF)
+        r = 0xFF;
+    if (g > 0xFF)
+        g = 0xFF;
+    if (b > 0xFF)
+        b = 0xFF;
+    if (Sparkle != 0) {
+        FT4 = ThisDat->PrintFt4(f + 0xD0, x, y, 0, OtPos, 0);
+        FT4->r0 = SpinR;
+        FT4->g0 = SpinG;
+        FT4->b0 = (unsigned char)SpinB;
+        FT4->code = (FT4->code & 0xFE) | 2;
+    }
+    y = y - 3;
+    x = x + 3;
+    SinStep = SinStep & 0xFF;
+    i = 0;
+    f = SinStep * 2;
+    do {
+        GT4 = ThisDat->PrintGt4(0xD8, x, y, 0, OtPos + 1, 0);
+        GT4->tpage = GT4->tpage | 0x20;
+        GT4->v2 = GT4->v2 - 1;
+        GT4->u1 = GT4->u1 - 1;
+        GT4->v3 = GT4->v3 - 1;
+        GT4->u3 = GT4->u3 - 1;
+        y1 = y;
+        if (iso == 0) {
+            x1 = (Circle[angle & 0x3F] * spinradius) >> 8;
+            radius = Circle[(angle + SinStep) & 0x3F];
+            x3 = (Circle[(angle + f) & 0x3F] * spinradius) >> 8;
+            y2 = (Circle[(angle + SinStep + 0x10) & 0x3F] * spinradius) >> 8;
+            y1 = y1 + ((Circle[(angle + 0x10) & 0x3F] * spinradius) >> 8);
+            y3 = y1;
+            y3 = (Circle[(angle + f + 0x10) & 0x3F] * spinradius) >> 8;
+        } else {
+            x1 = (Circle[angle & 0x3F] * spinradius) >> 8;
+            radius = Circle[(angle + SinStep) & 0x3F];
+            x3 = (Circle[(angle + f) & 0x3F] * spinradius) >> 8;
+            y2 = (Circle[(angle + SinStep + 0x10) & 0x3F] * spinradius) >> 9;
+            y1 = y1 + ((Circle[(angle + 0x10) & 0x3F] * spinradius) >> 9);
+            y3 = (Circle[(angle + f + 0x10) & 0x3F] * spinradius) >> 9;
+        }
+        x2 = x;
+        GT4->x0 = x2 + x1;
+        GT4->y0 = y1;
+        GT4->x1 = x2;
+        GT4->x2 = x2 + ((radius * spinradius) >> 8);
+        GT4->y1 = y;
+        GT4->x3 = x2 + x3;
+        GT4->y3 = y + y3;
+        GT4->r0 = 0;
+        GT4->g0 = 0;
+        GT4->b0 = 0;
+        GT4->y2 = y + y2;
+        GT4->r1 = (unsigned char)r;
+        GT4->g1 = (unsigned char)g;
+        GT4->r2 = 0;
+        GT4->g2 = 0;
+        GT4->b2 = 0;
+        GT4->r3 = 0;
+        GT4->g3 = 0;
+        GT4->b3 = 0;
+        GT4->code = (GT4->code & 0xFE) | 2;
+        GT4->b1 = (unsigned char)b;
+        if (cross != 0) {
+            GT4 = ThisDat->PrintGt4(0xD8, x, y, 0, OtPos + 1, 0);
+            GT4->x0 = x2 + x1;
+            GT4->y0 = y1;
+            GT4->x1 = x2;
+            GT4->x2 = x2 + (((radius * spinradius) >> 8) >> 3);
+            GT4->y1 = y;
+            GT4->x3 = x2 + x3;
+            GT4->y3 = y + y3;
+            GT4->y2 = y + (y2 >> 3);
+            r2 = r >> 2;
+            GT4->r0 = (unsigned char)r2;
+            g2 = g >> 2;
+            GT4->g0 = (unsigned char)g2;
+            b2 = b >> 2;
+            GT4->b0 = (unsigned char)b2;
+            GT4->r1 = (unsigned char)r;
+            GT4->g1 = (unsigned char)g;
+            GT4->b1 = (unsigned char)b;
+            GT4->r2 = (unsigned char)r2;
+            GT4->g2 = (unsigned char)g2;
+            GT4->b2 = (unsigned char)b2;
+            GT4->r3 = (unsigned char)r2;
+            GT4->g3 = (unsigned char)g2;
+            GT4->tpage = GT4->tpage | 0x20;
+            GT4->u1 = GT4->u1 - 1;
+            GT4->v2 = GT4->v2 - 1;
+            GT4->u3 = GT4->u3 - 1;
+            GT4->b3 = (unsigned char)b2;
+            GT4->v3 = GT4->v3 - 1;
+            GT4->code = (GT4->code & 0xFE) | 2;
+        }
+        angle = angle + f;
+        i = i + f;
+    } while (i < 0x40);
+    GM_FinishedUsing(ThisDat);
+}
+
+void DrawOptions(TASK *T)
+{
+    CPad *P;
+
+    if (options_pad == -1 && deathflag == 0) {
+        ToggleOptions();
+        return;
+    }
+    P = PAD_GetPad(options_pad, 0);
+    Slider = GM_UseTexData(0);
+    sw = Slider->GetFr(0x96)->W - 2;
+    cmenu = deathflag == 0 ? 1 : 8;
+    if (Qfromoptions == 0) {
+        if (FeFlag == 0)
+            PlaySFX(0x33);
+        cs = 1;
+    } else {
+        cs = Qfromoptions;
+        Qfromoptions = 0;
+    }
+    qspin = 0;
+    lqspin = 0;
+    OptionsSetSeed = 0;
+    GetVolumes();
+    GLUE_SetHomingScrollFlag(0);
+    GLUE_SetShowPanelFlag(0);
+    GLUE_SuspendGame();
+    TSK_Sleep(1);
+    debounce = 1;
+    if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10))
+        debounce = 0;
+    OrigLang = LANG_GetLang();
+    OldLang = OrigLang;
+    PadFrig = 0;
+    old_pad = options_pad;
+    while (msgflag != 0 && msgholdflag != 0) {
+        msgholdflag = 0;
+        TSK_Sleep(1);
+    }
+    while (optionsflag != 0 && options_pad != -1) {
+        switch (cmenu) {
+        case 0:
+        case 1:
+        case 3:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+            DrawMenu(cmenu);
+            SoundPad();
+            break;
+        case 2:
+            DrawMenu(cmenu);
+            CalcVolumes();
+            SoundPad();
+            break;
+        case 4:
+            DrawMenu(cmenu);
+            CentrePad();
+            break;
+        case 9:
+        case 0xB:
+        case 0xC:
+        case 0x11:
+        case 0x12:
+            MemcardPad();
+            DrawMenu(cmenu);
+            break;
+        case 10:
+            GameSpeedPad();
+            DrawMenu(cmenu);
+            break;
+        case 0xD:
+            CharCardSelectMemcardPad();
+            DrawMenu(cmenu);
+            break;
+        case 0xE:
+            current_card = 0;
+            CharacterLoadPad();
+            DrawMenu(cmenu);
+            break;
+        case 0xF:
+            current_card = 1;
+            CharacterLoadPad();
+            DrawMenu(cmenu);
+            break;
+        case 0x10:
+            DrawMenu(cmenu);
+            FormatPad();
+            break;
+        case 0x13:
+            SaveOverwritePad();
+            DrawMenu(cmenu);
+            break;
+        case 0x14:
+            DrawCtrlSetup();
+            cs = FeFlag == 0 ? 7 : 2;
+            break;
+        case 0x16:
+            cmenu = 0;
+            cs = 4;
+            PaletteFadeOut(8);
+            while (GetFadeState() != 0) {
+                DrawMenu(cmenu);
+                TSK_Sleep(1);
+            }
+            PaletteFadeIn(8);
+            break;
+        case 0x17:
+            Qfromoptions = options_pad + 1;
+            ToggleOptions();
+            pad_func_SplBook(options_pad);
+            cs = 4;
+            options_pad = old_pad;
+            break;
+        case 0x18:
+            Qfromoptions = options_pad + 1;
+            ToggleOptions();
+            StartQuestlog();
+            cs = 4;
+            options_pad = old_pad;
+            break;
+        case 0x19:
+            DrawHelp();
+            cs = FeFlag == 0 ? 9 : 5;
+            break;
+        case 0x1A:
+            ToggleOptions();
+            invflag = 1;
+            cs = 4;
+            options_pad = old_pad;
+            break;
+        case 0x1B:
+            ToggleOptions();
+            pad_func_Chr(options_pad);
+            cs = 4;
+            options_pad = old_pad;
+            break;
+        }
+        if (Qfromoptions != 0 && cs == 4)
+            debounce = 1;
+        TSK_Sleep(1);
+        if (FeFlag == 0) {
+            if ((P->GetDown() & 0x20) && MemCardActive == 0) {
+                if (cmenu == 1) {
+                    if (PadFrig == 0) {
+                        PlaySFX(ctrlflag == 0 ? 0x33 : 0x3D3);
+                        ToggleOptions();
+                        if (optionsflag == 0)
+                            ignore_buttons = 1;
+                    } else {
+                        PadFrig = 0;
+                    }
+                } else {
+                    if (ctrlflag == 0) {
+                        if (deathflag == 0) {
+                            cs = cmenu != 7 ? lastcs : 5;
+                            cmenu = 1;
+                            PlaySFX(0x33);
+                        }
+                    } else {
+                        if (RemoveCtrlScreen() != 0) {
+                            PlaySFX(0x33);
+                            cmenu = 1;
+                            cs = lastcs;
+                        } else {
+                            PlaySFX(0x3D3);
+                        }
+                    }
+                }
+            }
+            if (FeFlag == 0 && GLUE_Finished() != 0)
+                optionsflag = 0;
+        }
+    }
+    Adjust = 0;
+    if (MemCardActive != 0)
+        MemcardOFF();
+    if (MemcardOverlay != 0) {
+        MemcardOverlay = 0;
+        if (FeFlag == 0)
+            OVR_LoadGame();
+        music_start(sgnMusicTrack);
+    }
+    if (initchr == 0) {
+        if (TSK_Exist(NULL, 0x8001, 0xFFFFFFFF) == NULL && Qfromoptions == 0) {
+            GLUE_ResumeGame();
+            GLUE_SetShowPanelFlag(1);
+            GLUE_SetHomingScrollFlag(1);
+            PauseMode = 0;
+            PostGamePad(5, 0, 0, 0);
+        }
+        if (ctrlflag != 0)
+            RemoveCtrlScreen();
+        if (Qfromoptions == 0)
+            GLUE_SetShowGameScreenFlag(1);
+    }
+}
+
+void DrawMenu(int MenuNo)
+{
+    OMENULIST *mptr;
+    OMENUITEM *iptr;
+    int sh;
+    POLY_G4 *G4;
+    int yoff;
+    int len;
+    int depth;
+    unsigned char r, g, b;
+    int mx, my;
+    int BARFRAC;
+    int i;
+    int OtOff;
+    unsigned long Mask;
+
+    if (cmenu == 2) {
+        if (FeFlag == 0) {
+            SoundMenu[1].y = 2;
+            SoundMenu[2].y = 3;
+            SoundMenu[3].y = 4;
+            SoundMenu[6].y = 6;
+        } else {
+            SoundMenu[1].y = 1;
+            SoundMenu[2].y = 2;
+            SoundMenu[3].y = 3;
+            SoundMenu[6].y = 5;
+        }
+    }
+
+    if (MenuNo == 0 && FeFlag == 0) {
+        if (deathflag == 0) {
+            MenuNo = 1;
+            cmenu = MenuNo;
+        } else {
+            cmenu = 8;
+            MenuNo = 8;
+        }
+    }
+    if (MenuNo == 1 && FeFlag != 0) {
+        cmenu = 0;
+        MenuNo = 0;
+    }
+
+    mptr = &MenuList[MenuNo];
+    iptr = MenuList[MenuNo].Item;
+    sh = (Slider->GetFr(0x96)->H) - 4;
+    depth = CBlocks::GetOverlayOtBase();
+    depth = depth + 4;
+    mx = ((0x100 - mptr->w) / 2) + 0x20;
+    my = ((0xB0 - mptr->h) / 2) + 0x20;
+    BARFRAC = 0x8000 / sw;
+    yoff = my;
+    if (FeFlag != 0)
+        yoff = 0x20;
+    Spacing = 0xD;
+
+    if (MenuNo == 4) {
+        DrawDialogBox(0x12, 0x94, &ORect, 10, 0x14, 0x129, 0xCD);
+        ORect.x = 10;
+        ORect.y = 0x14;
+        ORect.w = 0x129;
+        ORect.h = 0xCD;
+        mx = 10;
+        yoff = 0x14;
+    } else if (FeFlag == 0) {
+        DrawDialogBox(0x12, 0x94, &ORect, mx, my, mptr->w, mptr->h);
+        ORect.x = mx;
+        ORect.y = yoff;
+        ORect.w = mptr->w;
+        ORect.h = mptr->h;
+    } else {
+        ORect.x = mx;
+        ORect.y = yoff;
+        ORect.w = mptr->w;
+        ORect.h = mptr->h + 100;
+    }
+
+    len = 0xC;
+    OtOff = depth << 2;
+    i = 0;
+    Mask = 0xFFFFFF;
+    for (;;) {
+        if (mptr->NoEntries <= i) {
+            unsigned short Str_00;
+
+            if (MenuNo == 2)
+                Str_00 = 0x331;
+            else if (MenuNo == 4)
+                Str_00 = 0x49E;
+            else if (MenuNo == 8)
+                Str_00 = 0x4E5;
+            else
+                Str_00 = 0x4E6;
+            PrintSelectBack(Str_00);
+            return;
+        }
+        r = WHITER;
+        g = WHITEG;
+        b = WHITEB;
+        if (i != 0)
+            len = Spacing + 4;
+        if (iptr[i].var != NULL) {
+            char *Str;
+            CFont *Font;
+            int Frm;
+            int x, y;
+            short sVar1, sVar2, sVar7, sVar8;
+            unsigned int uVar5, uVar14;
+            unsigned char uVar11, uVar12, uVar13, SpinG;
+
+            x = (mx + mptr->w) - sw;
+            y = yoff + iptr[i].y * Spacing + len;
+            if (FeFlag != 0 && cmenu == 2)
+                y = y + 0x20;
+            Frm = (iptr[i].len == cs) ? 0x97 : 0x98;
+            Slider->PrintFt4(Frm, (x + iptr[i].Just) - 0x11, y - 8, 0, depth, 0);
+            sVar7 = (short)y - 6;
+            Frm = BARFRAC * iptr[i].Just;
+            uVar5 = (unsigned int)Frm >> 8;
+            uVar14 = 0x80 - uVar5;
+            DrawDialogBox(0x12, 0x94, NULL, x - 0x10, y - 5, sw, sh - 2);
+            PRIM_GetPrim(&G4);
+            setlen(G4, 8);
+            G4->code = 0x38;
+            G4->code = G4->code & 0xFD;
+            G4->code = G4->code & 0xFE;
+            G4->r0 = 0x40;
+            G4->g0 = 0;
+            G4->b0 = 0;
+            uVar12 = (unsigned char)(uVar14 >> 1);
+            G4->r1 = uVar12;
+            uVar11 = (unsigned char)(uVar5 >> 1);
+            G4->g1 = uVar11;
+            G4->b1 = 0;
+            G4->r2 = 0x80;
+            G4->g2 = 0;
+            G4->b2 = 0;
+            uVar13 = (unsigned char)uVar14;
+            G4->r3 = uVar13;
+            SpinG = (unsigned char)((unsigned int)Frm >> 8);
+            G4->g3 = SpinG;
+            sVar1 = (short)x - 0x11;
+            G4->b3 = 0;
+            sVar8 = sVar1 + (short)iptr[i].Just;
+            G4->x0 = sVar1;
+            G4->y0 = sVar7;
+            G4->x1 = sVar8;
+            G4->y1 = sVar7;
+            G4->x2 = sVar1;
+            G4->x3 = sVar8;
+            sVar2 = (short)((sh + (sh >> 31)) >> 1);
+            sVar7 = sVar7 + sVar2;
+            G4->y2 = sVar7;
+            G4->y3 = sVar7;
+            addPrim(ThisOt + OtOff, G4);
+
+            PRIM_GetPrim(&G4);
+            setlen(G4, 8);
+            G4->code = 0x38;
+            G4->code = G4->code & 0xFD;
+            G4->code = G4->code & 0xFE;
+            G4->r0 = 0x80;
+            G4->g0 = 0;
+            G4->b0 = 0;
+            G4->r1 = uVar13;
+            G4->g1 = SpinG;
+            G4->b1 = 0;
+            G4->r2 = 0x40;
+            G4->g2 = 0;
+            G4->b2 = 0;
+            G4->r3 = uVar12;
+            G4->g3 = uVar11;
+            G4->b3 = 0;
+            G4->y0 = sVar7;
+            G4->y1 = sVar7;
+            sVar7 = sVar7 + sVar2;
+            G4->x0 = sVar1;
+            G4->x1 = sVar8;
+            G4->x2 = sVar1;
+            G4->y2 = sVar7;
+            G4->x3 = sVar8;
+            G4->y3 = sVar7;
+            addPrim(ThisOt + OtOff, G4);
+
+            (void)Str; (void)Font;
+        }
+        if (i == 0) {
+            r = BLUER;
+            g = BLUEG;
+            b = BLUEB;
+        }
+        if (i == cs) {
+            if (iptr[i].Text != 0) {
+                char *Str;
+                int y2, Frm2;
+                int x, iVal;
+
+                g = GOLDG;
+                r = GOLDR;
+                b = GOLDB;
+                if ((unsigned)(MenuNo - 0xE) < 2 && MemCardActive != 0) {
+                    y2 = 0x280;
+                    if (card_status[current_card] == 0 && CharacterBlockLoaded != 0)
+                        y2 = GetSpinnerWidth(i - 1);
+                } else {
+                    if (FeFlag == 0 || i != 0) {
+                        Str = GetStr(iptr[i].Text);
+                        y2 = MediumFont.GetStrWidth(Str);
+                    } else {
+                        Str = GetStr(iptr[i].Text);
+                        y2 = LargeFont.GetStrWidth(Str);
+                    }
+                }
+                Frm2 = (yoff + iptr[i].y * Spacing + len) - 2;
+                if (cmenu == 2 && cs != 7) {
+                    iVal = y2 + 10;
+                    x = mx + 2;
+                    if (FeFlag != 0)
+                        x = mx - 8;
+                } else {
+                    x = (((0x100 - y2)) / 2) + 0x14;
+                    iVal = y2 + 0x10;
+                    if (FeFlag != 0 && cmenu == 2)
+                        Frm2 = (yoff + iptr[i].y * Spacing + len) + 0x1E;
+                }
+                if (MenuNo != 4) {
+                    if (AlertTxt == 0) {
+                        DrawSpinner(x, Frm2, -0x60, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
+                        DrawSpinner(x + iVal, Frm2, -0x60, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
+                    } else if (FeFlag != 0) {
+                        DrawSpinner(x, Frm2, -0x60, -0x60, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
+                        DrawSpinner(x + iVal, Frm2, -0x60, -0x60, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
+                    }
+                }
+            }
+        } else {
+            if (iptr[i].Text != 0) {
+                if (Adjust != 0 && i == 3) {
+                    r = REDR;
+                    g = REDG;
+                    b = REDB;
+                }
+                if (MenuNo == 3 && iptr[i].len != 0 && iptr[i].Link != 1) {
+                    r = REDR;
+                    g = REDG;
+                    b = REDB;
+                }
+                if (MenuNo == 10 && iptr[i].len != 0 && iptr[i].Link == -2) {
+                    r = REDR;
+                    g = REDG;
+                    b = REDB;
+                }
+                if (DiabloDieFlag != 0) {
+                    if (MenuNo == 7 && iptr[i].Link == 0xD) {
+                        r = 0x28;
+                        g = 0x28;
+                        b = 0x28;
+                    }
+                    if (MenuNo == 1 && i != 0 && i < 5) {
+                        r = 0x28;
+                        g = 0x28;
+                        b = 0x28;
+                    }
+                }
+                if (FeFlag == 0) {
+                    char *Str;
+                    int x2;
+
+                    if (i == 0 || cmenu != 2) {
+                        Str = GetStr(iptr[i].Text);
+                        x2 = 0;
+                    } else {
+                        Str = GetStr(iptr[i].Text);
+                        MediumFont.Print(8, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
+                        if (i == 5)
+                            PrintMono(iptr[i].y * Spacing + len);
+                        goto next_item;
+                    }
+                    MediumFont.Print(x2, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
+                } else {
+                    if (i == 0) {
+                        char *Str;
+
+                        ORect.y = ORect.y - 0x20;
+                        if (iptr[i].Text == 0x3B6) {
+                            ORect.x = ORect.x - 0x40;
+                            ORect.w = ORect.w + 0x80;
+                        }
+                        Str = GetStr(iptr[i].Text);
+                        LargeFont.Print(0, iptr[i].y * Spacing + len + 0x22, Str, iptr[i].Just, &ORect, BLUER, BLUEG, BLUEB);
+                        if (iptr[i].Text == 0x3B6) {
+                            ORect.x = ORect.x + 0x40;
+                            ORect.w = ORect.w - 0x80;
+                        }
+                        ORect.y = ORect.y + 0x20;
+                    } else if (cmenu != 2) {
+                        char *Str;
+
+                        Str = GetStr(iptr[i].Text);
+                        MediumFont.Print(8, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
+                    } else {
+                        char *Str;
+
+                        Str = GetStr(iptr[i].Text);
+                        MediumFont.Print(0, iptr[i].y * Spacing + len + 0x20, Str, iptr[i].Just, &ORect, r, g, b);
+                        if (i == 5)
+                            PrintMono(iptr[i].y * Spacing + len + 0x20);
+                    }
+                }
+            }
+        }
+    next_item:
+        i = i + 1;
+        iptr = iptr + 1;
+    }
 }

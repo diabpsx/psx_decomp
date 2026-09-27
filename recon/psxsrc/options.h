@@ -34,7 +34,22 @@ int VID_GetYOff(void);   /* @0x80084178 VID.CPP */
 void VID_SetXYOff(int X, int Y);   /* @0x8008415C VID.CPP */
 void DaveCentreStuff(void);   /* @0x800847D4 -- real fn, another TU */
 
-struct TextDat;
+struct FRAME_HDR {   /* size 12; only .W accessed here */
+    unsigned int FrOffset;
+    unsigned int X : 8, Y : 8, PalNum : 8, NotTrans : 1, Rotated : 1, InVRAM : 1, CompType : 2,
+        Floor : 1, Cycle : 1, pad : 1;
+    unsigned int W : 9, H : 9, PentaGram : 1, pad2 : 13;
+};
+struct TextDat {
+    POLY_FT4 * PrintFt4(int a, int b, int c, int d, int e, int f);
+    POLY_GT4 * PrintGt4(int a, int b, int c, int d, int e, int f);
+    FRAME_HDR * GetFr(int frame);
+};
+TextDat * GM_UseTexData(int idx);   /* @0x80093C10 */
+void GM_FinishedUsing(TextDat *td);   /* @0x80093D80 */
+extern short Circle[64];   /* @0x800CD2E0 -- sin/cos lookup table, another module */
+unsigned long GU_GetRnd(void);   /* @0x80020CF4 */
+unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP */
 
 struct CFont {   /* sizeof 540 */
     int TextureId;   /* +0x0 */
@@ -219,6 +234,16 @@ extern unsigned char ctrlflag;
 extern unsigned char sbookflag;
 extern OMENULIST MenuList[20];
 extern unsigned char GOLDR, GOLDG, GOLDB;
+extern unsigned char BLUER, BLUEG, BLUEB;
+extern unsigned char REDR, REDG, REDB;
+extern CFont LargeFont;
+extern unsigned long *ThisOt;
+extern OMENUITEM SoundMenu[7];
+int GetSpinnerWidth(int idx);   /* @0x8015B37C -- another module */
+BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP */
+BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP */
+void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP */
+void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP */
 extern int current_card;
 extern int card_status[2];
 extern int card_side_empty[2];
@@ -272,6 +297,22 @@ extern unsigned char Qfromoptions;
 extern BOOL DiabloDieFlag;
 extern BOOL PadFrig;
 void GO_DoGameOver(void);   /* @0x80082204 -- another module */
+void DrawCtrlSetup(void);   /* @0x8009D5D8 CTRL.CPP */
+BOOL PaletteFadeOut(int a);   /* @0x8007F2F8 PALETTE.CPP */
+BOOL PaletteFadeIn(int a);   /* @0x8007F1F0 PALETTE.CPP */
+BOOL GetFadeState(void);   /* @0x8007EEAC PALETTE.CPP */
+void pad_func_SplBook(int pad);   /* @0x800A2244 OPTIONS.CPP (or CTRL.CPP) */
+void StartQuestlog(void);   /* @0x80068D40 QUESTS.CPP */
+void pad_func_Chr(int pad);   /* @0x800A1FE0 */
+void DrawHelp(void);   /* @0x800AECD0 */
+BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP */
+void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP */
+TASK * TSK_Exist(TASK *T, unsigned long Id, unsigned long Mask);   /* @0x800206D8 TASKER.C */
+extern unsigned char invflag;
+extern char msgflag;
+extern BOOL initchr;
+extern int old_pad;
+void DrawMenu(int cmenu);   /* @0x800A72F4 OPTIONS.CPP -- not yet reconstructed in this TU */
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP */
 extern BOOL ignore_buttons;
 void ShowLoadingBox(int Str);   /* @0x800A5E5C CARDCORE.CPP */
@@ -300,5 +341,8 @@ void CharCardSelectMemcardPad(void);   /* @0x800AB0B8 OPTIONS.CPP:3432 */
 void CharacterLoadPad(void);   /* @0x800A839C OPTIONS.CPP:1522 */
 void MemcardPad(void);   /* @0x800A88F0 OPTIONS.CPP:1719 */
 void SoundPad(void);   /* @0x800A9260 OPTIONS.CPP:2043 */
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB,
+                  int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross,
+                  BOOL iso, unsigned char SinStep);   /* @0x800A6A44 OPTIONS.CPP:898 */
 
 #endif
