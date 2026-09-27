@@ -2019,17 +2019,15 @@ void MI_Lightctrl(int i)
     int dam, p, mx, my;
     MissileStruct *miss = &missile[i];
 
-    /* was missing entirely -- confirmed via raw oracle as literally the first instruction
-     * (mirange loaded/decremented/stored before anything else). */
     miss->_mirange--;
 
-    if (miss->_misource != -1) {
+    p = miss->_misource;
+    if (p != -1) {
         if (miss->_micaster == TARGET_MONSTERS) {
-            p = miss->_misource;
-            dam = (ENG_random(2) + ENG_random(plr[p]._pLevel) + 2) << 6;
+            dam = ENG_random(plr[p]._pLevel) + ENG_random(2) + 2;
+            dam <<= 6;
         } else {
-            p = miss->_misource;
-            dam = 2 * (monster[p].mMinDamage + ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1));
+            dam = 2 * (ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1) + monster[p].mMinDamage);
         }
     } else {
         dam = ENG_random(currlevel) + 2 * currlevel;
@@ -2043,36 +2041,28 @@ void MI_Lightctrl(int i)
     my = miss->_miy;
 
     /* PSX bounds against the raw dung_map extent (112) AFTER the position update, with an early
-     * AddUnLight+return -- no PC twin has this gate at all. Confirmed via raw oracle: the check
-     * uses the freshly-updated mx/my (post-GetMissilePos), not the pre-move _mix/_miy. */
+     * AddUnLight+return -- no PC twin has this gate at all. */
     if (mx >= 112 || my >= 112) {
-        AddUnLight(miss->_mlid);
         miss->_miDelFlag = 1;
+        AddUnLight(miss->_mlid);
         return;
     }
 
-    if (miss->_misource == -1) {
-        if ((mx != miss->_misx || my != miss->_misy) && GetMISSILE(mx, my))
-            miss->_mirange = 0;
-    } else if (GetMISSILE(mx, my)) {
+    if ((miss->_misource != -1 || mx != miss->_misx || my != miss->_misy) && GetMISSILE(mx, my))
         miss->_mirange = 0;
-    }
     if (!GetMISSILE(mx, my)) {
         if ((mx != miss->_miVar1 || my != miss->_miVar2) && mx > 0 && my > 0 && mx < 112 && my < 112) {
-            /* PSX-only: if the owning monster's type falls in either of two ranges
-             * (MType->mtype in [0x4C,0x4F] or [0x6B,0x6E]), use MIS_LIGHTNING2(0x17) instead of
-             * MIS_LIGHTNING(8) -- confirmed via raw oracle; only reached when _misource != -1 and
-             * _micaster == TARGET_PLAYERS. No PC twin equivalent for the second range. */
-            int mistype = MIS_LIGHTNING;
-            if (miss->_misource != -1 && miss->_micaster == TARGET_PLAYERS) {
-                unsigned char mt = monster[miss->_misource].MType->mtype;
-                if ((unsigned char)(mt - 0x4C) < 4 || (unsigned char)(mt - 0x6B) < 4)
-                    mistype = 0x17; /* MIS_LIGHTNING2 */
+            /* PSX-only: monster casters of type [0x4C,0x4F] or [0x6B,0x6E] spawn MIS_LIGHTNING2
+             * (0x17) and play the cast SFX on the first tick; everything else MIS_LIGHTNING. */
+            if (miss->_misource != -1 && miss->_micaster == TARGET_PLAYERS
+                && ((monster[miss->_misource].MType->mtype >= 0x4C && monster[miss->_misource].MType->mtype <= 0x4F)
+                    || (monster[miss->_misource].MType->mtype >= 0x6B && monster[miss->_misource].MType->mtype <= 0x6E))) {
+                AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, 0x17 /* MIS_LIGHTNING2 */, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
+                if (miss->_mirange >= 254)
+                    PlaySfxLoc(0x50, miss->_mix, miss->_miy);
+            } else {
+                AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, MIS_LIGHTNING, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
             }
-            AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, mistype, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
-            /* PSX-only: on the very first tick (mirange >= 254) plays a cast SFX -- no PC twin. */
-            if (miss->_mirange >= 254)
-                PlaySfxLoc(0x50, miss->_mix, miss->_miy);
             miss->_miVar1 = miss->_mix;
             miss->_miVar2 = miss->_miy;
         }
