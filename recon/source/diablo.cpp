@@ -16,6 +16,12 @@
 
 #define MAX_PLRS 2
 
+/* file statics (SYM class STAT, .bss @0x8012EAE8..) */
+static int glEndSeed[17];
+static int glMid1Seed[17];
+static int glMid2Seed[17];
+static int glMid3Seed[17];
+
 void FreeGameMem(void)
 {
     music_stop();
@@ -94,56 +100,53 @@ void LittleStart(unsigned char bNewGame, unsigned char bSinglePlayer)
 
 unsigned char StartGame(unsigned char bNewGame, unsigned char bSinglePlayer)
 {
-    unsigned char fExitProgram;
-    unsigned int uMsg;
-
     gbSelectProvider = 1;
     InitGamePadVars();
 
-    do {
+    while (1) {
+        unsigned char fExitProgram;
+        unsigned int uMsg;
+
         fExitProgram = 0;
         if (!NetInit(bSinglePlayer, &fExitProgram)) {
             gbRunGameResult = !fExitProgram;
             break;
         }
+
         gbSelectProvider = 0;
 
-        {
-            int post;
-            if (bNewGame && demo_pad_time) {
-                post = 0x4D;
-                uMsg = 0;
-                currlevel = level_record;
-                leveltype = gnLevelTypeTbl[(unsigned char)level_record];
-                goto post_msg;
-            }
-            if (!bNewGame && gbValidSaveFile) {
-                uMsg = 0;
-                post = 0x4B;
-                goto post_msg;
-            }
+        if (bNewGame && demo_pad_time) {
+            currlevel = level_record;
+            leveltype = gnLevelTypeTbl[(unsigned char)level_record];
+            GRL_PostMessage(ghMainWnd, 0x4D, 0, 0);
+            uMsg = 0;
+        } else if (bNewGame || !gbValidSaveFile) {
             OVR_LoadPregame();
             uMsg = 0x4A;
             InitLevels();
             InitQuests();
             InitPortals();
             InitDungMsgs(myplr);
-            goto post_done;
-post_msg:
-            GRL_PostMessage(ghMainWnd, post, 0, 0);
-post_done:
-            ;
+        } else {
+            GRL_PostMessage(ghMainWnd, 0x4B, 0, 0);
+            uMsg = 0;
         }
 
         if (FePlayerNo && !plr[1].plractive && plr[1]._pHitPoints) {
-            NetSendCmdLocParam1(1, 0x35, plr[1]._px, plr[1]._py, plr[0].plrlevel);
+            myplr = 1;
+            NetSendCmdLocParam1(1, 0x35, plr[myplr]._px, plr[myplr]._py, plr[0].plrlevel);
             plr[1].plractive = 1;
             myplr = 0;
         }
 
         SetAmbientLight();
         run_game_loop(uMsg);
-    } while (gbMaxPlayers != 1 && gbRunGameResult);
+
+        if (gbMaxPlayers == 1)
+            break;
+        if (!gbRunGameResult)
+            break;
+    }
 
     return gbRunGameResult;
 }
@@ -390,17 +393,18 @@ void ClearOutDungeonMap(void)
         }
     }
 
-    if (!istown) {
-        for (int y = 0; y < 40; y++)
-            for (int x = 0; x < 40; x++)
-                mydflags[y * 40 + x] = 0;
-        for (int y = 0; y < 40; y++)
-            for (int x = 0; x < 40; x++)
-                pdungeon[y][x] = 0;
-        for (int y = 0; y < 48; y++)
-            for (int x = 0; x < 48; x++)
-                dungeon[y][x] = val;
-    }
+    if (istown)
+        return;
+
+    for (int y = 0; y < 40; y++)
+        for (int x = 0; x < 40; x++)
+            mydflags[y * 40 + x] = 0;
+    for (int y = 0; y < 40; y++)
+        for (int x = 0; x < 40; x++)
+            pdungeon[x][y] = 0;
+    for (int y = 0; y < 48; y++)
+        for (int x = 0; x < 48; x++)
+            dungeon[x][y] = val;
 }
 
 void AddQuestItems(void)
@@ -420,7 +424,6 @@ void AllSolid(int x, int y)
 void FillCrapBits(void)
 {
     struct QuestStruct *qs;
-    int x, y;
 
     switch (currlevel) {
     case 3:                                             /* Q_SKELKING */
@@ -433,23 +436,21 @@ void FillCrapBits(void)
         break;
     case 15:
         qs = &quests[15];                              /* Q_BETRAYER */
-        if (!setlevel)
-            break;
-        if (!qs->_qactive)
-            break;
-        if (setlvlnum != qs->_qslvl)
-            break;
-        for (y = 18; y < 62; y++)
-            for (x = 56; x < 58; x++)
-                AllSolid(x, y);
-        for (y = 60; y < 62; y++)
-            for (x = 40; x < 46; x++)
-                AllSolid(x, y);
-        if (qs->_qvar1 < 4) {
-            AllSolid(0x20, 0x30);
-            AllSolid(0x21, 0x30);
-            AllSolid(0x20, 0x31);
-            AllSolid(0x21, 0x31);
+        if (setlevel && qs->_qactive && setlvlnum == qs->_qslvl) {
+            int x, y;
+
+            for (y = 18; y < 62; y++)
+                for (x = 56; x < 58; x++)
+                    AllSolid(x, y);
+            for (y = 60; y < 62; y++)
+                for (x = 40; x < 46; x++)
+                    AllSolid(x, y);
+            if (qs->_qvar1 < 4) {
+                AllSolid(0x20, 0x30);
+                AllSolid(0x21, 0x30);
+                AllSolid(0x20, 0x31);
+                AllSolid(0x21, 0x31);
+            }
         }
         break;
     }
@@ -494,9 +495,7 @@ void Lrestoreplrpos(void)
  *    "doubled calls" guess (there is no duplication; it is a real if/else). */
 void LoadGameLevel(unsigned char firstflag, int lvldir)
 {
-    static int glMid1Seed[17], glMid2Seed[17], glMid3Seed[17], glEndSeed[17];
-    int i;
-    BOOL visited;
+    int i, j;
 
     AllocdPiece();
     mydflags = (unsigned char *)Tmalloc(0x640);
@@ -529,6 +528,8 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
     InitLevelMonsters();
 
     if (!setlevel) {
+        unsigned char visited;
+
         CreateLevel(lvldir);
         FillSolidBlockTbls();
         SetRndSeed(glSeedTbl[currlevel]);
@@ -554,11 +555,9 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
         InitMultiView();
 
         visited = 0;
-        if (FePlayerNo >= 0) {
-            for (i = 0; i <= FePlayerNo; i++) {
-                if (plr[i].plractive)
-                    visited = visited || plr[i]._pLvlVisited[currlevel];
-            }
+        for (i = 0; i <= FePlayerNo; i++) {
+            if (plr[i].plractive)
+                visited = visited || plr[i]._pLvlVisited[currlevel];
         }
 
         SetRndSeed(glSeedTbl[currlevel]);
@@ -598,9 +597,9 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
             SavePreLighting();
             Lrestoreplrpos();
         } else {
-            for (int x = 0; x < 96; x++)
-                for (int y = 0; y < 96; y++)
-                    dung_map[x][y].dFlags |= 3;
+            for (i = 0; i < 96; i++)
+                for (j = 0; j < 96; j++)
+                    dung_map[i][j].dFlags |= 3;
             InitTowners();
             InitItems(1);
             InitMissiles();
@@ -647,18 +646,16 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
     ClrDiabloMsg();
     FillCrapBits();
 
-    if (FePlayerNo >= 0) {
-        for (i = 0; i <= FePlayerNo; i++) {
-            plr[i].plrlevel = currlevel;
-            InitPlayerGFX(i);
-            if (lvldir == 4) {
-                plr[i]._plid = AddVision(plr[i]._px, plr[i]._py, plr[i]._pLightRad, i);
-            } else if (LoadedChar[i]) {
+    for (i = 0; i <= FePlayerNo; i++) {
+        plr[i].plrlevel = currlevel;
+        InitPlayerGFX(i);
+        if (lvldir != 4) {
+            if (!LoadedChar[i])
                 InitPlayer(i, firstflag);
-            } else {
+            else
                 PlacePlayer(i, ViewX, ViewY, 0);
-            }
-        }
+        } else
+            plr[i]._pvid = AddVision(plr[i]._px, plr[i]._py, 10, i);
     }
 
     ChangeLightXY(plr[0]._plid, plr[0]._px, plr[0]._py);

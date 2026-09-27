@@ -1,5 +1,5 @@
 extern struct LightListStruct2 LightList[80];   /* @0x800D6300 */
-extern unsigned char lightactive[80];   /* @0x800D6580 */
+extern unsigned char lightactive[];   /* @0x800D6580 */
 extern struct LightListStruct VisionList[32];   /* @0x800D65D0 */
 extern unsigned char TransList[256];   /* @0x800E7928 */
 extern char TransVal;   /* @0x8011C148 */

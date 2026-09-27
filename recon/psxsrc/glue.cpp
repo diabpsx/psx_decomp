@@ -68,6 +68,7 @@ extern "C" void StartStand__FP12PlayerStructi(struct PlayerStruct *P, int Dir);
 
 struct RECT { short x, y, w, h; };   /* sizeof 8 */
 struct TextDat;
+struct PanelXY;
 struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record) */
     int HealthAnimCount;    /* +0x0 */
     int ManaAnimCount;      /* +0x4 */
@@ -75,11 +76,12 @@ struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record
     struct RECT MsgRect;    /* +0xC */
     struct TextDat *PanelTData;   /* +0x14 */
     int GPanelOt;           /* +0x18 */
+
+    GPanel(int Ofs);
+    void Print(struct PanelXY *XY, struct PlayerStruct *Plr);
 };
-struct PanelXY;
 extern struct PanelXY DefP1PanelXY, DefP2PanelXY, DefP1PanelXY2, DefP2PanelXY2;
 extern int sel_data;
-extern "C" void Print__6GPanelP7PanelXYP12PlayerStruct(struct GPanel *P, struct PanelXY *XY, void *Plr);
 
 /* ---- BgTask externs ---- */
 extern "C" int GetFadeState__Fv(void);
@@ -98,30 +100,18 @@ extern struct Quests quests;
 extern void *gplayer;
 int D_8011AFF0;   /* TU-owned; only written here (paired with D_8011AFF4/HasGameStarted) */
 
-extern "C" void __7CBlocksiiiii(struct CBlocks *This, int a, int b, int c, int d, int e);
-extern "C" void SetTownersGraphics__7CBlocks(struct CBlocks *This);
 extern "C" int GM_UseTexData__Fi(int Id);
 extern int MissDat;
 extern "C" void music_start__Fi(int LevelType);
 extern "C" void PaletteFadeIn__Fi(int Ticks);
-extern "C" void SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(struct CPlayer *Player, struct PlayerStruct *Plr, struct CBlocks *Blocks);
 extern "C" void PlaySFX__Fi(int Id);
 extern "C" void ResetFlames__Fv(void);
-extern "C" void SetRandOffset__7CBlocksi(struct CBlocks *This, int Amount);
-extern "C" void DoScroll__7CBlocks(struct CBlocks *This);
-extern "C" void Print__7CBlocks(struct CBlocks *This);
 extern "C" void DrawAndBlit__Fv(void);
-extern "C" void Print__7CPlayerR12PlayerStructR7CBlocks(struct CPlayer *Player, struct PlayerStruct *Plr, struct CBlocks *Blocks);
 extern "C" void DrawLBird__Fv(void);
 extern "C" void GO_DoGameOver__Fv(void);
 extern "C" void VID_GetTick__Fv(void);
-extern "C" void __7CPlayerbii(struct CPlayer *This, BOOL InTown, int Which, int PlayerNum);
-extern "C" void ___7CPlayer(struct CPlayer *This, int Flag);
-extern "C" void ___7CBlocks(struct CBlocks *This, int Flag);
 extern "C" void FinishProgress__Fv(void);
 extern "C" void TakeDownCutScreen__Fv(void);
-struct GPanel;
-extern "C" void __6GPaneli(struct GPanel *This, int Arg);
 
 /* Minimal local layouts (this TU only touches these fields; matches davel.cpp's CPlayer). */
 class CPlayer {
@@ -130,9 +120,13 @@ public:
     int TexId;   /* +0x80 */
     unsigned char pad1[144 - 0x84];   /* sizeof CPlayer = 144 per retail SYM */
 
+    CPlayer(BOOL InTown, int Which, int PlayerNum);
+    ~CPlayer();
     int GetTexId(void);
     void Load(int Id);
     void NonBlockingLoadNewGFX(int Id);
+    void SetScrollTarget(struct PlayerStruct &Plr, class CBlocks &Blocks);
+    void Print(struct PlayerStruct &Plr, class CBlocks &Blocks);
 };
 
 class CBlocks {
@@ -146,8 +140,14 @@ public:
     int ScrollY;           /* +0xD4 */
     unsigned char pad2[264 - 0xD8];   /* sizeof CBlocks = 264 per retail SYM */
 
+    CBlocks(int TextId, int MLev, int c, int Level, int List);
+    ~CBlocks();
     void SetTown(BOOL Val);
     void MoveToScrollTarget(void);
+    void SetTownersGraphics(void);
+    void SetRandOffset(int Amount);
+    void DoScroll(void);
+    void Print(void);
 };
 
 /* TU-owned small data */
@@ -411,28 +411,23 @@ void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
     if (plr[0x1D] != 0) {
         if (plr[0x1A05] != 0) {
             sel_data = 0;
-            Print__6GPanelP7PanelXYP12PlayerStruct(P1, &DefP1PanelXY2, &plr[0]);
+            P1->Print(&DefP1PanelXY2, (struct PlayerStruct *)&plr[0]);
             sel_data = 1;
-            Print__6GPanelP7PanelXYP12PlayerStruct(P2, &DefP2PanelXY2, &plr[0x19E8]);
+            P2->Print(&DefP2PanelXY2, (struct PlayerStruct *)&plr[0x19E8]);
         } else {
             sel_data = 0;
-            Print__6GPanelP7PanelXYP12PlayerStruct(P1, &DefP1PanelXY, &plr[0]);
+            P1->Print(&DefP1PanelXY, (struct PlayerStruct *)&plr[0]);
         }
         return;
     }
     if (plr[0x1A05] != 0) {
         sel_data = 1;
-        Print__6GPanelP7PanelXYP12PlayerStruct(P2, &DefP2PanelXY, &plr[0x19E8]);
+        P2->Print(&DefP2PanelXY, (struct PlayerStruct *)&plr[0x19E8]);
     }
 }
 
 void BgTask(struct TASK *T)
 {
-    struct CBlocks Blocks;
-    struct CPlayer P1, P2;
-    struct GPanel Panel1Obj, Panel2Obj;
-    struct GPanel *Panel1 = &Panel1Obj;
-    struct GPanel *Panel2 = &Panel2Obj;
     struct DEF_ARGS *Args;
     int TextId, Level, MLev;
     BOOL IsTown;
@@ -465,11 +460,11 @@ void BgTask(struct TASK *T)
         MLev = 0xCE;
         List = (void *)GLUE_GetMonsterList();
     }
-    __7CBlocksiiiii(&Blocks, TextId, MLev, 0, Level, (int)List);
+    CBlocks Blocks(TextId, MLev, 0, Level, (int)List);
     Blocks.SetTown(IsTown);
     UPDATEPROGRESS__Fi(4);
-    __7CPlayerbii(&P1, IsTown, 0, FePlayerNo);
-    __7CPlayerbii(&P2, IsTown, 1, FePlayerNo);
+    CPlayer P1(IsTown, 0, FePlayerNo);
+    CPlayer P2(IsTown, 1, FePlayerNo);
     MakeSurePlayerDressedProperly(P1, *(struct PlayerStruct *)&plr[0], IsTown, 1);
     if (FePlayerNo != 0) {
         MakeSurePlayerDressedProperly(P2, *(struct PlayerStruct *)&plr[0x19E8], IsTown, 1);
@@ -480,19 +475,21 @@ void BgTask(struct TASK *T)
     if (leveltype != 0) {
         MissDat = GM_UseTexData__Fi(0xD0);
     } else {
-        SetTownersGraphics__7CBlocks(&Blocks);
+        Blocks.SetTownersGraphics();
         MissDat = GM_UseTexData__Fi(0xCD);
     }
     music_start__Fi(leveltype);
     PaletteFadeIn__Fi(8);
-    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)&plr[0], &Blocks);
+    P1.SetScrollTarget(*(struct PlayerStruct *)&plr[0], Blocks);
     Blocks.MoveToScrollTarget();
     GLUE_SetShowGameScreenFlag(1);
     GLUE_SetHomingScrollFlag(1);
     GLUE_SetShowPanelFlag(1);
     TSK_AddTask(0x8000, (void *)DaveLTask__FP4TASK, 0x1000, 0);
-    __6GPaneli(Panel1, 0);
-    __6GPaneli(Panel2, 0);
+    struct GPanel Panel1Obj(0);
+    struct GPanel Panel2Obj(0);
+    struct GPanel *Panel1 = &Panel1Obj;
+    struct GPanel *Panel2 = &Panel2Obj;
     gplayer = &P1;
     VID_GetTick__Fv();
     D_8011AFF0 = 0;
@@ -509,27 +506,27 @@ void BgTask(struct TASK *T)
         ResetFlames__Fv();
         if (DoDrawBg != 0) {
             if (PauseMode == 0 && D_8011C6C0 != 0) {
-                SetRandOffset__7CBlocksi(&Blocks, D_8011C6C4);
+                Blocks.SetRandOffset(D_8011C6C4);
                 D_8011C6C0 -= 1;
             }
             Plr = &plr[0];
             if (plr[0x1D] == 0) {
                 Plr = &plr[0x19E8];
             }
-            SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)Plr, &Blocks);
+            P1.SetScrollTarget(*(struct PlayerStruct *)Plr, Blocks);
             if (DoHomingScroll != 0 && deathflag == 0) {
-                DoScroll__7CBlocks(&Blocks);
+                Blocks.DoScroll();
             }
-            Print__7CBlocks(&Blocks);
+            Blocks.Print();
             DrawAndBlit__Fv();
             if (DoShowPanel != 0) {
                 DoShowPanelGFX(Panel1, Panel2);
             }
             MakeSurePlayerDressedProperly(P1, *(struct PlayerStruct *)&plr[0], IsTown, 0);
-            Print__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)&plr[0], &Blocks);
+            P1.Print(*(struct PlayerStruct *)&plr[0], Blocks);
             if (FePlayerNo != 0) {
                 MakeSurePlayerDressedProperly(P2, *(struct PlayerStruct *)&plr[0x19E8], IsTown, 0);
-                Print__7CPlayerR12PlayerStructR7CBlocks(&P2, (struct PlayerStruct *)&plr[0x19E8], &Blocks);
+                P2.Print(*(struct PlayerStruct *)&plr[0x19E8], Blocks);
             }
             if (IsTown) {
                 DrawLBird__Fv();
@@ -541,7 +538,4 @@ void BgTask(struct TASK *T)
         TSK_Sleep(1);
     }
     D_8011AFF4 = 0;
-    ___7CPlayer(&P2, 2);
-    ___7CPlayer(&P1, 2);
-    ___7CBlocks(&Blocks, 2);
 }

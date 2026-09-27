@@ -640,6 +640,122 @@ void ProcessObjects(void)
     }
 }
 
+void MonstCheckDoors(int m)
+{
+    int i, oi, dpx, dpy;
+    int mx, my;
+
+    mx = monster[m]._mx;
+    my = monster[m]._my;
+    if (!(dung_map[mx - 1][my - 1].dObject
+          || dung_map[mx][my - 1].dObject
+          || dung_map[mx + 1][my - 1].dObject
+          || dung_map[mx - 1][my].dObject
+          || dung_map[mx + 1][my].dObject
+          || dung_map[mx - 1][my + 1].dObject
+          || dung_map[mx][my + 1].dObject
+          || dung_map[mx + 1][my + 1].dObject))
+        return;
+    for (i = 0; i < numobjects; i++) {
+        oi = objectactive[i];
+        if (object[oi]._otype == 1 || object[oi]._otype == 2) {
+            if (object[oi]._oVar4 == 0) {
+                dpx = abs(object[oi]._ox - mx);
+                dpy = abs(object[oi]._oy - my);
+                if (dpx == 1 && dpy <= 1 && object[oi]._otype == 1)
+                    OperateL1LDoor(myplr, oi, 1);
+                if (dpx <= 1 && dpy == 1 && object[oi]._otype == 2)
+                    OperateL1RDoor(myplr, oi, 1);
+            }
+        }
+        if (object[oi]._otype == 0x2A || object[oi]._otype == 0x2B) {
+            if (object[oi]._oVar4 == 0) {
+                dpx = abs(object[oi]._ox - mx);
+                dpy = abs(object[oi]._oy - my);
+                if (dpx == 1 && dpy <= 1 && object[oi]._otype == 0x2A)
+                    OperateL2LDoor(myplr, oi, 1);
+                if (dpx <= 1 && dpy == 1 && object[oi]._otype == 0x2B)
+                    OperateL2RDoor(myplr, oi, 1);
+            }
+        }
+        if (object[oi]._otype == 0x4A || object[oi]._otype == 0x4B) {
+            if (object[oi]._oVar4 == 0) {
+                dpx = abs(object[oi]._ox - mx);
+                dpy = abs(object[oi]._oy - my);
+                if (dpx == 1 && dpy <= 1 && object[oi]._otype == 0x4B)
+                    OperateL3RDoor(myplr, oi, 1);
+                if (dpx <= 1 && dpy == 1 && object[oi]._otype == 0x4A)
+                    OperateL3LDoor(myplr, oi, 1);
+            }
+        }
+    }
+}
+
+void BreakBarrel(int pnum, int i, int dam, unsigned char forcebreak, unsigned char sendmsg)
+{
+    int x, y, oi;
+
+    if (object[i]._oSelFlag == 0)
+        return;
+    if (forcebreak) {
+        object[i]._oVar1 = 0;
+    } else {
+        object[i]._oVar1 -= dam;
+        if (pnum != myplr && object[i]._oVar1 <= 0)
+            object[i]._oVar1 = 1;
+    }
+    if (object[i]._oVar1 > 0) {
+        if (!deltaload)
+            PlaySfxLoc(0x1D, object[i]._ox, object[i]._oy);
+        return;
+    }
+    object[i]._oVar1 = 0;
+    object[i]._oAnimFlag = 1;
+    object[i]._oAnimFrame = 1;
+    object[i]._oAnimDelay = 1;
+    object[i]._oSolidFlag = 0;
+    object[i]._oMissFlag = 1;
+    object[i]._oBreak = -1;
+    object[i]._oSelFlag = 0;
+    object[i]._oPreFlag = 1;
+    if (deltaload) {
+        object[i]._oAnimFrame = object[i]._oAnimLen;
+        object[i]._oAnimCnt = 0;
+        object[i]._oAnimDelay = 1000;
+        return;
+    }
+    if (object[i]._otype == 0x3A) {
+        PlaySfxLoc(0xE, object[i]._ox, object[i]._oy);
+        object[i]._olid = AddLight(object[i]._ox, object[i]._oy, 0x33);
+        object[i]._oVar1 = 1;
+        for (y = object[i]._oy - 1; y <= object[i]._oy + 1; y++) {
+            for (x = object[i]._ox - 1; x <= object[i]._ox + 1; x++) {
+                if (dung_map[x][y].dMonster > 0)
+                    MonsterTrapHit(dung_map[x][y].dMonster - 1, 1, 4, 0, 1, 0);
+                if (IsDplayer(x, y))
+                    PlayerMHit(IsDplayer(x, y) - 1, -1, 0, 8, 16, 1, 0, 0);
+                if (dung_map[x][y].dObject > 0) {
+                    oi = dung_map[x][y].dObject - 1;
+                    if (object[oi]._otype == 0x3A && object[oi]._oBreak != -1)
+                        BreakBarrel(pnum, oi, dam, 1, sendmsg);
+                }
+            }
+        }
+    } else {
+        PlaySfxLoc(0xF, object[i]._ox, object[i]._oy);
+        SetRndSeed(object[i]._oRndSeed);
+        if (object[i]._oVar2 < 2) {
+            if (object[i]._oVar3 == 0)
+                CreateRndUseful(pnum, object[i]._ox, object[i]._oy, sendmsg);
+            else
+                CreateRndItem(object[i]._ox, object[i]._oy, 0, sendmsg, 0);
+        }
+        if (object[i]._oVar2 >= 8)
+            SpawnSkeleton(object[i]._oVar4, object[i]._ox, object[i]._oy);
+    }
+    NetSendCmdParam2(0, 0x2F, pnum, i);
+}
+
 void PostAddObject(int ot, int ox, int oy)
 {
     int oi;
@@ -649,7 +765,14 @@ void PostAddObject(int ot, int ox, int oy)
     if (QuestStatus(9) && (oi = dung_map[ox][oy].dObject) != 0) {
         oi--;
         if (ot == 0x2A) {
-            if (deltaload) {
+            if (!deltaload) {
+                if (object[oi]._oVar4 == 1)
+                    NetSendCmdParam1(1, 0x2C, oi);
+                ObjSetMicro(ox, oy, 0x21A);
+                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
+                object[oi]._oSelFlag = 1;
+                object[oi]._oVar4 = 0;
+            } else {
                 if (object[oi]._oVar4 != 0) {
                     ObjSetMicro(ox, oy, 0x11);
                     dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x99;
@@ -661,16 +784,16 @@ void PostAddObject(int ot, int ox, int oy)
                     object[oi]._oSelFlag = 1;
                     object[oi]._oVar4 = 0;
                 }
-            } else {
-                if (object[oi]._oVar4 == 1)
-                    NetSendCmdParam1(1, 0x2C, oi);
-                ObjSetMicro(ox, oy, 0x21A);
-                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
-                object[oi]._oSelFlag = 1;
-                object[oi]._oVar4 = 0;
             }
         } else if (ot == 0x2B) {
-            if (deltaload) {
+            if (!deltaload) {
+                if (object[oi]._oVar4 == 1)
+                    NetSendCmdParam1(1, 0x2C, oi);
+                ObjSetMicro(ox, oy, 0x21C);
+                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
+                object[oi]._oSelFlag = 2;
+                object[oi]._oVar4 = 0;
+            } else {
                 if (object[oi]._oVar4 != 0) {
                     ObjSetMicro(ox, oy, 0xD);
                     dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x98;
@@ -682,13 +805,6 @@ void PostAddObject(int ot, int ox, int oy)
                     object[oi]._oSelFlag = 2;
                     object[oi]._oVar4 = 0;
                 }
-            } else {
-                if (object[oi]._oVar4 == 1)
-                    NetSendCmdParam1(1, 0x2C, oi);
-                ObjSetMicro(ox, oy, 0x21C);
-                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
-                object[oi]._oSelFlag = 2;
-                object[oi]._oVar4 = 0;
             }
         } else {
             goto create_new;
@@ -915,8 +1031,12 @@ void OperateSChambBk(int pnum, int i)
         return;
     if (object[i]._oAnimFrame != object[i]._oVar6) {
         ObjChangeMapResync(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-        for (j = 0; j < numobjects; j++)
-            SyncObjectAnim(objectactive[j]);
+        for (j = 0; j < numobjects; j++) {
+            int oi;
+
+            oi = objectactive[j];
+            SyncObjectAnim(oi);
+        }
     }
     object[i]._oAnimFrame = object[i]._oVar6;
     if (quests[13]._qactive == 1) {

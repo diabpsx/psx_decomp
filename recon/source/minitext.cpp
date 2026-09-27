@@ -23,13 +23,16 @@ static int qtexty;
 static BOOL qtbodge;
 static int textadj;
 static int fetextadj;
-static unsigned char FadeState;
+static char FadeState;
 static BOOL MusicFading;
 static int iBookName;
 static unsigned long sgLastScroll;
 static unsigned long scrolltexty;
 static int TextNum;
+int TextWait;   /* @0x8011B95C EXT, gp-rel in the oracle -> TU-owned */
 static BOOL qtextonflag;
+
+Dialog QBack;   /* @0x800D6790 -- first initialized public global: names the _GLOBAL_.I/D.QBack thunks */
 
 void FreeQuestText(void)
 {
@@ -59,13 +62,14 @@ void CalcTextSpeed(const char *Name)
     char *ptr;
     char SpeechName[16];
     unsigned long SfxFrames;
-    LANG_TYPE Lang;
-    char Prefix[2];
-    RECT Window;
     unsigned long TextHeight;
 
     ptr = (char *)qtextptr;
     if (FileSYS == 2) {
+        LANG_TYPE Lang;
+        char Prefix[2];
+        RECT Window;
+
         Lang = LANG_GetLang();
         switch (Lang) {
         case LANG_ENGLISH:
@@ -93,16 +97,17 @@ void CalcTextSpeed(const char *Name)
         SfxFrames = BL_FileLength(SpeechName, 0);
         if (SfxFrames == 0)
             DBG_Error(0, "source/MINITEXT.cpp", 0xAF);
+        SfxFrames /= 105;
         Window.x = 0;
         Window.y = 0;
         Window.w = 0x118;
         Window.h = -1;
-        TextHeight = MediumFont.GetWrap(ptr, &Window);
+        TextHeight = MediumFont.GetWrap(ptr, &Window) * 15 + 0xD7;
         if (FeFlag != 0)
-            textadj = fetextadj;
-        qtextSpd = (((SfxFrames * 0x38138139) >> 32) * 15 + 0xD7 - textadj) << 16 / TextHeight;
-        qtbodge = 0;
-        scrolltexty = qtexty << 16;
+            TextHeight -= fetextadj;
+        else
+            TextHeight -= textadj;
+        qtextSpd = (TextHeight << 16) / SfxFrames;
     } else {
         qtextSpd = 0x10000;
     }
@@ -113,45 +118,37 @@ void CalcTextSpeed(const char *Name)
 void FadeMusicTSK(TASK *T)
 {
     long MusicVolume;
-    int Command;
-    unsigned char state;
 
     if (MusicFading == 0) {
         MusicVolume = sglMusicVolume;
-        state = FadeState;
         MusicFading = 1;
-        if ((signed char)FadeState != 0) {
-            do {
-                if (sghMusic != NULL) {
-                    switch ((signed char)state) {
-                    case 2:
-                        if (MusicVolume < sglMusicVolume) {
-                            if (sghMusic->state == 3)
-                                STR_SoundCommand(sghMusic, 4);
-                            MusicVolume += 0x80;
-                        } else {
-                            if (sghMusic->state == 3)
-                                STR_SoundCommand(sghMusic, 4);
-                            FadeState = 0;
-                        }
-                        break;
-                    case 3:
-                        if (MusicVolume > 0) {
-                            MusicVolume -= 0x40;
-                        } else {
-                            STR_SoundCommand(sghMusic, 3);
-                            FadeState = 1;
-                        }
-                        break;
+        while (FadeState != 0) {
+            if (sghMusic != NULL) {
+                switch (FadeState) {
+                case 2:
+                    if (MusicVolume < sglMusicVolume) {
+                        if (sghMusic->state == 3)
+                            STR_SoundCommand(sghMusic, 4);
+                        MusicVolume += 0x80;
+                    } else {
+                        if (sghMusic->state == 3)
+                            STR_SoundCommand(sghMusic, 4);
+                        FadeState = 0;
                     }
-                    Command = (MusicVolume * sglMasterVolume) >> 8;
-                    sghMusic->volume = Command;
-                    sghMusic->s_volume = Command;
-                    STR_setvolume(sghMusic);
+                    break;
+                case 3:
+                    if (MusicVolume > 0) {
+                        MusicVolume -= 0x40;
+                    } else {
+                        STR_SoundCommand(sghMusic, 3);
+                        FadeState = 1;
+                    }
+                    break;
                 }
-                TSK_Sleep(1);
-                state = FadeState;
-            } while ((signed char)FadeState != 0);
+                sghMusic->s_volume = sghMusic->volume = (MusicVolume * sglMasterVolume) >> 8;
+                STR_setvolume(sghMusic);
+            }
+            TSK_Sleep(1);
         }
         MusicFading = 0;
     }
@@ -159,77 +156,72 @@ void FadeMusicTSK(TASK *T)
 
 void InitQTextMsg(int m)
 {
-    int i;
-    TASK *t;
-    void **args;
-
     TextNum = m;
-    if (qtextflag == 0) {
-        qtextflag = 1;
-        gbProcessPlayers = 0;
-        PauseMode = 1;
+    if (qtextflag != 0)
+        return;
+    qtextflag = 1;
+    gbProcessPlayers = 0;
+    PauseMode = 1;
+    TSK_Sleep(1);
+    if (FeFlag != 0) {
+        switch (m) {
+        case 0x103:
+            iBookName = 0x2001;
+            break;
+        case 0x104:
+            iBookName = 0x2002;
+            break;
+        case 0x105:
+            iBookName = 0x2003;
+            break;
+        case 0x106:
+            iBookName = 0x2004;
+            break;
+        case 0x107:
+            iBookName = 0x2005;
+            break;
+        case 0x108:
+            iBookName = 0x2006;
+            break;
+        case 0x109:
+            iBookName = 0x2007;
+            break;
+        case 0x10A:
+            iBookName = 0x2008;
+            break;
+        case 0x10B:
+            iBookName = 0x2009;
+            break;
+        case 0x10C:
+            iBookName = 0x200A;
+            break;
+        }
+    }
+    stream_stop();
+    for (int i = 1; i < 24; i++)
+        SpuSetKey(0, 1 << i);
+    while (SFXTab[1].used)
         TSK_Sleep(1);
-        if (FeFlag != 0) {
-            switch (m) {
-            case 0x103:
-                iBookName = 0x2001;
-                break;
-            case 0x104:
-                iBookName = 0x2002;
-                break;
-            case 0x105:
-                iBookName = 0x2003;
-                break;
-            case 0x106:
-                iBookName = 0x2004;
-                break;
-            case 0x107:
-                iBookName = 0x2005;
-                break;
-            case 0x108:
-                iBookName = 0x2006;
-                break;
-            case 0x109:
-                iBookName = 0x2007;
-                break;
-            case 0x10A:
-                iBookName = 0x2008;
-                break;
-            case 0x10B:
-                iBookName = 0x2009;
-                break;
-            case 0x10C:
-                iBookName = 0x200A;
-                break;
-            }
+    if (alltext[m].scrlltxt != 0) {
+        DEF_ARGS *args;
+        CDWAIT = 1;
+        if (FadeState == 0)
+            TSK_AddTask(0, (void (*)())FadeMusicTSK, 0x800, 0);
+        FadeState = 3;
+        if (stextflag != 0) {
+            GLUE_SetShowGameScreenFlag(0);
+            GLUE_SetShowPanelFlag(0);
+            GLUE_SuspendGame();
+            TSK_Sleep(1);
         }
-        stream_stop();
-        i = 1;
-        do {
-            SpuSetKey(0, 1 << i);
-            i++;
-        } while (i < 24);
-        if (alltext[m].scrlltxt != 0) {
-            CDWAIT = 1;
-            if (FadeState == 0)
-                TSK_AddTask(0, (void (*)())FadeMusicTSK, 0x800, 0);
-            FadeState = 3;
-            if (stextflag != 0) {
-                GLUE_SetShowGameScreenFlag(0);
-                GLUE_SetShowPanelFlag(0);
-                GLUE_SuspendGame();
-                TSK_Sleep(1);
-            }
-            if (options_pad == -1)
-                options_pad = myplr;
-            qtextptr = NULL;
-            qtexty = 0xE6;
-            t = TSK_AddTask(0, (void (*)())DrawQTextTSK, 0x800, 0x10);
-            args = (void **)t->Data;
-            args[0] = (void *)options_pad;
-            args[1] = (void *)m;
-            return;
-        }
+        if (options_pad == -1)
+            options_pad = myplr;
+        qtextptr = NULL;
+        qtexty = 0xE6;
+        args = (DEF_ARGS *)TSK_AddTask(0, (void (*)())DrawQTextTSK, 0x800, 0x10)->Data;
+        args->a0 = options_pad;
+        args->a1 = m;
+    } else {
         qtextflag = 0;
         PauseMode = 0;
         CDWAIT = 0;
@@ -240,36 +232,32 @@ void InitQTextMsg(int m)
 
 void DrawQTextBack(void)
 {
-    char BookName[80];
-    RECT ClipRect;
-    int oldot;
-    int H;
-    int h;
-
     QBack.SetBorder(0x1A);
     QBack.SetRGB(BORDERR, BORDERG, BORDERB);
     if (stextflag != 0 && qtextflag == 0) {
-        h = 0xCD;
+        QBack.Back(0x14, 0x14, 0x118, 0xCD);
     } else {
-        if (FeFlag != 0) {
+        if (FeFlag == 0) {
+            QBack.Back(0x14, 0x14, 0x118, 0xBD);
+        } else {
+            char BookName[80];
+            RECT ClipRect;
+            int oldot;
+
             strcpy(BookName, GetStr(iBookName));
             ClipRect.x = 0x14;
+            ClipRect.y = 0;
             ClipRect.w = 0x118;
             ClipRect.h = 0xB9;
-            ClipRect.y = 0;
             QBack.Back(0x14, 0x40, 0x118, 0x91);
             oldot = LargeFont.SetOTpos(0x80);
             if (LargeFont.GetStrWidth(BookName) < 0x118)
-                H = 0x32;
+                LargeFont.Print(0, 0x32, BookName, JustCentre, &ClipRect, BLUER, BLUEG, BLUEB);
             else
-                H = 0x28;
-            LargeFont.Print(0, H, BookName, JustCentre, &ClipRect, BLUER, BLUEG, BLUEB);
+                LargeFont.Print(0, 0x28, BookName, JustCentre, &ClipRect, BLUER, BLUEG, BLUEB);
             LargeFont.SetOTpos(oldot);
-            return;
         }
-        h = 0xBD;
     }
-    QBack.Back(0x14, 0x14, 0x118, h);
 }
 
 Dialog::Dialog()

@@ -115,9 +115,6 @@ int PSX_GM_SaveGame(int card_number, char *name, char *title)
     int tries;
     unsigned char *SaveBuff;
     int SaveSize;
-    int delete_file_number;
-    unsigned char *icon;
-    unsigned short *clut;
     int savesize;
     unsigned char *endptr;
 
@@ -181,9 +178,9 @@ int PSX_GM_SaveGame(int card_number, char *name, char *title)
     ISave(ViewY);
     BSave((char)GetSpeed());
 
+    SaveSize = tbuff - SaveBuff;
     endptr = tbuff;
     tbuff = SaveBuff;
-    SaveSize = endptr - SaveBuff;
     ISave(SaveSize);
     tbuff = endptr;
 
@@ -192,15 +189,12 @@ int PSX_GM_SaveGame(int card_number, char *name, char *title)
         savesize = 0x13E00;
     }
 
-    icon = IconBuffer + 0x28;
-    clut = (unsigned short *)(icon - 0x20);
-
     do {
-        delete_file_number = GetFileNumber(current_card, DiabloGameFile);
+        int delete_file_number = GetFileNumber(current_card, DiabloGameFile);
         if (delete_file_number != -1) {
             delete_card_file(current_card, delete_file_number);
         }
-        result = write_card_file(card_number, 0x3001, name, title, icon, clut, savesize, SaveBuff);
+        result = write_card_file(card_number, 0x3001, name, title, IconBuffer + 0x28, (unsigned short *)(IconBuffer + 8), savesize, SaveBuff);
         tries--;
     } while (tries != -1 && result != 0);
 
@@ -229,9 +223,6 @@ int PSX_CH_SaveGame(int card_number, int slot)
     int result;
     int tries;
     char TempStr[64];
-    unsigned char *icon;
-    unsigned short *clut;
-    int delete_file_number;
 
     sprintf(TempStr, "%s %s",
         "\x83\x66\x83\x42\x83\x41\x83\x75\x83\x8D",   /* Shift-JIS "ディアブロ" ("Diablo") */
@@ -241,17 +232,15 @@ int PSX_CH_SaveGame(int card_number, int slot)
 
     PackPlayer(&CharDataStruct.CharSlots[slot], options_pad);
     CharDataStruct.ToggleSave[slot] = QSpell[options_pad];
-    icon = IconBuffer + 0x28;
     CharDataStruct.spltypesave[slot] = _spltotype[options_pad];
-    clut = (unsigned short *)(icon - 0x20);
 
     do {
-        delete_file_number = GetFileNumber(current_card, DiabloCharacterFile);
+        int delete_file_number = GetFileNumber(current_card, DiabloCharacterFile);
         if (delete_file_number != -1) {
             delete_card_file(current_card, delete_file_number);
         }
         result = write_card_file(card_number, 0x3001, DiabloCharacterFile, TempStr,
-                                  icon, clut, 0x1DE0, (unsigned char *)&CharDataStruct);
+                                  IconBuffer + 0x28, (unsigned short *)(IconBuffer + 8), 0x1DE0, (unsigned char *)&CharDataStruct);
         tries--;
     } while (tries != -1 && result != 0);
 
@@ -343,8 +332,8 @@ int PSX_OPT_SaveGame(int card_number, char *filename)
     int tries;
     char TempStr[64];
     unsigned char *SaveBuff;
-    int delete_file_number;
 
+    tries = 4;
     sprintf(TempStr, "%s %s",
         "\x83\x66\x83\x42\x83\x41\x83\x75\x83\x8D",   /* Shift-JIS "ディアブロ" ("Diablo") */
         "\x83\x49\x83\x76\x83\x56\x83\x87\x83\x93");   /* Shift-JIS "オプション" ("Option") */
@@ -354,9 +343,8 @@ int PSX_OPT_SaveGame(int card_number, char *filename)
     ISave(LANG_GetLang());
     GetIcon();
 
-    tries = 4;
     do {
-        delete_file_number = GetFileNumber(current_card, DiabloOptionFile);
+        int delete_file_number = GetFileNumber(current_card, DiabloOptionFile);
         if (delete_file_number != -1) {
             delete_card_file(current_card, delete_file_number);
         }
@@ -385,13 +373,13 @@ void SaveOptions(void)
 /* @0x8015C1BC */
 int PSX_GM_LoadGame(unsigned char firstflag, int card_number, int file)
 {
-    unsigned char *LoadBuff;
     int result;
+    unsigned char *LoadBuff;
 
     LoadBuff = save_buffer;
     tbuff = LoadBuff;
     FreeGameMem();
-    result = read_card_file(card_number, file, 0x3001, (char *)LoadBuff);
+    result = read_card_file(card_number, file, 0x3001, (char *)tbuff);
     if (result != 0)
         return result;
 

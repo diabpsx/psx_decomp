@@ -813,24 +813,22 @@ void On_GETITEM(const TCmd *pCmd, int pnum)
     int nIndex = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
     unsigned char ok = delta_get_item(p, p->bLevel);
     if (ok) {
-        if (currlevel != p->bLevel) {
-            if (p->bPnum != myplr)
-                return;
-        }
-        if (p->bMaster == myplr)
-            return;
-        if (p->bPnum == myplr) {
-            if (currlevel != p->bLevel) {
-                int hitem = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI,
-                                         p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue,
-                                         p->dwBuff);
-                if (hitem != -1)
-                    InvGetItem(myplr, hitem);
+        if (currlevel == p->bLevel || p->bPnum == myplr) {
+            if (p->bMaster == myplr) {
+                /* item already picked up -- nothing to do */
+            } else if (p->bPnum == myplr) {
+                if (currlevel != p->bLevel) {
+                    int hitem = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI,
+                                             p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue,
+                                             p->dwBuff);
+                    if (hitem != -1)
+                        InvGetItem(myplr, hitem);
+                } else {
+                    InvGetItem(myplr, nIndex);
+                }
             } else {
-                InvGetItem(p->bPnum, nIndex);
+                SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
             }
-        } else {
-            SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
         }
     } else {
         NetSendCmdGItem2(1, 8, p->bMaster, p->bPnum, p);
@@ -867,24 +865,22 @@ void On_AGETITEM(const TCmd *pCmd, int pnum)
     FindGetItem(p->wIndx, p->wCI, p->dwSeed);
     unsigned char ok = delta_get_item(p, p->bLevel);
     if (ok) {
-        if (currlevel != p->bLevel) {
-            if (p->bPnum != myplr)
-                return;
-        }
-        if (p->bMaster == myplr)
-            return;
-        if (p->bPnum == myplr) {
-            if (currlevel != p->bLevel) {
-                int hitem = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI,
-                                         p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue,
-                                         p->dwBuff);
-                if (hitem != -1)
-                    AutoGetItem(myplr, hitem);
+        if (currlevel == p->bLevel || p->bPnum == myplr) {
+            if (p->bMaster == myplr) {
+                /* item already picked up -- nothing to do */
+            } else if (p->bPnum == myplr) {
+                if (currlevel != p->bLevel) {
+                    int hitem = SyncPutItem(p->bPnum, plr[p->bPnum]._px, plr[p->bPnum]._py, p->wIndx, p->wCI,
+                                             p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue,
+                                             p->dwBuff);
+                    if (hitem != -1)
+                        AutoGetItem(myplr, hitem);
+                } else {
+                    AutoGetItem(myplr, p->bCursitem);
+                }
             } else {
-                AutoGetItem(p->bPnum, p->bCursitem);
+                SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
             }
-        } else {
-            SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
         }
     } else {
         NetSendCmdGItem2(1, 9, p->bMaster, p->bPnum, p);
@@ -1097,18 +1093,16 @@ void On_KILLGOLEM(const TCmd *pCmd, int pnum)
 void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
-        int dummy1;
         unsigned char addok = 1;
         int i;
+        const TCmdGolem *p = (const TCmdGolem *)pCmd;
         for (i = 0; i < nummissiles; i++) {
             int mi = missileactive[i];
             if (missile[mi]._mitype == 0x21 && missile[mi]._misource == pnum)
                 addok = 0;
         }
-        if (addok) {
-            const TCmdGolem *p = (const TCmdGolem *)pCmd;
+        if (addok)
             AddMissile(plr[pnum]._px, plr[pnum]._py, p->_mx, p->_my, p->_mdir, 0x21, 0, pnum, 0, 1);
-        }
     }
 }
 

@@ -23,7 +23,7 @@ void TSK_Sleep(int Frames);
 TASK *TSK_AddTask(unsigned long Id, void (*Main)(TASK *), int StackSize, int DataSize);
 void ToggleOptions(void);
 void PrintSelectBack(unsigned short Str);
-void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, int SinStep);
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, unsigned char SinStep);
 unsigned char QuestStatus(int i);
 unsigned char delta_quest_inited(int i);
 void CheckRPortalOK(int *rx, int *ry);

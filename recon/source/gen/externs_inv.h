@@ -65,4 +65,6 @@ extern int ScrollFlag[2];   /* @0x8011B8B8 */
 extern struct TASK *_spselflag[2];   /* @0x8011B650 */
 extern unsigned char _trigflag[2];   /* @0x8011BB74 */
 extern struct InvXY InvRect[73];   /* @0x8010D030 */
-extern unsigned char InvSlotTable[73];   /* @0x8010D680 */
+extern unsigned char InvSlotTable[];   /* @0x8010D680 */
+extern int icursW;   /* @0x8011B740 */
+extern int icursH;   /* @0x8011B744 */

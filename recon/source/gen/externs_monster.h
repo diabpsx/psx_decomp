@@ -38,4 +38,6 @@ extern int ViewX;   /* @0x8011C114 */
 extern int ViewY;   /* @0x8011C118 */
 extern unsigned char gbProcessPlayers;   /* @0x8011B800 */
 extern short monstkills[190];   /* @0x8010A240 */
+extern struct MonsterData monsterdata[];   /* @0x8010AB9C */
+extern char D_8011C2C8[];   /* @0x8011C2C8 */
 extern struct UniqMonstStruct UniqMonst[96];   /* @0x8010C708 */

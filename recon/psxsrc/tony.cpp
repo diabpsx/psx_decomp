@@ -237,16 +237,14 @@ void SetDemoPlayer()
 }
 
 /* @0x8009B4EC TONY.CPP:178
- * OPEN (bytes 41 diffs, SYM length): the block tree is exact (`while (1) { int demo_char; ...` -- the
- * scope note keeps gcc from duplicating the demo_finish exit test, so the loop is not rotated).
- * Residual: retail strength-reduces the _pSplLvl fill into a pointer (v0) + counter x (v1); ours
- * keeps base+index ("giv ... not worth while, 0 vs 4" in -dL), which shifts demo_char/SetQSpell
- * scheduling downstream.  Falsified: plr[0]. vs plr-> vs (&plr[0])->, *(arr+x), x!=-1 / x>-1 /
- * --x, 'd', sizeof bound, char* local, (unsigned char) forms of demo_which % 5. */
+ * OPEN (bytes 33 diffs): block tree exact (`while (1) { int demo_char; ...` keeps the demo_finish
+ * exit test from being duplicated).  Residual: demo_which % 5 is computed in a0 then andi'd into s0
+ * (retail computes it in s0), plus SetQSpell arg scheduling. */
 void print_demo_task(TASK *T)
 {
     while (1) {
         int demo_char;
+        char *p;   /* copy-propagated: no SYM record; makes the fill loop a reduced pointer walk */
 
         if (demo_finish)
             break;
@@ -267,7 +265,7 @@ void print_demo_task(TASK *T)
                 MediumFont.Print(0x88, 0x28, GetStr(0xF8), JustCentre, NULL, WHITER, WHITEG, WHITEG);
         }
         for (int x = 63; x >= 0; x--)
-            plr->_pSplLvl[x] = 100;
+            *(p = &plr->_pSplLvl[x]) = 100;
         demo_char = demo_which % 5;
         plr[0]._pRSpell = demo_level_spell1[demo_char];
         plr[0]._pRSplType = 1;
@@ -305,14 +303,16 @@ void print_demo_task(TASK *T)
     plr[0]._pInvincible = 0;
 }
 
-/* @0x8009B82C TONY.CPP:259
- * OPEN: retail follows DrawSync(0) with `break 1024` = PsyQ LIBSN.H pollhost(), an SDK asm() macro
- * (#define pollhost() asm("break 1024")).  No C-only spelling emits a break; awaiting a ruling on the
- * SDK-macro exception (same class as the allowed GTE macros). */
+/* PsyQ 4.0 LIBSN.H (verbatim): an SDK asm() macro, allowed by the user ruling (same class as GTE/BIOS) */
+#define	pollhost()	asm("break 1024")	/* inline to keep variable scope */
+
+/* @0x8009B82C TONY.CPP:259 */
 void TonysDummyPoll()
 {
-    if (tony_poll)
+    if (tony_poll) {
         DrawSync(0);
+        pollhost();
+    }
 }
 
 /* @0x8009B858 TONY.CPP:268 */
@@ -369,13 +369,12 @@ void set_pad_record_play(int level)
     DemoTask = TSK_AddTask(0x4000, (void (*)())print_demo_task, 0x1000, 0);
 }
 
-/* @0x8009B9A4 TONY.CPP:324
- * OPEN (SYM): retail has a 16-byte frame and no local record (body lines 324-337, all compiled out);
- * an unused `int dummy[4]` reproduces the bytes but adds an AUTO record.  Falsified: char[8],
- * if(0){...}, register array, anonymous-struct temporary D16(), alloca, (void)dummy. */
+/* @0x8009B9A4 TONY.CPP:324 -- the 16-byte frame with no locals is the outgoing-argument area of a
+ * call the optimiser deleted (dead code); ra is not saved because no call survives. */
 void start_demo()
 {
-    int dummy[4];
+    if (0)
+        TSK_Sleep(1);
 }
 
 /* @0x8009B9B4 TONY.CPP:340 */

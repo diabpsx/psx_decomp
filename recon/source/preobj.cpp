@@ -322,34 +322,29 @@ void AddBarrel(int i, int ot)
 
 void AddShrine(int i)
 {
+    int st;
     unsigned char slist[NUM_SHRINETYPE];
-    int j;
-    int val;
 
     object[i]._oPreFlag = 1;
-    for (j = 0; j < NUM_SHRINETYPE; j++) {
-        if (currlevel != 0) {
-            if (j == 7)
-                slist[j] = ((int)currlevel < 9);
-            else
-                slist[j] = ((int)currlevel < 17);
-        } else {
-            slist[j] = 0;
-        }
+    for (st = 0; st < NUM_SHRINETYPE; st++) {
+        if (currlevel != 0 && (st == 7 ? (int)currlevel < 9 : (int)currlevel < 17))
+            slist[st] = 1;
+        else
+            slist[st] = 0;
         if (gbMaxPlayers != 1) {
-            if (shrineavail[j] == 1)
-                slist[j] = 0;
+            if (shrineavail[st] == 1)
+                slist[st] = 0;
         }
         if (gbMaxPlayers == 1) {
-            if (shrineavail[j] == 2)
-                slist[j] = 0;
+            if (shrineavail[st] == 2)
+                slist[st] = 0;
         }
     }
     do {
-        val = ENG_random(NUM_SHRINETYPE);
-    } while (!slist[val]);
+        st = ENG_random(NUM_SHRINETYPE);
+    } while (!slist[st]);
 
-    object[i]._oVar1 = val;
+    object[i]._oVar1 = st;
 }
 
 void AddBookcase(int i)
@@ -489,34 +484,34 @@ void AddFlameLvr(int i)
 
 void GetRndObjLoc(int randarea, int &xx, int &yy)
 {
+    int i, j;
     unsigned char failed;
-    int i, j, tries;
 
-    if (randarea == 0)
-        return;
-
-    tries = 0;
-    while (1) {
-        tries++;
-        if (tries > 1000 && randarea > 1)
-            randarea--;
-        xx = ENG_random(MAXDUNX);
-        yy = ENG_random(MAXDUNY);
-        failed = 0;
-        for (i = 0; i < randarea && !failed; i++) {
-            for (j = 0; j < randarea && !failed; j++) {
-                failed = (unsigned char)RndLocOk(xx + i, yy + j) == 0;
+    if (randarea != 0) {
+        int tries = 0;
+        while (1) {
+            tries++;
+            if (tries > 1000 && randarea > 1)
+                randarea--;
+            xx = ENG_random(MAXDUNX);
+            yy = ENG_random(MAXDUNY);
+            failed = 0;
+            for (i = 0; i < randarea && !failed; i++) {
+                for (j = 0; j < randarea && !failed; j++) {
+                    failed = (unsigned char)RndLocOk(xx + i, yy + j) == 0;
+                }
             }
+            if (!failed)
+                break;
         }
-        if (!failed)
-            break;
     }
 }
 
 void AddMushPatch()
 {
+    int x, y;
+
     if (numobjects < MAXOBJECTS) {
-        int x, y;
         int i = objectavail[0];
         GetRndObjLoc(5, x, y);
         dung_map[x + 1][y + 1].dObject = -1 - i;
@@ -546,9 +541,11 @@ BOOL RndLocOk(int xp, int yp)
         return 0;
     if (GetSOLID(xp, yp))
         return 0;
-    if (leveltype != DTYPE_CATHEDRAL || GetDPiece(xp, yp) <= 126 || GetDPiece(xp, yp) >= 144)
-        return 1;
-    return 0;
+    if (leveltype == DTYPE_CATHEDRAL) {
+        if (GetDPiece(xp, yp) > 126 && GetDPiece(xp, yp) < 144)
+            return 0;
+    }
+    return 1;
 }
 
 BOOL TrapLocOk(int xp, int yp)
@@ -1056,13 +1053,13 @@ void AddDiabObjs()
 
     lpSetPiece = GRL_LoadFileInMemSig("diab1.DUN", NULL);
     LoadMapObjects(lpSetPiece, 2 * diabquad1x, 2 * diabquad1y, diabquad2x, diabquad2y, 11, 12, 1);
-    mem_free_dbg(lpSetPiece);
+    MemFreeDbg(lpSetPiece);
     lpSetPiece = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
     LoadMapObjects(lpSetPiece, 2 * diabquad2x, 2 * diabquad2y, diabquad3x, diabquad3y, 11, 11, 2);
-    mem_free_dbg(lpSetPiece);
+    MemFreeDbg(lpSetPiece);
     lpSetPiece = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
     LoadMapObjects(lpSetPiece, 2 * diabquad3x, 2 * diabquad3y, diabquad4x, diabquad4y, 9, 9, 3);
-    mem_free_dbg(lpSetPiece);
+    MemFreeDbg(lpSetPiece);
 }
 
 void AddStoryBooks()
@@ -1233,100 +1230,100 @@ void InitObjects()
     ClrAllObjects();
     if (currlevel == 16) {
         AddDiabObjs();
-    } else {
-        saveplrpos();
-        InitObjFlag = 1;
-        GetRndSeed();
-        if (currlevel == 9 && gbMaxPlayers == 1)
-            AddSlainHero();
-        if (QuestStatus(Q_MUSHROOM) && currlevel == quests[Q_MUSHROOM]._qlevel && gbMaxPlayers != 2)
-            AddMushPatch();
-        if (currlevel == 4)
-            AddStoryBooks();
-        if (currlevel == 8)
-            AddStoryBooks();
-        if (currlevel == 12)
-            AddStoryBooks();
-        if (leveltype == DTYPE_CATHEDRAL) {
-            if (QuestStatus(Q_BUTCHER))
-                AddTortures();
-            if (QuestStatus(Q_PWATER))
-                AddCandles();
-            if (QuestStatus(Q_LTBANNER))
-                AddObject(OBJ_SIGNCHEST, 2 * setpc_x + 26, 2 * setpc_y + 19);
-            InitRndLocBigObj(10, 15, OBJ_SARC);
-            AddL1Objs(0, 0, MAXDUNX, MAXDUNY);
-            InitRndBarrels();
-        }
-        if (leveltype == DTYPE_CATACOMBS) {
-            if (QuestStatus(Q_ROCK) && gbMaxPlayers != 2)
-                InitRndLocObj5x5(1, 1, 0x17 /* OBJ_STAND */);
-            if (QuestStatus(Q_SCHAMB))
-                InitRndLocObj5x5(1, 1, OBJ_BOOK2R);
-            AddL2Objs(0, 0, MAXDUNX, MAXDUNY);
-            AddL2Torches();
-            if (QuestStatus(Q_BLIND)) {
-                if (plr[myplr]._pClass == PC_WARRIOR) {
-                    textdef = TEXT_BLINDING;
-                } else if (plr[myplr]._pClass == PC_ROGUE) {
-                    textdef = TEXT_RBLINDING;
-                } else if (plr[myplr]._pClass == PC_SORCERER) {
-                    textdef = TEXT_MBLINDING;
-                }
-                quests[Q_BLIND]._qmsg = textdef;
-                AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1, textdef);
-                setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", NULL);
-                LoadMapObjs(setp, 2 * setpc_x, 2 * setpc_y);
-                mem_free_dbg(setp);
-            }
-            if (QuestStatus(Q_BLOOD)) {
-                if (plr[myplr]._pClass == PC_WARRIOR) {
-                    textdef = TEXT_BLOODY;
-                } else if (plr[myplr]._pClass == PC_ROGUE) {
-                    textdef = TEXT_RBLOODY;
-                } else if (plr[myplr]._pClass == PC_SORCERER) {
-                    textdef = TEXT_MBLOODY;
-                }
-                quests[Q_BLOOD]._qmsg = textdef;
-                AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7, textdef);
-                AddObject(OBJ_PEDISTAL, 2 * setpc_x + 25, 2 * setpc_y + 32);
-            }
-            InitRndBarrels();
-        }
-        if (leveltype == DTYPE_CAVES) {
-            AddL3Objs(0, 0, MAXDUNX, MAXDUNY);
-            InitRndBarrels();
-        }
-        if (leveltype == DTYPE_HELL) {
-            if (QuestStatus(Q_WARLORD)) {
-                if (plr[myplr]._pClass == PC_WARRIOR) {
-                    textdef = TEXT_BLOODWAR;
-                } else if (plr[myplr]._pClass == PC_ROGUE) {
-                    textdef = TEXT_RBLOODWAR;
-                } else if (plr[myplr]._pClass == PC_SORCERER) {
-                    textdef = TEXT_MBLOODWAR;
-                }
-                quests[Q_WARLORD]._qmsg = textdef;
-                AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w, setpc_y + setpc_h, textdef);
-                setp = GRL_LoadFileInMemSig("Levels\\L4Data\\Warlord.DUN", NULL);
-                LoadMapObjs(setp, 2 * setpc_x, 2 * setpc_y);
-                mem_free_dbg(setp);
-            }
-            if (QuestStatus(Q_BETRAYER) && gbMaxPlayers == 1)
-                AddLazStand();
-            InitRndBarrels();
-            AddL4Goodies();
-        }
-        InitRndLocObj(5, 10, OBJ_CHEST1);
-        InitRndLocObj(3, 6, OBJ_CHEST2);
-        InitRndLocObj(1, 5, OBJ_CHEST3);
-        if (leveltype != DTYPE_HELL)
-            AddObjTraps();
-        if (leveltype > DTYPE_CATHEDRAL)
-            AddChestTraps();
-        restoreplrpos();
-        InitObjFlag = 0;
+        return;
     }
+    saveplrpos();
+    InitObjFlag = 1;
+    GetRndSeed();
+    if (currlevel == 9 && gbMaxPlayers == 1)
+        AddSlainHero();
+    if (QuestStatus(Q_MUSHROOM) && currlevel == quests[Q_MUSHROOM]._qlevel && gbMaxPlayers != 2)
+        AddMushPatch();
+    if (currlevel == 4)
+        AddStoryBooks();
+    if (currlevel == 8)
+        AddStoryBooks();
+    if (currlevel == 12)
+        AddStoryBooks();
+    if (leveltype == DTYPE_CATHEDRAL) {
+        if (QuestStatus(Q_BUTCHER))
+            AddTortures();
+        if (QuestStatus(Q_PWATER))
+            AddCandles();
+        if (QuestStatus(Q_LTBANNER))
+            AddObject(OBJ_SIGNCHEST, 2 * setpc_x + 26, 2 * setpc_y + 19);
+        InitRndLocBigObj(10, 15, OBJ_SARC);
+        AddL1Objs(0, 0, MAXDUNX, MAXDUNY);
+        InitRndBarrels();
+    }
+    if (leveltype == DTYPE_CATACOMBS) {
+        if (QuestStatus(Q_ROCK) && gbMaxPlayers != 2)
+            InitRndLocObj5x5(1, 1, 0x17 /* OBJ_STAND */);
+        if (QuestStatus(Q_SCHAMB))
+            InitRndLocObj5x5(1, 1, OBJ_BOOK2R);
+        AddL2Objs(0, 0, MAXDUNX, MAXDUNY);
+        AddL2Torches();
+        if (QuestStatus(Q_BLIND)) {
+            if (plr[myplr]._pClass == PC_WARRIOR) {
+                textdef = TEXT_BLINDING;
+            } else if (plr[myplr]._pClass == PC_ROGUE) {
+                textdef = TEXT_RBLINDING;
+            } else if (plr[myplr]._pClass == PC_SORCERER) {
+                textdef = TEXT_MBLINDING;
+            }
+            quests[Q_BLIND]._qmsg = textdef;
+            AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1, textdef);
+            setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", NULL);
+            LoadMapObjs(setp, 2 * setpc_x, 2 * setpc_y);
+            MemFreeDbg(setp);
+        }
+        if (QuestStatus(Q_BLOOD)) {
+            if (plr[myplr]._pClass == PC_WARRIOR) {
+                textdef = TEXT_BLOODY;
+            } else if (plr[myplr]._pClass == PC_ROGUE) {
+                textdef = TEXT_RBLOODY;
+            } else if (plr[myplr]._pClass == PC_SORCERER) {
+                textdef = TEXT_MBLOODY;
+            }
+            quests[Q_BLOOD]._qmsg = textdef;
+            AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7, textdef);
+            AddObject(OBJ_PEDISTAL, 2 * setpc_x + 25, 2 * setpc_y + 32);
+        }
+        InitRndBarrels();
+    }
+    if (leveltype == DTYPE_CAVES) {
+        AddL3Objs(0, 0, MAXDUNX, MAXDUNY);
+        InitRndBarrels();
+    }
+    if (leveltype == DTYPE_HELL) {
+        if (QuestStatus(Q_WARLORD)) {
+            if (plr[myplr]._pClass == PC_WARRIOR) {
+                textdef = TEXT_BLOODWAR;
+            } else if (plr[myplr]._pClass == PC_ROGUE) {
+                textdef = TEXT_RBLOODWAR;
+            } else if (plr[myplr]._pClass == PC_SORCERER) {
+                textdef = TEXT_MBLOODWAR;
+            }
+            quests[Q_WARLORD]._qmsg = textdef;
+            AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w, setpc_y + setpc_h, textdef);
+            setp = GRL_LoadFileInMemSig("Levels\\L4Data\\Warlord.DUN", NULL);
+            LoadMapObjs(setp, 2 * setpc_x, 2 * setpc_y);
+            MemFreeDbg(setp);
+        }
+        if (QuestStatus(Q_BETRAYER) && gbMaxPlayers == 1)
+            AddLazStand();
+        InitRndBarrels();
+        AddL4Goodies();
+    }
+    InitRndLocObj(5, 10, OBJ_CHEST1);
+    InitRndLocObj(3, 6, OBJ_CHEST2);
+    InitRndLocObj(1, 5, OBJ_CHEST3);
+    if (leveltype != DTYPE_HELL)
+        AddObjTraps();
+    if (leveltype > DTYPE_CATHEDRAL)
+        AddChestTraps();
+    restoreplrpos();
+    InitObjFlag = 0;
 }
 
 /* ---- PSX overlay dispatcher: the switch(ot){...} half of devilution's AddObject(), called from

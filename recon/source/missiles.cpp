@@ -907,6 +907,17 @@ unsigned char CheckIfTrig(int x, int y)
             || (abs(trigs[i]._tx - x) < 2 && abs(trigs[i]._ty - y) < 2))
             return 1;
     }
+    /* PSX-only: also checks the fixed quests[16] table for an active quest-portal trigger on
+     * this level -- confirmed via raw oracle @0x8013EEB0 (second loop, fixed bound 0x10, NOT
+     * numtrigs). Gate = _qlevel==currlevel && _qslvl!=0 && _qactive!=0, then the same
+     * exact-or-abs<2 position test against (_qtx,_qty). */
+    for (i = 0; i < 16; i++) {
+        if (currlevel == quests[i]._qlevel && quests[i]._qslvl != 0 && quests[i]._qactive != 0) {
+            if ((x == quests[i]._qtx && y == quests[i]._qty)
+                || (abs(quests[i]._qtx - x) < 2 && abs(quests[i]._qty - y) < 2))
+                return 1;
+        }
+    }
     return 0;
 }
 
@@ -1053,7 +1064,9 @@ void AddFireball(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy
         i = 16;
 
     GetMissileVel(mi, sx, sy, dx, dy, i);
-    SetMissDir(mi, GetDirection16(sx, sy, dx, dy));
+    /* PSX-only: uses the 8-way GetDirection8 here (PC/hellfire source has GetDirection16) --
+     * confirmed via raw oracle jal target @0x8013E728. */
+    SetMissDir(mi, GetDirection8(sx, sy, dx, dy));
     missile[mi]._mirange = 256;
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
@@ -1392,8 +1405,13 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 {
     /* PSX reorders devilution: the light-radius selection by _miAnimType always runs first (a
      * SetMissAnim call earlier picked one of several flare animations), THEN the mienemy branch
-     * (UseMana+HP drain vs the monster-type SetMissAnim dispatch) runs. The DBG_Error fallback for
-     * an unrecognized _miAnimType is a debug-only assert, not reproduced here (dead in retail). */
+     * (UseMana+HP drain vs the monster-type SetMissAnim dispatch) runs. The unmatched-_miAnimType
+     * "default" case is a REAL (not dead) debug assert -- confirmed via raw oracle @0x80140258:
+     * it unconditionally calls DBG_Error(0,"source/MISSILES.cpp",0x9DE) reached from BOTH the
+     * <0x29-but-not-0x16 case and the >=0x29-but-not-0x2A/0x2C case. The "wtf?" string @D_8011A048
+     * is loaded and tested for truthiness (always true, never actually skips) -- byte-exact source
+     * idiom, not a real gate; kept literal to preserve the retail codegen shape. The two AddLight
+     * call sites in the oracle group {0x28,0x2A}->one physical jal and {0x16,0x2C}->the other. */
     if (sx == dx && sy == dy) {
         dx += XDirAdd[midir];
         dy += YDirAdd[midir];
@@ -1403,14 +1421,20 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
 
-    if (missile[mi]._miAnimType == 0x28)
+    if (missile[mi]._miAnimType == 0x28) {
         missile[mi]._mlid = AddLight(sx, sy, 0x243);
-    else if (missile[mi]._miAnimType == 0x16)
-        missile[mi]._mlid = AddLight(sx, sy, 0x93);
-    else if (missile[mi]._miAnimType == 0x2A)
+    } else if (missile[mi]._miAnimType < 0x29) {
+        if (missile[mi]._miAnimType == 0x16)
+            missile[mi]._mlid = AddLight(sx, sy, 0x93);
+        else if ("wtf? never heard of this missile")
+            DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
+    } else if (missile[mi]._miAnimType == 0x2A) {
         missile[mi]._mlid = AddLight(sx, sy, 0x1B3);
-    else if (missile[mi]._miAnimType == 0x2C)
+    } else if (missile[mi]._miAnimType == 0x2C) {
         missile[mi]._mlid = AddLight(sx, sy, 0x93);
+    } else if ("wtf? never heard of this missile") {
+        DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
+    }
 
     if (mienemy == TARGET_MONSTERS) {
         UseMana(id, 0x23); /* SPL_BSTAR (Hellfire-only spell id, not otherwise used in this TU) */
@@ -2137,17 +2161,17 @@ void MI_Firemove(int i)
         miss->_miDelFlag = 1;
         AddUnLight(miss->_mlid);
     }
-    if (miss->_mimfnum != 0 || miss->_mirange == 0) {
+    if (miss->_mimfnum == 0 && miss->_mirange != 0) {
+        if (miss->_miVar2 == 0)
+            miss->_mlid = AddLight(miss->_mix, miss->_miy, ExpLight[0]);
+        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, ExpLight[miss->_miVar2]);
+        miss->_miVar2++;
+    } else {
         if (miss->_mix != miss->_miVar3 || miss->_miy != miss->_miVar4) {
             miss->_miVar3 = miss->_mix;
             miss->_miVar4 = miss->_miy;
             ChangeLight(miss->_mlid, miss->_miVar3, miss->_miVar4, 8);
         }
-    } else {
-        if (miss->_miVar2 == 0)
-            miss->_mlid = AddLight(miss->_mix, miss->_miy, ExpLight[0]);
-        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, ExpLight[miss->_miVar2]);
-        miss->_miVar2++;
     }
     miss->_mix++;
     miss->_miy++;

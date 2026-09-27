@@ -175,40 +175,44 @@ void DrawAutoMapVertDoor(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
-    int scale, xs, ys;
 
-    scale = AutoMapScale;
-    xs = X * scale;
-    ys = Y * scale;
-    Ly = xs + ys + AMPlayerY;
-    Lx = (xs - ys) * 2 + AMPlayerX;
+    y2 = AutoMapScale;
+    X *= y2;
+    Y *= y2;
+    Ly = Y + X;
+    Lx = (X - Y) * 2;
+    Ly += AMPlayerY;
+    Lx += AMPlayerX;
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    Frac = AutoMapScale >> 1;
-    y0 = Ly + ((Frac + ((unsigned)AutoMapScale >> 31)) >> 1);
-    L2->x1 = Lx - Frac;
+    Frac = y2 >> 1;
+    y2 = Frac / 2;
     L2->x0 = Lx;
     L2->y0 = Ly;
-    L2->y1 = y0;
+    L2->x1 = Lx - Frac;
+    L2->y1 = Ly + y2;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
     x3 = AutoMapScale * 2;
-    x1 = Lx - x3;   /* anonymous compiler temp ($a3 -- no SYM record) reused below */
-    Lx = Lx - Frac * 2;
+    x1 = Lx - x3;
     y1 = Ly + AutoMapScale;
-    y2 = (Lx - x3) + Frac * 2;   /* final x1, computed with NEW Lx -- stashed in y2 for now */
-    L2->y1 = y1;
-    L2->y0 = y1 - y0;
-    y1 = y1 - Frac;
-    y0 = ((Ly + x3) - Frac) - Frac;   /* final y2, reuses y0's slot */
-    x3 = (Lx + x3) - Frac * 2;
     L2->x0 = x1 + Frac;
+    L2->y0 = y1 - y2;
     L2->x1 = x1;
-    x1 = y2;   /* final x1 */
-    y2 = y0;   /* final y2 */
+    L2->y1 = y1;
+    Lx -= Frac * 2;
+    y1 -= Frac;
+    y2 = Ly + x3;
+    y2 -= Frac;
+    y2 -= Frac;
+    x1 = Lx - x3;
+    x1 += Frac * 2;
+    x3 = Lx + x3;
+    x3 -= Frac * 2;
+    y0 = Ly;
 
     L2 = AMGetLine(0x7F, 0x7F, 0x64);
     L2->x0 = Lx;
-    L2->y0 = Ly;
+    L2->y0 = y0;
     L2->x1 = x1;
     L2->y1 = y1;
 
@@ -224,10 +228,11 @@ void DrawAutoMapVertDoor(int X, int Y)
     L2->x1 = x3;
     L2->y1 = y1;
 
+    L2 = AMGetLine(0x7F, 0x7F, 0x64);
     L2->x0 = x3;
     L2->y0 = y1;
     L2->x1 = Lx;
-    L2->y1 = Ly;
+    L2->y1 = y0;
 }
 
 /* line 383 @0x8016264C */
@@ -315,18 +320,18 @@ void DrawAutoMapHorzGrate(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly;
-    int scale, xs, ys;
 
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
-    scale = AutoMapScale;
-    xs = X * scale;
-    ys = Y * scale;
-    Ly = xs + ys + AMPlayerY;
+    X *= AutoMapScale;
+    Y *= AutoMapScale;
+    Ly = AMPlayerY + (Y + X);
+    Lx = (X - Y) * 2 + AMPlayerX;
     L2->y0 = Ly;
-    L2->y1 = Ly + AutoMapScale;
-    Lx = (xs - ys) * 2 + AMPlayerX;
+    Ly += AutoMapScale;
+    L2->y1 = Ly;
     L2->x0 = Lx;
-    L2->x1 = Lx + AutoMapScale * 2;
+    Lx += AutoMapScale * 2;
+    L2->x1 = Lx;
 }
 
 /* line 467 @0x8016293C */
@@ -334,17 +339,20 @@ void DrawAutoMapSquare(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
-    int xs, ys;
 
-    xs = X * AutoMapScale;
-    ys = Y * AutoMapScale;
+    X *= AutoMapScale;
+    Y *= AutoMapScale;
     Frac = AutoMapScale >> 1;
-    Ly = (ys + xs - Frac) + AMPlayerY;
+    Ly = Y + X;
+    Lx = (X - Y) * 2;
+    Lx -= Frac * 2;
+    Ly -= Frac;
+    Ly += AMPlayerY;
     x3 = AutoMapScale * 2;
     y0 = Ly + Frac;
-    y2 = Ly + AutoMapScale;
-    y1 = (Ly + x3) - Frac;
-    Lx = (((xs - ys) * 2) - (Frac * 2)) + AMPlayerX;
+    y1 = Ly + AutoMapScale;
+    y2 = (Ly + x3) - Frac;
+    Lx += AMPlayerX;
     x1 = (Lx - x3) + (Frac * 2);
     x3 = (Lx + x3) - (Frac * 2);
 
@@ -352,23 +360,23 @@ void DrawAutoMapSquare(int X, int Y)
     L2->x0 = Lx;
     L2->y0 = y0;
     L2->x1 = x1;
-    L2->y1 = y2;
-
-    L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = x1;
-    L2->y0 = y2;
-    L2->x1 = Lx;
     L2->y1 = y1;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = Lx;
+    L2->x0 = x1;
     L2->y0 = y1;
-    L2->x1 = x3;
+    L2->x1 = Lx;
     L2->y1 = y2;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = x3;
+    L2->x0 = Lx;
     L2->y0 = y2;
+    L2->x1 = x3;
+    L2->y1 = y1;
+
+    L2 = AMGetLine(0x5F, 0x58, 0x38);
+    L2->x0 = x3;
+    L2->y0 = y1;
     L2->x1 = Lx;
     L2->y1 = y0;
 }
@@ -380,22 +388,28 @@ void DrawVertArch(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly;
+    int Frac;
     int x0, y0, x1, y1, x2, y2, x3, y3;
-    int a, b, half;
 
-    a = X * 4;
-    b = Y * 4;
-    Lx = ((a - b) * 2) + AMPlayerX;
-    Ly = (b + a) + AMPlayerY;
-    half = AutoMapScale >> 2;
-    x0 = Lx - half;
-    y0 = Ly - half;
-    x1 = Lx - (half + 8);
-    y1 = Ly - (half - 4);
-    x2 = Lx + (half - 8);
-    y2 = Ly + (half + 4);
-    x3 = Lx + half;
-    y3 = Ly + half;
+    X *= 4;
+    Y *= 4;
+    Lx = (X - Y) * 2;
+    Ly = Y + X;
+    Lx += AMPlayerX;
+    Ly += AMPlayerY;
+    Frac = AutoMapScale >> 2;
+    x0 = Lx - Frac;
+    y0 = Ly - Frac;
+    x1 = Frac + 8;
+    x1 = Lx - x1;
+    y1 = Frac - 4;
+    y1 = Ly - y1;
+    x2 = Frac - 8;
+    x2 = Lx + x2;
+    y2 = Frac + 4;
+    y2 = Ly + y2;
+    x3 = Lx + Frac;
+    y3 = Ly + Frac;
 
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
     L2->x0 = x0;

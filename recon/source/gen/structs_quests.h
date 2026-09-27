@@ -67,8 +67,12 @@ struct CBlocks {
     static int GetOverlayOtBase(void);
 };
 
-struct CFont {
-    int Print(int X, int Y, char *Str, int Justify, RECT *TextWindow, int R, int G, int B);
+enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
+
+struct CFont {   /* sizeof 540 (printy.h); layout opaque here, size load-bearing: an empty
+                    struct is 1 byte -> -G8 small-data SYMBOL_REF_FLAG -> &MediumFont never CSEd */
+    unsigned char _opaque[540];
+    int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
     int GetStrWidth(char *Str);
 };
 

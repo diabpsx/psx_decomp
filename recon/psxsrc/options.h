@@ -298,6 +298,7 @@ extern BOOL DiabloDieFlag;
 extern BOOL PadFrig;
 void GO_DoGameOver(void);   /* @0x80082204 -- another module */
 void DrawCtrlSetup(void);   /* @0x8009D5D8 CTRL.CPP */
+void InitCredits(void);   /* @0x8013D1B4 CREDITS.CPP */
 BOOL PaletteFadeOut(int a);   /* @0x8007F2F8 PALETTE.CPP */
 BOOL PaletteFadeIn(int a);   /* @0x8007F1F0 PALETTE.CPP */
 BOOL GetFadeState(void);   /* @0x8007EEAC PALETTE.CPP */

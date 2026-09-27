@@ -1713,7 +1713,6 @@ tail:
         }
     }
 }
-
 void DoThatDrawInv(void)
 {
     int Loop;
@@ -1826,6 +1825,539 @@ void DoThatDrawInv(void)
 
     DrawInvCursor();
     InvDrawSlots();
+}
+
+void DrawInvStats(void)
+{
+    Dialog InvBack;
+    char c;
+    char chrstr[10];
+    long mind, maxd;
+    int hper, ac;
+
+    InvBack.SetOTpos(0xF9);
+    InvBack.SetBack(5);
+    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    InvBack.Back(0xA, 0x20, 0x74, 0xB0);
+
+    BRect.x = 0xB;
+    BRect.y = 0x20;
+    BRect.w = 0x72;
+    BRect.h = 0xB0;
+
+    c = (plr[options_pad]._pBaseStr < plr[options_pad]._pStrength) ? 1 : 0;
+    if (plr[options_pad]._pStrength < plr[options_pad]._pBaseStr)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pStrength);
+    PrintStat(0xC, 0x419, chrstr, c);
+
+    c = (plr[options_pad]._pBaseMag < plr[options_pad]._pMagic) ? 1 : 0;
+    if (plr[options_pad]._pMagic < plr[options_pad]._pBaseMag)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pMagic);
+    PrintStat(0x19, 0x26F, chrstr, c);
+
+    c = (plr[options_pad]._pBaseDex < plr[options_pad]._pDexterity) ? 1 : 0;
+    if (plr[options_pad]._pDexterity < plr[options_pad]._pBaseDex)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pDexterity);
+    PrintStat(0x26, 0xFF, chrstr, c);
+
+    c = (plr[options_pad]._pBaseVit < plr[options_pad]._pVitality) ? 1 : 0;
+    if (plr[options_pad]._pVitality < plr[options_pad]._pBaseVit)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pVitality);
+    PrintStat(0x32, 0x4B7, chrstr, c);
+
+    if (plr[options_pad]._pIBonusToHit < 0)
+        c = 2;
+    else
+        c = (0 < plr[options_pad]._pIBonusToHit) ? 1 : 0;
+    hper = 0x32 + (plr[options_pad]._pDexterity >> 1) + plr[options_pad]._pIBonusToHit;
+    sprintf(chrstr, GetStr(0x503), hper);
+    PrintStat(0x40, 0x495, chrstr, c);
+
+    if (plr[options_pad]._pIBonusDam < 0)
+        c = 2;
+    else
+        c = (0 < plr[options_pad]._pIBonusDam) ? 1 : 0;
+
+    mind = plr[options_pad]._pIMinDam;
+    mind = mind + (mind * plr[options_pad]._pIBonusDam) / 100;
+    mind = mind + plr[options_pad]._pIBonusDamMod;
+    if (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass == 1) {
+        mind = mind + plr[options_pad]._pDamageMod;
+    } else if (plr[options_pad].InvBody[4]._itype == 3) {
+        mind = mind + (plr[options_pad]._pDamageMod >> 1);
+    } else {
+        mind = mind + plr[options_pad]._pDamageMod;
+    }
+
+    maxd = plr[options_pad]._pIMaxDam;
+    maxd = maxd + (maxd * plr[options_pad]._pIBonusDam) / 100;
+    maxd = maxd + plr[options_pad]._pIBonusDamMod;
+    if (plr[options_pad].InvBody[4]._itype == 3 && plr[options_pad]._pClass == 1) {
+        maxd = maxd + plr[options_pad]._pDamageMod;
+    } else if (plr[options_pad].InvBody[4]._itype == 3) {
+        maxd = maxd + (plr[options_pad]._pDamageMod >> 1);
+    } else {
+        maxd = maxd + plr[options_pad]._pDamageMod;
+    }
+
+    sprintf(chrstr, GetStr(0x501), mind, maxd);
+    PrintStat(0x4D, 0xE1, chrstr, c);
+
+    c = 0;
+    if (plr[options_pad]._pHitPoints != plr[options_pad]._pMaxHP) {
+        c = (plr[options_pad]._pMaxHPBase < plr[options_pad]._pMaxHP) ? 1 : 0;
+    }
+    sprintf(chrstr, "%li/%li", plr[options_pad]._pHitPoints >> 6, plr[options_pad]._pMaxHP >> 6);
+    PrintStat(0x5C, 0x24D, chrstr, c);
+
+    c = 0;
+    if (plr[options_pad]._pMana != plr[options_pad]._pMaxMana) {
+        c = (plr[options_pad]._pMaxManaBase < plr[options_pad]._pMaxMana) ? 1 : 0;
+    }
+    sprintf(chrstr, "%li/%li", plr[options_pad]._pMana >> 6, plr[options_pad]._pMaxMana >> 6);
+    PrintStat(0x68, 0x27A, chrstr, c);
+
+    if (plr[options_pad]._pIBonusAC < 0)
+        c = 2;
+    else
+        c = (0 < plr[options_pad]._pIBonusAC) ? 1 : 0;
+    ac = plr[options_pad]._pIAC + plr[options_pad]._pIBonusAC + plr[options_pad]._pDexterity / 5;
+    sprintf(chrstr, GetStr(0x4FD), ac);
+    PrintStat(0x75, 0x2A, chrstr, c);
+
+    if (plr[options_pad]._pMagResist > 0)
+        c = 1;
+    else
+        c = 0;
+    if (plr[options_pad]._pMagResist < 0x4B) {
+        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pMagResist);
+    } else {
+        c = 3;
+        sprintf(chrstr, GetStr(0x285));
+    }
+    PrintStat(0x84, 0x273, chrstr, c);
+
+    if (plr[options_pad]._pFireResist > 0)
+        c = 1;
+    else
+        c = 0;
+    if (plr[options_pad]._pFireResist < 0x4B) {
+        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pFireResist);
+    } else {
+        c = 3;
+        sprintf(chrstr, GetStr(0x285));
+    }
+    PrintStat(0x91, 0x157, chrstr, c);
+
+    if (plr[options_pad]._pLghtResist > 0)
+        c = 1;
+    else
+        c = 0;
+    if (plr[options_pad]._pLghtResist < 0x4B) {
+        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pLghtResist);
+    } else {
+        c = 3;
+        sprintf(chrstr, GetStr(0x285));
+    }
+    PrintStat(0x9E, 0x254, chrstr, c);
+
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pGold);
+    PrintStat(0xAC, 0x191, chrstr, 0);
+}
+
+void CheckInvPaste(int pnum, int mx, int my)
+{
+    int r, sx, sy;
+    int i, j, xx, yy, ii;
+    unsigned char done, done2h;
+    int il, cn, it, iv, ig;
+    long gt;
+    struct ItemStruct tempitem;
+
+    SetICursor(plr[pnum].HoldItem._iCurs + 12);
+    i = mx + (icursW >> 1);
+    j = my + (icursH >> 1);
+    sx = icursW28;
+    sy = icursH28;
+    done = 0;
+    for (r = 0; (unsigned int)r < 0x49 && !done; r++) {
+        if (i >= InvRect[r].X && i < InvRect[r].X + 28) {
+            if (j >= InvRect[r].Y - 29 && j < InvRect[r].Y) {
+                done = 1;
+                r--;
+            }
+        }
+        if (r == 24) {
+            if (!(sx & 1))
+                i -= 14;
+            if (!(sy & 1))
+                j -= 14;
+        }
+        if (r == 64 && !(sy & 1))
+            j += 14;
+    }
+    if (!done)
+        return;
+
+    il = 7;
+    if (r >= 0 && r <= 3)
+        il = 4;
+    if (r >= 4 && r <= 5)
+        il = 5;
+    if (r == 6)
+        il = 6;
+    if (r >= 7 && r <= 18)
+        il = 1;
+    if (r >= 19 && r <= 24)
+        il = 3;
+    if (r >= 65 && r <= 72)
+        il = 8;
+
+    done = 0;
+    if (plr[pnum].HoldItem._iLoc == il)
+        done = 1;
+    if (il == 1 && plr[pnum].HoldItem._iLoc == ILOC_TWOHAND) {
+        il = 2;
+        done = 1;
+    }
+    if (plr[pnum].HoldItem._iLoc == 7 && il == 8 && sx == 1 && sy == 1) {
+        done = 1;
+        if (!AllItemsUseable[plr[pnum].HoldItem.IDidx])
+            done = 0;
+        if (!plr[pnum].HoldItem._iStatFlag)
+            done = 0;
+        if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
+            done = 0;
+    }
+
+    it = 0;
+    if (il == 7) {
+        ii = r - 25;
+        done = 1;
+        if (plr[pnum].HoldItem._itype == ITYPE_GOLD) {
+            yy = 10 * (ii / 10);
+            xx = ii % 10;
+            if (plr[pnum].InvGrid[xx + yy] != 0) {
+                iv = plr[pnum].InvGrid[xx + yy];
+                if (iv > 0) {
+                    if (plr[pnum].InvList[iv - 1]._itype != ITYPE_GOLD)
+                        it = iv;
+                } else {
+                    it = -iv;
+                }
+            }
+        } else {
+            yy = 10 * ((ii / 10) - ((sy - 1) >> 1));
+            if (yy < 0)
+                yy = 0;
+            for (j = 0; j < sy && done; j++) {
+                if (yy >= 40)
+                    done = 0;
+                xx = (ii % 10) - ((sx - 1) >> 1);
+                if (xx < 0)
+                    xx = 0;
+                for (i = 0; i < sx && done; i++) {
+                    if (xx >= 10) {
+                        done = 0;
+                    } else {
+                        if (plr[pnum].InvGrid[xx + yy] != 0) {
+                            iv = plr[pnum].InvGrid[xx + yy];
+                            if (iv < 0)
+                                iv = -iv;
+                            if (it != 0) {
+                                if (it != iv)
+                                    done = 0;
+                            } else {
+                                it = iv;
+                            }
+                        }
+                    }
+                    xx++;
+                }
+                yy += 10;
+            }
+        }
+    }
+
+    if (!done)
+        return;
+
+    if (il != 7 && il != 8 && !plr[pnum].HoldItem._iStatFlag) {
+        done = 0;
+        if (plr[pnum]._pClass == 0)
+            PlaySFX(0x2D8);
+        else if (plr[pnum]._pClass == 1)
+            PlaySFX(0x270);
+        else if (plr[pnum]._pClass == 2)
+            PlaySFX(0x208);
+    }
+
+    if (!done) {
+        PlaySFX(0x3D3);
+        return;
+    }
+
+    if (pnum == myplr)
+        PlaySFX(ItemInvSnds[ItemCAnimTbl[plr[pnum].HoldItem._iCurs]]);
+
+    cn = CURSOR_HAND;
+    switch (il) {
+    case 1: /* one-hand */
+        if (r <= 12) {
+            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE) {
+                if (plr[pnum].InvBody[5]._itype == ITYPE_NONE || plr[pnum].InvBody[5]._iClass != plr[pnum].HoldItem._iClass) {
+                    NetSendCmdChItem(0, 4);
+                    plr[pnum].InvBody[4] = plr[pnum].HoldItem;
+                } else {
+                    NetSendCmdChItem(0, 5);
+                    cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
+                }
+                break;
+            }
+            if (plr[pnum].InvBody[5]._itype == ITYPE_NONE || plr[pnum].InvBody[5]._iClass != plr[pnum].HoldItem._iClass) {
+                NetSendCmdChItem(0, 4);
+                cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
+                break;
+            }
+            NetSendCmdChItem(0, 5);
+            cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
+            break;
+        }
+        if (plr[pnum].InvBody[5]._itype == ITYPE_NONE) {
+            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE || plr[pnum].InvBody[4]._iLoc != ILOC_TWOHAND) {
+                if (plr[pnum].InvBody[4]._itype == ITYPE_NONE || plr[pnum].InvBody[4]._iClass != plr[pnum].HoldItem._iClass) {
+                    NetSendCmdChItem(0, 5);
+                    plr[pnum].InvBody[5] = plr[pnum].HoldItem;
+                    break;
+                }
+                NetSendCmdChItem(0, 4);
+                cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
+                break;
+            }
+            NetSendCmdDelItem(0, 4);
+            NetSendCmdChItem(0, 5);
+            SwapItem(&plr[pnum].InvBody[5], &plr[pnum].InvBody[4]);
+            cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
+            break;
+        }
+        if (plr[pnum].InvBody[4]._itype != ITYPE_NONE && plr[pnum].InvBody[4]._iClass == plr[pnum].HoldItem._iClass) {
+            NetSendCmdChItem(0, 4);
+            cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
+            break;
+        }
+        NetSendCmdChItem(0, 5);
+        cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
+        break;
+    case 2: /* two-hand */
+        NetSendCmdDelItem(0, 5);
+        if (plr[pnum].InvBody[4]._itype != ITYPE_NONE && plr[pnum].InvBody[5]._itype != ITYPE_NONE) {
+            tempitem = plr[pnum].HoldItem;
+            if (plr[pnum].InvBody[5]._itype == 3)
+                plr[pnum].HoldItem = plr[pnum].InvBody[5];
+            else
+                plr[pnum].HoldItem = plr[pnum].InvBody[4];
+            if (pnum == myplr)
+                SetCursor(plr[pnum].HoldItem._iCurs + 12);
+            else
+                SetICursor(plr[pnum].HoldItem._iCurs + 12);
+            done2h = 0;
+            for (i = 0; i < 40 && !done2h; i++)
+                done2h = AutoPlace(pnum, i, icursW28, icursH28, 1);
+            plr[pnum].HoldItem = tempitem;
+            if (pnum == myplr)
+                SetCursor(plr[pnum].HoldItem._iCurs + 12);
+            else
+                SetICursor(plr[pnum].HoldItem._iCurs + 12);
+            if (!done2h)
+                return;
+            if (plr[pnum].InvBody[5]._itype == 3)
+                plr[pnum].InvBody[5]._itype = ITYPE_NONE;
+            else
+                plr[pnum].InvBody[4]._itype = ITYPE_NONE;
+        }
+        if (plr[pnum].InvBody[4]._itype != ITYPE_NONE || plr[pnum].InvBody[5]._itype != ITYPE_NONE) {
+            NetSendCmdChItem(0, 4);
+            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE)
+                SwapItem(&plr[pnum].InvBody[4], &plr[pnum].InvBody[5]);
+            cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
+        } else {
+            NetSendCmdChItem(0, 4);
+            plr[pnum].InvBody[4] = plr[pnum].HoldItem;
+        }
+        break;
+    case 3: /* chest */
+        NetSendCmdChItem(0, 6);
+        if (plr[pnum].InvBody[6]._itype == ITYPE_NONE)
+            plr[pnum].InvBody[6] = plr[pnum].HoldItem;
+        else
+            cn = SwapItem(&plr[pnum].InvBody[6], &plr[pnum].HoldItem);
+        break;
+    case 4: /* head */
+        NetSendCmdChItem(0, 0);
+        if (plr[pnum].InvBody[0]._itype == ITYPE_NONE)
+            plr[pnum].InvBody[0] = plr[pnum].HoldItem;
+        else
+            cn = SwapItem(&plr[pnum].InvBody[0], &plr[pnum].HoldItem);
+        break;
+    case 5: /* ring */
+        if (r == 4) {
+            NetSendCmdChItem(0, 1);
+            if (plr[pnum].InvBody[1]._itype == ITYPE_NONE)
+                plr[pnum].InvBody[1] = plr[pnum].HoldItem;
+            else
+                cn = SwapItem(&plr[pnum].InvBody[1], &plr[pnum].HoldItem);
+        } else {
+            NetSendCmdChItem(0, 2);
+            if (plr[pnum].InvBody[2]._itype == ITYPE_NONE)
+                plr[pnum].InvBody[2] = plr[pnum].HoldItem;
+            else
+                cn = SwapItem(&plr[pnum].InvBody[2], &plr[pnum].HoldItem);
+        }
+        break;
+    case 6: /* amulet */
+        NetSendCmdChItem(0, 3);
+        if (plr[pnum].InvBody[3]._itype == ITYPE_NONE)
+            plr[pnum].InvBody[3] = plr[pnum].HoldItem;
+        else
+            cn = SwapItem(&plr[pnum].InvBody[3], &plr[pnum].HoldItem);
+        break;
+    case 7: /* inv */
+        if (plr[pnum].HoldItem._itype == ITYPE_GOLD && it == 0) {
+            ii = r - 25;
+            yy = 10 * (ii / 10);
+            xx = ii % 10;
+            if (plr[pnum].InvGrid[yy + xx] > 0) {
+                il = plr[pnum].InvGrid[yy + xx];
+                il--;
+                gt = plr[pnum].InvList[il]._ivalue;
+                ig = plr[pnum].HoldItem._ivalue + gt;
+                if (ig <= GOLD_MAX_LIMIT) {
+                    plr[pnum].InvList[il]._ivalue = ig;
+                    plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
+                    if (ig >= GOLD_MEDIUM_LIMIT)
+                        plr[pnum].InvList[il]._iCurs = ICURS_GOLD_LARGE;
+                    else if (ig <= GOLD_SMALL_LIMIT)
+                        plr[pnum].InvList[il]._iCurs = ICURS_GOLD_SMALL;
+                    else
+                        plr[pnum].InvList[il]._iCurs = ICURS_GOLD_MEDIUM;
+                } else {
+                    ig = GOLD_MAX_LIMIT - gt;
+                    plr[pnum]._pGold += ig;
+                    plr[pnum].HoldItem._ivalue -= ig;
+                    plr[pnum].InvList[il]._ivalue = GOLD_MAX_LIMIT;
+                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_LARGE;
+                    if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
+                        cn = ICURS_GOLD_LARGE + 12;
+                    else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
+                        cn = ICURS_GOLD_SMALL + 12;
+                    else
+                        cn = ICURS_GOLD_MEDIUM + 12;
+                }
+            } else {
+                il = plr[pnum]._pNumInv;
+                plr[pnum].InvList[il] = plr[pnum].HoldItem;
+                plr[pnum]._pNumInv++;
+                plr[pnum].InvGrid[yy + xx] = plr[pnum]._pNumInv;
+                plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
+                if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
+                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_LARGE;
+                else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
+                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_SMALL;
+                else
+                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_MEDIUM;
+            }
+        } else {
+            if (it == 0) {
+                plr[pnum].InvList[plr[pnum]._pNumInv] = plr[pnum].HoldItem;
+                plr[pnum]._pNumInv++;
+                it = plr[pnum]._pNumInv;
+            } else {
+                il = it - 1;
+                if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
+                    plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
+                cn = SwapItem(&plr[pnum].InvList[il], &plr[pnum].HoldItem);
+                if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
+                    plr[pnum]._pGold = CalculateGold(pnum);
+                for (i = 0; i < 40; i++) {
+                    if (plr[pnum].InvGrid[i] == it)
+                        plr[pnum].InvGrid[i] = 0;
+                    if (plr[pnum].InvGrid[i] == -it)
+                        plr[pnum].InvGrid[i] = 0;
+                }
+            }
+            ii = r - 25;
+            yy = 10 * (ii / 10 - ((sy - 1) >> 1));
+            if (yy < 0)
+                yy = 0;
+            for (j = 0; j < sy; j++) {
+                xx = ii % 10 - ((sx - 1) >> 1);
+                if (xx < 0)
+                    xx = 0;
+                for (i = 0; i < sx; i++) {
+                    if (i != 0 || j != sy - 1)
+                        plr[pnum].InvGrid[xx + yy] = -it;
+                    else
+                        plr[pnum].InvGrid[xx + yy] = it;
+                    xx++;
+                }
+                yy += 10;
+            }
+        }
+        break;
+    case 8: /* belt */
+        ii = r - 65;
+        if (plr[pnum].HoldItem._itype == ITYPE_GOLD) {
+            if (plr[pnum].SpdList[ii]._itype != ITYPE_NONE) {
+                if (plr[pnum].SpdList[ii]._itype == ITYPE_GOLD) {
+                    i = plr[pnum].HoldItem._ivalue + plr[pnum].SpdList[ii]._ivalue;
+                    if (i <= GOLD_MAX_LIMIT) {
+                        plr[pnum].SpdList[ii]._ivalue += plr[pnum].HoldItem._ivalue;
+                        plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
+                        if (i >= GOLD_MEDIUM_LIMIT)
+                            plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_LARGE;
+                        else if (i <= GOLD_SMALL_LIMIT)
+                            plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_SMALL;
+                        else
+                            plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_MEDIUM;
+                    } else {
+                        i = GOLD_MAX_LIMIT - plr[pnum].SpdList[ii]._ivalue;
+                        plr[pnum]._pGold += i;
+                        plr[pnum].HoldItem._ivalue -= i;
+                        plr[pnum].SpdList[ii]._ivalue = GOLD_MAX_LIMIT;
+                        plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_LARGE;
+                        if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
+                            cn = ICURS_GOLD_LARGE + 12;
+                        else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
+                            cn = ICURS_GOLD_SMALL + 12;
+                        else
+                            cn = ICURS_GOLD_MEDIUM + 12;
+                    }
+                } else {
+                    plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
+                    cn = SwapItem(&plr[pnum].SpdList[ii], &plr[pnum].HoldItem);
+                }
+            } else {
+                plr[pnum].SpdList[ii] = plr[pnum].HoldItem;
+                plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
+            }
+        } else if (plr[pnum].SpdList[ii]._itype == ITYPE_NONE) {
+            plr[pnum].SpdList[ii] = plr[pnum].HoldItem;
+        } else {
+            cn = SwapItem(&plr[pnum].SpdList[ii], &plr[pnum].HoldItem);
+            if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
+                plr[pnum]._pGold = CalculateGold(pnum);
+        }
+        drawsbarflag = 1;
+        break;
+    }
+
+    CalcPlrInv(pnum, 1);
+    if (pnum == myplr)
+        SetCursor(cn);
 }
 
 void DrawInvTSK(struct TASK *T)

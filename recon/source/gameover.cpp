@@ -9,6 +9,12 @@
 
 struct TASK { unsigned char pad[92]; };   /* sizeof 92 per retail SYM; only used as an untyped handle here */
 
+class CBlocks {
+public:
+    static int GetOverlayOtBase() { return 0x1E8; }
+    static int GetMaxOtPos() { return 0x1FF; }
+};
+
 struct Dialog {   /* sizeof 16, real field names from the retail SYM STRTAG record */
     int BevelGfx;      /* +0x0 */
     int BorderGfx;     /* +0x4 */
@@ -75,8 +81,6 @@ extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 extern unsigned char BORDERR, BORDERG, BORDERB;
 
 void GameOverTask(struct TASK *T);
-extern "C" int GetOverlayOtBase__7CBlocks_80082690(void);
-extern "C" int GetMaxOtPos__7CBlocks_80082698(void);
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -133,30 +137,20 @@ Dialog::Dialog()
     DialogTRed = 0x20;
     DialogTGreen = 0x20;
     DialogTBlue = 0x20;
-    DialogOTpos = GetOverlayOtBase__7CBlocks_80082690();
-}
-
-int GetOverlayOtBase__7CBlocks_80082690(void)
-{
-    return 0x1E8;
-}
-
-int GetMaxOtPos__7CBlocks_80082698(void)
-{
-    return 0x1FF;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
 }
 
 void PrintGameOver(void)
 {
     struct Dialog PBack;
-    struct CFont *Font = &MediumFont;
-    int oldDotpos, oldTotpos;
-    int MaxOt;
     RECT PRect;
+    struct CFont *Font = &MediumFont;
+    int otpos;
+    int oldDotpos, oldTotpos;
 
-    MaxOt = GetMaxOtPos__7CBlocks_80082698();
-    oldDotpos = PBack.SetOTpos(MaxOt - 3);
-    oldTotpos = Font->SetOTpos(MaxOt - 2);
+    otpos = CBlocks::GetMaxOtPos();
+    oldDotpos = PBack.SetOTpos(otpos - 3);
+    oldTotpos = Font->SetOTpos(otpos - 2);
     PBack.SetRGB(BORDERR, BORDERG, BORDERB);
     PBack.SetBack(0x94);
     PBack.SetBorder(0x12);

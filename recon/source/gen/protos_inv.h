@@ -63,6 +63,9 @@ void GM_ForceTpLoad(int Id);   /* @0x80093D44 GMAN.CPP:1337 */
 void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
 BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
 void DoThatDrawInv(void);   /* @0x80159714 INV.CPP:1274 */
+void InvDrawSlot(int X, int Y, int Frame);   /* @0x8015727C INV.CPP:448 */
+void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag);   /* @0x80157300 INV.CPP:462 */
+void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int TransFlag);   /* @0x801575B8 INV.CPP:508 */
 void DrawInfoBox(RECT *InfoRect);   /* @0x80032FA4 CONTROL.CPP:2079 */
 void PRIM_Clip(RECT *R, int Depth);   /* @0x800839EC PRIMPOOL.CPP:216 */
 void PRIM_FullScreen(int Depth);   /* @0x80083B20 PRIMPOOL.CPP:257 */

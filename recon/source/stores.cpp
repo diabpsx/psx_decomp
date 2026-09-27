@@ -1287,6 +1287,8 @@ void S_SBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
+        int p = myplr;
+
         w = cursW;
         if (w < 0) {
             w += 0xF;
@@ -1295,7 +1297,7 @@ void S_SBuyEnter(void)
         if (h < 0) {
             h += 0xF;
         }
-        done = func_80159F24(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+        done = func_80159F24(p, i++, w >> 4, h >> 4, 0) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);
@@ -1331,6 +1333,8 @@ void S_WBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
+        int p = myplr;
+
         w = cursW;
         if (w < 0) {
             w += 0xF;
@@ -1339,7 +1343,7 @@ void S_WBuyEnter(void)
         if (h < 0) {
             h += 0xF;
         }
-        done = func_8015A24C(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+        done = func_8015A24C(p, i++, w >> 4, h >> 4, 0) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);
@@ -1367,6 +1371,8 @@ void S_BBuyEnter(void)
         SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
         i = 0;
         do {
+            int p = myplr;
+
             w = cursW;
             if (w < 0) {
                 w += 0xF;
@@ -1375,7 +1381,7 @@ void S_BBuyEnter(void)
             if (h < 0) {
                 h += 0xF;
             }
-            done = func_80159F24(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+            done = func_80159F24(p, i++, w >> 4, h >> 4, 0) & 0xFF;
         } while (i < 0x28 && done == 0);
         StartStore(done != 0 ? 0xB : 0xA);
         SetCursor(1);
@@ -1741,6 +1747,8 @@ void S_SPBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
+        int p = myplr;
+
         w = cursW;
         if (w < 0) {
             w += 0xF;
@@ -1749,7 +1757,7 @@ void S_SPBuyEnter(void)
         if (h < 0) {
             h += 0xF;
         }
-        done = func_80159F24(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+        done = func_80159F24(p, i++, w >> 4, h >> 4, 0) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);
@@ -1982,8 +1990,8 @@ void S_ScrollSSell(int idx)
                 iclr = 2;
             }
             if (storehold[idx]._iMagical != 0 && storehold[idx]._iIdentified != 0) {
-                v = storehold[idx]._iIvalue;
                 StrPtr = MakeItemStr(&storehold[idx], storehold[idx]._iIName, 0x100);
+                v = storehold[idx]._iIvalue;
             } else {
                 StrPtr = MakeItemStr(&storehold[idx], storehold[idx]._iName, 0x100);
                 v = storehold[idx]._ivalue;
@@ -2246,6 +2254,8 @@ void S_HBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
+        int p = myplr;
+
         w = cursW;
         if (w < 0) {
             w += 0xF;
@@ -2254,7 +2264,7 @@ void S_HBuyEnter(void)
         if (h < 0) {
             h += 0xF;
         }
-        done = func_8015A24C(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+        done = func_8015A24C(p, i++, w >> 4, h >> 4, 0) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);

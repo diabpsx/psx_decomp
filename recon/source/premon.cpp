@@ -75,15 +75,15 @@ void InitMonsterGFX(int monst)
 {
     int anim;
     char strBuff[256];
-    char letter = 's';
     int mtype;
     struct MonsterData *pmonsterdata;
 
-    (void)strBuff;
     mtype = Monsters[monst].mtype;
     pmonsterdata = &monsterdata[mtype];
 
     for (anim = 0; anim < 6; anim++) {
+        if (!(animletter[anim] == 's' && !pmonsterdata->has_special) && pmonsterdata->Frames[anim] > 0) {
+        }
         Monsters[monst].Anims[anim].Frames = pmonsterdata->Frames[anim];
         Monsters[monst].Anims[anim].Rate = pmonsterdata->Rate[anim];
     }

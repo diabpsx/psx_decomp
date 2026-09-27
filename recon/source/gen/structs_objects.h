@@ -351,6 +351,7 @@ struct MonsterStruct {   /* sizeof 104 */
     unsigned char _uniqtype;   /* +0x4F */
     char _pad50[0xC];   /* +0x50 */
     int mName;   /* +0x5C */
+    char _pad60[8];   /* +0x60 */
 };
 
 struct MissileStruct {   /* sizeof 76 */

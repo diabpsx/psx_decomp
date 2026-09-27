@@ -80,52 +80,35 @@ void InitVPTriggers(void)
 /* @0x80075060 */
 BOOL FindLevTrig(int x, int y, int l)
 {
-    short *base;
     int i;
 
-    if (*(short *)((char *)TrigList + (l << 7)) == -1)
-        return FALSE;
-
     i = 0;
-    base = (short *)((char *)TrigList + (l << 7));
-loop:
-    if (x == *(short *)((char *)base + i)) {
-        i += 4;
-        if (y == *(short *)((char *)base + i - 2))
+    while (TrigList[l][i] != -1) {
+        if (x == TrigList[l][i] && y == TrigList[l][i + 1])
             return TRUE;
-        goto cont;
+        i += 2;
     }
-    i += 4;
-cont:
-    base = (short *)((char *)TrigList + (l << 7));
-    if (*(short *)((char *)base + i) == -1)
-        return FALSE;
-    goto loop;
+    return FALSE;
 }
 
 /* @0x800750F8 */
 void ScanMap(short *list, int l)
 {
-    int NoTrigs;
-    short *entry;
-    int x, y;
+    int NoTrigs = 0;
 
-    NoTrigs = 0;
     while (*list != -1) {
-        for (y = 0; y < 112; y++) {
-            for (x = 0; x < 112; x++) {
+        for (int y = 0; y < 112; y++) {
+            for (int x = 0; x < 112; x++) {
                 if (GetDPiece(x, y) == *list) {
                     if (NoTrigs >= 32)
                         DBG_Error(NULL, "psxsrc/TRIGS.CPP", 0x99);
-                    entry = &TrigList[l][NoTrigs * 2];
-                    entry[0] = x;
-                    entry[1] = y;
+                    TrigList[l][NoTrigs * 2] = x;
+                    TrigList[l][NoTrigs * 2 + 1] = y;
                     NoTrigs++;
                     x = 112;
                     y = 112;
-                    entry += 2;
-                    entry[0] = -1;
-                    entry[1] = -1;
+                    TrigList[l][NoTrigs * 2] = -1;
+                    TrigList[l][NoTrigs * 2 + 1] = -1;
                 }
             }
         }
@@ -137,48 +120,35 @@ void ScanMap(short *list, int l)
 int FindBlock(int x, int y)
 {
     struct BLOCK *ptr;
-    int i;
 
     ptr = BlockList;
     if (dPiece != NULL)
         return GetDPiece(x, y);
-
-    if (BlockList[0].block == 0)
-        return 0;
-
-    i = 0;
-    for (;;) {
+    while (ptr->block != 0) {
         if (ptr->x == x && ptr->y == y)
             return ptr->block;
-        i++;
         ptr++;
-        if (ptr->block == 0)
-            return 0;
     }
+    return 0;
 }
 
 /* @0x8007529C */
 void ChangeBlock(int x, int y, int bl)
 {
-    struct BLOCK *ptr;
-    int b;
+    struct BLOCK *ptr = BlockList;
+    short *list;
 
-    ptr = BlockList;
-    if (NoBlocks > 0) {
-        for (b = 0; b < NoBlocks; b++) {
-            if (x == ptr->x && y == ptr->y) {
-                ptr->block = bl;
-                return;
-            }
-            ptr++;
+    for (int b = 0; b < NoBlocks; b++) {
+        if (x == ptr->x && y == ptr->y) {
+            ptr->block = bl;
+            return;
         }
-        return;
+        ptr++;
     }
-
-    if (levlist != NULL) {
-        while (*levlist != -1) {
-            levlist++;
-            if (bl == *levlist) {
+    if (levlist) {
+        list = levlist;
+        while (*list != -1) {
+            if (bl == *list++) {
                 if (NoBlocks >= 160)
                     DBG_Error(NULL, "psxsrc/TRIGS.CPP", 0xD9);
                 ptr->x = x;
@@ -196,17 +166,14 @@ void ChangeBlock(int x, int y, int bl)
 void ScanBlocks(short *list)
 {
     struct BLOCK *ptr;
-    int bl;
-    int x, y;
 
     levlist = list;
     ptr = &BlockList[NoBlocks];
-
     while (*list != -1) {
-        bl = *list;
+        int bl = *list;
         list++;
-        for (y = 0; y < 112; y++) {
-            for (x = 0; x < 112; x++) {
+        for (int y = 0; y < 112; y++) {
+            for (int x = 0; x < 112; x++) {
                 if (GetDPiece(x, y) == bl) {
                     if (NoBlocks >= 160)
                         DBG_Error(NULL, "psxsrc/TRIGS.CPP", 0xF3);
@@ -347,20 +314,18 @@ BOOL ForceL1Trig(void)
 /* @0x80075A48 */
 BOOL ForceL2Trig(void)
 {
-    int i;
+    int j;
     int dx, dy;
-    struct TriggerStruct *t;
 
     if (FindLevTrig(cursmx, cursmy, 0)) {
-        t = trigs;
-        for (i = 0; i < numtrigs; i++, t++) {
-            if (t->_tmsg == WM_DIABPREVLVL) {
-                dx = abs(t->_tx - cursmx);
-                dy = abs(t->_ty - cursmy);
+        for (j = 0; j < numtrigs; j++) {
+            if (trigs[j]._tmsg == WM_DIABPREVLVL) {
+                dx = abs(trigs[j]._tx - cursmx);
+                dy = abs(trigs[j]._ty - cursmy);
                 if (dx < 4 && dy < 4) {
                     sprintf(_infostr[sel_data], GetStr(0x4A7), currlevel - 1);
-                    cursmx = t->_tx;
-                    cursmy = t->_ty;
+                    cursmx = trigs[j]._tx;
+                    cursmy = trigs[j]._ty;
                     return TRUE;
                 }
             }
@@ -369,10 +334,10 @@ BOOL ForceL2Trig(void)
 
     if (FindLevTrig(cursmx, cursmy, 1)) {
         sprintf(_infostr[sel_data], GetStr(0x115), currlevel + 1);
-        for (i = 0; i < numtrigs; i++) {
-            if (trigs[i]._tmsg == WM_DIABNEXTLVL) {
-                cursmx = trigs[i]._tx;
-                cursmy = trigs[i]._ty;
+        for (j = 0; j < numtrigs; j++) {
+            if (trigs[j]._tmsg == WM_DIABNEXTLVL) {
+                cursmx = trigs[j]._tx;
+                cursmy = trigs[j]._ty;
                 return TRUE;
             }
         }
@@ -380,14 +345,14 @@ BOOL ForceL2Trig(void)
 
     if (currlevel == 5) {
         if (FindLevTrig(cursmx, cursmy, 2)) {
-            for (i = 0; i < numtrigs; i++) {
-                if (trigs[i]._tmsg == WM_DIABTWARPUP) {
-                    dx = abs(trigs[i]._tx - cursmx);
-                    dy = abs(trigs[i]._ty - cursmy);
+            for (j = 0; j < numtrigs; j++) {
+                if (trigs[j]._tmsg == WM_DIABTWARPUP) {
+                    dx = abs(trigs[j]._tx - cursmx);
+                    dy = abs(trigs[j]._ty - cursmy);
                     if (dx < 4 && dy < 4) {
                         strcpy(_infostr[sel_data], GetStr(0x4A8));
-                        cursmx = trigs[i]._tx;
-                        cursmy = trigs[i]._ty;
+                        cursmx = trigs[j]._tx;
+                        cursmy = trigs[j]._ty;
                         return TRUE;
                     }
                 }
@@ -567,7 +532,6 @@ BOOL ForcePWaterTrig(void)
 /* @0x800765E4 */
 void CheckTrigForce(void)
 {
-    int i;
     int ocursmx, ocursmy;
 
     ocursmx = cursmx;
@@ -576,7 +540,7 @@ void CheckTrigForce(void)
     _trigflag[sel_data] = 0;
 
     if (!setlevel) {
-        for (i = 0; i < 8 && !_trigflag[sel_data]; i++) {
+        for (int i = 0; i < 8 && !_trigflag[sel_data]; i++) {
             cursmx = ocursmx + offset_x[i];
             cursmy = ocursmy + offset_y[i];
             switch (leveltype) {
@@ -601,7 +565,7 @@ void CheckTrigForce(void)
             }
         }
     } else {
-        for (i = 0; i < 8 && !_trigflag[sel_data]; i++) {
+        for (int i = 0; i < 8 && !_trigflag[sel_data]; i++) {
             cursmx = ocursmx + offset_x[i];
             cursmy = ocursmy + offset_y[i];
             switch (setlvlnum) {
@@ -670,130 +634,111 @@ BOOL IsTrigger(int x, int y)
 /* @0x80076A8C */
 BOOL CheckTrigLevel(int level)
 {
-    BOOL result;
-
-    if (plr[0]._pLevel < level) {
-        if (plr[1]._pLevel < level)
-            return FALSE;
-        result = TRUE;
-    } else {
-        result = TRUE;
-    }
-    return result;
+    if (plr[0]._pLevel >= level || plr[1]._pLevel >= level)
+        return TRUE;
+    return FALSE;
 }
 
 /* @0x80076AC8 */
 void CheckTriggers(int pnum)
 {
-    int i;
-    int px, py;
-    int msgId;
-    unsigned char abort;
-    char pclass;
+    int x, y;
 
-    if (plr[pnum].plractive == 0)
+    if (plr[0].plractive == 0)
         myplr = 1;
 
-    for (i = 0; i < numtrigs; i++) {
-        if (plr[pnum]._px != trigs[i]._tx || plr[pnum]._py != trigs[i]._ty)
+    for (int i = 0; i < numtrigs; i++) {
+        if (plr[pnum]._px != trigs[i]._tx)
+            continue;
+        if (plr[pnum]._py != trigs[i]._ty)
             continue;
         if (qtextflag)
             continue;
         if (PauseMode)
             continue;
-        if (gbMaxPlayers == 2 && plr[pnum ^ 1].plractive != 0 && plr[pnum ^ 1].destAction == 0xD)
+        if (gbMaxPlayers == 2 && plr[pnum ^ 1].plractive && plr[pnum ^ 1].destAction == 0xD)
             continue;
 
         switch (trigs[i]._tmsg) {
         case WM_DIABNEXTLVL:
-            if (_pcurs[myplr] < CURSOR_FIRSTITEM || !DropItemBeforeTrig()) {
-                FadeGameOut();
-                StartNewLvl(myplr, trigs[i]._tmsg, currlevel + 1);
-                goto tail;
+            if (_pcurs[myplr] >= CURSOR_FIRSTITEM) {
+                if (DropItemBeforeTrig())
+                    return;
             }
+            FadeGameOut();
+            StartNewLvl(myplr, trigs[i]._tmsg, currlevel + 1);
             break;
         case WM_DIABPREVLVL:
-            if (_pcurs[myplr] < CURSOR_FIRSTITEM || !DropItemBeforeTrig()) {
-                FadeGameOut();
-                StartNewLvl(myplr, trigs[i]._tmsg, currlevel - 1);
-                goto tail;
+            if (_pcurs[myplr] >= CURSOR_FIRSTITEM) {
+                if (DropItemBeforeTrig())
+                    return;
             }
+            FadeGameOut();
+            StartNewLvl(myplr, trigs[i]._tmsg, currlevel - 1);
             break;
         case WM_DIABTOWNWARP:
-            abort = 0;
             if (gbMaxPlayers != 1) {
-                px = 0;
-                py = 0;
-                msgId = 0;
-                if (trigs[i]._tlvl == 5) {
-                    if (!CheckTrigLevel(8)) {
-                        abort = 1;
-                        msgId = EMSG_REQUIRES_LVL_8;
-                        px = plr[pnum]._px;
-                        py = plr[pnum]._py + 1;
-                    }
+                unsigned char abortflag = FALSE;
+                int dx = 0, dy = 0;
+                char m = 0;
+                if (trigs[i]._tlvl == 5 && !CheckTrigLevel(8)) {
+                    abortflag = TRUE;
+                    dx = plr[pnum]._px;
+                    dy = plr[pnum]._py + 1;
+                    m = EMSG_REQUIRES_LVL_8;
                 }
-                if (trigs[i]._tlvl == 9) {
-                    if (!CheckTrigLevel(13)) {
-                        abort = 1;
-                        msgId = EMSG_REQUIRES_LVL_13;
-                        py = plr[pnum]._py;
-                        px = plr[pnum]._px + 1;
-                    }
+                if (trigs[i]._tlvl == 9 && !CheckTrigLevel(13)) {
+                    abortflag = TRUE;
+                    dx = plr[pnum]._px + 1;
+                    dy = plr[pnum]._py;
+                    m = EMSG_REQUIRES_LVL_13;
                 }
-                if (trigs[i]._tlvl == 13) {
-                    if (!CheckTrigLevel(17)) {
-                        msgId = EMSG_REQUIRES_LVL_17;
-                        px = plr[pnum]._px;
-                        py = plr[pnum]._py + 1;
-                        abort = 1;
-                    }
+                if (trigs[i]._tlvl == 13 && !CheckTrigLevel(17)) {
+                    abortflag = TRUE;
+                    dx = plr[pnum]._px;
+                    dy = plr[pnum]._py + 1;
+                    m = EMSG_REQUIRES_LVL_17;
                 }
-                if (abort) {
-                    pclass = plr[pnum]._pClass;
-                    if (pclass == PC_WARRIOR)
+                if (abortflag) {
+                    if (plr[pnum]._pClass == PC_WARRIOR)
                         PlaySFX(PS_WARR43);
-                    else if (pclass == PC_ROGUE)
+                    else if (plr[pnum]._pClass == PC_ROGUE)
                         PlaySFX(PS_ROGUE43);
-                    else if (pclass == PC_SORCERER)
+                    else if (plr[pnum]._pClass == PC_SORCERER)
                         PlaySFX(PS_MAGE43);
-                    InitDiabloMsg(msgId);
-                    NetSendCmdLoc(1, 1, px, py);
+                    InitDiabloMsg(m);
+                    NetSendCmdLoc(1, 1, dx, dy);
                     return;
                 }
             }
             FadeGameOut();
             StartNewLvl(myplr, trigs[i]._tmsg, trigs[i]._tlvl);
-            goto tail;
+            break;
         case WM_DIABTWARPUP:
             TWarpFrom = currlevel;
             FadeGameOut();
             StartNewLvl(myplr, trigs[i]._tmsg, 0);
-            goto tail;
+            break;
         case WM_DIABRTNLVL:
             FadeGameOut();
             StartNewLvl(myplr, trigs[i]._tmsg, ReturnLvl);
-            goto tail;
+            break;
         }
-        continue;
 
-    tail:
         if (plr[0].plractive) {
             PlacePlayer(0, ViewX, ViewY, 1);
-            px = plr[0]._px;
-            py = plr[0]._py;
+            x = plr[0]._px;
+            y = plr[0]._py;
         } else {
-            px = ViewX;
-            py = ViewY;
+            x = ViewX;
+            y = ViewY;
         }
-        if (FePlayerNo != 0 && plr[0].plractive != 0) {
-            if (plr[1].plractive != 0) {
+        if (FePlayerNo && plr[0].plractive) {
+            if (plr[1].plractive) {
                 PlacePlayer(1, plr[0]._px, plr[0]._py, 0);
                 ChangeLight(plr[1]._plid, plr[1]._px, plr[1]._py, plr[1]._pLightRad + 0x23F0);
             }
-        } else {
-            if (plr[1].plractive != 0)
-                PlacePlayer(1, px, py, 0);
-        }
+        } else if (plr[1].plractive)
+            PlacePlayer(1, x, y, 0);
     }
 }

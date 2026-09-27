@@ -69,6 +69,11 @@ struct PanelXY {   /* sizeof 88, real field names from the retail SYM STRTAG rec
     unsigned char WhichPlayerDoesThisPanelReallyBelongToThen;   /* +0x54 */
 };
 
+class CBlocks {
+public:
+    static int GetMaxOtPos() { return 0x1FF; }
+};
+
 struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record) */
     int HealthAnimCount;    /* +0x0 */
     int ManaAnimCount;      /* +0x4 */
@@ -135,7 +140,6 @@ extern int SpellITbl[];
 extern unsigned char D_80110868[16];
 extern int InvGfxTable[];
 
-extern "C" int GetMaxOtPos__7CBlocks_80098948(void);
 
 /* TU-owned small data: speed-bar needle physics state (persists between frames) */
 int D_8011AD94, D_8011AD98, D_8011AD9C, D_8011ADA0;
@@ -159,7 +163,7 @@ GPanel::GPanel(int Ofs)
     HealthAnimCount = Ofs + 1;
     ManaAnimCount = Ofs + 0x17;
     GlobeAnimCount = Ofs + 0xF;
-    GPanelOt = GetMaxOtPos__7CBlocks_80098948() - 2;
+    GPanelOt = CBlocks::GetMaxOtPos() - 2;
 }
 
 short SpdTrimCol(short col)
@@ -346,10 +350,17 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
     }
     Ft4 = PanelTData->PrintFt4(ItemType + 0x29, X, Y, 0, GPanelOt + 1, 0);
     Loop = (Item->_iDurability - 1) * 3;
-    Ft4->code = (Ft4->code | 2) & 0xFE;
-    Ft4->r0 = D_800B9BCC[Loop];
-    Ft4->g0 = D_800B9BCD[Loop];
-    Ft4->b0 = D_800B9BCE[Loop];
+    {
+        unsigned char NewR, NewG, NewB;
+
+        NewR = D_800B9BCC[Loop];
+        NewG = D_800B9BCD[Loop];
+        Ft4->code = (Ft4->code | 2) & 0xFE;
+        NewB = D_800B9BCE[Loop];
+        Ft4->r0 = NewR;
+        Ft4->g0 = NewG;
+        Ft4->b0 = NewB;
+    }
 
     Ft4 = PanelTData->PrintFt4(0x94, X, Y, 0, GPanelOt + 1, 0);
     Ft4->y0 = (short)(Y - 2);
@@ -419,11 +430,6 @@ void GPanel::Print(struct PanelXY *XY, struct PlayerStruct *Plr)
         HealthAnimCount = (HealthAnimCount + 1) & 0x1F;
         ManaAnimCount = (ManaAnimCount + 1) & 0x1F;
     }
-}
-
-int GetMaxOtPos__7CBlocks_80098948(void)
-{
-    return 0x1FF;
 }
 
 void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)

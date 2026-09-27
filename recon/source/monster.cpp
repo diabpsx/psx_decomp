@@ -29,6 +29,12 @@
 #define OBJ_L3DOORR 75
 
 #define IMMUNE_FIRE 0x10
+#define RESIST_MAGIC     0x01
+#define RESIST_FIRE      0x02
+#define RESIST_LIGHTNING 0x04
+#define IMMUNE_MAGIC     0x08
+#define IMMUNE_LIGHTNING 0x20
+#define D_HELL 2
 
 /* AI ids */
 #define AI_GARG     12
@@ -3343,11 +3349,10 @@ void MAI_Snake(int i)
  * the "goal!=EAT" failure path). */
 void MAI_Scav(int i)
 {
+    unsigned char done = 0;
     MonsterStruct *Monst = &monster[i];
-    int x, y;
-    unsigned char done;
+    int x = 0, y;
 
-    done = 0;
     if (Monst->_mmode == MM_STAND) {
         if (Monst->_mhitpoints < (Monst->_mmaxhp >> 1) && Monst->_mgoal != MG_EAT) {
             if (monster[i].leaderflag) {
@@ -3857,4 +3862,55 @@ void M_DiabloDeath(int i, unsigned char sendmsg, int pnum)
     Monst->_mVar8 = pnum;
     Monst->_mVar5 = ((long long)(Monst->_mVar3 - (_mx << 16))) / j;
     Monst->_mVar6 = ((long long)(Monst->_mVar4 - (_my << 16))) / j;
+}
+
+void PrintMonstHistory(int mt)
+{
+    int res;
+
+    if (monstkills[mt] >= 15) {
+        if (gnDifficulty != D_HELL)
+            res = monsterdata[mt].mMagicRes;
+        else
+            res = monsterdata[mt].mMagicRes2;
+        res &= (RESIST_MAGIC | RESIST_FIRE | RESIST_LIGHTNING | IMMUNE_MAGIC | IMMUNE_FIRE | IMMUNE_LIGHTNING);
+
+        if (res == 0) {
+            strcpy(tempstr, GetStr(0x2CE));
+        } else {
+            if (res & (RESIST_MAGIC | RESIST_FIRE | RESIST_LIGHTNING)) {
+                strcpy(tempstr, GetStr(0x35F));
+                if (res & RESIST_MAGIC)
+                    strcat(tempstr, GetStr(0x273));
+                if (res & RESIST_FIRE) {
+                    if (res & RESIST_MAGIC)
+                        strcat(tempstr, D_8011C2C8);
+                    strcat(tempstr, GetStr(0x157));
+                }
+                if (res & RESIST_LIGHTNING) {
+                    if (res & RESIST_FIRE)
+                        strcat(tempstr, D_8011C2C8);
+                    strcat(tempstr, GetStr(0x254));
+                }
+                AddPanelString(tempstr, 1);
+            }
+            if (res & (IMMUNE_MAGIC | IMMUNE_FIRE | IMMUNE_LIGHTNING)) {
+                strcpy(tempstr, GetStr(0x20D));
+                if (res & IMMUNE_MAGIC)
+                    strcat(tempstr, GetStr(0x273));
+                if (res & IMMUNE_FIRE) {
+                    if (res & IMMUNE_MAGIC)
+                        strcat(tempstr, D_8011C2C8);
+                    strcat(tempstr, GetStr(0x157));
+                }
+                if (res & IMMUNE_LIGHTNING) {
+                    if (res & IMMUNE_FIRE)
+                        strcat(tempstr, D_8011C2C8);
+                    strcat(tempstr, GetStr(0x254));
+                }
+                AddPanelString(tempstr, 1);
+            }
+        }
+    }
+    _pinfoflag[sel_data] = 1;
 }

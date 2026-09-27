@@ -23,7 +23,7 @@ extern unsigned char BORDERR;   /* @0x8011ABF7 */
 extern unsigned char BORDERG;   /* @0x8011ABF8 */
 extern unsigned char BORDERB;   /* @0x8011ABF9 */
 extern struct TextDataStruct alltext[269];   /* @0x80117C20 */
-extern struct Dialog QBack;   /* @0x800D6790 */
+/* QBack (@0x800D6790) is DEFINED in minitext.cpp (its ctor/dtor thunks _GLOBAL_.I/D.QBack live here) */
 extern char stextflag;   /* @0x8011BAE0 */
 extern int options_pad;   /* @0x8011B250 */
 extern BOOL ignore_buttons;   /* @0x8011BBD0 */
@@ -37,3 +37,4 @@ extern unsigned char WHITEB;   /* @0x8011ABD3 */
 extern int TextWait;   /* @0x8011B95C */
 extern char MtPrevText[80];   /* @0x800D67A0 */
 extern char tempstr[256];   /* @0x800CEA10 */
+extern struct SFXHDR SFXTab[2];   /* @0x800B9BE0 */

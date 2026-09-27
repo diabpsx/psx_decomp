@@ -145,279 +145,277 @@ void SetWeirdFX(void)
 void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
 {
     int xoff, yoff;
-    int colour_mask, shift_mask, weirdy, cont;
+    int x, y;
+    int v;
+    int colour_mask, shift_mask, shake;
     int light_x, light_y;
     int block_x, block_y;
-    int scr_x, scr_y;
-    int v, max_x;
-    int mult;
+    int dist_y;
+    int max_x;
+    int mult, mult_st;
     int radius_block;
-    int val;
+    int scr_x, scr_y;
+    int temp_x, temp_y;
+    int weirdy, cont;
 
     xoff = 0;
     yoff = 0;
     colour_mask = (nRadius >> 4) & 7;
     shift_mask = (nRadius >> 7) & 0x3F;
-    weirdy = (nRadius >> 0xE) & 1;
-
-    if (weirdy || g_weirdy_prev != 1) {
-        if (weirdy == 1)
-            g_weirdy_prev = weirdy;
-        cont = (nRadius >> 0xF) & 1;
-        nRadius = nRadius & 0xF;
-        if (leveltype == 3) {
-            /* FIELD OFFSET UNCERTAIN: oracle reads plr+0x1D/plr+0x1A05 (== plr[1]+0x1D by struct
-             * size) with NO myplr multiply -- i.e. it tests plr[0] and plr[1] directly (2-player
-             * PSX split-screen?), not plr[myplr]. Named plractive/_ 1plid mechanically from the
-             * struct layout; semantic role (co-op infra-vision boost?) not confirmed. */
-            if (plr[0].plractive != 0 && Lnum == plr[0]._plid)
-                nRadius = 0xA;
-            if (plr[1].plractive != 0 && Lnum == plr[1]._plid)
-                nRadius = 0xA;
+    shake = 1;
+    weirdy = (nRadius >> 14) & 1;
+    if (!weirdy && g_weirdy_prev == 1)
+        return;
+    if (weirdy == 1)
+        g_weirdy_prev = weirdy;
+    cont = (nRadius >> 15) & 1;
+    nRadius &= 0xF;
+    if (leveltype == 3) {
+        if (plr[0].plractive && Lnum == plr[0]._plid)
+            nRadius = 10;
+        if (plr[1].plractive && Lnum == plr[1]._plid)
+            nRadius = 10;
+    }
+    nRadius += light_level[leveltype];
+    if (nRadius > 15)
+        nRadius = 15;
+    g_light_amp = D_800D62E0[nRadius];
+    g_light_amp2 = D_800D62F0[nRadius];
+    if (weirdy) {
+        g_light_amp = 0x40;
+        g_light_amp2 = 4;
+        g_light_clamp = 0xFF;
+        disp_tab_r += dispy_r;
+        disp_tab_g += dispy_g;
+        disp_tab_b += dispy_b;
+        if (!cont && disp_tab_r > 0xC800) {
+            g_weirdy_prev = 0;
+            LightList[Lnum]._ldel = 1;
+            g_light_clamp = 0x80;
+            return;
         }
-        nRadius = nRadius + light_level[leveltype];
-        if (nRadius >= 0x10)
-            nRadius = 0xF;
-        g_light_amp = D_800D62E0[nRadius];
-        g_light_amp2 = D_800D62F0[nRadius];
-        if (weirdy) {
-            g_light_amp = 0x40;
-            g_light_amp2 = 4;
-            g_light_clamp = 0xFF;
-            scr_x = disp_tab_r + dispy_r;
-            disp_tab_r = scr_x;
-            disp_tab_g += dispy_g;
-            disp_tab_b += dispy_b;
-            if (!cont && scr_x > 0xC800) {
-                g_weirdy_prev = 0;
-                LightList[Lnum]._ldel = 1;
-                g_light_clamp = 0x80;
-                return;
+    }
+    if (Lnum >= 0) {
+        xoff = LightList[Lnum]._xoff + 8;
+        yoff = LightList[Lnum]._yoff + 8;
+    }
+    if (leveltype) {
+        nXPos = (nXPos - 16) / 2;
+        nYPos = (nYPos - 16) / 2;
+        light_x = ((nXPos << 4) | xoff) - 8;
+        light_y = ((nYPos << 4) | yoff) - 8;
+    } else {
+        nXPos = (nXPos + 2) / 2 - 2;
+        nYPos = (nYPos + 2) / 2 - 2;
+        light_x = ((nXPos << 4) | xoff) + 4;
+        light_y = ((nYPos << 4) | yoff) + 4;
+    }
+    if (nRadius < 0)
+        return;
+    if (!shake) {
+        light_x += GU_GetRnd() & 1;
+        light_y += GU_GetRnd() & 1;
+    }
+    temp_x = nXPos;
+    temp_y = nYPos;
+    block_x = nXPos - (g_light_amp >> 4);
+    block_y = nYPos - (g_light_amp >> 4);
+    scr_x = (gr_scrxoff >> 16) / 40 - 2;
+    scr_y = (gr_scryoff >> 16) / 40 - 8;
+    if (!leveltype) {
+        temp_x -= 6;
+        temp_y -= 8;
+    }
+    if (scr_x < temp_x + 8 && temp_x < scr_x + 8 && scr_y < temp_y + 8 && temp_y < scr_y + 8) {
+        max_x = 48;
+        radius_block = g_light_amp >> 3;
+        if (block_y < 0 || block_y + radius_block > max_x || block_x < 0 || block_x + radius_block > max_x) {
+            if (!shift_mask) {
+                for (y = 0; y <= radius_block; y++) {
+                    if (block_y + y >= 0 && block_y + y < 48) {
+                        for (x = 0; x <= radius_block; x++) {
+                            dist_y = light_y - ((block_y + y) << 4);
+                            mult_st = g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y);
+                            if (mult_st < 0)
+                                mult_st = 0;
+                            if (block_x + x >= 0 && block_x + x < max_x) {
+                                if (colour_mask & 1) {
+                                    if (weirdy)
+                                        mult = g_lightband[(mult_st + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
+                                    else
+                                        mult = mult_st * g_light_amp2;
+                                    v = dung_map_r[block_x + x][block_y + y] + (mult & 0xFF);
+                                    if (v > g_light_clamp)
+                                        v = g_light_clamp;
+                                    dung_map_r[block_x + x][block_y + y] = v;
+                                }
+                                if (colour_mask & 2) {
+                                    if (weirdy)
+                                        mult = g_lightband[(mult_st + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
+                                    else
+                                        mult = mult_st * g_light_amp2;
+                                    v = dung_map_g[block_x + x][block_y + y] + (mult & 0xFF);
+                                    if (v > g_light_clamp)
+                                        v = g_light_clamp;
+                                    dung_map_g[block_x + x][block_y + y] = v;
+                                }
+                                if (colour_mask & 4) {
+                                    if (weirdy)
+                                        mult = g_lightband[(mult_st + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
+                                    else
+                                        mult = mult_st * g_light_amp2;
+                                    v = dung_map_b[block_x + x][block_y + y] + (mult & 0xFF);
+                                    if (v > g_light_clamp)
+                                        v = g_light_clamp;
+                                    dung_map_b[block_x + x][block_y + y] = v;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                for (y = 0; y <= radius_block; y++) {
+                    if (block_y + y >= 0 && block_y + y < 48) {
+                        for (x = 0; x <= radius_block; x++) {
+                            dist_y = light_y - ((block_y + y) << 4);
+                            mult = (g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y)) * g_light_amp2;
+                            if (mult < 0)
+                                mult = 0;
+                            if (block_x + x >= 0 && block_x + x < max_x) {
+                                v = dung_map_r[block_x + x][block_y + y];
+                                if (colour_mask & 1) {
+                                    if (!(shift_mask & 9)) {
+                                        v += mult;
+                                    } else {
+                                        if (shift_mask & 1)
+                                            v += mult >> 1;
+                                        if (shift_mask & 8)
+                                            v += mult * 2;
+                                    }
+                                    if (v > g_light_clamp)
+                                        v = g_light_clamp;
+                                    dung_map_r[block_x + x][block_y + y] = v;
+                                }
+                                v = dung_map_g[block_x + x][block_y + y];
+                                if (colour_mask & 2) {
+                                    if (!(shift_mask & 0x12)) {
+                                        v += mult;
+                                    } else {
+                                        if (shift_mask & 2)
+                                            v += mult >> 1;
+                                        if (shift_mask & 0x10)
+                                            v += mult * 2;
+                                    }
+                                    if (v > g_light_clamp)
+                                        v = g_light_clamp;
+                                    dung_map_g[block_x + x][block_y + y] = v;
+                                }
+                                v = dung_map_b[block_x + x][block_y + y];
+                                if (colour_mask & 4) {
+                                    if (!(shift_mask & 0x24)) {
+                                        v += mult;
+                                    } else {
+                                        if (shift_mask & 4)
+                                            v += mult >> 1;
+                                        if (shift_mask & 0x20)
+                                            v += mult * 2;
+                                    }
+                                    if (v > g_light_clamp)
+                                        v = g_light_clamp;
+                                    dung_map_b[block_x + x][block_y + y] = v;
+                                }
+                            }
+                        }
+                    }
+                }
             }
-        }
-        if (Lnum >= 0) {
-            xoff = LightList[Lnum]._xoff + 8;
-            yoff = LightList[Lnum]._yoff + 8;
-        }
-        if (leveltype != 0) {
-            nXPos = (nXPos - 0x10) / 2;
-            nYPos = (nYPos - 0x10) / 2;
-            block_x = (nXPos * 0x10 | xoff) - 8;
-            block_y = (nYPos * 0x10 | yoff) - 8;
+        } else if (!shift_mask) {
+            for (y = 0; y <= radius_block; y++) {
+                for (x = 0; x <= radius_block; x++) {
+                    dist_y = light_y - ((block_y + y) << 4);
+                    mult_st = g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y);
+                    if (mult_st < 0)
+                        mult_st = 0;
+                    if (colour_mask & 1) {
+                        if (weirdy)
+                            mult = g_lightband[(mult_st + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
+                        else
+                            mult = mult_st * g_light_amp2;
+                        v = dung_map_r[block_x + x][block_y + y] + (mult & 0xFF);
+                        if (v > g_light_clamp)
+                            v = g_light_clamp;
+                        dung_map_r[block_x + x][block_y + y] = v;
+                    }
+                    if (colour_mask & 2) {
+                        if (weirdy)
+                            mult = g_lightband[(mult_st + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
+                        else
+                            mult = mult_st * g_light_amp2;
+                        v = dung_map_g[block_x + x][block_y + y] + (mult & 0xFF);
+                        if (v > g_light_clamp)
+                            v = g_light_clamp;
+                        dung_map_g[block_x + x][block_y + y] = v;
+                    }
+                    if (colour_mask & 4) {
+                        if (weirdy)
+                            mult = g_lightband[(mult_st + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
+                        else
+                            mult = mult_st * g_light_amp2;
+                        v = dung_map_b[block_x + x][block_y + y] + (mult & 0xFF);
+                        if (v > g_light_clamp)
+                            v = g_light_clamp;
+                        dung_map_b[block_x + x][block_y + y] = v;
+                    }
+                }
+            }
         } else {
-            nXPos = (nXPos + 2) / 2 - 2;
-            nYPos = (nYPos + 2) / 2 - 2;
-            block_x = (nXPos * 0x10 | xoff) + 4;
-            block_y = (nYPos * 0x10 | yoff) + 4;
-        }
-
-        if (nRadius >= 0) {
-            /* NOTE: the oracle's "shake"(GU_GetRnd jitter) arm is dead code in this build (the
-             * gate that would enable it is a compiled-out `1==0`) -- omitted, matches retail. */
-            v = gr_scrxoff / 2621440;
-            light_y = nYPos - (g_light_amp >> 4);
-            max_x = gr_scryoff / 2621440;
-            light_x = nXPos - (g_light_amp >> 4);
-            if (leveltype == 0) {
-                nXPos -= 6;
-                nYPos -= 8;
-            }
-            if ((v - 2) < (nXPos + 8) && nXPos < (v + 6) && (max_x - 8) < (nYPos + 8) && nYPos < max_x) {
-                mult = g_light_amp >> 3;
-                if (light_y < 0 || (light_y + mult) > 0x30 || light_x < 0 || (light_x + mult) > 0x30) {
-                    if (shift_mask == 0) {
-                        /* Clipped arm, shift_mask==0 (from .L8004C1CC; per-tile nXPos/nYPos bounds check,
-                         * WITH the weirdy/g_lightband branch). Not yet byte-verified. */
-                        for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
-                            if (nYPos >= 0 && nYPos < 0x30) {
-                                for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
-                                    radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
-                                    if (radius_block < 0)
-                                        radius_block = 0;
-                                    if (nXPos >= 0 && nXPos < 0x30) {
-                                        if (colour_mask & 1) {
-                                            if (weirdy)
-                                                val = g_lightband[(radius_block + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
-                                            else
-                                                val = radius_block * g_light_amp2;
-                                            val = dung_map_r[nXPos][nYPos] + (val & 0xFF);
-                                            if (val > g_light_clamp)
-                                                val = g_light_clamp;
-                                            dung_map_r[nXPos][nYPos] = val;
-                                        }
-                                        if (colour_mask & 2) {
-                                            if (weirdy)
-                                                val = g_lightband[(radius_block + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
-                                            else
-                                                val = radius_block * g_light_amp2;
-                                            val = dung_map_g[nXPos][nYPos] + (val & 0xFF);
-                                            if (val > g_light_clamp)
-                                                val = g_light_clamp;
-                                            dung_map_g[nXPos][nYPos] = val;
-                                        }
-                                        if (colour_mask & 4) {
-                                            if (weirdy)
-                                                val = g_lightband[(radius_block + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
-                                            else
-                                                val = radius_block * g_light_amp2;
-                                            val = dung_map_b[nXPos][nYPos] + (val & 0xFF);
-                                            if (val > g_light_clamp)
-                                                val = g_light_clamp;
-                                            dung_map_b[nXPos][nYPos] = val;
-                                        }
-                                    }
-                                }
-                            }
+            for (y = 0; y <= radius_block; y++) {
+                for (x = 0; x <= radius_block; x++) {
+                    dist_y = light_y - ((block_y + y) << 4);
+                    mult = (g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y)) * g_light_amp2;
+                    if (mult < 0)
+                        mult = 0;
+                    v = dung_map_r[block_x + x][block_y + y];
+                    if (colour_mask & 1) {
+                        if (!(shift_mask & 9)) {
+                            v += mult;
+                        } else {
+                            if (shift_mask & 1)
+                                v += mult >> 1;
+                            if (shift_mask & 8)
+                                v += mult * 2;
                         }
-                    } else {
-                        /* Clipped arm, shift_mask!=0 (from .L8004C414; per-tile nXPos/nYPos bounds check;
-                         * like the unclipped shift!=0 arm, the m2c shows NO weirdy branch here).
-                         * Not yet byte-verified. */
-                        for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
-                            if (nYPos >= 0 && nYPos < 0x30) {
-                                for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
-                                    radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
-                                    if (radius_block < 0)
-                                        radius_block = 0;
-                                    if (nXPos >= 0 && nXPos < 0x30) {
-                                        if (colour_mask & 1) {
-                                            val = dung_map_r[nXPos][nYPos];
-                                            if (!(shift_mask & 9)) {
-                                                val += radius_block;
-                                            } else {
-                                                if (shift_mask & 1)
-                                                    val += radius_block >> 1;
-                                                if (shift_mask & 8)
-                                                    val += radius_block * 2;
-                                            }
-                                            if (val > g_light_clamp)
-                                                val = g_light_clamp;
-                                            dung_map_r[nXPos][nYPos] = val;
-                                        }
-                                        if (colour_mask & 2) {
-                                            val = dung_map_g[nXPos][nYPos];
-                                            if (!(shift_mask & 0x12)) {
-                                                val += radius_block;
-                                            } else {
-                                                if (shift_mask & 2)
-                                                    val += radius_block >> 1;
-                                                if (shift_mask & 0x10)
-                                                    val += radius_block * 2;
-                                            }
-                                            if (val > g_light_clamp)
-                                                val = g_light_clamp;
-                                            dung_map_g[nXPos][nYPos] = val;
-                                        }
-                                        if (colour_mask & 4) {
-                                            val = dung_map_b[nXPos][nYPos];
-                                            if (!(shift_mask & 0x24)) {
-                                                val += radius_block;
-                                            } else {
-                                                if (shift_mask & 4)
-                                                    val += radius_block >> 1;
-                                                if (shift_mask & 0x20)
-                                                    val += radius_block * 2;
-                                            }
-                                            if (val > g_light_clamp)
-                                                val = g_light_clamp;
-                                            dung_map_b[nXPos][nYPos] = val;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        if (v > g_light_clamp)
+                            v = g_light_clamp;
+                        dung_map_r[block_x + x][block_y + y] = v;
                     }
-                } else if (shift_mask == 0) {
-                    /* Unclipped arm, shift_mask==0 (implemented; not yet byte-verified). */
-                    for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
-                        for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
-                            radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
-                            if (radius_block < 0)
-                                radius_block = 0;
-                            if (colour_mask & 1) {
-                                if (weirdy)
-                                    val = g_lightband[(radius_block + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
-                                else
-                                    val = radius_block * g_light_amp2;
-                                val = dung_map_r[nXPos][nYPos] + (val & 0xFF);
-                                if (val > g_light_clamp)
-                                    val = g_light_clamp;
-                                dung_map_r[nXPos][nYPos] = val;
-                            }
-                            if (colour_mask & 2) {
-                                if (weirdy)
-                                    val = g_lightband[(radius_block + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
-                                else
-                                    val = radius_block * g_light_amp2;
-                                val = dung_map_g[nXPos][nYPos] + (val & 0xFF);
-                                if (val > g_light_clamp)
-                                    val = g_light_clamp;
-                                dung_map_g[nXPos][nYPos] = val;
-                            }
-                            if (colour_mask & 4) {
-                                if (weirdy)
-                                    val = g_lightband[(radius_block + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
-                                else
-                                    val = radius_block * g_light_amp2;
-                                val = dung_map_b[nXPos][nYPos] + (val & 0xFF);
-                                if (val > g_light_clamp)
-                                    val = g_light_clamp;
-                                dung_map_b[nXPos][nYPos] = val;
-                            }
+                    v = dung_map_g[block_x + x][block_y + y];
+                    if (colour_mask & 2) {
+                        if (!(shift_mask & 0x12)) {
+                            v += mult;
+                        } else {
+                            if (shift_mask & 2)
+                                v += mult >> 1;
+                            if (shift_mask & 0x10)
+                                v += mult * 2;
                         }
+                        if (v > g_light_clamp)
+                            v = g_light_clamp;
+                        dung_map_g[block_x + x][block_y + y] = v;
                     }
-                } else {
-                    /* Unclipped arm, shift_mask!=0 (from the m2c draft; it shows NO weirdy/
-                     * g_lightband branch here -- plain radius_block blend with a per-channel
-                     * shift_mask sub-select of >>1 / *2 additions). Not yet byte-verified. */
-                    for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
-                        for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
-                            radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
-                            if (radius_block < 0)
-                                radius_block = 0;
-                            if (colour_mask & 1) {
-                                val = dung_map_r[nXPos][nYPos];
-                                if (!(shift_mask & 9)) {
-                                    val += radius_block;
-                                } else {
-                                    if (shift_mask & 1)
-                                        val += radius_block >> 1;
-                                    if (shift_mask & 8)
-                                        val += radius_block * 2;
-                                }
-                                if (val > g_light_clamp)
-                                    val = g_light_clamp;
-                                dung_map_r[nXPos][nYPos] = val;
-                            }
-                            if (colour_mask & 2) {
-                                val = dung_map_g[nXPos][nYPos];
-                                if (!(shift_mask & 0x12)) {
-                                    val += radius_block;
-                                } else {
-                                    if (shift_mask & 2)
-                                        val += radius_block >> 1;
-                                    if (shift_mask & 0x10)
-                                        val += radius_block * 2;
-                                }
-                                if (val > g_light_clamp)
-                                    val = g_light_clamp;
-                                dung_map_g[nXPos][nYPos] = val;
-                            }
-                            if (colour_mask & 4) {
-                                val = dung_map_b[nXPos][nYPos];
-                                if (!(shift_mask & 0x24)) {
-                                    val += radius_block;
-                                } else {
-                                    if (shift_mask & 4)
-                                        val += radius_block >> 1;
-                                    if (shift_mask & 0x20)
-                                        val += radius_block * 2;
-                                }
-                                if (val > g_light_clamp)
-                                    val = g_light_clamp;
-                                dung_map_b[nXPos][nYPos] = val;
-                            }
+                    v = dung_map_b[block_x + x][block_y + y];
+                    if (colour_mask & 4) {
+                        if (!(shift_mask & 0x24)) {
+                            v += mult;
+                        } else {
+                            if (shift_mask & 4)
+                                v += mult >> 1;
+                            if (shift_mask & 0x20)
+                                v += mult * 2;
                         }
+                        if (v > g_light_clamp)
+                            v = g_light_clamp;
+                        dung_map_b[block_x + x][block_y + y] = v;
                     }
                 }
             }
@@ -664,16 +662,10 @@ void InitLightMax(void)
 void InitLighting(void)
 {
     int i;
-    unsigned char *p;
 
     numlights = 0;
-    i = 0x4F;
-    p = &lightactive[0x4F];
-    do {
-        *p = i;
-        i--;
-        p--;
-    } while (i >= 0);
+    for (i = 0; i < MAXLIGHTS; i++)
+        lightactive[i] = i;
     set_light_bands();
     g_weirdy_prev = 0;
 }

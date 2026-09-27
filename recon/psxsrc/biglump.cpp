@@ -83,7 +83,7 @@ unsigned long BL_NoLumpFiles;   /* @0x8011AB60 */
 unsigned long BL_NoStreamFiles;   /* @0x8011AB64 */
 STRHDR *LFileTab;   /* @0x8011AB68 */
 STRHDR *SFileTab;   /* @0x8011AB6C */
-unsigned char FileLoaded = 1;   /* @0x8011AB70 */
+volatile unsigned char FileLoaded = 1;   /* @0x8011AB70 */ /* callback-shared (AsyncLoadCallBack) */
 unsigned char NoQuedAsyncs;   /* @0x8011AB71 */
 unsigned char CurrAsync = 1;   /* @0x8011AB72 */
 
@@ -387,8 +387,8 @@ long BL_LoadFileAsync(char *Name, char LumpID)
     long MyHnd;
     unsigned char *LoadAddr;
 
-    NoQuedAsyncs++;
-    while (CurrAsync != NoQuedAsyncs)
+    Size = ++NoQuedAsyncs;
+    while (CurrAsync != Size)
         TSK_Sleep(1);
     if (!BL_AsyncLoadDone())
         BL_WaitForAsyncFinish();

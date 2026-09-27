@@ -520,20 +520,20 @@ void STR_SoundCommand(SFXHDR *sfh, int Command)
 char STR_Command(SFXHDR *sfh)
 {
     switch (sfh->state) {
-    case 1:
-    case 7:
+    case 2:
+    case 8:
         sfh->loop = 0;
         return 1;
-    case 2:
+    case 3:
         sfh->volume = 0;
         STR_setvolume(sfh);
         return 0;
-    case 3:
+    case 4:
         sfh->state = 1;
         sfh->volume = sfh->s_volume;
         STR_PlaySFX(sfh);
         return 0;
-    case 4:
+    case 5:
         if (sfh->volume >= 0) {
             sfh->volume -= 0x100;
             STR_setvolume(sfh);
@@ -547,26 +547,26 @@ char STR_Command(SFXHDR *sfh)
             sfh->loop = 0;
         }
         break;
-    case 6:
+    case 7:
         sfh->SPU_sec = ((sfh->SPU_pos = sfh->stream_pos - 0x5F00) / 0x2F80) % 3;
         sfh->stream_playing = 1;
         sfh->state = 1;
         STR_PlaySFX(sfh);
         return 0;
-    case 8:
+    case 9:
         STRSave.sec_num = sfh->sec_num;
         STRSave.stream_pos = sfh->stream_pos;
         STRSave.stream_read = sfh->stream_read;
         STRSave.SizeIn = sfh->SizeIn;
         break;
-    case 9:
+    case 10:
         sfh->sec_num = STRSave.sec_num;
         sfh->stream_pos = STRSave.stream_pos;
         sfh->stream_read = STRSave.stream_read;
         AS_WasLastBlock(sfh->ah, sfh->StreamHND, sfh);
         sfh->SizeIn = STRSave.SizeIn;
         break;
-    case 10:
+    case 1:   /* retail jump table: state 1 (and 6) -> switch exit */
         break;
     }
     return 0;
@@ -780,7 +780,9 @@ void STR_AsyncTASK(TASK *T)
             if (sfh->SizeIn <= 0)
                 Done = 1;
             if (Done) {
-                if (sfh->state != 8) {
+                if (sfh->state == 8) {
+                    Done = 1;
+                } else {
                     Done = 0;
                     sfh->stream_ending++;
                     if (sfh->SPU_pos >= sfh->stream_pos || sfh->volume < 0) {
@@ -790,13 +792,12 @@ void STR_AsyncTASK(TASK *T)
                             if (!sghMusic)
                                 sghMusic = STR_PlaySound(sgszMusicTracks[sgnMusicTrack], 1, vol, 1);
                             return;
+                        } else {
+                            STR_SoundCommand(sfh, 8);
+                            STR_Debug(sfh, "STREAM ENDED");
+                            Done = 1;
                         }
-                        STR_SoundCommand(sfh, 8);
-                        STR_Debug(sfh, "STREAM ENDED");
-                        Done = 1;
                     }
-                } else {
-                    Done = 1;
                 }
             }
             if (latency < 0x2F80 && sfh->playing && !sfh->stream_ending) {

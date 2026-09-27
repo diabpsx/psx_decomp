@@ -37,3 +37,4 @@ void SpuSetKey(long on, unsigned long voice_bit);
 #ifdef __cplusplus
 }
 #endif
+int sprintf(char *buf, const char *fmt, ...);

@@ -1515,25 +1515,17 @@ void DrawOptions(TASK *T)
             CalcVolumes();
             SoundPad();
             break;
-        case 4:
-            DrawMenu(cmenu);
-            CentrePad();
+        case 0x14:
+            DrawCtrlSetup();
+            cs = FeFlag == 0 ? 7 : 2;
             break;
-        case 9:
-        case 0xB:
-        case 0xC:
-        case 0x11:
-        case 0x12:
-            MemcardPad();
-            DrawMenu(cmenu);
+        case 0x19:
+            DrawHelp();
+            cs = FeFlag == 0 ? 9 : 5;
             break;
-        case 10:
-            GameSpeedPad();
+        case 0x10:
             DrawMenu(cmenu);
-            break;
-        case 0xD:
-            CharCardSelectMemcardPad();
-            DrawMenu(cmenu);
+            FormatPad();
             break;
         case 0xE:
             current_card = 0;
@@ -1545,17 +1537,25 @@ void DrawOptions(TASK *T)
             CharacterLoadPad();
             DrawMenu(cmenu);
             break;
-        case 0x10:
+        case 0xD:
+            CharCardSelectMemcardPad();
             DrawMenu(cmenu);
-            FormatPad();
             break;
         case 0x13:
             SaveOverwritePad();
             DrawMenu(cmenu);
             break;
-        case 0x14:
-            DrawCtrlSetup();
-            cs = FeFlag == 0 ? 7 : 2;
+        case 9:
+        case 0xB:
+        case 0xC:
+        case 0x11:
+        case 0x12:
+            MemcardPad();
+            DrawMenu(cmenu);
+            break;
+        case 4:
+            DrawMenu(cmenu);
+            CentrePad();
             break;
         case 0x16:
             cmenu = 0;
@@ -1565,6 +1565,7 @@ void DrawOptions(TASK *T)
                 DrawMenu(cmenu);
                 TSK_Sleep(1);
             }
+            InitCredits();
             PaletteFadeIn(8);
             break;
         case 0x17:
@@ -1581,10 +1582,6 @@ void DrawOptions(TASK *T)
             cs = 4;
             options_pad = old_pad;
             break;
-        case 0x19:
-            DrawHelp();
-            cs = FeFlag == 0 ? 9 : 5;
-            break;
         case 0x1A:
             ToggleOptions();
             invflag = 1;
@@ -1596,6 +1593,10 @@ void DrawOptions(TASK *T)
             pad_func_Chr(options_pad);
             cs = 4;
             options_pad = old_pad;
+            break;
+        case 10:
+            GameSpeedPad();
+            DrawMenu(cmenu);
             break;
         }
         if (Qfromoptions != 0 && cs == 4)
@@ -1740,21 +1741,7 @@ void DrawMenu(int MenuNo)
     OtOff = depth << 2;
     i = 0;
     Mask = 0xFFFFFF;
-    for (;;) {
-        if (mptr->NoEntries <= i) {
-            unsigned short Str_00;
-
-            if (MenuNo == 2)
-                Str_00 = 0x331;
-            else if (MenuNo == 4)
-                Str_00 = 0x49E;
-            else if (MenuNo == 8)
-                Str_00 = 0x4E5;
-            else
-                Str_00 = 0x4E6;
-            PrintSelectBack(Str_00);
-            return;
-        }
+    while (i < mptr->NoEntries) {
         r = WHITER;
         g = WHITEG;
         b = WHITEB;
@@ -1923,55 +1910,66 @@ void DrawMenu(int MenuNo)
                         b = 0x28;
                     }
                 }
-                if (FeFlag == 0) {
+                {
                     char *Str;
                     int x2;
 
-                    if (i == 0 || cmenu != 2) {
-                        Str = GetStr(iptr[i].Text);
-                        x2 = 0;
-                    } else {
+                    if (FeFlag == 0) {
+                        if (i == 0 || cmenu != 2) {
+                            Str = GetStr(iptr[i].Text);
+                            x2 = 0;
+                            goto shared_print;
+                        }
                         Str = GetStr(iptr[i].Text);
                         MediumFont.Print(8, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
                         if (i == 5)
                             PrintMono(iptr[i].y * Spacing + len);
                         goto next_item;
-                    }
-                    MediumFont.Print(x2, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
-                } else {
-                    if (i == 0) {
-                        char *Str;
-
-                        ORect.y = ORect.y - 0x20;
-                        if (iptr[i].Text == 0x3B6) {
-                            ORect.x = ORect.x - 0x40;
-                            ORect.w = ORect.w + 0x80;
-                        }
-                        Str = GetStr(iptr[i].Text);
-                        LargeFont.Print(0, iptr[i].y * Spacing + len + 0x22, Str, iptr[i].Just, &ORect, BLUER, BLUEG, BLUEB);
-                        if (iptr[i].Text == 0x3B6) {
-                            ORect.x = ORect.x + 0x40;
-                            ORect.w = ORect.w - 0x80;
-                        }
-                        ORect.y = ORect.y + 0x20;
-                    } else if (cmenu != 2) {
-                        char *Str;
-
-                        Str = GetStr(iptr[i].Text);
-                        MediumFont.Print(8, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
                     } else {
-                        char *Str;
-
-                        Str = GetStr(iptr[i].Text);
-                        MediumFont.Print(0, iptr[i].y * Spacing + len + 0x20, Str, iptr[i].Just, &ORect, r, g, b);
-                        if (i == 5)
-                            PrintMono(iptr[i].y * Spacing + len + 0x20);
+                        if (i == 0) {
+                            ORect.y = ORect.y - 0x20;
+                            if (iptr[i].Text == 0x3B6) {
+                                ORect.x = ORect.x - 0x40;
+                                ORect.w = ORect.w + 0x80;
+                            }
+                            Str = GetStr(iptr[i].Text);
+                            LargeFont.Print(0, iptr[i].y * Spacing + len + 0x22, Str, iptr[i].Just, &ORect, BLUER, BLUEG, BLUEB);
+                            if (iptr[i].Text == 0x3B6) {
+                                ORect.x = ORect.x + 0x40;
+                                ORect.w = ORect.w - 0x80;
+                            }
+                            ORect.y = ORect.y + 0x20;
+                        } else if (cmenu != 2) {
+                            Str = GetStr(iptr[i].Text);
+                            x2 = 8;
+                            goto shared_print;
+                        } else {
+                            Str = GetStr(iptr[i].Text);
+                            MediumFont.Print(0, iptr[i].y * Spacing + len + 0x20, Str, iptr[i].Just, &ORect, r, g, b);
+                            if (i == 5)
+                                PrintMono(iptr[i].y * Spacing + len + 0x20);
+                        }
                     }
+                    goto next_item;
+shared_print:
+                    MediumFont.Print(x2, iptr[i].y * Spacing + len, Str, iptr[i].Just, &ORect, r, g, b);
                 }
             }
         }
     next_item:
         i = i + 1;
-        iptr = iptr + 1;
+    }
+    {
+        unsigned short Str_00;
+
+        if (MenuNo == 2)
+            Str_00 = 0x331;
+        else if (MenuNo == 4)
+            Str_00 = 0x49E;
+        else if (MenuNo == 8)
+            Str_00 = 0x4E5;
+        else
+            Str_00 = 0x4E6;
+        PrintSelectBack(Str_00);
     }
 }

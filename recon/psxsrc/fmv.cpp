@@ -16,7 +16,7 @@ typedef struct CdlFILE { CdlLOC pos; u_int size; char name[16]; } CdlFILE;  /* s
 typedef struct {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     u_short id, type, secCount, nSectors;
     u_int   frameCount, frameSize;
-    u_short width, height;
+    short width, height;
     u_int   dummy1, dummy2;
     CdlLOC  loc;
 } StHEADER;
@@ -577,16 +577,13 @@ extern "C" void init_mdec_buffer(char *buf, int size)
  * FOUR ADJACENT grid points: TL=off[mbuf][col][row], TR=off[mbuf][col+1][row], BL=off[mbuf][col][row+1],
  * BR=off[mbuf][col+1][row+1] (byte deltas +80/+8/+88 confirmed against TL). rebuild_mdec_polys re-adds
  * the CURRENT camera pan (x,y) to each cached corner every frame instead of re-tiling from scratch. */
-/* The confirmed byte-offset formula from the raw is 800*mbuf + 80*col + 8*row (+2 for the y half of
- * the {x,y} pair) -- row's own stride (8 bytes) is TWICE an {x,y} pair's size (4 bytes), so this
- * table is NOT expressible as a clean short[2][10][10][2] (that gives row stride 4, col stride 40,
- * mbuf stride 400 -- exactly half of every real coefficient; a genuine open question, possibly an
- * interleaved/duplicated-row storage this TU doesn't otherwise reveal). A flat byte-addressed
- * TMDC_OFFS() macro reproducing the real addresses compiles WORSE (98/117 vs 119/117 insns) than
- * indexing the (address-wrong) short[2][10][10][2] array directly -- kept the array form since this
- * WIP function is being tuned for byte-match, but the two READ sites (here and split_poly_area's
- * WRITE site) must be changed together if the real dimensionality is ever nailed down. */
-static short tmdc_pol_offs[2][10][10][2];
+/* SYM (rom/DIABPSX-SYM.txt): `96 Def2 class EXT type ARY ARY ARY STRUCT size 1600 dims 3 2 10 10 tag
+ * SVECTOR name tmdc_pol_offs` -- genuinely `SVECTOR tmdc_pol_offs[2][10][10]` (LIBGTE, 8 bytes/elem:
+ * vx,vy,vz,pad), NOT a short[2][10][10][2] -- that's exactly why the confirmed byte coefficients
+ * (800/80/8) were double a plain 2-short pair's stride: each grid point is a full SVECTOR (8 bytes),
+ * x lives in .vx (+0), y in .vy (+2). */
+typedef struct { short vx, vy, vz, pad; } SVECTOR;   /* PsyQ libgte.h, sizeof 8 */
+static SVECTOR tmdc_pol_offs[2][10][10];
 #define TMDC_OFFS(mb, col, row) (tmdc_pol_offs[mb][col][row])
 
 /* WIP -- NOT byte-verified yet (deep GTE/MDEC polygon-tiler internals, no PC twin to cross-check
@@ -659,8 +656,8 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
                     }
                     x += colw;
                     x_run += colw;
-                    TMDC_OFFS(offs, area_pw, area_ph)[0] = xoff;
-                    TMDC_OFFS(offs, area_pw, area_ph)[1] = yoff;
+                    TMDC_OFFS(offs, area_pw, area_ph).vx = xoff;
+                    TMDC_OFFS(offs, area_pw, area_ph).vy = yoff;
                     area_pw += 1;
                     p += 1;
                 } while (wleft != 0);
@@ -690,14 +687,14 @@ extern "C" void rebuild_mdec_polys(int x, int y)
     for (; row < mdec_ph[mbuf]; row++) {
         if (mdec_pw[mbuf] > 0) {
             for (int col = 0; col < mdec_pw[mbuf]; col++) {
-                p->x0 = TMDC_OFFS(mbuf, col, row)[0] + x;
-                p->y0 = TMDC_OFFS(mbuf, col, row)[1] + y;
-                p->x1 = TMDC_OFFS(mbuf, col + 1, row)[0] + x;
-                p->y1 = TMDC_OFFS(mbuf, col + 1, row)[1] + y;
-                p->x2 = TMDC_OFFS(mbuf, col, row + 1)[0] + x;
-                p->y2 = TMDC_OFFS(mbuf, col, row + 1)[1] + y;
-                p->x3 = TMDC_OFFS(mbuf, col + 1, row + 1)[0] + x;
-                p->y3 = TMDC_OFFS(mbuf, col + 1, row + 1)[1] + y;
+                p->x0 = TMDC_OFFS(mbuf, col, row).vx + x;
+                p->y0 = TMDC_OFFS(mbuf, col, row).vy + y;
+                p->x1 = TMDC_OFFS(mbuf, col + 1, row).vx + x;
+                p->y1 = TMDC_OFFS(mbuf, col + 1, row).vy + y;
+                p->x2 = TMDC_OFFS(mbuf, col, row + 1).vx + x;
+                p->y2 = TMDC_OFFS(mbuf, col, row + 1).vy + y;
+                p->x3 = TMDC_OFFS(mbuf, col + 1, row + 1).vx + x;
+                p->y3 = TMDC_OFFS(mbuf, col + 1, row + 1).vy + y;
                 p += 1;
             }
         }
@@ -1009,7 +1006,7 @@ extern "C" int dequeue_animation(void)
 extern "C" int decode_mdec_stream(int frames_elapsed)
 {
     unsigned char *data = 0;
-    StHEADER *h = 0;
+    StHEADER *h;
     int want_frame;
 
     if (mdec_waiting_tail != 0 && mdec_stream_starting == 0)
@@ -1038,15 +1035,13 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
         cdstream_get_chunk(&data, &h);
     }
     if (data != 0) {
-        int half = mbuf;
-        RECT *m = &mdc_buf[half];
         mdec_waiting_tail = 0;
         mdec_last_frame = h->frameCount;
-        start_mdec_decode(data + 32, m->x, m->y, h->width, h->height);
+        start_mdec_decode(data + 32, mdc_buf[mbuf].x, mdc_buf[mbuf].y, h->width, h->height);
         frame_decoded = 1;
         do_brightness = 1;
         mbuf ^= 1;
-        play_mdec_audio(data + 8064, (StHEADER *)((char *)h + 256));
+        play_mdec_audio(data + 0x3F00, (StHEADER *)((char *)h + 256));
         cdstream_discard_chunk();
         if (h->frameCount == mdec_framecount) {
             if (mdecs_queued != 0)

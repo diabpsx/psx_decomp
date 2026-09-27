@@ -88,10 +88,16 @@ void DeltaLoadLevel(void)
 
         for (i = 0; i < 0x7F; i++) {
             unsigned char cmd = ThisLevel->object[i].bCmd;
-            if (cmd == 0x2F) {
-                SyncBreakObj(-1, i);
-            } else if (cmd >= 0x2B && cmd < 0x30) {
+            switch (cmd) {
+            case 0x2B:
+            case 0x2C:
+            case 0x2D:
+            case 0x2E:
                 SyncOpObject(-1, cmd, i);
+                break;
+            case 0x2F:
+                SyncBreakObj(-1, i);
+                break;
             }
         }
         if (numobjects > 0) {

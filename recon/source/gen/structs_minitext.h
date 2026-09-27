@@ -148,3 +148,9 @@ struct TextDataStruct {   /* PSX layout: 12 bytes (no txtspd field -- speed is c
     unsigned char scrlltxt;
     int sfxnr;
 };
+struct DEF_ARGS {   /* sizeof 16 */
+    unsigned long a0;   /* +0x0 */
+    unsigned long a1;   /* +0x4 */
+    unsigned long a2;   /* +0x8 */
+    unsigned long a3;   /* +0xC */
+};

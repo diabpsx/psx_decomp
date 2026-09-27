@@ -290,7 +290,7 @@ static void L4makeDmt()
 static int L4HWallOk(int i, int j)
 {
     int x;
-    int wallok;
+    unsigned char wallok;
 
     x = 1;
     while (dungeon[i + x][j] == 6 && DFLAGS(i + x, j) == 0
@@ -335,8 +335,8 @@ static int L4HWallOk(int i, int j)
 /* @0x8014F9E8 */
 static int L4VWallOk(int i, int j)
 {
-    int wallok;
     int y;
+    unsigned char wallok;
 
     y = 1;
     while (dungeon[i][j + y] == 6 && DFLAGS(i, j + y) == 0
@@ -1430,6 +1430,8 @@ static int DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax,
     int i, ii, numt;
     int found, bailcnt;
 
+    sx = 0;
+    sy = 0;
     sw = miniset[0];
     sh = miniset[1];
 
@@ -1496,7 +1498,7 @@ static int DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax,
         }
     }
 
-    if (currlevel == 15) {
+    if (currlevel == 15 && quests[Q_BETRAYER]._qactive >= QUEST_ACTIVE) {
         quests[Q_BETRAYER]._qtx = sx + 1;
         quests[Q_BETRAYER]._qty = sy + 1;
     }
@@ -1572,28 +1574,27 @@ static void DRLG_L4FloodTVal()
     int i, j, xx, yy;
 
     if (TransVal == 0) {
-        TransVal = 1;
+        TransVal++;
     }
 
     if (currlevel == 16) {
-        /* PSX-only fast path: level 16 (Diablo) is a 4-fold mirrored quad dungeon (see
-         * L4makeDungeon/CreateL4Dungeon), so instead of recursing per-quadrant it directly
-         * stamps the SAME TransVal into a cell's own position plus its 3 mirrored counterparts. */
-        for (yy = 16; yy < DMAXY; yy += 2) {
-            for (j = 0; j < DMAXY; j++) {
-                for (i = 0; i < DMAXX; i++) {
-                    if (dungeon[i][j] == 6 && dung_map[16 + 2 * i][yy].dTransVal == 0) {
-                        dung_map[16 + 2 * i][yy].dTransVal = TransVal;
-                        dung_map[17][yy].dTransVal = TransVal;
-                        dung_map[16 + 2 * i][17 + 2 * j].dTransVal = TransVal;
-                        dung_map[17][17 + 2 * j].dTransVal = TransVal;
-                    }
+        /* PSX-only fast path for the 4-fold mirrored level 16: stamp TransVal into the 2x2 block directly. */
+        yy = 16;
+        for (j = 0; j < DMAXY; j++, yy += 2) {
+            xx = 16;
+            for (i = 0; i < DMAXX; i++) {
+                if (dungeon[i][j] == 6 && dung_map[xx][yy].dTransVal == 0) {
+                    dung_map[xx][yy].dTransVal = TransVal;
+                    dung_map[xx + 1][yy].dTransVal = TransVal;
+                    dung_map[xx][17 + 2 * j].dTransVal = TransVal;
+                    dung_map[xx + 1][17 + 2 * j].dTransVal = TransVal;
                 }
+                xx += 2;
             }
         }
     } else {
         yy = 16;
-        for (j = 0; j < DMAXY; j++) {
+        for (j = 0; j < DMAXY; j++, yy += 2) {
             xx = 16;
             for (i = 0; i < DMAXX; i++) {
                 if (dungeon[i][j] == 6 && dung_map[xx][yy].dTransVal == 0) {
@@ -1603,7 +1604,6 @@ static void DRLG_L4FloodTVal()
                 }
                 xx += 2;
             }
-            yy += 2;
         }
     }
 }
@@ -1731,13 +1731,14 @@ void DRLG_L4GeneralFix()
  * dung_map per dungeon tile (set for a wall-open tile #6 or an unset tile #0, cleared otherwise). */
 static void DRLG_L4SetWalls()
 {
-    int xx, yy;
+    int i, j, yy;
 
     yy = 16;
-    for (int j = 0; j < DMAXY; j++) {
-        xx = 16;
-        for (int i = 0; i < DMAXX; i++) {
-            if (dungeon[i][j] == 6 || dungeon[i][j] == 0) {
+    for (j = 0; j < DMAXY; j++) {
+        int xx = 16;
+        for (i = 0; i < DMAXX; i++) {
+            int v = dungeon[i][j];
+            if (v == 6 || v == 0) {
                 dung_map[xx][yy].dFlags |= 0x20;
             } else {
                 dung_map[xx][yy].dFlags &= ~0x20;
@@ -1753,7 +1754,6 @@ static void DRLG_L4(int entry)
 {
     unsigned char doneflag;
     int i, j, spi, spj;
-    long ar;
 
     do {
         UPDATEPROGRESS(1);
@@ -1762,11 +1762,10 @@ static void DRLG_L4(int entry)
             InitL4Dungeon();
             L4firstRoom();
             L4FixRim();
-            ar = GetArea();
-            if (ar >= 173) {
+            if (!(i = GetArea() < 173)) {
                 uShape();
             }
-        } while (ar < 173);
+        } while (i);
         L4makeDungeon();
         L4makeDmt();
         L4tileFix();
@@ -1843,20 +1842,20 @@ static void DRLG_L4(int entry)
             if (entry == ENTRY_MAIN) {
                 doneflag = DRLG_L4PlaceMiniSet(L4USTAIRS, 1, 1, -1, -1, 1, 0);
                 if (doneflag) {
-                    if (gbMaxPlayers == 1 && quests[Q_DIABLO]._qactive != QUEST_ACTIVE) {
-                        doneflag = DRLG_L4PlaceMiniSet(L4PENTA, 1, 1, -1, -1, 0, 1);
-                    } else {
+                    if (gbMaxPlayers != 1 || quests[Q_DIABLO]._qactive == QUEST_ACTIVE) {
                         doneflag = DRLG_L4PlaceMiniSet(L4PENTA2, 1, 1, -1, -1, 0, 1);
+                    } else {
+                        doneflag = DRLG_L4PlaceMiniSet(L4PENTA, 1, 1, -1, -1, 0, 1);
                     }
                 }
                 ViewX++;
             } else {
                 doneflag = DRLG_L4PlaceMiniSet(L4USTAIRS, 1, 1, -1, -1, 0, 0);
                 if (doneflag) {
-                    if (gbMaxPlayers == 1 && quests[Q_DIABLO]._qactive != QUEST_ACTIVE) {
-                        doneflag = DRLG_L4PlaceMiniSet(L4PENTA, 1, 1, -1, -1, 1, 1);
-                    } else {
+                    if (gbMaxPlayers != 1 || quests[Q_DIABLO]._qactive == QUEST_ACTIVE) {
                         doneflag = DRLG_L4PlaceMiniSet(L4PENTA2, 1, 1, -1, -1, 1, 1);
+                    } else {
+                        doneflag = DRLG_L4PlaceMiniSet(L4PENTA, 1, 1, -1, -1, 1, 1);
                     }
                 }
                 ViewY++;

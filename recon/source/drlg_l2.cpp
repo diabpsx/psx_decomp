@@ -48,70 +48,79 @@ static unsigned char DRLG_L2PlaceMiniSet(unsigned char *miniset, int tmin, int t
     int sw, sh;
     int xx, yy;
     int i, ii, numt;
-    int found, bailcnt;
+    int found;
+    int randxy[128];
+    int rcount;
+    int failed;
+    int r;
 
     sw = miniset[0];
     sh = miniset[1];
 
-    if ((tmax - tmin) == 0) {
+    if (tmax == tmin) {
         numt = 1;
     } else {
         numt = ENG_random(tmax - tmin) + tmin;
     }
 
+    rcount = 0;
+    failed = 0;
+    sx = 0;
+    sy = 0;
+    do {
+        found = 1;
+
+        if (sx >= nSx1 && sx <= nSx2 && sy >= nSy1 && sy <= nSy2) {
+            found = 0;
+        }
+
+        if (cx != -1) {
+            if (sx >= cx - sw && sx <= cx + 12) {
+                found = 0;
+            }
+        }
+        if (cy != -1) {
+            if (sy >= cy - sh && sy <= cy + 12) {
+                found = 0;
+            }
+        }
+
+        for (yy = 0; yy < sh; yy++) {
+            for (xx = 0; xx < sw; xx++) {
+                if (miniset[2] != 0 && dungeon[sx + xx][sy + yy] != miniset[2]) {
+                    found = 0;
+                }
+                if (mydflags[(sx + xx) + (sy + yy) * DMAXX] != 0) {
+                    found = 0;
+                }
+            }
+        }
+
+        if (found) {
+            randxy[rcount * 2 + 0] = sx;
+            randxy[rcount * 2 + 1] = sy;
+            rcount++;
+            if (rcount >= 64) {
+                failed = 1;
+            }
+        }
+
+        sx++;
+        if (sx == DMAXX - sw) {
+            sx = 0;
+            sy++;
+            if (sy == DMAXY - sh) {
+                failed = 1;
+            }
+        }
+    } while (!failed);
+
     for (i = 0; i < numt; i++) {
-        sx = ENG_random(DMAXX - sw);
-        sy = ENG_random(DMAXY - sh);
+        r = ENG_random(rcount);
+        sx = randxy[r * 2 + 0];
+        sy = randxy[r * 2 + 1];
 
-        found = 0;
-        bailcnt = 0;
-        while ((found == 0) && (bailcnt < 200)) {
-            found = 1;
-
-            if (((sx >= nSx1) && (sx <= nSx2)) && ((sy >= nSy1) && (sy <= nSy2))) {
-                found = 0;
-            }
-
-            if ((cx != -1) && (sx >= (cx - sw)) && (sx <= (cx + 12))) {
-                sx = ENG_random(DMAXX - sw);
-                sy = ENG_random(DMAXY - sh);
-                found = 0;
-            }
-            if ((cy != -1) && (sy >= (cy - sh)) && (sy <= (cy + 12))) {
-                sx = ENG_random(DMAXX - sw);
-                sy = ENG_random(DMAXY - sh);
-                found = 0;
-            }
-            ii = 2;
-            for (yy = 0; (yy < sh) && (found == 1); yy++) {
-                for (xx = 0; (xx < sw) && (found == 1); xx++) {
-                    if ((miniset[ii] != 0) && (dungeon[sx + xx][sy + yy] != miniset[ii])) {
-                        found = 0;
-                    }
-                    if (mydflags[(sx + xx) + (sy + yy) * DMAXX] != 0) {
-                        found = 0;
-                    }
-                    ii++;
-                }
-            }
-            if (found == 0) {
-                sx++;
-                if (sx == (DMAXX - sw)) {
-                    sx = 0;
-                    sy++;
-                    if (sy == (DMAXY - sh)) {
-                        sy = 0;
-                    }
-                }
-            }
-            bailcnt++;
-        }
-
-        if (bailcnt >= 200) {
-            return false;
-        }
-
-        ii = (sh * sw) + 2;
+        ii = sh * sw + 2;
         for (yy = 0; yy < sh; yy++) {
             for (xx = 0; xx < sw; xx++) {
                 if (miniset[ii] != 0) {
@@ -761,7 +770,9 @@ static void DoPatternCheck(int i, int j)
                 y++;
                 x = i - 1;
             }
-            if (x >= 0 && x < DMAXX && y >= 0 && y < DMAXY) {
+            if (x < 0 || x >= DMAXX || y < 0 || y >= DMAXY) {
+                nOk = 254;
+            } else {
                 switch (Patterns[k][l]) {
                 case 0:
                     nOk = 254;
@@ -806,9 +817,9 @@ static void DoPatternCheck(int i, int j)
                         nOk = 254;
                     }
                     break;
+                default:
+                    break;
                 }
-            } else {
-                nOk = 254;
             }
             x++;
         }

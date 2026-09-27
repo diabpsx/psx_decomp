@@ -61,3 +61,4 @@ extern void RedoPlayerVision(void);   /* @0x80055C20 OBJECTS.CPP:1459 */
 extern unsigned char SolidLoc(int x, int y);   /* @0x80060C4C PLAYER.CPP:1339 */
 extern void mem_free_dbg(void *p);   /* @0x8003DBDC ENGINE.CPP:432 */
 extern "C" void DBG_SendMessage(const char *file, const char *fmt, ...);   /* @0x80020E6C GDEBUG.C:108 */
+extern char animletter[7];   /* @0x8011C2A0 */
