@@ -556,6 +556,48 @@ void TakePlrsMoney(long cost)
     }
 }
 
+/* @0x800714A8 */
+unsigned char StoreGoldFit(int idx)
+{
+    int sz;
+    int numsqrs;
+    int i;
+    long cost;
+
+    cost = storehold[idx]._iIvalue;
+    numsqrs = cost / 5000;
+    if (cost % 5000)
+        numsqrs++;
+
+    SetCursor(storehold[idx]._iCurs + 0xC);
+    sz = cursW / 16 * (cursH / 16);
+    SetCursor(1);
+
+    if (sz >= numsqrs)
+        return 1;
+
+    for (i = 0; i < 40; i++) {
+        if (!plr[myplr].InvGrid[i])
+            sz++;
+    }
+
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (plr[myplr].InvList[i]._itype == 11 && plr[myplr].InvList[i]._ivalue != 5000) {
+            if (cost + plr[myplr].InvList[i]._ivalue <= 5000)
+                cost = 0;
+            else
+                cost -= 5000 - plr[myplr].InvList[i]._ivalue;
+        }
+    }
+
+    numsqrs = cost / 5000;
+    if (cost % 5000)
+        numsqrs++;
+
+    return sz >= numsqrs;
+}
+
+
 /* @0x80071760 */
 void PlaceStoreGold(long v)
 {
