@@ -456,7 +456,7 @@ static void CreateRoom(int nX1, int nY1, int nX2, int nY2, int nRDest, int nHDir
     int nAw, nAh;
     int nRw, nRh;
     int nRx1, nRy1, nRx2, nRy2;
-    int nHx1 = 0, nHy1 = 0, nHx2, nHy2;
+    int nHx1 = 0, nHy1 = 0, nHx2 = 0, nHy2 = 0;
     int nRid;
 
     if (nRoomCnt >= 80) {
