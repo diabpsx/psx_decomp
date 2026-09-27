@@ -1938,35 +1938,33 @@ void DrawSLine(int y)
 /* @0x8006961C */
 void DrawStoreArrows(void)
 {
-    int otpos;
-    int show;
-    int v1;
-    struct TextDat *td;
-    struct POLY_FT4 *ft4;
+    struct TextDat *PanelGfx;
+    struct POLY_FT4 *Ft4;
+    int OtPos;
+    int Flagy;
 
-    otpos = CBlocks::GetOverlayOtBase() + 0xA;
-    v1 = (unsigned char)stextflag;
-    show = 0;
-    if ((unsigned int)(v1 - 2) < 2 || (signed char)v1 == 4 ||
-        (unsigned int)(v1 - 6) < 2 || (signed char)v1 == 8 ||
-        (unsigned int)(v1 - 0x10) < 2 || (signed char)v1 == 0x12) {
-        show = 1;
-    }
-    if (show != 0 && storenumh != 0) {
-        td = GM_UseTexData(0);
-        if (stextsval != 0) {
-            ft4 = td->PrintFt4(0x7F, StoreBackRect.x, StoreBackRect.y + 0x31, 0, otpos, 0);
-            ft4->code &= 0xFC;
-            ft4->r0 = GOLDR;
-            ft4->g0 = GOLDG;
-            ft4->b0 = GOLDB;
+    OtPos = CBlocks::GetOverlayOtBase() + 10;
+    Flagy = 0;
+    if (stextflag == 2 || stextflag == 3 || stextflag == 4 || stextflag == 6 || stextflag == 7 || stextflag == 8
+        || stextflag == 16 || stextflag == 17 || stextflag == 18)
+        Flagy = 1;
+    if (Flagy && storenumh) {
+        PanelGfx = GM_UseTexData(0);
+        if (stextsval) {
+            Ft4 = PanelGfx->PrintFt4(0x7F, StoreBackRect.x, StoreBackRect.y + 0x31, 0, OtPos, 0);
+            Ft4->code &= ~1;
+            Ft4->code &= ~2;
+            Ft4->r0 = GOLDR;
+            Ft4->g0 = GOLDG;
+            Ft4->b0 = GOLDB;
         }
         if (stextsval < stextsmax) {
-            ft4 = td->PrintFt4(0x80, StoreBackRect.x, (StoreBackRect.y + StoreBackRect.h) - 0x12, 0, otpos, 0);
-            ft4->code &= 0xFC;
-            ft4->r0 = GOLDR;
-            ft4->g0 = GOLDG;
-            ft4->b0 = GOLDB;
+            Ft4 = PanelGfx->PrintFt4(0x80, StoreBackRect.x, StoreBackRect.y + StoreBackRect.h - 0x12, 0, OtPos, 0);
+            Ft4->code &= ~1;
+            Ft4->code &= ~2;
+            Ft4->r0 = GOLDR;
+            Ft4->g0 = GOLDG;
+            Ft4->b0 = GOLDB;
         }
     }
 }
