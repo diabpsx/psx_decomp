@@ -1389,44 +1389,43 @@ void SyncQSTLever(int i)
 
 void RestoreObjectLight(void)
 {
-    int m;
-    int p;
-    int j, oi, ot, ox, oy;
+    int i, oi, ox, oy;
+    MonsterStruct *Monst;
 
     InitLighting();
-    for (m = 0; m < nummonsters; m++) {
-        if (monster[monstactive[m]]._uniqtype) {
-            AddLight(monster[monstactive[m]]._mx, monster[monstactive[m]]._my, 0x23F4);
-        }
+    for (i = 0; i < nummonsters; i++) {
+        Monst = &monster[monstactive[i]];
+        if (Monst->_uniqtype)
+            AddLight(Monst->_mx, Monst->_my, 0x23F4);
     }
-    if (FePlayerNo >= 0) {
-        p = 0;
-        do {
-            plr[p]._plid = AddLight(plr[p]._px, plr[p]._py, plr[p]._pLightRad + 0x23F0);
-            p++;
-        } while (p <= FePlayerNo);
-    }
-    for (j = 0; j < numobjects; j++) {
-        oi = objectactive[j];
-        ot = object[oi]._otype;
+    for (i = 0; i <= FePlayerNo; i++)
+        plr[i]._plid = AddLight(plr[i]._px, plr[i]._py, plr[i]._pLightRad + 0x23F0);
+    for (i = 0; i < numobjects; i++) {
+        oi = objectactive[i];
         ox = object[oi]._ox;
         oy = object[oi]._oy;
-        switch (ot) {
+        switch (object[oi]._otype) {
         case 3:
         case 8:
         case 9:
+        case 65:
+            AddLamp(ox, oy, 0x3F3);
+            break;
+        case 87:
+            AddLamp(ox, oy, 0x3F3);
+            break;
         case 44:
         case 45:
         case 46:
         case 47:
-        case 65:
-        case 87:
             AddLamp(ox, oy, 0x3F3);
             break;
         case 0:
         case 26:
         case 91:
             AddLamp(ox, oy, 0x1B8);
+            break;
+        case 92:
             break;
         }
     }
