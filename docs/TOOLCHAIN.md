@@ -33,3 +33,12 @@
 * `-G` value (default 8 assumed) and ASPSX version (2.56 assumed) — to be settled by the gp-rel
   census + gates on functions touching small globals.
 * Overlay binaries (791 SYM functions live at 80139BF8+) — extract with `divination`'s `dstream`.
+
+## Linux lane
+`sh tools/linux_setup.sh && . /home/user/tc/env.sh` builds an equivalent gate lane on Linux (PsyQ 4.0 exes under
+wibo, bare-metal `mipsel-none-elf` as/objdump from binutils 2.42, psx_mnd_sym as DUMPSYM) and exports the
+`DIAB_*` overrides that build.py / verify_asm.py / symlane.py read. Checked 2026-09-27: `tools/status.py` reproduces
+the Windows board function-for-function (2406/2702 excluding the `scratch` segment, whose oracle
+`asm/nonmatchings/scratch/` is caught by the `scratch/` .gitignore rule and is not in the repo).
+Use the `*-elf` binutils, not Ubuntu's `mips-linux-gnu`: its gas pads `.text` to 16 bytes, which fails the last
+function of every TU on a trailing nop.
