@@ -1224,12 +1224,10 @@ void CBlocks::PrintDead(int x, int y)
     CachedInfoList *InfoList;
 
     IterateVisibleMap(x, y, AddDead, 0);
-    x -= 7;
-    y -= 11;
     InfoList = (CachedInfoList *)0x1F800000;
     Total = InfoList->NumOfItems;
-    Wx = WorldToScrX(x, y);
-    Wy = WorldToScrY(x, y);
+    Wx = WorldToScrX(x - 7, y - 11);
+    Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
     for (int f = 0; f < Total; f++) {
@@ -1270,10 +1268,8 @@ void CBlocks::PrintDead(int x, int y)
                 FRAME_HDR *Fr = ObjTexDat->GetFr(TransPals[transfile * 2 + 1]);
                 ObjTexDat->SetPal(Fr, Ft4);
             }
-            dx >>= 1;
-            dy >>= 1;
-            bx = dx - 16;
-            by = dy - 16;
+            bx = dx / 2 - 16;
+            by = dy / 2 - 16;
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];
@@ -1308,11 +1304,10 @@ void CBlocks::PrintTowners(int x, int y)
         YVel = 0xA0000;
     }
     IterateVisibleMap(x, y, AddTowners, 1);
-    x -= 7;
-    y -= 11;
     Total = InfoList->NumOfItems;
-    Wx = WorldToScrX(x, y);
-    Wy = WorldToScrY(x, y);
+    /* x - 7 / y - 11 passed as arguments, not assigned: retail loads a0 = this first */
+    Wx = WorldToScrX(x - 7, y - 11);
+    Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
     for (int f = 0; f < Total; f++) {
@@ -1337,8 +1332,13 @@ void CBlocks::PrintTowners(int x, int y)
         Creature = FindTownCreature(towner[mi]._ttype);
         PhysFrame = ThisData->GetFrNum(Creature, 0, Dir, GameFrame);
         PRIM_GetPrim(&Ft4);
-        x = towner[mi]._tx * 20;
-        y = towner[mi]._ty * 20;
+        /* accumulated *20 (tx*4 + tx, *4): retail builds the product in x's own register */
+        x = towner[mi]._tx * 4;
+        x += towner[mi]._tx;
+        x *= 4;
+        y = towner[mi]._ty * 4;
+        y += towner[mi]._ty;
+        y *= 4;
         Sx = Cx + WorldToScrX(x, y) - Wx;
         Sy = Cy + WorldToScrY(x, y) - Wy;
         OtPos = GetOtPos(Sy);

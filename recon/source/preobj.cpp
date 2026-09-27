@@ -167,7 +167,7 @@
 
 /* forward decls needed because this TU's retail definition order (mirrored below) uses
  * GetRndObjLoc/SetMapObjects before RndLocOk/ClrAllObjects are defined further down. */
-BOOL RndLocOk(int xp, int yp);
+unsigned char RndLocOk(int xp, int yp);
 void ClrAllObjects();
 
 /* ---- simple per-type "Add" handlers (called only via PreObjObjAddSwitch / AddObject) ---- */
@@ -190,9 +190,9 @@ void AddSCambBook(int i)
 {
     object[i]._oVar1 = setpc_x;
     object[i]._oVar2 = setpc_y;
-    object[i]._oVar3 = setpc_w + setpc_x + 1;
+    object[i]._oVar3 = setpc_x + setpc_w + 1;
+    object[i]._oVar4 = setpc_y + setpc_h + 1;
     object[i]._oVar6 = object[i]._oAnimFrame + 1;
-    object[i]._oVar4 = setpc_h + setpc_y + 1;
 }
 
 void AddChest(int i, int t)
@@ -327,7 +327,7 @@ void AddShrine(int i)
 
     object[i]._oPreFlag = 1;
     for (st = 0; st < NUM_SHRINETYPE; st++) {
-        if (currlevel != 0 && (st == 7 ? (int)currlevel < 9 : (int)currlevel < 17))
+        if (currlevel != 0 && currlevel < (st == 7 ? 9 : 17))
             slist[st] = 1;
         else
             slist[st] = 0;
@@ -529,7 +529,7 @@ void AddSlainHero()
     AddObject(OBJ_SLAINHERO, x + 2, y + 2);
 }
 
-BOOL RndLocOk(int xp, int yp)
+unsigned char RndLocOk(int xp, int yp)
 {
     if (dung_map[xp][yp].dMonster != 0)
         return 0;
@@ -1019,7 +1019,9 @@ void AddChestTraps()
 
 void LoadMapObjects(unsigned char *pMap, int startx, int starty, int x1, int y1, int w, int h, int leveridx)
 {
-    int rw, rh, i, j, oi, type;
+    int i, j;
+    int rw, rh;
+    int ox, oy;
     unsigned char *lm;
     long mapoff;
 
@@ -1029,19 +1031,19 @@ void LoadMapObjects(unsigned char *pMap, int startx, int starty, int x1, int y1,
     rw = *lm;
     lm += 2;
     rh = *lm;
-    mapoff = (rw * rh + 1) * 2;
+    mapoff = rw * rh * 2 + 2;
     rw <<= 1;
     rh <<= 1;
-    mapoff += rw * 2 * rh * 2;
+    mapoff += rw * rh * 4;
     lm += mapoff;
 
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*lm) {
-                type = *lm;
-                AddObject(ObjTypeConv[type], startx + 16 + i, starty + 16 + j);
-                oi = ObjIndex(startx + 16 + i, starty + 16 + j);
-                SetObjMapRange(oi, x1, y1, x1 + w, y1 + h, leveridx);
+                ox = i + 16 + startx;
+                oy = j + 16 + starty;
+                AddObject(ObjTypeConv[*lm], ox, oy);
+                SetObjMapRange(ObjIndex(ox, oy), x1, y1, x1 + w, y1 + h, leveridx);
             }
             lm += 2;
         }

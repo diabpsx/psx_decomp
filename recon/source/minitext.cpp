@@ -449,12 +449,10 @@ void DrawQText(void)
     }
     if (FileSYS == 2) {
         if (sghStream == NULL && qtexty > TextWait) {
-            unsigned long diff;
+            int diff = -0x10000;
 
-            currTime = VID_GetTick();
-            diff = 0x10000;
-            scrolltexty -= diff;
-            sgLastScroll = currTime;
+            sgLastScroll = VID_GetTick();
+            scrolltexty = scrolltexty + diff;
             qtexty = scrolltexty >> 16;
             if (TextWait >= qtexty)
                 PlaySFX(alltext[TextNum].sfxnr);
