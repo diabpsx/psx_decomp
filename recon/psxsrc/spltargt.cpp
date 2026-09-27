@@ -231,8 +231,15 @@ void SpellTarget::Show(void)
         inthatx = plx >> 3;
         inthaty = ply >> 3;
         vis_flag = dung_map[inthatx][inthaty].dFlags & (pnum + 1);
-        if (vis_flag)
-            CheckRangeObject(inthatx, inthaty, 1);
+        if (vis_flag) {
+            /* two-compare test on _pTSpell with identical arms: jump2 cross-jumps the arms and
+             * deletes the branches, but the _pTSpell load survives (as in retail).  The compared
+             * values are erased by the merge; 2/7 are placeholders. */
+            if (player->_pTSpell == 2 || player->_pTSpell == 7)
+                CheckRangeObject(inthatx, inthaty, 1);
+            else
+                CheckRangeObject(inthatx, inthaty, 1);
+        }
     } else {
         if (!IsAutoTarget(player->_pRSpell) || player->_pRSplType == 4 || (Monst->_mhitpoints >> 6) <= 0) {
             forcespell = 0;
