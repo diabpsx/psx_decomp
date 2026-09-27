@@ -3017,30 +3017,20 @@ void Obj_Light(int i, int lr)
 
 void Obj_Circle(int i)
 {
-    int p;
-    unsigned char found;
-    int ox, oy;
-    int px, py;
-    int ot;
-    char *pxp, *pyp, *pdirp;
+    int px, py, ox, oy, v1, v2;
+    BOOL done;
 
-    found = 0;
+    done = 0;
     ox = object[i]._ox;
     oy = object[i]._oy;
-    pxp = (char *)&plr[0]._px;
-    pyp = pxp + 2;
-    pdirp = pxp + 0x12;
-    for (p = 0; p < 2 && !found; p++, pxp += sizeof(struct PlayerStruct), pyp += sizeof(struct PlayerStruct), pdirp += sizeof(struct PlayerStruct)) {
-        px = *(short *)pxp;
-        py = *(short *)pyp;
+    for (int pnum = 0; pnum < 2 && !done; pnum++) {
+        px = plr[pnum]._px;
+        py = plr[pnum]._py;
         if ((px == ox && py == oy) || deltaload) {
-            found = 1;
-            ot = object[i]._otype;
-            if (ot == 0x54) {
+            done = 1;
+            if (object[i]._otype == 0x54)
                 object[i]._oAnimFrame = 2;
-                ot = object[i]._otype;
-            }
-            if (ot == 0x55)
+            if (object[i]._otype == 0x55)
                 object[i]._oAnimFrame = 4;
             if (ox == 0x2D && oy == 0x2F)
                 object[i]._oVar6 = 2;
@@ -3049,18 +3039,19 @@ void Obj_Circle(int i)
             else
                 object[i]._oVar6 = 0;
             if (object[i]._oVar5 >= 3 && ((ox == 0x23 && oy == 0x24) || deltaload)) {
+                int unused; /* dead local (no SYM record): retail keeps this scope's blocks, which also stops the loop-exit test being rotated */
                 object[i]._oVar6 = 4;
                 ObjChangeMapResync(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-                if (quests[15]._qactive == 2) {
-                    if (quests[15]._qvar1 < 5) {
-                        quests[15]._qvar1 = 4;
-                        if (!deltaload)
-                            NetSendCmdQuest(1, 15);
-                    }
+                v1 = 0x23;
+                v2 = 0x2E;
+                if (quests[Q_BETRAYER]._qactive == 2 && quests[Q_BETRAYER]._qvar1 <= 4) {
+                    quests[Q_BETRAYER]._qvar1 = 4;
+                    if (!deltaload)
+                        NetSendCmdQuest(1, Q_BETRAYER);
                 }
-                AddMissile(px, py, 0x23, 0x2E, *pdirp, 3, 0, p, 0, 0);
-                ClrPlrPath(p);
-                StartStand(p, 0);
+                AddMissile(plr[pnum]._px, plr[pnum]._py, v1, v2, plr[pnum]._pdir, 3, 0, pnum, 0, 0);
+                ClrPlrPath(pnum);
+                StartStand(pnum, 0);
             }
         } else {
             if (object[i]._otype == 0x54)
