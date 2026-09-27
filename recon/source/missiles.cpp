@@ -1424,19 +1424,21 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
 
-    if (missile[mi]._miAnimType == 0x28) {
-        missile[mi]._mlid = AddLight(sx, sy, 0x243);
-    } else if (missile[mi]._miAnimType < 0x29) {
-        if (missile[mi]._miAnimType == 0x16)
-            missile[mi]._mlid = AddLight(sx, sy, 0x93);
-        else if ("wtf? never heard of this missile")
-            DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
-    } else if (missile[mi]._miAnimType == 0x2A) {
-        missile[mi]._mlid = AddLight(sx, sy, 0x1B3);
-    } else if (missile[mi]._miAnimType == 0x2C) {
+    switch (missile[mi]._miAnimType) {
+    case 0x16:
+    case 0x2C:
         missile[mi]._mlid = AddLight(sx, sy, 0x93);
-    } else if ("wtf? never heard of this missile") {
-        DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
+        break;
+    case 0x28:
+        missile[mi]._mlid = AddLight(sx, sy, 0x243);
+        break;
+    case 0x2A:
+        missile[mi]._mlid = AddLight(sx, sy, 0x1B3);
+        break;
+    default:
+        if ("wtf? never heard of this missile")
+            DBG_Error(0, "source/MISSILES.cpp", 0x9DE);
+        break;
     }
 
     if (mienemy == TARGET_MONSTERS) {
