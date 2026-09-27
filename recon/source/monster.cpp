@@ -1667,12 +1667,12 @@ void MAI_RoundRanged(int i, int missile_type, unsigned char checkdoors, int dam,
     }
 }
 
-/* OPEN: bytes near-miss (113 diffs, ours 244 / oracle 247 insns, 3 short). Logic transcribed from
- * hellfire with confirmed PSX simplifications read off the raw oracle: (1) the
+/* OPEN: bytes near-miss (108 diffs, ours 247 / oracle 247 insns -- LENGTH EXACT). Logic transcribed
+ * from hellfire with confirmed PSX simplifications read off the raw oracle: (1) the
  * `dLight[mx][my]!=lightmax` visibility guard at the top is ABSENT entirely (PSX runs the whole AI
  * unconditionally once mmode==MM_STAND); (2) the MG_RUN_AWAY check drops hellfire's
  * `&& !(_mFlags&MFLAG_NOENEMY)` term.
- * TWO MORE REAL BUGS found+fixed this pass, both confirmed byte-for-byte against the raw oracle
+ * THREE REAL BUGS found+fixed across two passes, all confirmed byte-for-byte against the raw oracle
  * disasm (asm/nonmatchings/monster/MAI_Sneak__Fi.s):
  * (a) callaudit.py flagged a call-ORDER mismatch (17 calls vs retail's 18) -- the fadein guard
  *     `abs(mx) < dist && (flags&MFLAG_HIDDEN)` was missing the DIST-macro's second half
@@ -1685,18 +1685,26 @@ void MAI_RoundRanged(int i, int missile_type, unsigned char checkdoors, int dam,
  *     Monst->_my, plr[_menemy]._pownerx, plr[_menemy]._pownery`); when CLEAR, `md` keeps its prior
  *     value (from `M_GetDir(i)` at the top) with NO call at all -- fixed by dropping the
  *     monster-coords branch entirely (confirmed against both the raw bytes and the JAP Ghidra
- *     decompile at this exact VA, which shows the identical single-branch shape). This alone cut
- *     131->113 diffs and 260->244 insns (was 13 OVER length, now 3 short).
- * Residual (3 short, 113 diffs): a whole-function register-coloring swap -- retail assigns `i`'s
- * transient home (before `Monst` is computed) to $s5 exactly where SYM says `i` permanently lives;
- * ours puts it in $s4 (the register `mx` will later use), cascading an s4<->s5 / s6<->fp swap through
- * the whole body (content-identical instructions, different register letters throughout). FALSIFIED:
+ *     decompile at this exact VA, which shows the identical single-branch shape). (a)+(b) cut
+ *     131->113 diffs and 260->244 insns (was 13 OVER length, then 3 short).
+ * (c) a genuine POLARITY BUG in the walk-approach condition: `_mgoal==MG_RUN_AWAY || (abs(mx)<2 &&
+ *     abs(my)<2 && (COND1||COND2))` had `abs(mx)<2 && abs(my)<2` (DIST/close) where the raw oracle
+ *     requires the OPPOSITE -- traced the control flow label-by-label (L80150D0C: `_mgoal==RUN_AWAY`
+ *     jumps straight to the CallWalk site; else computes `bVar1 = abs(mx)>=2 || abs(my)>=2` i.e.
+ *     `!DIST(mx,my,2)`, then `beqz s1,.L80150DE4` -- when s1==0 (DIST/close true) it SKIPS the walk
+ *     entirely, going straight to the final attack-check; only the FAR case falls through to test
+ *     COND1/COND2) -- fixed to `!(abs(mx)<2 && abs(my)<2) && (...)`. This closed the length gap
+ *     exactly: 244->247 insns (now byte-count EXACT), 113->108 diffs.
+ * Residual (108 diffs, length now EXACT): a whole-function register-coloring swap -- retail assigns
+ * `i`'s transient home (before `Monst` is computed) to $s5 exactly where SYM says `i` permanently
+ * lives; ours puts it in $s4 (the register `mx` will later use), cascading an s4<->s5 / s6<->fp swap
+ * through the whole body (content-identical instructions, different register letters throughout,
+ * confirmed via symlane: ours has `i` on physical reg $20/s4, retail on $21/s5). FALSIFIED:
  * swapping `dist`/`Monst` declaration order to match SYM's local-record order (i,mx,my,md,v,Monst,
- * dist) -- no byte change. NEXT ANGLE (untried): this is register-coloring/permuter territory per
- * the methodology doc; the 3-insn length gap suggests there may also be a genuine missing/extra
- * instruction hiding under the register noise -- worth a careful line-by-line reread of the tail
- * (offsets 80150D0C-80150DE4, the attack-check block) against the current C once the coloring noise
- * is untangled. */
+ * dist) -- no byte change, both before and after fix (c). NEXT ANGLE (untried): pure permuter/
+ * register-coloring territory now that the length is exact and every structural/logic angle is
+ * closed -- would need a statement-permutation search over the whole function body per the
+ * methodology doc's "PERMUTER PLATEAU is a SMELL" class. */
 void MAI_Sneak(int i)
 {
     int mx, my, md, v;
@@ -1740,9 +1748,9 @@ void MAI_Sneak(int i)
         else if (!(abs(mx) < dist + 1 && abs(my) < dist + 1) && !(Monst->_mFlags & MFLAG_HIDDEN))
             M_StartFadeout(i, md, 1);
         else if (Monst->_mgoal == MG_RUN_AWAY
-            || (abs(mx) < 2 && abs(my) < 2
+            || (!(abs(mx) < 2 && abs(my) < 2)
                 && ((Monst->_mVar2 > 20 && v < (14 + 4 * Monst->_mint))
-                    || ((Monst->_mVar1 == MM_WALK || Monst->_mVar1 == MM_WALK2 || Monst->_mVar1 == MM_WALK3)
+                    || (WALKMODE(Monst->_mVar1)
                         && Monst->_mVar2 == 0 && v < (64 + 4 * Monst->_mint))))) {
             Monst->_mgoalvar1++;
             M_CallWalk(i, md);
