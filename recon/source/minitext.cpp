@@ -360,3 +360,160 @@ void DrawQTextTSK(TASK *T)
     ignore_buttons = 1;
     LANG_ReloadMainTXT();
 }
+
+void DrawQText(void)
+{
+    RECT ClipRect;
+    char *p;
+    char *pnl;
+    char *SpacePtr;
+    char *t;
+    int ty;
+    int l;
+    int LetterCount;
+    int KanjiCount;
+    int doneflag;
+    int oldDialogOt;
+    int oldFontOt;
+    char c, c2;
+    int yPrint;
+    unsigned long currTime;
+    long diff;
+
+    memset(tempstr, 0, 0x100);
+    if (FeFlag == 0) {
+        ClipRect.x = 0x14;
+        ClipRect.y = 0x18;
+        ClipRect.w = 0x118;
+        ClipRect.h = 0xB9;
+    } else {
+        ClipRect.x = 0x14;
+        ClipRect.y = 0x40;
+        ClipRect.w = 0x118;
+        ClipRect.h = 0x91;
+    }
+
+    oldDialogOt = QBack.SetOTpos(CBlocks::GetOverlayOtBase() - 1);
+    oldFontOt = MediumFont.SetOTpos(CBlocks::GetOverlayOtBase());
+    DrawQTextBack();
+    QBack.SetOTpos(oldDialogOt);
+
+    if (qtextptr != NULL) {
+        pnl = NULL;
+        if (!BL_AsyncLoadDone()) {
+            doneflag = 0;
+            p = (char *)qtextptr;
+            ty = qtexty;
+            while (!doneflag) {
+                l = 0;
+                SpacePtr = NULL;
+                LetterCount = 0;
+                KanjiCount = 0;
+                t = tempstr;
+                for (;;) {
+                    c = *p;
+                    if (c == '\n' || c == 0)
+                        break;
+                    p++;
+                    *t = c;
+                    l += MediumFont.GetCharWidth((unsigned char)c);
+                    c2 = *t;
+                    if (c2 == ' ') {
+                        SpacePtr = p - 1;
+                        LetterCount = 0;
+                    }
+                    if (c2 & 0x80) {
+                        KanjiCount += 2;
+                        t++;
+                        *t = *p;
+                        p++;
+                    } else {
+                        LetterCount++;
+                    }
+                    t++;
+                    if (l >= 0x118)
+                        break;
+                }
+                if (l >= 0x118 && SpacePtr != NULL) {
+                    p = SpacePtr;
+                    t -= LetterCount + KanjiCount;
+                }
+                c = *p;
+                if (c == '\n') {
+                    p++;
+                    c = *p;
+                }
+                if (c == 0)
+                    doneflag = 1;
+                *t = 0;
+                KANJI_strlen(tempstr);
+                if (FeFlag != 0)
+                    yPrint = ty - 0x46;
+                else
+                    yPrint = ty - 0x1E;
+                MediumFont.Print(0x10, yPrint, tempstr, JustLeft, &ClipRect, BORDERR, BORDERG, BORDERB);
+                if (pnl == NULL)
+                    pnl = p;
+                ty += 0xF;
+                if (ty >= 0xE7)
+                    doneflag = 1;
+            }
+
+            if (FileSYS == 2) {
+                if (sghStream == NULL) {
+                    if (TextWait < qtexty) {
+                        scrolltexty += 0xFFFF0000;
+                        sgLastScroll = VID_GetTick();
+                        qtexty = scrolltexty >> 16;
+                        if (TextWait >= qtexty)
+                            PlaySFX(alltext[TextNum].sfxnr);
+                    }
+                    if (sghStream == NULL) {
+                        if (qtbodge != 0) {
+                            currTime = VID_GetTick();
+                            diff = currTime - sgLastScroll;
+                            if (diff < 0)
+                                diff = -diff;
+                            scrolltexty -= diff * qtextSpd;
+                            sgLastScroll = currTime;
+                            qtexty = scrolltexty >> 16;
+                        }
+                    } else {
+                        goto stream_sync;
+                    }
+                } else {
+stream_sync:
+                    currTime = VID_GetTick();
+                    diff = currTime - sgLastScroll;
+                    if (diff < 0)
+                        diff = -diff;
+                    sgLastScroll = currTime;
+                    scrolltexty -= qtextSpd * diff;
+                    qtexty = scrolltexty >> 16;
+                    if (sghStream->playing != 0 && sghStream->stream_ending == 0)
+                        qtbodge = 1;
+                }
+            } else {
+                currTime = VID_GetTick();
+                diff = qtextSpd * (currTime - sgLastScroll);
+                sgLastScroll = currTime;
+                scrolltexty -= diff;
+                qtexty = scrolltexty >> 16;
+            }
+
+            if ((FeFlag != 0 ? 0x3C : 0xF) >= qtexty) {
+                scrolltexty += 0xF0000;
+                qtextptr = pnl;
+                qtexty = scrolltexty >> 16;
+                if (pnl[-1] == 0 || pnl[0] == 0 || pnl[1] == 0)
+                    qtextonflag = 0;
+                if (sghStream != NULL && qtextonflag == 0)
+                    qtextonflag = 1;
+            }
+
+            strcpy(MtPrevText, GetStr(FeFlag != 0 ? 0x2000 : 0x10C1));
+            MediumFont.Print(((0x100 - MediumFont.GetStrWidth(MtPrevText)) / 2) + 0x20, 0xE0, MtPrevText, JustLeft, NULL, WHITER, WHITEG, WHITEB);
+            MediumFont.SetOTpos(oldFontOt);
+        }
+    }
+}
