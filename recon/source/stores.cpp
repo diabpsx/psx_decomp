@@ -1726,35 +1726,30 @@ void S_TalkEnter(void)
     if (stextsel == 0x16) {
         StartStore(stextshold);
         stextsel = stextlhold;
-        return;
-    }
-    tq = 0;
-    i = 0;
-    do {
-        if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog != 0) {
-            tq += 1;
-        }
-        i += 1;
-    } while (i < 0x10);
-    sn = 0xA - (tq >> 1);
-    if (stextsel == sn - 2) {
-        SetRndSeed(towner[talker]._tSeed);
-        InitQTextMsg(ENG_random(gossipend - gossipstart + 1) + gossipstart);
-        return;
-    }
-    i = 0;
-    do {
-        if (quests[i]._qactive == 2) {
-            la = Qtalklist[talker][i];
-            if (la != -1 && quests[i]._qlog != 0) {
-                if (sn == stextsel) {
-                    InitQTextMsg(la);
-                }
-                sn = sn + 1;
+    } else {
+        tq = 0;
+        for (i = 0; i < 16; i++) {
+            if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog != 0) {
+                tq++;
             }
         }
-        i = i + 1;
-    } while (i < 0x10);
+        sn = 10 - (tq >> 1);
+        la = 1;
+        if (stextsel == sn - 2) {
+            int x;   /* dead local: retail SYM has a record-less level here */
+            SetRndSeed(towner[talker]._tSeed);
+            InitQTextMsg(ENG_random(gossipend - gossipstart + 1) + gossipstart);
+        } else {
+            for (i = 0; i < 16; i++) {
+                if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog != 0) {
+                    if (sn == stextsel) {
+                        InitQTextMsg(Qtalklist[talker][i]);
+                    }
+                    sn += la;
+                }
+            }
+        }
+    }
 }
 
 /* @0x8007123C */
