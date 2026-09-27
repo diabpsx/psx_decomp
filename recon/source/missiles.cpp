@@ -3274,8 +3274,9 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
 
 unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
 {
-    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
-     * byte-verified given the size (496 insns). PSX confirmed to include hellfire's MIS_HBOLT/
+    /* Byte + SYM matched. The retail SYM's chain of empty nested blocks comes from g++'s implicit
+     * if/else scopes, kept alive by the block-scoped `dir` temp in the knockback call (a v0-only
+     * local, so it gets no record of its own). PSX confirmed to include hellfire's MIS_HBOLT/
      * MT_DIABLO/MC_UNDEAD immunity check (a MC_UNDEAD value of 0 is assumed from the oracle's
      * bare `!= 0` test), and drops devilution's `if (pnum == myplr)` gate on the hitpoint
      * deduction (unconditional here). The `m >= 4` checks (not `m > MAX_PLRS - 1`) match the
@@ -3304,13 +3305,15 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
 
     hit = ENG_random(100);
     if (missiledata[t].mType == 0) {
-        hper = plr[pnum]._pLevel - (monster[m].mArmorClass - 50) - plr[pnum]._pIEnAc + (plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit) - ((dist * dist) >> 1);
+        hper = plr[pnum]._pLevel + 50 - monster[m].mArmorClass - plr[pnum]._pIEnAc;
+        hper += plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit;
+        hper -= ((dist * dist) >> 1);
         if (plr[pnum]._pClass == PC_ROGUE)
             hper += 20;
         if (plr[pnum]._pClass == PC_WARRIOR)
             hper += 10;
     } else {
-        hper = plr[pnum]._pMagic - (monster[m].mLevel - 25) * 2 - dist;
+        hper = plr[pnum]._pMagic + 50 - (monster[m].mLevel << 1) - dist;
         if (plr[pnum]._pClass == PC_SORCERER)
             hper += 20;
     }
@@ -3322,8 +3325,7 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
         hit = 0;
     if (CheckMonsterHit(m, &ret))
         return ret;
-
-    if (hit < hper) {
+    else if (hit < hper) {
         if (t == MIS_BONESPIRIT)
             dam = (monster[m]._mhitpoints / 3) >> 6;
         else
@@ -3359,8 +3361,10 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
                     M_StartHit(m, pnum, dam);
                 monster[m]._mmode = MM_STONE;
             } else {
-                if (missiledata[t].mType == 0 && (plr[pnum]._pIFlags & 0x800 /* ISPL_KNOCKBACK */))
-                    M_GetKnockback(m, GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my));
+                if (missiledata[t].mType == 0 && (plr[pnum]._pIFlags & 0x800 /* ISPL_KNOCKBACK */)) {
+                    int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my);
+                    M_GetKnockback(m, dir);
+                }
                 if (m >= 4)
                     M_StartHit(m, pnum, dam);
             }
@@ -3371,8 +3375,9 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
             monster[m]._lastx = plr[pnum]._px;
             monster[m]._lasty = plr[pnum]._py;
         }
-    }
-    return 1;
+        return 1;
+    } else
+        return 1;
 }
 
 unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
