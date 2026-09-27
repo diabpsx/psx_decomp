@@ -567,12 +567,11 @@ void PutMissile(int i)
             if (dMiss < 0) {
                 /* oracle computes the shift/column term (dMiss&0x60) BEFORE the row term
                  * (dMiss&0x1F) -- confirmed via raw oracle register order; matters for coloring. */
-                if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][(dMiss & 0x60) >> 5] - 1]._mitype)
+                char col = (dMiss & 0x60) >> 5;
+                if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][col] - 1]._mitype)
                     return;
-                if ((char)(((dMiss & 0x60) >> 5) + 1) < 4) {
-                    dMissArray[dMiss & 0x1F][(char)(((dMiss & 0x60) >> 5) + 1)] = i + 1;
-                    dung_map[mx][my].dMissile += 0x20;
-                }
+                if ((char)(col + 1) < 4)
+                    dMissArray[dMiss & 0x1F][(char)(col + 1)] = i + 1, dung_map[mx][my].dMissile += 0x20;
             } else {
                 for (m = 0; m < 32; m++) {
                     if (dMissArray[m][0] == 0) {
