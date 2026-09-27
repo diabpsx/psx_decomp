@@ -1036,14 +1036,13 @@ void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir)
     M_CheckEFlag(i);
 }
 
-/* OPEN: bytes near-miss (15 diffs, 137 vs 140 insns) -- fully derived from the raw oracle (NOT
+/* PASS+SYM (see end of note) -- fully derived from the raw oracle (NOT
  * from hellfire, whose M_StartWalk2/M_StartWalk3 calls don't exist on PSX -- confirmed all 8
  * switch-case bodies + the case LAYOUT ORDER from the jump table bytes at 0x8011A310: N,NE,E,SE,
  * S,SW,W,NW, matching hellfire's switch source order even though the case VALUES are the DIR_
  * enum).  Getting the case order right (ascending 0..7 instead of the jump-table's physical N-first
- * order) alone took the diff from "far miss" to this near-miss.  Residual: per-case instruction
- * SCHEDULING (which value lands in the branch/jump delay slot) -- same scheduling-artifact family
- * as M_StartWalk/M_StartKill/M_ChangeLightOffset. */
+ * order) alone took the diff from "far miss" to this near-miss.  PASS+SYM once DIR_NW's yvel was
+ * fixed to -MWVel[mwi][0] (a real sign bug; the cross-jumped `negu a1; negu a2` tail shows it). */
 void M_WalkDir(int i, int md)
 {
     int mwi = monster[i].MType->Anims[MA_WALK].Frames - 1;
@@ -1071,7 +1070,7 @@ void M_WalkDir(int i, int md)
         M_StartWalk(i, -MWVel[mwi][2], 0, -1, 1, DIR_W);
         break;
     case DIR_NW:
-        M_StartWalk(i, -MWVel[mwi][1], MWVel[mwi][0], -1, 0, DIR_NW);
+        M_StartWalk(i, -MWVel[mwi][1], -MWVel[mwi][0], -1, 0, DIR_NW);
         break;
     }
 }
@@ -2886,17 +2885,15 @@ void GroupUnity(int i)
  * block BEFORE the `if(_mmode==MM_STONE) return;` check -- not gated inside
  * it like M_StartHit's tail (retail reads _moldx/_moldy speculatively before
  * ever testing _mmode; moving the read+early-return to match closed the
- * count from 173 to 175 exactly). Remaining 16-diff residue is pure
- * scheduling: oracle hoists the `lui/addiu hi(monster)/lo(monster)` constant
- * pair earlier (right after the previous statement) and combines it with the
- * stride into $v1, ours computes the stride first then the constant into
- * $v0 -- tried `monster+mid` vs `&monster[mid]` spelling and declaring
- * _mx/_my before pmonster, no change either way. This is the closest OPEN
- * item in the file; a fresh angle on THIS specific scheduling tie (not
- * reg-save-order, a genuine "which independent sub-expression gets
- * evaluated first" choice) would likely close it. */
+ * count from 173 to 175 exactly). NOW PASS+SYM: the `monster` base is loaded
+ * as its own statement (`pmonster = monster; pmonster += mid;`, the same
+ * spelling as M_StartKill), which hoists the lui/addiu pair into $v1; and the
+ * locals live in the function's top block (retail SYM has no inner block). */
 void M2MStartHit(int mid, int i, int dam)
 {
+    MonsterStruct *pmonster;
+    int _mx, _my;
+
     if (i >= 0)
         monster[i].mWhoHit |= 1 << i;
 
@@ -2917,31 +2914,30 @@ void M2MStartHit(int mid, int i, int dam)
         monster[mid]._mgoal = MGOAL_NORMAL;
     }
 
-    {
-        MonsterStruct *pmonster = &monster[mid];
-        int _mx = pmonster->_moldx;
-        int _my = pmonster->_moldy;
+    pmonster = monster;
+    pmonster += mid;
+    _mx = pmonster->_moldx;
+    _my = pmonster->_moldy;
 
-        if (monster[mid]._mmode == MM_STONE)
-            return;
+    if (monster[mid]._mmode == MM_STONE)
+        return;
 
-        if (monster[mid].MType->mtype != MT_GOLEM) {
-            NewMonsterAnim(mid, monster[mid].MType->Anims[MA_GOTHIT], monster[mid]._mdir, MA_GOTHIT);
-            monster[mid]._mmode = MM_GOTHIT;
-        }
-
-        monster[mid]._mxoff = 0;
-        monster[mid]._myoff = 0;
-        monster[mid]._mx = _mx;
-        monster[mid]._my = _my;
-        monster[mid]._mfutx = _mx;
-        monster[mid]._mfuty = _my;
-        monster[mid]._moldx = _mx;
-        monster[mid]._moldy = _my;
-        M_CheckEFlag(mid);
-        M_ClearSquares(mid);
-        dung_map[_mx][_my].dMonster = mid + 1;
+    if (monster[mid].MType->mtype != MT_GOLEM) {
+        NewMonsterAnim(mid, monster[mid].MType->Anims[MA_GOTHIT], monster[mid]._mdir, MA_GOTHIT);
+        monster[mid]._mmode = MM_GOTHIT;
     }
+
+    monster[mid]._mxoff = 0;
+    monster[mid]._myoff = 0;
+    monster[mid]._mx = _mx;
+    monster[mid]._my = _my;
+    monster[mid]._mfutx = _mx;
+    monster[mid]._mfuty = _my;
+    monster[mid]._moldx = _mx;
+    monster[mid]._moldy = _my;
+    M_CheckEFlag(mid);
+    M_ClearSquares(mid);
+    dung_map[_mx][_my].dMonster = mid + 1;
 }
 
 /* SYM not checked; bytes OPEN (215 diffs, ours 237 / oracle 242, 5 insns
