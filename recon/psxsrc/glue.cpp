@@ -66,7 +66,16 @@ extern const char D_80110B68[];
 extern int FePlayerNo;
 extern "C" void StartStand__FP12PlayerStructi(struct PlayerStruct *P, int Dir);
 
-struct GPanel { unsigned char pad[28]; };   /* sizeof 28 per retail SYM; opaque here */
+struct RECT { short x, y, w, h; };   /* sizeof 8 */
+struct TextDat;
+struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record) */
+    int HealthAnimCount;    /* +0x0 */
+    int ManaAnimCount;      /* +0x4 */
+    int GlobeAnimCount;     /* +0x8 */
+    struct RECT MsgRect;    /* +0xC */
+    struct TextDat *PanelTData;   /* +0x14 */
+    int GPanelOt;           /* +0x18 */
+};
 struct PanelXY;
 extern struct PanelXY DefP1PanelXY, DefP2PanelXY, DefP1PanelXY2, DefP2PanelXY2;
 extern int sel_data;
@@ -144,12 +153,12 @@ public:
 /* TU-owned small data */
 int D_8011C6BC;   /* MonsterList (GLUE_Set/GetMonsterList) */
 int D_8011C6B0;   /* Finished flag */
-int D_8011C6B4;   /* HomingScroll flag */
+BOOL DoHomingScroll;   /* @0x8011C6B4 */
 int D_8011AFF4;   /* HasGameStarted flag */
 int D_8011C6C0;   /* GLUE_DoQuake Time */
 int D_8011C6C4;   /* GLUE_DoQuake Amount */
-int DoDrawBg;     /* @0x8011B004 -- other TUs (control/scrollrt/graham/padfuncs) see it as a cross-TU extern (lui/lw) */
-int DoShowPanel;  /* @0x8011B000 -- ditto */
+BOOL DoDrawBg;    /* @0x8011B004 */
+BOOL DoShowPanel; /* @0x8011B000 */
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -214,9 +223,9 @@ void GLUE_StartBg(int TextId, BOOL IsTown, int Level)
     Args->a2 = Level;
 }
 
-int GLUE_SetShowGameScreenFlag(BOOL NewFlag)
+BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag)
 {
-    int OldFlag;
+    BOOL OldFlag;
 
     OldFlag = DoDrawBg;
     DoDrawBg = NewFlag;
@@ -228,18 +237,18 @@ int GLUE_GetShowGameScreenFlag(void)
     return DoDrawBg;
 }
 
-int GLUE_SetHomingScrollFlag(BOOL NewFlag)
+BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag)
 {
-    int OldFlag;
+    BOOL OldFlag;
 
-    OldFlag = D_8011C6B4;
-    D_8011C6B4 = NewFlag;
+    OldFlag = DoHomingScroll;
+    DoHomingScroll = NewFlag;
     return OldFlag;
 }
 
-int GLUE_SetShowPanelFlag(BOOL NewFlag)
+BOOL GLUE_SetShowPanelFlag(BOOL NewFlag)
 {
-    int OldFlag;
+    BOOL OldFlag;
 
     OldFlag = DoShowPanel;
     DoShowPanel = NewFlag;
@@ -347,7 +356,7 @@ struct PInf *FindPlayerChar(struct PlayerStruct *P)
     return FindPlayerChar((int)P->_pClass, P->_pgfxnum & 0xF, (int)(P->_pgfxnum << 24) >> 28);
 }
 
-unsigned short FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
+int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
 {
     char Class;
     struct PInf *Inf;
@@ -362,13 +371,13 @@ unsigned short FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
                 return 0x124;
             }
             DBG_Error(0, D_80110B58, 0x2AF);
-            return (unsigned short)-1;
+            return -1;
         }
         if (Class == 2) {
             return 0x125;
         }
         DBG_Error(0, D_80110B58, 0x2AF);
-        return (unsigned short)-1;
+        return -1;
     }
     Inf = FindPlayerChar(P);
     if (InTown != 0) {
@@ -382,7 +391,7 @@ unsigned short FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
 
 void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
 {
-    unsigned short Id;
+    int Id;
 
     Id = FindPlayerChar(&Plr, InTown);
     if (Id != Player.GetTexId()) {
@@ -421,9 +430,9 @@ void BgTask(struct TASK *T)
 {
     struct CBlocks Blocks;
     struct CPlayer P1, P2;
-    unsigned char Panel1Buf[32], Panel2Buf[32];
-    struct GPanel *Panel1 = (struct GPanel *)Panel1Buf;
-    struct GPanel *Panel2 = (struct GPanel *)Panel2Buf;
+    struct GPanel Panel1Obj, Panel2Obj;
+    struct GPanel *Panel1 = &Panel1Obj;
+    struct GPanel *Panel2 = &Panel2Obj;
     struct DEF_ARGS *Args;
     int TextId, Level, MLev;
     BOOL IsTown;
@@ -508,7 +517,7 @@ void BgTask(struct TASK *T)
                 Plr = &plr[0x19E8];
             }
             SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)Plr, &Blocks);
-            if (D_8011C6B4 != 0 && deathflag == 0) {
+            if (DoHomingScroll != 0 && deathflag == 0) {
                 DoScroll__7CBlocks(&Blocks);
             }
             Print__7CBlocks(&Blocks);
