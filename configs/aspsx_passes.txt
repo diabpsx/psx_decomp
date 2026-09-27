@@ -16,3 +16,4 @@ padfuncs pad_func_Quick_Spell__Fi
 player ValidatePlayer__Fv
 player PM_DoSpell__FP12PlayerStruct
 stream STR_AllocBuffer__Fv
+block PrintMissiles__7CBlocksii

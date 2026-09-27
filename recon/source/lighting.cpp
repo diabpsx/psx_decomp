@@ -132,7 +132,7 @@ void SetWeirdFX(void)
 
 /* @0x8004BE20 -- PSX-only coloured radial light-fill (no PC twin). All four paint arms are written from
  * the oracle: clipped/unclipped x shift_mask==0/!=0. Parameters are reused as loop rows/columns
- * (nYPos = block_y + y in the clipped arms; nYPos walks the rows beside the y counter in the unclipped ones).
+ * (clipped arms: nYPos = block_y + y set at the top of each row; unclipped: nYPos walks beside the y counter).
  * dist_y is set inside the x loop (retail computes it after the inner entry test). The shake jitter
  * (two GU_GetRnd calls) is dead in this build: shake is the constant 1.
  * NEAR-MISS: 804/821 insns; the remaining gap is register allocation, caller-save slots and the plr[0]
@@ -226,8 +226,8 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
         radius_block = g_light_amp >> 3;
         if (block_y < 0 || block_y + radius_block > max_x || block_x < 0 || block_x + radius_block > max_x) {
             if (!shift_mask) {
-                nYPos = block_y;
-                for (y = 0; y <= radius_block; y++, nYPos++) {
+                for (y = 0; y <= radius_block; y++) {
+                    nYPos = block_y + y;
                     if (nYPos >= 0) if (nYPos < 48) {
                         for (x = 0; x <= radius_block; x++) {
                             dist_y = light_y - ((nYPos) << 4);
@@ -270,8 +270,8 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                     }
                 }
             } else {
-                nYPos = block_y;
-                for (y = 0; y <= radius_block; y++, nYPos++) {
+                for (y = 0; y <= radius_block; y++) {
+                    nYPos = block_y + y;
                     if (nYPos >= 0) if (nYPos < 48) {
                         for (x = 0; x <= radius_block; x++) {
                             dist_y = light_y - ((nYPos) << 4);

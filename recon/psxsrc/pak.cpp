@@ -60,6 +60,7 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
     struct block theblock;
     int inpos;
     int maxlen = 255;
+    int (&data)[128] = theblock.data;
 
     theblock.blocksize = 0;
     theblock.data[0] = buffer[0];
@@ -104,8 +105,7 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
         if (bestlength < 3) {
             if (theblock.blockrep || theblock.blocksize >= 127)
                 writeblock(&theblock);
-            *(theblock.data + theblock.blocksize + 1) = buffer[inpos++];
-            theblock.blocksize++;
+            data[++theblock.blocksize] = buffer[inpos++];
         } else {
             writeblock(&theblock);
             inpos += bestlength;

@@ -1185,21 +1185,20 @@ void CBlocks::PrintMissiles(int x, int y)
     int Total;
 
     IterateVisibleMap(x, y, AddMissile, 0);
-    x -= 7;
-    y -= 11;
     InfoList = (CachedInfoList *)0x1F800000;
     Total = InfoList->NumOfItems;
-    Wx = WorldToScrX(x, y);
-    Wy = WorldToScrY(x, y);
+    Wx = WorldToScrX(x - 7, y - 11);
+    Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
     for (int f = 0; f < Total; f++) {
-        MissileStruct *MissStr = (MissileStruct *)(InfoList->Items[f].uMissStr.MyMiss | 0x80000000);
         int Sx;
-        int Sy = MissStr->_miy * 20;
-        y = MissStr->_mix * 20;
-        Sx = Cx + WorldToScrX(y, Sy) - Wx;
-        Sy = Cy + WorldToScrY(y, Sy) - Wy;
+        int Sy;
+        MissileStruct *MissStr = (MissileStruct *)(InfoList->Items[f].uMissStr.MyMiss | 0x80000000);
+        Sy = MissStr->_miy * 20;
+        int mx = MissStr->_mix * 20;   /* record-less loop-local holder (retail: own local reg, no SYM record) */
+        Sx = Cx + WorldToScrX(mx, Sy) - Wx;
+        Sy = Cy + WorldToScrY(mx, Sy) - Wy;
         Sx += MissStr->_mixoff * 625 / 1000;
         Sy += MissStr->_miyoff * 625 / 1000;
         ((void (*)(MissileStruct *, int, int, int))MissStr->PrintPtr)(MissStr, Sx, Sy, GetOtPos(Sy));
@@ -1261,15 +1260,15 @@ void CBlocks::PrintDead(int x, int y)
             Sy = Cy + WorldToScrY(dx * 20, dy * 20) - Wy;
             GetOtPos(Sy);
             Ft4 = MonstTexDat->PrintMonster(Creature, 4, 0, Frame, Sx, Sy, 4);
-            dx += 16;
-            dy += 16;
+            int hx = dx + 16;   /* record-less carriers across the transfile if: keep dx/dy block-local (retail s2/s3) */
+            int hy = dy + 16;
             transfile = MyMonst->MData->TransFile;
             if (transfile) {
                 FRAME_HDR *Fr = ObjTexDat->GetFr(TransPals[transfile * 2 + 1]);
                 ObjTexDat->SetPal(Fr, Ft4);
             }
-            bx = dx / 2 - 16;
-            by = dy / 2 - 16;
+            bx = hx / 2 - 16;
+            by = hy / 2 - 16;
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];
