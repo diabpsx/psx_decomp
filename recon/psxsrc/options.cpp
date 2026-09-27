@@ -37,6 +37,9 @@ BOOL CharacterBlockLoaded;      /* gp_rel in FormatPad's oracle -> owned here */
 int ReturnCards;                /* gp_rel in SaveOverwritePad's oracle -> owned here */
 static int lastlastcs;          /* D_8011B238 -- SYM name "lastlastcs" */
 static int Spacing;             /* D_8011B22C -- SYM name "Spacing" */
+static unsigned char KeyPos;    /* D_8011B270 -- SYM name "KeyPos" */
+static BOOL debounce;           /* D_8011B26C -- SYM name "debounce" */
+static LANG_TYPE OldLang;       /* D_8011C708 -- SYM name "OldLang" */
 
 /* ---------------------------------------------------------------- header-copy methods ---- */
 unsigned short CPad::GetDown() const
@@ -1071,4 +1074,243 @@ L_9124:
         saveflag = CountdownSave(saveflag);
 L_91F8:
     return;
+}
+
+void SoundPad(void)
+{
+    CPad *P;
+    int move;
+    OMENUITEM *iptr;
+    int lcs;
+
+    P = PAD_GetPad(options_pad, 0);
+    if (MemCardActive != 0) {
+        MemcardOFF();
+        cardondelay = 5;
+        card_active[1] = 0;
+        card_active[0] = 0;
+    }
+    if (CDWAIT != 0)
+        return;
+
+    if (KeyTab[KeyPos] & P->GetDown()) {
+        KeyPos = KeyPos + 1;
+        if (KeyTab[KeyPos & 0xFF] == 0)
+            PlaySFX(0x2AF);
+    } else {
+        if (P->GetDown() & 0xFFFF)
+            KeyPos = 0;
+    }
+
+    if (FeFlag != 0)
+        P->SetPadTick(0xC);
+    else if (cmenu == 2)
+        P->SetPadTick(4);
+    else
+        P->SetPadTick(8);
+    P->SetPadTickMask(0xF);
+
+    move = 0;
+    if (P->GetTick() & 1)
+        move = -1;
+    if (P->GetTick() & 2)
+        move = 1;
+    iptr = MenuList[cmenu].Item;
+    lcs = cs + move;
+    cs = lcs;
+    if (iptr[lcs].Text == 0) {
+        do {
+            if (move == 0)
+                move = 1;
+            lcs = cs;
+            if (lcs < 0)
+                move = 1;
+            if (lcs < MenuList[cmenu].NoEntries - 1)
+                lcs = lcs + move;
+            else {
+                move = -1;
+                lcs = lcs + move;
+            }
+            cs = lcs;
+        } while (iptr[lcs].Text == 0);
+    }
+    if (cmenu != 1 && cmenu != 8) {
+        if (cs <= 0)
+            cs = MenuList[cmenu].NoEntries - 2;
+        if (!(cs < MenuList[cmenu].NoEntries - 1))
+            cs = 1;
+    }
+    if (cs != lcs)
+        PlaySFX(0x32);
+
+    if (cmenu == 3) {
+        int i;
+
+        for (i = 5; i >= 1; i--)
+            iptr[i].len = 0;
+        iptr[NewLang].len = 1;
+        if (NewLang != OldLang) {
+            PlaySFX(0x33);
+            ChangeLang();
+            OldLang = NewLang;
+        }
+    }
+
+    if (cmenu == 6) {
+        if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
+            if (cs == 1) {
+                optionsflag = 0;
+                options_pad = -1;
+                PlaySFX(0x33);
+                TSK_Sleep(1);
+                GO_DoGameOver();
+            }
+        }
+    } else {
+        if (iptr[cs].var != NULL) {
+            int llen;
+
+            llen = iptr[cs].len;
+            if (P->GetTick() & 4) {
+                iptr[cs].len = iptr[cs].len - 2;
+                if (iptr[cs].len < 0)
+                    iptr[cs].len = 0;
+            }
+            if (P->GetTick() & 8) {
+                iptr[cs].len = iptr[cs].len + 2;
+                if (sw < iptr[cs].len)
+                    iptr[cs].len = sw;
+            }
+            if (llen != iptr[cs].len)
+                PlaySFX(cs == 4 ? 0x79 : 0x32);
+            *iptr[cs].var = iptr[cs].len;
+        }
+    }
+
+    if ((P->GetUp() & 0x40) || (P->GetUp() & 0x10)) {
+        ignore_buttons = 1;
+        debounce = 1;
+    }
+
+    if (((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) && debounce != 0) {
+        int link;
+
+        they_pressed = who_pressed(0x50);
+        link = iptr[cs].Link;
+        if (link == -1) {
+            PlaySFX(0x33);
+            Adjust = 0;
+            ToggleOptions();
+            if (optionsflag != 0)
+                return;
+            ignore_buttons = 1;
+            return;
+        }
+        if (link == -2) {
+            if (cmenu == 3) {
+                NewLang = cs - 1;
+                return;
+            }
+            /* else: fall through to the post-dispatch tail below */
+        } else if (DiabloDieFlag == 0 || (link != 0xD && (cmenu != 1 || cs > 4))) {
+            PlaySFX(0x33);
+            link = iptr[cs].Link;
+            lastcs = cs;
+            cmenu = link - 1;
+            if (link == 1 && FeFlag == 0)
+                cmenu = link;
+            if (cmenu == 0x17) {
+                if (Qfromoptions == 0 || cs != 4) {
+                    Qfromoptions = options_pad + 1;
+                } else {
+                    GLUE_SetShowGameScreenFlag(1);
+                    cmenu = 0;
+                    Qfromoptions = 0;
+                    debounce = 1;
+                }
+            } else {
+                cs = 1;
+            }
+            if (cmenu == 10) {
+                GM_SPEEDS spd = GetSpeed();
+                if (spd == GM_SPEED_NORMAL)
+                    cs = 1;
+                else if (spd == GM_SPEED_FAST)
+                    cs = 2;
+            }
+            if (deathflag != 0 && cmenu < 2) {
+                cs = lastcs;
+                cmenu = 8;
+                Adjust = 0;
+                return;
+            }
+            if (cmenu - 5 < 2)
+                cs = 2;
+            Adjust = 0;
+            return;
+        } else {
+            PlaySFX(0x3D3);
+            return;
+        }
+    }
+
+    if (cmenu == 2 && cs == 5) {
+        if (P->GetDown() & 0xC)
+            SwitchMONO();
+    }
+    if ((P->GetDown() & 0x100) && PadFrig != 0) {
+        PadFrig = 0;
+        return;
+    }
+    if (!(P->GetDown() & 0x100))
+        return;
+    if (cmenu != 8) {
+        int link;
+
+        if (Qfromoptions != 0) {
+            PlaySFX(0x33);
+            GLUE_SetShowGameScreenFlag(1);
+            Qfromoptions = 0;
+            return;
+        }
+        cs = MenuList[cmenu].NoEntries - 1;
+        link = iptr[cs].Link;
+        if (link == -1 || link == 6) {
+            PlaySFX(0x33);
+            Adjust = 0;
+            ToggleOptions();
+            if (optionsflag != 0)
+                return;
+            ignore_buttons = 0;
+            return;
+        }
+        if (link == -2)
+            return;
+        PlaySFX(0x33);
+        if (deathflag == 0) {
+            if (cmenu == 7) {
+                cmenu = iptr[cs].Link - 1;
+                Adjust = 0;
+                cs = 5;
+            } else {
+                Adjust = 0;
+                cmenu = iptr[cs].Link - 1;
+                cs = lastcs;
+            }
+        } else {
+            if (cmenu == 6) {
+                cmenu = 8;
+                Adjust = 0;
+                cs = lastcs;
+            }
+        }
+        if (MemcardOverlay == 0)
+            return;
+        MemcardOverlay = 0;
+        if (FeFlag != 0)
+            return;
+        OVR_LoadGame();
+        return;
+    }
+    PlaySFX(0x3D3);
 }

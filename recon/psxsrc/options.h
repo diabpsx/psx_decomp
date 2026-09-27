@@ -76,8 +76,8 @@ struct CPad {   /* sizeof 236 */
     unsigned short GetDown() const;
     unsigned short GetUp() const;
     unsigned short GetTick() const;
-    void SetPadTick(unsigned short v) { PADTICK = (unsigned char)v; }
-    void SetPadTickMask(unsigned short v) { PADTICKMASK = v; }
+    void SetPadTick(unsigned short tick) { PADTICK = (unsigned char)tick; }
+    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
 };
 
 struct Dialog {   /* sizeof 16 */
@@ -264,6 +264,16 @@ extern unsigned char block_buf[128];
 extern int card_side_load[2];
 extern int card_side_nogame[2];
 extern int card_side_noopt[2];
+
+/* SoundPad additions */
+extern unsigned short KeyTab[10];   /* @0x800CD360 -- keyboard-remap mask table, another module */
+extern int they_pressed;
+extern unsigned char Qfromoptions;
+extern BOOL DiabloDieFlag;
+extern BOOL PadFrig;
+void GO_DoGameOver(void);   /* @0x80082204 -- another module */
+BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP */
+extern BOOL ignore_buttons;
 void ShowLoadingBox(int Str);   /* @0x800A5E5C CARDCORE.CPP */
 int format_card(int card);   /* @0x80142FF4 -- another module, real fn (not a BIOS syscall) */
 void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstructed in this TU */
@@ -289,5 +299,6 @@ void SaveOverwritePad(void);   /* @0x800AAE7C OPTIONS.CPP:3350 */
 void CharCardSelectMemcardPad(void);   /* @0x800AB0B8 OPTIONS.CPP:3432 */
 void CharacterLoadPad(void);   /* @0x800A839C OPTIONS.CPP:1522 */
 void MemcardPad(void);   /* @0x800A88F0 OPTIONS.CPP:1719 */
+void SoundPad(void);   /* @0x800A9260 OPTIONS.CPP:2043 */
 
 #endif

@@ -223,76 +223,42 @@ void SyncPedistal(int i)
 void DoorSet(int oi, int dx, int dy)
 {
     int pn;
-    struct ObjectStruct *op;
 
     pn = FindBlock(dx, dy);
-    if (pn == 0x2B) {
+    if (pn == 0x2B)
         ObjSetMicro(dx, dy, 0x188);
-        pn = 0x2D;
-    }
-    if (pn == 0x2D) {
+    if (pn == 0x2D)
         ObjSetMicro(dx, dy, 0x18A);
-        pn = 0x32;
-    }
-    if (pn == 0x32) {
-        op = &object[oi];
-        if (op->_otype == 1)
-            ObjSetMicro(dx, dy, 0x19B);
-        if (op->_otype == 2)
-            ObjSetMicro(dx, dy, 0x19C);
-        pn = 0x36;
-    }
-    if (pn == 0x36) {
+    if (pn == 0x32 && object[oi]._otype == 1)
+        ObjSetMicro(dx, dy, 0x19B);
+    if (pn == 0x32 && object[oi]._otype == 2)
+        ObjSetMicro(dx, dy, 0x19C);
+    if (pn == 0x36)
         ObjSetMicro(dx, dy, 0x18D);
-        pn = 0x37;
-    }
-    if (pn == 0x37) {
+    if (pn == 0x37)
         ObjSetMicro(dx, dy, 0x18E);
-        pn = 0x3D;
-    }
-    if (pn == 0x3D) {
+    if (pn == 0x3D)
         ObjSetMicro(dx, dy, 0x18F);
-        pn = 0x43;
-    }
-    if (pn == 0x43) {
+    if (pn == 0x43)
         ObjSetMicro(dx, dy, 0x190);
-        pn = 0x44;
-    }
-    if (pn == 0x44) {
+    if (pn == 0x44)
         ObjSetMicro(dx, dy, 0x191);
-        pn = 0x45;
-    }
-    if (pn == 0x45) {
+    if (pn == 0x45)
         ObjSetMicro(dx, dy, 0x193);
-        pn = 0x46;
-    }
-    if (pn == 0x46) {
+    if (pn == 0x46)
         ObjSetMicro(dx, dy, 0x194);
-        pn = 0x48;
-    }
-    if (pn == 0x48) {
+    if (pn == 0x48)
         ObjSetMicro(dx, dy, 0x196);
-        pn = 0xD4;
-    }
-    if (pn == 0xD4) {
+    if (pn == 0xD4)
         ObjSetMicro(dx, dy, 0x197);
-        pn = 0x162;
-    }
-    if (pn == 0x162) {
+    if (pn == 0x162)
         ObjSetMicro(dx, dy, 0x199);
-        pn = 0x163;
-    }
-    if (pn == 0x163) {
+    if (pn == 0x163)
         ObjSetMicro(dx, dy, 0x19A);
-        pn = 0x19B;
-    }
-    if (pn == 0x19B) {
+    if (pn == 0x19B)
         ObjSetMicro(dx, dy, 0x18C);
-        pn = 0x19C;
-    }
-    if (pn == 0x19C) {
+    if (pn == 0x19C)
         ObjSetMicro(dx, dy, 0x18C);
-    }
 }
 
 int ItemMiscIdIdx(int imiscid)
@@ -924,16 +890,31 @@ void OperateL1LDoor(int pnum, int i, unsigned char sendflag)
 {
     int dx, dy;
     unsigned char dok;
-    int oVar1, micro, pn;
 
     if (object[i]._oVar4 == 2) {
         if (!deltaload)
             PlaySfxLoc(0x13, object[i]._ox, object[i]._oy);
         return;
     }
-    dy = object[i]._oy;
     dx = object[i]._ox;
-    if (object[i]._oVar4 != 0) {
+    dy = object[i]._oy;
+    if (object[i]._oVar4 == 0) {
+        if (pnum == myplr && sendflag)
+            NetSendCmdParam1(1, 0x2B, i);
+        if (!deltaload)
+            PlaySfxLoc(0x14, dx, dy);
+        if (object[i]._oVar1 == 0xD6)
+            ObjSetMicro(dx, dy, 0x198);
+        else
+            ObjSetMicro(dx, dy, 0x189);
+        dy--;
+        object[i]._oAnimFrame += 2;
+        object[i]._oPreFlag = 1;
+        DoorSet(i, dx, dy);
+        object[i]._oVar4 = 1;
+        object[i]._oSelFlag = 2;
+        RedoPlayerVision();
+    } else {
         if (!deltaload)
             PlaySfxLoc(0x13, dx, dy);
         dok = dung_map[dx][dy].dMonster == 0;
@@ -946,36 +927,21 @@ void OperateL1LDoor(int pnum, int i, unsigned char sendflag)
                 NetSendCmdParam1(1, 0x2C, i);
             object[i]._oVar4 = 0;
             object[i]._oSelFlag = 3;
-            oVar1 = object[i]._oVar1;
-            if (oVar1 == 0x32) {
-                pn = FindBlock(dx - 1, dy);
-                if (pn == 0x18C)
-                    micro = 0x19B;
-                else
-                    micro = object[i]._oVar2;
+            ObjSetMicro(dx, dy, object[i]._oVar1);
+            if (object[i]._oVar2 != 0x32) {
+                ObjSetMicro(dx, dy - 1, object[i]._oVar2);
             } else {
-                micro = object[i]._oVar2;
+                if (FindBlock(dx - 1, dy) == 0x18C)
+                    ObjSetMicro(dx - 1, dy, 0x19B);
+                else
+                    ObjSetMicro(dx, dy - 1, object[i]._oVar2);
             }
-            ObjSetMicro(dx - 1, dy, micro);
+            object[i]._oAnimFrame -= 2;
             object[i]._oPreFlag = 0;
             RedoPlayerVision();
         } else {
             object[i]._oVar4 = 2;
         }
-    } else {
-        if (pnum == myplr && sendflag)
-            NetSendCmdParam1(1, 0x2B, i);
-        if (!deltaload)
-            PlaySfxLoc(0x14, dx, dy);
-        if (object[i]._oVar1 == 0xD6)
-            ObjSetMicro(dx, dy, 0x198);
-        else
-            ObjSetMicro(dx, dy, 0x189);
-        object[i]._oPreFlag = 1;
-        DoorSet(i, dx, dy - 1);
-        object[i]._oVar4 = 1;
-        object[i]._oSelFlag = 2;
-        RedoPlayerVision();
     }
 }
 
@@ -1400,6 +1366,52 @@ void Obj_Light(int i, int lr)
                     AddUnLight(object[i]._olid);
                 object[i]._oVar1 = 0;
             }
+        }
+    }
+}
+
+void Obj_FlameTrap(int i)
+{
+    int xp, yp;
+    int j;
+
+    if (object[i]._oVar2 != 0) {
+        if (object[i]._oVar4 != 0) {
+            object[i]._oAnimFrame--;
+            if (object[i]._oAnimFrame == 1) {
+                object[i]._oVar4 = 0;
+                AddUnLight(object[i]._olid);
+            } else {
+                if (object[i]._oAnimFrame <= 4)
+                    ChangeLightRadius(object[i]._olid, object[i]._oAnimFrame);
+            }
+        }
+    } else {
+        if (object[i]._oVar4 == 0) {
+            if (object[i]._oVar3 == 2) {
+                xp = object[i]._ox - 2;
+                yp = object[i]._oy;
+                for (j = 0; j < 5; j++) {
+                    if (IsDplayer(xp, yp) != 0 || dung_map[xp][yp].dMonster != 0)
+                        object[i]._oVar4 = 1;
+                    xp++;
+                }
+            } else {
+                xp = object[i]._ox;
+                yp = object[i]._oy - 2;
+                for (j = 0; j < 5; j++) {
+                    if (IsDplayer(xp, yp) != 0 || dung_map[xp][yp].dMonster != 0)
+                        object[i]._oVar4 = 1;
+                    yp++;
+                }
+            }
+            if (object[i]._oVar4 != 0)
+                ActivateTrapLine(object[i]._otype, object[i]._oVar1);
+        } else {
+            if (object[i]._oAnimFrame == object[i]._oAnimLen)
+                object[i]._oAnimFrame = 11;
+            if (object[i]._oAnimFrame <= 5)
+                ChangeLightRadius(object[i]._olid, object[i]._oAnimFrame);
         }
     }
 }

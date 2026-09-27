@@ -96,6 +96,7 @@ void TryDisarm(int pnum, int i);   /* @0x8005A258 OBJECTS.CPP:2595 */
 
 /* external helpers (defined/owned in other TUs), exact signatures from their oracle FCN records */
 int AddLight(int x, int y, int r);
+int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl);   /* @0x80142A04 MISSILES.CPP:3451 */
 void AddUnLight(int i);
 struct CBlocks * BL_GetCurrentBlocks(void);
 void CalcPlrInv(int p, unsigned char Loadgfx);
