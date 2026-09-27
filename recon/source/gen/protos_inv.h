@@ -46,6 +46,9 @@ void InvMoveCursUp(void);   /* @0x80161958 INV.CPP:4261 */
 void InvMoveCursDown(void);   /* @0x80161B50 INV.CPP:4359 */
 unsigned char TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
 void NetSendCmdDelItem(unsigned char bHiPri, unsigned char bLoc);   /* @0x8004FD98 MSG.CPP:1212 */
+void DrawInfoBox(RECT *InfoRect);   /* @0x80032FA4 CONTROL.CPP:2079 */
+void PRIM_Clip(RECT *R, int Depth);   /* @0x800839EC PRIMPOOL.CPP:216 */
+void PRIM_FullScreen(int Depth);   /* @0x80083B20 PRIMPOOL.CPP:257 */
 struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
 void DrawInvTSK(struct TASK *T);   /* @0x801590FC INV.CPP:1049 */
 void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */

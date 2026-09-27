@@ -16,6 +16,7 @@ public:
     int PrintyOTpos;   /* +0x204 */
     int MinX;   /* +0x208 */
     int Print(int X, int Y, char *Str, enum TXT_JUST Justify, RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
+    int SetOTpos(int OT);
 };
 
 extern unsigned char DialogRed, DialogGreen, DialogBlue;

@@ -1681,6 +1681,59 @@ void PrintStat(int Y, int Txt0, char *Txt1, unsigned char Col)
     MediumFont.Print(0, Y, Txt1, JustRight, &BRect, WHITER, WHITEG, WHITEG);
 }
 
+void DrawInvMsg(void)
+{
+    Dialog InvBack;
+    RECT InfoRect;
+    int InfoY;
+    int InfoH;
+    int OldOt;
+    struct POLY_FT4 *Ft4;
+
+    OldOt = MediumFont.SetOTpos(0xFA);
+    MediumFont.SetOTpos(OldOt - 1);
+    PRIM_FullScreen(OldOt);
+
+    InfoRect.x = 0x80;
+    InfoRect.y = 0x81;
+    InfoRect.w = 0xB0;
+    InfoRect.h = 0x4E;
+    InfoH = 0x50;
+
+    InfoY = 0x80;
+    if (invflag) {
+        DrawInfoBox(&InfoRect);
+    }
+
+    InvBack.SetOTpos(0xF9);
+    InvBack.SetBack(5);
+    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    InvBack.Back(0x80, 0x80, 0xB0, InfoH);
+
+    Ft4 = InvPanelTData->PrintFt4(0x94, 0, 0, 0, OldOt, 0);
+
+    Ft4->y2 = 0xD0;
+    Ft4->y3 = 0xD0;
+    Ft4->r0 = 0x20;
+    Ft4->g0 = 0x20;
+    Ft4->b0 = 0x20;
+    Ft4->x1 = 0x130;
+    Ft4->x3 = 0x130;
+    Ft4->x0 = InfoY;
+    Ft4->y0 = InfoY;
+    Ft4->y1 = InfoY;
+    Ft4->x2 = InfoY;
+    Ft4->tpage = Ft4->tpage | 0x40;
+    Ft4->u1 = Ft4->u0 + 1;
+    Ft4->u3 = Ft4->u0 + 1;
+    Ft4->v2 = Ft4->v0 + 1;
+    Ft4->v3 = Ft4->v0 + 1;
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+    MediumFont.SetOTpos(OldOt);
+
+    PRIM_Clip(&InfoRect, OldOt);
+}
+
 void DrawInvBack(void)
 {
     Dialog InvBack;
@@ -1832,7 +1885,7 @@ void ControlInv(void)
     else
         InvBackAY = 0x60;
 
-    if (InvBackAY < InvBackY) {
+    if (InvBackY > InvBackAY) {
         InvBackY -= 0x10;
         if (InvBackY < InvBackAY)
             InvBackY = InvBackAY;
@@ -1851,12 +1904,13 @@ void ControlInv(void)
     }
 
     if (InvPageFlag) {
-        if (DavesPad & 0x400)
+        if (DavesPad & 0x400) {
             PlaySFX(0x32);
-        if (InvPageNo == 0)
-            InvPageNo = 1;
-        else
-            InvPageNo = 0;
+            if (InvPageNo == 0)
+                InvPageNo = 1;
+            else
+                InvPageNo = 0;
+        }
     } else {
         InvPageNo = 0;
     }
