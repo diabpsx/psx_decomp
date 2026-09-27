@@ -1014,23 +1014,25 @@ unsigned char M_CallWalk(int i, int md)
     return ok;
 }
 
-/* OPEN: bytes near-miss (89 vs 86 insns) -- logic verified against hellfire's M_StartWalk (matches
- * exactly, PSX just drops the unused `pn=dPiece[fx][fy]-1` local).  Residual is the SAME
- * scheduling-only class as M_ChangeLightOffset/M_StartKill: with a `MonsterStruct *pmonster`
- * cache the `monster` symbol materializes into the RIGHT register (v0) but at the wrong point in
- * the schedule (oracle interleaves it mid-way through the index*104 chain; ours emits it as one
- * block).  Declaration-order swap (pmonster before/after fx,fy) made no difference. */
+/* PASS+SYM. Logic from hellfire's M_StartWalk (PSX drops the unused `pn` local). Locals per retail
+ * SYM (long fx/fy, pmonster, _mx/_my); pmonster is a const view built as `monster; += i` (same
+ * lever as M_StartKill -- its loads then don't wait for the `sw ra` save). */
 void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir)
 {
-    int fx, fy;
-    MonsterStruct *pmonster = &monster[i];
+    long fx, fy;
+    const MonsterStruct *pmonster;
+    int _mx, _my;
 
-    fx = pmonster->_mx + xadd;
-    fy = pmonster->_my + yadd;
+    pmonster = monster;
+    pmonster += i;
+    _mx = pmonster->_mx;
+    _my = pmonster->_my;
+    fx = _mx + xadd;
+    fy = _my + yadd;
     dung_map[fx][fy].dMonster = -1 - i;
     monster[i]._mmode = MM_WALK;
-    monster[i]._moldx = pmonster->_mx;
-    monster[i]._moldy = pmonster->_my;
+    monster[i]._moldx = _mx;
+    monster[i]._moldy = _my;
     monster[i]._mfutx = fx;
     monster[i]._mfuty = fy;
     monster[i]._mxvel = xvel;
