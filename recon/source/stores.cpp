@@ -2222,6 +2222,48 @@ void S_ScrollWBuy(int idx)
     }
 }
 
+/* @0x8006C714 */
+void S_StartWBuy(void)
+{
+    int i;
+
+    if (WStaffFlag)
+        SItemListFlag = 2;
+    else
+        SItemListFlag = 1;
+
+    WitchIdxOfs = 0;
+    NoWitchItems = 0;
+    for (i = 0; witchitem[i]._itype != -1; i++) {
+        if (CheckWitchItem(i)) {
+            SetItemMinStats(&plr[options_pad], &witchitem[i]);
+            NoWitchItems++;
+        }
+    }
+    if (!NoWitchItems) {
+        StartStore(24);
+        return;
+    }
+    if (WStaffFlag) {
+        while (witchitem[WitchIdxOfs]._iMiscId != 0x17)
+            WitchIdxOfs++;
+    }
+    stextsize = 1;
+    stextscrl = 1;
+    stextsval = 0;
+    stextsmax = 20;
+    sprintf(tempstr, GetStr(0x228), plr[myplr]._pGold);
+    AddSText(0, 1, 1, tempstr, 3, 0);
+    AddSLine(2);
+    S_ScrollWBuy(stextsval + WitchIdxOfs);
+
+    storenumh = NoWitchItems;
+    stextsmax = storenumh - 2;
+    if (!WStaffFlag && WFlag)
+        stextsmax = storenumh - 3;
+    if (stextsmax < 0) stextsmax = 0;
+}
+
 /* @0x8006E304 */
 void S_ScrollHBuy(int idx)
 {
