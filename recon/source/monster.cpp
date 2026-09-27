@@ -1399,31 +1399,30 @@ int M_DoWalk3(int i)
     return rv;
 }
 
-/* OPEN: bytes near-miss (47 diffs, 104 vs 107 insns) -- logic fully verified against hellfire
- * (3 special-attack combos for Magma/Storm mtype ranges + the AI_SNAKE sound-before-attack quirk).
- * Caching mHit/mMinDamage/mMaxDamage into locals (needed since the oracle holds all 3 in saved
- * regs across the whole function) got the frame close but the specific s3/s4/s5 REGISTER
- * ASSIGNMENT still differs -- a coloring tie-break, not a logic issue. */
+/* PASS+SYM. Logic from hellfire (Magma/Storm special-attack combos + AI_SNAKE sound quirk).
+ * Locals per retail SYM: UCHAR mMinDamage/mMaxDamage/mHit and int _menemy cached up front; Monst
+ * is a const view (it is only read here), which lets the three damage loads float above `sw ra`. */
 int M_DoAttack(int i)
 {
-    MonsterStruct *Monst = &monster[i];
-    int mHit = Monst->mHit;
-    int mMinDamage = Monst->mMinDamage;
-    int mMaxDamage = Monst->mMaxDamage;
+    const MonsterStruct *Monst = &monster[i];
+    unsigned char mMinDamage = Monst->mMinDamage;
+    unsigned char mMaxDamage = Monst->mMaxDamage;
+    unsigned char mHit = Monst->mHit;
+    int _menemy = Monst->_menemy;
 
     if (Monst->_mAnimFrame == Monst->MData->mAFNum) {
-        M_TryH2HHit(i, Monst->_menemy, mHit, mMinDamage, mMaxDamage);
+        M_TryH2HHit(i, _menemy, mHit, mMinDamage, mMaxDamage);
         if (Monst->_mAi != AI_SNAKE)
             PlayEffect(i, 0);
     }
     if (Monst->MType->mtype >= MT_NMAGMA && Monst->MType->mtype < MT_NMAGMA + 4
         && Monst->_mAnimFrame == 9) {
-        M_TryH2HHit(i, Monst->_menemy, mHit + 10, mMinDamage - 2, mMaxDamage - 2);
+        M_TryH2HHit(i, _menemy, mHit + 10, mMinDamage - 2, mMaxDamage - 2);
         PlayEffect(i, 0);
     }
     if (Monst->MType->mtype >= MT_STORM && Monst->MType->mtype < MT_STORM + 4
         && Monst->_mAnimFrame == 13) {
-        M_TryH2HHit(i, Monst->_menemy, mHit - 20, mMinDamage + 4, mMaxDamage + 4);
+        M_TryH2HHit(i, _menemy, mHit - 20, mMinDamage + 4, mMaxDamage + 4);
         PlayEffect(i, 0);
     }
     if (Monst->_mAi == AI_SNAKE && Monst->_mAnimFrame == 1)
