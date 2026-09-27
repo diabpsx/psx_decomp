@@ -420,7 +420,7 @@ void DRLG_L3River(void)
     int river[3][100];
     int rivercnt, riveramt;
     int i, trys, found, bridge, lpcnt;
-    unsigned char bail;
+    int bail;
 
     rivercnt = 0;
     bail = false;
@@ -812,17 +812,29 @@ void DRLG_L3PoolFix(void)
 {
     int dunx, duny;
 
-    for (duny = 0; duny < DMAXY; duny++) {
-        for (dunx = 0; dunx < DMAXX; dunx++) {
+    for (dunx = 0; dunx < DMAXX; dunx++) {
+        for (duny = 0; duny < DMAXY; duny++) {
             if (dungeon[dunx][duny] == 8) {
-                if (dungeon[dunx - 1][duny - 1] >= 25 && dungeon[dunx - 1][duny - 1] <= 41
-                    && dungeon[dunx - 1][duny] >= 25 && dungeon[dunx - 1][duny] <= 41
-                    && dungeon[dunx - 1][duny + 1] >= 25 && dungeon[dunx - 1][duny + 1] <= 41
-                    && dungeon[dunx][duny - 1] >= 25 && dungeon[dunx][duny - 1] <= 41
-                    && dungeon[dunx][duny + 1] >= 25 && dungeon[dunx][duny + 1] <= 41
-                    && dungeon[dunx + 1][duny - 1] >= 25 && dungeon[dunx + 1][duny - 1] <= 41
-                    && dungeon[dunx + 1][duny] >= 25 && dungeon[dunx + 1][duny] <= 41
-                    && dungeon[dunx + 1][duny + 1] >= 25 && dungeon[dunx + 1][duny + 1] <= 41) {
+                if ((dungeon[dunx - 1][duny - 1] >= 25 && dungeon[dunx - 1][duny - 1] <= 41)
+                    && (dungeon[dunx][duny - 1] >= 25 && dungeon[dunx][duny - 1] <= 41)
+                    && (dungeon[dunx + 1][duny - 1] >= 25 && dungeon[dunx + 1][duny - 1] <= 41)
+                    && (dungeon[dunx - 1][duny] >= 25 && dungeon[dunx - 1][duny] <= 41)
+                    && (dungeon[dunx + 1][duny] >= 25 && dungeon[dunx + 1][duny] <= 41)
+                    && (dungeon[dunx - 1][duny + 1] >= 25 && dungeon[dunx - 1][duny + 1] <= 41)
+                    && (dungeon[dunx][duny + 1] >= 25 && dungeon[dunx][duny + 1] <= 41)
+                    && (dungeon[dunx + 1][duny + 1] >= 25 && dungeon[dunx + 1][duny + 1] <= 41)) {
+                    dungeon[dunx][duny] = 33;
+                }
+            }
+            if (dungeon[dunx][duny] == 8) {
+                if ((dungeon[dunx - 1][duny - 1] >= 25 && dungeon[dunx - 1][duny - 1] <= 41)
+                    && (dungeon[dunx][duny - 1] >= 25 && dungeon[dunx][duny - 1] <= 41)
+                    && (dungeon[dunx + 1][duny - 1] >= 25 && dungeon[dunx + 1][duny - 1] <= 41)
+                    && (dungeon[dunx - 1][duny] >= 25 && dungeon[dunx - 1][duny] <= 41)
+                    && (dungeon[dunx + 1][duny] >= 25 && dungeon[dunx + 1][duny] <= 41)
+                    && (dungeon[dunx - 1][duny + 1] >= 25 && dungeon[dunx - 1][duny + 1] <= 41)
+                    && (dungeon[dunx][duny + 1] >= 25 && dungeon[dunx][duny + 1] <= 41)
+                    && (dungeon[dunx + 1][duny + 1] >= 25 && dungeon[dunx + 1][duny + 1] <= 41)) {
                     dungeon[dunx][duny] = 33;
                 }
             }
@@ -1327,8 +1339,8 @@ void DRLG_L3Wood(void)
 
 int DRLG_L3Anvil(void)
 {
-    int sx, sy, sw, sh, xx, yy, ii, trys;
-    int found;
+    int sx, sy, sw, sh, xx, yy, ii, found;
+    int trys;
 
     sw = L3ANVIL[0];
     sh = L3ANVIL[1];
@@ -1497,8 +1509,8 @@ void DRLG_L3SetWalls(void)
 
 void DRLG_L3(int entry)
 {
-    int x1, y1, x2, y2, i, j;
-    unsigned char found, genok;
+    int x1, y1, x2, y2, sx1, sy1, i, j;
+    int found, genok;
 
     lavapool = false;
 
@@ -1517,11 +1529,9 @@ void DRLG_L3(int entry)
                 DRLG_L3CreateBlock(x1, y2, 2, 2);
                 DRLG_L3CreateBlock(x1, y1, 2, 3);
                 if (QuestStatus(Q_ANVIL)) {
-                    x1 = ENG_random(10) + 10;
-                    y1 = ENG_random(10) + 10;
-                    x2 = x1 + 12;
-                    y2 = y1 + 12;
-                    DRLG_L3FloorArea(x1, y1, x2, y2);
+                    sx1 = ENG_random(10) + 10;
+                    sy1 = ENG_random(10) + 10;
+                    DRLG_L3FloorArea(sx1, sy1, sx1 + 12, sy1 + 12);
                 }
                 DRLG_L3FillDiags();
                 DRLG_L3FillSingles();
