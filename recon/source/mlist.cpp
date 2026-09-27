@@ -85,3 +85,58 @@ int ML_SetList(int Level, int List)
         QlTab[Level] = List;
     return List;
 }
+
+struct MonsterData {   /* sizeof 60; only the fields read here */
+    unsigned short GraphicType;
+    unsigned char pad0[0x18 - 2];
+    char mMinDLvl;   /* +0x18 */
+    char mMaxDLvl;   /* +0x19 */
+    unsigned char pad1[60 - 0x1A];
+};
+
+extern int OPT_NoQuests;
+extern unsigned long glSeedTbl[17];
+extern struct MonsterData monsterdata[113];
+int CM_ChooseMonsterList(int currlevel, unsigned long QuestsNeededMask);
+void CM_ShowMonsterList(int currlevel, int List);
+void GLUE_SetMonsterList(int List);
+struct MonstList *GLUE_GetCurrentList(int currlevel);
+void SetRndSeed(long s);
+
+/* @0x8007D7F8 MLIST.CPP:163 */
+int ML_GetPresetMonsters(int currlevel, int *typelist, unsigned long QuestsNeededMask)
+{
+    struct MonstList *Mlist;
+    int NumOfMonsters;
+    int ThisList;
+    int Index[10];
+
+    NumOfMonsters = 0;
+    if (OPT_NoQuests)
+        QuestsNeededMask = 0;
+    ThisList = ML_GetList(currlevel);
+    if (ThisList == -1) {
+        ThisList = CM_ChooseMonsterList(currlevel, QuestsNeededMask);
+        ML_SetList(currlevel, ThisList);
+        SetRndSeed(glSeedTbl[currlevel]);
+    } else
+        CM_ShowMonsterList(currlevel, ThisList);
+
+    GLUE_SetMonsterList(ThisList);
+    Mlist = GLUE_GetCurrentList(currlevel);
+    for (unsigned int f = 0; f < Mlist->NumOfMonsters; f++) {
+        if (Mlist->TheList[f] != 9 && Mlist->TheList[f] != 29) {
+            for (int i = 0; i < 111; i++) {
+                if (monsterdata[i].GraphicType == Mlist->TheList[f]) {
+                    int minl = monsterdata[i].mMinDLvl / 2 + 1;
+                    int maxl = monsterdata[i].mMaxDLvl / 2 + 1;
+                    if ((currlevel >= minl && currlevel <= maxl) || Mlist->TheList[f] == 29)
+                        typelist[NumOfMonsters++] = i;
+                }
+            }
+        }
+    }
+    if (!NumOfMonsters)
+        DBG_Error(NULL, "source/MLIST.cpp", 215);
+    return NumOfMonsters;
+}
