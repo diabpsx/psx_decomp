@@ -98,3 +98,5 @@ void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
 BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
 void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 void DoThatDrawSText(void);
+void DrawSLine(int y);
+void DrawStoreArrows(void);

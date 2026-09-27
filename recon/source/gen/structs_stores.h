@@ -1,4 +1,54 @@
-struct TextDat;
+struct POLY_FT4 {   /* sizeof 40 -- copied from recon/psxsrc/davel.cpp */
+    unsigned long tag;
+    unsigned char r0, g0, b0, code;
+    short x0, y0;
+    unsigned char u0, v0;
+    unsigned short clut;
+    short x1, y1;
+    unsigned char u1, v1;
+    unsigned short tpage;
+    short x2, y2;
+    unsigned char u2, v2;
+    unsigned short pad0;
+    short x3, y3;
+    unsigned char u3, v3;
+    unsigned short pad1;
+};
+
+/* TextDat -- copied from recon/source/gen/structs_control.h's (already-proven) layout. Only
+ * PrintFt4 is exercised in this TU. */
+class TextDat {
+public:
+    BOOL OwnDat;   /* +0x0 */
+    int TexNum;   /* +0x4 */
+    int LastFrame;   /* +0x8 */
+    BOOL DatLoaded;   /* +0xC */
+    long hndDat;   /* +0x10 */
+    long hndHdr;   /* +0x14 */
+    long hndPalOffset;   /* +0x18 */
+    long hndCreatureOffset;   /* +0x1C */
+    long hndBlockOffsets;   /* +0x20 */
+    struct FRAME_HDR *Frames;   /* +0x24 */
+    struct SPR_HDR *Hdr;   /* +0x28 */
+    void *Pals;   /* +0x2C */
+    int *PalOffset;   /* +0x30 */
+    int *CreatureOffset;   /* +0x34 */
+    unsigned char *CreatureAnims;   /* +0x38 */
+    unsigned char *Blocks;   /* +0x3C */
+    BOOL Loaded;   /* +0x40 */
+    int LoadCount;   /* +0x44 */
+    struct CTextFileInfo *FileInfo;   /* +0x48 */
+    long hndDecompBuffer;   /* +0x4C */
+    int DecX;   /* +0x50 */
+    int DecY;   /* +0x54 */
+    int PalX;   /* +0x58 */
+    int PalY;   /* +0x5C */
+    int Scr;   /* +0x60 */
+    int NumOfBuffers[2];   /* +0x64 */
+    long hndDecompArrays;   /* +0x6C */
+
+    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
+};
 
 struct CFont {   /* sizeof 540 */
     int TextureId;   /* +0x0 */

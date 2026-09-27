@@ -29,7 +29,7 @@
 
 /* file-owned globals (EXT in SYM, gp-rel tentative defs) */
 int StorePlrNo;
-unsigned char *pSTextBoxCels;
+unsigned char *pSTextBoxCels = 0;
 unsigned char *pSTextSlidCels;
 int *SStringY;
 char WStaffFlag;
@@ -1425,14 +1425,14 @@ void STextUp(void)
                 }
             } else {
                 stextsel -= 1;
-                if (((unsigned char)stext[stextsel]._sx) == 0) {
+                if ((stext[stextsel]._ssel) == 0) {
                     do {
                         if (stextsel == 0) {
                             stextsel = 0x17;
                         } else {
                             stextsel -= 1;
                         }
-                    } while (((unsigned char)stext[stextsel]._sx) == 0);
+                    } while ((stext[stextsel]._ssel) == 0);
                 }
             }
         } else {
@@ -1441,14 +1441,14 @@ void STextUp(void)
             } else {
                 stextsel -= 1;
             }
-            if (((unsigned char)stext[stextsel]._sx) == 0) {
+            if ((stext[stextsel]._ssel) == 0) {
                 do {
                     if (stextsel == 0) {
                         stextsel = 0x17;
                     } else {
                         stextsel -= 1;
                     }
-                } while (((unsigned char)stext[stextsel]._sx) == 0);
+                } while ((stext[stextsel]._ssel) == 0);
             }
         }
     }
@@ -1466,14 +1466,14 @@ void STextDown(void)
                 }
             } else {
                 stextsel += 1;
-                if ((unsigned char)stext[stextsel]._sx == 0) {
+                if (stext[stextsel]._ssel == 0) {
                     do {
                         if (stextsel == 0x17) {
                             stextsel = 0;
                         } else {
                             stextsel += 1;
                         }
-                    } while ((unsigned char)stext[stextsel]._sx == 0);
+                    } while (stext[stextsel]._ssel == 0);
                 }
             }
         } else {
@@ -1482,14 +1482,14 @@ void STextDown(void)
             } else {
                 stextsel += 1;
             }
-            if ((unsigned char)stext[stextsel]._sx == 0) {
+            if (stext[stextsel]._ssel == 0) {
                 do {
                     if (stextsel == 0x17) {
                         stextsel = 0;
                     } else {
                         stextsel += 1;
                     }
-                } while ((unsigned char)stext[stextsel]._sx == 0);
+                } while (stext[stextsel]._ssel == 0);
             }
         }
     }
@@ -1701,10 +1701,10 @@ void S_TalkEnter(void)
                 if (sn == stextsel) {
                     InitQTextMsg(la);
                 }
-                sn += 1;
+                sn = sn + 1;
             }
         }
-        i += 1;
+        i = i + 1;
     } while (i < 0x10);
 }
 
@@ -1811,6 +1811,51 @@ void DrawSTextTSK(struct TASK *T)
         GLUE_SetShowPanelFlag(1);
         GLUE_SetHomingScrollFlag(1);
         PauseMode = 0;
+    }
+}
+
+/* @0x80069C44 */
+void DrawSLine(int y)
+{
+    int yy;
+
+    yy = SStringY[y] + StoreBackRect.y;
+    SBack.SetBorder(0x1A);
+    SBack.SetRGB(BORDERR >> 1, BORDERG >> 1, BORDERB >> 1);
+    SBack.Line(StoreBackRect.x, yy, StoreBackRect.w);
+}
+
+/* @0x8006961C */
+void DrawStoreArrows(void)
+{
+    int otpos;
+    int show;
+    struct TextDat *td;
+    struct POLY_FT4 *ft4;
+
+    otpos = CBlocks::GetOverlayOtBase() + 0xA;
+    show = 0;
+    if ((unsigned int)(stextflag - 2) < 2 || (signed char)stextflag == 4 ||
+        (unsigned int)(stextflag - 6) < 2 || (signed char)stextflag == 8 ||
+        (unsigned int)(stextflag - 0x10) < 2 || (signed char)stextflag == 0x12) {
+        show = 1;
+    }
+    if (show != 0 && storenumh != 0) {
+        td = GM_UseTexData(0);
+        if (stextsval != 0) {
+            ft4 = td->PrintFt4(0x7F, StoreBackRect.x, StoreBackRect.y + 0x31, 0, otpos, 0);
+            ft4->code &= 0xFC;
+            ft4->r0 = GOLDR;
+            ft4->g0 = GOLDG;
+            ft4->b0 = GOLDB;
+        }
+        if (stextsval < stextsmax) {
+            ft4 = td->PrintFt4(0x80, StoreBackRect.x, (StoreBackRect.y + StoreBackRect.h) - 0x12, 0, otpos, 0);
+            ft4->code &= 0xFC;
+            ft4->r0 = GOLDR;
+            ft4->g0 = GOLDG;
+            ft4->b0 = GOLDB;
+        }
     }
 }
 

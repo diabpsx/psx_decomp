@@ -53,3 +53,4 @@ extern unsigned char qtextflag;   /* MINITEXT.CPP */
 extern struct TownerStruct towner[16];   /* @0x800CFE80 */
 extern char **TextPtr;   /* @0x8011BBF4 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
+extern unsigned char BORDERR, BORDERG, BORDERB;
