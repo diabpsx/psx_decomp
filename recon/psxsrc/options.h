@@ -29,6 +29,11 @@ enum GM_SPEEDS {
     GM_SPEED_FASTEST = 3
 };
 
+int VID_GetXOff(void);   /* @0x8008416C VID.CPP */
+int VID_GetYOff(void);   /* @0x80084178 VID.CPP */
+void VID_SetXYOff(int X, int Y);   /* @0x8008415C VID.CPP */
+void DaveCentreStuff(void);   /* @0x800847D4 -- real fn, another TU */
+
 struct TextDat;
 
 struct CFont {   /* sizeof 540 */
@@ -197,7 +202,10 @@ enum GM_SPEEDS GetSpeed(void);   /* @0x80039BBC DIABLO.CPP:3169 */
 void SetSpeed(enum GM_SPEEDS Speed);   /* @0x80039BA8 DIABLO.CPP:3163 */
 
 extern unsigned char deathflag;
-extern BOOL optionsflag;
+/* optionsflag/cmenu/options_pad/DrawOptionsTask: SYM class EXT, but THIS TU's own oracle reaches every
+ * one of them via %gp_rel -> OPTIONS.CPP owns the definitions (see options.cpp), not extern here.
+ * MemCardActive/MemcardOverlay stay extern below: confirmed via the ToggleOptions oracle they're
+ * addressed by plain absolute lui/lw here, not %gp_rel -- owned elsewhere. */
 extern char msgholdflag;
 extern int saveflag;
 extern int loadflag;
@@ -206,12 +214,9 @@ extern int StatusTxt;
 extern int cardondelay;
 extern int card_active[2];
 extern BOOL MemCardActive;
-extern unsigned char ctrlflag;
 extern BOOL MemcardOverlay;
+extern unsigned char ctrlflag;
 extern unsigned char sbookflag;
-extern TASK *DrawOptionsTask;
-extern int options_pad;
-extern int cmenu;
 extern OMENULIST MenuList[20];
 void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstructed in this TU */
 
@@ -229,5 +234,7 @@ void GameSpeedPad(void);   /* @0x800AA1A8 OPTIONS.CPP:2644 */
 void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
 void PrintSelectBack(unsigned short Str);   /* @0x800A68D0 OPTIONS.CPP:817 */
 void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H);   /* @0x800A6960 OPTIONS.CPP:862 */
+void CentrePad(void);   /* @0x800A9C68 OPTIONS.CPP:2409 */
+void LAMBO_MovePad(CPad *P);   /* @0x800AB300 OPTIONS.CPP:3508 */
 
 #endif

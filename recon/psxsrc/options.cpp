@@ -10,13 +10,28 @@ static LANG_TYPE NewLang;
 static LANG_TYPE OrigLang;
 static int sw;             /* D_8011C6F4 -- volume-slider scale divisor */
 static RECT ORect;         /* D_8011C710 -- PrintMono's clip rect */
-static int cs;             /* D_8011B230 -- GameSpeedPad's sub-selection counter */
+static int cs;              /* D_8011B230 -- confirmed by SYM: real name IS "cs", a single shared
+                              * "current highlighted menu item" static used by GameSpeedPad (as the
+                              * speed-submenu sub-selection counter) AND by CentrePad/LAMBO_MovePad
+                              * (as the active menu's cursor position) -- ONE static, not per-function. */
+static int lastcs;          /* D_8011B234 -- SYM name "lastcs"; CentrePad's previous-frame cs snapshot */
+static int sx;               /* D_8011C6F8 -- SYM name "sx"; CentrePad's screen X offset accumulator */
+static int sy;               /* D_8011C6FC -- SYM name "sy"; CentrePad's screen Y offset accumulator */
+static unsigned char Adjust; /* D_8011C700 -- SYM name "Adjust"; CentrePad's one-shot "changed" latch */
 
-/* real (non-static) globals DEFINED in this TU (SYM EXT, oracle reaches them via %gp_rel) */
+/* real (non-static) globals DEFINED in this TU (SYM class EXT, but THIS TU's oracle reaches every one
+ * of these via %gp_rel across 13 OPTIONS.CPP function oracles -> OPTIONS.CPP owns them, per the
+ * project's ownership rule: a module owns a global iff its own oracle addresses it %gp_rel, regardless
+ * of the SYM "EXT" linkage label. Kept `extern` in options.h ONLY for globals this TU's oracle reaches
+ * via an absolute lui/lw (owned elsewhere -- e.g. FeFlag, sghMusic, MediumFont, deathflag, etc). */
 unsigned long MasterVol;
 unsigned long MusicVol;
 unsigned long SoundVol;
 unsigned long SpeechVol;
+BOOL optionsflag;
+int cmenu;
+int options_pad;
+TASK *DrawOptionsTask;
 
 /* ---------------------------------------------------------------- header-copy methods ---- */
 unsigned short CPad::GetDown() const
@@ -365,4 +380,102 @@ void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H)
         DRect->w = W;
         DRect->h = H;
     }
+}
+
+void CentrePad(void)
+{
+    CPad *P;
+    OMENUITEM *iptr;
+    int osx, osy;
+
+    sx = VID_GetXOff();
+    sy = VID_GetYOff();
+    P = PAD_GetPad(options_pad, 0);
+    if (FeFlag != 0)
+        P->SetPadTick(0xA);
+    else
+        P->SetPadTick(3);
+    P->SetPadTickMask(0xF);
+    iptr = MenuList[cmenu].Item;
+    osx = sx;
+    osy = sy;
+    if (P->GetTick() & 1) {
+        if (sy >= -2)
+            sy = sy - 1;
+    }
+    if (P->GetTick() & 2) {
+        if (sy < 3)
+            sy = sy + 1;
+    }
+    if (P->GetTick() & 4) {
+        if (sx >= -2)
+            sx = sx - 1;
+    }
+    if (P->GetTick() & 8) {
+        if (sx < 3)
+            sx = sx + 1;
+    }
+    if (sx != osx || sy != osy)
+        PlaySFX(0x32);
+    if (P->GetDown() & 0x80) {
+        PlaySFX(0x33);
+        sx = 0;
+        sy = 0;
+    }
+    if ((P->GetDown() & 0x100) && Adjust == 0) {
+        int n;
+        int link;
+
+        PlaySFX(0x33);
+        n = MenuList[cmenu].NoEntries - 1;
+        link = iptr[n].Link;
+        cs = n;
+        if (link != -2) {
+            cmenu = link - 1;
+            Adjust = 0;
+            cs = lastcs;
+        }
+    }
+    DaveCentreStuff();
+    VID_SetXYOff(sx, sy);
+}
+
+void LAMBO_MovePad(CPad *P)
+{
+    OMENUITEM *iptr;
+    int move;
+    int lcs;
+    CPad *Pad;
+
+    iptr = MenuList[cmenu].Item;
+    Pad = PAD_GetPad(options_pad, 0);
+    Pad->SetPadTick(8);
+    Pad->SetPadTickMask(3);
+    move = -(Pad->GetTick() & 1);
+    if (Pad->GetTick() & 2)
+        move = 1;
+    lcs = cs + move;
+    cs = lcs;
+    if (iptr[lcs].Text == 0) {
+        do {
+            if (move == 0)
+                move = 1;
+            lcs = cs;
+            if (lcs < 0)
+                move = 1;
+            if (lcs < MenuList[cmenu].NoEntries - 1)
+                lcs = lcs + move;
+            else {
+                move = -1;
+                lcs = lcs + move;
+            }
+            cs = lcs;
+        } while (iptr[lcs].Text == 0);
+    }
+    if (cs <= 0)
+        cs = MenuList[cmenu].NoEntries - 2;
+    if (!(cs < MenuList[cmenu].NoEntries - 1))
+        cs = 1;
+    if (cs != lcs)
+        PlaySFX(0x32);
 }
