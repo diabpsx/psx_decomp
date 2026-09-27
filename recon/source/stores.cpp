@@ -53,6 +53,20 @@ struct SpellData {   /* sizeof 52 */
 };
 extern struct SpellData spelldata[37];   /* @0x800DDB80 */
 
+/* QuestData layout (from DIABPSX.SYM; not emitted into the stores headers) */
+struct QuestData {   /* sizeof 16 */
+    unsigned char _qdlvl;   /* +0x0 */
+    char _qdmultlvl;   /* +0x1 */
+    unsigned char _qlvlt;   /* +0x2 */
+    unsigned char _qdtype;   /* +0x3 */
+    unsigned char _qdrnd;   /* +0x4 */
+    unsigned char _qslvl;   /* +0x5 */
+    unsigned char _qflags;   /* +0x6 */
+    int _qdmsg;   /* +0x8 */
+    int _qlstr;   /* +0xC */
+};
+extern struct QuestData questlist[16];   /* @0x800DD908 */
+
 /* file-owned globals (EXT in SYM, gp-rel tentative defs) */
 int StorePlrNo;
 unsigned char *pSTextBoxCels = 0;
@@ -71,7 +85,7 @@ unsigned long gdwAllTextEntries;
 int tile;
 struct ItemStruct storehold[48];
 char storehidx[48];
-char *talkname[9];
+int talkname[9];
 
 /* file-static globals (STAT in SYM: internal linkage, not exported) */
 static struct STextStruct stext[NUMSTLINES];
@@ -995,6 +1009,41 @@ void S_StartIdShow(void)
 
     AddSText(0, 15, 1, GetStr(0x108), 0, 1);
     OffsetSTextY(1, -4);
+}
+
+/* @0x8006F49C */
+void S_StartTalk(void)
+{
+    int i;
+    int tq;
+    int sn;
+    int la;
+    int gl;
+
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    sprintf(tempstr, GetStr(0x42E), GetStr(talkname[talker]));
+    AddSText(0, 1, 1, tempstr, 3, 0);
+    AddSLine(3);
+
+    tq = 0;
+    for (i = 0; i < 16; i++) {
+        if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog)
+            tq++;
+    }
+
+    sn = 10 - (tq >> 1);
+    la = 1;
+
+    gl = sn - 2;
+    for (i = 0; i < 16; i++) {
+        if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog) {
+            AddSText(0, sn, 1, GetStr(questlist[i]._qlstr), 0, 1);
+            sn += la;
+        }
+    }
+    AddSText(0, gl, 1, GetStr(0x199), 1, 1);
 }
 
 /* @0x8006F6CC */
