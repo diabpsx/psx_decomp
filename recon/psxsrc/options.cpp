@@ -742,9 +742,11 @@ void CharacterLoadPad(void)
     {
         int pressed;
 
-        pressed = 0;
-        if (card_status[current_card] == 0) {
+        if (card_status[current_card] != 0) {
+            pressed = 0;
+        } else {
             ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
+            pressed = 0;
         }
         if (P->GetDown() & 0x40)
             pressed = 1;
