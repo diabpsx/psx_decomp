@@ -343,20 +343,20 @@ BOOL BL_LoadFileAtAddr(char *Name, unsigned char *Dest, char LumpID)
     if (sh) {
         if (!Dest) {
             ASSERT(!"DEST POINTER NULL", 0x21A);
-        } else {
-            if (LumpID == 1)
-                setasyncfile("LUMP.BIN");
-            else
-                setasyncfile(STREAM_BIN);
-            ah = asyncloadsegment(sh->Offset + 4, Dest, sh->Size);
-            do {
-                systemtask(0);
-            } while (!(unsigned char)getasyncreadstatus(ah));
-            cancelasyncload(ah);
-            return TRUE;
+            return FALSE;
         }
-    }
-    return FALSE;
+    } else
+        return FALSE;
+    if (LumpID == 1)
+        setasyncfile("LUMP.BIN");
+    else
+        setasyncfile(STREAM_BIN);
+    ah = asyncloadsegment(sh->Offset + 4, Dest, sh->Size);
+    do {
+        systemtask(0);
+    } while (!(unsigned char)getasyncreadstatus(ah));
+    cancelasyncload(ah);
+    return TRUE;
 }
 
 BOOL BL_AsyncLoadDone(void)
