@@ -27,9 +27,30 @@ unsigned char chrbtnactive;
 unsigned char chrflag;
 unsigned char sbookflag;
 unsigned char chrbtn[2][4];
+int scx1;
+int scy1;
+int scx2;
+int scy2;
+long talkofs;
+char sgszTalkMsg[80];
+unsigned char sgbPlrTalkTbl[2];
+unsigned char talkbtndown[3];
+unsigned char dropGoldFlag;
+unsigned char drawhpflag;
+unsigned char drawmanaflag;
+unsigned char panbtndown;
+unsigned char panelflag;
+unsigned char lvlbtndown;
+unsigned char talkflag;
+int dropGoldValue;
+int initialDropGoldValue;
+int initialDropGoldIndex;
 int _pSpell[2];
 int _pSplType[2];
 int my_cur_spel[2];
+int sbooktab;
+int cur_spel[2];
+TASK *_spselflag[2];
 char _panelstr[2][10][64];
 int _pstrjust[2][10];
 unsigned char *pMultiBtns;
@@ -556,8 +577,6 @@ void ChrCheckValidButton(int move)
 void CheckChrBtns(void)
 {
     int pc;
-    int statval;
-    int sendcode;
 
     if (CS_XOFF != 0x140)
         return;
@@ -572,27 +591,19 @@ void CheckChrBtns(void)
         plr[options_pad]._pStatPts--;
     }
     pc = plr[options_pad]._pClass;
-    switch (lus) {
-    case 0:
-        sendcode = 3;
-        statval = plr[options_pad]._pBaseStr;
-        break;
-    case 1:
-        sendcode = 4;
-        statval = plr[options_pad]._pBaseMag;
-        break;
-    case 2:
-        sendcode = 5;
-        statval = plr[options_pad]._pBaseDex;
-        break;
-    case 3:
-    default:
-        sendcode = 6;
-        statval = plr[options_pad]._pBaseVit;
-        break;
+    if (lus == 1) {
+        NetSendCmdParam1(1, 4, 1);
+        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseMag == MaxStats[pc][lus]);
+    } else if (lus == 0) {
+        NetSendCmdParam1(1, 3, 1);
+        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseStr == MaxStats[pc][lus]);
+    } else if (lus == 2) {
+        NetSendCmdParam1(1, 5, 1);
+        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseDex == MaxStats[pc][lus]);
+    } else {
+        NetSendCmdParam1(1, 6, 1);
+        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseVit == MaxStats[pc][lus]);
     }
-    NetSendCmdParam1(1, sendcode, 1);
-    chrbtn[options_pad][lus] = (statval == MaxStats[pc][lus]);
     ChrCheckValidButton(0);
     BuildChr();
 }
@@ -626,6 +637,85 @@ static void CPrintString(int No, char *pszStr, int Just)
         break;
     }
     MediumFont.Print(0, No * 13 + 10, pszStr, Justify, InfoBoxRect, R, G, B);
+}
+
+void InitControlPan(void)
+{
+    int i;
+    char *str;
+    int cnt;
+    unsigned char *p;
+    unsigned char v;
+
+    scx1 = 0;
+    scy1 = 0;
+    scx2 = 0;
+    scy2 = 0;
+    pManaBuff = 0;
+    pLifeBuff = 0;
+    pPanelText = LoadFileInMem("CtrlPan\SmalText.CEL", 0);
+    pChrPanel = LoadFileInMem("Data\Char.CEL", 0);
+    pSpellCels = LoadFileInMem("CtrlPan\SpelIcon.CEL", 0);
+    SetSpellTrans(0);
+    talkflag = 0;
+    if (gbMaxPlayers != 1) {
+        pMultiBtns = 0;
+        pTalkBtns = 0;
+        talkofs = 0;
+        sgszTalkMsg[0] = 0;
+        v = 1;
+        cnt = 1;
+        p = &sgbPlrTalkTbl[1];
+        do {
+            *p = v;
+            cnt--;
+            p--;
+        } while (cnt >= 0);
+        cnt = 2;
+        p = &talkbtndown[2];
+        do {
+            *p = 0;
+            cnt--;
+            p--;
+        } while (cnt >= 0);
+    }
+    panelflag = 0;
+    lvlbtndown = 0;
+    pPanelButtons = LoadFileInMem("CtrlPan\Panel8bu.CEL", 0);
+    panbtndown = 0;
+    pChrButtons = 0;
+    for (i = 0; i < 4; i++)
+        chrbtn[myplr][i] = 0;
+    pDurIcons = 0;
+    str = GetStr(0x4FA);
+    strcpy(&_infostr[sel_data][0], str);
+    InitPanelStr();
+    drawhpflag = 1;
+    drawmanaflag = 1;
+    chrflag = 0;
+    _spselflag[0] = 0;
+    _spselflag[1] = 0;
+    pSpellBkCel = 0;
+    pSBkBtnCel = 0;
+    pSBkIconCels = 0;
+    sbooktab = 0;
+    sbookflag = 0;
+    cur_spel[0] = 0;
+    cur_spel[1] = 0;
+    my_cur_spel[0] = 0;
+    my_cur_spel[1] = 0;
+    if (plr[myplr]._pClass == 0)
+        SpellPages[0][0] = 0x1A;
+    else if (plr[myplr]._pClass == 1)
+        SpellPages[0][0] = 0x1C;
+    else if (plr[myplr]._pClass == 2)
+        SpellPages[0][0] = 0x1B;
+    pQLogCel = 0;
+    pGBoxBuff = 0;
+    dropGoldFlag = 0;
+    dropGoldValue = 0;
+    initialDropGoldValue = 0;
+    initialDropGoldIndex = 0;
 }
 
 void DrawLevelUpIcon(int pnum)

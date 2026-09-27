@@ -55,3 +55,5 @@ void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short w
 void BuildChr(void);   /* @0x80034434 CONTROL.CPP:2596 */
 void CheckChrBtns(void);   /* @0x80035CEC CONTROL.CPP:3006 */
 static void CPrintString(int No, char *pszStr, int Just);
+unsigned char *LoadFileInMem(const char *pszName, unsigned long *pdwFileLen);   /* @0x8003DC2C ENGINE.CPP:490 */
+void InitControlPan(void);   /* @0x80031F70 CONTROL.CPP:1433 */
