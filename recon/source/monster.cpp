@@ -3332,88 +3332,94 @@ void M_TryH2HHit(int i, int pnum, int Hit, int MinDam, int MaxDam)
  * it is NOT a function-lifetime cached pointer the source can spell as a
  * literal `MonsterStruct*` local; direct `monster[i].field` indexing
  * (letting the compiler re-derive/CSE the pointer on demand) is closer to
- * retail's real codegen. Residual (143 diffs, 3 over): whole-function
- * register-coloring, same class as every other near-miss in this file --
- * not chased further this pass (landing a near-miss, not a seal, per the
- * priority). */
+ * retail's real codegen. NOW PASS+SYM from the retail SLD: `Monst` IS a
+ * real pointer but only used for the four early reads/writes (_mx/_my/
+ * mName/_mgoal) -- everything else stays `monster[i].field`; the
+ * effect_is_playing test is an early `return 0`; `int tren` is restored
+ * (TransVal = tren) before the LTBANNER quest writes. */
 int M_DoTalk(int i)
 {
-    int _mx = monster[i]._mx;
-    int _my = monster[i]._my;
-    unsigned int mName = monster[i].mName;
+    int tren;
+    MonsterStruct *Monst;
+    int _mx, _my;
+    int mName;
+
+    Monst = &monster[i];
+    _mx = Monst->_mx;
+    _my = Monst->_my;
+    mName = Monst->mName;
 
     M_StartStand(i, monster[i]._mdir);
-    monster[i]._mgoal = MG_WAITTOTALK;
-    if (!effect_is_playing(alltext[monster[i].mtalkmsg].sfxnr)) {
-        InitQTextMsg(monster[i].mtalkmsg);
+    Monst->_mgoal = MG_WAITTOTALK;
+    if (effect_is_playing(alltext[monster[i].mtalkmsg].sfxnr))
+        return 0;
+    InitQTextMsg(monster[i].mtalkmsg);
 
-        if (mName == (unsigned int)UniqMonst[UMT_GARBUD].mName) {
-            if (monster[i].mtalkmsg == TXT_GARB1) {
-                quests[Q_GARBUD]._qactive = 2;
-                quests[Q_GARBUD]._qvar1 = 2;
-                quests[Q_GARBUD]._qlog = 1;
-                if (!deltaload)
-                    NetSendCmdQuest(1, Q_GARBUD);
-            }
-            if (monster[i].mtalkmsg == TXT_GARB2 && !(monster[i]._mFlags & MFLAG_DROP)) {
-                quests[Q_GARBUD]._qvar1 = 3;
-                if (!deltaload)
-                    NetSendCmdQuest(1, Q_GARBUD);
-                SpawnItem(i, _mx + 1, _my + 1, 1);
-                monster[i]._mFlags |= MFLAG_DROP;
-            }
+    if (mName == UniqMonst[UMT_GARBUD].mName) {
+        if (monster[i].mtalkmsg == TXT_GARB1) {
+            quests[Q_GARBUD]._qactive = 2;
+            quests[Q_GARBUD]._qvar1 = 2;
+            quests[Q_GARBUD]._qlog = 1;
+            if (!deltaload)
+                NetSendCmdQuest(1, Q_GARBUD);
         }
-        if (mName == (unsigned int)UniqMonst[UMT_ZHAR].mName && monster[i].mtalkmsg == TXT_ZHAR1
+        if (monster[i].mtalkmsg == TXT_GARB2
             && !(monster[i]._mFlags & MFLAG_DROP)) {
-            quests[Q_ZHAR]._qactive = 2;
-            quests[Q_ZHAR]._qlog = 1;
-            quests[Q_ZHAR]._qvar2 = 2;
-            if (!deltaload) {
-                NetSendCmdQuest(1, Q_ZHAR);
-                CreateTypeItem(_mx + 1, _my + 1, 0, 0, 0x18, 1, 0);
-            }
+            quests[Q_GARBUD]._qvar1 = 3;
+            if (!deltaload)
+                NetSendCmdQuest(1, Q_GARBUD);
+            SpawnItem(i, _mx + 1, _my + 1, 1);
             monster[i]._mFlags |= MFLAG_DROP;
         }
-        if (mName == (unsigned int)UniqMonst[3].mName && monster[i].mtalkmsg == TXT_BOL1
-            && !(monster[i]._mFlags & MFLAG_DROP)) {
-            char tren;
-
-            ObjChangeMap(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 2, setpc_y + (setpc_h >> 1) - 2);
-            tren = TransVal;
-            TransVal = 9;
-            DRLG_MRectTrans(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 4, setpc_y + (setpc_h >> 1));
-            quests[Q_LTBANNER]._qvar1 = 2;
-            if (quests[Q_LTBANNER]._qactive == 1)
-                quests[Q_LTBANNER]._qactive = 2;
-            TransVal = tren;
+    }
+    if (mName == UniqMonst[UMT_ZHAR].mName
+        && monster[i].mtalkmsg == TXT_ZHAR1
+        && !(monster[i]._mFlags & MFLAG_DROP)) {
+        quests[Q_ZHAR]._qactive = 2;
+        quests[Q_ZHAR]._qlog = 1;
+        quests[Q_ZHAR]._qvar2 = 2;
+        if (!deltaload) {
+            NetSendCmdQuest(1, Q_ZHAR);
+            CreateTypeItem(_mx + 1, _my + 1, 0, 0, 0x18, 1, 0);
+        }
+        monster[i]._mFlags |= MFLAG_DROP;
+    }
+    if (mName == UniqMonst[3].mName && monster[i].mtalkmsg == TXT_BOL1 && !(monster[i]._mFlags & MFLAG_DROP)) {
+        ObjChangeMap(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 2, setpc_y + (setpc_h >> 1) - 2);
+        tren = TransVal;
+        TransVal = 9;
+        DRLG_MRectTrans(setpc_x, setpc_y, setpc_x + (setpc_w >> 1) + 4, setpc_y + (setpc_h >> 1));
+        TransVal = tren;
+        quests[Q_LTBANNER]._qvar1 = 2;
+        if (quests[Q_LTBANNER]._qactive == 1)
+            quests[Q_LTBANNER]._qactive = 2;
+        monster[i]._mFlags |= MFLAG_DROP;
+        NetSendCmdQuest(1, Q_LTBANNER);
+    }
+    if (mName == UniqMonst[7].mName) {
+        if (monster[i].mtalkmsg == TXT_VEIL1) {
+            quests[Q_VEIL]._qactive = 2;
+            quests[Q_VEIL]._qlog = 1;
+            if (!deltaload)
+                NetSendCmdQuest(1, Q_VEIL);
+        }
+        if (monster[i].mtalkmsg == TXT_VEIL3 && !(monster[i]._mFlags & MFLAG_DROP)) {
+            SpawnUnique(6, _mx + 1, _my + 1);
             monster[i]._mFlags |= MFLAG_DROP;
-            NetSendCmdQuest(1, Q_LTBANNER);
         }
-        if (mName == (unsigned int)UniqMonst[7].mName) {
-            if (monster[i].mtalkmsg == TXT_VEIL1) {
-                quests[Q_VEIL]._qactive = 2;
-                quests[Q_VEIL]._qlog = 1;
-                if (!deltaload)
-                    NetSendCmdQuest(1, Q_VEIL);
-            }
-            if (monster[i].mtalkmsg == TXT_VEIL3 && !(monster[i]._mFlags & MFLAG_DROP)) {
-                SpawnUnique(6, _mx + 1, _my + 1);
-                monster[i]._mFlags |= MFLAG_DROP;
-            }
-        }
-        if (mName == (unsigned int)UniqMonst[8].mName) {
-            quests[11]._qvar1 = 2;
-            if (!deltaload)
-                NetSendCmdQuest(1, 8);
-        }
-        if (mName == (unsigned int)UniqMonst[4].mName && gbMaxPlayers != 1) {
-            quests[Q_BETRAYER]._qvar1 = 6;
-            if (!deltaload)
-                NetSendCmdQuest(1, Q_BETRAYER);
-            monster[i]._mgoal = MG_ATTACK;
-            monster[i]._msquelch = 255;
-            monster[i].mtalkmsg = 0;
-        }
+    }
+    if (mName == UniqMonst[8].mName) {
+        quests[11]._qvar1 = 2;
+        if (!deltaload)
+            NetSendCmdQuest(1, 8);
+    }
+    if (mName == UniqMonst[4].mName && gbMaxPlayers != 1) {
+        quests[Q_BETRAYER]._qvar1 = 6;
+        if (!deltaload)
+            NetSendCmdQuest(1, Q_BETRAYER);
+        monster[i]._mgoal = MG_ATTACK;
+        monster[i]._msquelch = 255;
+        monster[i].mtalkmsg = 0;
     }
     return 0;
 }
