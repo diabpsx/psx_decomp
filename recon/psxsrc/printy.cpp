@@ -409,6 +409,7 @@ int CFont::GetWrapWidth(char *Str, RECT *TextWindow)
 {
     char *EndPtr;
     char *SpacePtr;
+    char *LastSpacePtr;
     int CharW;
     int SpaceW;
     int WindowW;
@@ -419,6 +420,7 @@ int CFont::GetWrapWidth(char *Str, RECT *TextWindow)
         WindowW = 0x140;
     EndPtr = Str;
     SpacePtr = NULL;
+    LastSpacePtr = NULL;
     Width = 0;
     SpaceW = 0;
     while (Width < WindowW) {
@@ -455,10 +457,12 @@ int CFont::GetWrapWidth(char *Str, RECT *TextWindow)
     if (WindowW < Width) {
         if (!SpacePtr)
             return 0;
-        if (!SpacePtr)
+        else if (LastSpacePtr == SpacePtr)
             DBG_Error(NULL, "psxsrc/PRINTY.CPP", 0x499);
-        else
+        else {
+            EndPtr = SpacePtr;
             Width = SpaceW;
+        }
     }
     return Width;
 }
