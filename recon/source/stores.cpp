@@ -1110,8 +1110,12 @@ void HealerBuyItem(void)
     int idx;
 
     idx = ((stextlhold - stextup) >> 2) + stextvhold;
-    if (gbMaxPlayers == 1 ? idx < 2 : idx < 3) {
-        plr[myplr].HoldItem._iSeed = GetRndSeed();
+    if (gbMaxPlayers == 1) {
+        if (idx < 2)
+            plr[myplr].HoldItem._iSeed = GetRndSeed();
+    } else {
+        if (idx < 3)
+            plr[myplr].HoldItem._iSeed = GetRndSeed();
     }
     TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
     if (plr[myplr].HoldItem._iMagical == 0) {
@@ -1119,21 +1123,23 @@ void HealerBuyItem(void)
     }
     StoreAutoPlace();
     CalcPlrInv(myplr, 1);
-    if (!(gbMaxPlayers == 1 ? idx < 2 : idx < 3)) {
-        idx = ((stextlhold - stextup) >> 2) + stextvhold;
-        if (idx == 0x13) {
-            _healitem[StorePlrNo][19]._itype = -1;
-        } else {
-            if (_healitem[StorePlrNo][idx + 1]._itype != -1) {
-                do {
-                    _healitem[StorePlrNo][idx] = _healitem[StorePlrNo][idx + 1];
-                    idx++;
-                } while (_healitem[StorePlrNo][idx + 1]._itype != -1);
-            }
-            _healitem[StorePlrNo][idx]._itype = -1;
-        }
-        CalcPlrInv(myplr, 1);
+    if (gbMaxPlayers == 1) {
+        if (idx < 2)
+            return;
+    } else {
+        if (idx < 3)
+            return;
     }
+    idx = ((stextlhold - stextup) >> 2) + stextvhold;
+    if (idx == 0x13) {
+        _healitem[StorePlrNo][19]._itype = -1;
+    } else {
+        for (; _healitem[StorePlrNo][idx + 1]._itype != -1; idx++) {
+            _healitem[StorePlrNo][idx] = _healitem[StorePlrNo][idx + 1];
+        }
+        _healitem[StorePlrNo][idx]._itype = -1;
+    }
+    CalcPlrInv(myplr, 1);
 }
 
 /* @0x80071E54 */
