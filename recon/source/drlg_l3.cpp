@@ -659,6 +659,7 @@ void DRLG_L3River(void)
 int DRLG_L3SpawnEdge(int x, int y, int *totarea)
 {
     unsigned char i;
+    static const unsigned char spawntable[] = { 0x00, 0x0a, 0x43, 0x05, 0x2c, 0x06, 0x09, 0x00, 0x00, 0x1c, 0x83, 0x06, 0x09, 0x0a, 0x05 };
 
     if (*totarea > 40) {
         return true;
@@ -761,45 +762,44 @@ void DRLG_L3Pool(void)
     int dunx, duny;
     int totarea, poolchance;
     unsigned char k;
+    static const unsigned char poolsub[] = { 0, 35, 26, 36, 25, 29, 34, 7, 33, 28, 27, 37, 32, 31, 30 };
 
     for (duny = 0; duny < DMAXY; duny++) {
-        for (dunx = 0; dunx < DMAXY; dunx++) {
-            if (dungeon[dunx][duny] != 8) {
-                continue;
-            }
-            dungeon[dunx][duny] |= 0x80;
-            totarea = 1;
-            if (dunx + 1 < DMAXX) {
-                found = DRLG_L3Spawn(dunx + 1, duny, &totarea);
-            } else {
-                found = true;
-            }
-            if (dunx - 1 > 0 && !found) {
-                found = DRLG_L3Spawn(dunx - 1, duny, &totarea);
-            } else {
-                found = true;
-            }
-            if (duny + 1 < DMAXY && !found) {
-                found = DRLG_L3Spawn(dunx, duny + 1, &totarea);
-            } else {
-                found = true;
-            }
-            if (duny - 1 > 0 && !found) {
-                found = DRLG_L3Spawn(dunx, duny - 1, &totarea);
-            } else {
-                found = true;
-            }
-            poolchance = ENG_random(100);
-            for (j = duny - totarea; j < duny + totarea; j++) {
-                for (i = dunx - totarea; i < dunx + totarea; i++) {
-                    if (dungeon[i][j] & 0x80 && j >= 0 && j < DMAXY && i >= 0 && i < DMAXX) {
-                        dungeon[i][j] &= 0x7f;
-                        if (totarea > 4 && poolchance < 25 && !found) {
-                            k = poolsub[dungeon[i][j]];
-                            if (k != 0 && k <= 37) {
-                                dungeon[i][j] = k;
+        for (dunx = 0; dunx < DMAXX; dunx++) {
+            if (dungeon[dunx][duny] == 8) {
+                dungeon[dunx][duny] |= 0x80;
+                totarea = 1;
+                found = 0;
+
+                if (dunx + 1 < DMAXX && found == 0)
+                    found = DRLG_L3Spawn(dunx + 1, duny, &totarea);
+                else
+                    found = 1;
+                if (dunx - 1 > 0 && found == 0)
+                    found = DRLG_L3Spawn(dunx - 1, duny, &totarea);
+                else
+                    found = 1;
+                if (duny + 1 < DMAXY && found == 0)
+                    found = DRLG_L3Spawn(dunx, duny + 1, &totarea);
+                else
+                    found = 1;
+                if (duny - 1 > 0 && found == 0)
+                    found = DRLG_L3Spawn(dunx, duny - 1, &totarea);
+                else
+                    found = 1;
+
+                poolchance = ENG_random(100);
+                for (i = duny - totarea; i < duny + totarea; i++) {
+                    for (j = dunx - totarea; j < dunx + totarea; j++) {
+                        if ((dungeon[j][i] & 0x80) != 0 && i >= 0 && i < DMAXY && j >= 0 && j < DMAXX) {
+                            dungeon[j][i] &= 0x7f;
+
+                            if (totarea > 4 && poolchance < 25 && found == 0) {
+                                k = poolsub[dungeon[j][i]];
+                                if (k != 0 && k <= 37)
+                                    dungeon[j][i] = k;
+                                lavapool = 1;
                             }
-                            lavapool = true;
                         }
                     }
                 }
@@ -1152,8 +1152,11 @@ void FenceDoorFix(void)
 
 void DRLG_L3Wood(void)
 {
-    int i, j, x, y, xx, yy, rt, rp, x1, y1, x2, y2;
-    int skip;
+    int i, j;
+    int x, y;
+    int xx, yy;
+    int rt, rp, skip;
+    int x1, y1, x2, y2;
 
     for (j = 0; j < DMAXY - 1; j++) {
         for (i = 0; i < DMAXX - 1; i++) {
@@ -1515,7 +1518,8 @@ void DRLG_L3SetWalls(void)
 
 void DRLG_L3(int entry)
 {
-    int x1, y1, x2, y2, sx1, sy1, i, j;
+    int x1, y1, x2, y2, sx1, sy1;
+    int i, j;
     unsigned char found;
     int genok;
 
