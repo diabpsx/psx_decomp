@@ -1127,15 +1127,14 @@ void StoreSellItem(void)
     } else {
         idx = (stextlhold - stextup) / 8 + stextvhold;
     }
-    i = storehidx[idx];
-    if (i >= 0) {
-        RemoveInvItem(myplr, i);
+    if (storehidx[idx] >= 0) {
+        RemoveInvItem(myplr, storehidx[idx]);
     } else {
-        RemoveSpdBarItem(myplr, ~i);
+        RemoveSpdBarItem(myplr, ~storehidx[idx]);
     }
     cost = storehold[idx]._iIvalue;
     storenumh--;
-    if (idx < storenumh) {
+    if (idx != storenumh && idx < storenumh) {
         for (i = idx; i < storenumh; i++) {
             storehold[i] = storehold[i + 1];
             storehidx[i] = storehidx[i + 1];
@@ -2064,8 +2063,8 @@ void S_ScrollHBuy(int idx)
 /* @0x8006AFB0 */
 void S_ScrollSPBuy(int idx)
 {
-    int boughtitems;
     int l;
+    int boughtitems;
 
     ClearSText(5, 0x15);
     stextup = 5;
