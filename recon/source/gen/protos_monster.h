@@ -117,6 +117,11 @@ unsigned char PosOkMonst(int i, int x, int y);   /* @0x8008045C COREMON.CPP:665 
 unsigned char SolidLoc(int x, int y);   /* @0x80060C4C PLAYER.CPP:1339 */
 unsigned char IsDplayer(int x, int y);   /* @0x8005FD10 PLAYER.CPP:262 */
 void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
+unsigned char IsSkel(int mt);   /* COREMON.CPP */
+int AddMonster(int x, int y, int dir, int mtype, unsigned char InMap);   /* @0x8007FDD0 COREMON.CPP:513 */
+void M_StartSpStand(int i, int md);   /* COREMON.CPP */
+void delta_monster_hp(int mi, long hp, unsigned char bLevel);
+void NetSendCmdParam2(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1, unsigned short wParam2);
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */

@@ -12,6 +12,7 @@ extern short missileactive[125];   /* @0x80102A60 */
 extern unsigned char gbMaxPlayers;   /* @0x8011B9A2 */
 extern struct CMonster Monsters[16];   /* @0x8010A3BC */
 extern void (*AiProc[32])(int);   /* @0x80105314 */
+extern int nummtypes;   /* @0x8011C29C */
 extern int myplr;   /* @0x8011BA08 */
 extern BOOL user_start;   /* @0x8011B4E4 */
 extern unsigned char gbDoEnding;   /* @0x8011B801 */
