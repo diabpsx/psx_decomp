@@ -1947,19 +1947,19 @@ void S_ScrollSBuy(int idx)
 void S_ScrollSSell(int idx)
 {
     int l;
-    int step;
+    int ls;
+    int v;
+    char iclr;
+    int Jumpy;
 
-    step = 8;
+    Jumpy = 8;
     if (SItemListFlag == 1) {
-        step = 4;
+        Jumpy = 4;
     }
     ClearSText(5, 0x15);
     stextup = 5;
-    for (l = 5; l < 0xF && idx < storenumh; idx++, l += step) {
+    for (l = 5; l < 0xF && idx < storenumh; idx++, l += Jumpy) {
         if (storehold[idx]._itype != -1) {
-            int ls;
-            int v;
-            char iclr;
             char *StrPtr;
 
             ls = l;
@@ -1996,18 +1996,18 @@ void S_ScrollSSell(int idx)
 void S_ScrollWBuy(int idx)
 {
     int l;
-    int step;
+    int ls;
+    char iclr;
+    int Jumpy;
 
-    step = 4;
+    Jumpy = 4;
     if (WStaffFlag != 0) {
-        step = 8;
+        Jumpy = 8;
     }
     ClearSText(5, 0x15);
     stextup = 5;
-    for (l = 5; l < 0xF; l += step) {
+    for (l = 5; l < 0xF; l += Jumpy) {
         if (_witchitem[StorePlrNo][idx]._itype != -1) {
-            int ls;
-            char iclr;
             char *StrPtr;
 
             iclr = _witchitem[StorePlrNo][idx]._iMagical != 0;
@@ -2064,6 +2064,7 @@ void S_ScrollHBuy(int idx)
 void S_ScrollSPBuy(int idx)
 {
     int l;
+    char iclr;
     int boughtitems;
 
     ClearSText(5, 0x15);
@@ -2080,7 +2081,6 @@ void S_ScrollSPBuy(int idx)
     }
     for (l = 5; l < 0xF && idx < 6; idx++, l += 8) {
         if (_premiumitem[StorePlrNo][idx]._itype != -1) {
-            char iclr;
             char *StrPtr;
 
             iclr = _premiumitem[StorePlrNo][idx]._iMagical != 0;
