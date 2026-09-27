@@ -1507,33 +1507,29 @@ void S_BoyEnter(void)
 void STextUp(void)
 {
     if (stextsel != -1) {
-        if (stextscrl != 0) {
+        if (stextscrl) {
             if (stextsel == stextup) {
-                if (stextsval != 0) {
-                    stextsval -= 1;
-                }
+                if (stextsval)
+                    stextsval--;
             } else {
-                stextsel -= 1;
-                if ((stext[stextsel]._ssel) == 0) {
-                    do {
-                        if (stextsel == 0) {
-                            stextsel = 0x17;
-                        } else {
-                            stextsel -= 1;
-                        }
-                    } while ((stext[stextsel]._ssel) == 0);
+                stextsel--;
+                while (!stext[stextsel]._ssel) {
+                    if (!stextsel)
+                        stextsel = 23;
+                    else
+                        stextsel--;
                 }
             }
         } else {
-            stextsel = (stextsel == 0) ? 0x17 : stextsel - 1;
-            if ((stext[stextsel]._ssel) == 0) {
-                do {
-                    if (stextsel == 0) {
-                        stextsel = 0x17;
-                    } else {
-                        stextsel -= 1;
-                    }
-                } while ((stext[stextsel]._ssel) == 0);
+            if (!stextsel)
+                stextsel = 23;
+            else
+                stextsel--;
+            while (!stext[stextsel]._ssel) {
+                if (!stextsel)
+                    stextsel = 23;
+                else
+                    stextsel--;
             }
         }
     }
@@ -1544,37 +1540,29 @@ void STextUp(void)
 void STextDown(void)
 {
     if (stextsel != -1) {
-        if (stextscrl != 0) {
+        if (stextscrl) {
             if (stextsel == stextdown) {
-                if (stextsval < stextsmax) {
-                    stextsval += 1;
-                }
+                if (stextsval < stextsmax)
+                    stextsval++;
             } else {
-                stextsel += 1;
-                if (stext[stextsel]._ssel == 0) {
-                    do {
-                        if (stextsel == 0x17) {
-                            stextsel = 0;
-                        } else {
-                            stextsel += 1;
-                        }
-                    } while (stext[stextsel]._ssel == 0);
+                stextsel++;
+                while (!stext[stextsel]._ssel) {
+                    if (stextsel == 23)
+                        stextsel = 0;
+                    else
+                        stextsel++;
                 }
             }
         } else {
-            if (stextsel == 0x17) {
+            if (stextsel == 23)
                 stextsel = 0;
-            } else {
-                stextsel += 1;
-            }
-            if (stext[stextsel]._ssel == 0) {
-                do {
-                    if (stextsel == 0x17) {
-                        stextsel = 0;
-                    } else {
-                        stextsel += 1;
-                    }
-                } while (stext[stextsel]._ssel == 0);
+            else
+                stextsel++;
+            while (!stext[stextsel]._ssel) {
+                if (stextsel == 23)
+                    stextsel = 0;
+                else
+                    stextsel++;
             }
         }
     }
