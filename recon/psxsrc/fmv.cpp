@@ -191,7 +191,7 @@ static void *volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
 static volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
 static volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
-static volatile int time_in_frames;   /* ISR-shared (CdReadyCallback) */
+static int time_in_frames;   /* written by the main loop (VID_GetTick), read by the handler */
 static volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
@@ -395,12 +395,8 @@ extern "C" void cdstream_service(void)
         install_stream_handlers();
         cdstream_resetsec = stream_secnum;
         reset_cdstream();
-        {
-            int t = time_in_frames;
-            first_handler_event = 0;
-            last_handler_event = t;
-        }
-        stream_opened = time_in_frames;
+        first_handler_event = 0;
+        stream_opened = last_handler_event = time_in_frames;
     }
 }
 
