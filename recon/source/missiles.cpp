@@ -1462,7 +1462,7 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 
 void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    int i, mx, k, j, l, tx, ty;
+    int i, mx;
     int CrawlNum[6];
 
     memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
@@ -1476,20 +1476,19 @@ void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
         }
     }
 
-    for (k = 0; k < 6; k++) {
-        l = CrawlNum[k];
-        j = l + 1;
+    for (int k = 0; k < 6; k++) {
+        int l = CrawlNum[k];
+        int j = l + 1;
         for (i = (unsigned char)CrawlTable[l]; i > 0; i--) {
-            tx = dx + CrawlTable[j];
-            ty = dy + CrawlTable[j + 1];
+            int tx = dx + CrawlTable[j];
+            int ty = dy + CrawlTable[j + 1];
             if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {  /* AddGolem: retail uses the playable bound (0x5F=95) here, unlike the sibling crawl-search fns */
                 if (LineClear(sx, sy, tx, ty) && (GetSOLID(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject | IsDplayer(tx, ty)) == 0) {
                     missile[mi]._miVar1 = sx;
                     missile[mi]._miVar2 = sy;
-                    missile[mi]._miVar4 = tx;
-                    missile[mi]._miVar5 = ty;
-                    /* PSX oracle has AND here, not hellfire's OR -- confirmed, a real behavior delta. */
-                    if (monster[id]._mx == 1 && monster[id]._my != 0 && id == myplr)
+                    missile[mi]._miVar4 = dx;
+                    missile[mi]._miVar5 = dy;
+                    if ((monster[id]._mx != 1 || monster[id]._my != 0) && id == myplr)
                         M_StartKill(id, id);
                     UseMana(id, SPL_GOLEM);
                     k = 6;
