@@ -1207,23 +1207,22 @@ extern "C" void decode_mdec_stream(int frames_elapsed)
 }
 
 /* @0x801581D0 FMV.CPP:1626 */
-extern "C" int play_mdec_stream(char *filename, int speed, int start, int end)
+extern "C" void play_mdec_stream(char *filename, int speed, int start, int end)
 {
-    struct _mdecanim *a = &mdec_queue[mdec_tail];
+    struct _mdecanim *a = &mdec_queue[mdec_head];
 
-    if (mdecs_queued >= 16)
-        return 0;
-    a->name = filename;
-    a->speed = speed;
-    a->start = start;
-    a->end = end;
-    a->flag = 0;
-    mdecs_queued += 1;
-    mdecs_waiting += 1;
-    mdec_tail = (mdec_tail + 1) & 0xF;
-    if (!mdec_streaming)
-        return dequeue_animation();
-    return 1;
+    if (mdecs_queued < 16) {
+        a->name = filename;
+        a->speed = speed;
+        a->start = start;
+        a->end = end;
+        a->flag = 0;
+        mdecs_queued++;
+        mdecs_waiting++;
+        mdec_head = (mdec_head + 1) % 16;
+        if (!mdec_streaming)
+            dequeue_animation();
+    }
 }
 
 /* @0x8015826C FMV.CPP:1652 */
