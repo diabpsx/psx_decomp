@@ -2220,7 +2220,7 @@ void OperateShrine(int pnum, int i, int sType)
                     }
                 }
                 done = 0;
-                do {
+                while (!done) {
                     r = ENG_random(7);
                     if (plr[pnum].InvBody[r]._itype != -1 && plr[pnum].InvBody[r]._iMaxDur != 0xFF && plr[pnum].InvBody[r]._iMaxDur != 0) {
                         plr[pnum].InvBody[r]._iDurability -= 20;
@@ -2231,7 +2231,7 @@ void OperateShrine(int pnum, int i, int sType)
                             plr[pnum].InvBody[r]._iMaxDur = 1;
                         break;
                     }
-                } while (!done);
+                }
             }
             InitDiabloMsg(0xD);
             break;
