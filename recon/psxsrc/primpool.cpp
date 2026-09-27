@@ -32,7 +32,7 @@ struct PRIM_BUFFER {   /* sizeof 28 */
     POLY_FT4 *Prims;       /* +0x00 */
     POLY_FT4 *EndAddr;     /* +0x04 */
     unsigned long *OtList; /* +0x08 */
-    unsigned char Drawing; /* +0x0C */
+    volatile unsigned char Drawing; /* +0x0C */   /* ISR-shared (DrawSync callback): cleared by PrimDrawSycnCallBack (raw: sb $zero,0xC($v0) @0x80083DEC) */
     int OtSize;            /* +0x10 */
     long hndOtList;        /* +0x14 */
     long hndPrims;         /* +0x18 */
