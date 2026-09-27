@@ -4011,10 +4011,10 @@ void AddAcid(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
      * _mimfnum unset. */
     GetMissileVel(mi, sx, sy, dx, dy, 16);
     SetMissDir(mi, GetDirection8(sx, sy, dx, dy));
+    missile[mi]._mirange = 5 * (monster[id]._mint + 1) + 15;
     missile[mi]._mlid = -1;
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
-    missile[mi]._mirange = 15 + 5 * (monster[id]._mint + 1);
     PutMissile(mi);
 }
 
