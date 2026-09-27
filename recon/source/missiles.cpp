@@ -669,18 +669,20 @@ unsigned char GetTableValue(unsigned char code, int dir)
 {
     unsigned char hicode = (code & 0xF0) >> 4;
     unsigned char locode = code & 0xF;
-    unsigned char limit;
 
     if (code == 0)
         return 0;
     if (hicode < 10) {
-        limit = hicode != 0 ? hicode : 16;
-        if (dir < limit)
+        if (hicode == 0)
+            hicode = 16;
+        if (dir < hicode)
             return ValueTable[locode];
         return 0;
     }
-    if (dir < locode)
-        return StringTable[hicode - 10][dir];
+    if (dir < locode) {
+        hicode -= 10;
+        return StringTable[hicode][dir];
+    }
     return 0;
 }
 
