@@ -527,6 +527,7 @@ void TalkToTowner(int p, int t)
             towner[t]._tbtcnt = 150;
             towner[t]._tVar1 = p;
             quests[Q_BUTCHER]._qvar1 = 1;
+            unsigned char effect_is_playing(int nSFX);
             if (plr[p]._pClass == PC_WARRIOR && !effect_is_playing(PS_WARR8)) {
                 PlaySFX(PS_WARR8);
             } else if (plr[p]._pClass == PC_ROGUE && !effect_is_playing(PS_ROGUE8)) {
