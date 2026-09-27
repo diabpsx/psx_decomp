@@ -322,7 +322,6 @@ void GPanel::DrawMsgWindow(struct PanelXY *XY, struct PlayerStruct *Plr)
 
 int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
 {
-    int Loop;
     struct POLY_FT4 *Ft4;
 
     if (Item->_itype == -1 || Item->_iDurability >= 5) {
@@ -349,14 +348,14 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
         break;
     }
     Ft4 = PanelTData->PrintFt4(ItemType + 0x29, X, Y, 0, GPanelOt + 1, 0);
-    Loop = (Item->_iDurability - 1) * 3;
     {
+        int idx0 = (Item->_iDurability - 1) * 3;
         unsigned char NewR, NewG, NewB;
 
-        NewR = D_800B9BCC[Loop];
-        NewG = D_800B9BCD[Loop];
+        NewR = D_800B9BCC[idx0];
+        NewG = D_800B9BCD[idx0];
         Ft4->code = (Ft4->code | 2) & 0xFE;
-        NewB = D_800B9BCE[Loop];
+        NewB = D_800B9BCE[idx0];
         Ft4->r0 = NewR;
         Ft4->g0 = NewG;
         Ft4->b0 = NewB;
@@ -376,18 +375,20 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
     Ft4->b0 = 0;
     Ft4->code = (Ft4->code | 2) & 0xFE;
 
-    Loop = 0;
     if (Item->_iDurability > 0) {
-        int Xs, Xe;
+        int Loop = 0;
+        int Idx = 0;
+        int Xs, Xe, y0;
 
         Xs = X + 0x15;
         Xe = X + 0x17;
+        y0 = Y - 1;
         do {
             struct POLY_FT4 *F2;
             int y1;
 
             F2 = PanelTData->PrintFt4(0x94, X, Y, 1, GPanelOt + 1, 0);
-            y1 = (Y - 1) + ((3 - Loop) * 5);
+            y1 = y0 + (3 - Loop) * 5;
             F2->y0 = (short)y1;
             F2->y2 = (short)y1;
             F2->x0 = (short)Xs;
@@ -396,11 +397,12 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
             F2->y1 = (short)(y1 + 5);
             F2->x3 = (short)Xe;
             F2->y3 = (short)(y1 + 5);
-            F2->r0 = D_800B9BCC[Loop * 3];
-            F2->g0 = D_800B9BCD[Loop * 3];
-            F2->b0 = D_800B9BCE[Loop * 3];
+            F2->r0 = D_800B9BCC[Idx];
+            F2->g0 = D_800B9BCD[Idx];
+            F2->b0 = D_800B9BCE[Idx];
             F2->code = (F2->code | 2) & 0xFE;
             Loop++;
+            Idx += 3;
         } while (Loop < Item->_iDurability);
     }
     return 1;

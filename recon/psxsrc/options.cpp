@@ -217,12 +217,12 @@ void SetLoadedVolumes(void)
     sv = sglSoundVolume / unit;
     spv = sglSpeechVolume / unit;
     MasterVol = m;
-    MasterVol &= ~1;
     MusicVol = mv;
-    MusicVol &= ~1;
     SoundVol = sv;
-    SoundVol &= ~1;
     SpeechVol = spv;
+    MasterVol &= ~1;
+    MusicVol &= ~1;
+    SoundVol &= ~1;
     SpeechVol &= ~1;
 }
 

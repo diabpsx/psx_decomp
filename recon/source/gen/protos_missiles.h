@@ -1,3 +1,11 @@
+/* External TU functions (SPELLS.CPP / GLUE) called from AddApoca -- confirmed via raw oracle
+ * jal targets @0x80141CC8/0x80141CDC (mangled SPL_Arrow__F6TARGETiii proves the enum type name
+ * is literally "TARGET"; using distinct enumerator names here to avoid colliding with this TU's
+ * own TARGET_MONSTERS/TARGET_PLAYERS #defines). */
+enum TARGET { TGT_MONSTERS = 0, TGT_PLAYERS = 1 };
+void GLUE_DoQuake(int a, int b);
+void SPL_Arrow(enum TARGET t, int id, int mind, int maxd);
+
 void GetDamageAmt(int i, int *mind, int *maxd);   /* @0x80139C04 MISSILES.CPP:274 */
 int CheckBlock(int fx, int fy, int tx, int ty);   /* @0x8013A1FC MISSILES.CPP:443 */
 int FindClosest(int sx, int sy, int rad);   /* @0x8013A2B0 MISSILES.CPP:469 */

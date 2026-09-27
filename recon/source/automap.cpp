@@ -391,9 +391,9 @@ void DrawVertArch(int X, int Y)
     int Frac;
     int x0, y0, x1, y1, x2, y2, x3, y3;
 
-    X *= 4;
-    Y *= 4;
-    Lx = (X - Y) * 2;
+    X <<= 2;
+    Y <<= 2;
+    Lx = (X - Y) << 1;
     Ly = Y + X;
     Lx += AMPlayerX;
     Ly += AMPlayerY;
@@ -442,22 +442,28 @@ void DrawHorzArch(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly;
+    int Frac;
     int x0, y0, x1, y1, x2, y2, x3, y3;
-    int a, b, half;
 
-    a = X * 4;
-    b = Y * 4;
-    Lx = ((a - b) * 2) + AMPlayerX;
-    Ly = (b + a) + AMPlayerY;
-    half = AutoMapScale >> 2;
-    x0 = Lx + half;
-    y0 = Ly - half;
-    x1 = Lx + (half + 8);
-    y1 = Ly - (half - 4);
-    x2 = Lx - (half - 8);
-    y2 = Ly + (half + 4);
-    x3 = Lx - half;
-    y3 = Ly + half;
+    X *= 4;
+    Y *= 4;
+    Lx = (X - Y) * 2;
+    Ly = Y + X;
+    Lx += AMPlayerX;
+    Ly += AMPlayerY;
+    Frac = AutoMapScale >> 2;
+    x0 = Lx + Frac;
+    y0 = Ly - Frac;
+    x1 = Frac + 8;
+    x1 = Lx + x1;
+    y1 = Frac - 4;
+    y1 = Ly - y1;
+    x2 = Frac - 8;
+    x2 = Lx - x2;
+    y2 = Frac + 4;
+    y2 = Ly + y2;
+    x3 = Lx - Frac;
+    y3 = Ly + Frac;
 
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
     L2->x0 = x0;

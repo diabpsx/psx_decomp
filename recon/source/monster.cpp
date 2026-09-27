@@ -3349,10 +3349,13 @@ void MAI_Snake(int i)
  * the "goal!=EAT" failure path). */
 void MAI_Scav(int i)
 {
-    unsigned char done = 0;
-    MonsterStruct *Monst = &monster[i];
-    int x = 0, y;
+    MonsterStruct *Monst;
+    int x, y;
+    unsigned char done;
 
+    done = 0;
+    Monst = &monster[i];
+    x = 0;
     if (Monst->_mmode == MM_STAND) {
         if (Monst->_mhitpoints < (Monst->_mmaxhp >> 1) && Monst->_mgoal != MG_EAT) {
             if (monster[i].leaderflag) {

@@ -294,26 +294,26 @@ unsigned short CPad::GetDown() const
 
 void DrawQTextTSK(TASK *T)
 {
-    int *args;
+    DEF_ARGS *args;
     int pnum;
-    unsigned char stextflagsave;
-    char Name[16];
+    char Name[14];
+    char stextflagsave;
 
-    args = (int *)T->Data;
+    args = (DEF_ARGS *)T->Data;
     stextflagsave = stextflag;
-    pnum = args[0];
+    pnum = args->a0;
     GLUE_SuspendGame();
     GLUE_SetHomingScrollFlag(0);
     GLUE_SetShowPanelFlag(0);
-    qtextptr = GetStr(*(int *)&alltext[args[1]]);
-    while (IsKanjiLoaded() != 1)
+    qtextptr = GetStr(*(int *)&alltext[args->a1]);
+    while (!IsKanjiLoaded())
         TSK_Sleep(1);
-    sprintf(Name, "%04X", alltext[args[1]].sfxnr);
+    sprintf(Name, "%04X", alltext[args->a1].sfxnr);
     CalcTextSpeed(Name);
     stextflag = 0;
     qtextonflag = qtextflag != 0;
     sgLastScroll = VID_GetTick();
-    if (qtextonflag != 0) {
+    while (qtextonflag != 0) {
         do {
             DrawQText();
             TSK_Sleep(1);
@@ -324,7 +324,8 @@ void DrawQTextTSK(TASK *T)
                 ignore_buttons = 1;
                 qtextonflag = 0;
             }
-            if (qtextonflag != 0 && CDWAIT != 0)
+            if (qtextonflag != 0) break;
+            if (CDWAIT != 0)
                 qtextonflag = 1;
         } while (qtextonflag != 0);
     }
@@ -334,18 +335,24 @@ void DrawQTextTSK(TASK *T)
     ignore_buttons = 1;
     PlaySFX(0x33);
     stream_stop();
+    while (SFXTab[1].used)
+        TSK_Sleep(1);
     if (FadeState == 0)
         TSK_AddTask(0, (void (*)())FadeMusicTSK, 0x800, 0);
     FadeState = 2;
     stextflag = stextflagsave;
     if (stextflagsave == 0)
         options_pad = -1;
-    if (stextflagsave == 0 && questlog == 0) {
-        PostGamePad(5, 0, 0, 0);
-        GLUE_SetHomingScrollFlag(1);
-        GLUE_SetShowPanelFlag(1);
+    if (Qfromoptions != 0) {
+        options_pad = Qfromoptions - 1;
+    } else {
+        if (stextflagsave == 0 && questlog == 0) {
+            PostGamePad(5, 0, 0, 0);
+            GLUE_SetHomingScrollFlag(1);
+            GLUE_SetShowPanelFlag(1);
+        }
+        ignore_buttons = 1;
     }
-    ignore_buttons = 1;
     LANG_ReloadMainTXT();
 }
 

@@ -134,6 +134,13 @@ void FreeMonsterSnd(void)
 static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan)
 {
     char Temp[64];
+    long volume;
+    long pan;
+    int scrx, scry;
+    CBlocks *gblocks;
+    RECT R;
+    long vol;
+
     *plVolume = (sglSoundVolume * sglMasterVolume) >> 8;
     *plPan = 0x8000;
 
@@ -142,15 +149,14 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     if (x + y == 0)
         return 1;
 
-    CBlocks *gblocks = BL_GetCurrentBlocks();
+    gblocks = BL_GetCurrentBlocks();
     if (!gblocks)
         return 0;
 
-    RECT R;
     gblocks->GetScrXY(R, x * 20, y * 20, 0, 0);
 
-    int scrx = R.x;
-    int scry = R.y;
+    scrx = R.x;
+    scry = R.y;
 
     if (scrx < gnScreenX) return 0;
     if (gnScreenX + gnScreenWidth < scrx) return 0;
@@ -159,16 +165,17 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
 
     if (MONO) return 1;
 
-    long pan = scrx * 204;
+    pan = scrx * 204;
     if (pan < 0) pan = 0;
     if (pan > 0x10000) pan = 0x10000;
 
-    long vol = (sglSoundVolume * sglMasterVolume) << 8;
+    vol = (sglSoundVolume * sglMasterVolume) << 8;
     scry = gnScreenWidth / 2;
     if (scry < scrx)
         scrx = gnScreenWidth - scrx;
 
-    *plVolume = (scrx * 2 * (vol / scry)) >> 16;
+    scrx <<= 1;
+    *plVolume = (scrx * (vol / scry)) >> 16;
     *plPan = pan;
     return 1;
 }

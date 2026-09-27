@@ -1225,6 +1225,10 @@ void AddApoca(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     missile[mi]._mirange = 255;
     missile[mi]._miDelFlag = 0;
     UseMana(id, SPL_APOCA);
+    /* PSX-only: also kicks a screen-shake + a follow-up SPL_Arrow cast -- confirmed via raw
+     * oracle @0x80141CC8/0x80141CDC (2 extra calls, no PC-twin equivalent). */
+    GLUE_DoQuake(15, 2);
+    SPL_Arrow(TGT_MONSTERS, id, 10, 20);
 }
 
 void AddElement(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)

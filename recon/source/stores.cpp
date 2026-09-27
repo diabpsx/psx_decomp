@@ -2264,7 +2264,9 @@ void S_HBuyEnter(void)
         if (h < 0) {
             h += 0xF;
         }
-        done = func_8015A24C(p, i++, w >> 4, h >> 4, 0) & 0xFF;
+        w >>= 4;
+        h >>= 4;
+        done = func_8015A24C(p, i++, w, h, 0) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);

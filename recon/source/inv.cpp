@@ -2106,6 +2106,35 @@ void CheckInvPaste(int pnum, int mx, int my)
 
     cn = CURSOR_HAND;
     switch (il) {
+    case 4: /* head */
+        NetSendCmdChItem(0, 0);
+        if (plr[pnum].InvBody[0]._itype == ITYPE_NONE)
+            plr[pnum].InvBody[0] = plr[pnum].HoldItem;
+        else
+            cn = SwapItem(&plr[pnum].InvBody[0], &plr[pnum].HoldItem);
+        break;
+    case 5: /* ring */
+        if (r == 4) {
+            NetSendCmdChItem(0, 1);
+            if (plr[pnum].InvBody[1]._itype == ITYPE_NONE)
+                plr[pnum].InvBody[1] = plr[pnum].HoldItem;
+            else
+                cn = SwapItem(&plr[pnum].InvBody[1], &plr[pnum].HoldItem);
+        } else {
+            NetSendCmdChItem(0, 2);
+            if (plr[pnum].InvBody[2]._itype == ITYPE_NONE)
+                plr[pnum].InvBody[2] = plr[pnum].HoldItem;
+            else
+                cn = SwapItem(&plr[pnum].InvBody[2], &plr[pnum].HoldItem);
+        }
+        break;
+    case 6: /* amulet */
+        NetSendCmdChItem(0, 3);
+        if (plr[pnum].InvBody[3]._itype == ITYPE_NONE)
+            plr[pnum].InvBody[3] = plr[pnum].HoldItem;
+        else
+            cn = SwapItem(&plr[pnum].InvBody[3], &plr[pnum].HoldItem);
+        break;
     case 1: /* one-hand */
         if (r <= 12) {
             if (plr[pnum].InvBody[4]._itype == ITYPE_NONE) {

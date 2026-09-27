@@ -38,3 +38,4 @@ extern int TextWait;   /* @0x8011B95C */
 extern char MtPrevText[80];   /* @0x800D67A0 */
 extern char tempstr[256];   /* @0x800CEA10 */
 extern struct SFXHDR SFXTab[2];   /* @0x800B9BE0 */
+extern unsigned char Qfromoptions;   /* @0x8011B228 */
