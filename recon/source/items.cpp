@@ -48,6 +48,13 @@
 #define ICI_WITCH 0x2000
 #define ICI_HEALER 0x4000
 #define ICI_LVLMASK 0x003f
+#define ICI_ONLYGOOD 0x0040
+#define ICI_UPER15 0x0080
+#define ICI_UPER1 0x0100
+#define ICI_USEFUL 0x0180
+#define ICI_UNIQUE 0x0200
+#define ICI_PREGEN 0x8000
+#define ICI_TOWNMASK 0x7c00
 #define IMID_ESTR 10
 #define IMID_EMAG 11
 #define IMID_EDEX 12
@@ -922,6 +929,146 @@ void RecalcStoreStats(void)
     for (i = 0; i < 20; i++)
         if (_healitem[StorePlrNo][i]._itype != -1) _healitem[StorePlrNo][i]._iStatFlag = StoreStatOk(&_healitem[StorePlrNo][i]);
     _boyitem[StorePlrNo]._iStatFlag = StoreStatOk(&_boyitem[StorePlrNo]);
+}
+
+/* @0x80045008 ITEMS.CPP:3172 — PSX's _iName is a text-ID (unsigned short), not a char buffer: instead of
+ * hellfire's `sprintf(item[ii]._iName,"Ear of %s",tempstr)` it just stores the "Ear of %s"-template id
+ * 0x122; the tempstr byte-pack is still computed identically (real write to the GLOBAL tempstr buffer,
+ * so gcc can't dead-code it even though this function no longer consumes it) */
+void RecreateEar(int ii, unsigned short ic, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, int ibuff)
+{
+    SetPlrHandItem(&item[ii], 0x17);
+    tempstr[0] = (ic >> 8) & 0x7f;
+    tempstr[1] = ic & 0x7f;
+    tempstr[2] = (iseed >> 24) & 0x7f;
+    tempstr[3] = (iseed >> 16) & 0x7f;
+    tempstr[4] = (iseed >> 8) & 0x7f;
+    tempstr[5] = iseed & 0x7f;
+    tempstr[6] = Id & 0x7f;
+    tempstr[7] = dur & 0x7f;
+    tempstr[8] = mdur & 0x7f;
+    tempstr[9] = ch & 0x7f;
+    tempstr[10] = mch & 0x7f;
+    tempstr[11] = (ivalue >> 8) & 0x7f;
+    tempstr[12] = (ibuff >> 24) & 0x7f;
+    tempstr[13] = (ibuff >> 16) & 0x7f;
+    tempstr[14] = (ibuff >> 8) & 0x7f;
+    tempstr[15] = ibuff & 0x7f;
+    tempstr[16] = 0;
+    item[ii]._iName = 0x122;
+    item[ii]._iCurs = ((ivalue >> 6) & 0x3) + 0x13;
+    item[ii]._ivalue = ivalue & 0x3f;
+    item[ii]._iCreateInfo = ic;
+    item[ii]._iSeed = iseed;
+    item[ii]._PlrCreate = FePlayerNo;
+}
+
+/* @0x8004BA14 ITEMS.CPP:6127 — PSX adds a 6th param `PlrCreate`: if != -1, temporarily overrides
+ * FePlayerNo for the duration of this call (so the nested GetItemAttrs/SetupAllItems/etc. network-safety
+ * checks act as if running as that player), restoring it afterward; sets item[ii]._PlrCreate = the
+ * (possibly-overridden) FePlayerNo just before restoring. Field-store order in the GOLD arm is
+ * ivalue/createinfo/seed (not hellfire's seed/createinfo/ivalue). */
+void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue, int PlrCreate)
+{
+    int savedFePlayerNo = FePlayerNo;
+    if (PlrCreate != -1) FePlayerNo = PlrCreate;
+
+    if (idx == IDI_GOLD) {
+        SetPlrHandItem(&item[ii], idx);
+        item[ii]._ivalue = ivalue;
+        item[ii]._iCreateInfo = icreateinfo;
+        item[ii]._iSeed = iseed;
+        if (item[ii]._ivalue >= GOLD_VT2) {
+            item[ii]._iCurs = ITEM_5GOLD;
+        } else {
+            if (ivalue <= GOLD_VT1) item[ii]._iCurs = ITEM_1GOLD;
+            else item[ii]._iCurs = ITEM_3GOLD;
+        }
+    } else {
+        if (icreateinfo == 0) {
+            SetPlrHandItem(&item[ii], idx);
+            SetPlrHandSeed(&item[ii], iseed);
+        } else {
+            if (icreateinfo & ICI_TOWNMASK) RecreateTownItem(ii, idx, icreateinfo, iseed, ivalue);
+            else {
+                if ((icreateinfo & ICI_USEFUL) == ICI_USEFUL) {
+                    SetupAllUseful(ii, iseed, icreateinfo & ICI_LVLMASK);
+                } else {
+                    unsigned char uper = 0, onlygood = FALSE, uavail = FALSE, pregen = FALSE;
+                    if (icreateinfo & ICI_UPER1) uper = 1;
+                    if (icreateinfo & ICI_UPER15) uper = 15;
+                    if (icreateinfo & ICI_ONLYGOOD) onlygood = TRUE;
+                    if (icreateinfo & ICI_UNIQUE) uavail = TRUE;
+                    if (icreateinfo & ICI_PREGEN) pregen = TRUE;
+                    SetupAllItems(ii, idx, iseed, icreateinfo & ICI_LVLMASK, uper, onlygood, uavail, pregen);
+                }
+            }
+        }
+    }
+
+    item[ii]._PlrCreate = FePlayerNo;
+    FePlayerNo = savedFePlayerNo;
+}
+
+#define ISEL_NONE 0
+
+/* @0x80043530 ITEMS.CPP:2598 — PSX drops the DROPLOG debug call and the _iAnimData/_iAnimWidth/
+ * _iAnimWidth2 sets (PSX's item sprite system reaches ItemCAnimTbl directly, no itemanims[] pointer);
+ * `D_801161F4[it]` replaces hellfire's ItemAnimLs[it] with a different (unnamed) per-anim-set table;
+ * adds `item[i]._PlrCreate = FePlayerNo` */
+void SetupItem(int i)
+{
+    int it;
+
+    it = ItemCAnimTbl[item[i]._iCurs];
+    item[i]._iIdentified = FALSE;
+    item[i]._iPostDraw = FALSE;
+    item[i]._iAnimLen = D_801161F4[it];
+    if (plr[myplr].pLvlLoad == 0) {
+        item[i]._iAnimFrame = 1;
+        item[i]._iAnimFlag = TRUE;
+        item[i]._iSelFlag = ISEL_NONE;
+    } else {
+        item[i]._iAnimFrame = item[i]._iAnimLen;
+        item[i]._iAnimFlag = FALSE;
+        item[i]._iSelFlag = ISEL_FLR;
+    }
+    item[i]._PlrCreate = FePlayerNo;
+}
+
+#define MAXUITEMS 128
+
+/* @0x80043DB0 ITEMS.CPP:2757 */
+int CheckUnique(int i, int lvl, int uper, unsigned char recreate)
+{
+    int j, idata;
+    unsigned char uok[MAXUITEMS];
+    int numu, u;
+
+    if (ENG_random(100) > uper) return -1;
+
+    numu = 0;
+    memset(uok, 0, sizeof(uok));
+    for (j = 0; UniqueItemList[j].UIItemId != -1; j++) {
+        idata = item[i].IDidx;
+        if (UniqueItemList[j].UIItemId != AllItemsList[idata].iItemId) continue;
+        if (lvl < UniqueItemList[j].UIMinLvl) continue;
+        if (!recreate && UniqueItemFlag[j] && (gbMaxPlayers == 1)) continue;
+        uok[j] = TRUE;
+        numu++;
+    }
+
+    if (numu == 0) return -1;
+    u = ENG_random(10);
+    j = 0;
+    while (numu > 0) {
+        if (uok[j]) numu--;
+        if (numu > 0) {
+            j++;
+            if (j == MAXUITEMS) j = 0;
+        }
+    }
+    return j;
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */
