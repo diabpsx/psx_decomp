@@ -452,10 +452,11 @@ void AddStoryBook(int i)
         object[i]._oVar2 = StoryText[object[i]._oVar1][1];
     if (currlevel == 12)
         object[i]._oVar2 = StoryText[object[i]._oVar1][2];
-    bookframe = 3 * object[i]._oVar1;
-    object[i]._oVar3 = (currlevel >> 2) - 1 + bookframe;
-    object[i]._oAnimFrame = 1;
-    object[i]._oVar4 = 2;
+    object[i]._oVar3 = (currlevel >> 2) + 3 * object[i]._oVar1 - 1;
+    bookframe = 1;
+    object[i]._oAnimFrame = bookframe;
+    bookframe++;
+    object[i]._oVar4 = bookframe;
 }
 
 void AddWeaponRack(int i)
