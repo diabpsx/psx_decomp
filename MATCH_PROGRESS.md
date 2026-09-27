@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2438 / 2727 functions PASS (89.4%) — 837 PsyQ SDK functions excluded**
+**Game code: 2439 / 2727 functions PASS (89.4%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -2682,7 +2682,7 @@
 - ✅ GetVersionString__FPc (53)
 - ✅ GetWord__FPc (107)
 
-## stores  (recon/source/stores.cpp) — 60/103 PASS
+## stores  (recon/source/stores.cpp) — 61/103 PASS
 - ✅ FreeStoreMem__Fv (2)
 - ⬜ DrawSTextBack__Fv
 - ❌ DrawStoreArrows__Fv — 56 diffs (ours 96)
@@ -2747,7 +2747,7 @@
 - ✅ TakePlrsMoney__Fl (275)
 - ❌ SmithBuyItem__Fv — 16 diffs (ours 160)
 - ❌ S_SBuyEnter__Fv — 36 diffs (ours 153)
-- 🟡 SmithBuyPItem__Fv — bytes PASS, SYM differs
+- ✅ SmithBuyPItem__Fv (113)
 - ✅ S_SPBuyEnter__Fv (155)
 - ⬜ StoreGoldFit__Fi
 - ❌ PlaceStoreGold__Fl — 30 diffs (ours 168)
