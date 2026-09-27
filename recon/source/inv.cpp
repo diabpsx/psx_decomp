@@ -388,7 +388,8 @@ unsigned char AutoPlace(int pnum, int ii, int sx, int sy, unsigned char saveflag
         yy += 10;
     }
     if (done && saveflag) {
-        plr[pnum].InvList[plr[pnum]._pNumInv] = plr[pnum].HoldItem;
+        i = plr[pnum]._pNumInv;
+        plr[pnum].InvList[i] = plr[pnum].HoldItem;
         plr[pnum]._pNumInv++;
         yy = 10 * (ii / 10);
         if (yy < 0) {
@@ -455,7 +456,8 @@ unsigned char SpecialAutoPlace(int pnum, int ii, int sx, int sy, unsigned char s
         }
     }
     if (done && saveflag) {
-        plr[pnum].InvList[plr[pnum]._pNumInv] = plr[pnum].HoldItem;
+        i = plr[pnum]._pNumInv;
+        plr[pnum].InvList[i] = plr[pnum].HoldItem;
         plr[pnum]._pNumInv++;
         yy = 10 * (ii / 10);
         if (yy < 0) {
