@@ -1590,11 +1590,9 @@ void AddDiabApoca(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
      * hellfire does, and reads plr[]._px/_py (there is no _pfutx/_pfuty in the PSX struct). */
     int pnum;
 
-    if (FePlayerNo >= 0) {
-        for (pnum = 0; pnum <= FePlayerNo; pnum++) {
-            if (plr[pnum].plractive && LineClear(sx, sy, plr[pnum]._px, plr[pnum]._py))
-                AddMissile(0, 0, plr[pnum]._px, plr[pnum]._py, 0, 0x42, mienemy, id, dam, 0);
-        }
+    for (pnum = 0; pnum <= FePlayerNo; pnum++) {
+        if (plr[pnum].plractive && LineClear(sx, sy, plr[pnum]._px, plr[pnum]._py))
+            AddMissile(plr[pnum]._px, plr[pnum]._py, plr[pnum]._px, plr[pnum]._py, 0, 0x42, mienemy, id, dam, 0);
     }
     missile[mi]._miDelFlag = 1;
 }
