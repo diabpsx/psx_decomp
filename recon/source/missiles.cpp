@@ -723,19 +723,9 @@ void ClearMissileSpot(int mi)
 
 void RemoveStoneMissiles(int mon, int mx, int my)
 {
-    /* near-miss: oracle loop keeps `mon` live in $a0 for the whole loop (no saved-reg spill) and
-     * tests i<nummissiles via a gp-rel load each iteration; ours spills mon to a callee-saved reg.
-     * Falsified: direct-index form (no pointer local, worse: 39/34), pointer-to-missile local
-     * (36/34, kept below as closest). Next angle: hoist `nummissiles` into a local copy before the
-     * loop (oracle re-reads it via $gp each pass -- may need the read INSIDE the loop condition
-     * written differently, e.g. `while` with the test as the raw condition vs a `for`). */
-    int i;
-    int mi;
-    MissileStruct *pmissile;
-
-    for (i = 0; i < nummissiles; i++) {
-        mi = missileactive[i];
-        pmissile = &missile[mi];
+    for (int i = 0; i < nummissiles; i++) {
+        int mi = missileactive[i];
+        MissileStruct *pmissile = &missile[mi];
         if (pmissile->_mitype == MIS_STONE && pmissile->_miVar2 == mon)
             pmissile->_miDelFlag = 1;
     }
