@@ -217,6 +217,38 @@ unsigned char SmithSellOk(int i)
 #define NoWitchItems _NoWitchItems[StorePlrNo]
 #define WitchIdxOfs  _WitchIdxOfs[StorePlrNo]
 
+/* @0x8006B210 */
+unsigned char S_StartSPBuy(void)
+{
+    int i;
+
+    SItemListFlag = 2;
+    storenumh = 0;
+    for (i = 0; i < 6; i++) {
+        if (premiumitem[i]._itype != -1) {
+            SetItemMinStats(&plr[options_pad], &premiumitem[i]);
+            storenumh++;
+        }
+    }
+    if (!storenumh) {
+        StartStore(1);
+        stextsel = 14;
+        return 0;
+    }
+
+    stextsize = 1;
+    stextscrl = 1;
+    stextsval = 0;
+    sprintf(tempstr, GetStr(0x229), plr[myplr]._pGold);
+    AddSText(0, 1, 1, tempstr, 3, 0);
+    AddSLine(2);
+
+    stextsmax = storenumh - 2;
+    if (stextsmax < 0) stextsmax = 0;
+    S_ScrollSPBuy(stextsval);
+    return 1;
+}
+
 /* @0x8006BB44 */
 unsigned char SmithRepairOk(int i)
 {
