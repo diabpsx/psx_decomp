@@ -373,10 +373,10 @@ extern "C" int cdstream_get_chunk(unsigned char **data, StHEADER **h)
     if (stream_chunks_in != stream_chunks_borrowed) {
         *data = stream_buf + (stream_out * stream_chunksize * 0x7E0);
         *h = (StHEADER *)(stream_bufh + ((stream_out * stream_chunksize) << 5));
-        _get_count += 1;
         stream_out = (stream_out + 1) % stream_bufsize;
         stream_chunks_borrowed += 1;
         stream_got_chunks += 1;
+        _get_count += 1;
         return 1;
     }
     *data = 0;
@@ -1168,6 +1168,12 @@ extern "C" void LoPlayFMVOverLay(void *)
     init_mdec_audio(1);
     init_mdec_stream(map_buf, 10, 5);
     StrClearVRAM();
+    /* NB: the raw's v1==1 arm reaches the shared play_mdec_stream call site WITHOUT ever setting $a1
+     * on that path -- it falls through using whatever $a1 held from the preceding v1==0/default
+     * comparison block (a genuine retail register-reuse artifact, not a real per-case constant).
+     * Modeling case 0 with the DEFAULT arm's literal (0x1333) and case 1 with the "real" 0x1000
+     * reproduces this byte-for-byte closer than the semantically-tidier 0x1000/0x1000 split (case 1's
+     * "stale" value happens to coincide with whatever the case-0/default combination leaves behind). */
     switch (GetVideoMode()) {
     case 0:
         play_mdec_stream(g_movie_filename, 0x1333, start, end);
