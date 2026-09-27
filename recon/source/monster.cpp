@@ -1580,21 +1580,22 @@ void MAI_Garg(int i)
     }
 }
 
-/* OPEN: bytes near-miss (74 diffs, 90==90 insns -- count exact) -- pure register-coloring (which
- * saved reg holds `i` -- $17 vs $19 -- and everything downstream that depends on it).  Declaration
- * order swap (Monst before/after mx,my,md) made no difference. */
+/* PASS+SYM. Locals per retail SYM (md, Monst, _mx, _my); _mx/_my cached at the top through the
+ * const view (see MAI_Lachdanan). Retail's nested SYM block chain is g++'s binding levels kept alive
+ * by a declaration in the innermost scope -- reproduced with a block-scope effect_is_playing
+ * declaration (retail evidently called it undeclared here, as MAI_SnotSpil does ObjChangeMap). */
 void MAI_Warlord(int i)
 {
+    int md;
     MonsterStruct *Monst = &monster[i];
-    int mx, my, md;
+    int _mx, _my;
 
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
     if (Monst->_mmode == MM_STAND) {
-        mx = Monst->_mx;
-        my = Monst->_my;
         md = M_GetDir(i);
-        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
-            mx = Monst->_mx - Monst->_menemyx;
-            my = Monst->_my - Monst->_menemyy;
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+            unsigned char effect_is_playing(int nSFX);
             if (Monst->mtalkmsg == TXT_WARLRD1 && Monst->_mgoal == MG_TALK) {
                 Monst->_mmode = MM_TALK;
             }
