@@ -1261,63 +1261,54 @@ void InvMoveCursLeft(void)
     OldPos = InvCursPos;
 
     if (_pcurs[myplr] < 12) {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-            case 4:
-            case 6:
-                InvCursPos = 7;
-                goto after;
-            case 5:
-                InvCursPos = 19;
-                goto after;
-            case 7:
-                InvCursPos = 13;
-                goto after;
-            case 13:
-                InvCursPos = 5;
-                goto after;
-            case 19:
-                InvCursPos = 4;
-                goto after;
-            default:
-                break;
-            }
+        switch (InvCursPos) {
+        case 0:
+        case 4:
+        case 6:
+            InvCursPos = 7;
+            break;
+        case 5:
+            InvCursPos = 19;
+            break;
+        case 7:
+            InvCursPos = 13;
+            break;
+        case 13:
+            InvCursPos = 5;
+            break;
+        case 19:
+            InvCursPos = 4;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40 || InvCursPos >= 0x41)
+                ItemInc = 1;
+            break;
         }
     } else {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-            case 6:
-            case 19:
-                goto after;
-            case 4:
-                InvCursPos = 5;
-                goto after;
-            case 5:
-                InvCursPos = 4;
-                goto after;
-            case 7:
-                InvCursPos = 13;
-                goto after;
-            case 13:
-                InvCursPos = 7;
-                goto after;
-            default:
-                break;
-            }
+        switch (InvCursPos) {
+        case 0:
+        case 6:
+        case 19:
+            break;
+        case 4:
+            InvCursPos = 5;
+            break;
+        case 5:
+            InvCursPos = 4;
+            break;
+        case 7:
+            InvCursPos = 13;
+            break;
+        case 13:
+            InvCursPos = 7;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40 || InvCursPos >= 0x41)
+                ItemInc = 1;
+            break;
         }
     }
 
-    if ((unsigned int)(InvCursPos - 25) < 40) {
-        ItemInc = 1;
-    } else if (InvCursPos < 0x41) {
-        /* nothing */
-    } else {
-        ItemInc = 1;
-    }
-
-after:
     if ((unsigned int)(InvCursPos - 25) < 40) {
         InvCursPos -= ItemInc;
         if ((InvCursPos - 25) % 10 == 9 || (InvCursPos - 25) % 10 == -1) {
