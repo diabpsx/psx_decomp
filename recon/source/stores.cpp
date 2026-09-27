@@ -27,6 +27,29 @@
 
 #define NUMSTLINES 24
 
+/* SpellData layout (from DIABPSX.SYM; not emitted into the stores headers) */
+struct SpellData {   /* sizeof 52 */
+    unsigned char sName;   /* +0x0 */
+    unsigned char sManaCost;   /* +0x1 */
+    unsigned char sType;   /* +0x2 */
+    int sNameText;   /* +0x4 */
+    int sSkillText;   /* +0x8 */
+    int sBookLvl;   /* +0xC */
+    int sStaffLvl;   /* +0x10 */
+    unsigned char sTargeted;   /* +0x14 */
+    unsigned char sTownSpell;   /* +0x15 */
+    int sMinInt;   /* +0x18 */
+    unsigned char sSFX;   /* +0x1C */
+    unsigned char sMissiles[3];   /* +0x1D */
+    unsigned char sManaAdj;   /* +0x20 */
+    unsigned char sMinMana;   /* +0x21 */
+    int sStaffMin;   /* +0x24 */
+    int sStaffMax;   /* +0x28 */
+    int sBookCost;   /* +0x2C */
+    int sStaffCost;   /* +0x30 */
+};
+extern struct SpellData spelldata[37];   /* @0x800DDB80 */
+
 /* file-owned globals (EXT in SYM, gp-rel tentative defs) */
 int StorePlrNo;
 unsigned char *pSTextBoxCels = 0;
@@ -153,6 +176,16 @@ unsigned char IdItemOk(ItemStruct *i)
     return 1;
 }
 
+/* @0x8006E748 */
+void AddStoreHoldId(ItemStruct itm, int i)
+{
+    storehold[storenumh] = itm;
+    storehold[storenumh]._ivalue = 100;
+    storehold[storenumh]._iIvalue = 100;
+    storehidx[storenumh] = i;
+    storenumh++;
+}
+
 /* @0x8006B3D0 -- PSX-specific: reads InvList[i] directly (no i<0 -> SpdList branch), and tests IDidx
  * (not an _iMiscId range) for the oil-item exclusion. */
 unsigned char SmithSellOk(int i)
@@ -251,6 +284,17 @@ unsigned char WitchRechargeOk(int i)
         rv = plr[myplr].InvList[i]._iCharges != plr[myplr].InvList[i]._iMaxCharges;
     }
     return rv;
+}
+
+/* @0x8006D2B8 */
+void AddStoreHoldRecharge(ItemStruct itm, int i)
+{
+    storehold[storenumh] = itm;
+    storehold[storenumh]._ivalue += spelldata[itm._iSpell].sStaffCost;
+    storehold[storenumh]._ivalue = (100 * (storehold[storenumh]._iMaxCharges - storehold[storenumh]._iCharges) / storehold[storenumh]._iMaxCharges) * storehold[storenumh]._ivalue / 100 >> 1;
+    storehold[storenumh]._iIvalue = storehold[storenumh]._ivalue;
+    storehidx[storenumh] = i;
+    storenumh++;
 }
 
 /* @0x8006AA50 */
