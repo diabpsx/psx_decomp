@@ -1073,7 +1073,7 @@ extern "C" void dequeue_stream(void)
 }
 
 /* @0x80157E40 FMV.CPP:1486 */
-extern "C" int dequeue_animation(void)
+extern "C" void dequeue_animation(void)
 {
     /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/dequeue_animation.s) -- prior
      * reconstruction indexed off mdec_head and wrote several fields to the wrong globals/struct
@@ -1100,24 +1100,17 @@ extern "C" int dequeue_animation(void)
      *     register as `mdec_streaming = 1;`), and stores `a->speed` into `mdec_speed`, not
      *     `user_start` (decode_mdec_stream's raw confirms it reads mdec_speed, not user_start, for
      *     its own frame-time accumulator -- user_start appears to be a phantom/unused global here).
-     *   - the `mdecs_queued == 0` early-out never sets $v0 at all in the raw (its delay slot only
-     *     computes `a`'s address); kept `return 0;` here since omitting it would be a stronger,
-     *     unverified UB-reliant claim than the 1-diff residual it might save. */
+     *   - retail SYM types this function VOID (FCN VOID) with `a` as its only local: the start == -1
+     *     arm's `mdec_last_frame = -1` reuses the compared a->start register (s1) via cse. */
     struct _mdecanim *a = &mdec_queue[mdec_tail];
 
     if (mdecs_queued != 0) {
-        /* a->start is read-only in this function (never written) and stays live across the
-         * flush_cdstream/open_cdstream calls, so the raw keeps it in a callee-saved register ($s1,
-         * spilled/restored in the prologue/epilogue) instead of reloading from memory after each call
-         * -- caching it in a local reproduces that register class. */
         mdec_tail = (mdec_tail + 1) % 0x10;
-        int start = a->start;
-        if (start == -1) {
+        if (a->start == -1) {
             flush_cdstream();
-            int len = open_cdstream(a->name, 0, -1);
+            last_stream_frame = open_cdstream(a->name, 0, -1) / (mdec_sectors_per_frame << 11) - 1;
             mdec_framecount = 0;
-            mdec_last_frame = start;
-            last_stream_frame = len / (mdec_sectors_per_frame << 11) - 1;
+            mdec_last_frame = -1;
             mdec_waiting_tail = (mdec_waiting_tail + 1) % 0x10;
             mdecs_waiting -= 1;
         } else {
@@ -1129,16 +1122,14 @@ extern "C" int dequeue_animation(void)
                 mdecs_waiting -= 1;
             }
             last_stream_frame = a->end;
-            mdec_framecount = a->start << 12;
             mdec_last_frame = a->start - 1;
+            mdec_framecount = a->start << 12;
         }
-        mdec_speed = a->speed;
         mdec_streaming = 1;
         mdec_stream_starting = 1;
+        mdec_speed = a->speed;
         mdecs_queued -= 1;
-        return 1;
     }
-    return 0;
 }
 
 /* @0x80157FF0 FMV.CPP:1548 */
