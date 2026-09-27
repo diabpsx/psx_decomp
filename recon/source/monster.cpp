@@ -2756,19 +2756,12 @@ void MAI_Garbud(int i)
     }
 }
 
-/* SYM not checked; bytes OPEN (112 diffs, 140==140 insns exact): logic fully
- * verified against devilution field-by-field (formulas for _mmaxhp/mHit/
- * mMinDamage/mMaxDamage match exactly; confirmed PSX drops _pathcount=0,
- * replaces M_Enemy(i) with a hardcoded `_menemy=0`, ORs _mFlags with
- * MFLAG_TARGETS_MONSTER|MFLAG_MKILLER as one combined write, and calls
- * NetSendCmdGolem unconditionally with no `if(i==myplr)` gate -- all
- * confirmed from the raw oracle, no branches in this fn so every diff here
- * is pure temp-register choice, not control flow). Falsified: swapping the
- * mmaxhp addition operand order. This is a bigger scheduling mismatch than
- * the single-swap class (112 of 140 insns differ only in temp reg identity:
- * t0 vs t1, and ra-save position) -- likely the whole function's temp-reg
- * numbering is offset by one somewhere near the top; needs a slower
- * side-by-side register-by-register walk, not a quick lever. */
+/* PASS. PSX drops _pathcount=0, replaces M_Enemy(i) with `_menemy=0` (after the
+ * _mFlags write, per retail SLD), and calls NetSendCmdGolem with no myplr gate.
+ * The stat formulas are written with shifts: retail loads _mispllvl/_pLevel with
+ * lbu for the UCHAR stores, i.e. the front end narrowed the arithmetic -- which
+ * convert_to_integer only does through +/<< (not *), and 640*spl is expanded as
+ * (s<<9)+(s<<7) rather than synth_mult's (s*5)<<7. */
 void SpawnGolum(int i, int x, int y, int mi)
 {
     dung_map[x][y].dMonster = i + 1;
@@ -2778,14 +2771,15 @@ void SpawnGolum(int i, int x, int y, int mi)
     monster[i]._mfuty = y;
     monster[i]._moldx = x;
     monster[i]._moldy = y;
-    monster[i]._mmaxhp = 2 * (320 * missile[mi]._mispllvl + plr[i]._pMaxMana / 3);
+    monster[i]._mmaxhp = 2 * (plr[i]._pMaxMana / 3) + ((missile[mi]._mispllvl << 9) + (missile[mi]._mispllvl << 7));
     monster[i]._mhitpoints = monster[i]._mmaxhp;
     monster[i].mArmorClass = 25;
-    monster[i].mHit = 5 * (missile[mi]._mispllvl + 8) + 2 * plr[i]._pLevel;
-    monster[i].mMinDamage = 2 * (missile[mi]._mispllvl + 4);
-    monster[i].mMaxDamage = 2 * (missile[mi]._mispllvl + 8);
-    monster[i]._menemy = 0;
+    monster[i].mHit = (plr[i]._pLevel << 1) + 40 + ((missile[mi]._mispllvl << 2) + missile[mi]._mispllvl);
+    monster[i].mMinDamage = (missile[mi]._mispllvl << 1) + 8;
+    monster[i].mMaxDamage = (missile[mi]._mispllvl << 1) + 16;
+
     monster[i]._mFlags |= (MFLAG_TARGETS_MONSTER | MFLAG_MKILLER);
+    monster[i]._menemy = 0;
     M_StartSpStand(i, 0);
     NetSendCmdGolem(monster[i]._mx, monster[i]._my, monster[i]._mdir, monster[i]._menemy, monster[i]._mhitpoints, currlevel);
 }
