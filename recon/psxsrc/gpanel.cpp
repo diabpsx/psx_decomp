@@ -169,16 +169,9 @@ GPanel::GPanel(int Ofs)
 
 short SpdTrimCol(short col)
 {
-    short v1;
-
-    v1 = col;
-    if ((col << 16) < 0) {
-        v1 = 0;
-    }
-    if (v1 >= 0x100) {
-        v1 = 0xFF;
-    }
-    return v1;
+    if (col < 0) col = 0;
+    if (col > 255) col = 255;
+    return col;
 }
 
 void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
