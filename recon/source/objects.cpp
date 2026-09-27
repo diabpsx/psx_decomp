@@ -2202,7 +2202,7 @@ void OperateShrine(int pnum, int i, int sType)
     object[i]._oAnimFlag = 1;
     object[i]._oAnimDelay = 1;
     stype = object[i]._oVar1;
-    if ((unsigned int)stype < 0x1A) {
+    {
         switch (stype) {
         case 0:
             ModifyPlrStr(pnum, -1);
