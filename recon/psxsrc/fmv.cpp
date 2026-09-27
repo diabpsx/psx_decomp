@@ -248,6 +248,9 @@ static int mdec_audio_offs;
 static int mdec_audio_rate_shift;
 static int mdec_audio_sec;
 static int sfx_volume;
+static unsigned char DiabEnd;   /* SYM: STAT UCHAR DiabEnd @0x8011b4e8; movie-end flag, read by
+ * play_mdec_audio (previously undeclared -- that fn's SpuWrite address math used mdec_audio_sec
+ * instead, a wrong-global bug). */
 
 /* ---------------------------------------------------------------- movie-play queue */
 struct mdec_queue_entry mdec_queue[16];
@@ -943,16 +946,38 @@ extern "C" int init_mdec_audio(int rate)
 }
 
 /* WIP -- NOT byte-verified (SPU double-buffer feed; no PC twin). @0x80157900 FMV.CPP:1298 */
+/* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/play_mdec_audio.s) -- confirmed
+ * field-by-field, same method as init_mdec_audio/set_mdec_audio_volume:
+ *   - the first loop's dispatch reads `mdec_audio_sec`, NOT `mdec_audio_playing` (the two globals
+ *     are unrelated; gp_rel normalization hid this the same way it hid decode_mdec_stream's swaps).
+ *   - both SpuWrite addresses are built from `DiabEnd` (SYM: STAT UCHAR @0x8011b4e8 -- an unrelated
+ *     "movie end" flag, previously undeclared) and the ORIGINAL, unadvanced `data` pointer (saved
+ *     once at entry, here `data0`), not from `mdec_audio_sec`/the post-loop-advanced `data`:
+ *     DiabEnd!=0 -> data0 + (DiabEnd-1)*2016 for BOTH calls; DiabEnd==0 -> data0 for the first call
+ *     but data0+2016 for the second (an asymmetry confirmed directly in the raw, not a typo).
+ *   - the trailing SpuSetKeyOnWithAttr block uses a LOCAL SpuVoiceAttr (stack, distinct from
+ *     set_mdec_audio_volume's function-static `voice_attr`), only entered when `mdec_audio_playing
+ *     == 0` (previously always ran); when it doesn't run, the raw instead does
+ *     `mdec_audio_playing -= 1`. The struct fields: mask=0xFF93 (VOLL|VOLR|PITCH|WDSA|ADSR_AMODE|
+ *     ADSR_SMODE|ADSR_RMODE|ADSR_AR|ADSR_DR|ADSR_SR|ADSR_RR|ADSR_SL), sl=0xF, a_mode=s_mode=1,
+ *     r_mode=3, ar=dr=sr=0, rr=3, volume.left/right=0x3FFF per-voice, pitch=0xFFA>>
+ *     mdec_audio_rate_shift, addr=mdec_audio_buffer[v] + slot*h->frameSize where
+ *     slot=(mdec_audio_sec>=3)?mdec_audio_sec-3:mdec_audio_sec+7 -- none of which resemble the
+ *     previous fabricated {mask,l,r,pitch,adsr1..4} shape. On loop completion mdec_audio_playing is
+ *     set to -1 (not left alone). */
+#define SPU_VOICE_ADSR_MASK_ALL 0xFF93
+
 extern "C" int play_mdec_audio(unsigned char *data, StHEADER *h)
 {
     unsigned char *b = data;
+    unsigned char *data0 = data;
 
     for (int i = 0; i < 2; i++) {
-        if (mdec_audio_playing == 0) {
+        if (mdec_audio_sec == 0) {
             b[1] |= 6;
             for (int j = 16; j < (int)h->frameSize; j += 16)
-                (b + j)[1] |= 2;
-        } else if (mdec_audio_playing == 9) {
+                (data + j)[1] |= 2;
+        } else if (mdec_audio_sec == 9) {
             int j = 0;
             for (; j < (int)h->frameSize - 16; j += 16)
                 (data + j)[1] |= 2;
@@ -966,29 +991,38 @@ extern "C" int play_mdec_audio(unsigned char *data, StHEADER *h)
     }
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[0] + mdec_audio_offs);
-    SpuWrite(mdec_audio_sec ? data - 2016 * (2 - mdec_audio_sec) : data - 4032, h->frameSize);
+    SpuWrite(DiabEnd ? data0 + (DiabEnd - 1) * 2016 : data0, h->frameSize);
     SpuIsTransferCompleted(1);
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[1] + mdec_audio_offs);
-    SpuWrite(mdec_audio_sec ? data - 2016 + 2016 * mdec_audio_sec : data - 2016, h->frameSize);
+    SpuWrite(DiabEnd ? data0 + (DiabEnd - 1) * 2016 : data0 + 2016, h->frameSize);
     SpuIsTransferCompleted(1);
     mdec_audio_offs += (int)h->frameSize;
-    /* WIP: retail's raw calls SpuSetKeyOnWithAttr once more here (callaudit-confirmed, byte shape not
-     * yet verified) -- per the earlier ida draft, a 2-iteration loop builds a per-voice attr struct
-     * (pitch=0x3FFF/adsr literals seen in set_mdec_audio_volume's own attr) and keys both voices on. */
-    {
-        struct { unsigned short mask; short l, r; short pitch, adsr1, adsr2, adsr3, adsr4; } attr;
+    if (mdec_audio_playing == 0) {
+        SpuVoiceAttr attr;
+        int slot = (mdec_audio_sec - 3 >= 0) ? mdec_audio_sec - 3 : mdec_audio_sec + 7;
+        int base = slot * (int)h->frameSize;
+
         for (int v = 0; v < 2; v++) {
-            attr.mask = 1 << v;
-            attr.pitch = 0x3FFF;
-            attr.l = (v == 0) ? 0x3FFF : 0;
-            attr.r = (v == 1) ? 0x3FFF : 0;
-            attr.adsr1 = 1;
-            attr.adsr2 = 1;
-            attr.adsr3 = 3;
-            attr.adsr4 = 0;
+            attr.mask = SPU_VOICE_ADSR_MASK_ALL;
+            attr.sl = 0xF;
+            attr.a_mode = 1;
+            attr.s_mode = 1;
+            attr.r_mode = 3;
+            attr.ar = 0;
+            attr.dr = 0;
+            attr.sr = 0;
+            attr.rr = 3;
+            attr.voice = 1 << v;
+            attr.volume.left = (v == 0) ? 0x3FFF : 0;
+            attr.volume.right = (v == 1) ? 0x3FFF : 0;
+            attr.pitch = (unsigned short)(0xFFA >> mdec_audio_rate_shift);
+            attr.addr = mdec_audio_buffer[v] + base;
             SpuSetKeyOnWithAttr(&attr);
         }
+        mdec_audio_playing = -1;
+    } else {
+        mdec_audio_playing -= 1;
     }
     return 0;
 }

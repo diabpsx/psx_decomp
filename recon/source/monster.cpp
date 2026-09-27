@@ -2962,13 +2962,28 @@ void M2MStartHit(int mid, int i, int dam)
  * devilution's `-4` -- same mod-8 result, matches the actual instruction).
  * SYM shows a persistent `int omp` local ($s0) for the whole tail
  * (mmode=DEATH through the dMonster write) that I could not identify the
- * exact form of -- tried a block-scoped `MonsterStruct *pmonster = monster;`
- * covering just that tail (237, 5 short, current best) and widening it to
- * also cover the golem-check/NewMonsterAnim section (231, worse, reverted).
- * `omp`'s SYM type is plain `int`, not a pointer, so it may be a cached
- * INDEX/stride rather than a `MonsterStruct*` -- worth trying an
- * `int omp = mid;` (or a raw `mid*104`-style stride) redundant local next,
- * not a pointer, if revisited. */
+ * exact form of. `omp`'s SYM type is plain `int`, not a pointer -- tried an
+ * `int omp = mid;` redundant-index local for that tail block: no change
+ * (compiler CSEs it away), reverted.
+ * OPDIFF PASS (using scratch/block/opdiff.py, the register-blind mnemonic
+ * diff -- much clearer than verify_asm's raw LCS alignment for finding
+ * REAL structural gaps under the register-coloring noise): found that
+ * `python tools/symtypes.py fn M2MStartKill__Fii` lists `pmonster`($s7),
+ * `_mx`($s5), `_my`($s6) as REG locals spanning the WHOLE function, not
+ * just the tail block -- opdiff showed oracle caching `monster[mid]._mx`/
+ * `_my` into stack/persistent slots right at the TOP of the function
+ * (before even the MM_STONE/MonstPartJump check), matching the "speculative
+ * read before guard" lever used elsewhere in this file. Moved `pmonster`/
+ * `_mx`/`_my` to the top (`_mx`/`_my` now read the CURRENT position, not
+ * `_moldx`/`_moldy` -- those are a separate, later read inside the tail
+ * block) and reused them for `delta_kill_monster`/`NetSendCmdLocParam1`/
+ * `SpawnItem`'s position args -- this closed 215->199 diffs and the opdiff
+ * structural count 80->53. Residual (199 diffs, opdiff 53, 3 short):
+ * `monster[mid].MType->mtype` is checked 3 times (monstkills[], MT_DIABLO,
+ * MT_GOLEM) and oracle appears to recompute `&monster[mid]` fresh for each
+ * check rather than reusing `pmonster` there -- NOT yet tried; next angle
+ * is confirming that and deliberately NOT converting those 3 sites to
+ * `pmonster[mid]`. */
 void M2MStartKill(int i, int mid)
 {
     int md;

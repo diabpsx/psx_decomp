@@ -2411,31 +2411,37 @@ void OperateShrine(int pnum, int i, int sType)
                 if (plr[pnum].InvList[j]._itype != 0)
                     continue;
                 mid = plr[pnum].InvList[j]._iMiscId;
-                if (mid == 3 || mid == 6)
+                if (mid == 3 || mid == 6) {
                     idx = ItemMiscIdIdx(0x12);
-                else if (mid == 2 || mid == 7)
+                    SetPlrHandItem(&plr[pnum].HoldItem, idx);
+                    GetPlrHandSeed(&plr[pnum].HoldItem);
+                    plr[pnum].InvList[j] = plr[pnum].HoldItem;
+                    plr[pnum].InvList[j]._iStatFlag = 1;
+                } else if (mid == 2 || mid == 7) {
                     idx = ItemMiscIdIdx(0x13);
-                else
-                    continue;
-                SetPlrHandItem(&plr[pnum].HoldItem, idx);
-                GetPlrHandSeed(&plr[pnum].HoldItem);
-                plr[pnum].InvList[j] = plr[pnum].HoldItem;
-                plr[pnum].InvList[j]._iStatFlag = 1;
+                    SetPlrHandItem(&plr[pnum].HoldItem, idx);
+                    GetPlrHandSeed(&plr[pnum].HoldItem);
+                    plr[pnum].InvList[j] = plr[pnum].HoldItem;
+                    plr[pnum].InvList[j]._iStatFlag = 1;
+                }
             }
             for (j = 0; j < 8; j++) {
                 if (plr[pnum].SpdList[j]._itype != 0)
                     continue;
                 mid = plr[pnum].SpdList[j]._iMiscId;
-                if (mid == 3 || mid == 6)
+                if (mid == 3 || mid == 6) {
                     idx = ItemMiscIdIdx(0x12);
-                else if (mid == 2 || mid == 7)
+                    SetPlrHandItem(&plr[pnum].HoldItem, idx);
+                    GetPlrHandSeed(&plr[pnum].HoldItem);
+                    plr[pnum].SpdList[j] = plr[pnum].HoldItem;
+                    plr[pnum].SpdList[j]._iStatFlag = 1;
+                } else if (mid == 2 || mid == 7) {
                     idx = ItemMiscIdIdx(0x13);
-                else
-                    continue;
-                SetPlrHandItem(&plr[pnum].HoldItem, idx);
-                GetPlrHandSeed(&plr[pnum].HoldItem);
-                plr[pnum].SpdList[j] = plr[pnum].HoldItem;
-                plr[pnum].SpdList[j]._iStatFlag = 1;
+                    SetPlrHandItem(&plr[pnum].HoldItem, idx);
+                    GetPlrHandSeed(&plr[pnum].HoldItem);
+                    plr[pnum].SpdList[j] = plr[pnum].HoldItem;
+                    plr[pnum].SpdList[j]._iStatFlag = 1;
+                }
             }
             InitDiabloMsg(0x18);
             break;
