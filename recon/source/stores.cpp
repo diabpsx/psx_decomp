@@ -1262,7 +1262,7 @@ void S_SBuyEnter(void)
 {
     int idx;
     int i;
-    int done;
+    unsigned char done;
     int w, h;
 
     if (SmithItemCount == 0) {
@@ -1306,7 +1306,7 @@ void S_WBuyEnter(void)
 {
     int idx;
     int i;
-    int done;
+    unsigned char done;
     int w, h;
 
     if (_NoWitchItems[StorePlrNo] == 0) {
@@ -1349,7 +1349,7 @@ void S_WBuyEnter(void)
 void S_BBuyEnter(void)
 {
     int i;
-    int done;
+    unsigned char done;
     int w, h;
     long half;
 
@@ -1714,7 +1714,7 @@ void S_SPBuyEnter(void)
     int idx;
     int i;
     int found;
-    int done;
+    unsigned char done;
     int w, h;
 
     stextshold = 0x12;
@@ -1966,11 +1966,11 @@ void S_ScrollSSell(int idx)
     }
     ClearSText(5, 0x15);
     stextup = 5;
-    for (l = 5; l < 0xF && idx < storenumh; l += step, idx++) {
+    for (l = 5; l < 0xF && idx < storenumh; idx++, l += step) {
         if (storehold[idx]._itype != -1) {
             int ls;
             int v;
-            int iclr;
+            char iclr;
             char *StrPtr;
 
             ls = l;
@@ -2018,7 +2018,7 @@ void S_ScrollWBuy(int idx)
     for (l = 5; l < 0xF; l += step) {
         if (_witchitem[StorePlrNo][idx]._itype != -1) {
             int ls;
-            int iclr;
+            char iclr;
             char *StrPtr;
 
             iclr = _witchitem[StorePlrNo][idx]._iMagical != 0;
@@ -2094,7 +2094,7 @@ void S_ScrollSPBuy(int idx)
         if (_premiumitem[StorePlrNo][nidx]._itype == -1) {
             l -= 8;
         } else {
-            int iclr;
+            char iclr;
             char *StrPtr;
 
             iclr = _premiumitem[StorePlrNo][nidx]._iMagical != 0;
@@ -2225,7 +2225,7 @@ void S_HBuyEnter(void)
 {
     int idx;
     int i;
-    int done;
+    unsigned char done;
     int w, h;
 
     if (stextsel == 0x16) {
