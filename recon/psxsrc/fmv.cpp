@@ -646,82 +646,85 @@ static SVECTOR tmdc_pol_offs[2][10][10];
 #define setSemiTrans_(p, abe) \
 	((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
 
-/* WIP -- NOT byte-verified yet (deep GTE/MDEC polygon-tiler internals, no PC twin to cross-check
- * against). Faithful transcription of the m2c draft (skel/PSXSRC/FMV.CPP) with M2C_FIELD resolved to
- * POLY_FT4/RECT members; next angle if it doesn't match on the first verify_asm pass: pull the raw
- * oracle (asm/nonmatchings/fmv/split_poly_area.s, 0x3E8 bytes) and diff block-by-block.
- * @0x801569EC FMV.CPP:925 */
-/* Field mapping confirmed byte-offset-by-byte against POLY_FT4 (tag=0,r0=4,g0=5,b0=6,code=7,x0=8,y0=10,
- * u0=12,v0=13,clut=14,x1=16,y1=18,u1=20,v1=21,tpage=22,x2=24,y2=26,u2=28,v2=29,pad1=30,x3=32,y3=34,
- * u3=36,v3=37,pad2=38) against the raw's cursor `s0 = p+0x20` (i.e. s0's offsets are ABSOLUTE-32):
- *   r0/g0/b0 = 0x80 (neutral tint); x0=sx, y0=sy (screen-space anchor, SHORT); x1=x_run+colw, y1=sy;
- *   x2=sx, y2=sy+rowh; x3=x_run+colw, y3=sy+rowh; u0=xb, v0=(byte)y; u1=xb+colw, v1=(byte)y;
- *   u2=xb, u3=xb+colw, v2=(byte)y2, v3=(byte)y2; tpage=GetTPage(2,0,x&0xFFC0,y&0xFF00).
- * `x_run` (the raw's $fp) is reset to the `sx` PARAMETER once per OUTER (row) iteration and accumulates
- * by `colw` every INNER (column) iteration -- distinct from `sy`, which only advances by `rowh` once
- * per outer iteration and never resets. */
+/* @0x801569EC FMV.CPP:925 -- SYM: all-INT params (sy too) and locals xx,x,y,xs,ys,w,h,n,ox,oy in
+ * retail order; statement order per SLD (tmdc_pol_offs grid corners written before the x/xx/n/p
+ * advances). Tiles RECT r into <=64x256 POLY_FT4 texture-page chunks. */
 extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int sx, int sy, int correct)
 {
-    int rows = 0;
-    short y = r->y;
-    short h = r->h;
-    short w = r->w;
-    int hleft = (short)h;
-    short yoff = -(h >> 1);
-    short xoff = -(w >> 1);
+    int xx;
+    int x;
+    int y;
+    int xs;
+    int ys;
+    int w;
+    int h;
+    int n;
+    int ox;
+    int oy;
 
-    area_pw = 0;
+    y = r->y;
+    ys = r->h;
+
+    n = 0;
+    ox = -(r->w >> 1);
+    oy = -(r->h >> 1);
+
     area_ph = 0;
-    if (h != 0) {
-        do {
-            int rowh = 256 - (y & 0xFF);
-            if (hleft < rowh)
-                rowh = hleft;
-            int x_run = sx;
-            hleft -= rowh;
-            area_pw = 0;
-            short wleft = r->w;
-            short x = r->x;
-            if (wleft != 0) {
-                short y2 = y + rowh;
-                do {
-                    signed char xb = (signed char)(x & 0x3F);
-                    short colw = 0x40 - xb;
-                    if (wleft < colw)
-                        colw = wleft;
-                    wleft -= colw;
-                    SetPolyFT4(p);
-                    setRGB0_(p, 0x80, 0x80, 0x80);
-                    setXY4_(p, (short)x_run, sy, (short)(x_run + colw), sy,
-                            (short)x_run, (short)(sy + rowh), (short)(x_run + colw), (short)(sy + rowh));
-                    setUV4_(p, (unsigned char)xb, (unsigned char)y, (unsigned char)(xb + colw), (unsigned char)y,
-                            (unsigned char)xb, (unsigned char)y2, (unsigned char)(xb + colw), (unsigned char)y2);
-                    p->tpage = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
-                    if (bp != 0) {
-                        POLY_FT4 *dst = bp;
-                        POLY_FT4 *src = p;
-                        while (src != p + 1)
-                            *dst++ = *src++;
-                        setRGB0_(bp, (unsigned char)ENG_random(correct), (unsigned char)ENG_random(correct),
-                                 (unsigned char)ENG_random(correct));
-                        setXY4_(bp, x, y, x + colw, y, x, y2, x + colw, y2);
-                        bp += 1;
-                    }
-                    x += colw;
-                    x_run += colw;
-                    TMDC_OFFS(offs, area_pw, area_ph).vx = xoff;
-                    TMDC_OFFS(offs, area_pw, area_ph).vy = yoff;
-                    area_pw += 1;
-                    p += 1;
-                } while (wleft != 0);
+    while (ys) {
+        h = 256 - (y & 0xFF);
+        if (h > ys)
+            h = ys;
+        ys -= h;
+
+        x = r->x;
+        xs = r->w;
+        xx = sx;
+        area_pw = 0;
+
+        while (xs) {
+            w = 64 - (x & 0x3F);
+            if (w > xs)
+                w = xs;
+            xs -= w;
+
+            SetPolyFT4(p);
+            setRGB0_(p, 128, 128, 128);
+            setUV4_(p, x & 0x3F, y, (x & 0x3F) + w, y, x & 0x3F, y + h, (x & 0x3F) + w, y + h);
+            setXY4_(p, xx, sy, xx + w, sy, xx, sy + h, xx + w, sy + h);
+
+            p->tpage = GetTPage(2, 0, x & 0xFFC0, y & 0xFF00);
+
+            if (bp) {
+                *bp = *p;
+                setRGB0_(bp, ENG_random(correct), ENG_random(correct), ENG_random(correct));
+                setXY4_(bp, x, y, x + w, y, x, y + h, x + w, y + h);
+                bp++;
             }
-            yoff += rowh;
-            sy = (short)(sy + rowh);
-            area_ph += 1;
-            y += rowh;
-        } while (hleft != 0);
+
+            TMDC_OFFS(offs, area_pw, area_ph).vx = ox;
+            TMDC_OFFS(offs, area_pw, area_ph).vy = oy;
+            TMDC_OFFS(offs, area_pw + 1, area_ph).vx = ox + w;
+            TMDC_OFFS(offs, area_pw + 1, area_ph).vy = oy;
+            TMDC_OFFS(offs, area_pw, area_ph + 1).vx = ox;
+            TMDC_OFFS(offs, area_pw, area_ph + 1).vy = oy + h;
+            TMDC_OFFS(offs, area_pw + 1, area_ph + 1).vx = ox + w;
+            TMDC_OFFS(offs, area_pw + 1, area_ph + 1).vy = oy + h;
+
+            ox += w;
+            x += w;
+            xx += w;
+            n++;
+            p++;
+            area_pw++;
+        }
+
+        oy += h;
+        sy += h;
+        area_ph++;
+        y += h;
     }
-    return rows;
+
+    return n;
 }
 
 /* @0x80156DD4 FMV.CPP:1009 */
