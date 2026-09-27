@@ -42,6 +42,12 @@
 #define IMID_TSCROLL 22
 #define IMID_STAFF 23
 #define IMID_BOOK 24
+#define ICI_SMITH 0x0400
+#define ICI_PREMIUM 0x0800
+#define ICI_BOY 0x1000
+#define ICI_WITCH 0x2000
+#define ICI_HEALER 0x4000
+#define ICI_LVLMASK 0x003f
 #define IMID_ESTR 10
 #define IMID_EMAG 11
 #define IMID_EDEX 12
@@ -727,6 +733,195 @@ void SortSmith(void)
         }
         k--;
     }
+}
+
+/* @0x80049AB8 ITEMS.CPP:5095 — `_witchitem[StorePlrNo]` in place of hellfire's flat `witchitem` */
+void SortWitch(void)
+{
+    int j, k;
+    unsigned char sorted;
+
+    for (k = 3; _witchitem[StorePlrNo][k + 1]._itype != -1; k++)
+        ;
+    sorted = FALSE;
+    while ((k > 3) && (!sorted)) {
+        sorted = TRUE;
+        for (j = 3; j < k; j++) {
+            if (_witchitem[StorePlrNo][j].IDidx > _witchitem[StorePlrNo][j + 1].IDidx) {
+                BubbleSwapItem(&_witchitem[StorePlrNo][j], &_witchitem[StorePlrNo][j + 1]);
+                sorted = FALSE;
+            }
+        }
+        k--;
+    }
+}
+
+/* @0x8004B884 ITEMS.CPP:5434 — `_healitem[StorePlrNo]` in place of hellfire's flat `healitem` */
+void SortHealer(void)
+{
+    int j, k;
+    unsigned char sorted;
+
+    for (k = 2; _healitem[StorePlrNo][k + 1]._itype != -1; k++)
+        ;
+    sorted = FALSE;
+    while ((k > 2) && (!sorted)) {
+        sorted = TRUE;
+        for (j = 2; j < k; j++) {
+            if (_healitem[StorePlrNo][j].IDidx > _healitem[StorePlrNo][j + 1].IDidx) {
+                BubbleSwapItem(&_healitem[StorePlrNo][j], &_healitem[StorePlrNo][j + 1]);
+                sorted = FALSE;
+            }
+        }
+        k--;
+    }
+}
+
+/* @0x80043894 ITEMS.CPP:2669 — PSX drops the GetEffLevel() call (uses `currlevel` directly) and gates
+ * SPL_RESURRECT/HEALOTHER on FePlayerNo==0, SPL_TELE/PHASE on FePlayerNo!=0 (same family as RndItem) */
+int RndUItem(int m)
+{
+    int ril[512];
+    int ri, i;
+
+    if (m != -1) {
+        if ((monster[m].MData->mTreasure & T_U) && (gbMaxPlayers == 1))
+            return -((monster[m].MData->mTreasure & T_MASK) + 1);
+    }
+
+    ri = 0;
+    for (i = 0; AllItemsList[i].iLoc != -1; i++) {
+        unsigned char okflag = AllItemsList[i].iRnd != 0;
+        if (m != -1) {
+            if (monster[m].mLevel < AllItemsList[i].iMinMLvl) okflag = FALSE;
+        } else {
+            if ((currlevel << 1) < AllItemsList[i].iMinMLvl) okflag = FALSE;
+        }
+        if (AllItemsList[i].itype == IT_MISC) okflag = FALSE;
+        if (AllItemsList[i].itype == IT_GOLD) okflag = FALSE;
+        if (AllItemsList[i].itype == IT_FOOD) okflag = FALSE;
+        if (AllItemsList[i].iMiscId == IMID_BOOK) okflag = TRUE;
+        if (AllItemsList[i].iSpell == SPL_RESURRECT && FePlayerNo == 0) okflag = FALSE;
+        if (AllItemsList[i].iSpell == SPL_HEALOTHER && FePlayerNo == 0) okflag = FALSE;
+        if (AllItemsList[i].iSpell == SPL_TELE && FePlayerNo != 0) okflag = FALSE;
+        if (AllItemsList[i].iSpell == SPL_PHASE && FePlayerNo != 0) okflag = FALSE;
+        if (okflag) ril[ri++] = i;
+    }
+    return ril[ENG_random(ri)];
+}
+
+/* @0x8004A258 ITEMS.CPP:5507 — PSX adds `item[ii]._PlrCreate = FePlayerNo` (network item-ownership tag,
+ * not in hellfire) */
+void RecreateSmithItem(int ii, int idx, int lvl, int iseed)
+{
+    SetRndSeed(iseed);
+    int itype = RndSmithItem(lvl) - 1;
+    GetItemAttrs(ii, itype, lvl);
+    item[ii]._iSeed = iseed;
+    item[ii]._iCreateInfo = lvl | ICI_SMITH;
+    item[ii]._iIdentified = TRUE;
+    item[ii]._PlrCreate = FePlayerNo;
+}
+
+/* @0x8004A308 ITEMS.CPP:5581 — idx values are IDI_HEAL(0x18)/IDI_FULLHEAL(0x1D)/IDI_RESURRECT(0x22);
+ * PSX adds `item[ii]._PlrCreate = FePlayerNo` (see RecreateSmithItem) */
+void RecreateHealerItem(int ii, int idx, int lvl, int iseed)
+{
+    if ((idx == 0x18) || (idx == 0x1D) || (idx == 0x22)) {
+        GetItemAttrs(ii, idx, lvl);
+    } else {
+        SetRndSeed(iseed);
+        int itype = RndHealerItem(lvl) - 1;
+        GetItemAttrs(ii, itype, lvl);
+    }
+    item[ii]._iSeed = iseed;
+    item[ii]._iCreateInfo = lvl | ICI_HEALER;
+    item[ii]._iIdentified = TRUE;
+    item[ii]._PlrCreate = FePlayerNo;
+}
+
+/* @0x8004A3DC ITEMS.CPP:5534 — PSX's GetItemBonus has no hellfire SpellsOk 6th param; adds
+ * `item[ii]._PlrCreate = FePlayerNo` (see RecreateSmithItem) */
+void RecreateBoyItem(int ii, int idx, int lvl, int iseed)
+{
+    SetRndSeed(iseed);
+    int itype = RndBoyItem(lvl) - 1;
+    GetItemAttrs(ii, itype, lvl);
+    GetItemBonus(ii, itype, lvl, lvl << 1, TRUE);
+    item[ii]._iSeed = iseed;
+    item[ii]._iCreateInfo = lvl | ICI_BOY;
+    item[ii]._iIdentified = TRUE;
+    item[ii]._PlrCreate = FePlayerNo;
+}
+
+/* @0x8004A014 ITEMS.CPP:5520 */
+void RecreatePremiumItem(int ii, int idx, int plvl, int iseed)
+{
+    SetRndSeed(iseed);
+    int itype = RndPremiumItem(plvl >> 2, plvl) - 1;
+    GetItemAttrs(ii, itype, plvl);
+    GetItemBonus(ii, itype, plvl >> 1, plvl, TRUE);
+    item[ii]._iSeed = iseed;
+    item[ii]._iCreateInfo = plvl | ICI_PREMIUM;
+    item[ii]._iIdentified = TRUE;
+    item[ii]._PlrCreate = FePlayerNo;
+}
+
+/* @0x8004A0F0 ITEMS.CPP:5549 — PSX drops the hellfire "book range" (IDI_FIRST_BOOK..IDI_LAST_BOOK) special
+ * case and the CHEATS block; idx values are IDI_MANA(0x19)/IDI_FULLMANA(0x1E)/IDI_PORTAL(0x1B) */
+void RecreateWitchItem(int ii, int idx, int lvl, int iseed)
+{
+    if ((idx == 0x19) || (idx == 0x1E) || (idx == 0x1B)) {
+        GetItemAttrs(ii, idx, lvl);
+    } else {
+        SetRndSeed(iseed);
+        int itype = RndWitchItem(lvl) - 1;
+        GetItemAttrs(ii, itype, lvl);
+        int iblvl = -1;
+        if (ENG_random(100) < 6) iblvl = lvl << 1;
+        if ((iblvl == -1) && (item[ii]._iMiscId == IMID_STAFF)) iblvl = lvl << 1;
+        if (iblvl != -1) GetItemBonus(ii, itype, iblvl >> 1, iblvl, TRUE);
+    }
+    item[ii]._iSeed = iseed;
+    item[ii]._iCreateInfo = lvl | ICI_WITCH;
+    item[ii]._iIdentified = TRUE;
+    item[ii]._PlrCreate = FePlayerNo;
+}
+
+/* @0x8004A4B4 ITEMS.CPP:5599 — PSX checks ICI_PREMIUM/BOY/WITCH/HEALER/SMITH in that order (hellfire
+ * checks SMITH first); `ivalue` (5th param) is unused here */
+void RecreateTownItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue)
+{
+    if (icreateinfo & ICI_PREMIUM) RecreatePremiumItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+    else if (icreateinfo & ICI_BOY) RecreateBoyItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+    else if (icreateinfo & ICI_WITCH) RecreateWitchItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+    else if (icreateinfo & ICI_HEALER) RecreateHealerItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+    else if (icreateinfo & ICI_SMITH) RecreateSmithItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+}
+
+/* @0x80048788 ITEMS.CPP:5496 */
+void SpawnStoreGold(void)
+{
+    GetItemAttrs(0, 0, 1);
+    _golditem[StorePlrNo] = item[0];
+    _golditem[StorePlrNo]._iStatFlag = TRUE;
+}
+
+/* @0x80048858 ITEMS.CPP:5728 — PSX's per-player arrays are sized smaller than hellfire's MAXSMITHITEMS/
+ * MAXPREMIUM/etc (20/6/20/20 here, matching the declared array sizes) */
+void RecalcStoreStats(void)
+{
+    int i;
+
+    for (i = 0; i < 20; i++)
+        if (_smithitem[StorePlrNo][i]._itype != -1) _smithitem[StorePlrNo][i]._iStatFlag = StoreStatOk(&_smithitem[StorePlrNo][i]);
+    for (i = 0; i < 6; i++)
+        if (_premiumitem[StorePlrNo][i]._itype != -1) _premiumitem[StorePlrNo][i]._iStatFlag = StoreStatOk(&_premiumitem[StorePlrNo][i]);
+    for (i = 0; i < 20; i++)
+        if (_witchitem[StorePlrNo][i]._itype != -1) _witchitem[StorePlrNo][i]._iStatFlag = StoreStatOk(&_witchitem[StorePlrNo][i]);
+    for (i = 0; i < 20; i++)
+        if (_healitem[StorePlrNo][i]._itype != -1) _healitem[StorePlrNo][i]._iStatFlag = StoreStatOk(&_healitem[StorePlrNo][i]);
+    _boyitem[StorePlrNo]._iStatFlag = StoreStatOk(&_boyitem[StorePlrNo]);
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */

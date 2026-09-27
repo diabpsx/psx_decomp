@@ -44,6 +44,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum);
 void DoUnLight(void);
 void DoUnVision(int nXPos, int nYPos, int nRadius, int num);
 void DoVision(int nXPos, int nYPos, int nRadius, unsigned char doautomap, unsigned char visible);
+void SetAutomapView(int x, int y);
 
 /* LIGHTING.CPP OWNS these (reaches them via %gp_rel here; other TUs like missiles.cpp reach them
  * absolute -- methodology lever #6, gp-rel ownership by tentative definition). */
@@ -151,8 +152,6 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
 {
     int xoff, yoff;
     int colour_mask, shift_mask, weirdy, cont;
-    int radius;
-    int amp_idx;
     int light_x, light_y;
     int block_x, block_y;
     int scr_x, scr_y;
@@ -171,23 +170,23 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
     if (weirdy || g_weirdy_prev != 1) {
         if (weirdy == 1)
             g_weirdy_prev = weirdy;
-        radius = nRadius & 0xF;
         cont = (nRadius >> 0xF) & 1;
+        nRadius = nRadius & 0xF;
         if (leveltype == 3) {
             /* FIELD OFFSET UNCERTAIN: oracle reads plr+0x1D/plr+0x1A05 (== plr[1]+0x1D by struct
              * size) with NO myplr multiply -- i.e. it tests plr[0] and plr[1] directly (2-player
              * PSX split-screen?), not plr[myplr]. Named plractive/_ 1plid mechanically from the
              * struct layout; semantic role (co-op infra-vision boost?) not confirmed. */
             if (plr[0].plractive != 0 && Lnum == plr[0]._plid)
-                radius = 0xA;
+                nRadius = 0xA;
             if (plr[1].plractive != 0 && Lnum == plr[1]._plid)
-                radius = 0xA;
+                nRadius = 0xA;
         }
-        amp_idx = radius + light_level[leveltype];
-        if (amp_idx >= 0x10)
-            amp_idx = 0xF;
-        g_light_amp = D_800D62E0[amp_idx];
-        g_light_amp2 = D_800D62F0[amp_idx];
+        nRadius = nRadius + light_level[leveltype];
+        if (nRadius >= 0x10)
+            nRadius = 0xF;
+        g_light_amp = D_800D62E0[nRadius];
+        g_light_amp2 = D_800D62F0[nRadius];
         if (weirdy) {
             g_light_amp = 0x40;
             g_light_amp2 = 4;
@@ -219,7 +218,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
             block_y = (nYPos * 0x10 | yoff) + 4;
         }
 
-        if (radius >= 0) {
+        if (nRadius >= 0) {
             /* NOTE: the oracle's "shake"(GU_GetRnd jitter) arm is dead code in this build (the
              * gate that would enable it is a compiled-out `1==0`) -- omitted, matches retail. */
             x = nXPos;
@@ -236,14 +235,111 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                 mult = g_light_amp >> 3;
                 if (light_y < 0 || (light_y + mult) > 0x30 || light_x < 0 || (light_x + mult) > 0x30) {
                     if (shift_mask == 0) {
-                        /* TODO clipped, shift_mask==0 arm -- see .L8004C1CC in the oracle. */
+                        /* Clipped arm, shift_mask==0 (from .L8004C1CC; per-tile x/y bounds check,
+                         * WITH the weirdy/g_lightband branch). Not yet byte-verified. */
+                        for (y = light_y; y <= light_y + mult; y++) {
+                            if (y >= 0 && y < 0x30) {
+                                for (x = light_x; x <= light_x + mult; x++) {
+                                    radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                                    if (radius_block < 0)
+                                        radius_block = 0;
+                                    if (x >= 0 && x < 0x30) {
+                                        if (colour_mask & 1) {
+                                            if (weirdy)
+                                                val = g_lightband[(radius_block + (g_lightfx_dr >> 8)) & g_lightband_mask] * g_light_amp2;
+                                            else
+                                                val = radius_block * g_light_amp2;
+                                            val = dung_map_r[x][y] + (val & 0xFF);
+                                            if (val > g_light_clamp)
+                                                val = g_light_clamp;
+                                            dung_map_r[x][y] = val;
+                                        }
+                                        if (colour_mask & 2) {
+                                            if (weirdy)
+                                                val = g_lightband[(radius_block + (g_lightfx_dg >> 8)) & g_lightband_mask] * g_light_amp2;
+                                            else
+                                                val = radius_block * g_light_amp2;
+                                            val = dung_map_g[x][y] + (val & 0xFF);
+                                            if (val > g_light_clamp)
+                                                val = g_light_clamp;
+                                            dung_map_g[x][y] = val;
+                                        }
+                                        if (colour_mask & 4) {
+                                            if (weirdy)
+                                                val = g_lightband[(radius_block + (g_lightfx_db >> 8)) & g_lightband_mask] * g_light_amp2;
+                                            else
+                                                val = radius_block * g_light_amp2;
+                                            val = dung_map_b[x][y] + (val & 0xFF);
+                                            if (val > g_light_clamp)
+                                                val = g_light_clamp;
+                                            dung_map_b[x][y] = val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     } else {
-                        /* TODO clipped, shift_mask!=0 arm -- see .L8004C414 in the oracle. */
+                        /* Clipped arm, shift_mask!=0 (from .L8004C414; per-tile x/y bounds check;
+                         * like the unclipped shift!=0 arm, the m2c shows NO weirdy branch here).
+                         * Not yet byte-verified. */
+                        for (y = light_y; y <= light_y + mult; y++) {
+                            if (y >= 0 && y < 0x30) {
+                                for (x = light_x; x <= light_x + mult; x++) {
+                                    radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                                    if (radius_block < 0)
+                                        radius_block = 0;
+                                    if (x >= 0 && x < 0x30) {
+                                        if (colour_mask & 1) {
+                                            val = dung_map_r[x][y];
+                                            if (!(shift_mask & 9)) {
+                                                val += radius_block;
+                                            } else {
+                                                if (shift_mask & 1)
+                                                    val += radius_block >> 1;
+                                                if (shift_mask & 8)
+                                                    val += radius_block * 2;
+                                            }
+                                            if (val > g_light_clamp)
+                                                val = g_light_clamp;
+                                            dung_map_r[x][y] = val;
+                                        }
+                                        if (colour_mask & 2) {
+                                            val = dung_map_g[x][y];
+                                            if (!(shift_mask & 0x12)) {
+                                                val += radius_block;
+                                            } else {
+                                                if (shift_mask & 2)
+                                                    val += radius_block >> 1;
+                                                if (shift_mask & 0x10)
+                                                    val += radius_block * 2;
+                                            }
+                                            if (val > g_light_clamp)
+                                                val = g_light_clamp;
+                                            dung_map_g[x][y] = val;
+                                        }
+                                        if (colour_mask & 4) {
+                                            val = dung_map_b[x][y];
+                                            if (!(shift_mask & 0x24)) {
+                                                val += radius_block;
+                                            } else {
+                                                if (shift_mask & 4)
+                                                    val += radius_block >> 1;
+                                                if (shift_mask & 0x20)
+                                                    val += radius_block * 2;
+                                            }
+                                            if (val > g_light_clamp)
+                                                val = g_light_clamp;
+                                            dung_map_b[x][y] = val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 } else if (shift_mask == 0) {
                     /* Unclipped arm, shift_mask==0 (implemented; not yet byte-verified). */
-                    for (y = light_y; y < light_y + mult; y++) {
-                        for (x = light_x; x < light_x + mult; x++) {
+                    for (y = light_y; y <= light_y + mult; y++) {
+                        for (x = light_x; x <= light_x + mult; x++) {
                             radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
                             if (radius_block < 0)
                                 radius_block = 0;
@@ -283,8 +379,8 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                     /* Unclipped arm, shift_mask!=0 (from the m2c draft; it shows NO weirdy/
                      * g_lightband branch here -- plain radius_block blend with a per-channel
                      * shift_mask sub-select of >>1 / *2 additions). Not yet byte-verified. */
-                    for (y = light_y; y < light_y + mult; y++) {
-                        for (x = light_x; x < light_x + mult; x++) {
+                    for (y = light_y; y <= light_y + mult; y++) {
+                        for (x = light_x; x <= light_x + mult; x++) {
                             radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
                             if (radius_block < 0)
                                 radius_block = 0;
@@ -340,9 +436,14 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
 
 /* Best-effort transcription from the oracle (PSX-only screen-space colour restore; no PC twin --
  * PC's DoUnLight(x,y,r) just copies dPreLight back over dLight, this build's DoUnLight(void)
- * instead re-paints the visible screen rect of dung_map_r/g/b back to restore_r/g/b). OPEN: bytes
- * not yet verified against the oracle -- transcribed straight from the disassembly's register flow,
- * not yet gated. */
+ * instead re-paints the visible screen rect of dung_map_r/g/b back to restore_r/g/b). The clip
+ * block below was re-derived instruction-by-instruction from asm/nonmatchings/lighting/DoUnLight__Fv.s
+ * (the earlier if/goto guess is gone): the oracle's 6-branch sequence reduces to "if the whole
+ * 13x14 tile is already in [0,0x30] bounds, paint it unconditionally (X outer, Y inner, matching
+ * dung_map_r/g/b[x][y]'s row-major layout); otherwise paint with a per-tile bounds check" -- one
+ * of the branches in the oracle's sequence (comparing X+13 against X itself) is PROVABLY always
+ * false and never taken, confirmed algebraically, so it is omitted here as genuine dead code, not
+ * an approximation. Still not byte-verified past this structural derivation. */
 void DoUnLight(void)
 {
     int nXPos, nYPos, x, y, max_x, max_y;
@@ -360,7 +461,8 @@ void DoUnLight(void)
         if (nYPos + 0xE > max_y)
             return;
     } else if (nYPos + max_y < nXPos) {
-        /* unreachable in practice -- literal transcription of the oracle's clip test */
+        /* unreachable in practice (algebraically always false -- confirmed against the oracle's
+         * own dead `slt v1,t1` compare) -- literal transcription of the oracle's branch shape. */
     }
     if (nXPos < 0) {
         if (nXPos + 0xD <= max_x)
@@ -432,11 +534,138 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
     }
 }
 
-/* OPEN -- PSX-only; the PC twin (devilution DoVision) uses the vCrawlTable/RadiusAdj crawl
- * algorithm which this build's oracle does NOT match (no vCrawlTable/RadiusAdj/nBlockTable refs in
- * the DoVision__FiiiUcUc oracle) -- not yet attempted. */
+/* CORRECTION (this pass): the earlier note was wrong -- the oracle DOES use vCrawlTable/RadiusAdj
+ * (confirmed via `lui %hi(vCrawlTable)`/`lui %hi(RadiusAdj)` in the raw .s and their real EXT
+ * symbols in configs/symbol_addrs.txt, size 0x2B2=23*30 and 0x17=23). DoVision is in fact devilution's
+ * SAME crawl-radius/vCrawlTable algorithm (GetBLOCK__Fii here plays the role of PC's
+ * nBlockTable[dPiece[x][y]]), just with PSX's dung_map[][].dFlags field access and a different
+ * dFlags bit layout (the oracle ORs in `(visible+1)|4` unconditionally rather than PC's separate
+ * BFLAG_LIT/BFLAG_VISIBLE bits -- transcribed literally, not mapped to PC bit names). Data tables
+ * copied verbatim from refs/devilution/Source/lighting.cpp (byte-for-byte game data, not prose).
+ * Structural draft built from the devilution twin + the raw oracle; NOT YET byte-verified. */
+extern unsigned char GetBLOCK(int x, int y);
+
+static unsigned char vCrawlTable[23][30] = {
+    { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15, 0 },
+    { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 1, 9, 1, 10, 1, 11, 1, 12, 1, 13, 1, 14, 1, 15, 1 },
+    { 1, 0, 2, 0, 3, 0, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1, 10, 1, 11, 1, 12, 2, 13, 2, 14, 2, 15, 2 },
+    { 1, 0, 2, 0, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 2, 9, 2, 10, 2, 11, 2, 12, 2, 13, 3, 14, 3, 15, 3 },
+    { 1, 0, 2, 1, 3, 1, 4, 1, 5, 1, 6, 2, 7, 2, 8, 2, 9, 3, 10, 3, 11, 3, 12, 3, 13, 4, 14, 4, 0, 0 },
+    { 1, 0, 2, 1, 3, 1, 4, 1, 5, 2, 6, 2, 7, 3, 8, 3, 9, 3, 10, 4, 11, 4, 12, 4, 13, 5, 14, 5, 0, 0 },
+    { 1, 0, 2, 1, 3, 1, 4, 2, 5, 2, 6, 3, 7, 3, 8, 3, 9, 4, 10, 4, 11, 5, 12, 5, 13, 6, 14, 6, 0, 0 },
+    { 1, 1, 2, 1, 3, 2, 4, 2, 5, 3, 6, 3, 7, 4, 8, 4, 9, 5, 10, 5, 11, 6, 12, 6, 13, 7, 0, 0, 0, 0 },
+    { 1, 1, 2, 1, 3, 2, 4, 2, 5, 3, 6, 4, 7, 4, 8, 5, 9, 6, 10, 6, 11, 7, 12, 7, 12, 8, 13, 8, 0, 0 },
+    { 1, 1, 2, 2, 3, 2, 4, 3, 5, 4, 6, 5, 7, 5, 8, 6, 9, 7, 10, 7, 10, 8, 11, 8, 12, 9, 0, 0, 0, 0 },
+    { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 5, 7, 6, 8, 7, 9, 8, 10, 9, 11, 9, 11, 10, 0, 0, 0, 0, 0, 0 },
+    { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 0, 0, 0, 0, 0, 0, 0, 0 },
+    { 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 9, 11, 10, 11, 0, 0, 0, 0, 0, 0 },
+    { 1, 1, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 5, 7, 6, 8, 7, 9, 7, 10, 8, 10, 8, 11, 9, 12, 0, 0, 0, 0 },
+    { 1, 1, 1, 2, 2, 3, 2, 4, 3, 5, 4, 6, 4, 7, 5, 8, 6, 9, 6, 10, 7, 11, 7, 12, 8, 12, 8, 13, 0, 0 },
+    { 1, 1, 1, 2, 2, 3, 2, 4, 3, 5, 3, 6, 4, 7, 4, 8, 5, 9, 5, 10, 6, 11, 6, 12, 7, 13, 0, 0, 0, 0 },
+    { 0, 1, 1, 2, 1, 3, 2, 4, 2, 5, 3, 6, 3, 7, 3, 8, 4, 9, 4, 10, 5, 11, 5, 12, 6, 13, 6, 14, 0, 0 },
+    { 0, 1, 1, 2, 1, 3, 1, 4, 2, 5, 2, 6, 3, 7, 3, 8, 3, 9, 4, 10, 4, 11, 4, 12, 5, 13, 5, 14, 0, 0 },
+    { 0, 1, 1, 2, 1, 3, 1, 4, 1, 5, 2, 6, 2, 7, 2, 8, 3, 9, 3, 10, 3, 11, 3, 12, 4, 13, 4, 14, 0, 0 },
+    { 0, 1, 0, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 2, 8, 2, 9, 2, 10, 2, 11, 2, 12, 3, 13, 3, 14, 3, 15 },
+    { 0, 1, 0, 2, 0, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1, 10, 1, 11, 2, 12, 2, 13, 2, 14, 2, 15 },
+    { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 1, 8, 1, 9, 1, 10, 1, 11, 1, 12, 1, 13, 1, 14, 1, 15 },
+    { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15 },
+};
+
+static unsigned char RadiusAdj[23] = { 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 4, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0 };
+
 void DoVision(int nXPos, int nYPos, int nRadius, unsigned char doautomap, unsigned char visible)
 {
+    int nCrawlX, nCrawlY;
+    int nLineLen;
+    int nBlockerFlag;
+    int j, k, v;
+    int x1adj, x2adj, y1adj, y2adj;
+    int vis_flag;
+    int nTrans;
+
+    vis_flag = visible + 1;
+
+    if ((unsigned)nXPos < 0x61 && (unsigned)nYPos < 0x61) {
+        if (doautomap) {
+            if (dung_map[nXPos][nYPos].dFlags >= 0)
+                SetAutomapView(nXPos, nXPos);
+            dung_map[nXPos][nYPos].dFlags |= 0x80;
+        }
+        dung_map[nXPos][nYPos].dFlags |= vis_flag | 4;
+    }
+
+    for (j = 0; j < 23; j++) {
+        nLineLen = 2 * (nRadius - RadiusAdj[j]);
+        if (nLineLen > 0) {
+            for (v = 0; v < 4; v++) {
+                nBlockerFlag = 0;
+                x1adj = 0;
+                x2adj = 0;
+                y1adj = 0;
+                y2adj = 0;
+                for (k = 0; k < nLineLen; k += 2) {
+                    x1adj = 0;
+                    x2adj = 0;
+                    y1adj = 0;
+                    y2adj = 0;
+                    switch (v) {
+                    case 0:
+                        nCrawlX = nXPos + vCrawlTable[j][k];
+                        nCrawlY = nYPos + vCrawlTable[j][k + 1];
+                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
+                            x1adj = -1;
+                            y2adj = -1;
+                        }
+                        break;
+                    case 1:
+                        nCrawlX = nXPos - vCrawlTable[j][k];
+                        nCrawlY = nYPos - vCrawlTable[j][k + 1];
+                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
+                            y1adj = 1;
+                            x2adj = 1;
+                        }
+                        break;
+                    case 2:
+                        nCrawlX = nXPos + vCrawlTable[j][k];
+                        nCrawlY = nYPos - vCrawlTable[j][k + 1];
+                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
+                            x1adj = -1;
+                            y2adj = 1;
+                        }
+                        break;
+                    default:
+                        nCrawlX = nXPos - vCrawlTable[j][k];
+                        nCrawlY = nYPos + vCrawlTable[j][k + 1];
+                        if (vCrawlTable[j][k] != 0 && vCrawlTable[j][k + 1] != 0) {
+                            y1adj = -1;
+                            x2adj = 1;
+                        }
+                        break;
+                    }
+                    if ((unsigned)nCrawlX < 0x61 && (unsigned)nCrawlY < 0x61) {
+                        nBlockerFlag = GetBLOCK(nCrawlX, nCrawlY);
+                        if (!GetBLOCK(nCrawlX + x1adj, nCrawlY + y1adj) || !GetBLOCK(nCrawlX + x2adj, nCrawlY + y2adj)) {
+                            if (doautomap) {
+                                if (dung_map[nCrawlX][nCrawlY].dFlags >= 0) {
+                                    SetAutomapView(nCrawlX, nCrawlY);
+                                    SetAutomapView(nCrawlX + 1, nCrawlY);
+                                }
+                                dung_map[nCrawlX][nCrawlY].dFlags |= 0x80;
+                            }
+                            dung_map[nCrawlX][nCrawlY].dFlags |= vis_flag | 4;
+                            if (!nBlockerFlag) {
+                                nTrans = dung_map[nCrawlX][nCrawlY].dTransVal;
+                                if (nTrans != 0)
+                                    TransList[nTrans] = 1;
+                            }
+                        }
+                    }
+                    if (nBlockerFlag)
+                        break;
+                }
+            }
+        }
+    }
 }
 
 void FreeLightTable(void)
