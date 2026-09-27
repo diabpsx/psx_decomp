@@ -1099,37 +1099,16 @@ void StoryIdItem(void)
 
     idx = (stextlhold - stextup) / 8 + stextvhold;
     i = storehidx[idx];
-    switch (i) {
-    case -1:
-        plr[myplr].InvBody[0]._iIdentified = 1;
-        if (i == -2) {
-    case -2:
-            plr[myplr].InvBody[6]._iIdentified = 1;
-        }
-        if (i == -3) {
-    case -3:
-            plr[myplr].InvBody[4]._iIdentified = 1;
-        }
-        if (i == -4) {
-    case -4:
-            plr[myplr].InvBody[5]._iIdentified = 1;
-        }
-        if (i == -5) {
-    case -5:
-            plr[myplr].InvBody[1]._iIdentified = 1;
-        }
-        if (i == -6) {
-    case -6:
-            plr[myplr].InvBody[2]._iIdentified = 1;
-        }
-        if (i == -7) {
-    case -7:
-            plr[myplr].InvBody[3]._iIdentified = 1;
-        }
-        break;
-    default:
+    if (i < 0) {
+        if (i == -1) plr[myplr].InvBody[0]._iIdentified = 1;
+        if (i == -2) plr[myplr].InvBody[6]._iIdentified = 1;
+        if (i == -3) plr[myplr].InvBody[4]._iIdentified = 1;
+        if (i == -4) plr[myplr].InvBody[5]._iIdentified = 1;
+        if (i == -5) plr[myplr].InvBody[1]._iIdentified = 1;
+        if (i == -6) plr[myplr].InvBody[2]._iIdentified = 1;
+        if (i == -7) plr[myplr].InvBody[3]._iIdentified = 1;
+    } else {
         plr[myplr].InvList[i]._iIdentified = 1;
-        break;
     }
     plr[myplr].HoldItem._iIdentified = 1;
     TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
