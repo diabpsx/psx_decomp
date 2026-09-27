@@ -1164,8 +1164,12 @@ void OperateMushPatch(int pnum, int i)
     if (object[i]._oSelFlag == 0)
         return;
     object[i]._oSelFlag = 0;
+    /* Retail reads deltaload once here (SLD line 2256) and both arms test that register (v1),
+     * but the retail SYM has no local for it (only x, y) -- spelling still unknown; this temp
+     * gives exact bytes. */
+    unsigned char dl = deltaload;
     if (!(quests[1]._qactive == 2 && quests[1]._qvar1 >= 2)) {
-        if (!deltaload && pnum == myplr) {
+        if (!dl && pnum == myplr) {
             if (plr[pnum]._pClass == 0)
                 PlaySFX(0x2D8);
             else if (plr[pnum]._pClass == 1)
@@ -1174,7 +1178,7 @@ void OperateMushPatch(int pnum, int i)
                 PlaySFX(0x208);
         }
     } else {
-        if (!deltaload)
+        if (!dl)
             PlaySfxLoc(0x12, object[i]._ox, object[i]._oy);
         object[i]._oAnimFrame = 2;
         if (quests[1].pad_for_laz == 0) {
