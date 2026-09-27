@@ -3358,7 +3358,9 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
 
 unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
 {
-    int hit, hper, dam, mor, mir;
+    int hit, hper;
+    long dam;
+    int mor, mir;
     unsigned char resist, ret;
 
     resist = 0;
@@ -3378,7 +3380,7 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
      * 0x1=LIGHTNING(mir==3), 0x2=MAGIC(mir==1), 0x4=FIRE(mir==2) -- NOT this TU's
      * IMMUNE_MAGIC/RESIST_MAGIC #defines (those are for a different bit layout). */
     if ((mor & 0x8 && mir == MISR_LIGHTNING) || (mor & 0x10 && mir == MISR_MAGIC) || (mor & 0x20 && mir == MISR_FIRE))
-        return 0;
+        return 1;
 
     if ((mor & 0x1 && mir == MISR_LIGHTNING) || (mor & 0x2 && mir == MISR_MAGIC) || (mor & 0x4 && mir == MISR_FIRE))
         resist = 1;
@@ -3393,7 +3395,7 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
         return ret;
 
     if (hit < hper || monster[m]._mmode == MM_STONE) {
-        dam = mindam + ENG_random(maxdam - mindam + 1);
+        dam = ENG_random(maxdam - mindam + 1) + mindam;
         if (!shift)
             dam <<= 6;
         if (resist)
@@ -3419,9 +3421,8 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
                     M_StartHit(m, -1, dam);
             }
         }
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx, int my, unsigned char nodel, BOOL HurtPlr)
