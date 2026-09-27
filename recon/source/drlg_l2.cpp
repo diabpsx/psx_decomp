@@ -35,6 +35,7 @@ int nSx1;
 int nSy1;
 int nSx2;
 int nSy2;
+extern int nSxy[16]; /* @0x801026E8 (source/gen/externs_gendung.h) -- level-indexed exclusion box, read here */
 struct NODE *pHallList;
 /* compiler-introduced spill slot written once at the tail of DoPatternCheck's switch dispatch
  * (gp_rel `sw $t9,myk`); not part of the C source -- no read site found anywhere in the oracle. */
@@ -1862,31 +1863,23 @@ void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
 
 void CreateL2Dungeon(unsigned int rseed, int entry)
 {
-    if (gbMaxPlayers == 1) {
-        if (currlevel == 7 && quests[Q_BLIND]._qactive == QUEST_NOTAVAIL) {
-            currlevel = 6;
-            CreateL2Dungeon(glSeedTbl[6], 4);
-            currlevel = 7;
-        }
-        if (currlevel == 8) {
-            if (quests[Q_BLIND]._qactive == QUEST_NOTAVAIL) {
-                currlevel = 6;
-                CreateL2Dungeon(glSeedTbl[6], 4);
-                currlevel = 8;
-            } else {
-                currlevel = 7;
-                CreateL2Dungeon(glSeedTbl[7], 4);
-                currlevel = 8;
-            }
-        }
+    int idx;
+
+    idx = (currlevel - 4) * 4;
+    if (nSxy[idx] != -1) {
+        nSx1 = nSxy[idx];
+        nSy1 = nSxy[idx + 1];
+        nSx2 = nSxy[idx + 2];
+        nSy2 = nSxy[idx + 3];
     }
+    pSetPiece = 0;
 
     SetRndSeed(rseed);
 
     dminx = 16;
     dminy = 16;
-    dmaxx = 96;
-    dmaxy = 96;
+    dmaxx = 80;
+    dmaxy = 80;
 
     DRLG_InitTrans();
     DRLG_InitSetPC();
