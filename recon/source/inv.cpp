@@ -1069,7 +1069,6 @@ int InvPutItem(int pnum, int x, int y)
 {
     int ii;
     unsigned char done;
-    int Dist, d;
 
     if (numitems >= 0x7A) {
         PlaySFX(0x3D3);
@@ -1080,12 +1079,12 @@ int InvPutItem(int pnum, int x, int y)
         SyncGetItem(x, y, plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed);
     }
 
-    x = plr[pnum]._px;
-    y = plr[pnum]._py;
+    done = 0;
+    x = plr[myplr]._px;
+    y = plr[myplr]._py;
     if (!CanPut(x, y)) {
-        done = 0;
-        for (Dist = 1; Dist < 8 && !done; Dist++) {
-            for (d = 0; d < 8 && !done; d++) {
+        for (int Dist = 1; Dist < 8 && !done; Dist++) {
+            for (int d = 0; d < 8 && !done; d++) {
                 x = plr[myplr]._px + offset_x[d] * Dist;
                 y = plr[myplr]._py + offset_y[d] * Dist;
                 if (CanPut(x, y))
