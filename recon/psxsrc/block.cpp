@@ -9,6 +9,16 @@
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
 #include "psxsrc/gen/structs_block.h"
+/* verbatim PsyQ 4.0 LIBGPU.H primitive macros (psyq.h's shared copies drift: casts, setcode-based ?:) */
+#undef getaddr
+#undef getlen
+#undef setSemiTrans
+#undef setShadeTex
+#define getlen(p)    		(u_char)(((P_TAG *)(p))->len)
+#define getcode(p)   		(u_char)(((P_TAG *)(p))->code)
+#define getaddr(p)   		(u_long)(((P_TAG *)(p))->addr)
+#define setSemiTrans(p, abe) ((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
+#define setShadeTex(p, tge) ((tge)?setcode(p, getcode(p)|0x01):setcode(p, getcode(p)&~0x01))
 #define setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)
 
 struct FRAME_HDR {   /* sizeof 12 */

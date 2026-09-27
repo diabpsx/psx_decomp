@@ -73,9 +73,9 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
     inpos++;
     while (inpos < insize) {
         begin = -inpos;
+        end = insize - inpos;
         if (begin < -128)
             begin = -128;
-        end = insize - inpos;
         if (end > maxlen)
             end = maxlen;
         bestoffset = begin;

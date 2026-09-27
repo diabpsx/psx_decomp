@@ -195,22 +195,22 @@ unsigned short CPad::Trans(unsigned short PadVal)
 {
     unsigned short RetVal;
 
-    RetVal = (PadVal >> 12) & 1;
-    if (PadVal & 0x4000)
-        RetVal |= 2;
-    RetVal = (PadVal & 0x8000) ? (RetVal | 4) : RetVal;
-    RetVal = (PadVal & 0x2000) ? (RetVal | 8) : RetVal;
-    RetVal = (PadVal & 0x800) ? (RetVal | 0x10) : RetVal;
-    RetVal = (PadVal & 0x100) ? (RetVal | 0x20) : RetVal;
-    RetVal = (PadVal & 0x100) ? (RetVal | 0x20) : RetVal;
-    RetVal = (PadVal & 0x40) ? (RetVal | 0x100) : RetVal;
-    RetVal = (PadVal & 0x80) ? (RetVal | 0x80) : RetVal;
-    RetVal = (PadVal & 0x20) ? (RetVal | 0x40) : RetVal;
-    RetVal = (PadVal & 0x10) ? (RetVal | 0x200) : RetVal;
-    RetVal = (PadVal & 0x4) ? (RetVal | 0x400) : RetVal;
-    RetVal = (PadVal & 0x1) ? (RetVal | 0x800) : RetVal;
-    RetVal = (PadVal & 0x8) ? (RetVal | 0x1000) : RetVal;
-    RetVal = (PadVal & 0x2) ? (RetVal | 0x2000) : RetVal;
+    /* Climax TranslatePadVals idiom (cf. SBSPSS source/pad/pads.cpp) */
+    RetVal  = PadVal&0x1000 ? 1 : 0;
+    RetVal |= PadVal&0x4000 ? 2 : 0;
+    RetVal |= PadVal&0x8000 ? 4 : 0;
+    RetVal |= PadVal&0x2000 ? 8 : 0;
+    RetVal |= PadVal&0x800 ? 0x10 : 0;
+    RetVal |= PadVal&0x100 ? 0x20 : 0;
+    RetVal |= PadVal&0x100 ? 0x20 : 0;
+    RetVal |= PadVal&0x40 ? 0x100 : 0;
+    RetVal |= PadVal&0x80 ? 0x80 : 0;
+    RetVal |= PadVal&0x20 ? 0x40 : 0;
+    RetVal |= PadVal&0x10 ? 0x200 : 0;
+    RetVal |= PadVal&0x4 ? 0x400 : 0;
+    RetVal |= PadVal&0x1 ? 0x800 : 0;
+    RetVal |= PadVal&0x8 ? 0x1000 : 0;
+    RetVal |= PadVal&0x2 ? 0x2000 : 0;
     return RetVal;
 }
 

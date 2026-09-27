@@ -59,11 +59,27 @@ struct P_TAG {
     unsigned len : 8;
     unsigned char r0, g0, b0, code;
 };
-#define setlen(p, _len)   (((P_TAG *)(p))->len = (unsigned char)(_len))
-#define setcode(p, _code) (((P_TAG *)(p))->code = (unsigned char)(_code))
-#define setaddr(p, _addr) (((P_TAG *)(p))->addr = (unsigned long)(_addr))
-#define getaddr(p) (((P_TAG *)(p))->addr)
-#define addPrim(ot, p) setaddr(p, getaddr(ot)), setaddr(ot, p)
+/* verbatim PsyQ 4.0 LIBGPU.H primitive macros */
+typedef unsigned char u_char;
+typedef unsigned long u_long;
+#define setRECT(r, _x, _y, _w, _h) \
+	(r)->x = (_x),(r)->y = (_y),(r)->w = (_w),(r)->h = (_h)
+#define setRGB0(p,_r0,_g0,_b0)						\
+	(p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setlen( p, _len) 	(((P_TAG *)(p))->len  = (u_char)(_len))
+#define setaddr(p, _addr)	(((P_TAG *)(p))->addr = (u_long)(_addr))
+#define setcode(p, _code)	(((P_TAG *)(p))->code = (u_char)(_code))
+#define getlen(p)    		(u_char)(((P_TAG *)(p))->len)
+#define getcode(p)   		(u_char)(((P_TAG *)(p))->code)
+#define getaddr(p)   		(u_long)(((P_TAG *)(p))->addr)
+#define addPrim(ot, p)		setaddr(p, getaddr(ot)), setaddr(ot, p)
+#define setSemiTrans(p, abe) \
+	((abe)?setcode(p, getcode(p)|0x02):setcode(p, getcode(p)&~0x02))
+#define setShadeTex(p, tge) \
+	((tge)?setcode(p, getcode(p)|0x01):setcode(p, getcode(p)&~0x01))
+#define setPolyFT4(p)	setlen(p, 9),  setcode(p, 0x2c)
+#define setPolyGT4(p)	setlen(p, 12), setcode(p, 0x3c)
+#define setPolyG4(p)	setlen(p, 8),  setcode(p, 0x38)
 
 /* ---------------------------------------------------------------- engine types ---- */
 struct FRAME_HDR {   /* sizeof 12 */
@@ -333,24 +349,18 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
             FT4->clut = Clut[1];
         } else if (!(!"Pallete Prob!!"))
             DBG_Error(NULL, "psxsrc/DIALOG.CPP", 0x13A);
-        setlen(FT4, 9);
-        setcode(FT4, 0x2C);
-        if (Trans)
-            setcode(FT4, 0x2E);
-        FT4->code &= ~1;
+        setPolyFT4(FT4);
+        setSemiTrans(FT4, Trans);
+        setShadeTex(FT4, 0);
         if (Frm == 0x94) {
-            FT4->r0 = DialogTRed;
-            FT4->g0 = DialogTGreen;
-            FT4->b0 = DialogTBlue;
+            setRGB0(FT4, DialogTRed, DialogTGreen, DialogTBlue);
             FT4->u1 = FT4->u0 + 1;
             FT4->u3 = FT4->u0 + 1;
             FT4->v2 = FT4->v0 + 1;
             FT4->v3 = FT4->v0 + 1;
             FT4->tpage = Tp->tpage | 0x40;
         } else {
-            FT4->r0 = DialogRed;
-            FT4->g0 = DialogGreen;
-            FT4->b0 = DialogBlue;
+            setRGB0(FT4, DialogRed, DialogGreen, DialogBlue);
             FT4->tpage = Tp->tpage;
         }
         addPrim(ThisOt + MY_DialogOTpos, FT4);
@@ -381,11 +391,9 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
             GT4->clut = Clut[1];
         } else if (!(!"Pallete Prob!!"))
             DBG_Error(NULL, "psxsrc/DIALOG.CPP", 0x161);
-        setlen(GT4, 12);
-        setcode(GT4, 0x3C);
-        if (Trans)
-            setcode(GT4, 0x3E);
-        GT4->code &= ~1;
+        setPolyGT4(GT4);
+        setSemiTrans(GT4, Trans);
+        setShadeTex(GT4, 0);
         G1 = GShadeTab[(char)(GShadeY % 8) * 8 + (char)(GShadeX % 8)];
         G2 = GShadeTab[(char)(GShadeY % 8) * 8 + (char)(GShadeX % 8) + 1];
         G3 = GShadeTab[(char)((GShadeY + 1) % 8) * 8 + (char)(GShadeX % 8)];
@@ -599,11 +607,9 @@ void Dialog::Back(int DX, int DY, int DW, int DH)
                 int fh = Fr->H;
                 if (Cxy[c * 2] + fw < W && Cxy[c * 2 + 1] + fh < H) {
                     Ft4 = DialogTData->PrintFt4(c / 2 + 0x22, X + Cxy[c * 2], Y + Cxy[c * 2 + 1], c & 1, MY_DialogOTpos, 0);
-                    Ft4->r0 = BACKR;
-                    Ft4->g0 = BACKG;
-                    Ft4->b0 = BACKB;
-                    Ft4->code |= 2;
-                    Ft4->code &= ~1;
+                    setRGB0(Ft4, BACKR, BACKG, BACKB);
+                    setSemiTrans(Ft4, 1);
+                    setShadeTex(Ft4, 0);
                 }
             }
         }
@@ -710,34 +716,23 @@ void Dialog::Back(int DX, int DY, int DW, int DH)
             }
         }
     }
-#define setSemiTrans(p, abe) ((abe) ? setcode(p, getcode(p) | 0x02) : setcode(p, getcode(p) & ~0x02))
-#define setShadeTex(p, tge) ((tge) ? setcode(p, getcode(p) | 0x01) : setcode(p, getcode(p) & ~0x01))
-#define getcode(p) (((P_TAG *)(p))->code)
     DialogGBack = 0;
     if (DialogBorderGfx != 18)
         DialogGBack = 2;
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx, X - 1, Y - 1, 0, MY_DialogOTpos, 0);
-    Ft4->r0 = DialogRed;
-    Ft4->g0 = DialogGreen;
-    Ft4->b0 = DialogBlue;
+    setRGB0(Ft4, DialogRed, DialogGreen, DialogBlue);
     setSemiTrans(Ft4, 0);
     setShadeTex(Ft4, 0);
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 2, X + W, Y - 1, 0, MY_DialogOTpos, 0);
-    Ft4->r0 = DialogRed;
-    Ft4->g0 = DialogGreen;
-    Ft4->b0 = DialogBlue;
+    setRGB0(Ft4, DialogRed, DialogGreen, DialogBlue);
     setSemiTrans(Ft4, 0);
     setShadeTex(Ft4, 0);
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 5, X - 1, Y + H, 0, MY_DialogOTpos, 0);
-    Ft4->r0 = DialogRed;
-    Ft4->g0 = DialogGreen;
-    Ft4->b0 = DialogBlue;
+    setRGB0(Ft4, DialogRed, DialogGreen, DialogBlue);
     setSemiTrans(Ft4, trans);
     setShadeTex(Ft4, 0);
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 7, X + W, Y + H, 0, MY_DialogOTpos, 0);
-    Ft4->r0 = DialogRed;
-    Ft4->g0 = DialogGreen;
-    Ft4->b0 = DialogBlue;
+    setRGB0(Ft4, DialogRed, DialogGreen, DialogBlue);
     setSemiTrans(Ft4, trans);
     setShadeTex(Ft4, 0);
     GShadeX = 1;
