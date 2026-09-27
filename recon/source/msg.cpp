@@ -36,6 +36,7 @@ extern "C" void decrunch(const unsigned char *Src, unsigned char *Dest, int SrcL
  * in declaration order (proved in QUESTS.CPP); this must be that first initialized global, ahead of
  * the CompClass objects further down. */
 unsigned char deltaload = 0;
+unsigned char gbBufferMsgs = 0;   /* @0x8011B97E -- .sdata right after deltaload; msg is the only %gp_rel user (TU-owned) */
 static DJunk sgJunk;
 static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-owned tentative def */
 
@@ -1146,21 +1147,20 @@ void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
      * kill-check right below is against plr[pnum] (ParseCmd's own index) -- confirmed asymmetry,
      * both read straight off the raw. retail's SYM has exactly one named local ('player'); no
      * separate TCmdDamage* pointer -- every command field is an inline pCmd cast. */
-    PlayerStruct *P = &plr[0];
-    PlayerStruct *player = &P[((const TCmdDamage *)pCmd)->bPlr];
-    if (currlevel != 0 && gbBufferMsgs != 1 && player->plrlevel == currlevel &&
+    PlayerStruct *player = &plr[((const TCmdDamage *)pCmd)->bPlr];
+    if (currlevel != 0 && gbBufferMsgs != 1 && currlevel == player->plrlevel &&
         ((const TCmdDamage *)pCmd)->dwDam <= 0x2EE00) {
         if ((player->_pHitPoints >> 6) > 0) {
             player->_pHitPoints -= ((const TCmdDamage *)pCmd)->dwDam;
             player->_pHPBase -= ((const TCmdDamage *)pCmd)->dwDam;
-            if (player->_pMaxHP < player->_pHitPoints) {
+            if (player->_pHitPoints > player->_pMaxHP) {
                 player->_pHitPoints = player->_pMaxHP;
                 player->_pHPBase = player->_pMaxHPBase;
             }
+            if ((plr[pnum]._pHitPoints >> 6) <= 0)
+                StartPlrKill(&plr[pnum], 1);
         }
     }
-    if ((P[pnum]._pHitPoints >> 6) <= 0)
-        StartPlrKill(&P[pnum], 1);
 }
 
 /* @0x80050EC0 MSG.CPP:1934 */
