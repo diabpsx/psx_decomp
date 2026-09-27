@@ -1588,39 +1588,60 @@ void STextESC(void)
         stextflag = 0;
         options_pad = -1;
         stream_stop();
-        return;
+        break;
+    case 13:
+        StartStore(0xC);
+        stextsel = 6;
+        break;
+    case 19:
+        StartStore(stextshold);
+        stextsel = stextlhold;
+        break;
     case 2:
         StartStore(1);
         stextsel = 9;
-        return;
+        break;
+    case 18:
+        StartStore(1);
+        stextsel = 0xA;
+        break;
     case 3:
         StartStore(1);
         stextsel = 0xB;
-        return;
+        break;
     case 4:
         StartStore(1);
         stextsel = 0xC;
-        return;
+        break;
     case 6:
         StartStore(5);
-        if (WStaffFlag != 0) {
+        if (WStaffFlag)
             stextsel = 0xA;
-        } else {
+        else
             stextsel = 9;
-        }
-        return;
+        break;
     case 7:
         StartStore(5);
-        if (WStaffFlag == 0) {
-            stextsel = 0xB;
-        } else {
+        if (WStaffFlag)
             stextsel = 0xC;
-        }
-        return;
+        else
+            stextsel = 0xB;
+        break;
     case 8:
         StartStore(5);
         stextsel = 0xD;
-        return;
+        break;
+    case 16:
+        StartStore(0xE);
+        stextsel = 0xB;
+        break;
+    case 17:
+        StartStore(0xF);
+        stextsel = 9;
+        break;
+    case 20:
+        StartStore(0x11);
+        break;
     case 9:
     case 10:
     case 11:
@@ -1628,32 +1649,7 @@ void STextESC(void)
         StartStore(stextshold);
         stextsel = stextlhold;
         stextsval = stextvhold;
-        return;
-    case 13:
-        StartStore(0xC);
-        stextsel = 6;
-        return;
-    case 16:
-        StartStore(0xE);
-        stextsel = 0xB;
-        return;
-    case 17:
-        StartStore(0xF);
-        stextsel = 9;
-        return;
-    case 18:
-        StartStore(1);
-        stextsel = 0xA;
-        return;
-    case 19:
-        StartStore(stextshold);
-        stextsel = stextlhold;
-        return;
-    case 20:
-        StartStore(0x11);
-        return;
-    default:
-        return;
+        break;
     }
 }
 
