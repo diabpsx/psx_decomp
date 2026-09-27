@@ -1728,52 +1728,53 @@ void OperateBookLever(int pnum, int i)
 
 void OperatePedistal(int pnum, int i)
 {
-    int idx;
-    unsigned char *buf;
-    unsigned char found;
+    int jstn;
+    BOOL JustOperated;
 
-    found = 0;
+    JustOperated = 0;
     if (numitems >= 0x7F) {
         PlaySFX(0x3D3);
         return;
     }
     if (!deltaload) {
-        if (object[i]._oVar6 == 3)
-            return;
-        if (PlrHasItem(pnum, 0x15, &idx) != 0) {
-            RemoveInvItem(pnum, idx);
-            object[i]._oAnimFrame++;
-            object[i]._oVar6++;
-            found = 1;
+        if (object[i]._oVar6 != 3) {
+            if (PlrHasItem(pnum, 0x15, &jstn) != 0) {
+                RemoveInvItem(pnum, jstn);
+                object[i]._oAnimFrame++;
+                object[i]._oVar6++;
+                JustOperated = 1;
+            }
+            if (!JustOperated)
+                return;
+            if (object[i]._oVar6 == 1) {
+                PlaySfxLoc(0x6A, object[i]._ox, object[i]._oy);
+                ObjChangeMap(setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7);
+                quests[Q_BLOOD]._qvar2 = 2;
+                SpawnQuestItem(0x15, setpc_x * 2 + 19, setpc_y * 2 + 26, 0, 1);
+                NetSendCmdQuest(1, Q_BLOOD);
+            }
+            if (object[i]._oVar6 == 2) {
+                PlaySfxLoc(0x6A, object[i]._ox, object[i]._oy);
+                ObjChangeMap(setpc_x + 6, setpc_y + 3, setpc_x + setpc_w, setpc_y + 7);
+                quests[Q_BLOOD]._qvar2 = 3;
+                SpawnQuestItem(0x15, setpc_x * 2 + 31, setpc_y * 2 + 26, 0, 1);
+                NetSendCmdQuest(1, Q_BLOOD);
+            }
+            if (object[i]._oVar6 == 3) {
+                unsigned char *setp;
+                { int unused; } /* retail SYM: empty zero-length scope here (dead local, no record) */
+                PlaySfxLoc(0x48, object[i]._ox, object[i]._oy);
+                ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
+                setp = GRL_LoadFileInMemSig("Blood2.DUN", 0);
+                LoadMapObjs(setp, setpc_x * 2, setpc_y * 2);
+                mem_free_dbg(setp);
+                CreateItem(7, setpc_x * 2 + 25, setpc_y * 2 + 19);
+                object[i]._oSelFlag = 0;
+                quests[Q_BLOOD]._qvar2 = 4;
+                NetSendCmdQuest(1, Q_BLOOD);
+            }
+            NetSendCmdParam1(0, 0x2D, i);
         }
-        if (!found)
-            return;
-        if (object[i]._oVar6 == 1) {
-            PlaySfxLoc(0x6A, object[i]._ox, object[i]._oy);
-            ObjChangeMap(setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7);
-            quests[Q_BLOOD]._qvar2 = 2;
-            SpawnQuestItem(0x15, setpc_x * 2 + 19, setpc_y * 2 + 26, 0, 1);
-            NetSendCmdQuest(1, Q_BLOOD);
-        }
-        if (object[i]._oVar6 == 2) {
-            PlaySfxLoc(0x6A, object[i]._ox, object[i]._oy);
-            ObjChangeMap(setpc_x + 6, setpc_y + 3, setpc_x + setpc_w, setpc_y + 7);
-            quests[Q_BLOOD]._qvar2 = 3;
-            SpawnQuestItem(0x15, setpc_x * 2 + 31, setpc_y * 2 + 26, 0, 1);
-            NetSendCmdQuest(1, Q_BLOOD);
-        }
-        if (object[i]._oVar6 == 3) {
-            PlaySfxLoc(0x48, object[i]._ox, object[i]._oy);
-            ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-            buf = GRL_LoadFileInMemSig("Blood2.DUN", 0);
-            LoadMapObjs(buf, setpc_x * 2, setpc_y * 2);
-            mem_free_dbg(buf);
-            CreateItem(7, setpc_x * 2 + 25, setpc_y * 2 + 19);
-            object[i]._oSelFlag = 0;
-            quests[Q_BLOOD]._qvar2 = 4;
-            NetSendCmdQuest(1, Q_BLOOD);
-        }
-        NetSendCmdParam1(0, 0x2D, i);
     } else {
         if (quests[Q_BLOOD]._qvar2 == 2) {
             ObjChangeMap(setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7);
@@ -1785,12 +1786,14 @@ void OperatePedistal(int pnum, int i)
             object[i]._oAnimFrame = 3;
         }
         if (quests[Q_BLOOD]._qvar2 == 4) {
+            unsigned char *setp;
+            { int unused; } /* retail SYM: empty zero-length scope here (dead local, no record) */
             ObjChangeMap(setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7);
             ObjChangeMap(setpc_x + 6, setpc_y + 3, setpc_x + setpc_w, setpc_y + 7);
             ObjChangeMap(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-            buf = GRL_LoadFileInMemSig("Blood2.DUN", 0);
-            LoadMapObjs(buf, setpc_x * 2, setpc_y * 2);
-            mem_free_dbg(buf);
+            setp = GRL_LoadFileInMemSig("Blood2.DUN", 0);
+            LoadMapObjs(setp, setpc_x * 2, setpc_y * 2);
+            mem_free_dbg(setp);
             object[i]._oSelFlag = 0;
             object[i]._oAnimFrame = 4;
         }
