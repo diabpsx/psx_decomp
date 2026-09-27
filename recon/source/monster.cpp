@@ -38,6 +38,7 @@
 #define D_HELL 2
 
 /* AI ids */
+#define AI_FALLEN   8
 #define AI_GARG     12
 #define PACK_MEMBER   1
 #define PACK_NOMEMBER 2
@@ -4268,6 +4269,47 @@ void M_DiabloDeath(int i, unsigned char sendmsg, int pnum)
     Monst->_mVar5 = ((long long)(Monst->_mVar3 - (_mx << 16))) / steps;
     Monst->_mVar6 = ((long long)(Monst->_mVar4 - (_my << 16))) / steps;
     Monst->_mVar8 = pnum;
+}
+
+/* PASS+SYM. Devilution's M_FallenFear (incl. its GetDirection-on-monster[i] quirk); the fallen
+ * spear/sword mtypes are 4..7 / 12..15 (jump table at 0x8011A378). The distance pair is a
+ * parenthesized sub-condition -- retail materializes it as a 0/1 flag (like a DIST macro). */
+void M_FallenFear(int x, int y)
+{
+    int i, mi, rundist, aitype;
+
+    for (i = 0; i < nummonsters; i++) {
+        rundist = 0;
+        mi = monstactive[i];
+
+        switch (monster[mi].MType->mtype) {
+        case 4:
+        case 12:
+            rundist = 7;
+            break;
+        case 5:
+        case 13:
+            rundist = 5;
+            break;
+        case 6:
+        case 14:
+            rundist = 3;
+            break;
+        case 7:
+        case 15:
+            rundist = 2;
+            break;
+        }
+        aitype = monster[mi]._mAi;
+        if (aitype == AI_FALLEN
+            && rundist
+            && (abs(x - monster[mi]._mx) < 5 && abs(y - monster[mi]._my) < 5)
+            && monster[mi]._mhitpoints >> 6 > 0) {
+            monster[mi]._mgoal = MG_RUN_AWAY;
+            monster[mi]._mgoalvar1 = rundist;
+            monster[mi]._mdir = GetDirection(x, y, monster[i]._mx, monster[i]._my);
+        }
+    }
 }
 
 void PrintMonstHistory(int mt)
