@@ -13,7 +13,7 @@
 /* ---------------------------------------------------------------- types (SYM / libcd.h) */
 typedef struct { u_char minute, second, sector, track; } CdlLOC;   /* sizeof 4 */
 typedef struct CdlFILE { CdlLOC pos; u_int size; char name[16]; } CdlFILE;  /* sizeof 24 */
-typedef struct {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
+typedef struct strheader {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     u_short id, type, secCount, nSectors;
     u_int   frameCount, frameSize;
     short width, height;
@@ -1164,7 +1164,7 @@ extern "C" int dequeue_animation(void)
 }
 
 /* @0x80157FF0 FMV.CPP:1548 */
-extern "C" int decode_mdec_stream(int frames_elapsed)
+extern "C" void decode_mdec_stream(int frames_elapsed)
 {
     /* Content-bug sweep (raw oracle vs prior reconstruction) -- verify_asm.py's %gp_rel(SYM)->0
      * normalization makes wrong-global substitutions byte-invisible to the diff gate as long as the
@@ -1183,24 +1183,24 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
      *     `mdec_stream_starting = 0;` (mdec_waiting_tail never appears anywhere in this function's raw). */
     unsigned char *data = 0;
     StHEADER *h;
-    int want_frame;
+    int req_frame;
 
     if (mdecs_waiting != 0 && stream_open == 0)
         dequeue_stream();
     cdstream_service();
     if (!mdec_streaming)
-        return 0;
+        return;
     if (stream_chunks_in == 0)
-        return stream_chunks_in;
+        return;
     if (mdec_stream_starting == 0) {
-        want_frame = (mdec_framecount + mdec_speed * frames_elapsed) >> 12;
+        req_frame = (mdec_framecount + mdec_speed * frames_elapsed) >> 12;
         mdec_framecount += mdec_speed * frames_elapsed;
-        if (mdec_last_frame < want_frame) {
+        if (mdec_last_frame < req_frame) {
             for (;;) {
                 cdstream_get_chunk(&data, &h);
                 if (!mdec_streaming)
                     break;
-                if (h->frameCount == last_stream_frame || (int)h->frameCount >= want_frame)
+                if (h->frameCount == last_stream_frame || (int)h->frameCount >= req_frame)
                     break;
                 if (stream_chunks_in < 2)
                     break;
@@ -1213,7 +1213,7 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
     if (data != 0) {
         mdec_stream_starting = 0;
         mdec_last_frame = h->frameCount;
-        start_mdec_decode(data + 32, mdc_buf[mbuf].x, mdc_buf[mbuf].y, h->width, h->height);
+        start_mdec_decode(data, mdc_buf[mbuf].x, mdc_buf[mbuf].y, h->width, h->height);
         frame_decoded = 1;
         do_brightness = 1;
         mbuf ^= 1;
@@ -1221,12 +1221,11 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
         cdstream_discard_chunk();
         if (h->frameCount == last_stream_frame) {
             if (mdecs_queued != 0)
-                return dequeue_animation();
+                dequeue_animation();
             else
-                return stop_mdec_stream();
+                stop_mdec_stream();
         }
     }
-    return stream_chunks_in;
 }
 
 /* @0x801581D0 FMV.CPP:1626 */
