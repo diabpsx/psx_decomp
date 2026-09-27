@@ -3282,13 +3282,13 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
 
     hit = ENG_random(100);
     if (missiledata[t].mType == 0) {
-        hper = plr[pnum]._pLevel - (monster[m].mArmorClass - 50) - plr[pnum]._pIEnAc + plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit - ((dist * dist) >> 1);
+        hper = plr[pnum]._pLevel - (monster[m].mArmorClass - 50) - plr[pnum]._pIEnAc + (plr[pnum]._pDexterity + plr[pnum]._pIBonusToHit) - ((dist * dist) >> 1);
         if (plr[pnum]._pClass == PC_ROGUE)
             hper += 20;
-        else if (plr[pnum]._pClass == PC_WARRIOR)
+        if (plr[pnum]._pClass == PC_WARRIOR)
             hper += 10;
     } else {
-        hper = plr[pnum]._pMagic - (monster[m].mLevel << 1) + 50 - dist;
+        hper = plr[pnum]._pMagic - (monster[m].mLevel - 25) * 2 - dist;
         if (plr[pnum]._pClass == PC_SORCERER)
             hper += 20;
     }
@@ -3305,9 +3305,10 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
         if (t == MIS_BONESPIRIT)
             dam = (monster[m]._mhitpoints / 3) >> 6;
         else
-            dam = mindam + ENG_random(maxdam - mindam + 1);
+            dam = ENG_random(maxdam - mindam + 1) + mindam;
         if (missiledata[t].mType == 0) {
-            dam = plr[pnum]._pIBonusDamMod + dam * plr[pnum]._pIBonusDam / 100 + dam;
+            dam += dam * plr[pnum]._pIBonusDam / 100;
+            dam += plr[pnum]._pIBonusDamMod;
             if (plr[pnum]._pClass == PC_ROGUE)
                 dam += plr[pnum]._pDamageMod;
             else
@@ -3348,9 +3349,8 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
             monster[m]._lastx = plr[pnum]._px;
             monster[m]._lasty = plr[pnum]._py;
         }
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
