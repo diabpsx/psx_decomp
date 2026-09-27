@@ -1094,21 +1094,18 @@ void OperateSlainHero(int pnum, int i, unsigned char sendmsg)
 
 void OperateSChambBk(int pnum, int i)
 {
-    int j;
     int textdef;
+    int j;
 
+    textdef = 0;
     if (object[i]._oSelFlag == 0)
         return;
     if (qtextflag)
         return;
     if (object[i]._oAnimFrame != object[i]._oVar6) {
         ObjChangeMapResync(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-        for (j = 0; j < numobjects; j++) {
-            int oi;
-
-            oi = objectactive[j];
-            SyncObjectAnim(oi);
-        }
+        for (j = 0; j < numobjects; j++)
+            SyncObjectAnim(objectactive[j]);
     }
     object[i]._oAnimFrame = object[i]._oVar6;
     if (quests[13]._qactive == 1) {
