@@ -561,6 +561,483 @@ void OperateLever(int pnum, int i)
     }
 }
 
+void ProcessObjects(void)
+{
+    int i, oi;
+
+    for (i = 0; i < numobjects; i++) {
+        oi = objectactive[i];
+        switch (object[oi]._otype) {
+        case 0:
+            Obj_Light(oi, 0x1B8);
+            break;
+        case 20:
+        case 21:
+        case 22:
+        case 57:
+        case 58:
+        case 59:
+        case 60:
+            Obj_StopAnim(oi);
+            break;
+        case 1:
+        case 2:
+        case 42:
+        case 43:
+        case 74:
+        case 75:
+            Obj_Door(oi);
+            break;
+        case 3:
+        case 9:
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+        case 65:
+        case 87:
+            Obj_Light(oi, 0x3F3);
+            break;
+        case 48:
+            Obj_Sarc(oi);
+            break;
+        case 49:
+            Obj_FlameTrap(oi);
+            break;
+        case 53:
+        case 54:
+            Obj_Trap(oi);
+            break;
+        case 84:
+        case 85:
+            Obj_Circle(oi);
+            break;
+        case 26:
+        case 91:
+            Obj_Light(oi, 0x1B8);
+            Obj_BCrossDamage(oi);
+            break;
+        }
+        if (object[oi]._oAnimFlag) {
+            object[oi]._oAnimCnt++;
+            if (object[oi]._oAnimCnt >= object[oi]._oAnimDelay) {
+                object[oi]._oAnimCnt = 0;
+                object[oi]._oAnimFrame++;
+                if (object[oi]._oAnimFrame > object[oi]._oAnimLen)
+                    object[oi]._oAnimFrame = 1;
+            }
+        }
+    }
+    i = 0;
+    while (i < numobjects) {
+        oi = objectactive[i];
+        if (object[oi]._oDelFlag) {
+            DeleteObject(oi, i);
+            i = 0;
+        } else {
+            i++;
+        }
+    }
+}
+
+void PostAddObject(int ot, int ox, int oy)
+{
+    int oi;
+
+    if (numobjects >= 0x7F)
+        return;
+    if (QuestStatus(9) && (oi = dung_map[ox][oy].dObject) != 0) {
+        oi--;
+        if (ot == 0x2A) {
+            if (deltaload) {
+                if (object[oi]._oVar4 != 0) {
+                    ObjSetMicro(ox, oy, 0x11);
+                    dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x99;
+                    object[oi]._oSelFlag = 4;
+                    object[oi]._oVar4 = 1;
+                } else {
+                    ObjSetMicro(ox, oy, 0x21A);
+                    dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
+                    object[oi]._oSelFlag = 1;
+                    object[oi]._oVar4 = 0;
+                }
+            } else {
+                if (object[oi]._oVar4 == 1)
+                    NetSendCmdParam1(1, 0x2C, oi);
+                ObjSetMicro(ox, oy, 0x21A);
+                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x96;
+                object[oi]._oSelFlag = 1;
+                object[oi]._oVar4 = 0;
+            }
+        } else if (ot == 0x2B) {
+            if (deltaload) {
+                if (object[oi]._oVar4 != 0) {
+                    ObjSetMicro(ox, oy, 0xD);
+                    dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x98;
+                    object[oi]._oSelFlag = 3;
+                    object[oi]._oVar4 = 1;
+                } else {
+                    ObjSetMicro(ox, oy, 0x21C);
+                    dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
+                    object[oi]._oSelFlag = 2;
+                    object[oi]._oVar4 = 0;
+                }
+            } else {
+                if (object[oi]._oVar4 == 1)
+                    NetSendCmdParam1(1, 0x2C, oi);
+                ObjSetMicro(ox, oy, 0x21C);
+                dungeon[(ox - 16) >> 1][(oy - 16) >> 1] = 0x97;
+                object[oi]._oSelFlag = 2;
+                object[oi]._oVar4 = 0;
+            }
+        } else {
+            goto create_new;
+        }
+        return;
+    }
+create_new:
+    oi = objectavail[0];
+    objectavail[0] = objectavail[0x7E - numobjects];
+    object[oi]._olid = -1;
+    objectactive[numobjects] = oi;
+    dung_map[ox][oy].dObject = oi + 1;
+    SetupObject(oi, ox, oy, ot);
+    if (ot != 0x53)
+        PostObjObjAddSwitch(ot, ox, oy, oi);
+    numobjects++;
+}
+
+void OperateObject(int pnum, int i, unsigned char TeleFlag)
+{
+    unsigned char senditemmsg;
+
+    senditemmsg = !deltaload;
+    switch ((char)((unsigned char)object[i]._otype - 1)) {
+    case 0:
+    case 1:
+        if (TeleFlag) {
+            if (object[i]._otype == 1)
+                OperateL1LDoor(pnum, i, 1);
+            if (object[i]._otype == 2)
+                OperateL1RDoor(pnum, i, 1);
+        } else {
+            if (pnum == myplr)
+                OperateL1Door(pnum, i, senditemmsg);
+        }
+        break;
+    case 41:
+    case 42:
+        if (TeleFlag) {
+            if (object[i]._otype == 42)
+                OperateL2LDoor(pnum, i, 1);
+            if (object[i]._otype == 43)
+                OperateL2RDoor(pnum, i, 1);
+        } else {
+            if (pnum == myplr)
+                OperateL2Door(pnum, i, senditemmsg);
+        }
+        break;
+    case 73:
+    case 74:
+        if (TeleFlag) {
+            if (object[i]._otype == 74)
+                OperateL3LDoor(pnum, i, 1);
+            if (object[i]._otype == 75)
+                OperateL3RDoor(pnum, i, 1);
+        } else {
+            if (pnum == myplr)
+                OperateL3Door(pnum, i, senditemmsg);
+        }
+        break;
+    case 3:
+    case 27:
+        OperateLever(pnum, i);
+        break;
+    case 24:
+        OperateBook(pnum, i);
+        break;
+    case 40:
+        OperateSChambBk(pnum, i);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 67:
+    case 68:
+    case 69:
+        OperateChest(pnum, i, senditemmsg);
+        break;
+    case 47:
+        OperateSarc(pnum, i, senditemmsg);
+        break;
+    case 49:
+        OperateTrapLvr(i);
+        break;
+    case 70:
+    case 71:
+    case 87:
+        OperateBookLever(pnum, i);
+        break;
+    case 58:
+    case 59:
+        OperateShrine(pnum, i, 0x2C);
+        break;
+    case 60:
+    case 63:
+        OperateSkelBook(pnum, i, senditemmsg);
+        break;
+    case 61:
+    case 62:
+        OperateBookCase(pnum, i, senditemmsg);
+        break;
+    case 66:
+        OperateDecap(pnum, i, senditemmsg);
+        break;
+    case 76:
+    case 88:
+        OperateArmorStand(pnum, i, senditemmsg);
+        break;
+    case 78:
+        OperateGoatShrine(pnum, i, 0x5D);
+        break;
+    case 79:
+        OperateCauldron(pnum, i, 0x4C);
+        break;
+    case 65:
+    case 75:
+    case 80:
+    case 81:
+        OperateFountains(pnum, i);
+        break;
+    case 85:
+        OperateStoryBook(pnum, i);
+        break;
+    case 72:
+        OperatePedistal(pnum, i);
+        break;
+    case 89:
+    case 91:
+        OperateWeaponRack(pnum, i, senditemmsg);
+        break;
+    case 93:
+        OperateMushPatch(pnum, i);
+        break;
+    case 94:
+        OperateLazStand(pnum, i);
+        break;
+    case 95:
+        OperateSlainHero(pnum, i, senditemmsg);
+        break;
+    case 96:
+        OperateInnSignChest(pnum, i);
+        break;
+    }
+}
+
+void OperateChest(int pnum, int i, unsigned char sendmsg)
+{
+    int j, mdir, mtype;
+
+    mtype = 0;
+    if (object[i]._oSelFlag != 0) {
+        if (!deltaload)
+            PlaySfxLoc(0x12, object[i]._ox, object[i]._oy);
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame = 2;
+        if (!deltaload) {
+            SetRndSeed(object[i]._oRndSeed);
+            if (setlevel) {
+                for (j = 0; j < object[i]._oVar1; j++) {
+                    CreateRndItem(object[i]._ox, object[i]._oy, 1, sendmsg, 0);
+                }
+            } else {
+                for (j = 0; j < object[i]._oVar1; j++) {
+                    if (object[i]._oVar2)
+                        CreateRndItem(object[i]._ox, object[i]._oy, 0, sendmsg, 0);
+                    else
+                        CreateRndUseful(pnum, object[i]._ox, object[i]._oy, sendmsg);
+                }
+            }
+            if (object[i]._oTrapFlag && (unsigned char)(object[i]._otype - 0x44) < 3) {
+                mdir = GetDirection(object[i]._ox, object[i]._oy, plr[pnum]._px, plr[pnum]._py);
+                switch (object[i]._oVar4) {
+                case 0:
+                    mtype = 0;
+                    break;
+                case 1:
+                    mtype = 0x1B;
+                    break;
+                case 2:
+                    mtype = 0x2A;
+                    break;
+                default:
+                    mtype = 0;
+                    break;
+                }
+                AddMissile(object[i]._ox, object[i]._oy, plr[pnum]._px, plr[pnum]._py, mdir, mtype, 0, -1, 0, 0);
+                object[i]._oTrapFlag = 0;
+            }
+            if (pnum == myplr)
+                NetSendCmdParam2(0, 0x2E, pnum, i);
+        }
+    }
+}
+
+void OperateSlainHero(int pnum, int i, unsigned char sendmsg)
+{
+    if (object[i]._oSelFlag != 0) {
+        object[i]._oSelFlag = 0;
+        if (!deltaload) {
+            if (plr[pnum]._pClass == 0) {
+                CreateMagicArmor(object[i]._ox, object[i]._oy, 9, 0x99, 1, 0);
+                PlaySfxLoc(0x2D4, plr[myplr]._px, plr[myplr]._py);
+            } else if (plr[pnum]._pClass == 1) {
+                CreateMagicWeapon(object[i]._ox, object[i]._oy, 3, 0x77, 1, 0);
+                PlaySfxLoc(0x26C, plr[myplr]._px, plr[myplr]._py);
+            } else if (plr[pnum]._pClass == 2) {
+                CreateSpellBook(object[i]._ox, object[i]._oy, 3, 1, 0);
+                PlaySfxLoc(0x204, plr[myplr]._px, plr[myplr]._py);
+            }
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void OperateSChambBk(int pnum, int i)
+{
+    int j;
+    int textdef;
+
+    if (object[i]._oSelFlag == 0)
+        return;
+    if (qtextflag)
+        return;
+    if (object[i]._oAnimFrame != object[i]._oVar6) {
+        ObjChangeMapResync(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
+        for (j = 0; j < numobjects; j++)
+            SyncObjectAnim(objectactive[j]);
+    }
+    object[i]._oAnimFrame = object[i]._oVar6;
+    if (quests[13]._qactive == 1) {
+        quests[13]._qactive = 2;
+        quests[13]._qlog = 1;
+        if (!deltaload)
+            NetSendCmdQuest(1, 0xE);
+    }
+    if (!deltaload) {
+        PlaySfxLoc(0x26, object[i]._ox, object[i]._oy);
+        if (plr[myplr]._pClass == 0)
+            textdef = 0xEB;
+        else if (plr[myplr]._pClass == 1)
+            textdef = 0xF3;
+        else if (plr[myplr]._pClass == 2)
+            textdef = 0xEF;
+        quests[13]._qmsg = textdef;
+        InitQTextMsg(textdef);
+        NetSendCmdParam1(0, 0x2D, i);
+    }
+}
+
+void OperateBookCase(int pnum, int i, unsigned char sendmsg)
+{
+    if (object[i]._oSelFlag != 0) {
+        if (!deltaload)
+            PlaySfxLoc(0x26, object[i]._ox, object[i]._oy);
+        object[i]._oSelFlag = 0;
+        object[i]._oAnimFrame -= 2;
+        if (QuestStatus(3)) {
+            if (monster[4].mName == UniqMonst[2].mName) {
+                if (quests[3]._qvar2 != 3) {
+                    if (monster[4]._msquelch == 0xFF && monster[4]._mhitpoints != 0) {
+                        monster[4].mtalkmsg = 0x95;
+                        M_StartStand(0, monster[4]._mdir);
+                        monster[4]._mgoal = 5;
+                        monster[4]._mmode = 0x11;
+                        quests[3]._qvar2 = 3;
+                        if (!deltaload)
+                            NetSendCmdQuest(1, 3);
+                    }
+                }
+            }
+        }
+        if (!deltaload) {
+            SetRndSeed(object[i]._oRndSeed);
+            CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 0x18, sendmsg, 0);
+            if (pnum == myplr)
+                NetSendCmdParam1(0, 0x2D, i);
+        }
+    }
+}
+
+void OperateMushPatch(int pnum, int i)
+{
+    int x, y;
+
+    if (numitems >= 0x7F) {
+        PlaySFX(0x3D3);
+        return;
+    }
+    if (object[i]._oSelFlag == 0)
+        return;
+    object[i]._oSelFlag = 0;
+    if (!(quests[1]._qactive == 2 && quests[1]._qvar1 >= 2)) {
+        if (!deltaload && pnum == myplr) {
+            if (plr[pnum]._pClass == 0)
+                PlaySFX(0x2D8);
+            else if (plr[pnum]._pClass == 1)
+                PlaySFX(0x270);
+            else if (plr[pnum]._pClass == 2)
+                PlaySFX(0x208);
+        }
+    } else {
+        if (!deltaload)
+            PlaySfxLoc(0x12, object[i]._ox, object[i]._oy);
+        object[i]._oAnimFrame = 2;
+        if (quests[1].pad_for_laz == 0) {
+            GetSuperItemLoc(object[i]._ox, object[i]._oy, &x, &y);
+            SpawnQuestItem(0x11, x, y, 0, 0);
+        }
+        if (!deltaload) {
+            quests[1]._qvar1 = 3;
+            NetSendCmdQuest(1, 1);
+            NetSendCmdParam2(0, 0x2E, pnum, i);
+        }
+    }
+}
+
+void OperateInnSignChest(int pnum, int i)
+{
+    int x, y;
+
+    if (numitems >= 0x7F) {
+        PlaySFX(0x3D3);
+        return;
+    }
+    if (quests[7]._qvar1 < 2) {
+        if (!deltaload && pnum == myplr) {
+            if (plr[pnum]._pClass == 0)
+                PlaySFX(0x2E9);
+            else if (plr[pnum]._pClass == 1)
+                PlaySFX(0x27B);
+            else if (plr[pnum]._pClass == 2)
+                PlaySFX(0x213);
+        }
+        return;
+    }
+    if (object[i]._oSelFlag == 0)
+        return;
+    if (!deltaload)
+        PlaySfxLoc(0x12, object[i]._ox, object[i]._oy);
+    object[i]._oSelFlag = 0;
+    object[i]._oAnimFrame = 2;
+    if (deltaload)
+        return;
+    GetSuperItemLoc(object[i]._ox, object[i]._oy, &x, &y);
+    SpawnQuestItem(0xC, x, y, 0, 0);
+    NetSendCmdParam1(0, 0x2D, i);
+}
+
 void OperateSarc(int pnum, int i, unsigned char sendmsg)
 {
     if (object[i]._oSelFlag != 0) {

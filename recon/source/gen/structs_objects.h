@@ -344,8 +344,13 @@ struct MonsterStruct {   /* sizeof 104 */
     char _mAnimFrame;   /* +0x41 */
     char _mAFNum;   /* +0x42 */
     char _lastx;   /* +0x43 */
-    char _pad44[0xB];   /* +0x44 */
+    char _pad44[5];   /* +0x44 */
+    unsigned char _mgoal;   /* +0x49 */
+    char _pad4A[4];   /* +0x4A */
+    unsigned char _msquelch;   /* +0x4E */
     unsigned char _uniqtype;   /* +0x4F */
+    char _pad50[0xC];   /* +0x50 */
+    int mName;   /* +0x5C */
 };
 
 struct MissileStruct {   /* sizeof 76 */
