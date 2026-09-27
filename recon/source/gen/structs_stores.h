@@ -439,6 +439,21 @@ struct TownerStruct {   /* sizeof 196 */
     unsigned char *_tNData;   /* +0xC0 */
 };
 
+struct PLStruct {   /* sizeof 40 */
+    int PLName;   /* +0x0 */
+    int PLPower;   /* +0x4 */
+    int PLParam1;   /* +0x8 */
+    int PLParam2;   /* +0xC */
+    char PLMinLvl;   /* +0x10 */
+    long PLIType;   /* +0x14 */
+    unsigned char PLGOE;   /* +0x18 */
+    unsigned char PLDouble;   /* +0x19 */
+    unsigned char PLOk;   /* +0x1A */
+    int PLMinVal;   /* +0x1C */
+    int PLMaxVal;   /* +0x20 */
+    int PLMultVal;   /* +0x24 */
+};
+
 struct RECT {   /* sizeof 8 */
     short x;   /* +0x0 */
     short y;   /* +0x2 */

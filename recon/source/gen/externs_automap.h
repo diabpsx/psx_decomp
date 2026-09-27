@@ -4,8 +4,8 @@ extern struct POLY_FT4 *AddrToAvoid;   /* @0x8011AABC */
 
 extern int AMPlayerX;   /* @0x8011C38C */
 extern int AMPlayerY;   /* @0x8011C390 */
-extern int AMPx[];   /* @0x8011C394 -- unsized: not owned by this TU, must NOT gp-rel-promote (methodology 3.12#5) */
-extern int AMPy[];   /* @0x8011C39C */
+extern int AMPx[2];   /* @0x8011C394 (defined in automap.cpp) */
+extern int AMPy[2];   /* @0x8011C39C (defined in automap.cpp) */
 
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 extern unsigned short automaptype[512];   /* @0x8010D7AC */

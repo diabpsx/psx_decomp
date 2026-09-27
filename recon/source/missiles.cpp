@@ -3543,6 +3543,232 @@ void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mien
     }
 }
 
+void ProcessMissiles(void)
+{
+    int i, mi;
+
+    for (i = 0; i < nummissiles; i++) {
+        dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dFlags &= ~0x40; /* BFLAG_MISSILE */
+        dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dMissile = 0;
+    }
+
+    i = 0;
+    while (i < nummissiles) {
+        if (missile[missileactive[i]]._miDelFlag) {
+            DeleteMissile(missileactive[i], i);
+            i = 0;
+        } else {
+            i++;
+        }
+    }
+
+    MissilePreFlag = 0;
+    ManashieldFlag = 0;
+    ManashieldFlag2 = 0;
+
+    for (i = 0; i < nummissiles; i++) {
+        mi = missileactive[i];
+        ((void (*)(int))missiledata[missile[mi]._mitype].mProc)(missileactive[i]);
+        if (!(missile[mi]._miAnimFlags & 0x2 /* MFLAG_LOCK_ANIMATION */)) {
+            missile[mi]._miAnimCnt++;
+            if (missile[mi]._miAnimCnt >= missile[mi]._miAnimDelay) {
+                missile[mi]._miAnimCnt = 0;
+                missile[mi]._miAnimFrame += missile[mi]._miAnimAdd;
+                if (missile[mi]._miAnimFrame > missile[mi]._miAnimLen)
+                    missile[mi]._miAnimFrame = 1;
+                if (missile[mi]._miAnimFrame < 1)
+                    missile[mi]._miAnimFrame = missile[mi]._miAnimLen;
+            }
+        }
+    }
+
+    if (ManashieldFlag || ManashieldFlag2) {
+        for (i = 0; i < nummissiles; i++) {
+            if (missile[missileactive[i]]._mitype == MIS_MANASHIELD)
+                MI_Manashield(missileactive[i]);
+        }
+    }
+
+    i = 0;
+    while (i < nummissiles) {
+        if (missile[missileactive[i]]._miDelFlag) {
+            DeleteMissile(missileactive[i], i);
+            i = 0;
+        } else {
+            i++;
+        }
+    }
+}
+
+void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
+{
+    /* Structurally reconstructed from the raw oracle -- NOT yet byte-verified (0x480 = 288 insns).
+     * PSX-specific bound (112, confirmed via raw sltiu 0x6F) and the established
+     * GetSOLID|GetMISSILE|IsDplayer|dObject|dMissile OR-chain idiom. The trailing
+     * `myplr = id;` write is a real, surprising finding -- confirmed via a direct `sw` to the
+     * myplr global at the very end, UNCONDITIONALLY (not gated by `id == myplr` at all, unlike
+     * devilution/hellfire's read-only comparison there). */
+    int i, pn, k, l, j, tx, ty, mx;
+    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+
+    if (currlevel != 0) {
+        missile[mi]._miDelFlag = 1;
+        for (k = 0; k < 6; k++) {
+            l = CrawlNum[k];
+            j = l + 1;
+            for (i = (unsigned char)CrawlTable[l]; i > 0; i--) {
+                tx = dx + CrawlTable[j];
+                ty = dy + CrawlTable[j + 1];
+                if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
+                    if ((GetSOLID(tx, ty) | dung_map[tx][ty].dObject | GetMISSILE(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMissile) == 0 && !CheckIfTrig(tx, ty)) {
+                        missile[mi]._mix = tx;
+                        missile[mi]._miy = ty;
+                        missile[mi]._misx = tx;
+                        missile[mi]._misy = ty;
+                        missile[mi]._miDelFlag = 0;
+                        k = 6;
+                        break;
+                    }
+                }
+                j += 2;
+            }
+        }
+    } else {
+        tx = dx;
+        ty = dy;
+        missile[mi]._mix = tx;
+        missile[mi]._miy = ty;
+        missile[mi]._misx = tx;
+        missile[mi]._misy = ty;
+        missile[mi]._miDelFlag = 0;
+    }
+
+    missile[mi]._mirange = 100;
+    missile[mi]._miVar1 = missile[mi]._mirange - missile[mi]._miAnimLen;
+    missile[mi]._miVar2 = 0;
+
+    for (i = 0; i < nummissiles; i++) {
+        mx = missileactive[i];
+        if (missile[mx]._mitype == MIS_TOWN && mx != mi && missile[mx]._misource == id)
+            missile[mx]._mirange = 0;
+    }
+
+    PutMissile(mi);
+
+    if (!missile[mi]._miDelFlag && currlevel != 0) {
+        if (!setlevel)
+            NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, currlevel, leveltype, 0);
+        else
+            NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, setlvlnum, leveltype, 1);
+    }
+
+    myplr = id;
+}
+
+void MI_Wave(int i)
+{
+    /* Structurally reconstructed from the raw oracle -- NOT yet byte-verified. PSX bound is 112
+     * (confirmed via raw sltiu 0x6F), not MAXDUNX/MAXDUNY(96); uses GetMISSILE(x,y) in place of
+     * nMissileTable[dPiece[x][y]] per this TU's established idiom. */
+    int dira, dirb, nxa, nya, nxb, nyb;
+    int sd, j, f1, f2, id, sx, sy, dx, dy;
+
+    f1 = 0;
+    f2 = 0;
+    id = missile[i]._misource;
+    sx = missile[i]._mix;
+    sy = missile[i]._miy;
+    dx = missile[i]._miVar1;
+    dy = missile[i]._miVar2;
+
+    sd = GetDirection(sx, sy, dx, dy);
+    dira = (sd - 2) & 7;
+    dirb = (sd + 2) & 7;
+    nxa = sx + XDirAdd[sd];
+    nya = sy + YDirAdd[sd];
+
+    if (GetMISSILE(nxa, nya) == 0) {
+        AddMissile(nxa, nya, nxa + XDirAdd[sd], nya + YDirAdd[sd], plr[id]._pdir, MIS_FIREMOVE, TARGET_MONSTERS, id, 0, missile[i]._mispllvl);
+
+        nxa += XDirAdd[dira];
+        nya += YDirAdd[dira];
+        nxb = sx + XDirAdd[sd] + XDirAdd[dirb];
+        nyb = sy + YDirAdd[sd] + YDirAdd[dirb];
+        for (j = 0; j < 2 + (missile[i]._mispllvl >> 1); j++) {
+            if (GetMISSILE(nxa, nya) == 0 && f1 == 0 && nxa > 0 && nxa < 112 && nya > 0 && nya < 112) {
+                AddMissile(nxa, nya, nxa + XDirAdd[sd], nya + YDirAdd[sd], plr[id]._pdir, MIS_FIREMOVE, TARGET_MONSTERS, id, 0, missile[i]._mispllvl);
+                nxa += XDirAdd[dira];
+                nya += YDirAdd[dira];
+            } else {
+                f1 = 1;
+            }
+
+            if (GetMISSILE(nxb, nyb) == 0 && f2 == 0 && nxb > 0 && nxb < 112 && nyb > 0 && nyb < 112) {
+                AddMissile(nxb, nyb, nxb + XDirAdd[sd], nyb + YDirAdd[sd], plr[id]._pdir, MIS_FIREMOVE, TARGET_MONSTERS, id, 0, missile[i]._mispllvl);
+                nxb += XDirAdd[dirb];
+                nyb += YDirAdd[dirb];
+            } else {
+                f2 = 1;
+            }
+        }
+    }
+
+    missile[i]._mirange--;
+    if (missile[i]._mirange == 0)
+        missile[i]._miDelFlag = 1;
+}
+
+void MI_Teleport(int i)
+{
+    /* Structurally reconstructed from the raw oracle -- NOT yet byte-verified. This is the
+     * PSX-specific screen/scroll-integrated teleport-completion function (BL_GetCurrentBlocks,
+     * WorldToOffset, light_fix, gplayer->SetScrollTarget) with no direct PC-twin structure;
+     * types/externs (CBlocks, ScrollStruct, CPlayer, gplayer, BL_GetCurrentBlocks) are shared
+     * with gamepad.cpp/effects.cpp, redeclared here to match exactly. */
+    int id, other;
+    void *gblocks;
+
+    gblocks = BL_GetCurrentBlocks();
+    if (!gblocks)
+        DBG_Error(0, "source/MISSILES.CPP", 0x12C2);
+
+    missile[i]._mirange--;
+    id = missile[i]._misource;
+    if (missile[i]._mirange <= 0) {
+        missile[i]._miDelFlag = 1;
+        return;
+    }
+
+    PlrClrTrans(plr[id]._px, plr[id]._py);
+    plr[id]._px = missile[i]._mix;
+    plr[id]._py = missile[i]._miy;
+    plr[id]._pxoff = 0;
+    plr[id]._poldx = plr[id]._px;
+    plr[id]._poldy = plr[id]._py;
+    PlrDoTrans(plr[id]._px, plr[id]._py);
+    missile[i]._miVar1 = 1;
+    WorldToOffset(id, (plr[id]._px << 3) | 4, (plr[id]._py << 3) | 4);
+
+    if (leveltype) {
+        light_fix(plr[id]._plid);
+        ChangeLightXY(plr[id]._plid, plr[id]._px, plr[id]._py);
+        light_fix(plr[id]._pvid);
+        ChangeVisionXY(plr[id]._pvid, plr[id]._px, plr[id]._py);
+    }
+
+    if (id == myplr) {
+        ViewX = plr[id]._px - ScrollInfo._sdx;
+        ViewY = plr[id]._py - ScrollInfo._sdy;
+    }
+
+    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, &plr[id], gblocks);
+    MoveToScrollTarget__7CBlocks_8014ab60(gblocks);
+
+    other = id ^ 1;
+    if (plr[other].plractive)
+        PlacePlayer(other, plr[id]._px, plr[id]._py, 0);
+}
+
 void MI_Rportal(int i)
 {
     int ExpLight[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15 };

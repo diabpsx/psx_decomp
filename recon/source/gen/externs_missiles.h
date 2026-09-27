@@ -45,3 +45,4 @@ extern unsigned char setlvlnum;   /* @0x8011C10F */
 extern int stonendx;   /* @0x8011B774 */
 extern struct TriggerStruct trigs[5];   /* @0x800E33CC */
 extern unsigned char vCrawlTable[23][30];   /* @0x800D6014 */
+extern struct ScrollStruct ScrollInfo;   /* @0x800E7914 */

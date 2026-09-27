@@ -55,3 +55,5 @@ extern char **TextPtr;   /* @0x8011BBF4 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
 extern unsigned char BORDERR, BORDERG, BORDERB;
 extern char tempstr[256];   /* @0x800CEA10 */
+extern const struct PLStruct PL_Prefix[84];   /* @0x80112744 */
+extern const struct PLStruct PL_Suffix[96];   /* @0x80113464 */

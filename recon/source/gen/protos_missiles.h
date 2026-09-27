@@ -129,6 +129,21 @@ void SetPlayerHitPoints(int pnum, int val);   /* PLAYER.CPP:282 */
 unsigned char ChkPlrOffsets(int wx1, int wy1, int wx2, int wy2);   /* @0x80062568 PLAYER.CPP:2562 (SYM: ChkPlrOffsets__Fiiii) */
 void BreakObject(int pnum, int oi);   /* @0x8005EB40 OBJECTS.CPP (SYM: BreakObject__Fii) */
 void NetSendCmdDamage(unsigned char bHiPri, unsigned char pnum, unsigned long dam);   /* @0x8004FEF8 MSG.CPP (SYM: NetSendCmdDamage__FUcUcUl) */
+void NetSendCmdLocParam3(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short p1, unsigned short p2, unsigned short p3);   /* @0x8004F7EC MSG.CPP */
+void *BL_GetCurrentBlocks(void);   /* @0x800919EC BLOCK.CPP:2805 -- opaque pointer: this TU's own
+                                       `CBlocks`/`CPlayer` names already denote different, unrelated
+                                       structs (a rendering-block struct here); called as plain
+                                       functions with their exact mangled names to avoid the clash,
+                                       not as C++ methods on gamepad.cpp's classes. */
+void SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(void *thisPlayer, void *plrRef, void *blocksRef);
+void MoveToScrollTarget__7CBlocks_8014ab60(void *thisBlocks);
+void DBG_Error(char *Text, char *File, int Line);
+void PlrClrTrans(int x, int y);   /* @0x80060C6C PLAYER.CPP */
+void PlrDoTrans(int x, int y);   /* @0x80060CE4 PLAYER.CPP */
+void WorldToOffset(int pnum, int wx, int wy);   /* @0x80078440 (SYM: WorldToOffset__Fiii) */
+void light_fix(int lid);   /* @0x8004D3B0 LIGHTING.CPP */
+void ChangeVisionXY(int i, int x, int y);   /* @0x8004D6D0 LIGHTING.CPP */
+void PlacePlayer(int pnum, int x, int y, unsigned char flag);   /* @0x800A4080 */
 void ChangeLightXY(int i, int x, int y);   /* @0x8004D384 LIGHTING.CPP */
 void MissToMonst(int i, int x, int y);   /* @0x80155CE4 MONSTER.CPP */
 void UseMana(int id, int sn);   /* @0x80077308 SPELLS.CPP:110 */

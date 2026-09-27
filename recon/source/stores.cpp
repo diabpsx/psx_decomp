@@ -1863,6 +1863,8 @@ void DoThatDrawSText(void)
             PrintSString(stext[i]._sx, i, stext[i]._sjust, stext[i]._sstr, stext[i]._sclr, stext[i]._sval);
         }
         i++;
+        if (stext[i]._sval > 0) {
+        }
     } while (i < 0x18);
     DrawQTextBack();
     DrawStoreArrows();
@@ -1956,10 +1958,7 @@ void S_ScrollSBuy(int idx)
 void S_ScrollSSell(int idx)
 {
     int l;
-    int v;
-    int iclr;
     int step;
-    char *str;
 
     step = 8;
     if (SItemListFlag == 1) {
@@ -1967,9 +1966,14 @@ void S_ScrollSSell(int idx)
     }
     ClearSText(5, 0x15);
     stextup = 5;
-    l = 5;
-    while (l < 0xF && idx < storenumh) {
+    for (l = 5; l < 0xF && idx < storenumh; l += step, idx++) {
         if (storehold[idx]._itype != -1) {
+            int ls;
+            int v;
+            int iclr;
+            char *StrPtr;
+
+            ls = l;
             iclr = storehold[idx]._iMagical != 0;
             if (storehold[idx]._iMagical == 2) {
                 iclr = 3;
@@ -1979,18 +1983,16 @@ void S_ScrollSSell(int idx)
             }
             if (storehold[idx]._iMagical != 0 && storehold[idx]._iIdentified != 0) {
                 v = storehold[idx]._iIvalue;
-                str = MakeItemStr(&storehold[idx], storehold[idx]._iIName, 0x100);
+                StrPtr = MakeItemStr(&storehold[idx], storehold[idx]._iIName, 0x100);
             } else {
-                str = MakeItemStr(&storehold[idx], storehold[idx]._iName, 0x100);
+                StrPtr = MakeItemStr(&storehold[idx], storehold[idx]._iName, 0x100);
                 v = storehold[idx]._ivalue;
             }
-            AddSText(0xC, l, 0, str, iclr, 1);
+            AddSText(0xC, l, 0, StrPtr, iclr, 1);
             AddSTextVal(l, v);
-            PrintStoreItem(&storehold[idx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
-            stextdown = l;
+            PrintStoreItem(&storehold[idx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
+            stextdown = ls;
         }
-        idx++;
-        l += step;
     }
     stextsmax = storenumh - 2;
     if (WStaffFlag == 0 && WFlag != 0) {
@@ -2005,9 +2007,7 @@ void S_ScrollSSell(int idx)
 void S_ScrollWBuy(int idx)
 {
     int l;
-    int iclr;
     int step;
-    char *str;
 
     step = 4;
     if (WStaffFlag != 0) {
@@ -2015,25 +2015,28 @@ void S_ScrollWBuy(int idx)
     }
     ClearSText(5, 0x15);
     stextup = 5;
-    l = 5;
-    while (l < 0xF) {
+    for (l = 5; l < 0xF; l += step) {
         if (_witchitem[StorePlrNo][idx]._itype != -1) {
+            int ls;
+            int iclr;
+            char *StrPtr;
+
             iclr = _witchitem[StorePlrNo][idx]._iMagical != 0;
+            ls = l;
             if (_witchitem[StorePlrNo][idx]._iStatFlag == 0) {
                 iclr = 2;
             }
             if (_witchitem[StorePlrNo][idx]._iMagical) {
-                str = MakeItemStr(&_witchitem[StorePlrNo][idx], _witchitem[StorePlrNo][idx]._iIName, 0x100);
+                StrPtr = MakeItemStr(&_witchitem[StorePlrNo][idx], _witchitem[StorePlrNo][idx]._iIName, 0x100);
             } else {
-                str = MakeItemStr(&_witchitem[StorePlrNo][idx], _witchitem[StorePlrNo][idx]._iName, 0x100);
+                StrPtr = MakeItemStr(&_witchitem[StorePlrNo][idx], _witchitem[StorePlrNo][idx]._iName, 0x100);
             }
-            AddSText(0xC, l, 0, str, iclr, 1);
+            AddSText(0xC, l, 0, StrPtr, iclr, 1);
             AddSTextVal(l, _witchitem[StorePlrNo][idx]._iIvalue);
-            PrintStoreItem(&_witchitem[StorePlrNo][idx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
-            stextdown = l;
+            PrintStoreItem(&_witchitem[StorePlrNo][idx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
+            stextdown = ls;
             idx++;
         }
-        l += step;
     }
     if (!stext[stextsel]._ssel && stextsel != 0x16) {
         stextsel = stextdown;
@@ -2044,24 +2047,25 @@ void S_ScrollWBuy(int idx)
 void S_ScrollHBuy(int idx)
 {
     int l;
-    int iclr;
-    char *str;
 
     ClearSText(5, 0x15);
     stextup = 5;
-    l = 5;
-    do {
+    for (l = 5; l < 0xF; l += 4) {
         if (_healitem[StorePlrNo][idx]._itype != -1) {
+            int ls;
+            int iclr;
+            char *StrPtr;
+
+            ls = l;
             iclr = (_healitem[StorePlrNo][idx]._iStatFlag == 0) * 2;
-            str = MakeItemStr(&_healitem[StorePlrNo][idx], _healitem[StorePlrNo][idx]._iName, (StoreBackRect.w - 0x44) & 0xFFFF);
-            AddSText(0xC, l, 0, str, iclr, 1);
+            StrPtr = MakeItemStr(&_healitem[StorePlrNo][idx], _healitem[StorePlrNo][idx]._iName, (StoreBackRect.w - 0x44) & 0xFFFF);
+            AddSText(0xC, l, 0, StrPtr, iclr, 1);
             AddSTextVal(l, _healitem[StorePlrNo][idx]._iIvalue);
-            PrintStoreItem(&_healitem[StorePlrNo][idx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
-            stextdown = l;
+            PrintStoreItem(&_healitem[StorePlrNo][idx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
+            stextdown = ls;
             idx++;
         }
-        l += 4;
-    } while (l < 0xF);
+    }
     if (!stext[stextsel]._ssel && stextsel != 0x16) {
         stextsel = stextdown;
     }
@@ -2072,9 +2076,7 @@ void S_ScrollSPBuy(int idx)
 {
     int boughtitems;
     int l;
-    int iclr;
     int nidx;
-    char *str;
 
     ClearSText(5, 0x15);
     boughtitems = idx;
@@ -2088,23 +2090,23 @@ void S_ScrollSPBuy(int idx)
             nidx++;
         } while (boughtitems != 0);
     }
-    l = 5;
-    while (l < 0xF && nidx < 6) {
+    for (l = 5; l < 0xF && nidx < 6; nidx++, l += 8) {
         if (_premiumitem[StorePlrNo][nidx]._itype == -1) {
             l -= 8;
         } else {
+            int iclr;
+            char *StrPtr;
+
             iclr = _premiumitem[StorePlrNo][nidx]._iMagical != 0;
             if (_premiumitem[StorePlrNo][nidx]._iStatFlag == 0) {
                 iclr = 2;
             }
-            str = MakeItemStr(&_premiumitem[StorePlrNo][nidx], _premiumitem[StorePlrNo][nidx]._iIName, 0x100);
-            AddSText(0xC, l, 0, str, iclr, 1);
+            StrPtr = MakeItemStr(&_premiumitem[StorePlrNo][nidx], _premiumitem[StorePlrNo][nidx]._iIName, 0x100);
+            AddSText(0xC, l, 0, StrPtr, iclr, 1);
             AddSTextVal(l, _premiumitem[StorePlrNo][nidx]._iIvalue);
-            PrintStoreItem(&_premiumitem[StorePlrNo][nidx], l + MediumFont.GetWrap(str, &StoreBackRectClipper), iclr);
+            PrintStoreItem(&_premiumitem[StorePlrNo][nidx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
             stextdown = l;
         }
-        nidx++;
-        l += 8;
     }
     if (!stext[stextsel]._ssel && stextsel != 0x16) {
         stextsel = stextdown;
@@ -2127,20 +2129,25 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
     if (x->_iIdentified != 0) {
         if (x->_iMagical != 2) {
             if (x->_iPrePower != -1) {
-                PrintItemPower(x->_iPrePower, x);
+                PrintItemPower(PL_Prefix[x->_iPrePower].PLPower, x);
                 if (tempstr[0] != 0) {
                     strcat(sstr, tempstr);
                 }
             }
         }
         if (x->_iSufPower != -1) {
-            PrintItemPower(x->_iSufPower, x);
-            if (sstr[0] != 0 && tempstr[0] != 0) {
-                strcat(sstr, ",  ");
-                li = 1;
-            } else if (tempstr[0] != 0) {
+            PrintItemPower(PL_Suffix[x->_iSufPower].PLPower, x);
+            if (sstr[0] != 0) {
+                if (tempstr[0] != 0) {
+                    strcat(sstr, ",  ");
+                    li = 1;
+                    goto block_9;
+                }
+            }
+            if (tempstr[0] != 0) {
                 strcat(sstr, tempstr);
             }
+block_9:;
         }
     }
     if (x->_iMiscId == 0x17) {

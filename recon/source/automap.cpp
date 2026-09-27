@@ -23,6 +23,8 @@ int AutoMapYOfs;
 int D_8011C36C;   /* OT layer/index scratch for AMGetLine's addPrim -- no SYM name, retail static data */
 int AMPlayerX;
 int AMPlayerY;
+int AMPx[2];   /* %gp_rel(AMPx) in DrawAutomap's oracle -> owned here */
+int AMPy[2];
 
 /* PsyQ PSXSRC/PRIMPOOL.H template, LINE_F2 instantiation (one out-of-line copy per TU that uses it --
  * this TU declares its own local copy, matching the source/*.cpp "self-contained" convention). */
@@ -294,17 +296,18 @@ void DrawAutoMapVertGrate(int X, int Y)
 {
     LINE_F2 *L2;
     int Lx, Ly;
-    int xs, ys;
 
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
-    xs = X * AutoMapScale;
-    ys = Y * AutoMapScale;
-    Ly = xs + ys + AMPlayerY;
-    Lx = (xs - ys) * 2 + AMPlayerX;
+    X *= AutoMapScale;
+    Y *= AutoMapScale;
+    Ly = AMPlayerY + (Y + X);
+    Lx = (X - Y) * 2 + AMPlayerX;
     L2->y0 = Ly;
-    L2->y1 = Ly + AutoMapScale;
+    Ly += AutoMapScale;
+    L2->y1 = Ly;
     L2->x0 = Lx;
-    L2->x1 = Lx - AutoMapScale * 2;
+    Lx -= AutoMapScale * 2;
+    L2->x1 = Lx;
 }
 
 /* line 449 @0x801628A4 */

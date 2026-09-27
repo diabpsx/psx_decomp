@@ -585,3 +585,4 @@ struct MonsterStruct {   /* sizeof 104 */
     struct CMonster *MType;   /* +0x60 */
     struct MonsterData *MData;   /* +0x64 */
 };
+
