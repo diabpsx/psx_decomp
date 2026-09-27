@@ -3418,32 +3418,26 @@ int M_DoTalk(int i)
  * reads are all replaced by `IsDplayer()` calls (called 4 TIMES total in the
  * H2H branch, matching the raw call count exactly -- do not try to cache
  * the result in fewer calls, retail genuinely re-calls it each time,
- * confirmed from the `jal IsDplayer` count). Remaining 5-insn gap: the
- * `plr[pnum].plractive` check appears to reuse an ALREADY-computed
- * PlayerStruct stride from the earlier `_pmode`/`StartPlrHit` prep. Tried
- * wrapping `_pmode`+`StartPlrHit`+the whole FePlayerNo block in one scope
- * with `PlayerStruct *p1=&plr[pnum];` reused for both `_pmode` and
- * `plractive` -- improved 312->311 (39->46 diffs, oddly more diff LINES for
- * fewer total insns, i.e. the remaining mismatch moved around) but did not
- * close it. Next angle: check whether oracle's `s3` reuse crosses the
- * `StartPlrHit` CALL itself (a real callee-saved register surviving the
- * call, which a local pointer variable should already achieve) or whether
- * it's actually a raw stride int reused via `plr+stride` arithmetic rather
- * than a `PlayerStruct*` -- try an `int pstride` int-offset version next,
- * matching the M2MStartKill `omp` lesson (plain int stride, not a typed
- * pointer). */
+ * confirmed from the `jal IsDplayer` count). NOW PASS+SYM, rebuilt from the
+ * retail SYM/SLD: `bool KnockOk` lives in the knockback `if` body's block,
+ * `PlayerStruct *ptrplr/plr2` in the FePlayerNo block, and the proximity test
+ * is `if (!ChkPlrOffsets(newx<<3, newy<<3, plr2->WorldX, plr2->WorldY))
+ * KnockOk = 0;` (the old argument order was wrong). */
 void MissToMonst(int i, int x, int y)
 {
     int oldx;
     int oldy;
     int newx;
     int newy;
-    MissileStruct *Miss = &missile[i];
-    int m = Miss->_misource;
-    MonsterStruct *Monst = &monster[m];
+    MissileStruct *Miss;
+    int m;
+    MonsterStruct *Monst;
     int pnum;
-    unsigned char KnockOk;
 
+    Miss = &missile[i];
+    m = Miss->_misource;
+
+    Monst = &monster[m];
     oldx = Miss->_mix;
     oldy = Miss->_miy;
 
@@ -3457,14 +3451,12 @@ void MissToMonst(int i, int x, int y)
     Monst->_mAnimFrame = Miss->_miAnimFrame;
     M_StartStand(m, Monst->_mdir);
 
-    if (Monst->MType->mtype >= MT_INCIN && Monst->MType->mtype <= MT_HELLBURN) {
+    if (Monst->MType->mtype >= MT_INCIN && Monst->MType->mtype <= MT_HELLBURN)
         M_StartFadein(m, Monst->_mdir, 0);
-    } else {
-        if (!(Monst->_mFlags & MFLAG_TARGETS_MONSTER))
-            M_StartHit(m, -1, 0);
-        else
-            M2MStartHit(m, -1, 0);
-    }
+    else if (!(Monst->_mFlags & MFLAG_TARGETS_MONSTER))
+        M_StartHit(m, -1, 0);
+    else
+        M2MStartHit(m, -1, 0);
 
     if (!(Monst->_mFlags & MFLAG_TARGETS_MONSTER)) {
         pnum = IsDplayer(oldx, oldy) - 1;
@@ -3472,30 +3464,24 @@ void MissToMonst(int i, int x, int y)
             && Monst->MType->mtype != MT_GLOOM
             && !(Monst->MType->mtype >= MT_INCIN && Monst->MType->mtype <= MT_HELLBURN)) {
             M_TryH2HHit(m, IsDplayer(oldx, oldy) - 1, 500, Monst->mMinDamage2, Monst->mMaxDamage2);
-
             if (pnum == IsDplayer(oldx, oldy) - 1
                 && !(Monst->MType->mtype >= MT_NSNAKE && Monst->MType->mtype <= MT_GSNAKE)) {
-                KnockOk = 1;
-                {
-                    PlayerStruct *p1 = &plr[pnum];
-                    if (p1->_pmode != PM_GOTHIT && p1->_pmode != PM_DEATH)
-                        StartPlrHit(pnum, 0, 1);
-
-                    newx = oldx + offset_x[Monst->_mdir];
-                    newy = oldy + offset_y[Monst->_mdir];
-                    if (FePlayerNo) {
-                        int other = pnum ^ 1;
-                        if (p1->plractive && plr[other].plractive) {
-                            if (ChkPlrOffsets(newx << 3, plr[other].WorldX, plr[other].WorldY, newy << 3))
-                                KnockOk = 0;
-                        }
+                bool KnockOk = 1;
+                if (plr[pnum]._pmode != PM_GOTHIT && plr[pnum]._pmode != PM_DEATH)
+                    StartPlrHit(pnum, 0, 1);
+                newx = oldx + offset_x[Monst->_mdir];
+                newy = oldy + offset_y[Monst->_mdir];
+                if (FePlayerNo) {
+                    PlayerStruct *ptrplr = &plr[pnum];
+                    PlayerStruct *plr2 = &plr[pnum ^ 1];
+                    if (ptrplr->plractive && plr2->plractive) {
+                        if (!ChkPlrOffsets(newx << 3, newy << 3, plr2->WorldX, plr2->WorldY))
+                            KnockOk = 0;
                     }
                 }
-                if (KnockOk) {
-                    if (PosOkPlayer(pnum, newx, newy)) {
-                        SetPlayerOld(pnum);
-                        WorldToOffset(pnum, (newx << 3) | 4, (newy << 3) | 4);
-                    }
+                if (KnockOk && PosOkPlayer(pnum, newx, newy)) {
+                    SetPlayerOld(pnum);
+                    WorldToOffset(pnum, (newx << 3) | 4, (newy << 3) | 4);
                 }
             }
         }
