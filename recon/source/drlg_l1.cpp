@@ -333,7 +333,7 @@ int L5HWallOk(int i, int j)
 int L5VWallOk(int i, int j)
 {
     int y;
-    BOOL wallok;
+    unsigned char wallok;
 
     for (y = 1; dungeon[i][j + y] == 13; y++) {
         if (dungeon[i - 1][j + y] != 13 || dungeon[i + 1][j + y] != 13 || mydflags[i + (j + y) * DMAXX])
@@ -1012,18 +1012,34 @@ void DRLG_L5DirtFix(void)
 
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
-            if (dungeon[i][j] == 21 && dungeon[i + 1][j] != 19)
-                dungeon[i][j] = 202;
-            if (dungeon[i][j] == 19 && dungeon[i + 1][j] != 19)
-                dungeon[i][j] = 200;
-            if (dungeon[i][j] == 24 && dungeon[i + 1][j] != 19)
-                dungeon[i][j] = 205;
-            if (dungeon[i][j] == 18 && dungeon[i][j + 1] != 18)
-                dungeon[i][j] = 199;
-            if (dungeon[i][j] == 21 && dungeon[i][j + 1] != 18)
-                dungeon[i][j] = 202;
-            if (dungeon[i][j] == 23 && dungeon[i][j + 1] != 18)
-                dungeon[i][j] = 204;
+            if (dungeon[i][j] == 21) {
+                if (dungeon[i][j + 1] == 13)
+                    dungeon[i][j] = 7;
+            }
+            if (dungeon[i][j] == 21) {
+                if (dungeon[i + 1][j] != 19)
+                    dungeon[i][j] = 202;
+            }
+            if (dungeon[i][j] == 19) {
+                if (dungeon[i + 1][j] != 19)
+                    dungeon[i][j] = 200;
+            }
+            if (dungeon[i][j] == 24) {
+                if (dungeon[i + 1][j] != 19)
+                    dungeon[i][j] = 205;
+            }
+            if (dungeon[i][j] == 18) {
+                if (dungeon[i][j + 1] != 18)
+                    dungeon[i][j] = 199;
+            }
+            if (dungeon[i][j] == 21) {
+                if (dungeon[i][j + 1] != 18)
+                    dungeon[i][j] = 202;
+            }
+            if (dungeon[i][j] == 23) {
+                if (dungeon[i][j + 1] != 18)
+                    dungeon[i][j] = 204;
+            }
         }
     }
 }
@@ -1706,8 +1722,9 @@ void DRLG_L5(int entry)
 {
     int i, j;
     long minarea = 0;
-    BOOL doneflag;
+    unsigned char doneflag;
 
+    doneflag = FALSE;
     switch (currlevel) {
     case 1:
         minarea = 533;
@@ -1721,7 +1738,8 @@ void DRLG_L5(int entry)
         break;
     }
 
-    do {
+    while (doneflag == FALSE) {
+        doneflag = TRUE;
         UPDATEPROGRESS(1);
         DRLG_InitTrans();
 
@@ -1738,8 +1756,6 @@ void DRLG_L5(int entry)
         L5ClearFlags();
         DRLG_L5FloodTVal();
         DRLG_SetWalls();
-
-        doneflag = TRUE;
 
         if (QuestStatus(Q_PWATER)) {
             if (entry == ENTRY_MAIN) {
@@ -1777,7 +1793,7 @@ void DRLG_L5(int entry)
                 doneflag = FALSE;
             ViewY--;
         }
-    } while (doneflag == FALSE);
+    }
 
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {

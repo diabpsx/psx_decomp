@@ -2012,8 +2012,9 @@ void MI_Lightctrl(int i)
 
 void MI_Town(int i)
 {
-    int ExpLight[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15 };
     int p;
+    int ExpLight[17] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15 };
+    PlayerStruct *player;
 
     if (missile[i]._mirange > 1)
         missile[i]._mirange--;
@@ -2021,25 +2022,31 @@ void MI_Town(int i)
         SetMissDir(i, 1);
     if (currlevel != 0 && missile[i]._mimfnum != 1 && missile[i]._mirange != 0) {
         if (missile[i]._miVar2 == 0)
-            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, 1);
-        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar2]);
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 320);
+        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar2] >> 2) + 320);
         missile[i]._miVar2++;
     }
 
+    /* PSX's per-player loop is much simpler than devilution's (no currlevel/plrlevel,
+     * _pLvlChanging or _pmode==PM_STAND checks), but adds qtextflag/PauseMode gates and, in a
+     * 2-player co-op game, a check that the OTHER player isn't already mid-warp (_pmode==13) to
+     * avoid double-triggering. No `p == myplr` gate at all -- confirmed via raw oracle: on a
+     * match it always calls ClrPlrPath/PutMissile/NetSendCmdParam1(cmd=0x1F, not 34) and returns
+     * immediately, skipping the rest of the loop and the mirange/AddUnLight cleanup below. */
     for (p = 0; p < MAX_PLRS; p++) {
-        if (plr[p].plractive && currlevel == plr[p].plrlevel && !plr[p]._pLvlChanging && plr[p]._pmode == PM_STAND && plr[p]._px == missile[i]._mix && plr[p]._py == missile[i]._miy) {
-            ClrPlrPath(p);
-            if (p == myplr) {
-                NetSendCmdParam1(1, 34 /* CMD_WARP */, missile[i]._misource);
-                plr[p]._pmode = PM_NEWLVL;
+        player = &plr[p];
+        if (player->plractive && player->_px == missile[i]._mix && player->_py == missile[i]._miy && !qtextflag && !PauseMode) {
+            if (gbMaxPlayers != 2 || !plr[p ^ 1].plractive || plr[p ^ 1].destAction != 13) {
+                ClrPlrPath(p);
+                PutMissile(i);
+                NetSendCmdParam1(1, 0x1F, missile[i]._misource);
+                return;
             }
         }
     }
 
-    if (missile[i]._mirange == 0) {
+    if (missile[i]._mirange == 0)
         missile[i]._miDelFlag = 1;
-        AddUnLight(missile[i]._mlid);
-    }
     PutMissile(i);
 }
 
@@ -2131,42 +2138,47 @@ void MI_Firemove(int i)
 
 void MI_Manashield(int i)
 {
+    /* PSX-only: a class(3) x direction(8) pixel-offset table with no PC-twin equivalent, looked
+     * up by player class/facing and stashed into _miVar6 (NOT _mix -- confirmed via raw oracle
+     * field offset 0x28). Values read directly from rom/DIABPSX.BIN @ VA 0x8011A13C. */
+    static int xoffset[3][8] = {
+        { -2, -1, 4, 6, 9, 10, 6, 2 },
+        { 3, 2, 2, 4, 5, 6, 6, 4 },
+        { 1, -1, -2, 0, 3, 5, 5, 4 },
+    };
     int j, id;
-    MissileStruct *miss = &missile[i];
     long diff, pct;
+    MissileStruct *miss = &missile[i];
+    PlayerStruct *player;
 
     id = miss->_misource;
+    player = &plr[id];
 
-    miss->_mix = plr[id]._px;
-    miss->_miy = plr[id]._py;
-    miss->_mitxoff = plr[id]._pxoff << 16;
-    miss->_mityoff = plr[id]._pyoff << 16;
-
-    /* PSX has no _pfutx/_pfuty (confirmed elsewhere in this TU) -- both PM_WALK3 branches use _px/_py. */
-    miss->_misx = plr[id]._px;
-    miss->_misy = plr[id]._py;
+    miss->_miVar6 = xoffset[player->_pClass][player->_pdir];
+    miss->_mix = player->_px;
+    miss->_miy = player->_py;
+    miss->_mitxoff = player->_pxoff << 16;
+    miss->_mityoff = player->_pyoff << 16;
+    miss->_misx = player->_px;
+    miss->_misy = player->_py;
 
     GetMissilePos(i);
 
-    if (plr[id]._pmode == PM_WALK3) {
-        if (plr[id]._pdir == DIR_W)
+    if (player->_pmode == PM_WALK3) {
+        if (player->_pdir == DIR_W)
             miss->_mix++;
         else
             miss->_miy++;
     }
 
-    if (id != myplr) {
-        if (currlevel != plr[id].plrlevel)
-            miss->_miDelFlag = 1;
-        PutMissile(i);
-        return;
-    }
-
-    if (plr[id]._pMana <= 0 || !plr[id].plractive)
+    /* PSX drops devilution's `if (id != myplr) { ...; return; }` early-out entirely -- confirmed
+     * absent from the raw oracle (no currlevel/plrlevel/myplr check at all; falls straight into
+     * the pMana/plractive test below for every player). */
+    if (player->_pMana <= 0 || !player->plractive)
         miss->_mirange = 0;
 
-    if (plr[id]._pHitPoints < miss->_miVar1) {
-        diff = miss->_miVar1 - plr[id]._pHitPoints;
+    if (player->_pHitPoints < miss->_miVar1) {
+        diff = miss->_miVar1 - player->_pHitPoints;
         pct = 0;
         for (j = 0; j < miss->_mispllvl && j < 7; j++)
             pct += 3;
@@ -2176,35 +2188,34 @@ void MI_Manashield(int i)
             diff = 0;
         drawmanaflag = 1;
         drawhpflag = 1;
-        if (plr[id]._pMana >= diff) {
-            plr[id]._pHitPoints = miss->_miVar1;
-            plr[id]._pHPBase = miss->_miVar2;
-            plr[id]._pMana -= diff;
-            plr[id]._pManaBase -= diff;
+        if (player->_pMana >= diff) {
+            player->_pHitPoints = miss->_miVar1;
+            player->_pHPBase = miss->_miVar2;
+            player->_pMana -= diff;
+            player->_pManaBase -= diff;
         } else {
-            plr[id]._pHitPoints -= diff - plr[id]._pMana;
-            plr[id]._pHPBase -= diff - plr[id]._pMana;
-            plr[id]._pMana = 0;
-            plr[id]._pManaBase = -(plr[id]._pMaxMana - plr[id]._pMaxManaBase);
+            player->_pHitPoints -= diff - player->_pMana;
+            player->_pHPBase -= diff - player->_pMana;
+            player->_pMana = 0;
+            player->_pManaBase = -(player->_pMaxMana - player->_pMaxManaBase);
             miss->_mirange = 0;
             miss->_miDelFlag = 1;
-            if (plr[id]._pHitPoints < 0)
+            if (player->_pHitPoints < 0)
                 SetPlayerHitPoints(id, 0);
-            if ((plr[id]._pHitPoints >> 6) == 0 && id == myplr)
-                StartPlrKill(id, 0);
+            if ((player->_pHitPoints >> 6) == 0 && id == myplr)
+                StartPlrKill(id, miss->_miVar8);
         }
     }
 
-    miss->_miVar1 = plr[id]._pHitPoints;
-    miss->_miVar2 = plr[id]._pHPBase;
+    miss->_miVar1 = player->_pHitPoints;
+    miss->_miVar2 = player->_pHPBase;
 
     if (miss->_mirange == 0) {
         miss->_miDelFlag = 1;
         NetSendCmd(1, 89 /* CMD_ENDSHIELD */);
-        if (id == 0)
-            ManashieldFlag = 0;
-        else
-            ManashieldFlag2 = 0;
+        /* PSX clears BOTH flags unconditionally here (not gated by id==0) -- confirmed via raw oracle. */
+        ManashieldFlag = 0;
+        ManashieldFlag2 = 0;
     }
     PutMissile(i);
 }
