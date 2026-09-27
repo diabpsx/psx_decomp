@@ -132,7 +132,7 @@ void SetWeirdFX(void)
     restore_g = 0;
     restore_r = 0;
     g_lightfx_sb = 0xAA0;
-    ChangeLightColour(plr[myplr]._plid, 0xE070);
+    ChangeLightColour(plr[0]._plid, 0xE070);
     weird_cheat = 1;
 }
 
@@ -157,7 +157,6 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
     int scr_x, scr_y;
     int v, max_x;
     int mult;
-    int x, y;
     int radius_block;
     int val;
 
@@ -221,76 +220,74 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
         if (nRadius >= 0) {
             /* NOTE: the oracle's "shake"(GU_GetRnd jitter) arm is dead code in this build (the
              * gate that would enable it is a compiled-out `1==0`) -- omitted, matches retail. */
-            x = nXPos;
-            y = nYPos;
             v = gr_scrxoff / 2621440;
-            light_y = y - (g_light_amp >> 4);
+            light_y = nYPos - (g_light_amp >> 4);
             max_x = gr_scryoff / 2621440;
-            light_x = x - (g_light_amp >> 4);
+            light_x = nXPos - (g_light_amp >> 4);
             if (leveltype == 0) {
-                x -= 6;
-                y -= 8;
+                nXPos -= 6;
+                nYPos -= 8;
             }
-            if ((v - 2) < (x + 8) && x < (v + 6) && (max_x - 8) < (y + 8) && y < max_x) {
+            if ((v - 2) < (nXPos + 8) && nXPos < (v + 6) && (max_x - 8) < (nYPos + 8) && nYPos < max_x) {
                 mult = g_light_amp >> 3;
                 if (light_y < 0 || (light_y + mult) > 0x30 || light_x < 0 || (light_x + mult) > 0x30) {
                     if (shift_mask == 0) {
-                        /* Clipped arm, shift_mask==0 (from .L8004C1CC; per-tile x/y bounds check,
+                        /* Clipped arm, shift_mask==0 (from .L8004C1CC; per-tile nXPos/nYPos bounds check,
                          * WITH the weirdy/g_lightband branch). Not yet byte-verified. */
-                        for (y = light_y; y <= light_y + mult; y++) {
-                            if (y >= 0 && y < 0x30) {
-                                for (x = light_x; x <= light_x + mult; x++) {
-                                    radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                        for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
+                            if (nYPos >= 0 && nYPos < 0x30) {
+                                for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
+                                    radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
                                     if (radius_block < 0)
                                         radius_block = 0;
-                                    if (x >= 0 && x < 0x30) {
+                                    if (nXPos >= 0 && nXPos < 0x30) {
                                         if (colour_mask & 1) {
                                             if (weirdy)
                                                 val = g_lightband[(radius_block + (g_lightfx_dr >> 8)) & g_lightband_mask] * g_light_amp2;
                                             else
                                                 val = radius_block * g_light_amp2;
-                                            val = dung_map_r[x][y] + (val & 0xFF);
+                                            val = dung_map_r[nXPos][nYPos] + (val & 0xFF);
                                             if (val > g_light_clamp)
                                                 val = g_light_clamp;
-                                            dung_map_r[x][y] = val;
+                                            dung_map_r[nXPos][nYPos] = val;
                                         }
                                         if (colour_mask & 2) {
                                             if (weirdy)
                                                 val = g_lightband[(radius_block + (g_lightfx_dg >> 8)) & g_lightband_mask] * g_light_amp2;
                                             else
                                                 val = radius_block * g_light_amp2;
-                                            val = dung_map_g[x][y] + (val & 0xFF);
+                                            val = dung_map_g[nXPos][nYPos] + (val & 0xFF);
                                             if (val > g_light_clamp)
                                                 val = g_light_clamp;
-                                            dung_map_g[x][y] = val;
+                                            dung_map_g[nXPos][nYPos] = val;
                                         }
                                         if (colour_mask & 4) {
                                             if (weirdy)
                                                 val = g_lightband[(radius_block + (g_lightfx_db >> 8)) & g_lightband_mask] * g_light_amp2;
                                             else
                                                 val = radius_block * g_light_amp2;
-                                            val = dung_map_b[x][y] + (val & 0xFF);
+                                            val = dung_map_b[nXPos][nYPos] + (val & 0xFF);
                                             if (val > g_light_clamp)
                                                 val = g_light_clamp;
-                                            dung_map_b[x][y] = val;
+                                            dung_map_b[nXPos][nYPos] = val;
                                         }
                                     }
                                 }
                             }
                         }
                     } else {
-                        /* Clipped arm, shift_mask!=0 (from .L8004C414; per-tile x/y bounds check;
+                        /* Clipped arm, shift_mask!=0 (from .L8004C414; per-tile nXPos/nYPos bounds check;
                          * like the unclipped shift!=0 arm, the m2c shows NO weirdy branch here).
                          * Not yet byte-verified. */
-                        for (y = light_y; y <= light_y + mult; y++) {
-                            if (y >= 0 && y < 0x30) {
-                                for (x = light_x; x <= light_x + mult; x++) {
-                                    radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                        for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
+                            if (nYPos >= 0 && nYPos < 0x30) {
+                                for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
+                                    radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
                                     if (radius_block < 0)
                                         radius_block = 0;
-                                    if (x >= 0 && x < 0x30) {
+                                    if (nXPos >= 0 && nXPos < 0x30) {
                                         if (colour_mask & 1) {
-                                            val = dung_map_r[x][y];
+                                            val = dung_map_r[nXPos][nYPos];
                                             if (!(shift_mask & 9)) {
                                                 val += radius_block;
                                             } else {
@@ -301,10 +298,10 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                             }
                                             if (val > g_light_clamp)
                                                 val = g_light_clamp;
-                                            dung_map_r[x][y] = val;
+                                            dung_map_r[nXPos][nYPos] = val;
                                         }
                                         if (colour_mask & 2) {
-                                            val = dung_map_g[x][y];
+                                            val = dung_map_g[nXPos][nYPos];
                                             if (!(shift_mask & 0x12)) {
                                                 val += radius_block;
                                             } else {
@@ -315,10 +312,10 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                             }
                                             if (val > g_light_clamp)
                                                 val = g_light_clamp;
-                                            dung_map_g[x][y] = val;
+                                            dung_map_g[nXPos][nYPos] = val;
                                         }
                                         if (colour_mask & 4) {
-                                            val = dung_map_b[x][y];
+                                            val = dung_map_b[nXPos][nYPos];
                                             if (!(shift_mask & 0x24)) {
                                                 val += radius_block;
                                             } else {
@@ -329,7 +326,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                             }
                                             if (val > g_light_clamp)
                                                 val = g_light_clamp;
-                                            dung_map_b[x][y] = val;
+                                            dung_map_b[nXPos][nYPos] = val;
                                         }
                                     }
                                 }
@@ -338,9 +335,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                     }
                 } else if (shift_mask == 0) {
                     /* Unclipped arm, shift_mask==0 (implemented; not yet byte-verified). */
-                    for (y = light_y; y <= light_y + mult; y++) {
-                        for (x = light_x; x <= light_x + mult; x++) {
-                            radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                    for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
+                        for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
+                            radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
                             if (radius_block < 0)
                                 radius_block = 0;
                             if (colour_mask & 1) {
@@ -348,30 +345,30 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                     val = g_lightband[(radius_block + (g_lightfx_dr >> 8)) & g_lightband_mask] * g_light_amp2;
                                 else
                                     val = radius_block * g_light_amp2;
-                                val = dung_map_r[x][y] + (val & 0xFF);
+                                val = dung_map_r[nXPos][nYPos] + (val & 0xFF);
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
-                                dung_map_r[x][y] = val;
+                                dung_map_r[nXPos][nYPos] = val;
                             }
                             if (colour_mask & 2) {
                                 if (weirdy)
                                     val = g_lightband[(radius_block + (g_lightfx_dg >> 8)) & g_lightband_mask] * g_light_amp2;
                                 else
                                     val = radius_block * g_light_amp2;
-                                val = dung_map_g[x][y] + (val & 0xFF);
+                                val = dung_map_g[nXPos][nYPos] + (val & 0xFF);
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
-                                dung_map_g[x][y] = val;
+                                dung_map_g[nXPos][nYPos] = val;
                             }
                             if (colour_mask & 4) {
                                 if (weirdy)
                                     val = g_lightband[(radius_block + (g_lightfx_db >> 8)) & g_lightband_mask] * g_light_amp2;
                                 else
                                     val = radius_block * g_light_amp2;
-                                val = dung_map_b[x][y] + (val & 0xFF);
+                                val = dung_map_b[nXPos][nYPos] + (val & 0xFF);
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
-                                dung_map_b[x][y] = val;
+                                dung_map_b[nXPos][nYPos] = val;
                             }
                         }
                     }
@@ -379,13 +376,13 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                     /* Unclipped arm, shift_mask!=0 (from the m2c draft; it shows NO weirdy/
                      * g_lightband branch here -- plain radius_block blend with a per-channel
                      * shift_mask sub-select of >>1 / *2 additions). Not yet byte-verified. */
-                    for (y = light_y; y <= light_y + mult; y++) {
-                        for (x = light_x; x <= light_x + mult; x++) {
-                            radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                    for (nYPos = light_y; nYPos <= light_y + mult; nYPos++) {
+                        for (nXPos = light_x; nXPos <= light_x + mult; nXPos++) {
+                            radius_block = g_light_amp - veclen2(block_x - nXPos * 0x10, block_y - nYPos * 0x10);
                             if (radius_block < 0)
                                 radius_block = 0;
                             if (colour_mask & 1) {
-                                val = dung_map_r[x][y];
+                                val = dung_map_r[nXPos][nYPos];
                                 if (!(shift_mask & 9)) {
                                     val += radius_block;
                                 } else {
@@ -396,10 +393,10 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                 }
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
-                                dung_map_r[x][y] = val;
+                                dung_map_r[nXPos][nYPos] = val;
                             }
                             if (colour_mask & 2) {
-                                val = dung_map_g[x][y];
+                                val = dung_map_g[nXPos][nYPos];
                                 if (!(shift_mask & 0x12)) {
                                     val += radius_block;
                                 } else {
@@ -410,10 +407,10 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                 }
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
-                                dung_map_g[x][y] = val;
+                                dung_map_g[nXPos][nYPos] = val;
                             }
                             if (colour_mask & 4) {
-                                val = dung_map_b[x][y];
+                                val = dung_map_b[nXPos][nYPos];
                                 if (!(shift_mask & 0x24)) {
                                     val += radius_block;
                                 } else {
@@ -424,7 +421,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                 }
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
-                                dung_map_b[x][y] = val;
+                                dung_map_b[nXPos][nYPos] = val;
                             }
                         }
                     }
@@ -542,10 +539,14 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
  * dFlags bit layout (the oracle ORs in `(visible+1)|4` unconditionally rather than PC's separate
  * BFLAG_LIT/BFLAG_VISIBLE bits -- transcribed literally, not mapped to PC bit names). Data tables
  * copied verbatim from refs/devilution/Source/lighting.cpp (byte-for-byte game data, not prose).
- * Structural draft built from the devilution twin + the raw oracle; NOT YET byte-verified. */
+ * Structural draft built from the devilution twin + the raw oracle; NOT YET byte-verified.
+ * OWNERSHIP: vCrawlTable/RadiusAdj are addressed ABSOLUTE (`hi()/lo()`, not %gp_rel) in this TU's
+ * own oracle AND in missiles.cpp's oracle (which already `extern`s vCrawlTable, non-static) --
+ * defined here (non-static, real initializer) as the true owner; missiles.cpp's existing extern
+ * decl is unchanged and now resolves against this definition. */
 extern unsigned char GetBLOCK(int x, int y);
 
-static unsigned char vCrawlTable[23][30] = {
+unsigned char vCrawlTable[23][30] = {
     { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15, 0 },
     { 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 1, 9, 1, 10, 1, 11, 1, 12, 1, 13, 1, 14, 1, 15, 1 },
     { 1, 0, 2, 0, 3, 0, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1, 10, 1, 11, 1, 12, 2, 13, 2, 14, 2, 15, 2 },
@@ -571,11 +572,11 @@ static unsigned char vCrawlTable[23][30] = {
     { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 15 },
 };
 
-static unsigned char RadiusAdj[23] = { 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 4, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0 };
+unsigned char RadiusAdj[23] = { 0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 4, 3, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0 };
 
 void DoVision(int nXPos, int nYPos, int nRadius, unsigned char doautomap, unsigned char visible)
 {
-    int nCrawlX, nCrawlY;
+    int nCrawlX = 0, nCrawlY = 0;
     int nLineLen;
     int nBlockerFlag;
     int j, k, v;
