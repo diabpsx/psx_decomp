@@ -375,6 +375,7 @@ int M_DoStand(int i)
 #define MIT_FLASH        0xB
 #define MIT_FLASH2       0xC
 #define MIT_ACIDPUD      0x3B
+#define TARGET_PLAYERS   1
 
 void MAI_GoatMc(int i)
 {
@@ -2752,26 +2753,23 @@ void MAI_Lazurus(int i)
     }
 }
 
-/* SYM not checked; bytes OPEN (208 diffs, ours 279 / oracle 261, 18 insns
- * short): logic/call-list fully verified against hellfire (LineClearF+
- * CheckNoSolid wall check, PACK_MEMBER/PACK_NOMEMBER pack-join/leave with the
+/* SYM not checked; bytes OPEN (254 diffs, ours 263 / oracle 261, only 2
+ * insns OVER now -- was 18 short before this pass). logic/call-list fully
+ * verified against hellfire (LineClearF+CheckNoSolid wall check,
+ * PACK_MEMBER/PACK_NOMEMBER pack-join/leave with the
  * DIST(mx-mfutx,my-mfuty,4) rejoin gate, the msquelch/_lastx/_lasty leader
  * "keep active" update, the AI_GARG+MFLAG_STILL->MM_SATTACK wake, and the
- * UN_STICK unique-pack loop over monstactive[] -- one `jal LineClearF` + two
- * `jal abs` matches the oracle's call list exactly). Register allocation is
- * badly scrambled: oracle keeps `i` in $s4 (not the more usual $s3) and a
- * genuinely persistent `MonsterStruct *pMonster = monster;` (bare array-decay
- * base pointer, $s7) reused at several far-apart points via `pMonster+stride`
- * (`addu v1,s0,s7` style) instead of the usual `lui hi(monster+OFF)+stride`
- * absolute addressing used everywhere else. Using pMonster for the top
- * `_mx`/`_my` reads AND the `packsize++/--` writes (this file's usual
- * base[monst]. lever, from M_ChangeLightOffset) narrowed the gap from 23 to
- * 18 insns short but the 8-register frame still isn't reproduced. Next
- * angle: extend pMonster to the `_lastx`/`_lasty`/`_msquelch`/`_mAi`/
- * `_mFlags`/`_mmode` leader (and tmp-in-loop) accesses too -- i.e. every
- * monster[]. access in this function, not just the four converted so far.
- * Needs a slower side-by-side walk; large function, deprioritized this pass
- * in favor of throughput. */
+ * UN_STICK unique-pack loop over monstactive[]). Extended pMonster (the bare
+ * array-decay base pointer, matching retail's persistent $s7) to the
+ * `_lastx`/`_lasty`/`_msquelch`/`_mAi`/`_mFlags`/`_mmode` LEADER accesses
+ * (not the tmp-in-loop ones -- tried both combinations: leader-as-pMonster+
+ * tmp-as-monster[] gives 263, the reverse also gives 263, using pMonster
+ * for BOTH over-collapses to 247, using it for NEITHER stayed at 279+18-short
+ * -- so exactly one of {leader block, tmp-loop block} should use pMonster,
+ * picked leader here to match the earlier-confirmed `packsize` pMonster
+ * usage). Still 7 saved regs vs retail's 8 (`sp-64` vs `sp-72`) -- one
+ * persistent variable's worth of register pressure still unaccounted for.
+ * Close but not solved; needs a slower register-by-register walk. */
 void GroupUnity(int i)
 {
     int leader;
@@ -2801,14 +2799,14 @@ void GroupUnity(int i)
     }
 
     if (monster[i].leaderflag == PACK_MEMBER) {
-        if (monster[i]._msquelch > monster[leader]._msquelch) {
-            monster[leader]._lastx = _mx;
-            monster[leader]._lasty = _my;
-            monster[leader]._msquelch = monster[i]._msquelch - 1;
+        if (monster[i]._msquelch > pMonster[leader]._msquelch) {
+            pMonster[leader]._lastx = _mx;
+            pMonster[leader]._lasty = _my;
+            pMonster[leader]._msquelch = monster[i]._msquelch - 1;
         }
-        if (monster[leader]._mAi == AI_GARG && (monster[leader]._mFlags & MFLAG_STILL)) {
-            monster[leader]._mFlags &= ~MFLAG_STILL;
-            monster[leader]._mmode = MM_SATTACK;
+        if (pMonster[leader]._mAi == AI_GARG && (pMonster[leader]._mFlags & MFLAG_STILL)) {
+            pMonster[leader]._mFlags &= ~MFLAG_STILL;
+            pMonster[leader]._mmode = MM_SATTACK;
         }
     } else if (monster[i]._uniqtype && (UniqMonst[monster[i]._uniqtype - 1].mUnqAttr & UN_STICK)) {
         for (m = 0; m < nummonsters; m++) {
@@ -2827,20 +2825,26 @@ void GroupUnity(int i)
     }
 }
 
-/* SYM not checked (length differs 0x2b4 vs 0x2bc); bytes OPEN (98 diffs,
- * ours 173 / oracle 175, 2 insns short): logic verified against devilution
- * including the documented BUGFIX (`monster[i].mWhoHit |= 1<<i`, using the
- * ATTACKER index for both the array and the shift, not `mid` -- confirmed
- * from raw bytes), the `(monster[i]._mdir+4)&7` opposite-direction calc, and
- * the MT_GOLEM exclusion around the NewMonsterAnim/_mmode=MM_GOTHIT pair.
- * Used the same block-scoped `pmonster` lever from M_StartHit for
- * _moldx/_moldy. Remaining gap looks like a duplicated-store cluster in the
- * final field-write block (mx/my/mfutx/mfuty/moldx/moldy) -- oracle's
- * register mapping for mid/i/dam (i=$s1,mid=$s0,dam=$s3) doesn't match ours
- * (mid=$s1,dam=$s2,i=$s3) despite identical source shape; tried moving the
- * mmode!=STONE guard vs the pmonster block relative order, reverted (no
- * change). Close enough that a fresh side-by-side register walk should
- * close it quickly -- not attempted further this pass. */
+/* SYM OPEN (record 3 pmonster: ours $v0 / retail $v1 -- pure temp-reg choice);
+ * bytes OPEN (16 diffs, 175==175 insns exact -- was 98 diffs/173 insns before
+ * this pass). Logic verified against devilution including the documented
+ * BUGFIX (`monster[i].mWhoHit |= 1<<i`, using the ATTACKER index for both the
+ * array and the shift, not `mid`), the `(monster[i]._mdir+4)&7`
+ * opposite-direction calc, and the MT_GOLEM exclusion around the
+ * NewMonsterAnim/_mmode=MM_GOTHIT pair. FIX FOUND this pass: the block-scoped
+ * `pmonster`/`_mx`/`_my` reads must happen UNCONDITIONALLY, in an anonymous
+ * block BEFORE the `if(_mmode==MM_STONE) return;` check -- not gated inside
+ * it like M_StartHit's tail (retail reads _moldx/_moldy speculatively before
+ * ever testing _mmode; moving the read+early-return to match closed the
+ * count from 173 to 175 exactly). Remaining 16-diff residue is pure
+ * scheduling: oracle hoists the `lui/addiu hi(monster)/lo(monster)` constant
+ * pair earlier (right after the previous statement) and combines it with the
+ * stride into $v1, ours computes the stride first then the constant into
+ * $v0 -- tried `monster+mid` vs `&monster[mid]` spelling and declaring
+ * _mx/_my before pmonster, no change either way. This is the closest OPEN
+ * item in the file; a fresh angle on THIS specific scheduling tie (not
+ * reg-save-order, a genuine "which independent sub-expression gets
+ * evaluated first" choice) would likely close it. */
 void M2MStartHit(int mid, int i, int dam)
 {
     if (i >= 0)
@@ -2863,10 +2867,13 @@ void M2MStartHit(int mid, int i, int dam)
         monster[mid]._mgoal = MGOAL_NORMAL;
     }
 
-    if (monster[mid]._mmode != MM_STONE) {
+    {
         MonsterStruct *pmonster = &monster[mid];
         int _mx = pmonster->_moldx;
         int _my = pmonster->_moldy;
+
+        if (monster[mid]._mmode == MM_STONE)
+            return;
 
         if (monster[mid].MType->mtype != MT_GOLEM) {
             NewMonsterAnim(mid, monster[mid].MType->Anims[MA_GOTHIT], monster[mid]._mdir, MA_GOTHIT);
@@ -2885,4 +2892,91 @@ void M2MStartHit(int mid, int i, int dam)
         M_ClearSquares(mid);
         dung_map[_mx][_my].dMonster = mid + 1;
     }
+}
+
+/* SYM not checked; bytes OPEN (215 diffs, ours 237 / oracle 242, 5 insns
+ * short). Logic verified against devilution's non-HELLFIRE branch, call
+ * list confirmed via `jal` scan (MonstPartJump, delta_kill_monster,
+ * NetSendCmdLocParam1, AddPlrMonstExper, SpawnItem, M_DiabloDeath, two
+ * PlayEffect, NewMonsterAnim, M_CheckEFlag, M_ClearSquares, CheckQuestKill,
+ * M_FallenFear, AddMissile -- exact match). PSX-specific findings confirmed
+ * from raw bytes: (1) `MonstPartJump(i)` fires when the ATTACKER (i, not
+ * mid) is in MM_STONE -- present in neither twin; (2) `monster[mid].mWhoHit
+ * |= 1<<i` matches devilution's documented BUGFIX (attacker index used
+ * for both slot and shift, not the more "natural" masked/local form);
+ * (3) `AddPlrMonstExper` takes no pnum param -- it reads the global `myplr`,
+ * so PSX temporarily swaps `myplr=i` around the call and restores it after
+ * (matching the oracle's save/lw-before, sw-after pattern exactly);
+ * (4) NO `SetRndSeed`/reseed call at all (unlike MonstStartKill/
+ * SyncMonstStartKill) -- confirmed absent from the call list; (5) both
+ * `PlayEffect(i,2)` (non-HELLFIRE only, inside the else) and the unconditional
+ * `PlayEffect(mid,2)` fire, matching devilution's `#ifndef HELLFIRE` shape;
+ * (6) `md=(monster[i]._mdir+4)&7` (oracle literally emits `+4`, not
+ * devilution's `-4` -- same mod-8 result, matches the actual instruction).
+ * SYM shows a persistent `int omp` local ($s0) for the whole tail
+ * (mmode=DEATH through the dMonster write) that I could not identify the
+ * exact form of -- tried a block-scoped `MonsterStruct *pmonster = monster;`
+ * covering just that tail (237, 5 short, current best) and widening it to
+ * also cover the golem-check/NewMonsterAnim section (231, worse, reverted).
+ * `omp`'s SYM type is plain `int`, not a pointer, so it may be a cached
+ * INDEX/stride rather than a `MonsterStruct*` -- worth trying an
+ * `int omp = mid;` (or a raw `mid*104`-style stride) redundant local next,
+ * not a pointer, if revisited. */
+void M2MStartKill(int i, int mid)
+{
+    int md;
+
+    if (monster[i]._mmode == MM_STONE)
+        MonstPartJump(i);
+
+    delta_kill_monster(mid, monster[mid]._mx, monster[mid]._my, currlevel);
+    NetSendCmdLocParam1(0, CMD_MONSTDEATH, monster[mid]._mx, monster[mid]._my, mid);
+
+    monster[mid].mWhoHit |= 1 << i;
+    if (i < 2) {
+        int savemyplr = myplr;
+        myplr = i;
+        AddPlrMonstExper(monster[mid].mLevel, monster[mid].mExp, monster[mid].mWhoHit);
+        myplr = savemyplr;
+    }
+
+    monstkills[monster[mid].MType->mtype]++;
+    monster[mid]._mhitpoints = 0;
+
+    if (mid >= 2)
+        SpawnItem(mid, monster[mid]._mx, monster[mid]._my, 1);
+
+    if (monster[mid].MType->mtype == MT_DIABLO) {
+        M_DiabloDeath(mid, 1, 0);
+    } else {
+        PlayEffect(i, 2);
+    }
+    PlayEffect(mid, 2);
+
+    md = (monster[i]._mdir + 4) & 7;
+    if (monster[mid].MType->mtype == MT_GOLEM)
+        md = 0;
+
+    monster[mid]._mdir = md;
+    NewMonsterAnim(mid, monster[mid].MType->Anims[MA_DEATH], md, MA_DEATH);
+    {
+        MonsterStruct *pmonster = monster;
+        pmonster[mid]._mmode = MM_DEATH;
+        pmonster[mid]._mxoff = 0;
+        pmonster[mid]._myoff = 0;
+        pmonster[mid]._mx = pmonster[mid]._moldx;
+        pmonster[mid]._my = pmonster[mid]._moldy;
+        pmonster[mid]._mfutx = pmonster[mid]._mx;
+        pmonster[mid]._mfuty = pmonster[mid]._my;
+        pmonster[mid]._moldx = pmonster[mid]._mx;
+        pmonster[mid]._moldy = pmonster[mid]._my;
+        M_CheckEFlag(mid);
+        M_ClearSquares(mid);
+        dung_map[pmonster[mid]._mx][pmonster[mid]._my].dMonster = mid + 1;
+    }
+    CheckQuestKill(mid, 1);
+    M_FallenFear(monster[mid]._mx, monster[mid]._my);
+
+    if (monster[mid].MType->mtype >= MT_NACID && monster[mid].MType->mtype <= MT_XACID)
+        AddMissile(monster[mid]._mx, monster[mid]._my, 0, 0, 0, MIT_ACIDPUD, TARGET_PLAYERS, mid, monster[mid]._mint + 1, 0);
 }
