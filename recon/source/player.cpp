@@ -1535,19 +1535,16 @@ unsigned char ChkPlrOffsets(int wx1, int wy1, int wx2, int wy2)
 {
     int x, y;
 
-    if (plr[0]._pmode != PM_DEATH && plr[1]._pmode != PM_DEATH) {
-        {
-            int t = wx1 - wy1;
-            wy1 = ((wx1 + wy1) >> 1) << 2;
-            x = t - (wx2 - wy2);
-        }
-        y = ((wx2 + wy2) >> 1) << 2;
-        x = abs(x << 2);
-        y = abs(wy1 - y);
-        if (x >= 317 || y >= 221)
-            return FALSE;
+    if (plr[0]._pmode == PM_DEATH || plr[1]._pmode == PM_DEATH)
         return TRUE;
-    }
+    const int t = wx1 - wy1;
+    wy1 = ((wx1 + wy1) >> 1) << 2;
+    x = t - (wx2 - wy2);
+    y = ((wx2 + wy2) >> 1) << 2;
+    x = abs(x << 2);
+    y = abs(wy1 - y);
+    if (x >= 317 || y >= 221)
+        return FALSE;
     return TRUE;
 }
 
