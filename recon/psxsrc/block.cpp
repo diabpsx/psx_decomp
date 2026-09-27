@@ -15,8 +15,39 @@ struct RECT {   /* sizeof 8 */
     short x, y, w, h;
 };
 
-struct FRAME_HDR;
-struct SPR_HDR;
+struct FRAME_HDR {   /* sizeof 12 */
+    unsigned int FrOffset : 32;
+    int X : 8;
+    int Y : 8;
+    unsigned int PalNum : 8;
+    unsigned int NotTrans : 1;
+    unsigned int Rotated : 1;
+    unsigned int InVRAM : 1;
+    unsigned int CompType : 2;
+    unsigned int Floor : 1;
+    unsigned int Cycle : 1;
+    unsigned int pad : 1;
+    unsigned int W : 9;
+    unsigned int H : 9;
+    unsigned int PentaGram : 1;
+    unsigned int pad2 : 13;
+};
+struct SPR_HDR {   /* sizeof 40 */
+    unsigned int DecompOffset : 32;
+    unsigned int CreatureOffset : 32;
+    unsigned int PalOffset : 32;
+    unsigned int FrameOffset : 32;
+    unsigned int BaseFrame : 32;
+    unsigned int DestTPage : 32;
+    unsigned int ComponentOffset : 32;
+    unsigned int NumOfCreatures : 32;
+    unsigned int NumOfFrames : 16;
+    unsigned int NumOfPals : 16;
+    unsigned int TWidth : 8;
+    unsigned int THeight : 8;
+    unsigned int IsTiles : 8;
+    unsigned int Spare : 8;
+};
 struct CTextFileInfo;
 struct LittleGt4;
 
@@ -57,6 +88,8 @@ struct TextDat {   /* sizeof 112 -- matches recon/psxsrc/gman.cpp's TextDat exac
     int GetNumOfFrames(int Creature, int Action);
     void *GetPal(int PalNum);
     void SetFileInfo(const struct CTextFileInfo *NewInfo, int Id);
+    void Use(long NewHndDat, BOOL DatLoaded, int size);
+    int GetNumOfFrames();
 };
 
 struct CCreatureAction {   /* sizeof 14 */
@@ -137,6 +170,15 @@ struct MonstLevel {   /* sizeof 8 */
     struct MonstList *TheLists;
 };
 
+class CBlock {
+public:
+    void GetBoundingBox(struct TextDat *TDat, struct RECT *R);
+};
+
+extern "C" long GAL_Alloc(unsigned long Size, unsigned long Type, char *Name);
+extern "C" void *GAL_Lock(long Handle);
+extern "C" unsigned char GAL_Unlock(long Handle);
+
 /* CBlocks -- only the methods reconstructed this round are declared; a later pass adds the rest
    (PrintMap/PrintMonsters/etc.) and the full ctor/dtor body. */
 class CBlocks {
@@ -189,6 +231,11 @@ public:
     void DumpObjs();
     void DumpMonsters();
     void PrintMap(int x, int y);   /* not yet reconstructed -- declared only, defined elsewhere later */
+    void Load(int Id);
+    void MakeGt4Table();
+    void MakeRectTable();
+    void InitColourCycling();
+    CBlocks(int BgId, int ObjId, int ItemId, int Level, int List);
 };
 
 void MyRoutine(CBlocks &B, int x, int y);
@@ -200,6 +247,10 @@ void GM_FinishedUsing(TextDat *Fin);
 unsigned char GAL_Free(long Handle);
 void DBG_Error(char *Text, char *File, int Line);
 unsigned long GU_GetRndRange(unsigned int Range);
+extern unsigned short water_clut;
+extern unsigned short penta_clut;
+extern unsigned char leveltype;
+void UPDATEPROGRESS(int inc);
 
 extern int NumOfMonsterListLevels;      /* @0x8011AA94 */
 extern struct MonstLevel AllLevels[16]; /* @0x800B7558 */
@@ -585,4 +636,156 @@ POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
     PRIM_GetPrim(&RetPrim);
     PRIM_CopyPrim(RetPrim, Prim);
     return RetPrim;
+}
+
+extern struct CTextFileInfo *TX_DatTab[];
+struct FileIO;
+FileIO *SYSI_GetFs(void);
+
+/* @0x8008DB64 BLOCK.CPP:624 */
+void CBlocks::Load(int Id)
+{
+    if (!TextDat.Loaded) {
+        FileIO *Fs = SYSI_GetFs();
+        SetFileInfo(TX_DatTab[Id], -1);
+        Use(-1, 1, 0);
+        if (TextDat.hndBlockOffsets == -1)
+            DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x277);
+        NumOfBlocks = *(int *)TextDat.Blocks;
+        MakeGt4Table();
+        MakeRectTable();
+    }
+}
+
+/* @0x8008D6FC BLOCK.CPP:392 */
+CBlocks::CBlocks(int BgId, int ObjId, int ItemId, int Level, int List)
+{
+    ClipRect.x = 1;
+    ClipRect.w = 0x13E;
+    CursX = -1;
+    CursY = -1;
+    RndX = 0;
+    RndY = 0;
+    IsTown = 0;
+    ClipRect.y = 0;
+    ClipRect.h = 0xF0;
+    SetScrollTarget(0, 0);
+    SetXY(0, 0);
+    MonstTexId = -1;
+    MonstTexDat = NULL;
+    MonsterList = NULL;
+    ObjTexId = -1;
+    ObjTexDat = NULL;
+    ItemTexId = -1;
+    ItemTexDat = NULL;
+    BgTexId = -1;
+    Load(BgId);
+    BgTexDat = NULL;
+    InitColourCycling();
+    BgTexId = BgId;
+    BgTexDat = (struct TextDat *)this;
+    if (ItemId != -1)
+        SetItemGraphics(ItemId);
+    UPDATEPROGRESS(1);
+    if (ObjId != -1)
+        SetObjGraphics(ObjId);
+    UPDATEPROGRESS(1);
+    if (Level != -1 && List != -1 && Level != 0)
+        SetMonsterGraphics(Level, List);
+    UPDATEPROGRESS(1);
+    CurrentBlocks = this;
+}
+
+/* @0x8008DC1C BLOCK.CPP:648 */
+void CBlocks::MakeRectTable()
+{
+    hndRects = GAL_Alloc(NumOfBlocks * 8, 0x8001, "RECTTAB");
+    if (hndRects == -1)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x296);
+
+    Rects = (RECT *)GAL_Lock(hndRects);
+    if (!Rects)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x299);
+
+    unsigned char *blocks = (unsigned char *)GAL_Lock(TextDat.hndBlockOffsets);
+    if (!blocks)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x29F);
+
+    unsigned char *BlockData = TextDat.Blocks;
+    if (!BlockData)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2A2);
+
+    for (int i = 0; i < NumOfBlocks; i++) {
+        int offset = *(int *)blocks;
+        blocks += 4;
+        ((CBlock *)(BlockData + offset))->GetBoundingBox(&TextDat, &Rects[i]);
+    }
+
+    GAL_Unlock(TextDat.hndBlockOffsets);
+    if (!TextDat.hndBlockOffsets)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2AD);
+}
+
+/* @0x80091E08 GMAN.H (header copy):233 */
+int TextDat::GetNumOfFrames()
+{
+    return Hdr->NumOfFrames;
+}
+
+/* @0x8008E29C BLOCK.CPP:879 */
+void CBlocks::InitColourCycling()
+{
+    int match = -1;
+    for (int f = 0; f < GetNumOfFrames() && match == -1; f++) {
+        FRAME_HDR *fr = &TextDat.Frames[f];
+        if (fr->Cycle) {
+            unsigned short *pal = (unsigned short *)GetPal(fr->PalNum);
+            match = pal[1];
+        }
+    }
+    if (match != -1)
+        water_clut = match;
+
+    match = -1;
+    for (int f = 0; f < GetNumOfFrames() && match == -1; f++) {
+        FRAME_HDR *fr = &TextDat.Frames[f];
+        if (fr->PentaGram) {
+            unsigned short *pal = (unsigned short *)GetPal(fr->PalNum);
+            match = pal[1];
+        }
+    }
+    if (match != -1)
+        penta_clut = match;
+}
+
+/* @0x8008DD70 BLOCK.CPP:698 */
+void CBlocks::MakeGt4Table()
+{
+    hndGt4s = GAL_Alloc(TextDat.Hdr->NumOfFrames * 16, 0x8001, "GT4TAB");
+    if (hndGt4s == -1)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2BC);
+
+    Gt4s = (LittleGt4 *)GAL_Lock(hndGt4s);
+    if (!Gt4s)
+        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2BE);
+
+    for (unsigned int f = 0; f < TextDat.Hdr->NumOfFrames; f++) {
+        POLY_GT4 GT4;
+        FRAME_HDR *fr = &TextDat.Frames[f];
+        MakeGt4(&GT4, fr);
+
+        unsigned int wh = *(unsigned int *)((char *)fr + 8);
+        Gt4s[f].InitFromGt4(&GT4, wh & 0x1FF, (wh >> 9) & 0x1FF);
+        Gt4s[f].Flags = 0;
+
+        unsigned int flags = *(unsigned int *)((char *)fr + 4);
+        if (flags & 0x20000000)
+            Gt4s[f].Flags |= 1;
+        if (flags & 0x21000000)
+            Gt4s[f].Flags |= 2;
+        if (flags & 0x40000000) {
+            if (!leveltype)
+                Gt4s[f].Flags |= 0x10;
+        }
+    }
 }
