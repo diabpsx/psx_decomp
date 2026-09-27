@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2447 / 2727 functions PASS (89.7%) — 837 PsyQ SDK functions excluded**
+**Game code: 2448 / 2727 functions PASS (89.8%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -2682,7 +2682,7 @@
 - ✅ GetVersionString__FPc (53)
 - ✅ GetWord__FPc (107)
 
-## stores  (recon/source/stores.cpp) — 61/103 PASS
+## stores  (recon/source/stores.cpp) — 62/103 PASS
 - ✅ FreeStoreMem__Fv (2)
 - ⬜ DrawSTextBack__Fv
 - ❌ DrawStoreArrows__Fv — 56 diffs (ours 96)
@@ -2764,7 +2764,7 @@
 - ✅ S_BoyEnter__Fv (102)
 - ✅ BoyBuyItem__Fv (40)
 - ❌ HealerBuyItem__Fv — 28 diffs (ours 203)
-- ❌ S_BBuyEnter__Fv — 12 diffs (ours 133)
+- ✅ S_BBuyEnter__Fv (133)
 - ❌ StoryIdItem__Fv — 62 diffs (ours 212)
 - ✅ S_ConfirmEnter__Fv (71)
 - ✅ S_HealerEnter__Fv (38)

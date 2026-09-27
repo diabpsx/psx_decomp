@@ -1343,34 +1343,22 @@ void S_BBuyEnter(void)
 {
     int i;
     unsigned char done;
-    int w, h;
-    long half;
 
     if (stextsel == 5) {
-        stextlhold = stextsel;
         stextshold = 0xD;
+        stextlhold = stextsel;
         stextvhold = stextsval;
         if (plr[myplr]._pGold < _boyitem[StorePlrNo]._iIvalue + (_boyitem[StorePlrNo]._iIvalue >> 1)) {
             StartStore(9);
             return;
         }
         plr[myplr].HoldItem = _boyitem[StorePlrNo];
-        half = plr[myplr].HoldItem._iIvalue >> 1;
-        plr[myplr].HoldItem._iIvalue += half;
+        plr[myplr].HoldItem._iIvalue += plr[myplr].HoldItem._iIvalue >> 1;
         SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
         i = 0;
         do {
-            int p = myplr;
-
-            w = cursW;
-            if (w < 0) {
-                w += 0xF;
-            }
-            h = cursH;
-            if (h < 0) {
-                h += 0xF;
-            }
-            done = func_80159F24(p, i++, w >> 4, h >> 4, 0) & 0xFF;
+            done = func_80159F24(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
+            i++;
         } while (i < 0x28 && done == 0);
         StartStore(done != 0 ? 0xB : 0xA);
         SetCursor(1);
