@@ -154,8 +154,12 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
     otpos = CBlocks::GetOverlayOtBase() + 1;
     nCel--;
     if (w == 1 && !sbookflag) {
-        xp = xp * 18 + SPLICONRIGHT + 32;
-        yp = yp * 18 + SPLICONY + 32;
+        xp *= 18;
+        yp *= 18;
+        xp += SPLICONRIGHT;
+        yp += SPLICONY;
+        xp += 32;
+        yp += 32;
     }
     if (sel) {
         r = REDR >> 1;
@@ -189,10 +193,10 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             pinc3 = 4;
         if (paloffset4 < -64)
             pinc4 = 4;
-        SW = Fr->W;
         SH = Fr->H;
         X = xp + Fr->X;
         Y = yp + Fr->Y;
+        SW = Fr->W;
         GT4 = PRIM_GetNextPolyGt4();
         setPolyGT4(GT4);
         if (!(((unsigned long *)Fr)[1] & 0x2000000)) {
@@ -264,7 +268,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             GT4->r3 = TrimCol(r + paloffset4);
             GT4->g3 = TrimCol(g + paloffset4);
             GT4->b3 = TrimCol(b + paloffset4);
-            DrawSpinner(X + Fr->W / 2 - 3, Y + Fr->H / 2 + 3, 160, 64, 240, 32, 96, 0, 0, 0xFFFF, st, 0, 8);
+            DrawSpinner(X + SW / 2 - 3, Y + SH / 2 + 3, 160, 64, 240, 32, 96, 0, 0, 0xFFFF, st, 0, 8);
             break;
         case 2:
             GT4->r0 = r;
@@ -279,7 +283,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             GT4->r3 = r;
             GT4->g3 = g;
             GT4->b3 = b;
-            DrawSpinner(X + Fr->W / 2 - 3, Y + Fr->H / 2 + 3, 160, 64, 240, 32, 96, 0, 0, 0xFFFF, st, 0, 8);
+            DrawSpinner(X + SW / 2 - 3, Y + SH / 2 + 3, 160, 64, 240, 32, 96, 0, 0, 0xFFFF, st, 0, 8);
             break;
         default:
             GT4->r0 = BACKR >> 1;
@@ -326,14 +330,14 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         Ft4->b0 = 128;
         setShadeTex(Ft4, 0);
         setSemiTrans(Ft4, 1);
-        Ft4->x0 = xp + (Fr->X + 1);
-        Ft4->y0 = yp + (Fr->Y + 1);
-        Ft4->x1 = Fr->X + xp - 1 + SpellW;
-        Ft4->y1 = yp + (Fr->Y + 1);
-        Ft4->x2 = xp + (Fr->X + 1);
-        Ft4->y2 = Fr->Y + yp - 1 + SpellH;
-        Ft4->x3 = Fr->X + xp - 1 + SpellW;
-        Ft4->y3 = Fr->Y + yp - 1 + SpellH;
+        Ft4->x0 = Fr->X - (-1 - xp);
+        Ft4->y0 = Fr->Y - (-1 - yp);
+        Ft4->x1 = Fr->X + xp - (1 - SpellW);
+        Ft4->y1 = Fr->Y - (-1 - yp);
+        Ft4->x2 = Fr->X - (-1 - xp);
+        Ft4->y2 = Fr->Y + yp - (1 - SpellH);
+        Ft4->x3 = Fr->X + xp - (1 - SpellW);
+        Ft4->y3 = Fr->Y + yp - (1 - SpellH);
         Fr = ThisDat->GetFr(165);
         SpellW = Fr->W;
         SpellH = Fr->H;
@@ -344,14 +348,14 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         setShadeTex(Ft4, 0);
         if (!sbookflag) {
             setSemiTrans(Ft4, 1);
-            Ft4->x0 = xp + (Fr->X + 1);
-            Ft4->y0 = yp + (Fr->Y + 1);
-            Ft4->x1 = Fr->X + xp - 1 + SpellW;
-            Ft4->y1 = yp + (Fr->Y + 1);
-            Ft4->x2 = xp + (Fr->X + 1);
-            Ft4->y2 = Fr->Y + yp - 1 + SpellH;
-            Ft4->x3 = Fr->X + xp - 1 + SpellW;
-            Ft4->y3 = Fr->Y + yp - 1 + SpellH;
+            Ft4->x0 = Fr->X - (-1 - xp);
+            Ft4->y0 = Fr->Y - (-1 - yp);
+            Ft4->x1 = Fr->X + xp - (1 - SpellW);
+            Ft4->y1 = Fr->Y - (-1 - yp);
+            Ft4->x2 = Fr->X - (-1 - xp);
+            Ft4->y2 = Fr->Y + yp - (1 - SpellH);
+            Ft4->x3 = Fr->X + xp - (1 - SpellW);
+            Ft4->y3 = Fr->Y + yp - (1 - SpellH);
         }
     }
 }

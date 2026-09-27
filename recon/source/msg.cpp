@@ -46,65 +46,76 @@ static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-ow
 #define CMD_WALKXY       1
 #define CMD_ACK_PLRINFO  2
 
-/* --- CMD_* dispatch ids, in the EXACT order the retail jump table (jtbl_80116868) lists them --- */
-#define CMD_ADDSTR           2
-#define CMD_ADDDEX           3
+/* --- CMD_* dispatch ids -- these are the REAL jump-table indices read off jtbl_80116868 in
+ * asm/data/rodata_msg.rodata.s (90 .word entries, default target 0x80052858 at the "hole" indices:
+ * 1,11,12,18,19,20,31-34,53,57-75,77 -- table INDEX, i.e. wire bCmd minus 1, see below).
+ * verify_asm.py does NOT check jump-table data, so a sequential/positional guess here silently
+ * passes the byte gate while dispatching the WRONG handler for a given wire bCmd -- these are the
+ * corrected, per-slot values (cross-checked against each jal target in ParseCmd's own body).
+ * ParseCmd's raw computes `a1 = bCmd - 1` BEFORE indexing the table (`sltiu v0,a1,0x5A` then
+ * `jtbl[a1]`), so every CMD_* value below is (table index + 1) -- the WIRE bCmd, which is what the
+ * switch(pCmd->bCmd) case labels must use. CMD_ON_WALKXY is renamed from CMD_WALKXY specifically to
+ * avoid colliding with the unrelated delta-record marker CMD_WALKXY(=1) above; the real dispatch
+ * slot for On_WALKXY is jtbl index 0 -> wire bCmd 1. */
+#define CMD_ON_WALKXY        1
+#define CMD_ADDSTR           3
+#define CMD_ADDDEX           5
 #define CMD_ADDMAG           4
-#define CMD_ADDVIT           5
-#define CMD_SBSPELL          6
-#define CMD_GOTOGETITEM      7
-#define CMD_REQUESTGITEM     8
-#define CMD_GETITEM          9
-#define CMD_GOTOAGETITEM     10
-#define CMD_REQUESTAGITEM    11
-#define CMD_AGETITEM         12
-#define CMD_ITEMEXTRA        13
-#define CMD_PUTITEM          14
-#define CMD_SYNCPUTITEM      15
-#define CMD_RESPAWNITEM      16
-#define CMD_SATTACKXY        17
-#define CMD_SPELLXYD         18
-#define CMD_SPELLXY          19
-#define CMD_TSPELLXY         20
-#define CMD_OPOBJXY          21
-#define CMD_DISARMXY         22
-#define CMD_OPOBJT           23
-#define CMD_ATTACKID         24
-#define CMD_SPELLID          25
-#define CMD_SPELLPID         26
-#define CMD_TSPELLID         27
-#define CMD_TSPELLPID        28
-#define CMD_KNOCKBACK        29
-#define CMD_RESURRECT        30
-#define CMD_HEALOTHER        31
-#define CMD_TALKXY           32
-#define CMD_NEWLVL           33
-#define CMD_WARP             34
-#define CMD_MONSTDEATH       35
-#define CMD_KILLGOLEM        36
-#define CMD_AWAKEGOLEM       37
-#define CMD_MONSTDAMAGE      38
-#define CMD_PLRDEAD          39
-#define CMD_PLRDAMAGE        40
-#define CMD_OPENDOOR         41
-#define CMD_CLOSEDOOR        42
-#define CMD_OPERATEOBJ       43
-#define CMD_PLROPOBJ         44
-#define CMD_BREAKOBJ         45
-#define CMD_CHANGEPLRITEMS   46
-#define CMD_DELPLRITEMS      47
-#define CMD_PLRLEVEL         48
-#define CMD_DROPITEM         49
-#define CMD_PLAYER_JOINLEVEL 50
-#define CMD_ACTIVATEPORTAL   51
-#define CMD_DEACTIVATEPORTAL 52
-#define CMD_RETOWN           53
-#define CMD_SETSTR           54
-#define CMD_SETMAG           55
-#define CMD_SETDEX           56
-#define CMD_SETVIT           57
-#define CMD_SYNCQUEST        58
-#define CMD_ENDSHIELD        59
+#define CMD_ADDVIT           6
+#define CMD_SBSPELL          7
+#define CMD_GOTOGETITEM      41
+#define CMD_REQUESTGITEM     39
+#define CMD_GETITEM          8
+#define CMD_GOTOAGETITEM     42
+#define CMD_REQUESTAGITEM    40
+#define CMD_AGETITEM         9
+#define CMD_ITEMEXTRA        85
+#define CMD_PUTITEM          10
+#define CMD_SYNCPUTITEM      86
+#define CMD_RESPAWNITEM      11
+#define CMD_SATTACKXY        55
+#define CMD_SPELLXYD         84
+#define CMD_SPELLXY          14
+#define CMD_TSPELLXY         15
+#define CMD_OPOBJXY          16
+#define CMD_DISARMXY         17
+#define CMD_OPOBJT           27
+#define CMD_ATTACKID         18
+#define CMD_SPELLID          22
+#define CMD_SPELLPID         23
+#define CMD_TSPELLID         24
+#define CMD_TSPELLPID        25
+#define CMD_KNOCKBACK        28
+#define CMD_RESURRECT        26
+#define CMD_HEALOTHER        77
+#define CMD_TALKXY           29
+#define CMD_NEWLVL           30
+#define CMD_WARP             31
+#define CMD_MONSTDEATH       36
+#define CMD_KILLGOLEM        87
+#define CMD_AWAKEGOLEM       90
+#define CMD_MONSTDAMAGE      37
+#define CMD_PLRDEAD          38
+#define CMD_PLRDAMAGE        50
+#define CMD_OPENDOOR         43
+#define CMD_CLOSEDOOR        44
+#define CMD_OPERATEOBJ       45
+#define CMD_PLROPOBJ         46
+#define CMD_BREAKOBJ         47
+#define CMD_CHANGEPLRITEMS   48
+#define CMD_DELPLRITEMS      49
+#define CMD_PLRLEVEL         51
+#define CMD_DROPITEM         52
+#define CMD_PLAYER_JOINLEVEL 53
+#define CMD_ACTIVATEPORTAL   56
+#define CMD_DEACTIVATEPORTAL 57
+#define CMD_RETOWN           83
+#define CMD_SETSTR           79
+#define CMD_SETMAG           80
+#define CMD_SETDEX           81
+#define CMD_SETVIT           82
+#define CMD_SYNCQUEST        88
+#define CMD_ENDSHIELD        89
 
 /* destAction values (plr[].destAction, offsets from the raw: +0x1E/+0x1F/+0x20/+0x21) */
 #define ACTION_WALK      15  /* 0xF  -- GOTOGETITEM */
@@ -1065,6 +1076,7 @@ void On_MONSTDEATH(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     if (pnum != myplr) {
+        int dummy1;
         if (currlevel == plr[pnum].plrlevel)
             M_SyncStartKill(p->wParam1, p->x, p->y, pnum);
         delta_kill_monster(p->wParam1, p->x, p->y, plr[pnum].plrlevel);
@@ -1086,6 +1098,7 @@ void On_KILLGOLEM(const TCmd *pCmd, int pnum)
 void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
+        int dummy1;
         unsigned char addok = 1;
         int i;
         for (i = 0; i < nummissiles; i++) {
@@ -1104,13 +1117,14 @@ void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
+        int dummy1;
         monster[((const TCmdParam2 *)pCmd)->wParam1].mWhoHit |= (1 << pnum);
         if (monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints != 0) {
             monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints -= ((const TCmdParam2 *)pCmd)->wParam2;
             if ((monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints >> 6) <= 0)
                 monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints = 0x40;
-            delta_monster_hp(((const TCmdParam2 *)pCmd)->wParam1, monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints,
-                              plr[pnum].plrlevel);
+            delta_monster_hp(((const TCmdParam2 *)pCmd)->wParam1,
+                              monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints, plr[pnum].plrlevel);
         }
     }
 }
@@ -1413,8 +1427,10 @@ void On_SETVIT(const TCmd *pCmd, int pnum)
 void On_SYNCQUEST(const TCmd *pCmd, int pnum)
 {
     const TCmdQuest *p = (const TCmdQuest *)pCmd;
-    if (pnum != myplr)
+    if (pnum != myplr) {
+        int dummy1;
         SetMultiQuest(p->q, p->qstate, p->qlog, p->qvar1);
+    }
     sgbDeltaChanged = 1;
 }
 
@@ -1425,7 +1441,7 @@ int ParseCmd(int pnum, const TCmd *pCmd)
     static unsigned char sbLastCmd;
     sbLastCmd = pCmd->bCmd;
     switch (pCmd->bCmd) {
-    case CMD_WALKXY:           On_WALKXY(pCmd, pnum); break;
+    case CMD_ON_WALKXY:        On_WALKXY(pCmd, pnum); break;
     case CMD_ADDSTR:           On_ADDSTR(pCmd, pnum); break;
     case CMD_ADDDEX:           On_ADDDEX(pCmd, pnum); break;
     case CMD_ADDMAG:           On_ADDMAG(pCmd, pnum); break;
@@ -1484,13 +1500,15 @@ int ParseCmd(int pnum, const TCmd *pCmd)
     case CMD_SETVIT:           On_SETVIT(pCmd, pnum); break;
     case CMD_SYNCQUEST:        On_SYNCQUEST(pCmd, pnum); break;
     case CMD_ENDSHIELD:        On_ENDSHIELD(pCmd, pnum); break;
-    /* the retail jump table (jtbl_80116868) has 90 entries (bCmd 1..90) though only 1..59 have a
-     * named handler above -- the unused 60..90 range still needs an explicit case so gcc emits the
-     * SAME dense table bound (`sltiu v0,a1,90`) instead of shrinking it to 59. */
-    case 60: case 61: case 62: case 63: case 64: case 65: case 66: case 67: case 68: case 69:
-    case 70: case 71: case 72: case 73: case 74: case 75: case 76: case 77: case 78: case 79:
-    case 80: case 81: case 82: case 83: case 84: case 85: case 86: case 87: case 88: case 89:
-    case 90:
+    /* the retail jump table (jtbl_80116868) has 90 entries (bCmd 0..89) and every "hole" (indices
+     * with no named handler here) targets the SAME default-fallthrough label 0x80052858 in the raw
+     * table -- these are exactly those hole indices (cross-checked word-for-word against the table,
+     * see the CMD_* block comment above), needed so gcc emits the SAME dense 90-entry table
+     * (`sltiu v0,a1,90`) with every slot landing on the right body instead of a sequential guess. */
+    case 2: case 12: case 13: case 19: case 20: case 21: case 32: case 33: case 34: case 35:
+    case 54: case 58: case 59: case 60: case 61: case 62: case 63: case 64: case 65: case 66:
+    case 67: case 68: case 69: case 70: case 71: case 72: case 73: case 74: case 75: case 76:
+    case 78:
     default:
         if ("Shouldn't get here")
             DBG_Error(NULL, "source/MSG.cpp", 0xACE);
