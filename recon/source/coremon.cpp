@@ -295,7 +295,6 @@ void M_StartStand(int i, int md)
 {
     MonsterStruct *pmonster;
     int _mx, _my;
-    char mode;
 
     ClearMVars(i);
     if (monster[i].MType->mtype == MT_GOLEM)
@@ -303,7 +302,7 @@ void M_StartStand(int i, int md)
     else
         NewMonsterAnim(i, monster[i].MType->Anims[MA_STAND], md, MA_STAND);
     pmonster = &monster[i];
-    mode = monster[i]._mmode;
+    const char mode = monster[i]._mmode;
     _mx = pmonster->_mx;
     _my = pmonster->_my;
     monster[i]._mVar1 = mode;
