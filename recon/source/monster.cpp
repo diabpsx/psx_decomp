@@ -1908,26 +1908,31 @@ void MAI_Counselor(int i)
     }
 }
 
-/* OPEN: bytes near-miss (56 diffs, 129 vs 127 insns) -- logic verified against hellfire exactly
- * (TXT_ZHAR1=0x94, TXT_ZHAR2=0x95, USFX_ZHAR2=0x35B all confirmed from the raw oracle constants).
- * Residual is register-coloring noise (s3 vs s4 for `i`). */
+/* PASS+SYM. Logic verified against hellfire (TXT_ZHAR1=0x94, TXT_ZHAR2=0x95, USFX_ZHAR2=0x35B from
+ * the raw oracle). SYM has no `dist`: like devilution, the distance calc is a bare
+ * `if (abs(mx) > abs(my)) abs(mx); else abs(my);` whose result is discarded. `_mx/_my` are cached
+ * at the top through the const view (see MAI_Lachdanan). */
 void MAI_Zhar(int i)
 {
-    int mx, my, md, dist;
+    int mx, my, md;
     MonsterStruct *Monst = &monster[i];
+    int _mx, _my;
 
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
     if (Monst->_mmode == MM_STAND) {
-        mx = Monst->_mx;
-        my = Monst->_my;
         md = M_GetDir(i);
-        if (Monst->mtalkmsg == TXT_ZHAR1 && !(dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) && Monst->_mgoal == MG_WAITTOTALK) {
-            Monst->mtalkmsg++;
+        if (Monst->mtalkmsg == TXT_ZHAR1 && !(dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) && Monst->_mgoal == MG_WAITTOTALK) {
+            Monst->mtalkmsg = TXT_ZHAR1 + 1;
             Monst->_mgoal = MG_TALK;
         }
-        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
-            mx = Monst->_mx - Monst->_menemyx;
-            my = Monst->_my - Monst->_menemyy;
-            dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+            mx = _mx - Monst->_menemyx;
+            my = _my - Monst->_menemyy;
+            if (abs(mx) > abs(my))
+                abs(mx);
+            else
+                abs(my);
             if (Monst->mtalkmsg == TXT_ZHAR2 && !effect_is_playing(USFX_ZHAR2) && Monst->_mgoal == MG_WAITTOTALK) {
                 Monst->_mgoal = MG_ATTACK;
                 Monst->_msquelch = 255;
