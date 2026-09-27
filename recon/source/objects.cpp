@@ -16,6 +16,8 @@
 
 #define THEME_NONE (-1)
 
+extern "C" int sprintf(char *buf, const char *fmt, ...);
+
 /* TU-owned small data (.sdata/.sbss, gp-relative in retail) */
 unsigned char InitObjFlag;
 int numobjects;
@@ -3226,12 +3228,16 @@ void OperateStoryBook(int pnum, int i)
 
 void GetObjectStr(int i)
 {
-    int id;
-    char *s;
-    short idx;
-
-    s = 0;
     switch (object[i]._otype) {
+    case 20:
+    case 21:
+    case 22:
+        strcpy(_infostr[sel_data], GetStr(0xDA));
+        break;
+    case 4:
+    case 50:
+        strcpy(_infostr[sel_data], GetStr(0x248));
+        break;
     case 1:
     case 2:
     case 42:
@@ -3242,148 +3248,124 @@ void GetObjectStr(int i)
             strcpy(_infostr[sel_data], GetStr(0x2F3));
         if (object[i]._oVar4 == 0)
             strcpy(_infostr[sel_data], GetStr(0xBD));
-        if (object[i]._oVar4 != 2)
-            goto tail;
-        id = 0x5E;
-        break;
-    case 20:
-    case 21:
-    case 22:
-        id = 0xDA;
-        break;
-    case 4:
-    case 50:
-        id = 0x248;
+        if (object[i]._oVar4 == 2)
+            strcpy(_infostr[sel_data], GetStr(0x5E));
         break;
     case 25:
-        if (!setlevel)
-            goto tail;
-        if (setlvlnum == 2)
-            id = 0x17;
-        else if (setlvlnum == 5)
-            id = 0x7B;
-        else
-            goto tail;
+        if (setlevel) {
+            if (setlvlnum == 2)
+                strcpy(_infostr[sel_data], GetStr(0x17));
+            else if (setlvlnum == 5)
+                strcpy(_infostr[sel_data], GetStr(0x7B));
+        }
         break;
     case 28:
-        id = 0x3D8;
+        strcpy(_infostr[sel_data], GetStr(0x3D8));
         break;
     case 41:
-        id = 0x2AE;
+        strcpy(_infostr[sel_data], GetStr(0x2AE));
         break;
     case 5:
     case 68:
-        id = 0x3DF;
+        strcpy(_infostr[sel_data], GetStr(0x3DF));
         break;
     case 6:
     case 69:
-        id = 0xB5;
+        strcpy(_infostr[sel_data], GetStr(0xB5));
         break;
     case 7:
     case 70:
     case 97:
-        id = 0x239;
+        strcpy(_infostr[sel_data], GetStr(0x239));
         break;
     case 48:
-        id = 0x383;
+        strcpy(_infostr[sel_data], GetStr(0x383));
         break;
     case 55:
-        id = 0x78;
+        strcpy(_infostr[sel_data], GetStr(0x78));
         break;
     case 62:
     case 63:
-        id = 0x77;
+        strcpy(_infostr[sel_data], GetStr(0x77));
         break;
     case 57:
     case 58:
-        id = 0x40;
+        strcpy(_infostr[sel_data], GetStr(0x40));
         break;
     case 59:
     case 60:
-        idx = object[i]._oVar1;
-        if (shrinestrs[idx] == 0x1ED) {
-            s = GetStr(0x1EE);
-            sprintf(tempstr, "%s", s);
-        } else if (shrinestrs[idx] == 0x1FA) {
-            s = GetStr(0x1FD);
-            sprintf(tempstr, "%s", s);
-        } else if (shrinestrs[idx] == 0x4C7) {
-            s = GetStr(0x4C8);
-            sprintf(tempstr, "%s", s);
-        } else {
-            s = GetStr(0x517);
-            sprintf(tempstr, s, GetStr(shrinestrs[idx]));
-        }
+        if (shrinestrs[object[i]._oVar1] == 0x1ED)
+            sprintf(tempstr, "%s", GetStr(0x1EE));
+        else if (shrinestrs[object[i]._oVar1] == 0x1FA)
+            sprintf(tempstr, "%s", GetStr(0x1FD));
+        else if (shrinestrs[object[i]._oVar1] == 0x4C7)
+            sprintf(tempstr, "%s", GetStr(0x4C8));
+        else
+            sprintf(tempstr, GetStr(0x517), GetStr(shrinestrs[object[i]._oVar1]));
         strcpy(_infostr[sel_data], tempstr);
-        goto tail;
+        break;
     case 61:
-        id = 0x3D3;
+        strcpy(_infostr[sel_data], GetStr(0x3D3));
         break;
     case 64:
-        id = 0x24B;
+        strcpy(_infostr[sel_data], GetStr(0x24B));
         break;
     case 66:
-        id = 0x68;
+        strcpy(_infostr[sel_data], GetStr(0x68));
         break;
     case 67:
-        id = 0xEF;
+        strcpy(_infostr[sel_data], GetStr(0xEF));
         break;
     case 71:
-        id = 0x7A;
+        strcpy(_infostr[sel_data], GetStr(0x7A));
+        break;
+    case 88:
+        strcpy(_infostr[sel_data], GetStr(0x40D));
         break;
     case 72:
-        id = 0x40D;
+        strcpy(_infostr[sel_data], GetStr(0x79));
         break;
     case 76:
-        id = 0x337;
+        strcpy(_infostr[sel_data], GetStr(0x337));
         break;
     case 77:
     case 89:
-        id = 0x28;
+        strcpy(_infostr[sel_data], GetStr(0x28));
         break;
     case 90:
-        id = 0x4C4;
+        strcpy(_infostr[sel_data], GetStr(0x4C4));
         break;
     case 79:
-        id = 0x18C;
+        strcpy(_infostr[sel_data], GetStr(0x18C));
         break;
     case 80:
-        id = 0xA3;
+        strcpy(_infostr[sel_data], GetStr(0xA3));
         break;
     case 81:
-        id = 0x2A9;
+        strcpy(_infostr[sel_data], GetStr(0x2A9));
         break;
     case 82:
-        id = 0x169;
+        strcpy(_infostr[sel_data], GetStr(0x169));
         break;
     case 73:
-        id = 0x304;
+        strcpy(_infostr[sel_data], GetStr(0x304));
         break;
     case 86:
-        idx = object[i]._oVar2;
-        s = GetStr(StoryBookName[idx]);
-        strcpy(_infostr[sel_data], s);
-        goto tail;
-    case 88:
-        id = 0x40D;
+        strcpy(_infostr[sel_data], GetStr(StoryBookName[object[i]._oVar3]));
         break;
     case 92:
-        id = 0x4C4;
+        strcpy(_infostr[sel_data], GetStr(0x4C4));
         break;
     case 94:
-        id = 0x2AA;
+        strcpy(_infostr[sel_data], GetStr(0x2AA));
         break;
     case 95:
-        id = 0x4B3;
+        strcpy(_infostr[sel_data], GetStr(0x4B3));
         break;
     case 96:
-        id = 0x3D9;
+        strcpy(_infostr[sel_data], GetStr(0x3D9));
         break;
-    default:
-        goto tail;
     }
-    strcpy(_infostr[sel_data], GetStr(id));
-tail:
     if (plr[sel_data]._pClass == 1) {
         if (object[i]._oDoorFlag) {
             sprintf(tempstr, GetStr(0x499), _infostr[sel_data]);
