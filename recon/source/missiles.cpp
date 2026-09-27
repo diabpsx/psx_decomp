@@ -3582,7 +3582,8 @@ void ProcessMissiles(void)
     /* SYM-confirmed: retail declares i/j/mi as `short` (not int), plus a cached
      * `MissileStruct *miss` and a `short *pmissileactive` pointer-walk reused across the
      * dFlags/dMissile-clear loop AND the mProc-dispatch loop. */
-    short i, j, mi;
+    short i, j;
+    unsigned short mi;
     struct MissileStruct *miss;
     unsigned short *pmissileactive;
 
@@ -3621,8 +3622,8 @@ void ProcessMissiles(void)
         struct MissileData *mdata = missiledata;
         for (i = 0; i < nummissiles; i++) {
             mi = *pmissileactive;
-            miss = &missile[mi];
-            ((void (*)(int))mdata[miss->_mitype].mProc)(mi);
+            miss = missile + (short)mi;
+            ((void (*)(int))mdata[miss->_mitype].mProc)((short)mi);
             if (!(miss->_miAnimFlags & 0x2 /* MFLAG_LOCK_ANIMATION */)) {
                 miss->_miAnimCnt++;
                 if (miss->_miAnimCnt >= miss->_miAnimDelay) {
@@ -3798,10 +3799,7 @@ void MI_Teleport(int i)
     PlrClrTrans(plr[id]._px, plr[id]._py);
     plr[id]._px = missile[i]._mix;
     plr[id]._py = missile[i]._miy;
-    {
-        struct PlayerStruct *pplr = &plr[id];
-        pplr->_pyoff = 0;
-    }
+    (&plr[id])->_pyoff = 0;
     plr[id]._pxoff = 0;
     plr[id]._poldx = plr[id]._px;
     plr[id]._poldy = plr[id]._py;
@@ -3821,10 +3819,7 @@ void MI_Teleport(int i)
         ViewY = plr[id]._py - ScrollInfo._sdy;
     }
 
-    {
-        struct PlayerStruct *pplr = &plr[id];
-        SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, pplr, gblocks);
-    }
+    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, &plr[id], gblocks);
     gblocks->MoveToScrollTarget();
 
     if (plr[id ^ 1].plractive)
