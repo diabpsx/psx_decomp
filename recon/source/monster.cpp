@@ -3749,12 +3749,29 @@ void MAI_SkelKing(int i)
  * *piVar1=iVar16;` exactly, computing the address BEFORE the sel_data/myplr
  * restore instead of after) compiled byte-identical to the direct
  * `_pcursmonst[sel_data]=cursm;` form -- no change, reverted to the simpler
- * spelling. Residual (13 over): SYM also lists an `int nd` local ($v0) not
- * yet identified/placed -- likely in the DirOK retry loop (`mid`/`md`
- * juggling around line ~3831) given `nd`'s register slot. NEXT ANGLE:
- * find `nd`'s call site from the raw oracle's DirOK-loop instructions and
- * give it a real name (probably a cached "next candidate direction" the
- * loop currently recomputes via `mid`/`md` inline). */
+ * spelling. `nd` FOUND+APPLIED this pass (297->256 diffs, 344->345 insns,
+ * 14 over now): it's in the FIRST DirOK retry loop (right after the
+ * CheckArea/gSameRoom miss, `md=plr[i]._pdir; ...`), not the second. The
+ * JAP decompile distinguishes `uVar9` (the one-shot `DirOK(i,mdir_00)`
+ * check that only decides whether to ENTER the retry loop) from `uVar10`
+ * (a SEPARATE flag initialized `=1` BEFORE that check, reset to 0 if the
+ * loop is entered, reassigned every iteration, and -- critically -- it is
+ * `uVar10`, not `uVar9`, that the code tests at the very end to decide
+ * `goto LAB_80156fcc`). My reconstruction had collapsed both into one `ok`
+ * variable; split them into `ok` (the initial DirOK call/gate) and `nd`
+ * (`nd=1` before the gate, `nd=0`+loop-reassigned if the gate fails, final
+ * `if (!nd) goto skip_walk;` instead of `if (!ok)`) -- behaviorally
+ * identical (nd stays 1 when the loop is skipped) but matches retail's
+ * real variable/register identity. Residual (256 diffs, 14 over): pure
+ * scheduling -- the very top of the function reorders which independent
+ * sub-expression (the `Monst` pointer's index*sizeof multiply vs the
+ * `myplr`/`sel_data<<2`/`&_pcursmonst` prep) is computed first; oracle does
+ * Monst-pointer-first, ours does the myplr/pcursmonst prep first. Same
+ * "which sub-expression evaluates first" class as M2MStartHit/MissToMonst;
+ * not a structural miss (checked: `Monst = &monster[i]` is ALREADY declared
+ * before `omp`/`sdata`/`cursm`, so the statement order already matches the
+ * oracle's -- this is allocator/scheduler-internal, not source-order-
+ * controllable via the angles tried so far). */
 void MAI_Golum(int i)
 {
     MonsterStruct *Monst = &monster[i];
@@ -3763,6 +3780,7 @@ void MAI_Golum(int i)
     int cursm;
     int sdata;
     int omp;
+    int nd;
 
     omp = myplr;
     sdata = sel_data;
@@ -3795,21 +3813,22 @@ void MAI_Golum(int i)
                 Monst->_menemyy = monster[_pcursmonst[sel_data]]._mfuty;
                 goto skip_walk;
             }
-            ok = 1;
+            nd = 1;
             Monst->_menemy = 0;
             md = plr[i]._pdir;
             ok = DirOK(i, md);
             if (!ok) {
                 mid = 0;
+                nd = 0;
                 do {
                     md = mid;
-                    ok = DirOK(i, md);
+                    nd = DirOK(i, md);
                     if (mid + 1 > 7)
                         break;
                     mid = md + 1;
-                } while (!ok);
+                } while (!nd);
             }
-            if (!ok)
+            if (!nd)
                 goto skip_walk;
         } else {
             MonsterStruct *pMonster = monster;
