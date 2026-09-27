@@ -935,8 +935,9 @@ tail:
 
 void AutoGetItem(int pnum, int ii)
 {
-    int i, idx;
+    int i, g;
     int w, h;
+    int idx;
     unsigned char done;
 
     if (dropGoldFlag) {
@@ -960,7 +961,8 @@ void AutoGetItem(int pnum, int ii)
         done = GoldAutoPlace(pnum);
     } else {
         done = 0;
-        if ((unsigned int)(plr[pnum]._pgfxnum & 0xF) < 2 /* ANIM_ID_UNARMED or _SHIELD */
+        g = plr[pnum]._pgfxnum & 0xF;
+        if ((g == 0 /* ANIM_ID_UNARMED */ || g == 1 /* ANIM_ID_UNARMED_SHIELD */)
             && plr[pnum]._pmode <= 3 /* PM_WALK3 */) {
             if (plr[pnum].HoldItem._iStatFlag) {
                 if (plr[pnum].HoldItem._iClass == ICLASS_WEAPON) {
@@ -1039,14 +1041,17 @@ void AutoGetItem(int pnum, int ii)
         }
     }
     if (done) {
+        int j, jj;
+
         dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
-        i = 0;
-        while (i < numitems) {
-            if (itemactive[i] == ii) {
-                DeleteItem(itemactive[i], i);
-                i = 0;
+        j = 0;
+        while (j < numitems) {
+            jj = itemactive[j];
+            if (jj == ii) {
+                DeleteItem(jj, j);
+                j = 0;
             } else {
-                i++;
+                j++;
             }
         }
     } else {
