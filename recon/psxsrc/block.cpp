@@ -52,11 +52,11 @@ struct TextDat {   /* sizeof 112 -- matches recon/psxsrc/gman.cpp's TextDat exac
     int NumOfBuffers[2];
     long hndDecompArrays;
 
-    void *GetCreature(int Creature) const;
-    int GetNumOfActions(int Creature) const;
-    int GetNumOfFrames(int Creature, int Action) const;
-    void *GetPal(int Creature) const;
-    void SetFileInfo(const struct CTextFileInfo *Info, int Id);
+    void *GetCreature(int Creature);
+    int GetNumOfActions(int Creature);
+    int GetNumOfFrames(int Creature, int Action);
+    void *GetPal(int PalNum);
+    void SetFileInfo(const struct CTextFileInfo *NewInfo, int Id);
 };
 
 struct CCreatureAction {   /* sizeof 14 */
@@ -108,13 +108,28 @@ struct POLY_GT4 {   /* sizeof 52 */
     unsigned short pad3;
 };
 
-struct POLY_FT4;
+struct POLY_FT4 {   /* sizeof 40 */
+    unsigned long tag;
+    unsigned char r0, g0, b0, code;
+    short x0, y0;
+    unsigned char u0, v0;
+    unsigned short clut;
+    short x1, y1;
+    unsigned char u1, v1;
+    unsigned short tpage;
+    short x2, y2;
+    unsigned char u2, v2;
+    unsigned short pad1;
+    short x3, y3;
+    unsigned char u3, v3;
+    unsigned short pad2;
+};
 
 struct TownToCreature {   /* sizeof 2 */
     unsigned char GameEqu;
     unsigned char CreatureEquate;
 
-    int GetCreature(int GameCreature) const;
+    int GetCreature(int GameCreature);
 };
 
 struct MonstLevel {   /* sizeof 8 */
@@ -159,7 +174,6 @@ public:
     void DumpRects();
     void SetGraphics(struct TextDat **TDat, int *pId, int Id);
     void DumpGraphics(struct TextDat **TDat, int *Id);
-    void MyRoutine(int x, int y);
     void SetRandOffset(int QuakeAmount);
     void SetXY(int nx, int ny);
     void GetXY(int *nx, int *ny);
@@ -190,7 +204,8 @@ unsigned long GU_GetRndRange(unsigned int Range);
 extern int NumOfMonsterListLevels;      /* @0x8011AA94 */
 extern struct MonstLevel AllLevels[16]; /* @0x800B7558 */
 extern struct TownToCreature TownConv[10]; /* @0x800B8B80 */
-extern int PosAdj;
+/* sole %gp_rel consumer is GetOtPos in this TU */
+static int PosAdj;
 
 /* BLOCK.CPP-owned globals (sole %gp_rel consumers are in this TU). */
 static CBlocks *CurrentBlocks;
@@ -199,10 +214,10 @@ static void *OldSp;
 /* @0x8008D614 BLOCK.CPP:358 */
 int CBlocks::FindTownCreature(int GameEqu)
 {
-    for (int i = 0; i < 10; i++) {
-        int c = TownConv[i].GetCreature(GameEqu);
-        if (c != -1)
-            return c;
+    for (unsigned int f = 0; f < 10; f++) {
+        int Creature = TownConv[f].GetCreature(GameEqu);
+        if (Creature != -1)
+            return Creature;
     }
     return -1;
 }
@@ -210,10 +225,10 @@ int CBlocks::FindTownCreature(int GameEqu)
 /* @0x8008D688 BLOCK.CPP:375 */
 int CBlocks::FindCreature(int MgNum)
 {
-    MonstList *ml = MonsterList;
-    if (ml->Count) {
-        unsigned char *p = ml->List;
-        for (unsigned int i = 0; i < ml->Count; i++, p++) {
+    unsigned int count = MonsterList->Count;
+    if (count) {
+        unsigned char *p = MonsterList->List;
+        for (unsigned int i = 0; i < count; i++, p++) {
             if (*p == MgNum)
                 return i;
         }
@@ -236,11 +251,11 @@ void CBlocks::SetMonsterGraphics(int Level, int List)
     if (levelIdx < 0 || !(levelIdx < NumOfMonsterListLevels))
         DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x1DB);
 
-    MonstList *ml;
-    if (List < 0 || AllLevels[levelIdx].NumOfLists < List)
+    MonstLevel *lvl = &AllLevels[levelIdx];
+    if (List < 0 || lvl->NumOfLists < List)
         DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x1DD);
-    ml = (MonstList *)((char *)AllLevels[levelIdx].TheLists + List * 16);
 
+    MonstList *ml = (MonstList *)((char *)lvl->TheLists + List * 16);
     unsigned short id = *(unsigned short *)((char *)ml + 2);
     MonstTexId = id;
     MonstTexDat = GM_UseTexData(id);
@@ -251,7 +266,8 @@ void CBlocks::SetMonsterGraphics(int Level, int List)
 void CBlocks::DumpGt4s()
 {
     if (hndGt4s != -1) {
-        if (!GAL_Free(hndGt4s))
+        unsigned char ret = GAL_Free(hndGt4s);
+        if (!ret)
             DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x208);
         Gt4s = NULL;
         hndGt4s = -1;
@@ -262,7 +278,8 @@ void CBlocks::DumpGt4s()
 void CBlocks::DumpRects()
 {
     if (hndRects != -1) {
-        if (!GAL_Free(hndRects))
+        unsigned char ret = GAL_Free(hndRects);
+        if (!ret)
             DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x218);
         Rects = NULL;
         hndRects = -1;
@@ -272,7 +289,7 @@ void CBlocks::DumpRects()
 /* @0x8008DAB8 BLOCK.CPP:548 */
 void CBlocks::SetGraphics(struct TextDat **TDat, int *pId, int Id)
 {
-    if (*pId != Id) {
+    if (Id != *pId) {
         DumpGraphics(TDat, pId);
         *pId = Id;
         *TDat = GM_UseTexData(Id);
@@ -289,11 +306,11 @@ void CBlocks::DumpGraphics(struct TextDat **TDat, int *Id)
     *Id = -1;
 }
 
-/* @0x8008E07C BLOCK.CPP:801 */
-void CBlocks::MyRoutine(int x, int y)
+/* @0x8008E07C BLOCK.CPP:801 -- mangled FR7CBlocksii = a FREE function taking CBlocks& (not a method) */
+void MyRoutine(CBlocks &B, int x, int y)
 {
     OldSp = SetSp((void *)0x1F8003F0);
-    PrintMap(x, y);
+    B.PrintMap(x, y);
     SetSp(OldSp);
 }
 
@@ -308,8 +325,8 @@ void CBlocks::SetRandOffset(int QuakeAmount)
 void CBlocks::SetXY(int nx, int ny)
 {
     Mx = nx;
-    SetScrollTarget(Mx, ny);
     My = ny;
+    SetScrollTarget(Mx, ny);
 }
 
 /* @0x8008E284 BLOCK.CPP:867 */
@@ -346,8 +363,8 @@ int CBlocks::WorldToScrY(int x, int y)
 /* @0x8009160C BLOCK.CPP:2619 */
 void CBlocks::SetScrollTarget(int x, int y)
 {
-    StX = (WorldToScrX(x, ClipRect.y) - x) * 65536;
-    StY = (WorldToScrY(ClipRect.x, y) - y) * 65536;
+    StX = (x - ScrToWorldX(ClipRect.w / 2, ClipRect.h / 2)) * 65536;
+    StY = (y - ScrToWorldY(ClipRect.w / 2, ClipRect.h / 2)) * 65536;
 }
 
 /* @0x80091CC0 BLOCK.H (header copy):177 */
@@ -396,73 +413,119 @@ CBlocks *BL_GetCurrentBlocks(void)
     return CurrentBlocks;
 }
 
-/* @0x800919F8 BLOCK.CPP:115 */
-int GetHighlightCol__FiPcUsUsUs(int Index, char *SelList, unsigned short P1Col, unsigned short P2Col, int P12Col)
+extern unsigned char PauseMode;
+extern char stextflag;
+extern unsigned char qtextflag;
+extern unsigned short D_8011AC96, D_8011AC98, D_8011AC9A;
+extern unsigned short D_8011AC9C, D_8011AC9E, D_8011ACA0;
+extern unsigned short D_8011ACA2, D_8011ACA4, D_8011ACA6;
+
+/* sole %gp_rel consumer of these 9 counters is CycleSelCols -- tentative-define here. */
+static unsigned char P1ObjSelCount, P2ObjSelCount, P12ObjSelCount;
+static unsigned char P1ItemSelCount, P2ItemSelCount, P12ItemSelCount;
+static unsigned char P1MonstSelCount, P2MonstSelCount, P12MonstSelCount;
+
+/* @0x8008D41C BLOCK.CPP:310 */
+void UpdateSel(unsigned short *Col, unsigned short Add, unsigned char *Count)
 {
-    if (SelList[0] != SelList[1]) {
-        if (SelList[0] == Index)
-            return P1Col;
-    } else {
-        if (Index == SelList[0])
-            return P12Col & 0xFFFF;
+    *Col &= 0x7FFF;
+    if (*Count < 0x10)
+        *Col += Add;
+    else
+        *Col -= Add;
+    *Col |= 0x8000;
+}
+
+/* @0x8008D45C BLOCK.CPP:321 */
+void CycleSelCols(void)
+{
+    if (PauseMode == 0 && stextflag == 0 && qtextflag == 0) {
+        UpdateSel(&D_8011AC96, 0x400, &P1ObjSelCount);
+        P1ObjSelCount = (P1ObjSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011AC98, 1, &P2ObjSelCount);
+        P2ObjSelCount = (P2ObjSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011AC9A, 0x401, &P12ObjSelCount);
+        P12ObjSelCount = (P12ObjSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011AC9C, 0x400, &P1ItemSelCount);
+        P1ItemSelCount = (P1ItemSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011AC9E, 1, &P2ItemSelCount);
+        P2ItemSelCount = (P2ItemSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011ACA0, 0x401, &P12ItemSelCount);
+        P12ItemSelCount = (P12ItemSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011ACA2, 0x400, &P1MonstSelCount);
+        P1MonstSelCount = (P1MonstSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011ACA4, 1, &P2MonstSelCount);
+        P2MonstSelCount = (P2MonstSelCount + 1) & 0x1F;
+        UpdateSel(&D_8011ACA6, 0x401, &P12MonstSelCount);
+        P12MonstSelCount = (P12MonstSelCount + 1) & 0x1F;
     }
+}
+
+/* @0x800919F8 BLOCK.CPP:115 */
+int GetHighlightCol(int Index, char *SelList, unsigned short P1Col, unsigned short P2Col, unsigned short P12Col)
+{
+    if (SelList[0] == SelList[1]) {
+        if (SelList[0] == Index)
+            return P12Col;
+    }
+    if (Index == SelList[0])
+        return P1Col & 0xFFFF;
     if (Index == SelList[1])
         return P2Col & 0xFFFF;
     return -1;
 }
 
 /* @0x80091ABC BLOCK.CPP:115 */
-int GetHighlightCol__FiPiUsUsUs(int Index, int *SelList, unsigned short P1Col, unsigned short P2Col, int P12Col)
+int GetHighlightCol(int Index, int *SelList, unsigned short P1Col, unsigned short P2Col, unsigned short P12Col)
 {
-    if (SelList[0] != SelList[1]) {
+    if (SelList[0] == SelList[1]) {
         if (SelList[0] == Index)
-            return P1Col;
-    } else {
-        if (Index == SelList[0])
-            return P12Col & 0xFFFF;
+            return P12Col;
     }
+    if (Index == SelList[0])
+        return P1Col & 0xFFFF;
     if (Index == SelList[1])
         return P2Col & 0xFFFF;
     return -1;
 }
 
 /* @0x80091BE4 BLOCK.CPP:239 */
-int TownToCreature::GetCreature(int GameCreature) const
+int TownToCreature::GetCreature(int GameCreature)
 {
-    if (GameEqu != GameCreature)
+    if (GameCreature != GameEqu)
         return -1;
     return CreatureEquate;
 }
 
 /* @0x80091DE0 GMAN.H (header copy):284 */
-void *TextDat::GetCreature(int Creature) const
+void *TextDat::GetCreature(int Creature)
 {
     return (char *)CreatureAnims + CreatureOffset[Creature];
 }
 
 /* @0x80091DBC GMAN.H (header copy):252 */
-int TextDat::GetNumOfActions(int Creature) const
+int TextDat::GetNumOfActions(int Creature)
 {
     return *(int *)GetCreature(Creature);
 }
 
 /* @0x80091D84 BLOCK.CPP:1350 (GMAN.H header copy):253 */
-int TextDat::GetNumOfFrames(int Creature, int Action) const
+int TextDat::GetNumOfFrames(int Creature, int Action)
 {
     CCreatureHdr *hdr = (CCreatureHdr *)GetCreature(Creature);
-    return hdr->GetAction(Action)->NumOfPhysFrames;
+    return hdr->GetAction(Action)->NumOfFrames;
 }
 
 /* @0x80091E1C GMAN.H (header copy):232 */
-void *TextDat::GetPal(int Creature) const
+void *TextDat::GetPal(int PalNum)
 {
-    return (char *)Pals + PalOffset[Creature];
+    return (char *)Pals + PalOffset[PalNum];
 }
 
 /* @0x80091DFC GMAN.H (header copy):240 */
-void TextDat::SetFileInfo(const CTextFileInfo *Info, int Id)
+void TextDat::SetFileInfo(const CTextFileInfo *NewInfo, int Id)
 {
-    FileInfo = (CTextFileInfo *)Info;
+    FileInfo = (CTextFileInfo *)NewInfo;
     TexNum = Id;
 }
 
@@ -483,4 +546,43 @@ void LittleGt4::InitFromGt4(POLY_GT4 *Gt4, int nw, int nh)
     w = (unsigned char)nw;
     h = (unsigned char)nh;
     v3 = v3v;
+}
+
+extern unsigned long ThisPrimAddr;
+extern unsigned long AddrToAvoid;
+
+/* @0x80091A40 PRIMPOOL.H (header copy):65 */
+void PRIM_GetPrim(POLY_FT4 **Prim)
+{
+    if (!(ThisPrimAddr + 0x190 < AddrToAvoid))
+        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
+    *Prim = (POLY_FT4 *)ThisPrimAddr;
+    ThisPrimAddr = ThisPrimAddr + 0x28;
+}
+
+/* @0x80091B40 PRIMPOOL.H (header copy):65 */
+void PRIM_GetPrim(POLY_GT4 **Prim)
+{
+    if (!(ThisPrimAddr + 0x208 < AddrToAvoid))
+        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
+    *Prim = (POLY_GT4 *)ThisPrimAddr;
+    ThisPrimAddr = ThisPrimAddr + 0x34;
+}
+
+/* @0x80091BBC PRIMPOOL.H (header copy):75 */
+void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
+{
+    unsigned long *Dest32 = (unsigned long *)Dest;
+    unsigned long *Source32 = (unsigned long *)Source;
+    for (unsigned int f = 0; f < 10; f++)
+        *Dest32++ = *Source32++;
+}
+
+/* @0x80091B04 PRIMPOOL.H (header copy):84 */
+POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
+{
+    POLY_FT4 *RetPrim;
+    PRIM_GetPrim(&RetPrim);
+    PRIM_CopyPrim(RetPrim, Prim);
+    return RetPrim;
 }
