@@ -1999,19 +1999,16 @@ void MI_Lightctrl(int i)
     int dam, p, mx, my;
     MissileStruct *miss = &missile[i];
 
-    /* PSX bounds against the raw dung_map extent (112) before doing anything else, with an early
-     * AddUnLight+return -- no PC twin has this gate at all. Confirmed via raw oracle. */
-    if (miss->_mix >= 112 || miss->_miy >= 112) {
-        miss->_miDelFlag = 1;
-        AddUnLight(miss->_mlid);
-        return;
-    }
+    /* was missing entirely -- confirmed via raw oracle as literally the first instruction
+     * (mirange loaded/decremented/stored before anything else). */
+    miss->_mirange--;
 
-    p = miss->_misource;
-    if (p != -1) {
+    if (miss->_misource != -1) {
         if (miss->_micaster == TARGET_MONSTERS) {
+            p = miss->_misource;
             dam = (ENG_random(2) + ENG_random(plr[p]._pLevel) + 2) << 6;
         } else {
+            p = miss->_misource;
             dam = 2 * (monster[p].mMinDamage + ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1));
         }
     } else {
@@ -2024,6 +2021,15 @@ void MI_Lightctrl(int i)
 
     mx = miss->_mix;
     my = miss->_miy;
+
+    /* PSX bounds against the raw dung_map extent (112) AFTER the position update, with an early
+     * AddUnLight+return -- no PC twin has this gate at all. Confirmed via raw oracle: the check
+     * uses the freshly-updated mx/my (post-GetMissilePos), not the pre-move _mix/_miy. */
+    if (mx >= 112 || my >= 112) {
+        AddUnLight(miss->_mlid);
+        miss->_miDelFlag = 1;
+        return;
+    }
 
     if (miss->_misource == -1) {
         if ((mx != miss->_misx || my != miss->_misy) && GetMISSILE(mx, my))
@@ -3520,35 +3526,37 @@ void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mien
     int other, tx, ty, oi;
 
     tries = 0;
-    do {
-        r1 = ENG_random(3) + 4;
-        r2 = ENG_random(3) + 4;
-        if (ENG_random(2) == 1)
-            r1 = -r1;
-        if (ENG_random(2) == 1)
-            r2 = -r2;
-
+    for (;;) {
+        /* retail recomputes ok=1 and other=id^1 only once per OUTER (tile) attempt; the
+         * co-op-position INNER retry (redo r1/r2 only, no tries++/500 check) is a distinct,
+         * uncounted loop reached only when the gate below actually rejects a candidate --
+         * confirmed via raw oracle: two separate loop-back targets (.L8013D9A4 outer vs
+         * .L8013D9D4 inner). */
         ok = 1;
-        if (mienemy == 0) {
-            other = id ^ 1;
-            if (plr[other].plractive && *((unsigned char *)&plr[other] + 0x1A05))
+        other = id ^ 1;
+        do {
+            r1 = ENG_random(3) + 4;
+            r2 = ENG_random(3) + 4;
+            if (ENG_random(2) == 1)
+                r1 = -r1;
+            if (ENG_random(2) == 1)
+                r2 = -r2;
+            if (mienemy == 0 && plr[other].plractive && *((unsigned char *)&plr[other] + 0x1A05))
                 ok = ChkPlrOffsets((sx + r1) << 3, (sy + r2) << 3, plr[other].WorldX, plr[other].WorldY);
-        }
-        if (!ok)
-            continue;
-
-        if (++tries > 500) {
-            r1 = 0;
-            r2 = 0;
-            break;
-        }
+        } while (!ok);
 
         tx = sx + r1;
         ty = sy + r2;
-        if (GetSOLID(tx, ty) || dung_map[tx][ty].dObject != 0 || dung_map[tx][ty].dMonster != 0)
+        if (GetSOLID(tx, ty) || dung_map[tx][ty].dObject != 0 || dung_map[tx][ty].dMonster != 0) {
+            if (++tries > 500) {
+                r1 = 0;
+                r2 = 0;
+                break;
+            }
             continue;
+        }
         break;
-    } while (1);
+    }
 
     missile[mi]._mirange = 2;
     missile[mi]._miVar1 = 0;
@@ -3571,11 +3579,24 @@ void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mien
 
 void ProcessMissiles(void)
 {
-    int i, mi;
+    /* SYM-confirmed: retail declares i/j/mi as `short` (not int), plus a cached
+     * `MissileStruct *miss` and a `short *pmissileactive` pointer-walk for the mProc loop --
+     * matching that fully is a deeper rewrite; only the loop-counter TYPES are fixed here. */
+    short i, j, mi;
 
     for (i = 0; i < nummissiles; i++) {
-        dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dFlags &= ~0x40; /* BFLAG_MISSILE */
+        /* PSX-only: clears an extra bit (0x1) alongside BFLAG_MISSILE(0x40) -- confirmed via raw
+         * oracle mask 0x41 (devilution/hellfire PC source only clears BFLAG_MISSILE). */
+        dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dFlags &= ~0x41;
         dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dMissile = 0;
+    }
+
+    /* PSX-only: zeroes the whole dMissArray[32][4] table every frame -- no PC twin. Confirmed via
+     * raw oracle (a distinct nested loop right after the dFlags/dMissile clear, before the
+     * DeleteMissile pass). */
+    for (i = 0; i < 32; i++) {
+        for (j = 0; j < 4; j++)
+            dMissArray[i][j] = 0;
     }
 
     i = 0;
@@ -3751,10 +3772,11 @@ void MI_Teleport(int i)
      * WorldToOffset, light_fix, gplayer->SetScrollTarget) with no direct PC-twin structure;
      * types/externs (CBlocks, ScrollStruct, CPlayer, gplayer, BL_GetCurrentBlocks) are shared
      * with gamepad.cpp/effects.cpp, redeclared here to match exactly. */
-    int id, other;
-    void *gblocks;
+    int id;
+    struct CBlocks *gblocks;
+    struct PlayerStruct *pplr;
 
-    gblocks = BL_GetCurrentBlocks();
+    gblocks = (struct CBlocks *)BL_GetCurrentBlocks();
     if (!gblocks)
         DBG_Error(0, "source/MISSILES.CPP", 0x12C2);
 
@@ -3768,6 +3790,8 @@ void MI_Teleport(int i)
     PlrClrTrans(plr[id]._px, plr[id]._py);
     plr[id]._px = missile[i]._mix;
     plr[id]._py = missile[i]._miy;
+    pplr = &plr[id];
+    pplr->_pyoff = 0;
     plr[id]._pxoff = 0;
     plr[id]._poldx = plr[id]._px;
     plr[id]._poldy = plr[id]._py;
@@ -3787,12 +3811,11 @@ void MI_Teleport(int i)
         ViewY = plr[id]._py - ScrollInfo._sdy;
     }
 
-    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, &plr[id], gblocks);
-    MoveToScrollTarget__7CBlocks_8014ab60(gblocks);
+    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, pplr, gblocks);
+    gblocks->MoveToScrollTarget();
 
-    other = id ^ 1;
-    if (plr[other].plractive)
-        PlacePlayer(other, plr[id]._px, plr[id]._py, 0);
+    if (plr[id ^ 1].plractive)
+        PlacePlayer(id ^ 1, plr[id]._px, plr[id]._py, 0);
 }
 
 void MI_Rportal(int i)

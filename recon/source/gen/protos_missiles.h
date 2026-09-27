@@ -144,7 +144,6 @@ void *BL_GetCurrentBlocks(void);   /* @0x800919EC BLOCK.CPP:2805 -- opaque point
                                        functions with their exact mangled names to avoid the clash,
                                        not as C++ methods on gamepad.cpp's classes. */
 void SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(void *thisPlayer, void *plrRef, void *blocksRef);
-void MoveToScrollTarget__7CBlocks_8014ab60(void *thisBlocks);
 void DBG_Error(char *Text, char *File, int Line);
 void PlrClrTrans(int x, int y);   /* @0x80060C6C PLAYER.CPP */
 void PlrDoTrans(int x, int y);   /* @0x80060CE4 PLAYER.CPP */

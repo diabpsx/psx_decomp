@@ -92,6 +92,9 @@ struct CBlocks {   /* sizeof 264 */
     int CursX;   /* +0xE8 */
     int CursY;   /* +0xEC */
     struct RgbBlockInf GlBlockInf;   /* +0xF0 */
+
+    /* BLOCK.H:205 -- in-class inline; -fno-inline emits the out-of-line copy here */
+    void MoveToScrollTarget() { Mx = StX; My = StY; }
 };
 
 struct MissileStruct {   /* sizeof 76 */

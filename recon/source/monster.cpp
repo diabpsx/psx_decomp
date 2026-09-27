@@ -3732,19 +3732,29 @@ void MAI_SkelKing(int i)
  * NOT the twin here; PSX genuinely repurposes the player-cursor-selection
  * globals `myplr`/`sel_data`/`_pcursmonst[]` for AI enemy-finding via
  * `CheckArea`+`gSameRoom`, a mechanism absent from both devilution and
- * hellfire). SYM OPEN (frame 80 vs retail 88, one register short, the
- * familiar "unnamed persistent temp" class); bytes OPEN (ours ~359 / oracle
- * 331, 28 over). Real fix found and applied: `omp`/`sdata`/`cursm` (the
- * saved myplr/sel_data/_pcursmonst[sel_data]) must be read at the VERY TOP
- * of the function, BEFORE the `_mx==1`/`_mmode` early-return checks --
- * confirmed directly from JAP's literal statement order (`iVar8=myplr;
- * iVar7=sel_data; iVar16=(&_pcursmonst)[sel_data];` precede every early
- * `if(...)return;`) -- this reordering alone didn't close the gap, so
- * something else is still missing; the oracle's prologue also shows a
- * `sel_data<<2` address computation cached very early (a genuine pointer to
- * `&_pcursmonst[sel_data]`, not just a value read) that this version doesn't
- * replicate. Needs a proper register-by-register raw-oracle walk; not
- * pursued further this pass given the size of the remaining priority list. */
+ * hellfire). SYM OPEN (length 0x560 vs retail 0x52c); bytes OPEN (297 diffs,
+ * ours 344 / oracle 331, 13 over -- was 382 diffs/359 insns before this
+ * pass). Real fix applied: `python tools/symtypes.py fn MAI_Golum__Fi`
+ * reveals a SYM-named `struct MonsterStruct *pMonster` local ($s1) this
+ * reconstruction was entirely missing -- the JAP decompile's repeated
+ * `monster[Monst->_menemy].field` accesses in the "chase" branch (mx/my/md
+ * computation, the squelch wake, the `_lastx`/`_lasty` update, the 5x5
+ * dung_map scan's `monster[mid]._msquelch=255`) are retail's bare
+ * array-decay pointer `pMonster = monster;` + `pMonster[Monst->_menemy]`,
+ * the SAME idiom already established in GroupUnity/M2MStartHit for this
+ * class of repeated-index struct access. Applying it (7 call sites) alone
+ * cut 382->297 diffs and 359->344 insns (13 over now, was 28). The earlier
+ * `piVar1 = &_pcursmonst[sel_data]` pointer-hoist tried this pass (matching
+ * the JAP tail `piVar1 = &_pcursmonst+sel_data; sel_data=iVar7; myplr=iVar8;
+ * *piVar1=iVar16;` exactly, computing the address BEFORE the sel_data/myplr
+ * restore instead of after) compiled byte-identical to the direct
+ * `_pcursmonst[sel_data]=cursm;` form -- no change, reverted to the simpler
+ * spelling. Residual (13 over): SYM also lists an `int nd` local ($v0) not
+ * yet identified/placed -- likely in the DirOK retry loop (`mid`/`md`
+ * juggling around line ~3831) given `nd`'s register slot. NEXT ANGLE:
+ * find `nd`'s call site from the raw oracle's DirOK-loop instructions and
+ * give it a real name (probably a cached "next candidate direction" the
+ * loop currently recomputes via `mid`/`md` inline). */
 void MAI_Golum(int i)
 {
     MonsterStruct *Monst = &monster[i];
@@ -3802,31 +3812,33 @@ void MAI_Golum(int i)
             if (!ok)
                 goto skip_walk;
         } else {
-            mx = Monst->_mx - monster[Monst->_menemy]._mfutx;
-            my = Monst->_my - monster[Monst->_menemy]._mfuty;
-            md = GetDirection(Monst->_mx, Monst->_my, monster[Monst->_menemy]._mx, monster[Monst->_menemy]._my);
+            MonsterStruct *pMonster = monster;
+
+            mx = Monst->_mx - pMonster[Monst->_menemy]._mfutx;
+            my = Monst->_my - pMonster[Monst->_menemy]._mfuty;
+            md = GetDirection(Monst->_mx, Monst->_my, pMonster[Monst->_menemy]._mx, pMonster[Monst->_menemy]._my);
             Monst->_mdir = md;
 
             if (abs(mx) < 2 && abs(my) < 2) {
-                if (monster[Monst->_menemy]._msquelch == 0) {
-                    monster[Monst->_menemy]._msquelch = 255;
-                    monster[Monst->_menemy]._lastx = Monst->_mx;
-                    monster[Monst->_menemy]._lasty = Monst->_my;
+                if (pMonster[Monst->_menemy]._msquelch == 0) {
+                    pMonster[Monst->_menemy]._msquelch = 255;
+                    pMonster[Monst->_menemy]._lastx = Monst->_mx;
+                    pMonster[Monst->_menemy]._lasty = Monst->_my;
                     for (j = 0; j < 5; j++) {
                         for (k = 0; k < 5; k++) {
                             mid = dung_map[Monst->_mx - 2 + k][Monst->_my - 2 + j].dMonster;
                             if (mid > 0)
-                                monster[mid]._msquelch = 255;
+                                pMonster[mid]._msquelch = 255;
                         }
                     }
                 }
                 M_StartAttack(i);
                 goto skip_walk;
             }
-            if (monster[Monst->_menemy]._msquelch == 0)
-                monster[Monst->_menemy]._msquelch = 0;
+            if (pMonster[Monst->_menemy]._msquelch == 0)
+                pMonster[Monst->_menemy]._msquelch = 0;
             else
-                monster[Monst->_menemy]._msquelch--;
+                pMonster[Monst->_menemy]._msquelch--;
 
             ok = DirOK(i, md);
             if (!ok) {
