@@ -47,10 +47,9 @@ void start_game(unsigned int uMsg)
             pad_func_Quick_Spell(1);
             pad_func_Quick_Spell(1);
         }
-
-        LoadedChar[1] = 0;
-        LoadedChar[0] = 0;
     }
+    LoadedChar[1] = 0;
+    LoadedChar[0] = 0;
     InitLevelCursor();
     D_8011B7A8 = 0;
     sgbMouseDown = 0;
@@ -109,21 +108,31 @@ unsigned char StartGame(unsigned char bNewGame, unsigned char bSinglePlayer)
         }
         gbSelectProvider = 0;
 
-        if (bNewGame && demo_pad_time) {
-            currlevel = level_record;
-            leveltype = gnLevelTypeTbl[(unsigned char)level_record];
-            uMsg = 0;
-            GRL_PostMessage(ghMainWnd, 0x4D, 0, 0);
-        } else if (!bNewGame && gbValidSaveFile) {
-            uMsg = 0;
-            GRL_PostMessage(ghMainWnd, 0x4B, 0, 0);
-        } else {
+        {
+            int post;
+            if (bNewGame && demo_pad_time) {
+                post = 0x4D;
+                uMsg = 0;
+                currlevel = level_record;
+                leveltype = gnLevelTypeTbl[(unsigned char)level_record];
+                goto post_msg;
+            }
+            if (!bNewGame && gbValidSaveFile) {
+                uMsg = 0;
+                post = 0x4B;
+                goto post_msg;
+            }
             OVR_LoadPregame();
             uMsg = 0x4A;
             InitLevels();
             InitQuests();
             InitPortals();
             InitDungMsgs(myplr);
+            goto post_done;
+post_msg:
+            GRL_PostMessage(ghMainWnd, post, 0, 0);
+post_done:
+            ;
         }
 
         if (FePlayerNo && !plr[1].plractive && plr[1]._pHitPoints) {
@@ -357,7 +366,6 @@ void ClearOutDungeonMap(void)
 {
     BOOL istown = 0;
     unsigned short val = 0;
-    int x, y;
 
     if (!mydflags)
         DBG_Error(0, "source/DIABLO.cpp", 0xA25);
@@ -370,8 +378,8 @@ void ClearOutDungeonMap(void)
     default: istown = 1; break;
     }
 
-    for (x = 0; x < 112; x++) {
-        for (y = 0; y < 112; y++) {
+    for (int x = 0; x < 112; x++) {
+        for (int y = 0; y < 112; y++) {
             dung_map[x][y].dBits = 0;
             dung_map[x][y].dObject = 0;
             dung_map[x][y].dItem = 0;
@@ -383,14 +391,14 @@ void ClearOutDungeonMap(void)
     }
 
     if (!istown) {
-        for (y = 0; y < 40; y++)
-            for (x = 0; x < 40; x++)
+        for (int y = 0; y < 40; y++)
+            for (int x = 0; x < 40; x++)
                 mydflags[y * 40 + x] = 0;
-        for (y = 0; y < 40; y++)
-            for (x = 0; x < 40; x++)
+        for (int y = 0; y < 40; y++)
+            for (int x = 0; x < 40; x++)
                 pdungeon[y][x] = 0;
-        for (y = 0; y < 48; y++)
-            for (x = 0; x < 48; x++)
+        for (int y = 0; y < 48; y++)
+            for (int x = 0; x < 48; x++)
                 dungeon[y][x] = val;
     }
 }
@@ -415,33 +423,33 @@ void FillCrapBits(void)
     int x, y;
 
     switch (currlevel) {
-    case 3:
-        if (!setlevel) {                               /* Q_SKELKING */
-            if (quests[12]._qactive) {
-                AllSolid(quests[12]._qtx - 1, quests[12]._qty);
-                AllSolid(quests[12]._qtx - 1, quests[12]._qty - 2);
-            }
-        }
+    case 3:                                             /* Q_SKELKING */
+        if (setlevel)
+            break;
+        if (!quests[12]._qactive)
+            break;
+        AllSolid(quests[12]._qtx - 1, quests[12]._qty);
+        AllSolid(quests[12]._qtx - 1, quests[12]._qty - 2);
         break;
     case 15:
         qs = &quests[15];                              /* Q_BETRAYER */
-        if (setlevel) {
-            if (qs->_qactive) {
-                if (setlvlnum == qs->_qslvl) {
-                    for (y = 18; y < 62; y++)
-                        for (x = 56; x < 58; x++)
-                            AllSolid(x, y);
-                    for (y = 60; y < 62; y++)
-                        for (x = 40; x < 46; x++)
-                            AllSolid(x, y);
-                    if (qs->_qvar1 < 4) {
-                        AllSolid(0x20, 0x30);
-                        AllSolid(0x21, 0x30);
-                        AllSolid(0x20, 0x31);
-                        AllSolid(0x21, 0x31);
-                    }
-                }
-            }
+        if (!setlevel)
+            break;
+        if (!qs->_qactive)
+            break;
+        if (setlvlnum != qs->_qslvl)
+            break;
+        for (y = 18; y < 62; y++)
+            for (x = 56; x < 58; x++)
+                AllSolid(x, y);
+        for (y = 60; y < 62; y++)
+            for (x = 40; x < 46; x++)
+                AllSolid(x, y);
+        if (qs->_qvar1 < 4) {
+            AllSolid(0x20, 0x30);
+            AllSolid(0x21, 0x30);
+            AllSolid(0x20, 0x31);
+            AllSolid(0x21, 0x31);
         }
         break;
     }
@@ -471,36 +479,31 @@ void Lrestoreplrpos(void)
     PlacePlayer(0, plr[1]._pVar5, plr[1]._pVar6, 0);
 }
 
-/* SYM OPEN (2026-09-27): huge PSX-only function (2-player split-screen dungeon load, own
- * GSYS_SetStackAndJump'd CreateLevel, doubled theme/monster/item init per view via the
- * Lsaveplrpos/Lrestoreplrpos brackets).  Call-sequence transcribed from the raw oracle jal trace
- * (AllocdPiece/Tmalloc, SND_LoadBank, MakeLightTable, LoadLvlGFX, ClearOutDungeonMap, InitInv/
- * InitItemGFX/InitQuestText, InitStores, InitAutomapOnce, SetupTownStores, InitAutomap, InitLighting/
- * InitVision, InitLevelMonsters, CreateLevel, FillSolidBlockTbls, GetLevelMTypes, InitThemes,
- * LoadAllGFX, GetReturnLvlPos/GetPortalLvlPos, WorldToOffset, PlayDungMsgs, InitMultiView,
- * Lsaveplrpos -> {HoldThemeRooms,InitMonsters,InitObjects,InitItems,CreateThemeRooms,InitMissiles,
- * InitDead,AddQuestItems} x2 (once per split-screen half) -> SavePreLighting, Lrestoreplrpos,
- * InitTowners/InitItems/InitMissiles/InitBird (town arm), DeltaLoadLevel, ResyncQuests, setlevel arm
- * (LoadSetMap + a second FillSolidBlockTbls/GetLevelMTypes/InitMonsters/InitItems/InitDead run),
- * SetDungeonMicros, InitLightMax, InitControlPan, ConvertdPiece, BuildLevTrigs, Tfree/FreedPiece,
- * ClrDiabloMsg, FillCrapBits, per-player InitPlayerGFX/InitPlayer/PlacePlayer/AddVision/
- * ChangeLightXY/ChangeLightOff, ProcessLightList/ProcessVisionList).  Structural draft below follows
- * that order and devilution's LoadGameLevel branch shape; NOT yet verify_asm-gated (~640 oracle
- * instructions) -- falsified nothing yet since no attempt has been gated; next angle: split into the
- * dungeon-arm vs setlevel-arm vs town-arm bodies and gate each independently with VA_CTX for the
- * exact statement order/branch polarity once split_asm can slice the middle of the function. */
+/* SYM OPEN (2026-09-27, second pass): fully re-derived from the raw oracle jal/branch trace
+ * (scratch/tuinfo.py DIABLO.CPP LoadGameLevel__FUci, 637 lines) rather than devilution's shape --
+ * several branches run OPPOSITE to the first draft's guess (see below).  Not yet verify_asm-gated
+ * end-to-end (~640 oracle insns); next angle: gate the 3 arms (dungeon/town/setlevel) separately via
+ * VA_CTX once a sub-range verify helper exists.  Confirmed structural facts this pass:
+ *  - the earlier draft had a bogus DUPLICATE per-player InitPlayerGFX/InitPlayer loop mid-function;
+ *    the oracle has only ONE such loop, at the very end (with AddVision/PlacePlayer too).
+ *  - the "SIMPLE vs record-seeds" dungeon choice and the town/setlevel DeltaLoadLevel gate all share
+ *    ONE condition, `!firstflag && (lvldir==4 || plr[myplr]._pLvlVisited[currlevel])`; when TRUE take
+ *    the plain path (calls DeltaLoadLevel, no seed bookkeeping); when FALSE take the "fresh split-
+ *    screen generation" path (records the 4 generation RNG seeds into glMid1/2/3Seed+glEndSeed,
+ *    passes InitItems(1) not (0), and skips DeltaLoadLevel entirely) -- opposite of the first draft's
+ *    "doubled calls" guess (there is no duplication; it is a real if/else). */
 void LoadGameLevel(unsigned char firstflag, int lvldir)
 {
+    static int glMid1Seed[17], glMid2Seed[17], glMid3Seed[17], glEndSeed[17];
     int i;
     BOOL visited;
 
+    AllocdPiece();
+    mydflags = (unsigned char *)Tmalloc(0x640);
     if (setseed)
         glSeedTbl[currlevel] = setseed;
-
-    AllocdPiece();
-    Tmalloc(0x14000);
     music_stop();
-    SetCursor(0);
+    SetCursor(1);
     SetRndSeed(glSeedTbl[currlevel]);
     SND_LoadBank(currlevel);
     MakeLightTable();
@@ -517,15 +520,12 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
 
     SetRndSeed(glSeedTbl[currlevel]);
 
-    if (leveltype == 0)
+    if (!leveltype)
         SetupTownStores();
 
     InitAutomap();
-
-    if (leveltype != 0 && lvldir != 3)
-        InitLighting();
+    InitLighting();
     InitVision();
-
     InitLevelMonsters();
 
     if (!setlevel) {
@@ -533,118 +533,145 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
         FillSolidBlockTbls();
         SetRndSeed(glSeedTbl[currlevel]);
 
-        if (leveltype != 0) {
+        if (leveltype) {
             GetLevelMTypes();
+            SetRndSeed(glSeedTbl[currlevel]);
             InitThemes();
             LoadAllGFX();
         }
 
-        if (lvldir == 2)
+        if (lvldir == 3)
             GetReturnLvlPos();
-        if (lvldir == 1)
+        if (lvldir == 5) {
             GetPortalLvlPos();
-
-        WorldToOffset(myplr, plr[myplr]._px, plr[myplr]._py);
-
-        for (i = 0; i < MAX_PLRS; i++) {
-            if (plr[i].plractive && currlevel == plr[i].plrlevel) {
-                InitPlayerGFX(i);
-                if (lvldir != 4)
-                    InitPlayer(i, firstflag);
+            if (plr[0].plractive) {
+                if (plr[1].plractive)
+                    WorldToOffset(0, ViewX << 3, ViewY << 3);
             }
         }
 
         PlayDungMsgs();
         InitMultiView();
 
-        if (leveltype != 0) {
-            Lsaveplrpos();
-            HoldThemeRooms();
-            GetRndSeed();
-            ConvertdPiece();
-            InitMonsters();
-            GetRndSeed();
-            InitObjects();
-            InitItems(0);
-            CreateThemeRooms();
-            GetRndSeed();
-            InitMissiles();
-            InitDead();
-            AddQuestItems();
-            GetRndSeed();
-            DeltaLoadLevel();
+        visited = 0;
+        if (FePlayerNo >= 0) {
+            for (i = 0; i <= FePlayerNo; i++) {
+                if (plr[i].plractive)
+                    visited = visited || plr[i]._pLvlVisited[currlevel];
+            }
+        }
 
-            Lsaveplrpos();
-            HoldThemeRooms();
-            GetRndSeed();
-            ConvertdPiece();
-            InitMonsters();
-            GetRndSeed();
-            InitObjects();
-            InitItems(0);
-            CreateThemeRooms();
-            GetRndSeed();
-            InitMissiles();
-            InitDead();
-            AddQuestItems();
-            GetRndSeed();
+        SetRndSeed(glSeedTbl[currlevel]);
 
+        if (leveltype) {
+            Lsaveplrpos();
+            if (!firstflag && (plr[myplr]._pLvlVisited[currlevel] || lvldir == 4)) {
+                HoldThemeRooms();
+                GetRndSeed();
+                ConvertdPiece();
+                InitMonsters();
+                GetRndSeed();
+                InitObjects();
+                InitItems(0);
+                CreateThemeRooms();
+                GetRndSeed();
+                InitMissiles();
+                InitDead();
+                AddQuestItems();
+                GetRndSeed();
+                DeltaLoadLevel();
+            } else {
+                HoldThemeRooms();
+                glMid1Seed[currlevel] = GetRndSeed();
+                ConvertdPiece();
+                InitMonsters();
+                glMid2Seed[currlevel] = GetRndSeed();
+                InitObjects();
+                InitItems(1);
+                CreateThemeRooms();
+                glMid3Seed[currlevel] = GetRndSeed();
+                InitMissiles();
+                InitDead();
+                AddQuestItems();
+                glEndSeed[currlevel] = GetRndSeed();
+            }
             SavePreLighting();
             Lrestoreplrpos();
         } else {
+            for (int x = 0; x < 96; x++)
+                for (int y = 0; y < 96; y++)
+                    dung_map[x][y].dFlags |= 3;
             InitTowners();
-            InitItems(0);
+            InitItems(1);
             InitMissiles();
             InitBird();
-            DeltaLoadLevel();
-            ResyncQuests();
+            if (!firstflag && (lvldir == 4 || plr[myplr]._pLvlVisited[currlevel]))
+                DeltaLoadLevel();
         }
+        ResyncQuests();
     } else {
         Lsaveplrpos();
         LoadSetMap();
         FillSolidBlockTbls();
         GetLevelMTypes();
         InitMonsters();
-        InitItems(0);
+        InitItems(1);
         InitDead();
-        DeltaLoadLevel();
-
-        if (lvldir == 1)
+        if (lvldir == 4)
+            DeltaLoadLevel();
+        if (lvldir == 5)
             GetPortalLvlPos();
-
         Lrestoreplrpos();
         InitMultiView();
-        DeltaLoadLevel();
-        SavePreLighting();
+        if (!firstflag && lvldir != 4 && plr[myplr]._pSLvlVisited[setlvlnum])
+            DeltaLoadLevel();
+        else
+            SavePreLighting();
         ResyncQuests();
         InitMissiles();
     }
 
-    SetDungeonMicros();
+    myplr = 0;
+    if (leveltype)
+        SetDungeonMicros();
     InitLightMax();
-    InitControlPan();
+    if (firstflag)
+        InitControlPan();
+    last_type = visible_level;
+    visible_level = leveltype;
     ConvertdPiece();
     BuildLevTrigs();
-    Tfree(0);
+    Tfree(mydflags);
+    mydflags = 0;
     FreedPiece();
     ClrDiabloMsg();
     FillCrapBits();
 
-    visited = 0;
-    for (i = 0; i < MAX_PLRS; i++) {
-        if (plr[i].plractive && plr[i].plrlevel == currlevel) {
+    if (FePlayerNo >= 0) {
+        for (i = 0; i <= FePlayerNo; i++) {
+            plr[i].plrlevel = currlevel;
             InitPlayerGFX(i);
-            InitPlayer(i, firstflag);
-            PlacePlayer(i, plr[i]._px, plr[i]._py, 0);
-            AddVision(plr[i]._px, plr[i]._py, plr[i]._pLightRad, i == myplr);
-            ChangeLightXY(plr[i]._plid, plr[i]._px, plr[i]._py);
-            ChangeLightOff(plr[i]._plid, 0, 0);
+            if (lvldir == 4) {
+                plr[i]._plid = AddVision(plr[i]._px, plr[i]._py, plr[i]._pLightRad, i);
+            } else if (LoadedChar[i]) {
+                InitPlayer(i, firstflag);
+            } else {
+                PlacePlayer(i, ViewX, ViewY, 0);
+            }
         }
     }
 
-    ProcessLightList();
-    ProcessVisionList();
-    (void)visited;
+    ChangeLightXY(plr[0]._plid, plr[0]._px, plr[0]._py);
+    ChangeLightOff(plr[0]._plid, (plr[0].WorldX & 0xF) - 8, (plr[0].WorldY & 0xF) - 8);
+    if (FePlayerNo) {
+        ChangeLightXY(plr[1]._plid, plr[1]._px, plr[1]._py);
+        ChangeLightOff(plr[1]._plid, (plr[1].WorldX & 0xF) - 8, (plr[1].WorldY & 0xF) - 8);
+    }
+
+    if (leveltype) {
+        ProcessLightList();
+        ProcessVisionList();
+    }
 }
 
 void SetSpeed(enum GM_SPEEDS Speed)
