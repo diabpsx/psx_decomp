@@ -2920,80 +2920,64 @@ void InvMoveCursDown(void)
     ItemInc = 0;
 
     if (_pcurs[myplr] < 12) {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-                InvCursPos = 6;
-                goto tail4;
-            case 4:
-            case 7:
-                InvCursPos = 25;
-                goto tail4;
-            case 5:
-            case 13:
-                InvCursPos = 34;
-                goto tail4;
-            case 6:
-                InvCursPos = 19;
-                goto tail4;
-            case 19:
-                InvCursPos = 29;
-                goto tail4;
-            default:
-                break;
-            }
-        }
-
-        if ((unsigned int)(InvCursPos - 25) < 40) {
-            if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
-                InvGetItemWH(InvCursPos - 25);
-                if (InvCursPos < 0x39) {
-                    InvCursPos = InvCursPos + ItemH * 10;
-                } else {
-                    InvCursPos = InvCursPos + ItemH * 9;
-                }
-                goto tail4;
-            } else {
-                if (InvCursPos < 0x38) {
-                    InvCursPos = InvCursPos + 10;
-                } else if (InvCursPos < 0x41) {
+        switch (InvCursPos) {
+        case 0:
+            InvCursPos = 6;
+            break;
+        case 4:
+        case 7:
+            InvCursPos = 25;
+            break;
+        case 5:
+        case 13:
+            InvCursPos = 34;
+            break;
+        case 6:
+            InvCursPos = 19;
+            break;
+        case 19:
+            InvCursPos = 29;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40) {
+                if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+                    InvGetItemWH(InvCursPos - 25);
+                    if (InvCursPos >= 0x39)
+                        InvCursPos = InvCursPos + ItemH * 9;
+                    else
+                        InvCursPos = InvCursPos + ItemH * 10;
+                } else if (InvCursPos >= 0x38) {
                     InvCursPos = InvCursPos + 9;
+                } else if (InvCursPos < 0x41) {
+                    InvCursPos = InvCursPos + 10;
                 }
-                goto tail4;
             }
+            break;
         }
     } else {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-            case 6:
-            case 19:
-                InvCursPos = 29;
-                goto tail4;
-            case 4:
-            case 7:
-                InvCursPos = 25;
-                goto tail4;
-            case 5:
-            case 13:
-                InvCursPos = 34;
-                goto tail4;
-            default:
-                break;
-            }
-        }
-
-        if ((unsigned int)(InvCursPos - 25) < 40) {
-            ItemInc = 1;
-            goto tail4;
-        } else if (InvCursPos < 0x41) {
-            /* nothing */
-        } else {
-            ItemInc = 0;
+        switch (InvCursPos) {
+        case 4:
+        case 7:
+            InvCursPos = 25;
+            break;
+        case 5:
+        case 13:
+            InvCursPos = 34;
+            break;
+        case 0:
+        case 6:
+        case 19:
+            InvCursPos = 29;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40)
+                ItemInc = 1;
+            else if (InvCursPos >= 0x41)
+                ItemInc = 0;
+            break;
         }
     }
 
-tail4:
     if ((unsigned int)(InvCursPos - 25) < 40 && ItemInc != 0) {
         ItemNo = plr[myplr].HoldItem._iCurs;
         ItemW = InvItemWidth[ItemNo + 12] >> 4;
