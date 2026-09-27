@@ -134,6 +134,7 @@ public:
 
     FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
     PAL *GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }
+    POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
     inline void DumpDatFile();
 };
 /* GMAN.H:290-296 -- never called here; compiling it emits "psxsrc/gman.h" into .DIALOG_rdata */
@@ -166,6 +167,11 @@ POLY_G4 *PRIM_GetNextPolyG4(void);
 POLY_FT4 *PRIM_GetNextPolyFt4(void);
 POLY_GT4 *PRIM_GetNextPolyGt4(void);
 extern unsigned long *ThisOt;
+extern unsigned char qtextflag;
+void PRIM_Clip(RECT *R, int Depth);
+void PRIM_FullScreen(int Depth);
+void DropShadows(int x, int y, int w, int h);
+POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int UOfs, int VOfs, int Trans);
 
 /* ---------------------------------------------------------------- TU data ---- */
 static char GShadePX = 0;                   /* @0x8011ABF5 */
@@ -555,7 +561,267 @@ void Dialog::GetSizes()
     MY_DialogOTpos = DialogOTpos;
 }
 
-/* @0x8008BEE0 DIALOG.CPP:569 -- OPEN: not reconstructed yet (1094-insn tiler) */
+/* @0x8008BEE0 DIALOG.CPP:569 */
+void Dialog::Back(int DX, int DY, int DW, int DH)
+{
+    int X, Y, W, H;
+    int Bx, By, Xr, Yr, Xl, Yl;
+    POLY_FT4 *Ft4;
+    RECT ClipRect;
+    char trans = 0;
+
+    if (qtextflag)
+        PRIM_FullScreen(MY_DialogOTpos + 2);
+    X = DX;
+    Y = DY;
+    W = DW;
+    H = DH;
+    ClipRect.x = X;
+    ClipRect.y = Y;
+    ClipRect.w = W;
+    ClipRect.h = H;
+    DialogGBack = 0;
+    GetSizes();
+    if (!DialogBackGfx)
+        return;
+    if (DialogBackGfx == 0x94) {
+        DialogGBack = 0;
+        DialogPrint(0x94, X, Y, W, H, 1, 1, 0, 0, 1);
+    } else {
+        DialogGBack = 1;
+        if (DialogBackGfx == 5) {
+            DropShadows(X, Y, W, H);
+            for (int c = 0; c < 14; c++) {
+                FRAME_HDR *Fr = DialogTData->GetFr(c / 2 + 0x22);
+                int fw = Fr->W;
+                int fh = Fr->H;
+                if (Cxy[c * 2] + fw < W && Cxy[c * 2 + 1] + fh < H) {
+                    Ft4 = DialogTData->PrintFt4(c / 2 + 0x22, X + Cxy[c * 2], Y + Cxy[c * 2 + 1], c & 1, MY_DialogOTpos, 0);
+                    Ft4->r0 = BACKR;
+                    Ft4->g0 = BACKG;
+                    Ft4->b0 = BACKB;
+                    Ft4->code |= 2;
+                    Ft4->code &= ~1;
+                }
+            }
+        }
+        GShadeX = 0;
+        GShadeY = 0;
+        Bx = W / 2 - DialogBackW / 2;
+        By = H / 2 - DialogBackH / 2;
+        if (W < DialogBackW) {
+            if (H < DialogBackH) {
+                Xr = W % DialogBackW;
+                Yr = H % DialogBackH;
+                GShadeY = 0;
+                GShadeX = 0;
+                DialogPrint(DialogBackGfx, X, Y, Xr, Yr, Xr, Yr, 0, 0, 0);
+            } else {
+                Xr = W % DialogBackW;
+                Yr = By % DialogBackH;
+                GShadeY = 0;
+                GShadeX = 0;
+                DialogPrint(DialogBackGfx, X, Y, Xr, Yr, Xr, Yr, 0, 0, 0);
+                Bx = 0;
+                GShadeY++;
+                By = Yr;
+                for (Yl = 0; Yl < (H - Yr * 2) / DialogBackH; Yl++) {
+                    DialogPrint(DialogBackGfx, X + Bx, Y + By, Xr, DialogBackH, Xr, 0, 0, 0, 0);
+                    By += DialogBackH;
+                    GShadeY++;
+                }
+                DialogPrint(DialogBackGfx, X + Bx, Y + By, Xr, Yr + (H & 1), Xr, Yr + (H & 1), 0, 0, 0);
+            }
+        } else if (H < DialogBackH) {
+            Xr = Bx % DialogBackW;
+            Yr = H % DialogBackH;
+            GShadeY = 0;
+            GShadeX = 0;
+            DialogPrint(DialogBackGfx, X, Y, Xr, Yr, Xr, Yr, 0, 0, 0);
+            By = 0;
+            GShadeX++;
+            Bx = Xr;
+            for (Xl = 0; Xl < (W - Xr * 2) / DialogBackW; Xl++) {
+                DialogPrint(DialogBackGfx, X + Bx, Y + By, DialogBackW, Yr, DialogBackW, Yr, 0, 0, 0);
+                Bx += DialogBackW;
+                GShadeX++;
+            }
+            DialogPrint(DialogBackGfx, X + Bx, Y + By, Xr + (W & 1), Yr, Xr + (W & 1), Yr, 0, 0, 0);
+        } else {
+            Yr = By % DialogBackH;
+            GShadeY = 0;
+            Xr = Bx % DialogBackW;
+            By = 0;
+            if (Yr > 0) {
+                GShadeX = 0;
+                if (Xr > 0)
+                    DialogPrint(DialogBackGfx, X, Y + By, Xr, Yr, Xr, Yr, 0, 0, 0);
+                GShadeX++;
+                Bx = Xr;
+                if (W >= DialogBackW) {
+                    for (Xl = 0; Xl < (W - Xr * 2) / DialogBackW; Xl++) {
+                        DialogPrint(DialogBackGfx, X + Bx, Y + By, DialogBackW, Yr, DialogBackW, Yr, 0, 0, 0);
+                        Bx += DialogBackW;
+                        GShadeX++;
+                    }
+                }
+                if (Xr > 0)
+                    DialogPrint(DialogBackGfx, X + Bx, Y + By, Xr + (W & 1), Yr, Xr + (W & 1), Yr, 0, 0, 0);
+                By += Yr;
+                GShadeY++;
+            }
+            if (H >= DialogBackH) {
+                for (Yl = 0; Yl < (H - Yr * 2) / DialogBackH; Yl++) {
+                    GShadeX = 0;
+                    if (Xr > 0)
+                        DialogPrint(DialogBackGfx, X, Y + By, Xr, DialogBackH, Xr, DialogBackH, 0, 0, 0);
+                    GShadeX++;
+                    Bx = Xr;
+                    if (W >= DialogBackW) {
+                        for (Xl = 0; Xl < (W - Xr * 2) / DialogBackW; Xl++) {
+                            DialogPrint(DialogBackGfx, X + Bx, Y + By, DialogBackW, DialogBackH, DialogBackW, DialogBackH, 0, 0, 0);
+                            Bx += DialogBackW;
+                            GShadeX++;
+                        }
+                    }
+                    if (Xr > 0)
+                        DialogPrint(DialogBackGfx, X + Bx, Y + By, Xr + (W & 1), DialogBackH, Xr + (W & 1), DialogBackH, 0, 0, 0);
+                    By += DialogBackH;
+                    GShadeY++;
+                }
+            }
+            if (Yr > 0) {
+                GShadeX = 0;
+                if (Xr > 0)
+                    DialogPrint(DialogBackGfx, X, Y + By, Xr, Yr + (H & 1), Xr, Yr + (H & 1), 0, 0, 0);
+                GShadeX++;
+                Bx = Xr;
+                if (W >= DialogBackW) {
+                    for (Xl = 0; Xl < (W - Xr * 2) / DialogBackW; Xl++) {
+                        DialogPrint(DialogBackGfx, X + Bx, Y + By, DialogBackW, Yr + (H & 1), DialogBackW, Yr + (H & 1), 0, 0, 0);
+                        Bx += DialogBackW;
+                        GShadeX++;
+                    }
+                }
+                if (Xr > 0)
+                    DialogPrint(DialogBackGfx, X + Bx, Y + By, Xr + (W & 1), Yr + (H & 1), Xr + (W & 1), Yr + (H & 1), 0, 0, 0);
+            }
+        }
+    }
+    DialogGBack = 0;
+    if (DialogBorderGfx != 18)
+        DialogGBack = 2;
+    Ft4 = DialogTData->PrintFt4(DialogBorderGfx, X - 1, Y - 1, 0, MY_DialogOTpos, 0);
+    Ft4->r0 = DialogRed;
+    Ft4->g0 = DialogGreen;
+    Ft4->b0 = DialogBlue;
+    Ft4->code &= ~3;
+    Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 2, X + W, Y - 1, 0, MY_DialogOTpos, 0);
+    Ft4->r0 = DialogRed;
+    Ft4->g0 = DialogGreen;
+    Ft4->b0 = DialogBlue;
+    Ft4->code &= ~3;
+    Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 5, X - 1, Y + H, 0, MY_DialogOTpos, 0);
+    Ft4->r0 = DialogRed;
+    Ft4->g0 = DialogGreen;
+    Ft4->b0 = DialogBlue;
+    Ft4->code &= ~2;
+    Ft4->code &= ~1;
+    Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 7, X + W, Y + H, 0, MY_DialogOTpos, 0);
+    Ft4->r0 = DialogRed;
+    Ft4->g0 = DialogGreen;
+    Ft4->b0 = DialogBlue;
+    Ft4->code &= ~2;
+    Ft4->code &= ~1;
+    GShadeX = 1;
+    GShadeY = 1;
+    if (DialogBorderGfx == 18 || DialogBorderGfx == 26) {
+        DialogPrint(DialogBorderGfx + 1, X, Y - DialogBorderTH, W, DialogBorderTH, 0, 0, -1, 0, trans);
+        DialogPrint(DialogBorderGfx + 6, X, Y + H, W, DialogBorderBH, 0, 0, 0, -1, trans);
+        DialogPrint(DialogBorderGfx + 3, X - DialogBorderLW, Y, DialogBorderLW, H, 0, 0, 0, -1, trans);
+        DialogPrint(DialogBorderGfx + 4, X + W, Y, DialogBorderRW, H, 0, 0, 0, -1, trans);
+    } else {
+        if (W >= DialogBorderTW) {
+            Bx = W / 2 - DialogBorderTW / 2;
+            Xr = Bx % DialogBorderTW;
+            GShadeX = 1;
+            if (Xr > 0) {
+                GShadeY = 1;
+                DialogPrint(DialogBorderGfx + 1, X, Y - DialogBorderTH, Xr, DialogBorderTH, Xr, DialogBorderTH, 0, 0, trans);
+                GShadeY = 3;
+                DialogPrint(DialogBorderGfx + 6, X, Y + H, Xr, DialogBorderBH, Xr, DialogBorderBH, 0, 0, trans);
+            }
+            GShadeX++;
+            Bx = Xr;
+            if (DialogBorderTW < W) {
+                for (Xl = 0; Xl < (W - Xr) / DialogBorderTW; Xl++) {
+                    GShadeY = 1;
+                    DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, DialogBorderTW, DialogBorderTH, DialogBorderTW, DialogBorderTH, 0, 0, trans);
+                    GShadeY = 3;
+                    DialogPrint(DialogBorderGfx + 6, X + Bx, Y + H, DialogBorderBW, DialogBorderBH, DialogBorderBW, DialogBorderBH, 0, 0, trans);
+                    Bx += DialogBorderTW;
+                    GShadeX++;
+                }
+            }
+            Xr = W - Bx;
+            if (Xr > 0) {
+                GShadeY = 1;
+                DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, Xr, DialogBorderTH, Xr, DialogBorderTH, 0, 0, trans);
+                GShadeY = 3;
+                DialogPrint(DialogBorderGfx + 6, X + Bx, Y + H, Xr, DialogBorderBH, Xr, DialogBorderBH, 0, 0, trans);
+            }
+        } else {
+            Xr = W % DialogBorderTW;
+            GShadeX = 1;
+            if (Xr > 0) {
+                GShadeY = 1;
+                DialogPrint(DialogBorderGfx + 1, X, Y - DialogBorderTH, Xr, DialogBorderTH, Xr, DialogBorderTH, 0, 0, trans);
+                GShadeY = 3;
+                DialogPrint(DialogBorderGfx + 6, X, Y + H, Xr, DialogBorderBH, Xr, DialogBorderBH, 0, 0, trans);
+            }
+        }
+        GShadeX = 1;
+        if (H >= DialogBorderLH) {
+            By = H / 2 - DialogBorderLH / 2;
+            Yr = By % DialogBorderLH;
+            GShadeY = 1;
+            if (Yr > 0) {
+                GShadeX = 1;
+                DialogPrint(DialogBorderGfx + 3, X - DialogBorderLW, Y, DialogBorderLW, Yr, DialogBorderLW, Yr, 0, 0, trans);
+                GShadeX = 3;
+                DialogPrint(DialogBorderGfx + 4, X + W, Y, DialogBorderRW, Yr, DialogBorderRW, Yr, 0, 0, trans);
+            }
+            GShadeY++;
+            By = Yr;
+            if (DialogBorderLH < H) {
+                for (Yl = 0; Yl < (H - Yr) / DialogBorderLH; Yl++) {
+                    GShadeX = 1;
+                    DialogPrint(DialogBorderGfx + 3, X - DialogBorderLW, Y + By, DialogBorderLW, DialogBorderLH, DialogBorderLW, DialogBorderLH, 0, 0, trans);
+                    GShadeX = 3;
+                    DialogPrint(DialogBorderGfx + 4, X + W, Y + By, DialogBorderRW, DialogBorderRH, DialogBorderRW, DialogBorderRH, 0, 0, trans);
+                    By += DialogBorderLH;
+                    GShadeY++;
+                }
+            }
+            Yr = H - By;
+            if (Yr > 0) {
+                GShadeX = 1;
+                DialogPrint(DialogBorderGfx + 3, X - DialogBorderLW, Y + By, DialogBorderLW, Yr, DialogBorderLW, Yr, 0, 0, trans);
+                GShadeX = 3;
+                DialogPrint(DialogBorderGfx + 4, X + W, Y + By, DialogBorderRW, Yr, DialogBorderRW, Yr, 0, 0, trans);
+            }
+        } else {
+            Yr = H % DialogBorderLH;
+            GShadeX = 1;
+            GShadeY = 6;
+            DialogPrint(DialogBorderGfx + 3, X - DialogBorderLW, Y, DialogBorderLW, Yr, DialogBorderLW, Yr, 0, 0, trans);
+            GShadeX = 3;
+            DialogPrint(DialogBorderGfx + 4, X + W, Y, DialogBorderRW, Yr, DialogBorderRW, Yr, 0, 0, trans);
+        }
+    }
+    if (qtextflag)
+        PRIM_Clip(&ClipRect, MY_DialogOTpos + 1);
+}
 
 /* @0x8008CFF8 DIALOG.CPP:999 */
 void Dialog::Line(int DX, int DY, int DW)

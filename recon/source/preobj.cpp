@@ -642,17 +642,18 @@ void InitRndLocObj5x5(int min, int max, int objtype)
 
 void SetMapObjects(unsigned char *pMap, int startx, int starty)
 {
-    int rw, rh;
     int i, j;
+    int rw, rh;
     unsigned char *lm, *h;
     long mapoff;
+    int ot;
     unsigned char fileload[56];
     char filestr[32];
 
     ClrAllObjects();
+    InitObjFlag = 1;
     for (i = 0; i < 56; i++)
         fileload[i] = 0;
-    InitObjFlag = 1;
 
     for (i = 0; AllObjects[i].oload != -1; i++) {
         if (AllObjects[i].oload == 1 && leveltype == AllObjects[i].olvltype)
@@ -663,17 +664,19 @@ void SetMapObjects(unsigned char *pMap, int startx, int starty)
     rw = *lm;
     lm += 2;
     rh = *lm;
-    mapoff = (rw * rh + 1) * 2;
+    mapoff = rw * rh * 2 + 2;
     rw <<= 1;
     rh <<= 1;
-    mapoff += 2 * rw * rh * 2;
+    mapoff += rw * rh * 4;
     lm += mapoff;
     h = lm;
 
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
-            if (*lm)
-                fileload[AllObjects[ObjTypeConv[*lm]].ofindex] = 1;
+            if (*lm) {
+                ot = ObjTypeConv[*lm];
+                fileload[AllObjects[ot].ofindex] = 1;
+            }
             lm += 2;
         }
     }
@@ -689,7 +692,7 @@ void SetMapObjects(unsigned char *pMap, int startx, int starty)
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*lm)
-                AddObject(ObjTypeConv[*lm], startx + 16 + i, starty + 16 + j);
+                AddObject(ObjTypeConv[*lm], i + 16 + startx, j + 16 + starty);
             lm += 2;
         }
     }
