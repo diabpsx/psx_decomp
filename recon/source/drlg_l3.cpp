@@ -425,7 +425,7 @@ void DRLG_L3River(void)
     rivercnt = 0;
     bail = false;
     trys = 0;
-    pdir = -1;
+    pdir = 0;
 
     while (trys < 200 && rivercnt < 4) {
         bail = false;

@@ -32,6 +32,10 @@ BOOL optionsflag;
 int cmenu;
 int options_pad;
 TASK *DrawOptionsTask;
+int ReturnMenu;                 /* gp_rel in FormatPad's oracle -> owned here */
+BOOL CharacterBlockLoaded;      /* gp_rel in FormatPad's oracle -> owned here */
+int ReturnCards;                /* gp_rel in SaveOverwritePad's oracle -> owned here */
+static int lastlastcs;          /* D_8011B238 -- SYM name "lastlastcs" */
 
 /* ---------------------------------------------------------------- header-copy methods ---- */
 unsigned short CPad::GetDown() const
@@ -478,4 +482,216 @@ void LAMBO_MovePad(CPad *P)
         cs = 1;
     if (cs != lcs)
         PlaySFX(0x32);
+}
+
+void FormatPad(void)
+{
+    CPad *P;
+    char *S;
+
+    int sn;
+
+    ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
+    if (current_card == 0)
+        sn = 0x288;
+    else
+        sn = 0x289;
+    S = GetStr(sn);
+    MediumFont.Print(0, 0x38, S, JustCentre, NULL, GOLDR, GOLDG, GOLDB);
+
+    if (card_status[current_card] == 2) {
+        AlertTxt = card_side_empty[current_card];
+        ActivateMemcard(1, 1);
+        cardondelay = 5;
+        saveflag = 0;
+        cs = current_card + 1;
+        cmenu = ReturnMenu;
+        return;
+    }
+
+    if (formatflag == 0) {
+        int pressed;
+
+        P = PAD_GetPad(options_pad, 0);
+        LAMBO_MovePad(P);
+        if (P->GetDown() & 0x100) {
+            PlaySFX(0x33);
+            ActivateMemcard(1, 1);
+            saveflag = 0;
+            AlertTxt = 0;
+            cs = current_card + 1;
+            cmenu = ReturnMenu;
+            return;
+        }
+        pressed = 0;
+        if (P->GetDown() & 0x40)
+            pressed = 1;
+        else if (P->GetDown() & 0x10)
+            pressed = 1;
+        if (pressed) {
+            PlaySFX(0x33);
+            if (cs == 1) {
+                formatflag = cs;
+            } else {
+                formatflag = 0;
+                saveflag = 0;
+                AlertTxt = 0;
+                ActivateMemcard(1, 1);
+                cs = current_card + 1;
+                cmenu = ReturnMenu;
+            }
+        }
+        if (formatflag == 0)
+            return;
+    }
+
+    formatflag = formatflag + 1;
+    if (formatflag < 3)
+        return;
+    ShowLoadingBox(card_side_format[current_card]);
+    if (formatflag < 0xB)
+        return;
+    if (format_card(current_card) == 0) {
+        AlertTxt = 0x507;
+        ActivateMemcard(1, 1);
+        cardondelay = 5;
+        CharacterBlockLoaded = 0;
+        saveflag = 0;
+        formatflag = 0;
+        cs = lastcs;
+        cmenu = ReturnMenu;
+        return;
+    }
+    formatflag = 0;
+    AlertTxt = 0;
+    cs = lastcs;
+    cmenu = ReturnMenu;
+}
+
+void SaveOverwritePad(void)
+{
+    CPad *P;
+    char *S;
+    int sn;
+    int pressed;
+
+    P = PAD_GetPad(options_pad, 0);
+    LAMBO_MovePad(P);
+    if (current_card == 0)
+        sn = 0x288;
+    else
+        sn = 0x289;
+    S = GetStr(sn);
+    MediumFont.Print(0, 0x60, S, JustCentre, NULL, GOLDR, GOLDG, GOLDB);
+
+    if (card_status[current_card] == 2) {
+        AlertTxt = card_side_empty[current_card];
+        ActivateMemcard(1, 1);
+        saveflag = 0;
+        cs = current_card + 1;
+        cmenu = ReturnMenu;
+        return;
+    }
+
+    pressed = 0;
+    if (P->GetDown() & 0x40)
+        pressed = 1;
+    else if (P->GetDown() & 0x10)
+        pressed = 1;
+    if (pressed) {
+        PlaySFX(0x33);
+        if (cs == 2) {
+            if (ReturnCards == 1)
+                ActivateCharacterMemcard(current_card == 0, (current_card ^ 1) == 0);
+            else
+                ActivateMemcard(1, 1);
+            loadflag = 0;
+            saveflag = 0;
+        }
+        StatusTxt = 0;
+        cs = lastlastcs;
+        cmenu = ReturnMenu;
+        return;
+    }
+
+    if (P->GetDown() & 0x100) {
+        if (ReturnCards == 1)
+            ActivateCharacterMemcard(current_card == 0, (current_card ^ 1) == 0);
+        else
+            ActivateMemcard(1, 1);
+        PlaySFX(0x33);
+        loadflag = 0;
+        saveflag = 0;
+        AlertTxt = 0;
+        cs = lastlastcs;
+        cmenu = ReturnMenu;
+    }
+}
+
+void CharCardSelectMemcardPad(void)
+{
+    CPad *P;
+    OMENUITEM *iptr;
+    int pressed;
+
+    iptr = MenuList[cmenu].Item;
+    P = PAD_GetPad(options_pad, 0);
+    if (cardondelay > 0) {
+        cardondelay = cardondelay - 1;
+        ShowLoadingBox(0x348);
+        return;
+    }
+    ActivateMemcard(1, 1);
+    if (AlertTxt != 0) {
+        ShowAlertBox();
+        pressed = 0;
+        if (P->GetDown() & 0x40)
+            pressed = 1;
+        else if (P->GetDown() & 0x10)
+            pressed = 1;
+        if (pressed) {
+            PlaySFX(0x33);
+            AlertTxt = 0;
+        }
+        return;
+    }
+    ShowCardActionText();
+    LAMBO_MovePad(P);
+    pressed = 0;
+    if (P->GetDown() & 0x40)
+        pressed = 1;
+    else if (P->GetDown() & 0x10)
+        pressed = 1;
+    if (pressed) {
+        if (D_8011B3D8[cs] != 2) {
+            int oldcs;
+            int link;
+
+            oldcs = cs;
+            link = iptr[oldcs].Link;
+            countdownloadcharblock = 1;
+            cardondelay = 5;
+            PlaySFX(0x33);
+            cs = 1;
+            lastcs = 1;
+            current_card = 0;
+            cmenu = link - 1;
+            return;
+        } else {
+            PlaySFX(0x3D3);
+            AlertTxt = DoLoadedGame[cs];
+        }
+    }
+    if (P->GetDown() & 0x100) {
+        int n, link;
+
+        PlaySFX(0x33);
+        n = MenuList[cmenu].NoEntries - 1;
+        cs = n;
+        link = iptr[n].Link;
+        if (link != -2) {
+            cmenu = link - 1;
+            cs = 3;
+        }
+    }
 }

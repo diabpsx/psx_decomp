@@ -218,6 +218,25 @@ extern BOOL MemcardOverlay;
 extern unsigned char ctrlflag;
 extern unsigned char sbookflag;
 extern OMENULIST MenuList[20];
+extern unsigned char GOLDR, GOLDG, GOLDB;
+extern int current_card;
+extern int card_status[2];
+extern int card_side_empty[2];
+extern int card_side_format[2];
+extern int formatflag;
+/* ReturnMenu/CharacterBlockLoaded: also %gp_rel in THIS TU's oracle (FormatPad) -> owned here too. */
+
+void ActivateMemcard(int a, int b);   /* @0x800A5790 CARDCORE.CPP */
+void ActivateCharacterMemcard(int a, int b);   /* @0x800A57CC CARDCORE.CPP */
+void ShowCardActionText(void);   /* @0x800A5888 CARDCORE.CPP */
+void ShowAlertBox(void);   /* @0x8015A3BC -- real fn, another module */
+extern int D_8011B3D8[];   /* SYM has no name for this address (gap between CreditSubTitleNo and
+                             * dirflag/card_status); absolute lui/lw in this TU's oracle -> extern, owned
+                             * elsewhere. Indexed [cs]. */
+extern BOOL DoLoadedGame[];
+extern int countdownloadcharblock;
+void ShowLoadingBox(int Str);   /* @0x800A5E5C CARDCORE.CPP */
+int format_card(int card);   /* @0x80142FF4 -- another module, real fn (not a BIOS syscall) */
 void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstructed in this TU */
 
 void SetLoadedLang(LANG_TYPE LoadLang);   /* @0x800A70C0 OPTIONS.CPP:1059 */
@@ -236,5 +255,8 @@ void PrintSelectBack(unsigned short Str);   /* @0x800A68D0 OPTIONS.CPP:817 */
 void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H);   /* @0x800A6960 OPTIONS.CPP:862 */
 void CentrePad(void);   /* @0x800A9C68 OPTIONS.CPP:2409 */
 void LAMBO_MovePad(CPad *P);   /* @0x800AB300 OPTIONS.CPP:3508 */
+void FormatPad(void);   /* @0x800AAB74 OPTIONS.CPP:3234 */
+void SaveOverwritePad(void);   /* @0x800AAE7C OPTIONS.CPP:3350 */
+void CharCardSelectMemcardPad(void);   /* @0x800AB0B8 OPTIONS.CPP:3432 */
 
 #endif

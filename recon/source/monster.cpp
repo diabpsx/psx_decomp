@@ -32,6 +32,9 @@
 
 /* AI ids */
 #define AI_GARG     12
+#define PACK_MEMBER   1
+#define PACK_NOMEMBER 2
+#define UN_STICK      0x0002
 #define AI_LAZURUS  28
 #define AI_SNAKE    24
 #define AI_MEGA     26
@@ -2746,5 +2749,140 @@ void MAI_Lazurus(int i)
         monster[i]._mdir = md;
         if (Monst->_mmode == MM_STAND || Monst->_mmode == MM_TALK)
             Monst->Action = 0;
+    }
+}
+
+/* SYM not checked; bytes OPEN (208 diffs, ours 279 / oracle 261, 18 insns
+ * short): logic/call-list fully verified against hellfire (LineClearF+
+ * CheckNoSolid wall check, PACK_MEMBER/PACK_NOMEMBER pack-join/leave with the
+ * DIST(mx-mfutx,my-mfuty,4) rejoin gate, the msquelch/_lastx/_lasty leader
+ * "keep active" update, the AI_GARG+MFLAG_STILL->MM_SATTACK wake, and the
+ * UN_STICK unique-pack loop over monstactive[] -- one `jal LineClearF` + two
+ * `jal abs` matches the oracle's call list exactly). Register allocation is
+ * badly scrambled: oracle keeps `i` in $s4 (not the more usual $s3) and a
+ * genuinely persistent `MonsterStruct *pMonster = monster;` (bare array-decay
+ * base pointer, $s7) reused at several far-apart points via `pMonster+stride`
+ * (`addu v1,s0,s7` style) instead of the usual `lui hi(monster+OFF)+stride`
+ * absolute addressing used everywhere else. Using pMonster for the top
+ * `_mx`/`_my` reads AND the `packsize++/--` writes (this file's usual
+ * base[monst]. lever, from M_ChangeLightOffset) narrowed the gap from 23 to
+ * 18 insns short but the 8-register frame still isn't reproduced. Next
+ * angle: extend pMonster to the `_lastx`/`_lasty`/`_msquelch`/`_mAi`/
+ * `_mFlags`/`_mmode` leader (and tmp-in-loop) accesses too -- i.e. every
+ * monster[]. access in this function, not just the four converted so far.
+ * Needs a slower side-by-side walk; large function, deprioritized this pass
+ * in favor of throughput. */
+void GroupUnity(int i)
+{
+    int leader;
+    int tmp;
+    int m;
+    MonsterStruct *pMonster = monster;
+    int _mx;
+    int _my;
+
+    _mx = pMonster[i]._mx;
+    _my = pMonster[i]._my;
+
+    if (monster[i].leaderflag) {
+        leader = monster[i].leader;
+
+        tmp = LineClearF(CheckNoSolid, _mx, _my, monster[leader]._mfutx, monster[leader]._mfuty);
+
+        if (!tmp && monster[i].leaderflag == PACK_MEMBER) {
+            pMonster[leader].packsize--;
+            monster[i].leaderflag = PACK_NOMEMBER;
+        } else if (tmp && monster[i].leaderflag == PACK_NOMEMBER
+                   && abs(_mx - monster[leader]._mfutx) < 4
+                   && abs(_my - monster[leader]._mfuty) < 4) {
+            pMonster[leader].packsize++;
+            monster[i].leaderflag = PACK_MEMBER;
+        }
+    }
+
+    if (monster[i].leaderflag == PACK_MEMBER) {
+        if (monster[i]._msquelch > monster[leader]._msquelch) {
+            monster[leader]._lastx = _mx;
+            monster[leader]._lasty = _my;
+            monster[leader]._msquelch = monster[i]._msquelch - 1;
+        }
+        if (monster[leader]._mAi == AI_GARG && (monster[leader]._mFlags & MFLAG_STILL)) {
+            monster[leader]._mFlags &= ~MFLAG_STILL;
+            monster[leader]._mmode = MM_SATTACK;
+        }
+    } else if (monster[i]._uniqtype && (UniqMonst[monster[i]._uniqtype - 1].mUnqAttr & UN_STICK)) {
+        for (m = 0; m < nummonsters; m++) {
+            if (monster[tmp = monstactive[m]].leaderflag == PACK_MEMBER && monster[tmp].leader == i) {
+                if (monster[i]._msquelch > monster[tmp]._msquelch) {
+                    monster[tmp]._lastx = _mx;
+                    monster[tmp]._lasty = _my;
+                    monster[tmp]._msquelch = monster[i]._msquelch - 1;
+                }
+                if (monster[tmp]._mAi == AI_GARG && (monster[tmp]._mFlags & MFLAG_STILL)) {
+                    monster[tmp]._mFlags &= ~MFLAG_STILL;
+                    monster[tmp]._mmode = MM_SATTACK;
+                }
+            }
+        }
+    }
+}
+
+/* SYM not checked (length differs 0x2b4 vs 0x2bc); bytes OPEN (98 diffs,
+ * ours 173 / oracle 175, 2 insns short): logic verified against devilution
+ * including the documented BUGFIX (`monster[i].mWhoHit |= 1<<i`, using the
+ * ATTACKER index for both the array and the shift, not `mid` -- confirmed
+ * from raw bytes), the `(monster[i]._mdir+4)&7` opposite-direction calc, and
+ * the MT_GOLEM exclusion around the NewMonsterAnim/_mmode=MM_GOTHIT pair.
+ * Used the same block-scoped `pmonster` lever from M_StartHit for
+ * _moldx/_moldy. Remaining gap looks like a duplicated-store cluster in the
+ * final field-write block (mx/my/mfutx/mfuty/moldx/moldy) -- oracle's
+ * register mapping for mid/i/dam (i=$s1,mid=$s0,dam=$s3) doesn't match ours
+ * (mid=$s1,dam=$s2,i=$s3) despite identical source shape; tried moving the
+ * mmode!=STONE guard vs the pmonster block relative order, reverted (no
+ * change). Close enough that a fresh side-by-side register walk should
+ * close it quickly -- not attempted further this pass. */
+void M2MStartHit(int mid, int i, int dam)
+{
+    if (i >= 0)
+        monster[i].mWhoHit |= 1 << i;
+
+    delta_monster_hp(mid, monster[mid]._mhitpoints, currlevel);
+    NetSendCmdParam2(0, 0x25, mid, dam);
+    PlayEffect(mid, 1);
+
+    if (!(monster[mid].MType->mtype >= MT_SNEAK && monster[mid].MType->mtype <= MT_ILLWEAV)
+        && (dam >> 6) < monster[mid].mLevel + 3)
+        return;
+
+    if (i >= 0)
+        monster[mid]._mdir = (monster[i]._mdir + 4) & 7;
+
+    if (monster[mid].MType->mtype == MT_BLINK) {
+        M_Teleport(mid);
+    } else if (monster[mid].MType->mtype >= MT_NSCAV && monster[mid].MType->mtype <= MT_YSCAV) {
+        monster[mid]._mgoal = MGOAL_NORMAL;
+    }
+
+    if (monster[mid]._mmode != MM_STONE) {
+        MonsterStruct *pmonster = &monster[mid];
+        int _mx = pmonster->_moldx;
+        int _my = pmonster->_moldy;
+
+        if (monster[mid].MType->mtype != MT_GOLEM) {
+            NewMonsterAnim(mid, monster[mid].MType->Anims[MA_GOTHIT], monster[mid]._mdir, MA_GOTHIT);
+            monster[mid]._mmode = MM_GOTHIT;
+        }
+
+        monster[mid]._mxoff = 0;
+        monster[mid]._myoff = 0;
+        monster[mid]._mx = _mx;
+        monster[mid]._my = _my;
+        monster[mid]._mfutx = _mx;
+        monster[mid]._mfuty = _my;
+        monster[mid]._moldx = _mx;
+        monster[mid]._moldy = _my;
+        M_CheckEFlag(mid);
+        M_ClearSquares(mid);
+        dung_map[_mx][_my].dMonster = mid + 1;
     }
 }
