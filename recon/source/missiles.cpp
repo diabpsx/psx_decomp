@@ -3533,23 +3533,16 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
 
 void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
-     * byte-verified. PSX adds a co-op safety check with no PC twin: when `mienemy==0`
-     * (TARGET_MONSTERS) it also rejects candidate tiles that `ChkPlrOffsets` (PLAYER.CPP) flags
-     * as overlapping the OTHER player's (`id^1`) screen/view, using `plr[id^1].WorldX/WorldY`.
-     * The `plr+0x1A05` gate field is not yet named in this TU's struct -- read via raw offset. */
-    int pn, r1, r2, tries, ok;
-    int other, tx, ty, oi;
+    /* PSX adds a co-op check with no PC twin: a player's phase (mienemy == 0) re-rolls the
+     * offset while ChkPlrOffsets says the landing tile would leave the OTHER player's (id^1)
+     * screen. The plractive / +0x1A05 gate reads plr[0] literally in the raw. */
+    int r1, r2;
+    unsigned char dirok;
+    int nTries;
 
-    tries = 0;
+    nTries = 1;
     for (;;) {
-        /* retail recomputes ok=1 and other=id^1 only once per OUTER (tile) attempt; the
-         * co-op-position INNER retry (redo r1/r2 only, no tries++/500 check) is a distinct,
-         * uncounted loop reached only when the gate below actually rejects a candidate --
-         * confirmed via raw oracle: two separate loop-back targets (.L8013D9A4 outer vs
-         * .L8013D9D4 inner). */
-        ok = 1;
-        other = id ^ 1;
+        dirok = 1;
         do {
             r1 = ENG_random(3) + 4;
             r2 = ENG_random(3) + 4;
@@ -3557,29 +3550,26 @@ void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mien
                 r1 = -r1;
             if (ENG_random(2) == 1)
                 r2 = -r2;
-            if (mienemy == 0 && plr[other].plractive && *((unsigned char *)&plr[other] + 0x1A05))
-                ok = ChkPlrOffsets((sx + r1) << 3, (sy + r2) << 3, plr[other].WorldX, plr[other].WorldY);
-        } while (!ok);
+            if (mienemy == 0 && plr[0].plractive && *((unsigned char *)&plr[0] + 0x1A05))
+                dirok = ChkPlrOffsets((sx + r1) << 3, (sy + r2) << 3, plr[id ^ 1].WorldX, plr[id ^ 1].WorldY);
+        } while (!dirok);
 
-        tx = sx + r1;
-        ty = sy + r2;
-        if (GetSOLID(tx, ty) || dung_map[tx][ty].dObject != 0 || dung_map[tx][ty].dMonster != 0) {
-            if (++tries > 500) {
+        if (GetSOLID(sx + r1, sy + r2) || dung_map[sx + r1][sy + r2].dObject || dung_map[sx + r1][sy + r2].dMonster) {
+            if (++nTries > 500) {
                 r1 = 0;
                 r2 = 0;
                 break;
             }
-            continue;
-        }
-        break;
+        } else
+            break;
     }
 
     missile[mi]._mirange = 2;
     missile[mi]._miVar1 = 0;
 
     if (setlevel && setlvlnum == 5) {
-        oi = dung_map[dx][dy].dObject - 1;
-        if ((unsigned char)(object[oi]._otype - 0x54) < 2 /* OBJ_MCIRCLE1/2 */) {
+        int oi = dung_map[dx][dy].dObject - 1;
+        if (object[oi]._otype == 0x54 /* OBJ_MCIRCLE1 */ || object[oi]._otype == 0x55 /* OBJ_MCIRCLE2 */) {
             missile[mi]._mix = dx;
             missile[mi]._miy = dy;
             if (!PosOkPlayer(myplr, dx, dy))
