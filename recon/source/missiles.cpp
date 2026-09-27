@@ -3448,25 +3448,22 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
 
 void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx, int my, unsigned char nodel, BOOL HurtPlr)
 {
-    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
-     * byte-verified (332 insns, genuinely different branch structure from both devilution and
-     * hellfire's CheckMissileCol; the top-level discriminator is `_miAnimType==MFILE_FIREWAL(4)`
-     * combined with `_misource!=-1`, not simply `_micaster==TARGET_MONSTERS`). Depends on
-     * MonsterMHit/PlayerMHit/Plr2PlrMHit which are themselves not yet implemented, so this cannot
-     * be verify_asm'd meaningfully until at least one of those exists. Documented per-branch below. */
+    /* PSX shape: traps (_misource == -1) and firewall tiles share the first arm; a monster-cast
+     * missile (_micaster != 0) only hurts monsters flagged for it; players' missiles hit monsters
+     * (including stoned ones) and, if the tile holds a different player, that player. */
+    int oi;
     MissileStruct *miss = &missile[i];
     struct map_info *dm = &dung_map[mx][my];
-    unsigned char hit;
-    int mid, oi;
 
     if (mx >= 112 || my >= 112) {
-        miss->_miDelFlag = 1;
+        missile[i]._miDelFlag = 1;
         AddUnLight(miss->_mlid);
         return;
     }
 
-    if (miss->_miAnimType == 4 /* MFILE_FIREWAL */ || miss->_misource != -1) {
+    if (miss->_miAnimType == 4 /* MFILE_FIREWAL */ || miss->_misource == -1) {
         if (dm->dMonster > 0) {
+            unsigned char hit;
             if (miss->_miAnimType == 4)
                 hit = MonsterMHit(miss->_misource, dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
             else
@@ -3478,53 +3475,44 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
             }
         }
         if (IsDplayer(mx, my) && HurtPlr) {
-            hit = PlayerMHit(IsDplayer(mx, my) - 1, -1, miss->_midist, mindam, maxdam, miss->_mitype, shift, (miss->_miAnimType == 4));
-            if (hit) {
+            unsigned char earflag = miss->_miAnimType == 4;
+            if (PlayerMHit(IsDplayer(mx, my) - 1, -1, miss->_midist, mindam, maxdam, miss->_mitype, shift, earflag)) {
                 if (!nodel)
                     miss->_mirange = 0;
                 miss->_miHitFlag = 1;
             }
         }
-    } else if (miss->_micaster != 0) {
-        if ((monster[miss->_misource]._mFlags & 0x10) && dm->dMonster > 0 && (monster[dm->dMonster - 1]._mFlags & 0x20)) {
-            hit = MonsterTrapHit(dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
-            if (hit) {
+    } else if (miss->_micaster == 0) {
+        if (dm->dMonster > 0) {
+            if (MonsterMHit(miss->_misource, dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift)) {
+                if (!nodel)
+                    miss->_mirange = 0;
+                miss->_miHitFlag = 1;
+            }
+        } else if (dm->dMonster < 0 && monster[~dm->dMonster]._mmode == MM_STONE) {
+            if (MonsterMHit(miss->_misource, ~dm->dMonster, mindam, maxdam, miss->_midist, miss->_mitype, shift)) {
                 if (!nodel)
                     miss->_mirange = 0;
                 miss->_miHitFlag = 1;
             }
         }
-        if (IsDplayer(mx, my) && HurtPlr) {
-            hit = PlayerMHit(IsDplayer(mx, my) - 1, miss->_misource, miss->_midist, mindam, maxdam, miss->_mitype, shift, 0);
-            if (hit) {
+        if (IsDplayer(mx, my) && IsDplayer(mx, my) - 1 != miss->_misource && HurtPlr) {
+            if (Plr2PlrMHit(miss->_misource, IsDplayer(mx, my) - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift)) {
                 if (!nodel)
                     miss->_mirange = 0;
                 miss->_miHitFlag = 1;
             }
         }
     } else {
-        if (dm->dMonster > 0) {
-            mid = dm->dMonster - 1;
-            hit = MonsterMHit(miss->_misource, mid, mindam, maxdam, miss->_midist, miss->_mitype, shift);
-            if (hit) {
+        if ((monster[miss->_misource]._mFlags & 0x10) && dm->dMonster > 0 && (monster[dm->dMonster - 1]._mFlags & 0x20)) {
+            if (MonsterTrapHit(dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift)) {
                 if (!nodel)
                     miss->_mirange = 0;
                 miss->_miHitFlag = 1;
             }
-        } else if (dm->dMonster < 0) {
-            mid = ~dm->dMonster;
-            if (monster[mid]._mmode == MM_STONE) {
-                hit = MonsterMHit(miss->_misource, mid, mindam, maxdam, miss->_midist, miss->_mitype, shift);
-                if (hit) {
-                    if (!nodel)
-                        miss->_mirange = 0;
-                    miss->_miHitFlag = 1;
-                }
-            }
         }
-        if (IsDplayer(mx, my) && (IsDplayer(mx, my) - 1) != miss->_misource && HurtPlr) {
-            hit = Plr2PlrMHit(miss->_misource, IsDplayer(mx, my) - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
-            if (hit) {
+        if (IsDplayer(mx, my) && HurtPlr) {
+            if (PlayerMHit(IsDplayer(mx, my) - 1, miss->_misource, miss->_midist, mindam, maxdam, miss->_mitype, shift, 0)) {
                 if (!nodel)
                     miss->_mirange = 0;
                 miss->_miHitFlag = 1;
@@ -3534,25 +3522,23 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
 
     if (dm->dObject != 0) {
         oi = dm->dObject > 0 ? dm->dObject - 1 : ~dm->dObject;
-        if (object[oi]._oMissFlag == 0) {
+        if (!object[oi]._oMissFlag) {
             if (object[oi]._oBreak == 1)
                 BreakObject(-1, oi);
-            miss->_miHitFlag = 0;
             if (!nodel)
                 miss->_mirange = 0;
+            miss->_miHitFlag = 0;
         }
     }
 
     if (GetMISSILE(mx, my)) {
-        miss->_miHitFlag = 0;
         if (!nodel)
             miss->_mirange = 0;
+        miss->_miHitFlag = 0;
     }
 
-    if (miss->_mirange == 0) {
-        if (missiledata[miss->_mitype].miSFX != -1)
-            PlaySfxLoc(missiledata[miss->_mitype].miSFX, miss->_mix, miss->_miy);
-    }
+    if (miss->_mirange == 0 && missiledata[miss->_mitype].miSFX != -1)
+        PlaySfxLoc(missiledata[miss->_mitype].miSFX, miss->_mix, miss->_miy);
 }
 
 void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
