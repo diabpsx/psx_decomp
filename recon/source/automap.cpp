@@ -285,14 +285,10 @@ void DrawAutoMapVertGrate(int X, int Y)
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
     X *= AutoMapScale;
     Y *= AutoMapScale;
-    Ly = AMPlayerY + (Y + X);
+    Ly = Y + X;
+    Ly += AMPlayerY;
     Lx = (X - Y) * 2 + AMPlayerX;
-    L2->y0 = Ly;
-    Ly += AutoMapScale;
-    L2->y1 = Ly;
-    L2->x0 = Lx;
-    Lx -= AutoMapScale * 2;
-    L2->x1 = Lx;
+    L2->x0 = Lx; L2->y0 = Ly; L2->x1 = Lx - AutoMapScale * 2; L2->y1 = Ly + AutoMapScale;
 }
 
 /* line 449 @0x801628A4 */
@@ -304,14 +300,10 @@ void DrawAutoMapHorzGrate(int X, int Y)
     L2 = AMGetLine(0x3A, 0x38, 0x2D);
     X *= AutoMapScale;
     Y *= AutoMapScale;
-    Ly = AMPlayerY + (Y + X);
+    Ly = Y + X;
+    Ly += AMPlayerY;
     Lx = (X - Y) * 2 + AMPlayerX;
-    L2->y0 = Ly;
-    Ly += AutoMapScale;
-    L2->y1 = Ly;
-    L2->x0 = Lx;
-    Lx += AutoMapScale * 2;
-    L2->x1 = Lx;
+    L2->x0 = Lx; L2->y0 = Ly; L2->x1 = Lx + AutoMapScale * 2; L2->y1 = Ly + AutoMapScale;
 }
 
 /* line 467 @0x8016293C */
@@ -370,6 +362,7 @@ void DrawVertArch(int X, int Y)
     int Lx, Ly;
     int Frac;
     int x0, y0, x1, y1, x2, y2, x3, y3;
+    int K8 = 8, K4 = 4;
 
     X <<= 2;
     Y <<= 2;
@@ -380,14 +373,10 @@ void DrawVertArch(int X, int Y)
     Frac = AutoMapScale >> 2;
     x0 = Lx - Frac;
     y0 = Ly - Frac;
-    x1 = Frac + 8;
-    x1 = Lx - x1;
-    y1 = Frac - 4;
-    y1 = Ly - y1;
-    x2 = Frac - 8;
-    x2 = Lx + x2;
-    y2 = Frac + 4;
-    y2 = Ly + y2;
+    x1 = Lx - (Frac + K8);
+    y1 = Ly - (Frac - K4);
+    x2 = Lx + (Frac - K8);
+    y2 = Ly + (Frac + K4);
     x3 = Lx + Frac;
     y3 = Ly + Frac;
 
@@ -424,6 +413,7 @@ void DrawHorzArch(int X, int Y)
     int Lx, Ly;
     int Frac;
     int x0, y0, x1, y1, x2, y2, x3, y3;
+    int K8 = 8, K4 = 4;
 
     X <<= 2;
     Y <<= 2;
@@ -434,14 +424,10 @@ void DrawHorzArch(int X, int Y)
     Frac = AutoMapScale >> 2;
     x0 = Lx + Frac;
     y0 = Ly - Frac;
-    x1 = Frac + 8;
-    x1 = Lx + x1;
-    y1 = Frac - 4;
-    y1 = Ly - y1;
-    x2 = Frac - 8;
-    x2 = Lx - x2;
-    y2 = Frac + 4;
-    y2 = Ly + y2;
+    x1 = Lx + (Frac + K8);
+    y1 = Ly - (Frac - K4);
+    x2 = Lx - (Frac - K8);
+    y2 = Ly + (Frac + K4);
     x3 = Lx - Frac;
     y3 = Ly + Frac;
 
