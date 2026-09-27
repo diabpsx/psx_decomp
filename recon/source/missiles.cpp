@@ -2124,30 +2124,26 @@ void MI_Flash(int i)
     CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix + 1, miss->_miy + 1, 1, 1);
     if (miss->_mirange == 0) {
         miss->_miDelFlag = 1;
+        restore_r = fadetor;
+        restore_g = fadetog;
+        restore_b = fadetob;
         if (miss->_micaster == TARGET_MONSTERS && miss->_misource != -1)
             plr[miss->_misource]._pInvincible = 0;
     }
 
     /* PSX-only: unlike MI_Flash2's plain snapshot, MI_Flash blends a fade-out gradient into
-     * restore_r/g/b -- `(19 - _miAnimFrame) / 9` (confirmed: raw oracle's multiply-by-0x38E38E39
-     * is the standard unsigned reciprocal for division by 9) scaled by 240 and added to the
+     * restore_r/g/b -- `(19 - _miAnimFrame) / 18` (raw: multiply-by-0x38E38E39, mfhi >> 2) scaled by 240 and added to the
      * current fadetor/fadetog/fadetob, then clamped to 255. Runs unconditionally (both mirange
      * paths reach it). No PC twin has this; reconstructed instruction-by-instruction. */
-    {
-        int d;
-        d = (19 - miss->_miAnimFrame) / 9;
-        restore_r = fadetor + d * 240;
-        d = (19 - miss->_miAnimFrame) / 9;
-        restore_g = fadetog + d * 240;
-        d = (19 - miss->_miAnimFrame) / 9;
-        restore_b = fadetob + d * 240;
-        if (restore_r >= 256)
-            restore_r = 255;
-        if (restore_g >= 256)
-            restore_g = 255;
-        if (restore_b >= 256)
-            restore_b = 255;
-    }
+    restore_r = fadetor + (19 - miss->_miAnimFrame) / 18 * 240;
+    restore_g = fadetog + (19 - miss->_miAnimFrame) / 18 * 240;
+    restore_b = fadetob + (19 - miss->_miAnimFrame) / 18 * 240;
+    if (restore_r >= 256)
+        restore_r = 255;
+    if (restore_g >= 256)
+        restore_g = 255;
+    if (restore_b >= 256)
+        restore_b = 255;
 
     PutMissile(i);
 }
