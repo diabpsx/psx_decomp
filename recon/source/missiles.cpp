@@ -1545,7 +1545,7 @@ void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 
 void AddFirewallC(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    int i, k, l, j, tx, ty, dir;
+    int i, k, l, j, tx, ty;
     int CrawlNum[6];
 
     memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
@@ -1578,9 +1578,9 @@ void AddFirewallC(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._miVar7 = 0;
     missile[mi]._miVar8 = 0;
 
-    dir = GetDirection(sx, sy, missile[mi]._miVar1, missile[mi]._miVar2);
-    missile[mi]._miVar4 = (dir - 2) & 7;
-    missile[mi]._miVar3 = (dir + 2) & 7;
+    midir = GetDirection(sx, sy, dx, dy);
+    missile[mi]._miVar4 = (midir - 2) & 7;
+    missile[mi]._miVar3 = (midir + 2) & 7;
 
     missile[mi]._mirange = 7;
     UseMana(id, SPL_FIREWALL);
