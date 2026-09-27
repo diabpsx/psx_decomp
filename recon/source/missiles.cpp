@@ -51,6 +51,13 @@ unsigned char fadetor;
 unsigned char fadetog;
 unsigned char fadetob;
 
+/* @0x8011A030 -- the CrawlNum[6] template all 7 Add-family/MI_Golem functions memcpy from. Materialized
+ * separately in asm/data/rodata_missiles.rodata.s (real .rdata, no symbol name in the SYM). An
+ * `extern const` can't be constant-folded (unlike a static-const template, which WAS folded back
+ * to individual li/sw in a probe), so this reproduces the oracle's real runtime block copy without
+ * introducing a new .data symbol retail doesn't have. */
+extern const int D_8011A030[6];
+
 /* spell ids (retail 1.09 values; PSX has no Hellfire spells) */
 #define SPL_FIREBOLT    0x1
 #define SPL_HEAL        0x2
@@ -970,7 +977,9 @@ void AddFirebolt(int mi, int sx, int sy, int dx, int dy, int midir, char micaste
 void AddTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, k, l, j, tx, ty;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     missile[mi]._miDelFlag = 1;
     for (k = 0; k < 6; k++) {
@@ -1462,7 +1471,9 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, mx, k, j, l, tx, ty;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     missile[mi]._miDelFlag = 0;
     for (i = 0; i < nummissiles; i++) {
@@ -1535,7 +1546,9 @@ void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 void AddFirewallC(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, k, l, j, tx, ty, dir;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     missile[mi]._miDelFlag = 1;
     for (k = 0; k < 6; k++) {
@@ -1566,8 +1579,8 @@ void AddFirewallC(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._miVar8 = 0;
 
     dir = GetDirection(sx, sy, missile[mi]._miVar1, missile[mi]._miVar2);
-    missile[mi]._miVar4 = (dir + 2) & 7;
-    missile[mi]._miVar3 = (dir - 2) & 7;
+    missile[mi]._miVar4 = (dir - 2) & 7;
+    missile[mi]._miVar3 = (dir + 2) & 7;
 
     missile[mi]._mirange = 7;
     UseMana(id, SPL_FIREWALL);
@@ -2734,7 +2747,9 @@ void AddStone(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 {
     int i, j, k, l, tx, ty;
     int mid;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     missile[mi]._misource = id;
 
@@ -2893,7 +2908,9 @@ void MI_Apoca(int i)
 void AddGuardian(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     int i, pn, k, l, j, tx, ty;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     missile[mi]._midam = ENG_random(10) + 1 + (plr[id]._pLevel >> 1);
     for (i = missile[mi]._mispllvl; i > 0; i--)
@@ -3666,7 +3683,9 @@ void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
      * myplr global at the very end, UNCONDITIONALLY (not gated by `id == myplr` at all, unlike
      * devilution/hellfire's read-only comparison there). */
     int i, pn, k, l, j, tx, ty, mx;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     if (currlevel != 0) {
         missile[mi]._miDelFlag = 1;
@@ -3855,7 +3874,9 @@ void MI_Rportal(int i)
 void MI_Golem(int i)
 {
     int id, pn, j, k, l, m, tx, ty;
-    int CrawlNum[6] = { 0, 3, 12, 45, 94, 159 };
+    int CrawlNum[6];
+
+    memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
     id = missile[i]._misource;
 
