@@ -29,6 +29,11 @@
 
 extern "C" void DBG_Error(char *Text, char *File, int Line);
 void SetItemMinStats(const struct PlayerStruct *p, struct ItemStruct *x);
+void SetICursor(int i);
+extern int icursW28;
+extern int icursH28;
+extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */
+extern int AP2x2Tbl[10];   /* @0x8010D008 */
 
 /* SpellData layout (from DIABPSX.SYM; not emitted into the stores headers) */
 struct SpellData {   /* sizeof 52 */
@@ -428,6 +433,69 @@ void AddStoreHoldRecharge(ItemStruct itm, int i)
     storehold[storenumh]._iIvalue = storehold[storenumh]._ivalue;
     storehidx[storenumh] = i;
     storenumh++;
+}
+
+/* @0x8006A408 */
+int StoreAutoPlace(void)
+{
+    int i;
+    int w;
+    int h;
+    int idx;
+    unsigned char done;
+
+    SetICursor(plr[myplr].HoldItem._iCurs + 0xC);
+    w = icursW28;
+    h = icursH28;
+    done = 0;
+    if (w == 1 && h == 1) {
+        idx = plr[myplr].HoldItem.IDidx;
+        if (plr[myplr].HoldItem._iStatFlag && AllItemsUseable[idx] && plr[myplr].HoldItem._itype != 11) {
+            for (i = 0; i < 8 && !done; i++) {
+                if (plr[myplr].SpdList[i]._itype == -1) {
+                    plr[myplr].SpdList[i] = plr[myplr].HoldItem;
+                    done = 1;
+                }
+            }
+        }
+        for (i = 30; i <= 39 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 20; i <= 29 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 10; i <= 19 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 0; i <= 9 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+    }
+    if (w == 1 && h == 2) {
+        for (i = 29; i >= 20 && !done; i--)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 9; i >= 0 && !done; i--)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 19; i >= 10 && !done; i--)
+            done = func_80159F24(myplr, i, w, h, 1);
+    }
+    if (w == 1 && h == 3) {
+        for (i = 0; i < 20 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+    }
+    if (w == 2 && h == 2) {
+        for (i = 0; i < 10 && !done; i++)
+            done = func_80159F24(myplr, AP2x2Tbl[i], w, h, 1);
+        for (i = 21; i < 29 && !done; i += 2)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 1; i < 9 && !done; i += 2)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 10; i < 19 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+    }
+    if (w == 2 && h == 3) {
+        for (i = 0; i < 9 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+        for (i = 10; i < 19 && !done; i++)
+            done = func_80159F24(myplr, i, w, h, 1);
+    }
+    return done;
 }
 
 /* @0x8006AA50 */
