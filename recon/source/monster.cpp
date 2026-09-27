@@ -646,19 +646,15 @@ void M_StartFadeout(int i, int md, unsigned char backwards)
     }
 }
 
-/* OPEN: logic correct (verified against refs/diablo-hellfire), bytes near-miss (120 vs 107 insns).
- * The oracle fuses each direction's `SolidLoc(...) || dFlags&BFLAG_MONSTLR` guard directly into the
- * shared tail (no separate "return 0" per branch -- it flows straight from the mask/compare into the
- * next direction's shared code), where ours keeps each branch's own beqz/li/j return-0 sequence.
- * Next angle: a single fused boolean `if (SolidLoc(..)||(...)) return 0;` chain written WITHOUT
- * if/else-if (four independent `if` statements in sequence, each an early return) may let gcc thread
- * the branches the way the oracle does; not yet tried due to time budget. */
+/* PASS+SYM. fx/fy are `long` (SYM) with devilution's signed `< 0 || >= 98` bounds test (gcc folds
+ * each pair into one sltiu); the N/S corner checks are two separate `if (SolidLoc) return 0;`
+ * statements, whose identical tails gcc cross-jumps with the E/W dFlags test. */
 unsigned char DirOK(int i, int mdir)
 {
-    unsigned int fx = monster[i]._mx + offset_x[mdir];
-    unsigned int fy = monster[i]._my + offset_y[mdir];
+    long fx = monster[i]._mx + offset_x[mdir];
+    long fy = monster[i]._my + offset_y[mdir];
 
-    if (fy >= 98 || fx >= 98)
+    if (fy < 0 || fy >= 98 || fx < 0 || fx >= 98)
         return 0;
     if (!PosOkMonst(i, fx, fy))
         return 0;
@@ -670,10 +666,14 @@ unsigned char DirOK(int i, int mdir)
         if (SolidLoc(fx + 1, fy) || (dung_map[fx + 1][fy].dFlags & BFLAG_MONSTLR))
             return 0;
     } else if (mdir == DIR_N) {
-        if (SolidLoc(fx + 1, fy) || SolidLoc(fx, fy + 1))
+        if (SolidLoc(fx + 1, fy))
+            return 0;
+        if (SolidLoc(fx, fy + 1))
             return 0;
     } else if (mdir == DIR_S) {
-        if (SolidLoc(fx - 1, fy) || SolidLoc(fx, fy - 1))
+        if (SolidLoc(fx - 1, fy))
+            return 0;
+        if (SolidLoc(fx, fy - 1))
             return 0;
     }
 
