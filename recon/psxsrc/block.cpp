@@ -177,6 +177,8 @@ public:
     void PrintMap(int x, int y);   /* not yet reconstructed -- declared only, defined elsewhere later */
 };
 
+void MyRoutine(CBlocks &B, int x, int y);
+
 extern "C" void *SetSp(void *newsp);
 
 TextDat *GM_UseTexData(int Id);

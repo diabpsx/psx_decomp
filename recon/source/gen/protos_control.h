@@ -41,3 +41,6 @@ void DrawChr(void);   /* @0x80035698 CONTROL.CPP:2808 */
 void stream_resume(void);   /* @0x8003D01C EFFECTS.CPP:148 */
 void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
 void DrawChrTSK(TASK *T);   /* @0x80035B48 CONTROL.CPP:2959 */
+BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
+BOOL SelectorActive(void);   /* @0x800A336C PADFUNCS.CPP:1146 */
+void DrawSpellList(void);   /* @0x800310B8 CONTROL.CPP:895 */

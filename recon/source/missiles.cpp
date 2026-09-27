@@ -2587,31 +2587,32 @@ void MI_Bonespirit(int i)
 
 void MI_FirewallC(int i)
 {
+    MissileStruct *miss = &missile[i];
     int tx, ty, id;
 
-    missile[i]._mirange--;
-    id = missile[i]._misource;
-    if (missile[i]._mirange == 0) {
-        missile[i]._miDelFlag = 1;
+    miss->_mirange--;
+    id = miss->_misource;
+    if (miss->_mirange == 0) {
+        miss->_miDelFlag = 1;
     } else {
-        tx = missile[i]._miVar1 + XDirAdd[missile[i]._miVar3];
-        ty = missile[i]._miVar2 + YDirAdd[missile[i]._miVar3];
-        if (GetMISSILE(missile[i]._miVar1, missile[i]._miVar2) == 0 && missile[i]._miVar8 == 0 && tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
-            AddMissile(missile[i]._miVar1, missile[i]._miVar2, missile[i]._miVar1, missile[i]._miVar2, plr[id]._pdir, MIS_FIREWALL, TARGET_BOTH, id, 0, missile[i]._mispllvl);
-            missile[i]._miVar1 = tx;
-            missile[i]._miVar2 = ty;
+        tx = miss->_miVar1 + XDirAdd[miss->_miVar3];
+        ty = miss->_miVar2 + YDirAdd[miss->_miVar3];
+        if (GetMISSILE(miss->_miVar1, miss->_miVar2) == 0 && miss->_miVar8 == 0 && tx > 0 && tx < 112 && ty > 0 && ty < 112) {
+            AddMissile(miss->_miVar1, miss->_miVar2, miss->_miVar1, miss->_miVar2, plr[id]._pdir, MIS_FIREWALL, TARGET_BOTH, id, 0, miss->_mispllvl);
+            miss->_miVar1 = tx;
+            miss->_miVar2 = ty;
         } else {
-            missile[i]._miVar8 = 1;
+            miss->_miVar8 = 1;
         }
 
-        tx = missile[i]._miVar5 + XDirAdd[missile[i]._miVar4];
-        ty = missile[i]._miVar6 + YDirAdd[missile[i]._miVar4];
-        if (GetMISSILE(missile[i]._miVar5, missile[i]._miVar6) == 0 && missile[i]._miVar7 == 0 && tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {
-            AddMissile(missile[i]._miVar5, missile[i]._miVar6, missile[i]._miVar5, missile[i]._miVar6, plr[id]._pdir, MIS_FIREWALL, TARGET_BOTH, id, 0, missile[i]._mispllvl);
-            missile[i]._miVar5 = tx;
-            missile[i]._miVar6 = ty;
+        tx = miss->_miVar5 + XDirAdd[miss->_miVar4];
+        ty = miss->_miVar6 + YDirAdd[miss->_miVar4];
+        if (GetMISSILE(miss->_miVar5, miss->_miVar6) == 0 && miss->_miVar7 == 0 && tx > 0 && tx < 112 && ty > 0 && ty < 112) {
+            AddMissile(miss->_miVar5, miss->_miVar6, miss->_miVar5, miss->_miVar6, plr[id]._pdir, MIS_FIREWALL, 0 /* PSX literal, not TARGET_BOTH */, id, 0, miss->_mispllvl);
+            miss->_miVar5 = tx;
+            miss->_miVar6 = ty;
         } else {
-            missile[i]._miVar7 = 1;
+            miss->_miVar7 = 1;
         }
     }
 }

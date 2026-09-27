@@ -872,14 +872,15 @@ void On_SATTACKXY(const TCmd *pCmd, int pnum)
 void On_SPELLXYD(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellXY *p = (const TCmdSpellXY *)pCmd;
+    unsigned short spell = p->wParam1;
     ClrPlrPath(pnum);
-    plr[pnum]._pSpell = (char)p->wParam1;
     plr[pnum].destAction = 0x1A;
     plr[pnum]._pSplFrom = 0;
     plr[pnum].destParam1 = (char)p->x;
     plr[pnum].destParam2 = (char)p->y;
     plr[pnum].destParam3 = (char)p->wParam2;
     plr[pnum].destParam4 = (char)p->wParam3;
+    plr[pnum]._pSpell = (char)spell;
     plr[pnum]._pSplType = plr[pnum]._pRSplType;
 }
 
@@ -887,13 +888,14 @@ void On_SPELLXYD(const TCmd *pCmd, int pnum)
 void On_SPELLXY(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellXY *p = (const TCmdSpellXY *)pCmd;
+    unsigned short spell = p->wParam1;
     ClrPlrPath(pnum);
-    plr[pnum]._pSpell = (char)p->wParam1;
     plr[pnum].destAction = 0xC;
     plr[pnum]._pSplFrom = 0;
     plr[pnum].destParam1 = (char)p->x;
     plr[pnum].destParam2 = (char)p->y;
     plr[pnum].destParam3 = (char)p->wParam2;
+    plr[pnum]._pSpell = (char)spell;
     plr[pnum]._pSplType = plr[pnum]._pRSplType;
 }
 
@@ -901,13 +903,14 @@ void On_SPELLXY(const TCmd *pCmd, int pnum)
 void On_TSPELLXY(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellXY *p = (const TCmdSpellXY *)pCmd;
+    unsigned short spell = p->wParam1;
     ClrPlrPath(pnum);
-    plr[pnum]._pSpell = (char)p->wParam1;
     plr[pnum].destAction = 0xC;
     plr[pnum]._pSplFrom = 2;
     plr[pnum].destParam1 = (char)p->x;
     plr[pnum].destParam2 = (char)p->y;
     plr[pnum].destParam3 = (char)p->wParam2;
+    plr[pnum]._pSpell = (char)spell;
     plr[pnum]._pSplType = plr[pnum]._pTSplType;
 }
 

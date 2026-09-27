@@ -11,6 +11,7 @@
 /* monster types (_mMTidx / CMonster::mtype, retail values) */
 #define MT_GOLEM    109
 #define MT_DIABLO   110
+#define MT_CLEAVER  0x33
 #define MT_COUNSLR  0x69
 #define MT_ADVOCATE 0x6C
 
@@ -54,6 +55,10 @@
 #define MM_WALK3   3
 #define MM_DEATH   6
 #define MM_RSATTACK 12
+#define MM_SPSTAND  11
+#define RUN_DONE    0
+#define USFX_CLEAVER 0x349
+#define MFLAG_BACKWARDS 0x02
 #define MM_HEAL    0x10
 
 #define MGOAL_NORMAL    1
@@ -2224,4 +2229,155 @@ unsigned char PosOkMonst3(int i, int x, int y)
     }
 
     return ret;
+}
+
+void ProcessMonsters(void)
+{
+    static unsigned int WipeCount;
+    unsigned char DoWipe;
+    MonsterStruct *Monst;
+    int oldmode;
+    int i;
+    int mi;
+    int raflag;
+    int mx;
+    int my;
+    int _menemy;
+
+    DeleteMonsterList();
+
+    DoWipe = ((++WipeCount) % 200) == 0;
+    for (i = 0; i < nummonsters; i++) {
+        mi = monstactive[i];
+        Monst = &monster[mi];
+
+        if (DoWipe) {
+            if (mi >= 4)
+                Monst->_mFlags &= ~MFLAG_TARGETS_MONSTER;
+        }
+
+        if (!(monster[mi]._mFlags & MFLAG_NOHEAL) && Monst->_mhitpoints < Monst->_mmaxhp && (Monst->_mhitpoints >> 6) > 0) {
+            if (Monst->mLevel > 1)
+                Monst->_mhitpoints += Monst->mLevel >> 1;
+            else
+                Monst->_mhitpoints += Monst->mLevel;
+        }
+
+        mx = Monst->_mx;
+        my = Monst->_my;
+
+        if ((dung_map[mx][my].dFlags & 0x3) && (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) && Monst->_msquelch == 0) {
+            if (Monst->MType->mtype == MT_CLEAVER)
+                PlaySFX(USFX_CLEAVER);
+        }
+
+        if (Monst->_mFlags & MFLAG_TARGETS_MONSTER) {
+            _menemy = Monst->_menemy;
+            Monst->_lastx = monster[_menemy]._mfutx;
+            Monst->_menemyx = Monst->_lastx;
+            Monst->_lasty = monster[_menemy]._mfuty;
+            Monst->_menemyy = Monst->_lasty;
+        } else {
+            _menemy = Monst->_menemy;
+            if (!plr[_menemy].plractive) {
+                _menemy ^= 1;
+                Monst->_menemy = _menemy;
+            }
+            Monst->_menemyx = plr[_menemy]._px;
+            Monst->_menemyy = plr[_menemy]._py;
+            if (dung_map[mx][my].dFlags & 0x3) {
+                Monst->_msquelch = 255;
+                Monst->_lastx = plr[_menemy]._px;
+                Monst->_lasty = plr[_menemy]._py;
+            } else if (Monst->_msquelch != 0 && Monst->_mAi != MT_DIABLO) {
+                Monst->_msquelch--;
+            }
+        }
+
+        if (!(dung_map[mx][my].dFlags & 0x3) && Monst->_msquelch == 0 && i >= 4)
+            continue;
+
+        do {
+            AiProc[Monst->_mAi](mi);
+
+            switch (oldmode = Monst->_mmode) {
+            case MM_STAND:
+                raflag = M_DoStand(mi);
+                break;
+            case MM_WALK:
+                raflag = M_DoWalk(mi);
+                break;
+            case MM_WALK2:
+                raflag = M_DoWalk2(mi);
+                break;
+            case MM_WALK3:
+                raflag = M_DoWalk3(mi);
+                break;
+            case MM_ATTACK:
+                raflag = M_DoAttack(mi);
+                break;
+            case MM_GOTHIT:
+                raflag = M_DoGotHit(mi);
+                break;
+            case MM_DEATH:
+                raflag = M_DoDeath(mi);
+                break;
+            case MM_SATTACK:
+                raflag = M_DoSAttack(mi);
+                break;
+            case MM_FADEIN:
+                raflag = M_DoFadein(mi);
+                break;
+            case MM_FADEOUT:
+                raflag = M_DoFadeout(mi);
+                break;
+            case MM_RATTACK:
+                raflag = M_DoRAttack(mi);
+                break;
+            case MM_SPSTAND:
+                raflag = M_DoSpStand(mi);
+                break;
+            case MM_RSATTACK:
+                raflag = M_DoRSpAttack(mi);
+                break;
+            case MM_DELAY:
+                raflag = M_DoDelay(mi);
+                break;
+            case MM_MISSILE:
+                raflag = RUN_DONE;
+                break;
+            case MM_STONE:
+                raflag = M_DoStone(mi);
+                break;
+            case MM_HEAL:
+                raflag = M_DoHeal(mi);
+                break;
+            case MM_TALK:
+                raflag = M_DoTalk(mi);
+                break;
+            }
+
+            if (raflag != RUN_DONE)
+                GroupUnity(mi);
+        } while (raflag != RUN_DONE);
+
+        if (Monst->_mmode != MM_STONE) {
+            Monst->_mAnimCnt++;
+            if (!(Monst->_mFlags & MFLAG_STILL)) {
+                if (Monst->_mAnimCnt >= Monst->_mAnimDelay) {
+                    Monst->_mAnimCnt = 0;
+                    if (Monst->_mFlags & MFLAG_BACKWARDS) {
+                        Monst->_mAnimFrame--;
+                        if (!Monst->_mAnimFrame)
+                            Monst->_mAnimFrame = Monst->_mAnimLen;
+                    } else {
+                        Monst->_mAnimFrame++;
+                        if (Monst->_mAnimFrame > Monst->_mAnimLen)
+                            Monst->_mAnimFrame = 1;
+                    }
+                }
+            }
+        }
+    }
+    DeleteMonsterList();
 }

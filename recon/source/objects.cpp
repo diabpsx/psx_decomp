@@ -515,19 +515,73 @@ void Obj_StopAnim(int i)
 
 void SyncBreakObj(int pnum, int oi)
 {
-    int type;
-
-    type = object[oi]._otype;
-    if (type < 0x14)
+    if (object[oi]._otype < 0x14)
         return;
-    if (type < 0x17) {
+    if (object[oi]._otype < 0x17) {
         BreakCrux(pnum, oi);
         return;
     }
-    if (type >= 0x3B)
+    if (object[oi]._otype >= 0x3B)
         return;
-    if (type >= 0x39)
+    if (object[oi]._otype >= 0x39)
         BreakBarrel(pnum, oi, 0, 1, 0);
+}
+
+void SyncOpL1Door(int pnum, int cmd, int i)
+{
+    unsigned char opok;
+
+    if (pnum == myplr)
+        return;
+    opok = 0;
+    if (cmd == 0x2B && object[i]._oVar4 == 0)
+        opok = 1;
+    if (cmd == 0x2C && object[i]._oVar4 == 1)
+        opok = 1;
+    if (opok) {
+        if (object[i]._otype == 1)
+            OperateL1LDoor(-1, i, 0);
+        if (object[i]._otype == 2)
+            OperateL1RDoor(-1, i, 0);
+    }
+}
+
+void SyncOpL2Door(int pnum, int cmd, int i)
+{
+    unsigned char opok;
+
+    if (pnum == myplr)
+        return;
+    opok = 0;
+    if (cmd == 0x2B && object[i]._oVar4 == 0)
+        opok = 1;
+    if (cmd == 0x2C && object[i]._oVar4 == 1)
+        opok = 1;
+    if (opok) {
+        if (object[i]._otype == 0x2A)
+            OperateL2LDoor(-1, i, 0);
+        if (object[i]._otype == 0x2B)
+            OperateL2RDoor(-1, i, 0);
+    }
+}
+
+void SyncOpL3Door(int pnum, int cmd, int i)
+{
+    unsigned char opok;
+
+    if (pnum == myplr)
+        return;
+    opok = 0;
+    if (cmd == 0x2B && object[i]._oVar4 == 0)
+        opok = 1;
+    if (cmd == 0x2C && object[i]._oVar4 == 1)
+        opok = 1;
+    if (opok) {
+        if (object[i]._otype == 0x4A)
+            OperateL3RDoor(-1, i, 0);
+        if (object[i]._otype == 0x4B)
+            OperateL3LDoor(-1, i, 0);
+    }
 }
 
 void OperateStoryBook(int pnum, int i)

@@ -38,10 +38,10 @@ void HappyMan(int n)
 /* --------------------------------------------------------------------- */
 void WorldToOffset(int pnum, int WorldX, int WorldY)
 {
-    int ox, oy;
+    int x, oy;
     struct PlayerStruct *p;
 
-    ox = WorldX & 7;
+    x = WorldX & 7;
     oy = WorldY & 7;
     p = &plr[pnum];
 
@@ -52,10 +52,10 @@ void WorldToOffset(int pnum, int WorldX, int WorldY)
 
     p->_px = WorldX >> 3;
     p->_py = WorldY >> 3;
-    p->_pxoff = (ox - oy) * 4;
+    p->_pxoff = (x - oy) * 4;
     p->WorldX = WorldX;
     p->WorldY = WorldY;
-    p->_pyoff = (ox + oy - 8) * 2;
+    p->_pyoff = (x + oy - 8) * 2;
 }
 
 /* --------------------------------------------------------------------- */
@@ -92,25 +92,25 @@ GamePad *GetGamePad(int pnum)
 /* --------------------------------------------------------------------- */
 char GetPadStyle(int pnum)
 {
-    GamePad *g;
+    GamePad *GPad;
 
     if (pnum != 0)
-        g = &GPad2;
+        GPad = &GPad2;
     else
-        g = &GPad1;
-    return g->style;
+        GPad = &GPad1;
+    return GPad->style;
 }
 
 /* --------------------------------------------------------------------- */
 int SetWalkStyle(int pnum, int style)
 {
-    int oldstyle;
+    int ret;
 
     PostGamePad(0xB, 0, (int)txt_actions, 0);
-    oldstyle = txt_actions[9].pad_val;
+    ret = txt_actions[9].pad_val;
     txt_actions[9].pad_val = style;
     PostGamePad(9, 0, (int)txt_actions, 0);
-    return oldstyle;
+    return ret;
 }
 
 /* --------------------------------------------------------------------- */

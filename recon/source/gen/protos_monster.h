@@ -116,6 +116,7 @@ void NewMonsterAnim(int i, AnimStruct &anim, int md, int AnimType);   /* @0x8007
 unsigned char PosOkMonst(int i, int x, int y);   /* @0x8008045C COREMON.CPP:665 */
 unsigned char SolidLoc(int x, int y);   /* @0x80060C4C PLAYER.CPP:1339 */
 unsigned char IsDplayer(int x, int y);   /* @0x8005FD10 PLAYER.CPP:262 */
+void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */

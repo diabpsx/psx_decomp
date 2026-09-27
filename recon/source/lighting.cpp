@@ -240,8 +240,8 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                     } else {
                         /* TODO clipped, shift_mask!=0 arm -- see .L8004C414 in the oracle. */
                     }
-                } else {
-                    /* Unclipped arm, shift_mask==0 (the arm this draft implements). */
+                } else if (shift_mask == 0) {
+                    /* Unclipped arm, shift_mask==0 (implemented; not yet byte-verified). */
                     for (y = light_y; y < light_y + mult; y++) {
                         for (x = light_x; x < light_x + mult; x++) {
                             radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
@@ -273,6 +273,59 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                 else
                                     val = radius_block * g_light_amp2;
                                 val = dung_map_b[x][y] + (val & 0xFF);
+                                if (val > g_light_clamp)
+                                    val = g_light_clamp;
+                                dung_map_b[x][y] = val;
+                            }
+                        }
+                    }
+                } else {
+                    /* Unclipped arm, shift_mask!=0 (from the m2c draft; it shows NO weirdy/
+                     * g_lightband branch here -- plain radius_block blend with a per-channel
+                     * shift_mask sub-select of >>1 / *2 additions). Not yet byte-verified. */
+                    for (y = light_y; y < light_y + mult; y++) {
+                        for (x = light_x; x < light_x + mult; x++) {
+                            radius_block = g_light_amp - veclen2(block_x - x * 0x10, block_y - y * 0x10);
+                            if (radius_block < 0)
+                                radius_block = 0;
+                            if (colour_mask & 1) {
+                                val = dung_map_r[x][y];
+                                if (!(shift_mask & 9)) {
+                                    val += radius_block;
+                                } else {
+                                    if (shift_mask & 1)
+                                        val += radius_block >> 1;
+                                    if (shift_mask & 8)
+                                        val += radius_block * 2;
+                                }
+                                if (val > g_light_clamp)
+                                    val = g_light_clamp;
+                                dung_map_r[x][y] = val;
+                            }
+                            if (colour_mask & 2) {
+                                val = dung_map_g[x][y];
+                                if (!(shift_mask & 0x12)) {
+                                    val += radius_block;
+                                } else {
+                                    if (shift_mask & 2)
+                                        val += radius_block >> 1;
+                                    if (shift_mask & 0x10)
+                                        val += radius_block * 2;
+                                }
+                                if (val > g_light_clamp)
+                                    val = g_light_clamp;
+                                dung_map_g[x][y] = val;
+                            }
+                            if (colour_mask & 4) {
+                                val = dung_map_b[x][y];
+                                if (!(shift_mask & 0x24)) {
+                                    val += radius_block;
+                                } else {
+                                    if (shift_mask & 4)
+                                        val += radius_block >> 1;
+                                    if (shift_mask & 0x20)
+                                        val += radius_block * 2;
+                                }
                                 if (val > g_light_clamp)
                                     val = g_light_clamp;
                                 dung_map_b[x][y] = val;

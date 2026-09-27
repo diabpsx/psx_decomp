@@ -36,6 +36,7 @@ struct CFont {   /* sizeof 540 */
     int GetStrWidth(char *Str);
     int GetWrap(char *Str, RECT *TextWindow);
     int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, int R, int G, int B);
+    int GetCharWidth(unsigned char ch);
 };
 
 struct CPad {   /* sizeof 236 */
@@ -75,6 +76,7 @@ struct Dialog {   /* sizeof 16 */
     void SetBorder(int Type) { BorderGfx = Type; }
     void SetRGB(unsigned char R, unsigned char G, unsigned char B);
     void Back(int DX, int DY, int DW, int DH);
+    int SetOTpos(int OT);
 };
 
 class CBlocks {

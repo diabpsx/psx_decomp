@@ -1030,6 +1030,8 @@ void ShieldDur(PlayerStruct *ptrplr)
 
 void ArmorDur(PlayerStruct *ptrplr)
 {
+    ItemStruct *pi;
+
     if (!ismyplr(ptrplr)) {
         return;
     }
@@ -1045,7 +1047,6 @@ void ArmorDur(PlayerStruct *ptrplr)
         a = 0;
     }
 
-    ItemStruct *pi;
     if (a != 0) {
         pi = ptrplr->InvBody + INVLOC_CHEST;
     } else {
@@ -1067,6 +1068,36 @@ void ArmorDur(PlayerStruct *ptrplr)
     }
     pi->_itype = ITYPE_NONE;
     CalcPlrInv(ptrplr, TRUE);
+}
+
+/* PSX stubs: both are bare `return FALSE;` (the state-machine handler exists but does nothing on
+ * this build -- PM_STAND/PM_NEWLVL need no per-frame processing here). */
+int PM_DoStand(PlayerStruct *ptrplr)
+{
+    return FALSE;
+}
+
+int PM_DoNewLvl(PlayerStruct *ptrplr)
+{
+    return FALSE;
+}
+
+int PM_DoGotHit(PlayerStruct *ptrplr)
+{
+    int rv;
+    if (ptrplr->_pVar8 != ptrplr->_pHFrames) {
+        ptrplr->_pVar8++;
+        rv = 0;
+    } else {
+        StartStand(ptrplr, ptrplr->_pdir);
+        ClearPlrPVars(ptrplr);
+        rv = 1;
+        if (ENG_random(4) == 0) {
+            ArmorDur(ptrplr);
+        }
+    }
+    ChangeLightColour(ptrplr->_plid, 0x23F0);
+    return rv;
 }
 
 void AddPlrMonstExper(int lvl, long exp, char pmask)

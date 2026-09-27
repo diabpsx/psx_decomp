@@ -849,6 +849,47 @@ void S_SIDEnter(void)
     }
 }
 
+/* @0x800720C8 */
+void S_SRepairEnter(void)
+{
+    int idx;
+
+    stextshold = 4;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    idx = (stextsel - stextup) / 8 + stextsval;
+    plr[myplr].HoldItem = storehold[idx];
+    SellIdx = idx;
+    if (plr[myplr]._pGold < storehold[idx]._iIvalue) {
+        StartStore(9);
+    } else {
+        StartStore(0xB);
+    }
+}
+
+/* @0x80072818 */
+void S_WSellEnter(void)
+{
+    int idx;
+
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    stextshold = 7;
+    if (WStaffFlag != 0) {
+        idx = (stextsel - stextup) / 8;
+    } else {
+        idx = (stextsel - stextup) / 4;
+    }
+    idx += stextsval;
+    plr[myplr].HoldItem = storehold[idx];
+    SellIdx = idx;
+    if (StoreGoldFit(idx)) {
+        StartStore(0xB);
+    } else {
+        StartStore(0xA);
+    }
+}
+
 /* @0x80073AE8 */
 void S_StoryEnter(void)
 {

@@ -272,7 +272,7 @@ void DRLG_L3FillStraights(void)
     int i, j;
     int xc, xs;
     int yc, ys;
-    int k, rv;
+    int k, rv = 0;
 
     for (j = 0; j < DMAXY - 1; j++) {
         xc = 0;
@@ -409,7 +409,7 @@ void DRLG_L3MakeMegas(void)
         }
         dungeon[46][j] = 8;
     }
-    for (i = 0; i < DMAXX; i++) {
+    for (i = 0; i < 47; i++) {
         dungeon[i][DMAXY - 1] = 8;
     }
 }

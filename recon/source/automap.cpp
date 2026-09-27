@@ -516,10 +516,30 @@ void DrawAutoMapStairs(int X, int Y)
  * in this TU is either sealed or has a concrete near-miss target. */
 void DrawAutomap(void)
 {
-    /* Setup block transcribed from refs/m2c/automap.c:791-835 (AMPlayerX/Y + per-player AMPx/AMPy
-     * split-screen offsets) -- structurally complete but NOT YET byte-verified in isolation.
-     * The leveltype==3 / else run-merge rasterizer bodies (refs/m2c/automap.c:836-1148, ~650 raw
-     * insns) and the draw_game_info-equivalent text tail (refs/m2c/automap.c:1148-1254) are TODO. */
+    /* Full draft transcribed from refs/m2c/automap.c:791-1254 (setup + leveltype==3/else run-merge
+     * rasterizer + draw_game_info-equivalent text tail).  NOT YET byte-verified against the oracle --
+     * SYM names applied per tools/symtypes.py's register map (LLen=$s1/RLen=$s3/LLLen=$s6/LRLen=$s7,
+     * LSx,LSy/RSx,RSy/LLSx,LLSy/LRSx,LRSy paired by frame offset, AmTile/AmTileType/AmTileTypePtr for
+     * the automaptype[]-lookup byte-view idiom used elsewhere in this codebase).  Open uncertainties
+     * flagged inline; the leveltype==3 vs else branch's HORIZONTAL-vs-VERTICAL door/grate/arch call
+     * routing and the dungeon[][] index order are the biggest correctness risks and should be
+     * re-checked against VA_CTX=1 diffs before trusting the byte-level shape. */
+    LINE_F2 *L2;
+    int Lx, Ly;
+    int LineY, MapX, MapY;
+    int LLSx, LLSy, LRSx, LRSy, LSx, LSy, RSx, RSy;
+    int LLen, RLen, LLLen, LRLen;
+    unsigned char AMLWallFlag, AMRWallFlag;
+    unsigned short AmTile;
+    unsigned char AmTileType;
+    unsigned char *AmTileTypePtr;
+    int P1x, P1y, P2x, P2y;
+    char levname[64];
+    int len;
+    int PAx, PAy;
+
+    AmTileTypePtr = (unsigned char *)&AmTile + 1;
+
     if (PauseMode == 0 && (plr[0].plractive || plr[1].plractive)) {
         int a1, a2, a3, t0;
 
@@ -552,27 +572,359 @@ void DrawAutomap(void)
             AMPy[1] = (t0 - my) * 2;
         }
 
-        {
-            int lo, lo2;
+        Lx = AMPlayerX * AutoMapScale;
+        Ly = AMPlayerY * AutoMapScale;
+        AMPlayerX = (AutoMapXOfs + 0xA0) - (Lx >> 1);
+        AMPlayerY = (AutoMapYOfs + 0x64) - (Ly >> 1);
 
-            lo = AMPlayerX * AutoMapScale;
-            lo2 = AMPlayerY * AutoMapScale;
-            AMPlayerX = (AutoMapXOfs + 0xA0) - (lo >> 1);
-            AMPlayerY = (AutoMapYOfs + 0x64) - (lo2 >> 1);
-        }
-
+        LineY = 0;
         if (leveltype == 3) {
-            /* TODO (open): the horizontal wall/door/grate/arch run-merge pass over
-             * automapview[][]/dungeon[][]/automaptype[]/AmRTab[] for the 40x40 visible window --
-             * refs/m2c/automap.c:836-1077. */
+            MapX = 0;
+        automap_row3:
+            RLen = 0;
+            LLen = 0;
+            LRLen = 0;
+            LLLen = 0;
+            MapY = 1;
+            do {
+                if ((automapview[MapX >> 3][MapY] >> (MapX & 7)) & 1) {
+                    AmTile = automaptype[dungeon[MapX][MapY]];
+                    AmTileType = *AmTileTypePtr;
+                    AMLWallFlag = AmLTab[AmTile & 0xF];
+
+                    if (AmTileType & 0x80)
+                        DrawAutoMapStairs(MapX, MapY);
+
+                    if (!(AmTileType & 0x15) && (AMLWallFlag & 2)) {
+                        if (LLen == 0) {
+                            LSx = MapX;
+                            LSy = MapY;
+                        }
+                        LLen++;
+                    } else if (LLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((LSx - LSy) * 8) + AMPlayerX;
+                        P1y = ((LSy + LSx) * 4) + AMPlayerY;
+                        P2x = P1x - LLen * 4 * 2;
+                        P2y = P1y + LLen * 4;
+                        LLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+
+                    if (AMLWallFlag & 1)
+                        DrawAutoMapSquare(MapX, MapY);
+
+                    if (!(AmTileType & 0x15) && (AMLWallFlag & 4)) {
+                        if (LLLen == 0) {
+                            LLSx = MapX;
+                            LLSy = MapY;
+                        }
+                        LLLen++;
+                        goto row3_afterll;
+                    }
+                    if (LLLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((LLSx - LLSy) * 8) + AMPlayerX;
+                        P1y = ((LLSy + LLSx) * 4) + AMPlayerY;
+                        P2x = P1x + LLLen * 4 * 2;
+                        P2y = P1y + LLLen * 4;
+                        LLLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+
+                    if (AmTileType != 0) {
+                        if (AmTileType & 1) {
+                            DrawAutoMapHorzDoor(MapX, LineY);
+                        } else if (AmTileType & 0x10) {
+                            DrawAutoMapHorzGrate(MapX, LineY);
+                        } else if (AmTileType & 4) {
+                            DrawHorzArch(MapX, LineY);
+                        } else {
+                            goto row3_join1;
+                        }
+                    } else {
+                        goto row3_join1;
+                    }
+                    goto row3_after1;
+                row3_afterll:
+                    goto row3_join1;
+                } else {
+                    if (LLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((LSx - LSy) * 8) + AMPlayerX;
+                        P1y = ((LSy + LSx) * 4) + AMPlayerY;
+                        P2x = P1x - LLen * 4 * 2;
+                        P2y = P1y + LLen * 4;
+                        LLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+                    if (LLLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((LLSx - LLSy) * 8) + AMPlayerX;
+                        P1y = ((LLSy + LLSx) * 4) + AMPlayerY;
+                        P2x = P1x + LLLen * 4 * 2;
+                        P2y = P1y + LLLen * 4;
+                        LLLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+                row3_join1:;
+                }
+            row3_after1:
+
+                if ((automapview[MapY >> 3][MapX] >> (MapY & 7)) & 1) {
+                    AmTile = automaptype[dungeon[MapY][MapX]];
+                    AmTileType = *AmTileTypePtr;
+                    AMRWallFlag = AmRTab[AmTile & 0xF];
+
+                    if (!(AmTileType & 0x2A) && (AMRWallFlag & 8)) {
+                        if (RLen == 0) {
+                            RSx = MapX;
+                            RSy = MapY;
+                        }
+                        RLen++;
+                    } else if (RLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((RSx - RSy) * 8) + AMPlayerX;
+                        P1y = ((RSy + RSx) * 4) + AMPlayerY;
+                        P2x = P1x + RLen * 4 * 2;
+                        P2y = P1y + RLen * 4;
+                        RLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+
+                    if (!(AmTileType & 0x2A) && (AMRWallFlag & 0x10)) {
+                        if (LRLen == 0) {
+                            LRSx = MapX;
+                            LRSy = LineY;
+                        }
+                        LRLen++;
+                        goto row3_afterlr;
+                    }
+                    if (LRLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((LRSx - LRSy) * 8) + AMPlayerX;
+                        P1y = ((LRSy + LRSx) * 4) + AMPlayerY;
+                        P2x = P1x - LRLen * 4 * 2;
+                        P2y = P1y + LRLen * 4;
+                        LRLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+
+                    if (AmTileType != 0) {
+                        if (AmTileType & 2) {
+                            DrawAutoMapVertDoor(MapX, LineY);
+                            MapX++;
+                        } else if (AmTileType & 0x20) {
+                            DrawAutoMapVertGrate(MapX, LineY);
+                            MapX++;
+                        } else {
+                            if (AmTileType & 8)
+                                DrawVertArch(MapX, LineY);
+                            goto row3_join2;
+                        }
+                    } else {
+                    row3_join2:
+                        MapX++;
+                    }
+                } else {
+                    if (RLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((RSx - RSy) * 8) + AMPlayerX;
+                        P1y = ((RSy + RSx) * 4) + AMPlayerY;
+                        P2x = P1x + RLen * 4 * 2;
+                        P2y = P1y + RLen * 4;
+                        RLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+                    if (LRLen != 0) {
+                        L2 = AMGetLine(0x5F, 0x58, 0x38);
+                        P1x = ((LRSx - LRSy) * 8) + AMPlayerX;
+                        P1y = ((LRSy + LRSx) * 4) + AMPlayerY;
+                        P2x = P1x - LRLen * 4 * 2;
+                        P2y = P1y + LRLen * 4;
+                        LRLen = 0;
+                        L2->x0 = P1x;
+                        L2->y0 = P1y;
+                        L2->x1 = P2x;
+                        L2->y1 = P2y;
+                    }
+                row3_afterlr:
+                    MapY++;
+                }
+            } while (MapY < 0x28);
+
+            if (LLen != 0) {
+                L2 = AMGetLine(0x5F, 0x58, 0x38);
+                P1x = ((LSx - LSy) * 8) + AMPlayerX;
+                P1y = ((LSy + LSx) * 4) + AMPlayerY;
+                L2->x1 = P1x - (LLen * 4) * 2;
+                L2->x0 = P1x;
+                L2->y0 = P1y;
+                L2->y1 = P1y + LLen * 4;
+            }
+            if (LLLen != 0) {
+                L2 = AMGetLine(0x5F, 0x58, 0x38);
+                P1x = ((LLSx - LLSy) * 8) + AMPlayerX;
+                P1y = ((LLSy + LLSx) * 4) + AMPlayerY;
+                L2->x1 = P1x + (LLLen * 4) * 2;
+                L2->x0 = P1x;
+                L2->y0 = P1y;
+                L2->y1 = P1y + LLLen * 4;
+            }
+            if (RLen != 0) {
+                L2 = AMGetLine(0x5F, 0x58, 0x38);
+                P1x = ((RSx - RSy) * 8) + AMPlayerX;
+                P1y = ((RSy + RSx) * 4) + AMPlayerY;
+                L2->x1 = P1x + (RLen * 4) * 2;
+                L2->x0 = P1x;
+                L2->y0 = P1y;
+                L2->y1 = P1y + RLen * 4;
+            }
+            PAx = 0x5F;
+            if (LRLen != 0) {
+                L2 = AMGetLine(0x5F, 0x58, 0x38);
+                P1x = ((LRSx - LRSy) * 8) + AMPlayerX;
+                PAx = ((LRSy + LRSx) * 4) + AMPlayerY;
+                L2->x1 = P1x - (LRLen * 4) * 2;
+                L2->x0 = P1x;
+                L2->y0 = PAx;
+                L2->y1 = PAx + LRLen * 4;
+            }
+
+            MapX += 1;
+            if (MapX < 0x28)
+                goto automap_row3;
         } else {
-            /* TODO (open): the leveltype!=3 sibling pass using AmLTab[] +
-             * DrawAutoMapStairs/HorzDoor/HorzGrate/DrawHorzArch -- refs/m2c/automap.c:1078-1148. */
+            /* leveltype != 3: same run-merge shape, single automapview check per tile (no AmRTab
+             * sub-pass), calling the Horz*/Stairs family. */
+            do {
+                MapY = 0;
+                RLen = 0;
+                LLen = 0;
+
+                do {
+                    if ((automapview[LineY >> 3][MapY] >> (LineY & 7)) & 1) {
+                        AmTile = automaptype[dungeon[LineY][MapY]];
+                        AmTileType = *AmTileTypePtr;
+                        AMLWallFlag = AmLTab[AmTile & 0xF];
+
+                        if (AmTileType & 0x80)
+                            DrawAutoMapStairs(LineY, MapY);
+
+                        if (!(AmTileType & 0x15) && (AMLWallFlag & 2)) {
+                            if (LLen == 0) {
+                                LSx = LineY;
+                                LSy = MapY;
+                            }
+                            LLen++;
+                            goto row_join3;
+                        }
+                        if (LLen != 0) {
+                            L2 = AMGetLine(0x5F, 0x58, 0x38);
+                            P1x = ((LSx - LSy) * 8) + AMPlayerX;
+                            P1y = ((LSy + LSx) * 4) + AMPlayerY;
+                            P2x = P1x - LLen * 4 * 2;
+                            P2y = P1y + LLen * 4;
+                            LLen = 0;
+                            L2->x0 = P1x;
+                            L2->y0 = P1y;
+                            L2->x1 = P2x;
+                            L2->y1 = P2y;
+                        }
+
+                        if (AmTileType != 0) {
+                            if (AmTileType & 1) {
+                                DrawAutoMapVertDoor(MapY, LineY);
+                                MapY++;
+                            } else if (AmTileType & 0x10) {
+                                DrawAutoMapVertGrate(MapY, LineY);
+                                MapY++;
+                            } else if (AmTileType & 4) {
+                                DrawVertArch(MapY, LineY);
+                                MapY++;
+                            } else {
+                                goto row_join4;
+                            }
+                        } else {
+                            goto row_join4;
+                        }
+                    } else {
+                        if (LLen != 0) {
+                            L2 = AMGetLine(0x5F, 0x58, 0x38);
+                            P1x = ((LSx - LSy) * 8) + AMPlayerX;
+                            P1y = ((LSy + LSx) * 4) + AMPlayerY;
+                            P2x = P1x - LLen * 4 * 2;
+                            P2y = P1y + LLen * 4;
+                            LLen = 0;
+                            L2->x0 = P1x;
+                            L2->y0 = P1y;
+                            L2->x1 = P2x;
+                            L2->y1 = P2y;
+                        }
+                    row_join4:
+                        MapY++;
+                    }
+                row_join3:;
+                } while (MapY < 0x28);
+
+                if (LLen != 0) {
+                    L2 = AMGetLine(0x5F, 0x58, 0x38);
+                    P1x = ((LSx - LSy) * 8) + AMPlayerX;
+                    P1y = ((LSy + LSx) * 4) + AMPlayerY;
+                    P2x = P1x - LLen * 4 * 2;
+                    P2y = P1y + LLen * 4;
+                    L2->x0 = P1x;
+                    L2->y0 = P1y;
+                    L2->x1 = P2x;
+                    L2->y1 = P2y;
+                }
+                if (RLen != 0) {
+                    L2 = AMGetLine(0x5F, 0x58, 0x38);
+                    P1x = ((RSx - RSy) * 8) + AMPlayerX;
+                    P1y = ((RSy + RSx) * 4) + AMPlayerY;
+                    P2x = P1x + RLen * 4 * 2;
+                    P2y = P1y + RLen * 4;
+                    L2->x0 = P1x;
+                    L2->y0 = P1y;
+                    L2->x1 = P2x;
+                    L2->y1 = P2y;
+                }
+
+                LineY += 1;
+            } while (LineY < 0x28);
         }
     }
 
     DrawAutomapPlr();
 
-    /* TODO (open): draw_game_info-equivalent tail (MediumFont.Print/GetStr/sprintf/GOLDR,G,B) --
-     * refs/m2c/automap.c:1148-1254. */
+    if (setlevel == 0) {
+        sprintf(levname, GetStr(0x243) ? "Level: %s" : "Level: %d", currlevel);
+    } else {
+        sprintf(levname, "%s", GetStr(0));
+    }
+    len = MediumFont.GetStrWidth(levname);
+    PAx = ((0x100 - len) / 2) + 0x20;
+    PAy = (gbActivePlayers >= 2) ? 0xC0 : 0x20;
+    MediumFont.Print(PAx, PAy, levname, JustLeft, NULL, GOLDR, GOLDG, GOLDB);
 }

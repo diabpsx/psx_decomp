@@ -40,3 +40,5 @@ extern unsigned char GOLDG;   /* @0x8011ABDB */
 extern unsigned char GOLDB;   /* @0x8011ABDC */
 extern struct CSDATA CS_Tab[28];   /* @0x800CE3B0 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
+extern unsigned char invflag;   /* @0x8011C32C */
+extern unsigned char questlog;   /* @0x8011BA29 */

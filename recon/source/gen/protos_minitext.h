@@ -28,6 +28,7 @@ CPad * PAD_GetPad(int PadNum, unsigned char both);   /* @0x800897F4 PADS.CPP:251
 void LANG_ReloadMainTXT(void);   /* @0x8007B5A4 LANG.CPP:204 */
 void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP:1952 */
 unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */
+BOOL BL_AsyncLoadDone(void);   /* @0x80087E1C BIGLUMP.CPP:614 */
 
 #ifdef __cplusplus
 extern "C" {

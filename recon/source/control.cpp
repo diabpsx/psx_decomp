@@ -375,6 +375,34 @@ test:
     GLUE_SetHomingScrollFlag(1);
 }
 
+void DrawSpeedSpellTSK(TASK *T)
+{
+    DEF_ARGS *args;
+    int pnum;
+    BOOL alive;
+    int old_opts;
+
+    alive = 1;
+    args = (DEF_ARGS *)T->Data;
+    pnum = args->a0;
+    TSK_Sleep(1);
+    while (alive) {
+        if (GLUE_Finished())
+            break;
+        old_opts = options_pad;
+        options_pad = pnum;
+        if ((sbookflag | questlog | invflag | chrflag | SelectorActive()) == 0) {
+            PostGamePad(pnum + 3, 0, 0, 0);
+            DrawSpellList();
+        }
+        options_pad = old_opts;
+        TSK_Sleep(1);
+        if (!plr[pnum].plractive)
+            alive = 0;
+    }
+    _spselflag[pnum] = 0;
+}
+
 void DrawLevelUpIcon(int pnum)
 {
     if (!optionsflag && DoShowPanel && !stextflag && !qtextflag) {

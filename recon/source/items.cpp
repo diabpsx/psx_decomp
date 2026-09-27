@@ -695,7 +695,7 @@ int RndTypeItems(int itype, int imid)
         if ((imid != -1) && (AllItemsList[i].iMiscId != imid)) okflag = FALSE;
 
         if (FePlayerNo != 0) {
-            if (imid == IMID_SCROLL || imid == IMID_TSCROLL || imid == IMID_STAFF || imid == IMID_BOOK) {
+            if (imid == IMID_SCROLL || imid == IMID_BOOK || (unsigned)(imid - IMID_TSCROLL) < 2) {
                 if (AllItemsList[i].iMiscId == imid) {
                     if (AllItemsList[i].iSpell == SPL_TELE || AllItemsList[i].iSpell == SPL_PHASE) okflag = FALSE;
                 }
@@ -713,16 +713,15 @@ void SortSmith(void)
 {
     int j, k;
     unsigned char sorted;
-    ItemStruct *smithitem = _smithitem[StorePlrNo];
 
-    for (k = 0; smithitem[k + 1]._itype != -1; k++)
+    for (k = 0; _smithitem[StorePlrNo][k + 1]._itype != -1; k++)
         ;
     sorted = FALSE;
     while ((k > 0) && (!sorted)) {
         sorted = TRUE;
         for (j = 0; j < k; j++) {
-            if (smithitem[j].IDidx > smithitem[j + 1].IDidx) {
-                BubbleSwapItem(&smithitem[j], &smithitem[j + 1]);
+            if (_smithitem[StorePlrNo][j].IDidx > _smithitem[StorePlrNo][j + 1].IDidx) {
+                BubbleSwapItem(&_smithitem[StorePlrNo][j], &_smithitem[StorePlrNo][j + 1]);
                 sorted = FALSE;
             }
         }

@@ -31,3 +31,9 @@ extern BOOL CDWAIT;   /* @0x8011ADEC */
 extern unsigned char BLUER;   /* @0x8011ABD4 */
 extern unsigned char BLUEG;   /* @0x8011ABD5 */
 extern unsigned char BLUEB;   /* @0x8011ABD6 */
+extern unsigned char WHITER;   /* @0x8011ABD1 */
+extern unsigned char WHITEG;   /* @0x8011ABD2 */
+extern unsigned char WHITEB;   /* @0x8011ABD3 */
+extern int TextWait;   /* @0x8011B95C */
+extern char MtPrevText[80];   /* @0x800D67A0 */
+extern char tempstr[256];   /* @0x800CEA10 */

@@ -47,6 +47,8 @@ void S_SmithEnter(void);
 void S_SSellEnter(void);
 void S_WRechargeEnter(void);
 void S_SIDEnter(void);
+void S_SRepairEnter(void);
+void S_WSellEnter(void);
 void S_WitchEnter(void);
 void S_HealerEnter(void);
 void S_StoryEnter(void);
