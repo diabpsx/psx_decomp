@@ -284,7 +284,7 @@ static const unsigned char L5ConvTbl[16] = { 22, 13, 1, 13, 2, 13, 13, 13, 4, 13
 
 void L5makeDmt(void)
 {
-    int i, j, idx, val, dmtx, dmty;
+    int i, j, idx, val, dmty;
 
     for (j = 0; j < 47; j++) {
         for (i = 0; i < 47; i++) {
@@ -293,11 +293,11 @@ void L5makeDmt(void)
     }
 
     for (j = 0, dmty = 1; dmty <= 77; j++, dmty += 2) {
-        for (i = 0, dmtx = 1; dmtx <= 77; i++, dmtx += 2) {
-            val = 8 * L5dungeon[dmtx + 1][dmty + 1]
-                + 4 * L5dungeon[dmtx][dmty + 1]
-                + 2 * L5dungeon[dmtx + 1][dmty]
-                + L5dungeon[dmtx][dmty];
+        for (i = 0; i < 47; i++) {
+            val = 8 * L5dungeon[2 * i + 2][dmty + 1]
+                + 4 * L5dungeon[2 * i + 1][dmty + 1]
+                + 2 * L5dungeon[2 * i + 2][dmty]
+                + L5dungeon[2 * i + 1][dmty];
             idx = L5ConvTbl[val];
             dungeon[i][j] = idx;
         }
@@ -1373,8 +1373,8 @@ void DRLG_InitL1Vals(void)
 
 void LoadL1Dungeon(char *sFileName, int vx, int vy)
 {
-    int i, j;
-    unsigned char *pLevelMap;
+    int i, j, rw, rh;
+    unsigned char *pLevelMap, *lm;
 
     dminx = 16;
     dminy = 16;
@@ -1383,35 +1383,34 @@ void LoadL1Dungeon(char *sFileName, int vx, int vy)
 
     DRLG_InitTrans();
     pLevelMap = GRL_LoadFileInMemSig(sFileName, 0);
+    lm = pLevelMap;
+
+    for (j = 0; j < DMAXY; j++) {
+        for (i = 0; i < DMAXX; i++) {
+            dungeon[i][j] = 22;
+            mydflags[i + j * DMAXX] = 0;
+        }
+    }
+
+    rw = *lm;
+    lm += 2;
+    rh = *lm;
+    lm += 2;
+
+    for (j = 0; j < rh; j++) {
+        for (i = 0; i < rw; i++) {
+            if (*lm != 0) {
+                dungeon[i][j] = *lm;
+                mydflags[i + j * DMAXX] |= DLRG_PROTECTED;
+            } else {
+                dungeon[i][j] = 13;
+            }
+            lm += 2;
+        }
+    }
 
     {
-        int rw, rh;
-        unsigned char *lm = pLevelMap;
-
-        for (j = 0; j < DMAXY; j++) {
-            for (i = 0; i < DMAXX; i++) {
-                dungeon[i][j] = 22;
-                mydflags[i + j * DMAXX] = 0;
-            }
-        }
-
-        rw = *lm;
-        lm += 2;
-        rh = *lm;
-        lm += 2;
-
-        for (j = 0; j < rh; j++) {
-            for (i = 0; i < rw; i++) {
-                if (*lm != 0) {
-                    dungeon[i][j] = *lm;
-                    mydflags[i + j * DMAXX] |= DLRG_PROTECTED;
-                } else {
-                    dungeon[i][j] = 13;
-                }
-                lm += 2;
-            }
-        }
-
+        int dummy;
         DRLG_L1Floor();
         ViewX = vx;
         ViewY = vy;
@@ -1633,12 +1632,13 @@ void DRLG_L1Shadows(void)
  * dungeon tile is passable floor/dirt (13/22) at the 2x-scaled dung_map resolution. */
 void DRLG_SetWalls(void)
 {
+    int i, j;
     int yy = 16;
 
-    for (int i = 0; i < DMAXY; i++) {
+    for (j = 0; j < DMAXY; j++) {
         int xx = 16;
-        for (int j = 0; j < DMAXX; j++) {
-            int v = dungeon[j][i];
+        for (i = 0; i < DMAXX; i++) {
+            int v = dungeon[i][j];
             if (v == 13 || v == 22 || v == 0)
                 dung_map[xx][yy].dFlags |= 0x20;
             else
@@ -1705,7 +1705,7 @@ static const unsigned char LAMPS[] = {
 void DRLG_L5(int entry)
 {
     int i, j;
-    long minarea;
+    long minarea = 0;
     BOOL doneflag;
 
     switch (currlevel) {
