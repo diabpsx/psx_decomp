@@ -3602,16 +3602,16 @@ void ProcessMissiles(void)
      * `MissileStruct *miss` and a `short *pmissileactive` pointer-walk reused across the
      * dFlags/dMissile-clear loop AND the mProc-dispatch loop. */
     short i, j;
-    unsigned short mi;
+    short mi;
     struct MissileStruct *miss;
-    unsigned short *pmissileactive;
+    short *pmissileactive;
 
     pmissileactive = missileactive;
     for (i = 0; i < nummissiles; i++) {
-        miss = &missile[*pmissileactive];
+        mi = *pmissileactive++;
+        miss = &missile[mi];
         dung_map[miss->_mix][miss->_miy].dFlags &= ~0x40; /* BFLAG_MISSILE -- oracle imm is -0x41 == ~0x40, not ~0x41 */
         dung_map[miss->_mix][miss->_miy].dMissile = 0;
-        pmissileactive++;
     }
 
     /* PSX-only: zeroes the whole dMissArray[32][4] table every frame -- no PC twin. Confirmed via
@@ -3632,17 +3632,15 @@ void ProcessMissiles(void)
         }
     }
 
+    pmissileactive = missileactive;
     MissilePreFlag = 0;
     ManashieldFlag = 0;
     ManashieldFlag2 = 0;
-
-    pmissileactive = missileactive;
     {
-        struct MissileData *mdata = missiledata;
         for (i = 0; i < nummissiles; i++) {
-            mi = *pmissileactive;
-            miss = missile + (short)mi;
-            ((void (*)(int))mdata[miss->_mitype].mProc)((short)mi);
+            mi = *pmissileactive++;
+            miss = &missile[mi];
+            ((void (*)(int))(&missiledata[miss->_mitype])->mProc)(mi);
             if (!(miss->_miAnimFlags & 0x2 /* MFLAG_LOCK_ANIMATION */)) {
                 miss->_miAnimCnt++;
                 if (miss->_miAnimCnt >= miss->_miAnimDelay) {
@@ -3654,7 +3652,6 @@ void ProcessMissiles(void)
                         miss->_miAnimFrame = miss->_miAnimLen;
                 }
             }
-            pmissileactive++;
         }
     }
 
