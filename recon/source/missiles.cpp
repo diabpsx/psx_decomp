@@ -1621,22 +1621,23 @@ void MI_LArrow(int i)
             missile[i]._mitxoff -= missile[i]._mixvel;
             missile[i]._mityoff -= missile[i]._miyvel;
             GetMissilePos(i);
-            if (missile[i]._mitype == MIS_LARROW) {
-                SetMissAnim(i, 0x1A /* MF_CBOLT */);
-                missile[i]._mirange = missile[i]._miAnimLen - 1;
-            } else {
-                SetMissAnim(i, 5 /* MF_EXP1 */);
-                missile[i]._mirange = missile[i]._miAnimLen - 1;
-            }
+            SetMissAnim(i, missile[i]._mitype != MIS_LARROW ? 5 /* MF_EXP1 */ : 0x1A /* MF_CBOLT */);
+            missile[i]._mirange = missile[i]._miAnimLen - 1;
         } else {
             if (missile[i]._mix != missile[i]._miVar1 || missile[i]._miy != missile[i]._miVar2) {
                 missile[i]._miVar1 = missile[i]._mix;
                 missile[i]._miVar2 = missile[i]._miy;
-                ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 5);
+                if (missile[i]._mitype == MIS_LARROW)
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x365);
+                else
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x95);
             }
         }
     } else {
-        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 5 + missile[i]._miAnimFrame);
+        if (missile[i]._mitype == MIS_LARROW)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, missile[i]._miAnimFrame + 0x360);
+        else
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, missile[i]._miAnimFrame + 0x90);
         rst = missiledata[missile[i]._mitype].mResist;
         if (missile[i]._mitype == MIS_LARROW) {
             if (p != -1) {
@@ -1647,7 +1648,7 @@ void MI_LArrow(int i)
                 maxd = currlevel * 2 + ENG_random(10) + 1;
             }
             missiledata[MIS_LARROW].mResist = 2; /* MIMT_LGHT */
-            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 1, 1);
+            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
         }
         if (missile[i]._mitype == 27 /* MIT_FARROW -- no MIS_FARROW slot in this build's MIS_ table */) {
             if (p != -1) {
@@ -1658,7 +1659,7 @@ void MI_LArrow(int i)
                 maxd = currlevel * 2 + ENG_random(10) + 1;
             }
             missiledata[27].mResist = 1; /* MIMT_FIRE */
-            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 1, 1);
+            CheckMissileCol(i, mind, maxd, 0, missile[i]._mix, missile[i]._miy, 0, 1);
         }
         missiledata[missile[i]._mitype].mResist = rst;
     }
