@@ -728,19 +728,24 @@ void StartPlrKill(PlayerStruct *ptrplr, int val)
 
 /* PSX drops the myplr NetSendCmdParam1(CMD_SETSTR,...) network-sync tail every Modify/SetPlr* stat
  * function has in devilution (no netcode on this build). */
+/* SYM confirms retail caches a named `PlayerStruct *player = &plr[p];` local (REG $a2) and an `int
+ * ms` -- not a repeated `plr[p]` re-index. */
 void ModifyPlrStr(int p, int l)
 {
-    int max = MaxStats[plr[p]._pClass][0];
-    if (plr[p]._pBaseStr + l > max) {
-        l = max - plr[p]._pBaseStr;
+    PlayerStruct *player = &plr[p];
+    if (player->_pBaseStr + l > MaxStats[player->_pClass][0]) {
+        l = MaxStats[player->_pClass][0] - player->_pBaseStr;
     }
-    plr[p]._pStrength += l;
-    plr[p]._pBaseStr += l;
+    player->_pStrength += l;
+    player->_pBaseStr += l;
 
-    if (plr[p]._pClass == CLASS_ROGUE) {
-        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pStrength + plr[p]._pDexterity) / 200;
+    int ms;
+    if (player->_pClass == CLASS_ROGUE) {
+        ms = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
+        player->_pDamageMod = ms;
     } else {
-        plr[p]._pDamageMod = plr[p]._pLevel * plr[p]._pStrength / 100;
+        ms = player->_pStrength * player->_pLevel / 100;
+        player->_pDamageMod = ms;
     }
 
     CalcPlrInv(p, TRUE);
@@ -748,22 +753,23 @@ void ModifyPlrStr(int p, int l)
 
 void ModifyPlrMag(int p, int l)
 {
-    int max = MaxStats[plr[p]._pClass][1];
-    if (plr[p]._pBaseMag + l > max) {
-        l = max - plr[p]._pBaseMag;
+    PlayerStruct *player = &plr[p];
+    int ms = MaxStats[player->_pClass][1];
+    if (player->_pBaseMag + l > ms) {
+        l = ms - player->_pBaseMag;
     }
-    plr[p]._pMagic += l;
-    plr[p]._pBaseMag += l;
+    player->_pMagic += l;
+    player->_pBaseMag += l;
 
-    int ms = l << 6;
-    if (plr[p]._pClass == CLASS_SORCERER) {
-        ms <<= 1;
+    l <<= 6;
+    if (player->_pClass == CLASS_SORCERER) {
+        l <<= 1;
     }
-    plr[p]._pMaxManaBase += ms;
-    plr[p]._pMaxMana += ms;
-    if (!(plr[p]._pIFlags & ISPL_NOMANA)) {
-        plr[p]._pManaBase += ms;
-        plr[p]._pMana += ms;
+    player->_pMaxManaBase += l;
+    player->_pMaxMana += l;
+    if (!(player->_pIFlags & ISPL_NOMANA)) {
+        player->_pManaBase += l;
+        player->_pMana += l;
     }
 
     CalcPlrInv(p, TRUE);
@@ -771,87 +777,93 @@ void ModifyPlrMag(int p, int l)
 
 void ModifyPlrDex(int p, int l)
 {
-    int max = MaxStats[plr[p]._pClass][2];
-    if (plr[p]._pBaseDex + l > max) {
-        l = max - plr[p]._pBaseDex;
+    PlayerStruct *player = &plr[p];
+    int ms = MaxStats[player->_pClass][2];
+    if (player->_pBaseDex + l > ms) {
+        l = ms - player->_pBaseDex;
     }
-    plr[p]._pDexterity += l;
-    plr[p]._pBaseDex += l;
+    player->_pDexterity += l;
+    player->_pBaseDex += l;
     CalcPlrInv(p, TRUE);
 
-    if (plr[p]._pClass == CLASS_ROGUE) {
-        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pDexterity + plr[p]._pStrength) / 200;
+    if (player->_pClass == CLASS_ROGUE) {
+        player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     }
 }
 
 void ModifyPlrVit(int p, int l)
 {
-    int max = MaxStats[plr[p]._pClass][3];
-    if (plr[p]._pBaseVit + l > max) {
-        l = max - plr[p]._pBaseVit;
+    PlayerStruct *player = &plr[p];
+    int ms = MaxStats[player->_pClass][3];
+    if (player->_pBaseVit + l > ms) {
+        l = ms - player->_pBaseVit;
     }
-    plr[p]._pVitality += l;
-    plr[p]._pBaseVit += l;
+    player->_pVitality += l;
+    player->_pBaseVit += l;
 
-    int ms = l << 6;
-    if (plr[p]._pClass == CLASS_WARRIOR) {
-        ms <<= 1;
+    l <<= 6;
+    if (player->_pClass == CLASS_WARRIOR) {
+        l <<= 1;
     }
-    plr[p]._pHPBase += ms;
-    plr[p]._pMaxHPBase += ms;
-    plr[p]._pHitPoints += ms;
-    plr[p]._pMaxHP += ms;
+    player->_pHPBase += l;
+    player->_pMaxHPBase += l;
+    player->_pHitPoints += l;
+    player->_pMaxHP += l;
 
     CalcPlrInv(p, TRUE);
 }
 
 void SetPlrStr(int p, int v)
 {
-    plr[p]._pBaseStr = v;
+    PlayerStruct *player = &plr[p];
+    player->_pBaseStr = v;
     CalcPlrInv(p, TRUE);
 
-    if (plr[p]._pClass == CLASS_ROGUE) {
-        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pStrength + plr[p]._pDexterity) / 200;
+    if (player->_pClass == CLASS_ROGUE) {
+        player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     } else {
-        plr[p]._pDamageMod = plr[p]._pLevel * plr[p]._pStrength / 100;
+        player->_pDamageMod = player->_pStrength * player->_pLevel / 100;
     }
 }
 
 void SetPlrMag(int p, int v)
 {
-    plr[p]._pBaseMag = v;
+    PlayerStruct *player = &plr[p];
+    player->_pBaseMag = v;
 
-    int m = v << 6;
-    if (plr[p]._pClass == CLASS_SORCERER) {
-        m <<= 1;
+    v <<= 6;
+    if (player->_pClass == CLASS_SORCERER) {
+        v <<= 1;
     }
-    plr[p]._pMaxManaBase = m;
-    plr[p]._pMaxMana = m;
+    player->_pMaxManaBase = v;
+    player->_pMaxMana = v;
     CalcPlrInv(p, TRUE);
 }
 
 void SetPlrDex(int p, int v)
 {
-    plr[p]._pBaseDex = v;
+    PlayerStruct *player = &plr[p];
+    player->_pBaseDex = v;
     CalcPlrInv(p, TRUE);
 
-    if (plr[p]._pClass == CLASS_ROGUE) {
-        plr[p]._pDamageMod = plr[p]._pLevel * (plr[p]._pStrength + plr[p]._pDexterity) / 200;
+    if (player->_pClass == CLASS_ROGUE) {
+        player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     } else {
-        plr[p]._pDamageMod = plr[p]._pStrength * plr[p]._pLevel / 100;
+        player->_pDamageMod = player->_pStrength * player->_pLevel / 100;
     }
 }
 
 void SetPlrVit(int p, int v)
 {
-    plr[p]._pBaseVit = v;
+    PlayerStruct *player = &plr[p];
+    player->_pBaseVit = v;
 
-    int hp = v << 6;
-    if (plr[p]._pClass == CLASS_WARRIOR) {
-        hp <<= 1;
+    v <<= 6;
+    if (player->_pClass == CLASS_WARRIOR) {
+        v <<= 1;
     }
-    plr[p]._pHPBase = hp;
-    plr[p]._pMaxHPBase = hp;
+    player->_pHPBase = v;
+    player->_pMaxHPBase = v;
     CalcPlrInv(p, TRUE);
 }
 
@@ -945,43 +957,44 @@ unsigned char PlrDeathModeOK(int p)
 /* PSX narrows the class cascade to 3 (warrior/rogue/sorcerer), matching the rest of the file. */
 void CheckStats(int p)
 {
+    PlayerStruct *player = &plr[p];
     int c = 0;
-    if (plr[p]._pClass == CLASS_WARRIOR) {
+    if (player->_pClass == CLASS_WARRIOR) {
         c = CLASS_WARRIOR;
-    } else if (plr[p]._pClass == CLASS_ROGUE) {
+    } else if (player->_pClass == CLASS_ROGUE) {
         c = CLASS_ROGUE;
-    } else if (plr[p]._pClass == CLASS_SORCERER) {
+    } else if (player->_pClass == CLASS_SORCERER) {
         c = CLASS_SORCERER;
     }
 
     for (int i = 0; i < 4; i++) {
         switch (i) {
         case 0:
-            if (plr[p]._pBaseStr > MaxStats[c][0]) {
-                plr[p]._pBaseStr = MaxStats[c][0];
-            } else if (plr[p]._pBaseStr < 0) {
-                plr[p]._pBaseStr = 0;
+            if (player->_pBaseStr > MaxStats[c][0]) {
+                player->_pBaseStr = MaxStats[c][0];
+            } else if (player->_pBaseStr < 0) {
+                player->_pBaseStr = 0;
             }
             break;
         case 1:
-            if (plr[p]._pBaseMag > MaxStats[c][1]) {
-                plr[p]._pBaseMag = MaxStats[c][1];
-            } else if (plr[p]._pBaseMag < 0) {
-                plr[p]._pBaseMag = 0;
+            if (player->_pBaseMag > MaxStats[c][1]) {
+                player->_pBaseMag = MaxStats[c][1];
+            } else if (player->_pBaseMag < 0) {
+                player->_pBaseMag = 0;
             }
             break;
         case 2:
-            if (plr[p]._pBaseDex > MaxStats[c][2]) {
-                plr[p]._pBaseDex = MaxStats[c][2];
-            } else if (plr[p]._pBaseDex < 0) {
-                plr[p]._pBaseDex = 0;
+            if (player->_pBaseDex > MaxStats[c][2]) {
+                player->_pBaseDex = MaxStats[c][2];
+            } else if (player->_pBaseDex < 0) {
+                player->_pBaseDex = 0;
             }
             break;
         case 3:
-            if (plr[p]._pBaseVit > MaxStats[c][3]) {
-                plr[p]._pBaseVit = MaxStats[c][3];
-            } else if (plr[p]._pBaseVit < 0) {
-                plr[p]._pBaseVit = 0;
+            if (player->_pBaseVit > MaxStats[c][3]) {
+                player->_pBaseVit = MaxStats[c][3];
+            } else if (player->_pBaseVit < 0) {
+                player->_pBaseVit = 0;
             }
             break;
         }
@@ -1028,29 +1041,32 @@ void ShieldDur(PlayerStruct *ptrplr)
 
 #define INVLOC_CHEST 6
 
+/* SYM shows retail keeps a SEPARATE `PlayerStruct *p = ptrplr;` local (matching devilution's
+ * original `p = &plr[pnum];`), not just the incoming `ptrplr` param reused directly. */
 void ArmorDur(PlayerStruct *ptrplr)
 {
-    ItemStruct *pi;
-
     if (!ismyplr(ptrplr)) {
         return;
     }
-    if (ptrplr->InvBody[INVLOC_CHEST]._itype == ITYPE_NONE && ptrplr->InvBody[INVLOC_HEAD]._itype == ITYPE_NONE) {
+
+    PlayerStruct *p = ptrplr;
+    if (p->InvBody[INVLOC_CHEST]._itype == ITYPE_NONE && p->InvBody[INVLOC_HEAD]._itype == ITYPE_NONE) {
         return;
     }
 
     int a = ENG_random(3);
-    if (ptrplr->InvBody[INVLOC_CHEST]._itype != ITYPE_NONE && ptrplr->InvBody[INVLOC_HEAD]._itype == ITYPE_NONE) {
+    if (p->InvBody[INVLOC_CHEST]._itype != ITYPE_NONE && p->InvBody[INVLOC_HEAD]._itype == ITYPE_NONE) {
         a = 1;
     }
-    if (ptrplr->InvBody[INVLOC_CHEST]._itype == ITYPE_NONE && ptrplr->InvBody[INVLOC_HEAD]._itype != ITYPE_NONE) {
+    if (p->InvBody[INVLOC_CHEST]._itype == ITYPE_NONE && p->InvBody[INVLOC_HEAD]._itype != ITYPE_NONE) {
         a = 0;
     }
 
+    ItemStruct *pi;
     if (a != 0) {
-        pi = ptrplr->InvBody + INVLOC_CHEST;
+        pi = p->InvBody + INVLOC_CHEST;
     } else {
-        pi = ptrplr->InvBody + INVLOC_HEAD;
+        pi = p->InvBody + INVLOC_HEAD;
     }
     if (pi->_iDurability == DUR_INDESTRUCTIBLE) {
         return;
@@ -1130,13 +1146,13 @@ int PM_DoBlock(PlayerStruct *ptrplr)
  * straight from entry to the `_pAnimFrame==_pAFNum` fire check). */
 int PM_DoRangeAttack(PlayerStruct *ptrplr)
 {
+    int mistype;
     if (ptrplr->_pAnimFrame == ptrplr->_pAFNum) {
-        int mistype = (ptrplr->_pIFlags & ISPL_FIRE_ARROWS) ? MIS_FARROW : MIS_ARROW;
+        mistype = (ptrplr->_pIFlags & ISPL_FIRE_ARROWS) ? MIS_FARROW : MIS_ARROW;
         if (ptrplr->_pIFlags & ISPL_LIGHT_ARROWS) {
             mistype = MIS_LARROW;
         }
-        int id = plrind(ptrplr);
-        AddMissile(ptrplr->_px, ptrplr->_py, ptrplr->_pVar1, ptrplr->_pVar2, ptrplr->_pdir, mistype, 0, id, 4, 0);
+        AddMissile(ptrplr->_px, ptrplr->_py, ptrplr->_pVar1, ptrplr->_pVar2, ptrplr->_pdir, mistype, 0, ptrplr != plr, 4, 0);
 
         PlaySfxLoc(4, ptrplr->_px, ptrplr->_py);
 
@@ -1305,25 +1321,150 @@ void StartPlayerKill(PlayerStruct *ptrplr, int earflag)
     } while (sghStream != 0);
     PauseMode = 0;
 
-    if (ptrplr->_pgfxnum) {
-        ptrplr->_pgfxnum = 0;
-        SetPlrAnims(ptrplr);
-        ptrplr->_pGFXLoad = 0;
+    /* SYM shows a SEPARATE `PlayerStruct *p = ptrplr;` local for the rest of the function
+     * (matches devilution's original `p = &plr[pnum];`). */
+    PlayerStruct *p = ptrplr;
+    if (p->_pgfxnum) {
+        p->_pgfxnum = 0;
+        SetPlrAnims(p);
+        p->_pGFXLoad = 0;
     }
 
-    NewPlrAnim(ptrplr, 1, ptrplr->_pDFrames, 1);
-    ptrplr->_pmode = PM_DEATH;
-    ptrplr->_pBlockFlag = 0;
-    ptrplr->_pInvincible = 1;
-    SetPlayerHitPoints(ptrplr, 0);
-    ptrplr->DeadLevel = currlevel;
-    ptrplr->_pVar8 = 1;
-    SetPlayerOld(ptrplr);
+    NewPlrAnim(p, 1, p->_pDFrames, 1);
+    p->_pmode = PM_DEATH;
+    p->_pBlockFlag = 0;
+    p->_pInvincible = 1;
+    SetPlayerHitPoints(p, 0);
+    p->DeadLevel = currlevel;
+    p->_pVar8 = 1;
+    SetPlayerOld(p);
     drawhpflag = 1;
 
     pind = plrind(ptrplr);
     D_8011C878[pind] = 30;
     StartPlayerDropItems(ptrplr, earflag);
+}
+
+/* PSX merges devilution's StartAttack/StartRangeAttack into one function, dispatched at runtime
+ * on `_pwtype` (weapon type) and whether the target tile holds a breakable object: `d` (direction)
+ * is unused. `_pVar6/_pVar7` hold the raw target world tile (read via `dung_map[.].dObject`, NOT
+ * the usual `IsDplayer`-substitute pattern -- this checks OBJECTS, not players). Drops devilution's
+ * LoadPlrGFX/FixPlayerLocation like every other Start* function. */
+void StartAttack(PlayerStruct *ptrplr, int d)
+{
+    int co = dung_map[ptrplr->_pVar6][ptrplr->_pVar7].dObject;
+    unsigned char closeattack = 0;
+
+    if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
+        StartPlrKill(ptrplr, -1);
+        return;
+    }
+
+    if (co > 0) {
+        co--;
+        if (object[co]._oBreak == 1) {
+            closeattack = 1;
+        }
+    }
+
+    if (ptrplr->_pwtype != 0 && !closeattack) {
+        if (ptrplr->_pVar6 <= 0) {
+            return;
+        }
+        if (ptrplr->_pVar7 <= 0) {
+            return;
+        }
+        ptrplr->_pmode = PM_RATTACK;
+        ptrplr->_pVar1 = ptrplr->_pVar6;
+        ptrplr->_pVar2 = ptrplr->_pVar7;
+    } else {
+        ptrplr->_pmode = PM_ATTACK;
+    }
+
+    SetPlayerOld(ptrplr);
+    NewPlrAnim(ptrplr, 2, ptrplr->_pAFrames, 0);
+}
+
+/* PSX-specific "held spell still available?" re-check after casting: for RSplType==2 (scroll) tests
+ * _pScrlSpells, for ==3 (charges) tests _pISpells, both as a 64-bit bit-test on (_pRSpell-1); resets
+ * the queued repeat-spell to none (-1 / RSPLTYPE_INVALID=4) if the bit isn't set. `_pSpell` literal
+ * ids used directly (23=teleport, 10=phase, 2=heal, 0x22=healother) match TeleStart/PhaseStart/
+ * HealStart/HealotherStart's trigger checks seen elsewhere in this TU. */
+int PM_DoSpell(PlayerStruct *ptrplr)
+{
+    if (invflag) {
+        return 0;
+    }
+
+    if (ptrplr->_pVar8 < ptrplr->_pSFNum) {
+        do_spell_anim(ptrplr->_pVar8, ptrplr->_pSpell, ptrplr->_pClass, ptrplr);
+    } else if (ptrplr->_pVar8 == ptrplr->_pSFNum) {
+        if (ptrplr->_pSpell == 24) {
+            ApocaStart(ptrplr != plr);
+        }
+        CastSpell(ptrplr != plr, ptrplr->_pSpell, ptrplr->_px, ptrplr->_py, ptrplr->_pVar1, ptrplr->_pVar2, 0, ptrplr->_pVar4);
+
+        if (ptrplr->_pSplFrom == 0) {
+            if (ptrplr->_pRSplType == 2 && !((ptrplr->_pScrlSpells >> (ptrplr->_pRSpell - 1)) & 1)) {
+                ptrplr->_pRSpell = -1;
+                ptrplr->_pRSplType = 4;
+            }
+            if (ptrplr->_pRSplType == 3 && !((ptrplr->_pISpells >> (ptrplr->_pRSpell - 1)) & 1)) {
+                ptrplr->_pRSpell = -1;
+                ptrplr->_pRSplType = 4;
+            }
+        }
+    }
+
+    if (ptrplr->_pSpell == 23 && ptrplr->_pVar8 == 1) {
+        TeleStart(ptrplr);
+    }
+    if (ptrplr->_pSpell == 10 && ptrplr->_pVar8 == 1) {
+        PhaseStart(ptrplr);
+    }
+    if (ptrplr->_pSpell == 2 && ptrplr->_pVar8 == 1) {
+        HealStart(ptrplr);
+    }
+    if (ptrplr->_pSpell == 0x22 && ptrplr->_pVar8 == 1) {
+        HealotherStart(ptrplr);
+    }
+
+    ptrplr->_pVar8++;
+    if (leveltype == 0) {
+        if (ptrplr->_pVar8 <= ptrplr->_pSFrames) {
+            return 0;
+        }
+        int pind;
+        if (_spselflag[plrind(ptrplr)] == 0) {
+            pind = SelectorActive() == 0;
+        } else {
+            pind = 0;
+        }
+        if (pind) {
+            PostGamePad(ptrplr == plr ? 6 : 7, 0, 0, 0);
+        }
+        StartWalkStand(ptrplr);
+    } else {
+        if (ptrplr->_pAnimFrame != ptrplr->_pSFrames) {
+            return 0;
+        }
+        int pind;
+        if (_spselflag[plrind(ptrplr)] == 0) {
+            pind = SelectorActive() == 0;
+        } else {
+            pind = 0;
+        }
+        if (pind) {
+            PostGamePad(ptrplr == plr ? 6 : 7, 0, 0, 0);
+        }
+        StartStand(ptrplr, ptrplr->_pdir);
+    }
+
+    ClearPlrPVars(ptrplr);
+    if (ptrplr->_pSpell != 10) {
+        PhaseEnd(ptrplr);
+    }
+    return 1;
 }
 
 void AddPlrMonstExper(int lvl, long exp, char pmask)
