@@ -46,3 +46,5 @@ extern unsigned char GOLDB;
 extern int SStringYNorm[20];   /* @0x800DE314 */
 extern int SStringYBuy0[20];   /* @0x800DE364 */
 extern int SStringYBuy1[20];   /* @0x800DE3B4 */
+extern int cursW;   /* CURSOR.CPP */
+extern int cursH;   /* CURSOR.CPP */

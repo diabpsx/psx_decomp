@@ -890,6 +890,46 @@ void S_WSellEnter(void)
     }
 }
 
+/* @0x800738B4 */
+void S_HBuyEnter(void)
+{
+    int idx;
+    int i;
+    int done;
+    int w, h;
+
+    if (stextsel == 0x16) {
+        StartStore(0xE);
+        stextsel = 0xB;
+        return;
+    }
+    stextshold = 0x10;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    idx = (stextsel - stextup) / 4 + stextsval;
+    if (plr[myplr]._pGold < _healitem[StorePlrNo][idx]._iIvalue) {
+        StartStore(9);
+        return;
+    }
+    plr[myplr].HoldItem = _healitem[StorePlrNo][idx];
+    SellIdx = idx;
+    SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
+    i = 0;
+    do {
+        w = cursW;
+        if (w < 0) {
+            w += 0xF;
+        }
+        h = cursH;
+        if (h < 0) {
+            h += 0xF;
+        }
+        done = func_8015A24C(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+    } while (i < 0x28 && done == 0);
+    StartStore(done != 0 ? 0xB : 0xA);
+    SetCursor(1);
+}
+
 /* @0x80073AE8 */
 void S_StoryEnter(void)
 {

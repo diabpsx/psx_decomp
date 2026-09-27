@@ -272,7 +272,7 @@ void DRLG_L3FillStraights(void)
     int i, j;
     int xc, xs;
     int yc, ys;
-    int k, rv = 0;
+    int k, rv;
 
     for (j = 0; j < DMAXY - 1; j++) {
         xc = 0;
@@ -1137,7 +1137,7 @@ void FenceDoorFix(void)
 void DRLG_L3Wood(void)
 {
     int i, j, x, y, xx, yy, rt, rp, x1, y1, x2, y2;
-    unsigned char skip;
+    int skip;
 
     for (j = 0; j < DMAXY - 1; j++) {
         for (i = 0; i < DMAXX - 1; i++) {
@@ -1328,7 +1328,7 @@ void DRLG_L3Wood(void)
 int DRLG_L3Anvil(void)
 {
     int sx, sy, sw, sh, xx, yy, ii, trys;
-    unsigned char found;
+    int found;
 
     sw = L3ANVIL[0];
     sh = L3ANVIL[1];
@@ -1343,10 +1343,10 @@ int DRLG_L3Anvil(void)
         ii = 2;
         for (yy = 0; yy < sh && found == true; yy++) {
             for (xx = 0; xx < sw && found == true; xx++) {
-                if (L3ANVIL[ii] != 0 && dungeon[xx + sx][yy + sy] != L3ANVIL[ii]) {
+                if (L3ANVIL[ii] != 0 && dungeon[sx + xx][sy + yy] != L3ANVIL[ii]) {
                     found = false;
                 }
-                if (mydflags[(xx + sx) + (yy + sy) * DMAXX] != 0) {
+                if (mydflags[(sy + yy) * DMAXX + (sx + xx)] != 0) {
                     found = false;
                 }
                 ii++;
@@ -1367,13 +1367,13 @@ int DRLG_L3Anvil(void)
         return true;
     }
 
-    ii = sw * sh + 2;
+    ii = sh * sw + 2;
     for (yy = 0; yy < sh; yy++) {
         for (xx = 0; xx < sw; xx++) {
             if (L3ANVIL[ii] != 0) {
-                dungeon[xx + sx][yy + sy] = L3ANVIL[ii];
+                dungeon[sx + xx][sy + yy] = L3ANVIL[ii];
             }
-            mydflags[(xx + sx) + (yy + sy) * DMAXX] |= DLRG_PROTECTED;
+            mydflags[(sy + yy) * DMAXX + (sx + xx)] |= DLRG_PROTECTED;
             ii++;
         }
     }
