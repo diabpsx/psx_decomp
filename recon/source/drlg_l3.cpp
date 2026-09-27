@@ -1498,13 +1498,13 @@ unsigned char DRLG_L3Lockout(void)
 void DRLG_L3SetWalls(void)
 {
     int i, j, xx, yy;
-    int v;
 
     yy = 16;
     for (j = 0; j < DMAXX; j++) {
         xx = 16;
         for (i = 0; i < DMAXX; i++) {
-            v = dungeon[i][j];
+            int v = dungeon[i][j];
+
             if (v == 0 || v == 7 || v == 8) {
                 dung_map[xx][yy].dFlags |= 0x20;
             } else {
