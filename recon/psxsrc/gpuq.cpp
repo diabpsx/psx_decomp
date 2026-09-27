@@ -60,8 +60,8 @@ void GPUQ_FlushQ(void)
     for (f = 0; f < ArgsSoFar; f++) {
         LOAD_IMAGE_ARGS *A = &AllArgs[f];
         if (!(A->Flags & 5)) {
-            unsigned char GalRet = (A->Flags & 2) ? GAL_Free(A->Handle) : GAL_Unlock(A->Handle);
-            if (!GalRet)
+            unsigned char GalRet;
+            if (!(GalRet = (A->Flags & 2) ? GAL_Free(A->Handle) : GAL_Unlock(A->Handle)))
                 DBG_Error(0, "psxsrc/GPUQ.CPP", 0x91);
         }
     }

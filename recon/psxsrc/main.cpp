@@ -74,24 +74,22 @@ void GameTask(TASK *T)
         ATT_DoAttract();
         if (demo_record_load == 1)
             set_pad_record_play(level_record);
-        unsigned char bNewGame;
         if (demo_pad_time != 0) {
-            bNewGame = 1;
+            StartGame(1, 1);
         } else if (DoLoadedGame == 1) {
-            bNewGame = 0;
+            StartGame(0, 1);
         } else {
             GLUE_PreTown();
             GAL_SetTimeStamp(4);
-            bNewGame = 1;
+            StartGame(1, 1);
         }
-        StartGame(bNewGame, 1);
         GLUE_SetFinished(1);
         TSK_Sleep(5);
         if (gbDoEnding != 0) {
             MSG_ClearOutCompMap();
-            unsigned char ending = gbDoEnding;
+            unsigned char end2 = gbDoEnding;
             gbDoEnding = 0;
-            DoEnding(ending - 1);
+            DoEnding(end2 - 1);
         }
     }
 }

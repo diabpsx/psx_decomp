@@ -255,32 +255,32 @@ void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
 {
     DLevel *Dl = GetDLevel(bLevel, setlevel);
-    TCmdPItem *pD = Dl->item;
-    unsigned char *pB = (unsigned char *)pD;
-    int i;
-    unsigned char bc;
-    for (i = 0; i < MAXITEMS; i++, pD++, pB += sizeof(TCmdPItem)) {
-        bc = *pB;
-        if (bc == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
-            continue;
+    {
+        TCmdPItem *pD = Dl->item;
+        unsigned char bc;
+        for (int i = 0; i < MAXITEMS; i++, pD++) {
+            bc = pD->bCmd;
+            if (bc == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
+                continue;
 
-        if (bc == CMD_WALKXY) {
-            ReleaseDLevel(Dl);
-            return 1;
+            if (bc == CMD_WALKXY) {
+                ReleaseDLevel(Dl);
+                return 1;
+            }
+            if (bc == CMD_STAND) {
+                sgbDeltaChanged = 1;
+                pD->bCmd = CMD_WALKXY;
+                ReleaseDLevel(Dl);
+                return 1;
+            }
+            if (bc == CMD_ACK_PLRINFO) {
+                sgbDeltaChanged = 1;
+                pD->bCmd = 0xFF;
+                ReleaseDLevel(Dl);
+                return 1;
+            }
+            break;
         }
-        if (bc == CMD_STAND) {
-            sgbDeltaChanged = 1;
-            *pB = CMD_WALKXY;
-            ReleaseDLevel(Dl);
-            return 1;
-        }
-        if (bc == CMD_ACK_PLRINFO) {
-            sgbDeltaChanged = 1;
-            *pB = 0xFF;
-            ReleaseDLevel(Dl);
-            return 1;
-        }
-        break;
     }
     ReleaseDLevel(Dl);
 
@@ -288,8 +288,9 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
         return 1;
 
     Dl = GetDLevel(bLevel, setlevel);
-    pD = Dl->item;
-    for (i = 0; i < MAXITEMS; i++, pD++) {
+    {
+    TCmdPItem *pD = Dl->item;
+    for (int i = 0; i < MAXITEMS; i++, pD++) {
         if (pD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
             pD->bCmd = CMD_WALKXY;
@@ -307,6 +308,7 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
             pD->dwBuff = pI->dwBuff;
             break;
         }
+    }
     }
     ReleaseDLevel(Dl);
     return 1;
@@ -373,31 +375,31 @@ BOOL delta_quest_inited(int i)
  * to the NetSendCmdGItem/network-record family; this local delta-record uses a different field). */
 void DeltaAddItem(int ii)
 {
-    TCmdPItem *pD;
-    TCmdPItem *OpD;
     DLevel *Dl;
-    int i;
-    unsigned char bc;
     Dl = GetDLevel(currlevel, setlevel);
-    pD = Dl->item;
-    for (i = 0; i < MAXITEMS; i++, pD++) {
-        bc = pD->bCmd;
-        if (bc == 0xFF)
-            continue;
-        if (pD->wIndx != item[ii].IDidx)
-            continue;
-        if (pD->wCI != item[ii]._iCreateInfo)
-            continue;
-        if (pD->dwSeed != item[ii]._iSeed)
-            continue;
-        if (bc < 2) {
-            ReleaseDLevel(Dl);
-            return;
+    {
+        TCmdPItem *pD = Dl->item;
+        unsigned char bc;
+        for (int i = 0; i < MAXITEMS; i++, pD++) {
+            bc = pD->bCmd;
+            if (bc == 0xFF)
+                continue;
+            if (pD->wIndx != item[ii].IDidx)
+                continue;
+            if (pD->wCI != item[ii]._iCreateInfo)
+                continue;
+            if (pD->dwSeed != item[ii]._iSeed)
+                continue;
+            if (bc < 2) {
+                ReleaseDLevel(Dl);
+                return;
+            }
         }
     }
 
-    OpD = Dl->item;
-    for (i = 0; i < MAXITEMS; i++, OpD++) {
+    {
+    TCmdPItem *OpD = Dl->item;
+    for (int i = 0; i < MAXITEMS; i++, OpD++) {
         if (OpD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
             OpD->bCmd = 0;
@@ -415,6 +417,7 @@ void DeltaAddItem(int ii)
             OpD->dwBuff = item[ii]._PlrCreate;
             break;
         }
+    }
     }
     ReleaseDLevel(Dl);
 }
