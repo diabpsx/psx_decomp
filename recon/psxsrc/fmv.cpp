@@ -260,7 +260,7 @@ static int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a p
  * "mdec_waiting_tail_unused" -- renamed: confirmed via SYM ($8011b5b4 EXT INT last_stream_frame) and
  * cross-refs in dequeue_animation.s + decode_mdec_stream.s (both use this exact bss slot). */
 static int streampos;
-static int user_start;
+BOOL user_start;
 static void *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
 static void *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
 static void *vlc_tab;      /* Tmalloc'd MDEC VLC table buffer, ditto */
@@ -746,7 +746,7 @@ extern "C" void rebuild_mdec_polys(int x, int y)
 }
 
 /* WIP -- NOT byte-verified (see split_poly_area note). @0x80156FB4 FMV.CPP:1044 */
-extern "C" int draw_mdec_polys(signed char bright)
+extern "C" int draw_mdec_polys(int bright)
 {
     int screen = PRIM_GetCurrentScreen();
 
@@ -1282,47 +1282,54 @@ static unsigned char D_8011B4E8;   /* language-variant byte for the DIABEND endi
 
 extern "C" void LoPlayFMVOverLay(void *)
 {
+    int start = -1;
+    int end = -1;
+    int start_time = -1;
+    int br = 0x80;
+    int fade = 0;
+    int user_quit;
+    RECT r;   /* SYM AUTO local (sp-0x30); unreferenced in the raw -- same frame-hole class as
+               * wait_cdstream's start_wait (catalog 13A). */
+    CPad *P1;
+    CPad *P2;
     char *filename = D_8011C758;
     int w = D_8011C75C;
     int h = D_8011C760;
-    int start = -1;
-    int end = -1;
-    int bright = 0x80;
-    int fade = 0;
-    int start_time = -1;
-    RECT r;   /* SYM AUTO local (sp-0x30); unreferenced in the raw -- same frame-hole class as
-               * wait_cdstream's start_wait (catalog 13A). */
-    int i;
+    long vm;
 
-    time_in_frames = VID_GetTick();
-    for (i = 0; i < 100; i++)
-        systemtask(0);
+    {
+        int i;
+
+        time_in_frames = VID_GetTick();
+        for (i = 0; i < 100; i++)
+            systemtask(0);
+    }
     D_8011B4E8 = 0;
-    if (strcmp("DIABEND.MOV", filename) != 0) {
-        {
-            int lang = LANG_GetLang();
-            int v;
-            switch (lang) {
-            case LANG_ENGLISH: v = 1; goto set1;
-            case LANG_FRENCH:  v = 2;
-            set1:
-                D_8011B4E8 = v;
-                sprintf(g_movie_filename, "DIABEND1.MOV");
-                break;
-            case LANG_GERMAN: v = 1; goto set2;
-            case LANG_SPANISH: v = 2;
-            set2:
-                D_8011B4E8 = v;
-                sprintf(g_movie_filename, "DIABEND2.MOV");
-                break;
-            case LANG_ITALIAN:
-                D_8011B4E8 = 1;
-                sprintf(g_movie_filename, "DIABEND3.MOV");
-                break;
-            case LANG_JAPANESE:
-                DBG_Error(0, "psxsrc/FMV.CPP", 1790);
-                break;
-            }
+    if (strcmp("DIABEND.MOV", filename) == 0) {
+        switch (LANG_GetLang()) {
+        case LANG_ENGLISH:
+            D_8011B4E8 = 1;
+            sprintf(g_movie_filename, "DIABEND1.MOV");
+            break;
+        case LANG_FRENCH:
+            D_8011B4E8 = 2;
+            sprintf(g_movie_filename, "DIABEND1.MOV");
+            break;
+        case LANG_GERMAN:
+            D_8011B4E8 = 1;
+            sprintf(g_movie_filename, "DIABEND2.MOV");
+            break;
+        case LANG_SPANISH:
+            D_8011B4E8 = 2;
+            sprintf(g_movie_filename, "DIABEND2.MOV");
+            break;
+        case LANG_ITALIAN:
+            D_8011B4E8 = 1;
+            sprintf(g_movie_filename, "DIABEND3.MOV");
+            break;
+        case LANG_JAPANESE:
+            DBG_Error(0, "psxsrc/FMV.CPP", 1790);
+            break;
         }
     } else {
         strcpy(g_movie_filename, filename);
@@ -1345,7 +1352,8 @@ extern "C" void LoPlayFMVOverLay(void *)
      * Modeling case 0 with the DEFAULT arm's literal (0x1333) and case 1 with the "real" 0x1000
      * reproduces this byte-for-byte closer than the semantically-tidier 0x1000/0x1000 split (case 1's
      * "stale" value happens to coincide with whatever the case-0/default combination leaves behind). */
-    switch (GetVideoMode()) {
+    vm = GetVideoMode();
+    switch (vm) {
     case 0:
         play_mdec_stream(g_movie_filename, 0x1000, start, end);
         break;
@@ -1362,25 +1370,26 @@ extern "C" void LoPlayFMVOverLay(void *)
         if (start_time < time_in_frames) {
             TICK_Update();
             PAD_Handler();
-            draw_mdec_polys((signed char)bright);
+            draw_mdec_polys(br);
             if (fade != 0) {
-                bright -= 8;
-                set_mdec_audio_volume((short)(bright << 7));
+                br -= 8;
+                set_mdec_audio_volume((short)(br << 7));
             }
             VID_AfterDisplay();
         }
         decode_mdec_stream(1);
         if (start_time == -1 && mdec_last_frame != -1)
             start_time = time_in_frames;
-        CPad *P1 = PAD_GetPad(0, 1);
-        CPad *P2 = PAD_GetPad(0, 2);
-        if ((P1->GetDown() & 0x10) != 0 || (P2->GetDown() & 0x10) != 0) {
-            user_start = 1;
+        P1 = PAD_GetPad(0, 1);
+        P2 = PAD_GetPad(0, 2);
+        if ((P1->GetDown() & 0x10) || (P2->GetDown() & 0x10)) {
+            user_quit = 1;
+            user_start = user_quit;
             fade = 1;
         }
-        if ((P1->GetDown() & 0x40) != 0 || (P2->GetDown() & 0x40) != 0)
+        if ((P1->GetDown() & 0x40) || (P2->GetDown() & 0x40))
             fade = 1;
-    } while (mdec_streaming != 0 && bright >= 0);
+    } while (mdec_streaming != 0 && br >= 0);
     stop_mdec_stream();
     wait_cdstream();
     kill_mdec_audio();
