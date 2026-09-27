@@ -146,8 +146,10 @@ static volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
 static int stream_out;
 static volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
-static int _discard_count;
-static int _get_count;
+static volatile int _discard_count;   /* USER RULING (this session): volatile allowed for exactly this
+ * pair as part of the stream ring-buffer bookkeeping group, even though stream_cdready_handler itself
+ * never touches them -- NOT a general policy widening, this pair only. */
+static volatile int _get_count;   /* see _discard_count ruling comment above */
 static volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
 static volatile int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
 static volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
@@ -499,6 +501,15 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
 /* @0x80156720 FMV.CPP:791 */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
+    /* Raw oracle keeps TWO separate induction registers through the loop: $a1 (the trip counter,
+     * compared `slti $a1,0x15`) AND $a2 (a running byte-length accumulator, `addiu $a2,0x1900` each
+     * iter, returned as-is via `addu $v0,$a2,zero` -- no final multiply/constant-fold at the end).
+     * A `len` local accumulated the same way here (`len += 0x1900;` each iter) still folds to the
+     * `lui/ori` literal-constant form (GCC 2.7.2's IV final-value-replacement collapses an
+     * unused-inside-the-loop linear accumulator into count*step) -- the compiler can't be talked out
+     * of it from C alone since len is never read before the loop exits; same 7-diff result either way.
+     * Falsified as a source-level lever; would need a per-TU compiler-flag change, which is out of
+     * scope (no compiler-source/flag changes rule). Left in the simpler literal-multiply form. */
     unsigned long *dst = (unsigned long *)imgbuf;
     int count = 0;
 
