@@ -1030,17 +1030,17 @@ void AddFirewall(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy
     /* PSX drops hellfire's `if (mienemy != MI_ENEMYMONST || id < 0) mirange += currlevel;` branch
      * entirely -- always applies the pISplDur-scaled adjustment (confirmed: no currlevel add
      * anywhere in the oracle, just one unconditional mult/mflo/sra-7 sequence). */
-    int k;
+    int i;
 
     missile[mi]._midam = ((ENG_random(10) + ENG_random(10) + 2 + plr[id]._pLevel) << 4) >> 1;
     GetMissileVel(mi, sx, sy, dx, dy, 16);
-    missile[mi]._miVar2 = 0;
     missile[mi]._mirange = 10;
-    for (k = missile[mi]._mispllvl; k > 0; k--)
+    for (i = missile[mi]._mispllvl; i > 0; i--)
         missile[mi]._mirange += 10;
-    missile[mi]._mirange = missile[mi]._mirange + ((plr[id]._pISplDur * missile[mi]._mirange) >> 7);
-    missile[mi]._mirange = missile[mi]._mirange << 4;
+    missile[mi]._mirange += (plr[id]._pISplDur * missile[mi]._mirange) >> 7;
+    missile[mi]._mirange <<= 4;
     missile[mi]._miVar1 = missile[mi]._mirange - missile[mi]._miAnimLen;
+    missile[mi]._miVar2 = 0;
 }
 
 void AddFireball(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
