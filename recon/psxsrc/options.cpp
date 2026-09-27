@@ -624,7 +624,6 @@ void CharCardSelectMemcardPad(void)
 {
     CPad *P;
     OMENUITEM *iptr;
-    int pressed;
 
     iptr = MenuList[cmenu].Item;
     P = PAD_GetPad(options_pad, 0);
@@ -636,12 +635,7 @@ void CharCardSelectMemcardPad(void)
     ActivateMemcard(1, 1);
     if (AlertTxt != 0) {
         ShowAlertBox();
-        pressed = 0;
-        if (P->GetDown() & 0x40)
-            pressed = 1;
-        else if (P->GetDown() & 0x10)
-            pressed = 1;
-        if (pressed) {
+        if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             PlaySFX(0x33);
             AlertTxt = 0;
         }
@@ -649,12 +643,7 @@ void CharCardSelectMemcardPad(void)
     }
     ShowCardActionText();
     LAMBO_MovePad(P);
-    pressed = 0;
-    if (P->GetDown() & 0x40)
-        pressed = 1;
-    else if (P->GetDown() & 0x10)
-        pressed = 1;
-    if (pressed) {
+    if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
         if (D_8011B3D8[cs] != 2) {
             int oldcs;
             int link;
@@ -708,15 +697,8 @@ void CharacterLoadPad(void)
         ActivateCharacterMemcard(current_card == 0, (current_card ^ 1) == 0);
     P = PAD_GetPad(options_pad, 0);
     if (AlertTxt != 0) {
-        int pressed;
-
         ShowAlertBox();
-        pressed = 0;
-        if (P->GetDown() & 0x40)
-            pressed = 1;
-        else if (P->GetDown() & 0x10)
-            pressed = 1;
-        if (pressed) {
+        if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             int n, link;
 
             n = MenuList[cmenu].NoEntries - 1;
@@ -742,19 +724,10 @@ void CharacterLoadPad(void)
     }
     ShowCardActionText();
     {
-        int pressed;
-
         if (card_status[current_card] == 0) {
             ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
-            pressed = 0;
-        } else {
-            pressed = 0;
         }
-        if (P->GetDown() & 0x40)
-            pressed = 1;
-        else if (P->GetDown() & 0x10)
-            pressed = 1;
-        if (pressed) {
+        if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             if (saveflag == 0) {
                 if (card_status[current_card] != 2) {
                     PlaySFX(0x33);
@@ -1050,15 +1023,8 @@ L_9080:
     if (loadflag != 0)
         goto L_9114;
     {
-        int pressed;
-
         ShowAlertBox();
-        pressed = 0;
-        if (P->GetDown() & 0x40)
-            pressed = 1;
-        else if (P->GetDown() & 0x10)
-            pressed = 1;
-        if (pressed) {
+        if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             loadflag = 0;
             saveflag = 0;
             formatflag = 0;
