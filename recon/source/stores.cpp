@@ -935,11 +935,8 @@ void SmithBuyItem(void)
     if (idx == 0x13) {
         _smithitem[StorePlrNo][19]._itype = -1;
     } else {
-        if (_smithitem[StorePlrNo][idx + 1]._itype != -1) {
-            do {
-                _smithitem[StorePlrNo][idx] = _smithitem[StorePlrNo][idx + 1];
-                idx++;
-            } while (_smithitem[StorePlrNo][idx + 1]._itype != -1);
+        for (; _smithitem[StorePlrNo][idx + 1]._itype != -1; idx++) {
+            _smithitem[StorePlrNo][idx] = _smithitem[StorePlrNo][idx + 1];
         }
         _smithitem[StorePlrNo][idx]._itype = -1;
     }
@@ -1179,11 +1176,8 @@ void WitchBuyItem(void)
         if (idx == 0x13) {
             _witchitem[StorePlrNo][19]._itype = -1;
         } else {
-            if (_witchitem[StorePlrNo][idx + 1]._itype != -1) {
-                do {
-                    _witchitem[StorePlrNo][idx] = _witchitem[StorePlrNo][idx + 1];
-                    idx++;
-                } while (_witchitem[StorePlrNo][idx + 1]._itype != -1);
+            for (; _witchitem[StorePlrNo][idx + 1]._itype != -1; idx++) {
+                _witchitem[StorePlrNo][idx] = _witchitem[StorePlrNo][idx + 1];
             }
             _witchitem[StorePlrNo][idx]._itype = -1;
         }
