@@ -886,12 +886,12 @@ void AddLightctrl(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
 
 void GetVileMissPos(int mi, int dx, int dy)
 {
-    int xx, yy, l, j, i;
+    int xx, yy;
 
-    for (l = 1; l < 50; l++) {
-        for (j = -l; j <= l; j++) {
+    for (int l = 1; l < 50; l++) {
+        for (int j = -l; j <= l; j++) {
             yy = dy + j;
-            for (i = -l; i <= l; i++) {
+            for (int i = -l; i <= l; i++) {
                 xx = dx + i;
                 if (PosOkPlayer(myplr, xx, yy)) {
                     missile[mi]._mix = xx;
