@@ -149,7 +149,8 @@ long BL_AsyncReadFile(char *Name, unsigned long RamId)
     unsigned char *LoadAddr;
     int ah;
 
-    if (!fileexists(Name))
+    MemSize = fileexists(Name);   /* the extra MemSize refs give it retail's s0 (greg priority over ah) */
+    if (!MemSize)
         ASSERT(!"CANT FIND FILE", 0xCA);
     MemSize = filesize(Name);
     ASSERT(MemSize, 0xCF);
@@ -163,7 +164,7 @@ long BL_AsyncReadFile(char *Name, unsigned long RamId)
         systemtask(0);
         MemSize = getasyncreadstatus(ah);
         TSK_Sleep(1);
-    } while (!(char)MemSize);
+    } while (!(MemSize <<= 24));   /* == !(char)status; retail shifts MemSize in place (dead after the loop) */
     cancelasyncload(ah);
     ASSERT(GAL_Unlock(MyHnd), 0xEB);
     return MyHnd;
