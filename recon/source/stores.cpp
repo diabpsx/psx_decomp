@@ -28,6 +28,7 @@
 #define NUMSTLINES 24
 
 extern "C" void DBG_Error(char *Text, char *File, int Line);
+void SetItemMinStats(const struct PlayerStruct *p, struct ItemStruct *x);
 
 /* SpellData layout (from DIABPSX.SYM; not emitted into the stores headers) */
 struct SpellData {   /* sizeof 52 */
@@ -2141,6 +2142,35 @@ void S_ScrollHBuy(int idx)
     if (!stext[stextsel]._ssel && stextsel != 0x16) {
         stextsel = stextdown;
     }
+}
+
+/* @0x8006ADE0 */
+void S_StartSBuy(void)
+{
+    int i;
+
+    storenumh = 0;
+    for (i = 0; smithitem[i]._itype != -1; i++) {
+        SetItemMinStats(&plr[options_pad], &smithitem[i]);
+        storenumh++;
+    }
+    if (!storenumh) {
+        stextsmax = 0;
+        StartStore(24);
+        return;
+    }
+
+    SItemListFlag = 1;
+    stextsize = 1;
+    stextscrl = 1;
+    stextsval = 0;
+    sprintf(tempstr, GetStr(0x228), plr[myplr]._pGold);
+    AddSText(0, 1, 1, tempstr, 3, 0);
+    AddSLine(2);
+
+    stextsmax = storenumh - 3;
+    if (stextsmax < 0) stextsmax = 0;
+    S_ScrollSBuy(stextsval);
 }
 
 /* @0x8006AFB0 */
