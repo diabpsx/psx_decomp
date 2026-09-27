@@ -2299,32 +2299,38 @@ void MI_Guardian(int i)
 
     if (!(miss->_mirange % 16)) {
         ex = 0;
-        for (j = 0; j < 23 && ex != -1; j++) {
-            for (k = 10; ex != -1 && k >= 0 && (vCrawlTable[j][k] != 0 || vCrawlTable[j][k + 1] != 0); k -= 2) {
-                if (sx1 == vCrawlTable[j][k] && sy1 == vCrawlTable[j][k + 1])
+        for (k = 0; k < 23; k++) {
+            if (ex == -1)
+                break;
+            for (j = 10; j >= 0; j -= 2) {
+                if (ex == -1)
+                    break;
+                if (vCrawlTable[k][j] == 0 && vCrawlTable[k][j + 1] == 0)
+                    break;
+                if (sx1 == vCrawlTable[k][j] && sy1 == vCrawlTable[k][j + 1])
                     continue;
-                sx = miss->_mix + vCrawlTable[j][k];
-                sy = miss->_miy + vCrawlTable[j][k + 1];
+                sx = miss->_mix + vCrawlTable[k][j];
+                sy = miss->_miy + vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx = miss->_mix - vCrawlTable[j][k];
-                sy = miss->_miy - vCrawlTable[j][k + 1];
+                sx = miss->_mix - vCrawlTable[k][j];
+                sy = miss->_miy - vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx = miss->_mix + vCrawlTable[j][k];
-                sy = miss->_miy - vCrawlTable[j][k + 1];
+                sx = miss->_mix + vCrawlTable[k][j];
+                sy = miss->_miy - vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx = miss->_mix - vCrawlTable[j][k];
-                sy = miss->_miy + vCrawlTable[j][k + 1];
+                sx = miss->_mix - vCrawlTable[k][j];
+                sy = miss->_miy + vCrawlTable[k][j + 1];
                 ex = Sentfire(i, sx, sy);
                 if (ex == -1)
                     break;
-                sx1 = vCrawlTable[j][k];
-                sy1 = vCrawlTable[j][k + 1];
+                sx1 = vCrawlTable[k][j];
+                sy1 = vCrawlTable[k][j + 1];
             }
         }
     }
@@ -2339,7 +2345,7 @@ void MI_Guardian(int i)
     if (miss->_miVar3 > 15) {
         miss->_miVar3 = 15;
     } else if (miss->_miVar3 > 0) {
-        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, miss->_miVar3);
+        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, 148);
     }
 
     if (miss->_mirange == 0) {
