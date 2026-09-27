@@ -252,7 +252,8 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
 
     Frm &= 0xFFFF;
     if (DialogGBack == 2) {
-        if ((RandBTab[(char)(GShadeY % 8)] >> (GShadeX % 8)) & 1) {
+        int Bits = RandBTab[(char)(GShadeY % 8)] >> (GShadeX % 8);
+        if (Bits & 1) {
             if (Frm == 7)
                 Frm = 14;
             if (Frm == 12)
@@ -307,6 +308,8 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
         v3 = v1;
     }
     if (DialogGBack == 0) {
+        PAL *Pal;
+
         FT4 = PRIM_GetNextPolyFt4();
         FT4->u0 = u0;
         FT4->v0 = v0;
@@ -324,13 +327,12 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
         FT4->y2 = y2;
         FT4->x3 = x3;
         FT4->y3 = y3;
-        {
-            PAL *Pal = DialogTData->GetPal(Fr->PalNum);
-            if (Pal->InVram)
-                FT4->clut = ((unsigned short *)Pal)[1];
-            else if (!(!"Pallete Prob!!"))
-                DBG_Error(NULL, "psxsrc/DIALOG.CPP", 0x13A);
-        }
+        Pal = DialogTData->GetPal(Fr->PalNum);
+        if (Pal->InVram) {
+            unsigned short *Clut = (unsigned short *)Pal;
+            FT4->clut = Clut[1];
+        } else if (!(!"Pallete Prob!!"))
+            DBG_Error(NULL, "psxsrc/DIALOG.CPP", 0x13A);
         setlen(FT4, 9);
         setcode(FT4, 0x2C);
         if (Trans)
@@ -344,15 +346,16 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
             FT4->u3 = FT4->u0 + 1;
             FT4->v2 = FT4->v0 + 1;
             FT4->v3 = FT4->v0 + 1;
-            FT4->tpage = ((FRAME_TP *)Fr)->Tpage | 0x40;
+            FT4->tpage = Tp->tpage | 0x40;
         } else {
             FT4->r0 = DialogRed;
             FT4->g0 = DialogGreen;
             FT4->b0 = DialogBlue;
-            FT4->tpage = ((FRAME_TP *)Fr)->Tpage;
+            FT4->tpage = Tp->tpage;
         }
         addPrim(ThisOt + MY_DialogOTpos, FT4);
     } else {
+        PAL *Pal;
         short G1, G2, G3, G4;
 
         GT4 = PRIM_GetNextPolyGt4();
@@ -372,13 +375,12 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
         GT4->y2 = y2;
         GT4->x3 = x3;
         GT4->y3 = y3;
-        {
-            PAL *Pal = DialogTData->GetPal(Fr->PalNum);
-            if (Pal->InVram)
-                GT4->clut = ((unsigned short *)Pal)[1];
-            else if (!(!"Pallete Prob!!"))
-                DBG_Error(NULL, "psxsrc/DIALOG.CPP", 0x161);
-        }
+        Pal = DialogTData->GetPal(Fr->PalNum);
+        if (Pal->InVram) {
+            unsigned short *Clut = (unsigned short *)Pal;
+            GT4->clut = Clut[1];
+        } else if (!(!"Pallete Prob!!"))
+            DBG_Error(NULL, "psxsrc/DIALOG.CPP", 0x161);
         setlen(GT4, 12);
         setcode(GT4, 0x3C);
         if (Trans)
@@ -415,7 +417,7 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
             GT4->g3 = TrimCol(BACKG + G4);
             GT4->b3 = TrimCol(BACKB + G4);
         }
-        GT4->tpage = ((FRAME_TP *)Fr)->Tpage;
+        GT4->tpage = Tp->tpage;
         addPrim(ThisOt + MY_DialogOTpos, GT4);
     }
     return GT4;
