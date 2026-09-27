@@ -563,17 +563,18 @@ void PlaceStoreGold(long v)
     unsigned char done;
 
     done = 0;
-    for (i = 0; i < 40 && !done; i++) {
-        yy = 10 * (i / 10);
-        xx = i % 10;
+    for (ii = 0; ii < 40 && !done; ii++) {
+        yy = 10 * (ii / 10);
+        xx = ii % 10;
         if (plr[myplr].InvGrid[xx + yy] == 0) {
-            ii = plr[myplr]._pNumInv;
+            int x;   /* dead local: retail SYM has a record-less level here (it also keeps the loop unrotated) */
+            i = plr[myplr]._pNumInv;
             GetGoldSeed(myplr, &golditem);
-            plr[myplr].InvList[ii] = golditem;
+            plr[myplr].InvList[i] = golditem;
             plr[myplr]._pNumInv++;
             plr[myplr].InvGrid[xx + yy] = plr[myplr]._pNumInv;
-            plr[myplr].InvList[ii]._ivalue = v;
-            SetGoldCurs(myplr, ii);
+            plr[myplr].InvList[i]._ivalue = v;
+            SetGoldCurs(myplr, i);
             done = 1;
         }
     }
