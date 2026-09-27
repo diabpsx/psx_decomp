@@ -1143,11 +1143,9 @@ void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed)
 
 int SyncPutItem(int pnum, int x, int y, int idx, unsigned short icreateinfo, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, unsigned long ibuff)
 {
-    unsigned char done;
-    int d, ii;
-    int i, j, l;
-    int xx, yy;
-    int xp, yp;
+    int ii;
+    int d;
+    int dy;
 
     if (numitems >= 0x7A) {
         PlaySFX(0x3D3);
@@ -1159,9 +1157,8 @@ int SyncPutItem(int pnum, int x, int y, int idx, unsigned short icreateinfo, int
     }
 
     d = GetDirection(plr[pnum]._px, plr[pnum]._py, x, y);
-    xx = x - plr[pnum]._px;
-    yy = y - plr[pnum]._py;
-    if (abs(xx) > 1 || abs(yy) > 1) {
+    dy = y - plr[pnum]._py;
+    if (abs(x - plr[pnum]._px) > 1 || abs(dy) > 1) {
         x = plr[pnum]._px + offset_x[d];
         y = plr[pnum]._py + offset_y[d];
     }
@@ -1174,22 +1171,16 @@ int SyncPutItem(int pnum, int x, int y, int idx, unsigned short icreateinfo, int
             x = plr[pnum]._px + offset_x[d];
             y = plr[pnum]._py + offset_y[d];
             if (!CanPut(x, y)) {
-                done = 0;
-                for (l = 1; l < 50; l++) {
-                    if (done)
-                        break;
-                    for (j = -l; j <= l; j++) {
-                        if (done)
-                            break;
-                        yp = j + plr[pnum]._py;
-                        for (i = -l; i <= l; i++) {
-                            if (done)
-                                break;
-                            xp = i + plr[pnum]._px;
-                            if (CanPut(xp, yp)) {
+                unsigned char done = 0;
+                for (int l = 1; l < 50 && !done; l++) {
+                    for (int j = -l; j <= l && !done; j++) {
+                        int yy = plr[pnum]._py + j;
+                        for (int i = -l; i <= l && !done; i++) {
+                            int xx = plr[pnum]._px + i;
+                            if (CanPut(xx, yy)) {
                                 done = 1;
-                                x = xp;
-                                y = yp;
+                                x = xx;
+                                y = yy;
                             }
                         }
                     }
