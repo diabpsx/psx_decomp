@@ -2061,6 +2061,28 @@ void MI_Flash(int i)
         if (miss->_micaster == TARGET_MONSTERS && miss->_misource != -1)
             plr[miss->_misource]._pInvincible = 0;
     }
+
+    /* PSX-only: unlike MI_Flash2's plain snapshot, MI_Flash blends a fade-out gradient into
+     * restore_r/g/b -- `(19 - _miAnimFrame) / 9` (confirmed: raw oracle's multiply-by-0x38E38E39
+     * is the standard unsigned reciprocal for division by 9) scaled by 240 and added to the
+     * current fadetor/fadetog/fadetob, then clamped to 255. Runs unconditionally (both mirange
+     * paths reach it). No PC twin has this; reconstructed instruction-by-instruction. */
+    {
+        int d;
+        d = (19 - miss->_miAnimFrame) / 9;
+        restore_r = fadetor + d * 240;
+        d = (19 - miss->_miAnimFrame) / 9;
+        restore_g = fadetog + d * 240;
+        d = (19 - miss->_miAnimFrame) / 9;
+        restore_b = fadetob + d * 240;
+        if (restore_r >= 256)
+            restore_r = 255;
+        if (restore_g >= 256)
+            restore_g = 255;
+        if (restore_b >= 256)
+            restore_b = 255;
+    }
+
     PutMissile(i);
 }
 
@@ -2204,7 +2226,7 @@ void MI_Guardian(int i)
     if (!(miss->_mirange % 16)) {
         ex = 0;
         for (j = 0; j < 23 && ex != -1; j++) {
-            for (k = 10; k >= 0 && ex != -1 && (vCrawlTable[j][k] != 0 || vCrawlTable[j][k + 1] != 0); k -= 2) {
+            for (k = 10; ex != -1 && k >= 0 && (vCrawlTable[j][k] != 0 || vCrawlTable[j][k + 1] != 0); k -= 2) {
                 if (sx1 == vCrawlTable[j][k] && sy1 == vCrawlTable[j][k + 1])
                     continue;
                 sx = miss->_mix + vCrawlTable[j][k];
@@ -2404,12 +2426,17 @@ void MI_Cbolt(int i)
             GetMissilePos(i);
         }
 
-        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, missile[i]._miVar1);
+        /* PSX-only: bit 2 of the raw missile slot index gates this ChangeLight call (and the
+         * AddUnLight below) -- same idiom as MI_Lightball's `i & 2` gate, confirmed via oracle
+         * (`andi v0,s2,4` where s2=i); when gated off, the call is skipped entirely. */
+        if (i & 4)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 578);
     }
 
     if (missile[i]._mirange == 0) {
         missile[i]._miDelFlag = 1;
-        AddUnLight(missile[i]._mlid);
+        if (i & 4)
+            AddUnLight(missile[i]._mlid);
     }
 
     PutMissile(i);
@@ -2648,6 +2675,8 @@ void AddStone(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     missile[mi]._misource = id;
 
     i = 0;
+    tx = 0;
+    ty = 0;
     for (k = 0; k < 6; k++) {
         l = CrawlNum[k];
         j = l + 1;
@@ -2994,10 +3023,10 @@ void MI_Stone(int i)
     missile[i]._mirange--;
     m = missile[i]._miVar2;
 
-    if (monster[m]._mhitpoints == 0 && missile[i]._miAnimType != 0x12) {
-        SetMissAnim(i, 0x12);
+    /* PSX drops the `SetMissAnim(i, MF_STONE)` call the PC twin has here -- confirmed absent from
+     * the raw oracle (no jal at all in this branch, just the mirange write). */
+    if (monster[m]._mhitpoints == 0 && missile[i]._miAnimType != 0x12)
         missile[i]._mirange = 11;
-    }
 
     if (monster[m]._mmode != MM_STONE) {
         missile[i]._miDelFlag = 1;
