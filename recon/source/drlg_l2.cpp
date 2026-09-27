@@ -318,23 +318,26 @@ static void DRLG_L2SetRoom(int rx1, int ry1)
     int rw, rh, i, j;
     unsigned char *sp;
 
-    rw = pSetPiece[0];
-    rh = pSetPiece[2];
+    sp = pSetPiece;
+    rw = *sp;
+    sp += 2;
+    rh = *sp;
+    sp += 2;
 
     setpc_x = rx1;
     setpc_y = ry1;
     setpc_w = rw;
     setpc_h = rh;
 
-    sp = &pSetPiece[4];
+    sp = pSetPiece + 4;
 
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*sp != 0) {
-                dungeon[i + rx1][j + ry1] = *sp;
-                mydflags[(i + rx1) + (j + ry1) * DMAXX] |= DLRG_PROTECTED;
+                dungeon[i + rx1][ry1 + j] = *sp;
+                mydflags[(i + rx1) + (ry1 + j) * DMAXX] |= DLRG_PROTECTED;
             } else {
-                dungeon[i + rx1][j + ry1] = 3;
+                dungeon[i + rx1][ry1 + j] = 3;
             }
             sp += 2;
         }
