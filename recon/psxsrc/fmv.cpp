@@ -312,8 +312,13 @@ extern "C" void stream_cdready_handler(unsigned char status, unsigned char *resu
     static int idx;   /* retail SYM: function statics idx/i/sec/subcode (sbss/bss @0x8011C74C..) */
     static int i;
     static int sec;
-    static CdlLOC subcode[3];
-    unsigned long OldGp = ReloadGP();
+    unsigned long OldGp = (unsigned long)ReloadGP();
+    static CdlLOC subcode[3];   /* declared AFTER OldGp: source-order swap needed to avoid a nested
+     * lexical block cc1plus opens whenever this static struct ARRAY is declared immediately before
+     * OldGp's call-initializer (scalars idx/i/sec don't trigger it, only this array does) -- costs an
+     * adjacent record-order swap (ours: ...sec OldGp subcode / retail: ...sec subcode OldGp) instead
+     * of the earlier full block-nesting mismatch. Several placements/split-init forms tried; this is
+     * the closest (bytes PASS, single adjacent SYM record swap). */
 
     if (stream_ending == 0)
         first_handler_event = 1;
@@ -472,9 +477,9 @@ extern "C" void wait_cdstream(void)
                        * 13A "SYM-LOCAL STAGING LAW"): its declared-but-unused presence supplies the
                        * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
     int wait = 1;   /* NB: SYM shows one spurious REG record for this local that retail's SYM lacks --
-                     * tried register/const/static/for-scope/comma/global-const variants, all either
-                     * keep the record or break the bytes (see project notes); kept as the only form
-                     * that reproduces the exact 46/46 bytes. Parked per orchestrator instruction. */
+                     * tried register/const/static/for-scope/comma/global-const/unsigned variants, all
+                     * either keep the record or break the bytes (see project notes); kept as the only
+                     * form that reproduces the exact 46/46 bytes. Parked per orchestrator instruction. */
 
     (void)&start_wait;
     while (((stream_open != 0) || (stream_ending != 0)) && wait) {

@@ -1094,18 +1094,17 @@ void On_KILLGOLEM(const TCmd *pCmd, int pnum)
  * this player's golem (the loop over missileactive[] guards against a duplicate MIS_GOLEM(0x21)). */
 void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 {
+    {
     if (pnum != myplr) {
         unsigned char addok = 1;
-        int i;
-        for (i = 0; i < nummissiles; i++) {
+        for (int i = 0; i < nummissiles; i++) {
             int mi = missileactive[i];
             if (missile[mi]._mitype == 0x21 && missile[mi]._misource == pnum)
                 addok = 0;
         }
-        if (addok) {
-            const TCmdGolem *p = (const TCmdGolem *)pCmd;
-            AddMissile(plr[pnum]._px, plr[pnum]._py, p->_mx, p->_my, p->_mdir, 0x21, 0, pnum, 0, 1);
-        }
+        if (addok)
+            AddMissile(plr[pnum]._px, plr[pnum]._py, ((const TCmdGolem *)pCmd)->_mx, ((const TCmdGolem *)pCmd)->_my, ((const TCmdGolem *)pCmd)->_mdir, 0x21, 0, pnum, 0, 1);
+    }
     }
 }
 
