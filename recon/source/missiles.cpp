@@ -4201,8 +4201,11 @@ void AddArrow(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl)
 {
     int mi;
+    /* PSX-only: per-direction sub-tile offsets (x, y pairs) for a player-cast missile's start
+     * position -- rodata template D_8011A080. */
+    int xyoffs[16] = { 0, 0, 0, 6, 0, 6, 0, 0, 12, 0, 0, 4, 0, 12, 0, 12 };
 
-    if (nummissiles >= MAXMISSILES - 1)
+    if (nummissiles >= MAXMISSILES)
         return -1;
 
     mi = missileavail[0];
@@ -4215,36 +4218,41 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
     missile[mi]._misource = id;
     missile[mi].PrintPtr = MissPrintRoutines[mitype];
     missile[mi]._miAnimType = missiledata[mitype].mFileNum;
-    missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
     missile[mi]._mispllvl = spllvl;
     missile[mi]._mimfnum = midir;
+    missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
 
-    if (missile[mi]._miAnimType != 0xFF && misfiledata[missile[mi]._miAnimType].mAnimFAmt >= 8)
-        SetMissDir(mi, midir);
-    else
+    if (missile[mi]._miAnimType == 0xFF || misfiledata[missile[mi]._miAnimType].mAnimFAmt < 8)
         SetMissDir(mi, 0);
-
-    /* PSX-only positional-offset block decoded from the raw: gated on `micaster != 0 && mitype !=
-     * MIS_APOCA(0x2C) && mitype != MIS_FLAMEC(0x31)`, computing _mitxoff/_mityoff from
-     * plr[id] fields at +0x3C/+0x3D/+0x42 (role not fully attributed -- open item) instead of the
-     * flat 0 devilution/hellfire always use. Both arms currently write 0 pending that attribution,
-     * so this fn is NOT byte-verified for that branch; everything else below is. */
-    missile[mi]._mitxoff = 0;
-    missile[mi]._mityoff = 0;
+    else
+        SetMissDir(mi, midir);
 
     missile[mi]._mix = sx;
     missile[mi]._miy = sy;
-    missile[mi]._mixoff = 0;
-    missile[mi]._miyoff = 0;
     missile[mi]._misx = sx;
     missile[mi]._misy = sy;
+
+    /* PSX-only: a player's missile starts half a direction-offset away from the caster's current
+     * sub-tile offset (apocalypse and flame-wave excepted). */
+    if (micaster == TARGET_MONSTERS && mitype != 0x2C /* MIS_APOCA */ && mitype != 0x31 /* MIS_FLAMEC */) {
+        missile[mi]._miVar6 = (plr[id]._pxoff + xyoffs[plr[id]._pdir * 2]) >> 1;
+        missile[mi]._miVar7 = (plr[id]._pyoff + xyoffs[plr[id]._pdir * 2 + 1]) >> 1;
+    } else {
+        missile[mi]._miVar6 = 0;
+        missile[mi]._miVar7 = 0;
+    }
+
+    missile[mi]._mitxoff = 0;
+    missile[mi]._mityoff = 0;
+    missile[mi]._mixoff = 0;
+    missile[mi]._miyoff = 0;
     missile[mi]._miDelFlag = 0;
     missile[mi]._miAnimAdd = 1;
     missile[mi]._miLightFlag = 0;
     missile[mi]._miPreFlag = 0;
+    missile[mi]._mlid = -1;
     missile[mi]._miHitFlag = 0;
     missile[mi]._midist = 0;
-    missile[mi]._mlid = -1;
     missile[mi]._mirnd = 0;
     missile[mi]._midam = v3;
 
