@@ -1525,91 +1525,81 @@ void InvDrawSlots(void)
 
 void DrawInvCursor(void)
 {
-    struct POLY_FT4 *Ft4;
-    struct TextDat *TData;
     int ItemX, ItemY;
     int LoopX, LoopY;
-    int GoldAmount;
+    struct POLY_FT4 *Ft4;
+    struct TextDat *TData;
 
     ItemH = 1;
     ItemW = 1;
 
-    if (_pcurs[myplr] < 12)
-        goto no_item;
-
-    if (plr[myplr].HoldItem._itype != -1) {
-        if (plr[myplr].HoldItem._itype == ITYPE_GOLD) {
-            GoldAmount = plr[myplr].HoldItem._ivalue;
-            if (GoldAmount < 0x9C4) {
-                if (GoldAmount < 0x3E9)
+    if (_pcurs[myplr] >= 12) {
+        if (plr[myplr].HoldItem._itype != ITYPE_NONE) {
+            if (plr[myplr].HoldItem._itype == ITYPE_GOLD) {
+                int GoldAmount = plr[myplr].HoldItem._ivalue;
+                if (GoldAmount >= 2500)
+                    plr[myplr].HoldItem._iCurs = 6;
+                else if (GoldAmount <= 1000)
                     plr[myplr].HoldItem._iCurs = 4;
                 else
                     plr[myplr].HoldItem._iCurs = 5;
+            }
+
+            ItemNo = plr[myplr].HoldItem._iCurs;
+            ItemW = InvItemWidth[ItemNo + 12] >> 4;
+            ItemH = InvItemHeight[ItemNo + 12] >> 4;
+            ItemX = InvRect[InvCursPos].X;
+            ItemY = InvRect[InvCursPos].Y;
+
+            if (ItemNo < 0x32)
+                TData = InvPanelTData;
+            else
+                TData = InvGfxTData;
+
+            if (InvCursPos == 7 || InvCursPos == 0x13 || InvCursPos == 0xD) {
+                if (ItemW == 1)
+                    ItemX += 8;
+                if (ItemH == 1)
+                    ItemY += 0x10;
+                if (ItemH == 2)
+                    ItemY += 8;
+            }
+
+            Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x7A, ItemY - InvBackY + 0x1A, 0, D_8011C304 + 1, 0);
+            Ft4->code = Ft4->code & 0xFC;
+            if (plr[myplr].HoldItem._iStatFlag) {
+                Ft4->r0 = 0x80;
+                Ft4->g0 = 0x80;
+                Ft4->b0 = 0x80;
             } else {
-                plr[myplr].HoldItem._iCurs = 6;
+                Ft4->r0 = 0x80;
+                Ft4->g0 = 0;
+                Ft4->b0 = 0;
             }
+
+            Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x82, ItemY - InvBackY + 0x22, 0, D_8011C304 + 1, 0);
+            Ft4->r0 = 0x10;
+            Ft4->g0 = 0x10;
+            Ft4->b0 = 0x10;
+            Ft4->code = (Ft4->code | 2) & 0xFE;
+
+            InvSlotTable[InvCursPos] |= 2;
         }
-    }
-
-    ItemNo = plr[myplr].HoldItem._iCurs;
-    ItemW = InvItemWidth[ItemNo + 12] >> 4;
-    ItemH = InvItemHeight[ItemNo + 12] >> 4;
-    ItemX = InvRect[InvCursPos].X;
-    ItemY = InvRect[InvCursPos].Y;
-
-    TData = (ItemNo < 0x32) ? InvPanelTData : InvGfxTData;
-
-    if (InvCursPos == 7 || InvCursPos == 0x13 || InvCursPos == 0xD) {
-        if (ItemW == 1)
-            ItemX = ItemX + 8;
-        if (ItemH == 1)
-            ItemY = ItemY + 0x10;
-        if (ItemH == 2)
-            ItemY = ItemY + 8;
-    }
-
-    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x7A, ItemY - InvBackY + 0x1A, 0, D_8011C304 + 1, 0);
-    Ft4->code = Ft4->code & 0xFC;
-    if (plr[myplr].HoldItem._iStatFlag) {
-        Ft4->r0 = 0x80;
-        Ft4->g0 = 0x80;
-        Ft4->b0 = 0x80;
     } else {
-        Ft4->r0 = 0;
-        Ft4->g0 = 0;
-        Ft4->b0 = 0;
-    }
-
-    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x82, ItemY - InvBackY + 0x22, 0, D_8011C304 + 1, 0);
-    Ft4->r0 = 0x10;
-    Ft4->g0 = 0x10;
-    Ft4->b0 = 0x10;
-    Ft4->code = (Ft4->code | 2) & 0xFE;
-
-    InvSlotTable[InvCursPos] = InvSlotTable[InvCursPos] | 2;
-    goto tail;
-
-no_item:
-    if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
-        InvSetItemCurs();
-        InvGetItemWH(InvCursPos - 25);
-    }
-    if (InvCursPos < 0x41) {
-        ItemH = 1;
-        ItemW = 1;
-    }
-    if (ItemH > 0) {
-        for (LoopY = 0; LoopY < ItemH; LoopY++) {
-            if (ItemW > 0) {
-                for (LoopX = 0; LoopX < ItemW; LoopX++) {
-                    InvSlotTable[InvCursPos + LoopX + LoopY * 10] = 2;
-                }
-            }
+        if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+            InvSetItemCurs();
+            InvGetItemWH(InvCursPos - 25);
         }
-    }
+        if (InvCursPos >= 0x41) {
+            ItemH = 1;
+            ItemW = 1;
+        }
+        for (LoopY = 0; LoopY < ItemH; LoopY++) {
+            for (LoopX = 0; LoopX < ItemW; LoopX++)
+                InvSlotTable[InvCursPos + LoopX + LoopY * 10] = 2;
+        }
 
-    if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4) {
-        if ((unsigned int)InvCursPos < 20) {
+        if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4) {
             switch (InvCursPos) {
             case 0:
                 ItemW = 2;
@@ -1628,37 +1618,29 @@ no_item:
                 ItemH = 3;
                 break;
             default:
-                InvGetItemWH(InvCursPos - 25);
                 ItemW = 1;
                 ItemH = 1;
+                InvGetItemWH(InvCursPos - 25);
                 break;
             }
-        } else {
-            InvGetItemWH(InvCursPos - 25);
-            ItemW = 1;
-            ItemH = 1;
+
+            ItemX = InvRect[InvCursPos].X + 8;
+            ItemY = InvRect[InvCursPos].Y + 8;
+            if (ItemW == 2)
+                ItemX = InvRect[InvCursPos].X + 0x10;
+            if (ItemH == 2)
+                ItemY = InvRect[InvCursPos].Y + 0x10;
+            if (ItemH == 3)
+                ItemY += 0x10;
+
+            InvGfxTData->PrintFt4(_pcurs[myplr] - 2, ItemX + 0x80, ItemY - InvBackY + 0x20, 0, 0x100, 0);
         }
-
-        ItemX = InvRect[InvCursPos].X + 8;
-        ItemY = InvRect[InvCursPos].Y + 8;
-        if (ItemW == 2)
-            ItemX = InvRect[InvCursPos].X + 0x10;
-        if (ItemH == 2)
-            ItemY = InvRect[InvCursPos].Y + 0x10;
-        if (ItemH == 3)
-            ItemY = ItemY + 0x10;
-
-        Ft4 = InvGfxTData->PrintFt4(_pcurs[myplr] - 2, ItemX + 0x80, ItemY - InvBackY + 0x20, 0, 0x100, 0);
     }
 
-tail:
-    if (InvCursPos >= 0x19 && ItemH > 0) {
+    if (InvCursPos >= 0x19) {
         for (LoopY = 0; LoopY < ItemH; LoopY++) {
-            if (ItemW > 0) {
-                for (LoopX = 0; LoopX < ItemW; LoopX++) {
-                    InvSlotTable[InvCursPos + LoopX + LoopY * 10] |= 2;
-                }
-            }
+            for (LoopX = 0; LoopX < ItemW; LoopX++)
+                InvSlotTable[InvCursPos + LoopX + LoopY * 10] |= 2;
         }
     }
 }
