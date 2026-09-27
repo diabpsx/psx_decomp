@@ -374,9 +374,9 @@ int CFont::GetWrap(char *Str, RECT *TextWindow)
             if (!SpacePtr) {
                 char c;
                 if (*EndPtr && *EndPtr != ' ') {
-                    for (;;) {
+                    do for (;;) {
                         if (!*EndPtr)
-                            break;
+                            goto done;
                         c = *EndPtr;
                         if (c & 0x80) {
                             EndPtr++;
@@ -387,7 +387,8 @@ int CFont::GetWrap(char *Str, RECT *TextWindow)
                         EndPtr++;
                         if (!c || c == ' ')
                             break;
-                    }
+                    } while (0);
+                done:;
                 }
             } else if (LastSpacePtr == SpacePtr) {
                 DBG_Error(NULL, "psxsrc/PRINTY.CPP", 0x43D);
