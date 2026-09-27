@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2436 / 2727 functions PASS (89.3%) — 837 PsyQ SDK functions excluded**
+**Game code: 2438 / 2727 functions PASS (89.4%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1617,7 +1617,7 @@
 - ✅ ML_SetList__Fii (44)
 - ✅ ML_GetPresetMonsters__FiPiUl (124)
 
-## monster  (recon/source/monster.cpp) — 68/105 PASS
+## monster  (recon/source/monster.cpp) — 69/105 PASS
 - ✅ DeleteMonster__Fi (14)
 - ✅ M_GetDir__Fi (25)
 - ✅ M_StartDelay__Fii (20)
@@ -1710,7 +1710,7 @@
 - ✅ LineClear__Fiiii (16)
 - ✅ LineClearF1__FPFiii_Uciiiii (165)
 - ⬜ M_FallenFear__Fii
-- ❌ PrintMonstHistory__Fi — 5 diffs (ours 161)
+- ✅ PrintMonstHistory__Fi (161)
 - ❌ PrintUniqueHistory__Fv — 11 diffs (ours 75)
 - ❌ MissToMonst__Fiii — 46 diffs (ours 307)
 - ✅ PosOkMonst3__Fiii (183)
@@ -1847,7 +1847,7 @@
 - ✅ InitNewSeed__Fl (29)
 - ✅ NetInit__FUcPUc (164)
 
-## objects  (recon/source/objects.cpp) — 69/96 PASS
+## objects  (recon/source/objects.cpp) — 70/96 PASS
 - ✅ PostAddL1Door__Fiiii (58)
 - ✅ PostAddL2Door__Fiiii (83)
 - ✅ PostAddArmorStand__Fi (34)
@@ -1914,7 +1914,7 @@
 - ✅ OperateBookCase__FiiUc (134)
 - ✅ OperateDecap__FiiUc (58)
 - ✅ OperateArmorStand__FiiUc (91)
-- ❌ FindValidShrine__Fi — 7 diffs (ours 59)
+- ✅ FindValidShrine__Fi (59)
 - ✅ OperateGoatShrine__Fiii (42)
 - ✅ OperateCauldron__Fiii (41)
 - ❌ OperateFountains__Fii — 63 diffs (ours 361)

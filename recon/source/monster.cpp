@@ -4276,6 +4276,7 @@ void PrintMonstHistory(int mt)
 
         if (res == 0) {
             strcpy(tempstr, GetStr(0x2CE));
+            AddPanelString(tempstr, 1);
         } else {
             if (res & (RESIST_MAGIC | RESIST_FIRE | RESIST_LIGHTNING)) {
                 strcpy(tempstr, GetStr(0x35F));

@@ -1459,29 +1459,20 @@ int TextDat::GetNumOfFrames(int Creature, int Action)
 int FindValidShrine(int i)
 {
     int rv;
-    int cl;
-    int rangeok;
     unsigned char done;
 
     done = 0;
     do {
         rv = ENG_random(0x1A);
-        cl = currlevel;
-        if (cl != 0) {
-            if (rv == 7)
-                rangeok = cl < 9;
-            else
-                rangeok = cl < 0x11;
-            if (rangeok && rv != 8)
-                done = 1;
-        }
+        if (currlevel != 0 && currlevel < (rv == 7 ? 9 : 17) && rv != 8)
+            done = 1;
         if (done) {
             if (gbMaxPlayers != 1 && shrineavail[rv] == 1) {
                 done = 0;
-            } else if (gbMaxPlayers == 1) {
+            } else if (gbMaxPlayers == 1 && shrineavail[rv] == 2) {
+                done = 0;
+            } else {
                 done = 1;
-                if (shrineavail[rv] == 2)
-                    done = 0;
             }
         }
     } while (!done);
