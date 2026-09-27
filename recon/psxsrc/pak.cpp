@@ -44,7 +44,14 @@ int writeblock(struct block *theblock)
     theblock->blocksize = -1;
 }
 
-/* @0x800AE084 PAK.CPP:118 */
+/* @0x800AE084 PAK.CPP:118 -- OPEN (120 diffs, 142/144 insns; fsize 600 vs 608).  Retail hoists &theblock.data
+ * (sp+16) out of the outer loop into a pseudo that global-alloc spills (sw at 0x230, lw a3 at the literal
+ * store) -> +8 frame and a different s-register assignment (retail inpos=s5 bestoffset=s7 theptr=s6).  Ours:
+ * cc1plus -dL 'Insn 340: regno 124 (life 1), savings 1 not desirable' -- loop.c moves an invariant only when
+ * threshold(1+n_non_fixed_regs, call in loop) * savings * lifetime >= insn_count (84): needs lifetime >= 3.
+ * Falsified: *(data + ++bs), bs += 1, split ++bs / store / inpos++ statements.  Next angle: a spelling whose
+ * RTL materializes the data base 3+ insns before its use (or shares it with another use in the loop).  Kept
+ * from this pass (131 -> 120): ptr1 = &buffer[inpos + bestoffset] before theptr, ptr3++ before ptr2++. */
 int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
 {
     long begin, end, bestlength;
@@ -70,9 +77,10 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
             end = 255;
         bestoffset = begin;
         bestlength = 1;
-        theptr = (unsigned char *)buffer + inpos;
-        ptr1 = (unsigned char *)buffer + inpos + begin;
-        for (offset = begin; offset < 0; offset++, ptr1++) {
+        ptr1 = (unsigned char *)&buffer[inpos + bestoffset];
+        offset = begin;
+        theptr = (unsigned char *)&buffer[inpos];
+        for (; offset < 0; offset++, ptr1++) {
             if (*ptr1 == *theptr && !memcmp(ptr1, theptr, bestlength + 1)) {
                 bestlength++;
                 bestoffset = offset;
@@ -82,8 +90,8 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
                     bestlength++;
                     if (bestlength >= end)
                         break;
-                    ptr2++;
                     ptr3++;
+                    ptr2++;
                 }
             }
             if (bestlength >= end) {
@@ -94,7 +102,7 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
         if (bestlength < 3) {
             if (theblock.blockrep || theblock.blocksize >= 127)
                 writeblock(&theblock);
-            theblock.data[++theblock.blocksize] = buffer[inpos++];
+            *(theblock.data + ++theblock.blocksize) = buffer[inpos++];
         } else {
             writeblock(&theblock);
             inpos += bestlength;
