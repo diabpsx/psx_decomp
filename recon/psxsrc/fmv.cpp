@@ -660,7 +660,7 @@ static SVECTOR tmdc_pol_offs[2][10][10];
  * `x_run` (the raw's $fp) is reset to the `sx` PARAMETER once per OUTER (row) iteration and accumulates
  * by `colw` every INNER (column) iteration -- distinct from `sy`, which only advances by `rowh` once
  * per outer iteration and never resets. */
-extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int sx, short sy, int correct)
+extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int sx, int sy, int correct)
 {
     int rows = 0;
     short y = r->y;
@@ -791,39 +791,54 @@ extern "C" void draw_mdec_polys(int bright)
         do_brightness = 0;
 }
 
-/* WIP -- NOT byte-verified (see split_poly_area note). @0x8015734C FMV.CPP:1111 */
+/* @0x8015734C FMV.CPP:1111 -- SYM: w/h decremented in place, RECT r + int i, separate copy loops. */
 extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, int bx2, int by2, int correct)
 {
-    short w1 = w - 1, h1 = h - 1;
-    RECT rr;
+    RECT r;
+    int i;
+
+    w--;
+    h--;
 
     frame_decoded = 0;
-    mdc_buf[0].w = w1; mdc_buf[0].h = h1;
-    mdc_buf[1].w = w1; mdc_buf[1].h = h1;
-    mdc_buf[0].x = (short)bx1; mdc_buf[0].y = (short)by1;
-    mdc_buf[1].x = (short)bx2; mdc_buf[1].y = (short)by2;
-    rr.x = (short)bx1; rr.y = (short)by1; rr.w = w1; rr.h = h1;
-    num_pol[0] = split_poly_area(&tmdc_pol[0][0][0], (POLY_FT4 *)&br[0][0][0], 0, &rr,
-                                  x - (w1 >> 1), (unsigned short)(y - (h1 >> 1)), correct);
+
+    mdc_buf[0].x = bx1;
+    mdc_buf[0].y = by1;
+    mdc_buf[0].w = w;
+    mdc_buf[0].h = h;
+    mdc_buf[1].x = bx2;
+    mdc_buf[1].y = by2;
+    mdc_buf[1].w = w;
+    mdc_buf[1].h = h;
+
+    r.x = bx1;
+    r.y = by1;
+    r.w = w;
+    r.h = h;
+    num_pol[0] = split_poly_area(&tmdc_pol[0][0][0], &br[0][0][0], 0, &r, x - (r.w >> 1), y - (r.h >> 1), correct);
     mdec_pw[0] = area_pw;
     mdec_ph[0] = area_ph;
-    for (int i = 0; i < num_pol[0]; i++) {
+    for (i = 0; i < num_pol[0]; i++)
         tmdc_pol[1][0][i] = tmdc_pol[0][0][i];
+    for (i = 0; i < num_pol[0]; i++)
         br[1][0][i] = br[0][0][i];
-    }
-    rr.x = (short)bx2; rr.y = (short)by2; rr.w = w1; rr.h = h1;
-    num_pol[1] = split_poly_area(&tmdc_pol[0][1][0], (POLY_FT4 *)&br[0][1][0], 1, &rr,
-                                  x - (w1 >> 1), (unsigned short)(y - (h1 >> 1)), correct);
+
+    r.x = bx2;
+    r.y = by2;
+
+    num_pol[1] = split_poly_area(&tmdc_pol[0][1][0], &br[0][1][0], 1, &r, x - (r.w >> 1), y - (r.h >> 1), correct);
     mdec_pw[1] = area_pw;
     mdec_ph[1] = area_ph;
-    for (int i = 0; i < num_pol[1]; i++) {
+    for (i = 0; i < num_pol[1]; i++)
         tmdc_pol[1][1][i] = tmdc_pol[0][1][i];
+    for (i = 0; i < num_pol[1]; i++)
         br[1][1][i] = br[0][1][i];
-    }
-    mdec_w = w1;
-    mdec_h = h1;
+
+    mdec_w = w;
+    mdec_h = h;
     mdec_cx = x;
     mdec_cy = y;
+
     last_mdc = -1;
     last_fn = -1;
 }
