@@ -1311,9 +1311,9 @@ void AddWeapexp(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy,
     missile[mi]._miVar2 = dx;
     missile[mi]._mimfnum = 0;
     if (dx == 1)
-        SetMissAnim(mi, 0x1A); /* MFILE_EXP1 -- PSX misfiledata code, from the oracle literal */
-    else
         SetMissAnim(mi, 5); /* MFILE_CBOLT */
+    else
+        SetMissAnim(mi, 0x1A); /* MFILE_EXP1 -- PSX ordering is reversed from the PC twin */
     missile[mi]._mirange = missile[mi]._miAnimLen - 1;
 }
 
@@ -1505,12 +1505,10 @@ void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
      * EquivMonst(mtype,MT_HORNED)=[0x40,0x43], EquivMonst(mtype,MT_NSNAKE)=[0x59,0x5C] ranges) and
      * copies Frames/Rate; no Cels pointer, no _miAnimWidth/Width2, no uniqtype/mlid path exist here. */
     struct AnimStruct *anim;
-    unsigned char mtype;
 
-    mtype = monster[id].MType->mtype;
-    if ((unsigned char)(mtype - 0x40) < 4)
+    if ((unsigned char)(monster[id].MType->mtype - 0x40) < 4)
         anim = &monster[id].MType->Anims[5];
-    else if ((unsigned char)(mtype - 0x59) < 4)
+    else if ((unsigned char)(monster[id].MType->mtype - 0x59) < 4)
         anim = &monster[id].MType->Anims[2];
     else
         anim = &monster[id].MType->Anims[1];
@@ -1520,8 +1518,8 @@ void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     missile[mi]._mimfnum = midir;
     missile[mi]._miAnimFlags = 0;
     missile[mi]._miAnimDelay = anim->Rate;
-    missile[mi]._miAnimAdd = 1;
     missile[mi]._miAnimLen = anim->Frames;
+    missile[mi]._miAnimAdd = 1;
 
     if ((unsigned char)(monster[id].MType->mtype - 0x59) < 4)
         missile[mi]._miAnimFrame = 7;

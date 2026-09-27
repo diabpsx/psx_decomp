@@ -23,5 +23,11 @@ that reproduces `DIABPSX.BIN` byte for byte.
 ```
 python tools/verify_asm.py recon/psxsrc/gman.cpp __7TextDat,OnceOnlyInit__7TextDat
 ```
-`PASS (N insns)` = byte-identical instruction stream vs the retail oracle (reloc-name and
-branch-target lenient, everything else exact).
+`PASS (N insns)` = byte-identical instruction stream vs the retail oracle. Relocation fields are
+normalized, local branch targets are exact, and symbolic call/jump targets are verified separately.
+
+The complete seal bar also requires an exact `tools/symlane.py` receipt plus the call-target
+and jump-table audits.  Functions affected by maspsx emulation differences are checked through
+the real PsyQ ASPSX 2.56 lane (`tools/aspsx_gate.py`) and listed in
+`configs/aspsx_passes.txt`.  The reconstruction target is 2727 game functions; the 837 PsyQ SDK
+functions are linked from the retail Sony libraries and are excluded from the reconstruction count.

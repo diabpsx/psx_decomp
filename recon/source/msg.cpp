@@ -1297,10 +1297,11 @@ void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 {
     plr[pnum]._pLvlChanging = 0;
     if (plr[pnum].plractive && pnum) {
+        const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
         plr[pnum]._pGFXLoad = 0;
-        plr[pnum]._px = ((const TCmdLocParam1 *)pCmd)->x;
-        plr[pnum]._py = ((const TCmdLocParam1 *)pCmd)->y;
-        plr[pnum].plrlevel = ((const TCmdLocParam1 *)pCmd)->wParam1;
+        plr[pnum]._px = p->x;
+        plr[pnum]._py = p->y;
+        plr[pnum].plrlevel = p->wParam1;
         SyncInitPlr(pnum);
         if ((plr[pnum]._pHitPoints >> 6) > 0) {
             StartStand(pnum, 0);
@@ -1314,7 +1315,7 @@ void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
         if (plr[pnum]._pvid == -1)
             plr[pnum]._pvid = (char)AddVision(plr[pnum]._px, plr[pnum]._py, 10, pnum);
         gbActivePlayers = 0;
-        if (plr[pnum].plractive)
+        if (plr[0].plractive)
             gbActivePlayers = 1;
         if (plr[1].plractive)
             gbActivePlayers = gbActivePlayers + 1;

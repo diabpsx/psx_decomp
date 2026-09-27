@@ -19,6 +19,8 @@ extern "C" int MoveImage(RECT *rect, int x, int y);
 struct LOAD_IMAGE_ARGS AllArgs[30];
 int ArgsSoFar;
 
+void GPUQ_FlushQ(void);
+
 /* @0x800833B0 GPUQ.CPP:76 */
 void CheckMaxArgs(void)
 {

@@ -1,6 +1,6 @@
-# Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only
+# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Main image: 2343 / 3564 functions byte-matched (65.7%)**
+**Game code: 2376 / 2727 functions PASS (87.1%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -55,13 +55,13 @@
 - ✅ BL_OpenStreamFile__FPcc (11)
 - ✅ BL_CloseStreamFile__FP6STRHDR (2)
 
-## bird  (recon/psxsrc/bird.cpp) — 27/28 PASS
+## bird  (recon/psxsrc/bird.cpp) — 28/28 PASS
 - ✅ SetBirdFrig__Fb (13)
 - ✅ BirdDistanceOK__Fiiii (22)
 - ✅ AlterBirdPos__FP10BIRDSTRUCTUc (86)
 - ✅ BirdWorld__FP10BIRDSTRUCTii (31)
 - ✅ CheckDist__Fii (58)
-- ❌ BirdScared__FP10BIRDSTRUCT — 1 diffs (ours 75)
+- ✅ BirdScared__FP10BIRDSTRUCT (75, ASPSX)
 - ✅ GetPerch__FP10BIRDSTRUCT (21)
 - ✅ BIRD_StartHop__FP10BIRDSTRUCT (117)
 - ✅ BIRD_DoHop__FP10BIRDSTRUCT (65)
@@ -85,7 +85,7 @@
 - ✅ PRIM_GetPrim__FPP8POLY_FT4_800acea0 (31)
 - ✅ GetOtPos__7CBlocksi_800acf1c (15)
 
-## block  (recon/psxsrc/block.cpp) — 58/68 PASS
+## block  (recon/psxsrc/block.cpp) — 59/68 PASS
 - ✅ UpdateSel__FPUsUsPUc (16)
 - ✅ CycleSelCols__Fv (110)
 - ✅ FindTownCreature__7CBlocksi (29)
@@ -114,11 +114,11 @@
 - ✅ AddMonst__FP9CacheInfoP8map_infoii (58)
 - ❌ PrintMonsters__7CBlocksii — 295 diffs (ours 681)
 - ✅ AddTowners__FP9CacheInfoP8map_infoii (23)
-- ❌ PrintTowners__7CBlocksii — 24 diffs (ours 238)
+- ✅ PrintTowners__7CBlocksii (238)
 - ✅ AddObject__FP9CacheInfoP8map_infoii (23)
 - ❌ PrintObjects__7CBlocksii — 179 diffs (ours 279)
 - ✅ AddDead__FP9CacheInfoP8map_infoii (35)
-- ❌ PrintDead__7CBlocksii — 40 diffs (ours 177)
+- ❌ PrintDead__7CBlocksii — 32 diffs (ours 177)
 - ✅ AddItem__FP9CacheInfoP8map_infoii (23)
 - ❌ PrintItems__7CBlocksii — 468 diffs (ours 368)
 - ✅ AddMissile__FP9CacheInfoP8map_infoii (70)
@@ -227,7 +227,7 @@
 - ✅ ___4AMap (18)
 - ✅ __4AMap (13)
 
-## control  (recon/source/control.cpp) — 43/51 PASS
+## control  (recon/source/control.cpp) — 48/51 PASS
 - ✅ TrimCol__Fs (14)
 - ❌ DrawSpellCel__FllUclUcc — 342 diffs (ours 737)
 - ✅ SetSpellTrans__Fc (3)
@@ -235,7 +235,7 @@
 - ✅ DrawSpeedSpellTSK__FP4TASK (76)
 - ✅ ToggleSpell__Fi (45)
 - ✅ DrawSpellList__Fv (807)
-- ❌ SetSpell__Fi — 1 diffs (ours 67)
+- ✅ SetSpell__Fi (67, ASPSX)
 - ✅ AddPanelString__FPCci (48)
 - ✅ ClearPanel__Fv (12)
 - ✅ InitPanelStr__Fv (8)
@@ -258,11 +258,11 @@
 - ✅ DrawLevelUpIcon__Fi (37)
 - ✅ CheckChrBtns__Fv (226)
 - ✅ DrawDurIcon4Item__FPC10ItemStructii (33)
-- ❌ RedBack__Fv — 6 diffs (ours 62)
+- ✅ RedBack__Fv (62)
 - ✅ PrintSBookStr__FiiiPCcUcUc (162)
-- ❌ GetSBookTrans__FiUc — 2 diffs (ours 152)
-- ❌ DrawSpellBook__Fb — 2 diffs (ours 746)
-- ❌ CheckSBook__Fv — 4 diffs (ours 167)
+- ✅ GetSBookTrans__FiUc (152, ASPSX)
+- ✅ DrawSpellBook__Fb (746, ASPSX)
+- ✅ CheckSBook__Fv (167, ASPSX)
 - ✅ get_pieces_str__Fi (13)
 - ✅ _GLOBAL__D_DrawLevelUpFlag (10)
 - ✅ _GLOBAL__I_DrawLevelUpFlag (15)
@@ -506,7 +506,7 @@
 - ✅ DropShadows__Fiiii (169)
 - ✅ InitDialog__Fv (78)
 - ✅ GetSizes__6Dialog (161)
-- ⬜ Back__6Dialogiiii
+- ❌ Back__6Dialogiiii — 281 diffs (ours 1094)
 - ✅ Line__6Dialogiii (140)
 - ✅ SetOTpos__6Dialogi (5)
 - ✅ GetPal__7TextDati_8008d23c (7)
@@ -766,7 +766,7 @@
 - ✅ ClrDiabloMsg__Fv (11)
 - ✅ DrawDiabloMsg__Fv (77)
 
-## fe  (recon/psxsrc/fe.cpp) — 44/45 PASS
+## fe  (recon/psxsrc/fe.cpp) — 45/45 PASS
 - ✅ FeInitBuffer__Fv (11)
 - ✅ FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont (33)
 - ✅ FeAddTable__FP11FeMenuTablei (31)
@@ -790,7 +790,7 @@
 - ✅ FeDrawChrClass__Fv (290)
 - ✅ FeInitNewP1NameMenu__Fv (23)
 - ✅ FeInitNewP2NameMenu__Fv (21)
-- ❌ FeNewNameMenuCtrl__Fv — 2 diffs (ours 370)
+- ✅ FeNewNameMenuCtrl__Fv (370, ASPSX)
 - ✅ FeCopyPlayerInfoForReturn__Fv (69)
 - ✅ FeEnterGame__Fv (10)
 - ✅ FeInitLoadMemcardSelect__Fv (32)
@@ -896,7 +896,7 @@
 - ✅ GetOverlayOtBase__7CBlocks_80082690 (2)
 - ✅ GetMaxOtPos__7CBlocks_80082698 (2)
 
-## gamepad  (recon/source/gamepad.cpp) — 40/42 PASS
+## gamepad  (recon/source/gamepad.cpp) — 41/42 PASS
 - ✅ ClrCursor__Fi (23)
 - ✅ HappyMan__Fi (4)
 - ✅ flyabout__7GamePad (255)
@@ -925,7 +925,7 @@
 - ✅ walk__7GamePadi (210)
 - ✅ check_around_player__7GamePad (207)
 - ✅ show_combos__7GamePad (163)
-- ❌ Handle__7GamePad — 3 diffs (ours 431)
+- ✅ Handle__7GamePad (431, ASPSX)
 - ✅ GamePadTask__FP4TASK (62)
 - ✅ GetGamePad__Fi (8)
 - ✅ PostGamePad__Fiiii (65)
@@ -963,7 +963,7 @@
 - ✅ SkipThemeRoom__Fii (51)
 - ✅ InitLevels__Fv (17)
 
-## glue  (recon/psxsrc/glue.cpp) — 23/28 PASS
+## glue  (recon/psxsrc/glue.cpp) — 24/28 PASS
 - ✅ GLUE_SetMonsterList__Fi (3)
 - ✅ GLUE_GetMonsterList__Fv (3)
 - ✅ GLUE_SuspendGame__Fv (21)
@@ -981,7 +981,7 @@
 - ✅ DoShowPanelGFX__FP6GPanelT0 (54)
 - ✅ GLUE_DoQuake__Fii (4)
 - ❌ BgTask__FP4TASK — 135 diffs (ours 299)
-- ❌ FindPlayerChar__FPc — 8 diffs (ours 38)
+- ✅ FindPlayerChar__FPc (38)
 - ✅ FindPlayerChar__Fiii (23)
 - ✅ FindPlayerChar__FP12PlayerStruct (12)
 - ❌ FindPlayerChar__FP12PlayerStructb — 32 diffs (ours 51)
@@ -1086,8 +1086,8 @@
 - ✅ GetPal__7TextDati_80098950 (7)
 - ✅ GetFr__7TextDati_8009896c (7)
 
-## gpuq  (recon/psxsrc/gpuq.cpp) — 4/7 PASS
-- 🟡 CheckMaxArgs__Fv — bytes PASS, SYM differs
+## gpuq  (recon/psxsrc/gpuq.cpp) — 5/7 PASS
+- ✅ CheckMaxArgs__Fv (13)
 - ✅ GPUQ_InitModule__Fv (3)
 - 🟡 GPUQ_FlushQ__Fv — bytes PASS, SYM differs
 - ❌ GPUQ_LoadImage__FP4RECTli — 18 diffs (ours 45)
@@ -1110,11 +1110,11 @@
 - ✅ interface_msg_pump__Fv (2)
 - ✅ ShowProgress__FUi (245)
 
-## inv  (recon/source/inv.cpp) — 27/57 PASS
+## inv  (recon/source/inv.cpp) — 28/57 PASS
 - ✅ FreeInvGFX__Fv (2)
 - ✅ InvDrawSlot__Fiii (33)
 - ❌ InvDrawSlotBack__FiiiiUc — 150 diffs (ours 174)
-- ❌ InvDrawItem__FiiiUci — 6 diffs (ours 52)
+- ✅ InvDrawItem__FiiiUci (52)
 - ❌ InvDrawSlots__Fv — 178 diffs (ours 198)
 - ✅ PrintStat__FiiPcUc (51)
 - ❌ DrawInvStats__Fv — 396 diffs (ours 711)
@@ -1158,7 +1158,7 @@
 - ❌ InvGetItemWH__Fi — 44 diffs (ours 62)
 - ❌ InvAlignObject__Fv — 49 diffs (ours 109)
 - ❌ InvSetItemCurs__Fv — 41 diffs (ours 104)
-- ❌ InvMoveCursLeft__Fv — 5 diffs (ours 106)
+- 🟡 InvMoveCursLeft__Fv — bytes PASS, SYM differs
 - ❌ InvMoveCursRight__Fv — 89 diffs (ours 173)
 - ❌ InvMoveCursUp__Fv — 11 diffs (ours 126)
 - ❌ InvMoveCursDown__Fv — 32 diffs (ours 194)
@@ -1172,14 +1172,14 @@
 ## itemdat  (recon/source/itemdat.cpp) — 1/1 PASS
 - ✅ InitAllItemsUseable__Fv (14)
 
-## items  (recon/source/items.cpp) — 98/106 PASS
+## items  (recon/source/items.cpp) — 102/106 PASS
 - ✅ InitItemGFX__Fv (2)
 - ✅ ItemPlace__Fii (39)
 - ✅ AddInitItems__Fv (130)
 - ✅ InitItems__Fb (110)
-- ❌ CalcPlrItemVals__FiUc — 4 diffs (ours 672)
-- ❌ CalcPlrScrolls__Fi — 4 diffs (ours 224)
-- ❌ CalcPlrStaff__FP12PlayerStruct — 2 diffs (ours 51)
+- ✅ CalcPlrItemVals__FiUc (672, ASPSX)
+- ✅ CalcPlrScrolls__Fi (224, ASPSX)
+- ✅ CalcPlrStaff__FP12PlayerStruct (51, ASPSX)
 - ✅ CalcSelfItems__Fi (88)
 - ✅ ItemMinStats__FPC12PlayerStructPC10ItemStruct (19)
 - ✅ SetItemMinStats__FPC12PlayerStructP10ItemStruct (11)
@@ -1242,7 +1242,7 @@
 - ✅ PrintItemDetails__FPC10ItemStruct (287)
 - ✅ PrintItemDur__FPC10ItemStruct (219)
 - ✅ CastScroll__Fii (163)
-- ❌ UseItem__Fiii — 2 diffs (ours 389)
+- ✅ UseItem__Fiii (389, ASPSX)
 - ✅ StoreStatOk__FP10ItemStruct (37)
 - ✅ PremiumItemOk__Fi (31)
 - ✅ RndPremiumItem__Fii (65)
@@ -1372,13 +1372,13 @@
 - ✅ GetOverlayOtBase__7CBlocks_800a4fdc (2)
 - ✅ ___7CScreen (8)
 
-## loadsave  (recon/source/loadsave.cpp) — 22/23 PASS
+## loadsave  (recon/source/loadsave.cpp) — 23/23 PASS
 - ✅ GetOptStr__Fv (4)
 - ✅ GetDiabloStr__Fv (4)
 - ✅ BLoad__Fv (7)
 - ✅ ILoad__Fv (21)
 - ✅ OLoad__Fv (9)
-- ❌ LoadQuest__Fi — 1 diffs (ours 50)
+- ✅ LoadQuest__Fi (50, ASPSX)
 - ✅ BSave__Fc (6)
 - ✅ ISave__Fi (24)
 - ✅ OSave__FUc (17)
@@ -1413,7 +1413,7 @@
 - ✅ MyFilter__FUlUlPCc (2)
 - ✅ SlowMemMove__FPvT0Ul (8)
 
-## memcard  (recon/psxsrc/memcard.cpp) — 13/16 PASS
+## memcard  (recon/psxsrc/memcard.cpp) — 14/16 PASS
 - ✅ endian_swap__FPUci (13)
 - ✅ sjis_endian_swap__FPUci (18)
 - ✅ to_sjis__Fc (32)
@@ -1429,7 +1429,7 @@
 - ✅ format_card__Fi (49)
 - ✅ write_card_file__FiiPcT2PUcPUsiT4 (213)
 - ✅ new_card__Fi (37)
-- ❌ service_card__Fi — 5 diffs (ours 82)
+- ✅ service_card__Fi (77)
 
 ## minitext  (recon/source/minitext.cpp) — 16/17 PASS
 - ✅ FreeQuestText__Fv (2)
@@ -1440,7 +1440,7 @@
 - ✅ DrawQTextBack__Fv (103)
 - ✅ DrawQTextTSK__FP4TASK (186)
 - ✅ KANJI_strlen__FPc (16)
-- ❌ DrawQText__Fv — 11 diffs (ours 363)
+- ❌ DrawQText__Fv — 3 diffs (ours 363)
 - ✅ _GLOBAL__D_QBack (10)
 - ✅ _GLOBAL__I_QBack (10)
 - ✅ SetRGB__6DialogUcUcUc_8004e98c (8)
@@ -1493,7 +1493,7 @@
 - ✅ GetNumOfFrames__7TextDat (5)
 - ✅ GetFr__7TextDati_8007d5dc (7)
 
-## missiles  (recon/source/missiles.cpp) — 69/115 PASS
+## missiles  (recon/source/missiles.cpp) — 71/115 PASS
 - ❌ GetDamageAmt__FiPiT1 — 712 diffs (ours 382)
 - ✅ CheckBlock__Fiiii (45)
 - 🟡 FindClosest__Fiii — bytes PASS, SYM differs
@@ -1526,7 +1526,7 @@
 - ✅ AddLightctrl__Fiiiiiicii (59)
 - ✅ AddLightning__Fiiiiiicii (123)
 - ✅ AddMisexp__Fiiiiiicii (139)
-- ❌ AddWeapexp__Fiiiiiicii — 4 diffs (ours 64)
+- ✅ AddWeapexp__Fiiiiiicii (64)
 - ✅ CheckIfTrig__Fii (106)
 - ❌ AddTown__Fiiiiiicii — 141 diffs (ours 288)
 - ✅ AddFlash__Fiiiiiicii (139)
@@ -1535,7 +1535,7 @@
 - ✅ AddFiremove__Fiiiiiicii (88)
 - ✅ AddGuardian__Fiiiiiicii (285)
 - ✅ AddChain__Fiiiiiicii (25)
-- ❌ AddRhino__Fiiiiiicii — 8 diffs (ours 97)
+- ✅ AddRhino__Fiiiiiicii (97)
 - ❌ AddFlare__Fiiiiiicii — 30 diffs (ours 196)
 - ❌ AddAcid__Fiiiiiicii — 72 diffs (ours 69)
 - ✅ AddAcidpud__Fiiiiiicii (57)
@@ -1617,12 +1617,12 @@
 - ✅ ML_SetList__Fii (44)
 - ✅ ML_GetPresetMonsters__FiPiUl (124)
 
-## monster  (recon/source/monster.cpp) — 67/105 PASS
+## monster  (recon/source/monster.cpp) — 68/105 PASS
 - ✅ DeleteMonster__Fi (14)
 - ✅ M_GetDir__Fi (25)
 - ✅ M_StartDelay__Fii (20)
 - ✅ M_StartRAttack__Fiii (72)
-- ❌ M_StartRSpAttack__Fiii — 1 diffs (ours 93)
+- ✅ M_StartRSpAttack__Fiii (93)
 - ✅ M_StartSpAttack__Fi (60)
 - ✅ M_StartEat__Fi (54)
 - ❌ M_GetKnockback__Fii — 112 diffs (ours 135)
@@ -1632,7 +1632,7 @@
 - ❌ MonstStartKill__FiiUc — 126 diffs (ours 199)
 - ✅ SyncMonstStartKill__FiiUc (84)
 - ❌ M2MStartKill__Fii — 215 diffs (ours 242)
-- ❌ M_StartKill__Fii — 8 diffs (ours 66)
+- ❌ M_StartKill__Fii — 4 diffs (ours 66)
 - ✅ M_SyncStartKill__Fiiii (68)
 - ✅ M_StartFadein__FiiUc (87)
 - ✅ M_StartFadeout__FiiUc (84)
@@ -1655,7 +1655,7 @@
 - ❌ M_Teleport__Fi — 40 diffs (ours 133)
 - ✅ M_DoGotHit__Fi (26)
 - ✅ DoEnding__Fi (42)
-- ❌ PrepDoEnding__Fi — 4 diffs (ours 82)
+- ❌ PrepDoEnding__Fi — 8 diffs (ours 82)
 - ✅ M_DoDeath__Fi (113)
 - ✅ M_DoSpStand__Fi (43)
 - ✅ M_DoDelay__Fi (69)
@@ -1727,7 +1727,7 @@
 ## monsview  (recon/psxsrc/monsview.cpp) — 1/1 PASS
 - ✅ DisplayMonsterTypes__Fv (2)
 
-## msg  (recon/source/msg.cpp) — 102/111 PASS
+## msg  (recon/source/msg.cpp) — 103/111 PASS
 - ✅ delta_init__Fv (22)
 - ✅ delta_kill_monster__FiUcUcUc (39)
 - ✅ delta_monster_hp__FilUc (31)
@@ -1812,7 +1812,7 @@
 - ✅ On_DELPLRITEMS__FPC4TCmdi (2)
 - ✅ On_PLRLEVEL__FPC4TCmdi (2)
 - ✅ On_DROPITEM__FPC4TCmdi (22)
-- ❌ On_PLAYER_JOINLEVEL__FPC4TCmdi — 6 diffs (ours 130)
+- ✅ On_PLAYER_JOINLEVEL__FPC4TCmdi (130)
 - ✅ On_ACTIVATEPORTAL__FPC4TCmdi (17)
 - ✅ On_DEACTIVATEPORTAL__FPC4TCmdi (24)
 - ✅ On_RETOWN__FPC4TCmdi (14)
@@ -2032,7 +2032,7 @@
 - ✅ _GLOBAL__I_OVR_Open__Fv (92)
 - ✅ GetOverType__7Overlay (3)
 
-## padfuncs  (recon/psxsrc/padfuncs.cpp) — 45/49 PASS
+## padfuncs  (recon/psxsrc/padfuncs.cpp) — 46/49 PASS
 - ✅ SetQSpell__Fiii (8)
 - ✅ release_spell__Fi (25)
 - ✅ select_belt_item__Fi (2)
@@ -2059,7 +2059,7 @@
 - ✅ pad_func_QLog__Fi (61)
 - ✅ pad_func_SpellBook__Fi (54)
 - ✅ pad_func_AutoMap__Fi (47)
-- ❌ pad_func_Quick_Spell__Fi — 2 diffs (ours 93)
+- ✅ pad_func_Quick_Spell__Fi (93, ASPSX)
 - ✅ check_inv__FiPci (160)
 - ✅ pad_func_Quick_Use_Health__Fi (10)
 - ✅ pad_func_Quick_Use_Mana__Fi (10)
@@ -2172,7 +2172,7 @@
 - ✅ game_2_ui_player__FPC12PlayerStructP11_uiheroinfoUc (45)
 - ✅ SetupLocalPlayer__Fv (4)
 
-## player  (recon/source/player.cpp) — 132/136 PASS
+## player  (recon/source/player.cpp) — 134/136 PASS
 - ✅ IsDplayer__Fii (35)
 - ✅ ismyplr__FP12PlayerStruct (17)
 - ✅ plrind__FP12PlayerStruct (5)
@@ -2227,14 +2227,14 @@
 - ✅ ShieldDur__FP12PlayerStruct (53)
 - ✅ PM_DoBlock__FP12PlayerStruct (39)
 - ✅ do_spell_anim__FiiiP12PlayerStruct (312)
-- ❌ PM_DoSpell__FP12PlayerStruct — 4 diffs (ours 243)
+- ✅ PM_DoSpell__FP12PlayerStruct (243, ASPSX)
 - ✅ ArmorDur__FP12PlayerStruct (66)
 - ✅ PM_DoGotHit__FP12PlayerStruct (36)
 - ✅ PM_DoDeath__FP12PlayerStruct (122)
 - ✅ PM_DoNewLvl__FP12PlayerStruct (2)
 - ✅ CheckNewPath__FP12PlayerStruct (304)
 - ✅ PlrDeathModeOK__Fi (26)
-- ❌ ValidatePlayer__Fv — 2 diffs (ours 319)
+- ✅ ValidatePlayer__Fv (319, ASPSX)
 - ✅ CheckCheatStats__FP12PlayerStruct (39)
 - ✅ ProcessPlayers__Fv (185)
 - ✅ ClrPlrPath__FP12PlayerStruct (10)
@@ -2361,9 +2361,9 @@
 - ✅ removellist__FPUcUc (14)
 - ❌ DeltaLoadLevel__Fv — 568 diffs (ours 604)
 
-## preobj  (recon/source/preobj.cpp) — 52/61 PASS
+## preobj  (recon/source/preobj.cpp) — 54/61 PASS
 - ✅ AddL1Door__Fiiii (58)
-- ❌ AddSCambBook__Fi — 44 diffs (ours 40)
+- ✅ AddSCambBook__Fi (40)
 - ✅ AddChest__Fii (116)
 - ✅ AddL2Door__Fiiii (83)
 - ✅ AddL3Door__Fiiii (37)
@@ -2373,7 +2373,7 @@
 - ✅ AddArmorStand__Fi (34)
 - ✅ AddObjLight__Fii (50)
 - ✅ AddBarrel__Fii (42)
-- ❌ AddShrine__Fi — 7 diffs (ours 82)
+- ✅ AddShrine__Fi (82)
 - ✅ AddBookcase__Fi (22)
 - ✅ AddBookstand__Fi (18)
 - ✅ AddBloodFtn__Fi (18)
@@ -2396,15 +2396,15 @@
 - ✅ AddSlainHero__Fv (16)
 - ✅ RndLocOk__Fii (70)
 - ✅ TrapLocOk__Fii (21)
-- ❌ InitRndLocObj__Fiii — 75 diffs (ours 96)
-- ❌ InitRndLocBigObj__Fiii — 78 diffs (ours 112)
+- ❌ InitRndLocObj__Fiii — 62 diffs (ours 96)
+- ❌ InitRndLocBigObj__Fiii — 62 diffs (ours 112)
 - ✅ InitRndLocObj5x5__Fiii (71)
 - ❌ SetMapObjects__FPUcii — 12 diffs (ours 168)
 - ✅ ClrAllObjects__Fv (60)
 - ✅ AddTortures__Fv (96)
 - ✅ AddCandles__Fv (34)
 - ✅ AddBookLever__Fiiiiiiiii (125)
-- ❌ InitRndBarrels__Fv — 72 diffs (ours 99)
+- ❌ InitRndBarrels__Fv — 68 diffs (ours 99)
 - ✅ AddL1Objs__Fiiii (67)
 - ✅ AddL2Objs__Fiiii (63)
 - ✅ AddL3Objs__Fiiii (56)
@@ -2682,7 +2682,7 @@
 - ✅ GetVersionString__FPc (53)
 - ✅ GetWord__FPc (107)
 
-## stores  (recon/source/stores.cpp) — 53/103 PASS
+## stores  (recon/source/stores.cpp) — 56/103 PASS
 - ✅ FreeStoreMem__Fv (2)
 - ⬜ DrawSTextBack__Fv
 - ❌ DrawStoreArrows__Fv — 56 diffs (ours 96)
@@ -2707,7 +2707,7 @@
 - ⬜ AddStoreHoldRepair__FP10ItemStructi
 - ⬜ S_StartSRepair__Fv
 - ✅ S_StartWitch__Fv (98)
-- ❌ CheckWitchItem__Fi — 4 diffs (ours 41)
+- ✅ CheckWitchItem__Fi (41)
 - 🟡 S_ScrollWBuy__Fi — bytes PASS, SYM differs
 - ⬜ S_StartWBuy__Fv
 - ⬜ WitchSellOk__Fi
@@ -2748,7 +2748,7 @@
 - ❌ SmithBuyItem__Fv — 16 diffs (ours 160)
 - ❌ S_SBuyEnter__Fv — 36 diffs (ours 153)
 - 🟡 SmithBuyPItem__Fv — bytes PASS, SYM differs
-- ❌ S_SPBuyEnter__Fv — 6 diffs (ours 155)
+- ✅ S_SPBuyEnter__Fv (155)
 - ⬜ StoreGoldFit__Fi
 - ❌ PlaceStoreGold__Fl — 30 diffs (ours 168)
 - ❌ StoreSellItem__Fv — 104 diffs (ours 209)
@@ -2768,7 +2768,7 @@
 - ❌ StoryIdItem__Fv — 62 diffs (ours 212)
 - ✅ S_ConfirmEnter__Fv (71)
 - ✅ S_HealerEnter__Fv (38)
-- ❌ S_HBuyEnter__Fv — 6 diffs (ours 141)
+- ✅ S_HBuyEnter__Fv (141)
 - ✅ S_StoryEnter__Fv (39)
 - ✅ S_SIDEnter__Fv (97)
 - ❌ S_TalkEnter__Fv — 15 diffs (ours 128)
@@ -2791,12 +2791,12 @@
 - ✅ SMemAlloc (8)
 - ✅ SMemFree (8)
 
-## stream  (recon/psxsrc/stream.cpp) — 19/21 PASS
+## stream  (recon/psxsrc/stream.cpp) — 20/21 PASS
 - ❌ PrintCDWaitTask__FP4TASK — 17 diffs (ours 79)
 - ✅ InitCDWaitIcon__Fv (13)
 - ✅ STR_Debug__FP6SFXHDRPce (5)
 - ✅ STR_SystemTask__FP4TASK (12)
-- ❌ STR_AllocBuffer__Fv — 2 diffs (ours 14)
+- ✅ STR_AllocBuffer__Fv (14, ASPSX)
 - ✅ STR_Init__Fv (75)
 - ✅ STR_InitStream__Fc (74)
 - ✅ STR_PlaySound__FUscic (146)
@@ -2879,7 +2879,7 @@
 - ✅ InitTmalloc__Fv (10)
 - ✅ strupr__FPc (21)
 
-## tony  (recon/psxsrc/tony.cpp) — 14/17 PASS
+## tony  (recon/psxsrc/tony.cpp) — 16/17 PASS
 - ✅ stub__FPcPv (2)
 - ✅ new_eprint__FPcT0i (13)
 - ✅ TonysGameTask__FP4TASK (34)
@@ -2889,8 +2889,8 @@
 - ✅ TonysDummyPoll__Fv (11)
 - ✅ SetTonyPoll__Fv (3)
 - ✅ ClearTonyPoll__Fv (3)
-- ❌ load_demo_pad_data__FUl — 3 diffs (ours 24)
-- ❌ save_demo_pad_data__FUl — 3 diffs (ours 24)
+- ✅ load_demo_pad_data__FUl (24)
+- ✅ save_demo_pad_data__FUl (24)
 - ✅ set_pad_record_play__Fi (29)
 - ✅ start_demo__Fv (4)
 - ✅ SetQuest__Fv (2)

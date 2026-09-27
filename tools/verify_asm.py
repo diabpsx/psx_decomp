@@ -4,7 +4,7 @@ and diff each named function against its asm/nonmatchings/<seg>/<FUNC>.s oracle 
 Use FUNC@VA when two file-static functions have the same retail name and the
 oracle filename must be selected by address (for example locaterequest@800FC4E4).
 Reloc-name + branch-target lenient. Prints PASS/diff per function."""
-import os, re, sys, subprocess
+import os, re, sys, subprocess, struct
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MIPS = Path(r'C:/Tools/mips-ps1/mips/bin')
@@ -12,6 +12,20 @@ OBJD = str(MIPS / 'mipsel-none-elf-objdump.exe')
 
 cpp = ROOT / sys.argv[1]
 funcs = sys.argv[2].split(',')
+
+def _embedded_text_tables():
+    out = {}
+    p = ROOT / 'configs' / 'embedded_text_tables.txt'
+    if p.is_file():
+        for raw in p.read_text(encoding='utf-8').splitlines():
+            line = raw.split('#', 1)[0].strip()
+            if line:
+                fn, start, count = line.split()
+                out[fn] = (int(start, 0), int(count, 0))
+    return out
+
+_EMBEDDED_TEXT_TABLES = _embedded_text_tables()
+_TABLE_TARGETS = {}
 
 def _split_target(target):
     """Return (source symbol, optional retail VA) for the diagnostic selector.
@@ -322,8 +336,10 @@ def oracle(fn, oracle_va=None):
     p = _find_oracle_path(fn, oracle_va)
     if p is None:
         return None
-    out=[]; tg=[]; fva=None
+    out=[]; tg=[]; fva=None; table_words=[]
+    table_spec = _EMBEDDED_TEXT_TABLES.get(fn)
     for ln in p.read_text().splitlines():
+        raw_ln = ln
         mv = re.search(r'/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s', ln)
         if mv and fva is None: fva = int(mv.group(1), 16)
         mt = re.search(r'\*/\s*(?:beq|bne|b\w*z|bgez|blez|bgtz|bltz|b|j)\s+.*?\.L([0-9A-Fa-f]{8})\s*$', ln)
@@ -345,8 +361,51 @@ def oracle(fn, oracle_va=None):
         if not s or s.startswith(('.','glabel','nonmatching','dlabel','jlabel','alabel')) or s.startswith('.L') or s.endswith(':'):
             continue
         out.append(norm_ins(s))
+        if table_spec and table_spec[0] <= len(out) - 1 < table_spec[0] + table_spec[1]:
+            mw_raw = re.search(r'/\*\s*[0-9A-Fa-f]+\s+[0-9A-Fa-f]{8}\s+([0-9A-Fa-f]{8})\s*\*/', raw_ln)
+            if not mw_raw:
+                raise RuntimeError(f'{fn}: embedded table word lacks raw bytes: {raw_ln}')
+            table_words.append(int.from_bytes(bytes.fromhex(mw_raw.group(1)), 'little'))
+    if table_spec:
+        start, count = table_spec
+        if len(table_words) != count or fva is None:
+            raise RuntimeError(f'{fn}: expected {count} embedded table words, found {len(table_words)}')
+        cut_hi = (start + count) * 4
+        def shifted(rel):
+            return rel - count * 4 if rel >= cut_hi else rel
+        _TABLE_TARGETS['oracle'] = [shifted(word - fva) for word in table_words]
+        tg = [shifted(target) for target in tg]
+        del out[start:start + count]
     _TARGETS['oracle']=tg
     return out
+
+def object_rodata_table_matches(fn, expected):
+    """Find a contiguous .rodata relocation run whose function-relative targets equal expected."""
+    rel = subprocess.run([OBJD, '-r', '-j', '.rodata', str(obj)], capture_output=True, text=True).stdout
+    offsets = []
+    for ln in rel.splitlines():
+        m = re.match(r'([0-9a-f]+)\s+R_MIPS_32\s+\.text', ln)
+        if m:
+            offsets.append(int(m.group(1), 16))
+    dump = subprocess.run([OBJD, '-s', '-j', '.rodata', str(obj)], capture_output=True, text=True).stdout
+    data = bytearray()
+    for ln in dump.splitlines():
+        m = re.match(r'\s*[0-9a-f]+\s+((?:[0-9a-f]{8}\s*){1,4})', ln)
+        if m:
+            for word in m.group(1).split():
+                data.extend(bytes.fromhex(word))
+    base_hex = _name2addr.get(fn)
+    if base_hex is None:
+        return False
+    base = int(base_hex, 16)
+    n = len(expected)
+    for off in offsets:
+        if all(off + i * 4 in offsets for i in range(n)) and off + n * 4 <= len(data):
+            actual = [struct.unpack_from('<I', data, off + i * 4)[0] - base for i in range(n)]
+            if actual == expected:
+                _TABLE_TARGETS['ours'] = actual
+                return True
+    return False
 
 allpass=True
 for target in funcs:
@@ -354,6 +413,9 @@ for target in funcs:
     o=ours(fn, oracle_va); e=oracle(fn, oracle_va)
     if e is None: print(f"  {target}: NO ORACLE"); allpass=False; continue
     if not o: print(f"  {target}: NOT IN OBJECT"); allpass=False; continue
+    if fn in _EMBEDDED_TEXT_TABLES and not object_rodata_table_matches(_resolve(fn), _TABLE_TARGETS.get('oracle', [])):
+        print(f"  {target}: FAIL embedded jump table differs (ours {_TABLE_TARGETS.get('ours')} / oracle {_TABLE_TARGETS.get('oracle')})")
+        allpass=False; continue
     # w59-a9 DEAD-%hi ARTIFACT FIX: a lui whose %hi has no paired %lo is not
     # symbolized by spimdisasm, so the oracle renders the BARE CONSTANT while
     # ours (R_MIPS_HI16 reloc) normalizes to 0.  Positionally-aligned pairs

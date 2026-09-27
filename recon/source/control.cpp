@@ -26,6 +26,8 @@
 #define cursplr _pcursplr[sel_data]
 #define spselflag _spselflag[sel_data]
 #define pSplType _pSplType[sel_data]
+#define setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)
+#define setXYWH(p, _x0, _y0, _w, _h) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x0)+(_w), (p)->y1 = (_y0), (p)->x2 = (_x0), (p)->y2 = (_y0)+(_h), (p)->x3 = (_x0)+(_w), (p)->y3 = (_y0)+(_h)
 
 /* DrawLevelUpFlag is the first explicitly-initialised public definition -> names the
  * static-init thunk _GLOBAL__I_DrawLevelUpFlag (lane fact 64). */
@@ -2030,17 +2032,14 @@ void RedBack(void)
 
     ThisDat = GM_UseTexData(0);
     FT4 = ThisDat->PrintFt4(0xD8, 0, 0, 0, CBlocks::GetMaxOtPos() - 4, 0);
-    FT4->x1 = 0x160;
-    FT4->x3 = 0x160;
-    FT4->y2 = 0xF0;
-    FT4->y3 = 0xF0;
-    FT4->b0 = FT4->g0 = FT4->r0 = 0x18;
-    FT4->x2 = FT4->y1 = FT4->y0 = FT4->x0 = 0;
+    setXYWH(FT4, 0, 0, 0x160, 0xF0);
+    setRGB0(FT4, 0x18, 0x18, 0x18);
+    setSemiTrans(FT4, 1);
+    setShadeTex(FT4, 0);
     FT4->u1--;
     FT4->u3--;
     FT4->v2--;
     FT4->v3--;
-    FT4->code = (FT4->code | 2) & ~1;
     FT4->tpage |= 0x40;
     if (leveltype) {
         FT4->r0 = 0;

@@ -154,6 +154,7 @@ extern unsigned char demo_buffer[900];
 extern unsigned char PauseMode;
 extern CFont MediumFont;
 extern const unsigned char WHITER, WHITEG;
+extern char D_80110B24[];                                  /* "DEMOPAD0.DAT" */
 
 /* ---------------------------------------------------------------- TU data (.sdata) ---- */
 int tony_poll = 0;                                          /* @0x8011AE34 */
@@ -327,32 +328,25 @@ void ClearTonyPoll()
     tony_poll = 0;
 }
 
-/* @0x8009B870 TONY.CPP:278
- * OPEN (bytes 3 diffs): retail = `if (demo_num >= 10) demo_num += 7;` with ONE symbolic store
- * `sb v0,D+7` at the join; that single-store spelling makes our cse hold "DEMOPAD0.DAT"+7 in a
- * register (la a1,LC+7; sb 0(a1); addu a1,-7), the two-store spelling here fixes the store but
- * folds s0+7+48.  Falsified: const char[] global, *(p+7), (unsigned char *), &x[0]/x+0 call arg,
- * ternary, char temp, (demo_num += 7) in the arm.  Next: -dS/-dc cse dump of the single-store form. */
+/* @0x8009B870 TONY.CPP:278 */
 void load_demo_pad_data(unsigned long demo_num)
 {
     FileIO *Fs = SYSI_GetFs();
 
-    if (demo_num < 10)
-        ((char *)"DEMOPAD0.DAT")[7] = demo_num + '0';
-    else
-        ((char *)"DEMOPAD0.DAT")[7] = demo_num + 7 + '0';
+    if (demo_num >= 10)
+        demo_num += 7;
+    D_80110B24[7] = demo_num + '0';
     Fs->ReadAtAddr("DEMOPAD0.DAT", demo_buffer, -1);
 }
 
-/* @0x8009B8D0 TONY.CPP:289 -- OPEN, same residual as load_demo_pad_data */
+/* @0x8009B8D0 TONY.CPP:289 */
 void save_demo_pad_data(unsigned long demo_num)
 {
     FileIO *Fs = SYSI_GetFs();
 
-    if (demo_num < 10)
-        ((char *)"DEMOPAD0.DAT")[7] = demo_num + '0';
-    else
-        ((char *)"DEMOPAD0.DAT")[7] = demo_num + 7 + '0';
+    if (demo_num >= 10)
+        demo_num += 7;
+    D_80110B24[7] = demo_num + '0';
     Fs->Save("DEMOPAD0.DAT", demo_buffer, 900);
 }
 

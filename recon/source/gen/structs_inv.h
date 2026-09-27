@@ -117,6 +117,7 @@ struct POLY_FT4 {   /* sizeof 40 */
 };
 
 struct TextDat {
+    unsigned char _opaque[112];
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);   /* @0x80093418 GMAN.CPP:989 */
 };
 

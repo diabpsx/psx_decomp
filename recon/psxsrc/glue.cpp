@@ -323,22 +323,10 @@ void CBlocks::MoveToScrollTarget(void)
 
 struct PInf *FindPlayerChar(char *Id)
 {
-    struct PInf *f;
-    int i;
-    int idx;
-
-    f = PlayerInfo;
-    i = 0;
-    idx = 0;
-    do {
-        i++;
-        if (strcmp(*(char **)((char *)PlayerInfo + idx), Id) != 0) {
-            f = (struct PInf *)((char *)f + 0xC);
-            idx += 0xC;
-            continue;
-        }
-        return f;
-    } while (i < 0x51);
+    for (int f = 0; f < 0x51; f++) {
+        if (strcmp(PlayerInfo[f].Id, Id) == 0)
+            return &PlayerInfo[f];
+    }
     DBG_Error(0, D_80110B58, 0x288);
     return 0;
 }

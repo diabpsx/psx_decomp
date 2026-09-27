@@ -27,6 +27,19 @@ RETAIL = ROOT / "rom" / "DIABPSX-SYM.txt"
 OUT = ROOT / "build" / "sn"
 ENV = dict(os.environ, MSYS2_ARG_CONV_EXCL="*")
 
+def embedded_text_tables():
+    out = {}
+    p = ROOT / "configs" / "embedded_text_tables.txt"
+    if p.is_file():
+        for raw in p.read_text(encoding="utf-8").splitlines():
+            line = raw.split("#", 1)[0].strip()
+            if line:
+                fn, start, count = line.split()
+                out[fn] = (int(start, 0), int(count, 0))
+    return out
+
+EMBEDDED_TEXT_TABLES = embedded_text_tables()
+
 def crlf(p: Path):
     b = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"); p.write_bytes(b)
 
@@ -157,6 +170,22 @@ def compare(ours, retail):
         return False, "blocks differ" + chr(10) + "      ours:   " + show(ours) + chr(10) + "      retail: " + show(retail)
     return True, "SYM ok"
 
+def normalize_embedded_text_table(f, fn):
+    """Return a retail receipt with inline table bytes removed from code-relative offsets."""
+    spec = EMBEDDED_TEXT_TABLES.get(fn)
+    if not spec:
+        return f
+    start, count = spec
+    cut_hi = (start + count) * 4
+    delta = count * 4
+    def shifted(a):
+        return a - delta if a >= cut_hi else a
+    out = dict(f)
+    out["end"] = f.get("end", 0) - delta
+    out["blocks"] = [(shifted(a), k) for a, k in f.get("blocks", [])]
+    out["seq"] = [(x[0], x[1], shifted(x[2])) if x[0] == "B" else x for x in f.get("seq", [])]
+    return out
+
 def main():
     src = ROOT / sys.argv[1]
     want = sys.argv[2].split(",") if len(sys.argv) > 2 else None
@@ -178,6 +207,7 @@ def main():
         if len(retail_all[rn]) > 1:     # same-named copies: take the one at this segment's oracle VA
             va = oracle_va(src.stem.lower(), n0)
             rf = next((c for c in retail_all[rn] if c["start"] == va), rf)
+        rf = normalize_embedded_text_table(rf, n)
         ok, msg = compare(ours[n], rf)
         if os.environ.get("SYM_BLOCKS"):
             msg += chr(10) + "      ours:   " + show(ours[n]) + chr(10) + "      retail: " + show(rf)

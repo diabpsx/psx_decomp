@@ -36,6 +36,10 @@
 #define ICURS_GOLD_MEDIUM 5
 #define ICURS_GOLD_LARGE 6
 
+#define setSemiTrans(p, abe) ((abe) ? ((p)->code |= 0x02) : ((p)->code &= ~0x02))
+#define setShadeTex(p, tge)  ((tge) ? ((p)->code |= 0x01) : ((p)->code &= ~0x01))
+#define setRGB0(p, _r0, _g0, _b0) (p)->r0 = _r0, (p)->g0 = _g0, (p)->b0 = _b0
+
 /* TU data (.sdata, tentative definitions) — this TU owns these (every %gp_rel oracle reference
  * is inside asm/nonmatchings/inv/); preinv.cpp/coreinv.cpp only `extern` them. */
 int InvBackY;
@@ -280,7 +284,6 @@ unsigned char TryInvPut(void)
         if (CanPut(plr[myplr]._px + offset_x[d] * Dist, plr[myplr]._py + offset_y[d] * Dist))
             return 1;
     }
-
     return 0;
 }
 
@@ -1234,13 +1237,12 @@ void InvSetItemCurs(void)
 
 void InvMoveCursLeft(void)
 {
-    int ItemInc;
+    int ItemInc = 0;
     int OldPos;
 
     OldPos = InvCursPos;
 
     if (_pcurs[myplr] < 12) {
-        ItemInc = 0;
         if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
@@ -2644,9 +2646,8 @@ void InvDrawSlot(int X, int Y, int Frame)
 
 void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int TransFlag)
 {
-    struct TextDat *TData;
     struct POLY_FT4 *Ft4;
-    unsigned char a0, v0;
+    struct TextDat *TData;
 
     if (ItemNo < 0x32)
         TData = InvGfxTData;
@@ -2655,26 +2656,13 @@ void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int T
 
     Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x80, ItemY - InvBackY + 0x20, 0, D_8011C304, 0);
 
-    a0 = Ft4->code;
-    v0 = a0 & 0xFE;
-    Ft4->code = v0;
-    if (TransFlag == 0) {
-        v0 = a0 & 0xFC;
-        Ft4->code = v0;
-    } else {
-        v0 = v0 | 2;
-    }
+    setShadeTex(Ft4, 0);
+    setSemiTrans(Ft4, TransFlag);
 
-    v0 = StatFlag;
-    if (v0) {
-        v0 = 0x80;
-        Ft4->r0 = v0;
-        Ft4->g0 = v0;
-        Ft4->b0 = v0;
+    if (StatFlag) {
+        setRGB0(Ft4, 0x80, 0x80, 0x80);
     } else {
-        Ft4->r0 = 0;
-        Ft4->g0 = 0;
-        Ft4->b0 = 0;
+        setRGB0(Ft4, 0x80, 0, 0);
     }
 }
 

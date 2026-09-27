@@ -6,12 +6,28 @@ segment (the INCLUDE_ASM list in src/<seg>.c) and write MATCH_PROGRESS.md.
 
 Mapping recon TU -> segment: recon/<dir>/<seg>.c or .cpp  (seg = splat subsegment name =
 lowercased MAP section name, e.g. recon/psxsrc/gman.cpp <-> src/gman.c <-> asm/nonmatchings/gman/).
-Per-function verdict comes from tools/verify_asm.py (the sole gate)."""
+Per-function verdict comes from tools/verify_asm.py or a reviewed real-ASPSX
+entry, plus tools/symlane.py.  Call-target and jump-table audits remain required
+for the project seal bar."""
 import re, subprocess, sys, collections
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable
+
+def aspsx_registry():
+    """Reviewed real-ASPSX passes, keyed by segment."""
+    out = collections.defaultdict(set)
+    p = ROOT / "configs" / "aspsx_passes.txt"
+    if not p.is_file():
+        return out
+    for raw in p.read_text(encoding="utf-8").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if not line:
+            continue
+        seg, fn = line.split(None, 1)
+        out[seg].add(fn)
+    return out
 
 def seg_functions(seg):
     """every function of the segment in VA order: the oracle .s files (splat writes trivial bodies such as an
@@ -44,6 +60,15 @@ def gate(tu: Path, fns):
         print(f"[{tu}] gate error:\n{r.stdout}{r.stderr}", file=sys.stderr)
     return res
 
+def aspsx_gate(tu: Path, fns):
+    """Return {fn: instruction_count} for reviewed functions passing real ASPSX."""
+    if not fns:
+        return {}
+    r = subprocess.run([PY, str(ROOT / "tools" / "aspsx_gate.py"), str(tu.relative_to(ROOT)), ",".join(fns)],
+                       cwd=ROOT, capture_output=True, text=True)
+    return {m.group(1): int(m.group(2)) for m in
+            re.finditer(r"^\s+(\S+): PASS \((\d+) insns\)", r.stdout, re.M)}
+
 def sym_ok(tu: Path, fns):
     """{fn: True/False} from tools/symlane.py (the SYM receipt of the PASS rule)"""
     r = subprocess.run([PY, str(ROOT / "tools" / "symlane.py"), str(tu.relative_to(ROOT)), ",".join(fns)],
@@ -55,33 +80,43 @@ def sym_ok(tu: Path, fns):
 
 def main():
     tus = recon_tus()
+    focused = bool(sys.argv[1:])
     segs = sys.argv[1:] or sorted(tus)
-    total_all = sum(len(seg_functions(s)) for s in sorted(p.stem for p in (ROOT / "src").glob("*.c")))
-    lines = ["# Match progress — PASS = bytes identical (tools/verify_asm.py) AND SYM records identical (tools/symlane.py); 🟡 = bytes only", ""]
+    registry = aspsx_registry()
+    total_all = sum(len(seg_functions(s)) for s in sorted(p.stem for p in (ROOT / "src").glob("*.c")) if s != "lib")
+    lines = ["# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only", ""]
     grand_pass = 0
     for seg in segs:
         fns = seg_functions(seg)
         if seg not in tus or not fns: continue
         res = gate(tus[seg], fns)
-        sym = sym_ok(tus[seg], [f for f, v in res.items() if v[0] == "PASS"]) if any(v[0] == "PASS" for v in res.values()) else {}
+        alt_want = [f for f in fns if f in registry.get(seg, ()) and res.get(f, ("",))[0] != "PASS"]
+        for f, nins in aspsx_gate(tus[seg], alt_want).items():
+            res[f] = ("ASPSX", nins, 0)
+        byte_pass = [f for f, v in res.items() if v[0] in ("PASS", "ASPSX")]
+        sym = sym_ok(tus[seg], byte_pass) if byte_pass else {}
         for f, v in list(res.items()):
-            if v[0] == "PASS" and not sym.get(f, False):
+            if v[0] in ("PASS", "ASPSX") and not sym.get(f, False):
                 res[f] = ("SYMDIFF", v[1], 0)
-        npass = sum(1 for v in res.values() if v[0] == "PASS")
+        npass = sum(1 for v in res.values() if v[0] in ("PASS", "ASPSX"))
         grand_pass += npass
         lines.append(f"## {seg}  ({tus[seg].relative_to(ROOT).as_posix()}) — {npass}/{len(fns)} PASS")
         for fn in fns:
             st = res.get(fn, ("TODO", 0, 0))
             if st[0] == "PASS": lines.append(f"- ✅ {fn} ({st[1]})")
+            elif st[0] == "ASPSX": lines.append(f"- ✅ {fn} ({st[1]}, ASPSX)")
             elif st[0] == "FAIL": lines.append(f"- ❌ {fn} — {st[2]} diffs (ours {st[1]})")
             elif st[0] == "SYMDIFF": lines.append(f"- 🟡 {fn} — bytes PASS, SYM differs")
             elif st[0] == "NOT IN OBJECT": lines.append(f"- ⬜ {fn}")
             else: lines.append(f"- ⬜ {fn} ({st[0]})")
         lines.append("")
         print(f"{seg}: {npass}/{len(fns)}")
-    lines.insert(2, f"**Main image: {grand_pass} / {total_all} functions byte-matched ({100.0*grand_pass/total_all:.1f}%)**\n")
-    (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print(f"TOTAL {grand_pass}/{total_all}")
+    if focused:
+        print(f"SELECTED TOTAL {grand_pass}/{sum(len(seg_functions(s)) for s in segs)}")
+    else:
+        lines.insert(2, f"**Game code: {grand_pass} / {total_all} functions PASS ({100.0*grand_pass/total_all:.1f}%) — 837 PsyQ SDK functions excluded**\n")
+        (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"TOTAL {grand_pass}/{total_all}")
 
 if __name__ == "__main__":
     main()

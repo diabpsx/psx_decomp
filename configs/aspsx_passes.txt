@@ -1,0 +1,18 @@
+# Reviewed functions whose real ASPSX 2.56 output matches retail while the
+# maspsx/GNU-as lane differs.  Each entry must also pass tools/symlane.py.
+bird BirdScared__FP10BIRDSTRUCT
+control SetSpell__Fi
+control GetSBookTrans__FiUc
+control DrawSpellBook__Fb
+control CheckSBook__Fv
+fe FeNewNameMenuCtrl__Fv
+gamepad Handle__7GamePad
+items CalcPlrStaff__FP12PlayerStruct
+items CalcPlrScrolls__Fi
+items CalcPlrItemVals__FiUc
+items UseItem__Fiii
+loadsave LoadQuest__Fi
+padfuncs pad_func_Quick_Spell__Fi
+player ValidatePlayer__Fv
+player PM_DoSpell__FP12PlayerStruct
+stream STR_AllocBuffer__Fv

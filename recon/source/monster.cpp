@@ -317,34 +317,25 @@ void DoEnding(int p)
     user_start = 1;
 }
 
-void PrepDoEnding(int reason)
+void PrepDoEnding(int pnum)
 {
-    int newKillLevel;
-    int p;
-
-    gbDoEnding = reason + 1;
+    gbDoEnding = pnum + 1;
     gbRunGame = 0;
     deathflag = 0;
 
-    /* SYM OPEN: bytes near-miss (82==82 insns) -- ours vs oracle swap which of {gnDifficulty+1, the
-     * loaded pDiabloKillLevel} lands in v1 vs a0 for the final sltu compare (pure coloring).
-     * Falsified: if/else vs ternary forms (both orders), dropping/keeping a `killLevel` pointer
-     * local, moving this statement before/after the gbDoEnding/gbRunGame/deathflag stores, the
-     * Hellfire-source max()-style single ternary.  Next angle: SYM REG dump (allocno priorities)
-     * or a decl-order permuter sweep on this one statement. */
-    newKillLevel = gnDifficulty + 1;
-    if (plr[myplr].pDiabloKillLevel > newKillLevel)
-        newKillLevel = plr[myplr].pDiabloKillLevel;
-    plr[myplr].pDiabloKillLevel = newKillLevel;
+    plr[myplr].pDiabloKillLevel =
+        plr[myplr].pDiabloKillLevel > (unsigned long)(gnDifficulty + 1)
+            ? plr[myplr].pDiabloKillLevel
+            : (unsigned long)(gnDifficulty + 1);
 
-    for (p = 0; p < 2; p++) {
-        plr[p]._pmode = PM_QUIT;
-        plr[p]._pInvincible = 1;
+    for (int i = 0; i < 2; i++) {
+        plr[i]._pmode = PM_QUIT;
+        plr[i]._pInvincible = 1;
         if (gbMaxPlayers > 1) {
-            if (plr[p]._pHitPoints >> 6 == 0)
-                plr[p]._pHitPoints = 64;
-            if (plr[p]._pMana >> 6 == 0)
-                plr[p]._pMana = 64;
+            if (plr[i]._pHitPoints >> 6 == 0)
+                plr[i]._pHitPoints = 64;
+            if (plr[i]._pMana >> 6 == 0)
+                plr[i]._pMana = 64;
         }
     }
 
@@ -820,14 +811,7 @@ void M_ChangeLightOffset(int monst)
     ChangeLightOff(base[monst].mlid, lx - 8, ly - 8);
 }
 
-/* SYM+bytes OPEN (1 diff, 94 vs 93 insns): only residual is a redundant `li v0,12` -- retail
- * reuses the SAME register that (unconditionally, before the branch) already holds MM_RSATTACK=12
- * for BOTH the SetLightFX 8th arg (SetLightFX takes 8 params per its SYM proto -- x,y,s_r,s_g,s_b,
- * d_r,d_g,d_b -- confirmed via symhdr.py proto, so this genuinely is a real 8th arg, not a stale
- * register per the orchestrator's hint) and the later `_mmode = MM_RSATTACK` store.  Falsified: a
- * shared `int mmode = MM_RSATTACK;` local used both places (forced mmode into a callee-saved reg
- * live across the SetLightFX/NewMonsterAnim calls, growing the frame +8 bytes and regressing to 27
- * diffs -- wrong lever, reverted). */
+/* PSX adds the Diablo-Apocalypse light effect before entering ranged-special mode. */
 void M_StartRSpAttack(int i, int missile_type, int dam)
 {
     int md;
@@ -841,7 +825,7 @@ void M_StartRSpAttack(int i, int missile_type, int dam)
     _my = pmonster->_my;
 
     if (missile_type == MIT_DIABAPOCA)
-        SetLightFX(_mx, _my, 0xA00, 0xA00, 0xA00, 0x40, 0x40, MM_RSATTACK);
+        SetLightFX(_mx, _my, 0xA00, 0xA00, 0xA00, 0x40, 0x40, 0x40);
 
     monster[i]._mmode = MM_RSATTACK;
     monster[i]._mVar1 = missile_type;
@@ -900,9 +884,11 @@ void M_GetKnockback(int i, int d)
  * a scheduler artifact, not reachable by the statement/declaration reorderings tried so far. */
 void M_StartKill(int i, int pnum)
 {
-    MonsterStruct *pmonster = &monster[i];
+    MonsterStruct *pmonster;
     int _mx, _my;
 
+    pmonster = monster;
+    pmonster += i;
     _mx = pmonster->_mx;
     _my = pmonster->_my;
 
