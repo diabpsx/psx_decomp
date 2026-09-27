@@ -401,8 +401,8 @@ void ActivateTrapLine(int ttype, int tid)
 
 void LoadMapObjs(unsigned char *pMap, int startx, int starty)
 {
-    int rw, rh;
     int i, j;
+    int rw, rh;
     unsigned char *lm;
     long mapoff;
 
@@ -411,20 +411,21 @@ void LoadMapObjs(unsigned char *pMap, int startx, int starty)
     rw = *lm;
     lm += 2;
     rh = *lm;
-    mapoff = (rw * rh + 1) * 2;
+    mapoff = rw * rh * 2 + 2;
     rw <<= 1;
     rh <<= 1;
-    mapoff += 2 * rw * rh * 2;
+    mapoff += rw * rh * 4;
     lm += mapoff;
 
     for (j = 0; j < rh; j++) {
         for (i = 0; i < rw; i++) {
             if (*lm) {
-                PostAddObject(ObjTypeConv[*lm], startx + 16 + i, starty + 16 + j);
+                PostAddObject(ObjTypeConv[*lm], i + startx + 16, j + starty + 16);
             }
             lm += 2;
         }
     }
+    InitObjFlag = 0;
 }
 
 void AddObject(int ot, int ox, int oy)
