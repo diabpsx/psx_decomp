@@ -183,13 +183,13 @@ short SpdTrimCol(short col)
 void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
     int HealthHeight, ManaHeight;
-    int HealthAnimFrm, ManaAnimFrm, xof;
+    int HealthAnim, ManaAnim, xof;
     int BarY;
     struct POLY_FT4 *Ft4;
 
     HealthHeight = (int)(Plr->_pHitPoints * 0x2B) / (int)Plr->_pMaxHP;
-    HealthAnimFrm = HealthAnimCount >> 2;
-    ManaAnimFrm = ManaAnimCount >> 2;
+    HealthAnim = HealthAnimCount >> 2;
+    ManaAnim = ManaAnimCount >> 2;
     ManaHeight = 0;
     if (Plr->_pMana > 0) {
         if (Plr->_pMaxMana > 0) {
@@ -239,7 +239,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->u3 = (unsigned char)((Ft4->u2 + HealthHeight) - 1);
         Ft4->tpage = Ft4->tpage | 0x20;
         Ft4->code = Ft4->code & 0xFC;
-        Ft4 = PanelTData->PrintFt4(HealthAnimFrm + 0x84, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
+        Ft4 = PanelTData->PrintFt4(HealthAnim + 0x84, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
@@ -259,7 +259,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->u3 = (unsigned char)((Ft4->u2 + ManaHeight) - 1);
         Ft4->tpage = Ft4->tpage | 0x20;
         Ft4->code = Ft4->code & 0xFC;
-        Ft4 = PanelTData->PrintFt4(ManaAnimFrm + 0x8C, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
+        Ft4 = PanelTData->PrintFt4(ManaAnim + 0x8C, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
         Ft4->b0 = 0x7F;

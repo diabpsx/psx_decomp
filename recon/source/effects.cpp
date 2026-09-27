@@ -156,12 +156,11 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     gblocks->GetScrXY(R, x * 20, y * 20, 0, 0);
 
     scrx = R.x;
-    scry = R.y;
 
     if (scrx < gnScreenX) return 0;
     if (gnScreenX + gnScreenWidth < scrx) return 0;
-    if (scry < gnScreenY) return 0;
-    if (gnScreenY + gnScreenHeight < scry) return 0;
+    if (R.y < gnScreenY) return 0;
+    if (gnScreenY + gnScreenHeight < R.y) return 0;
 
     if (MONO) return 1;
 
@@ -173,9 +172,8 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     scry = gnScreenWidth / 2;
     if (scry < scrx)
         scrx = gnScreenWidth - scrx;
-
-    volume = scrx * 2;
-    *plVolume = (volume * (vol / scry)) >> 16;
+    scrx *= 2;
+    *plVolume = (scrx * (vol / scry)) >> 16;
     *plPan = pan;
     return 1;
 }

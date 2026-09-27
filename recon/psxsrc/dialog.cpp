@@ -562,7 +562,7 @@ void Dialog::Line(int DX, int DY, int DW)
 {
     int X, Y, W, Bx, Xr, Xl;
     RECT ClipRect;
-    RECT Unused;
+    char trans = 0;
 
     DialogGBack = 0;
     GetSizes();
@@ -580,7 +580,7 @@ void Dialog::Line(int DX, int DY, int DW)
         GShadeX = 1;
         if (Xr > 0) {
             GShadeY = 1;
-            DialogPrint(DialogBorderGfx + 1, DX, DY - DialogBorderTH, Xr, DialogBorderTH, Xr, DialogBorderTH, 0, 0, 0);
+            DialogPrint(DialogBorderGfx + 1, DX, DY - DialogBorderTH, Xr, DialogBorderTH, Xr, DialogBorderTH, 0, 0, trans);
         }
         GShadeX++;
         Bx = Xr;
@@ -588,7 +588,7 @@ void Dialog::Line(int DX, int DY, int DW)
             DW -= Xr;
             for (Xl = 0; Xl < DW / DialogBorderTW; Xl++) {
                 GShadeY = 1;
-                DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, DialogBorderTW, DialogBorderTH, DialogBorderTW, DialogBorderTH, 0, 0, 0);
+                DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, DialogBorderTW, DialogBorderTH, DialogBorderTW, DialogBorderTH, 0, 0, trans);
                 GShadeX++;
                 Bx += DialogBorderTW;
             }
@@ -596,14 +596,14 @@ void Dialog::Line(int DX, int DY, int DW)
         Xl = W - Bx;
         if (Xl > 0) {
             GShadeY = 1;
-            DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, Xl, DialogBorderTH, Xl, DialogBorderTH, 0, 0, 0);
+            DialogPrint(DialogBorderGfx + 1, X + Bx, Y - DialogBorderTH, Xl, DialogBorderTH, Xl, DialogBorderTH, 0, 0, trans);
         }
     } else {
         Xl = DW % DialogBorderTW;
         GShadeX = 1;
         if (Xl > 0) {
             GShadeY = 1;
-            DialogPrint(DialogBorderGfx + 1, DX, DY - DialogBorderTH, Xl, DialogBorderTH, Xl, DialogBorderTH, 0, 0, 0);
+            DialogPrint(DialogBorderGfx + 1, DX, DY - DialogBorderTH, Xl, DialogBorderTH, Xl, DialogBorderTH, 0, 0, trans);
         }
     }
 }

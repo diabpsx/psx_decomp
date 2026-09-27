@@ -2148,7 +2148,7 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
             if (sstr[0] != 0) {
                 if (tempstr[0] != 0) {
                     strcat(sstr, ",  ");
-                    li = 1;
+                    li += 1;
                     goto block_9;
                 }
             }
@@ -2170,7 +2170,8 @@ block_9:;
     }
     if (sstr[0] != 0) {
         AddSText(0xC, l, 0, sstr, iclr, 0);
-        l = l + 1 + li;
+        int t = l + 1;
+        l = t + li;
         li = 0;
     }
     sstr[0] = 0;
@@ -2255,9 +2256,7 @@ void S_HBuyEnter(void)
     i = 0;
     do {
         int p = myplr;
-        int seed;
 
-        seed = 0;
         w = cursW;
         if (w < 0) {
             w += 0xF;
@@ -2266,9 +2265,7 @@ void S_HBuyEnter(void)
         if (h < 0) {
             h += 0xF;
         }
-        w >>= 4;
-        h >>= 4;
-        done = func_8015A24C(p, i++, w, h, seed) & 0xFF;
+        done = func_8015A24C(p, i++, w >> 4, h >> 4, 0) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);

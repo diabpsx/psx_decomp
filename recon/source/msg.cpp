@@ -218,27 +218,27 @@ void delta_leave_sync(unsigned char bLevel)
 {
     if (currlevel == 0)
         glSeedTbl[0] = GetRndSeed();
-    if (currlevel != 0) {
-        DLevel *Dl = GetDLevel(bLevel, setlevel);
-        for (int i = 0; i < nummonsters; i++) {
-            int ii = monstactive[i];
-            DMonsterStr *pD;
-            if (monster[ii]._mhitpoints != 0) {
-                pD = &Dl->monster[ii];
-                sgbDeltaChanged = 1;
-                pD->_mx = monster[ii]._mx;
-                pD->_my = monster[ii]._my;
-                pD->_mdir = monster[ii]._mdir;
-                pD->_menemy = encode_enemy(ii);
-                pD->_mhitpoints = monster[ii]._mhitpoints;
-            }
+    if (currlevel == 0)
+        return;
+    DLevel *Dl = GetDLevel(bLevel, setlevel);
+    for (int i = 0; i < nummonsters; i++) {
+        int ii = monstactive[i];
+        DMonsterStr *pD;
+        if (monster[ii]._mhitpoints != 0) {
+            pD = &Dl->monster[ii];
+            sgbDeltaChanged = 1;
+            pD->_mx = monster[ii]._mx;
+            pD->_my = monster[ii]._my;
+            pD->_mdir = monster[ii]._mdir;
+            pD->_menemy = encode_enemy(ii);
+            pD->_mhitpoints = monster[ii]._mhitpoints;
         }
-        ReleaseDLevel(Dl);
-        if (!setlevel)
-            memcpy(&sgLocals[bLevel].automapsv, automapview, sizeof(automapview));
-        else
-            memcpy(&sgLocals[setlvlnum + 16].automapsv, automapview, sizeof(automapview));
     }
+    ReleaseDLevel(Dl);
+    if (!setlevel)
+        memcpy(&sgLocals[bLevel].automapsv, automapview, sizeof(automapview));
+    else
+        memcpy(&sgLocals[setlvlnum + 16].automapsv, automapview, sizeof(automapview));
 }
 
 /* @0x8004EF38 MSG.CPP:416 */
@@ -1095,14 +1095,15 @@ void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
     if (pnum != myplr) {
         unsigned char addok = 1;
         int i;
-        const TCmdGolem *p = (const TCmdGolem *)pCmd;
         for (i = 0; i < nummissiles; i++) {
             int mi = missileactive[i];
             if (missile[mi]._mitype == 0x21 && missile[mi]._misource == pnum)
                 addok = 0;
         }
-        if (addok)
+        if (addok) {
+            const TCmdGolem *p = (const TCmdGolem *)pCmd;
             AddMissile(plr[pnum]._px, plr[pnum]._py, p->_mx, p->_my, p->_mdir, 0x21, 0, pnum, 0, 1);
+        }
     }
 }
 

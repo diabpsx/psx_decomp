@@ -445,9 +445,9 @@ void DrawHorzArch(int X, int Y)
     int Frac;
     int x0, y0, x1, y1, x2, y2, x3, y3;
 
-    X *= 4;
-    Y *= 4;
-    Lx = (X - Y) * 2;
+    X <<= 2;
+    Y <<= 2;
+    Lx = (X - Y) << 1;
     Ly = Y + X;
     Lx += AMPlayerX;
     Ly += AMPlayerY;

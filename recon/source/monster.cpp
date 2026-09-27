@@ -3489,8 +3489,8 @@ void MAI_Rhino(int i)
                         PlayEffect(i, MS_SATTACK);
                     dung_map[_mx][_my].dMonster = ~i;
                     Monst->_mmode = MM_MISSILE;
-                    Monst->Action = 5;
                     Monst->_mdir = missile[mi]._mimfnum;
+                    Monst->Action = 5;
                 }
             } else if (abs(mx) < 2 && abs(my) < 2) {
                 if (v < 28 + 2 * Monst->_mint) {

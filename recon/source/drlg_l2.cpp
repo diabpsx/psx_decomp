@@ -1768,6 +1768,7 @@ void LoadL2Dungeon(char *sFileName, int vx, int vy)
     InitDungeon();
     DRLG_InitTrans();
     pLevelMap = GRL_LoadFileInMemSig(sFileName, 0);
+    lm = pLevelMap;
 
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
@@ -1776,7 +1777,6 @@ void LoadL2Dungeon(char *sFileName, int vx, int vy)
         }
     }
 
-    lm = pLevelMap;
     rw = *lm;
     lm += 2;
     rh = *lm;

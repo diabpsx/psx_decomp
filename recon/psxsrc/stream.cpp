@@ -210,10 +210,10 @@ BOOL CDWAIT = false;                     /* @0x8011ADEC */
 static void PrintCDWaitTask(TASK *T)
 {
     TextDat *CDGfxData = GM_UseTexData(0);
+    POLY_FT4 *Ft4;
 
     while (1) {
         if (CDWAIT) {
-            POLY_FT4 *Ft4;
             int cdx;
             int cdy;
             PRIM_FullScreen(300);
