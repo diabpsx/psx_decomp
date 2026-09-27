@@ -2339,8 +2339,10 @@ void OperateShrine(int pnum, int i, int sType)
                 lv = 1;
                 for (r = 1; r < 38; r++) {
                     if (plr[pnum]._pMemSpells & lv) {
-                        if (plr[pnum]._pSplLvl[r] < 15)
+                        if (plr[pnum]._pSplLvl[r] < 15) {
                             plr[pnum]._pSplLvl[r]++;
+                            v1 = r;
+                        }
                     }
                     lv <<= 1;
                 }
@@ -2348,7 +2350,7 @@ void OperateShrine(int pnum, int i, int sType)
                 while (!done) {
                     lv = 1;
                     r = ENG_random(37);
-                    lv <<= r;
+                    lv = lv << r;
                     if (plr[pnum]._pMemSpells & lv) {
                         if (plr[pnum]._pSplLvl[r + 1] >= 2)
                             plr[pnum]._pSplLvl[r + 1] -= 2;

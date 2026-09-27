@@ -21,3 +21,5 @@ automap DrawAutoMapSquare__Fii
 objects OperateBook__Fii
 fmv DCT_out_handler
 fmv start_mdec_decode
+objects OperateShrine__Fiii
+objects OperateBook__Fii
