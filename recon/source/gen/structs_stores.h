@@ -19,6 +19,89 @@ enum TXT_JUST {
     JustLeft = 0
 };
 
+/* CBlocks/Dialog -- copied verbatim from recon/psxsrc/psxhelp.cpp (canonical layout used across the
+ * whole TU family). Declaring a `static Dialog SBack;` object below makes the compiler synthesize
+ * the ctor/dtor/_GLOBAL__ static-init thunks automatically -- they are NOT hand-written functions. */
+class CBlocks {
+public:
+    static int GetOverlayOtBase() { return 0x1E8; }
+};
+
+extern unsigned char DialogRed, DialogGreen, DialogBlue;     /* @0x8011ABFD.. */
+extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;  /* @0x8011AC00.. */
+
+class Dialog {
+public:
+    int BevelGfx;      /* +0x0 */
+    int BorderGfx;     /* +0x4 */
+    int BackGfx;       /* +0x8 */
+    int DialogOTpos;   /* +0xC */
+
+    Dialog()
+    {
+        BackGfx = 0x94;
+        BevelGfx = 0x1A;
+        BorderGfx = 0x1A;
+        DialogRed = 0x80;
+        DialogGreen = 0x80;
+        DialogBlue = 0x80;
+        DialogTRed = 0x20;
+        DialogTGreen = 0x20;
+        DialogTBlue = 0x20;
+        DialogOTpos = CBlocks::GetOverlayOtBase();
+    }
+    ~Dialog() {}
+    void SetBorder(int Type) { BorderGfx = Type; }
+    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
+    {
+        DialogRed = R;
+        DialogGreen = G;
+        DialogBlue = B;
+    }
+    void Bevels(int Type);
+    void Display(int x, int y, int W, int H);
+    void Back(int x, int y, int w, int h);
+    void Line(int x, int y, int w);
+    int SetOTpos(int OT);
+};
+
+/* CPad -- copied from recon/psxsrc/psxhelp.cpp (canonical layout used across the whole TU family). */
+class CPad {
+public:
+    unsigned char get_both;       /* +0x0 */
+    unsigned char active;         /* +0x1 */
+    unsigned char PadType;        /* +0x2 */
+    unsigned char PADTICK;        /* +0x3 */
+    unsigned short PADTICKMASK;   /* +0x4 */
+    unsigned short PadNum;        /* +0x6 */
+    unsigned short Cur;           /* +0x8 */
+    unsigned short Up;            /* +0xA */
+    unsigned short Down;          /* +0xC */
+    unsigned short Tick;          /* +0xE */
+    unsigned short Old;           /* +0x10 */
+    unsigned short both_Cur;      /* +0x12 */
+    unsigned short both_Up;       /* +0x14 */
+    unsigned short both_Down;     /* +0x16 */
+    unsigned short both_Tick;     /* +0x18 */
+    unsigned short both_Old;      /* +0x1A */
+    unsigned char rest[236 - 0x1C];
+
+    unsigned short GetTick() const
+    {
+        if (get_both)
+            return both_Tick;
+        return Tick;
+    }
+    unsigned short GetDown() const
+    {
+        if (get_both)
+            return both_Down;
+        return Down;
+    }
+    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
+    void SetPadTick(unsigned short tick) { PADTICK = tick; }
+};
+
 struct ItemStruct {   /* sizeof 108 */
     int _iVAdd1;   /* +0x0 */
     int _iVMult1;   /* +0x4 */
@@ -261,6 +344,47 @@ struct QuestStruct {   /* sizeof 20 */
     unsigned char _qvar2;
     unsigned char _qlog;
     unsigned char pad_for_laz;
+};
+
+struct TNQ {   /* sizeof 3 */
+    unsigned char _qsttype;   /* +0x0 */
+    unsigned char _qstmsg;   /* +0x1 */
+    unsigned char _qstmsgact;   /* +0x2 */
+};
+
+struct TownerStruct {   /* sizeof 196 */
+    int _tmode;   /* +0x0 */
+    int _ttype;   /* +0x4 */
+    int _tx;   /* +0x8 */
+    int _ty;   /* +0xC */
+    long _txoff;   /* +0x10 */
+    long _tyoff;   /* +0x14 */
+    long _txvel;   /* +0x18 */
+    long _tyvel;   /* +0x1C */
+    int _tdir;   /* +0x20 */
+    int _tAnimDelay;   /* +0x24 */
+    int _tAnimCnt;   /* +0x28 */
+    int _tAnimLen;   /* +0x2C */
+    int _tAnimFrame;   /* +0x30 */
+    int _tAnimFrameCnt;   /* +0x34 */
+    char _tAnimOrder;   /* +0x38 */
+    long _tAnimWidth;   /* +0x3C */
+    long _tAnimWidth2;   /* +0x40 */
+    int _tTenPer;   /* +0x44 */
+    int _teflag;   /* +0x48 */
+    int _tbtcnt;   /* +0x4C */
+    unsigned char _tSelFlag;   /* +0x50 */
+    unsigned char _tMsgSaid;   /* +0x51 */
+    struct TNQ qsts[16];   /* +0x52 */
+    int _tSeed;   /* +0x84 */
+    long _tVar1;   /* +0x88 */
+    long _tVar2;   /* +0x8C */
+    long _tVar3;   /* +0x90 */
+    long _tVar4;   /* +0x94 */
+    int _tName;   /* +0x98 */
+    unsigned char *_tNAnim[8];   /* +0x9C */
+    int _tNFrames;   /* +0xBC */
+    unsigned char *_tNData;   /* +0xC0 */
 };
 
 struct RECT {   /* sizeof 8 */

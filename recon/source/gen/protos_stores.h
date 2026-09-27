@@ -74,6 +74,12 @@ void STextUp(void);
 void STextDown(void);
 void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
 void STextESC(void);
+void S_TalkEnter(void);
+void S_SPBuyEnter(void);
+void STextEnter(void);
+struct CPad *PAD_GetPad(int PadNum, unsigned char both);
+void CheckStoreBtn(void);
+void InitQTextMsg(int m);   /* @0x8004DC78 MINITEXT.CPP:296 */
 void S_WitchEnter(void);
 void S_HealerEnter(void);
 void S_StoryEnter(void);
@@ -81,3 +87,14 @@ void S_TavernEnter(void);
 void S_BarmaidEnter(void);
 void S_DrunkEnter(void);
 unsigned char StoreGoldFit(int idx);
+void DrawStoreHelpText(void);
+struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+void DrawSTextTSK(struct TASK *T);
+void DrawSText(void);
+BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
+BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
+void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
+void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
+BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
+void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+void DoThatDrawSText(void);

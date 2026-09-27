@@ -48,3 +48,8 @@ extern int SStringYBuy0[20];   /* @0x800DE364 */
 extern int SStringYBuy1[20];   /* @0x800DE3B4 */
 extern int cursW;   /* CURSOR.CPP */
 extern int cursH;   /* CURSOR.CPP */
+extern BOOL CDWAIT;   /* @0x8011ADEC */
+extern unsigned char qtextflag;   /* MINITEXT.CPP */
+extern struct TownerStruct towner[16];   /* @0x800CFE80 */
+extern char **TextPtr;   /* @0x8011BBF4 */
+extern unsigned char PauseMode;   /* @0x8011B7A4 */

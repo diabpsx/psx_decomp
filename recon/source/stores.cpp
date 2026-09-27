@@ -67,6 +67,11 @@ static struct RECT StoreBackRect;
 static struct RECT StoreBackRectClipper;
 static int talker;   /* @0x8011C8C4 */
 
+/* Static Dialog object: declaring it makes the compiler synthesize the ctor/dtor/_GLOBAL__ static-
+ * init/destroy thunks automatically -- see __6Dialog_800743f0, ___6Dialog_800743c8,
+ * _GLOBAL__I/D_pSTextBoxCels in the raw oracle (all boilerplate, not hand-written per-class code). */
+static Dialog SBack;
+
 /* @0x800695A4 -- empty on PSX: the PC's 3 DiabloFreePtr calls are gone */
 void FreeStoreMem(void)
 {
@@ -684,6 +689,32 @@ void SetSpdbarGoldCurs(int pnum, int i)
         plr[pnum].SpdList[i]._iCurs = 4;
     } else {
         plr[pnum].SpdList[i]._iCurs = 5;
+    }
+}
+
+/* @0x80074228 -- CPad idiom copied from psxhelp.cpp/pause.cpp: PAD_GetPad(options_pad, 0) then
+ * repeated Pad->GetDown() & mask checks (GetDown() is genuinely re-invoked per check, not cached). */
+void CheckStoreBtn(void)
+{
+    struct CPad *Pad;
+
+    if (CDWAIT == 0 && qtextflag == 0) {
+        Pad = PAD_GetPad(options_pad, 0);
+        if (Pad->GetDown() & 1) {
+            STextUp();
+        }
+        if (Pad->GetDown() & 2) {
+            STextDown();
+        }
+        if ((Pad->GetDown() & 0x40) && stextsel != -1) {
+            STextEnter();
+        }
+        if (Pad->GetDown() & 0x100) {
+            STextESC();
+        }
+        if ((signed char)stextflag == 0) {
+            options_pad = -1;
+        }
     }
 }
 
@@ -1551,6 +1582,235 @@ void STextESC(void)
         return;
     default:
         return;
+    }
+}
+
+/* @0x80074064 -- ida's 1-indexed switch on stextflag is the authority (m2c's index is off-by-one). */
+void STextEnter(void)
+{
+    PlaySFX(0x33);
+    switch (stextflag) {
+    case 1:
+        S_SmithEnter();
+        return;
+    case 2:
+        S_SBuyEnter();
+        return;
+    case 18:
+        S_SPBuyEnter();
+        return;
+    case 3:
+        S_SSellEnter();
+        return;
+    case 4:
+        S_SRepairEnter();
+        return;
+    case 5:
+        S_WitchEnter();
+        return;
+    case 6:
+        S_WBuyEnter();
+        return;
+    case 7:
+        S_WSellEnter();
+        return;
+    case 8:
+        S_WRechargeEnter();
+        return;
+    case 9:
+    case 10:
+    case 24:
+        StartStore(stextshold);
+        stextsel = stextlhold;
+        stextsval = stextvhold;
+        return;
+    case 11:
+        S_ConfirmEnter();
+        return;
+    case 12:
+        S_BoyEnter();
+        return;
+    case 13:
+        S_BBuyEnter();
+        return;
+    case 14:
+        S_HealerEnter();
+        return;
+    case 15:
+        S_StoryEnter();
+        return;
+    case 16:
+        S_HBuyEnter();
+        return;
+    case 17:
+        S_SIDEnter();
+        return;
+    case 19:
+        S_TalkEnter();
+        return;
+    case 20:
+        StartStore(0x11);
+        return;
+    case 21:
+        S_TavernEnter();
+        return;
+    case 23:
+        S_BarmaidEnter();
+        return;
+    case 22:
+        S_DrunkEnter();
+        return;
+    default:
+        return;
+    }
+}
+
+/* @0x80073D08 -- SetRndSeed's extra m2c "args" are spurious (real signature is SetRndSeed(long),
+ * matching the existing extern); ida's single-arg call is the authority. */
+void S_TalkEnter(void)
+{
+    int i;
+    int tq;
+    int sn;
+    int la;
+
+    if (stextsel == 0x16) {
+        StartStore(stextshold);
+        stextsel = stextlhold;
+        return;
+    }
+    tq = 0;
+    i = 0;
+    do {
+        if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog != 0) {
+            tq += 1;
+        }
+        i += 1;
+    } while (i < 0x10);
+    sn = 0xA - (tq >> 1);
+    if (stextsel == sn - 2) {
+        SetRndSeed(towner[talker]._tSeed);
+        InitQTextMsg(ENG_random(gossipend - gossipstart + 1) + gossipstart);
+        return;
+    }
+    i = 0;
+    do {
+        if (quests[i]._qactive == 2) {
+            la = Qtalklist[talker][i];
+            if (la != -1 && quests[i]._qlog != 0) {
+                if (sn == stextsel) {
+                    InitQTextMsg(la);
+                }
+                sn += 1;
+            }
+        }
+        i += 1;
+    } while (i < 0x10);
+}
+
+/* @0x8007123C */
+void S_SPBuyEnter(void)
+{
+    int idx;
+    int i;
+    int found;
+    int done;
+    int w, h;
+
+    stextshold = 0x12;
+    stextlhold = stextsel;
+    stextvhold = stextsval;
+    idx = (stextsel - stextup) / 8 + stextsval;
+    found = 0;
+    i = 0;
+    if (idx >= 0) {
+        do {
+            if (_premiumitem[StorePlrNo][i]._itype != -1) {
+                idx--;
+                found = i;
+            }
+            i++;
+        } while (idx >= 0);
+    }
+    if (plr[myplr]._pGold < _premiumitem[StorePlrNo][found]._iIvalue) {
+        StartStore(9);
+        return;
+    }
+    plr[myplr].HoldItem = _premiumitem[StorePlrNo][found];
+    SellIdx = found;
+    SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
+    i = 0;
+    do {
+        w = cursW;
+        if (w < 0) {
+            w += 0xF;
+        }
+        h = cursH;
+        if (h < 0) {
+            h += 0xF;
+        }
+        done = func_80159F24(myplr, i++, w >> 4, h >> 4, 0) & 0xFF;
+    } while (i < 0x28 && done == 0);
+    StartStore(done != 0 ? 0xB : 0xA);
+    SetCursor(1);
+}
+
+/* @0x8006FCC8 */
+void DrawStoreHelpText(void)
+{
+    switch (stextflag) {
+    case 1:
+    case 5:
+    case 12:
+    case 14:
+    case 15:
+    case 19:
+    case 21:
+    case 22:
+    case 24:
+        MediumFont.Print(0, 0xDE, GetStr(0x4E6), JustCentre, 0, WHITER, WHITEG, WHITEB);
+        break;
+    }
+}
+
+/* @0x8006FD64 */
+void DrawSText(void)
+{
+    if (InStoreFlag == 0) {
+        InStoreFlag = 1;
+        TSK_AddTask(0, DrawSTextTSK, 0x1000, 0);
+    }
+}
+
+/* @0x8006FDA4 -- m2c's decompile (single GLUE_Finished() check outside the loop) does NOT match the
+ * raw oracle: the real shape is a plain do-while re-checking GLUE_Finished() every iteration and
+ * breaking out entirely once it returns true, transcribed directly from the raw bytes below. */
+void DrawSTextTSK(struct TASK *T)
+{
+    InStoreFlag = 1;
+    GLUE_SetHomingScrollFlag(0);
+    GLUE_SetShowPanelFlag(0);
+    GLUE_SuspendGame();
+    if ((signed char)stextflag != 0) {
+        do {
+            if ((GLUE_Finished() ^ 1) == 0) {
+                break;
+            }
+            if (qtextflag == 0 && CDWAIT == 0 && TextPtr != 0) {
+                DoThatDrawSText();
+            }
+            TSK_Sleep(1);
+        } while ((signed char)stextflag != 0);
+    }
+    if (qtextflag == 0) {
+        DoThatDrawSText();
+    }
+    InStoreFlag = 0;
+    if (qtextflag == 0) {
+        GLUE_ResumeGame();
+        GLUE_SetShowPanelFlag(1);
+        GLUE_SetHomingScrollFlag(1);
+        PauseMode = 0;
     }
 }
 
