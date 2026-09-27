@@ -657,14 +657,12 @@ void StartStore(char s)
         break;
     }
 
-    i = 0;
-    while (i < NUMSTLINES && !stext[i]._ssel) {
-        i++;
-    }
+    for (i = 0; i < NUMSTLINES && !stext[i]._ssel; i++);
     if (i == NUMSTLINES) {
-        i = -1;
+        stextsel = -1;
+    } else {
+        stextsel = i;
     }
-    stextsel = i;
     stextflag = s;
 }
 
