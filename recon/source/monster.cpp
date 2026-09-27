@@ -1926,12 +1926,12 @@ void MAI_Fireman(int i)
  * the body block) -- same artifact as ProcessMonsters; our compile keeps them inside the block. */
 void MAI_Counselor(int i)
 {
+    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
     int fx, fy, mx, my, md, v;
     int dist;
     MonsterStruct *Monst;
 
     Monst = &monster[i];
-    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
     int _mx, _my;
 
     _mx = ((const MonsterStruct *)Monst)->_mx;
@@ -2413,12 +2413,6 @@ void ProcessMonsters(void)
     bool DoWipe;
     MonsterStruct *Monst;
     int oldmode;
-    int i;
-    int mi;
-    int raflag;
-    int mx;
-    int my;
-    int _menemy;
 
     DeleteMonsterList();
 
@@ -2428,11 +2422,24 @@ void ProcessMonsters(void)
      * delay slot). SYM OPEN: retail lists WipeCount/DoWipe/Monst/oldmode at
      * FUNCTION level (before the body block) and i..._menemy inside it; the
      * same split shows in MAI_Counselor (counsmiss/_mx/_my) -- every retail
-     * function with a static local has it. Not reproduced yet: extra nested
-     * block, decl-after-statement, static initializer all falsified. */
+     * function with a static local has it. FALSIFIED this pass: wrapping
+     * i/mi/raflag/mx/my/_menemy in an explicit `{ }` block around the
+     * for-loop fixes the "record/level membership" check's grouping but
+     * BREAKS the separate block-TREE check (retail's real block-tree is a
+     * single flat block start-to-end, per `symtypes.py fn` and symlane's
+     * "blocks differ" comparison both agreeing retail = ONE block) --
+     * reverted; the two SYM checks want CONTRADICTORY structures here, so
+     * the flat (original) form is closer to ground truth. */
     DoWipe = 0;
     if (++WipeCount % 200 == 0)
         DoWipe = 1;
+    int i;
+    int mi;
+    int raflag;
+    int mx;
+    int my;
+    int _menemy;
+
     for (i = 0; i < nummonsters; i++) {
         mi = monstactive[i];
         Monst = &monster[mi];
