@@ -1862,7 +1862,7 @@ void MI_Lightball(int i)
     missile[i]._mityoff += missile[i]._miyvel;
     GetMissilePos(i);
     j = missile[i]._mirange;
-    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 0, missile[i]._mix, missile[i]._miy, 0, 1);
+    CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 0, missile[i]._mix, missile[i]._miy, 0, 0);
     if (missile[i]._miHitFlag == 1)
         missile[i]._mirange = j;
 
@@ -1871,7 +1871,7 @@ void MI_Lightball(int i)
             oi = dung_map[tx][ty].dObject - 1;
         else
             oi = ~dung_map[tx][ty].dObject;
-        if ((unsigned char)(object[oi]._otype - 59) < 2) /* OBJ_SHRINEL(59)/OBJ_SHRINER(60) */
+        if (object[oi]._otype == 59 /* OBJ_SHRINEL */ || object[oi]._otype == 60 /* OBJ_SHRINER */)
             missile[i]._mirange = j;
     }
 
