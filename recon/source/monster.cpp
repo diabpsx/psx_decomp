@@ -2973,7 +2973,11 @@ void M2MStartHit(int mid, int i, int dam)
     dung_map[_mx][_my].dMonster = mid + 1;
 }
 
-/* SYM not checked; bytes OPEN (215 diffs, ours 237 / oracle 242, 5 insns
+/* NOW PASS+SYM: `omp` is the saved myplr around AddPlrMonstExper (same PSX idiom as
+ * MonstStartKill), the tail re-reads `_mx/_my` from `pmonster[mid]._moldx/_moldy` right after
+ * NewMonsterAnim and writes everything through monster[mid], and pmonster is a const view.
+ * Older notes follow.
+ * SYM not checked; bytes OPEN (215 diffs, ours 237 / oracle 242, 5 insns
  * short). Logic verified against devilution's non-HELLFIRE branch, call
  * list confirmed via `jal` scan (MonstPartJump, delta_kill_monster,
  * NetSendCmdLocParam1, AddPlrMonstExper, SpawnItem, M_DiabloDeath, two
@@ -3019,9 +3023,12 @@ void M2MStartHit(int mid, int i, int dam)
 void M2MStartKill(int i, int mid)
 {
     int md;
-    MonsterStruct *pmonster = monster;
-    int _mx = pmonster[mid]._mx;
-    int _my = pmonster[mid]._my;
+    const MonsterStruct *pmonster;
+    int _mx, _my;
+
+    pmonster = monster;
+    _mx = pmonster[mid]._mx;
+    _my = pmonster[mid]._my;
 
     if (monster[i]._mmode == MM_STONE)
         MonstPartJump(i);
@@ -3031,10 +3038,10 @@ void M2MStartKill(int i, int mid)
 
     monster[mid].mWhoHit |= 1 << i;
     if (i < 2) {
-        int savemyplr = myplr;
+        int omp = myplr;
         myplr = i;
         AddPlrMonstExper(monster[mid].mLevel, monster[mid].mExp, monster[mid].mWhoHit);
-        myplr = savemyplr;
+        myplr = omp;
     }
 
     monstkills[monster[mid].MType->mtype]++;
@@ -3043,11 +3050,10 @@ void M2MStartKill(int i, int mid)
     if (mid >= 2)
         SpawnItem(mid, _mx, _my, 1);
 
-    if (monster[mid].MType->mtype == MT_DIABLO) {
+    if (monster[mid].MType->mtype == MT_DIABLO)
         M_DiabloDeath(mid, 1, 0);
-    } else {
+    else
         PlayEffect(i, 2);
-    }
     PlayEffect(mid, 2);
 
     md = (monster[i]._mdir + 4) & 7;
@@ -3056,25 +3062,27 @@ void M2MStartKill(int i, int mid)
 
     monster[mid]._mdir = md;
     NewMonsterAnim(mid, monster[mid].MType->Anims[MA_DEATH], md, MA_DEATH);
-    {
-        pmonster[mid]._mmode = MM_DEATH;
-        pmonster[mid]._mxoff = 0;
-        pmonster[mid]._myoff = 0;
-        pmonster[mid]._mx = pmonster[mid]._moldx;
-        pmonster[mid]._my = pmonster[mid]._moldy;
-        pmonster[mid]._mfutx = pmonster[mid]._mx;
-        pmonster[mid]._mfuty = pmonster[mid]._my;
-        pmonster[mid]._moldx = pmonster[mid]._mx;
-        pmonster[mid]._moldy = pmonster[mid]._my;
-        M_CheckEFlag(mid);
-        M_ClearSquares(mid);
-        dung_map[pmonster[mid]._mx][pmonster[mid]._my].dMonster = mid + 1;
-    }
-    CheckQuestKill(mid, 1);
-    M_FallenFear(monster[mid]._mx, monster[mid]._my);
+    _mx = pmonster[mid]._moldx;
+    _my = pmonster[mid]._moldy;
 
-    if (monster[mid].MType->mtype >= MT_NACID && monster[mid].MType->mtype <= MT_XACID)
-        AddMissile(monster[mid]._mx, monster[mid]._my, 0, 0, 0, MIT_ACIDPUD, TARGET_PLAYERS, mid, monster[mid]._mint + 1, 0);
+    monster[mid]._mmode = MM_DEATH;
+    monster[mid]._mxoff = 0;
+    monster[mid]._myoff = 0;
+    monster[mid]._mx = _mx;
+    monster[mid]._my = _my;
+    monster[mid]._mfutx = _mx;
+    monster[mid]._mfuty = _my;
+    monster[mid]._moldx = _mx;
+    monster[mid]._moldy = _my;
+    M_CheckEFlag(mid);
+    M_ClearSquares(mid);
+    dung_map[_mx][_my].dMonster = mid + 1;
+    CheckQuestKill(mid, 1);
+
+    M_FallenFear(_mx, _my);
+
+    if (monster[mid].MType->mtype >= MT_NACID && monster[mid].MType->mtype <= MT_NACID + 3)
+        AddMissile(_mx, _my, 0, 0, 0, MIT_ACIDPUD, TARGET_PLAYERS, mid, monster[mid]._mint + 1, 0);
 }
 
 /* SYM OPEN (length 0x214 vs 0x238); bytes OPEN (51 diffs, ours 133 / oracle
