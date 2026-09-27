@@ -4218,19 +4218,19 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
     missileactive[nummissiles] = mi;
     nummissiles++;
 
+    missile[mi].PrintPtr = MissPrintRoutines[mitype];
     missile[mi]._mitype = mitype;
     missile[mi]._micaster = micaster;
     missile[mi]._misource = id;
-    missile[mi].PrintPtr = MissPrintRoutines[mitype];
     missile[mi]._miAnimType = missiledata[mitype].mFileNum;
+    missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
     missile[mi]._mispllvl = spllvl;
     missile[mi]._mimfnum = midir;
-    missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
 
-    if (missile[mi]._miAnimType == 0xFF || misfiledata[missile[mi]._miAnimType].mAnimFAmt < 8)
-        SetMissDir(mi, 0);
-    else
+    if (missile[mi]._miAnimType != 0xFF && misfiledata[missile[mi]._miAnimType].mAnimFAmt >= 8)
         SetMissDir(mi, midir);
+    else
+        SetMissDir(mi, 0);
 
     missile[mi]._mix = sx;
     missile[mi]._miy = sy;
@@ -4255,11 +4255,11 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
     missile[mi]._miAnimAdd = 1;
     missile[mi]._miLightFlag = 0;
     missile[mi]._miPreFlag = 0;
-    missile[mi]._mlid = -1;
+    missile[mi]._midam = v3;
     missile[mi]._miHitFlag = 0;
     missile[mi]._midist = 0;
     missile[mi]._mirnd = 0;
-    missile[mi]._midam = v3;
+    missile[mi]._mlid = -1;
 
     if (missiledata[mitype].mlSFX != -1)
         PlaySfxLoc(missiledata[mitype].mlSFX, missile[mi]._mix, missile[mi]._miy);
