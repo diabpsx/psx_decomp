@@ -130,6 +130,8 @@ unsigned char ChkPlrOffsets(int a0, int a1, int a2, int a3);
 unsigned char PosOkPlayer(int pnum, int x, int y);
 void SetPlayerOld(int pnum);
 void WorldToOffset(int pnum, int x, int y);
+unsigned char GetdDead(int x, int y);
+void SetdDead(int x, int y, unsigned char v);
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */

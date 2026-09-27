@@ -63,7 +63,7 @@ public:
     inline Dialog();
     ~Dialog() {}
     void SetBorder(int v) { BorderGfx = v; }
-    void SetBack(int v) { BackGfx = v; }
+    void SetBack(int Type) { BackGfx = Type; }
     void Back(int DX, int DY, int DW, int DH);
     void SetRGB(unsigned char R, unsigned char G, unsigned char B)
     {

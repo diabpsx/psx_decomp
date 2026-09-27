@@ -58,6 +58,7 @@ struct RECT BRect;
 int D_8011C300;
 int CursGlow;
 int CursGlowDx;
+int D_8011C2F4;
 
 void FreeInvGFX(void)
 {
@@ -1573,6 +1574,260 @@ void InvDrawSlots(void)
     }
 }
 
+void DrawInvCursor(void)
+{
+    struct POLY_FT4 *Ft4;
+    struct TextDat *TData;
+    int ItemX, ItemY;
+    int LoopX, LoopY;
+    int GoldAmount;
+
+    ItemH = 1;
+    ItemW = 1;
+
+    if (_pcurs[myplr] < 12)
+        goto no_item;
+
+    if (plr[myplr].HoldItem._itype != -1) {
+        if (plr[myplr].HoldItem._itype == ITYPE_GOLD) {
+            GoldAmount = plr[myplr].HoldItem._ivalue;
+            if (GoldAmount < 0x9C4) {
+                if (GoldAmount < 0x3E9)
+                    plr[myplr].HoldItem._iCurs = 4;
+                else
+                    plr[myplr].HoldItem._iCurs = 5;
+            } else {
+                plr[myplr].HoldItem._iCurs = 6;
+            }
+        }
+    }
+
+    ItemNo = plr[myplr].HoldItem._iCurs;
+    ItemW = InvItemWidth[ItemNo + 12] >> 4;
+    ItemH = InvItemHeight[ItemNo + 12] >> 4;
+    ItemX = InvRect[InvCursPos].X;
+    ItemY = InvRect[InvCursPos].Y;
+
+    TData = (ItemNo < 0x32) ? InvPanelTData : InvGfxTData;
+
+    if (InvCursPos == 7 || InvCursPos == 0x13 || InvCursPos == 0xD) {
+        if (ItemW == 1)
+            ItemX = ItemX + 8;
+        if (ItemH == 1)
+            ItemY = ItemY + 0x10;
+        if (ItemH == 2)
+            ItemY = ItemY + 8;
+    }
+
+    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x7A, ItemY - InvBackY + 0x1A, 0, D_8011C304 + 1, 0);
+    Ft4->code = Ft4->code & 0xFC;
+    if (plr[myplr].HoldItem._iStatFlag) {
+        Ft4->r0 = 0x80;
+        Ft4->g0 = 0x80;
+        Ft4->b0 = 0x80;
+    } else {
+        Ft4->r0 = 0;
+        Ft4->g0 = 0;
+        Ft4->b0 = 0;
+    }
+
+    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x82, ItemY - InvBackY + 0x22, 0, D_8011C304 + 1, 0);
+    Ft4->r0 = 0x10;
+    Ft4->g0 = 0x10;
+    Ft4->b0 = 0x10;
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+
+    InvSlotTable[InvCursPos] = InvSlotTable[InvCursPos] | 2;
+    goto tail;
+
+no_item:
+    if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+        InvSetItemCurs();
+        InvGetItemWH(InvCursPos - 25);
+    }
+    if (InvCursPos < 0x41) {
+        ItemH = 1;
+        ItemW = 1;
+    }
+    if (ItemH > 0) {
+        for (LoopY = 0; LoopY < ItemH; LoopY++) {
+            if (ItemW > 0) {
+                for (LoopX = 0; LoopX < ItemW; LoopX++) {
+                    InvSlotTable[InvCursPos + LoopX + LoopY * 10] = 2;
+                }
+            }
+        }
+    }
+
+    if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4) {
+        if ((unsigned int)InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+                ItemW = 2;
+                ItemH = 2;
+                break;
+            case 4:
+            case 5:
+            case 6:
+                ItemW = 1;
+                ItemH = 1;
+                break;
+            case 7:
+            case 13:
+            case 19:
+                ItemW = 2;
+                ItemH = 3;
+                break;
+            default:
+                InvGetItemWH(InvCursPos - 25);
+                ItemW = 1;
+                ItemH = 1;
+                break;
+            }
+        } else {
+            InvGetItemWH(InvCursPos - 25);
+            ItemW = 1;
+            ItemH = 1;
+        }
+
+        ItemX = InvRect[InvCursPos].X + 8;
+        ItemY = InvRect[InvCursPos].Y + 8;
+        if (ItemW == 2)
+            ItemX = InvRect[InvCursPos].X + 0x10;
+        if (ItemH == 2)
+            ItemY = InvRect[InvCursPos].Y + 0x10;
+        if (ItemH == 3)
+            ItemY = ItemY + 0x10;
+
+        Ft4 = InvGfxTData->PrintFt4(_pcurs[myplr] - 2, ItemX + 0x80, ItemY - InvBackY + 0x20, 0, 0x100, 0);
+    }
+
+tail:
+    if (InvCursPos >= 0x19 && ItemH > 0) {
+        for (LoopY = 0; LoopY < ItemH; LoopY++) {
+            if (ItemW > 0) {
+                for (LoopX = 0; LoopX < ItemW; LoopX++) {
+                    InvSlotTable[InvCursPos + LoopX + LoopY * 10] |= 2;
+                }
+            }
+        }
+    }
+}
+
+void DoThatDrawInv(void)
+{
+    int Loop;
+    int ii;
+    int ItemX, ItemY, ItemNo;
+    struct RECT ClipRect;
+
+    PRIM_FullScreen(0xFB);
+    InvPageFlag = 0;
+    GLUE_SetShowGameScreenFlag(0);
+    GLUE_SetShowPanelFlag(0);
+
+    for (Loop = 0x48; Loop >= 0; Loop--)
+        InvSlotTable[Loop] = 0;
+
+    DrawInvBack();
+
+    ClipRect.x = 0x7E;
+    ClipRect.y = 0x1E;
+    ClipRect.w = 0xB8;
+    ClipRect.h = 0x60;
+    PRIM_Clip(&ClipRect, D_8011C2F4);
+
+    DrawInvStats();
+    DrawInvMsg();
+    DrawInvHelpTxt();
+
+    if (plr[myplr].InvBody[0]._itype != -1) {
+        InvSlotTable[0] = 1;
+        InvDrawItem(InvRect[0].X, InvRect[0].Y, plr[myplr].InvBody[0]._iCurs, !!plr[myplr].InvBody[0]._iStatFlag, 0);
+    }
+
+    if (plr[myplr].InvBody[1]._itype != -1) {
+        InvSlotTable[4] = 1;
+        InvDrawItem(InvRect[4].X, InvRect[4].Y, plr[myplr].InvBody[1]._iCurs, !!plr[myplr].InvBody[1]._iStatFlag, 0);
+    }
+
+    if (plr[myplr].InvBody[2]._itype != -1) {
+        InvSlotTable[5] = 1;
+        InvDrawItem(InvRect[5].X, InvRect[5].Y, plr[myplr].InvBody[2]._iCurs, !!plr[myplr].InvBody[2]._iStatFlag, 0);
+    }
+
+    if (plr[myplr].InvBody[3]._itype != -1) {
+        InvSlotTable[6] = 1;
+        InvDrawItem(InvRect[6].X, InvRect[6].Y, plr[myplr].InvBody[3]._iCurs, !!plr[myplr].InvBody[3]._iStatFlag, 0);
+    }
+
+    if (plr[myplr].InvBody[4]._itype != -1) {
+        InvSlotTable[7] = 1;
+        ItemNo = plr[myplr].InvBody[4]._iCurs;
+        ItemX = InvRect[7].X;
+        ItemY = InvRect[7].Y;
+        if (InvItemWidth[ItemNo + 12] == 0x10)
+            ItemX = ItemX + 8;
+        if (InvItemHeight[ItemNo + 12] == 0x20)
+            ItemY = ItemY + 8;
+        InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvBody[4]._iStatFlag, 0);
+
+        if (plr[myplr].InvBody[4]._iLoc == ILOC_TWOHAND) {
+            InvSlotTable[13] = 1;
+            ItemNo = plr[myplr].InvBody[4]._iCurs;
+            ItemX = InvRect[13].X;
+            ItemY = InvRect[13].Y;
+            if (InvItemWidth[ItemNo + 12] == 0x10)
+                ItemX = ItemX + 8;
+            if (InvItemHeight[ItemNo + 12] == 0x20)
+                ItemY = ItemY + 8;
+            InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvBody[5]._iStatFlag, 1);
+        }
+    }
+
+    if (plr[myplr].InvBody[5]._itype != -1) {
+        InvSlotTable[13] = 1;
+        ItemNo = plr[myplr].InvBody[5]._iCurs;
+        ItemX = InvRect[13].X;
+        ItemY = InvRect[13].Y;
+        if (InvItemWidth[ItemNo + 12] == 0x10)
+            ItemX = ItemX + 8;
+        if (InvItemHeight[ItemNo + 12] == 0x20)
+            ItemY = ItemY + 8;
+        InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvBody[5]._iStatFlag, 0);
+    }
+
+    if (plr[myplr].InvBody[6]._itype != -1) {
+        InvSlotTable[19] = 1;
+        InvDrawItem(InvRect[19].X, InvRect[19].Y, plr[myplr].InvBody[6]._iCurs, !!plr[myplr].InvBody[6]._iStatFlag, 0);
+    }
+
+    for (Loop = 0; Loop < 40; Loop++) {
+        InvSlotTable[25 + Loop] = plr[myplr].InvGrid[Loop] != 0;
+        ii = plr[myplr].InvGrid[Loop];
+        if (ii > 0) {
+            if (plr[myplr]._pNumInv >= ii) {
+                int iv = ii - 1;
+
+                ItemNo = plr[myplr].InvList[iv]._iCurs;
+                ItemX = InvRect[25 + Loop].X;
+                ItemY = InvRect[25 + Loop].Y + 0x10 - InvItemHeight[ItemNo + 12];
+                InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvList[iv]._iStatFlag, 0);
+            }
+        }
+    }
+
+    for (Loop = 0; Loop < 8; Loop++) {
+        if (plr[myplr].SpdList[Loop]._itype != -1) {
+            InvSlotTable[65 + Loop] = 1;
+            InvDrawItem(InvRect[65 + Loop].X, InvRect[65 + Loop].Y, plr[myplr].SpdList[Loop]._iCurs, !!plr[myplr].SpdList[Loop]._iStatFlag, 0);
+        }
+    }
+
+    DrawInvCursor();
+    InvDrawSlots();
+}
+
 void DrawInvTSK(struct TASK *T)
 {
     int omp = myplr;
@@ -1764,6 +2019,13 @@ void CheckInvCut(int pnum, int mx, int my)
             NetSendCmdDelItem(0, 2);
             plr[pnum].HoldItem = plr[pnum].InvBody[2];
             plr[pnum].InvBody[2]._itype = -1;
+        }
+    }
+    if (r == 6) {
+        if (plr[pnum].InvBody[3]._itype != -1) {
+            NetSendCmdDelItem(0, 3);
+            plr[pnum].HoldItem = plr[pnum].InvBody[3];
+            plr[pnum].InvBody[3]._itype = -1;
         }
     }
     if ((unsigned int)(r - 7) < 6) {
@@ -2050,6 +2312,12 @@ void DrawInvHelpTxt(void)
             sprintf(TempStr, "%s  _ %s", s0, s0);
             goto done;
         }
+        if (_pcurs[myplr] == 4) {
+            GetStr(0x331);
+            s0 = GetStr(0x34C);
+            sprintf(TempStr, "%s  _ %s", s0, s0);
+            goto done;
+        }
         if (_pcurs[myplr] < 0xC)
             goto special;
         GetStr(0x4E6);
@@ -2065,6 +2333,12 @@ void DrawInvHelpTxt(void)
         }
         if (_pcurs[myplr] == 3) {
             GetStr(0x35A);
+            s0 = GetStr(0x331);
+            sprintf(TempStr, "_ %s  %s", s0, s0);
+            goto done;
+        }
+        if (_pcurs[myplr] == 4) {
+            GetStr(0x34C);
             s0 = GetStr(0x331);
             sprintf(TempStr, "_ %s  %s", s0, s0);
             goto done;

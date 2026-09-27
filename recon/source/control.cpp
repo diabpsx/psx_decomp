@@ -54,7 +54,8 @@ unsigned char CrossCount[2];
 unsigned char chrbtnactive;
 unsigned char chrflag;
 unsigned char sbookflag;
-unsigned char chrbtn[2][4];
+extern unsigned char chrbtn[][4];   /* unsized here, defined at the end of the TU: users see an incomplete
+                                       * array, so &chrbtn is materialised as its own register (CheckChrBtns) */
 int scx;
 int scy;
 int scx1;
@@ -146,14 +147,13 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
     int u0, u1, u2, u3;
     int v0, v1, v2, v3;
     int otpos;
-    int X, Y, SW, SH;
-    PAL *Pal;
-    int st;
 
     ThisDat = GM_UseTexData(0);
     otpos = CBlocks::GetOverlayOtBase() + 1;
     nCel--;
     if (w == 1 && !sbookflag) {
+        int dummy;   /* stand-in for the record-less declaration that opens retail's level here (lane fact 61) */
+
         xp *= 18;
         yp *= 18;
         xp += SPLICONRIGHT;
@@ -171,6 +171,10 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         b = SpellColors[SpellCol * 3 + 2] >> 1;
     }
     if (!Trans) {
+        int X, Y, SW, SH;
+        PAL *Pal;
+        int st;
+
         Fr = ThisDat->GetFr(165);
         Tp = (TP_LOAD_HDR *)Fr;
         paloffset1 += pinc1;
@@ -249,9 +253,10 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         GT4->x3 = x3;
         GT4->y3 = y3;
         Pal = ThisDat->GetPal(Fr->PalNum);
-        if (Pal->InVram)
-            GT4->clut = ((unsigned short *)Pal)[1];
-        else if (!(!"Pallete Prob!!"))
+        if (Pal->InVram) {
+            unsigned short *Clut = (unsigned short *)Pal;   /* coalesced copy: record-less level (GMAN SetPal idiom) */
+            GT4->clut = Clut[1];
+        } else if (!(!"Pallete Prob!!"))
             DBG_Error(NULL, "source/CONTROL.cpp", 657);
         st = 1;
         switch (w) {
@@ -1813,31 +1818,33 @@ void ChrCheckValidButton(int move)
 
     lus = lus + move;
     pc = plr[options_pad]._pClass;
+    unsigned char (*btn)[4] = chrbtn;
+    int *ms = MaxStats[pc];
     for (int i = 0; i < 4; i++) {
         switch (i) {
         case 0:
-            if (plr[options_pad]._pBaseStr == MaxStats[pc][0])
-                chrbtn[options_pad][0] = 1;
+            if (plr[options_pad]._pBaseStr == ms[0])
+                btn[options_pad][0] = 1;
             else
-                chrbtn[options_pad][0] = 0;
+                btn[options_pad][0] = 0;
             break;
         case 1:
-            if (plr[options_pad]._pBaseMag == MaxStats[pc][1])
-                chrbtn[options_pad][1] = 1;
+            if (plr[options_pad]._pBaseMag == ms[1])
+                btn[options_pad][1] = 1;
             else
-                chrbtn[options_pad][1] = 0;
+                btn[options_pad][1] = 0;
             break;
         case 2:
-            if (plr[options_pad]._pBaseDex == MaxStats[pc][2])
-                chrbtn[options_pad][2] = 1;
+            if (plr[options_pad]._pBaseDex == ms[2])
+                btn[options_pad][2] = 1;
             else
-                chrbtn[options_pad][2] = 0;
+                btn[options_pad][2] = 0;
             break;
         case 3:
-            if (plr[options_pad]._pBaseVit == MaxStats[pc][3])
-                chrbtn[options_pad][3] = 1;
+            if (plr[options_pad]._pBaseVit == ms[3])
+                btn[options_pad][3] = 1;
             else
-                chrbtn[options_pad][3] = 0;
+                btn[options_pad][3] = 0;
             break;
         }
     }
@@ -1847,17 +1854,16 @@ void ChrCheckValidButton(int move)
         lus = 3;
     if (lus >= 4)
         lus = 0;
-    /* retail indexes the row with an unscaled myplr (&chrbtn[0][0] + myplr + lus) */
-    if (chrbtn[0][myplr + lus]) {
-        for (count = 0; count < 4; count++) {
+    if (btn[myplr][lus]) {
+        count = 0;
+        do {
             lus = lus + move;
             if (lus < 0)
                 lus = 3;
             if (lus >= 4)
                 lus = 0;
-            if (!chrbtn[0][myplr + lus])
-                break;
-        }
+            count++;
+        } while (count < 4 && btn[myplr][lus]);
     }
 }
 
@@ -1878,18 +1884,35 @@ void CheckChrBtns(void)
         plr[options_pad]._pStatPts--;
     }
     pc = plr[options_pad]._pClass;
-    if (lus == 1) {
-        NetSendCmdParam1(1, 4, 1);
-        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseMag == MaxStats[pc][lus]);
-    } else if (lus == 0) {
+    switch (lus) {
+    case 0:
         NetSendCmdParam1(1, 3, 1);
-        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseStr == MaxStats[pc][lus]);
-    } else if (lus == 2) {
+        if (plr[options_pad]._pBaseStr == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    case 1:
+        NetSendCmdParam1(1, 4, 1);
+        if (plr[options_pad]._pBaseMag == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    case 2:
         NetSendCmdParam1(1, 5, 1);
-        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseDex == MaxStats[pc][lus]);
-    } else {
+        if (plr[options_pad]._pBaseDex == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    case 3:
         NetSendCmdParam1(1, 6, 1);
-        chrbtn[options_pad][lus] = (plr[options_pad]._pBaseVit == MaxStats[pc][lus]);
+        if (plr[options_pad]._pBaseVit == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
     }
     ChrCheckValidButton(0);
     BuildChr();
@@ -2025,3 +2048,6 @@ void RedBack(void)
         FT4->b0 = 0xFF;
     }
 }
+
+/* definition after its users -- see the unsized declaration at the top */
+unsigned char chrbtn[2][4];

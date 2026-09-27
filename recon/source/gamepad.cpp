@@ -12,13 +12,14 @@
 
 /* GAMEPAD.CPP data, in retail .sdata address order (= definition order). flyflag is the first
  * explicitly-initialised public global, which names the static-init thunk _GLOBAL_.I.flyflag.
- * (_pfind_list @0x800E38A8, also defined by this TU in retail, is not reconstructed yet.) */
+ * _pfind_list (60 zero bytes in GAMEPAD's .data, not .bss) is an explicitly initialised array. */
 unsigned char flyflag = 0;              /* @0x8011BBC1 */
 unsigned char _SpdBeltSelFlag[2] = { 0, 0 };   /* @0x8011BBC4 */
 static int HappyManFlag = 0;            /* @0x8011BBC8 (STAT) */
 static char seen_combo = -1;            /* @0x8011BBCC (STAT) */
 BOOL ignore_buttons = 0;                /* @0x8011BBD0 */
 int _pcurr_inv[2] = { 0, 0 };           /* @0x8011BBD4 */
+struct found_objects _pfind_list[2][10] = { 0 };   /* @0x800E38A8 (.data) */
 char _pfind_index[2] = { 0, 0 };        /* @0x8011BBDC */
 unsigned char automapmoved = 0;         /* @0x8011BBDE */
 
@@ -722,10 +723,10 @@ int GamePad::CheckDiagBodge(int dir)
         if (pl && pr) {
             if (pll && prr)
                 return dir;
+            if (!pll && prr)
+                return rnd;
             if (pll)
                 return lnd;
-            if (prr)
-                return rnd;
         }
         if (!pl && pr)
             return (dir + 1) & 7;
@@ -757,18 +758,18 @@ int GamePad::CheckIsoBodge(int dir)
     char ox, oy;
 
     newdir = dir;
-    lnd = (((dir - 1) & 7) - 1) & 7;
-    rnd = (((dir + 1) & 7) + 1) & 7;
+    poffset_x = offset_x;
+    poffset_y = offset_y;
+    lnd = (((newdir - 1) & 7) - 1) & 7;
+    rnd = (((newdir + 1) & 7) + 1) & 7;
     wx = player->WorldX;
     wy = player->WorldY;
-    ox = offset_x[dir];
-    oy = offset_y[dir];
+    ox = poffset_x[newdir];
+    oy = poffset_y[newdir];
     x = player->_px;
     y = player->_py;
     x += ox;
     y += oy;
-    poffset_x = offset_x;
-    poffset_y = offset_y;
 
     if (!PosOkPlayer(pnum, x, y)) {
         BOOL l, r;
@@ -776,32 +777,38 @@ int GamePad::CheckIsoBodge(int dir)
         wy += oy;
         if (CheckDirs(newdir, wx + ox, wy) != -1)
             return newdir;
-        l = PosOkPlayer(pnum, player->_px + poffset_x[(dir - 1) & 7], player->_py + poffset_y[(dir - 1) & 7])
+        l = PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])
             && PosOkPlayer(pnum, player->_px + poffset_x[lnd], player->_py + poffset_y[lnd]);
         if (l)
             newdir = lnd;
         else {
-            r = PosOkPlayer(pnum, player->_px + poffset_x[(dir + 1) & 7], player->_py + poffset_y[(dir + 1) & 7])
+            r = PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])
                 && PosOkPlayer(pnum, player->_px + poffset_x[rnd], player->_py + poffset_y[rnd]);
             if (!r)
-                return CheckDirs(newdir, wx + ox, wy);
+                goto nomove;
             newdir = rnd;
         }
-        if (!PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
-            newdir = CheckDirs(newdir);
+        if (PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
+            return newdir;
+        newdir = CheckDirs(newdir);
+        return newdir;
+    nomove:
+        newdir = CheckDirs(newdir, wx + ox, wy);
     } else {
         if (CheckCentre(newdir))
             return newdir;
         switch (CheckSide(newdir)) {
         case 2:
-            if (!PosOkPlayer(pnum, player->_px + poffset_x[(dir + 1) & 7], player->_py + poffset_y[(dir + 1) & 7])
-                && CheckDirs(rnd) == -1)
-                newdir = lnd;
+            if (!PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])) {
+                if (CheckDirs(rnd) == -1)
+                    newdir = lnd;
+            }
             break;
         case 1:
-            if (!PosOkPlayer(pnum, player->_px + poffset_x[(dir - 1) & 7], player->_py + poffset_y[(dir - 1) & 7])
-                && CheckDirs(lnd) == -1)
-                newdir = rnd;
+            if (!PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])) {
+                if (CheckDirs(lnd) == -1)
+                    newdir = rnd;
+            }
             break;
         }
     }

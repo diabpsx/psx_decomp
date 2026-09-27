@@ -408,6 +408,12 @@ struct GamePad {   /* sizeof 212 */
     void Handle(void);
 };
 
+struct found_objects {   /* sizeof 3 */
+    char index;   /* +0x0 */
+    char x;   /* +0x1 */
+    char y;   /* +0x2 */
+};
+
 struct KEY_ASSIGNS {   /* sizeof 16 */
     int txt;   /* +0x0 */
     int pad_val;   /* +0x4 */
