@@ -565,6 +565,76 @@ unsigned char M_CallWalk2(int i, int md)
     return ok;
 }
 
+/* PASS+SYM. Devilution's MAI_Fallen with the PSX locals from the retail SYM (xpos/ypos/my/aitype);
+ * note the PSX random gate is inverted vs devilution (retail returns when ENG_random(4) is
+ * NON-zero), and the bounds test checks x/y (not xpos/ypos) exactly as devilution does. */
+void MAI_Fallen(int i)
+{
+    MonsterStruct *Monst;
+    int x, y;
+    int xpos, ypos;
+    int m, rad;
+    int my;
+    int aitype;
+
+    Monst = &monster[i];
+
+    if (Monst->_mgoal == MG_ATTACK2) {
+        if (Monst->_mgoalvar1)
+            Monst->_mgoalvar1--;
+        else
+            Monst->_mgoal = MG_ATTACK;
+    }
+
+    if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
+        if (Monst->_mgoal == MG_RUN_AWAY && Monst->_mgoalvar1-- == 0) {
+            Monst->_mgoal = MG_ATTACK;
+            M_StartStand(i, (Monst->_mdir + 4) & 7);
+        }
+
+        if (Monst->_mAnimFrame == Monst->_mAnimLen) {
+            if (ENG_random(4))
+                return;
+            if (!(monster[i]._mFlags & MFLAG_NOHEAL)) {
+                M_StartSpStand(i, Monst->_mdir);
+                if (Monst->_mmaxhp - (2 * Monst->_mint + 2) >= Monst->_mhitpoints)
+                    Monst->_mhitpoints += 2 * Monst->_mint + 2;
+                else
+                    Monst->_mhitpoints = Monst->_mmaxhp;
+            }
+            rad = 2 * Monst->_mint + 4;
+            for (y = -rad; y <= rad; y++) {
+                for (x = -rad; x <= rad; x++) {
+                    xpos = Monst->_mx + x;
+                    ypos = Monst->_my + y;
+                    if (y >= 0 && y < 98 && x >= 0 && x < 98) {
+                        m = dung_map[xpos][ypos].dMonster;
+                        if (m > 0) {
+                            m--;
+                            aitype = monster[m]._mAi;
+                            if (aitype == AI_FALLEN) {
+                                monster[m]._mgoal = MG_ATTACK2;
+                                monster[m]._mgoalvar1 = 15 * (2 * Monst->_mint + 7);
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (Monst->_mgoal == MG_RUN_AWAY) {
+            M_CallWalk(i, Monst->_mdir);
+        } else if (Monst->_mgoal == MG_ATTACK2) {
+            xpos = Monst->_mx - Monst->_menemyx;
+            my = Monst->_my - Monst->_menemyy;
+            if ((abs(xpos) < 2 && abs(my) < 2))
+                M_StartAttack(i);
+            else
+                M_CallWalk(i, M_GetDir(i));
+        } else {
+            MAI_SkelSd(i);
+        }
+    }
+}
+
 void MAI_Cleaver(int i)
 {
     MonsterStruct *Monst = &monster[i];
