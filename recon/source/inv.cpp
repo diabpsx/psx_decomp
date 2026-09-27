@@ -1299,92 +1299,79 @@ void InvMoveCursRight(void)
     int OldPos;
 
     OldPos = InvCursPos;
+    ItemInc = 0;
 
     if (_pcurs[myplr] < 12) {
-        ItemInc = 0;
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-                InvCursPos = 6;
-                goto tail2;
-            case 4:
-                InvCursPos = 19;
-                goto tail2;
-            case 5:
-            case 6:
-                InvCursPos = 13;
-                goto tail2;
-            case 7:
-                InvCursPos = 4;
-                goto tail2;
-            case 13:
-                InvCursPos = 7;
-                goto tail2;
-            case 19:
-                InvCursPos = 5;
-                goto tail2;
-            default:
-                break;
+        switch (InvCursPos) {
+        case 0:
+            InvCursPos = 6;
+            break;
+        case 4:
+            InvCursPos = 19;
+            break;
+        case 5:
+        case 6:
+            InvCursPos = 13;
+            break;
+        case 7:
+            InvCursPos = 4;
+            break;
+        case 13:
+            InvCursPos = 7;
+            break;
+        case 19:
+            InvCursPos = 5;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40) {
+                ItemInc = 1;
+                if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+                    InvGetItemWH(InvCursPos - 25);
+                    ItemInc = ItemW;
+                }
+            } else if (InvCursPos >= 0x41) {
+                ItemInc = 1;
             }
-        }
-
-        if ((unsigned int)(InvCursPos - 25) < 40) {
-            ItemInc = 1;
-            if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
-                InvGetItemWH(InvCursPos - 25);
-                ItemInc = ItemW;
-            }
-        } else if (InvCursPos < 0x41) {
-            /* ItemInc unchanged (0) */
-        } else {
-            ItemInc = 1;
+            break;
         }
     } else {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-            case 6:
-            case 19:
-                goto tail2;
-            case 4:
-                InvCursPos = 5;
-                goto tail2;
-            case 5:
-                InvCursPos = 4;
-                goto tail2;
-            case 7:
-                InvCursPos = 13;
-                goto tail2;
-            case 13:
-                InvCursPos = 7;
-                goto tail2;
-            default:
-                break;
-            }
+        switch (InvCursPos) {
+        case 0:
+        case 6:
+        case 19:
+            break;
+        case 4:
+            InvCursPos = 5;
+            break;
+        case 5:
+            InvCursPos = 4;
+            break;
+        case 7:
+            InvCursPos = 13;
+            break;
+        case 13:
+            InvCursPos = 7;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40)
+                ItemInc = 1;
+            else if (InvCursPos >= 0x41)
+                ItemInc = 1;
+            break;
         }
-
-        if ((unsigned int)(InvCursPos - 25) < 40) {
-            ItemInc = 1;
-            if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
-                InvGetItemWH(InvCursPos - 25);
-                ItemInc = ItemW;
-            }
-        }
-        /* else: ItemInc left as-is (matches retail's uninitialized-but-unused path) */
     }
 
-tail2:
     if ((unsigned int)(InvCursPos - 25) < 40) {
-        if (_pcurs[myplr] < 12) {
-            ItemW = 0;
-        } else {
+        if (_pcurs[myplr] >= 12) {
             ItemNo = plr[myplr].HoldItem._iCurs;
             ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
+        } else {
+            ItemW = 0;
         }
 
         InvCursPos = InvCursPos + ItemInc;
-        if ((InvCursPos + ItemW - 25) % 10 == 0) {
-            InvCursPos = InvCursPos - 10 + ItemW;
+        if ((InvCursPos - 25 + ItemW) % 10 == 0) {
+            InvCursPos += ItemW - 10;
         }
     } else if (InvCursPos >= 0x41) {
         if (InvCursPos < 0x48) {
