@@ -1703,21 +1703,22 @@ void MI_Arrow(int i)
 void MI_Lightning(int i)
 {
     int j;
+    MissileStruct *miss = &missile[i];
 
-    missile[i]._mirange--;
-    j = missile[i]._mirange;
-    if (missile[i]._mix != missile[i]._misx || missile[i]._miy != missile[i]._misy)
-        CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix, missile[i]._miy, 0, 1);
-    if (missile[i]._miHitFlag == 1)
-        missile[i]._mirange = j;
+    miss->_mirange--;
+    j = miss->_mirange;
+    if (miss->_mix != miss->_misx || miss->_miy != miss->_misy)
+        CheckMissileCol(i, miss->_midam, miss->_midam, 1, miss->_mix, miss->_miy, 0, 1);
+    if (miss->_miHitFlag == 1)
+        miss->_mirange = j;
 
     /* PSX-only: re-centers the light on the missile's current tile every tick (hellfire doesn't
      * call ChangeLight in MI_Lightning at all); radius 0x243=579 not devilution's animation-based. */
-    ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, 0x243);
+    ChangeLight(miss->_mlid, miss->_mix, miss->_miy, 0x243);
 
-    if (missile[i]._mirange == 0) {
-        missile[i]._miDelFlag = 1;
-        AddUnLight(missile[i]._mlid);
+    if (miss->_mirange == 0) {
+        miss->_miDelFlag = 1;
+        AddUnLight(miss->_mlid);
     }
     PutMissile(i);
 }
