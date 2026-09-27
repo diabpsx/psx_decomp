@@ -884,14 +884,12 @@ void M_GetKnockback(int i, int d)
     }
 }
 
-/* OPEN: bytes near-miss (8 diffs, 66==66 insns -- count exact) -- pure instruction-SCHEDULING
- * difference: oracle materializes the `monster` symbol address (lui/addiu) EARLIER, interleaved
- * mid-way through the index*104 scaling chain, ours computes the full index chain first then the
- * symbol address.  SYM already matches.  Same family as M_ChangeLightOffset's sp/ra placement --
- * a scheduler artifact, not reachable by the statement/declaration reorderings tried so far. */
+/* PASS+SYM. `pmonster` is a pointer-to-CONST: loads through it are RTX_UNCHANGING, so sched2
+ * drops their memory dependence on the prologue's stack saves and hoists the `_mx` load (plus
+ * its s-reg save) above `sw ra` -- the 4-diff prologue residual shared with the MAI_* talkers. */
 void M_StartKill(int i, int pnum)
 {
-    MonsterStruct *pmonster;
+    const MonsterStruct *pmonster;
     int _mx, _my;
 
     pmonster = monster;
@@ -2546,21 +2544,18 @@ void M_StartHit(int i, int pnum, int dam)
     }
 }
 
-/* SYM+bytes OPEN (4 diffs, 108==108 insns exact): pure register-SAVE-ORDER
- * scheduling residual -- retail's prologue saves s2 (and loads _mx into it)
- * BEFORE saving ra/s4/s3, ours saves ra/s4/s3 first then s2. Semantics fully
- * verified against hellfire (TXT_VEIL1 advance / TXT_VEIL3+quest-done tail /
- * Action=0 replacing devilution's _mAnimData Cels-pointer set). Falsified:
- * declaration order (md before Monst, matching SYM), statement order
- * (mx/my together vs split by the mmode check, my-before-mx) -- all either
- * no change or worse. Next angle: same class as ProcessMonsters' WipeCount
- * near-miss -- revisit together if a scheduling lever is ever found. */
+/* PASS+SYM. The prologue residual (retail saves s2 + loads _mx BEFORE saving
+ * ra/s4/s3) is a const-read artifact: _mx/_my are read through a
+ * `const MonsterStruct *` view, making the loads RTX_UNCHANGING so sched2
+ * ignores their memory dependence on the stack saves (same lever as
+ * M_StartKill's const pmonster; applied to Garbud/SnotSpil/Lazurus/Rhino too).
+ * Semantics verified against hellfire (TXT_VEIL1 advance / TXT_VEIL3 tail). */
 void MAI_Lachdanan(int i)
 {
     int md;
     MonsterStruct *Monst = &monster[i];
-    int _mx = Monst->_mx;
-    int _my = Monst->_my;
+    int _mx = ((const MonsterStruct *)Monst)->_mx;
+    int _my = ((const MonsterStruct *)Monst)->_my;
 
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
@@ -2588,9 +2583,8 @@ void MAI_Lachdanan(int i)
     }
 }
 
-/* SYM ok, bytes OPEN (4 diffs, 132==132 insns exact): same prologue
- * register-SAVE-ORDER residual as MAI_Lachdanan (retail saves/loads s2
- * for _mx before saving ra/s4/s3; ours saves ra/s4/s3 first). Semantics
+/* PASS+SYM (prologue save-order residual fixed by the const-view _mx/_my
+ * read, see MAI_Lachdanan). Semantics
  * fully verified: hellfire's mtalkmsg-advance/TXT_GARB4-effect/MAI_Round
  * dispatch shape, PLUS a genuine PSX-only addition confirmed from raw
  * bytes -- both the advance path and the GARB4 path also write
@@ -2607,8 +2601,8 @@ void MAI_Garbud(int i)
     int _mx;
     int _my;
 
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
 
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
@@ -2679,9 +2673,11 @@ void SpawnGolum(int i, int x, int y, int mi)
     NetSendCmdGolem(monster[i]._mx, monster[i]._my, monster[i]._mdir, monster[i]._menemy, monster[i]._mhitpoints, currlevel);
 }
 
-/* SYM ok, bytes OPEN (4 diffs, 148==148 insns exact): same prologue
- * register-SAVE-ORDER residual as MAI_Lachdanan/MAI_Garbud. NEW LAW FOUND:
- * ObjChangeMap (NOT ObjChangeMapResync, and NOT RedoPlayerVision -- both of
+/* PASS+SYM (prologue residual fixed by the const-view _mx/_my read, see
+ * MAI_Lachdanan). protos_monster.h now prototypes ObjChangeMap, so the
+ * implicit-declaration effect described below is reproduced with an explicit
+ * block-scope declaration right before the call (same binding-level push).
+ * Original note: ObjChangeMap (NOT ObjChangeMapResync, and NOT RedoPlayerVision -- both of
  * those stay prototyped, needed flat/ok for MAI_Lazurus) must stay
  * UN-prototyped in protos_monster.h (retail's SYM block tree here is 7-deep
  * nested, matching a g++2.7 implicit-declaration-per-call artifact for this
@@ -2701,8 +2697,8 @@ void MAI_SnotSpil(int i)
     int _mx;
     int _my;
 
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
 
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
@@ -2719,6 +2715,7 @@ void MAI_SnotSpil(int i)
 
         if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
             if (Monst->mtalkmsg == TXT_BOL3 && !effect_is_playing(USFX_SNOT3) && Monst->_mgoal == MG_WAITTOTALK) {
+                void ObjChangeMap(int x1, int y1, int x2, int y2);
                 ObjChangeMap(setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1);
                 quests[Q_LTBANNER]._qvar1 = 3;
                 if (!deltaload)
@@ -2741,8 +2738,8 @@ void MAI_SnotSpil(int i)
     }
 }
 
-/* SYM ok, bytes OPEN (4 diffs, 169==169 insns exact): same prologue
- * register-SAVE-ORDER residual as the other MAI_* mtalkmsg-quest functions.
+/* PASS+SYM (prologue residual fixed by the const-view _mx/_my read, see
+ * MAI_Lachdanan).
  * Two real bugs found and fixed during transcription: (1) a missing
  * `if(!deltaload) NetSendCmdQuest(1,Q_BETRAYER)` after the FIRST
  * quests[Q_BETRAYER]._qvar1=5 write (easy to miss since the movie-trigger
@@ -2757,8 +2754,8 @@ void MAI_Lazurus(int i)
     int _mx;
     int _my;
 
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
 
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
@@ -3763,20 +3760,11 @@ void MAI_Scav(int i)
  * -- this alone dropped 79->12 diffs. Also fixed store ORDER on the missile
  * branch: retail sets `Monst->_mdir = missile[mi]._mimfnum;` BEFORE
  * `Monst->Action = 5;` (opposite of the read order suggested by hellfire) --
- * 12->4 diffs. OPEN residual (4 diffs, insn count EXACT 303/303): oracle
- * schedules the `_mx` register-save + load (`sw s3,68(sp); lb s3,52(s1)`)
- * immediately after computing `Monst`, BEFORE all other callee-saved-reg
- * prologue stores (ra/fp/s7/s6/s5/s4/s0); ours schedules the identical pair
- * AFTER those saves. FALSIFIED: reordering _mx/_my statement order, merging
- * the `int _mx = Monst->_mx;` declaration+init, splitting decl/assign like
- * the MAI_Scav lever -- none changed the scheduling (gcc's own prologue
- * store-batching, not source-order-controllable via these angles). SYM: bytes
- * are content-identical (0 real differences) but the SYM block-tree also
- * disagrees -- retail nests 7 lexical blocks (L13/53/54/56/58/63/82) for the
- * if/else-if chain that ours flattens into 1; NEXT ANGLE (untried): rewrite
- * the `else if` chain as literal nested `{ if (...) { ... } else { ... } }`
- * blocks matching the SYM's block start/end line numbers exactly (same class
- * as other block-tree-driven near-misses in this file). */
+ * 12->4 diffs. NOW PASS+SYM: the last 4 diffs (the `_mx` save+load hoisted
+ * above the other prologue stores) are fixed by the const-view _mx/_my read
+ * (see MAI_Lachdanan); the SYM block tree is fixed by declaring `mi` inside
+ * the missile-branch `if` body (retail's nested blocks are just g++'s
+ * binding levels kept alive by that inner declaration). */
 void MAI_Rhino(int i)
 {
     int fx, fy, mx, my, md, v;
@@ -3784,10 +3772,9 @@ void MAI_Rhino(int i)
     MonsterStruct *Monst = &monster[i];
     int _mx;
     int _my;
-    int mi;
 
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;
@@ -3821,7 +3808,7 @@ void MAI_Rhino(int i)
         if (Monst->_mgoal == MG_ATTACK) {
             if (!(abs(mx) < 5 && abs(my) < 5) && v < 43 + 2 * Monst->_mint
                 && LineClearF1(PosOkMonst, i, _mx, _my, fx, fy)) {
-                mi = AddMissile(_mx, _my, fx, fy, md, MIT_RHINO, Monst->_menemy, i, 0, 0);
+                int mi = AddMissile(_mx, _my, fx, fy, md, MIT_RHINO, Monst->_menemy, i, 0, 0);
                 if (mi != -1) {
                     if (Monst->MData->snd_special)
                         PlayEffect(i, MS_SATTACK);
