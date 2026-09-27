@@ -6,7 +6,7 @@ void DrawCtrlPan(void);   /* @0x8003219C CONTROL.CPP:1589 */
 void DoAutoMap(void);   /* @0x800321C8 CONTROL.CPP:1672 */
 void FreeControlPan(void);   /* @0x80032948 CONTROL.CPP:1856 */
 char * get_pieces_str(int nGold);   /* @0x8003751C CONTROL.CPP:3563 */
-int DrawDurIcon4Item(const ItemStruct *pItem, int x, int c);   /* @0x80036074 CONTROL.CPP:3064 */
+static int DrawDurIcon4Item(const ItemStruct *pItem, int x, int c);   /* @0x80036074 CONTROL.CPP:3064 */
 void DrawLevelUpIcon(int pnum);   /* @0x80035C58 CONTROL.CPP:2993 */
 char GetSBookTrans(int ii, unsigned char townok);   /* @0x80036478 CONTROL.CPP:3206 */
 void CheckSBook(void);   /* @0x80037280 CONTROL.CPP:3491 */
@@ -31,7 +31,7 @@ void SetSpell(int pnum);   /* @0x80031D54 CONTROL.CPP:1255 */
 void DrawSpeedSpellTSK(TASK *T);   /* @0x80030ED4 CONTROL.CPP:811 */
 void AddPanelString(const char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void DrawArrows(void);   /* @0x80034334 CONTROL.CPP:2564 */
-void ADD_PlrStringXY(const char *pszStr, char col);   /* @0x80033DE8 CONTROL.CPP:2398 */
+static void ADD_PlrStringXY(const char *pszStr, char col);   /* @0x80033DE8 CONTROL.CPP:2398 */
 BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
 void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
@@ -45,7 +45,7 @@ BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
 BOOL SelectorActive(void);   /* @0x800A336C PADFUNCS.CPP:1146 */
 void DrawSpellList(void);   /* @0x800310B8 CONTROL.CPP:895 */
 void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
-void DrawSpellBook(BOOL DrawBg);   /* @0x800366D8 CONTROL.CPP:3253 */
+static void DrawSpellBook(BOOL DrawBg);   /* @0x800366D8 CONTROL.CPP:3253 */
 void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
 void DrawSpellBookTSK(TASK *T);   /* @0x80030D44 CONTROL.CPP:754 */
 int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */
@@ -54,6 +54,22 @@ void ChrCheckValidButton(int move);   /* @0x80034028 CONTROL.CPP:2500 */
 void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1);   /* @0x8004F834 MSG.CPP:964 */
 void BuildChr(void);   /* @0x80034434 CONTROL.CPP:2596 */
 void CheckChrBtns(void);   /* @0x80035CEC CONTROL.CPP:3006 */
-static void CPrintString(int No, char *pszStr, int Just);
+int CPrintString(int No, char *pszStr, int Just);   /* @0x80032A58 CONTROL.CPP:1894 */
 unsigned char *LoadFileInMem(const char *pszName, unsigned long *pdwFileLen);   /* @0x8003DC2C ENGINE.CPP:490 */
 void InitControlPan(void);   /* @0x80031F70 CONTROL.CPP:1433 */
+char * MakeItemStr(ItemStruct *ItemPtr, unsigned short ItemNo, unsigned short MaxLen);   /* @0x80049198 ITEMS.CPP:5246 */
+void GetObjectStr(int i);   /* @0x8005F4C8 OBJECTS.CPP:4324 */
+void GetItemStr(int i);   /* @0x80045B78 ITEMS.CPP:3279 */
+void PrintMonstHistory(int mt);   /* @0x80155934 MONSTER.CPP:5061 */
+void PrintUniqueHistory(void);   /* @0x80155BB8 MONSTER.CPP:5151 */
+extern "C" int sprintf(char *buf, const char *fmt, ...);
+char CheckInvHLight(void);   /* @0x8015FA64 INV.CPP */
+CPad * PAD_GetPad(int PadNum, unsigned char both);   /* @0x800897F4 PADS */
+void PrintSelectBack(unsigned short Str);   /* @0x800A68D0 */
+int GetManaAmount(int id, int sn);   /* @0x80077054 SPELLS.CPP */
+void GetDamageAmt(int i, int *mind, int *maxd);   /* @0x80139C04 (overlay) */
+void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel);   /* @0x800301B4 CONTROL.CPP:551 */
+POLY_GT4 * PRIM_GetNextPolyGt4(void);   /* @0x80083E54 PRIMPOOL.CPP */
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, bool Sel, int Ot, int SpinSpeed, int SpinOffset, unsigned char Type);   /* @0x800A6A44 */
+#include "glibdev/gdebug.h"
+unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */
