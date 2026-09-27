@@ -1,0 +1,10 @@
+# Functions of a splat segment whose reconstruction lives in another TU than
+# recon/<dir>/<seg>.cpp (e.g. the startup segment links 8 source files).
+# tools/status.py gates each listed function in its home TU (bytes + SYM).
+# <seg> <function> <home TU relative to repo root>
+startup DEC_Open__Fv recon/psxsrc/decomp.cpp
+startup InitScreens__Fv recon/psxsrc/vid.cpp
+startup VID_OpenModule__Fv recon/psxsrc/vid.cpp
+startup OVR_Open__Fv recon/psxsrc/overlay.cpp
+startup PA_Open__Fv recon/psxsrc/pause.cpp
+startup SYSI_Init__Fv recon/psxsrc/sysinit.cpp

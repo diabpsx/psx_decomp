@@ -29,6 +29,20 @@ def aspsx_registry():
         out[seg].add(fn)
     return out
 
+def segment_homes():
+    """{seg: {fn: home TU Path}} for segment functions reconstructed outside the segment's own TU."""
+    out = collections.defaultdict(dict)
+    p = ROOT / "configs" / "segment_homes.txt"
+    if not p.is_file():
+        return out
+    for raw in p.read_text(encoding="utf-8").splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if not line:
+            continue
+        seg, fn, tu = line.split(None, 2)
+        out[seg][fn] = ROOT / tu
+    return out
+
 def seg_functions(seg):
     """every function of the segment in VA order: the oracle .s files (splat writes trivial bodies such as an
     empty `jr ra` function as C in src/<seg>.c, so the INCLUDE_ASM list alone undercounts)"""
@@ -83,27 +97,36 @@ def main():
     focused = bool(sys.argv[1:])
     segs = sys.argv[1:] or sorted(tus)
     registry = aspsx_registry()
+    homes = segment_homes()
     total_all = sum(len(seg_functions(s)) for s in sorted(p.stem for p in (ROOT / "src").glob("*.c")) if s != "lib")
     lines = ["# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only", ""]
     grand_pass = 0
     for seg in segs:
         fns = seg_functions(seg)
         if seg not in tus or not fns: continue
-        res = gate(tus[seg], fns)
-        alt_want = [f for f in fns if f in registry.get(seg, ()) and res.get(f, ("",))[0] != "PASS"]
-        for f, nins in aspsx_gate(tus[seg], alt_want).items():
-            res[f] = ("ASPSX", nins, 0)
-        byte_pass = [f for f, v in res.items() if v[0] in ("PASS", "ASPSX")]
-        sym = sym_ok(tus[seg], byte_pass) if byte_pass else {}
-        for f, v in list(res.items()):
-            if v[0] in ("PASS", "ASPSX") and not sym.get(f, False):
-                res[f] = ("SYMDIFF", v[1], 0)
+        away = homes.get(seg, {})
+        groups = collections.defaultdict(list)          # TU -> the segment functions gated there
+        for f in fns:
+            groups[away.get(f, tus[seg])].append(f)
+        res = {}
+        for tu, tfns in groups.items():
+            r = gate(tu, tfns)
+            alt_want = [f for f in tfns if f in registry.get(seg, ()) and r.get(f, ("",))[0] != "PASS"]
+            for f, nins in aspsx_gate(tu, alt_want).items():
+                r[f] = ("ASPSX", nins, 0)
+            byte_pass = [f for f, v in r.items() if v[0] in ("PASS", "ASPSX")]
+            sym = sym_ok(tu, byte_pass) if byte_pass else {}
+            for f, v in list(r.items()):
+                if v[0] in ("PASS", "ASPSX") and not sym.get(f, False):
+                    r[f] = ("SYMDIFF", v[1], 0)
+            res.update(r)
         npass = sum(1 for v in res.values() if v[0] in ("PASS", "ASPSX"))
         grand_pass += npass
         lines.append(f"## {seg}  ({tus[seg].relative_to(ROOT).as_posix()}) — {npass}/{len(fns)} PASS")
         for fn in fns:
             st = res.get(fn, ("TODO", 0, 0))
-            if st[0] == "PASS": lines.append(f"- ✅ {fn} ({st[1]})")
+            where = f" [{away[fn].relative_to(ROOT).as_posix()}]" if fn in away else ""
+            if st[0] == "PASS": lines.append(f"- ✅ {fn} ({st[1]}){where}")
             elif st[0] == "ASPSX": lines.append(f"- ✅ {fn} ({st[1]}, ASPSX)")
             elif st[0] == "FAIL": lines.append(f"- ❌ {fn} — {st[2]} diffs (ours {st[1]})")
             elif st[0] == "SYMDIFF": lines.append(f"- 🟡 {fn} — bytes PASS, SYM differs")
