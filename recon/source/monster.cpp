@@ -2246,7 +2246,17 @@ void ProcessMonsters(void)
 
     DeleteMonsterList();
 
-    DoWipe = ((++WipeCount) % 200) == 0;
+    /* SYM+bytes OPEN (372 vs 370 insns): the (++WipeCount % 200)==0 magic-divide
+     * codegen picks scratch regs v1/a0 swapped vs retail and needs one extra
+     * "addu s7,v1,zero" move retail doesn't have (retail's final sltiu writes
+     * s7 directly). Tried: post-increment vs pre-increment, split statements,
+     * if/else literal assignment, explicit temp -- all produce the identical
+     * ours-side codegen. Falsified: statement-order/temp-naming levers here.
+     * Next angle: try declaring WipeCount as `long` (not `unsigned int`) to
+     * see if the divide routine selection changes register preference, or
+     * revisit once a similar magic-divide near-miss elsewhere in the tree is
+     * solved (M_ChangeLightOffset has the same open class). */
+    DoWipe = (++WipeCount % 200) == 0;
     for (i = 0; i < nummonsters; i++) {
         mi = monstactive[i];
         Monst = &monster[mi];
@@ -2256,6 +2266,10 @@ void ProcessMonsters(void)
                 Monst->_mFlags &= ~MFLAG_TARGETS_MONSTER;
         }
 
+        _menemy = Monst->_menemy;
+        mx = Monst->_mx;
+        my = Monst->_my;
+
         if (!(monster[mi]._mFlags & MFLAG_NOHEAL) && Monst->_mhitpoints < Monst->_mmaxhp && (Monst->_mhitpoints >> 6) > 0) {
             if (Monst->mLevel > 1)
                 Monst->_mhitpoints += Monst->mLevel >> 1;
@@ -2263,22 +2277,17 @@ void ProcessMonsters(void)
                 Monst->_mhitpoints += Monst->mLevel;
         }
 
-        mx = Monst->_mx;
-        my = Monst->_my;
-
         if ((dung_map[mx][my].dFlags & 0x3) && (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) && Monst->_msquelch == 0) {
             if (Monst->MType->mtype == MT_CLEAVER)
                 PlaySFX(USFX_CLEAVER);
         }
 
         if (Monst->_mFlags & MFLAG_TARGETS_MONSTER) {
-            _menemy = Monst->_menemy;
             Monst->_lastx = monster[_menemy]._mfutx;
             Monst->_menemyx = Monst->_lastx;
             Monst->_lasty = monster[_menemy]._mfuty;
             Monst->_menemyy = Monst->_lasty;
         } else {
-            _menemy = Monst->_menemy;
             if (!plr[_menemy].plractive) {
                 _menemy ^= 1;
                 Monst->_menemy = _menemy;
