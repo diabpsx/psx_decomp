@@ -1542,9 +1542,8 @@ void CBlocks::PrintItems(int x, int y)
                     }
                     W >>= 1;
                     H >>= 1;
-                    int ang = IStr->_iAnimFrame & 0x1F;
-                    GTE_RotateFT4(Ft4, Ft4->x0 + W, Ft4->y0 + H, ang << 8);
-                    height = SinTab[ang] >> 2;
+                    GTE_RotateFT4(Ft4, Ft4->x0 + W, Ft4->y0 + H, (IStr->_iAnimFrame & 0x1F) << 8);
+                    height = SinTab[IStr->_iAnimFrame & 0x1F] >> 2;
                     if (height < 0) {
                         int it = ItemCAnimTbl[IStr->_iCurs];
                         PlaySfxLoc(ItemAnimSnds[it], IStr->_ix, IStr->_iy);
@@ -1563,9 +1562,9 @@ void CBlocks::PrintItems(int x, int y)
                     W += Fr->X;
                     H += Fr->Y + height;
                     if (!IStr->IDidx)
-                        DrawSpinner(Sx + W, Sy + H, 0x80, 0x60, 0x20, 0x30, -height * 2, -(ang * 4), 0, OtPos + 1, 1, 0, 8);
+                        DrawSpinner(Sx + W, Sy + H, 0x80, 0x60, 0x20, 0x30, -height * 2, -((IStr->_iAnimFrame & 0x1F) * 4), 0, OtPos + 1, 1, 0, 8);
                     else
-                        DrawSpinner(Sx + W, Sy + H, 0x60, 0x60, 0x60, 0x10, -height * 2, -(ang * 4), 0, OtPos + 1, 1, 0, 8);
+                        DrawSpinner(Sx + W, Sy + H, 0x60, 0x60, 0x60, 0x10, -height * 2, -((IStr->_iAnimFrame & 0x1F) * 4), 0, OtPos + 1, 1, 0, 8);
                 }
             } else {
                 if (!IStr->_iAnimFlag) {
