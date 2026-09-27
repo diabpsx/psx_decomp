@@ -644,16 +644,13 @@ void CharCardSelectMemcardPad(void)
     LAMBO_MovePad(P);
     if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
         if (D_8011B3D8[cs] != 2) {
-            int link;
-
             countdownloadcharblock = 1;
             cardondelay = 5;
             PlaySFX(0x33);
-            link = iptr[cs].Link;
+            cmenu = iptr[cs].Link - 1;
             cs = 1;
             lastcs = 1;
             current_card = 0;
-            cmenu = link - 1;
             return;
         } else {
             PlaySFX(0x3D3);
