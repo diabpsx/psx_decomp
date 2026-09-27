@@ -1219,14 +1219,14 @@ void InvSetItemCurs(void)
 {
     int ItemNo;
 
-    ItemNo = plr[myplr].InvGrid[InvCursPos - 25];
-    if (ItemNo == 0)
+    if (plr[myplr].InvGrid[InvCursPos - 25] == 0)
         return;
     if (_pcurs[myplr] >= 12)
         return;
     if ((unsigned int)(InvCursPos - 25) >= 40)
         return;
 
+    ItemNo = plr[myplr].InvGrid[InvCursPos - 25];
     if (InvCursPos >= 26) {
         while (plr[myplr].InvGrid[InvCursPos - 26] == ItemNo || plr[myplr].InvGrid[InvCursPos - 26] == -ItemNo) {
             InvCursPos--;
@@ -1235,6 +1235,8 @@ void InvSetItemCurs(void)
 
     if (InvCursPos >= 35) {
         while (plr[myplr].InvGrid[InvCursPos - 35] == ItemNo || plr[myplr].InvGrid[InvCursPos - 35] == -ItemNo) {
+            if (InvCursPos < 35)
+                break;
             InvCursPos -= 10;
         }
     }
