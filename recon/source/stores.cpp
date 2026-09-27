@@ -1246,7 +1246,6 @@ void S_SBuyEnter(void)
     int idx;
     int i;
     unsigned char done;
-    int w, h;
 
     if (SmithItemCount == 0) {
         StartStore(1);
@@ -1256,11 +1255,10 @@ void S_SBuyEnter(void)
     stextlhold = stextsel;
     stextvhold = stextsval;
     if (SItemListFlag == 1) {
-        idx = (stextsel - stextup) / 4;
+        idx = (stextsel - stextup) / 4 + stextsval;
     } else {
-        idx = (stextsel - stextup) / 8;
+        idx = (stextsel - stextup) / 8 + stextsval;
     }
-    idx += stextsval;
     if (plr[myplr]._pGold < _smithitem[StorePlrNo][idx]._iIvalue) {
         StartStore(9);
         return;
@@ -1270,19 +1268,14 @@ void S_SBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
-        int p = myplr;
-
-        w = cursW;
-        if (w < 0) {
-            w += 0xF;
-        }
-        h = cursH;
-        if (h < 0) {
-            h += 0xF;
-        }
-        done = func_80159F24(p, i++, w >> 4, h >> 4, 0) & 0xFF;
+        done = func_80159F24(myplr, i, cursW / 16, cursH / 16, 0);
+        i++;
     } while (i < 0x28 && done == 0);
-    StartStore(done != 0 ? 0xB : 0xA);
+    if (done != 0) {
+        StartStore(0xB);
+    } else {
+        StartStore(0xA);
+    }
     SetCursor(1);
 }
 
@@ -1292,7 +1285,6 @@ void S_WBuyEnter(void)
     int idx;
     int i;
     unsigned char done;
-    int w, h;
 
     if (_NoWitchItems[StorePlrNo] == 0) {
         StartStore(5);
@@ -1302,11 +1294,11 @@ void S_WBuyEnter(void)
     stextlhold = stextsel;
     stextvhold = stextsval;
     if (WStaffFlag != 0) {
-        idx = (stextsel - stextup) / 8;
+        idx = (stextsel - stextup) / 8 + stextsval;
     } else {
-        idx = (stextsel - stextup) / 4;
+        idx = (stextsel - stextup) / 4 + stextsval;
     }
-    idx += stextsval + _WitchIdxOfs[StorePlrNo];
+    idx += _WitchIdxOfs[StorePlrNo];
     if (plr[myplr]._pGold < _witchitem[StorePlrNo][idx]._iIvalue) {
         StartStore(9);
         return;
@@ -1316,19 +1308,14 @@ void S_WBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
-        int p = myplr;
-
-        w = cursW;
-        if (w < 0) {
-            w += 0xF;
-        }
-        h = cursH;
-        if (h < 0) {
-            h += 0xF;
-        }
-        done = func_8015A24C(p, i++, w >> 4, h >> 4, 0) & 0xFF;
+        done = func_8015A24C(myplr, i, cursW / 16, cursH / 16, 0);
+        i++;
     } while (i < 0x28 && done == 0);
-    StartStore(done != 0 ? 0xB : 0xA);
+    if (done != 0) {
+        StartStore(0xB);
+    } else {
+        StartStore(0xA);
+    }
     SetCursor(1);
 }
 
