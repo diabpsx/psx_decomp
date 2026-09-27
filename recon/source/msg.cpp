@@ -220,10 +220,9 @@ void delta_leave_sync(unsigned char bLevel)
         glSeedTbl[0] = GetRndSeed();
     if (currlevel != 0) {
         DLevel *Dl = GetDLevel(bLevel, setlevel);
-        int i;
-        DMonsterStr *pD;
-        for (i = 0; i < nummonsters; i++) {
+        for (int i = 0; i < nummonsters; i++) {
             int ii = monstactive[i];
+            DMonsterStr *pD;
             if (monster[ii]._mhitpoints != 0) {
                 pD = &Dl->monster[ii];
                 sgbDeltaChanged = 1;

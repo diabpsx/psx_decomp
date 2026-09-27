@@ -390,9 +390,9 @@ void DaveL()
 }
 
 /* @0x8009E424 DAVEL.CPP:118
- * OPEN (bytes 28 diffs, all in the prologue block): retail allocates zV0 -> $a0, zV2/zH -> $a1 and
- * schedules the v0/v2 loads before the `count` load; ours swaps a0/a1 (local-alloc gives the tied
- * zV2+zH quantity priority over zV0) and loads count/u0 first.  Every other instruction matches. */
+ * Prologue statement order is the allocation lever: zV0 must win $a0 over the tied zV2/zH quantity,
+ * so zV0 is loaded, consumed (zH, zV) and dies first; zH's shift is kept late to lengthen the tied
+ * quantity's life (-dl: priority = log2(refs)*refs/life). */
 void DoReflection(POLY_FT4 *Ft4, int R, int G, int B)
 {
     unsigned char zV0, zV2, zH, dH, zV;
@@ -402,24 +402,24 @@ void DoReflection(POLY_FT4 *Ft4, int R, int G, int B)
     int n, xoffset, yoffset;
     short zY;
 
-    Ft4m = (unsigned char *)Ft4;
-    zY = Ft4->y0;
     zV0 = Ft4->v0;
     zV2 = Ft4->v2;
+    zH = zV0 - zV2;
+    zV = zV0;
+    Ft4m = (unsigned char *)Ft4;
+    zY = Ft4->y0;
     zX0 = Ft4->x0;
     zX1 = Ft4->x1;
-    zH = zV0 - zV2;
-    zH >>= 3;
-    zV = zV0;
     xoffset = (count & 4) >> 2;
     yoffset = (count & 8) >> 3;
-    dH = zH - yoffset;
     Ft4->u0 += 0;
     Ft4->v0 += 1;
     Ft4->u1 += -1;
     Ft4->v1 += 1;
     Ft4->u2 += 0;
     Ft4->u3 += -1;
+    zH >>= 3;
+    dH = zH - yoffset;
     for (n = 0; n < 7; n++) {
         PRIM_GetPrim(&Ft4);
         for (s = Ft4m, d = (unsigned char *)Ft4; s < Ft4m + sizeof(POLY_FT4);)
