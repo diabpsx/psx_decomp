@@ -1676,7 +1676,7 @@ void DoThatDrawInv(void)
     GLUE_SetShowGameScreenFlag(0);
     GLUE_SetShowPanelFlag(0);
 
-    for (Loop = 0x48; Loop >= 0; Loop--)
+    for (Loop = 0; Loop < 0x49; Loop++)
         InvSlotTable[Loop] = 0;
 
     DrawInvBack();
@@ -1693,34 +1693,46 @@ void DoThatDrawInv(void)
 
     if (plr[myplr].InvBody[0]._itype != -1) {
         InvSlotTable[0] = 1;
-        InvDrawItem(InvRect[0].X, InvRect[0].Y, plr[myplr].InvBody[0]._iCurs, !!plr[myplr].InvBody[0]._iStatFlag, 0);
+        ItemX = InvRect[0].X;
+        ItemY = InvRect[0].Y;
+        ItemNo = plr[myplr].InvBody[0]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[0]._iStatFlag == 1, 0);
     }
 
     if (plr[myplr].InvBody[1]._itype != -1) {
         InvSlotTable[4] = 1;
-        InvDrawItem(InvRect[4].X, InvRect[4].Y, plr[myplr].InvBody[1]._iCurs, !!plr[myplr].InvBody[1]._iStatFlag, 0);
+        ItemX = InvRect[4].X;
+        ItemY = InvRect[4].Y;
+        ItemNo = plr[myplr].InvBody[1]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[1]._iStatFlag == 1, 0);
     }
 
     if (plr[myplr].InvBody[2]._itype != -1) {
         InvSlotTable[5] = 1;
-        InvDrawItem(InvRect[5].X, InvRect[5].Y, plr[myplr].InvBody[2]._iCurs, !!plr[myplr].InvBody[2]._iStatFlag, 0);
+        ItemX = InvRect[5].X;
+        ItemY = InvRect[5].Y;
+        ItemNo = plr[myplr].InvBody[2]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[2]._iStatFlag == 1, 0);
     }
 
     if (plr[myplr].InvBody[3]._itype != -1) {
         InvSlotTable[6] = 1;
-        InvDrawItem(InvRect[6].X, InvRect[6].Y, plr[myplr].InvBody[3]._iCurs, !!plr[myplr].InvBody[3]._iStatFlag, 0);
+        ItemX = InvRect[6].X;
+        ItemY = InvRect[6].Y;
+        ItemNo = plr[myplr].InvBody[3]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[3]._iStatFlag == 1, 0);
     }
 
     if (plr[myplr].InvBody[4]._itype != -1) {
         InvSlotTable[7] = 1;
-        ItemNo = plr[myplr].InvBody[4]._iCurs;
         ItemX = InvRect[7].X;
         ItemY = InvRect[7].Y;
+        ItemNo = plr[myplr].InvBody[4]._iCurs;
         if (InvItemWidth[ItemNo + 12] == 0x10)
             ItemX = ItemX + 8;
         if (InvItemHeight[ItemNo + 12] == 0x20)
             ItemY = ItemY + 8;
-        InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvBody[4]._iStatFlag, 0);
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[4]._iStatFlag == 1, 0);
 
         if (plr[myplr].InvBody[4]._iLoc == ILOC_TWOHAND) {
             InvSlotTable[13] = 1;
@@ -1731,7 +1743,7 @@ void DoThatDrawInv(void)
                 ItemX = ItemX + 8;
             if (InvItemHeight[ItemNo + 12] == 0x20)
                 ItemY = ItemY + 8;
-            InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvBody[5]._iStatFlag, 1);
+            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[5]._iStatFlag == 1, 1);
         }
     }
 
@@ -1744,33 +1756,37 @@ void DoThatDrawInv(void)
             ItemX = ItemX + 8;
         if (InvItemHeight[ItemNo + 12] == 0x20)
             ItemY = ItemY + 8;
-        InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvBody[5]._iStatFlag, 0);
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[5]._iStatFlag == 1, 0);
     }
 
     if (plr[myplr].InvBody[6]._itype != -1) {
         InvSlotTable[19] = 1;
-        InvDrawItem(InvRect[19].X, InvRect[19].Y, plr[myplr].InvBody[6]._iCurs, !!plr[myplr].InvBody[6]._iStatFlag, 0);
+        ItemX = InvRect[19].X;
+        ItemY = InvRect[19].Y;
+        ItemNo = plr[myplr].InvBody[6]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[6]._iStatFlag == 1, 0);
     }
 
     for (Loop = 0; Loop < 40; Loop++) {
         InvSlotTable[25 + Loop] = plr[myplr].InvGrid[Loop] != 0;
         ii = plr[myplr].InvGrid[Loop];
-        if (ii > 0) {
-            if (plr[myplr]._pNumInv >= ii) {
-                int iv = ii - 1;
-
-                ItemNo = plr[myplr].InvList[iv]._iCurs;
-                ItemX = InvRect[25 + Loop].X;
-                ItemY = InvRect[25 + Loop].Y + 0x10 - InvItemHeight[ItemNo + 12];
-                InvDrawItem(ItemX, ItemY, ItemNo, !!plr[myplr].InvList[iv]._iStatFlag, 0);
-            }
+        if (ii > 0 && ii <= plr[myplr]._pNumInv) {
+            ii--;
+            ItemX = InvRect[25 + Loop].X;
+            ItemY = InvRect[25 + Loop].Y;
+            ItemNo = plr[myplr].InvList[ii]._iCurs;
+            ItemY += 0x10 - InvItemHeight[ItemNo + 12];
+            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvList[ii]._iStatFlag == 1, 0);
         }
     }
 
     for (Loop = 0; Loop < 8; Loop++) {
         if (plr[myplr].SpdList[Loop]._itype != -1) {
             InvSlotTable[65 + Loop] = 1;
-            InvDrawItem(InvRect[65 + Loop].X, InvRect[65 + Loop].Y, plr[myplr].SpdList[Loop]._iCurs, !!plr[myplr].SpdList[Loop]._iStatFlag, 0);
+            ItemX = InvRect[65 + Loop].X;
+            ItemY = InvRect[65 + Loop].Y;
+            ItemNo = plr[myplr].SpdList[Loop]._iCurs;
+            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].SpdList[Loop]._iStatFlag == 1, 0);
         }
     }
 
