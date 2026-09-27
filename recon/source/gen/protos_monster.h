@@ -132,6 +132,9 @@ void SetPlayerOld(int pnum);
 void WorldToOffset(int pnum, int x, int y);
 unsigned char GetdDead(int x, int y);
 void SetdDead(int x, int y, unsigned char v);
+void CheckArea(int x, int y, int rad, unsigned char a4, int a5);
+int AddLight(int x, int y, int r);
+void DoVision(int x, int y, int r, unsigned char a4, unsigned char a5);
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */

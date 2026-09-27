@@ -36,5 +36,6 @@ extern struct QuestStruct quests[16];   /* @0x800DDA40 */
 extern BOOL DiabloDieFlag;   /* @0x8011B25C */
 extern int ViewX;   /* @0x8011C114 */
 extern int ViewY;   /* @0x8011C118 */
+extern unsigned char gbProcessPlayers;   /* @0x8011B800 */
 extern short monstkills[190];   /* @0x8010A240 */
 extern struct UniqMonstStruct UniqMonst[96];   /* @0x8010C708 */

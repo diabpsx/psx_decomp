@@ -110,6 +110,8 @@
 #define TXT_ZHAR1   0x94
 #define TXT_ZHAR2   0x95
 #define QUEST_DONE  3
+#define Q_DIABLO    5
+#define USFX_DIABLOD 0x35C
 #define USFX_LACH3  0x351
 #define TXT_GARB1   0x90
 #define TXT_GARB4   0x93
@@ -2363,6 +2365,9 @@ void ProcessMonsters(void)
             case MM_ATTACK:
                 raflag = M_DoAttack(mi);
                 break;
+            case MM_RATTACK:
+                raflag = M_DoRAttack(mi);
+                break;
             case MM_GOTHIT:
                 raflag = M_DoGotHit(mi);
                 break;
@@ -2377,9 +2382,6 @@ void ProcessMonsters(void)
                 break;
             case MM_FADEOUT:
                 raflag = M_DoFadeout(mi);
-                break;
-            case MM_RATTACK:
-                raflag = M_DoRAttack(mi);
                 break;
             case MM_SPSTAND:
                 raflag = M_DoSpStand(mi);
@@ -3407,17 +3409,19 @@ void MAI_Scav(int i)
 }
 
 /* NEW this pass, hellfire structure + JAP_1998_05_29 Ghidra decompile for
- * PSX-specific tweaks. SYM OPEN (frame size 80 vs retail's 96 -- retail
- * spills `fy` and `md` to the STACK as AUTO vars rather than keeping them
- * in registers, an allocation choice not directly controlled from C
- * source); bytes OPEN (189 diffs, ours 304 / oracle 303, only 1 insn over
- * despite the frame-size mismatch -- logic is very likely fully correct).
- * Confirmed PSX-specific from the JAP decompile (absent from hellfire):
- * on a successful missile launch, `Monst->Action=5` (the same "flying"
- * marker seen in MAI_Bat/MAI_Snake/M2MStartHit) and `Monst->_mdir =
- * missile[mi]._mimfnum` (re-read from the just-spawned missile, NOT the
- * local `md` used for the AddMissile call itself) -- both confirmed
- * directly from the JAP source text, not guessed. */
+ * PSX-specific tweaks. Frame-size gap mostly closed this pass: `_mx`/`_my`
+ * are `Monst->_mx`/`Monst->_my` cached UNCONDITIONALLY at the very top,
+ * before the `_mmode`/`_msquelch` guard, confirmed from the raw oracle
+ * (`lb s3,0x34(s1)` for `_mx` happens right after establishing `Monst`,
+ * before the mode check) -- same "speculative read before guard" lever as
+ * M_StartHit/M2MStartHit/MAI_SkelKing. SYM OPEN (length 0x4b8 vs retail
+ * 0x4bc, close); bytes OPEN (79 diffs, ours 302 / oracle 303, only 1 short
+ * now -- was 189 diffs/304 before this fix). Confirmed PSX-specific from
+ * the JAP decompile (absent from hellfire): on a successful missile
+ * launch, `Monst->Action=5` (the same "flying" marker seen in
+ * MAI_Bat/MAI_Snake/M2MStartHit) and `Monst->_mdir = missile[mi]._mimfnum`
+ * (re-read from the just-spawned missile, NOT the local `md` used for the
+ * AddMissile call itself). */
 void MAI_Rhino(int i)
 {
     int fx, fy, mx, my, md, v;
@@ -3427,12 +3431,14 @@ void MAI_Rhino(int i)
     int _my;
     int mi;
 
+    _mx = _mx;
+    _my = _my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;
-        mx = Monst->_mx - fx;
-        my = Monst->_my - fy;
-        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+        mx = _mx - fx;
+        my = _my - fy;
+        md = GetDirection(_mx, _my, Monst->_lastx, Monst->_lasty);
 
         if (Monst->_msquelch < 255)
             MonstCheckDoors(i);
@@ -3452,19 +3458,19 @@ void MAI_Rhino(int i)
             dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
 
             if ((Monst->_mgoalvar1++ >= (dist << 1))
-                || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+                || dung_map[_mx][_my].dTransVal != dung_map[fx][fy].dTransVal) {
                 Monst->_mgoal = MG_ATTACK;
             } else if (!M_RoundWalk(i, md, Monst->_mgoalvar2))
                 M_StartDelay(i, ENG_random(10) + 10);
         }
         if (Monst->_mgoal == MG_ATTACK) {
             if (!(abs(mx) < 5 && abs(my) < 5) && v < 43 + 2 * Monst->_mint
-                && LineClearF1(PosOkMonst, i, Monst->_mx, Monst->_my, fx, fy)) {
-                mi = AddMissile(Monst->_mx, Monst->_my, fx, fy, md, MIT_RHINO, Monst->_menemy, i, 0, 0);
+                && LineClearF1(PosOkMonst, i, _mx, _my, fx, fy)) {
+                mi = AddMissile(_mx, _my, fx, fy, md, MIT_RHINO, Monst->_menemy, i, 0, 0);
                 if (mi != -1) {
                     if (Monst->MData->snd_special)
                         PlayEffect(i, MS_SATTACK);
-                    dung_map[Monst->_mx][Monst->_my].dMonster = ~i;
+                    dung_map[_mx][_my].dMonster = ~i;
                     Monst->_mmode = MM_MISSILE;
                     Monst->Action = 5;
                     Monst->_mdir = missile[mi]._mimfnum;
@@ -3555,34 +3561,40 @@ void MAI_RR2(int i, int mistype, int dam)
 }
 
 /* NEW this pass, hellfire structure + JAP_1998_05_29 for PSX-specific
- * spawn-gating. SYM OPEN (frame 56 vs retail 72, plus retail has TWO extra
- * locals `_mx`/`_my` beyond hellfire's `nx,ny,skel` that this transcription
- * doesn't use -- likely a cached `Monst->_mx`/`_my` pair used somewhere in
- * the middle section, not yet identified); bytes OPEN (232 diffs, ours 331
- * / oracle 335, 4 short). Confirmed PSX-specific from the JAP decompile
- * (absent from hellfire): the skeleton-spawn is gated on `GetdDead(nx,ny)`
- * (a corpse must be present at the spawn tile) and, on success,
+ * spawn-gating. Frame-size gap CLOSED this pass: `_mx`/`_my` are
+ * `Monst->_mx`/`Monst->_my` cached UNCONDITIONALLY at the very top of the
+ * function (before the `_mmode==MM_STAND` guard even), matching the
+ * established "speculative read before guard" lever from M_StartHit/
+ * M2MStartHit -- confirmed from the raw oracle (`lb s2,0x34(s1); lb
+ * t0,0x35(s1)` happen BEFORE the `_mmode` check), then reused everywhere
+ * `Monst->_mx`/`_my` would otherwise be re-read. SYM OPEN (length 0x52c vs
+ * retail 0x53c, frame size now correct); bytes OPEN (116 diffs, ours 331 /
+ * oracle 335, 4 short -- down from 232 diffs before this fix). Remaining
+ * gap is the familiar i=$s3-vs-$s4 register-naming class plus a minor
+ * save-order tie. Confirmed PSX-specific from the JAP decompile (absent
+ * from hellfire): the skeleton-spawn is gated on `GetdDead(nx,ny)` (a
+ * corpse must be present at the spawn tile) and, on success,
  * `SetdDead(nx,ny,0)` clears it -- hellfire spawns unconditionally once
  * `PosOkMonst && nummonsters<MAXMONSTERS` pass, with no corpse requirement
  * at all; `M_StartSpStand(i,md)` only fires inside the `GetdDead` branch,
- * not unconditionally after `PosOkMonst`. Needs the missing `_mx`/`_my`
- * locals identified via the raw oracle before this can close -- not
- * pursued further this pass given the frame-size gap suggests a real
- * missing piece, not just a scheduling tie. */
+ * not unconditionally after `PosOkMonst`. */
 void MAI_SkelKing(int i)
 {
     int fx, fy, mx, my, md, v;
     int dist;
     MonsterStruct *Monst = &monster[i];
     int nx, ny;
+    int _mx, _my;
     int skel;
 
+    _mx = _mx;
+    _my = _my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;
-        mx = Monst->_mx - fx;
-        my = Monst->_my - fy;
-        md = GetDirection(Monst->_mx, Monst->_my, Monst->_lastx, Monst->_lasty);
+        mx = _mx - fx;
+        my = _my - fy;
+        md = GetDirection(_mx, _my, Monst->_lastx, Monst->_lasty);
 
         if (Monst->_msquelch < 255)
             MonstCheckDoors(i);
@@ -3590,7 +3602,7 @@ void MAI_SkelKing(int i)
         v = ENG_random(100);
         if ((abs(mx) < 2 && abs(my) < 2)
             || Monst->_msquelch != 255
-            || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+            || dung_map[_mx][_my].dTransVal != dung_map[fx][fy].dTransVal) {
             Monst->_mgoal = MG_ATTACK;
         } else if (Monst->_mgoal == MG_WALK_AROUND1 || (!(abs(mx) < 3 && abs(my) < 3) && !ENG_random(4))) {
             if (Monst->_mgoal != MG_WALK_AROUND1) {
@@ -3603,7 +3615,7 @@ void MAI_SkelKing(int i)
             dist = abs(mx) > abs(my) ? abs(mx) : abs(my);
 
             if ((Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md))
-                || dung_map[Monst->_mx][Monst->_my].dTransVal != dung_map[fx][fy].dTransVal) {
+                || dung_map[_mx][_my].dTransVal != dung_map[fx][fy].dTransVal) {
                 Monst->_mgoal = MG_ATTACK;
             } else if (!M_RoundWalk(i, md, Monst->_mgoalvar2))
                 M_StartDelay(i, ENG_random(10) + 10);
@@ -3611,9 +3623,9 @@ void MAI_SkelKing(int i)
         if (Monst->_mgoal == MG_ATTACK) {
             if (gbMaxPlayers == 1
                 && ((!(abs(mx) < 3 && abs(my) < 3) && v < 35 + 4 * Monst->_mint) || v < 6)
-                && LineClear(Monst->_mx, Monst->_my, fx, fy)) {
-                nx = Monst->_mx + offset_x[md];
-                ny = Monst->_my + offset_y[md];
+                && LineClear(_mx, _my, fx, fy)) {
+                nx = _mx + offset_x[md];
+                ny = _my + offset_y[md];
                 if (PosOkMonst(i, nx, ny) && nummonsters < 190) {
                     if (GetdDead(nx, ny)) {
                         skel = M_SpawnSkel(nx, ny, md);
@@ -3637,4 +3649,212 @@ void MAI_SkelKing(int i)
         if (Monst->_mmode == MM_STAND)
             Monst->Action = 0;
     }
+}
+
+/* NEW this pass, entirely from JAP_1998_05_29 (hellfire's MAI_Golum uses a
+ * completely DIFFERENT targeting mechanism -- MAI_Path/M_Enemy -- confirmed
+ * NOT the twin here; PSX genuinely repurposes the player-cursor-selection
+ * globals `myplr`/`sel_data`/`_pcursmonst[]` for AI enemy-finding via
+ * `CheckArea`+`gSameRoom`, a mechanism absent from both devilution and
+ * hellfire). SYM OPEN (frame 80 vs retail 88, one register short, the
+ * familiar "unnamed persistent temp" class); bytes OPEN (ours ~359 / oracle
+ * 331, 28 over). Real fix found and applied: `omp`/`sdata`/`cursm` (the
+ * saved myplr/sel_data/_pcursmonst[sel_data]) must be read at the VERY TOP
+ * of the function, BEFORE the `_mx==1`/`_mmode` early-return checks --
+ * confirmed directly from JAP's literal statement order (`iVar8=myplr;
+ * iVar7=sel_data; iVar16=(&_pcursmonst)[sel_data];` precede every early
+ * `if(...)return;`) -- this reordering alone didn't close the gap, so
+ * something else is still missing; the oracle's prologue also shows a
+ * `sel_data<<2` address computation cached very early (a genuine pointer to
+ * `&_pcursmonst[sel_data]`, not just a value read) that this version doesn't
+ * replicate. Needs a proper register-by-register raw-oracle walk; not
+ * pursued further this pass given the size of the remaining priority list. */
+void MAI_Golum(int i)
+{
+    MonsterStruct *Monst = &monster[i];
+    int mx, my, md;
+    int ok, j, k, mid;
+    int cursm;
+    int sdata;
+    int omp;
+
+    omp = myplr;
+    sdata = sel_data;
+    cursm = _pcursmonst[sel_data];
+
+    if (Monst->_mx == 1 && Monst->_my == 0)
+        return;
+
+    if (Monst->_mmode == MM_DEATH)
+        return;
+    if (Monst->_mmode == MM_SPSTAND)
+        return;
+    if (Monst->_mmode >= MM_WALK && Monst->_mmode <= MM_WALK3)
+        return;
+
+    sel_data = 0;
+    myplr = -1;
+    _pcursmonst[0] = -1;
+
+    if (Monst->_menemy != 0 && (monster[Monst->_menemy]._mhitpoints >> 6) < 1)
+        Monst->_menemy = 0;
+
+    if (Monst->_mmode != MM_ATTACK) {
+        if (Monst->_menemy == 0 || Monst->_msquelch == 0) {
+            Monst->_msquelch = 250;
+            CheckArea(Monst->_mx, Monst->_my, 4, 0, -1);
+            if (_pcursmonst[sel_data] > 0 && gSameRoom(_pcursmonst[sel_data], i)) {
+                Monst->_menemy = _pcursmonst[sel_data];
+                Monst->_menemyx = monster[_pcursmonst[sel_data]]._mfutx;
+                Monst->_menemyy = monster[_pcursmonst[sel_data]]._mfuty;
+                goto skip_walk;
+            }
+            ok = 1;
+            Monst->_menemy = 0;
+            md = plr[i]._pdir;
+            ok = DirOK(i, md);
+            if (!ok) {
+                mid = 0;
+                do {
+                    md = mid;
+                    ok = DirOK(i, md);
+                    if (mid + 1 > 7)
+                        break;
+                    mid = md + 1;
+                } while (!ok);
+            }
+            if (!ok)
+                goto skip_walk;
+        } else {
+            mx = Monst->_mx - monster[Monst->_menemy]._mfutx;
+            my = Monst->_my - monster[Monst->_menemy]._mfuty;
+            md = GetDirection(Monst->_mx, Monst->_my, monster[Monst->_menemy]._mx, monster[Monst->_menemy]._my);
+            Monst->_mdir = md;
+
+            if (abs(mx) < 2 && abs(my) < 2) {
+                if (monster[Monst->_menemy]._msquelch == 0) {
+                    monster[Monst->_menemy]._msquelch = 255;
+                    monster[Monst->_menemy]._lastx = Monst->_mx;
+                    monster[Monst->_menemy]._lasty = Monst->_my;
+                    for (j = 0; j < 5; j++) {
+                        for (k = 0; k < 5; k++) {
+                            mid = dung_map[Monst->_mx - 2 + k][Monst->_my - 2 + j].dMonster;
+                            if (mid > 0)
+                                monster[mid]._msquelch = 255;
+                        }
+                    }
+                }
+                M_StartAttack(i);
+                goto skip_walk;
+            }
+            if (monster[Monst->_menemy]._msquelch == 0)
+                monster[Monst->_menemy]._msquelch = 0;
+            else
+                monster[Monst->_menemy]._msquelch--;
+
+            ok = DirOK(i, md);
+            if (!ok) {
+                mid = (md + 1) & 7;
+                ok = 0;
+                if (mid != md) {
+                    do {
+                        mid = mid & 7;
+                        ok = DirOK(i, mid);
+                        if (ok)
+                            md = mid;
+                        mid++;
+                    } while (mid != md && !ok);
+                }
+            }
+            if (!ok) {
+                Monst->_menemy = 0;
+                goto skip_walk;
+            }
+        }
+        M_WalkDir(i, md);
+    }
+skip_walk:
+    _pcursmonst[sel_data] = cursm;
+    sel_data = sdata;
+    myplr = omp;
+}
+
+/* NEW this pass, entirely from JAP_1998_05_29 (a full clean decompile at
+ * this exact VA -- neither devilution nor hellfire show this function's
+ * PSX shape closely enough to use as the primary twin). SYM OPEN (frame 64
+ * vs retail 72, missing the SYM-listed `pmonster` local -- tried using a
+ * block-scoped `MonsterStruct *pmonster=&monster[mi]` for the stone-transform
+ * loop body, which made things WORSE (196->171 got further from 202 when
+ * NOT using it, i.e. using plain `monster[mi].field` indexing throughout is
+ * closer); `pmonster` must be used somewhere else in the function, not
+ * identified yet). Bytes OPEN (156 diffs, ours 196 / oracle 202, 6 short).
+ * Real fix applied: the per-monster loop guard is `monster[i]._msquelch`
+ * (Diablo's OWN squelch, read via fresh array indexing each iteration, loop
+ * -invariant) not `Monst->_msquelch` via the pointer -- using the pointer
+ * form cost 25 extra instructions of divergence. The screen-pan velocity
+ * calc genuinely needs a `(long long)` cast to force `__divdi3` (64-bit
+ * signed division) -- confirmed present in the raw oracle's call list;
+ * plain `long`/`int` division compiles to a single MIPS `div` and produces
+ * a MUCH shorter (wrong) function. Formula: `_mVar5 = (long long)
+ * (_mVar3 - (_mx<<16)) / j` where `j = min(20, abs(the larger of
+ * ViewX-_mx, ViewY-_my))`, `_mVar8 = pnum` (confirms this IS the "reason"
+ * argument PrepDoEnding later reads, per prior session notes). */
+void M_DiabloDeath(int i, unsigned char sendmsg, int pnum)
+{
+    MonsterStruct *Monst = &monster[i];
+    int _mx, _my;
+    int steps;
+    int j, k;
+
+    PlaySFX(USFX_DIABLOD);
+    quests[Q_DIABLO]._qactive = QUEST_DONE;
+    if (sendmsg)
+        NetSendCmdQuest(1, Q_DIABLO);
+    gbProcessPlayers = 0;
+
+    for (steps = 0; steps < nummonsters; steps++) {
+        int mi = monstactive[steps];
+        if (mi != i && monster[i]._msquelch != 0) {
+            int _moldx, _moldy;
+
+            NewMonsterAnim(mi, monster[mi].MType->Anims[MA_DEATH], monster[mi]._mdir, MA_DEATH);
+            _moldx = monster[mi]._moldx;
+            _moldy = monster[mi]._moldy;
+            monster[mi]._mmode = MM_DEATH;
+            monster[mi]._mxoff = 0;
+            monster[mi]._myoff = 0;
+            monster[mi]._mVar1 = 0;
+            monster[mi]._mx = _moldx;
+            monster[mi]._my = _moldy;
+            monster[mi]._mfutx = _moldx;
+            monster[mi]._mfuty = _moldy;
+            monster[mi]._moldx = _moldx;
+            monster[mi]._moldy = _moldy;
+            M_CheckEFlag(mi);
+            M_ClearSquares(mi);
+            dung_map[_moldx][_moldy].dMonster = mi + 1;
+        }
+    }
+
+    _mx = Monst->_mx;
+    _my = Monst->_my;
+    Monst->mlid = AddLight(Monst->_mx, Monst->_my, 3);
+    DoVision(_mx, _my, 8, 0, 1);
+
+    j = abs(ViewX - _mx);
+    k = abs(ViewY - _my);
+    if (k < j)
+        j = ViewX - _mx;
+    else
+        j = ViewY - _my;
+    k = abs(j);
+    j = 20;
+    if (k < 21)
+        j = k;
+
+    Monst->_mVar3 = 0;
+    Monst->_mVar4 = 0;
+    Monst->_mVar8 = pnum;
+    Monst->_mVar5 = ((long long)(Monst->_mVar3 - (_mx << 16))) / j;
+    Monst->_mVar6 = ((long long)(Monst->_mVar4 - (_my << 16))) / j;
 }
