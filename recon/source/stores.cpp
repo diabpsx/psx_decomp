@@ -797,22 +797,21 @@ void S_StartHealer(void)
     storenumh = 20;
 }
 
-/* @0x8006979C -- the two RECT* branches (`(RECT*)((short*)&Field.y - 2)`) are transcribed literally
- * from the oracle's raw pointer arithmetic (StoreBackRect/StoreBackRectClipper are 8 bytes apart,
- * confirmed adjacent in the SYM); this reads 4 bytes BEFORE the named .y field on purpose, per the
- * oracle -- not a bug in the reconstruction. */
+/* @0x8006979C */
 void PrintSString(int x, int y, unsigned char cjustflag, char *str, char col, int val)
 {
+    int yy;
     char valstr[32];
-    int sy;
-    int spinY;
-    int printY;
-    unsigned char R, G, B;
-    RECT *clipRect;
+    int SpinnerY;
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
+    static unsigned char DaveFix;
 
     SWrapCount = 0;
-    StoreBackRect.x += x;
     StoreBackRectClipper.x += x;
+    StoreBackRect.x += x;
+
     switch (SItemListFlag) {
     case 0:
         SStringY = SStringYNorm;
@@ -824,60 +823,62 @@ void PrintSString(int x, int y, unsigned char cjustflag, char *str, char col, in
         SStringY = SStringYBuy1;
         break;
     }
+
     GM_UseTexData(0);
-    if (y >= 5) {
-        y -= 1;
-    }
-    if (stextsel - 1 == y) {
-        col = (col != 3) ? 3 : 0;
-    }
+    if (y >= 5)
+        y--;
+    if (stextsel - 1 == y)
+        col = col != 3 ? 3 : 0;
+
     switch (col) {
     case 0:
-        R = WHITER;
-        G = WHITEG;
-        B = WHITEB;
+        R = WHITER; G = WHITEG; B = WHITEB;
         break;
     case 1:
-        R = BLUER;
-        G = BLUEG;
-        B = BLUEB;
+        R = BLUER; G = BLUEG; B = BLUEB;
         break;
     case 2:
-        R = REDR;
-        G = REDG;
-        B = REDB;
+        R = REDR; G = REDG; B = REDB;
         break;
     default:
-        R = GOLDR;
-        G = GOLDG;
-        B = GOLDB;
+        R = GOLDR; G = GOLDG; B = GOLDB;
         break;
     }
+
+    yy = SStringY[y] + stext[y]._syoff;
+    SpinnerY = yy + StoreBackRect.y;
+
     StoreBackRectClipper.y -= 4;
-    sy = SStringY[y] + stext[y]._syoff;
-    spinY = sy + StoreBackRect.y;
     StoreBackRect.y -= 4;
-    StoreBackRect.h += 4;
     StoreBackRectClipper.h += 4;
-    printY = sy + 3;
-    if (val >= 0) {
-        clipRect = (RECT *)((short *)&StoreBackRectClipper.y - 2);
+    StoreBackRect.h += 4;
+    yy += 3;
+
+    if (cjustflag) {
+        if (val >= 0)
+            SWrapCount = MediumFont.Print(0, yy, str, JustCentre, &StoreBackRectClipper, R, G, B);
+        else
+            SWrapCount = MediumFont.Print(0, yy, str, JustCentre, &StoreBackRect, R, G, B);
     } else {
-        clipRect = (RECT *)((short *)&StoreBackRect.y - 2);
+        if (val >= 0)
+            SWrapCount = MediumFont.Print(0, yy, str, JustLeft, &StoreBackRectClipper, R, G, B);
+        else
+            SWrapCount = MediumFont.Print(0, yy, str, JustLeft, &StoreBackRect, R, G, B);
     }
-    SWrapCount = MediumFont.Print(0, printY, str, (TXT_JUST)cjustflag, clipRect, R, G, B);
-    if (stextsel - 1 == y) {
-        DrawSpinner(MediumFont.MinX - 8, spinY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
-    }
+
+    if (stextsel - 1 == y)
+        DrawSpinner(MediumFont.MinX - 8, SpinnerY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+
     if (val > 0) {
         sprintf(valstr, GetStr(0x4FD), val);
-        StoreBackRect.w -= 0x1C;
-        MediumFont.Print(0, printY, valstr, JustRight, &StoreBackRect, R, G, B);
-        StoreBackRect.w += 0x1C;
+        StoreBackRect.w -= 28;
+        MediumFont.Print(0, yy, valstr, JustRight, &StoreBackRect, R, G, B);
+        StoreBackRect.w += 28;
     }
-    if (stextsel - 1 == y) {
-        DrawSpinner(MediumFont.MaxX + 4, spinY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
-    }
+
+    if (stextsel - 1 == y)
+        DrawSpinner(MediumFont.MaxX + 4, SpinnerY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+
     SStringY = SStringYNorm;
     StoreBackRectClipper.x -= x;
     StoreBackRect.x -= x;
