@@ -1574,73 +1574,86 @@ unsigned char OperateFountains(int pnum, int i)
 
 void OperateBook(int pnum, int i)
 {
-    unsigned char found;
-    int j, oi;
-    int otx, oty;
+    int v1, v2;
+    int j;
+    int oi;
+    int ot;
+    int itm;
 
+    v1 = 0;
+    v2 = 0;
     if (object[i]._oSelFlag == 0)
         return;
-    found = 0;
     if (setlevel && setlvlnum == 5) {
-        otx = plr[pnum]._px;
-        oty = plr[pnum]._py;
-        if (!deltaload) {
-            if (quests[15].pad_for_laz & 2) {
-                oi = dung_map[35][36].dObject - 1;
-                object[oi]._oVar5++;
-            }
-            if (quests[15].pad_for_laz & 1) {
-                oi = dung_map[26][46].dObject - 1;
-                object[oi]._oVar5++;
+        unsigned char found = 0;
+
+        if (deltaload) {
+            if (quests[Q_BETRAYER].pad_for_laz & 2) {
+                object[dung_map[35][36].dObject - 1]._oVar5++;
+                object[dung_map[26][46].dObject - 1]._oVar6 = 4;
                 found = 1;
             }
-        }
-        for (j = 0; j < numobjects; j++) {
-            oi = objectactive[j];
-            if (object[oi]._otype == 0x55) {
-                if (object[oi]._oVar6 == 1) {
-                    otx = 0x1B;
-                    oty = 0x1D;
-                    quests[15].pad_for_laz |= 2;
+            if (quests[Q_BETRAYER].pad_for_laz & 1) {
+                object[dung_map[35][36].dObject - 1]._oVar5++;
+                object[dung_map[45][47].dObject - 1]._oVar6 = 4;
+                found = 1;
+            }
+        } else {
+            unsigned char dowarp = 0;
+
+            for (j = 0; j < numobjects; j++) {
+                oi = objectactive[j];
+                ot = object[oi]._otype;
+                if (ot == 0x55 && object[oi]._oVar6 == 1) {
+                    quests[Q_BETRAYER].pad_for_laz |= 2;
+                    v1 = 0x1B;
+                    v2 = 0x1D;
                     object[oi]._oVar6 = 4;
-                    found = 1;
-                } else if (object[oi]._oVar6 == 2) {
-                    otx = 0x2B;
-                    oty = 0x1D;
-                    quests[15].pad_for_laz |= 1;
-                    object[oi]._oVar6 = 4;
-                    found = 1;
+                    dowarp = 1;
                 }
-                if (found)
+                if (ot == 0x55 && object[oi]._oVar6 == 2) {
+                    quests[Q_BETRAYER].pad_for_laz |= 1;
+                    v1 = 0x2B;
+                    v2 = 0x1D;
+                    object[oi]._oVar6 = 4;
+                    dowarp = 1;
+                }
+                if (dowarp) {
                     object[dung_map[35][36].dObject - 1]._oVar5++;
+                    if (!deltaload)
+                        AddMissile(plr[pnum]._px, plr[pnum]._py, v1, v2, plr[pnum]._pdir, 3, 0, pnum, 0, 0);
+                    found = 1;
+                    dowarp = 0;
+                }
             }
         }
-        if (found && !deltaload)
-            AddMissile(plr[pnum]._px, plr[pnum]._py, otx, oty, plr[pnum]._pdir, 1, 0, pnum, 0, 0);
         if (!found)
             return;
     }
     object[i]._oSelFlag = 0;
     object[i]._oAnimFrame++;
-    if (setlevel && setlvlnum == 2) {
+    if (setlevel && setlvlnum == 5) {
         ObjChangeMapResync(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-        for (j = 0; j < numobjects; j++)
-            SyncObjectAnim(objectactive[j]);
+        for (itm = 0; itm < numobjects; itm++)
+            SyncObjectAnim(objectactive[itm]);
     }
-    if (!deltaload) {
-        if (setlevel && setlvlnum == 2) {
-            plr[myplr]._pMemSpells |= 1ULL << 12;
-            if (plr[pnum]._pSplLvl[13] < 15)
-                plr[myplr]._pSplLvl[13]++;
-            quests[13]._qactive = 3;
-            NetSendCmdQuest(1, 0xE);
+    if (deltaload)
+        return;
+    if (setlevel && setlvlnum == 2) {
+        int unused; /* dead local (no SYM record): retail keeps this scope's blocks */
+        plr[myplr]._pMemSpells |= 1ULL << 12;
+        if (plr[pnum]._pSplLvl[13] < 15)
+            plr[myplr]._pSplLvl[13]++;
+        quests[14]._qactive = 3;
+        if (!deltaload)
+            NetSendCmdQuest(1, 14);
+        if (!deltaload)
             PlaySfxLoc(0xC, object[i]._ox, object[i]._oy);
-            InitDiabloMsg(0x2B);
-            ScrollFlag[myplr] = 1;
-            AddMissile(plr[myplr]._px, plr[myplr]._py, object[i]._ox - 2, object[i]._oy - 4, plr[myplr]._pdir, 2, 0, myplr, 0, 0);
-        }
-        NetSendCmdParam1(0, 0x2D, i);
+        InitDiabloMsg(0x2B);
+        ScrollFlag[myplr] = 1;
+        AddMissile(plr[myplr]._px, plr[myplr]._py, object[i]._ox - 2, object[i]._oy - 4, plr[myplr]._pdir, 2, 0, myplr, 0, 0);
     }
+    NetSendCmdParam1(0, 0x2D, i);
 }
 
 #define Q_BLIND 8
