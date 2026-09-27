@@ -2161,7 +2161,7 @@ void OperateShrine(int pnum, int i, int sType)
     int sc;
     int v1, v2, v3, v4;
     unsigned long long lv;
-    unsigned long t;
+    unsigned long long t;
     unsigned char done;
 
     if (dropGoldFlag) {
@@ -2372,7 +2372,8 @@ void OperateShrine(int pnum, int i, int sType)
             InitDiabloMsg(0x14);
             break;
         case 9:
-            plr[pnum]._pMemSpells |= (unsigned long long)1 << 0;
+            t = 1;
+            plr[pnum]._pMemSpells |= t;
             if (plr[pnum]._pSplLvl[1] < 15)
                 plr[pnum]._pSplLvl[1]++;
             if (plr[pnum]._pSplLvl[1] < 15)
