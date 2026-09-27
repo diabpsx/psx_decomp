@@ -436,6 +436,7 @@ extern "C" void wait_cdstream(void)
                        * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
     int wait = 1;
 
+    (void)&start_wait;
     while (((stream_open != 0) || (stream_ending != 0)) && wait) {
         /* spin -- volatile stream_open/stream_ending force a fresh reload each pass */
     }
@@ -635,12 +636,11 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
                         bp->x0 = x; bp->y0 = y; bp->x1 = x + colw; bp->y1 = y;
                         bp->x2 = x; bp->y2 = y2; bp->x3 = x + colw; bp->y3 = y2;
                         bp += 1;
-                        offs += 0x28;
                     }
                     x += colw;
                     x_run += colw;
-                    tmdc_pol_offs[0][0][area_pw][0] = xoff;
-                    tmdc_pol_offs[0][0][area_pw][1] = yoff;
+                    tmdc_pol_offs[offs][area_pw][area_ph][0] = xoff;
+                    tmdc_pol_offs[offs][area_pw][area_ph][1] = yoff;
                     area_pw += 1;
                     p += 1;
                 } while (wleft != 0);
@@ -658,21 +658,35 @@ extern "C" int split_poly_area(POLY_FT4 *p, POLY_FT4 *bp, int offs, RECT *r, int
 extern "C" void rebuild_mdec_polys(int x, int y)
 {
     /* tmdc_pol is [half][mbuf][poly] (half outer, confirmed against draw_mdec_polys's own +0x320
-     * half-copy stride); rebuild always (re)writes the CURRENT decode buffer's half-0 copy. */
+     * half-copy stride); rebuild always (re)writes the CURRENT decode buffer's half-0 copy.
+     * Matches the raw's exact induction-variable reuse: row's byte term (row*8) is recomputed once
+     * per OUTER iteration (loop-invariant across columns); the "next row" term ((row+1)*8) is a
+     * running += accumulator across outer iterations, not recomputed; the mbuf*800 term is computed
+     * once per INNER iteration and reused for both corners on that row; col*80 and (col+1)*80 are
+     * each computed once per inner iteration and reused for both corners on that column edge. */
     POLY_FT4 *p = &tmdc_pol[0][mbuf][0];
+    int row = 0;
+    int row1_8 = 8;   /* (row+1)*8 */
 
-    for (int row = 0; row < mdec_ph[mbuf]; row++) {
-        for (int col = 0; col < mdec_pw[mbuf]; col++) {
-            short *tl = tmdc_pol_offs[mbuf][col][row];
-            short *tr = tmdc_pol_offs[mbuf][col + 1][row];
-            short *bl = tmdc_pol_offs[mbuf][col][row + 1];
-            short *br_ = tmdc_pol_offs[mbuf][col + 1][row + 1];
-            p->x0 = tl[0] + x; p->y0 = tl[1] + y;
-            p->x1 = tr[0] + x; p->y1 = tr[1] + y;
-            p->x2 = bl[0] + x; p->y2 = bl[1] + y;
-            p->x3 = br_[0] + x; p->y3 = br_[1] + y;
-            p += 1;
+    for (; row < mdec_ph[mbuf]; row++) {
+        if (mdec_pw[mbuf] > 0) {
+            int row8 = row * 8;
+            for (int col = 0; col < mdec_pw[mbuf]; col++) {
+                int c80 = col * 80;
+                int mb800 = mbuf * 800;
+                short *tl = (short *)((char *)tmdc_pol_offs + row8 + c80 + mb800);
+                p->x0 = tl[0] + x; p->y0 = tl[1] + y;
+                int c80n = (col + 1) * 80;
+                short *tr = (short *)((char *)tmdc_pol_offs + row8 + c80n + mb800);
+                p->x1 = tr[0] + x; p->y1 = tr[1] + y;
+                short *bl = (short *)((char *)tmdc_pol_offs + row1_8 + c80 + mb800);
+                p->x2 = bl[0] + x; p->y2 = bl[1] + y;
+                short *br_ = (short *)((char *)tmdc_pol_offs + row1_8 + c80n + mb800);
+                p->x3 = br_[0] + x; p->y3 = br_[1] + y;
+                p += 1;
+            }
         }
+        row1_8 += 8;
     }
 }
 
@@ -699,12 +713,12 @@ extern "C" int draw_mdec_polys(signed char bright)
     if (state == 1 && tmdc_pol_dirty[mbuf] != 0) {
         tmdc_pol_dirty[mbuf] = 0;
         for (int i = 0; i < num_pol[mbuf]; i++) {
-            tmdc_pol[mbuf][1][i] = tmdc_pol[mbuf][0][i];
-            br[mbuf][1][i] = br[mbuf][0][i];
+            tmdc_pol[1][mbuf][i] = tmdc_pol[0][mbuf][i];
+            br[1][mbuf][i] = br[0][mbuf][i];
         }
     }
     for (int i = 0; i < num_pol[mbuf]; i++) {
-        POLY_FT4 *pp = &tmdc_pol[mbuf][screen & 0xFF][i];
+        POLY_FT4 *pp = &tmdc_pol[screen & 0xFF][mbuf][i];
         pp->r0 = bright; pp->g0 = bright; pp->b0 = bright;
         /* addPrim(ThisOt, pp) -- other TU's ordering-table head; left as a documented gap. */
     }
@@ -731,17 +745,17 @@ extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, in
     mdec_pw[0] = area_pw;
     mdec_ph[0] = area_ph;
     for (int i = 0; i < num_pol[0]; i++) {
-        tmdc_pol[0][1][i] = tmdc_pol[0][0][i];
-        br[0][1][i] = br[0][0][i];
+        tmdc_pol[1][0][i] = tmdc_pol[0][0][i];
+        br[1][0][i] = br[0][0][i];
     }
     rr.x = (short)bx2; rr.y = (short)by2; rr.w = w1; rr.h = h1;
-    num_pol[1] = split_poly_area(&tmdc_pol[1][0][0], (POLY_FT4 *)&br[1][0][0], 1, &rr,
+    num_pol[1] = split_poly_area(&tmdc_pol[0][1][0], (POLY_FT4 *)&br[0][1][0], 1, &rr,
                                   x - (w1 >> 1), (unsigned short)(y - (h1 >> 1)), correct);
     mdec_pw[1] = area_pw;
     mdec_ph[1] = area_ph;
     for (int i = 0; i < num_pol[1]; i++) {
-        tmdc_pol[1][1][i] = tmdc_pol[1][0][i];
-        br[1][1][i] = br[1][0][i];
+        tmdc_pol[1][1][i] = tmdc_pol[0][1][i];
+        br[1][1][i] = br[0][1][i];
     }
     mdec_w = w1;
     mdec_h = h1;
@@ -1114,24 +1128,30 @@ extern "C" void LoPlayFMVOverLay(void *)
         systemtask(0);
     D_8011B4E8 = 0;
     if (strcmp("DIABEND.MOV", filename) != 0) {
-        switch (LANG_GetLang()) {
-        case LANG_ENGLISH:
-        case LANG_FRENCH:
-            D_8011B4E8 = (LANG_GetLang() == LANG_ENGLISH) ? 1 : 2;
-            sprintf(g_movie_filename, "DIABEND1.MOV");
-            break;
-        case LANG_GERMAN:
-        case LANG_SPANISH:
-            D_8011B4E8 = (LANG_GetLang() == LANG_GERMAN) ? 1 : 2;
-            sprintf(g_movie_filename, "DIABEND2.MOV");
-            break;
-        case LANG_ITALIAN:
-            D_8011B4E8 = 1;
-            sprintf(g_movie_filename, "DIABEND3.MOV");
-            break;
-        case LANG_JAPANESE:
-            DBG_Error(0, "psxsrc/FMV.CPP", 1790);
-            break;
+        {
+            int lang = LANG_GetLang();
+            int v;
+            switch (lang) {
+            case LANG_ENGLISH: v = 1; goto set1;
+            case LANG_FRENCH:  v = 2;
+            set1:
+                D_8011B4E8 = v;
+                sprintf(g_movie_filename, "DIABEND1.MOV");
+                break;
+            case LANG_GERMAN: v = 1; goto set2;
+            case LANG_SPANISH: v = 2;
+            set2:
+                D_8011B4E8 = v;
+                sprintf(g_movie_filename, "DIABEND2.MOV");
+                break;
+            case LANG_ITALIAN:
+                D_8011B4E8 = 1;
+                sprintf(g_movie_filename, "DIABEND3.MOV");
+                break;
+            case LANG_JAPANESE:
+                DBG_Error(0, "psxsrc/FMV.CPP", 1790);
+                break;
+            }
         }
     } else {
         strcpy(g_movie_filename, filename);
