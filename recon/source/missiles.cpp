@@ -521,24 +521,19 @@ void GetMissileVel(int i, int sx, int sy, int dx, int dy, int v)
      * the jal targets directly (no `sqrt` symbol exists anywhere in the retail SYM at all). Also
      * clamps each of dxp/dyp/dr away from exact zero before dividing (avoids a div-by-zero /
      * degenerate direction), which the PC twin does not do explicitly. */
-    long dxp, dyp, dr;
-    long xd, yd;
+    long long dxp, dyp, dr;
 
-    /* retail computes (dx-sx)<<5 and (dy-sy)<<5 SEPARATELY, then combines and shifts by 16 more
-     * (NOT a single combined <<21) -- confirmed instruction-for-instruction via the raw oracle. */
-    xd = (dx - sx) << 5;
-    yd = (dy - sy) << 5;
-    dxp = (xd - yd) << 16;
-    dyp = (xd + yd) << 16;
-    if (dxp == 0)
-        dxp = 1;
-    if (dyp == 0)
-        dyp = 1;
+    dxp = (((dx - sx) << 5) - ((dy - sy) << 5)) << 16;
+    dyp = (((dx - sx) << 5) + ((dy - sy) << 5)) << 16;
     dr = veclen2(dxp, dyp);
+    if (dxp == 0)
+        dxp++;
+    if (dyp == 0)
+        dyp++;
     if (dr == 0)
-        dr = 1;
-    missile[i]._mixvel = (long)(((long long)dxp * (long long)(v << 16)) / (long long)dr);
-    missile[i]._miyvel = (long)(((long long)dyp * (long long)(v << 15)) / (long long)dr);
+        dr++;
+    missile[i]._mixvel = (v << 16) * dxp / dr;
+    missile[i]._miyvel = (v << 15) * dyp / dr;
 }
 
 void PutMissile(int i)
