@@ -1903,12 +1903,16 @@ void MI_Firewall(int i)
     CheckMissileCol(i, missile[i]._midam, missile[i]._midam, 1, missile[i]._mix, missile[i]._miy, 1, 1);
     if (missile[i]._mirange == 0) {
         missile[i]._miDelFlag = 1;
-        AddUnLight(missile[i]._mlid);
+        if ((unsigned char)i)
+            AddUnLight(missile[i]._mlid);
     }
     if (missile[i]._mimfnum != 0 && missile[i]._mirange != 0 && missile[i]._miAnimAdd != -1 && missile[i]._miVar2 < 12) {
-        if (missile[i]._miVar2 == 0)
-            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, ExpLight[0]);
-        ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, ExpLight[missile[i]._miVar2]);
+        if (missile[i]._miVar2 == 0) {
+            if ((unsigned char)i)
+                missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 3) + 16);
+        }
+        if ((unsigned char)i)
+            ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar2] >> 2) + 16);
         missile[i]._miVar2++;
     }
     PutMissile(i);
