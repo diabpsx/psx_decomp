@@ -1062,15 +1062,11 @@ void OperateChest(int pnum, int i, unsigned char sendmsg)
                 case 2:
                     mtype = 0x2A;
                     break;
-                default:
-                    mtype = 0;
-                    break;
                 }
-                AddMissile(object[i]._ox, object[i]._oy, plr[pnum]._px, plr[pnum]._py, mdir, mtype, 0, -1, 0, 0);
+                AddMissile(object[i]._ox, object[i]._oy, plr[pnum]._px, plr[pnum]._py, mdir, mtype, 1, -1, 0, 0);
                 object[i]._oTrapFlag = 0;
             }
-            if (pnum == myplr)
-                NetSendCmdParam2(0, 0x2E, pnum, i);
+            NetSendCmdParam2(0, 0x2E, pnum, i);
         }
     }
 }
