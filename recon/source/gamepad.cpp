@@ -16,6 +16,7 @@ static struct GamePad GPad2;
 
 /* file-static (SYM class STAT INT, gp-rel) */
 static int HappyManFlag;
+static char seen_combo;
 
 /* --------------------------------------------------------------------- */
 void ClrCursor(int num)
@@ -38,24 +39,24 @@ void HappyMan(int n)
 /* --------------------------------------------------------------------- */
 void WorldToOffset(int pnum, int WorldX, int WorldY)
 {
-    int x, oy;
-    struct PlayerStruct *p;
+    int x, y;
+    struct PlayerStruct *player;
 
     x = WorldX & 7;
-    oy = WorldY & 7;
-    p = &plr[pnum];
+    y = WorldY & 7;
+    player = &plr[pnum];
 
     if (WorldX < 0)
         WorldX = 0;
     if (WorldY < 0)
         WorldY = 0;
 
-    p->_px = WorldX >> 3;
-    p->_py = WorldY >> 3;
-    p->_pxoff = (x - oy) * 4;
-    p->WorldX = WorldX;
-    p->WorldY = WorldY;
-    p->_pyoff = (x + oy - 8) * 2;
+    player->_px = WorldX >> 3;
+    player->_py = WorldY >> 3;
+    player->_pxoff = (x - y) * 4;
+    player->WorldX = WorldX;
+    player->WorldY = WorldY;
+    player->_pyoff = (x + y - 8) * 2;
 }
 
 /* --------------------------------------------------------------------- */
@@ -68,16 +69,23 @@ void CloseInvChr(void)
 }
 
 /* --------------------------------------------------------------------- */
-int GamePad::GetActionButton(void (*func)())
+int GamePad::GetActionButton(void (*func)(int))
 {
+    signed char combo;
+    int *p;
+    void (*f)(int);
     int i;
-    void (*f)();
 
-    for (i = 0; i < 14; i++) {
-        f = await_combo ? button_combo[i] : button_down[i];
+    combo = await_combo;
+    p = &pad_txt[0].pnum;
+    i = 0;
+    do {
+        f = combo ? button_combo[i] : button_down[i];
         if (f == func)
-            return pad_txt[i].pnum;
-    }
+            return *p;
+        i++;
+        p = (int *)((char *)p + 12);
+    } while ((int)p < (int)((char *)&pad_txt[0].pnum + 168));
     return 0;
 }
 
@@ -105,11 +113,12 @@ char GetPadStyle(int pnum)
 int SetWalkStyle(int pnum, int style)
 {
     int ret;
+    struct KEY_ASSIGNS *ta = txt_actions;
 
-    PostGamePad(0xB, 0, (int)txt_actions, 0);
+    PostGamePad(0xB, 0, (int)ta, 0);
     ret = txt_actions[9].pad_val;
     txt_actions[9].pad_val = style;
-    PostGamePad(9, 0, (int)txt_actions, 0);
+    PostGamePad(9, 0, (int)ta, 0);
     return ret;
 }
 
@@ -211,8 +220,85 @@ void PostGamePad(int val, int var1, int var2, int var3)
         case 10:
         case 11:
             pad = var1 ? p2 : p1;
-            pad->SetUpAction((void (*)())var2, (void (*)())var3);
+            pad->SetUpAction((void (*)(int))var2, (void (*)(int))var3);
             break;
         }
+    }
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::SetMoveStyle(char style_num)
+{
+    style = style_num;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::SetDownButton(int pad_val, void (*func)(int))
+{
+    button_down[get_key_pad(pad_val)] = func;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::SetComboDownButton(int pad_val, void (*func)(int))
+{
+    button_combo[get_key_pad(pad_val)] = func;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::SetUpAction(void (*func)(int), void (*upfunc)(int))
+{
+    pad_up_button = GetActionButton(func);
+    pad_up_action = upfunc;
+}
+
+/* --------------------------------------------------------------------- */
+int GamePad::CheckDirs(int dir)
+{
+    return CheckDirs(dir, player->WorldX, player->WorldY);
+}
+
+/* --------------------------------------------------------------------- */
+int GamePad::CheckSide(int dir)
+{
+    dir = (dir - 1) & 7;
+    dir = (dir - 1) & 7;
+    if (CheckDirs(dir) == -1)
+        return 1;
+    return 2;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::RunFunc(int key)
+{
+    int idx;
+    void (*f)(int);
+
+    if (FeFlag)
+        return;
+
+    if ((player->_pHitPoints >> 6) == 0)
+        return;
+
+    idx = get_key_pad(key);
+
+    if (await_combo) {
+        f = button_combo[idx];
+        if (f == 0)
+            return;
+        if (leveltype == 0 && f == pad_func_AutoMap) {
+            if (seen_combo != -1) {
+                f(pnum);
+            } else {
+                f = button_down[idx];
+                if (f != 0)
+                    f(pnum);
+            }
+        } else {
+            f(pnum);
+        }
+    } else {
+        f = button_down[idx];
+        if (f != 0)
+            f(pnum);
     }
 }

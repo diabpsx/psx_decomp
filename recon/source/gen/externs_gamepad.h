@@ -29,3 +29,8 @@ extern void TSK_Kill(struct TASK *T);   /* @0x80020548 TASKER.C:350 */
 extern void RemoveTargetCursor(int pnum);   /* @0x800A178C PADFUNCS.CPP:466 */
 extern void TeleStop(int plr);   /* @0x800A040C DAVEL.CPP:749 */
 extern void ClrDiabloMsg(void);
+extern int get_key_pad(int n);   /* @0x8009C728 CTRL.CPP:360 */
+extern void pad_func_AutoMap(int pnum);   /* @0x800A255C PADFUNCS.CPP:807 */
+extern unsigned char FeFlag;   /* @0x8011B374 */
+extern unsigned char leveltype;   /* @0x8011C10D */
+

@@ -328,17 +328,22 @@ void AddShrine(int i)
 
     object[i]._oPreFlag = 1;
     for (j = 0; j < NUM_SHRINETYPE; j++) {
-        if (currlevel == 0) {
-            slist[j] = 0;
-        } else if (j == 7) {
-            slist[j] = (currlevel < 9);
+        if (currlevel != 0) {
+            if (j == 7)
+                slist[j] = ((int)currlevel < 9);
+            else
+                slist[j] = ((int)currlevel < 17);
         } else {
-            slist[j] = (currlevel < 17);
+            slist[j] = 0;
         }
-        if (gbMaxPlayers != 1 && shrineavail[j] == 1)
-            slist[j] = 0;
-        if (gbMaxPlayers == 1 && shrineavail[j] == 2)
-            slist[j] = 0;
+        if (gbMaxPlayers != 1) {
+            if (shrineavail[j] == 1)
+                slist[j] = 0;
+        }
+        if (gbMaxPlayers == 1) {
+            if (shrineavail[j] == 2)
+                slist[j] = 0;
+        }
     }
     do {
         val = ENG_random(NUM_SHRINETYPE);
@@ -759,8 +764,9 @@ void AddCandles()
 
 void AddBookLever(int lx1, int ly1, int lx2, int ly2, int x1, int y1, int x2, int y2, int msg)
 {
+    int xp, yp, xx, yy, cnt;
     unsigned char done;
-    int xp, yp, ob, cnt, m, n;
+    int i;
 
     cnt = 0;
     done = 0;
@@ -768,9 +774,9 @@ void AddBookLever(int lx1, int ly1, int lx2, int ly2, int x1, int y1, int x2, in
         done = 1;
         xp = ENG_random(0x40) + 16;
         yp = ENG_random(0x40) + 16;
-        for (n = -2; n <= 2; n++) {
-            for (m = -2; m <= 2; m++) {
-                if ((unsigned char)RndLocOk(xp + m, yp + n) == 0)
+        for (yy = -2; yy <= 2; yy++) {
+            for (xx = -2; xx <= 2; xx++) {
+                if ((unsigned char)RndLocOk(xp + xx, yp + yy) == 0)
                     done = 0;
             }
         }
@@ -790,12 +796,12 @@ void AddBookLever(int lx1, int ly1, int lx2, int ly2, int x1, int y1, int x2, in
         yp = 2 * setpc_y + 40;
         AddObject(0x48 /* OBJ_BLOODBOOK */, xp, yp);
     }
-    ob = dung_map[xp][yp].dObject - 1;
-    SetObjMapRange(ob, x1, y1, x2, y2, leverid);
-    SetBookMsg(ob, msg);
-    object[ob]._oVar6 = 2;
+    i = dung_map[xp][yp].dObject - 1;
+    SetObjMapRange(i, x1, y1, x2, y2, leverid);
+    SetBookMsg(i, msg);
+    object[i]._oVar6 = 2;
     leverid++;
-    object[ob]._oAnimFrame = 1;
+    object[i]._oAnimFrame = 1;
 }
 
 void InitRndBarrels()
@@ -1253,7 +1259,7 @@ void InitObjects()
             InitRndBarrels();
         }
         if (leveltype == DTYPE_CATACOMBS) {
-            if (QuestStatus(Q_ROCK))
+            if (QuestStatus(Q_ROCK) && gbMaxPlayers != 2)
                 InitRndLocObj5x5(1, 1, 0x17 /* OBJ_STAND */);
             if (QuestStatus(Q_SCHAMB))
                 InitRndLocObj5x5(1, 1, OBJ_BOOK2R);
@@ -1268,7 +1274,7 @@ void InitObjects()
                     textdef = TEXT_MBLINDING;
                 }
                 quests[Q_BLIND]._qmsg = textdef;
-                AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_w + setpc_x + 1, setpc_h + setpc_y + 1, textdef);
+                AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1, textdef);
                 setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", NULL);
                 LoadMapObjs(setp, 2 * setpc_x, 2 * setpc_y);
                 mem_free_dbg(setp);

@@ -14,7 +14,9 @@ struct PlayerStruct {
     short _poldy;      /* +0x3A */
     char _pxoff;       /* +0x3C */
     char _pyoff;       /* +0x3D */
-    char _pad03e[6632 - 0x3E];
+    char _pad03e[0x11C - 0x3E];
+    long _pHitPoints;  /* +0x11C */
+    char _pad120[6632 - 0x120];
 };
 
 struct TextDat;
@@ -57,25 +59,31 @@ struct GamePad {   /* sizeof 212 */
     char allow_walking;   /* +0x4D */
     char style;   /* +0x4E */
     int pad_up_button;   /* +0x50 */
-    void (*pad_up_action)();   /* +0x54 */
+    void (*pad_up_action)(int);   /* +0x54 */
     struct CPad *Pad;   /* +0x58 */
     int combo_key;   /* +0x5C */
-    void (*button_down[14])();   /* +0x60 */
-    void (*button_combo[14])();   /* +0x98 */
+    void (*button_down[14])(int);   /* +0x60 */
+    void (*button_combo[14])(int);   /* +0x98 */
     unsigned char await_combo;   /* +0xD0 */
     unsigned char combo_menu_active;   /* +0xD1 */
 
     void SetMoveStyle(char style_num);
-    int GetActionButton(void (*func)());
+    int GetActionButton(void (*func)(int));
     void SetAllButtons(struct KEY_ASSIGNS *actions);
     void GetAllButtons(struct KEY_ASSIGNS *actions);
-    void SetUpAction(void (*func)(), void (*upfunc)());
+    void SetUpAction(void (*func)(int), void (*upfunc)(int));
+    void SetDownButton(int pad_val, void (*func)(int));
+    void SetComboDownButton(int pad_val, void (*func)(int));
+    int CheckDirs(int dir, int wx, int wy);
+    int CheckDirs(int dir);
+    int CheckSide(int dir);
+    void RunFunc(int key);
 };
 
 struct KEY_ASSIGNS {   /* sizeof 16 */
     int txt;   /* +0x0 */
     int pad_val;   /* +0x4 */
-    void (*func)();   /* +0x8 */
+    void (*func)(int);   /* +0x8 */
     int combo_val;   /* +0xC */
 };
 

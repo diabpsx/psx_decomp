@@ -132,13 +132,15 @@ int AddMonsterType(int type, int placeflag)
 void GetMonsterTypes(unsigned long QuestMask)
 {
     int typelist[MAX_LVLMTYPES + 174];
-    int nt, mt;
+    int nt, mt, tmp;
 
     nt = ML_GetPresetMonsters(currlevel, typelist, QuestMask);
 
     while (nt > 0 && nummtypes < MAX_LVLMTYPES) {
         mt = ENG_random(nt);
-        SwapMonsterType(&typelist[mt]);
+        tmp = typelist[mt];
+        SwapMonsterType(&tmp);
+        typelist[mt] = tmp;
         AddMonsterType(typelist[mt], MPFLAG_SCATTER);
         typelist[mt] = typelist[--nt];
     }
