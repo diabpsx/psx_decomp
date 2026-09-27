@@ -3580,15 +3580,18 @@ void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mien
 void ProcessMissiles(void)
 {
     /* SYM-confirmed: retail declares i/j/mi as `short` (not int), plus a cached
-     * `MissileStruct *miss` and a `short *pmissileactive` pointer-walk for the mProc loop --
-     * matching that fully is a deeper rewrite; only the loop-counter TYPES are fixed here. */
+     * `MissileStruct *miss` and a `short *pmissileactive` pointer-walk reused across the
+     * dFlags/dMissile-clear loop AND the mProc-dispatch loop. */
     short i, j, mi;
+    struct MissileStruct *miss;
+    unsigned short *pmissileactive;
 
+    pmissileactive = missileactive;
     for (i = 0; i < nummissiles; i++) {
-        /* PSX-only: clears an extra bit (0x1) alongside BFLAG_MISSILE(0x40) -- confirmed via raw
-         * oracle mask 0x41 (devilution/hellfire PC source only clears BFLAG_MISSILE). */
-        dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dFlags &= ~0x41;
-        dung_map[missile[missileactive[i]]._mix][missile[missileactive[i]]._miy].dMissile = 0;
+        miss = &missile[*pmissileactive];
+        dung_map[miss->_mix][miss->_miy].dFlags &= ~0x40; /* BFLAG_MISSILE -- oracle imm is -0x41 == ~0x40, not ~0x41 */
+        dung_map[miss->_mix][miss->_miy].dMissile = 0;
+        pmissileactive++;
     }
 
     /* PSX-only: zeroes the whole dMissArray[32][4] table every frame -- no PC twin. Confirmed via
@@ -3613,19 +3616,25 @@ void ProcessMissiles(void)
     ManashieldFlag = 0;
     ManashieldFlag2 = 0;
 
-    for (i = 0; i < nummissiles; i++) {
-        mi = missileactive[i];
-        ((void (*)(int))missiledata[missile[mi]._mitype].mProc)(missileactive[i]);
-        if (!(missile[mi]._miAnimFlags & 0x2 /* MFLAG_LOCK_ANIMATION */)) {
-            missile[mi]._miAnimCnt++;
-            if (missile[mi]._miAnimCnt >= missile[mi]._miAnimDelay) {
-                missile[mi]._miAnimCnt = 0;
-                missile[mi]._miAnimFrame += missile[mi]._miAnimAdd;
-                if (missile[mi]._miAnimFrame > missile[mi]._miAnimLen)
-                    missile[mi]._miAnimFrame = 1;
-                if (missile[mi]._miAnimFrame < 1)
-                    missile[mi]._miAnimFrame = missile[mi]._miAnimLen;
+    pmissileactive = missileactive;
+    {
+        struct MissileData *mdata = missiledata;
+        for (i = 0; i < nummissiles; i++) {
+            mi = *pmissileactive;
+            miss = &missile[mi];
+            ((void (*)(int))mdata[miss->_mitype].mProc)(mi);
+            if (!(miss->_miAnimFlags & 0x2 /* MFLAG_LOCK_ANIMATION */)) {
+                miss->_miAnimCnt++;
+                if (miss->_miAnimCnt >= miss->_miAnimDelay) {
+                    miss->_miAnimCnt = 0;
+                    miss->_miAnimFrame += miss->_miAnimAdd;
+                    if (miss->_miAnimFrame > miss->_miAnimLen)
+                        miss->_miAnimFrame = 1;
+                    if (miss->_miAnimFrame < 1)
+                        miss->_miAnimFrame = miss->_miAnimLen;
+                }
             }
+            pmissileactive++;
         }
     }
 
@@ -3774,7 +3783,6 @@ void MI_Teleport(int i)
      * with gamepad.cpp/effects.cpp, redeclared here to match exactly. */
     int id;
     struct CBlocks *gblocks;
-    struct PlayerStruct *pplr;
 
     gblocks = (struct CBlocks *)BL_GetCurrentBlocks();
     if (!gblocks)
@@ -3790,8 +3798,10 @@ void MI_Teleport(int i)
     PlrClrTrans(plr[id]._px, plr[id]._py);
     plr[id]._px = missile[i]._mix;
     plr[id]._py = missile[i]._miy;
-    pplr = &plr[id];
-    pplr->_pyoff = 0;
+    {
+        struct PlayerStruct *pplr = &plr[id];
+        pplr->_pyoff = 0;
+    }
     plr[id]._pxoff = 0;
     plr[id]._poldx = plr[id]._px;
     plr[id]._poldy = plr[id]._py;
@@ -3811,7 +3821,10 @@ void MI_Teleport(int i)
         ViewY = plr[id]._py - ScrollInfo._sdy;
     }
 
-    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, pplr, gblocks);
+    {
+        struct PlayerStruct *pplr = &plr[id];
+        SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, pplr, gblocks);
+    }
     gblocks->MoveToScrollTarget();
 
     if (plr[id ^ 1].plractive)
