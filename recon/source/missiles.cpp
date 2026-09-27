@@ -2447,19 +2447,29 @@ void MI_Misexp(int i)
     }
 
     if (missile[i]._miVar1 == 0) {
-        if (missile[i]._miAnimType == 0x28)
+        switch (missile[i]._miAnimType) {
+        case 0x28:
             AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 0x240);
-        else if (missile[i]._miAnimType == 0x2A)
+            break;
+        case 0x2A:
             AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 0x1B0);
-        else
-            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[0] >> 2) + 0x90);
+            break;
+        default:
+            missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x90);
+            break;
+        }
     } else {
-        if (missile[i]._miAnimType == 0x28)
+        switch (missile[i]._miAnimType) {
+        case 0x28:
             ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x240);
-        else if (missile[i]._miAnimType == 0x2A)
+            break;
+        case 0x2A:
             ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x1B0);
-        else
+            break;
+        default:
             ChangeLight(missile[i]._mlid, missile[i]._mix, missile[i]._miy, (ExpLight[missile[i]._miVar1] >> 2) + 0x90);
+            break;
+        }
     }
 
     missile[i]._miVar1++;
