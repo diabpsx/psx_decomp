@@ -1973,7 +1973,13 @@ void MI_Lightctrl(int i)
     int dam, p, mx, my;
     MissileStruct *miss = &missile[i];
 
-    miss->_mirange--;
+    /* PSX bounds against the raw dung_map extent (112) before doing anything else, with an early
+     * AddUnLight+return -- no PC twin has this gate at all. Confirmed via raw oracle. */
+    if (miss->_mix >= 112 || miss->_miy >= 112) {
+        miss->_miDelFlag = 1;
+        AddUnLight(miss->_mlid);
+        return;
+    }
 
     p = miss->_misource;
     if (p != -1) {
@@ -2000,13 +2006,26 @@ void MI_Lightctrl(int i)
         miss->_mirange = 0;
     }
     if (!GetMISSILE(mx, my)) {
-        if ((mx != miss->_miVar1 || my != miss->_miVar2) && mx > 0 && my > 0 && mx < MAXDUNX && my < MAXDUNY) {
-            AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, MIS_LIGHTNING, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
+        if ((mx != miss->_miVar1 || my != miss->_miVar2) && mx > 0 && my > 0 && mx < 112 && my < 112) {
+            /* PSX-only: if the owning monster's type falls in either of two ranges
+             * (MType->mtype in [0x4C,0x4F] or [0x6B,0x6E]), use MIS_LIGHTNING2(0x17) instead of
+             * MIS_LIGHTNING(8) -- confirmed via raw oracle; only reached when _misource != -1 and
+             * _micaster == TARGET_PLAYERS. No PC twin equivalent for the second range. */
+            int mistype = MIS_LIGHTNING;
+            if (miss->_misource != -1 && miss->_micaster == TARGET_PLAYERS) {
+                unsigned char mt = monster[miss->_misource].MType->mtype;
+                if ((unsigned char)(mt - 0x4C) < 4 || (unsigned char)(mt - 0x6B) < 4)
+                    mistype = 0x17; /* MIS_LIGHTNING2 */
+            }
+            AddMissile(miss->_mix, miss->_miy, miss->_misx, miss->_misy, i, mistype, miss->_micaster, miss->_misource, dam, miss->_mispllvl);
+            /* PSX-only: on the very first tick (mirange >= 254) plays a cast SFX -- no PC twin. */
+            if (miss->_mirange >= 254)
+                PlaySfxLoc(0x50, miss->_mix, miss->_miy);
             miss->_miVar1 = miss->_mix;
             miss->_miVar2 = miss->_miy;
         }
     }
-    if (miss->_mirange == 0 || mx <= 0 || my <= 0 || mx >= MAXDUNX || my > MAXDUNY)
+    if (miss->_mirange == 0 || mx <= 0 || my <= 0 || mx >= 112 || my >= 113)
         miss->_miDelFlag = 1;
 }
 
@@ -3461,6 +3480,66 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
     if (miss->_mirange == 0) {
         if (missiledata[miss->_mitype].miSFX != -1)
             PlaySfxLoc(missiledata[miss->_mitype].miSFX, miss->_mix, miss->_miy);
+    }
+}
+
+void AddRndTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
+{
+    /* Structurally reconstructed from the raw oracle instruction-by-instruction -- NOT yet
+     * byte-verified. PSX adds a co-op safety check with no PC twin: when `mienemy==0`
+     * (TARGET_MONSTERS) it also rejects candidate tiles that `ChkPlrOffsets` (PLAYER.CPP) flags
+     * as overlapping the OTHER player's (`id^1`) screen/view, using `plr[id^1].WorldX/WorldY`.
+     * The `plr+0x1A05` gate field is not yet named in this TU's struct -- read via raw offset. */
+    int pn, r1, r2, tries, ok;
+    int other, tx, ty, oi;
+
+    tries = 0;
+    do {
+        r1 = ENG_random(3) + 4;
+        r2 = ENG_random(3) + 4;
+        if (ENG_random(2) == 1)
+            r1 = -r1;
+        if (ENG_random(2) == 1)
+            r2 = -r2;
+
+        ok = 1;
+        if (mienemy == 0) {
+            other = id ^ 1;
+            if (plr[other].plractive && *((unsigned char *)&plr[other] + 0x1A05))
+                ok = ChkPlrOffsets((sx + r1) << 3, (sy + r2) << 3, plr[other].WorldX, plr[other].WorldY);
+        }
+        if (!ok)
+            continue;
+
+        if (++tries > 500) {
+            r1 = 0;
+            r2 = 0;
+            break;
+        }
+
+        tx = sx + r1;
+        ty = sy + r2;
+        if (GetSOLID(tx, ty) || dung_map[tx][ty].dObject != 0 || dung_map[tx][ty].dMonster != 0)
+            continue;
+        break;
+    } while (1);
+
+    missile[mi]._mirange = 2;
+    missile[mi]._miVar1 = 0;
+
+    if (setlevel && setlvlnum == 5) {
+        oi = dung_map[dx][dy].dObject - 1;
+        if ((unsigned char)(object[oi]._otype - 0x54) < 2 /* OBJ_MCIRCLE1/2 */) {
+            missile[mi]._mix = dx;
+            missile[mi]._miy = dy;
+            if (!PosOkPlayer(myplr, dx, dy))
+                GetVileMissPos(mi, dx, dy);
+        }
+    } else {
+        missile[mi]._mix = sx + r1;
+        missile[mi]._miy = sy + r2;
+        if (mienemy == 0)
+            UseMana(id, 10 /* SPL_PHASE */);
     }
 }
 
