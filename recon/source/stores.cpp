@@ -1146,26 +1146,13 @@ void SmithRepairItem(void)
     idx = (stextlhold - stextup) / 8 + stextvhold;
     storehold[idx]._iDurability = storehold[idx]._iMaxDur;
     i = storehidx[idx];
-    switch (i) {
-    case -1:
-        plr[myplr].InvBody[0]._iDurability = plr[myplr].InvBody[0]._iMaxDur;
-        if (i == -2) {
-    case -2:
-            plr[myplr].InvBody[6]._iDurability = plr[myplr].InvBody[6]._iMaxDur;
-        }
-        if (i == -3) {
-    case -3:
-            plr[myplr].InvBody[4]._iDurability = plr[myplr].InvBody[4]._iMaxDur;
-        }
-        if (i == -4) {
-    case -4:
-            plr[myplr].InvBody[5]._iDurability = plr[myplr].InvBody[5]._iMaxDur;
-            return;
-        }
-        return;
-    default:
+    if (i < 0) {
+        if (i == -1) plr[myplr].InvBody[0]._iDurability = plr[myplr].InvBody[0]._iMaxDur;
+        if (i == -2) plr[myplr].InvBody[6]._iDurability = plr[myplr].InvBody[6]._iMaxDur;
+        if (i == -3) plr[myplr].InvBody[4]._iDurability = plr[myplr].InvBody[4]._iMaxDur;
+        if (i == -4) plr[myplr].InvBody[5]._iDurability = plr[myplr].InvBody[5]._iMaxDur;
+    } else {
         plr[myplr].InvList[i]._iDurability = plr[myplr].InvList[i]._iMaxDur;
-        break;
     }
 }
 
