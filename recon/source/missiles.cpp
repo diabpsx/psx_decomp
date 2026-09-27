@@ -3463,15 +3463,18 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
 
     if (miss->_miAnimType == 4 /* MFILE_FIREWAL */ || miss->_misource == -1) {
         if (dm->dMonster > 0) {
-            unsigned char hit;
-            if (miss->_miAnimType == 4)
-                hit = MonsterMHit(miss->_misource, dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
-            else
-                hit = MonsterTrapHit(dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift);
-            if (hit) {
-                if (!nodel)
-                    miss->_mirange = 0;
-                miss->_miHitFlag = 1;
+            if (miss->_miAnimType == 4) {
+                if (MonsterMHit(miss->_misource, dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift)) {
+                    if (!nodel)
+                        miss->_mirange = 0;
+                    miss->_miHitFlag = 1;
+                }
+            } else {
+                if (MonsterTrapHit(dm->dMonster - 1, mindam, maxdam, miss->_midist, miss->_mitype, shift)) {
+                    if (!nodel)
+                        miss->_mirange = 0;
+                    miss->_miHitFlag = 1;
+                }
             }
         }
         if (IsDplayer(mx, my) && HurtPlr) {
