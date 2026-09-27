@@ -576,11 +576,11 @@ void Dialog::Back(int DX, int DY, int DW, int DH)
     Y = DY;
     W = DW;
     H = DH;
+    DialogGBack = 0;
     ClipRect.x = X;
     ClipRect.y = Y;
     ClipRect.w = W;
     ClipRect.h = H;
-    DialogGBack = 0;
     GetSizes();
     if (!DialogBackGfx)
         return;
@@ -708,6 +708,9 @@ void Dialog::Back(int DX, int DY, int DW, int DH)
             }
         }
     }
+#define setSemiTrans(p, abe) ((abe) ? setcode(p, getcode(p) | 0x02) : setcode(p, getcode(p) & ~0x02))
+#define setShadeTex(p, tge) ((tge) ? setcode(p, getcode(p) | 0x01) : setcode(p, getcode(p) & ~0x01))
+#define getcode(p) (((P_TAG *)(p))->code)
     DialogGBack = 0;
     if (DialogBorderGfx != 18)
         DialogGBack = 2;
@@ -715,24 +718,26 @@ void Dialog::Back(int DX, int DY, int DW, int DH)
     Ft4->r0 = DialogRed;
     Ft4->g0 = DialogGreen;
     Ft4->b0 = DialogBlue;
-    Ft4->code &= ~3;
+    setSemiTrans(Ft4, 0);
+    setShadeTex(Ft4, 0);
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 2, X + W, Y - 1, 0, MY_DialogOTpos, 0);
     Ft4->r0 = DialogRed;
     Ft4->g0 = DialogGreen;
     Ft4->b0 = DialogBlue;
-    Ft4->code &= ~3;
+    setSemiTrans(Ft4, 0);
+    setShadeTex(Ft4, 0);
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 5, X - 1, Y + H, 0, MY_DialogOTpos, 0);
     Ft4->r0 = DialogRed;
     Ft4->g0 = DialogGreen;
     Ft4->b0 = DialogBlue;
-    Ft4->code &= ~2;
-    Ft4->code &= ~1;
+    setSemiTrans(Ft4, trans);
+    setShadeTex(Ft4, 0);
     Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 7, X + W, Y + H, 0, MY_DialogOTpos, 0);
     Ft4->r0 = DialogRed;
     Ft4->g0 = DialogGreen;
     Ft4->b0 = DialogBlue;
-    Ft4->code &= ~2;
-    Ft4->code &= ~1;
+    setSemiTrans(Ft4, trans);
+    setShadeTex(Ft4, 0);
     GShadeX = 1;
     GShadeY = 1;
     if (DialogBorderGfx == 18 || DialogBorderGfx == 26) {
