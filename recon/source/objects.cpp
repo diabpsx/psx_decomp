@@ -1681,11 +1681,10 @@ void OperateBook(int pnum, int i)
 
 void OperateBookLever(int pnum, int i)
 {
-    char savedTransVal;
-    int qix, qiy;
+    int x, y, tren;
 
-    qix = setpc_x * 2 + 0x10;
-    qiy = setpc_y * 2 + 0x10;
+    x = setpc_x * 2 + 0x10;
+    y = setpc_y * 2 + 0x10;
     if (numitems >= 0x7F) {
         PlaySFX(0x3D3);
         return;
@@ -1720,6 +1719,7 @@ void OperateBookLever(int pnum, int i)
             quests[Q_WARLORD]._qactive = 2;
             quests[Q_WARLORD]._qlog = 1;
             quests[Q_WARLORD]._qvar1 = 1;
+            object[i]._oVar6 = 2;
             if (!deltaload)
                 NetSendCmdQuest(1, Q_WARLORD);
         }
@@ -1731,14 +1731,14 @@ void OperateBookLever(int pnum, int i)
                 ConvertdPiece();
         }
         if (object[i]._otype == OBJ_BLINDBOOK) {
-            savedTransVal = TransVal;
+            tren = TransVal;
             TransVal = 9;
             DRLG_MRectTrans(object[i]._oVar1, object[i]._oVar2, object[i]._oVar3, object[i]._oVar4);
-            TransVal = savedTransVal;
+            TransVal = tren;
             if (deltaload)
                 ConvertdPiece();
             if (!quests[Q_BLIND].pad_for_laz)
-                CreateItem(3, qix + 5, qiy + 5);
+                CreateItem(3, x + 5, y + 5);
         }
     }
     if (object[i]._oAnimFrame != object[i]._oVar6)
