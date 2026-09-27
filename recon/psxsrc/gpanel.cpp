@@ -136,8 +136,9 @@ extern int sel_data;
 extern unsigned char _SpdBeltSelFlag[4];
 extern int *ThisOt;
 extern unsigned char D_800B9BCC[], D_800B9BCD[], D_800B9BCE[];
-extern int SpellITbl[];
-extern unsigned char D_80110868[16];
+extern signed char SpellITbl[];
+struct D_80110868_T { signed char b[16]; };   /* 16-byte table, block-copied (lwl/lwr) to a stack local in DrawSpell */
+extern struct D_80110868_T D_80110868;
 extern int InvGfxTable[];
 
 
@@ -280,7 +281,7 @@ void *TextDat::GetPal(int PalNum)
 
 void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
-    int *SpellXTbl = (int *)D_80110868;
+    struct D_80110868_T SpellXTbl = D_80110868;
     int X, Y, SpellNo;
     struct POLY_FT4 *Ft4;
     unsigned char c;
@@ -297,7 +298,7 @@ void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)
     if (SpellNo != -1) {
         struct POLY_FT4 *Ft4b;
 
-        Ft4b = PanelTData->PrintFt4(SpellITbl[SpellNo] + 0xA5, X + XY->SpellXOfs, Y + SpellXTbl[GPanelOt >> 1] + XY->SpellYOfs, 0, GPanelOt, 0);
+        Ft4b = PanelTData->PrintFt4(SpellITbl[SpellNo] + 0xA5, X + XY->SpellXOfs, Y + SpellXTbl.b[GPanelOt >> 1] + XY->SpellYOfs, 0, GPanelOt, 0);
         if (VID_GetTick__Fv() & 1) {
             Ft4b->r0 = (char)0x80;
             c = 0xA0;
