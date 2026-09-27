@@ -180,6 +180,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     int HealthAnim, ManaAnim, xof;
     int BarY;
     struct POLY_FT4 *Ft4;
+    unsigned char C7F = 0x7F;
 
     HealthHeight = (int)(Plr->_pHitPoints * 0x2B) / (int)Plr->_pMaxHP;
     HealthAnim = HealthAnimCount >> 2;
@@ -204,15 +205,15 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     }
 
     Ft4 = PanelTData->PrintFt4(0x36, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    Ft4->r0 = 0x7F;
-    Ft4->g0 = 0x7F;
-    Ft4->b0 = 0x7F;
+    Ft4->r0 = C7F;
+    Ft4->g0 = C7F;
+    Ft4->b0 = C7F;
     Ft4->code = (Ft4->code | 2) & 0xFE;
     Ft4->tpage = Ft4->tpage | 0x20;
     Ft4 = PanelTData->PrintFt4(0x37, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    Ft4->r0 = 0x7F;
-    Ft4->g0 = 0x7F;
-    Ft4->b0 = 0x7F;
+    Ft4->r0 = C7F;
+    Ft4->g0 = C7F;
+    Ft4->b0 = C7F;
     Ft4->code = (Ft4->code | 2) & 0xFE;
     Ft4->tpage = Ft4->tpage | 0x20;
     PanelTData->PrintFt4(0x31, XY->MainX, XY->MainY, XY->FlaskFlip, GPanelOt + 1, 0);
@@ -224,7 +225,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         BarY = XY->MainY - (HealthHeight + 8);
         xof = XY->MainX + ((-(XY->FlaskFlip != 0) & 0x18) - 0xB);
         Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
-        Ft4->r0 = 0x7F;
+        Ft4->r0 = C7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
         Ft4->y1 = (short)(Ft4->y0 + HealthHeight);
@@ -234,7 +235,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->tpage = Ft4->tpage | 0x20;
         Ft4->code = Ft4->code & 0xFC;
         Ft4 = PanelTData->PrintFt4(HealthAnim + 0x84, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
-        Ft4->r0 = 0x7F;
+        Ft4->r0 = C7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
         Ft4->code = Ft4->code & 0xFC;
@@ -246,7 +247,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
-        Ft4->b0 = 0x7F;
+        Ft4->b0 = C7F;
         Ft4->y1 = (short)(Ft4->y0 + ManaHeight);
         Ft4->u1 = (unsigned char)((Ft4->u0 + ManaHeight) - 1);
         Ft4->y3 = (short)(Ft4->y2 + ManaHeight);
@@ -256,7 +257,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4 = PanelTData->PrintFt4(ManaAnim + 0x8C, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
-        Ft4->b0 = 0x7F;
+        Ft4->b0 = C7F;
         Ft4->code = Ft4->code & 0xFC;
         Ft4->tpage = Ft4->tpage | 0x20;
     }
@@ -445,10 +446,9 @@ void GPanel::Print(struct PanelXY *XY, struct PlayerStruct *Plr)
 
 void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
-    struct ItemStruct *Belt = (struct ItemStruct *)Plr;   /* placeholder; see notes below */
+    int *CurInv = _pcurr_inv;
     int X, Y, Loop;
     int Xe;
-    (void)Belt;
 
     X = XY->MainX + XY->SpeedBarXOfs;
     Y = XY->MainY + XY->SpeedBarYOfs;
@@ -493,7 +493,7 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
             G4->tpage = 0x38;
             yy = (short)Y;
             G4->y0 = yy;
-            Item = &_pcurr_inv[sel_data];
+            Item = &CurInv[sel_data];
             G4->x0 = (short)(X + (*Item * 0x11));
             G4->y2 = yy;
             G4->x2 = (short)((X + (*Item * 0x11)) + 0x11);
@@ -543,6 +543,7 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
     } while (Loop < 6);
     {
         unsigned char *SpdList = (unsigned char *)Plr;
+        int *InvTbl = InvGfxTable;
         int Loop2, X2;
 
         Loop2 = 0;
@@ -554,7 +555,7 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
         Y = XY->MainY + 2 + XY->SpeedBarYOfs;
         do {
             if (*(short *)(SpdList + 0x15DC) != -1) {
-                PanelTData->PrintFt4(InvGfxTable[*(unsigned char *)(SpdList + 0x15FC)], X2, Y, 0, GPanelOt + 1, 0);
+                PanelTData->PrintFt4(InvTbl[*(unsigned char *)(SpdList + 0x15FC)], X2, Y, 0, GPanelOt + 1, 0);
             }
             X2 += 0x11;
             Loop2++;
