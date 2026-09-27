@@ -149,31 +149,16 @@ unsigned char IdItemOk(ItemStruct *i)
  * (not an _iMiscId range) for the oil-item exclusion. */
 unsigned char SmithSellOk(int i)
 {
-    if (plr[myplr].InvList[i]._itype == -1) {
-        return 0;
+    if (plr[myplr].InvList[i]._itype == -1) return 0;
+    if (plr[myplr].InvList[i]._itype == 0) return 0;
+    if (plr[myplr].InvList[i]._itype == 11) return 0;
+    if (plr[myplr].InvList[i]._itype == 14) return 0;
+    if (plr[myplr].InvList[i]._itype == 10) return 0;
+    if (plr[myplr].InvList[i].IDidx == 0x21) return 0;
+    if (plr[myplr].InvList[i]._iMagical != 0 && plr[myplr].InvList[i]._iIdentified != 0) {
+        if (plr[myplr].InvList[i]._iIvalue == 0) return 0;
     }
-    if (plr[myplr].InvList[i]._itype == 0) {
-        return 0;
-    }
-    if (plr[myplr].InvList[i]._itype == 11) {
-        return 0;
-    }
-    if (plr[myplr].InvList[i]._itype == 14) {
-        return 0;
-    }
-    if (plr[myplr].InvList[i]._itype == 10) {
-        return 0;
-    }
-    if (plr[myplr].InvList[i].IDidx == 0x21) {
-        return 0;
-    }
-    if (plr[myplr].InvList[i]._iMagical == 0) {
-        return 1;
-    }
-    if (plr[myplr].InvList[i]._iIdentified == 0) {
-        return 0;
-    }
-    return plr[myplr].InvList[i]._iIvalue != 0;
+    return 1;
 }
 
 #define numpremium   _numpremium[StorePlrNo]
