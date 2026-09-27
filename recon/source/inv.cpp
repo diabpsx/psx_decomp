@@ -805,7 +805,7 @@ void CheckQuestItem(int pnum)
         quests[0].pad_for_laz = 1;
         if (quests[0]._qactive == 1) {
             quests[0]._qactive = 2;
-            quests[0]._qvar1 = 1;
+            quests[0]._qvar1 = 2;
         }
         if (quests[0]._qlog == 1) {
             sfxdelay = 10;
@@ -820,8 +820,8 @@ void CheckQuestItem(int pnum)
     }
 
     if (plr[pnum].HoldItem.IDidx == 0x1C /* IDI_ARMOFVAL */) {
+        quests[9].pad_for_laz = 1;
         quests[9]._qactive = 3 /* QUEST_DONE */;
-        quests[9].pad_for_laz = 3;
         NetSendCmdQuest(1, 9);
         sfxdelay = 0x14;
         if (plr[myplr]._pClass == 0)
