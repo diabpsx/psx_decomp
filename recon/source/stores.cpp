@@ -1135,43 +1135,32 @@ void StoreSellItem(void)
     }
     cost = storehold[idx]._iIvalue;
     storenumh--;
-    if (idx != storenumh && idx < storenumh) {
+    if (idx < storenumh) {
         for (i = idx; i < storenumh; i++) {
             storehold[i] = storehold[i + 1];
             storehidx[i] = storehidx[i + 1];
         }
     }
     plr[myplr]._pGold += cost;
-    i = 0;
-    if (plr[myplr]._pNumInv > 0) {
-        while (cost > 0) {
-            if (plr[myplr].InvList[i]._itype == 11) {
-                if (plr[myplr].InvList[i]._ivalue != 5000) {
-                    if (cost + plr[myplr].InvList[i]._ivalue < 5001) {
-                        plr[myplr].InvList[i]._ivalue = cost + plr[myplr].InvList[i]._ivalue;
-                        SetGoldCurs(myplr, i);
-                        cost = 0;
-                    } else {
-                        cost = cost - 5000 + plr[myplr].InvList[i]._ivalue;
-                        plr[myplr].InvList[i]._ivalue = 5000;
-                        SetGoldCurs(myplr, i);
-                    }
-                }
-            }
-            i++;
-            if (i >= plr[myplr]._pNumInv) {
-                goto block_26;
+    for (i = 0; i < plr[myplr]._pNumInv && cost > 0; i++) {
+        if (plr[myplr].InvList[i]._itype == 11 && plr[myplr].InvList[i]._ivalue != 5000) {
+            if (cost + plr[myplr].InvList[i]._ivalue <= 5000) {
+                plr[myplr].InvList[i]._ivalue += cost;
+                SetGoldCurs(myplr, i);
+                cost = 0;
+            } else {
+                cost -= 5000 - plr[myplr].InvList[i]._ivalue;
+                plr[myplr].InvList[i]._ivalue = 5000;
+                SetGoldCurs(myplr, i);
             }
         }
-    } else {
-block_26:
-        if (cost > 0) {
-            while (cost >= 5001) {
-                PlaceStoreGold(5000);
-                cost -= 5000;
-            }
-            PlaceStoreGold(cost);
+    }
+    if (cost > 0) {
+        while (cost > 5000) {
+            PlaceStoreGold(5000);
+            cost -= 5000;
         }
+        PlaceStoreGold(cost);
     }
 }
 
@@ -2079,8 +2068,8 @@ void S_ScrollSPBuy(int idx)
     int l;
 
     ClearSText(5, 0x15);
-    boughtitems = idx;
     stextup = 5;
+    boughtitems = idx;
     idx = 0;
     if (boughtitems != 0) {
         do {
@@ -2091,9 +2080,7 @@ void S_ScrollSPBuy(int idx)
         } while (boughtitems != 0);
     }
     for (l = 5; l < 0xF && idx < 6; idx++, l += 8) {
-        if (_premiumitem[StorePlrNo][idx]._itype == -1) {
-            l -= 8;
-        } else {
+        if (_premiumitem[StorePlrNo][idx]._itype != -1) {
             char iclr;
             char *StrPtr;
 
@@ -2106,6 +2093,8 @@ void S_ScrollSPBuy(int idx)
             AddSTextVal(l, _premiumitem[StorePlrNo][idx]._iIvalue);
             PrintStoreItem(&_premiumitem[StorePlrNo][idx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
             stextdown = l;
+        } else if (idx < 6) {
+            l -= 8;
         }
     }
     if (!stext[stextsel]._ssel && stextsel != 0x16) {

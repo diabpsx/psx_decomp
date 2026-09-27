@@ -49,7 +49,7 @@ void ioreader(int);
 void setasyncfile(char *name);
 int asyncloadsegment(unsigned long pos, unsigned char *dest, int size);
 int asyncloadsegmentcallback(unsigned long pos, unsigned char *dest, int size, void (*cb)(int));
-unsigned char getasyncreadstatus(int ah);
+int getasyncreadstatus(int ah);   /* int (EA lib): BL_AsyncReadFile keeps the raw status; BL_LoadFileAtAddr masks it */
 void cancelasyncload(int ah);
 void systemtask(int);
 int asyncstructsize(int n);
@@ -350,7 +350,7 @@ BOOL BL_LoadFileAtAddr(char *Name, unsigned char *Dest, char LumpID)
             ah = asyncloadsegment(sh->Offset + 4, Dest, sh->Size);
             do {
                 systemtask(0);
-            } while (!getasyncreadstatus(ah));
+            } while (!(unsigned char)getasyncreadstatus(ah));
             cancelasyncload(ah);
             return TRUE;
         }
@@ -388,21 +388,24 @@ long BL_LoadFileAsync(char *Name, char LumpID)
     unsigned char *LoadAddr;
 
     Size = ++NoQuedAsyncs;
-    while (CurrAsync != Size)
+    while (CurrAsync != (unsigned char)Size)
         TSK_Sleep(1);
     if (!BL_AsyncLoadDone())
         BL_WaitForAsyncFinish();
     sh = BL_FindStreamFile(Name, LumpID);
     if (!sh)
         return -1;
-    FileLoaded--;
+    --FileLoaded;
     Size = BL_FileLength(Name, LumpID);
     ASSERT(Size, 0x2A4);
     MyHnd = GAL_Alloc(Size, 1, NULL);
     ASSERT(MyHnd != -1, 0x2A7);
     LoadAddr = (unsigned char *)GAL_Lock(MyHnd);
     ASSERT(MyHnd, 0x2AA);
-    setasyncfile(LumpID == 1 ? "LUMP.BIN" : STREAM_BIN);
+    if (LumpID == 1)
+        setasyncfile("LUMP.BIN");
+    else
+        setasyncfile(STREAM_BIN);
     asyncloadsegmentcallback(sh->Offset + 4, LoadAddr, sh->Size, BL_AsyncLoadCallBack);
     ASSERT(GAL_Unlock(MyHnd), 0x2B9);
     return MyHnd;
@@ -412,16 +415,21 @@ BOOL BL_AsyncLoadFileAtAddr(char *Name, unsigned char *Dest, char LumpID)
 {
     STRHDR *sh;
 
-    NoQuedAsyncs++;
-    while (CurrAsync != NoQuedAsyncs)
+    /* retail keeps the queue ticket in s0 -- the register sh takes next -- and the SYM lists no other local:
+     * sh itself carries the ticket until it is reassigned (a separate int/uchar local adds a record) */
+    sh = (STRHDR *)(int)++NoQuedAsyncs;
+    while (CurrAsync != (unsigned char)(int)sh)
         TSK_Sleep(1);
     if (!BL_AsyncLoadDone())
         BL_WaitForAsyncFinish();
     sh = BL_FindStreamFile(Name, LumpID);
     if (!sh || !sh->Size)
         return FALSE;
-    FileLoaded--;
-    setasyncfile(LumpID == 1 ? "LUMP.BIN" : STREAM_BIN);
+    --FileLoaded;
+    if (LumpID == 1)
+        setasyncfile("LUMP.BIN");
+    else
+        setasyncfile(STREAM_BIN);
     asyncloadsegmentcallback(sh->Offset + 4, Dest, sh->Size, BL_AsyncLoadCallBack);
     return TRUE;
 }

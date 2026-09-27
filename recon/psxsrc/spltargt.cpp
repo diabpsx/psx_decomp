@@ -349,20 +349,20 @@ void ArrowTask(TASK *T)
     int r;
     int g;
     int b;
-    int plx, ply;
-    int otpos;
 
-    r = 127;
-    g = 127;
     times = args->a1;
     pnum = args->a0;
     bright = args->a2;
     targ = (TARGET)args->a3;
-    b = 127;
     angle = ENG_random(0x1000);
+    r = 127;
+    g = 127;
+    b = 127;
 
     while (times && !GLUE_Finished() && !deathflag) {
         if (GLUE_GetShowGameScreenFlag()) {
+            int plx, ply;
+            int otpos;
             switch (targ) {
             case T_PLAYER: {
                 PlayerStruct *ptrplr = &plr[pnum];
