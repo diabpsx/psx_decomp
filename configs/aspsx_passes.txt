@@ -20,3 +20,4 @@ block PrintMissiles__7CBlocksii
 automap DrawAutoMapSquare__Fii
 objects OperateBook__Fii
 fmv DCT_out_handler
+fmv start_mdec_decode

@@ -541,21 +541,23 @@ extern "C" int set_mdec_img_buffer(unsigned char *p)
 /* @0x80156754 FMV.CPP:816 */
 extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int h)
 {
-    int rem;
-
     while (slices_to_do != 0) {
         /* spin */
     }
     func_8013B3B0(data, vlcbuf[vbuf], vlctab);
     func_8013AD94(data);
-    slice.x = (short)x;
-    slice.y = (short)y;
-    slice.h = (short)h;
-    slices_to_do = w / slice.w + ((w % slice.w) > 0);
-    slnum = slices_to_do;
-    rem = h & 0xF;
-    slice_size = (slice.w * (rem == 0 ? h : h + 0x10 - rem)) >> 1;
-    slice_inc = (w & 0xF) ? (w & 0xF) : 0x10;
+    slnum = slices_to_do = w / slice.w + ((w % slice.w) > 0);
+    slice.x = x;
+    slice.y = y;
+    slice.h = h;
+    if (h & 0xF)
+        slice_size = (slice.w * (slice.h + (0x10 - (h & 0xF)))) >> 1;
+    else
+        slice_size = (slice.w * slice.h) >> 1;
+    if (w & 0xF)
+        slice_inc = w & 0xF;
+    else
+        slice_inc = 0x10;
     func_8013ADA0(vlcbuf[vbuf], 2);
     func_8013AE1C(MAP_BUF_JTAB[slices_to_do], slice_size);
     vbuf ^= 1;
