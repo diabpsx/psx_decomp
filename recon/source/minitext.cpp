@@ -356,7 +356,7 @@ void DrawQTextTSK(TASK *T)
 void DrawQText(void)
 {
     char *p;
-    char *pnl;
+    const char *pnl;
     char *SpacePtr;
     int ty;
     int l;
@@ -396,7 +396,9 @@ void DrawQText(void)
     doneflag = 0;
     p = (char *)qtextptr;
     ty = qtexty;
-    while (!doneflag) {
+    for (;;) {
+        if (doneflag)
+            break;
         l = 0;
         SpacePtr = NULL;
         LetterCount = 0;
@@ -444,12 +446,12 @@ void DrawQText(void)
             doneflag = 1;
     }
     if (FileSYS == 2) {
-        if (sghStream == NULL && TextWait < qtexty) {
+        if (sghStream == NULL && qtexty > TextWait) {
             long diff;
 
             currTime = VID_GetTick();
-            diff = 0x10000;
-            scrolltexty -= diff;
+            diff = -0x10000;
+            scrolltexty += diff;
             sgLastScroll = currTime;
             qtexty = scrolltexty >> 16;
             if (TextWait >= qtexty)
@@ -465,7 +467,7 @@ void DrawQText(void)
             sgLastScroll = currTime;
             scrolltexty -= qtextSpd * diff;
             qtexty = scrolltexty >> 16;
-            if (sghStream->playing != 0 && sghStream->stream_ending == 0)
+            if (sghStream->playing != 0 && sghStream->stream_stall == 0)
                 qtbodge = 1;
         } else {
             if (qtbodge != 0) {
@@ -503,7 +505,7 @@ void DrawQText(void)
         if (sghStream != NULL && qtextonflag == 0)
             qtextonflag = 1;
     }
-    strcpy(MtPrevText, GetStr(FeFlag != 0 ? 0x2000 : 0x10C1));
+    strcpy(MtPrevText, GetStr(FeFlag == 0 ? 0x10C1 : 0x2000));
     MediumFont.Print((0x100 - MediumFont.GetStrWidth(MtPrevText)) / 2 + 0x20, 0xE0, MtPrevText, JustLeft, NULL,
                      WHITER, WHITEG, WHITEB);
     MediumFont.SetOTpos(OldOt);

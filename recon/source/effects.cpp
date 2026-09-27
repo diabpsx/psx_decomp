@@ -141,8 +141,7 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     RECT R;
     long vol;
 
-    volume = (sglSoundVolume * sglMasterVolume) >> 8;
-    *plVolume = volume;
+    *plVolume = (sglSoundVolume * sglMasterVolume) >> 8;
     *plPan = 0x8000;
 
     if (!dung_map[x][y].dFlags)

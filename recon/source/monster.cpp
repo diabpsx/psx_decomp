@@ -3630,8 +3630,8 @@ void MAI_SkelKing(int i)
     int _mx, _my;
     int skel;
 
-    _mx = _mx;
-    _my = _my;
+    _mx = Monst->_mx;
+    _my = Monst->_my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;
