@@ -283,7 +283,7 @@ void RemoveScroll(int pnum)
 
 unsigned char TryInvPut(void)
 {
-    int Dist, d;
+    int Dist;
 
     if (numitems >= 0x7A /* MAXITEMS */) {
         PlaySFX(0x3D3);
@@ -294,9 +294,12 @@ unsigned char TryInvPut(void)
         return 1;
 
     Dist = 1;
-    for (d = 0; d < 8; d++) {
-        if (CanPut(plr[myplr]._px + offset_x[d] * Dist, plr[myplr]._py + offset_y[d] * Dist))
-            return 1;
+    {
+        for (int d = 0; d < 8; d++) {
+            int dir;
+            if (CanPut(plr[myplr]._px + offset_x[d] * Dist, plr[myplr]._py + offset_y[d] * Dist))
+                return 1;
+        }
     }
     return 0;
 }
