@@ -409,16 +409,8 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
 
 void GPanel::DrawDurIcon(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
-    if (chrflag == 0) {
-        if (questlog != 0) {
-            if (invflag != 0 || sbookflag != 0) {
-                return;
-            }
-        }
-    } else {
-        if (invflag != 0 || sbookflag != 0) {
-            return;
-        }
+    if ((chrflag != 0 || questlog != 0) && (invflag != 0 || sbookflag != 0)) {
+        return;
     }
     if (gbMaxPlayers != 1 && spspelstate[Plr->_pClassGfx] != 0) {
         return;
