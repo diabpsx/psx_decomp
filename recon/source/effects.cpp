@@ -174,8 +174,8 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     if (scry < scrx)
         scrx = gnScreenWidth - scrx;
 
-    scrx <<= 1;
-    *plVolume = (scrx * (vol / scry)) >> 16;
+    volume = scrx * 2;
+    *plVolume = (volume * (vol / scry)) >> 16;
     *plPan = pan;
     return 1;
 }

@@ -314,7 +314,6 @@ void DrawQTextTSK(TASK *T)
     qtextonflag = qtextflag != 0;
     sgLastScroll = VID_GetTick();
     while (qtextonflag != 0) {
-        do {
             DrawQText();
             TSK_Sleep(1);
             if (FeFlag != 0) {
@@ -324,10 +323,8 @@ void DrawQTextTSK(TASK *T)
                 ignore_buttons = 1;
                 qtextonflag = 0;
             }
-            if (qtextonflag != 0) break;
-            if (CDWAIT != 0)
+            if (qtextonflag == 0 && CDWAIT != 0)
                 qtextonflag = 1;
-        } while (qtextonflag != 0);
     }
     CDWAIT = 1;
     PauseMode = 1;

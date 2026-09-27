@@ -3346,7 +3346,16 @@ void MAI_Snake(int i)
  * `if (goal==EAT && goalvar3) {...}` block (confirmed directly from the
  * JAP Ghidra decompile's shared `LAB_80152014` tail, reached by every exit
  * path including successful completion of the walk/eat logic, not just
- * the "goal!=EAT" failure path). */
+ * the "goal!=EAT" failure path).
+ * SEALED this pass: PASS bytes (241/241) + SYM ok. Closed the final 1-short
+ * gap: retail zero-inits BOTH `done` (early, before `Monst` is even
+ * computed) AND `x` (late, right after the `_mmode==MM_STAND` guard,
+ * before the hitpoints compare) -- `x` was never explicitly zeroed in the
+ * prior draft. Statement-execution order (not declaration order) controls
+ * WHICH zero-init gets scheduled early by gcc: `done=0;` must be the very
+ * first statement, `Monst=&monster[i];` second, `x=0;` third, while the
+ * DECLARATION order must stay Monst,x,y,done to match the SYM local-record
+ * order -- so declarations and their assignments were split apart. */
 void MAI_Scav(int i)
 {
     MonsterStruct *Monst;
@@ -3439,8 +3448,8 @@ void MAI_Rhino(int i)
     int _my;
     int mi;
 
-    _mx = _mx;
-    _my = _my;
+    _mx = Monst->_mx;
+    _my = Monst->_my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;

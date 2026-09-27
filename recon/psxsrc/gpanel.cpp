@@ -385,9 +385,13 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
         y0 = Y - 1;
         do {
             struct POLY_FT4 *F2;
+            unsigned char NewR, NewG, NewB;
             int y1;
 
             F2 = PanelTData->PrintFt4(0x94, X, Y, 1, GPanelOt + 1, 0);
+            NewR = D_800B9BCC[Idx];
+            NewG = D_800B9BCD[Idx];
+            NewB = D_800B9BCE[Idx];
             y1 = y0 + (3 - Loop) * 5;
             F2->y0 = (short)y1;
             F2->y2 = (short)y1;
@@ -397,10 +401,10 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
             F2->y1 = (short)(y1 + 5);
             F2->x3 = (short)Xe;
             F2->y3 = (short)(y1 + 5);
-            F2->r0 = D_800B9BCC[Idx];
-            F2->g0 = D_800B9BCD[Idx];
-            F2->b0 = D_800B9BCE[Idx];
             F2->code = (F2->code | 2) & 0xFE;
+            F2->r0 = NewR;
+            F2->g0 = NewG;
+            F2->b0 = NewB;
             Loop++;
             Idx += 3;
         } while (Loop < Item->_iDurability);

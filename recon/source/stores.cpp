@@ -2255,7 +2255,9 @@ void S_HBuyEnter(void)
     i = 0;
     do {
         int p = myplr;
+        int seed;
 
+        seed = 0;
         w = cursW;
         if (w < 0) {
             w += 0xF;
@@ -2266,7 +2268,7 @@ void S_HBuyEnter(void)
         }
         w >>= 4;
         h >>= 4;
-        done = func_8015A24C(p, i++, w, h, 0) & 0xFF;
+        done = func_8015A24C(p, i++, w, h, seed) & 0xFF;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
     SetCursor(1);

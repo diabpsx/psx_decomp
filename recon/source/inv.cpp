@@ -2225,35 +2225,6 @@ void CheckInvPaste(int pnum, int mx, int my)
         else
             cn = SwapItem(&plr[pnum].InvBody[6], &plr[pnum].HoldItem);
         break;
-    case 4: /* head */
-        NetSendCmdChItem(0, 0);
-        if (plr[pnum].InvBody[0]._itype == ITYPE_NONE)
-            plr[pnum].InvBody[0] = plr[pnum].HoldItem;
-        else
-            cn = SwapItem(&plr[pnum].InvBody[0], &plr[pnum].HoldItem);
-        break;
-    case 5: /* ring */
-        if (r == 4) {
-            NetSendCmdChItem(0, 1);
-            if (plr[pnum].InvBody[1]._itype == ITYPE_NONE)
-                plr[pnum].InvBody[1] = plr[pnum].HoldItem;
-            else
-                cn = SwapItem(&plr[pnum].InvBody[1], &plr[pnum].HoldItem);
-        } else {
-            NetSendCmdChItem(0, 2);
-            if (plr[pnum].InvBody[2]._itype == ITYPE_NONE)
-                plr[pnum].InvBody[2] = plr[pnum].HoldItem;
-            else
-                cn = SwapItem(&plr[pnum].InvBody[2], &plr[pnum].HoldItem);
-        }
-        break;
-    case 6: /* amulet */
-        NetSendCmdChItem(0, 3);
-        if (plr[pnum].InvBody[3]._itype == ITYPE_NONE)
-            plr[pnum].InvBody[3] = plr[pnum].HoldItem;
-        else
-            cn = SwapItem(&plr[pnum].InvBody[3], &plr[pnum].HoldItem);
-        break;
     case 7: /* inv */
         if (plr[pnum].HoldItem._itype == ITYPE_GOLD && it == 0) {
             ii = r - 25;

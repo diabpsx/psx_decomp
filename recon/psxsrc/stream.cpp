@@ -112,7 +112,8 @@ struct SpuVoiceAttr {   /* sizeof 64 */
 
 enum LANG_TYPE { LANG_ENGLISH = 0, LANG_FRENCH = 1, LANG_GERMAN = 2, LANG_SWEDISH = 3, LANG_JAP = 4, LANG_NONE = 5 };
 
-struct TextDat {
+struct TextDat {   /* sizeof 112 (SYM); members not used here */
+    unsigned char body[112];
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);   /* @0x80093418 GMAN.CPP:989 */
 };
 struct PlayerStruct {   /* sizeof 6632 -- only plractive is read here */
