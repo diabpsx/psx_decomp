@@ -4213,61 +4213,61 @@ skip_walk:
 void M_DiabloDeath(int i, unsigned char sendmsg, int pnum)
 {
     MonsterStruct *Monst = &monster[i];
+    const MonsterStruct *pmonster = monster;
     int _mx, _my;
     int steps;
-    int j, k;
 
+    /* bytes OPEN (14 diffs, 202==202): only the ternary arm temps -- retail loads ViewX/ViewY
+     * straight into $a0 for the third abs() call, ours via $v0. SYM ok: the retail block tree
+     * {j {k {} {_moldx,_moldy}}} is a bare block + while loop (a for loop adds a level). */
     PlaySFX(USFX_DIABLOD);
     quests[Q_DIABLO]._qactive = QUEST_DONE;
     if (sendmsg)
         NetSendCmdQuest(1, Q_DIABLO);
-    gbProcessPlayers = 0;
+    {
+        int j;
+        gbProcessPlayers = 0;
+        j = 0;
+        while (j < nummonsters) {
+            int k;
+            k = monstactive[j];
+            if (k != i && monster[i]._msquelch) {
+                int _moldx, _moldy;
 
-    for (steps = 0; steps < nummonsters; steps++) {
-        int mi = monstactive[steps];
-        if (mi != i && monster[i]._msquelch != 0) {
-            int _moldx, _moldy;
-
-            NewMonsterAnim(mi, monster[mi].MType->Anims[MA_DEATH], monster[mi]._mdir, MA_DEATH);
-            _moldx = monster[mi]._moldx;
-            _moldy = monster[mi]._moldy;
-            monster[mi]._mmode = MM_DEATH;
-            monster[mi]._mxoff = 0;
-            monster[mi]._myoff = 0;
-            monster[mi]._mVar1 = 0;
-            monster[mi]._mx = _moldx;
-            monster[mi]._my = _moldy;
-            monster[mi]._mfutx = _moldx;
-            monster[mi]._mfuty = _moldy;
-            monster[mi]._moldx = _moldx;
-            monster[mi]._moldy = _moldy;
-            M_CheckEFlag(mi);
-            M_ClearSquares(mi);
-            dung_map[_moldx][_moldy].dMonster = mi + 1;
+                NewMonsterAnim(k, monster[k].MType->Anims[MA_DEATH], monster[k]._mdir, MA_DEATH);
+                monster[k]._mmode = MM_DEATH;
+                monster[k]._mxoff = 0;
+                monster[k]._myoff = 0;
+                monster[k]._mVar1 = 0;
+                _moldx = pmonster[k]._moldx;
+                _moldy = pmonster[k]._moldy;
+                monster[k]._mx = _moldx;
+                monster[k]._my = _moldy;
+                monster[k]._mfutx = _moldx;
+                monster[k]._mfuty = _moldy;
+                monster[k]._moldx = _moldx;
+                monster[k]._moldy = _moldy;
+                M_CheckEFlag(k);
+                M_ClearSquares(k);
+                dung_map[_moldx][_moldy].dMonster = k + 1;
+            }
+            j++;
         }
     }
 
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    _mx = pmonster[i]._mx;
+    _my = pmonster[i]._my;
     Monst->mlid = AddLight(Monst->_mx, Monst->_my, 3);
     DoVision(_mx, _my, 8, 0, 1);
 
-    j = abs(ViewX - _mx);
-    k = abs(ViewY - _my);
-    if (k < j)
-        j = ViewX - _mx;
-    else
-        j = ViewY - _my;
-    k = abs(j);
-    j = 20;
-    if (k < 21)
-        j = k;
+    steps = abs(abs(ViewX - _mx) > abs(ViewY - _my) ? ViewX - _mx : ViewY - _my);
+    steps = steps > 20 ? 20 : steps;
 
     Monst->_mVar3 = 0;
     Monst->_mVar4 = 0;
+    Monst->_mVar5 = ((long long)(Monst->_mVar3 - (_mx << 16))) / steps;
+    Monst->_mVar6 = ((long long)(Monst->_mVar4 - (_my << 16))) / steps;
     Monst->_mVar8 = pnum;
-    Monst->_mVar5 = ((long long)(Monst->_mVar3 - (_mx << 16))) / j;
-    Monst->_mVar6 = ((long long)(Monst->_mVar4 - (_my << 16))) / j;
 }
 
 void PrintMonstHistory(int mt)
