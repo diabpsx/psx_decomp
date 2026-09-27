@@ -864,38 +864,44 @@ void M_StartRSpAttack(int i, int missile_type, int dam)
     M_CheckEFlag(i);
 }
 
-/* OPEN: bytes far-miss (147 vs 135 insns) -- logic transcribed as a best-effort reading of the raw
+/* PASS+SYM (see end). Logic transcribed as a best-effort reading of the raw
  * oracle (hellfire's M_GetKnockback takes no `d` param, computes `d=(mdir+4)&7` internally and has
  * NO _mVar1/2/6/7/xvel/yvel reset or _mVar8++ tail -- all of that is a genuine PSX addition read
- * directly from the disassembly, not sourced from any twin).  Structural issues remain (register
- * numbers assigned to `i` vs `d` differ, several field re-reads look duplicated in the oracle in a
- * way not yet matched).  Not chased further this pass (deprioritized vs the fresh-function list);
- * needs a dedicated pass re-deriving the exact store order from the raw bytes. */
+ * directly from the disassembly, not sourced from any twin).  NOW PASS+SYM, rebuilt from the
+ * retail SLD/SYM: the step is applied to `_mx/_my` (not _moldx), copied to _moldx/_moldy, then
+ * re-read through a block-local const `pmonster` view into `_mx/_my` for the fut/old/dMonster
+ * writes; dMonster is written right after M_ClearSquares, before the _mVar resets. */
 void M_GetKnockback(int i, int d)
 {
     if (DirOK(i, d)) {
+        const MonsterStruct *pmonster;
+        int _mx, _my;
+
         M_ClearSquares(i);
-        monster[i]._moldx += offset_x[d];
-        monster[i]._moldy += offset_y[d];
+        monster[i]._mx += offset_x[d];
+        monster[i]._my += offset_y[d];
         NewMonsterAnim(i, monster[i].MType->Anims[MA_GOTHIT], monster[i]._mdir, MA_GOTHIT);
         monster[i]._mmode = MM_GOTHIT;
         monster[i]._mxoff = 0;
         monster[i]._myoff = 0;
-        monster[i]._mx = monster[i]._moldx;
-        monster[i]._my = monster[i]._moldy;
-        monster[i]._mfutx = monster[i]._mx;
-        monster[i]._mfuty = monster[i]._my;
         monster[i]._moldx = monster[i]._mx;
         monster[i]._moldy = monster[i]._my;
+        pmonster = monster + i;
+        _mx = pmonster->_mx;
+        _my = pmonster->_my;
+        monster[i]._mfutx = _mx;
+        monster[i]._mfuty = _my;
+        monster[i]._moldx = _mx;
+        monster[i]._moldy = _my;
         M_CheckEFlag(i);
         M_ClearSquares(i);
+        dung_map[_mx][_my].dMonster = i + 1;
         monster[i]._mVar1 = 0;
         monster[i]._mVar2 = 0;
         monster[i]._mxvel = 0;
         monster[i]._myvel = 0;
         monster[i]._mVar6 = 0;
         monster[i]._mVar7 = 0;
-        dung_map[monster[i]._mx][monster[i]._my].dMonster = i + 1;
         monster[i]._mVar8++;
     }
 }
