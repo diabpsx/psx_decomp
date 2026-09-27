@@ -45,6 +45,9 @@ int InvCursPos;
 int ItemNo;
 int ItemW;
 int ItemH;
+int InvPageNo;
+int InvPageFlag;
+int InvBackAY;
 
 void FreeInvGFX(void)
 {
@@ -1105,4 +1108,398 @@ void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed)
             }
         }
     }
+}
+
+int SyncPutItem(int pnum, int x, int y, int idx, unsigned short icreateinfo, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, unsigned long ibuff)
+{
+    unsigned char done;
+    int d, ii;
+    int i, j, l;
+    int xx, yy;
+    int xp, yp;
+
+    if (numitems >= 0x7A) {
+        PlaySFX(0x3D3);
+        return -1;
+    }
+
+    if (FindGetItem(idx, icreateinfo, iseed) != -1) {
+        SyncGetItem(x, y, idx, icreateinfo, iseed);
+    }
+
+    d = GetDirection(plr[pnum]._px, plr[pnum]._py, x, y);
+    xx = x - plr[pnum]._px;
+    yy = y - plr[pnum]._py;
+    if (abs(xx) > 1 || abs(yy) > 1) {
+        x = plr[pnum]._px + offset_x[d];
+        y = plr[pnum]._py + offset_y[d];
+    }
+    if (!CanPut(x, y)) {
+        d = (d - 1) & 7;
+        x = plr[pnum]._px + offset_x[d];
+        y = plr[pnum]._py + offset_y[d];
+        if (!CanPut(x, y)) {
+            d = (d + 2) & 7;
+            x = plr[pnum]._px + offset_x[d];
+            y = plr[pnum]._py + offset_y[d];
+            if (!CanPut(x, y)) {
+                done = 0;
+                for (l = 1; l < 50; l++) {
+                    if (done)
+                        break;
+                    for (j = -l; j <= l; j++) {
+                        if (done)
+                            break;
+                        yp = j + plr[pnum]._py;
+                        for (i = -l; i <= l; i++) {
+                            if (done)
+                                break;
+                            xp = i + plr[pnum]._px;
+                            if (CanPut(xp, yp)) {
+                                done = 1;
+                                x = xp;
+                                y = yp;
+                            }
+                        }
+                    }
+                }
+                if (!done)
+                    return -1;
+            }
+        }
+    }
+
+    ii = itemavail[0];
+    dung_map[x][y].dItem = ii + 1;
+    itemavail[0] = itemavail[0x7E - numitems];
+    itemactive[numitems] = ii;
+
+    if (idx == 0x17) {
+        RecreateEar(ii, icreateinfo, iseed, Id, dur, mdur, ch, mch, ivalue, ibuff);
+    } else {
+        RecreateItem(ii, idx, icreateinfo, iseed, ivalue, ibuff);
+        if (Id)
+            item[ii]._iIdentified = 1;
+        item[ii]._iDurability = dur;
+        item[ii]._iMaxDur = mdur;
+        item[ii]._iCharges = ch;
+        item[ii]._iMaxCharges = mch;
+    }
+
+    item[ii]._ix = x;
+    item[ii]._iy = y;
+    RespawnItem(ii, 1);
+    numitems++;
+    return ii;
+}
+
+void InvSetItemCurs(void)
+{
+    int ItemNo;
+
+    ItemNo = plr[myplr].InvGrid[InvCursPos - 25];
+    if (ItemNo == 0)
+        return;
+    if (_pcurs[myplr] >= 12)
+        return;
+    if ((unsigned int)(InvCursPos - 25) >= 40)
+        return;
+
+    if (InvCursPos >= 26) {
+        while (plr[myplr].InvGrid[InvCursPos - 26] == ItemNo || plr[myplr].InvGrid[InvCursPos - 26] == -ItemNo) {
+            InvCursPos--;
+        }
+    }
+
+    if (InvCursPos >= 35) {
+        while (plr[myplr].InvGrid[InvCursPos - 35] == ItemNo || plr[myplr].InvGrid[InvCursPos - 35] == -ItemNo) {
+            InvCursPos -= 10;
+        }
+    }
+
+    if (InvCursPos < 25)
+        InvCursPos = 25;
+}
+
+void InvMoveCursLeft(void)
+{
+    int ItemInc;
+    int OldPos;
+    int newpos, rem;
+
+    OldPos = InvCursPos;
+
+    if (_pcurs[myplr] < 12) {
+        ItemInc = 0;
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+            case 4:
+            case 6:
+                InvCursPos = 7;
+                goto after;
+            case 5:
+                InvCursPos = 19;
+                goto after;
+            case 7:
+                InvCursPos = 13;
+                goto after;
+            case 13:
+                InvCursPos = 5;
+                goto after;
+            case 19:
+                InvCursPos = 4;
+                goto after;
+            default:
+                break;
+            }
+        }
+    } else {
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+            case 6:
+            case 19:
+                goto after;
+            case 4:
+                InvCursPos = 5;
+                goto after;
+            case 5:
+                InvCursPos = 4;
+                goto after;
+            case 7:
+                InvCursPos = 13;
+                goto after;
+            case 13:
+                InvCursPos = 7;
+                goto after;
+            default:
+                break;
+            }
+        }
+    }
+
+    if (InvCursPos >= 25)
+        ItemInc = 1;
+
+after:
+    if ((unsigned int)(InvCursPos - 25) < 40) {
+        newpos = InvCursPos - ItemInc;
+        InvCursPos = newpos;
+        rem = (newpos - 25) % 10;
+        if (rem == 9 || rem == -1) {
+            InvCursPos = newpos + 10;
+        }
+    } else if (InvCursPos < 0x41) {
+        /* nothing */
+    } else if (InvCursPos == 0x41) {
+        InvCursPos = InvCursPos + 7;
+    } else {
+        InvCursPos = InvCursPos - ItemInc;
+    }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
+}
+
+void InvMoveCursRight(void)
+{
+    int ItemInc;
+    int OldPos;
+
+    OldPos = InvCursPos;
+
+    if (_pcurs[myplr] < 12) {
+        ItemInc = 0;
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+                InvCursPos = 6;
+                goto tail2;
+            case 4:
+                InvCursPos = 19;
+                goto tail2;
+            case 5:
+            case 6:
+                InvCursPos = 13;
+                goto tail2;
+            case 7:
+                InvCursPos = 4;
+                goto tail2;
+            case 13:
+                InvCursPos = 7;
+                goto tail2;
+            case 19:
+                InvCursPos = 5;
+                goto tail2;
+            default:
+                break;
+            }
+        }
+
+        if ((unsigned int)(InvCursPos - 25) < 40) {
+            int gi = plr[myplr].InvGrid[InvCursPos - 25];
+            ItemInc = 1;
+            if (gi != 0) {
+                InvGetItemWH(InvCursPos - 25);
+                ItemInc = ItemW;
+            }
+        } else if (InvCursPos < 0x41) {
+            /* ItemInc unchanged (0) */
+        } else {
+            ItemInc = 1;
+        }
+    } else {
+        if (InvCursPos < 20) {
+            switch (InvCursPos) {
+            case 0:
+            case 6:
+            case 19:
+                goto tail2;
+            case 4:
+                InvCursPos = 5;
+                goto tail2;
+            case 5:
+                InvCursPos = 4;
+                goto tail2;
+            case 7:
+                InvCursPos = 13;
+                goto tail2;
+            case 13:
+                InvCursPos = 7;
+                goto tail2;
+            default:
+                break;
+            }
+        }
+
+        if ((unsigned int)(InvCursPos - 25) < 40) {
+            int gi = plr[myplr].InvGrid[InvCursPos - 25];
+            ItemInc = 1;
+            if (gi != 0) {
+                InvGetItemWH(InvCursPos - 25);
+                ItemInc = ItemW;
+            }
+        }
+        /* else: ItemInc left as-is (matches retail's uninitialized-but-unused path) */
+    }
+
+tail2:
+    if ((unsigned int)(InvCursPos - 25) < 40) {
+        int a1, a0;
+
+        if (_pcurs[myplr] < 12) {
+            ItemW = 0;
+        } else {
+            ItemNo = plr[myplr].HoldItem._iCurs;
+            ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
+        }
+
+        a1 = InvCursPos + ItemInc;
+        a0 = a1 + (ItemW - 25);
+        InvCursPos = a1;
+        if (a0 % 10 == 0) {
+            InvCursPos = a1 - 10 + ItemW;
+        }
+    } else if (InvCursPos >= 0x41) {
+        if (InvCursPos < 0x48) {
+            InvCursPos = InvCursPos + ItemInc;
+        } else {
+            InvCursPos = InvCursPos - 7;
+        }
+    }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
+}
+
+void ControlInv(void)
+{
+    CheckNewPath(myplr);
+    InvSetItemCurs();
+
+    if (sfxdelay > 0) {
+        sfxdelay--;
+        if (sfxdelay == 0)
+            PlaySFX(sfxdnum);
+    }
+
+    _pcursitem[sel_data] = -1;
+    uitemflag = 0;
+    ReadPad(-1);
+
+    if (_pcurs[myplr] == 9)
+        invflag = 0;
+
+    if (InvCursPos < 0x19)
+        InvBackAY = 0x60;
+    else
+        InvBackAY = 0;
+
+    if (InvBackAY < InvBackY) {
+        InvBackY -= 0x10;
+        if (InvBackY < InvBackAY)
+            InvBackY = InvBackAY;
+    } else if (InvBackY < InvBackAY) {
+        InvBackY += 0x10;
+        if (InvBackAY < InvBackY)
+            InvBackY = InvBackAY;
+    }
+
+    if (invflag) {
+        _pcursinvitem[sel_data] = CheckInvHLight();
+        if (_pcursinvitem[sel_data] == -1)
+            ClrCursor(options_pad);
+    } else {
+        ClearPanel();
+    }
+
+    if (InvPageFlag) {
+        if (DavesPad & 0x400)
+            PlaySFX(0x32);
+        if (InvPageNo == 0)
+            InvPageNo = 1;
+        else
+            InvPageNo = 0;
+    } else {
+        InvPageNo = 0;
+    }
+
+    if (uitemflag)
+        DrawUniqueInfo();
+
+    if (DavesPad & 0x4)
+        InvMoveCursLeft();
+    if (DavesPad & 0x8)
+        InvMoveCursRight();
+    if (DavesPad & 0x1)
+        InvMoveCursUp();
+    if (DavesPad & 0x2)
+        InvMoveCursDown();
+
+    if (DavesPad & 0x40) {
+        if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4)
+            TryIconCurs();
+        else
+            CheckInvScrn();
+    }
+
+    if (DavesPad & 0x200) {
+        ignore_buttons = 1;
+        UseInvItem(myplr, _pcursinvitem[sel_data]);
+    }
+
+    if (DavesPad & 0x80) {
+        if (_pcurs[myplr] >= 12) {
+            if (numitems < 0x7A && TryInvPut()) {
+                NetSendCmdPItem(1, 0xA, 0, 0);
+            } else {
+                PlaySFX(0x3D3);
+            }
+        }
+    }
+
+    InvAlignObject();
 }

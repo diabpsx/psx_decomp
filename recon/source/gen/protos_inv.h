@@ -1,3 +1,4 @@
+int sprintf(char *buf, const char *fmt, ...);
 void CalcPlrScrolls(int p);   /* @0x8003F130 ITEMS.CPP:945 */
 void CalcPlrStaff(PlayerStruct *ptrplr);   /* @0x8003F4B0 ITEMS.CPP:984 */
 unsigned char TryInvPut(void);   /* @0x8015F020 INV.CPP:2928 */
@@ -31,3 +32,16 @@ unsigned char WeaponAutoPlace(int pnum);   /* @0x8015AAC8 INV.CPP:1739 */
 unsigned char GoldAutoPlace(int pnum);   /* @0x8015A5F0 INV.CPP:1639 */
 int FindGetItem(int idx, unsigned short ci, int iseed);   /* @0x8008271C COREINV.CPP:52 */
 void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed);   /* @0x8015EEB8 INV.CPP:2842 */
+int GetDirection(int x1, int y1, int x2, int y2);   /* @0x8003DA28 ENGINE.CPP:45 */
+void RecreateEar(int ii, unsigned short ic, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, int ibuff);   /* @0x80045008 ITEMS.CPP:2962 */
+void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue, int PlrCreate);   /* @0x8004BA14 ITEMS.CPP:6127 */
+void CheckNewPath(int pnum);   /* @0x8006708C PLAYER.CPP:4698 */
+void InvSetItemCurs(void);   /* @0x8016135C INV.CPP:4023 */
+void ReadPad(int NoDeb);   /* @0x8008463C DAVEO.CPP:74 */
+void ClrCursor(int num);   /* @0x80077F90 GAMEPAD.CPP:113 */
+void DrawUniqueInfo(void);   /* @0x80049028 ITEMS.CPP:5051 */
+void InvMoveCursLeft(void);   /* @0x801614FC INV.CPP:4052 */
+void InvMoveCursRight(void);   /* @0x801616A4 INV.CPP:4153 */
+void InvMoveCursUp(void);   /* @0x80161958 INV.CPP:4261 */
+void InvMoveCursDown(void);   /* @0x80161B50 INV.CPP:4359 */
+unsigned char TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
