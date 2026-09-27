@@ -1333,13 +1333,10 @@ void AddMagmaball(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._mitxoff += 3 * missile[mi]._mixvel;
     missile[mi]._mityoff += 3 * missile[mi]._miyvel;
     GetMissilePos(mi);
-    if ((missile[mi]._mixvel >> 16) == 0 && (missile[mi]._miyvel >> 16) == 0)
-        missile[mi]._mirange = 1;
-    else
-        missile[mi]._mirange = 256;
+    missile[mi]._mirange = 256;
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
-    missile[mi]._mlid = AddLight(sx, sy, 8);
+    missile[mi]._mlid = AddLight(sx, sy, 0x97);
 }
 
 void MI_Boom(int i)
