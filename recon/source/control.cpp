@@ -1089,6 +1089,7 @@ static void PrintInfo(void)
     int nlines;
     int PageOffset;
     RECT *Rect;
+    int K1;
 
     if (talkflag)
         return;
@@ -1129,7 +1130,7 @@ static void PrintInfo(void)
         nOffset1 += CPrintString(invflag ? nlines - PageOffset : nlines, infostr, 1) - 1;
     for (int i = 0; i < pnumlines; i++) {
         if (invflag)
-            nOffset1 += CPrintString(i + nOffset1 + nlines - (PageOffset - 1), panelstr[i], pstrjust[i]) - 1;
+            nOffset1 += CPrintString(i + nOffset1 + nlines - (PageOffset - (K1 = 1)), panelstr[i], pstrjust[i]) - 1;
         else
             nOffset1 += CPrintString(i + nOffset1 + nlines + 1, panelstr[i], pstrjust[i]) - 1;
     }
@@ -1820,33 +1821,31 @@ void ChrCheckValidButton(int move)
 
     lus = lus + move;
     pc = plr[options_pad]._pClass;
-    unsigned char (*btn)[4] = chrbtn;
-    int *ms = MaxStats[pc];
     for (int i = 0; i < 4; i++) {
         switch (i) {
         case 0:
-            if (plr[options_pad]._pBaseStr == ms[0])
-                btn[options_pad][0] = 1;
+            if (plr[options_pad]._pBaseStr == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
             else
-                btn[options_pad][0] = 0;
+                chrbtn[options_pad][i] = 0;
             break;
         case 1:
-            if (plr[options_pad]._pBaseMag == ms[1])
-                btn[options_pad][1] = 1;
+            if (plr[options_pad]._pBaseMag == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
             else
-                btn[options_pad][1] = 0;
+                chrbtn[options_pad][i] = 0;
             break;
         case 2:
-            if (plr[options_pad]._pBaseDex == ms[2])
-                btn[options_pad][2] = 1;
+            if (plr[options_pad]._pBaseDex == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
             else
-                btn[options_pad][2] = 0;
+                chrbtn[options_pad][i] = 0;
             break;
         case 3:
-            if (plr[options_pad]._pBaseVit == ms[3])
-                btn[options_pad][3] = 1;
+            if (plr[options_pad]._pBaseVit == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
             else
-                btn[options_pad][3] = 0;
+                chrbtn[options_pad][i] = 0;
             break;
         }
     }
@@ -1856,16 +1855,16 @@ void ChrCheckValidButton(int move)
         lus = 3;
     if (lus >= 4)
         lus = 0;
-    if (btn[myplr][lus]) {
-        count = 0;
-        do {
+    count = 0;
+    while (chrbtn[myplr][lus]) {
             lus = lus + move;
             if (lus < 0)
                 lus = 3;
             if (lus >= 4)
                 lus = 0;
             count++;
-        } while (count < 4 && btn[myplr][lus]);
+        if (count >= 4)
+            break;
     }
 }
 

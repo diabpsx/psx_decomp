@@ -456,7 +456,7 @@ static void CreateRoom(int nX1, int nY1, int nX2, int nY2, int nRDest, int nHDir
     int nAw, nAh;
     int nRw, nRh;
     int nRx1, nRy1, nRx2, nRy2;
-    int nHx1, nHy1, nHx2, nHy2;
+    int nHx1 = 0, nHy1 = 0, nHx2, nHy2;
     int nRid;
 
     if (nRoomCnt >= 80) {
@@ -1823,6 +1823,7 @@ void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
     InitDungeon();
     DRLG_InitTrans();
     pLevelMap = GRL_LoadFileInMemSig(sFileName, 0);
+    lm = pLevelMap;
 
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
@@ -1831,7 +1832,6 @@ void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
         }
     }
 
-    lm = pLevelMap;
     rw = *lm;
     lm += 2;
     rh = *lm;
@@ -1861,7 +1861,10 @@ void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
         }
     }
 
-    mem_free_dbg(pLevelMap);
+    {
+        int dummy;
+        mem_free_dbg(pLevelMap);
+    }
 }
 
 void CreateL2Dungeon(unsigned int rseed, int entry)
