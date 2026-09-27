@@ -75,12 +75,12 @@ static void PRIM_GetPrim(POLY_G4 **Prim)
 
 /* ---------------------------------------------------------------- small game functions ---- */
 
-void SetLoadedLang(LANG_TYPE Lang)
+void SetLoadedLang(LANG_TYPE LoadLang)
 {
-    if (Lang != LANG_GetLang()) {
+    if (LoadLang != LANG_GetLang()) {
         CDWAIT = 1;
         music_stop();
-        LANG_SetLang(Lang);
+        LANG_SetLang(LoadLang);
         if (FileSYS != 1)
             BL_LoadStreamDir();
         if (!IsGameLoading()) {
@@ -90,8 +90,8 @@ void SetLoadedLang(LANG_TYPE Lang)
         }
         CDWAIT = 0;
     }
-    NewLang = Lang;
-    OrigLang = Lang;
+    NewLang = LoadLang;
+    OrigLang = LoadLang;
 }
 
 void ChangeLang(void)
@@ -119,20 +119,22 @@ void DrawLeftRight(void)
 void PrintMono(int ypos)
 {
     char *String;
+    int len;
 
     String = GetStr(MONO != 0 ? 0x29A : 0x29C);
-    MediumFont.Print(MonoX - (MediumFont.GetStrWidth(String) >> 1), ypos, String, JustLeft, &ORect, WHITER, WHITEG, WHITEB);
+    len = MediumFont.GetStrWidth(String) >> 1;
+    MediumFont.Print(MonoX - len, ypos, String, JustLeft, &ORect, WHITER, WHITEG, WHITEB);
 }
 
-int who_pressed(int mask)
+int who_pressed(int pval)
 {
-    CPad *P0, *P1;
+    CPad *Pad, *Pad1;
 
-    P0 = PAD_GetPad(0, 0);
-    P1 = PAD_GetPad(1, 0);
-    if (P0->GetDown() & 0xFFFF & mask)
+    Pad = PAD_GetPad(0, 0);
+    Pad1 = PAD_GetPad(1, 0);
+    if (Pad->GetDown() & 0xFFFF & pval)
         return 0;
-    if (P1->GetDown() & 0xFFFF & mask)
+    if (Pad1->GetDown() & 0xFFFF & pval)
         return 1;
     return -1;
 }
@@ -229,17 +231,17 @@ void GetVolumes(void)
 
 GM_SPEEDS AlterSpeedMenu(GM_SPEEDS gs)
 {
-    char *it;
+    OMENUITEM *it;
 
-    it = (char *)MenuList[cmenu].Item + 0x18;
+    it = MenuList[cmenu].Item + 1;
     switch (gs) {
     case GM_SPEED_NORMAL:
-        *(int *)(it + 0xC) = 1;
-        *(int *)(it + 0x24) = 0;
+        it->len = 1;
+        it[1].len = 0;
         return gs;
     case GM_SPEED_FAST:
-        *(int *)(it + 0xC) = 0;
-        *(int *)(it + 0x24) = gs;
+        it->len = 0;
+        it[1].len = gs;
         return gs;
     default:
         return gs;
@@ -291,41 +293,76 @@ void GameSpeedPad(void)
 
 void ToggleOptions(void)
 {
-    if (deathflag != 0 || !IS_GameOver()) {
-        if (optionsflag == 0) {
-            msgholdflag = 1;
-            PauseMode = 1;
-            optionsflag = 1;
-            saveflag = 0;
-            loadflag = 0;
-            AlertTxt = 0;
-            StatusTxt = 0;
-            cardondelay = 5;
-            card_active[1] = 0;
-            card_active[0] = 0;
-            MemCardActive = 0;
-            stream_pause();
-            DrawOptionsTask = TSK_AddTask(0, (void (*)())DrawOptions, 0x4000, 0);
+    if (deathflag == 0) {
+        if (IS_GameOver())
             return;
-        }
-        msgholdflag = 0;
-        if (ctrlflag != 0 && !RemoveCtrlScreen()) {
-            PlaySFX(0x3D3);
-            return;
-        }
-        if (MemCardActive != 0)
-            MemcardOFF();
-        if (MemcardOverlay != 0) {
-            MemcardOverlay = 0;
-            if (FeFlag == 0)
-                OVR_LoadGame();
-            if (sghMusic == NULL)
-                music_start(sgnMusicTrack);
-        }
-        PauseMode = 0;
-        optionsflag = 0;
-        stream_resume();
-        if (sbookflag == 0)
-            options_pad = -1;
+    }
+    if (optionsflag == 0) {
+        msgholdflag = 1;
+        PauseMode = 1;
+        optionsflag = 1;
+        saveflag = 0;
+        loadflag = 0;
+        AlertTxt = 0;
+        StatusTxt = 0;
+        cardondelay = 5;
+        card_active[1] = 0;
+        card_active[0] = 0;
+        MemCardActive = 0;
+        stream_pause();
+        DrawOptionsTask = TSK_AddTask(0, (void (*)())DrawOptions, 0x4000, 0);
+        return;
+    }
+    msgholdflag = 0;
+    if (ctrlflag != 0 && !RemoveCtrlScreen()) {
+        PlaySFX(0x3D3);
+        return;
+    }
+    if (MemCardActive != 0)
+        MemcardOFF();
+    if (MemcardOverlay != 0) {
+        MemcardOverlay = 0;
+        if (FeFlag == 0)
+            OVR_LoadGame();
+        if (sghMusic == NULL)
+            music_start(sgnMusicTrack);
+    }
+    PauseMode = 0;
+    optionsflag = 0;
+    stream_resume();
+    if (sbookflag == 0)
+        options_pad = -1;
+}
+
+/* ---------------------------------------------------------------- large dialog/pad functions ---- */
+
+void PrintSelectBack(unsigned short Str)
+{
+    char *S;
+    int y;
+
+    if (Str == 0x49E) {
+        S = GetStr(0x49E);
+        y = 0xDE;
+    } else {
+        S = GetStr(Str);
+        y = 0xE0;
+    }
+    MediumFont.Print(0, y, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
+}
+
+void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H)
+{
+    Dialog DBack;
+
+    DBack.SetBorder(e);
+    DBack.SetBack(f);
+    DBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    DBack.Back(X, Y, W, H);
+    if (DRect != NULL) {
+        DRect->x = X;
+        DRect->y = Y;
+        DRect->w = W;
+        DRect->h = H;
     }
 }

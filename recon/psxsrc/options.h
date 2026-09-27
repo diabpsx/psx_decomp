@@ -86,6 +86,7 @@ struct Dialog {   /* sizeof 16 */
     void SetBorder(int Type) { BorderGfx = Type; }
     void SetBack(int Type) { BackGfx = Type; }
     void SetRGB(unsigned char R, unsigned char G, unsigned char B);
+    void Back(int DX, int DY, int DW, int DH);   /* @0x8008BEE0 -- real fn, another TU (DIALOG.CPP) */
 };
 
 class CBlocks {
@@ -145,8 +146,8 @@ int sprintf(char *buf, const char *fmt, ...);
 char *strcpy(char *dst, const char *src);
 }
 
-extern unsigned char CDWAIT;
-extern unsigned char FileSYS;
+extern BOOL CDWAIT;
+extern int FileSYS;
 extern SFXHDR *sghMusic;
 extern SFXHDR *sghStream;
 extern TSFX *sgpStreamSFX;
@@ -165,6 +166,7 @@ extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 extern unsigned char PauseMode;
 extern unsigned char FeFlag;
 extern unsigned char WHITER, WHITEG, WHITEB;
+extern unsigned char BORDERR, BORDERG, BORDERB;
 extern POLY_FT4 *ThisPrimAddr;
 extern POLY_FT4 *AddrToAvoid;
 
@@ -213,11 +215,11 @@ extern int cmenu;
 extern OMENULIST MenuList[20];
 void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstructed in this TU */
 
-void SetLoadedLang(LANG_TYPE Lang);   /* @0x800A70C0 OPTIONS.CPP:1059 */
+void SetLoadedLang(LANG_TYPE LoadLang);   /* @0x800A70C0 OPTIONS.CPP:1059 */
 void ChangeLang(void);   /* @0x800A7170 OPTIONS.CPP:1091 */
 void DrawLeftRight(void);   /* @0x800A7234 OPTIONS.CPP:1121 */
 void PrintMono(int ypos);   /* @0x800A723C OPTIONS.CPP:1137 */
-int who_pressed(int mask);   /* @0x800A8314 OPTIONS.CPP:1498 */
+int who_pressed(int pval);   /* @0x800A8314 OPTIONS.CPP:1498 */
 void SwitchMONO(void);   /* @0x800A9214 OPTIONS.CPP:2023 */
 void CalcVolumes(void);   /* @0x800A9EAC OPTIONS.CPP:2463 */
 void SetLoadedVolumes(void);   /* @0x800AA008 OPTIONS.CPP:2498 */
@@ -225,5 +227,7 @@ void GetVolumes(void);   /* @0x800AA0B8 OPTIONS.CPP:2514 */
 GM_SPEEDS AlterSpeedMenu(GM_SPEEDS speed);   /* @0x800AA154 OPTIONS.CPP:2621 */
 void GameSpeedPad(void);   /* @0x800AA1A8 OPTIONS.CPP:2644 */
 void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
+void PrintSelectBack(unsigned short Str);   /* @0x800A68D0 OPTIONS.CPP:817 */
+void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H);   /* @0x800A6960 OPTIONS.CPP:862 */
 
 #endif
