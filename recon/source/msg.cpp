@@ -1151,11 +1151,10 @@ void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
         ((const TCmdDamage *)pCmd)->dwDam <= 0x2EE00) {
         if ((player->_pHitPoints >> 6) > 0) {
             player->_pHitPoints -= ((const TCmdDamage *)pCmd)->dwDam;
+            player->_pHPBase -= ((const TCmdDamage *)pCmd)->dwDam;
             if (player->_pMaxHP < player->_pHitPoints) {
-                player->_pHPBase = player->_pMaxHPBase;
                 player->_pHitPoints = player->_pMaxHP;
-            } else {
-                player->_pHPBase -= ((const TCmdDamage *)pCmd)->dwDam;
+                player->_pHPBase = player->_pMaxHPBase;
             }
         }
     }
