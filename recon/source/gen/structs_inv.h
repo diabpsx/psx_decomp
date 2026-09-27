@@ -1,4 +1,97 @@
-struct TextDat;
+struct TASK;
+
+struct RECT {   /* sizeof 8 */
+    short x;   /* +0x0 */
+    short y;   /* +0x2 */
+    short w;   /* +0x4 */
+    short h;   /* +0x6 */
+};
+
+enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
+
+class CFont {
+public:
+    int TextureId;   /* +0x0 */
+    unsigned short FontTab[256];   /* +0x4 */
+    int PrintyOTpos;   /* +0x204 */
+    int MinX;   /* +0x208 */
+    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
+};
+
+extern unsigned char DialogRed, DialogGreen, DialogBlue;
+extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
+
+class CBlocks {
+public:
+    static int GetOverlayOtBase() { return 0x1E8; }
+};
+
+class Dialog {
+public:
+    int BevelGfx;   /* +0x0 */
+    int BorderGfx;   /* +0x4 */
+    int BackGfx;   /* +0x8 */
+    int DialogOTpos;   /* +0xC */
+
+    inline Dialog();
+    ~Dialog() {}
+    void SetBorder(int v) { BorderGfx = v; }
+    void SetBack(int v) { BackGfx = v; }
+    void Back(int DX, int DY, int DW, int DH);
+    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
+    {
+        DialogRed = R;
+        DialogGreen = G;
+        DialogBlue = B;
+    }
+    int SetOTpos(int OT);
+};
+
+inline Dialog::Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+
+struct POLY_FT4 {   /* sizeof 40 */
+    unsigned long tag;   /* +0x0 */
+    unsigned char r0;   /* +0x4 */
+    unsigned char g0;   /* +0x5 */
+    unsigned char b0;   /* +0x6 */
+    unsigned char code;   /* +0x7 */
+    short x0;   /* +0x8 */
+    short y0;   /* +0xA */
+    unsigned char u0;   /* +0xC */
+    unsigned char v0;   /* +0xD */
+    unsigned short clut;   /* +0xE */
+    short x1;   /* +0x10 */
+    short y1;   /* +0x12 */
+    unsigned char u1;   /* +0x14 */
+    unsigned char v1;   /* +0x15 */
+    unsigned short tpage;   /* +0x16 */
+    short x2;   /* +0x18 */
+    short y2;   /* +0x1A */
+    unsigned char u2;   /* +0x1C */
+    unsigned char v2;   /* +0x1D */
+    unsigned short pad1;   /* +0x1E */
+    short x3;   /* +0x20 */
+    short y3;   /* +0x22 */
+    unsigned char u3;   /* +0x24 */
+    unsigned char v3;   /* +0x25 */
+    unsigned short pad2;   /* +0x26 */
+};
+
+struct TextDat {
+    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);   /* @0x80093418 GMAN.CPP:989 */
+};
 
 enum PLR_MODE {
     PM_QUIT = 11,

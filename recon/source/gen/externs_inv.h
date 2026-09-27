@@ -49,3 +49,10 @@ extern int InvPageNo;   /* @0x8011C338 */
 extern int InvBackAY;   /* @0x8011C340 */
 extern int options_pad;   /* @0x8011B250 */
 extern BOOL ignore_buttons;   /* @0x8011BBD0 */
+extern unsigned char BORDERR;   /* @0x8011ABF7 */
+extern unsigned char BORDERG;   /* @0x8011ABF8 */
+extern unsigned char BORDERB;   /* @0x8011ABF9 */
+extern int InvGfxTable[168];   /* @0x8010D278 */
+extern const unsigned char WHITER;   /* @0x8011ABD1 */
+extern const unsigned char WHITEG;   /* @0x8011ABD2 */
+extern struct CFont MediumFont;   /* @0x800B82D8 */

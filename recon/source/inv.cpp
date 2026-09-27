@@ -50,6 +50,11 @@ int InvPageFlag;
 int InvBackAY;
 unsigned char invflag;
 unsigned char drawsbarflag;
+int D_8011C324;
+int D_8011C2FC;
+int D_8011C2F8;
+int D_8011C304;
+struct RECT BRect;
 
 void FreeInvGFX(void)
 {
@@ -1232,7 +1237,7 @@ void InvMoveCursLeft(void)
 
     if (_pcurs[myplr] < 12) {
         ItemInc = 0;
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
             case 4:
@@ -1256,7 +1261,7 @@ void InvMoveCursLeft(void)
             }
         }
     } else {
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
             case 6:
@@ -1316,7 +1321,7 @@ void InvMoveCursRight(void)
 
     if (_pcurs[myplr] < 12) {
         ItemInc = 0;
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
                 InvCursPos = 6;
@@ -1354,7 +1359,7 @@ void InvMoveCursRight(void)
             ItemInc = 1;
         }
     } else {
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
             case 6:
@@ -1422,7 +1427,7 @@ void InvMoveCursUp(void)
 
     if (_pcurs[myplr] < 12) {
         ItemInc = 0;
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
                 goto tail3;
@@ -1456,7 +1461,7 @@ void InvMoveCursUp(void)
             InvCursPos = InvCursPos - 9;
         }
     } else {
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
             case 4:
@@ -1517,6 +1522,186 @@ tail3:
         PlaySFX(0x32);
 }
 
+void CheckInvCut(int pnum, int mx, int my)
+{
+    int r;
+    int ii, iv;
+
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+
+    plr[pnum].HoldItem._itype = -1;
+    r = InvCursPos;
+
+    if ((unsigned int)r < 4) {
+        if (plr[pnum].InvBody[0]._itype != -1) {
+            NetSendCmdDelItem(0, 0);
+            plr[pnum].HoldItem = plr[pnum].InvBody[0];
+            plr[pnum].InvBody[0]._itype = -1;
+        }
+    }
+    if (r == 4) {
+        if (plr[pnum].InvBody[1]._itype != -1) {
+            NetSendCmdDelItem(0, 1);
+            plr[pnum].HoldItem = plr[pnum].InvBody[1];
+            plr[pnum].InvBody[1]._itype = -1;
+        }
+    }
+    if (r == 5) {
+        if (plr[pnum].InvBody[2]._itype != -1) {
+            NetSendCmdDelItem(0, 2);
+            plr[pnum].HoldItem = plr[pnum].InvBody[2];
+            plr[pnum].InvBody[2]._itype = -1;
+        }
+    }
+    if ((unsigned int)(r - 7) < 6) {
+        if (plr[pnum].InvBody[4]._itype != -1) {
+            NetSendCmdDelItem(0, 4);
+            plr[pnum].HoldItem = plr[pnum].InvBody[4];
+            plr[pnum].InvBody[4]._itype = -1;
+        }
+    }
+    if ((unsigned int)(r - 13) < 6) {
+        if (plr[pnum].InvBody[5]._itype != -1) {
+            NetSendCmdDelItem(0, 5);
+            plr[pnum].HoldItem = plr[pnum].InvBody[5];
+            plr[pnum].InvBody[5]._itype = -1;
+        }
+    }
+    if ((unsigned int)(r - 19) < 6) {
+        if (plr[pnum].InvBody[6]._itype != -1) {
+            NetSendCmdDelItem(0, 6);
+            plr[pnum].HoldItem = plr[pnum].InvBody[6];
+            plr[pnum].InvBody[6]._itype = -1;
+        }
+    }
+
+    if ((unsigned int)(r - 25) < 40) {
+        ii = plr[pnum].InvGrid[r - 25];
+        if (ii != 0) {
+            int i;
+
+            iv = (ii > 0) ? ii : -ii;
+            for (i = 0; i < 40; i++) {
+                if (plr[pnum].InvGrid[i] == iv || plr[pnum].InvGrid[i] == -iv)
+                    plr[pnum].InvGrid[i] = 0;
+            }
+            iv--;
+            plr[pnum].HoldItem = plr[pnum].InvList[iv];
+            plr[pnum]._pNumInv--;
+            ii = plr[pnum]._pNumInv;
+            if (ii > 0 && ii != iv) {
+                plr[pnum].InvList[iv] = plr[pnum].InvList[ii];
+                for (i = 0; i < 40; i++) {
+                    if (plr[pnum].InvGrid[i] == ii + 1)
+                        plr[pnum].InvGrid[i] = iv + 1;
+                    if (plr[pnum].InvGrid[i] == -(ii + 1))
+                        plr[pnum].InvGrid[i] = -(iv + 1);
+                }
+            }
+        }
+    }
+
+    if (r >= 0x41) {
+        iv = r - 0x41;
+        if (plr[pnum].SpdList[iv]._itype != -1) {
+            plr[pnum].HoldItem = plr[pnum].SpdList[iv];
+            plr[pnum].SpdList[iv]._itype = -1;
+            drawsbarflag = 1;
+        }
+    }
+
+    if (plr[pnum].HoldItem._itype != -1) {
+        if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
+            plr[pnum]._pGold = CalculateGold(pnum);
+        CalcPlrInv(pnum, 1);
+        CheckItemStats(pnum);
+        if (pnum == myplr) {
+            PlaySFX(0x1F);
+            SetCursor(plr[pnum].HoldItem._iCurs + 12);
+        }
+    }
+}
+
+void InvDrawSlot(int X, int Y, int Frame)
+{
+    struct POLY_FT4 *Ft4;
+
+    Ft4 = InvGfxTData->PrintFt4(Frame, X + 0x80, Y - InvBackY + 0x20, 0, D_8011C2FC, 0);
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+    Ft4->r0 = BORDERR;
+    Ft4->g0 = BORDERG;
+    Ft4->b0 = BORDERB;
+}
+
+void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int TransFlag)
+{
+    struct TextDat *TData;
+    struct POLY_FT4 *Ft4;
+    unsigned char a0, v0;
+
+    if (ItemNo < 0x32)
+        TData = InvGfxTData;
+    else
+        TData = InvPanelTData;
+
+    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x80, ItemY - InvBackY + 0x20, 0, D_8011C304, 0);
+
+    a0 = Ft4->code;
+    v0 = a0 & 0xFE;
+    Ft4->code = v0;
+    if (TransFlag == 0) {
+        v0 = a0 & 0xFC;
+        Ft4->code = v0;
+    } else {
+        v0 = v0 | 2;
+    }
+
+    v0 = StatFlag;
+    if (v0) {
+        v0 = 0x80;
+        Ft4->r0 = v0;
+        Ft4->g0 = v0;
+        Ft4->b0 = v0;
+    } else {
+        Ft4->r0 = 0;
+        Ft4->g0 = 0;
+        Ft4->b0 = 0;
+    }
+}
+
+void PrintStat(int Y, int Txt0, char *Txt1, unsigned char Col)
+{
+    char *str;
+
+    str = GetStr(Txt0);
+    MediumFont.Print(0, Y, str, JustLeft, &BRect, WHITER, WHITEG, WHITEG);
+    MediumFont.Print(0, Y, Txt1, JustRight, &BRect, WHITER, WHITEG, WHITEG);
+}
+
+void DrawInvBack(void)
+{
+    Dialog InvBack;
+
+    InvBack.SetOTpos(D_8011C2F8);
+    InvBack.SetBack(5);
+    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    InvBack.Back(0x80, -InvBackY + 0x80, 0xB0, 0xBE);
+    InvBack.Back(0x80, -InvBackY + 0x20, 0xB0, 0x5E);
+}
+
+void DrawInv(void)
+{
+    if (D_8011C324 == 0) {
+        D_8011C324 = 1;
+        InvPageFlag = 0;
+        InvPageNo = 0;
+        TSK_AddTask(0, DrawInvTSK, 0x1000, 0);
+    }
+}
+
 void InvMoveCursDown(void)
 {
     int ItemInc;
@@ -1526,7 +1711,7 @@ void InvMoveCursDown(void)
     ItemInc = 0;
 
     if (_pcurs[myplr] < 12) {
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
                 InvCursPos = 6;
@@ -1569,7 +1754,7 @@ void InvMoveCursDown(void)
             }
         }
     } else {
-        if (InvCursPos < 20) {
+        if ((unsigned int)InvCursPos < 20) {
             switch (InvCursPos) {
             case 0:
             case 6:
