@@ -4028,7 +4028,14 @@ void MAI_RR2(int i, int mistype, int dam)
  * sp+24/sp+16 per the raw diff) back into registers by shrinking their
  * live range or restructuring the `GetdDead`/`SetdDead`/`M_StartSpStand`
  * block; this is permuter/register-coloring territory per the methodology
- * doc's "PERMUTER PLATEAU is a SMELL" class, not a structural miss. */
+ * doc's "PERMUTER PLATEAU is a SMELL" class, not a structural miss.
+ * NOW PASS+SYM: (1) retail materializes several conditions as 0/1 flags --
+ * reproduced by parenthesizing them as whole sub-expressions (the ranged
+ * summon test and the PosOkMonst/nummonsters/GetdDead test, and the
+ * `(abs(mx) < 2 && abs(my) < 2)` melee test); (2) no `skel` local:
+ * `if (M_SpawnSkel(...) != -1) SetdDead(...)`; (3) retail's nested SYM block
+ * chain is kept alive by a block-scope GetdDead declaration (retail called
+ * it undeclared); (4) _mx/_my read through the const view (MAI_Lachdanan). */
 void MAI_SkelKing(int i)
 {
     int fx, fy, mx, my, md, v;
@@ -4036,10 +4043,9 @@ void MAI_SkelKing(int i)
     MonsterStruct *Monst = &monster[i];
     int nx, ny;
     int _mx, _my;
-    int skel;
 
-    _mx = Monst->_mx;
-    _my = Monst->_my;
+    _mx = ((const MonsterStruct *)Monst)->_mx;
+    _my = ((const MonsterStruct *)Monst)->_my;
     if (Monst->_mmode == MM_STAND && Monst->_msquelch) {
         fx = Monst->_menemyx;
         fy = Monst->_menemyy;
@@ -4068,24 +4074,23 @@ void MAI_SkelKing(int i)
             if ((Monst->_mgoalvar1++ >= (dist << 1) && DirOK(i, md))
                 || dung_map[_mx][_my].dTransVal != dung_map[fx][fy].dTransVal) {
                 Monst->_mgoal = MG_ATTACK;
-            } else if (!M_RoundWalk(i, md, Monst->_mgoalvar2))
+            } else if (!M_RoundWalk(i, md, Monst->_mgoalvar2)) {
                 M_StartDelay(i, ENG_random(10) + 10);
+            }
         }
         if (Monst->_mgoal == MG_ATTACK) {
-            if (gbMaxPlayers == 1
+            if ((gbMaxPlayers == 1
                 && ((!(abs(mx) < 3 && abs(my) < 3) && v < 35 + 4 * Monst->_mint) || v < 6)
-                && LineClear(_mx, _my, fx, fy)) {
+                && LineClear(_mx, _my, fx, fy))) {
+                unsigned char GetdDead(int x, int y);
                 nx = _mx + offset_x[md];
                 ny = _my + offset_y[md];
-                if (PosOkMonst(i, nx, ny) && nummonsters < 190) {
-                    if (GetdDead(nx, ny)) {
-                        skel = M_SpawnSkel(nx, ny, md);
-                        if (skel != -1)
-                            SetdDead(nx, ny, 0);
-                        M_StartSpStand(i, md);
-                    }
+                if ((PosOkMonst(i, nx, ny) && nummonsters < 190 && GetdDead(nx, ny))) {
+                    if (M_SpawnSkel(nx, ny, md) != -1)
+                        SetdDead(nx, ny, 0);
+                    M_StartSpStand(i, md);
                 }
-            } else if (abs(mx) < 2 && abs(my) < 2) {
+            } else if ((abs(mx) < 2 && abs(my) < 2)) {
                 if (v < 20 + Monst->_mint) {
                     Monst->_mdir = md;
                     M_StartAttack(i);
