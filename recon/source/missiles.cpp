@@ -3672,17 +3672,17 @@ void ProcessMissiles(void)
 
 void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* Structurally reconstructed from the raw oracle -- NOT yet byte-verified (0x480 = 288 insns).
-     * PSX-specific bound (112, confirmed via raw sltiu 0x6F) and the established
-     * GetSOLID|GetMISSILE|IsDplayer|dObject|dMissile OR-chain idiom. The trailing
-     * `myplr = id;` write is a real, surprising finding -- confirmed via a direct `sw` to the
-     * myplr global at the very end, UNCONDITIONALLY (not gated by `id == myplr` at all, unlike
-     * devilution/hellfire's read-only comparison there). */
-    int i, pn, k, l, j, tx, ty, mx;
+    /* PSX: 112-wide bound (dung_map extent), dMonster joins the occupancy OR-chain, and the
+     * CMD_ACTIVATEPORTAL send is made with myplr temporarily switched to the caster (omp saves /
+     * restores it) -- both arms send currlevel; only the trailing bSetLvl flag differs. */
+    int i, k, l, j, tx, ty, mx;
     int CrawlNum[6];
+    int omp;
 
     memcpy(CrawlNum, D_8011A030, sizeof(CrawlNum));
 
+    tx = 0;
+    ty = 0;
     if (currlevel != 0) {
         missile[mi]._miDelFlag = 1;
         for (k = 0; k < 6; k++) {
@@ -3692,7 +3692,7 @@ void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
                 tx = dx + CrawlTable[j];
                 ty = dy + CrawlTable[j + 1];
                 if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
-                    if ((GetSOLID(tx, ty) | dung_map[tx][ty].dObject | GetMISSILE(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMissile) == 0 && !CheckIfTrig(tx, ty)) {
+                    if ((GetSOLID(tx, ty) | dung_map[tx][ty].dObject | GetMISSILE(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMissile | dung_map[tx][ty].dMonster) == 0 && !CheckIfTrig(tx, ty)) {
                         missile[mi]._mix = tx;
                         missile[mi]._miy = ty;
                         missile[mi]._misx = tx;
@@ -3727,14 +3727,15 @@ void AddTown(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, in
 
     PutMissile(mi);
 
+    omp = myplr;
+    myplr = id;
     if (!missile[mi]._miDelFlag && currlevel != 0) {
         if (!setlevel)
             NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, currlevel, leveltype, 0);
         else
-            NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, setlvlnum, leveltype, 1);
+            NetSendCmdLocParam3(1, 0x38 /* CMD_ACTIVATEPORTAL */, tx, ty, currlevel, leveltype, 1);
     }
-
-    myplr = id;
+    myplr = omp;
 }
 
 void MI_Wave(int i)
