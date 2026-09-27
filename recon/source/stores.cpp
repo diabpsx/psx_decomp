@@ -1431,11 +1431,7 @@ void STextUp(void)
                 }
             }
         } else {
-            if (stextsel == 0) {
-                stextsel = 0x17;
-            } else {
-                stextsel -= 1;
-            }
+            stextsel = (stextsel == 0) ? 0x17 : stextsel - 1;
             if ((stext[stextsel]._ssel) == 0) {
                 do {
                     if (stextsel == 0) {

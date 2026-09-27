@@ -1620,8 +1620,8 @@ unsigned char CheckRangeObject(int x, int y, int distance)
     return ok;
 }
 
-/* @0x800A3A9C  NEAR-MISS (26 diffs, count exact): only the two cross-jumped `_pcursmonst[sel_data] = ...`
- * store blocks pick v1/a0 where retail picks v0/v1. */
+/* @0x800A3A9C  the arms store and fall to the single `return 1` (no per-arm return: an in-arm `v0 = 1`
+ * would be hoisted by sched1 and push the store blocks off v0/v1). */
 unsigned char CheckArea(int xx, int yy, int range, unsigned char allflag, int pnum)
 {
     PlayerStruct *player = &plr[pnum];
@@ -1699,39 +1699,36 @@ unsigned char CheckArea(int xx, int yy, int range, unsigned char allflag, int pn
         if (leveltype) {
             MonsterStruct *Monst = &monster[cm];
             spl->ForceTarget(cm, Monst->_mx, Monst->_my);
-            if (player->_pwtype == 0 && (abs(xx - Monst->_mx) >= 2 || abs(yy - Monst->_my) >= 2)) {
+            if (player->_pwtype == 0 && (abs(xx - Monst->_mx) >= 2 || abs(yy - Monst->_my) >= 2))
                 _pcursmonst[sel_data] = -1;
-                return 1;
-            }
-            _pcursmonst[sel_data] = cm;
-            return 1;
+            else
+                _pcursmonst[sel_data] = cm;
         } else {
             TownerStruct *Twn = &towner[cm];
-            if (abs(xx - Twn->_tx) >= 2 || abs(yy - Twn->_ty) >= 2) {
+            if (abs(xx - Twn->_tx) >= 2 || abs(yy - Twn->_ty) >= 2)
                 _pcursmonst[sel_data] = -1;
-                return 1;
-            }
+            else
+                _pcursmonst[sel_data] = cm;
         }
-        _pcursmonst[sel_data] = cm;
-        return 1;
     } else
         spl->ForceTarget(-1, 0, 0);
     return 1;
 }
 
-/* @0x800A4080  NEAR-MISS (107 diffs): retail strength-reduces the offset_x/offset_y givs into two walking
- * pointers (end pointer spilled at 16(sp)); every index spelling tried gives loop.c benefit 0 ("not worth
- * while, 0 vs 29"), see the report. */
+/* @0x800A4080  px/py: constant-equivalent table pointers (no SYM record); px[i] is a reg+reg address, so
+ * loop.c strength-reduces both givs into walking pointers (end pointer spilled at 16(sp)) as retail does. */
 void PlacePlayer(int pnum, int x, int y, unsigned char do_current)
 {
+    char *px = offset_x;
+    char *py = offset_y;
     if (plr[pnum]._pmode == PM_DEATH)
         return;
     if (!PosOkPlayer(pnum, x, y) || IsTrigger(x, y)) {
         BOOL done = 0;
         int nx, ny;
         for (int i = 0; i < 8 && !done; i++) {
-            nx = x + offset_x[i];
-            ny = y + offset_y[i];
+            nx = x + px[i];
+            ny = y + py[i];
             if (PosOkPlayer(pnum, nx, ny) && !IsTrigger(nx, ny)) {
                 done = 1;
                 x = nx;

@@ -334,7 +334,7 @@ void SwitchMONO(void);   /* @0x800A9214 OPTIONS.CPP:2023 */
 void CalcVolumes(void);   /* @0x800A9EAC OPTIONS.CPP:2463 */
 void SetLoadedVolumes(void);   /* @0x800AA008 OPTIONS.CPP:2498 */
 void GetVolumes(void);   /* @0x800AA0B8 OPTIONS.CPP:2514 */
-GM_SPEEDS AlterSpeedMenu(GM_SPEEDS speed);   /* @0x800AA154 OPTIONS.CPP:2621 */
+void AlterSpeedMenu(GM_SPEEDS speed);   /* @0x800AA154 OPTIONS.CPP:2621 */
 void GameSpeedPad(void);   /* @0x800AA1A8 OPTIONS.CPP:2644 */
 void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
 void PrintSelectBack(unsigned short Str);   /* @0x800A68D0 OPTIONS.CPP:817 */

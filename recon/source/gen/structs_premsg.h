@@ -70,7 +70,7 @@ struct MonsterStruct {   /* sizeof 104 */
 
 struct CMonster {   /* sizeof 28 */
     struct MonsterData *MData;   /* +0x0 */
-    char Anims[24];   /* +0x4 (opaque -- not accessed here) */
+    char Anims[12];   /* +0x4 (6 x AnimStruct, 2 bytes each; opaque here) */
     unsigned short Snds;   /* +0x10 */
     unsigned char mtype;   /* +0x12 */
     unsigned char mPlaceFlags;   /* +0x13 */
@@ -151,7 +151,9 @@ struct ItemStruct {   /* sizeof 108 */
 };
 
 struct ObjectStruct {
-    char _opad[44];   /* opaque here -- only referenced via Obj_Trap/SyncOpObject, not directly */
+    char _opad0[30];   /* opaque here */
+    char _otype;   /* +0x1E */
+    char _opad1[13];
 };
 
 struct TCmdPItem {   /* sizeof 24 */

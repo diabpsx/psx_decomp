@@ -21,6 +21,40 @@ typedef struct {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     CdlLOC  loc;
 } StHEADER;
 
+/* ---------------------------------------------------------------- SPU types (LIBSPU.H, PsyQ 4.0) --
+ * confirmed against the raw oracle field-by-field (set_mdec_audio_volume's global `voice_attr` +
+ * play_mdec_audio's local SpuSetKeyOnWithAttr struct), not just the shipped header's declared shape;
+ * the previous reconstruction used ad-hoc fabricated structs for both call sites that didn't match
+ * either the real field layout OR (for set_mdec_audio_volume) that this is a GLOBAL, not a local. */
+typedef struct { short left, right; } SpuVolume;
+typedef struct SpuVoiceAttr {   /* sizeof 64 (SYM: STRUCT size 64 tag SpuVoiceAttr name voice_attr) */
+    unsigned long voice;
+    unsigned long mask;
+    SpuVolume volume;
+    SpuVolume volmode;
+    SpuVolume volumex;
+    unsigned short pitch;
+    unsigned short note;
+    unsigned short sample_note;
+    short envx;
+    unsigned long addr;
+    unsigned long loop_addr;
+    long a_mode, s_mode, r_mode;
+    unsigned short ar, dr, sr, rr, sl, adsr1, adsr2;
+} SpuVoiceAttr;
+#define SPU_VOICE_VOLL 0x01
+#define SPU_VOICE_VOLR 0x02
+#define SPU_VOICE_PITCH 0x10
+#define SPU_VOICE_WDSA 0x80
+#define SPU_VOICE_ADSR_AMODE 0x100
+#define SPU_VOICE_ADSR_SMODE 0x200
+#define SPU_VOICE_ADSR_RMODE 0x400
+#define SPU_VOICE_ADSR_AR 0x800
+#define SPU_VOICE_ADSR_DR 0x1000
+#define SPU_VOICE_ADSR_SR 0x2000
+#define SPU_VOICE_ADSR_RR 0x4000
+#define SPU_VOICE_ADSR_SL 0x8000
+
 /* @0x80158840 PADS.H (header copy):120 -- CPad::GetDown() const, inlined afresh per TU (-fno-inline
  * would emit it once; PsyQ 4.0 without that flag re-emits the inline body at every call site's TU). */
 class CPad {   /* sizeof 236, PADS.H */
@@ -219,7 +253,9 @@ static int sfx_volume;
 struct mdec_queue_entry mdec_queue[16];
 static int mdec_head, mdec_tail, mdecs_queued, mdecs_waiting, mdec_waiting_tail;
 static int mdec_sectors_per_frame, mdec_framecount, mdec_last_frame, mdec_speed;
-static int mdec_stream_starting, mdec_streaming, mdec_waiting_tail_unused;
+static int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a placeholder
+ * "mdec_waiting_tail_unused" -- renamed: confirmed via SYM ($8011b5b4 EXT INT last_stream_frame) and
+ * cross-refs in dequeue_animation.s + decode_mdec_stream.s (both use this exact bss slot). */
 static int streampos;
 static int user_start;
 static void *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
@@ -861,26 +897,39 @@ extern "C" int stop_mdec_audio(void)
     return SpuSetKey(0, 3);
 }
 
-static int mdec_audio_rate;   /* v6[885]: sample rate arg saved by init_mdec_audio */
+/* Content-bug fix: struct was a fabricated shape (int sample_rate/short a,b/int loop/short c,d,e,f)
+ * that happened to compile to a plausible-looking-but-wrong sequence. The raw's SpuSetCommonAttr arg
+ * is the REAL PsyQ SpuCommonAttr (LIBSPU.H): mask=0x2C3 (SPU_COMMON_MVOLL|MVOLR|CDVOLL|CDVOLR|CDMIX),
+ * mvol.{l,r}=0x3FFF, cd.volume.{l,r}=0, cd.mix=SPU_ON(1) -- i.e. "max SPU master volume, mute+silence
+ * CD-DA mix" while the MDEC stream drives audio directly via SpuWrite. Also: the field previously
+ * called `mdec_audio_rate` doesn't exist in the real SYM -- the actual global is
+ * `mdec_audio_rate_shift` (confirmed via play_mdec_audio's raw, which right-shifts a pitch constant
+ * by it: `srav v0,v0,v1` with v1=mdec_audio_rate_shift), already declared above; the stray local
+ * `mdec_audio_rate` declaration is removed. `mdec_audio_playing = 2;` was also missing entirely --
+ * the raw sets it right after both SpuMalloc calls, before the -1 checks. */
+typedef struct SpuCommonAttr { unsigned long mask; SpuVolume mvol, mvolmode, mvolx; SpuVolume cd_volume; long cd_reverb, cd_mix; SpuVolume ext_volume; long ext_reverb, ext_mix; } SpuCommonAttr;
 
 /* WIP -- NOT byte-verified (SPU streaming setup; no PC twin). @0x80157794 FMV.CPP:1191 */
 extern "C" int init_mdec_audio(int rate)
 {
-    struct { int sample_rate; short a, b; int loop; short c, d, e, f; } comm_attr;
+    SpuCommonAttr comm_attr;
 
     SPU_Init();
-    for (int i = 0; i < 5; i++)
+    for (int f = 0; f < 5; f++)
         VSync(0);
-    comm_attr.sample_rate = 707;
-    comm_attr.a = 0x3FFF; comm_attr.b = 0x3FFF;
-    comm_attr.loop = 1;
-    comm_attr.c = 0; comm_attr.d = 0;
+    comm_attr.mask = 0x2C3;
+    comm_attr.mvol.right = 0x3FFF;
+    comm_attr.mvol.left = 0x3FFF;
+    comm_attr.cd_mix = 1;
+    comm_attr.cd_volume.left = 0;
+    comm_attr.cd_volume.right = 0;
     SpuSetCommonAttr(&comm_attr);
     mdec_audio_buffer[0] = SpuMalloc(20480);
     mdec_audio_buffer[1] = SpuMalloc(20480);
+    mdec_audio_playing = 2;
     mdec_audio_offs = 0;
     mdec_audio_sec = 0;
-    mdec_audio_rate = rate;
+    mdec_audio_rate_shift = rate;
     if (mdec_audio_buffer[0] == -1 || mdec_audio_buffer[1] == -1)
         DBG_Error(0, "psxsrc/FMV.CPP", 1231);
     SpuSetTransferMode(0);
@@ -950,21 +999,32 @@ extern "C" void resync_audio(void)
     mdec_audio_playing = 2;
 }
 
-/* WIP -- NOT byte-verified (SPU per-voice volume; no PC twin). @0x80157C34 FMV.CPP:1418 */
+/* Content-bug fix: entirely fabricated struct/fields before (mask/l/r/pitch/adsr1..4 on a LOCAL,
+ * non-static). The raw's SpuSetVoiceAttr arg is `&voice_attr` where `voice_attr` (SYM: STAT
+ * SpuVoiceAttr @0x80121ca8) is a FUNCTION-LOCAL STATIC (declared inside the function below) --
+ * writes .mask/.volume.left/.volume.right/.voice, in that order (mask+volume first, voice last,
+ * right before each SpuSetVoiceAttr call). Also: no `mdec_audio_rate` -- the raw multiplies by
+ * `sfx_volume` (SYM global, already used elsewhere in this TU for master volume) and takes an
+ * UNSIGNED (srl) >>14 of the product's low word, not the previously-guessed `mdec_audio_rate`; the
+ * shifted result overwrites the `vol` parameter itself (no separate local) to match its SYM register.
+ * mask is the constant 3 (SPU_VOICE_VOLL|SPU_VOICE_VOLR) every iteration. @0x80157C34 FMV.CPP:1418 */
 extern "C" int set_mdec_audio_volume(short vol)
 {
-    struct { unsigned short mask; short l, r; short pitch, adsr1, adsr2, adsr3, adsr4; } voice_attr;
-    unsigned short v = (unsigned short)((mdec_audio_rate * vol) >> 14);
     int i;
-
+    static SpuVoiceAttr voice_attr;   /* SYM: STAT SpuVoiceAttr voice_attr @0x80121ca8, size 64 --
+     * function-local static (not file-scope); only voice/mask/volume.{l,r} get written each call, the
+     * rest keeps whatever a previous call left there. */
+    vol = (short)(((int)(sfx_volume * (int)vol)) >> 14);
     for (i = 0; i < 2; i++) {
-        voice_attr.pitch = 3;
-        voice_attr.l = (i != 0) ? 0 : (short)v;
-        voice_attr.r = (i == 1) ? (short)v : 0;
-        voice_attr.mask = 1 << i;
+        voice_attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR;
+        voice_attr.volume.left = (i == 0) ? vol : 0;
+        voice_attr.volume.right = (i == 1) ? vol : 0;
+        voice_attr.voice = 1 << i;
         SpuSetVoiceAttr(&voice_attr);
     }
-    return i < 2;
+    /* raw never sets $v0 on the loop-exit fallthrough (plain `nop`) -- no `return i<2;`/`return 0;`
+     * here; the return value on this path is whatever v0 held (unspecified), matching the same
+     * "no explicit return on this arm" pattern seen in dequeue_animation's early-out. */
 }
 
 /* @0x80157D10 FMV.CPP:1448 */
@@ -985,15 +1045,26 @@ extern "C" int dequeue_stream(void)
 
     if (mdecs_waiting != 0) {
         if (a->start == -1) {
-            int len = open_cdstream(a->name, 0, 0);
-            a->flag = 1;
-            a->start = len / (mdec_sectors_per_frame << 11);
+            /* seclen (3rd arg) is dead inside open_cdstream -- never read -- but the raw still computes
+             * and passes the literal -1 here, not 0; kept for byte-exactness. */
+            /* Raw stores literal 1 to offset 0x8 (a->start) and the computed quotient to offset 0xC
+             * (a->end) here -- NOT a->flag/a->start as the field names might suggest at a glance;
+             * confirmed via play_mdec_stream's struct-store offsets (0x0/0x4/0x8/0xC/0x10 =
+             * name/speed/start/end/flag). a->flag=1 happens once, common to both arms, below. */
+            int len = open_cdstream(a->name, 0, -1);
+            a->start = 1;
+            a->end = len / (mdec_sectors_per_frame << 11);
         } else {
-            open_cdstream(a->name, a->start * mdec_sectors_per_frame, 0);
+            /* Raw computes a real (if functionally dead) seclen here too:
+             * (a->end - a->start) * mdec_sectors_per_frame, not a bare 0. */
+            open_cdstream(a->name, a->start * mdec_sectors_per_frame,
+                          (a->end - a->start) * mdec_sectors_per_frame);
         }
         a->flag = 1;
         mdecs_waiting -= 1;
-        mdec_head = (mdec_head + 1) & 0xF;
+        /* raw uses the branchy sign-safe "% 0x10" idiom (bgez/+16/sra4/sll4/subu), not a plain andi --
+         * confirms the source is `% 0x10`, not `& 0xF`, for this counter. */
+        mdec_head = (mdec_head + 1) % 0x10;
     }
     return mdec_head;
 }
@@ -1001,31 +1072,66 @@ extern "C" int dequeue_stream(void)
 /* @0x80157E40 FMV.CPP:1486 */
 extern "C" int dequeue_animation(void)
 {
-    struct mdec_queue_entry *a;
+    /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/dequeue_animation.s) -- prior
+     * reconstruction indexed off mdec_head and wrote several fields to the wrong globals/struct
+     * members; verify_asm.py's %gp_rel(SYM)->0 normalization hides wrong-global swaps from the byte
+     * diff as long as the substitute is the same size/class, so none of this showed up as a diff.
+     * Corrections, each confirmed against its own store site's %gp_rel comment / struct offset in the
+     * raw (offsets 0x0/0x4/0x8/0xC/0x10 = name/speed/start/end/flag, confirmed via play_mdec_stream):
+     *   - indexes/advances `mdec_tail`, not `mdec_head` (this is the "animation" dequeue counterpart
+     *     to dequeue_stream's mdec_head; the two queues are read from opposite ends).
+     *   - `mdec_tail = (mdec_tail+1) % 0x10;` happens immediately after computing `a`, not at the end.
+     *   - start==-1 arm: unlike dequeue_stream, this arm writes NEITHER a->start NOR a->end -- the
+     *     computed quotient goes straight to `last_stream_frame` and mdec_last_frame reads the SAME
+     *     saved a->start register (still -1) rather than a fresh literal -1; no struct store here.
+     *   - `a->flag == 0` arm's open_cdstream 3rd arg is the same live-but-dead seclen pattern as
+     *     dequeue_stream: `(a->end - a->start) * mdec_sectors_per_frame`, not a bare 0.
+     *   - both arms' queue-drain bookkeeping is `mdec_waiting_tail = (mdec_waiting_tail+1) % 0x10;
+     *     mdecs_waiting -= 1;` (the same mod-16 idiom as dequeue_stream/mdec_head), not a bare
+     *     `mdecs_waiting -= 1;`.
+     *   - the post-if shared block sets `last_stream_frame = a->end; mdec_framecount = a->start<<12;
+     *     mdec_last_frame = a->start-1;` -- NOT `mdec_framecount=a->end; mdec_stream_starting=
+     *     a->start<<12; mdec_last_frame=a->end-1` as previously written. `last_stream_frame` is the
+     *     same previously-undeclared global (VA 0x8011b5b4) that decode_mdec_stream compares against.
+     *   - the final shared tail sets `mdec_stream_starting = 1;` (a literal, reusing the same
+     *     register as `mdec_streaming = 1;`), and stores `a->speed` into `mdec_speed`, not
+     *     `user_start` (decode_mdec_stream's raw confirms it reads mdec_speed, not user_start, for
+     *     its own frame-time accumulator -- user_start appears to be a phantom/unused global here).
+     *   - the `mdecs_queued == 0` early-out never sets $v0 at all in the raw (its delay slot only
+     *     computes `a`'s address); kept `return 0;` here since omitting it would be a stronger,
+     *     unverified UB-reliant claim than the 1-diff residual it might save. */
+    struct mdec_queue_entry *a = &mdec_queue[mdec_tail];
 
-    a = &mdec_queue[mdec_head];
     if (mdecs_queued != 0) {
-        mdec_head = (mdec_head + 1) & 0xF;
-        if (a->start == -1) {
+        /* a->start is read-only in this function (never written) and stays live across the
+         * flush_cdstream/open_cdstream calls, so the raw keeps it in a callee-saved register ($s1,
+         * spilled/restored in the prologue/epilogue) instead of reloading from memory after each call
+         * -- caching it in a local reproduces that register class. */
+        mdec_tail = (mdec_tail + 1) % 0x10;
+        int start = a->start;
+        if (start == -1) {
             flush_cdstream();
-            int len = open_cdstream(a->name, 0, 0);
-            mdec_stream_starting = 0;
-            mdec_last_frame = -1;
-            mdec_framecount = len / (mdec_sectors_per_frame << 11) - 1;
+            int len = open_cdstream(a->name, 0, -1);
+            mdec_framecount = 0;
+            mdec_last_frame = start;
+            last_stream_frame = len / (mdec_sectors_per_frame << 11) - 1;
+            mdec_waiting_tail = (mdec_waiting_tail + 1) % 0x10;
             mdecs_waiting -= 1;
         } else {
             if (a->flag == 0) {
                 flush_cdstream();
-                open_cdstream(a->name, a->start * mdec_sectors_per_frame, 0);
+                open_cdstream(a->name, a->start * mdec_sectors_per_frame,
+                              (a->end - a->start) * mdec_sectors_per_frame);
+                mdec_waiting_tail = (mdec_waiting_tail + 1) % 0x10;
                 mdecs_waiting -= 1;
             }
-            mdec_framecount = a->end;
-            mdec_stream_starting = a->start << 12;
-            mdec_last_frame = a->end - 1;
+            last_stream_frame = a->end;
+            mdec_framecount = a->start << 12;
+            mdec_last_frame = a->start - 1;
         }
+        mdec_speed = a->speed;
         mdec_streaming = 1;
-        mdec_waiting_tail = 1;
-        user_start = a->speed;
+        mdec_stream_starting = 1;
         mdecs_queued -= 1;
         return 1;
     }
@@ -1035,26 +1141,41 @@ extern "C" int dequeue_animation(void)
 /* @0x80157FF0 FMV.CPP:1548 */
 extern "C" int decode_mdec_stream(int frames_elapsed)
 {
+    /* Content-bug sweep (raw oracle vs prior reconstruction) -- verify_asm.py's %gp_rel(SYM)->0
+     * normalization makes wrong-global substitutions byte-invisible to the diff gate as long as the
+     * replacement global is the same size/class, so these were undetected until read directly against
+     * asm/nonmatchings/fmv/decode_mdec_stream.s. Confirmed swaps, each cross-checked against its own
+     * store site's %gp_rel comment in the raw:
+     *   - entry guard was `mdec_waiting_tail != 0 && mdec_stream_starting == 0` -> really
+     *     `mdecs_waiting != 0 && stream_open == 0`.
+     *   - inner guard/accumulator was `mdec_waiting_tail == 0` / `mdec_stream_starting +=` -> really
+     *     `mdec_stream_starting == 0` / `mdec_framecount +=` (mdec_framecount is the live frame-time
+     *     accumulator here, not `mdec_stream_starting`).
+     *   - both `h->frameCount == mdec_framecount` loop/tail compares -> really
+     *     `h->frameCount == last_stream_frame` (a previously-undeclared global, VA 0x8011b5b4; see
+     *     dequeue_animation, which writes it).
+     *   - the `mdec_waiting_tail = 0;` reset in the `data != 0` block -> really
+     *     `mdec_stream_starting = 0;` (mdec_waiting_tail never appears anywhere in this function's raw). */
     unsigned char *data = 0;
     StHEADER *h;
     int want_frame;
 
-    if (mdec_waiting_tail != 0 && mdec_stream_starting == 0)
+    if (mdecs_waiting != 0 && stream_open == 0)
         dequeue_stream();
     cdstream_service();
     if (!mdec_streaming)
         return 0;
     if (stream_chunks_in == 0)
         return stream_chunks_in;
-    if (mdec_waiting_tail == 0) {
-        want_frame = (mdec_stream_starting + user_start * frames_elapsed) >> 12;
-        mdec_stream_starting += user_start * frames_elapsed;
+    if (mdec_stream_starting == 0) {
+        want_frame = (mdec_framecount + mdec_speed * frames_elapsed) >> 12;
+        mdec_framecount += mdec_speed * frames_elapsed;
         if (mdec_last_frame < want_frame) {
             for (;;) {
                 cdstream_get_chunk(&data, &h);
                 if (!mdec_streaming)
                     break;
-                if (h->frameCount == mdec_framecount || (int)h->frameCount >= want_frame)
+                if (h->frameCount == last_stream_frame || (int)h->frameCount >= want_frame)
                     break;
                 if (stream_chunks_in < 2)
                     break;
@@ -1065,7 +1186,7 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
         cdstream_get_chunk(&data, &h);
     }
     if (data != 0) {
-        mdec_waiting_tail = 0;
+        mdec_stream_starting = 0;
         mdec_last_frame = h->frameCount;
         start_mdec_decode(data + 32, mdc_buf[mbuf].x, mdc_buf[mbuf].y, h->width, h->height);
         frame_decoded = 1;
@@ -1073,7 +1194,7 @@ extern "C" int decode_mdec_stream(int frames_elapsed)
         mbuf ^= 1;
         play_mdec_audio(data + 0x3F00, (StHEADER *)((char *)h + 256));
         cdstream_discard_chunk();
-        if (h->frameCount == mdec_framecount) {
+        if (h->frameCount == last_stream_frame) {
             if (mdecs_queued != 0)
                 return dequeue_animation();
             else

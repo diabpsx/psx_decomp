@@ -2972,12 +2972,15 @@ void M2MStartHit(int mid, int i, int dam)
 void M2MStartKill(int i, int mid)
 {
     int md;
+    MonsterStruct *pmonster = monster;
+    int _mx = pmonster[mid]._mx;
+    int _my = pmonster[mid]._my;
 
     if (monster[i]._mmode == MM_STONE)
         MonstPartJump(i);
 
-    delta_kill_monster(mid, monster[mid]._mx, monster[mid]._my, currlevel);
-    NetSendCmdLocParam1(0, CMD_MONSTDEATH, monster[mid]._mx, monster[mid]._my, mid);
+    delta_kill_monster(mid, _mx, _my, currlevel);
+    NetSendCmdLocParam1(0, CMD_MONSTDEATH, _mx, _my, mid);
 
     monster[mid].mWhoHit |= 1 << i;
     if (i < 2) {
@@ -2991,7 +2994,7 @@ void M2MStartKill(int i, int mid)
     monster[mid]._mhitpoints = 0;
 
     if (mid >= 2)
-        SpawnItem(mid, monster[mid]._mx, monster[mid]._my, 1);
+        SpawnItem(mid, _mx, _my, 1);
 
     if (monster[mid].MType->mtype == MT_DIABLO) {
         M_DiabloDeath(mid, 1, 0);
@@ -3007,7 +3010,6 @@ void M2MStartKill(int i, int mid)
     monster[mid]._mdir = md;
     NewMonsterAnim(mid, monster[mid].MType->Anims[MA_DEATH], md, MA_DEATH);
     {
-        MonsterStruct *pmonster = monster;
         pmonster[mid]._mmode = MM_DEATH;
         pmonster[mid]._mxoff = 0;
         pmonster[mid]._myoff = 0;
@@ -3155,11 +3157,11 @@ void M_TryH2HHit(int i, int pnum, int Hit, int MinDam, int MaxDam)
     if (monster[i]._mFlags & MFLAG_TARGETS_MONSTER) {
         M_TryM2MHit(i, pnum, Hit, MinDam, MaxDam);
     } else {
+        long hp = ptrplr->_pHitPoints;
         int _mx = monster[i]._mx;
         int _my = monster[i]._my;
         int _px = ptrplr->_px;
         int _py = ptrplr->_py;
-        long hp = ptrplr->_pHitPoints;
 
         if ((hp >> 6) > 0 && !ptrplr->_pInvincible && !(ptrplr->_pSpellFlags & 1)) {
             int dx = abs(_mx - _px);

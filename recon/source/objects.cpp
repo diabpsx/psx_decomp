@@ -2180,6 +2180,454 @@ void OperateL3RDoor(int pnum, int i, unsigned char sendflag)
     }
 }
 
+void OperateShrine(int pnum, int i, int sType)
+{
+    int j, r, cnt;
+    int stype;
+
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+    if (object[i]._oSelFlag == 0)
+        return;
+    SetRndSeed(object[i]._oRndSeed);
+    object[i]._oSelFlag = 0;
+    if (deltaload) {
+        object[i]._oAnimFrame = object[i]._oAnimLen;
+        object[i]._oAnimFlag = 0;
+        return;
+    }
+    PlaySfxLoc(sType, object[i]._ox, object[i]._oy);
+    object[i]._oAnimFlag = 1;
+    object[i]._oAnimDelay = 1;
+    stype = object[i]._oVar1;
+    if ((unsigned int)stype < 0x1A) {
+        switch (stype) {
+        case 0:
+            ModifyPlrStr(pnum, -1);
+            ModifyPlrMag(pnum, -1);
+            ModifyPlrDex(pnum, -1);
+            ModifyPlrVit(pnum, -1);
+            r = ENG_random(4);
+            switch (r) {
+            case 0: ModifyPlrStr(pnum, 6); break;
+            case 1: ModifyPlrMag(pnum, 6); break;
+            case 2: ModifyPlrDex(pnum, 6); break;
+            case 3: ModifyPlrVit(pnum, 6); break;
+            }
+            CheckStats(pnum);
+            InitDiabloMsg(0xC);
+            break;
+        case 1:
+            cnt = 0;
+            for (j = 0; j < 7; j++) {
+                if (plr[pnum].InvBody[j]._itype != -1 && plr[pnum].InvBody[j]._iMaxDur != 0xFF && plr[pnum].InvBody[j]._iMaxDur != 0)
+                    cnt++;
+            }
+            if (cnt > 0) {
+                for (j = 0; j < 7; j++) {
+                    if (plr[pnum].InvBody[j]._itype != -1 && plr[pnum].InvBody[j]._iMaxDur != 0xFF && plr[pnum].InvBody[j]._iMaxDur != 0) {
+                        plr[pnum].InvBody[j]._iDurability += 10;
+                        plr[pnum].InvBody[j]._iMaxDur += 10;
+                        if (plr[pnum].InvBody[j]._iDurability > plr[pnum].InvBody[j]._iMaxDur)
+                            plr[pnum].InvBody[j]._iDurability = plr[pnum].InvBody[j]._iMaxDur;
+                    }
+                }
+                do {
+                    r = ENG_random(7);
+                    if (plr[pnum].InvBody[r]._itype == -1)
+                        continue;
+                    if (plr[pnum].InvBody[r]._iMaxDur == 0xFF)
+                        continue;
+                    if (plr[pnum].InvBody[r]._iMaxDur == 0)
+                        continue;
+                    plr[pnum].InvBody[r]._iDurability -= 20;
+                    plr[pnum].InvBody[r]._iMaxDur -= 20;
+                    if (plr[pnum].InvBody[r]._iDurability <= 0)
+                        plr[pnum].InvBody[r]._iDurability = 1;
+                    if (plr[pnum].InvBody[r]._iMaxDur <= 0)
+                        plr[pnum].InvBody[r]._iMaxDur = 1;
+                    break;
+                } while (1);
+            }
+            InitDiabloMsg(0xD);
+            break;
+        case 2:
+            if (plr[pnum].InvBody[0]._itype != -1)
+                plr[pnum].InvBody[0]._iAC += 2;
+            if (plr[pnum].InvBody[6]._itype != -1)
+                plr[pnum].InvBody[6]._iAC += 2;
+            if (plr[pnum].InvBody[4]._itype != -1) {
+                if (plr[pnum].InvBody[4]._itype == 5) {
+                    plr[pnum].InvBody[4]._iAC += 2;
+                } else {
+                    plr[pnum].InvBody[4]._iMaxDam--;
+                    if (plr[pnum].InvBody[4]._iMaxDam < plr[pnum].InvBody[4]._iMinDam)
+                        plr[pnum].InvBody[4]._iMaxDam = plr[pnum].InvBody[4]._iMinDam;
+                }
+            }
+            if (plr[pnum].InvBody[5]._itype != -1) {
+                if (plr[pnum].InvBody[5]._itype == 5) {
+                    plr[pnum].InvBody[5]._iAC += 2;
+                } else {
+                    plr[pnum].InvBody[5]._iMaxDam--;
+                    if (plr[pnum].InvBody[5]._iMaxDam < plr[pnum].InvBody[5]._iMinDam)
+                        plr[pnum].InvBody[5]._iMaxDam = plr[pnum].InvBody[5]._iMinDam;
+                }
+            }
+            for (j = 0; j < plr[pnum]._pNumInv; j++) {
+                r = plr[pnum].InvList[j]._itype - 1;
+                if ((unsigned int)r < 10) {
+                    if (r >= 4 && r <= 8) {
+                        plr[pnum].InvList[j]._iAC += 2;
+                    } else {
+                        plr[pnum].InvList[j]._iMaxDam--;
+                        if (plr[pnum].InvList[j]._iMaxDam < plr[pnum].InvList[j]._iMinDam)
+                            plr[pnum].InvList[j]._iMaxDam = plr[pnum].InvList[j]._iMinDam;
+                    }
+                }
+            }
+            InitDiabloMsg(0xE);
+            break;
+        case 3:
+            if (plr[pnum].InvBody[4]._itype != -1 && plr[pnum].InvBody[4]._itype != 5)
+                plr[pnum].InvBody[4]._iMaxDam++;
+            if (plr[pnum].InvBody[5]._itype != -1 && plr[pnum].InvBody[5]._itype != 5)
+                plr[pnum].InvBody[5]._iMaxDam++;
+            for (j = 0; j < plr[pnum]._pNumInv; j++) {
+                r = plr[pnum].InvList[j]._itype;
+                if (r > 0 && (r < 5 || r == 10))
+                    plr[pnum].InvList[j]._iMaxDam++;
+            }
+            InitDiabloMsg(0xF);
+            break;
+        case 4:
+        case 11:
+            AddMissile(plr[pnum]._px, plr[pnum]._py, plr[pnum]._px, plr[pnum]._py, plr[pnum]._pdir, 0xD, -1, pnum, 0, leveltype << 1);
+            InitDiabloMsg(0x10);
+            break;
+        case 5:
+            for (j = 0; j < 7; j++) {
+                if (plr[pnum].InvBody[j]._itype == 10)
+                    plr[pnum].InvBody[j]._iCharges = plr[pnum].InvBody[j]._iMaxCharges;
+            }
+            for (j = 0; j < plr[pnum]._pNumInv; j++) {
+                if (plr[pnum].InvList[j]._itype == 10)
+                    plr[pnum].InvList[j]._iCharges = plr[pnum].InvList[j]._iMaxCharges;
+            }
+            for (j = 0; j < 8; j++) {
+                if (plr[pnum].SpdList[j]._itype == 10)
+                    plr[pnum].SpdList[j]._iCharges = plr[pnum].SpdList[j]._iMaxCharges;
+            }
+            InitDiabloMsg(0x11);
+            break;
+        case 6:
+            for (j = 0; j < 7; j++)
+                plr[pnum].InvBody[j]._iDurability = plr[pnum].InvBody[j]._iMaxDur;
+            for (j = 0; j < plr[pnum]._pNumInv; j++)
+                plr[pnum].InvList[j]._iDurability = plr[pnum].InvList[j]._iMaxDur;
+            for (j = 0; j < 8; j++)
+                plr[pnum].SpdList[j]._iDurability = plr[pnum].SpdList[j]._iMaxDur;
+            InitDiabloMsg(0x12);
+            break;
+        case 7: {
+            int spellToReduce;
+
+            cnt = 0;
+            for (j = 1; j < 0x26; j++) {
+                if (plr[pnum]._pMemSpells & (1ULL << j))
+                    cnt++;
+            }
+            if (cnt >= 2) {
+                do {
+                    spellToReduce = ENG_random(0x25) + 1;
+                } while (!(plr[pnum]._pMemSpells & (1ULL << spellToReduce)));
+                for (j = 1; j < 0x26; j++) {
+                    if ((plr[pnum]._pMemSpells & (1ULL << j)) && plr[pnum]._pSplLvl[j] < 15)
+                        plr[pnum]._pSplLvl[j]++;
+                }
+                if (plr[pnum]._pSplLvl[spellToReduce] < 2)
+                    plr[pnum]._pSplLvl[spellToReduce] = 0;
+                else
+                    plr[pnum]._pSplLvl[spellToReduce] -= 2;
+            }
+            InitDiabloMsg(0x13);
+            break;
+        }
+        case 8: {
+            int oi, ot;
+
+            for (j = 0; j < numobjects; j++) {
+                oi = objectactive[j];
+                ot = object[oi]._otype;
+                if (ot == 5 || ot == 6 || ot == 7) {
+                    if (object[oi]._oSelFlag == 0) {
+                        object[oi]._oRndSeed = GetRndSeed();
+                        object[oi]._oSelFlag = 1;
+                        object[oi]._oAnimFrame -= 2;
+                    }
+                }
+            }
+            InitDiabloMsg(0x14);
+            break;
+        }
+        case 9: {
+            int penalty, diffA, diffB;
+
+            plr[pnum]._pMemSpells |= 1ULL << 0;
+            if (plr[pnum]._pSplLvl[1] < 15)
+                plr[pnum]._pSplLvl[1]++;
+            if (plr[pnum]._pSplLvl[1] < 15)
+                plr[pnum]._pSplLvl[1]++;
+            penalty = plr[pnum]._pManaBase / 5;
+            diffA = plr[pnum]._pMana - plr[pnum]._pMaxManaBase;
+            diffB = plr[pnum]._pMaxMana - plr[pnum]._pManaBase;
+            plr[pnum]._pMaxManaBase -= penalty;
+            plr[pnum]._pMana -= penalty;
+            plr[pnum]._pMaxMana -= penalty;
+            plr[pnum]._pManaBase -= penalty;
+            if ((plr[pnum]._pMana >> 6) <= 0) {
+                plr[pnum]._pMana = diffA;
+                plr[pnum]._pMaxManaBase = 0;
+            }
+            if ((plr[pnum]._pMaxMana >> 6) <= 0) {
+                plr[pnum]._pMaxMana = diffB;
+                plr[pnum]._pManaBase = 0;
+            }
+            InitDiabloMsg(0x15);
+            break;
+        }
+        case 10:
+            AddMissile(plr[pnum]._px, plr[pnum]._py, plr[pnum]._px, plr[pnum]._py, plr[pnum]._pdir, 0x2A, -1, pnum, 0, leveltype << 1);
+            plr[pnum]._pMana = plr[pnum]._pMaxMana;
+            plr[pnum]._pMaxManaBase = plr[pnum]._pManaBase;
+            InitDiabloMsg(0x16);
+            break;
+        case 12: {
+            int idx, mid;
+
+            for (j = 0; j < plr[pnum]._pNumInv; j++) {
+                if (plr[pnum].InvList[j]._itype != 0)
+                    continue;
+                mid = plr[pnum].InvList[j]._iMiscId;
+                if (mid == 3 || mid == 6)
+                    idx = ItemMiscIdIdx(0x12);
+                else if (mid == 2 || mid == 7)
+                    idx = ItemMiscIdIdx(0x13);
+                else
+                    continue;
+                SetPlrHandItem(&plr[pnum].HoldItem, idx);
+                GetPlrHandSeed(&plr[pnum].HoldItem);
+                plr[pnum].InvList[j] = plr[pnum].HoldItem;
+                plr[pnum].InvList[j]._iStatFlag = 1;
+            }
+            for (j = 0; j < 8; j++) {
+                if (plr[pnum].SpdList[j]._itype != 0)
+                    continue;
+                mid = plr[pnum].SpdList[j]._iMiscId;
+                if (mid == 3 || mid == 6)
+                    idx = ItemMiscIdIdx(0x12);
+                else if (mid == 2 || mid == 7)
+                    idx = ItemMiscIdIdx(0x13);
+                else
+                    continue;
+                SetPlrHandItem(&plr[pnum].HoldItem, idx);
+                GetPlrHandSeed(&plr[pnum].HoldItem);
+                plr[pnum].SpdList[j] = plr[pnum].HoldItem;
+                plr[pnum].SpdList[j]._iStatFlag = 1;
+            }
+            InitDiabloMsg(0x18);
+            break;
+        }
+        case 13:
+            ModifyPlrMag(pnum, 2);
+            CheckStats(pnum);
+            InitDiabloMsg(0x19);
+            break;
+        case 14:
+            if (currlevel < 4) {
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 7, 1, 0);
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 2, 1, 0);
+            } else {
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 0x13, 1, 0);
+                CreateTypeItem(object[i]._ox, object[i]._oy, 0, 0, 0x13, 1, 0);
+            }
+            plr[pnum]._pMana = plr[pnum]._pMaxMana;
+            plr[pnum]._pManaBase = plr[pnum]._pMaxManaBase;
+            plr[pnum]._pHitPoints = plr[pnum]._pMaxHP;
+            plr[pnum]._pHPBase = plr[pnum]._pMaxHPBase;
+            InitDiabloMsg(0x1A);
+            break;
+        case 15: {
+            int fx, fy, tries;
+
+            fx = 0;
+            fy = 0;
+            for (tries = 0; tries < 0x2400; tries++) {
+                fx = ENG_random(0x60);
+                fy = ENG_random(0x60);
+                if (GetSOLID(fx, fy))
+                    continue;
+                if (dung_map[fx][fy].dObject != 0)
+                    continue;
+                if (dung_map[fx][fy].dMonster != 0)
+                    continue;
+                break;
+            }
+            AddMissile(plr[pnum]._px, plr[pnum]._py, fx, fy, plr[pnum]._pdir, 3, -1, pnum, 0, leveltype << 1);
+            InitDiabloMsg(0x1B);
+            break;
+        }
+        case 16: {
+            int penalty, diffA, diffB;
+
+            plr[pnum]._pMemSpells |= 1ULL << 29;
+            if (plr[pnum]._pSplLvl[30] < 15)
+                plr[pnum]._pSplLvl[30]++;
+            if (plr[pnum]._pSplLvl[30] < 15)
+                plr[pnum]._pSplLvl[30]++;
+            penalty = plr[pnum]._pManaBase / 5;
+            diffA = plr[pnum]._pMana - plr[pnum]._pMaxManaBase;
+            diffB = plr[pnum]._pMaxMana - plr[pnum]._pManaBase;
+            plr[pnum]._pMaxManaBase -= penalty;
+            plr[pnum]._pMana -= penalty;
+            plr[pnum]._pMaxMana -= penalty;
+            plr[pnum]._pManaBase -= penalty;
+            if ((plr[pnum]._pMana >> 6) <= 0) {
+                plr[pnum]._pMana = diffA;
+                plr[pnum]._pMaxManaBase = 0;
+            }
+            if ((plr[pnum]._pMaxMana >> 6) <= 0) {
+                plr[pnum]._pMaxMana = diffB;
+                plr[pnum]._pManaBase = 0;
+            }
+            InitDiabloMsg(0x1C);
+            break;
+        }
+        case 17: {
+            int amount, nInv;
+
+            for (j = 0; j < 0x28; j++) {
+                if (plr[pnum].InvGrid[j] != 0)
+                    continue;
+                amount = leveltype * 5 + ENG_random(leveltype * 10);
+                nInv = plr[pnum]._pNumInv;
+                plr[pnum].InvList[nInv] = _golditem[StorePlrNo];
+                plr[pnum].InvList[nInv]._iSeed = GetRndSeed();
+                plr[pnum]._pNumInv = nInv + 1;
+                plr[pnum].InvGrid[j] = plr[pnum]._pNumInv;
+                plr[pnum].InvList[nInv]._ivalue = amount;
+                plr[pnum]._pGold += amount;
+                SetGoldCurs(pnum, nInv);
+            }
+            InitDiabloMsg(0x1D);
+            break;
+        }
+        case 18:
+            if (gbMaxPlayers == 1) {
+                InitDiabloMsg(0x1E);
+            } else {
+                int other;
+
+                InitDiabloMsg(0x1F);
+                other = pnum ^ 1;
+                plr[other]._pHitPoints = plr[pnum]._pMaxHP;
+                plr[other]._pHPBase = plr[pnum]._pMaxHPBase;
+                plr[other]._pMana = plr[pnum]._pMaxMana;
+                plr[other]._pManaBase = plr[pnum]._pMaxManaBase;
+            }
+            break;
+        case 19:
+            ModifyPlrDex(pnum, 2);
+            CheckStats(pnum);
+            InitDiabloMsg(0x20);
+            break;
+        case 20:
+            ModifyPlrStr(pnum, 2);
+            CheckStats(pnum);
+            InitDiabloMsg(0x21);
+            break;
+        case 21:
+            ModifyPlrVit(pnum, 2);
+            CheckStats(pnum);
+            InitDiabloMsg(0x22);
+            break;
+        case 22: {
+            int col, row;
+
+            for (col = 0; col < 40; col++) {
+                for (row = 0; row < 5; row++)
+                    automapview[row][col] = 0xFF;
+            }
+            InitDiabloMsg(0x23);
+            break;
+        }
+        case 23: {
+            int penalty, diffA, diffB;
+
+            plr[pnum]._pMemSpells |= 1ULL << 30;
+            if (plr[pnum]._pSplLvl[31] < 15)
+                plr[pnum]._pSplLvl[31]++;
+            if (plr[pnum]._pSplLvl[31] < 15)
+                plr[pnum]._pSplLvl[31]++;
+            penalty = plr[pnum]._pManaBase / 5;
+            diffA = plr[pnum]._pMana - plr[pnum]._pMaxManaBase;
+            diffB = plr[pnum]._pMaxMana - plr[pnum]._pManaBase;
+            plr[pnum]._pMaxManaBase -= penalty;
+            plr[pnum]._pMana -= penalty;
+            plr[pnum]._pMaxMana -= penalty;
+            plr[pnum]._pManaBase -= penalty;
+            if ((plr[pnum]._pMana >> 6) <= 0) {
+                plr[pnum]._pMana = diffA;
+                plr[pnum]._pMaxManaBase = 0;
+            }
+            if ((plr[pnum]._pMaxMana >> 6) <= 0) {
+                plr[pnum]._pMaxMana = diffB;
+                plr[pnum]._pManaBase = 0;
+            }
+            InitDiabloMsg(0x24);
+            break;
+        }
+        case 24:
+            for (j = 0; j < 7; j++) {
+                if (plr[pnum].InvBody[j]._iMagical != 0 && plr[pnum].InvBody[j]._iIdentified == 0)
+                    plr[pnum].InvBody[j]._iIdentified = 1;
+            }
+            for (j = 0; j < plr[pnum]._pNumInv; j++) {
+                if (plr[pnum].InvList[j]._iMagical != 0 && plr[pnum].InvList[j]._iIdentified == 0)
+                    plr[pnum].InvList[j]._iIdentified = 1;
+            }
+            for (j = 0; j < 8; j++) {
+                if (plr[pnum].SpdList[j]._iMagical != 0 && plr[pnum].SpdList[j]._iIdentified == 0)
+                    plr[pnum].SpdList[j]._iIdentified = 1;
+            }
+            InitDiabloMsg(0x25);
+            break;
+        case 25: {
+            int other, mStr, mMag, mDex, mVit, roll;
+
+            InitDiabloMsg(0x26);
+            roll = ENG_random(4);
+            mStr = (roll == 0) ? -1 : 1;
+            mMag = (roll == 1) ? -1 : 1;
+            mDex = (roll == 2) ? -1 : 1;
+            mVit = (roll == 3) ? -1 : 1;
+            other = pnum ^ 1;
+            ModifyPlrStr(other, mStr);
+            ModifyPlrMag(other, mMag);
+            ModifyPlrDex(other, mDex);
+            ModifyPlrVit(other, mVit);
+            CheckStats(other);
+            break;
+        }
+        }
+    }
+    CalcPlrInv(pnum, 1);
+    force_redraw = 0xFF;
+    NetSendCmdParam2(0, 0x2E, pnum, i);
+}
+
 #define IT_ARMOR 6
 #define IT_MARMOR 8
 #define IT_HARMOR 9

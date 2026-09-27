@@ -255,7 +255,8 @@ void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 /* @0x8004EF98 MSG.CPP:439 */
 BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
 {
-    DLevel *Dl = GetDLevel(bLevel, setlevel);
+    DLevel *Dl;
+    Dl = GetDLevel(bLevel, setlevel);
     {
         TCmdPItem *pD = Dl->item;
         unsigned char bc;
@@ -264,21 +265,17 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
             if (bc == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
                 continue;
 
-            if (bc == CMD_WALKXY) {
-                ReleaseDLevel(Dl);
-                return 1;
-            }
+            if (bc == CMD_WALKXY)
+                goto ret1;
             if (bc == CMD_STAND) {
                 sgbDeltaChanged = 1;
                 pD->bCmd = CMD_WALKXY;
-                ReleaseDLevel(Dl);
-                return 1;
+                goto ret1;
             }
             if (bc == CMD_ACK_PLRINFO) {
                 sgbDeltaChanged = 1;
                 pD->bCmd = 0xFF;
-                ReleaseDLevel(Dl);
-                return 1;
+                goto ret1;
             }
             break;
         }
@@ -311,6 +308,7 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
         }
     }
     }
+ret1:
     ReleaseDLevel(Dl);
     return 1;
 }

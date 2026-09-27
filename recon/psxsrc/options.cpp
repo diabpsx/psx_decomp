@@ -259,22 +259,23 @@ void GetVolumes(void)
     }
 }
 
-GM_SPEEDS AlterSpeedMenu(GM_SPEEDS gs)
+void AlterSpeedMenu(GM_SPEEDS gs)
 {
     OMENUITEM *it;
 
-    it = MenuList[cmenu].Item + 1;
+    it = MenuList[cmenu].Item;
+    it++;
     switch (gs) {
     case GM_SPEED_NORMAL:
         it->len = 1;
         it[1].len = 0;
-        return gs;
+        return;
     case GM_SPEED_FAST:
         it->len = 0;
         it[1].len = gs;
-        return gs;
+        return;
     default:
-        return gs;
+        return;
     }
 }
 
@@ -1431,14 +1432,17 @@ void DrawOptions(TASK *T)
     P = PAD_GetPad(options_pad, 0);
     Slider = GM_UseTexData(0);
     sw = Slider->GetFr(0x96)->W - 2;
-    cmenu = deathflag == 0 ? 1 : 8;
-    if (Qfromoptions == 0) {
+    if (deathflag == 0)
+        cmenu = 1;
+    else
+        cmenu = 8;
+    if (Qfromoptions != 0) {
+        cs = Qfromoptions;
+        Qfromoptions = 0;
+    } else {
         if (FeFlag == 0)
             PlaySFX(0x33);
         cs = 1;
-    } else {
-        cs = Qfromoptions;
-        Qfromoptions = 0;
     }
     qspin = 0;
     lqspin = 0;

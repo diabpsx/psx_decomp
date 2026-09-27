@@ -373,6 +373,41 @@ void CPart::SetRect(TextDat &TDat, RECT &R)
     R.h = Fr->H;
 }
 
+/* line 1946 @0x80094F24 */
+void CBlock::GetBoundingBox(TextDat &TDat, RECT &R)
+{
+    int left, right, top, bottom;
+
+    if (NumOfParts) {
+        RECT Pr;
+        Parts[0].SetRect(TDat, Pr);
+        left = Pr.x;
+        top = Pr.y;
+        right = Pr.x + Pr.w;
+        bottom = Pr.y + Pr.h;
+        for (unsigned int f = 0; f < NumOfParts; f++) {
+            Parts[f].SetRect(TDat, Pr);
+            if (Pr.x + Pr.w > right)
+                right = Pr.x + Pr.w;
+            if (Pr.y + Pr.h > bottom)
+                bottom = Pr.y + Pr.h;
+            if (Pr.x < left)
+                left = Pr.x;
+            if (Pr.y < top)
+                top = Pr.y;
+        }
+    } else {
+        left = 0;
+        right = 0;
+        top = 0;
+        bottom = 0;
+    }
+    R.x = left;
+    R.y = top;
+    R.w = right - left;
+    R.h = bottom - top;
+}
+
 /* line 885 @0x800931CC */
 void TextDat::SetUVTpGT3(FRAME_HDR *Fr, POLY_GT3 *GT3)
 {
@@ -978,11 +1013,13 @@ void CScreen::Load(int Id, int tpx, int tpy)
         Fr = GetFr(0);
         if (Fr->InVRAM) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1819);
         DecompFrame(Fr);
-        if (tpx == 11)
+        if (tpx == 11) {
             setRECT(&R, 0x2C0, tpy, 0xA0, 0xF0);
-        else
+            GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+        } else {
             setRECT(&R, tpx * 64, tpy, 0x80, 0xF0);
-        GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+            GPUQ_LoadImage(&R, hndDecompBuffer, 0);
+        }
         GPUQ_FlushQ();
         Pal = GetPal(0);
         R.x = 0;
@@ -1011,16 +1048,18 @@ void CScreen::Load(int Id, int tpx, int tpy)
             R.h = 1;
             LoadImage(&R, (u_long *)MyPal);
         }
-        int NewId = Id;                     /* coalesced copy: record-less SYM level +0x278..end */
-        CDWAIT = 0;
-        LoadedId = NewId;
-        if (hndDat != -1) {
-            if (!GAL_Free(hndDat)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1873);
-            hndDat = -1;
-        }
-        if (hndDecompBuffer != -1) {
-            if (!GAL_Free(hndDecompBuffer)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1880);
-            hndDecompBuffer = -1;
+        {
+            int NewId = Id;
+            CDWAIT = 0;
+            LoadedId = NewId;
+            if (hndDat != -1) {
+                if (!GAL_Free(hndDat)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1873);
+                hndDat = -1;
+            }
+            if (hndDecompBuffer != -1) {
+                if (!GAL_Free(hndDecompBuffer)) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1880);
+                hndDecompBuffer = -1;
+            }
         }
     }
 }
@@ -1036,7 +1075,10 @@ void CScreen::Display(int Id, int tpx, int tpy, int fadeval)
     setcode(FT4, 0x2C);
     setSemiTrans(FT4, 0);
     setShadeTex(FT4, 1);
-    setXYWH(FT4, 0, 0, (tpx == 11) ? 256 : 320, 240);
+    if (tpx == 11)
+        setXYWH(FT4, 0, 0, 256, 240);
+    else
+        setXYWH(FT4, 0, 0, 320, 240);
     setUVWH(FT4, 0, 0, 255, 240);
     FT4->tpage = GetTPage(1, 0, tpx * 64, tpy);
     FT4->clut = GetClut(0, fadeval + 240);

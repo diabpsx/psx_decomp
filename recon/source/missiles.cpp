@@ -993,7 +993,7 @@ void AddTeleport(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy
             if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {
                 /* PSX drops the dItem/dMissile terms devilution's dPiece/dMonster/dObject/dPlayer
                  * check has, and substitutes GetSOLID/IsDplayer for nSolidTable[dPiece]/dPlayer. */
-                if ((GetSOLID(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject) == 0) {
+                if ((GetSOLID(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject | IsDplayer(tx, ty)) == 0) {
                     missile[mi]._mix = tx;
                     missile[mi]._miy = ty;
                     missile[mi]._misx = tx;
@@ -1491,7 +1491,7 @@ void AddGolem(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
             tx = dx + CrawlTable[j];
             ty = dy + CrawlTable[j + 1];
             if (tx > 0 && tx < MAXDUNX && ty > 0 && ty < MAXDUNY) {  /* AddGolem: retail uses the playable bound (0x5F=95) here, unlike the sibling crawl-search fns */
-                if (LineClear(sx, sy, tx, ty) && (GetSOLID(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject) == 0) {
+                if (LineClear(sx, sy, tx, ty) && (GetSOLID(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject | IsDplayer(tx, ty)) == 0) {
                     missile[mi]._miVar1 = sx;
                     missile[mi]._miVar2 = sy;
                     missile[mi]._miVar4 = tx;
@@ -3888,7 +3888,7 @@ void MI_Golem(int i)
                 tx = missile[i]._miVar4 + CrawlTable[j];
                 ty = missile[i]._miVar5 + CrawlTable[j + 1];
                 if (tx > 0 && tx < 112 && ty > 0 && ty < 112) {  /* raw dung_map extent, not MAXDUNX/MAXDUNY */
-                    if (LineClear(missile[i]._miVar1, missile[i]._miVar2, tx, ty) && (GetSOLID(tx, ty) | IsDplayer(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject) == 0) {
+                    if (LineClear(missile[i]._miVar1, missile[i]._miVar2, tx, ty) && (GetSOLID(tx, ty) | dung_map[tx][ty].dMonster | dung_map[tx][ty].dObject | IsDplayer(tx, ty)) == 0) {
                         k = 6;
                         SpawnGolum(id, tx, ty, i);
                         break;
