@@ -400,6 +400,27 @@ void S_StartNoItems(void)
     }
 }
 
+/* @0x8006DD54 */
+void S_StartBoy(void)
+{
+    SItemListFlag = 0;
+    stextsize = 0;
+    stextscrl = 0;
+    AddSText(0, 1, 1, GetStr(0x4D8), 3, 0);
+    AddSLine(3);
+    if (boyitem._itype != -1) {
+        AddSText(0, 6, 1, GetStr(0x42D), 1, 1);
+        AddSText(0, 8, 1, GetStr(0x227), 0, 0);
+        AddSText(0, 9, 1, GetStr(0x94), 0, 0);
+        AddSText(0, 10, 1, GetStr(0x22E), 0, 0);
+        AddSText(0, 12, 1, GetStr(0x4CB), 0, 1);
+        AddSText(0, 13, 1, GetStr(0x38C), 0, 1);
+    } else {
+        AddSText(0, 8, 1, GetStr(0x42D), 1, 1);
+        AddSText(0, 12, 1, GetStr(0x38C), 0, 1);
+    }
+}
+
 /* @0x8006979C -- the two RECT* branches (`(RECT*)((short*)&Field.y - 2)`) are transcribed literally
  * from the oracle's raw pointer arithmetic (StoreBackRect/StoreBackRectClipper are 8 bytes apart,
  * confirmed adjacent in the SYM); this reads 4 bytes BEFORE the named .y field on purpose, per the
