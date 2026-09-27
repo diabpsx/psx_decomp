@@ -77,6 +77,14 @@ void FreeStoreMem(void)
 {
 }
 
+/* @0x800695AC */
+void DrawSTextBack(void)
+{
+    SBack.SetBorder(0x1A);
+    SBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    SBack.Back(20, 24, 280, 205);
+}
+
 /* @0x80069CD8 */
 void ClearSText(int s, int e)
 {
