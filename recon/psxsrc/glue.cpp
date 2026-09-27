@@ -412,10 +412,14 @@ void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
 void BgTask(struct TASK *T)
 {
     struct DEF_ARGS *Args;
-    int TextId, Level, MLev;
+    int Level;
+    int MLev;
     BOOL IsTown;
     void *List;
-    void *Plr;
+    int TextId;
+    struct PlayerStruct *Plr1;
+    struct PlayerStruct *Plr2;
+    struct PlayerStruct *Plr;
 
     MLev = -1;
     List = (void *)-1;
@@ -429,6 +433,8 @@ void BgTask(struct TASK *T)
     GLUE_SetHomingScrollFlag(0);
     GLUE_SetShowPanelFlag(0);
     GLUE_SetFinished(0);
+    Plr1 = (struct PlayerStruct *)&plr[0];
+    Plr2 = (struct PlayerStruct *)&plr[0x19E8];
     if ((unsigned int)(currlevel - 0xF) < 2) {
         TSK_AddTask(0x8000, (void *)penta_cycle_task__FP4TASK, 0xC78, 0);
     }
@@ -448,9 +454,9 @@ void BgTask(struct TASK *T)
     UPDATEPROGRESS__Fi(4);
     CPlayer P1(IsTown, 0, FePlayerNo);
     CPlayer P2(IsTown, 1, FePlayerNo);
-    MakeSurePlayerDressedProperly(P1, *(struct PlayerStruct *)&plr[0], IsTown, 1);
+    MakeSurePlayerDressedProperly(P1, *Plr1, IsTown, 1);
     if (FePlayerNo != 0) {
-        MakeSurePlayerDressedProperly(P2, *(struct PlayerStruct *)&plr[0x19E8], IsTown, 1);
+        MakeSurePlayerDressedProperly(P2, *Plr2, IsTown, 1);
     }
     UPDATEPROGRESS__Fi(1);
     FinishProgress__Fv();
@@ -463,7 +469,7 @@ void BgTask(struct TASK *T)
     }
     music_start__Fi(leveltype);
     PaletteFadeIn__Fi(8);
-    P1.SetScrollTarget(*(struct PlayerStruct *)&plr[0], Blocks);
+    P1.SetScrollTarget(*Plr1, Blocks);
     Blocks.MoveToScrollTarget();
     GLUE_SetShowGameScreenFlag(1);
     GLUE_SetHomingScrollFlag(1);
@@ -492,11 +498,11 @@ void BgTask(struct TASK *T)
                 Blocks.SetRandOffset(D_8011C6C4);
                 D_8011C6C0 -= 1;
             }
-            Plr = &plr[0];
+            Plr = Plr1;
             if (plr[0x1D] == 0) {
-                Plr = &plr[0x19E8];
+                Plr = Plr2;
             }
-            P1.SetScrollTarget(*(struct PlayerStruct *)Plr, Blocks);
+            P1.SetScrollTarget(*Plr, Blocks);
             if (DoHomingScroll != 0 && deathflag == 0) {
                 Blocks.DoScroll();
             }
@@ -505,11 +511,11 @@ void BgTask(struct TASK *T)
             if (DoShowPanel != 0) {
                 DoShowPanelGFX(Panel1, Panel2);
             }
-            MakeSurePlayerDressedProperly(P1, *(struct PlayerStruct *)&plr[0], IsTown, 0);
-            P1.Print(*(struct PlayerStruct *)&plr[0], Blocks);
+            MakeSurePlayerDressedProperly(P1, *Plr1, IsTown, 0);
+            P1.Print(*Plr1, Blocks);
             if (FePlayerNo != 0) {
-                MakeSurePlayerDressedProperly(P2, *(struct PlayerStruct *)&plr[0x19E8], IsTown, 0);
-                P2.Print(*(struct PlayerStruct *)&plr[0x19E8], Blocks);
+                MakeSurePlayerDressedProperly(P2, *Plr2, IsTown, 0);
+                P2.Print(*Plr2, Blocks);
             }
             if (IsTown) {
                 DrawLBird__Fv();

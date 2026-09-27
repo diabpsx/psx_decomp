@@ -414,13 +414,24 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
 
 void GPanel::DrawDurIcon(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
-    (void)XY;
-    if (spspelstate[Plr->_pClassGfx] == 0) {
-        DrawDurThingy(XY->HeadDurX, XY->HeadDurY, &Plr->InvBody[0], 3);
-        DrawDurThingy(XY->BodyDurX, XY->BodyDurY, &Plr->InvBody[6], 2);
-        DrawDurThingy(XY->Hand0DurX, XY->Hand0DurY, &Plr->InvBody[4], -1);
-        DrawDurThingy(XY->Hand1DurX, XY->Hand1DurY, &Plr->InvBody[5], -1);
+    if (chrflag == 0) {
+        if (questlog != 0) {
+            if (invflag != 0 || sbookflag != 0) {
+                return;
+            }
+        }
+    } else {
+        if (invflag != 0 || sbookflag != 0) {
+            return;
+        }
     }
+    if (gbMaxPlayers != 1 && spspelstate[Plr->_pClassGfx] != 0) {
+        return;
+    }
+    DrawDurThingy(XY->HeadDurX, XY->HeadDurY, &Plr->InvBody[0], 3);
+    DrawDurThingy(XY->BodyDurX, XY->BodyDurY, &Plr->InvBody[6], 2);
+    DrawDurThingy(XY->Hand0DurX, XY->Hand0DurY, &Plr->InvBody[4], -1);
+    DrawDurThingy(XY->Hand1DurX, XY->Hand1DurY, &Plr->InvBody[5], -1);
 }
 
 void GPanel::Print(struct PanelXY *XY, struct PlayerStruct *Plr)
