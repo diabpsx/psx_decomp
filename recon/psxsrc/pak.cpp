@@ -59,22 +59,24 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
     unsigned char *theptr, *ptr1, *ptr2, *ptr3;
     struct block theblock;
     int inpos;
+    int maxlen = 255;
 
     theblock.blocksize = 0;
-    theblock.blocksize = 1;
+    theblock.data[0] = buffer[0];
+    inpos = 1;
+    theblock.blocksize = inpos;
     theblock.Dest = Dest;
     theblock.outsize = 0;
     theblock.blockrep = 0;
-    theblock.data[0] = buffer[0];
     theblock.data[1] = buffer[1];
-    inpos = 2;
+    inpos++;
     while (inpos < insize) {
         begin = -inpos;
         if (begin < -128)
             begin = -128;
         end = insize - inpos;
-        if (end > 255)
-            end = 255;
+        if (end > maxlen)
+            end = maxlen;
         bestoffset = begin;
         bestlength = 1;
         ptr1 = (unsigned char *)&buffer[inpos + bestoffset];
@@ -87,11 +89,11 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
                 ptr2 = ptr1 + bestlength;
                 ptr3 = theptr + bestlength;
                 while (*ptr2 == *ptr3) {
+                    ptr2++;
                     bestlength++;
                     if (bestlength >= end)
                         break;
                     ptr3++;
-                    ptr2++;
                 }
             }
             if (bestlength >= end) {
@@ -102,7 +104,8 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
         if (bestlength < 3) {
             if (theblock.blockrep || theblock.blocksize >= 127)
                 writeblock(&theblock);
-            *(theblock.data + ++theblock.blocksize) = buffer[inpos++];
+            *(theblock.data + theblock.blocksize + 1) = buffer[inpos++];
+            theblock.blocksize++;
         } else {
             writeblock(&theblock);
             inpos += bestlength;
