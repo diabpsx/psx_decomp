@@ -3117,24 +3117,15 @@ void Obj_Trap(int i)
     int oti;
     unsigned char otrig;
     int sx, sy, dx, dy;
-    int ax, ay;
     int x, y;
+    int ax, ay;
     int mdir;
 
+    otrig = 0;
     if (object[i]._oVar4 != 0)
         return;
     oti = dung_map[object[i]._oVar1][object[i]._oVar2].dObject - 1;
-    otrig = 0;
     switch ((char)((unsigned char)object[oti]._otype - 1)) {
-    case 0:
-    case 1:
-    case 41:
-    case 42:
-    case 73:
-    case 74:
-        if (object[oti]._oVar4 != 0)
-            otrig = 1;
-        break;
     case 3:
     case 4:
     case 5:
@@ -3142,6 +3133,15 @@ void Obj_Trap(int i)
     case 27:
     case 47:
         if (object[oti]._oSelFlag == 0)
+            otrig = 1;
+        break;
+    case 0:
+    case 1:
+    case 41:
+    case 42:
+    case 73:
+    case 74:
+        if (object[oti]._oVar4 != 0)
             otrig = 1;
         break;
     }
