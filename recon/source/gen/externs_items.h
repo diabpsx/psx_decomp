@@ -59,4 +59,4 @@ extern char tempstr[256];   /* @0x800CEA10 */
 unsigned char uitemflag;   /* @0x8011B8DC */  /* TU-owned tentative def, %gp_rel-reached */
 extern struct ObjectStruct object[127];   /* @0x800D8C4C */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
-extern unsigned short D_801161F4[];   /* @0x801161F4 — per-anim-set text id table (not ItemAnimLs) */
+static unsigned short Item2Frm[35];   /* @0x801161F4 SYM: STAT ARY SHORT[35] */

@@ -5,6 +5,9 @@ void NewCursor(int i);   /* @0x80037804 CURSOR.CPP:179 */
 void PlaySfxLoc(int psfx, int x, int y);   /* @0x8003D784 EFFECTS.CPP:535 */
 void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP:94 */
+void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
+void NetSendCmdDItem(unsigned char a, int ii);
+void DeltaAddItem(int ii);
 
 void AddInitItems(void);   /* @0x8003E2F0 ITEMS.CPP:588 */
 void BubbleSwapItem(ItemStruct *a, ItemStruct *b);   /* @0x800499B0 ITEMS.CPP:5590 */

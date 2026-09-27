@@ -29,6 +29,7 @@
 #define IT_AMULET 13
 #define IT_FOOD 14
 
+#define IMID_NONE 0
 #define IMID_PHEAL 2
 #define IMID_PLHEAL 3
 #define IMID_PMANA 6
@@ -55,6 +56,10 @@
 #define ICI_UNIQUE 0x0200
 #define ICI_PREGEN 0x8000
 #define ICI_TOWNMASK 0x7c00
+#define IMID_RING 25
+#define IMID_AMULET 26
+#define IMID_UNIQUE 27
+#define IMAGIC_UNIQUE 2
 #define IMID_ESTR 10
 #define IMID_EMAG 11
 #define IMID_EDEX 12
@@ -1014,7 +1019,7 @@ void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int iv
 
 /* @0x80043530 ITEMS.CPP:2598 — PSX drops the DROPLOG debug call and the _iAnimData/_iAnimWidth/
  * _iAnimWidth2 sets (PSX's item sprite system reaches ItemCAnimTbl directly, no itemanims[] pointer);
- * `D_801161F4[it]` replaces hellfire's ItemAnimLs[it] with a different (unnamed) per-anim-set table;
+ * `Item2Frm[it]` replaces hellfire's ItemAnimLs[it] with a different (unnamed) per-anim-set table;
  * adds `item[i]._PlrCreate = FePlayerNo` */
 void SetupItem(int i)
 {
@@ -1023,7 +1028,7 @@ void SetupItem(int i)
     it = ItemCAnimTbl[item[i]._iCurs];
     item[i]._iIdentified = FALSE;
     item[i]._iPostDraw = FALSE;
-    item[i]._iAnimLen = D_801161F4[it];
+    item[i]._iAnimLen = Item2Frm[it];
     if (plr[myplr].pLvlLoad == 0) {
         item[i]._iAnimFrame = 1;
         item[i]._iAnimFlag = TRUE;
@@ -1069,6 +1074,230 @@ int CheckUnique(int i, int lvl, int uper, unsigned char recreate)
         }
     }
     return j;
+}
+
+/* @0x80044D20 ITEMS.CPP:3018 — PSX uses hellfire's `#if 0`'d ORIGINAL body (IDI_HEAL/IDI_MANA/IDI_PORTAL
+ * coin-flips), not the active switch(random(34,7)) rewrite, and drops the "added 7/30/97" IDI_OILACC line */
+void SetupAllUseful(int ii, int iseed, int lvl)
+{
+    int idx;
+
+    item[ii]._iSeed = iseed;
+    SetRndSeed(iseed);
+
+    if (ENG_random(2)) idx = 0x18;
+    else idx = 0x19;
+
+    if ((lvl > 1) && (ENG_random(3) == 0)) idx = 0x1b;
+
+    GetItemAttrs(ii, idx, lvl);
+    item[ii]._iCreateInfo = lvl + ICI_USEFUL;
+    item[ii]._PlrCreate = FePlayerNo;
+    SetupItem(ii);
+}
+
+/* @0x80044490 ITEMS.CPP:2862 — PSX sets `item[ii]._PlrCreate = FePlayerNo` twice (before + after the
+ * _iCreateInfo flag assembly); when `recreate` is set, `uid` is `idx` directly instead of calling
+ * CheckUnique (CheckUnique's own `recreate` arg is always passed 0 here); the IMID_UNIQUE branch drops
+ * hellfire's `if (item[ii]._iLoc != IL_INV)` guard (always calls GetUniqueItem) */
+void SetupAllItems(int ii, int idx, int iseed, int lvl, int uper, unsigned char onlygood, unsigned char recreate, unsigned char pregen)
+{
+    int iblvl, uid;
+
+    item[ii]._iSeed = iseed;
+    item[ii]._PlrCreate = FePlayerNo;
+    SetRndSeed(iseed);
+    GetItemAttrs(ii, idx, lvl >> 1);
+    item[ii]._iCreateInfo = lvl;
+    item[ii]._PlrCreate = FePlayerNo;
+    if (pregen) item[ii]._iCreateInfo |= ICI_PREGEN;
+    if (onlygood) item[ii]._iCreateInfo |= ICI_ONLYGOOD;
+    if (uper == 15) item[ii]._iCreateInfo |= ICI_UPER15;
+    else if (uper == 1) item[ii]._iCreateInfo |= ICI_UPER1;
+    if (item[ii]._iMiscId != IMID_UNIQUE && !recreate) {
+        iblvl = -1;
+        if (ENG_random(100) <= 10) iblvl = lvl;
+        else if (ENG_random(100) <= lvl) iblvl = lvl;
+        if ((iblvl == -1) && (item[ii]._iMiscId == IMID_STAFF)) iblvl = lvl;
+        if ((iblvl == -1) && (item[ii]._iMiscId == IMID_RING)) iblvl = lvl;
+        if ((iblvl == -1) && (item[ii]._iMiscId == IMID_AMULET)) iblvl = lvl;
+        if (onlygood) iblvl = lvl;
+        if (uper == 15) iblvl = lvl + 4;
+        if (iblvl != -1) {
+            uid = CheckUnique(ii, iblvl, uper, 0);
+            if (uid == -1)
+                GetItemBonus(ii, idx, iblvl >> 1, iblvl, onlygood);
+            else {
+                GetUniqueItem(ii, uid);
+                item[ii]._iCreateInfo |= ICI_UNIQUE;
+            }
+        }
+        if (item[ii]._iMagical != IMAGIC_UNIQUE) ItemRndDur(ii);
+    } else {
+        GetUniqueItem(ii, iseed);
+    }
+    SetupItem(ii);
+}
+
+/* @0x80044A20 ITEMS.CPP:2964 — PSX drops GetEffLevel() (uses currlevel directly); in town (currlevel==0)
+ * only uid==2 or uid==8 are allowed — any other uid is rejected with a PlaySFX(0x3D3) + early return
+ * (unless numitems is already near the cap); sets item[ii]._iMagical=IMAGIC_UNIQUE directly and, unless
+ * this is a delta-load or a quest level (currlevel==3||7), broadcasts NetSendCmdDItem */
+void CreateItem(int uid, int x, int y)
+{
+    int ii, idx;
+
+    if (numitems < MAXITEMS) {
+        if (currlevel == 0) {
+            int want = (uid < 4) ? 2 : 8;
+            if (uid != want) {
+                if (numitems < 0x7B) {
+                    PlaySFX(0x3D3);
+                    return;
+                }
+            }
+        }
+
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        idx = 0;
+        while (AllItemsList[idx].iItemId != UniqueItemList[uid].UIItemId) idx++;
+        GetItemAttrs(ii, idx, currlevel);
+        GetUniqueItem(ii, uid);
+        SetupItem(ii);
+        item[ii]._iMagical = IMAGIC_UNIQUE;
+        if (!deltaload && currlevel != 7 && currlevel != 3) NetSendCmdDItem(0, ii);
+        numitems++;
+    }
+}
+
+/* @0x80044E04 ITEMS.CPP:2915 — PSX drops GetEffLevel() (uses currlevel directly) and the CHEATS block */
+void CreateRndUseful(int pnum, int x, int y, unsigned char sendmsg)
+{
+    int ii;
+
+    if (numitems < MAXITEMS) {
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        SetupAllUseful(ii, GetRndSeed(), currlevel);
+        if (sendmsg) NetSendCmdDItem(0, ii);
+        numitems++;
+    }
+}
+
+/* @0x80044BD8 ITEMS.CPP:2862 */
+void CreateRndItem(int x, int y, unsigned char onlygood, unsigned char sendmsg, unsigned char delta)
+{
+    int ii, idx;
+
+    if (onlygood) idx = RndUItem(-1);
+    else idx = RndAllItems();
+    if (numitems < MAXITEMS) {
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, onlygood, 0, delta);
+        if (sendmsg) NetSendCmdDItem(0, ii);
+        if (delta) DeltaAddItem(ii);
+        numitems++;
+    }
+}
+
+/* @0x80044EC4 ITEMS.CPP:3078 — PSX drops GetEffLevel() (uses currlevel directly) and the CHEATS block;
+ * RndTypeItems here has only 2 params (itype,imisc) */
+void CreateTypeItem(int x, int y, unsigned char onlygood, int itype, int imisc, unsigned char sendmsg, unsigned char delta)
+{
+    int ii, idx;
+
+    if (itype != IT_GOLD) idx = RndTypeItems(itype, imisc);
+    else idx = 0;
+    if (numitems < MAXITEMS) {
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, onlygood, 0, delta);
+        if (sendmsg) NetSendCmdDItem(0, ii);
+        if (delta) DeltaAddItem(ii);
+        numitems++;
+    }
+}
+
+/* @0x80048BA0 ITEMS.CPP:4832 — PSX-specific rewrite: no hellfire equivalent shape (no bookminlevel/
+ * spelldata precheck); instead a do/while re-rolls SetupAllItems until the item is a book of the right
+ * spell, same idiom as CreateMagicWeapon/CreateMagicArmor */
+void CreateSpellBook(int x, int y, int ispell, unsigned char sendmsg, unsigned char delta)
+{
+    int ii, idx;
+    unsigned char done = FALSE;
+
+    idx = RndTypeItems(IT_MISC, IMID_BOOK);
+    if (numitems < MAXITEMS) {
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        do {
+            SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, 1, 0, delta);
+            if (item[ii]._iMiscId == IMID_BOOK && item[ii]._iSpell == ispell) done = TRUE;
+        } while (!done);
+        if (sendmsg) NetSendCmdDItem(0, ii);
+        if (delta) DeltaAddItem(ii);
+        numitems++;
+    }
+}
+
+/* @0x80048D30 — PSX: no GetEffLevel() call, currlevel used inline; RndTypeItems takes only
+ * (itype, imid) on PSX, third efflevel arg dropped (matches RndTypeItems__Fii elsewhere) */
+void CreateMagicArmor(int x, int y, int imisc, int icurs, unsigned char sendmsg, unsigned char delta)
+{
+    int ii, idx;
+    unsigned char done = FALSE;
+
+    if (numitems < MAXITEMS) {
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        idx = RndTypeItems(imisc, IMID_NONE);
+        do {
+            SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, 1, 0, delta);
+            if (item[ii]._iCurs == icurs) done = TRUE;
+            else idx = RndTypeItems(imisc, IMID_NONE);
+        } while (!done);
+        if (sendmsg) NetSendCmdDItem(0, ii);
+        if (delta) DeltaAddItem(ii);
+        numitems++;
+    }
+}
+
+/* @0x80048EAC — PSX: same shape as CreateMagicArmor; hellfire's IT_STAFF->IMID_STAFF special
+ * case is dropped, RndTypeItems always called with IMID_NONE (2-arg form, no efflevel) */
+void CreateMagicWeapon(int x, int y, int imisc, int icurs, unsigned char sendmsg, unsigned char delta)
+{
+    int ii, idx;
+    unsigned char done = FALSE;
+
+    if (numitems < MAXITEMS) {
+        ii = itemavail[0];
+        GetSuperItemSpace(x, y, ii);
+        itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+        itemactive[numitems] = ii;
+        idx = RndTypeItems(imisc, IMID_NONE);
+        do {
+            SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, 1, 0, delta);
+            if (item[ii]._iCurs == icurs) done = TRUE;
+            else idx = RndTypeItems(imisc, IMID_NONE);
+        } while (!done);
+        if (sendmsg) NetSendCmdDItem(0, ii);
+        if (delta) DeltaAddItem(ii);
+        numitems++;
+    }
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */

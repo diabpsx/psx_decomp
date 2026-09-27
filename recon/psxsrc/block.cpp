@@ -236,6 +236,7 @@ public:
     void MakeRectTable();
     void InitColourCycling();
     CBlocks(int BgId, int ObjId, int ItemId, int Level, int List);
+    ~CBlocks();
 };
 
 void MyRoutine(CBlocks &B, int x, int y);
@@ -788,4 +789,20 @@ void CBlocks::MakeGt4Table()
                 Gt4s[f].Flags |= 0x10;
         }
     }
+}
+
+extern struct TextDat *MissDat;
+
+/* @0x8008D960 BLOCK.CPP:493 */
+CBlocks::~CBlocks()
+{
+    DumpMonsters();
+    DumpObjs();
+    DumpItems();
+    DumpGt4s();
+    DumpRects();
+    if (MissDat)
+        GM_FinishedUsing(MissDat);
+    MissDat = NULL;
+    CurrentBlocks = NULL;
 }
