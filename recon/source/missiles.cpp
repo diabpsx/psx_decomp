@@ -1026,12 +1026,8 @@ void AddLightball(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
         missile[mi]._miVar1 = plr[id]._px;
         missile[mi]._miVar2 = plr[id]._py;
     }
-    /* PSX-only addition: mienemy carries an extra bit-1 flag (not just the TARGET_ enum) that
-     * triggers a light source here -- no PC twin has this AddLight call. Near-miss: oracle keeps
-     * `mienemy` in a dedicated saved reg across the whole fn (re-tested after the if/else); ours
-     * coalesces it into the same reg as `dam`. Falsified: duplicating the check into both arms
-     * (gcc tail-merged it right back, worse). */
-    if (mienemy & 2)
+    /* PSX-only addition: missile slots with bit 1 set receive a light source here. */
+    if (mi & 2)
         missile[mi]._mlid = AddLight(sx, sy, 0x243);
 }
 

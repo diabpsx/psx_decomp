@@ -732,13 +732,8 @@ void DeleteMonsterList(void)
     }
 }
 
-/* SYM+bytes OPEN (74 vs 75 insns): the masked mMagicRes value should live directly in a
- * callee-saved reg across the GetStr/strcpy/AddPanelString calls (oracle: one `lhu s0,...;
- * andi s0,s0,63`), ours loads into v0 first then masks into s0 (an extra move) -- a pure
- * allocator tie-break on a single-statement load+mask.  Falsified: caching `tempstr` into a
- * local pointer held across the calls (made it WORSE, 69/75 -- wrong lever, tempstr address is
- * genuinely re-materialized per call site in the oracle, not cached).  Next angle: split the
- * load and mask into two statements, or try `unsigned` vs `int` for res. */
+/* The explicit resistance/immunity arms and shared final AddPanelString preserve the original
+ * register-cache and branch layout; equivalent ternaries compile differently under SN C++. */
 void PrintUniqueHistory(void)
 {
     int res;
@@ -749,13 +744,18 @@ void PrintUniqueHistory(void)
         strcpy(tempstr, GetStr(0x2D2));
         AddPanelString(tempstr, 1);
         strcpy(tempstr, GetStr(0x2CD));
-        AddPanelString(tempstr, 1);
     } else {
-        strcpy(tempstr, GetStr((res & 7) ? 0x3E7 : 0x2D2));
+        if (res & 7)
+            strcpy(tempstr, GetStr(0x3E7));
+        else
+            strcpy(tempstr, GetStr(0x2D2));
         AddPanelString(tempstr, 1);
-        strcpy(tempstr, GetStr((res & 0x38) ? 0x3E6 : 0x2CD));
-        AddPanelString(tempstr, 1);
+        if (res & 0x38)
+            strcpy(tempstr, GetStr(0x3E6));
+        else
+            strcpy(tempstr, GetStr(0x2CD));
     }
+    AddPanelString(tempstr, 1);
     _pinfoflag[sel_data] = 1;
 }
 
@@ -1263,22 +1263,22 @@ void MAI_Ranged(int i, int missile_type, unsigned char special)
     }
 }
 
-/* OPEN: bytes near-miss (11 diffs, 77 vs 78 insns) -- scheduling-only (which of two independent
- * instructions the sw/lb pair emits first) + one register choice (a0 vs s2 for md across the
- * M_CheckEFlag-analog call).  Declaration order swap (md first vs last) made no difference. */
+/* OPEN: bytes near-miss (4 diffs, 78 == 78 insns), exact SYM. Retail saves s3 and loads _mx
+ * before the remaining prologue saves; ours schedules that independent pair later. The PSX
+ * control flow deliberately skips the _mdir store after MAI_Succ, unlike the PC twin. */
 void MAI_Lazhelp(int i)
 {
-    int mx, my;
-    MonsterStruct *Monst = &monster[i];
     int md;
+    MonsterStruct *Monst = &monster[i];
+    int _mx, _my;
 
-    mx = Monst->_mx;
-    my = Monst->_my;
+    _mx = Monst->_mx;
+    _my = Monst->_my;
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
-        if (dung_map[mx][my].dFlags & BFLAG_MONSTACTIVE) {
-            mx = Monst->_mx - Monst->_menemyx;
-            my = Monst->_my - Monst->_menemyy;
+        if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+            _mx = Monst->_mx - Monst->_menemyx;
+            _my = Monst->_my - Monst->_menemyy;
             if (gbMaxPlayers == 1) {
                 if (quests[Q_BETRAYER]._qvar1 <= 5)
                     Monst->_mgoal = MG_TALK;
@@ -1292,8 +1292,9 @@ void MAI_Lazhelp(int i)
         }
         if (Monst->_mgoal == MG_ATTACK) {
             MAI_Succ(i);
+        } else {
+            monster[i]._mdir = md;
         }
-        monster[i]._mdir = md;
     }
     if (Monst->_mmode == MM_STAND)
         Monst->Action = MA_STAND;

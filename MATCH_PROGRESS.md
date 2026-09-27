@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2445 / 2727 functions PASS (89.7%) — 837 PsyQ SDK functions excluded**
+**Game code: 2447 / 2727 functions PASS (89.7%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1493,7 +1493,7 @@
 - ✅ GetNumOfFrames__7TextDat (5)
 - ✅ GetFr__7TextDati_8007d5dc (7)
 
-## missiles  (recon/source/missiles.cpp) — 77/115 PASS
+## missiles  (recon/source/missiles.cpp) — 78/115 PASS
 - ❌ GetDamageAmt__FiPiT1 — 712 diffs (ours 382)
 - ✅ CheckBlock__Fiiii (45)
 - ✅ FindClosest__Fiii (99)
@@ -1520,7 +1520,7 @@
 - ✅ AddFirebolt__Fiiiiiicii (142)
 - ❌ AddMagmaball__Fiiiiiicii — 45 diffs (ours 71)
 - ✅ AddTeleport__Fiiiiiicii (143)
-- ❌ AddLightball__Fiiiiiicii — 11 diffs (ours 90)
+- ✅ AddLightball__Fiiiiiicii (90)
 - ❌ AddFirewall__Fiiiiiicii — 33 diffs (ours 126)
 - ✅ AddFireball__Fiiiiiicii (155)
 - ✅ AddLightctrl__Fiiiiiicii (59)
@@ -1617,7 +1617,7 @@
 - ✅ ML_SetList__Fii (44)
 - ✅ ML_GetPresetMonsters__FiPiUl (124)
 
-## monster  (recon/source/monster.cpp) — 69/105 PASS
+## monster  (recon/source/monster.cpp) — 70/105 PASS
 - ✅ DeleteMonster__Fi (14)
 - ✅ M_GetDir__Fi (25)
 - ✅ M_StartDelay__Fii (20)
@@ -1698,7 +1698,7 @@
 - ❌ MAI_Zhar__Fi — 56 diffs (ours 127)
 - ❌ MAI_SnotSpil__Fi — 4 diffs (ours 148)
 - ❌ MAI_Lazurus__Fi — 4 diffs (ours 169)
-- ❌ MAI_Lazhelp__Fi — 11 diffs (ours 78)
+- ❌ MAI_Lazhelp__Fi — 4 diffs (ours 78)
 - ❌ MAI_Lachdanan__Fi — 4 diffs (ours 108)
 - ❌ MAI_Warlord__Fi — 74 diffs (ours 90)
 - ✅ DeleteMonsterList__Fv (73)
@@ -1711,7 +1711,7 @@
 - ✅ LineClearF1__FPFiii_Uciiiii (165)
 - ⬜ M_FallenFear__Fii
 - ✅ PrintMonstHistory__Fi (161)
-- ❌ PrintUniqueHistory__Fv — 11 diffs (ours 75)
+- ✅ PrintUniqueHistory__Fv (75)
 - ❌ MissToMonst__Fiii — 46 diffs (ours 307)
 - ✅ PosOkMonst3__Fiii (183)
 - ✅ M_SpawnSkel__Fiii (84)
