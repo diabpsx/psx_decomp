@@ -21,6 +21,46 @@ typedef struct {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     CdlLOC  loc;
 } StHEADER;
 
+/* @0x80158840 PADS.H (header copy):120 -- CPad::GetDown() const, inlined afresh per TU (-fno-inline
+ * would emit it once; PsyQ 4.0 without that flag re-emits the inline body at every call site's TU). */
+class CPad {   /* sizeof 236, PADS.H */
+public:
+    unsigned char get_both;
+    unsigned char active;
+    unsigned char PadType;
+    unsigned char PADTICK;
+    unsigned short PADTICKMASK;
+    unsigned short PadNum;
+    unsigned short Cur;
+    unsigned short Up;
+    unsigned short Down;
+    unsigned short Tick;
+    unsigned short Old;
+    unsigned short both_Cur;
+    unsigned short both_Up;
+    unsigned short both_Down;
+    unsigned short both_Tick;
+    unsigned short both_Old;
+    BOOL TickDown[16];
+    BOOL TickBoth[16];
+    unsigned char TickCount[16];
+    unsigned short BothTickCount[16];
+    unsigned short GazTickCount[16];
+
+    unsigned short GetCur() const
+    {
+        if (get_both)
+            return both_Cur;
+        return Cur;
+    }
+    unsigned short GetDown() const
+    {
+        if (get_both)
+            return both_Down;
+        return Down;
+    }
+};
+
 struct mdec_queue_entry {   /* sizeof 20 -- one queued PlayFMVOverLay-less streamed movie request */
     char *name;
     int speed;
@@ -66,6 +106,21 @@ int SpuSetVoiceAttr(void *attr);
 void SPU_Init(void);
 int ENG_random(long n);
 int VSync(int mode);
+int VID_GetTick(void);
+void systemtask(int);
+int strcmp(const char *a, const char *b);
+char *strcpy(char *dst, const char *src);
+int sprintf(char *dst, const char *fmt, ...);
+int STR_AllocBuffer(void);
+void *Tmalloc(int size);
+int Tfree(void *p);
+int GetVideoMode(void);
+int SetDispMask(int mask);
+void TICK_Update(void);
+void PAD_Handler(void);
+void VID_AfterDisplay(void);
+void VID_SetDBuffer(BOOL on);
+int TSK_Sleep(int frames);
 /* MDEC/VLC decoder-core library helpers (linked from another TU/lib -- unlabeled in the raw, real
  * retail names unknown; kept as func_<VA> per the raw oracle). */
 void func_8013B6EC(void *vlc_table);
@@ -76,7 +131,7 @@ void func_8013AD94(void *data);
 void func_8013ADA0(void *vlcbuf_half, int mode);
 void func_8013AE1C(void *dst, int size);
 /* PAD / audio / misc engine helpers used by LoPlayFMVOverLay's main loop (other TUs). */
-int PAD_GetPad(int pnum, int mode);
+class CPad *PAD_GetPad(int pnum, int mode);
 void PA_SetPauseOk(int on);
 }
 
@@ -86,28 +141,32 @@ static unsigned char *stream_bufh;
 static int stream_bufsize;
 static unsigned char *stream_buf;
 static int stream_chunks_borrowed;
-static int stream_in;
+static volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
 static int stream_out;
-static int stream_chunks_total;
-static int stream_chunks_in;
+static volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
+static volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
 static int _discard_count;
 static int _get_count;
-static int cdstream_resetsec;
-static int cdstream_resetting;
+static volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
+static volatile int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
 static int stream_handler_installed;
 static void *old_cdready_handler;
-static int stream_ending;
-static int first_handler_event;
-static int last_handler_event;
+static volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
+static volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
+static volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
 static int time_in_frames;
-static int stream_open;
-static int stream_stalled;
-static int stream_secnum;
-static int stream_subsec;
+static volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
+static volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
+static volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
+static volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
 static int stream_last_sector;
-static int D_8011C74C;   /* idx: chunk index of the sector about to be read */
-static int D_8011C754;   /* sec: CdPosToInt() result of the drive's actual position */
+static volatile int D_8011C74C;   /* idx: chunk index of the sector about to be read */
+static volatile int D_8011C754;   /* sec: CdPosToInt() result of the drive's actual position */
 static CdlLOC D_80121C98;   /* subcode: scratch CdlLOC for CdGetSector/CdPosToInt */
+static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movie filename buffer;
+                                      * LoPlayFMVOverLay strcpy's "DIABEND*.MOV" into it before queuing
+                                      * a play_mdec_stream/dequeue_animation request. Gap to the next
+                                      * undefined_syms_auto_fmv.txt symbol (D_80121D08) is exactly 0x20. */
 static int stream_opened;
 static int stream_startsec;
 static int stream_got_chunks;
@@ -160,7 +219,9 @@ static int mdec_sectors_per_frame, mdec_framecount, mdec_last_frame, mdec_speed;
 static int mdec_stream_starting, mdec_streaming, mdec_waiting_tail_unused;
 static int streampos;
 static int user_start;
-static unsigned char img_buf;
+static void *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
+static void *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
+static void *vlc_tab;      /* Tmalloc'd MDEC VLC table buffer, ditto */
 unsigned char imgbuf[0x15][4];   /* set_mdec_img_buffer: 21 x (u32 ptr) */
 
 /* @0x80155E1C FMV.CPP:295 */
@@ -410,7 +471,12 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
     stream_ending = 0;
     stream_chunks_total = 0;
     stream_secnum = 0;
-    CD_GetCdlFILE(fname, &RetFile);
+    /* NOT `fname` -- the raw hardcodes &g_movie_filename (@0x80121CE8), the ONE shared movie-name
+     * buffer LoPlayFMVOverLay fills (its own "DIABEND*.MOV" strcpy destination, %hi/%lo(D_80121CE8)
+     * matches ida's `-2146296600` calls there too). Every existing caller passes that same buffer's
+     * address as `fname`, so this is semantically a no-op vs the parameter -- but retail's C literally
+     * re-derives the global instead of forwarding the argument, and the bytes need the literal form. */
+    CD_GetCdlFILE(g_movie_filename, &RetFile);
     stream_secnum = CdPosToInt(&RetFile.pos);
     stream_secnum += secoffs;
     stream_startsec = stream_secnum;
@@ -609,7 +675,7 @@ extern "C" void rebuild_mdec_polys(int x, int y)
 }
 
 /* WIP -- NOT byte-verified (see split_poly_area note). @0x80156FB4 FMV.CPP:1044 */
-extern "C" int draw_mdec_polys(signed char bright)
+extern "C" int draw_mdec_polys(int bright)
 {
     int screen = PRIM_GetCurrentScreen();
 
@@ -993,56 +1059,140 @@ extern "C" void StrClearVRAM(void)
 }
 
 /* @0x80158358 FMV.CPP:1700 */
+typedef int jmp_buf[12];   /* PsyQ setjmp.h (psyq400/PSX/INCLUDE/SETJMP.H); same pattern as
+                            * recon/source/diablo.cpp's CreateLevel D_8012EC28. */
+extern "C" int setjmp(jmp_buf);
+extern "C" void longjmp(jmp_buf, int);
+extern "C" void GSYS_SetStackAndJump(void *Stack, void (*Func)(void *), void *Param);
+extern "C" void LoPlayFMVOverLay(void *);
+enum LANG_TYPE { LANG_ENGLISH, LANG_FRENCH, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_JAPANESE };
+extern int sglMasterVolume;
+
+static jmp_buf D_80121D08;     /* PlayFMVOverLay's own setjmp env (right after g_movie_filename[32],
+                                 * @0x80121CE8 + 0x20 = 0x80121D08). */
+static char *D_8011C758;       /* filename stashed across the GSYS_SetStackAndJump handoff */
+static int D_8011C75C;         /* w  ditto */
+static int D_8011C760;         /* h  ditto */
+/* Not gp-rel in the oracle (0x8012E534 is >32KB from $gp=0x8011A780, out of gp-relative range) --
+ * an unsized extern array forces the 2-insn lui/addiu absolute form instead of a tentative-def gp_rel
+ * access. Pre-allocated task stack top for LoPlayFMVOverLay; owning TU unknown/not yet reconstructed. */
+extern unsigned char D_8012E534[];
+
 extern "C" short PlayFMVOverLay(char *filename, int w, int h)
 {
-    extern int sglMusicVolume;
-    sfx_volume = (0x3FFF * sglMusicVolume) >> 8;
-    /* if (!TaskExists(...)) OpenTask(LoPlayFMVOverLay, ...) -- other TU, see near-miss note. */
+    sfx_volume = (sglMasterVolume * 0x3FFF) >> 8;
+    if (!setjmp(D_80121D08)) {
+        D_8011C758 = filename;
+        D_8011C75C = w;
+        D_8011C760 = h;
+        GSYS_SetStackAndJump(D_8012E534, LoPlayFMVOverLay, 0);
+    }
     return 0;
 }
 
 /* @0x801583E0 FMV.CPP:1737 -- see near-miss note: main FMV playback loop, uses ~15 other-TU helpers. */
-extern "C" void LoPlayFMVOverLay(void)
+static unsigned char D_8011B4E8;   /* language-variant byte for the DIABEND ending movie picker */
+
+extern "C" void LoPlayFMVOverLay(void *)
 {
-    /* WIP -- see report; needs the movie-name-table/task-arg globals nailed down first. */
+    char *filename = D_8011C758;
+    int w = D_8011C75C;
+    int h = D_8011C760;
+    int start = -1;
+    int end = -1;
+    int bright = 0x80;
+    int fade = 0;
+    int start_time = -1;
+    RECT r;   /* SYM AUTO local (sp-0x30); unreferenced in the raw -- same frame-hole class as
+               * wait_cdstream's start_wait (catalog 13A). */
+    int i;
+
+    time_in_frames = VID_GetTick();
+    for (i = 0; i < 100; i++)
+        systemtask(0);
+    D_8011B4E8 = 0;
+    if (strcmp("DIABEND.MOV", filename) != 0) {
+        switch (LANG_GetLang()) {
+        case LANG_ENGLISH:
+        case LANG_FRENCH:
+            D_8011B4E8 = (LANG_GetLang() == LANG_ENGLISH) ? 1 : 2;
+            sprintf(g_movie_filename, "DIABEND1.MOV");
+            break;
+        case LANG_GERMAN:
+        case LANG_SPANISH:
+            D_8011B4E8 = (LANG_GetLang() == LANG_GERMAN) ? 1 : 2;
+            sprintf(g_movie_filename, "DIABEND2.MOV");
+            break;
+        case LANG_ITALIAN:
+            D_8011B4E8 = 1;
+            sprintf(g_movie_filename, "DIABEND3.MOV");
+            break;
+        case LANG_JAPANESE:
+            DBG_Error(0, "psxsrc/FMV.CPP", 1790);
+            break;
+        }
+    } else {
+        strcpy(g_movie_filename, filename);
+    }
+    user_start = 0;
+    streampos = 0;
+    STR_AllocBuffer();
+    vlc_buf = Tmalloc(0x1D4C0);
+    img_buf = Tmalloc(0x22600);
+    time_in_frames = VID_GetTick();
+    init_mdec((unsigned char *)vlc_buf, (unsigned char *)vlc_tab);
+    init_mdec_polys(160, 120, w, h, 0, 256, 320, 256, 128);
+    set_mdec_img_buffer((unsigned char *)img_buf);
+    init_mdec_audio(1);
+    init_mdec_stream(map_buf, 10, 5);
+    StrClearVRAM();
+    switch (GetVideoMode()) {
+    case 0:
+        play_mdec_stream(g_movie_filename, 0x1333, start, end);
+        break;
+    case 1:
+        play_mdec_stream(g_movie_filename, 0x1000, start, end);
+        break;
+    default:
+        break;
+    }
+    SetDispMask(1);
+    VID_GetTick();
+    do {
+        time_in_frames = VID_GetTick();
+        if (start_time < time_in_frames) {
+            TICK_Update();
+            PAD_Handler();
+            draw_mdec_polys((signed char)bright);
+            if (fade != 0) {
+                bright -= 8;
+                set_mdec_audio_volume((short)(bright << 7));
+            }
+            VID_AfterDisplay();
+        }
+        decode_mdec_stream(1);
+        if (start_time == -1 && mdec_last_frame != -1)
+            start_time = time_in_frames;
+        CPad *P1 = PAD_GetPad(0, 1);
+        CPad *P2 = PAD_GetPad(0, 2);
+        if ((P1->GetDown() & 0x10) != 0 || (P2->GetDown() & 0x10) != 0) {
+            user_start = 1;
+            fade = 1;
+        }
+        if ((P1->GetDown() & 0x40) != 0 || (P2->GetDown() & 0x40) != 0)
+            fade = 1;
+    } while (mdec_streaming != 0 && bright >= 0);
+    stop_mdec_stream();
+    wait_cdstream();
+    kill_mdec_audio();
+    VID_SetDBuffer(0);
+    VSync(0);
+    Tfree(vlc_buf);
+    Tfree(img_buf);
+    StrClearVRAM();
+    TSK_Sleep(1);
+    StrClearVRAM();
+    TSK_Sleep(3);
+    longjmp(D_80121D08, 1);
 }
 
-/* @0x80158840 PADS.H (header copy):120 -- CPad::GetDown() const, inlined afresh per TU (-fno-inline
- * would emit it once; PsyQ 4.0 without that flag re-emits the inline body at every call site's TU). */
-class CPad {   /* sizeof 236, PADS.H */
-public:
-    unsigned char get_both;
-    unsigned char active;
-    unsigned char PadType;
-    unsigned char PADTICK;
-    unsigned short PADTICKMASK;
-    unsigned short PadNum;
-    unsigned short Cur;
-    unsigned short Up;
-    unsigned short Down;
-    unsigned short Tick;
-    unsigned short Old;
-    unsigned short both_Cur;
-    unsigned short both_Up;
-    unsigned short both_Down;
-    unsigned short both_Tick;
-    unsigned short both_Old;
-    BOOL TickDown[16];
-    BOOL TickBoth[16];
-    unsigned char TickCount[16];
-    unsigned short BothTickCount[16];
-    unsigned short GazTickCount[16];
-
-    unsigned short GetCur() const
-    {
-        if (get_both)
-            return both_Cur;
-        return Cur;
-    }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-};
