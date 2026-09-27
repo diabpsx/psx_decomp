@@ -1777,6 +1777,7 @@ void MI_Firebolt(int i)
 {
     int omx, omy, d, p;
 
+    d = 0;
     missile[i]._mirange--;
     /* PSX (like hellfire's source shape) checks the bonespirit-impact early-out FIRST,
      * not as a trailing else-if the way devilution's source reads. */
@@ -1799,17 +1800,22 @@ void MI_Firebolt(int i)
     p = missile[i]._misource;
     if (p != -1) {
         if (missile[i]._micaster == TARGET_MONSTERS) {
-            if (missile[i]._mitype == MIS_FIREBOLT)
-                d = ENG_random(10) + (plr[p]._pMagic >> 3) + missile[i]._mispllvl + 1;
-            else if (missile[i]._mitype == MIS_FLARE)
-                d = 3 * missile[i]._mispllvl - (plr[p]._pMagic >> 3) + (plr[p]._pMagic >> 1);
-            else if (missile[i]._mitype == MIS_BONESPIRIT)
+            switch (missile[i]._mitype) {
+            case MIS_FLARE:
+                d = (plr[p]._pMagic >> 1) - (plr[p]._pMagic >> 3) + 2 * missile[i]._mispllvl + missile[i]._mispllvl;
+                break;
+            case MIS_FIREBOLT:
+                d = ENG_random(10) + 1 + (plr[p]._pMagic >> 3) + missile[i]._mispllvl;
+                break;
+            case MIS_BONESPIRIT:
                 d = 0;
+                break;
+            }
         } else {
-            d = monster[p].mMinDamage + ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1);
+            d = ENG_random(monster[p].mMaxDamage - monster[p].mMinDamage + 1) + monster[p].mMinDamage;
         }
     } else {
-        d = currlevel + ENG_random(2 * currlevel);
+        d = ENG_random(2 * currlevel) + currlevel;
     }
     if (missile[i]._mix != missile[i]._misx || missile[i]._miy != missile[i]._misy)
         CheckMissileCol(i, d, d, 0, missile[i]._mix, missile[i]._miy, 0, 1);
@@ -1818,13 +1824,18 @@ void MI_Firebolt(int i)
         missile[i]._mitxoff = omx;
         missile[i]._mityoff = omy;
         GetMissilePos(i);
-        if (missile[i]._mitype == MIS_FIREBOLT || missile[i]._mitype == MIS_MAGMABALL)
-            AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP, missile[i]._micaster, missile[i]._misource, 0, 0);
-        else if (missile[i]._mitype == MIS_FLARE)
+        switch (missile[i]._mitype) {
+        case MIS_FLARE:
             AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP2, missile[i]._micaster, missile[i]._misource, 0, 0);
-        else if (missile[i]._mitype == MIS_ACID)
+            break;
+        case MIS_FIREBOLT:
+        case MIS_MAGMABALL:
+            AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP, missile[i]._micaster, missile[i]._misource, 0, 0);
+            break;
+        case MIS_ACID:
             AddMissile(missile[i]._mix, missile[i]._miy, i, 0, missile[i]._mimfnum, MIS_MISEXP3, missile[i]._micaster, missile[i]._misource, 0, 0);
-        else if (missile[i]._mitype == MIS_BONESPIRIT) {
+            break;
+        case MIS_BONESPIRIT:
             SetMissDir(i, 8);
             missile[i]._mirange = 7;
             missile[i]._miDelFlag = 0;
@@ -1838,8 +1849,19 @@ void MI_Firebolt(int i)
         if (missile[i]._mix != missile[i]._miVar1 || missile[i]._miy != missile[i]._miVar2) {
             missile[i]._miVar1 = missile[i]._mix;
             missile[i]._miVar2 = missile[i]._miy;
-            if (missile[i]._mlid >= 0)
-                ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 8);
+            if (missile[i]._mlid >= 0) {
+                switch (missile[i]._miAnimType) {
+                case 0x28:
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x243);
+                    break;
+                case 0x2A:
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x1B3);
+                    break;
+                default:
+                    ChangeLight(missile[i]._mlid, missile[i]._miVar1, missile[i]._miVar2, 0x95);
+                    break;
+                }
+            }
         }
         PutMissile(i);
     }
