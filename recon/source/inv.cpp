@@ -829,11 +829,9 @@ void CheckQuestItem(int pnum)
 char CheckInvHLight(void)
 {
     int r;
-    unsigned int u;
     char rv;
     ItemStruct *pi;
     PlayerStruct *p;
-    int nGold;
 
     r = InvCursPos;
     if (r >= 0x49)
@@ -843,53 +841,44 @@ char CheckInvHLight(void)
     p = &plr[myplr];
     ClearPanel();
     rv = -1;
-
-    if (_pcurs[myplr] < 12 /* CURSOR_FIRSTITEM */) {
-        nGold = 0;
+    pi = NULL;
+    if (_pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */) {
         pi = &p->HoldItem;
-        goto tail;
-    }
-
-    u = r;
-    if (u < 4) {
+    } else if (r >= 0 && r <= 3) {
         rv = 0;
         pi = &p->InvBody[0];
-    } else if (u == 4) {
+    } else if (r == 4) {
         rv = 1;
         pi = &p->InvBody[1];
-    } else if (u == 5) {
+    } else if (r == 5) {
         rv = 2;
         pi = &p->InvBody[2];
-    } else if (u == 6) {
+    } else if (r == 6) {
         rv = 3;
         pi = &p->InvBody[3];
-    } else if (u - 7 < 6) {
+    } else if (r >= 7 && r <= 12) {
         rv = 4;
         pi = &p->InvBody[4];
-    } else if (u - 13 < 6) {
+    } else if (r >= 13 && r <= 18) {
         pi = &p->InvBody[4];
-        if (pi->_itype == ITYPE_NONE) {
-            rv = 5;
-        } else if (pi->_iLoc == ILOC_TWOHAND) {
+        if (pi->_itype != ITYPE_NONE && pi->_iLoc == ILOC_TWOHAND) {
             rv = 4;
         } else {
             rv = 5;
+            pi = &p->InvBody[5];
         }
-        pi = &p->InvBody[5];
-    } else if (u - 0x13 < 6) {
+    } else if (r >= 19 && r <= 24) {
         rv = 6;
         pi = &p->InvBody[6];
-    } else if (u - 25 < 40) {
-        r = abs(p->InvGrid[u - 25]);
+    } else if (r >= 25 && r <= 64) {
+        r = abs(p->InvGrid[r - 25]);
         if (r == 0)
             return -1;
         r--;
         rv = r + 7;
         pi = &p->InvList[r];
-    } else if (u < 0x41) {
-        goto tail;
-    } else {
-        r = u - 0x41;
+    } else if (r >= 0x41) {
+        r -= 0x41;
         pi = &p->SpdList[r];
         drawsbarflag = 1;
         if (pi->_itype == ITYPE_NONE)
@@ -897,30 +886,34 @@ char CheckInvHLight(void)
         rv = r + 0x2F;
     }
 
-tail:
     if (pi->_itype == ITYPE_NONE)
         return -1;
 
     if (pi->_itype == ITYPE_GOLD) {
-        nGold = pi->_ivalue;
+        int nGold = pi->_ivalue;
         sprintf(_infostr[sel_data], GetStr(0x4FF), nGold, get_pieces_str(nGold));
-        return rv;
-    }
-
-    if (invflag && !pi->_iStatFlag) {
-        _infoclr[sel_data] = 2;
-    } else if (pi->_iMagical == 1) {
-        _infoclr[sel_data] = 1;
-    } else if (pi->_iMagical == 2) {
-        _infoclr[sel_data] = 3;
-    }
-
-    strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iName, 0x100));
-    if (pi->_iIdentified) {
-        strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iIName, 0x100));
-        PrintItemDetails(pi);
     } else {
-        PrintItemDur(pi);
+        if (invflag) {
+            if (!pi->_iStatFlag)
+                _infoclr[sel_data] = 2;
+            else if (pi->_iMagical == 1)
+                _infoclr[sel_data] = 1;
+            else if (pi->_iMagical == 2)
+                _infoclr[sel_data] = 3;
+        } else {
+            if (pi->_iMagical == 1)
+                _infoclr[sel_data] = 1;
+            else if (pi->_iMagical == 2)
+                _infoclr[sel_data] = 3;
+        }
+
+        strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iName, 0x100));
+        if (pi->_iIdentified) {
+            strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iIName, 0x100));
+            PrintItemDetails(pi);
+        } else {
+            PrintItemDur(pi);
+        }
     }
 
     return rv;
