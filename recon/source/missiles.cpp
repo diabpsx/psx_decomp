@@ -2179,14 +2179,14 @@ void MI_Firemove(int i)
     }
     if (miss->_mimfnum == 0 && miss->_mirange != 0) {
         if (miss->_miVar2 == 0)
-            miss->_mlid = AddLight(miss->_mix, miss->_miy, ExpLight[0]);
-        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, ExpLight[miss->_miVar2]);
+            miss->_mlid = AddLight(miss->_mix, miss->_miy, (ExpLight[0] >> 1) + 144);
+        ChangeLight(miss->_mlid, miss->_mix, miss->_miy, (ExpLight[miss->_miVar2] >> 1) + 144);
         miss->_miVar2++;
     } else {
         if (miss->_mix != miss->_miVar3 || miss->_miy != miss->_miVar4) {
             miss->_miVar3 = miss->_mix;
             miss->_miVar4 = miss->_miy;
-            ChangeLight(miss->_mlid, miss->_miVar3, miss->_miVar4, 8);
+            ChangeLight(miss->_mlid, miss->_miVar3, miss->_miVar4, 148);
         }
     }
     miss->_mix++;
