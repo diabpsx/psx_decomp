@@ -3147,13 +3147,13 @@ unsigned char Plr2PlrMHit(int pnum, int p, int mindam, int maxdam, int dist, int
 
 unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtype, unsigned char shift, unsigned char earflag)
 {
-    /* Structurally reconstructed from devilution's non-hellfire PlayerMHit (confirmed via call
-     * list: only ONE StartPlrBlock jal, no *blocked out-param, StartPlrKill not SyncPlrKill) --
-     * NOT yet byte-verified given the size (661 insns, the largest function in this TU). The
-     * currlevel==14/15/16 hper floors and 4 ENG_random call sites are confirmed present via the
-     * raw oracle; per-class hit-sound branches (PC_WARRIOR/ROGUE/SORCERER) collapse to what looks
-     * like a single call site in the oracle, not yet reconciled with this 3-branch source shape. */
-    int hit, hper, tac, dam, blk, blkper, resper;
+    /* PSX shape vs devilution: the half-damage-from-traps flag (0x10000000) halves every missile
+     * hit (no m == -1 gate), hitpoints are debited without the myplr gate, the resist path plays
+     * the per-class PSX hurt sfx, and a player already in PM_GOTHIT is not re-hit by an
+     * unblockable (shift == 1) missile. */
+    int hit, hper, tac;
+    long dam;
+    int blk, blkper, blkdir, resper;
 
     if ((plr[pnum]._pHitPoints >> 6) <= 0)
         return 0;
@@ -3166,12 +3166,12 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
     if (missiledata[mtype].mType == 0) {
         tac = plr[pnum]._pIAC + plr[pnum]._pIBonusAC + plr[pnum]._pDexterity / 5;
         if (m != -1)
-            hper = monster[m].mHit + ((monster[m].mLevel - plr[pnum]._pLevel) << 1) + 30 - (dist << 1) - tac;
+            hper = monster[m].mHit + 30 - tac + ((monster[m].mLevel - plr[pnum]._pLevel) << 1) - (dist << 1);
         else
             hper = 100 - (tac >> 1) - (dist << 1);
     } else {
         if (m != -1)
-            hper = 40 - (plr[pnum]._pLevel << 1) - (dist << 1) + (monster[m].mLevel << 1);
+            hper = (monster[m].mLevel << 1) + 40 - (plr[pnum]._pLevel << 1) - (dist << 1);
         else
             hper = 40;
     }
@@ -3189,7 +3189,7 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
         blk = ENG_random(100);
     else
         blk = 100;
-    if (shift)
+    if (shift == 1)
         blk = 100;
     if (mtype == MIS_ACIDPUD)
         blk = 100;
@@ -3203,27 +3203,36 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
     if (blkper > 100)
         blkper = 100;
 
-    if (missiledata[mtype].mResist == MISR_FIRE)
+    /* raw mResist values (devilution numbering: 1 fire, 2 lightning, 3 magic, 4 acid), as in
+     * Plr2PlrMHit. */
+    switch (missiledata[mtype].mResist) {
+    case 1:
         resper = plr[pnum]._pFireResist;
-    else if (missiledata[mtype].mResist == MISR_LIGHTNING)
+        break;
+    case 2:
         resper = plr[pnum]._pLghtResist;
-    else if (missiledata[mtype].mResist == MISR_MAGIC || missiledata[mtype].mResist == MISR_ACID)
+        break;
+    case 3:
+    case 4:
         resper = plr[pnum]._pMagResist;
-    else
+        break;
+    default:
         resper = 0;
+        break;
+    }
 
     if (hit < hper) {
         if (mtype == MIS_BONESPIRIT) {
             dam = plr[pnum]._pHitPoints / 3;
         } else {
             if (!shift) {
-                dam = (mind << 6) + ENG_random((maxd - mind + 1) << 6);
-                if (m == -1 && (plr[pnum]._pIFlags & 0x2000 /* ISPL_ABSHALFTRAP */))
+                dam = ENG_random((maxd - mind + 1) << 6) + (mind << 6);
+                if (plr[pnum]._pIFlags & 0x10000000)
                     dam >>= 1;
                 dam += plr[pnum]._pIGetHit << 6;
             } else {
-                dam = mind + ENG_random(maxd - mind + 1);
-                if (m == -1 && (plr[pnum]._pIFlags & 0x2000 /* ISPL_ABSHALFTRAP */))
+                dam = ENG_random(maxd - mind + 1) + mind;
+                if (plr[pnum]._pIFlags & 0x10000000)
                     dam >>= 1;
                 dam += plr[pnum]._pIGetHit;
             }
@@ -3233,10 +3242,8 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
 
         if (resper > 0) {
             dam = dam - dam * resper / 100;
-            if (pnum == myplr) {
-                plr[pnum]._pHitPoints -= dam;
-                plr[pnum]._pHPBase -= dam;
-            }
+            plr[pnum]._pHitPoints -= dam;
+            plr[pnum]._pHPBase -= dam;
             if (plr[pnum]._pHitPoints > plr[pnum]._pMaxHP) {
                 plr[pnum]._pHitPoints = plr[pnum]._pMaxHP;
                 plr[pnum]._pHPBase = plr[pnum]._pMaxHPBase;
@@ -3245,36 +3252,35 @@ unsigned char PlayerMHit(int pnum, int m, int dist, int mind, int maxd, int mtyp
                 StartPlrKill(pnum, earflag);
             } else {
                 if (plr[pnum]._pClass == PC_WARRIOR)
-                    PlaySfxLoc(0, plr[pnum]._px, plr[pnum]._py);
+                    PlaySfxLoc(0x316, plr[pnum]._px, plr[pnum]._py);
                 else if (plr[pnum]._pClass == PC_ROGUE)
-                    PlaySfxLoc(1, plr[pnum]._px, plr[pnum]._py);
+                    PlaySfxLoc(0x2A8, plr[pnum]._px, plr[pnum]._py);
                 else if (plr[pnum]._pClass == PC_SORCERER)
-                    PlaySfxLoc(2, plr[pnum]._px, plr[pnum]._py);
+                    PlaySfxLoc(0x240, plr[pnum]._px, plr[pnum]._py);
                 drawhpflag = 1;
             }
             return 1;
-        } else {
-            if (blk < blkper) {
-                if (m != -1)
-                    tac = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my);
-                else
-                    tac = plr[pnum]._pdir;
-                StartPlrBlock(pnum, tac);
-            } else {
-                if (pnum == myplr) {
-                    plr[pnum]._pHitPoints -= dam;
-                    plr[pnum]._pHPBase -= dam;
-                }
-                if (plr[pnum]._pHitPoints > plr[pnum]._pMaxHP) {
-                    plr[pnum]._pHitPoints = plr[pnum]._pMaxHP;
-                    plr[pnum]._pHPBase = plr[pnum]._pMaxHPBase;
-                }
-                if ((plr[pnum]._pHitPoints >> 6) <= 0)
-                    StartPlrKill(pnum, earflag);
-                else
-                    StartPlrHit(pnum, dam, 0);
-            }
         }
+        if (blk < blkper) {
+            if (m != -1)
+                blkdir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[m]._mx, monster[m]._my);
+            else
+                blkdir = plr[pnum]._pdir;
+            StartPlrBlock(pnum, blkdir);
+            return 1;
+        }
+        if (plr[pnum]._pmode == PM_GOTHIT && shift == 1)
+            return 0;
+        plr[pnum]._pHitPoints -= dam;
+        plr[pnum]._pHPBase -= dam;
+        if (plr[pnum]._pHitPoints > plr[pnum]._pMaxHP) {
+            plr[pnum]._pHitPoints = plr[pnum]._pMaxHP;
+            plr[pnum]._pHPBase = plr[pnum]._pMaxHPBase;
+        }
+        if ((plr[pnum]._pHitPoints >> 6) <= 0)
+            StartPlrKill(pnum, earflag);
+        else
+            StartPlrHit(pnum, dam, 0);
         return 1;
     }
     return 0;
