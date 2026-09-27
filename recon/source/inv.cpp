@@ -484,16 +484,18 @@ unsigned char SpecialAutoPlace(int pnum, int ii, int sx, int sy, unsigned char s
 unsigned char GoldAutoPlace(int pnum)
 {
     int i, ii, xx, yy;
+    long gt;
     unsigned char done;
 
     done = 0;
     for (i = 0; i < plr[pnum]._pNumInv && !done; i++) {
         if (plr[pnum].InvList[i]._itype == ITYPE_GOLD) {
-            if (plr[pnum].HoldItem._ivalue + plr[pnum].InvList[i]._ivalue <= GOLD_MAX_LIMIT) {
-                plr[pnum].InvList[i]._ivalue = plr[pnum].HoldItem._ivalue + plr[pnum].InvList[i]._ivalue;
-                if (plr[pnum].InvList[i]._ivalue >= GOLD_MEDIUM_LIMIT)
+            gt = plr[pnum].HoldItem._ivalue + plr[pnum].InvList[i]._ivalue;
+            if (gt <= GOLD_MAX_LIMIT) {
+                plr[pnum].InvList[i]._ivalue = gt;
+                if (gt >= GOLD_MEDIUM_LIMIT)
                     plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
-                else if (plr[pnum].InvList[i]._ivalue <= GOLD_SMALL_LIMIT)
+                else if (gt <= GOLD_SMALL_LIMIT)
                     plr[pnum].InvList[i]._iCurs = ICURS_GOLD_SMALL;
                 else
                     plr[pnum].InvList[i]._iCurs = ICURS_GOLD_MEDIUM;
@@ -502,44 +504,43 @@ unsigned char GoldAutoPlace(int pnum)
             }
         }
     }
-
     if (!done)
-        for (i = 0; i < plr[pnum]._pNumInv && !done; i++) {
-            if (plr[pnum].InvList[i]._itype == ITYPE_GOLD && plr[pnum].InvList[i]._ivalue < GOLD_MAX_LIMIT) {
-                if (plr[pnum].HoldItem._ivalue + plr[pnum].InvList[i]._ivalue <= GOLD_MAX_LIMIT) {
-                    plr[pnum].InvList[i]._ivalue = plr[pnum].HoldItem._ivalue + plr[pnum].InvList[i]._ivalue;
-                    if (plr[pnum].InvList[i]._ivalue >= GOLD_MEDIUM_LIMIT)
-                        plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
-                    else if (plr[pnum].InvList[i]._ivalue <= GOLD_SMALL_LIMIT)
-                        plr[pnum].InvList[i]._iCurs = ICURS_GOLD_SMALL;
-                    else
-                        plr[pnum].InvList[i]._iCurs = ICURS_GOLD_MEDIUM;
-                    plr[pnum]._pGold = CalculateGold(pnum);
-                    done = 1;
-                }
-            }
-        }
-
-    if (!done)
-        for (i = 39; i >= 0 && !done; i--) {
-            yy = 10 * (i / 10);
-            xx = i % 10;
-            if (plr[pnum].InvGrid[xx + yy] == 0) {
-                ii = plr[pnum]._pNumInv;
-                plr[pnum].InvList[ii] = plr[pnum].HoldItem;
-                plr[pnum]._pNumInv = plr[pnum]._pNumInv + 1;
-                plr[pnum].InvGrid[xx + yy] = plr[pnum]._pNumInv;
-                if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
-                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_LARGE;
-                else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
-                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_SMALL;
+    for (i = 0; i < plr[pnum]._pNumInv && !done; i++) {
+        if (plr[pnum].InvList[i]._itype == ITYPE_GOLD && plr[pnum].InvList[i]._ivalue < GOLD_MAX_LIMIT) {
+            gt = plr[pnum].InvList[i]._ivalue + plr[pnum].HoldItem._ivalue;
+            if (gt <= GOLD_MAX_LIMIT) {
+                plr[pnum].InvList[i]._ivalue = gt;
+                if (gt >= GOLD_MEDIUM_LIMIT)
+                    plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
+                else if (gt <= GOLD_SMALL_LIMIT)
+                    plr[pnum].InvList[i]._iCurs = ICURS_GOLD_SMALL;
                 else
-                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_MEDIUM;
+                    plr[pnum].InvList[i]._iCurs = ICURS_GOLD_MEDIUM;
                 plr[pnum]._pGold = CalculateGold(pnum);
                 done = 1;
             }
         }
-
+    }
+    if (!done)
+    for (ii = 39; ii >= 0 && !done; ii--) {
+        yy = 10 * (ii / 10);
+        xx = ii % 10;
+        if (plr[pnum].InvGrid[xx + yy] == 0) {
+            i = plr[pnum]._pNumInv;
+            plr[pnum].InvList[i] = plr[pnum].HoldItem;
+            plr[pnum]._pNumInv++;
+            plr[pnum].InvGrid[xx + yy] = plr[pnum]._pNumInv;
+            gt = plr[pnum].HoldItem._ivalue;
+            if (gt >= GOLD_MEDIUM_LIMIT)
+                plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
+            else if (gt <= GOLD_SMALL_LIMIT)
+                plr[pnum].InvList[i]._iCurs = ICURS_GOLD_SMALL;
+            else
+                plr[pnum].InvList[i]._iCurs = ICURS_GOLD_MEDIUM;
+            plr[pnum]._pGold = CalculateGold(pnum);
+            done = 1;
+        }
+    }
     return done;
 }
 
