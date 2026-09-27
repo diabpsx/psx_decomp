@@ -28,7 +28,10 @@ struct MonstListLevel {   /* sizeof 8 */
 };
 extern struct MonstListLevel AllLevels[];
 
-extern void BgTask(void *T);
+struct TASK;
+extern void BgTask(struct TASK *T);
+class CBlocks;
+class CPlayer;
 
 extern "C" void MAIN_RestartGameTask(void);
 extern "C" void SPU_Init(void);
@@ -68,6 +71,48 @@ struct PanelXY;
 extern struct PanelXY DefP1PanelXY, DefP2PanelXY, DefP1PanelXY2, DefP2PanelXY2;
 extern int sel_data;
 extern "C" void Print__6GPanelP7PanelXYP12PlayerStruct(struct GPanel *P, struct PanelXY *XY, void *Plr);
+
+/* ---- BgTask externs ---- */
+extern "C" int GetFadeState__Fv(void);
+extern "C" void penta_cycle_task__FP4TASK(struct TASK *T);
+extern "C" void color_cycle__FP4TASK(struct TASK *T);
+extern "C" void DaveLTask__FP4TASK(struct TASK *T);
+extern "C" void UPDATEPROGRESS__Fi(int Amount);
+extern unsigned char currlevel;
+extern unsigned char leveltype;
+extern unsigned char setlevel;
+extern unsigned char setlvlnum;
+extern unsigned char PauseMode;
+extern unsigned char deathflag;
+struct Quests { unsigned char pad[0xF3]; };   /* only +0xF2 read here */
+extern struct Quests quests;
+extern void *gplayer;
+int D_8011AFF0;   /* TU-owned; only written here (paired with D_8011AFF4/HasGameStarted) */
+
+extern "C" void __7CBlocksiiiii(struct CBlocks *This, int a, int b, int c, int d, int e);
+extern "C" void SetTownersGraphics__7CBlocks(struct CBlocks *This);
+extern "C" int GM_UseTexData__Fi(int Id);
+extern int MissDat;
+extern "C" void music_start__Fi(int LevelType);
+extern "C" void PaletteFadeIn__Fi(int Ticks);
+extern "C" void SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(struct CPlayer *Player, struct PlayerStruct *Plr, struct CBlocks *Blocks);
+extern "C" void PlaySFX__Fi(int Id);
+extern "C" void ResetFlames__Fv(void);
+extern "C" void SetRandOffset__7CBlocksi(struct CBlocks *This, int Amount);
+extern "C" void DoScroll__7CBlocks(struct CBlocks *This);
+extern "C" void Print__7CBlocks(struct CBlocks *This);
+extern "C" void DrawAndBlit__Fv(void);
+extern "C" void Print__7CPlayerR12PlayerStructR7CBlocks(struct CPlayer *Player, struct PlayerStruct *Plr, struct CBlocks *Blocks);
+extern "C" void DrawLBird__Fv(void);
+extern "C" void GO_DoGameOver__Fv(void);
+extern "C" void VID_GetTick__Fv(void);
+extern "C" void __7CPlayerbii(struct CPlayer *This, BOOL InTown, int Which, int PlayerNum);
+extern "C" void ___7CPlayer(struct CPlayer *This, int Flag);
+extern "C" void ___7CBlocks(struct CBlocks *This, int Flag);
+extern "C" void FinishProgress__Fv(void);
+extern "C" void TakeDownCutScreen__Fv(void);
+struct GPanel;
+extern "C" void __6GPaneli(struct GPanel *This, int Arg);
 
 /* Minimal local layouts (this TU only touches these fields; matches davel.cpp's CPlayer). */
 class CPlayer {
@@ -273,21 +318,20 @@ struct PInf *FindPlayerChar(char *Id)
     int i;
     int idx;
 
-    i = 0;
     f = PlayerInfo;
+    i = 0;
     idx = 0;
-    for (;;) {
+    do {
         i++;
-        if (strcmp(*(char **)((char *)PlayerInfo + idx), Id) == 0) {
-            return f;
+        if (strcmp(*(char **)((char *)PlayerInfo + idx), Id) != 0) {
+            f = (struct PInf *)((char *)f + 0xC);
+            idx += 0xC;
+            continue;
         }
-        f = (struct PInf *)((char *)f + 0xC);
-        idx += 0xC;
-        if (i >= 0x51) {
-            DBG_Error(0, D_80110B58, 0x288);
-            return 0;
-        }
-    }
+        return f;
+    } while (i < 0x51);
+    DBG_Error(0, D_80110B58, 0x288);
+    return 0;
 }
 
 struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
@@ -300,10 +344,7 @@ struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
 
 struct PInf *FindPlayerChar(struct PlayerStruct *P)
 {
-    unsigned char temp_a1;
-
-    temp_a1 = P->_pgfxnum;
-    return FindPlayerChar((int)P->_pClass, temp_a1 & 0xF, (int)(temp_a1 << 24) >> 28);
+    return FindPlayerChar((int)P->_pClass, P->_pgfxnum & 0xF, (int)(P->_pgfxnum << 24) >> 28);
 }
 
 unsigned short FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
@@ -358,32 +399,140 @@ void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTo
 
 void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
 {
-    struct GPanel *P;
-    struct PanelXY *XY;
-    void *Plr;
-
-    P = P1;
     if (plr[0x1D] != 0) {
         if (plr[0x1A05] != 0) {
             sel_data = 0;
             Print__6GPanelP7PanelXYP12PlayerStruct(P1, &DefP1PanelXY2, &plr[0]);
-            P = P2;
-            XY = &DefP2PanelXY2;
             sel_data = 1;
-            Plr = &plr[0x19E8];
+            Print__6GPanelP7PanelXYP12PlayerStruct(P2, &DefP2PanelXY2, &plr[0x19E8]);
         } else {
             sel_data = 0;
-            XY = &DefP1PanelXY;
-            Plr = &plr[0];
+            Print__6GPanelP7PanelXYP12PlayerStruct(P1, &DefP1PanelXY, &plr[0]);
         }
-        Print__6GPanelP7PanelXYP12PlayerStruct(P, XY, Plr);
         return;
     }
     if (plr[0x1A05] != 0) {
         sel_data = 1;
-        P = P2;
-        XY = &DefP2PanelXY;
-        Plr = &plr[0x19E8];
-        Print__6GPanelP7PanelXYP12PlayerStruct(P, XY, Plr);
+        Print__6GPanelP7PanelXYP12PlayerStruct(P2, &DefP2PanelXY, &plr[0x19E8]);
     }
+}
+
+void BgTask(struct TASK *T)
+{
+    struct CBlocks Blocks;
+    struct CPlayer P1, P2;
+    unsigned char Panel1Buf[32], Panel2Buf[32];
+    struct GPanel *Panel1 = (struct GPanel *)Panel1Buf;
+    struct GPanel *Panel2 = (struct GPanel *)Panel2Buf;
+    struct DEF_ARGS *Args;
+    int TextId, Level, MLev;
+    BOOL IsTown;
+    void *List;
+    void *Plr;
+
+    MLev = -1;
+    List = (void *)-1;
+    Args = *(struct DEF_ARGS **)((char *)T + 0x1C);
+    D_8011C6C0 = 0;
+    D_8011C6C4 = 0;
+    Level = Args->a2;
+    TextId = Args->a0;
+    IsTown = Args->a1 != 0;
+    GLUE_SetShowGameScreenFlag(0);
+    GLUE_SetHomingScrollFlag(0);
+    GLUE_SetShowPanelFlag(0);
+    GLUE_SetFinished(0);
+    if ((unsigned int)(currlevel - 0xF) < 2) {
+        TSK_AddTask(0x8000, (void *)penta_cycle_task__FP4TASK, 0xC78, 0);
+    }
+    TSK_AddTask(0x8000, (void *)color_cycle__FP4TASK, 0xC78, 0);
+    TSK_Sleep(2);
+    while (GetFadeState__Fv() != 0) {
+        TSK_Sleep(1);
+    }
+    if (IsTown) {
+        Level = 0;
+    } else {
+        MLev = 0xCE;
+        List = (void *)GLUE_GetMonsterList();
+    }
+    __7CBlocksiiiii(&Blocks, TextId, MLev, 0, Level, (int)List);
+    Blocks.SetTown(IsTown);
+    UPDATEPROGRESS__Fi(4);
+    __7CPlayerbii(&P1, IsTown, 0, FePlayerNo);
+    __7CPlayerbii(&P2, IsTown, 1, FePlayerNo);
+    MakeSurePlayerDressedProperly(P1, *(struct PlayerStruct *)&plr[0], IsTown, 1);
+    if (FePlayerNo != 0) {
+        MakeSurePlayerDressedProperly(P2, *(struct PlayerStruct *)&plr[0x19E8], IsTown, 1);
+    }
+    UPDATEPROGRESS__Fi(1);
+    FinishProgress__Fv();
+    TakeDownCutScreen__Fv();
+    if (leveltype != 0) {
+        MissDat = GM_UseTexData__Fi(0xD0);
+    } else {
+        SetTownersGraphics__7CBlocks(&Blocks);
+        MissDat = GM_UseTexData__Fi(0xCD);
+    }
+    music_start__Fi(leveltype);
+    PaletteFadeIn__Fi(8);
+    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)&plr[0], &Blocks);
+    Blocks.MoveToScrollTarget();
+    GLUE_SetShowGameScreenFlag(1);
+    GLUE_SetHomingScrollFlag(1);
+    GLUE_SetShowPanelFlag(1);
+    TSK_AddTask(0x8000, (void *)DaveLTask__FP4TASK, 0x1000, 0);
+    __6GPaneli(Panel1, 0);
+    __6GPaneli(Panel2, 0);
+    gplayer = &P1;
+    VID_GetTick__Fv();
+    D_8011AFF0 = 0;
+    D_8011AFF4 = 1;
+    if (setlevel != 0 && setlvlnum == 1) {
+        if (*((unsigned char *)&quests + 0xF2) == 2) {
+            PlaySFX__Fi(0x354);
+        }
+    }
+
+    while ((GLUE_Finished__Fv() ^ 1) != 0) {
+        VID_GetTick__Fv();
+        VID_GetTick__Fv();
+        ResetFlames__Fv();
+        if (DoDrawBg != 0) {
+            if (PauseMode == 0 && D_8011C6C0 != 0) {
+                SetRandOffset__7CBlocksi(&Blocks, D_8011C6C4);
+                D_8011C6C0 -= 1;
+            }
+            Plr = &plr[0];
+            if (plr[0x1D] == 0) {
+                Plr = &plr[0x19E8];
+            }
+            SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)Plr, &Blocks);
+            if (D_8011C6B4 != 0 && deathflag == 0) {
+                DoScroll__7CBlocks(&Blocks);
+            }
+            Print__7CBlocks(&Blocks);
+            DrawAndBlit__Fv();
+            if (DoShowPanel != 0) {
+                DoShowPanelGFX(Panel1, Panel2);
+            }
+            MakeSurePlayerDressedProperly(P1, *(struct PlayerStruct *)&plr[0], IsTown, 0);
+            Print__7CPlayerR12PlayerStructR7CBlocks(&P1, (struct PlayerStruct *)&plr[0], &Blocks);
+            if (FePlayerNo != 0) {
+                MakeSurePlayerDressedProperly(P2, *(struct PlayerStruct *)&plr[0x19E8], IsTown, 0);
+                Print__7CPlayerR12PlayerStructR7CBlocks(&P2, (struct PlayerStruct *)&plr[0x19E8], &Blocks);
+            }
+            if (IsTown) {
+                DrawLBird__Fv();
+            }
+            if (deathflag != 0) {
+                GO_DoGameOver__Fv();
+            }
+        }
+        TSK_Sleep(1);
+    }
+    D_8011AFF4 = 0;
+    ___7CPlayer(&P2, 2);
+    ___7CPlayer(&P1, 2);
+    ___7CBlocks(&Blocks, 2);
 }
