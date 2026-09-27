@@ -948,7 +948,6 @@ extern "C" int init_mdec_audio(int rate)
     return SpuIsTransferCompleted(1);
 }
 
-/* WIP -- NOT byte-verified (SPU double-buffer feed; no PC twin). @0x80157900 FMV.CPP:1298 */
 /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/play_mdec_audio.s) -- confirmed
  * field-by-field, same method as init_mdec_audio/set_mdec_audio_volume:
  *   - the first loop's dispatch reads `mdec_audio_sec`, NOT `mdec_audio_playing` (the two globals
@@ -968,66 +967,93 @@ extern "C" int init_mdec_audio(int rate)
  *     slot=(mdec_audio_sec>=3)?mdec_audio_sec-3:mdec_audio_sec+7 -- none of which resemble the
  *     previous fabricated {mask,l,r,pitch,adsr1..4} shape. On loop completion mdec_audio_playing is
  *     set to -1 (not left alone). */
-#define SPU_VOICE_ADSR_MASK_ALL 0xFF93
+/* SYM: `asec` (STRUCT size 8: int id, int size) -- the audio-sector header play_mdec_audio is handed. */
+typedef struct asec {
+    int id;
+    int size;
+} asec;
 
-extern "C" int play_mdec_audio(unsigned char *data, StHEADER *h)
+/* @0x80157900 FMV.CPP:1298 -- SYM: FCN VOID; locals i, b, offs, voice_attr (AUTO), dp. */
+extern "C" void play_mdec_audio(unsigned char *data, asec *h)
 {
-    unsigned char *b = data;
-    unsigned char *data0 = data;
+    int i;
+    int b;
+    int offs;
+    SpuVoiceAttr voice_attr;
+    unsigned char *dp;
 
-    for (int i = 0; i < 2; i++) {
+    dp = data;
+    for (b = 0; b < 2; b++) {
         if (mdec_audio_sec == 0) {
-            b[1] |= 6;
-            for (int j = 16; j < (int)h->frameSize; j += 16)
-                (data + j)[1] |= 2;
+            dp[1] |= 6;
+            for (i = 16; i < h->size; i += 16)
+                dp[i + 1] |= 2;
         } else if (mdec_audio_sec == 9) {
-            int j = 0;
-            for (; j < (int)h->frameSize - 16; j += 16)
-                (data + j)[1] |= 2;
-            (data + j)[1] = 3;
+            for (i = 0; i < h->size - 16; i += 16)
+                dp[i + 1] |= 2;
+            dp[i + 1] = 3;
         } else {
-            for (int j = 0; j < (int)h->frameSize; j += 16)
-                (data + j)[1] |= 2;
+            for (i = 0; i < h->size; i += 16)
+                dp[i + 1] |= 2;
         }
-        b += 2016;
-        data += 2016;
+        dp += 2016;
     }
+
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[0] + mdec_audio_offs);
-    SpuWrite(DiabEnd ? data0 + (DiabEnd - 1) * 2016 : data0, h->frameSize);
+    if (DiabEnd)
+        SpuWrite(data + (DiabEnd - 1) * 2016, h->size);
+    else
+        SpuWrite(data, h->size);
     SpuIsTransferCompleted(1);
+
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[1] + mdec_audio_offs);
-    SpuWrite(DiabEnd ? data0 + (DiabEnd - 1) * 2016 : data0 + 2016, h->frameSize);
+    if (DiabEnd)
+        SpuWrite(data + (DiabEnd - 1) * 2016, h->size);
+    else
+        SpuWrite(data + 2016, h->size);
     SpuIsTransferCompleted(1);
-    mdec_audio_offs += (int)h->frameSize;
-    if (mdec_audio_playing == 0) {
-        SpuVoiceAttr attr;
-        int slot = (mdec_audio_sec - 3 >= 0) ? mdec_audio_sec - 3 : mdec_audio_sec + 7;
-        int base = slot * (int)h->frameSize;
 
-        for (int v = 0; v < 2; v++) {
-            attr.mask = SPU_VOICE_ADSR_MASK_ALL;
-            attr.sl = 0xF;
-            attr.a_mode = 1;
-            attr.s_mode = 1;
-            attr.r_mode = 3;
-            attr.ar = 0;
-            attr.dr = 0;
-            attr.sr = 0;
-            attr.rr = 3;
-            attr.voice = 1 << v;
-            attr.volume.left = (v == 0) ? 0x3FFF : 0;
-            attr.volume.right = (v == 1) ? 0x3FFF : 0;
-            attr.pitch = (unsigned short)(0xFFA >> mdec_audio_rate_shift);
-            attr.addr = mdec_audio_buffer[v] + base;
-            SpuSetKeyOnWithAttr(&attr);
+    mdec_audio_sec++;
+    streampos += h->size;
+    if (mdec_audio_sec == 10) {
+        mdec_audio_offs = 0;
+        mdec_audio_sec = 0;
+    } else
+        mdec_audio_offs += h->size;
+
+    if (!mdec_audio_playing) {
+        offs = mdec_audio_sec - 3;
+        if (offs < 0)
+            offs += 10;
+        offs *= h->size;
+
+        for (i = 0; i < 2; i++) {
+            voice_attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR | SPU_VOICE_PITCH | SPU_VOICE_WDSA |
+                              SPU_VOICE_ADSR_AMODE | SPU_VOICE_ADSR_SMODE | SPU_VOICE_ADSR_RMODE |
+                              SPU_VOICE_ADSR_AR | SPU_VOICE_ADSR_DR | SPU_VOICE_ADSR_SR |
+                              SPU_VOICE_ADSR_RR | SPU_VOICE_ADSR_SL;
+            voice_attr.a_mode = 1;
+            voice_attr.s_mode = 1;
+            voice_attr.r_mode = 3;
+            voice_attr.ar = 0;
+            voice_attr.dr = 0;
+            voice_attr.sr = 0;
+            voice_attr.rr = 3;
+            voice_attr.sl = 0xF;
+
+            voice_attr.voice = 1 << i;
+
+            voice_attr.volume.left = (i == 0) ? 0x3FFF : 0;
+            voice_attr.volume.right = (i == 1) ? 0x3FFF : 0;
+            voice_attr.pitch = 0xFFA >> mdec_audio_rate_shift;
+            voice_attr.addr = mdec_audio_buffer[i] + offs;
+            SpuSetKeyOnWithAttr(&voice_attr);
         }
         mdec_audio_playing = -1;
-    } else {
-        mdec_audio_playing -= 1;
-    }
-    return 0;
+    } else
+        mdec_audio_playing--;
 }
 
 /* @0x80157D00 FMV.CPP:1437 */
@@ -1211,7 +1237,7 @@ extern "C" void decode_mdec_stream(int frames_elapsed)
         frame_decoded = 1;
         do_brightness = 1;
         mbuf ^= 1;
-        play_mdec_audio(data + 0x3F00, (StHEADER *)((char *)h + 256));
+        play_mdec_audio(data + 0x3F00, (asec *)((char *)h + 256));
         cdstream_discard_chunk();
         if (h->frameCount == last_stream_frame) {
             if (mdecs_queued != 0)
