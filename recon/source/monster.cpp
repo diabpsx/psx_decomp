@@ -121,11 +121,14 @@
 #define MFLAG_TARGETS_MONSTER 0x10
 #define MFLAG_MKILLER         0x20
 
+#define MT_GLOOM    0x28
 #define MT_INCIN    0x48
 #define MT_NMAGMA   0x3C
 #define MT_STORM    0x4C
 #define MT_UNSEEN   0x1F
 #define MT_HELLBURN 0x4B
+#define MT_NSNAKE   0x59
+#define MT_GSNAKE   0x5C
 
 #define PC_WARRIOR  0
 #define PC_SORCERER 2
@@ -376,6 +379,8 @@ int M_DoStand(int i)
 #define MIT_FLASH2       0xC
 #define MIT_ACIDPUD      0x3B
 #define TARGET_PLAYERS   1
+#define PM_GOTHIT   7
+#define PM_DEATH    8
 
 void MAI_GoatMc(int i)
 {
@@ -3045,4 +3050,127 @@ void M_TryM2MHit(int i, int mid, int hper, int mind, int maxd)
         }
     }
     return;
+}
+
+/* NEW function this pass. SYM OPEN (length 0x4dc vs 0x4cc); bytes OPEN (46
+ * diffs, ours 311 / oracle 307, 4 insns over -- was 312/39-diffs before
+ * trying the PlayerStruct *p1 lever, which helped by 1 insn) -- very close for a
+ * 307-instruction function transcribed cold from the raw oracle (hellfire
+ * has NO twin for this exact shape; devilution's non-HELLFIRE MissToMonst
+ * was used for the overall structure, PSX-specific pieces verified
+ * byte-by-byte). Confirmed PSX-only additions from raw bytes: (1)
+ * `Monst->_mxoff/_myoff/_mAnimFrame` copied from the dying MISSILE's
+ * `_mixoff/_miyoff/_miAnimFrame` right after `M_StartStand` -- a seamless
+ * visual-transition detail absent from both twins; (2) the whole
+ * player-knockback tail is NOT devilution's
+ * `_px=newx;_py=newy;FixPlayerLocation();FixPlrWalkTags();dPlayer=...;
+ * SetPlayerOld();` -- PSX replaces it with a `KnockOk` flag gated by an
+ * OPTIONAL split-screen proximity check (`if (FePlayerNo) { if
+ * (plr[pnum].plractive && plr[pnum^1].plractive) if
+ * (ChkPlrOffsets(newx<<3, otherWorldX, otherWorldY, newy<<3)) KnockOk=0; }`)
+ * followed by `PosOkPlayer`+`SetPlayerOld`+`WorldToOffset(pnum,(newx<<3)|4,
+ * (newy<<3)|4)` -- confirmed via the exact call list (`jal` scan) and the
+ * `|4` half-tile-center encoding on the WorldToOffset args. `dPlayer[][]`
+ * reads are all replaced by `IsDplayer()` calls (called 4 TIMES total in the
+ * H2H branch, matching the raw call count exactly -- do not try to cache
+ * the result in fewer calls, retail genuinely re-calls it each time,
+ * confirmed from the `jal IsDplayer` count). Remaining 5-insn gap: the
+ * `plr[pnum].plractive` check appears to reuse an ALREADY-computed
+ * PlayerStruct stride from the earlier `_pmode`/`StartPlrHit` prep. Tried
+ * wrapping `_pmode`+`StartPlrHit`+the whole FePlayerNo block in one scope
+ * with `PlayerStruct *p1=&plr[pnum];` reused for both `_pmode` and
+ * `plractive` -- improved 312->311 (39->46 diffs, oddly more diff LINES for
+ * fewer total insns, i.e. the remaining mismatch moved around) but did not
+ * close it. Next angle: check whether oracle's `s3` reuse crosses the
+ * `StartPlrHit` CALL itself (a real callee-saved register surviving the
+ * call, which a local pointer variable should already achieve) or whether
+ * it's actually a raw stride int reused via `plr+stride` arithmetic rather
+ * than a `PlayerStruct*` -- try an `int pstride` int-offset version next,
+ * matching the M2MStartKill `omp` lesson (plain int stride, not a typed
+ * pointer). */
+void MissToMonst(int i, int x, int y)
+{
+    int oldx;
+    int oldy;
+    int newx;
+    int newy;
+    MissileStruct *Miss = &missile[i];
+    int m = Miss->_misource;
+    MonsterStruct *Monst = &monster[m];
+    int pnum;
+    unsigned char KnockOk;
+
+    oldx = Miss->_mix;
+    oldy = Miss->_miy;
+
+    dung_map[x][y].dMonster = m + 1;
+
+    Monst->_mdir = Miss->_mimfnum;
+    Monst->_mx = x;
+    Monst->_my = y;
+    Monst->_mxoff = Miss->_mixoff;
+    Monst->_myoff = Miss->_miyoff;
+    Monst->_mAnimFrame = Miss->_miAnimFrame;
+    M_StartStand(m, Monst->_mdir);
+
+    if (Monst->MType->mtype >= MT_INCIN && Monst->MType->mtype <= MT_HELLBURN) {
+        M_StartFadein(m, Monst->_mdir, 0);
+    } else {
+        if (!(Monst->_mFlags & MFLAG_TARGETS_MONSTER))
+            M_StartHit(m, -1, 0);
+        else
+            M2MStartHit(m, -1, 0);
+    }
+
+    if (!(Monst->_mFlags & MFLAG_TARGETS_MONSTER)) {
+        pnum = IsDplayer(oldx, oldy) - 1;
+        if (IsDplayer(oldx, oldy)
+            && Monst->MType->mtype != MT_GLOOM
+            && !(Monst->MType->mtype >= MT_INCIN && Monst->MType->mtype <= MT_HELLBURN)) {
+            M_TryH2HHit(m, IsDplayer(oldx, oldy) - 1, 500, Monst->mMinDamage2, Monst->mMaxDamage2);
+
+            if (pnum == IsDplayer(oldx, oldy) - 1
+                && !(Monst->MType->mtype >= MT_NSNAKE && Monst->MType->mtype <= MT_GSNAKE)) {
+                KnockOk = 1;
+                {
+                    PlayerStruct *p1 = &plr[pnum];
+                    if (p1->_pmode != PM_GOTHIT && p1->_pmode != PM_DEATH)
+                        StartPlrHit(pnum, 0, 1);
+
+                    newx = oldx + offset_x[Monst->_mdir];
+                    newy = oldy + offset_y[Monst->_mdir];
+                    if (FePlayerNo) {
+                        int other = pnum ^ 1;
+                        if (p1->plractive && plr[other].plractive) {
+                            if (ChkPlrOffsets(newx << 3, plr[other].WorldX, plr[other].WorldY, newy << 3))
+                                KnockOk = 0;
+                        }
+                    }
+                }
+                if (KnockOk) {
+                    if (PosOkPlayer(pnum, newx, newy)) {
+                        SetPlayerOld(pnum);
+                        WorldToOffset(pnum, (newx << 3) | 4, (newy << 3) | 4);
+                    }
+                }
+            }
+        }
+    } else {
+        if (dung_map[oldx][oldy].dMonster > 0
+            && Monst->MType->mtype != MT_GLOOM
+            && !(Monst->MType->mtype >= MT_INCIN && Monst->MType->mtype <= MT_HELLBURN)) {
+            M_TryM2MHit(m, dung_map[oldx][oldy].dMonster - 1, 500, Monst->mMinDamage2, Monst->mMaxDamage2);
+            if (!(Monst->MType->mtype >= MT_NSNAKE && Monst->MType->mtype <= MT_GSNAKE)) {
+                newx = oldx + offset_x[Monst->_mdir];
+                newy = oldy + offset_y[Monst->_mdir];
+                if (PosOkMonst(dung_map[oldx][oldy].dMonster - 1, newx, newy)) {
+                    pnum = dung_map[newx][newy].dMonster = dung_map[oldx][oldy].dMonster;
+                    dung_map[oldx][oldy].dMonster = 0;
+                    pnum--;
+                    monster[pnum]._mfutx = monster[pnum]._mx = newx;
+                    monster[pnum]._mfuty = monster[pnum]._my = newy;
+                }
+            }
+        }
+    }
 }

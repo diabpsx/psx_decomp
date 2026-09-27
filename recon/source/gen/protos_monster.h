@@ -125,6 +125,11 @@ void NetSendCmdParam2(unsigned char bHiPri, unsigned char bCmd, unsigned short w
 void NetSendCmdGolem(unsigned char mx, unsigned char my, unsigned char dir, unsigned char menemy, long hp, unsigned char cl);
 void ObjChangeMapResync(int x1, int y1, int x2, int y2);
 void RedoPlayerVision(void);
+void StartPlrHit(int pnum, int dam, unsigned char forcehit);
+unsigned char ChkPlrOffsets(int a0, int a1, int a2, int a3);
+unsigned char PosOkPlayer(int pnum, int x, int y);
+void SetPlayerOld(int pnum);
+void WorldToOffset(int pnum, int x, int y);
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */
