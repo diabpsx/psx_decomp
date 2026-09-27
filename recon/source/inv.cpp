@@ -1449,89 +1449,76 @@ void InvMoveCursUp(void)
     OldPos = InvCursPos;
 
     if (_pcurs[myplr] < 12) {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-            case 4:
-            case 6:
-            case 7:
-                InvCursPos = 0;
-                goto tail3;
-            case 5:
-                InvCursPos = 6;
-                goto tail3;
-            case 13:
-            case 19:
-                InvCursPos = 6;
-                goto tail3;
-            default:
-                break;
+        switch (InvCursPos) {
+        case 5:
+            InvCursPos = 6;
+            break;
+        case 0:
+        case 4:
+        case 6:
+        case 7:
+            InvCursPos = 0;
+            break;
+        case 13:
+            InvCursPos = 6;
+            break;
+        case 19:
+            InvCursPos = 6;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40) {
+                if (InvCursPos < 35)
+                    InvCursPos = 19;
+                else
+                    ItemInc = 1;
+            } else if (InvCursPos >= 0x41) {
+                InvCursPos -= 9;
             }
-        }
-
-        if ((unsigned int)(InvCursPos - 25) < 40) {
-            if (InvCursPos < 35) {
-                InvCursPos = 19;
-            } else {
-                ItemInc = 1;
-                goto tail3;
-            }
-        } else if (InvCursPos < 0x41) {
-            /* nothing */
-        } else {
-            InvCursPos = InvCursPos - 9;
+            break;
         }
     } else {
-        if ((unsigned int)InvCursPos < 20) {
-            switch (InvCursPos) {
-            case 0:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 13:
-            case 19:
-                goto tail3;
-            default:
-                break;
-            }
-        }
-
-        if ((unsigned int)(InvCursPos - 25) < 40) {
-            ItemInc = 1;
-            goto tail3;
-        } else if (InvCursPos < 0x41) {
-            /* nothing */
-        } else {
-            InvCursPos = InvCursPos - 9;
+        switch (InvCursPos) {
+        case 0:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 13:
+        case 19:
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40)
+                ItemInc = 1;
+            else if (InvCursPos >= 0x41)
+                InvCursPos -= 9;
+            break;
         }
     }
 
-tail3:
     if ((unsigned int)(InvCursPos - 25) < 40 && ItemInc != 0) {
         if (InvCursPos < 35) {
-            int key = (signed char)(plr[myplr].HoldItem._iLoc - 1);
-            if ((unsigned int)key < 8) {
-                switch (key) {
-                case 0:
-                case 1:
-                    InvCursPos = 7;
-                    break;
-                case 2:
-                    InvCursPos = 19;
-                    break;
-                case 3:
-                    InvCursPos = 0;
-                    break;
-                case 4:
-                    InvCursPos = 4;
-                    break;
-                case 5:
-                    InvCursPos = 6;
-                    break;
-                default:
-                    break;
-                }
+            switch (plr[myplr].HoldItem._iLoc) {
+            case 1:
+                InvCursPos = 7;
+                break;
+            case ILOC_TWOHAND:
+                InvCursPos = 7;
+                break;
+            case 3:
+                InvCursPos = 19;
+                break;
+            case 4:
+                InvCursPos = 0;
+                break;
+            case 5:
+                InvCursPos = 4;
+                break;
+            case 6:
+                InvCursPos = 6;
+                break;
+            case 7:
+            case 8:
+                break;
             }
         } else {
             InvCursPos = InvCursPos - 10;
