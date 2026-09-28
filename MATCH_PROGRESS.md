@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2665 / 2727 functions PASS (97.7%) — 837 PsyQ SDK functions excluded**
+**Game code: 2666 / 2727 functions PASS (97.8%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -571,7 +571,7 @@
 - ✅ ClearTRAP__Fii (35)
 - ✅ GetTRAP__Fii (12)
 
-## drlg_l1  (recon/source/drlg_l1.cpp) — 38/40 PASS
+## drlg_l1  (recon/source/drlg_l1.cpp) — 39/40 PASS
 - ✅ DRLG_PlaceDoor__Fii (312)
 - ✅ DRLG_L1Shadows__Fv (260)
 - ✅ DRLG_PlaceMiniSet__FPCUciiiiiii (282)
@@ -589,7 +589,7 @@
 - ✅ L5ClearFlags__Fv (20)
 - ✅ L5drawRoom__Fiiii (27)
 - ✅ L5checkRoom__Fiiii (37)
-- ❌ L5roomGen__Fiiiii — 151 diffs (ours 204)
+- ✅ L5roomGen__Fiiiii (204)
 - ✅ L5firstRoom__Fv (232)
 - ✅ L5GetArea__Fv (24)
 - ✅ L5makeDungeon__Fv (35)
