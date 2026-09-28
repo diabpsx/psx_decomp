@@ -793,13 +793,9 @@ void CBlocks::MakeGt4Table()
 void CBlocks::MakeGt4(POLY_GT4 *GT4, FRAME_HDR *Fr)
 {
     int H = Fr->H;
-    GT4->x3 = GT4->x1 = Fr->W;
-    GT4->y3 = GT4->y2 = H;
+    const int W = Fr->W;   /* const local at its use: no SYM record (retail has none), one read of the frame word */
     setPolyGT4(GT4);
-    GT4->x0 = 0;
-    GT4->y0 = 0;
-    GT4->y1 = 0;
-    GT4->x2 = 0;
+    setXYWH(GT4, 0, 0, W, H);
     GT4->clut = ((unsigned short *)GetPal(Fr->PalNum))[1];
     int Rotated = Fr->Rotated;
     int Tpage = ((FRAME_TP *)Fr)->Tpage;

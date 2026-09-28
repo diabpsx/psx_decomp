@@ -1280,50 +1280,50 @@ void StartStore(char s)
     case 10:
         S_StartNoRoom();
         break;
-    case 11:
+    case 24:   /* STORE_NOITEMS: PSX addition after STORE_BARMAID (23); the body sits here between NOROOM and CONFIRM as in retail (jtbl order) */
         S_StartNoItems();
         break;
-    case 12:
+    case 11:
         S_StartConfirm();
         break;
-    case 13:
+    case 12:
         S_StartBoy();
         break;
-    case 14:
+    case 13:
         S_StartBBoy();
         break;
-    case 15:
+    case 14:
         S_StartHealer();
         break;
-    case 16:
+    case 15:
         S_StartStory();
         break;
-    case 17:
+    case 16:
         if (storenumh > 0) {
             S_StartHBuy();
         }
         break;
-    case 18:
+    case 17:
         S_StartSIdentify();
         break;
-    case 19:
+    case 18:
         if (!S_StartSPBuy()) {
             return;
         }
         break;
-    case 20:
+    case 19:
         S_StartTalk();
         break;
-    case 21:
+    case 20:
         S_StartIdShow();
         break;
-    case 22:
+    case 21:
         S_StartTavern();
         break;
-    case 23:
+    case 22:
         S_StartDrunk();
         break;
-    case 24:
+    case 23:
         S_StartBarMaid();
         break;
     }
@@ -2843,9 +2843,9 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
         sprintf(sstr, "%s:%i-%i", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
     if (x->_iClass == 2)
         sprintf(sstr, GetStr(0x2F), x->_iAC);
-    int first = sstr[0];
+    const int first = sstr[0];   /* record-less (never named): cse substitutes it for the sstr[0] test below, so the load is hoisted above the durability branches as in retail */
     if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
-        if (first)
+        if (sstr[0])
             strcat(sstr, ",  ");
         strcat(sstr, GetStr(0x218));
     } else {

@@ -2522,8 +2522,10 @@ void CheckInvCut(int pnum, int mx, int my)
         }
     }
 
-    if (r >= 25 && r <= 64) {
-        ii = plr[pnum].InvGrid[r - 25];
+    if ((unsigned int)(r - 25) < 40) {
+        char *const grid = plr[pnum].InvGrid;
+        const int idx = r - 25;
+        ii = grid[idx];
         if (ii != 0) {
             if (ii > 0)
                 iv = ii;

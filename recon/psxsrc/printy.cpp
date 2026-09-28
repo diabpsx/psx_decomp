@@ -166,8 +166,8 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
     MinX = 0x3039;
     MaxX = 0;
     if (TextWindow) {
-        WindowH = TextWindow->h;
         WindowW = TextWindow->w;
+        WindowH = TextWindow->h;
         WindowX = TextWindow->x;
         WindowY = TextWindow->y;
     } else {
@@ -225,10 +225,12 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
         if (WindowW < Width) {
             if (!SpacePtr) {
                 char c;
+                char sp;
                 if (*EndPtr && *EndPtr != ' ') {
-                    for (;;) {
+                    sp = ' ';
+                    do for (;;) {
                         if (!*EndPtr)
-                            break;
+                            goto done;
                         c = *EndPtr;
                         if (c & 0x80) {
                             EndPtr++;
@@ -237,9 +239,10 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
                             Width += GetCharWidth(c);
                         }
                         EndPtr++;
-                        if (!c || c == ' ')
+                        if (!c || c == sp)
                             break;
-                    }
+                    } while (0);
+                done:;
                 }
                 WindowW = Width;
             } else if (OrigStr == SpacePtr) {
@@ -257,7 +260,7 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
             while (Str != EndPtr) {
                 char c = *Str++;
                 if (c & 0x80) {
-                    kan = ((unsigned char)c << 8) | (unsigned char)*Str++;
+                    kan = ((c & 0xFF) << 8) | (unsigned char)*Str++;
                     Cx += KanjiPrintChar(Cx, Cy, kan, R, G, B);
                 } else if (c) {
                     Cx += PrintChar(Cx, Cy + 1, c, R, G, B);
@@ -373,7 +376,9 @@ int CFont::GetWrap(char *Str, RECT *TextWindow)
         if (WindowW < Width) {
             if (!SpacePtr) {
                 char c;
+                char sp;
                 if (*EndPtr && *EndPtr != ' ') {
+                    sp = ' ';
                     do for (;;) {
                         if (!*EndPtr)
                             goto done;
@@ -385,7 +390,7 @@ int CFont::GetWrap(char *Str, RECT *TextWindow)
                             Width += GetCharWidth(c);
                         }
                         EndPtr++;
-                        if (!c || c == ' ')
+                        if (!c || c == sp)
                             break;
                     } while (0);
                 done:;

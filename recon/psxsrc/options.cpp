@@ -242,7 +242,7 @@ void GetVolumes(void)
 
         mptr = &MenuList[i];
         iptr = mptr->Item;
-        if ((signed char)mptr->NoEntries > 0) {
+        if (mptr->NoEntries > 0) {
             int s;
 
             s = 0;
@@ -709,10 +709,9 @@ void CharacterLoadPad(void)
         return;
     }
     ShowCardActionText();
-    {
-        if (card_status[current_card] == 0) {
-            ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
-        }
+    if (card_status[current_card] == 0) {
+        ShowCharacterFiles(cs - 1, Spacing, ORect, 0x58);
+    }
         if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             if (saveflag == 0) {
                 if (card_status[current_card] == 2) {
@@ -733,9 +732,8 @@ void CharacterLoadPad(void)
                     cs = 2;
                     return;
                 } else {
-                    int idx;
+                    const int idx = cs - 1;
 
-                    idx = cs - 1;
                     if (D_80157B68[1272 * idx] != 0) {
                         ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
                         ReturnCards = 1;
@@ -768,19 +766,14 @@ void CharacterLoadPad(void)
         }
         LAMBO_MovePad(P);
         if (P->GetDown() & 0x100) {
-            int n, link;
-
             PlaySFX(0x33);
-            n = MenuList[cmenu].NoEntries - 1;
+            cs = MenuList[cmenu].NoEntries - 1;
             CharacterBlockLoaded = 0;
-            cs = n;
-            link = iptr[n].Link;
-            if (link != -2) {
-                cmenu = link - 1;
+            if (iptr[cs].Link != -2) {
+                cmenu = iptr[cs].Link - 1;
                 cs = current_card + 1;
             }
         }
-    }
 }
 
 void MemcardPad(void)

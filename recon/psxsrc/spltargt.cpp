@@ -212,11 +212,12 @@ void SpellTarget::Show(void)
         int inthaty;
         ClrCursor(pnum);
         plx = otx;
-        cp = pad_UpIsUpRight(Pad->GetCur() & 0xF, GetPadStyle(pnum));
-        x = offset_x[cp];
+        cp = Pad->GetCur() & 0xF;
+        const int dir = pad_UpIsUpRight(cp, GetPadStyle(pnum));
+        x = offset_x[dir];
         ply = oty;
-        y = offset_y[cp];
-        if (cp != -1) {
+        y = offset_y[dir];
+        if (dir != -1) {
             plx += x * 2;
             ply += y * 2;
             if (player->_px == (plx >> 3) && player->_py == (ply >> 3)) {
@@ -230,8 +231,8 @@ void SpellTarget::Show(void)
         }
         inthatx = plx >> 3;
         inthaty = ply >> 3;
-        vis_flag = dung_map[inthatx][inthaty].dFlags & (pnum + 1);
-        if (vis_flag) {
+        vis_flag = pnum + 1;
+        if (dung_map[inthatx][inthaty].dFlags & vis_flag) {
             /* two-compare test on _pTSpell with identical arms: jump2 cross-jumps the arms and
              * deletes the branches, but the _pTSpell load survives (as in retail).  The compared
              * values are erased by the merge; 2/7 are placeholders. */

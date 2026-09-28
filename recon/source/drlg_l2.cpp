@@ -774,9 +774,7 @@ static void DoPatternCheck(int i, int j)
                 y++;
                 x = i - 1;
             }
-            if (x < 0 || x >= DMAXX || y < 0 || y >= DMAXY) {
-                nOk = 254;
-            } else {
+            if (x >= 0 && x < DMAXX && y >= 0 && y < DMAXY) {
                 switch (Patterns[k][l]) {
                 case 0:
                     nOk = 254;
@@ -821,16 +819,14 @@ static void DoPatternCheck(int i, int j)
                         nOk = 254;
                     }
                     break;
-                default:
-                    break;
                 }
+            } else {
+                nOk = 254;
             }
             x++;
         }
         if (nOk == 254) {
             dungeon[i][j] = Patterns[k][9];
-        } else {
-            nOk = 255;
         }
     }
     myk = k;

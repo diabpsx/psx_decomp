@@ -1898,7 +1898,7 @@
 - ✅ OperateBookLever__Fii (294)
 - ✅ OperateSChambBk__Fii (143)
 - ✅ OperateChest__FiiUc (240)
-- 🟡 OperateMushPatch__Fii — bytes PASS, SYM differs
+- ❌ OperateMushPatch__Fii — 13 diffs (ours 133)
 - ✅ OperateInnSignChest__Fii (118)
 - ✅ OperateSlainHero__FiiUc (148)
 - ✅ OperateTrapLvr__Fi (116)

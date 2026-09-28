@@ -178,8 +178,8 @@ void CPlayer::Print(PlayerStruct &Plr, CBlocks &Bg)
     if (Action == 6) {
         int Frame = Plr._pAnimFrame - 1;
         if (Frame < GetNumOfFrames(0, 0)) {
-            int FrmNum = GetFrNum(0, 0, Plr._pdir, Plr._pAnimFrame - 1);
-            Frame += FrmNum - Frame;   /* = FrmNum; keeps the old Frame live here like retail (slt v0 + the s0 copy) -- SYM still lacks the FrmNum record */
+            int FrmNum = Plr._pAnimFrame - 1;
+            Frame = GetFrNum(0, 0, Plr._pdir, FrmNum);
             RECT R;
             Bg.GetScrXY(R, WorldX + 10, WorldY + 10, ScrXOff, ScrYOff);
             Ft4 = PrintFt4(Frame, R.x, R.y, 0, 4, 0);

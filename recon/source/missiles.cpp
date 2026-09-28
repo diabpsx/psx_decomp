@@ -567,7 +567,7 @@ void PutMissile(int i)
             if (dMiss < 0) {
                 /* oracle computes the shift/column term (dMiss&0x60) BEFORE the row term
                  * (dMiss&0x1F) -- confirmed via raw oracle register order; matters for coloring. */
-                char col = (dMiss & 0x60) >> 5;
+                const char col = (dMiss & 0x60) >> 5;
                 if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][col] - 1]._mitype)
                     return;
                 if ((char)(col + 1) < 4)

@@ -455,6 +455,7 @@ void DoCredits(void)
     int Mode;
     unsigned short TextNo;
     unsigned long CreditsCount;
+    int one = 1;
 
     Fade = 0;
     CreditsCount = 0;
@@ -464,7 +465,7 @@ void DoCredits(void)
     CreditSubTitleNo = -1;
     CreditTitleNo = -1;
     InCredits = 5;
-    CDWAIT = 1;
+    CDWAIT = one;
     CreditsBack.Load(0xE, 0xB, 0);
     PrintSelectBack(0x4000);
     CDWAIT = 0;
@@ -472,7 +473,7 @@ void DoCredits(void)
     while (GetFadeState()) {
         CreditsBack.Display(0xE, 0xB, 0, 0);
         PrintSelectBack(0x4000);
-        TSK_Sleep(1);
+        TSK_Sleep(one);
     }
     while (InCredits) {
         int YOfs;
@@ -515,7 +516,7 @@ void DoCredits(void)
         CreditsBack.Display(0xE, 0xB, 0, 0);
         if (InCredits >= 4)
             PrintSelectBack(0x4000);
-        TSK_Sleep(1);
+        TSK_Sleep(one);
         if (InCredits == 2) {
             InCredits = 3;
             PaletteFadeOut(8);

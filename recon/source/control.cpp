@@ -157,11 +157,9 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         int dummy;   /* stand-in for the record-less declaration that opens retail's level here (lane fact 61) */
 
         xp *= 18;
+        xp = xp + SPLICONRIGHT + 32;
         yp *= 18;
-        xp += SPLICONRIGHT;
-        yp += SPLICONY;
-        xp += 32;
-        yp += 32;
+        yp = yp + SPLICONY + 32;
     }
     if (sel) {
         r = REDR >> 1;
@@ -220,6 +218,8 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             v1 = v0;
             u2 = u0;
             v2 = v1 + SH;
+            u3 = u1;
+            v3 = v2;
         } else {
             x0 = X + SW;
             y0 = Y;
@@ -235,9 +235,9 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             v1 = v0;
             u2 = u0;
             v2 = SW - (1 - Tp->V);
+            u3 = u1;
+            v3 = v2;
         }
-        u3 = u1;
-        v3 = v2;
         GT4->u0 = u0;
         GT4->v0 = v0;
         GT4->u1 = u1;
@@ -318,7 +318,9 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         Ft4 = ThisDat->PrintFt4(nCel + 166, xp, yp, 0, otpos, 0);
         setSemiTrans(Ft4, 0);
         setShadeTex(Ft4, 0);
-        Ft4->r0 = Ft4->g0 = Ft4->b0 = 128 / st;
+        Ft4->r0 = 128 / st;
+        Ft4->g0 = 128 / st;
+        Ft4->b0 = 128 / st;
         Ft4->x0 = Fr->X + xp;
         Ft4->y0 = Fr->Y + yp;
         Ft4->x1 = Fr->X + xp + SpellW;

@@ -132,7 +132,7 @@ void SetWeirdFX(void)
 
 /* @0x8004BE20 -- PSX-only coloured radial light-fill (no PC twin). All four paint arms are written from
  * the oracle: clipped/unclipped x shift_mask==0/!=0. Parameters are reused as loop rows/columns
- * (clipped arms: nYPos = block_y + y set at the top of each row; unclipped: nYPos walks beside the y counter).
+ * (arm A: nYPos = block_y + y per row; arm B: rows counted in nYPos with y = nYPos copied at the row head and the loads indexed through y; unclipped arms: nYPos walks beside the y counter).
  * dist_y is set inside the x loop (retail computes it after the inner entry test). The shake jitter
  * (two GU_GetRnd calls) is dead in this build: shake is the constant 1.
  * NEAR-MISS: 804/821 insns; the remaining gap is register allocation, caller-save slots and the plr[0]
@@ -152,6 +152,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
     int scr_x, scr_y;
     int temp_x, temp_y;
     int weirdy, cont;
+    int p0 = plr[0].plractive;   /* unused carrier: retail loads plr[0].plractive in the entry block; an unused initialised local leaves no SYM record and cse propagates it into the leveltype==3 test */
 
     xoff = 0;
     yoff = 0;
@@ -270,16 +271,16 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                     }
                 }
             } else {
-                for (y = 0; y <= radius_block; y++) {
-                    nYPos = block_y + y;
+                for (nYPos = block_y; nYPos <= block_y + radius_block; nYPos++) {
                     if (nYPos >= 0) if (nYPos < 48) {
+                        y = nYPos;
                         for (x = 0; x <= radius_block; x++) {
                             dist_y = light_y - ((nYPos) << 4);
                             mult = (g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y)) * g_light_amp2;
                             if (mult < 0)
                                 mult = 0;
                             if (block_x + x >= 0 && block_x + x < max_x) {
-                                v = dung_map_r[block_x + x][nYPos];
+                                v = dung_map_r[block_x + x][y];
                                 if (colour_mask & 1) {
                                     if (!(shift_mask & 0x9)) {
                                         v += mult;
@@ -293,7 +294,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                         v = g_light_clamp;
                                     dung_map_r[block_x + x][nYPos] = v;
                                 }
-                                v = dung_map_g[block_x + x][nYPos];
+                                v = dung_map_g[block_x + x][y];
                                 if (colour_mask & 2) {
                                     if (!(shift_mask & 0x12)) {
                                         v += mult;
@@ -307,7 +308,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                         v = g_light_clamp;
                                     dung_map_g[block_x + x][nYPos] = v;
                                 }
-                                v = dung_map_b[block_x + x][nYPos];
+                                v = dung_map_b[block_x + x][y];
                                 if (colour_mask & 4) {
                                     if (!(shift_mask & 0x24)) {
                                         v += mult;

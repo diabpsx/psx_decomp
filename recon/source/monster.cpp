@@ -2419,17 +2419,33 @@ void ProcessMonsters(void)
     /* bytes PASS: DoWipe is `bool` (SYM type BOOL, int-sized -- no andi 0xff
      * on the test), set by `DoWipe = 0; if (...) DoWipe = 1;`, and raflag is
      * zeroed per monster right after the mx/my reads (fills the NOHEAL branch
-     * delay slot). SYM OPEN: retail lists WipeCount/DoWipe/Monst/oldmode at
-     * FUNCTION level (before the body block) and i..._menemy inside it; the
-     * same split shows in MAI_Counselor (counsmiss/_mx/_my) -- every retail
-     * function with a static local has it. FALSIFIED this pass: wrapping
-     * i/mi/raflag/mx/my/_menemy in an explicit `{ }` block around the
-     * for-loop fixes the "record/level membership" check's grouping but
-     * BREAKS the separate block-TREE check (retail's real block-tree is a
-     * single flat block start-to-end, per `symtypes.py fn` and symlane's
-     * "blocks differ" comparison both agreeing retail = ONE block) --
-     * reverted; the two SYM checks want CONTRADICTORY structures here, so
-     * the flat (original) form is closer to ground truth. */
+     * delay slot). SYM OPEN -- two falsified angles now: (a) wrapping
+     * i/mi/raflag/mx/my/_menemy in `{ }` around just the for-loop: block
+     * START address doesn't match retail's (starts later than offset 0) --
+     * "blocks differ". (b) widening that same `{ }` to cover the WHOLE rest
+     * of the function (both DeleteMonsterList() calls + DoWipe setup + the
+     * loop, so the block genuinely starts at relative offset 0 and ends at
+     * the same 0x598/366-insn offset retail's single block does): this gets
+     * `ours["blocks"]` SIZE-and-END-matching but gcc still emits it as a
+     * SECOND, separate block record (a real nested C scope, even one with
+     * an identical address range to the function, still gets its own
+     * block-start/end pair) -- "blocks differ" again, now 2 pairs vs
+     * retail's 1. Reverted to flat (this state): `ours["blocks"] ==
+     * retail["blocks"]` (both truly ONE block, confirmed) but the raw SYM
+     * record STREAM interleaves the block-start marker with the variable
+     * records differently ("record/level membership" seq mismatch) --
+     * retail's single block-start token is written to the stream AFTER the
+     * WipeCount/DoWipe/Monst/oldmode variable records even though the block
+     * itself spans the whole function (same address as the flat case). This
+     * looks like a debug-info EMISSION-ORDER quirk of the retail compiler/
+     * assembler pass tied to the `static` local specifically (same family
+     * as MAI_Counselor's counsmiss-ordering fix) rather than something a
+     * real nested C scope can reproduce without ALSO duplicating the block
+     * count. Next angle: check whether cc1's SLD/debug pass treats a
+     * `static` declaration as forcing a block boundary token immediately
+     * after itself as a side effect, independent of any C-level braces --
+     * would need a source form that has ONLY the `static` local emit that
+     * marker, not a real scope. */
     DoWipe = 0;
     if (++WipeCount % 200 == 0)
         DoWipe = 1;

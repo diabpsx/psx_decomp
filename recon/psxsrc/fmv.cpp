@@ -534,17 +534,32 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
     return len << 0xB;
 }
 
-/* @0x80156720 FMV.CPP:791 */
+/* @0x80156720 FMV.CPP:791 -- 7->3 diffs this round. loop.c's biv final-value replacement (folding
+ * `tsz` to the closed-form `21*0x1900` literal at the return, which the raw does NOT do -- it keeps
+ * tsz as a genuinely accumulated register) is gated on `maybe_never`: with a plain `for(i=0;i<21;i++)`
+ * loop.c can prove the loop always runs to completion, so it substitutes the final value. Adding a
+ * conditional exit (`if (p == 0) break;`, placed as the LAST statement in the body, after the
+ * pointer/tsz updates -- an earlier placement before the store left a stray hoisted guard + nop ahead
+ * of the loop) sets `maybe_never` and defeats the fold: the loop body becomes byte-identical to the
+ * raw (same accumulator register roles, same tail `addu v0,a2,zero` return), at the cost of one real
+ * `beqz` the raw doesn't have (scheduled into an existing delay slot, so no extra nop) plus the `i=0`
+ * init still compiling as a fresh zero instead of the raw's `addu a1,a2,zero` copy-from-tsz form (tried
+ * `i=tsz` explicitly -- already present below -- with no further change). `p` can't be proven non-null
+ * by the compiler (real pointer, not analyzable at compile time), so the check survives as a genuine,
+ * always-false-at-runtime guard; not aware of what condition retail's real source tested here, but this
+ * reproduces the closest known-good structure. */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
     int i;
     int tsz;
 
     tsz = 0;
-    for (i = 0; i < 21; i++) {
+    for (i = tsz; i < 21; i++) {
         imgbuf[i] = (unsigned short *)p;
         p += 0x1900;
         tsz += 0x1900;
+        if (p == 0)
+            break;
     }
     return tsz;
 }
