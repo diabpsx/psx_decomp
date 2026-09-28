@@ -1987,7 +1987,7 @@
 - ✅ PrintMono__Fi (46)
 - ❌ DrawMenu__Fi — 965 diffs (ours 1032)
 - ✅ who_pressed__Fi (34)
-- 🟡 CharacterLoadPad__Fv — bytes PASS, SYM differs
+- ❌ CharacterLoadPad__Fv — 1 diffs (ours 341)
 - ❌ MemcardPad__Fv — 124 diffs (ours 585)
 - ✅ SwitchMONO__Fv (19)
 - ❌ SoundPad__Fv — 535 diffs (ours 642)
