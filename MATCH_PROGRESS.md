@@ -101,7 +101,7 @@
 - ✅ Load__7CBlocksi (46)
 - ✅ MakeRectTable__7CBlocks (85)
 - ✅ MakeGt4Table__7CBlocks (121)
-- ❌ MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR — 2 diffs (ours 74)
+- 🟡 MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR — bytes PASS, SYM differs
 - ✅ MyRoutine__FR7CBlocksii (26)
 - ✅ SetRandOffset__7CBlocksi (23)
 - ✅ Print__7CBlocks (71)
