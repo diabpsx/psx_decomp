@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2651 / 2727 functions PASS (97.2%) — 837 PsyQ SDK functions excluded**
+**Game code: 2653 / 2727 functions PASS (97.3%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -651,7 +651,7 @@
 - ✅ LoadPreL2Dungeon__FPcii (125)
 - ❌ CreateL2Dungeon__FUii — 69 diffs (ours 86)
 
-## drlg_l3  (recon/source/drlg_l3.cpp) — 31/37 PASS
+## drlg_l3  (recon/source/drlg_l3.cpp) — 33/37 PASS
 - ✅ InitL3Dungeon__Fv (33)
 - ✅ SetBlankL3Dungeon__Fv (23)
 - ✅ FixL3Dungeon__Fv (29)
@@ -669,7 +669,7 @@
 - ✅ DRLG_L3Spawn__FiiPi (131)
 - ✅ DRLG_L3Pool__Fv (148)
 - ❌ DRLG_L3PoolFix__Fv — 153 diffs (ours 136)
-- ❌ DRLG_L3PlaceMiniSet__FPCUciiiiii — 50 diffs (ours 219)
+- ✅ DRLG_L3PlaceMiniSet__FPCUciiiiii (219)
 - ✅ DRLG_L3PlaceRndSet__FPCUci (207)
 - ✅ WoodVertU__Fii (43)
 - ✅ WoodVertD__Fii (39)
@@ -677,7 +677,7 @@
 - ✅ WoodHorizR__Fii (33)
 - ✅ AddFenceDoors__Fv (57)
 - ✅ FenceDoorFix__Fv (125)
-- ❌ DRLG_L3Wood__Fv — 48 diffs (ours 501)
+- ✅ DRLG_L3Wood__Fv (501)
 - ✅ DRLG_L3Anvil__Fv (150)
 - ✅ FixL3Warp__Fv (58)
 - ✅ FixL3HallofHeroes__Fv (85)
