@@ -1930,31 +1930,13 @@ void CheckInvPaste(int pnum, int mx, int my)
     long gt;
     struct ItemStruct tempitem;
 
-    cn = CURSOR_HAND;
     SetICursor(plr[pnum].HoldItem._iCurs + 12);
-    i = mx + (icursW >> 1);
-    j = my + (icursH >> 1);
-    sx = icursW28;
-    sy = icursH28;
-    done = 0;
-    for (r = 0; (unsigned int)r < 0x49 && !done; r++) {
-        if (i >= InvRect[r].X && i < InvRect[r].X + 28) {
-            if (j >= InvRect[r].Y - 29 && j < InvRect[r].Y) {
-                done = 1;
-                r--;
-            }
-        }
-        if (r == 24) {
-            if (!(sx & 1))
-                i -= 14;
-            if (!(sy & 1))
-                j -= 14;
-        }
-        if (r == 64 && !(sy & 1))
-            j += 14;
-    }
-    if (!done)
-        goto end;
+    ItemNo = plr[myplr].HoldItem._iCurs;
+    sy = InvItemHeight[ItemNo + 12] >> 4;
+    sx = InvItemWidth[ItemNo + 12] >> 4;
+    r = InvCursPos;
+    if (sy == 3 && (unsigned int)(r - 25) < 40)
+        r += 10;
 
     il = 7;
     if (r >= 0 && r <= 3)
@@ -2056,6 +2038,7 @@ void CheckInvPaste(int pnum, int mx, int my)
     if (pnum == myplr)
         PlaySFX(ItemInvSnds[ItemCAnimTbl[plr[pnum].HoldItem._iCurs]]);
 
+    cn = CURSOR_HAND;
     switch (il) {
     case 4: /* head */
         NetSendCmdChItem(0, 0);
