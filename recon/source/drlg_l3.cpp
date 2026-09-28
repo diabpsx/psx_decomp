@@ -1520,8 +1520,8 @@ void DRLG_L3(int entry)
 {
     int x1, y1, x2, y2, sx1, sy1;
     int i, j;
-    unsigned char found;
-    int genok;
+    int found;
+    unsigned char genok;
 
     lavapool = false;
 
@@ -1550,43 +1550,43 @@ void DRLG_L3(int entry)
                 DRLG_L3FillDiags();
                 DRLG_L3Edges();
                 if (DRLG_L3GetFloorArea() >= 600) {
-                    found = DRLG_L3Lockout();
+                    genok = DRLG_L3Lockout();
                 } else {
-                    found = false;
+                    genok = false;
                 }
-            } while (!found);
+            } while (!genok);
             DRLG_L3MakeMegas();
             if (entry == ENTRY_MAIN) {
-                genok = DRLG_L3PlaceMiniSet(L3UP, 1, 1, -1, -1, true, 0);
-                if (!genok) {
-                    genok = DRLG_L3PlaceMiniSet(L3DOWN, 1, 1, -1, -1, false, 1);
-                    if (!genok && currlevel == 9) {
-                        genok = DRLG_L3PlaceMiniSet(L3HOLDWARP, 1, 1, -1, -1, false, 6);
+                found = DRLG_L3PlaceMiniSet(L3UP, 1, 1, -1, -1, true, 0);
+                if (!found) {
+                    found = DRLG_L3PlaceMiniSet(L3DOWN, 1, 1, -1, -1, false, 1);
+                    if (!found && currlevel == 9) {
+                        found = DRLG_L3PlaceMiniSet(L3HOLDWARP, 1, 1, -1, -1, false, 6);
                     }
                 }
             } else if (entry == ENTRY_PREV) {
-                genok = DRLG_L3PlaceMiniSet(L3UP, 1, 1, -1, -1, false, 0);
-                if (!genok) {
-                    genok = DRLG_L3PlaceMiniSet(L3DOWN, 1, 1, -1, -1, true, 1);
+                found = DRLG_L3PlaceMiniSet(L3UP, 1, 1, -1, -1, false, 0);
+                if (!found) {
+                    found = DRLG_L3PlaceMiniSet(L3DOWN, 1, 1, -1, -1, true, 1);
                     ViewX += 2;
                     ViewY -= 2;
-                    if (!genok && currlevel == 9) {
-                        genok = DRLG_L3PlaceMiniSet(L3HOLDWARP, 1, 1, -1, -1, false, 6);
+                    if (!found && currlevel == 9) {
+                        found = DRLG_L3PlaceMiniSet(L3HOLDWARP, 1, 1, -1, -1, false, 6);
                     }
                 }
             } else {
-                genok = DRLG_L3PlaceMiniSet(L3UP, 1, 1, -1, -1, false, 0);
-                if (!genok) {
-                    genok = DRLG_L3PlaceMiniSet(L3DOWN, 1, 1, -1, -1, false, 1);
-                    if (!genok && currlevel == 9) {
-                        genok = DRLG_L3PlaceMiniSet(L3HOLDWARP, 1, 1, -1, -1, true, 6);
+                found = DRLG_L3PlaceMiniSet(L3UP, 1, 1, -1, -1, false, 0);
+                if (!found) {
+                    found = DRLG_L3PlaceMiniSet(L3DOWN, 1, 1, -1, -1, false, 1);
+                    if (!found && currlevel == 9) {
+                        found = DRLG_L3PlaceMiniSet(L3HOLDWARP, 1, 1, -1, -1, true, 6);
                     }
                 }
             }
-            if (!genok && QuestStatus(Q_ANVIL)) {
-                genok = DRLG_L3Anvil();
+            if (!found && QuestStatus(Q_ANVIL)) {
+                found = DRLG_L3Anvil();
             }
-        } while (genok == true);
+        } while (found == true);
         DRLG_L3Pool();
     } while (!lavapool);
 
