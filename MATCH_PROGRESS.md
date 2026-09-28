@@ -1130,7 +1130,7 @@
 - ✅ GoldAutoPlace__Fi (310)
 - ✅ WeaponAutoPlace__Fi (165)
 - ✅ SwapItem__FP10ItemStructT0 (69)
-- ❌ CheckInvPaste__Fiii — 2044 diffs (ours 1890)
+- ❌ CheckInvPaste__Fiii — 1712 diffs (ours 1890)
 - ✅ CheckInvCut__Fiii (705)
 - ✅ RemoveInvItem__Fii (172)
 - ✅ RemoveSpdBarItem__Fii (61)

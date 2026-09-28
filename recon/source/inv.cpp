@@ -1923,17 +1923,20 @@ void DrawInvStats(void)
 
 void CheckInvPaste(int pnum, int mx, int my)
 {
-    int r, sx, sy;
+    int r;
+    int sx;
+    int sy;
     int i, j, xx, yy, ii;
-    unsigned char done, done2h;
+    unsigned char done;
+    unsigned char done2h;
     int il, cn, it, iv, ig;
     long gt;
     struct ItemStruct tempitem;
 
     SetICursor(plr[pnum].HoldItem._iCurs + 12);
     ItemNo = plr[myplr].HoldItem._iCurs;
-    sy = InvItemHeight[ItemNo + 12] >> 4;
     sx = InvItemWidth[ItemNo + 12] >> 4;
+    sy = InvItemHeight[ItemNo + 12] >> 4;
     r = InvCursPos;
     if (sy == 3 && (unsigned int)(r - 25) < 40)
         r += 10;
@@ -1969,7 +1972,7 @@ void CheckInvPaste(int pnum, int mx, int my)
             done = 0;
     }
 
-    it = 0;
+    iv = 0;
     if (il == 7) {
         ii = r - 25;
         done = 1;
@@ -1977,12 +1980,12 @@ void CheckInvPaste(int pnum, int mx, int my)
             yy = 10 * (ii / 10);
             xx = ii % 10;
             if (plr[pnum].InvGrid[xx + yy] != 0) {
-                iv = plr[pnum].InvGrid[xx + yy];
-                if (iv > 0) {
-                    if (plr[pnum].InvList[iv - 1]._itype != ITYPE_GOLD)
-                        it = iv;
+                ig = plr[pnum].InvGrid[xx + yy];
+                if (ig > 0) {
+                    if (plr[pnum].InvList[ig - 1]._itype != ITYPE_GOLD)
+                        iv = ig;
                 } else {
-                    it = -iv;
+                    iv = -ig;
                 }
             }
         } else {
@@ -2000,14 +2003,14 @@ void CheckInvPaste(int pnum, int mx, int my)
                         done = 0;
                     } else {
                         if (plr[pnum].InvGrid[xx + yy] != 0) {
-                            iv = plr[pnum].InvGrid[xx + yy];
-                            if (iv < 0)
-                                iv = -iv;
-                            if (it != 0) {
-                                if (it != iv)
+                            ig = plr[pnum].InvGrid[xx + yy];
+                            if (ig < 0)
+                                ig = -ig;
+                            if (iv != 0) {
+                                if (iv != ig)
                                     done = 0;
                             } else {
-                                it = iv;
+                                iv = ig;
                             }
                         }
                     }
@@ -2035,8 +2038,9 @@ void CheckInvPaste(int pnum, int mx, int my)
         goto end;
     }
 
+    it = ItemCAnimTbl[plr[pnum].HoldItem._iCurs];
     if (pnum == myplr)
-        PlaySFX(ItemInvSnds[ItemCAnimTbl[plr[pnum].HoldItem._iCurs]]);
+        PlaySFX(ItemInvSnds[it]);
 
     cn = CURSOR_HAND;
     switch (il) {
@@ -2167,30 +2171,29 @@ void CheckInvPaste(int pnum, int mx, int my)
             cn = SwapItem(&plr[pnum].InvBody[6], &plr[pnum].HoldItem);
         break;
     case 7: /* inv */
-        if (plr[pnum].HoldItem._itype == ITYPE_GOLD && it == 0) {
+        if (plr[pnum].HoldItem._itype == ITYPE_GOLD && iv == 0) {
             ii = r - 25;
             yy = 10 * (ii / 10);
             xx = ii % 10;
             if (plr[pnum].InvGrid[yy + xx] > 0) {
-                il = plr[pnum].InvGrid[yy + xx];
-                il--;
-                gt = plr[pnum].InvList[il]._ivalue;
+                i = plr[pnum].InvGrid[yy + xx] - 1;
+                gt = plr[pnum].InvList[i]._ivalue;
                 ig = plr[pnum].HoldItem._ivalue + gt;
                 if (ig <= GOLD_MAX_LIMIT) {
-                    plr[pnum].InvList[il]._ivalue = ig;
+                    plr[pnum].InvList[i]._ivalue = ig;
                     plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
                     if (ig >= GOLD_MEDIUM_LIMIT)
-                        plr[pnum].InvList[il]._iCurs = ICURS_GOLD_LARGE;
+                        plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
                     else if (ig <= GOLD_SMALL_LIMIT)
-                        plr[pnum].InvList[il]._iCurs = ICURS_GOLD_SMALL;
+                        plr[pnum].InvList[i]._iCurs = ICURS_GOLD_SMALL;
                     else
-                        plr[pnum].InvList[il]._iCurs = ICURS_GOLD_MEDIUM;
+                        plr[pnum].InvList[i]._iCurs = ICURS_GOLD_MEDIUM;
                 } else {
                     ig = GOLD_MAX_LIMIT - gt;
                     plr[pnum]._pGold += ig;
                     plr[pnum].HoldItem._ivalue -= ig;
-                    plr[pnum].InvList[il]._ivalue = GOLD_MAX_LIMIT;
-                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_LARGE;
+                    plr[pnum].InvList[i]._ivalue = GOLD_MAX_LIMIT;
+                    plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
                     if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
                         cn = ICURS_GOLD_LARGE + 12;
                     else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
@@ -2199,34 +2202,35 @@ void CheckInvPaste(int pnum, int mx, int my)
                         cn = ICURS_GOLD_MEDIUM + 12;
                 }
             } else {
-                il = plr[pnum]._pNumInv;
-                plr[pnum].InvList[il] = plr[pnum].HoldItem;
+                ii = plr[pnum]._pNumInv;
+                plr[pnum].InvList[ii] = plr[pnum].HoldItem;
                 plr[pnum]._pNumInv++;
                 plr[pnum].InvGrid[yy + xx] = plr[pnum]._pNumInv;
                 plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
                 if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
-                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_LARGE;
+                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_LARGE;
                 else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
-                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_SMALL;
+                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_SMALL;
                 else
-                    plr[pnum].InvList[il]._iCurs = ICURS_GOLD_MEDIUM;
+                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_MEDIUM;
             }
         } else {
-            if (it == 0) {
-                plr[pnum].InvList[plr[pnum]._pNumInv] = plr[pnum].HoldItem;
+            if (iv == 0) {
+                ii = plr[pnum]._pNumInv;
+                plr[pnum].InvList[ii] = plr[pnum].HoldItem;
                 plr[pnum]._pNumInv++;
-                it = plr[pnum]._pNumInv;
+                iv = plr[pnum]._pNumInv;
             } else {
-                il = it - 1;
+                ii = iv - 1;
                 if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
                     plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
-                cn = SwapItem(&plr[pnum].InvList[il], &plr[pnum].HoldItem);
+                cn = SwapItem(&plr[pnum].InvList[ii], &plr[pnum].HoldItem);
                 if (plr[pnum].HoldItem._itype == ITYPE_GOLD)
                     plr[pnum]._pGold = CalculateGold(pnum);
                 for (i = 0; i < 40; i++) {
-                    if (plr[pnum].InvGrid[i] == it)
+                    if (plr[pnum].InvGrid[i] == iv)
                         plr[pnum].InvGrid[i] = 0;
-                    if (plr[pnum].InvGrid[i] == -it)
+                    if (plr[pnum].InvGrid[i] == -iv)
                         plr[pnum].InvGrid[i] = 0;
                 }
             }
@@ -2240,9 +2244,9 @@ void CheckInvPaste(int pnum, int mx, int my)
                     xx = 0;
                 for (i = 0; i < sx; i++) {
                     if (i != 0 || j != sy - 1)
-                        plr[pnum].InvGrid[xx + yy] = -it;
+                        plr[pnum].InvGrid[xx + yy] = -iv;
                     else
-                        plr[pnum].InvGrid[xx + yy] = it;
+                        plr[pnum].InvGrid[xx + yy] = iv;
                     xx++;
                 }
                 yy += 10;
