@@ -157,9 +157,11 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         int dummy;   /* stand-in for the record-less declaration that opens retail's level here (lane fact 61) */
 
         xp *= 18;
-        xp = xp + SPLICONRIGHT + 32;
         yp *= 18;
-        yp = yp + SPLICONY + 32;
+        xp += SPLICONRIGHT;
+        yp += SPLICONY;
+        xp += 32;
+        yp += 32;
     }
     if (sel) {
         r = REDR >> 1;
@@ -199,8 +201,8 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             pinc4 = 4;
         SH = Fr->H;
         X = xp + Fr->X;
-        Y = yp + Fr->Y;
         SW = Fr->W;
+        Y = yp + Fr->Y;
         GT4 = PRIM_GetNextPolyGt4();
         setPolyGT4(GT4);
         if (!(((unsigned long *)Fr)[1] & 0x2000000)) {
@@ -308,9 +310,9 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             GT4->b3 = BACKB >> 1;
             break;
         }
+        GT4->tpage = Tp->tpage;
         setSemiTrans(GT4, 0);
         setShadeTex(GT4, 0);
-        GT4->tpage = Tp->tpage;
         addPrim(&ThisOt[otpos - 1], GT4);
         Fr = ThisDat->GetFr(nCel + 166);
         SpellW = Fr->W;
