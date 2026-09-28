@@ -4,7 +4,7 @@
 |---|---|---|---|---|---|---|
 | DrawAutomap__Fv | automap | 1337 diffs (ours 979) | automap.cpp:648 | AUTOMAP.CPP:685 | automap.cpp:1752 | JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.CPP; JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.H; JAP_1998_05_29/DIABPSX/SOURCE/SCROLL |
 | BL_AsyncReadFile__FPcUl | biglump | 4 diffs (ours 88) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BIGLUMP.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BIGLUMP.H; PAL_1997_12_12/DIABPSX/PSXSRC/BIGLUM |
-| MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR | block | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
+| MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR | block | 2 diffs (ours 74) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
 | PrintMap__7CBlocksii | block | 254 diffs (ours 732) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
 | IterateVisibleMap__7CBlocksiiPFP9CacheInfoP8map_infoii_ib | block | 160 diffs (ours 286) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
 | PrintMonsters__7CBlocksii | block | 295 diffs (ours 681) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
@@ -61,7 +61,7 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 ## Verified SYM-only clusters
 
 - Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
-- Optimized temporary records: `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR`, `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail.
+- Optimized temporary records: `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now has exact SYM and instruction count; only the width/height mask scheduling order remains.
 - `CharacterLoadPad__Fv` now has retail's single outer block and no extra local records; its sole residual is the compiler folding `1272 * (cs - 1)` into a relocation/addend form and omitting retail's standalone `addiu v0, v0, -1`.
 
-Generated from MATCH_PROGRESS.md at master 3474183.
+Generated from MATCH_PROGRESS.md at master d2357db.
