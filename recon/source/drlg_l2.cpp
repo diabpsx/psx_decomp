@@ -1552,13 +1552,13 @@ void L2DoorFix(void)
 void DRLG_L2SetWalls(void)
 {
     int i, j, xx, yy;
-    unsigned short v;
+    int v;
 
     yy = 16;
     for (j = 0; j < DMAXX; j++) {
         xx = 16;
         for (i = 0; i < DMAXX; i++) {
-            v = dungeon[j][i];
+            v = dungeon[i][j];
             if (v == 3 || v == 12 || v == 0 || v == 0x4C || v == 0x9F || v == 0x32) {
                 dung_map[xx][yy].dFlags |= 0x20;
                 dung_map[xx + 1][yy].dFlags |= 0x20;
