@@ -1222,6 +1222,8 @@ int DRLG_PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, 
     int found;
     int abort;
 
+    sx = 0;
+    sy = 0;
     sw = miniset[0];
     sh = miniset[1];
 
@@ -1290,12 +1292,12 @@ int DRLG_PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, 
             }
         }
 
-        ii = sw * sh + 2;
+        ii = sh * sw + 2;
 
         for (yy = 0; yy < sh; yy++) {
             for (xx = 0; xx < sw; xx++) {
                 if (miniset[ii])
-                    dungeon[xx + sx][sy + yy] = miniset[ii];
+                    dungeon[sx + xx][sy + yy] = miniset[ii];
                 ii++;
             }
         }
