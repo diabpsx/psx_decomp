@@ -1192,8 +1192,8 @@ void DRLG_L3Wood(void)
                         } else {
                             dungeon[i][yy] = 124;
                         }
+                        dungeon[i][y] = 122;
                     }
-                    dungeon[i][y] = 122;
                 }
             }
             if (dungeon[i][j] == 11 && dungeon[i + 1][j] == 10 && dungeon[i][j + 1] == 9 && ENG_random(2) != 0) {
@@ -1243,17 +1243,17 @@ void DRLG_L3Wood(void)
                         y2++;
                     }
                     y2--;
-                    skip = true;
+                    rp = true;
                     if (dungeon[i][y1] == 7) {
-                        skip = false;
+                        rp = false;
                     }
                     if (dungeon[i][y2] == 7) {
-                        skip = false;
+                        rp = false;
                     }
-                    if (y2 - y1 > 1 && skip) {
-                        rp = ENG_random(y2 - y1 - 1) + y1 + 1;
+                    if (y2 - y1 > 1 && rp) {
+                        skip = ENG_random(y2 - y1 - 1) + y1 + 1;
                         for (y = y1; y <= y2; y++) {
-                            if (y == rp) {
+                            if (y == skip) {
                                 continue;
                             }
                             if (dungeon[i][y] == 7) {
@@ -1295,17 +1295,17 @@ void DRLG_L3Wood(void)
                         x2++;
                     }
                     x2--;
-                    skip = true;
+                    rp = true;
                     if (dungeon[x1][j] == 7) {
-                        skip = false;
+                        rp = false;
                     }
                     if (dungeon[x2][j] == 7) {
-                        skip = false;
+                        rp = false;
                     }
-                    if (x2 - x1 > 1 && skip) {
-                        rp = ENG_random(x2 - x1 - 1) + x1 + 1;
+                    if (x2 - x1 > 1 && rp) {
+                        skip = ENG_random(x2 - x1 - 1) + x1 + 1;
                         for (x = x1; x <= x2; x++) {
-                            if (x == rp) {
+                            if (x == skip) {
                                 continue;
                             }
                             if (dungeon[x][j] == 7) {
