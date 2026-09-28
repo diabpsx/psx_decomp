@@ -244,6 +244,10 @@ python tools/instr/isolate_fn.py recon/source/items.cpp PrintItemPower /tmp/item
 cp /tmp/items_isolated.cpp recon/source/         # needs to sit next to its own headers
 python tools/instr/gen_i.py recon/source/items_isolated.cpp out.i
 
+# Or, when just one earlier function ICEs and preceding-TU compiler state may
+# matter, remove only that body while retaining every other function:
+python tools/instr/isolate_fn.py --drop-only recon/source/items.cpp GetItemStr recon/source/items_no_getitemstr.cpp
+
 # 3. run the INSTRUMENTED cc1plus with GCC_TRACE_ALLOC=1, same flags as build.py's
 #    CC1PL_FLAGS (-quiet -O2 -G8 -fno-inline -fsigned-char), and a writable
 #    TMPDIR/TMP/TEMP (Windows path, trailing backslash):

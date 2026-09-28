@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
-"""isolate_fn.py <src.cpp> <FuncName> <out.cpp>
-Blank out every top-level (column-0-brace) function BODY except the target's,
-turning them into bodyless prototypes -- keeps types/globals/decls intact so
-the target function still compiles (and any callee prototypes resolve), while
-sidestepping earlier-function ICEs in a huge TU. Heuristic: column-0 '{' ...
-matching column-0 '}' is one top-level block; the preceding non-blank line(s)
-back to the last ';' or '}' is the signature."""
+"""isolate_fn.py [--drop-only] <src.cpp> <FuncName[,FuncName...]> <out.cpp>
+By default, blank every top-level function body except the named target.
+With --drop-only, blank only the named function body and preserve the rest of
+the TU.  The latter is useful when one earlier function ICEs but compiler state
+from the other preceding functions must be retained for a faithful trace.
+
+Blanked bodies become prototypes, keeping types/globals/callee declarations.
+Heuristic: column-0 '{' ... matching column-0 '}' is one top-level block; the
+preceding non-blank lines back to the last ';' or '}' are the signature."""
 import sys, re
 from pathlib import Path
 
-src = Path(sys.argv[1]); target = sys.argv[2]; out = Path(sys.argv[3])
+drop_only = len(sys.argv) > 1 and sys.argv[1] == "--drop-only"
+args = sys.argv[2:] if drop_only else sys.argv[1:]
+if len(args) != 3:
+    raise SystemExit(__doc__)
+src = Path(args[0]); targets = args[1].split(","); out = Path(args[2])
 text = src.read_text(encoding="latin-1")
 lines = text.split("\n")
 
@@ -38,8 +44,10 @@ while i < n:
         while k >= 0 and out_lines[k].strip() != "" and not out_lines[k].rstrip().endswith("}") and not out_lines[k].rstrip().endswith(";"):
             k -= 1
         sig_text = "\n".join(out_lines[k+1:sig_start])
-        is_target = re.search(r"\b" + re.escape(target) + r"\b\s*\(", sig_text) is not None
-        if is_target:
+        is_target = any(re.search(r"\b" + re.escape(target) + r"\b\s*\(", sig_text) is not None
+                        for target in targets)
+        keep_body = not is_target if drop_only else is_target
+        if keep_body:
             out_lines.extend(block)
         else:
             # turn into a prototype: keep signature, replace body with ';'
