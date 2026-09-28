@@ -644,7 +644,7 @@
 - ✅ L2DirtFix__Fv (88)
 - ✅ L2LockoutFix__Fv (225)
 - ✅ L2DoorFix__Fv (44)
-- ❌ DRLG_L2SetWalls__Fv — 60 diffs (ours 110)
+- ❌ DRLG_L2SetWalls__Fv — 63 diffs (ours 110)
 - ✅ DRLG_L2__Fi (661)
 - ✅ DRLG_InitL2Vals__Fv (2)
 - ✅ LoadL2Dungeon__FPcii (135)
