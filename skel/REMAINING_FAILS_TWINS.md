@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (54)
+# PC twins for the remaining non-PASS functions (53)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -47,7 +47,6 @@
 
 | CharacterLoadPad__Fv | options | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP |
 | CheckMissileCol__FiiiUciiUcb | missiles | bytes PASS, SYM differs | missiles.cpp:1131 | MISSILES.CPP:1076 | missiles.cpp:486 | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP |
-| GameTask__FP4TASK | main | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/MAIN.CPP |
 | GLUE_StartGameExit__Fv | glue | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.CPP |
 | M_ChangeLightOffset__Fi | monster | bytes PASS, SYM differs | monster.cpp:2323 | MONSTER.CPP:2702 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
 | MAI_Counselor__Fi | monster | bytes PASS, SYM differs | monster.cpp:5075 | MONSTER.CPP:5885 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
@@ -59,4 +58,4 @@
 | wait_cdstream | fmv | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/FMV.CPP |
 
 Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions.
-Generated from MATCH_PROGRESS.md at master a8abc19.
+Generated from MATCH_PROGRESS.md at master caa339c.
