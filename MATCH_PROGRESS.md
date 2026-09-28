@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2671 / 2727 functions PASS (97.9%) — 837 PsyQ SDK functions excluded**
+**Game code: 2672 / 2727 functions PASS (98.0%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1400,13 +1400,13 @@
 ## lznp  (recon/psxsrc/lznp.cpp) — 1/1 PASS
 - ✅ LZNP_Decode__FPUcT0 (53)
 
-## main  (recon/psxsrc/main.cpp) — 6/7 PASS
+## main  (recon/psxsrc/main.cpp) — 7/7 PASS
 - ✅ GetTpY__FUs (7)
 - ✅ GetTpX__FUs (3)
 - ✅ Remove96__Fv (14)
 - ✅ AppMain (49)
 - ✅ MAIN_RestartGameTask__Fv (11)
-- 🟡 GameTask__FP4TASK — bytes PASS, SYM differs
+- ✅ GameTask__FP4TASK (67)
 - ✅ MAIN_MainLoop__Fv (21)
 
 ## mem  (recon/psxsrc/mem.cpp) — 2/2 PASS
