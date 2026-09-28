@@ -150,8 +150,8 @@ static unsigned char DRLG_L2PlaceMiniSet(unsigned char *miniset, int tmin, int t
 
 static void DRLG_L2PlaceRndSet(unsigned char *miniset, int rndper)
 {
-    int sx, sy, sw, sh, xx, yy, ii, kk;
-    bool found;
+    int sx, sy, sw, sh, xx, yy, ii, jj, kk;
+    int found;
 
     sw = miniset[0];
     sh = miniset[1];
@@ -165,10 +165,10 @@ static void DRLG_L2PlaceRndSet(unsigned char *miniset, int rndper)
             }
             for (yy = 0; yy < sh && found == true; yy++) {
                 for (xx = 0; xx < sw && found == true; xx++) {
-                    if (miniset[ii] != 0 && dungeon[xx + sx][yy + sy] != miniset[ii]) {
+                    if (miniset[ii] != 0 && dungeon[sx + xx][sy + yy] != miniset[ii]) {
                         found = false;
                     }
-                    if (mydflags[(xx + sx) + (yy + sy) * DMAXX] != 0) {
+                    if (mydflags[(sx + xx) + (sy + yy) * DMAXX] != 0) {
                         found = false;
                     }
                     ii++;
@@ -176,9 +176,9 @@ static void DRLG_L2PlaceRndSet(unsigned char *miniset, int rndper)
             }
             kk = sh * sw + 2;
             if (found == true) {
-                for (yy = sy - sh; yy < sy + 2 * sh && found == true; yy++) {
-                    for (xx = sx - sw; xx < sx + 2 * sw; xx++) {
-                        if (dungeon[xx][yy] == miniset[kk]) {
+                for (ii = sy - sh; ii < sy + (sh << 1) && found == true; ii++) {
+                    for (jj = sx - sw; jj < sx + (sw << 1); jj++) {
+                        if (dungeon[jj][ii] == miniset[kk]) {
                             found = false;
                         }
                     }
@@ -188,7 +188,7 @@ static void DRLG_L2PlaceRndSet(unsigned char *miniset, int rndper)
                 for (yy = 0; yy < sh; yy++) {
                     for (xx = 0; xx < sw; xx++) {
                         if (miniset[kk] != 0) {
-                            dungeon[xx + sx][yy + sy] = miniset[kk];
+                            dungeon[sx + xx][sy + yy] = miniset[kk];
                         }
                         kk++;
                     }
