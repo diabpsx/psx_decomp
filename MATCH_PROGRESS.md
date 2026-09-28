@@ -1421,7 +1421,7 @@
 - ✅ ascii_to_sjis__FPUcPUs (34)
 - ✅ is_sjis__FPUc (3)
 - ✅ sjis_to_ascii__FPUsPc (34)
-- ❌ read_card_directory__Fi — 14 diffs (ours 151)
+- ❌ read_card_directory__Fi — 3 diffs (ours 151)
 - ✅ test_card_format__Fi (60)
 - ✅ checksum_data__FPci (15)
 - ✅ delete_card_file__Fii (62)

@@ -210,7 +210,8 @@ void new_card(int card_number)
 
 /* @0x80142998 MEMCARD.CPP:280 — scan bu<n>0:* into card_dir[n], then read each save's 512-byte header
  * (title byte-swapped and converted from Shift-JIS in place).  A card that is not usable while either
- * slot reports status 3 marks the OTHER slot dirty. */
+ * slot reports status 3 marks the OTHER slot dirty.  The short-circuit read/convert/close expression
+ * restores the retail fh/read-result register assignment; residual is one -1 comparison lowering. */
 void read_card_directory(int card_number)
 {
     char path[80];
@@ -233,13 +234,12 @@ void read_card_directory(int card_number)
         for (i = 0; i < card_files[card_number]; i++) {
             sprintf(path, "bu%d0:%s", card_number, card_dir[card_number][i].name);
             fh = open(path, 1);
-            if (fh != -1) {
-                r = read(fh, &card_header[card_number][i], 0x200);
-                endian_swap(card_header[card_number][i].title, 64);
-                sjis_to_ascii((unsigned short *)card_header[card_number][i].title, (char *)card_header[card_number][i].title);
-                close(fh);
-            }
-            if (fh == -1 || r == -1) {
+            if (fh == -1
+                || (r = read(fh, &card_header[card_number][i], 0x200),
+                    endian_swap(card_header[card_number][i].title, 64),
+                    sjis_to_ascii((unsigned short *)card_header[card_number][i].title, (char *)card_header[card_number][i].title),
+                    close(fh), fh == -1)
+                || r == -1) {
                 card_removed(card_number);
                 PantsDelay();
                 return;
