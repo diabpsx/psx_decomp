@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2670 / 2727 functions PASS (97.9%) — 837 PsyQ SDK functions excluded**
+**Game code: 2671 / 2727 functions PASS (97.9%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -651,7 +651,7 @@
 - ✅ LoadPreL2Dungeon__FPcii (125)
 - ✅ CreateL2Dungeon__FUii (86)
 
-## drlg_l3  (recon/source/drlg_l3.cpp) — 36/37 PASS
+## drlg_l3  (recon/source/drlg_l3.cpp) — 37/37 PASS
 - ✅ InitL3Dungeon__Fv (33)
 - ✅ SetBlankL3Dungeon__Fv (23)
 - ✅ FixL3Dungeon__Fv (29)
@@ -684,7 +684,7 @@
 - ✅ DRLG_L3LockRec__Fii (39)
 - ✅ DRLG_L3Lockout__Fv (48)
 - ✅ DRLG_L3SetWalls__Fv (45)
-- ❌ DRLG_L3__Fi — 8 diffs (ours 455)
+- ✅ DRLG_L3__Fi (455)
 - ✅ DRLG_L3Pass3__Fv (134)
 - ✅ CreateL3Dungeon__FUii (30)
 - ✅ LoadL3Dungeon__FPcii (97)
