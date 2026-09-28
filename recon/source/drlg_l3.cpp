@@ -824,24 +824,24 @@ void DRLG_L3PoolFix(void)
         for (dunx = 0; dunx < DMAXX; dunx++) {
             if (p1[duny] == 8) {
                 if ((p0[duny - 1] >= 25 && p0[duny - 1] <= 41)
-                    && (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
-                    && (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
                     && (p0[duny] >= 25 && p0[duny] <= 41)
-                    && (p2[duny] >= 25 && p2[duny] <= 41)
                     && (p0[duny + 1] >= 25 && p0[duny + 1] <= 41)
+                    && (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
                     && (p1[duny + 1] >= 25 && p1[duny + 1] <= 41)
+                    && (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
+                    && (p2[duny] >= 25 && p2[duny] <= 41)
                     && (p2[duny + 1] >= 25 && p2[duny + 1] <= 41)) {
                     p1[duny] = 33;
                 }
             }
             if (p1[duny] == 8) {
                 if ((p0[duny - 1] >= 25 && p0[duny - 1] <= 41)
-                    || (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
-                    || (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
                     || (p0[duny] >= 25 && p0[duny] <= 41)
-                    || (p2[duny] >= 25 && p2[duny] <= 41)
                     || (p0[duny + 1] >= 25 && p0[duny + 1] <= 41)
+                    || (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
                     || (p1[duny + 1] >= 25 && p1[duny + 1] <= 41)
+                    || (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
+                    || (p2[duny] >= 25 && p2[duny] <= 41)
                     || (p2[duny + 1] >= 25 && p2[duny + 1] <= 41)) {
                     p1[duny] = 33;
                 }
