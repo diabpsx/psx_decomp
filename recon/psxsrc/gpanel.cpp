@@ -177,14 +177,17 @@ short SpdTrimCol(short col)
 void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
     int HealthHeight, ManaHeight;
-    int HealthAnim, ManaAnim, xof;
+    int HealthAnim, ManaAnim;
     int BarY;
     struct POLY_FT4 *Ft4;
-    unsigned char C7F = 0x7F;
+    int X, Y;
+    int xof;
 
     HealthHeight = (int)(Plr->_pHitPoints * 0x2B) / (int)Plr->_pMaxHP;
     HealthAnim = HealthAnimCount >> 2;
     ManaAnim = ManaAnimCount >> 2;
+    X = XY->MainX;
+    Y = XY->MainY;
     ManaHeight = 0;
     if (Plr->_pMana > 0) {
         if (Plr->_pMaxMana > 0) {
@@ -204,60 +207,67 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         ManaHeight = 0;
     }
 
-    Ft4 = PanelTData->PrintFt4(0x36, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    Ft4->r0 = C7F;
-    Ft4->g0 = C7F;
-    Ft4->b0 = C7F;
+    Ft4 = PanelTData->PrintFt4(0x36, X, Y, 0, GPanelOt, 0);
+    Ft4->r0 = 0x7F;
+    Ft4->g0 = 0x7F;
+    Ft4->b0 = 0x7F;
     Ft4->code = (Ft4->code | 2) & 0xFE;
     Ft4->tpage = Ft4->tpage | 0x20;
-    Ft4 = PanelTData->PrintFt4(0x37, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    Ft4->r0 = C7F;
-    Ft4->g0 = C7F;
-    Ft4->b0 = C7F;
+    Ft4 = PanelTData->PrintFt4(0x37, X, Y, 0, GPanelOt, 0);
+    Ft4->r0 = 0x7F;
+    Ft4->g0 = 0x7F;
+    Ft4->b0 = 0x7F;
     Ft4->code = (Ft4->code | 2) & 0xFE;
     Ft4->tpage = Ft4->tpage | 0x20;
-    PanelTData->PrintFt4(0x31, XY->MainX, XY->MainY, XY->FlaskFlip, GPanelOt + 1, 0);
-    PanelTData->PrintFt4(0x32, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0x33, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0x34, XY->MainX, XY->MainY, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0x35, XY->MainX, XY->MainY, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0x31, X, Y, XY->FlaskFlip, GPanelOt + 1, 0);
+    PanelTData->PrintFt4(0x32, X, Y, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0x33, X, Y, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0x34, X, Y, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0x35, X, Y, 0, GPanelOt, 0);
     if (HealthHeight > 0) {
-        BarY = XY->MainY - (HealthHeight + 8);
-        xof = XY->MainX + ((-(XY->FlaskFlip != 0) & 0x18) - 0xB);
+        BarY = Y - (8 + HealthHeight);
+        xof = XY->FlaskFlip != 0;
+        xof = -xof;
+        xof &= 0x18;
+        xof += X - 0xB;
         Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
-        Ft4->r0 = C7F;
+        Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
         Ft4->y2 = (short)(Ft4->y0 + HealthHeight);
         Ft4->u2 = (unsigned char)((Ft4->u0 + HealthHeight) - 1);
         Ft4->y3 = (short)(Ft4->y1 + HealthHeight);
-        Ft4->u3 = (unsigned char)((Ft4->u1 + HealthHeight) - 1);
         Ft4->tpage = Ft4->tpage | 0x20;
+        Ft4->u3 = (unsigned char)((Ft4->u1 + HealthHeight) - 1);
         Ft4->code = Ft4->code & 0xFC;
         Ft4 = PanelTData->PrintFt4(HealthAnim + 0x84, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
-        Ft4->r0 = C7F;
+        Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
         Ft4->code = Ft4->code & 0xFC;
         Ft4->tpage = Ft4->tpage | 0x20;
     }
     if (ManaHeight > 0) {
-        BarY = XY->MainY - (ManaHeight + 8);
-        xof = XY->MainX + ((-(XY->FlaskFlip != 0) & ~1) + 2);
+        BarY = Y - (8 + ManaHeight);
+        xof = XY->FlaskFlip != 0;
+        xof = -xof;
+        xof &= ~1;
+        xof += 2;
+        xof += X;
         Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
-        Ft4->b0 = C7F;
+        Ft4->b0 = 0x7F;
         Ft4->y2 = (short)(Ft4->y0 + ManaHeight);
         Ft4->u2 = (unsigned char)((Ft4->u0 + ManaHeight) - 1);
         Ft4->y3 = (short)(Ft4->y1 + ManaHeight);
-        Ft4->u3 = (unsigned char)((Ft4->u1 + ManaHeight) - 1);
         Ft4->tpage = Ft4->tpage | 0x20;
+        Ft4->u3 = (unsigned char)((Ft4->u1 + ManaHeight) - 1);
         Ft4->code = Ft4->code & 0xFC;
         Ft4 = PanelTData->PrintFt4(ManaAnim + 0x8C, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
-        Ft4->b0 = C7F;
+        Ft4->b0 = 0x7F;
         Ft4->code = Ft4->code & 0xFC;
         Ft4->tpage = Ft4->tpage | 0x20;
     }
