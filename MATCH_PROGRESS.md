@@ -668,7 +668,7 @@
 - ✅ DRLG_L3SpawnEdge__FiiPi (163)
 - ✅ DRLG_L3Spawn__FiiPi (131)
 - ✅ DRLG_L3Pool__Fv (148)
-- ❌ DRLG_L3PoolFix__Fv — 153 diffs (ours 136)
+- ❌ DRLG_L3PoolFix__Fv — 150 diffs (ours 136)
 - ✅ DRLG_L3PlaceMiniSet__FPCUciiiiii (219)
 - ✅ DRLG_L3PlaceRndSet__FPCUci (207)
 - ✅ WoodVertU__Fii (43)
