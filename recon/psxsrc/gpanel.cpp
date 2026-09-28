@@ -330,11 +330,12 @@ void GPanel::DrawMsgWindow(struct PanelXY *XY, struct PlayerStruct *Plr)
 int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
 {
     struct POLY_FT4 *Ft4;
+    unsigned char NewR, NewG, NewB;
 
     if (Item->_itype == -1 || Item->_iDurability >= 5) {
         return 0;
     }
-    switch (Item->_itype - 1) {
+    switch ((short)(Item->_itype - 1)) {
     case 4:
         ItemType = 0;
         break;
@@ -355,26 +356,21 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
         break;
     }
     Ft4 = PanelTData->PrintFt4(ItemType + 0x29, X, Y, 0, GPanelOt + 1, 0);
-    {
-        int idx0 = (Item->_iDurability - 1) * 3;
-        unsigned char NewR, NewG, NewB;
-
-        NewR = D_800B9BCC[idx0];
-        NewG = D_800B9BCD[idx0];
-        Ft4->code = (Ft4->code | 2) & 0xFE;
-        NewB = D_800B9BCE[idx0];
-        Ft4->r0 = NewR;
-        Ft4->g0 = NewG;
-        Ft4->b0 = NewB;
-    }
+    NewR = D_800B9BCC[(Item->_iDurability - 1) * 3];
+    NewG = D_800B9BCD[(Item->_iDurability - 1) * 3];
+    NewB = D_800B9BCE[(Item->_iDurability - 1) * 3];
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+    Ft4->r0 = NewR;
+    Ft4->g0 = NewG;
+    Ft4->b0 = NewB;
 
     Ft4 = PanelTData->PrintFt4(0x94, X, Y, 0, GPanelOt + 1, 0);
     Ft4->y0 = (short)(Y - 2);
-    Ft4->y2 = (short)(Y - 2);
+    Ft4->y1 = (short)(Y - 2);
     Ft4->x0 = (short)(X + 0x14);
     Ft4->x2 = (short)(X + 0x14);
     Ft4->x1 = (short)(X + 0x18);
-    Ft4->y1 = (short)(Y + 0x17);
+    Ft4->y2 = (short)(Y + 0x17);
     Ft4->x3 = (short)(X + 0x18);
     Ft4->y3 = (short)(Y + 0x17);
     Ft4->r0 = 0;
@@ -384,36 +380,24 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
 
     if (Item->_iDurability > 0) {
         int Loop = 0;
-        int Idx = 0;
-        int Xs, Xe, y0;
-
-        Xs = X + 0x15;
-        Xe = X + 0x17;
-        y0 = Y - 1;
         do {
-            struct POLY_FT4 *F2;
-            unsigned char NewR, NewG, NewB;
-            int y1;
-
-            F2 = PanelTData->PrintFt4(0x94, X, Y, 1, GPanelOt + 1, 0);
-            NewR = D_800B9BCC[Idx];
-            NewG = D_800B9BCD[Idx];
-            NewB = D_800B9BCE[Idx];
-            y1 = y0 + (3 - Loop) * 5;
-            F2->y0 = (short)y1;
-            F2->y2 = (short)y1;
-            F2->x0 = (short)Xs;
-            F2->x2 = (short)Xe;
-            F2->x1 = (short)Xs;
-            F2->y1 = (short)(y1 + 5);
-            F2->x3 = (short)Xe;
-            F2->y3 = (short)(y1 + 5);
-            F2->code = (F2->code | 2) & 0xFE;
-            F2->r0 = NewR;
-            F2->g0 = NewG;
-            F2->b0 = NewB;
+            Ft4 = PanelTData->PrintFt4(0x94, X, Y, 1, GPanelOt + 1, 0);
+            NewR = D_800B9BCC[Loop * 3];
+            NewG = D_800B9BCD[Loop * 3];
+            NewB = D_800B9BCE[Loop * 3];
+            Ft4->y0 = (short)(Y - 1 + (3 - Loop) * 5);
+            Ft4->y1 = (short)(Y - 1 + (3 - Loop) * 5);
+            Ft4->x0 = (short)(X + 0x15);
+            Ft4->x1 = (short)(X + 0x17);
+            Ft4->x2 = (short)(X + 0x15);
+            Ft4->y2 = (short)(Y - 1 + (3 - Loop) * 5 + 5);
+            Ft4->x3 = (short)(X + 0x17);
+            Ft4->y3 = (short)(Y - 1 + (3 - Loop) * 5 + 5);
+            Ft4->r0 = NewR;
+            Ft4->g0 = NewG;
+            Ft4->b0 = NewB;
+            Ft4->code = (Ft4->code | 2) & 0xFE;
             Loop++;
-            Idx += 3;
         } while (Loop < Item->_iDurability);
     }
     return 1;
