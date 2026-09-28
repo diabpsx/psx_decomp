@@ -397,9 +397,8 @@ void LoadMapObjs(unsigned char *pMap, int startx, int starty)
     int rw, rh;
     unsigned char *lm;
     long mapoff;
-    int xo, yo;   /* retail hoists startx+16 / starty+16 into the loop preheader, which only an
-                   * in-loop invariant produces (fold reassociates every inline 'startx + 16 + i');
-                   * the retail SYM has no record for these -- spelling still unknown */
+    int ox, oy;
+    int ot;
 
     InitObjFlag = 1;
     lm = pMap;
@@ -413,11 +412,12 @@ void LoadMapObjs(unsigned char *pMap, int startx, int starty)
     lm += mapoff;
 
     for (j = 0; j < rh; j++) {
-        xo = startx + 16;
-        yo = starty + 16;
         for (i = 0; i < rw; i++) {
             if (*lm) {
-                PostAddObject(ObjTypeConv[*lm], i + xo, j + yo);
+                ot = *lm;
+                ox = i + 16 + startx;
+                oy = j + 16 + starty;
+                PostAddObject(ObjTypeConv[ot], ox, oy);
             }
             lm += 2;
         }
