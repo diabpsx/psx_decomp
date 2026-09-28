@@ -45,7 +45,7 @@
 | ResyncQuests__Fv | quests | 6 diffs (ours 315) | quests.cpp:739 | QUESTS.CPP:779 | quests.cpp:397 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LOADSAVE.CPP; JAP_1998_05_29/DIABPSX/SOURCE/QUES |
 | PrintCDWaitTask__FP4TASK | stream | 17 diffs (ours 79) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.H; PAL_1997_12_12/DIABPSX/PSXSRC/STREAM.C |
 
-| CharacterLoadPad__Fv | options | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP |
+| CharacterLoadPad__Fv | options | 1 diffs (ours 341) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP |
 | CheckMissileCol__FiiiUciiUcb | missiles | bytes PASS, SYM differs | missiles.cpp:1131 | MISSILES.CPP:1076 | missiles.cpp:486 | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP |
 | GLUE_StartGameExit__Fv | glue | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.CPP |
 | M_ChangeLightOffset__Fi | monster | bytes PASS, SYM differs | monster.cpp:2323 | MONSTER.CPP:2702 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
@@ -58,4 +58,4 @@
 | wait_cdstream | fmv | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/FMV.CPP |
 
 Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions.
-Generated from MATCH_PROGRESS.md at master caa339c.
+Generated from MATCH_PROGRESS.md at master 038b309.
