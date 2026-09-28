@@ -233,28 +233,36 @@ void SetLoadedVolumes(void)
 
 void GetVolumes(void)
 {
-    int i;
+    union {
+        struct {
+            unsigned int : 32;
+            unsigned int : 32;
+        };
+    };
 
     SetLoadedVolumes();
-    for (i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         OMENULIST *mptr;
         OMENUITEM *iptr;
 
         mptr = &MenuList[i];
         iptr = mptr->Item;
-        if (mptr->NoEntries > 0) {
+        {
             int s;
+            const int entries = mptr->NoEntries;
 
-            s = 0;
-            do {
-                if (iptr->var != NULL) {
-                    iptr->len = *iptr->var;
-                    if (sw < iptr->len)
-                        iptr->len = sw;
-                }
-                s++;
-                iptr++;
-            } while (s < mptr->NoEntries);
+            if (entries > 0) {
+                s = 0;
+                do {
+                    if (iptr->var != NULL) {
+                        iptr->len = *iptr->var;
+                        if (sw < iptr->len)
+                            iptr->len = sw;
+                    }
+                    iptr++;
+                    s++;
+                } while (s < mptr->NoEntries);
+            }
         }
     }
 }
