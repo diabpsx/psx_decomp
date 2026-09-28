@@ -374,31 +374,28 @@ BOOL delta_quest_inited(int i)
  * to the NetSendCmdGItem/network-record family; this local delta-record uses a different field). */
 void DeltaAddItem(int ii)
 {
-    DLevel *Dl;
     TCmdPItem *pD, *OpD;
+    DLevel *Dl;
+    int i;
+
     Dl = GetDLevel(currlevel, setlevel);
     OpD = pD = Dl->item;
-    {
-        unsigned char bc;
-        for (int i = 0; i < MAXITEMS; i++, pD++) {
-            bc = pD->bCmd;
-            if (bc == 0xFF)
-                continue;
-            if (pD->wIndx != item[ii].IDidx)
-                continue;
-            if (pD->wCI != item[ii]._iCreateInfo)
-                continue;
-            if (pD->dwSeed != item[ii]._iSeed)
-                continue;
-            if (bc < 2) {
-                ReleaseDLevel(Dl);
-                return;
-            }
+    for (i = 0; i < MAXITEMS; i++, pD++) {
+        if (pD->bCmd == 0xFF)
+            continue;
+        if (pD->wIndx != item[ii].IDidx)
+            continue;
+        if (pD->wCI != item[ii]._iCreateInfo)
+            continue;
+        if (pD->dwSeed != item[ii]._iSeed)
+            continue;
+        if (pD->bCmd < 2) {
+            ReleaseDLevel(Dl);
+            return;
         }
     }
 
-    {
-    for (int i = 0; i < MAXITEMS; i++, OpD++) {
+    for (i = 0; i < MAXITEMS; i++, OpD++) {
         if (OpD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
             OpD->bCmd = 0;
@@ -416,7 +413,6 @@ void DeltaAddItem(int ii)
             OpD->dwBuff = item[ii]._PlrCreate;
             break;
         }
-    }
     }
     ReleaseDLevel(Dl);
 }
