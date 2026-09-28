@@ -1100,10 +1100,8 @@ extern "C" void resync_audio(void)
  * mask is the constant 3 (SPU_VOICE_VOLL|SPU_VOICE_VOLR) every iteration. @0x80157C34 FMV.CPP:1418 */
 extern "C" int set_mdec_audio_volume(short vol)
 {
+    static SpuVoiceAttr voice_attr; /* function-local STAT @0x80121CA8; declared before i in retail */
     int i;
-    static SpuVoiceAttr voice_attr;   /* SYM: STAT SpuVoiceAttr voice_attr @0x80121ca8, size 64 --
-     * function-local static (not file-scope); only voice/mask/volume.{l,r} get written each call, the
-     * rest keeps whatever a previous call left there. */
     vol = (short)(((int)(sfx_volume * (int)vol)) >> 14);
     for (i = 0; i < 2; i++) {
         voice_attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR;
