@@ -1534,9 +1534,9 @@ void DRLG_L3(int entry)
 
     lavapool = false;
 
-    UPDATEPROGRESS(1);
     do {
         do {
+            UPDATEPROGRESS(1);
             do {
                 InitL3Dungeon();
                 x1 = ENG_random(20) + 10;
