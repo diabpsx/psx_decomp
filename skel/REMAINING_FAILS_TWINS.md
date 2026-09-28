@@ -58,4 +58,11 @@
 | wait_cdstream | fmv | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/FMV.CPP |
 
 Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions.
+
+## Verified SYM-only clusters
+
+- Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
+- Optimized temporary records: `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR`, `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail.
+- `CharacterLoadPad__Fv` now has retail's single outer block and no extra local records; its sole residual is the compiler folding `1272 * (cs - 1)` into a relocation/addend form and omitting retail's standalone `addiu v0, v0, -1`.
+
 Generated from MATCH_PROGRESS.md at master 038b309.
