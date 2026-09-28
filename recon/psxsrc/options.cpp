@@ -728,9 +728,7 @@ void CharacterLoadPad(void)
                     cs = 2;
                     return;
                 } else {
-                    const int idx = cs - 1;
-
-                    if (D_80157B68[1272 * idx] != 0) {
+                    if (D_80157B68[1272 * (cs - 1)] != 0) {
                         ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
                         ReturnCards = 1;
                         ReturnMenu = cmenu;
