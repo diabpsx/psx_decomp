@@ -774,7 +774,9 @@ static void DoPatternCheck(int i, int j)
                 y++;
                 x = i - 1;
             }
-            if (x >= 0 && x < DMAXX && y >= 0 && y < DMAXY) {
+            if (x < 0 || x >= DMAXX || y < 0 || y >= DMAXY) {
+                nOk = 254;
+            } else {
                 switch (Patterns[k][l]) {
                 case 0:
                     nOk = 254;
@@ -820,16 +822,18 @@ static void DoPatternCheck(int i, int j)
                     }
                     break;
                 }
-            } else {
-                nOk = 254;
             }
             x++;
         }
         if (nOk == 254) {
-            dungeon[i][j] = Patterns[k][9];
+            if (i == 9 && j == 19) {
+                myk = k;
+            }
+            dungeon[i][j] = (unsigned char)Patterns[k][9];
+        } else {
+            nOk = 255;
         }
     }
-    myk = k;
 }
 
 static void L2TileFix(void)

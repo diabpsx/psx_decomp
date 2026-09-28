@@ -1,6 +1,7 @@
-# Function                         parsed-word start  word count
+# Function                         table-word start  table words  padding words before table
 # Retail PSYLINK placed these switch words inside the function's text span;
 # GNU objects keep the equivalent relocated table in .rodata. verify_asm.py
 # removes the words from the instruction stream only after comparing targets.
 service_card__Fi                    22                 5
 LoPlayFMVOverLay                    47                 6
+DoPatternCheck__Fii                 46                 9           1

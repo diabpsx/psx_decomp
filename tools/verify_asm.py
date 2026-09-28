@@ -20,8 +20,10 @@ def _embedded_text_tables():
         for raw in p.read_text(encoding='utf-8').splitlines():
             line = raw.split('#', 1)[0].strip()
             if line:
-                fn, start, count = line.split()
-                out[fn] = (int(start, 0), int(count, 0))
+                fields = line.split()
+                fn, start, count = fields[:3]
+                pad_before = fields[3] if len(fields) > 3 else "0"
+                out[fn] = (int(start, 0), int(count, 0), int(pad_before, 0))
     return out
 
 _EMBEDDED_TEXT_TABLES = _embedded_text_tables()
@@ -367,15 +369,17 @@ def oracle(fn, oracle_va=None):
                 raise RuntimeError(f'{fn}: embedded table word lacks raw bytes: {raw_ln}')
             table_words.append(int.from_bytes(bytes.fromhex(mw_raw.group(1)), 'little'))
     if table_spec:
-        start, count = table_spec
+        start, count, pad_before = table_spec
         if len(table_words) != count or fva is None:
             raise RuntimeError(f'{fn}: expected {count} embedded table words, found {len(table_words)}')
+        cut_lo = start - pad_before
+        total = count + pad_before
         cut_hi = (start + count) * 4
         def shifted(rel):
-            return rel - count * 4 if rel >= cut_hi else rel
+            return rel - total * 4 if rel >= cut_hi else rel
         _TABLE_TARGETS['oracle'] = [shifted(word - fva) for word in table_words]
         tg = [shifted(target) for target in tg]
-        del out[start:start + count]
+        del out[cut_lo:start + count]
     _TARGETS['oracle']=tg
     return out
 
