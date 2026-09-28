@@ -982,9 +982,8 @@ void RecreateEar(int ii, unsigned short ic, int iseed, unsigned char Id, int dur
  * checks act as if running as that player), restoring it afterward; sets item[ii]._PlrCreate = the
  * (possibly-overridden) FePlayerNo just before restoring. Field-store order in the GOLD arm is
  * ivalue/createinfo/seed (not hellfire's seed/createinfo/ivalue). */
-/* NEAR-MISS (ours 148 / retail 149): retail computes icreateinfo & ICI_UNIQUE into a0 in the first
- * branch's delay slot (so the town test's slot gets `& ICI_USEFUL` instead of `a0 = ii`); ours has no
- * early copy. Falsified: block- vs fn-scope flag locals. Next: find where the UNIQUE mask is formed early. */
+/* The early uavail normalization is overwritten in the dungeon-item arm, but it is part of the
+ * original source shape: GCC removes the dead stores late while retaining retail's hoisted UNIQUE mask. */
 void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue, int PlrCreate)
 {
     int OldFePlayerNo = FePlayerNo;
@@ -993,6 +992,10 @@ void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int iv
 
     FePlayerNo = OldFePlayerNo;
     if (PlrCreate != -1) FePlayerNo = PlrCreate;
+    if (icreateinfo & ICI_UNIQUE)
+        uavail = TRUE;
+    else
+        uavail = FALSE;
 
     if (idx == IDI_GOLD) {
         SetPlrHandItem(&item[ii], idx);
