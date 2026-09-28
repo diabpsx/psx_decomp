@@ -1777,10 +1777,12 @@ static const unsigned char LAMPS[] = {
 
 void DRLG_L5(int entry)
 {
-    int i, j;
-    long minarea = 0;
+    long area, minarea;
     unsigned char doneflag;
+    int i, j;
+    int xx, yy;
 
+    minarea = 0;
     doneflag = FALSE;
     switch (currlevel) {
     case 1:
@@ -1796,15 +1798,16 @@ void DRLG_L5(int entry)
     }
 
     while (doneflag == FALSE) {
-        doneflag = TRUE;
         UPDATEPROGRESS(1);
         DRLG_InitTrans();
 
         do {
             InitL5Dungeon();
             L5firstRoom();
-        } while (L5GetArea() < minarea);
+            area = L5GetArea();
+        } while (area < minarea);
 
+        doneflag = TRUE;
         L5makeDungeon();
         L5makeDmt();
         L5FillChambers();
@@ -1816,8 +1819,7 @@ void DRLG_L5(int entry)
 
         if (QuestStatus(Q_PWATER)) {
             if (entry == ENTRY_MAIN) {
-                if (DRLG_PlaceMiniSet(PWATERIN, 1, 1, 0, 0, TRUE, -1, 0) < 0)
-                    doneflag = FALSE;
+                doneflag = DRLG_PlaceMiniSet(PWATERIN, 1, 1, 0, 0, TRUE, -1, 0) >= 0;
             } else {
                 if (DRLG_PlaceMiniSet(PWATERIN, 1, 1, 0, 0, FALSE, -1, 0) < 0)
                     doneflag = FALSE;
@@ -1855,8 +1857,8 @@ void DRLG_L5(int entry)
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
             if (dungeon[i][j] == 64) {
-                int xx = 2 * i + 16;
-                int yy = 2 * j + 16;
+                xx = 2 * i + 16;
+                yy = 2 * j + 16;
                 DRLG_CopyTrans(xx, yy + 1, xx, yy);
                 DRLG_CopyTrans(xx + 1, yy + 1, xx + 1, yy);
             }
