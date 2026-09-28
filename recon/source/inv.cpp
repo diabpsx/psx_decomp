@@ -1922,7 +1922,7 @@ void DrawInvStats(void)
 }
 
 /* PSX gamepad path reconstructed through exact call convergence: all 37 calls match retail in target
- * and physical order. Remaining near-match is 1876/1890 instructions with two saved-register pairs
+ * and physical order. Remaining near-match is 1878/1890 instructions with two saved-register pairs
  * reversed by allocation (ours pnum/il=s3/s2 and sx/cn=s5/s6; retail s2/s3 and s6/s5). The other
  * named locals now have retail registers. Moving iv/done2h initialization, reordering declarations,
  * and splitting the failure tail were tested and regress code length/frame allocation. */
@@ -1940,6 +1940,7 @@ void CheckInvPaste(int pnum, int mx, int my)
 
     SetICursor(plr[pnum].HoldItem._iCurs + 12);
     ItemNo = plr[myplr].HoldItem._iCurs;
+    cn = CURSOR_HAND;
     sx = InvItemWidth[ItemNo + 12] >> 4;
     sy = InvItemHeight[ItemNo + 12] >> 4;
     r = InvCursPos;
@@ -2047,7 +2048,6 @@ void CheckInvPaste(int pnum, int mx, int my)
     if (pnum == myplr)
         PlaySFX(ItemInvSnds[it]);
 
-    cn = CURSOR_HAND;
     switch (il) {
     case 4: /* head */
         NetSendCmdChItem(0, 0);
@@ -2182,21 +2182,20 @@ void CheckInvPaste(int pnum, int mx, int my)
             xx = ii % 10;
             if (plr[pnum].InvGrid[yy + xx] > 0) {
                 i = plr[pnum].InvGrid[yy + xx] - 1;
-                gt = plr[pnum].InvList[i]._ivalue;
-                ig = plr[pnum].HoldItem._ivalue + gt;
-                if (ig <= GOLD_MAX_LIMIT) {
-                    plr[pnum].InvList[i]._ivalue = ig;
+                gt = plr[pnum].InvList[i]._ivalue + plr[pnum].HoldItem._ivalue;
+                if (gt <= GOLD_MAX_LIMIT) {
+                    plr[pnum].InvList[i]._ivalue += plr[pnum].HoldItem._ivalue;
                     plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
-                    if (ig >= GOLD_MEDIUM_LIMIT)
+                    if (gt >= GOLD_MEDIUM_LIMIT)
                         plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
-                    else if (ig <= GOLD_SMALL_LIMIT)
+                    else if (gt <= GOLD_SMALL_LIMIT)
                         plr[pnum].InvList[i]._iCurs = ICURS_GOLD_SMALL;
                     else
                         plr[pnum].InvList[i]._iCurs = ICURS_GOLD_MEDIUM;
                 } else {
-                    ig = GOLD_MAX_LIMIT - gt;
-                    plr[pnum]._pGold += ig;
-                    plr[pnum].HoldItem._ivalue -= ig;
+                    gt = GOLD_MAX_LIMIT - plr[pnum].InvList[i]._ivalue;
+                    plr[pnum]._pGold += gt;
+                    plr[pnum].HoldItem._ivalue -= gt;
                     plr[pnum].InvList[i]._ivalue = GOLD_MAX_LIMIT;
                     plr[pnum].InvList[i]._iCurs = ICURS_GOLD_LARGE;
                     if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
@@ -2212,12 +2211,17 @@ void CheckInvPaste(int pnum, int mx, int my)
                 plr[pnum]._pNumInv++;
                 plr[pnum].InvGrid[yy + xx] = plr[pnum]._pNumInv;
                 plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
-                if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
+                gt = plr[pnum].HoldItem._ivalue;
+                if (gt <= GOLD_MAX_LIMIT) {
+                    if (gt >= GOLD_MEDIUM_LIMIT)
+                        plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_LARGE;
+                    else if (gt <= GOLD_SMALL_LIMIT)
+                        plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_SMALL;
+                    else
+                        plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_MEDIUM;
+                } else {
                     plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_LARGE;
-                else if (plr[pnum].HoldItem._ivalue <= GOLD_SMALL_LIMIT)
-                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_SMALL;
-                else
-                    plr[pnum].InvList[ii]._iCurs = ICURS_GOLD_MEDIUM;
+                }
             }
         } else {
             if (iv == 0) {
@@ -2263,20 +2267,20 @@ void CheckInvPaste(int pnum, int mx, int my)
         if (plr[pnum].HoldItem._itype == ITYPE_GOLD) {
             if (plr[pnum].SpdList[ii]._itype != ITYPE_NONE) {
                 if (plr[pnum].SpdList[ii]._itype == ITYPE_GOLD) {
-                    i = plr[pnum].HoldItem._ivalue + plr[pnum].SpdList[ii]._ivalue;
-                    if (i <= GOLD_MAX_LIMIT) {
+                    gt = plr[pnum].HoldItem._ivalue + plr[pnum].SpdList[ii]._ivalue;
+                    if (gt <= GOLD_MAX_LIMIT) {
                         plr[pnum].SpdList[ii]._ivalue += plr[pnum].HoldItem._ivalue;
                         plr[pnum]._pGold += plr[pnum].HoldItem._ivalue;
-                        if (i >= GOLD_MEDIUM_LIMIT)
+                        if (gt >= GOLD_MEDIUM_LIMIT)
                             plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_LARGE;
-                        else if (i <= GOLD_SMALL_LIMIT)
+                        else if (gt <= GOLD_SMALL_LIMIT)
                             plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_SMALL;
                         else
                             plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_MEDIUM;
                     } else {
-                        i = GOLD_MAX_LIMIT - plr[pnum].SpdList[ii]._ivalue;
-                        plr[pnum]._pGold += i;
-                        plr[pnum].HoldItem._ivalue -= i;
+                        gt = GOLD_MAX_LIMIT - plr[pnum].SpdList[ii]._ivalue;
+                        plr[pnum]._pGold += gt;
+                        plr[pnum].HoldItem._ivalue -= gt;
                         plr[pnum].SpdList[ii]._ivalue = GOLD_MAX_LIMIT;
                         plr[pnum].SpdList[ii]._iCurs = ICURS_GOLD_LARGE;
                         if (plr[pnum].HoldItem._ivalue >= GOLD_MEDIUM_LIMIT)
