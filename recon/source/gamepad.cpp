@@ -779,21 +779,24 @@ int GamePad::CheckIsoBodge(int dir)
             return newdir;
         l = PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])
             && PosOkPlayer(pnum, player->_px + poffset_x[lnd], player->_py + poffset_y[lnd]);
-        if (l)
+        if (l) {
             newdir = lnd;
-        else {
+            if (PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
+                return newdir;
+            newdir = CheckDirs(newdir);
+            return newdir;
+        } else {
             r = PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])
                 && PosOkPlayer(pnum, player->_px + poffset_x[rnd], player->_py + poffset_y[rnd]);
-            if (!r)
-                goto nomove;
-            newdir = rnd;
+            if (r) {
+                newdir = rnd;
+                if (PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
+                    return newdir;
+                newdir = CheckDirs(newdir);
+                return newdir;
+            } else
+                newdir = CheckDirs(newdir, wx + ox, wy);
         }
-        if (PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
-            return newdir;
-        newdir = CheckDirs(newdir);
-        return newdir;
-    nomove:
-        newdir = CheckDirs(newdir, wx + ox, wy);
     } else {
         if (CheckCentre(newdir))
             return newdir;
