@@ -67,7 +67,7 @@ void GameTask(TASK *T)
 {
     MSG_ClearOutCompMap();
     UPDATEPROGRESS(4);
-    for (;;) {
+    while (1) {
         OVR_LoadFrontend();
         InitAllItemsUseable();
         alloc_plr();
