@@ -988,7 +988,7 @@ void DRLG_L5FloodTVal(void)
 
 void DRLG_L5TransFix(void)
 {
-    int i, j, xx, yy, c;
+    int i, j, xx, yy, v;
 
     yy = 16;
 
@@ -996,57 +996,57 @@ void DRLG_L5TransFix(void)
         xx = 16;
 
         for (i = 0; i < DMAXX; i++) {
-            c = dungeon[i][j];
+            v = dungeon[i][j];
 
-            if (c == 23 && dungeon[i][j - 1] == 18) {
+            if (v == 23 && dungeon[i][j - 1] == 18) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (c == 24 && dungeon[i + 1][j] == 19) {
+            if (v == 24 && dungeon[i + 1][j] == 19) {
                 dung_map[xx][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (c == 18) {
+            if (v == 18) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (c == 19) {
+            if (v == 19) {
                 dung_map[xx][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (c == 20) {
+            if (v == 20) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
                 dung_map[xx + 1][yy + 1].dTransVal = dung_map[xx][yy].dTransVal;
             }
-            if (c == 24 && dungeon[i][j - 1] == 6) {
+            if (v == 24 && dungeon[i][j - 1] == 6) {
                 dung_map[xx][yy].dTransVal = dung_map[xx][yy - 2].dTransVal;
             }
-            if (c == 6) {
+            if (v == 6) {
                 if (dungeon[i - 1][j] == 2)
                     dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
                 if (dungeon[i - 1][j] == 37)
                     dung_map[xx][yy].dTransVal = dung_map[xx][yy + 1].dTransVal;
             }
-            if (c == 27 && dungeon[i - 1][j] == 2) {
+            if (v == 27 && dungeon[i - 1][j] == 2) {
                 dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
             }
-            if (c == 23) {
+            if (v == 23) {
                 if (dungeon[i - 1][j] == 7)
                     dung_map[xx][yy].dTransVal = -1;
                 if (dungeon[i - 1][j] == 13)
                     dung_map[xx][yy].dTransVal = dung_map[xx - 1][yy - 1].dTransVal;
             }
-            if (c == 7 && dungeon[i - 1][j] == 13) {
+            if (v == 7 && dungeon[i - 1][j] == 13) {
                 dung_map[xx][yy].dTransVal = -1;
             }
-            if (c == 12 && dungeon[i - 1][j] == 2) {
+            if (v == 12 && dungeon[i - 1][j] == 2) {
                 dung_map[xx][yy].dTransVal = -1;
             }
-            if (c == 7 && dungeon[i][j - 1] == 1) {
+            if (v == 7 && dungeon[i][j - 1] == 1) {
                 dung_map[xx][yy].dTransVal = -1;
             }
-            if (c == 21 && dungeon[i][j - 1] == 1) {
+            if (v == 21 && dungeon[i][j - 1] == 1) {
                 dung_map[xx][yy].dTransVal = -1;
             }
             xx += 2;
