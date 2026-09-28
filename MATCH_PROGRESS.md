@@ -340,7 +340,7 @@
 - ✅ DrawCreditsTitle__Fiiiii (46)
 - ✅ DrawCreditsSubTitle__Fiiiii (46)
 - ✅ CredCountNL__Fi (27)
-- ❌ DoCredits__Fv — 3 diffs (ours 250)
+- ❌ DoCredits__Fv — 4 diffs (ours 250)
 - ✅ PRIM_GetPrim__FPP8POLY_FT4_8013e03c (31)
 - ✅ ClearFont__5CFont_8013e0b8 (9)
 - ✅ GetCharHeight__5CFontUc (16)
