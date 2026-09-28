@@ -135,6 +135,11 @@ short TrimCol(short col)
     return col;
 }
 
+/* Frame audit: retail and reconstruction already place every outer AUTO/ARG at the same physical
+ * sp offset (yp=56, nCel=64, w=72, ThisDat=80, Tp=88, g=96, b=104, otpos=112). Retail alone has
+ * a recordless 32-byte gap above those slots, moving inner `st` and the saved-register area by 32.
+ * Aggregate/anonymous/scalar frame-hole experiments all allocate below the outer slots and therefore
+ * shift correct offsets; they are not the missing source construct. */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel)
 {
     TextDat *ThisDat;
