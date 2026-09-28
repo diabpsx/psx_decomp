@@ -1507,7 +1507,7 @@ void DRLG_L3SetWalls(void)
         for (i = 0; i < DMAXX; i++) {
             int v = dungeon[i][j];
 
-            if (v == 0 || v == 7 || v == 8) {
+            if ((unsigned int)(v - 7) < 2 || v == 0) {
                 dung_map[xx][yy].dFlags |= 0x20;
             } else {
                 dung_map[xx][yy].dFlags &= ~0x20;
