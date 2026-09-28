@@ -1737,7 +1737,7 @@
 - ✅ delta_put_item__FPC9TCmdPItemiiUc (99)
 - ✅ delta_portal_inited__Fi (9)
 - ✅ delta_quest_inited__Fi (9)
-- ❌ DeltaAddItem__Fi — 90 diffs (ours 138)
+- ❌ DeltaAddItem__Fi — 92 diffs (ours 138)
 - ✅ DeltaExportData__FPc (11)
 - ✅ DeltaImportData__FPc (18)
 - ✅ DeltaSaveLevel__Fv (63)
