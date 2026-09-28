@@ -98,13 +98,20 @@ BOOL L5checkRoom(int x, int y, int width, int height)
 
 void L5roomGen(int x, int y, int w, int h, int dir)
 {
+    /* Retail reserves an otherwise unnamed eight-byte frame hole here. */
+    union {
+        struct {
+            unsigned int : 32;
+            unsigned int : 32;
+        };
+    };
     int rx, ry, rx2, ry2;
     int height, width;
     int cx1, cy1, cw, ch;
     int num;
     int dirProb;
     int ran;
-    BOOL c, d;
+    int c, d;
 
     ran = ENG_random(4);
     if (dir == L5DIR_VERT) {
