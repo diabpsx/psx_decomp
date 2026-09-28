@@ -453,29 +453,26 @@ void LAMBO_MovePad(CPad *P)
     OMENUITEM *iptr;
     int move;
     int lcs;
-    CPad *Pad;
 
     iptr = MenuList[cmenu].Item;
-    Pad = PAD_GetPad(options_pad, 0);
-    Pad->SetPadTick(8);
-    Pad->SetPadTickMask(3);
-    move = -(Pad->GetTick() & 1);
-    if (Pad->GetTick() & 2)
+    P = PAD_GetPad(options_pad, 0);
+    P->SetPadTick(8);
+    P->SetPadTickMask(3);
+    move = -(P->GetTick() & 1);
+    if (P->GetTick() & 2)
         move = 1;
-    lcs = cs + move;
-    cs = lcs;
-    if (iptr[lcs].Text == 0) {
+    lcs = cs;
+    cs += move;
+    if (iptr[cs].Text == 0) {
         do {
             if (move == 0)
                 move = 1;
-            lcs = cs;
-            if (lcs < 0)
+            if (cs < 0)
                 move = 1;
-            if (!(lcs < MenuList[cmenu].NoEntries - 1))
+            if (!(cs < MenuList[cmenu].NoEntries - 1))
                 move = -1;
-            lcs = lcs + move;
-            cs = lcs;
-        } while (iptr[lcs].Text == 0);
+            cs += move;
+        } while (iptr[cs].Text == 0);
     }
     if (cs <= 0)
         cs = MenuList[cmenu].NoEntries - 2;
