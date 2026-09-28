@@ -811,13 +811,12 @@ void DRLG_L3Pool(void)
 void DRLG_L3PoolFix(void)
 {
     int duny, dunx;
-    unsigned short *p0, *p1, *p2;
+#define p0 dungeon[dunx - 1]
+#define p1 dungeon[dunx]
+#define p2 dungeon[dunx + 1]
 
     for (duny = 0; duny < DMAXY; duny++) {
         for (dunx = 0; dunx < DMAXX; dunx++) {
-            p0 = dungeon[dunx - 1];
-            p1 = dungeon[dunx];
-            p2 = dungeon[dunx + 1];
             if (p1[duny] == 8) {
                 if ((p0[duny - 1] >= 25 && p0[duny - 1] <= 41)
                     && (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
@@ -832,18 +831,21 @@ void DRLG_L3PoolFix(void)
             }
             if (p1[duny] == 8) {
                 if ((p0[duny - 1] >= 25 && p0[duny - 1] <= 41)
-                    && (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
-                    && (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
-                    && (p0[duny] >= 25 && p0[duny] <= 41)
-                    && (p2[duny] >= 25 && p2[duny] <= 41)
-                    && (p0[duny + 1] >= 25 && p0[duny + 1] <= 41)
-                    && (p1[duny + 1] >= 25 && p1[duny + 1] <= 41)
-                    && (p2[duny + 1] >= 25 && p2[duny + 1] <= 41)) {
+                    || (p1[duny - 1] >= 25 && p1[duny - 1] <= 41)
+                    || (p2[duny - 1] >= 25 && p2[duny - 1] <= 41)
+                    || (p0[duny] >= 25 && p0[duny] <= 41)
+                    || (p2[duny] >= 25 && p2[duny] <= 41)
+                    || (p0[duny + 1] >= 25 && p0[duny + 1] <= 41)
+                    || (p1[duny + 1] >= 25 && p1[duny + 1] <= 41)
+                    || (p2[duny + 1] >= 25 && p2[duny + 1] <= 41)) {
                     p1[duny] = 33;
                 }
             }
         }
     }
+#undef p0
+#undef p1
+#undef p2
 }
 
 int DRLG_L3PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir)
