@@ -471,12 +471,9 @@ void LAMBO_MovePad(CPad *P)
             lcs = cs;
             if (lcs < 0)
                 move = 1;
-            if (lcs < MenuList[cmenu].NoEntries - 1)
-                lcs = lcs + move;
-            else {
+            if (!(lcs < MenuList[cmenu].NoEntries - 1))
                 move = -1;
-                lcs = lcs + move;
-            }
+            lcs = lcs + move;
             cs = lcs;
         } while (iptr[lcs].Text == 0);
     }
@@ -818,12 +815,9 @@ void MemcardPad(void)
             lcs = cs;
             if (lcs < 0)
                 move = 1;
-            if (lcs < MenuList[cmenu].NoEntries - 1)
-                lcs = lcs + move;
-            else {
+            if (!(lcs < MenuList[cmenu].NoEntries - 1))
                 move = -1;
-                lcs = lcs + move;
-            }
+            lcs = lcs + move;
             cs = lcs;
         } while (iptr[lcs].Text == 0);
     }
@@ -1077,12 +1071,9 @@ void SoundPad(void)
             lcs = cs;
             if (lcs < 0)
                 move = 1;
-            if (lcs < MenuList[cmenu].NoEntries - 1)
-                lcs = lcs + move;
-            else {
+            if (!(lcs < MenuList[cmenu].NoEntries - 1))
                 move = -1;
-                lcs = lcs + move;
-            }
+            lcs = lcs + move;
             cs = lcs;
         } while (iptr[lcs].Text == 0);
     }
