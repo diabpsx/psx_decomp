@@ -37,8 +37,7 @@ int nSx2;
 int nSy2;
 extern int nSxy[16]; /* @0x801026E8 (source/gen/externs_gendung.h) -- level-indexed exclusion box, read here */
 struct NODE *pHallList;
-/* compiler-introduced spill slot written once at the tail of DoPatternCheck's switch dispatch
- * (gp_rel `sw $t9,myk`); not part of the C source -- no read site found anywhere in the oracle. */
+/* PSX-only diagnostic marker written when DoPatternCheck matches cell (9, 19). */
 int myk;
 
 /* ---------------------------------------------------------------------------------------------- */
@@ -86,9 +85,10 @@ static unsigned char DRLG_L2PlaceMiniSet(unsigned char *miniset, int tmin, int t
             }
         }
 
+        ii = 2;
         for (yy = 0; yy < sh; yy++) {
             for (xx = 0; xx < sw; xx++) {
-                if (miniset[2] != 0 && dungeon[sx + xx][sy + yy] != miniset[2]) {
+                if (miniset[ii] != 0 && dungeon[sx + xx][sy + yy] != miniset[ii]) {
                     found = 0;
                 }
                 if (mydflags[(sx + xx) + (sy + yy) * DMAXX] != 0) {
