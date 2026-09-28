@@ -1092,23 +1092,22 @@ static void PrintInfo(void)
     int nOffset1;
     int nlines;
     int PageOffset;
-    RECT *Rect;
     int K1;
 
     if (talkflag)
         return;
     nOffset1 = 0;
     NoOfLines = 0;
-    Rect = InfoBoxRect;
+    RECT * const Rect = InfoBoxRect;
     nlines = 0;
     if (invflag) {
         if (infostr[0])
-            NoOfLines = MediumFont.GetWrap(infostr, Rect);
+            NoOfLines = MediumFont.GetWrap(infostr, InfoBoxRect);
         for (int i = 0; i < pnumlines; i++)
             NoOfLines += MediumFont.GetWrap(panelstr[i], InfoBoxRect);
     } else if (gbActivePlayers == 1) {
         if (infostr[0])
-            nlines = MediumFont.GetWrap(infostr, Rect);
+            nlines = MediumFont.GetWrap(infostr, InfoBoxRect);
         for (int i = 0; i < pnumlines; i++)
             nlines += MediumFont.GetWrap(panelstr[i], InfoBoxRect);
         nlines = 4 - nlines;
