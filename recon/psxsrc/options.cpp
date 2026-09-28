@@ -184,8 +184,6 @@ void SwitchMONO(void)
 void CalcVolumes(void)
 {
     int unit;
-    int mixedVolume;
-    int streamVolume;
 
     sglMasterVolume = MasterVol * (0xE6 / sw);
     sglMusicVolume = MusicVol * (0x1FFF / sw);
@@ -193,19 +191,15 @@ void CalcVolumes(void)
     sglSoundVolume = SoundVol * unit;
     sglSpeechVolume = SpeechVol * unit;
     if (sghMusic != NULL) {
-        mixedVolume = (sglMusicVolume * sglMasterVolume) >> 8;
-        sghMusic->s_volume = mixedVolume;
-        sghMusic->volume = mixedVolume;
+        sghMusic->s_volume = (sglMusicVolume * sglMasterVolume) >> 8;
+        sghMusic->volume = sghMusic->s_volume;
         STR_setvolume(sghMusic);
     }
     if (sghStream != NULL) {
         if (sgpStreamSFX->flags & 1)
-            streamVolume = sglSoundVolume;
+            sghStream->volume = sghStream->s_volume = (sglSoundVolume * sglMasterVolume) >> 8;
         else
-            streamVolume = sglSpeechVolume;
-        mixedVolume = (streamVolume * sglMasterVolume) >> 8;
-        sghStream->s_volume = mixedVolume;
-        sghStream->volume = mixedVolume;
+            sghStream->volume = sghStream->s_volume = (sglSpeechVolume * sglMasterVolume) >> 8;
         if (sghStream->state != 3)
             STR_setvolume(sghStream);
     }
