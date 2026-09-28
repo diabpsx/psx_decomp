@@ -283,7 +283,7 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
     ReleaseDLevel(Dl);
 
     if (!(pI->wCI & 0x8000))
-        return 1;
+        return 0;
 
     Dl = GetDLevel(bLevel, setlevel);
     {
