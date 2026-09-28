@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2645 / 2727 functions PASS (97.0%) — 837 PsyQ SDK functions excluded**
+**Game code: 2649 / 2727 functions PASS (97.1%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -227,7 +227,7 @@
 - ✅ ___4AMap (18)
 - ✅ __4AMap (13)
 
-## control  (recon/source/control.cpp) — 49/51 PASS
+## control  (recon/source/control.cpp) — 50/51 PASS
 - ✅ TrimCol__Fs (14)
 - ❌ DrawSpellCel__FllUclUcc — 94 diffs (ours 737)
 - ✅ SetSpellTrans__Fc (3)
@@ -245,7 +245,7 @@
 - ✅ CheckPanelInfo__Fv (456)
 - ✅ FreeControlPan__Fv (68)
 - ✅ CPrintString__FiPci (71)
-- 🟡 PrintInfo__Fv — bytes PASS, SYM differs
+- ✅ PrintInfo__Fv (268)
 - ✅ DrawInfoBox__FP4RECT (461)
 - ✅ MY_PlrStringXY__Fv (452)
 - ✅ ADD_PlrStringXY__FPCcc (42)
@@ -1110,7 +1110,7 @@
 - ✅ interface_msg_pump__Fv (2)
 - ✅ ShowProgress__FUi (245)
 
-## inv  (recon/source/inv.cpp) — 54/57 PASS
+## inv  (recon/source/inv.cpp) — 55/57 PASS
 - ✅ FreeInvGFX__Fv (2)
 - ✅ InvDrawSlot__Fiii (33)
 - ✅ InvDrawSlotBack__FiiiiUc (174)
@@ -1131,7 +1131,7 @@
 - ✅ WeaponAutoPlace__Fi (165)
 - ✅ SwapItem__FP10ItemStructT0 (69)
 - ❌ CheckInvPaste__Fiii — 2151 diffs (ours 1890)
-- 🟡 CheckInvCut__Fiii — bytes PASS, SYM differs
+- ✅ CheckInvCut__Fiii (705)
 - ✅ RemoveInvItem__Fii (172)
 - ✅ RemoveSpdBarItem__Fii (61)
 - ✅ CheckInvScrn__Fv (30)
@@ -1847,7 +1847,7 @@
 - ✅ InitNewSeed__Fl (29)
 - ✅ NetInit__FUcPUc (164)
 
-## objects  (recon/source/objects.cpp) — 94/96 PASS
+## objects  (recon/source/objects.cpp) — 96/96 PASS
 - ✅ PostAddL1Door__Fiiii (58)
 - ✅ PostAddL2Door__Fiiii (83)
 - ✅ PostAddArmorStand__Fi (34)
@@ -1898,14 +1898,14 @@
 - ✅ OperateBookLever__Fii (294)
 - ✅ OperateSChambBk__Fii (143)
 - ✅ OperateChest__FiiUc (240)
-- 🟡 OperateMushPatch__Fii — bytes PASS, SYM differs
+- ✅ OperateMushPatch__Fii (133)
 - ✅ OperateInnSignChest__Fii (118)
 - ✅ OperateSlainHero__FiiUc (148)
 - ✅ OperateTrapLvr__Fi (116)
 - ✅ OperateSarc__FiiUc (110)
 - ✅ OperateL2Door__FiiUc (87)
 - ✅ OperateL3Door__FiiUc (87)
-- 🟡 LoadMapObjs__FPUcii — bytes PASS, SYM differs
+- ✅ LoadMapObjs__FPUcii (66)
 - ✅ OperatePedistal__Fii (337)
 - ✅ TryDisarm__Fii (108)
 - ✅ ItemMiscIdIdx__Fi (28)
