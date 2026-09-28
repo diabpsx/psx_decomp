@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2650 / 2727 functions PASS (97.2%) — 837 PsyQ SDK functions excluded**
+**Game code: 2651 / 2727 functions PASS (97.2%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1172,7 +1172,7 @@
 ## itemdat  (recon/source/itemdat.cpp) — 1/1 PASS
 - ✅ InitAllItemsUseable__Fv (14)
 
-## items  (recon/source/items.cpp) — 102/106 PASS
+## items  (recon/source/items.cpp) — 103/106 PASS
 - ✅ InitItemGFX__Fv (2)
 - ✅ ItemPlace__Fii (39)
 - ✅ AddInitItems__Fv (130)
@@ -1278,7 +1278,7 @@
 - ✅ SpawnBoy__Fi (193)
 - ✅ SortSmith__Fv (97)
 - ✅ SortHealer__Fv (100)
-- ❌ RecreateItem__FiiUsiii — 11 diffs (ours 149)
+- ✅ RecreateItem__FiiUsiii (149)
 
 ## kanji  (recon/psxsrc/kanji.cpp) — 24/24 PASS
 - ✅ GetTpY__FUs_800ad1f0 (7)
