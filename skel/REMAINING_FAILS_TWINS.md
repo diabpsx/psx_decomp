@@ -1,76 +1,62 @@
-# PC twins for the remaining fails (70)
+# PC twins for the remaining non-PASS functions (54)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
 | DrawAutomap__Fv | automap | 1337 diffs (ours 979) | automap.cpp:648 | AUTOMAP.CPP:685 | automap.cpp:1752 | JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.CPP; JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.H; JAP_1998_05_29/DIABPSX/SOURCE/SCROLL |
 | BL_AsyncReadFile__FPcUl | biglump | 4 diffs (ours 88) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BIGLUMP.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BIGLUMP.H; PAL_1997_12_12/DIABPSX/PSXSRC/BIGLUM |
-| MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR | block | 2 diffs (ours 74) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
+| MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR | block | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
 | PrintMap__7CBlocksii | block | 254 diffs (ours 732) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
 | IterateVisibleMap__7CBlocksiiPFP9CacheInfoP8map_infoii_ib | block | 160 diffs (ours 286) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
 | PrintMonsters__7CBlocksii | block | 295 diffs (ours 681) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
 | PrintObjects__7CBlocksii | block | 179 diffs (ours 279) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
 | PrintItems__7CBlocksii | block | 405 diffs (ours 368) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
-| DrawSpellCel__FllUclUcc | control | 342 diffs (ours 737) | control.cpp:286 | CONTROL.CPP:408 | - | JAP_1998_05_29/DIABPSX/SOURCE/CONTROL.CPP; JAP_1998_05_29/DIABPSX/SOURCE/CONTROL.H |
-| GetAutomapType__FiiUc | coreauto | 8 diffs (ours 53) | automap.cpp:562 | AUTOMAP.CPP:607 | automap.h:104 | JAP_1998_05_29/DIABPSX/SOURCE/COREAUTO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/COREAUTO.H; PAL_1997_12_12/DIABPSX/SOURCE/AUTO |
+| DrawSpellCel__FllUclUcc | control | 94 diffs (ours 737) | control.cpp:286 | CONTROL.CPP:408 | - | JAP_1998_05_29/DIABPSX/SOURCE/CONTROL.CPP; JAP_1998_05_29/DIABPSX/SOURCE/CONTROL.H |
 | SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks | cplayer | 113 diffs (ours 249) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CPLAYER.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CPLAYER.H; JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.C |
-| DoCredits__Fv | credits | 11 diffs (ours 250) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.H |
+| DoCredits__Fv | credits | 4 diffs (ours 250) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.H |
 | DialogPrint__Fiiiiiiiiii | dialog | 162 diffs (ours 608) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.H; PAL_1997_12_12/DIABPSX/PSXSRC/DIALOG.C |
 | Back__6Dialogiiii | dialog | 8 diffs (ours 1094) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG |
 | UnPackPlayer__FPC14PkPlayerStructiUc | dlg_2 | 14 diffs (ours 179) | pack.cpp:197 | PACKPLR.CPP:194 | pack.cpp:350 | JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DLG.H |
-| DRLG_PlaceMiniSet__FPCUciiiiiii | drlg_l1 | 82 diffs (ours 282) | drlg_l1.cpp:967 | DRLG_L1.CPP:1494 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
-| L5roomGen__Fiiiii | drlg_l1 | 205 diffs (ours 204) | drlg_l1.cpp:1425 | DRLG_L1.CPP:2037 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
 | DRLG_L5TransFix__Fv | drlg_l1 | 357 diffs (ours 273) | drlg_l1.cpp:2486 | DRLG_L1.CPP:2990 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
-| DRLG_L5__Fi | drlg_l1 | 152 diffs (ours 333) | drlg_l1.cpp:2600 | DRLG_L1.CPP:3243 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
-| DRLG_L2PlaceMiniSet__FPUciiiiii | drlg_l2 | 123 diffs (ours 228) | drlg_l2.cpp:1625 | DRLG_L2.CPP:1184 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| DRLG_L2PlaceRndSet__FPUci | drlg_l2 | 46 diffs (ours 190) | drlg_l2.cpp:1711 | DRLG_L2.CPP:1276 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| CreateRoom__Fiiiiiiiii | drlg_l2 | 6 diffs (ours 412) | drlg_l2.cpp:2014 | DRLG_L2.CPP:1610 | levels/drlg_l2.cpp:1771 | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| DoPatternCheck__Fii | drlg_l2 | 21 diffs (ours 182) | drlg_l2.cpp:2307 | DRLG_L2.CPP:1898 | levels/drlg_l2.cpp:1984 | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| DRLG_L2SetWalls__Fv | drlg_l2 | 60 diffs (ours 110) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| LoadL2Dungeon__FPcii | drlg_l2 | 95 diffs (ours 135) | drlg_l2.cpp:3368 | DRLG_L2.CPP:2858 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H; JAP_1998_05_29/DIABPSX/SOURCE/SETMAP |
-| CreateL2Dungeon__FUii | drlg_l2 | 69 diffs (ours 86) | drlg_l2.cpp:3507 | DRLG_L2.CPP:2994 | levels/drlg_l2.cpp:2830 | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| DRLG_L3River__Fv | drlg_l3 | 478 diffs (ours 650) | drlg_l3.cpp:1175 | DRLG_L3.CPP:1108 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.H |
-| DRLG_L3PoolFix__Fv | drlg_l3 | 153 diffs (ours 136) | drlg_l3.cpp:1589 | DRLG_L3.CPP:1463 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.H |
-| DRLG_L3PlaceMiniSet__FPCUciiiiii | drlg_l3 | 50 diffs (ours 219) | drlg_l3.cpp:1611 | DRLG_L3.CPP:1519 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.H |
-| DRLG_L3Wood__Fv | drlg_l3 | 48 diffs (ours 501) | drlg_l3.cpp:1976 | DRLG_L3.CPP:1882 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.H |
-| DRLG_L3SetWalls__Fv | drlg_l3 | 56 diffs (ours 45) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.H |
-| DRLG_L3__Fi | drlg_l3 | 8 diffs (ours 455) | drlg_l3.cpp:2317 | DRLG_L3.CPP:2313 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L3.H |
-| set_mdec_img_buffer | fmv | 7 diffs (ours 13) | - | - | - | - |
+| DRLG_L2PlaceMiniSet__FPUciiiiii | drlg_l2 | bytes PASS, SYM differs | drlg_l2.cpp:1625 | DRLG_L2.CPP:1184 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
+| DRLG_L2SetWalls__Fv | drlg_l2 | 63 diffs (ours 110) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
+| set_mdec_img_buffer | fmv | 2 diffs (ours 13) | - | - | - | - |
 | LoPlayFMVOverLay | fmv | 2 diffs (ours 274) | - | - | - | - |
-| CheckIsoBodge__7GamePadi | gamepad | 255 diffs (ours 219) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/GAMEPAD.CPP; JAP_1998_05_29/DIABPSX/SOURCE/GAMEPAD.H |
+| CheckIsoBodge__7GamePadi | gamepad | 110 diffs (ours 219) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/GAMEPAD.CPP; JAP_1998_05_29/DIABPSX/SOURCE/GAMEPAD.H |
 | BgTask__FP4TASK | glue | 186 diffs (ours 299) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.H; PAL_1997_12_12/DIABPSX/PSXSRC/GLUE.CPP; PA |
-| DrawFlask__6GPanelP7PanelXYP12PlayerStruct | gpanel | 375 diffs (ours 285) | control.cpp:1127 | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
-| DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct | gpanel | 386 diffs (ours 459) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
-| DrawSpell__6GPanelP7PanelXYP12PlayerStruct | gpanel | 80 diffs (ours 103) | control.cpp:470 | - | panels/spell_list.cpp:84 | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
-| DrawDurThingy__6GPaneliiP10ItemStructi | gpanel | 188 diffs (ours 179) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
-| DrawDurIcon__6GPanelP7PanelXYP12PlayerStruct | gpanel | 36 diffs (ours 75) | control.cpp:2330 | CONTROL.CPP:2164 | control/control_panel.cpp:751 | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
-| GPUQ_LoadImage__FP4RECTli | gpuq | 18 diffs (ours 45) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GMAN.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPUQ.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPUQ.H; PA |
+| DrawFlask__6GPanelP7PanelXYP12PlayerStruct | gpanel | 74 diffs (ours 285) | control.cpp:1127 | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
+| DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct | gpanel | 380 diffs (ours 459) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
+| DrawDurThingy__6GPaneliiP10ItemStructi | gpanel | 97 diffs (ours 179) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
 | DrawInvTSK__FP4TASK | inv | 8 diffs (ours 390) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | CheckInvPaste__Fiii | inv | 2151 diffs (ours 1890) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
-| CheckInvCut__Fiii | inv | 13 diffs (ours 705) | inv.cpp:1486 | INV.CPP:1213 | inv.cpp:750 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | GetUniqueItem__Fii | items | 88 diffs (ours 216) | items.cpp:2838 | ITEMS.CPP:2798 | items.cpp:1452 | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; PAL_1997_12_12/DIABPSX/SOURCE/ITEMS.CPP; |
 | ProcessItems__Fv | items | 136 diffs (ours 169) | items.cpp:3488 | ITEMS.CPP:3460 | items.cpp:3781 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H |
 | PrintItemPower__FcPC10ItemStruct | items | 134 diffs (ours 497) | items.cpp:3946 | ITEMS.CPP:3923 | - | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; JAP_1998_05_29/DIABPSX/SOURCE/STORES.CPP |
-| RecreateItem__FiiUsiii | items | 11 diffs (ours 149) | items.cpp:3179 | ITEMS.CPP:3107 | items.cpp:3518; msg.cpp:1357 | JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; J |
-| DoLighting__Fiiii | lighting | 411 diffs (ours 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
+| DoLighting__Fiiii | lighting | 373 diffs (ours 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
 | read_card_directory__Fi | memcard | 14 diffs (ours 151) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.H |
-| PutMissile__Fi | missiles | 12 diffs (ours 151) | missiles.cpp:462 | MISSILES.CPP:501 | missiles.cpp:198 | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.H; PAL_1997_12_12/DIABPSX/SOURCE/MISS |
-| delta_get_item__FPC9TCmdGItemUc | msg | 105 diffs (ours 115) | msg.cpp:548 | MSG.CPP:1065 | - | JAP_1998_05_29/DIABPSX/SOURCE/MSG.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.H; PAL_1997_12_12/DIABPSX/SOURCE/MSG.CPP; PAL_1 |
-| DeltaAddItem__Fi | msg | 90 diffs (ours 138) | msg.cpp:659 | MSG.CPP:1237 | msg.cpp:2892 | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.H; PAL |
+| delta_get_item__FPC9TCmdGItemUc | msg | 103 diffs (ours 115) | msg.cpp:548 | MSG.CPP:1065 | - | JAP_1998_05_29/DIABPSX/SOURCE/MSG.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.H; PAL_1997_12_12/DIABPSX/SOURCE/MSG.CPP; PAL_1 |
+| DeltaAddItem__Fi | msg | 92 diffs (ours 138) | msg.cpp:659 | MSG.CPP:1237 | msg.cpp:2892 | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.H; PAL |
 | DrawSpinner__FiiUcUcUciiibiT8T8Uc | options | 641 diffs (ours 415) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS |
 | DrawMenu__Fi | options | 965 diffs (ours 1032) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| MemcardPad__Fv | options | 126 diffs (ours 585) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| SoundPad__Fv | options | 537 diffs (ours 642) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| CalcVolumes__Fv | options | 14 diffs (ours 87) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPT |
-| GetVolumes__Fv | options | 13 diffs (ours 39) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPT |
+| MemcardPad__Fv | options | 124 diffs (ours 585) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
+| SoundPad__Fv | options | 535 diffs (ours 642) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
 | DrawOptions__FP4TASK | options | 164 diffs (ours 447) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| LAMBO_MovePad__FP4CPad | options | 52 diffs (ours 108) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H |
 | DrawObjSelector__FiP12PlayerStruct | padfuncs | 237 diffs (ours 514) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.H |
-| TryDropPlayerItems__FP12PlayerStruct | player | 2 diffs (ours 79) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/PLAYER.CPP; JAP_1998_05_29/DIABPSX/SOURCE/PLAYER.H |
-| SetMapObjects__FPUcii | preobj | 12 diffs (ours 168) | objects.cpp:1164 | OBJECTS.CPP:1375 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG |
-| Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc | printy | 250 diffs (ours 398) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/FE.CPP; |
-| GetWrap__5CFontPcP4RECT | printy | 4 diffs (ours 156) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/PRINTY.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/PRIN |
+| Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc | printy | 62 diffs (ours 398) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/FE.CPP; |
 | ResyncQuests__Fv | quests | 6 diffs (ours 315) | quests.cpp:739 | QUESTS.CPP:779 | quests.cpp:397 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LOADSAVE.CPP; JAP_1998_05_29/DIABPSX/SOURCE/QUES |
-| PrintStoreItem__FPC10ItemStructic | stores | 9 diffs (ours 335) | stores.cpp:336 | STORES.CPP:436 | stores.cpp:354 | JAP_1998_05_29/DIABPSX/SOURCE/STORES.CPP; JAP_1998_05_29/DIABPSX/SOURCE/STORES.H; PAL_1997_12_12/DIABPSX/SOURCE/STORES.C |
 | PrintCDWaitTask__FP4TASK | stream | 17 diffs (ours 79) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.H; PAL_1997_12_12/DIABPSX/PSXSRC/STREAM.C |
 
-Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions. Generated from MATCH_PROGRESS.md at master fd2dd51 (+4 passes not yet in the board: ChrCheckValidButton, DrawInvStats, GetWrapWidth, OperateShrine).
+| CharacterLoadPad__Fv | options | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP |
+| CheckMissileCol__FiiiUciiUcb | missiles | bytes PASS, SYM differs | missiles.cpp:1131 | MISSILES.CPP:1076 | missiles.cpp:486 | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP |
+| GameTask__FP4TASK | main | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/MAIN.CPP |
+| GLUE_StartGameExit__Fv | glue | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.CPP |
+| M_ChangeLightOffset__Fi | monster | bytes PASS, SYM differs | monster.cpp:2323 | MONSTER.CPP:2702 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
+| MAI_Counselor__Fi | monster | bytes PASS, SYM differs | monster.cpp:5075 | MONSTER.CPP:5885 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
+| MI_Manashield__Fi | missiles | bytes PASS, SYM differs | missiles.cpp:4848 | MISSILES.CPP:5626 | - | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP |
+| PrintGameOver__Fv | gameover | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/GAMEOVER.CPP |
+| ProcessMonsters__Fv | monster | bytes PASS, SYM differs | monster.cpp:5515 | MONSTER.CPP:6350 | monster.cpp:4257 | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
+| set_mdec_audio_volume | fmv | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/FMV.CPP |
+| stream_cdready_handler | fmv | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/FMV.CPP |
+| wait_cdstream | fmv | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/FMV.CPP |
+
+Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions.
+Generated from MATCH_PROGRESS.md at master a8abc19.
