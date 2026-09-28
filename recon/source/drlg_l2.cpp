@@ -1773,6 +1773,10 @@ void LoadL2Dungeon(char *sFileName, int vx, int vy)
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
             dungeon[i][j] = 12;
+        }
+    }
+    for (j = 0; j < DMAXY; j++) {
+        for (i = 0; i < DMAXX; i++) {
             mydflags[i + j * DMAXX] = 0;
         }
     }
@@ -1801,14 +1805,18 @@ void LoadL2Dungeon(char *sFileName, int vx, int vy)
         }
     }
 
-    DRLG_L2Pass3();
-    DRLG_Init_Globals();
+    {
+        int dummy;
 
-    ViewX = vx;
-    ViewY = vy;
-    SetMapMonsters(pLevelMap, 0, 0);
-    SetMapObjects(pLevelMap, 0, 0);
-    mem_free_dbg(pLevelMap);
+        DRLG_L2Pass3();
+        DRLG_Init_Globals();
+
+        ViewX = vx;
+        ViewY = vy;
+        SetMapMonsters(pLevelMap, 0, 0);
+        SetMapObjects(pLevelMap, 0, 0);
+        mem_free_dbg(pLevelMap);
+    }
 }
 
 void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
