@@ -2523,14 +2523,12 @@ void CheckInvCut(int pnum, int mx, int my)
     }
 
     if ((unsigned int)(r - 25) < 40) {
-        char *const grid = plr[pnum].InvGrid;
-        const int idx = r - 25;
-        ii = grid[idx];
-        if (ii != 0) {
-            if (ii > 0)
-                iv = ii;
+        ii = r - 25;
+        if (plr[pnum].InvGrid[ii] != 0) {
+            if (plr[pnum].InvGrid[ii] > 0)
+                iv = plr[pnum].InvGrid[ii];
             else
-                iv = -ii;
+                iv = -plr[pnum].InvGrid[ii];
             for (i = 0; i < 40; i++) {
                 if (plr[pnum].InvGrid[i] == iv || plr[pnum].InvGrid[i] == -iv)
                     plr[pnum].InvGrid[i] = 0;
@@ -2551,10 +2549,10 @@ void CheckInvCut(int pnum, int mx, int my)
     }
 
     if (r >= 0x41) {
-        iv = r - 0x41;
-        if (plr[pnum].SpdList[iv]._itype != -1) {
-            plr[pnum].HoldItem = plr[pnum].SpdList[iv];
-            plr[pnum].SpdList[iv]._itype = -1;
+        ii = r - 0x41;
+        if (plr[pnum].SpdList[ii]._itype != -1) {
+            plr[pnum].HoldItem = plr[pnum].SpdList[ii];
+            plr[pnum].SpdList[ii]._itype = -1;
             drawsbarflag = 1;
         }
     }
