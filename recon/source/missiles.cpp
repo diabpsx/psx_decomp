@@ -552,7 +552,7 @@ void PutMissile(int i)
      * byte-verified -- this is one of the largest remaining near-misses to grind. Bound check here
      * is against the dung_map ARRAY bound (112), not the playable MAXDUNX/MAXDUNY (96). */
     int mx, my;
-    char m;
+    char m, col;
 
     mx = missile[i]._mix;
     my = missile[i]._miy;
@@ -567,7 +567,7 @@ void PutMissile(int i)
             if (dMiss < 0) {
                 /* oracle computes the shift/column term (dMiss&0x60) BEFORE the row term
                  * (dMiss&0x1F) -- confirmed via raw oracle register order; matters for coloring. */
-                const char col = (dMiss & 0x60) >> 5;
+                col = (dMiss & 0x60) >> 5;
                 if (missile[i]._mitype == missile[dMissArray[dMiss & 0x1F][col] - 1]._mitype)
                     return;
                 if ((char)(col + 1) < 4)
@@ -3479,6 +3479,7 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
     int oi;
     MissileStruct *miss = &missile[i];
     struct map_info *dm = &dung_map[mx][my];
+    unsigned char earflag;
 
     if (mx >= 112 || my >= 112) {
         missile[i]._miDelFlag = 1;
@@ -3503,7 +3504,7 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
             }
         }
         if (IsDplayer(mx, my) && HurtPlr) {
-            const unsigned char earflag = miss->_miAnimType == 4;
+            earflag = miss->_miAnimType == 4;
             if (PlayerMHit(IsDplayer(mx, my) - 1, -1, miss->_midist, mindam, maxdam, miss->_mitype, shift, earflag)) {
                 if (!nodel)
                     miss->_mirange = 0;
