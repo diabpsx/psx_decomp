@@ -419,25 +419,30 @@ void DRLG_L3River(void)
     int rx, ry, px, py, dir, pdir, nodir, nodir2, dircheck;
     int river[3][100];
     int rivercnt, riveramt;
-    int i, trys, found, bridge, lpcnt;
-    int bail;
+    int i, j;
+    int trys, found, bridge, lpcnt, bail;
 
-    rivercnt = 0;
-    bail = false;
-    trys = 0;
+    dir = 0;
     pdir = 0;
+    nodir = 0;
+    rivercnt = 0;
+    i = 0;
+    riveramt = 0;
+    found = 0;
+    trys = 0;
 
-    while (trys < 200 && rivercnt < 4) {
-        bail = false;
-        while (!bail && trys < 200) {
+    while (trys < 200 && riveramt < 4) {
+        found = 0;
+        while (found == 0 && trys < 200) {
+            rivercnt = 0;
             trys++;
             rx = 0;
             ry = 0;
-            i = 0;
-            while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && i < 100) {
+            bail = 0;
+            while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && bail < 100) {
                 rx = ENG_random(DMAXX);
                 ry = ENG_random(DMAXY);
-                i++;
+                bail++;
                 while ((dungeon[rx][ry] < 25 || dungeon[rx][ry] > 28) && ry < DMAXY) {
                     rx++;
                     if (rx >= DMAXX) {
@@ -446,37 +451,37 @@ void DRLG_L3River(void)
                     }
                 }
             }
-            if (i >= 100) {
+            if (bail >= 100) {
                 return;
             }
             switch (dungeon[rx][ry]) {
             case 25:
                 dir = 3;
                 nodir = 2;
-                river[2][0] = 40;
+                river[2][rivercnt] = 40;
                 break;
             case 26:
                 dir = 0;
                 nodir = 1;
-                river[2][0] = 38;
+                river[2][rivercnt] = 38;
                 break;
             case 27:
                 dir = 1;
                 nodir = 0;
-                river[2][0] = 41;
+                river[2][rivercnt] = 41;
                 break;
             case 28:
                 dir = 2;
                 nodir = 3;
-                river[2][0] = 39;
+                river[2][rivercnt] = 39;
                 break;
             }
-            river[0][0] = rx;
-            river[1][0] = ry;
-            riveramt = 1;
+            river[0][rivercnt] = rx;
+            river[1][rivercnt] = ry;
+            rivercnt++;
             nodir2 = 4;
             dircheck = 0;
-            while (dircheck < 4 && riveramt < 100) {
+            while (dircheck < 4 && rivercnt < 100) {
                 px = rx;
                 py = ry;
                 if (dircheck == 0) {
@@ -504,17 +509,17 @@ void DRLG_L3River(void)
                 if (dungeon[rx][ry] == 7) {
                     dircheck = 0;
                     if (dir < 2) {
-                        river[2][riveramt] = (unsigned char)ENG_random(2) + 17;
+                        river[2][rivercnt] = (unsigned char)ENG_random(2) + 17;
                     }
                     if (dir > 1) {
-                        river[2][riveramt] = (unsigned char)ENG_random(2) + 15;
+                        river[2][rivercnt] = (unsigned char)ENG_random(2) + 15;
                     }
-                    river[0][riveramt] = rx;
-                    river[1][riveramt] = ry;
-                    riveramt++;
+                    river[0][rivercnt] = rx;
+                    river[1][rivercnt] = ry;
+                    rivercnt++;
                     if ((dir == 0 && pdir == 2) || (dir == 3 && pdir == 1)) {
-                        if (riveramt > 2) {
-                            river[2][riveramt - 2] = 22;
+                        if (rivercnt > 2) {
+                            river[2][rivercnt - 2] = 22;
                         }
                         if (dir == 0) {
                             nodir2 = 1;
@@ -523,8 +528,8 @@ void DRLG_L3River(void)
                         }
                     }
                     if ((dir == 0 && pdir == 3) || (dir == 2 && pdir == 1)) {
-                        if (riveramt > 2) {
-                            river[2][riveramt - 2] = 21;
+                        if (rivercnt > 2) {
+                            river[2][rivercnt - 2] = 21;
                         }
                         if (dir == 0) {
                             nodir2 = 1;
@@ -533,8 +538,8 @@ void DRLG_L3River(void)
                         }
                     }
                     if ((dir == 1 && pdir == 2) || (dir == 3 && pdir == 0)) {
-                        if (riveramt > 2) {
-                            river[2][riveramt - 2] = 20;
+                        if (rivercnt > 2) {
+                            river[2][rivercnt - 2] = 20;
                         }
                         if (dir == 1) {
                             nodir2 = 0;
@@ -543,8 +548,8 @@ void DRLG_L3River(void)
                         }
                     }
                     if ((dir == 1 && pdir == 3) || (dir == 2 && pdir == 0)) {
-                        if (riveramt > 2) {
-                            river[2][riveramt - 2] = 19;
+                        if (rivercnt > 2) {
+                            river[2][rivercnt - 2] = 19;
                         }
                         if (dir == 1) {
                             nodir2 = 0;
@@ -559,98 +564,98 @@ void DRLG_L3River(void)
                 }
             }
             if (dir == 0 && dungeon[rx][ry - 1] == 10 && dungeon[rx][ry - 2] == 8) {
-                river[0][riveramt] = rx;
-                river[1][riveramt] = ry - 1;
-                river[2][riveramt] = 24;
+                river[0][rivercnt] = rx;
+                river[1][rivercnt] = ry - 1;
+                river[2][rivercnt] = 24;
                 if (pdir == 2) {
-                    river[2][riveramt - 1] = 22;
+                    river[2][rivercnt - 1] = 22;
                 }
                 if (pdir == 3) {
-                    river[2][riveramt - 1] = 21;
+                    river[2][rivercnt - 1] = 21;
                 }
-                bail = true;
+                found = 1;
             }
             if (dir == 1 && dungeon[rx][ry + 1] == 2 && dungeon[rx][ry + 2] == 8) {
-                river[0][riveramt] = rx;
-                river[1][riveramt] = ry + 1;
-                river[2][riveramt] = 42;
+                river[0][rivercnt] = rx;
+                river[1][rivercnt] = ry + 1;
+                river[2][rivercnt] = 42;
                 if (pdir == 2) {
-                    river[2][riveramt - 1] = 20;
+                    river[2][rivercnt - 1] = 20;
                 }
                 if (pdir == 3) {
-                    river[2][riveramt - 1] = 19;
+                    river[2][rivercnt - 1] = 19;
                 }
-                bail = true;
+                found = 1;
             }
             if (dir == 2 && dungeon[rx + 1][ry] == 4 && dungeon[rx + 2][ry] == 8) {
-                river[0][riveramt] = rx + 1;
-                river[1][riveramt] = ry;
-                river[2][riveramt] = 43;
+                river[0][rivercnt] = rx + 1;
+                river[1][rivercnt] = ry;
+                river[2][rivercnt] = 43;
                 if (pdir == 0) {
-                    river[2][riveramt - 1] = 19;
+                    river[2][rivercnt - 1] = 19;
                 }
                 if (pdir == 1) {
-                    river[2][riveramt - 1] = 21;
+                    river[2][rivercnt - 1] = 21;
                 }
-                bail = true;
+                found = 1;
             }
             if (dir == 3 && dungeon[rx - 1][ry] == 9 && dungeon[rx - 2][ry] == 8) {
-                river[0][riveramt] = rx - 1;
-                river[1][riveramt] = ry;
-                river[2][riveramt] = 23;
+                river[0][rivercnt] = rx - 1;
+                river[1][rivercnt] = ry;
+                river[2][rivercnt] = 23;
                 if (pdir == 0) {
-                    river[2][riveramt - 1] = 20;
+                    river[2][rivercnt - 1] = 20;
                 }
                 if (pdir == 1) {
-                    river[2][riveramt - 1] = 22;
+                    river[2][rivercnt - 1] = 22;
                 }
-                bail = true;
+                found = 1;
             }
         }
-        if (bail == true && riveramt < 7) {
-            bail = false;
-        }
-        if (bail == true) {
+        if (found == 1 && rivercnt < 7) {
             found = 0;
+        }
+        if (found == 1) {
+            bridge = 0;
             lpcnt = 0;
-            while (found == 0 && lpcnt < 30) {
+            while (bridge == 0 && lpcnt < 30) {
                 lpcnt++;
-                bridge = ENG_random(riveramt);
-                if ((river[2][bridge] == 15 || river[2][bridge] == 16)
-                    && dungeon[river[0][bridge]][river[1][bridge] - 1] == 7
-                    && dungeon[river[0][bridge]][river[1][bridge] + 1] == 7) {
-                    found = 1;
+                i = ENG_random(rivercnt);
+                if ((river[2][i] == 15 || river[2][i] == 16)
+                    && dungeon[river[0][i]][river[1][i] - 1] == 7
+                    && dungeon[river[0][i]][river[1][i] + 1] == 7) {
+                    bridge = 1;
                 }
-                if ((river[2][bridge] == 17 || river[2][bridge] == 18)
-                    && dungeon[river[0][bridge] - 1][river[1][bridge]] == 7
-                    && dungeon[river[0][bridge] + 1][river[1][bridge]] == 7) {
-                    found = 2;
+                if ((river[2][i] == 17 || river[2][i] == 18)
+                    && dungeon[river[0][i] - 1][river[1][i]] == 7
+                    && dungeon[river[0][i] + 1][river[1][i]] == 7) {
+                    bridge = 2;
                 }
-                for (i = 0; i < riveramt && found != 0; i++) {
-                    if (found == 1
-                        && (river[1][bridge] - 1 == river[1][i] || river[1][bridge] + 1 == river[1][i])
-                        && river[0][bridge] == river[0][i]) {
-                        found = 0;
+                for (j = 0; j < rivercnt && bridge != 0; j++) {
+                    if (bridge == 1
+                        && (river[1][i] - 1 == river[1][j] || river[1][i] + 1 == river[1][j])
+                        && river[0][i] == river[0][j]) {
+                        bridge = 0;
                     }
-                    if (found == 2
-                        && (river[0][bridge] - 1 == river[0][i] || river[0][bridge] + 1 == river[0][i])
-                        && river[1][bridge] == river[1][i]) {
-                        found = 0;
+                    if (bridge == 2
+                        && (river[0][i] - 1 == river[0][j] || river[0][i] + 1 == river[0][j])
+                        && river[1][i] == river[1][j]) {
+                        bridge = 0;
                     }
                 }
             }
-            if (found != 0) {
-                if (found == 1) {
-                    river[2][bridge] = 44;
+            if (bridge != 0) {
+                if (bridge == 1) {
+                    river[2][i] = 44;
                 } else {
-                    river[2][bridge] = 45;
+                    river[2][i] = 45;
                 }
-                rivercnt++;
-                for (bridge = 0; bridge <= riveramt; bridge++) {
-                    dungeon[river[0][bridge]][river[1][bridge]] = river[2][bridge];
+                riveramt++;
+                for (i = 0; i <= rivercnt; i++) {
+                    dungeon[river[0][i]][river[1][i]] = river[2][i];
                 }
             } else {
-                bail = false;
+                found = 0;
             }
         }
     }
