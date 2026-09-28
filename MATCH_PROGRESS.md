@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2654 / 2727 functions PASS (97.3%) — 837 PsyQ SDK functions excluded**
+**Game code: 2659 / 2727 functions PASS (97.5%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -571,10 +571,10 @@
 - ✅ ClearTRAP__Fii (35)
 - ✅ GetTRAP__Fii (12)
 
-## drlg_l1  (recon/source/drlg_l1.cpp) — 36/40 PASS
+## drlg_l1  (recon/source/drlg_l1.cpp) — 37/40 PASS
 - ✅ DRLG_PlaceDoor__Fii (312)
 - ✅ DRLG_L1Shadows__Fv (260)
-- ❌ DRLG_PlaceMiniSet__FPCUciiiiiii — 82 diffs (ours 282)
+- ✅ DRLG_PlaceMiniSet__FPCUciiiiiii (282)
 - ✅ DRLG_SetWalls__Fv (47)
 - ✅ DRLG_L1Floor__Fv (57)
 - ✅ DRLG_L1Pass3__Fv (126)
@@ -613,7 +613,7 @@
 - ❌ DRLG_L5__Fi — 152 diffs (ours 333)
 - ✅ CreateL5Dungeon__FUii (36)
 
-## drlg_l2  (recon/source/drlg_l2.cpp) — 31/36 PASS
+## drlg_l2  (recon/source/drlg_l2.cpp) — 33/36 PASS
 - ❌ DRLG_L2PlaceMiniSet__FPUciiiiii — 123 diffs (ours 228)
 - ✅ DRLG_L2PlaceRndSet__FPUci (190)
 - ✅ DRLG_L2Subs__Fv (124)
@@ -647,9 +647,9 @@
 - ❌ DRLG_L2SetWalls__Fv — 60 diffs (ours 110)
 - ✅ DRLG_L2__Fi (661)
 - ✅ DRLG_InitL2Vals__Fv (2)
-- ❌ LoadL2Dungeon__FPcii — 95 diffs (ours 135)
+- ✅ LoadL2Dungeon__FPcii (135)
 - ✅ LoadPreL2Dungeon__FPcii (125)
-- ❌ CreateL2Dungeon__FUii — 69 diffs (ours 86)
+- ✅ CreateL2Dungeon__FUii (86)
 
 ## drlg_l3  (recon/source/drlg_l3.cpp) — 33/37 PASS
 - ✅ InitL3Dungeon__Fv (33)
@@ -1071,16 +1071,16 @@
 - ✅ HasTp__C13CTextFileInfo (10)
 - ✅ GetSize__C6CBlock (5)
 
-## gpanel  (recon/psxsrc/gpanel.cpp) — 8/13 PASS
+## gpanel  (recon/psxsrc/gpanel.cpp) — 10/13 PASS
 - ✅ GetPal__6GPaneli (17)
 - ✅ __6GPaneli (25)
 - ❌ DrawFlask__6GPanelP7PanelXYP12PlayerStruct — 363 diffs (ours 285)
 - ✅ SpdTrimCol__Fs (14)
 - ❌ DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct — 380 diffs (ours 459)
-- ❌ DrawSpell__6GPanelP7PanelXYP12PlayerStruct — 80 diffs (ours 103)
+- ✅ DrawSpell__6GPanelP7PanelXYP12PlayerStruct (103)
 - ✅ DrawMsgWindow__6GPanelP7PanelXYP12PlayerStruct (20)
 - ❌ DrawDurThingy__6GPaneliiP10ItemStructi — 188 diffs (ours 179)
-- ❌ DrawDurIcon__6GPanelP7PanelXYP12PlayerStruct — 36 diffs (ours 75)
+- ✅ DrawDurIcon__6GPanelP7PanelXYP12PlayerStruct (75)
 - ✅ Print__6GPanelP7PanelXYP12PlayerStruct (70)
 - ✅ GetMaxOtPos__7CBlocks_80098948 (2)
 - ✅ GetPal__7TextDati_80098950 (7)
