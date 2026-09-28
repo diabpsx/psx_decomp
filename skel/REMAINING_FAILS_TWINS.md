@@ -15,7 +15,6 @@
 | DoCredits__Fv | credits | 4 diffs (ours 250) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.H |
 | DialogPrint__Fiiiiiiiiii | dialog | 162 diffs (ours 608) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.H; PAL_1997_12_12/DIABPSX/PSXSRC/DIALOG.C |
 | Back__6Dialogiiii | dialog | 8 diffs (ours 1094) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG |
-| UnPackPlayer__FPC14PkPlayerStructiUc | dlg_2 | 14 diffs (ours 179) | pack.cpp:197 | PACKPLR.CPP:194 | pack.cpp:350 | JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DLG.H |
 | DRLG_L5TransFix__Fv | drlg_l1 | 357 diffs (ours 273) | drlg_l1.cpp:2486 | DRLG_L1.CPP:2990 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
 | DRLG_L2PlaceMiniSet__FPUciiiiii | drlg_l2 | bytes PASS, SYM differs | drlg_l2.cpp:1625 | DRLG_L2.CPP:1184 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
 | set_mdec_img_buffer | fmv | 2 diffs (ours 13) | - | - | - | - |
@@ -61,4 +60,4 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 
 - Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
 - Optimized temporary records: `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now has exact SYM and instruction count; only the width/height mask scheduling order remains.
-Generated from MATCH_PROGRESS.md at master 090914a.
+Generated from MATCH_PROGRESS.md at master 29180e0.
