@@ -499,8 +499,8 @@ void DoCredits(void)
         case 1:
             PrintCredits(CreditsText[TextNo].Text, Y, Fade, 255, 255, 255);
             if (VID_GetTick() - CreditsCount > 25) {
-                Mode = 2;
                 Fade -= 1;
+                Mode = 2;
             }
             break;
         case 2:
