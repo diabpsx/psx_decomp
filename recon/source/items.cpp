@@ -2159,8 +2159,10 @@ static char itemactivelist[127];
  * animation frozen while paused / CD-waiting, drop sounds only for visible tiles (SinTab<0 = anim end).
  * NEAR-MISS (ours 193 / retail 169): retail keeps the new frame in s1 (unsigned char, no SYM record), the
  * item offset in s2 AND &item[ii] in s0 across the PlaySfxLoc calls (ii dies before any call); ours keeps
- * ii live and recomputes. Falsified: frame temp, `ItemStruct *pi` (163 insns, 72 diffs, adds a record),
- * duplicated finish arms. Next: find the spelling that CSEs &item[ii] with no named pointer. */
+ * ii live and recomputes. Falsified: frame temp; `ItemStruct *pi` (163 insns, 72 diffs, adds a record);
+ * repeated `(&item[ii])->` macro spelling (158 insns, 139 diffs); block-local `ItemStruct *const`
+ * (142 insns, 115 diffs); duplicated finish arms. Next: find the spelling that retains the dynamic
+ * base in s0 across calls without a named pointer or over-folding the address chain. */
 void ProcessItems(void)
 {
     int i, ii, numitemslist, count;
