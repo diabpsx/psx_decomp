@@ -614,7 +614,7 @@
 - ✅ CreateL5Dungeon__FUii (36)
 
 ## drlg_l2  (recon/source/drlg_l2.cpp) — 34/36 PASS
-- ❌ DRLG_L2PlaceMiniSet__FPUciiiiii — 49 diffs (ours 228)
+- 🟡 DRLG_L2PlaceMiniSet__FPUciiiiii — bytes PASS, SYM differs
 - ✅ DRLG_L2PlaceRndSet__FPUci (190)
 - ✅ DRLG_L2Subs__Fv (124)
 - ✅ DRLG_L2Shadows__Fv (113)
