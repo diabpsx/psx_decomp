@@ -108,7 +108,7 @@ struct PlayerStruct {
     unsigned char pad0[0x54];
     unsigned char _pClassGfx;   /* +0x54 -- spell class index used by spspelstate[] */
     unsigned char pad1[0x64 - 0x55];
-    int _pTSpellGfx;            /* +0x64 -- current spell icon index */
+    int _pRSpell;               /* +0x64 -- current spell icon index */
     unsigned char pad2[0x11C - 0x68];
     long _pHitPoints;    /* +0x11C */
     long _pMaxHP;        /* +0x120 */
@@ -275,10 +275,12 @@ void *TextDat::GetPal(int PalNum)
 
 void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
-    struct D_80110868_T SpellXTbl = D_80110868;
-    int X, Y, SpellNo;
+    int X, Y, Anim;
     struct POLY_FT4 *Ft4;
-    unsigned char c;
+    int SpellNo;
+    char YT[16];
+
+    *(struct D_80110868_T *)YT = D_80110868;
 
     Y = XY->MainY;
     X = XY->MainX + 1;
@@ -288,20 +290,20 @@ void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)
     Ft4->b0 = 0x7F;
     Ft4->code = (Ft4->code | 2) & 0xFE;
     Ft4->tpage = Ft4->tpage | 0x20;
-    SpellNo = Plr->_pTSpellGfx;
+    SpellNo = Plr->_pRSpell;
     if (SpellNo != -1) {
-        struct POLY_FT4 *Ft4b;
-
-        Ft4b = PanelTData->PrintFt4(SpellITbl[SpellNo] + 0xA5, X + XY->SpellXOfs, Y + SpellXTbl.b[GPanelOt >> 1] + XY->SpellYOfs, 0, GPanelOt, 0);
+        Anim = HealthAnimCount >> 1;
+        Y += YT[Anim];
+        Ft4 = PanelTData->PrintFt4(SpellITbl[SpellNo] + 0xA5, X + XY->SpellXOfs, Y + XY->SpellYOfs, 0, GPanelOt, 0);
         if (VID_GetTick__Fv() & 1) {
-            Ft4b->r0 = (char)0x80;
-            c = 0xA0;
+            Ft4->r0 = (char)0x80;
+            Ft4->g0 = (char)0x80;
+            Ft4->b0 = (char)0x80;
         } else {
-            Ft4b->r0 = (char)0x9C;
-            c = 0x80;
+            Ft4->r0 = (char)0x9C;
+            Ft4->g0 = (char)0xA0;
+            Ft4->b0 = (char)0xA0;
         }
-        Ft4b->g0 = c;
-        Ft4b->b0 = c;
     }
 }
 
