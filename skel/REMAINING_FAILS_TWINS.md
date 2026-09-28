@@ -25,7 +25,7 @@
 | DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct | gpanel | 380 diffs (ours 459) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
 | DrawDurThingy__6GPaneliiP10ItemStructi | gpanel | 97 diffs (ours 179) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
 | DrawInvTSK__FP4TASK | inv | 8 diffs (ours 390) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
-| CheckInvPaste__Fiii | inv | 1995 diffs (ours 1890) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
+| CheckInvPaste__Fiii | inv | 2044 diffs (ours 1890; 37/37 calls exact, 8-insn length gap) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | GetUniqueItem__Fii | items | 88 diffs (ours 216) | items.cpp:2838 | ITEMS.CPP:2798 | items.cpp:1452 | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; PAL_1997_12_12/DIABPSX/SOURCE/ITEMS.CPP; |
 | ProcessItems__Fv | items | 136 diffs (ours 169) | items.cpp:3488 | ITEMS.CPP:3460 | items.cpp:3781 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H |
 | PrintItemPower__FcPC10ItemStruct | items | 134 diffs (ours 497) | items.cpp:3946 | ITEMS.CPP:3923 | - | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; JAP_1998_05_29/DIABPSX/SOURCE/STORES.CPP |
@@ -60,4 +60,4 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 
 - Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
 - Optimized temporary records: `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now has exact SYM and instruction count; only the width/height mask scheduling order remains.
-Generated from MATCH_PROGRESS.md at master 80c5e73.
+Generated from MATCH_PROGRESS.md at master bb0ea5e.
