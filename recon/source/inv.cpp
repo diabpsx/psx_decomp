@@ -2071,14 +2071,10 @@ void CheckInvPaste(int pnum, int mx, int my)
         break;
     case 1: /* one-hand */
         if (r <= 12) {
-            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE) {
-                if (plr[pnum].InvBody[5]._itype == ITYPE_NONE || plr[pnum].InvBody[5]._iClass != plr[pnum].HoldItem._iClass) {
-                    NetSendCmdChItem(0, 4);
-                    plr[pnum].InvBody[4] = plr[pnum].HoldItem;
-                } else {
-                    NetSendCmdChItem(0, 5);
-                    cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
-                }
+            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE
+                && (plr[pnum].InvBody[5]._itype == ITYPE_NONE || plr[pnum].InvBody[5]._iClass != plr[pnum].HoldItem._iClass)) {
+                NetSendCmdChItem(0, 4);
+                plr[pnum].InvBody[4] = plr[pnum].HoldItem;
                 break;
             }
             if (plr[pnum].InvBody[5]._itype == ITYPE_NONE || plr[pnum].InvBody[5]._iClass != plr[pnum].HoldItem._iClass) {
@@ -2091,20 +2087,24 @@ void CheckInvPaste(int pnum, int mx, int my)
             break;
         }
         if (plr[pnum].InvBody[5]._itype == ITYPE_NONE) {
-            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE || plr[pnum].InvBody[4]._iLoc != ILOC_TWOHAND) {
-                if (plr[pnum].InvBody[4]._itype == ITYPE_NONE || plr[pnum].InvBody[4]._iClass != plr[pnum].HoldItem._iClass) {
-                    NetSendCmdChItem(0, 5);
-                    plr[pnum].InvBody[5] = plr[pnum].HoldItem;
-                    break;
-                }
-                NetSendCmdChItem(0, 4);
-                cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
+            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE) {
+                NetSendCmdChItem(0, 5);
+                plr[pnum].InvBody[5] = plr[pnum].HoldItem;
                 break;
             }
-            NetSendCmdDelItem(0, 4);
-            NetSendCmdChItem(0, 5);
-            SwapItem(&plr[pnum].InvBody[5], &plr[pnum].InvBody[4]);
-            cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
+            if (plr[pnum].InvBody[4]._iLoc == ILOC_TWOHAND) {
+                NetSendCmdChItem(0, 4);
+                SwapItem(&plr[pnum].InvBody[5], &plr[pnum].InvBody[4]);
+                cn = SwapItem(&plr[pnum].InvBody[5], &plr[pnum].HoldItem);
+                break;
+            }
+            if (plr[pnum].InvBody[4]._iClass != plr[pnum].HoldItem._iClass) {
+                NetSendCmdChItem(0, 5);
+                plr[pnum].InvBody[5] = plr[pnum].HoldItem;
+                break;
+            }
+            NetSendCmdChItem(0, 4);
+            cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
             break;
         }
         if (plr[pnum].InvBody[4]._itype != ITYPE_NONE && plr[pnum].InvBody[4]._iClass == plr[pnum].HoldItem._iClass) {
@@ -2142,14 +2142,21 @@ void CheckInvPaste(int pnum, int mx, int my)
             else
                 plr[pnum].InvBody[4]._itype = ITYPE_NONE;
         }
-        if (plr[pnum].InvBody[4]._itype != ITYPE_NONE || plr[pnum].InvBody[5]._itype != ITYPE_NONE) {
-            NetSendCmdChItem(0, 4);
-            if (plr[pnum].InvBody[4]._itype == ITYPE_NONE)
-                SwapItem(&plr[pnum].InvBody[4], &plr[pnum].InvBody[5]);
-            cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
-        } else {
+        if (plr[pnum].InvBody[4]._itype == ITYPE_NONE && plr[pnum].InvBody[5]._itype == ITYPE_NONE) {
             NetSendCmdChItem(0, 4);
             plr[pnum].InvBody[4] = plr[pnum].HoldItem;
+            break;
+        }
+        NetSendCmdChItem(0, 4);
+        if (plr[pnum].InvBody[4]._itype == ITYPE_NONE)
+            SwapItem(&plr[pnum].InvBody[4], &plr[pnum].InvBody[5]);
+        cn = SwapItem(&plr[pnum].InvBody[4], &plr[pnum].HoldItem);
+        if (plr[pnum].InvBody[4]._itype == 10
+            && (ii = plr[pnum].InvBody[4]._iSpell) != 0
+            && plr[pnum].InvBody[4]._iCharges != 0) {
+            plr[pnum]._pRSplType = 3;
+            plr[pnum]._pRSpell = ii;
+            force_redraw = 0xFF;
         }
         break;
     case 3: /* chest */
