@@ -1635,6 +1635,7 @@ void TryDropPlayerItems(PlayerStruct *ptrplr)
 {
     unsigned char diablolevel;
     int pnum = plrind(ptrplr);
+    const int pnum4 = pnum << 2;
 
     diablolevel = currlevel == 16;
     if (PlayerDeathCount[pnum] > 0)
