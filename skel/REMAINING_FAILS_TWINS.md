@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (53)
+# PC twins for the remaining non-PASS functions (52)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -18,7 +18,6 @@
 | UnPackPlayer__FPC14PkPlayerStructiUc | dlg_2 | 14 diffs (ours 179) | pack.cpp:197 | PACKPLR.CPP:194 | pack.cpp:350 | JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DLG.H |
 | DRLG_L5TransFix__Fv | drlg_l1 | 357 diffs (ours 273) | drlg_l1.cpp:2486 | DRLG_L1.CPP:2990 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
 | DRLG_L2PlaceMiniSet__FPUciiiiii | drlg_l2 | bytes PASS, SYM differs | drlg_l2.cpp:1625 | DRLG_L2.CPP:1184 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
-| DRLG_L2SetWalls__Fv | drlg_l2 | 63 diffs (ours 110) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L2.H |
 | set_mdec_img_buffer | fmv | 2 diffs (ours 13) | - | - | - | - |
 | LoPlayFMVOverLay | fmv | 2 diffs (ours 274) | - | - | - | - |
 | CheckIsoBodge__7GamePadi | gamepad | 110 diffs (ours 219) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/GAMEPAD.CPP; JAP_1998_05_29/DIABPSX/SOURCE/GAMEPAD.H |
@@ -65,4 +64,4 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 - Optimized temporary records: `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR`, `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail.
 - `CharacterLoadPad__Fv` now has retail's single outer block and no extra local records; its sole residual is the compiler folding `1272 * (cs - 1)` into a relocation/addend form and omitting retail's standalone `addiu v0, v0, -1`.
 
-Generated from MATCH_PROGRESS.md at master 038b309.
+Generated from MATCH_PROGRESS.md at master 3474183.
