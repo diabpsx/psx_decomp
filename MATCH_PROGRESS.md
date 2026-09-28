@@ -589,7 +589,7 @@
 - ✅ L5ClearFlags__Fv (20)
 - ✅ L5drawRoom__Fiiii (27)
 - ✅ L5checkRoom__Fiiii (37)
-- ❌ L5roomGen__Fiiiii — 205 diffs (ours 204)
+- ❌ L5roomGen__Fiiiii — 151 diffs (ours 204)
 - ✅ L5firstRoom__Fv (232)
 - ✅ L5GetArea__Fv (24)
 - ✅ L5makeDungeon__Fv (35)
