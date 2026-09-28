@@ -1921,6 +1921,11 @@ void DrawInvStats(void)
     PrintStat(0xAC, 0x191, chrstr, 0);
 }
 
+/* PSX gamepad path reconstructed through exact call convergence: all 37 calls match retail in target
+ * and physical order. Remaining near-match is 1876/1890 instructions with two saved-register pairs
+ * reversed by allocation (ours pnum/il=s3/s2 and sx/cn=s5/s6; retail s2/s3 and s6/s5). The other
+ * named locals now have retail registers. Moving iv/done2h initialization, reordering declarations,
+ * and splitting the failure tail were tested and regress code length/frame allocation. */
 void CheckInvPaste(int pnum, int mx, int my)
 {
     int r;
