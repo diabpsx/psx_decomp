@@ -792,12 +792,12 @@ void CBlocks::MakeGt4Table()
 /* @0x8008DF54 BLOCK.CPP:729 */
 void CBlocks::MakeGt4(POLY_GT4 *GT4, FRAME_HDR *Fr)
 {
-    unsigned long WH = ((unsigned long *)Fr)[2];
+    const unsigned long WH = ((unsigned long *)Fr)[2];
     int H = WH >> 9;
-    WH &= 0x1FF;
-    H &= 0x1FF;
     setPolyGT4(GT4);
-    setXYWH(GT4, 0, 0, WH, H);
+    const int W = WH & 0x1FF;
+    H &= 0x1FF;
+    setXYWH(GT4, 0, 0, W, H);
     GT4->clut = ((unsigned short *)GetPal(Fr->PalNum))[1];
     int Rotated = Fr->Rotated;
     int Tpage = ((FRAME_TP *)Fr)->Tpage;
