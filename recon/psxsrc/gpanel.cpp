@@ -572,9 +572,9 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4b->y0 = (short)Y;
         Ft4b->y2 = (short)Y;
         Ft4b->u1 = (unsigned char)(Ft4b->u0 + 1);
-        Ft4b->v1 = (unsigned char)(Ft4b->u0 + 1);
-        Ft4b->u2 = (unsigned char)(Ft4b->v0 + 1);
+        Ft4b->u3 = (unsigned char)(Ft4b->u0 + 1);
         Ft4b->v2 = (unsigned char)(Ft4b->v0 + 1);
+        Ft4b->v3 = (unsigned char)(Ft4b->v0 + 1);
         Ft4b->tpage = Ft4b->tpage | 0x40;
         Ft4b->code = (Ft4b->code | 2) & 0xFE;
     }
