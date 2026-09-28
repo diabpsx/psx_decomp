@@ -728,7 +728,7 @@ void CharacterLoadPad(void)
                     cs = 2;
                     return;
                 } else {
-                    if (D_80157B68[1272 * (cs - 1)] != 0) {
+                    if (D_80157B68[cs - 1].first != 0) {
                         ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
                         ReturnCards = 1;
                         ReturnMenu = cmenu;

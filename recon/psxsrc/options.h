@@ -269,8 +269,12 @@ extern int card_side_read[2];
 extern int card_side_save[2];
 extern int card_usable[2];
 extern char *DiabloCharacterFile;
-extern signed char D_80157B68[];   /* SYM has no name; big per-slot table, indexed by a 1272-byte
-                                     * stride (cs-1) and read signed-byte -- owned elsewhere. */
+struct CharacterSaveSlot {
+    signed char first;
+    unsigned char data[1271];
+};
+extern CharacterSaveSlot D_80157B68[];   /* SYM has no name; big per-slot table, indexed by slot
+                                           * and read at byte zero -- owned elsewhere. */
 BOOL GetSaveStatusMessage(int a, char *Name);   /* @0x8015A67C -- another module */
 void ShowCharacterFiles(int idx, int Spacing, RECT R, int Height);   /* @0x8015A90C -- another module,
                                                                         * RECT passed BY VALUE (packed

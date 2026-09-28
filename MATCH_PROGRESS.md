@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2673 / 2727 functions PASS (98.0%) — 837 PsyQ SDK functions excluded**
+**Game code: 2674 / 2727 functions PASS (98.1%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1977,7 +1977,7 @@
 - ✅ GetCreature__7TextDati_8007ee2c (7)
 - ✅ GetFr__7TextDati_8007ee48 (7)
 
-## options  (recon/psxsrc/options.cpp) — 32/38 PASS
+## options  (recon/psxsrc/options.cpp) — 33/38 PASS
 - ✅ PrintSelectBack__FUs (36)
 - ✅ DrawDialogBox__FiiP4RECTiiii (57)
 - ❌ DrawSpinner__FiiUcUcUciiibiT8T8Uc — 641 diffs (ours 415)
@@ -1987,7 +1987,7 @@
 - ✅ PrintMono__Fi (46)
 - ❌ DrawMenu__Fi — 965 diffs (ours 1032)
 - ✅ who_pressed__Fi (34)
-- ❌ CharacterLoadPad__Fv — 1 diffs (ours 341)
+- ✅ CharacterLoadPad__Fv (341)
 - ❌ MemcardPad__Fv — 124 diffs (ours 585)
 - ✅ SwitchMONO__Fv (19)
 - ❌ SoundPad__Fv — 535 diffs (ours 642)
