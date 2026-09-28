@@ -601,8 +601,8 @@ void UnPackPlayer(const PkPlayerStruct *pPack, int pnum, unsigned char killok)
     pPlayer->DeadLevel = pPack->DeadLevel;
     pPlayer->_pExperience = pPack->pExperience;
     pPlayer->_pNextExper = ExpLvlsTbl[pPlayer->_pLevel];
-    pPlayer->_pHPBase = pPack->pHPBase;
     pPlayer->_pMaxHPBase = pPack->pMaxHPBase;
+    pPlayer->_pHPBase = pPack->pHPBase;
     if (!killok && (pPack->pHPBase >> 6) < 1)
         pPlayer->_pHPBase = 1 << 6;
     pPlayer->_pMaxManaBase = pPack->pMaxManaBase;

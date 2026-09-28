@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2674 / 2727 functions PASS (98.1%) — 837 PsyQ SDK functions excluded**
+**Game code: 2675 / 2727 functions PASS (98.1%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -512,7 +512,7 @@
 - ✅ GetPal__7TextDati_8008d23c (7)
 - ✅ GetFr__7TextDati_8008d258 (7)
 
-## dlg_2  (recon/psxsrc/dlg_2.cpp) — 34/35 PASS
+## dlg_2  (recon/psxsrc/dlg_2.cpp) — 35/35 PASS
 - ✅ GetFileNumber__FiPc (48)
 - ✅ DoSaveOptions__Fv (10)
 - ✅ DoSaveGame__Fv (94)
@@ -534,7 +534,7 @@
 - ✅ PackPlayer__FP14PkPlayerStructi (133)
 - ✅ UnPackItem__FPC12PkItemStructP10ItemStruct (77)
 - ✅ VerifyGoldSeeds__FP12PlayerStruct (54)
-- ❌ UnPackPlayer__FPC14PkPlayerStructiUc — 14 diffs (ours 179)
+- ✅ UnPackPlayer__FPC14PkPlayerStructiUc (179)
 - ✅ ConstructSlotName__FPci (62)
 - ✅ GetSpinnerWidth__Fi (41)
 - ✅ ReconstructSlotName__Fii (254)
