@@ -854,6 +854,8 @@ int DRLG_L3PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx
     int i, ii, numt;
     int found, trys;
 
+    sx = 0;
+    sy = 0;
     sw = miniset[0];
     sh = miniset[1];
 
