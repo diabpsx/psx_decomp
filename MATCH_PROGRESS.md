@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2659 / 2727 functions PASS (97.5%) — 837 PsyQ SDK functions excluded**
+**Game code: 2660 / 2727 functions PASS (97.5%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -2172,7 +2172,7 @@
 - ✅ game_2_ui_player__FPC12PlayerStructP11_uiheroinfoUc (45)
 - ✅ SetupLocalPlayer__Fv (4)
 
-## player  (recon/source/player.cpp) — 135/136 PASS
+## player  (recon/source/player.cpp) — 136/136 PASS
 - ✅ IsDplayer__Fii (35)
 - ✅ ismyplr__FP12PlayerStruct (17)
 - ✅ plrind__FP12PlayerStruct (5)
@@ -2204,7 +2204,7 @@
 - ✅ RespawnDeadItem__FP10ItemStructii (101)
 - ✅ PlrDeadItem__FP12PlayerStructP10ItemStructii (116)
 - ✅ StartPlayerDropItems__FP12PlayerStructi (24)
-- ❌ TryDropPlayerItems__FP12PlayerStruct — 2 diffs (ours 79)
+- ✅ TryDropPlayerItems__FP12PlayerStruct (79)
 - ✅ StartPlayerKill__FP12PlayerStructi (127)
 - ✅ DropHalfPlayersGold__FP12PlayerStruct (68)
 - ✅ StartPlrKill__FP12PlayerStructi (87)
