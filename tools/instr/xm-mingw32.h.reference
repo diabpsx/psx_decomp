@@ -1,0 +1,64 @@
+/* Configuration for GNU C-compiler for hosting on Windows32.
+   using GNU tools and the Windows32 API Library.
+   Copyright (C) 1997, 1998 Free Software Foundation, Inc.
+
+This file is part of GNU CC.
+
+GNU CC is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+GNU CC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with GNU CC; see the file COPYING.  If not, write to
+the Free Software Foundation, 59 Temple Place - Suite 330,
+Boston, MA 02111-1307, USA. */
+
+/* w-diab: 2.7.2 configure has no generic i386 xm_file default (unlike 2.8.1,
+   which prepends xm-i386.h automatically) -- pull it in explicitly so
+   HOST_BITS_PER_{CHAR,INT,LONG} etc. are defined. */
+#include "i386/xm-i386.h"
+
+/* w-diab: mingw-w64 UCRT has no BSD string.h compat (index/rindex/bcmp/bcopy/
+   bzero) that 2.7.2's C/C++ sources still call directly (c-common.c, tree.c,
+   cp/lex.c).  A few TUs also carry a K&R `extern char *index ();` forward
+   decl, which a FUNCTION-LIKE macro (index(s,c)) breaks ("requires 2
+   arguments, but only 1 given") -- use `#define NAME NAME2` (object-like)
+   renaming instead, which survives being "called" through a differently-
+   prototyped extern decl exactly like the real libc symbol would.
+   Host-only, no target-codegen effect. */
+#include <string.h>
+#define bcmp   memcmp
+#define bcopy(s,d,n) memmove((d),(s),(n))
+#define bzero(s,n)   memset((s),0,(n))
+#define index  strchr
+#define rindex strrchr
+
+#define NO_STAB_H
+
+#ifndef USG
+#define USG 1
+#endif
+
+#ifndef ONLY_INT_FIELD
+#define ONLY_INT_FIELDS 1
+#endif
+
+#ifndef USE_PROTOTYPES
+#define USE_PROTOTYPES 1
+#endif
+
+#define NO_SYS_SIGLIST 1
+#define environ _environ
+
+/* Even though we support "/", allow "\" since everybody tests both.  */
+#define DIR_SEPARATOR '\\'
+#define EXECUTABLE_SUFFIX ".exe"
+
+#undef PATH_SEPARATOR
+#define PATH_SEPARATOR ';'

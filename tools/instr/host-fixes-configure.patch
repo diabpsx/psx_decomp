@@ -1,0 +1,27 @@
+--- /c/Temp/gcc-2.7.2-src/gcc-2.7.2/configure	1995-11-27 00:39:15.000000000 +0500
++++ /c/temp/dmt-cc1/gccsrc/gcc-2.7.2/configure	2026-09-28 08:49:36.423333500 +0500
+@@ -1134,6 +1134,24 @@
+ 		tmake_file=i386/t-vsta
+ 		xmake_file=i386/x-vsta
+ 		;;
++	i[345]86-*-pe | i[345]86-*-cygwin32)
++		xm_file=i386/xm-cygwin32.h
++		tmake_file=i386/t-cygwin32
++		tm_file=i386/cygwin32.h
++		xmake_file=i386/x-cygwin32
++		extra_objs=winnt.o
++		fixincludes=Makefile.in
++		exeext=.exe
++		;;
++	i[345]86-*-mingw32*)
++		tm_file=i386/mingw32.h
++		xm_file=i386/xm-mingw32.h
++		tmake_file=i386/t-cygwin32
++		extra_objs=winnt.o
++		xmake_file=i386/x-cygwin32
++		fixincludes=Makefile.in
++		exeext=.exe
++		;;
+ 	i[345]86-*-winnt3*)
+ 		cpu_type=i386
+ 		tm_file=i386/win-nt.h
