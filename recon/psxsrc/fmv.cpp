@@ -477,9 +477,9 @@ extern "C" void wait_cdstream(void)
                        * 13A "SYM-LOCAL STAGING LAW"): its declared-but-unused presence supplies the
                        * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
     int wait = 1;   /* NB: SYM shows one spurious REG record for this local that retail's SYM lacks --
-                     * tried register/const/static/for-scope/comma/global-const/unsigned variants, all
-                     * either keep the record or break the bytes (see project notes); kept as the only
-                     * form that reproduces the exact 46/46 bytes. Parked per orchestrator instruction. */
+                     * tried register/const/static/for-scope/comma/global-const/unsigned/copy-from-
+                     * start_wait variants, all either keep the record or break the bytes (see project
+                     * notes); kept as the only form that reproduces the exact 46/46 bytes. Parked. */
 
     (void)&start_wait;
     while (((stream_open != 0) || (stream_ending != 0)) && wait) {
@@ -547,19 +547,19 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
  * `i=tsz` explicitly -- already present below -- with no further change). `p` can't be proven non-null
  * by the compiler (real pointer, not analyzable at compile time), so the check survives as a genuine,
  * always-false-at-runtime guard; not aware of what condition retail's real source tested here, but this
- * reproduces the closest known-good structure. */
+ * reproduces the closest known-good structure (3 diffs). NOT kept in the tree: an always-false guard retail
+ * never had is a codegen hack, not source; the faithful loop below stays at 7 diffs until the real
+ * maybe_never/non-computable-bound cause is found. */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
     int i;
     int tsz;
 
     tsz = 0;
-    for (i = tsz; i < 21; i++) {
+    for (i = 0; i < 21; i++) {
         imgbuf[i] = (unsigned short *)p;
         p += 0x1900;
         tsz += 0x1900;
-        if (p == 0)
-            break;
     }
     return tsz;
 }
