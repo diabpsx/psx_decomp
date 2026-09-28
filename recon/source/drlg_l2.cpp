@@ -1891,4 +1891,11 @@ void CreateL2Dungeon(unsigned int rseed, int entry)
     DRLG_FreeL2SP();
     DRLG_InitL2Vals();
     DRLG_SetPC();
+
+    if (nSxy[idx] == -1) {
+        nSxy[idx] = nSx1;
+        nSxy[idx + 1] = nSy1;
+        nSxy[idx + 2] = nSx2;
+        nSxy[idx + 3] = nSy2;
+    }
 }
