@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2649 / 2727 functions PASS (97.1%) — 837 PsyQ SDK functions excluded**
+**Game code: 2650 / 2727 functions PASS (97.2%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -280,8 +280,8 @@
 - ✅ GetPal__7TextDati (7)
 - ✅ GetFr__7TextDati (7)
 
-## coreauto  (recon/source/coreauto.cpp) — 1/2 PASS
-- ❌ GetAutomapType__FiiUc — 8 diffs (ours 53)
+## coreauto  (recon/source/coreauto.cpp) — 2/2 PASS
+- ✅ GetAutomapType__FiiUc (53)
 - ✅ SetAutomapView__Fii (276)
 
 ## corefmv  (recon/psxsrc/corefmv.cpp) — 2/2 PASS
