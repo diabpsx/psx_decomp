@@ -845,7 +845,7 @@
 - ✅ close_cdstream (16)
 - 🟡 wait_cdstream — bytes PASS, SYM differs
 - ✅ open_cdstream (74)
-- ❌ set_mdec_img_buffer — 7 diffs (ours 13)
+- ❌ set_mdec_img_buffer — 2 diffs (ours 13)
 - ✅ start_mdec_decode (87, ASPSX)
 - ✅ DCT_out_handler (44, ASPSX)
 - ✅ init_mdec (28)
