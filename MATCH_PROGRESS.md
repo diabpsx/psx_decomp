@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2660 / 2727 functions PASS (97.5%) — 837 PsyQ SDK functions excluded**
+**Game code: 2661 / 2727 functions PASS (97.6%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1086,11 +1086,11 @@
 - ✅ GetPal__7TextDati_80098950 (7)
 - ✅ GetFr__7TextDati_8009896c (7)
 
-## gpuq  (recon/psxsrc/gpuq.cpp) — 6/7 PASS
+## gpuq  (recon/psxsrc/gpuq.cpp) — 7/7 PASS
 - ✅ CheckMaxArgs__Fv (13)
 - ✅ GPUQ_InitModule__Fv (3)
 - ✅ GPUQ_FlushQ__Fv (93)
-- ❌ GPUQ_LoadImage__FP4RECTli — 18 diffs (ours 45)
+- ✅ GPUQ_LoadImage__FP4RECTli (45)
 - ✅ GPUQ_DiscardHandle__Fl (40)
 - ✅ GPUQ_LoadClutAddr__FiiiPv (39)
 - ✅ GPUQ_MoveImage__FP4RECTii (40)
