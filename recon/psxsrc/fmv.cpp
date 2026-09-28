@@ -556,10 +556,14 @@ extern "C" int set_mdec_img_buffer(unsigned char *p)
     int tsz;
 
     tsz = 0;
-    for (i = 0; i < 21; i++) {
+    i = tsz;
+    while (1) {
         imgbuf[i] = (unsigned short *)p;
         p += 0x1900;
         tsz += 0x1900;
+        i++;
+        if (i >= 21)
+            break;
     }
     return tsz;
 }
