@@ -1733,7 +1733,7 @@
 - ✅ delta_monster_hp__FilUc (31)
 - ✅ delta_leave_sync__FUc (203)
 - ✅ delta_sync_object__FiUcUc (24)
-- ❌ delta_get_item__FPC9TCmdGItemUc — 105 diffs (ours 115)
+- ❌ delta_get_item__FPC9TCmdGItemUc — 103 diffs (ours 115)
 - ✅ delta_put_item__FPC9TCmdPItemiiUc (99)
 - ✅ delta_portal_inited__Fi (9)
 - ✅ delta_quest_inited__Fi (9)
