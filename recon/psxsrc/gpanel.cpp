@@ -409,16 +409,26 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
 
 void GPanel::DrawDurIcon(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
+    int X, Y;
+
     if ((chrflag != 0 || questlog != 0) && (invflag != 0 || sbookflag != 0)) {
         return;
     }
-    if (gbMaxPlayers != 1 && spspelstate[Plr->_pClassGfx] != 0) {
+    if (gbMaxPlayers != 1 && spspelstate[XY->WhichPlayerDoesThisPanelReallyBelongToThen] != 0) {
         return;
     }
-    DrawDurThingy(XY->HeadDurX, XY->HeadDurY, &Plr->InvBody[0], 3);
-    DrawDurThingy(XY->BodyDurX, XY->BodyDurY, &Plr->InvBody[6], 2);
-    DrawDurThingy(XY->Hand0DurX, XY->Hand0DurY, &Plr->InvBody[4], -1);
-    DrawDurThingy(XY->Hand1DurX, XY->Hand1DurY, &Plr->InvBody[5], -1);
+    X = XY->HeadDurX;
+    Y = XY->HeadDurY;
+    DrawDurThingy(X, Y, &Plr->InvBody[0], 3);
+    X = XY->BodyDurX;
+    Y = XY->BodyDurY;
+    DrawDurThingy(X, Y, &Plr->InvBody[6], 2);
+    X = XY->Hand0DurX;
+    Y = XY->Hand0DurY;
+    DrawDurThingy(X, Y, &Plr->InvBody[4], -1);
+    X = XY->Hand1DurX;
+    Y = XY->Hand1DurY;
+    DrawDurThingy(X, Y, &Plr->InvBody[5], -1);
 }
 
 void GPanel::Print(struct PanelXY *XY, struct PlayerStruct *Plr)
