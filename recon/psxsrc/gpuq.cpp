@@ -84,11 +84,11 @@ void GPUQ_LoadImage(RECT *Rect, long ImgHandle, int Offset)
     Args->Rect.y = Rect->y;
     ArgsSoFar++;
     Args->Rect.w = Rect->w;
+    Args->Rect.h = Rect->h;
     Args->Handle = ImgHandle;
     Args->Flags &= ~2;
     Args->Flags &= ~4;
     Args->Flags &= ~1;
-    Args->Rect.h = Rect->h;
 }
 
 /* @0x80083618 GPUQ.CPP:220 */
