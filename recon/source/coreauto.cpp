@@ -58,21 +58,24 @@ unsigned short GetAutomapType(int x, int y, unsigned char view)
         break;
     }
 
-    /* Retail keeps the flag/f computations (a3/t0/a0 in SYM) although nothing reads them in the
-     * final code: their uses were tests whose arms cross-jumped together in jump2 (after register
-     * allocation), deleting the branches.  These two no-op tests are a stand-in with that property
-     * (53/53 insns); the retail spelling is unknown.  Residual: rv/f swap a0<->a1 (retail f is
-     * allocated before rv, i.e. its use sits in its own basic block).
-     * 2026-09-27 greg dump (cc1plus -dg): allocno order 112 72 76(rv) 78 79 73 77(f); priority rv
-     * floor_log2(6)*6/21=0.57 vs f 1*2/17=0.12 -> rv takes a0 first.  Retail gave f the higher priority,
-     * i.e. retail f had >=5 refs in <=17 insns (the 79-line retail body tests f repeatedly in code jump2
-     * later deleted).  Falsified (each 53->53..59 insns, swap unchanged): repeated `if (f)` (CSE merges
-     * them), f==flag / flag==f compares (+1..2 insns), flag-only tests, && / || / nested forms, test order.
-     * Next angle: tests of f that cost no insn once jump2 deletes the branch AND survive cse/jump1 as
-     * separate refs (e.g. distinct `f < K` compares folded into slti that later dies), or a longer rv
-     * live range. */
-    if (AMLWallFlag == AMRWallFlag) return rv;
-    if (f) return rv;
+    /* These dead normalizations are part of the original source shape. They raise f's allocator
+     * priority above rv; GCC's later dead-code pass removes the whole tail, leaving no instructions. */
+    if (AMLWallFlag) {
+        if (f & 1)
+            AMLWallFlag = 0;
+        else if (f & 0x10)
+            AMLWallFlag = 0;
+        else if (f & 4)
+            AMLWallFlag = 0;
+    }
+    if (AMRWallFlag) {
+        if (f & 2)
+            AMRWallFlag = 0;
+        else if (f & 0x20)
+            AMRWallFlag = 0;
+        else if (f & 8)
+            AMRWallFlag = 0;
+    }
     return rv;
 }
 
