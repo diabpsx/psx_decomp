@@ -1148,7 +1148,7 @@ void SoundPad(void)
         }
         if (link == -2) {
             if (cmenu == 3) {
-                NewLang = cs - 1;
+                NewLang = (LANG_TYPE)(cs - 1);
                 return;
             }
             /* else: fall through to the post-dispatch tail below */
@@ -1810,11 +1810,11 @@ void DrawMenu(int MenuNo)
                 }
                 if (MenuNo != 4) {
                     if (AlertTxt == 0) {
-                        DrawSpinner(x, Frm2, -0x60, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
-                        DrawSpinner(x + iVal, Frm2, -0x60, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
+                        DrawSpinner(x, Frm2, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
+                        DrawSpinner(x + iVal, Frm2, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
                     } else if (FeFlag != 0) {
-                        DrawSpinner(x, Frm2, -0x60, -0x60, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
-                        DrawSpinner(x + iVal, Frm2, -0x60, -0x60, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
+                        DrawSpinner(x, Frm2, 0xA0, 0xA0, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
+                        DrawSpinner(x + iVal, Frm2, 0xA0, 0xA0, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
                     }
                 }
             }
