@@ -2,7 +2,10 @@
 import sys, subprocess, os
 sys.path.insert(0, "tools"); import build as b
 from pathlib import Path
-src = Path(sys.argv[1]); t = Path("build/tmp/impl"); t.mkdir(parents=True, exist_ok=True)
+src = Path(sys.argv[1])
+if not src.is_file():   # a bare TU name ("inv") used to fall through to a vacuous "no implicit declarations"
+    sys.exit(f"implicit.py: no such TU file {src} (pass the path, e.g. recon/source/inv.cpp)")
+t = Path("build/tmp/impl"); t.mkdir(parents=True, exist_ok=True)
 i = t / (src.stem + ".i")
 b.run([b.CPP, "-x", "c", "-D__cplusplus=1", *b.CPP_FLAGS, src, "-o", i])
 env = dict(os.environ, TMP=str(t.resolve()), TEMP=str(t.resolve()), TMPDIR=str(t.resolve()))

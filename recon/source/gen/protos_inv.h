@@ -73,3 +73,9 @@ struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int Stac
 void DrawInvTSK(struct TASK *T);   /* @0x801590FC INV.CPP:1049 */
 void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */
 int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */
+void DrawInvBack(void);   /* @INV.CPP -- defined later in this TU; prototype avoids an implicit decl (lane fact 60) */
+void DrawInvStats(void);
+void DrawInvMsg(void);
+void DrawInvHelpTxt(void);
+void PrintStat(int Y, int Txt0, char *Txt1, unsigned char Col);
+void ControlInv(void);
