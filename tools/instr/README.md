@@ -420,6 +420,50 @@ agreement with the unmodified full-TU build.
 | `tools/instr/xm-mingw32.h.reference` | the finished host xm file (diff against 2.8.1's for the two additions) |
 | `tools/instr/printitempower_trace_example.txt` | full `GCC_TRACE_ALLOC=1` trace for §6 |
 
+## 8. Remaining allocator diagnostics (2026-09-30)
+
+### GetUniqueItem__Fii
+
+The `--drop-only GetItemStr,SpawnQuestItem` input compiles successfully with the
+instrumented compiler. Its current trace agrees with the full PsyQ `-dg` dump:
+
+```
+allocno 0 / pseudo 72: i    refs 13 / live 120 / calls 7 -> priority 3250 -> s1
+allocno 2 / pseudo 74: uid  refs 11 / live 119 / calls 7 -> priority 2773 -> s2
+```
+
+Retail requires i in s2 and uid in s1. With other inputs unchanged, uid would
+need 13 live references at its current live length (priority 3277), or its live
+length would need to fall to 101 or less. These are diagnostic bounds, not a
+reason to add redundant operations. The six SaveItemPower calls and all tail
+operations must retain their retail order and instructions.
+
+Measured and reverted: making parameter i const leaves 88 diffs / 216
+instructions unchanged. Reusing OUid for the new seed's packed uid/count reduces
+the function to 214 instructions, removes a required saved-value lifetime, and
+regresses to 160 diffs. Do not treat fewer saved registers as an improvement.
+
+### delta_get_item__FPC9TCmdGItemUc
+
+Baseline: 103 diffs, 116 generated instructions versus 115 retail. There are
+two distinguishable issues: command value 2 is hoisted into t2, whereas retail
+materializes it in v0 inside the matching-record path; Dl is kept in t8 rather
+than a0, displacing the record pointer and command-load registers.
+
+Replacing the three early goto exits with ReleaseDLevel(Dl) followed by return
+1 moves command 2 into the correct inner branch and preserves all four call
+targets, but leaves 117 instructions / 102 diffs: the remaining Dl allocation
+introduces two extra argument moves. Flattening the pointer/counter scopes on
+top of that form gives 110 diffs / 117 instructions. A command switch regresses
+to 116 diffs / 121 instructions; a block-local const command introduces loop
+control differences (107 diffs / 118 instructions). These forms were reverted.
+
+The isolated instrumented input emits this target's allocator trace before
+ICEing in a later static initializer. Its dispositions agree with the full
+PsyQ dump (Dl pseudo 75 -> t8; command pseudo 85 -> a0). A nonzero final compiler
+exit must still be reported: a completed target trace is useful diagnostic data,
+but does not establish successful compilation of the isolated TU.
+
 Nothing under `C:/temp/dmt-cc1/` is committed (outside the repo entirely,
 per the task's rules); everything under `tools/instr/` is small text and
 safe to commit if the user wants the diagnostic lane kept.
