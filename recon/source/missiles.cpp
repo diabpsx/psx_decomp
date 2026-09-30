@@ -3479,7 +3479,7 @@ void CheckMissileCol(int i, int mindam, int maxdam, unsigned char shift, int mx,
     int oi;
     MissileStruct *miss = &missile[i];
     struct map_info *dm = &dung_map[mx][my];
-    unsigned char earflag;
+    int earflag;
 
     if (mx >= 112 || my >= 112) {
         missile[i]._miDelFlag = 1;
