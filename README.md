@@ -60,6 +60,15 @@ these as data receipts, keeping the requested 2727-entry scope unchanged.
 
 Verify the source-emitted DLG data with `python tools/data_gate.py`.
 
+For an individual relocation-free data symbol, use (for example):
+```
+python tools/symbol_data_gate.py recon/psxsrc/gpanel.cpp DurColors 0x800B9BCC 18
+```
+This verifies source bytes and extent, not final placement or a function seal.
+When era assembly omits ELF symbol sizes, the tool requires the same source's
+real SDB array-size record; section padding is not treated as array data.
+Relocated pointer tables are rejected and need a relocation-aware gate.
+
 ## Final-image integration is still pending
 
 The function board is not a final reconstructed-image or SDK-linkage receipt.

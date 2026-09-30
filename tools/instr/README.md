@@ -494,14 +494,15 @@ but does not establish successful compilation of the isolated TU.
 
 ### DrawDurThingy__6GPaneliiP10ItemStructi
 
-The full gpanel.cpp compiles successfully with both compilers, but comparison
+Before the DurColors matrix reconstruction, the full gpanel.cpp compiled
+successfully with both compilers, but comparison
 shows a larger transformed-RTL discrepancy than a register permutation. PsyQ
 uses an 88-byte frame; stock gcc uses 104 bytes and spills the item pointer.
 The real global allocator has 19 allocnos, versus 23 in the instrumented stock
 trace. Inspect the real `loop`/`greg` dumps here rather than treating the stock
 trace's final registers as the gate compiler's choices.
 
-The real loop dump combines the red-channel address induction variable with
+That real loop dump combined the red-channel address induction variable with
 its memory use and retains both the complete red-table pointer and the scalar
 Loop*3 offset. Retail instead retains the scalar offset plus a Y-1 row anchor.
 That is the source of the saved-register displacement, not a hoisted flip
@@ -513,7 +514,27 @@ to 80 bytes but changes the instruction stream (168 / 101 diffs); a const int
 first-colour index gives 181 / 96 diffs, and a const short index gives 183 / 98.
 Changing only the switch selector to const unsigned short gives count-exact
 179 instructions but 100 diffs and the wrong SYM parameter locations. The
-committed source remains at 180 instructions / 97 diffs.
+then-committed source remained at 180 instructions / 97 diffs.
+
+The retail SDB global-data record identifies `DurColors` at 0x800B9BCC as a
+file-static `unsigned char[6][3]` (18 bytes), not three independent channel
+arrays. Restoring that actual declaration and its six RGB rows changes all
+three loop loads into destination-address induction variables. The real
+`loop` dump now combines them with the scalar Loop*3 offset; it no longer
+keeps a complete red-channel pointer. All three direct call sites still
+match. The table itself passes `tools/symbol_data_gate.py` against retail,
+including its source SDB extent; five negative tests rejected a wrong VA,
+wrong extent including padding, missing symbol, zero size, and pointer
+relocations. This data-byte receipt does not count as a new function PASS.
+
+Current source: 178/179 instructions, 57 diff lines, an 80-byte frame versus
+retail's 88. The unrecorded Y-1 row anchor and initial rectangle scheduling
+still differ. Adding an explicit const YBase restores the anchor's register
+but introduces an extra REG record/scope and stays nonmatching (180/179,
+57 diff lines). Reading row fields back for y2/y3 adds loads (181/179,
+86 lines); a setXYWH macro changes allocation (177/179, 160 lines);
+chaining y1=y0 gives 179/179 but 62 lines. Those coordinate experiments were
+restored; only the SYM-confirmed matrix declaration/initializer was retained.
 
 ### BL_AsyncReadFile__FPcUl
 

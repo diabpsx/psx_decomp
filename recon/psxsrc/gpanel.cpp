@@ -135,7 +135,10 @@ extern int _pcurr_inv[4];
 extern int sel_data;
 extern unsigned char _SpdBeltSelFlag[4];
 extern int *ThisOt;
-extern unsigned char D_800B9BCC[], D_800B9BCD[], D_800B9BCE[];
+static unsigned char DurColors[6][3] = {
+    {255, 0, 0}, {240, 64, 0}, {255, 255, 0},
+    {255, 255, 255}, {0, 0, 0}, {0, 0, 0}
+};
 extern signed char SpellITbl[];
 struct D_80110868_T { signed char b[16]; };   /* 16-byte table, block-copied (lwl/lwr) to a stack local in DrawSpell */
 extern struct D_80110868_T D_80110868;
@@ -356,9 +359,9 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
         break;
     }
     Ft4 = PanelTData->PrintFt4(ItemType + 0x29, X, Y, 0, GPanelOt + 1, 0);
-    NewR = D_800B9BCC[(Item->_iDurability - 1) * 3];
-    NewG = D_800B9BCD[(Item->_iDurability - 1) * 3];
-    NewB = D_800B9BCE[(Item->_iDurability - 1) * 3];
+    NewR = DurColors[Item->_iDurability - 1][0];
+    NewG = DurColors[Item->_iDurability - 1][1];
+    NewB = DurColors[Item->_iDurability - 1][2];
     Ft4->code = (Ft4->code | 2) & 0xFE;
     Ft4->r0 = NewR;
     Ft4->g0 = NewG;
@@ -382,9 +385,9 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
         int Loop = 0;
         do {
             Ft4 = PanelTData->PrintFt4(0x94, X, Y, 1, GPanelOt + 1, 0);
-            NewR = D_800B9BCC[Loop * 3];
-            NewG = D_800B9BCD[Loop * 3];
-            NewB = D_800B9BCE[Loop * 3];
+            NewR = DurColors[Loop][0];
+            NewG = DurColors[Loop][1];
+            NewB = DurColors[Loop][2];
             Ft4->y0 = (short)(Y - 1 + (3 - Loop) * 5);
             Ft4->y1 = (short)(Y - 1 + (3 - Loop) * 5);
             Ft4->x0 = (short)(X + 0x15);

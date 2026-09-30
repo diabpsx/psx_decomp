@@ -1085,7 +1085,7 @@
 - ❌ DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct — 380 diffs (ours 459)
 - ✅ DrawSpell__6GPanelP7PanelXYP12PlayerStruct (103)
 - ✅ DrawMsgWindow__6GPanelP7PanelXYP12PlayerStruct (20)
-- ❌ DrawDurThingy__6GPaneliiP10ItemStructi — 97 diffs (ours 179)
+- ❌ DrawDurThingy__6GPaneliiP10ItemStructi — 57 diffs (ours 179)
 - ✅ DrawDurIcon__6GPanelP7PanelXYP12PlayerStruct (75)
 - ✅ Print__6GPanelP7PanelXYP12PlayerStruct (70)
 - ✅ GetMaxOtPos__7CBlocks_80098948 (2)
