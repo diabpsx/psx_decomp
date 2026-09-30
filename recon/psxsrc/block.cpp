@@ -789,13 +789,14 @@ void CBlocks::MakeGt4Table()
     }
 }
 
-/* @0x8008DF54 BLOCK.CPP:729 */
+/* @0x8008DF54 BLOCK.CPP:729 — the nine-bit width is a const unsigned-short temporary:
+ * it folds out of SYM and preserves retail's W-mask before H-mask instruction order. */
 void CBlocks::MakeGt4(POLY_GT4 *GT4, FRAME_HDR *Fr)
 {
     const unsigned long WH = ((unsigned long *)Fr)[2];
     int H = WH >> 9;
     setPolyGT4(GT4);
-    const int W = WH & 0x1FF;
+    const unsigned short W = WH & 0x1FF;
     H &= 0x1FF;
     setXYWH(GT4, 0, 0, W, H);
     GT4->clut = ((unsigned short *)GetPal(Fr->PalNum))[1];
