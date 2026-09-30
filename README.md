@@ -43,7 +43,9 @@ types. SDK and Climax C-library declarations must use C linkage. Jump tables and
 function-pointer sources still need their separate checks. The older scratch call audit
 strips signatures and must not be used as the final call-target receipt.
 The first full strict scan (2026-09-30) checked 129 reconstructed TUs and found
-29 needing target fixes or audit routing work. Fifteen have since been repaired
-and re-audited; the remaining fourteen are tracked in
+29 needing target fixes or audit routing work. Twenty-six have since been
+repaired or routed and re-audited; the remaining three are tracked in
 `configs/callaudit_pending.txt`. These are additional seal requirements beyond
 the byte/SYM progress count.
+The call audit follows `configs/segment_homes.txt` for functions reconstructed
+outside their original segment's TU, matching the byte/SYM gate's ownership routing.

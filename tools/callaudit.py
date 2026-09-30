@@ -104,16 +104,21 @@ def main():
     if not source.is_file():
         parser.error(f"source does not exist: {source}")
     source.relative_to(B.ROOT)
-    obj = B.compile_any(source)
     objdump = os.environ.get("DIAB_OBJDUMP", str(B.MIPS / "mipsel-none-elf-objdump.exe"))
-    defined, actual_calls = calls(obj, objdump)
     segment = source.stem.lower()
     owned = set(S.seg_functions(segment))
     wanted = args.functions.split(",") if args.functions else sorted(owned)
     if not wanted:
         sys.exit(f"no oracle functions for {segment}")
     addrs, failures = addresses(), 0
+    homes = S.segment_homes().get(segment, {})
+    compiled = {}
     for name in wanted:
+        provider = homes.get(name, source).resolve()
+        if provider not in compiled:
+            compiled[provider] = calls(B.compile_any(provider), objdump)
+        defined, actual_calls = compiled[provider]
+        provider_owned = owned | set(S.seg_functions(provider.stem.lower()))
         oracle = B.ROOT / "asm/nonmatchings" / segment / (name + ".s")
         key = spelling(name) if spelling(name) in defined else copy_base(name)
         if not oracle.is_file() or key not in defined:
@@ -128,7 +133,7 @@ def main():
                         expected[index] if index < len(expected) else "<missing>")
                        for index in range(max(len(actual), len(expected)))
                        if index >= len(actual) or index >= len(expected)
-                       or not equivalent(actual[index], expected[index], defined, owned, addrs)]
+                       or not equivalent(actual[index], expected[index], defined, provider_owned, addrs)]
         if differences:
             failures += 1
             print(f"{name}: FAIL ({len(actual)}/{len(expected)} calls)")

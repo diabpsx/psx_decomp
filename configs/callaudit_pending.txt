@@ -1,18 +1,7 @@
 # Strict direct-call audit, 2026-09-30: 129 reconstructed TUs scanned.
-# Initial scan found 29 TUs; 15 repaired and re-audited, 14 remain below.
+# Initial scan found 29 TUs; 26 repaired/routed and re-audited, 3 remain below.
 # This is separate from the 49 byte/SYM non-PASS functions on MATCH_PROGRESS.md.
 # Rerun tools/callaudit.py on each TU after changes; do not normalize signatures.
-error         # CFont::Print colour types
-fmv           # game functions incorrectly declared with C linkage
-gameover      # game C++ linkage and CFont::Print declaration
-glue          # game functions incorrectly declared with C linkage
-interfac      # app_fatal C linkage
-loadsave      # FileIO constness; GLUE game linkage
 objects       # raw mangled shims; missile types; reference parameters; DBG linkage
 options       # tasker/GU/DBG linkage; CFont::Print; remaining nonmatching call order
-preauto       # FileIO constness; DBG linkage
-psxhelp       # DrawSpinner byte parameter types
-setmaps       # LoadPalette constness
-startup       # six functions live in other TUs via segment_homes.txt; audit routing
 stores        # tasker/sprintf linkage; CFont/DrawSpinner types; raw mangled shims
-towners       # LoadFileInMem constness
