@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2675 / 2727 functions PASS (98.1%) — 837 PsyQ SDK functions excluded**
+**Game code: 2676 / 2727 functions PASS (98.1%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1493,7 +1493,7 @@
 - ✅ GetNumOfFrames__7TextDat (5)
 - ✅ GetFr__7TextDati_8007d5dc (7)
 
-## missiles  (recon/source/missiles.cpp) — 113/115 PASS
+## missiles  (recon/source/missiles.cpp) — 114/115 PASS
 - ✅ GetDamageAmt__FiPiT1 (382)
 - ✅ CheckBlock__Fiiii (45)
 - ✅ FindClosest__Fiii (99)
@@ -1509,7 +1509,7 @@
 - ✅ MonsterMHit__FiiiiiiUc (496)
 - ✅ PlayerMHit__FiiiiiiUcUc (663)
 - ✅ Plr2PlrMHit__FiiiiiiUc (487)
-- 🟡 CheckMissileCol__FiiiUciiUcb — bytes PASS, SYM differs
+- ✅ CheckMissileCol__FiiiUciiUcb (332)
 - ✅ GetTableValue__FUci (37)
 - ✅ SetMissAnim__Fii (54)
 - ✅ SetMissDir__Fii (19)

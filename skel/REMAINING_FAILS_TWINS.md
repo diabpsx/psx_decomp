@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (52)
+# PC twins for the remaining non-PASS functions (51)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -43,7 +43,6 @@
 | ResyncQuests__Fv | quests | 6 diffs (ours 315) | quests.cpp:739 | QUESTS.CPP:779 | quests.cpp:397 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LOADSAVE.CPP; JAP_1998_05_29/DIABPSX/SOURCE/QUES |
 | PrintCDWaitTask__FP4TASK | stream | 17 diffs (ours 79) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.H; PAL_1997_12_12/DIABPSX/PSXSRC/STREAM.C |
 
-| CheckMissileCol__FiiiUciiUcb | missiles | bytes PASS, SYM differs | missiles.cpp:1131 | MISSILES.CPP:1076 | missiles.cpp:486 | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP |
 | GLUE_StartGameExit__Fv | glue | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.CPP |
 | M_ChangeLightOffset__Fi | monster | bytes PASS, SYM differs | monster.cpp:2323 | MONSTER.CPP:2702 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
 | MAI_Counselor__Fi | monster | bytes PASS, SYM differs | monster.cpp:5075 | MONSTER.CPP:5885 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
@@ -59,5 +58,5 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 ## Verified SYM-only clusters
 
 - Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
-- Optimized temporary records: `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, `CheckMissileCol__FiiiUciiUcb`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now has exact SYM and instruction count; only the width/height mask scheduling order remains.
-Generated from MATCH_PROGRESS.md at master d78c327.
+- Optimized temporary records: `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `CheckMissileCol__FiiiUciiUcb` now passes: function-scope `int earflag` preserves the bytes and loses the extra record emitted for `unsigned char earflag`. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now has exact SYM and instruction count; only the width/height mask scheduling order remains.
+Updated after e45ec18; MATCH_PROGRESS.md is the authoritative gate board.
