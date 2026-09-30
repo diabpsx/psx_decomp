@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2677 / 2727 functions PASS (98.2%) — 837 PsyQ SDK functions excluded**
+**Game code: 2678 / 2727 functions PASS (98.2%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -85,7 +85,7 @@
 - ✅ PRIM_GetPrim__FPP8POLY_FT4_800acea0 (31)
 - ✅ GetOtPos__7CBlocksi_800acf1c (15)
 
-## block  (recon/psxsrc/block.cpp) — 62/68 PASS
+## block  (recon/psxsrc/block.cpp) — 63/68 PASS
 - ✅ UpdateSel__FPUsUsPUc (16)
 - ✅ CycleSelCols__Fv (110)
 - ✅ FindTownCreature__7CBlocksi (29)
@@ -101,7 +101,7 @@
 - ✅ Load__7CBlocksi (46)
 - ✅ MakeRectTable__7CBlocks (85)
 - ✅ MakeGt4Table__7CBlocks (121)
-- ❌ MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR — 2 diffs (ours 74)
+- ✅ MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR (74)
 - ✅ MyRoutine__FR7CBlocksii (26)
 - ✅ SetRandOffset__7CBlocksi (23)
 - ✅ Print__7CBlocks (71)
