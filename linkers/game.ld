@@ -8,7 +8,7 @@ SECTIONS
         . = 0x0;   /* 0x80139BF8 */
         build/asm/data/game_hdr.data.s.o(.data);
         . = 0x4;   /* 0x80139BFC */
-        build/skel/PSXSRC/GAMEONLY.CPP.o(.text);
+        build/recon/psxsrc/gameonly.cpp.o(.text);   /* reconstructed TU */
         . = 0xC;   /* 0x80139C04 */
         build/skel/SOURCE/MISSILES.CPP.o(.text);
         . = 0x10F7C;   /* 0x8014AB74 */

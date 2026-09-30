@@ -8,8 +8,10 @@ shifting everything after it.
 
 Object naming follows splat: c -> build/src/<name>.c.o, asm -> build/asm/<name>.s.o,
 data/rodata/sdata/bss -> build/asm/data/<name>.<kind>.s.o.  A c subsegment contributes .text,
-and — when a reconstructed TU provides them — .rodata/.data/.sdata are taken from the same object
-in place of the splat data object (that swap is done here per subsegment name)."""
+Data sections currently come from their splat objects: reconstructed TUs with
+owned data/tables need an explicit placement implementation before integration.
+Named cross-image functions are supplied only from explicit bindings validated
+against the other image's retail symbol map; PROVIDE never overrides definitions."""
 import re, sys
 from pathlib import Path
 
@@ -21,7 +23,35 @@ _rl = ROOT / "configs" / "recon_link.json"
 RECON_MAP = json.loads(_rl.read_text()) if _rl.exists() else {}   # seg -> recon TU whose .text replaces the skeleton (bytes-proven TUs)
 SECT = {"data": ".data", "rodata": ".rodata", "sdata": ".sdata", "bss": ".bss", "sbss": ".sbss"}
 
+def cross_image_provisions(name):
+    registry = ROOT / "configs" / "cross_image_symbols.json"
+    if not registry.exists():
+        return []
+    bindings = json.loads(registry.read_text()).get(name, {})
+    if not isinstance(bindings, dict):
+        raise ValueError("cross-image bindings must be an image-to-function-list mapping")
+    out, seen = [], set()
+    for home, names in bindings.items():
+        if home == name or home not in ("diabpsx", "frontend", "pregame", "game", "fmv"):
+            raise ValueError(f"invalid cross-image home: {home}")
+        if not isinstance(names, list):
+            raise ValueError(f"{home}: cross-image symbols must be a list")
+        symbol_file = "symbol_addrs.txt" if home == "diabpsx" else f"symbol_addrs_{home}.txt"
+        symbols = (ROOT / "configs" / symbol_file).read_text()
+        for symbol in names:
+            if not isinstance(symbol, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.$]*", symbol) or symbol in seen:
+                raise ValueError(f"invalid/duplicate cross-image symbol: {symbol}")
+            addresses = {int(value, 16) for value in re.findall(
+                r"^" + re.escape(symbol) + r"\s*=\s*0x([0-9A-Fa-f]+);\s*//\s*type:func\b",
+                symbols, re.M)}
+            if len(addresses) != 1:
+                raise ValueError(f"{symbol}: expected one retail function address in {symbol_file}")
+            seen.add(symbol)
+            out.append(f"PROVIDE({symbol} = 0x{addresses.pop():08X}); /* {home} retail export */")
+    return out
+
 def gen(name: str):
+    provisions = cross_image_provisions(name)  # validate before writing the generated script
     y = (ROOT / "configs" / f"{name}.yaml").read_text()
     vram = int(re.search(r"^\s+vram: (0x[0-9A-F]+)", y, re.M).group(1), 16)
     gp = re.search(r"gp_value: (0x[0-9A-F]+)", y).group(1)
@@ -50,7 +80,7 @@ def gen(name: str):
     if bss:
         out.append(f"        {name}_BSS_START = .;")
         out.append(f"        . += {bss.group(1)};   /* .sbss + .bss zero fill (not in the file) */")
-    out += ["    }", "    /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }", "}"]
+    out += ["    }", "    /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }", "}", *provisions]
     (ROOT / "linkers" / f"{name}.ld").write_text("\n".join(out) + "\n")
     print(f"{name}: {len(subs)} subsegments -> linkers/{name}.ld")
 

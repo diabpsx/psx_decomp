@@ -264,23 +264,23 @@ SECTIONS
         . = 0x22014;   /* 0x8015BC0C */
         build/skel/SOURCE/THEMES.CPP.o(.text);
         . = 0x24B84;   /* 0x8015E77C */
-        build/skel/SOURCE/PREPORT.CPP.o(.text);
+        build/recon/source/preport.cpp.o(.text);   /* reconstructed TU */
         . = 0x24BE4;   /* 0x8015E7DC */
         build/skel/SOURCE/PREQUEST.CPP.o(.text);
         . = 0x25878;   /* 0x8015F470 */
-        build/skel/SOURCE/PREINV.CPP.o(.text);
+        build/recon/source/preinv.cpp.o(.text);   /* reconstructed TU */
         . = 0x258CC;   /* 0x8015F4C4 */
         build/skel/SOURCE/PREAUTO.CPP.o(.text);
         . = 0x25AF0;   /* 0x8015F6E8 */
         build/skel/SOURCE/PREMON.CPP.o(.text);
         . = 0x283E4;   /* 0x80161FDC */
-        build/skel/SOURCE/PREMISS.CPP.o(.text);
+        build/recon/source/premiss.cpp.o(.text);   /* reconstructed TU */
         . = 0x285B4;   /* 0x801621AC */
-        build/skel/SOURCE/PRETRIGS.CPP.o(.text);
+        build/recon/source/pretrigs.cpp.o(.text);   /* reconstructed TU */
         . = 0x290E4;   /* 0x80162CDC */
-        build/skel/SOURCE/PRESTORE.CPP.o(.text);
+        build/recon/source/prestore.cpp.o(.text);   /* reconstructed TU */
         . = 0x293DC;   /* 0x80162FD4 */
-        build/skel/SOURCE/PREMSG.CPP.o(.text);
+        build/recon/source/premsg.cpp.o(.text);   /* reconstructed TU */
         . = 0x29DCC;   /* image end 0x801639C4 */
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }

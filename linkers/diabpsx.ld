@@ -30,7 +30,7 @@ SECTIONS
         . = 0x2DE38;   /* 0x8003DE38 */
         build/skel/SOURCE/INTERFAC.CPP.o(.text);
         . = 0x2E214;   /* 0x8003E214 */
-        build/skel/SOURCE/ITEMDAT.CPP.o(.text);
+        build/recon/source/itemdat.cpp.o(.text);   /* reconstructed TU */
         . = 0x2E24C;   /* 0x8003E24C */
         build/skel/SOURCE/ITEMS.CPP.o(.text);
         . = 0x3BC68;   /* 0x8004BC68 */
@@ -38,7 +38,7 @@ SECTIONS
         . = 0x3D95C;   /* 0x8004D95C */
         build/skel/SOURCE/MINITEXT.CPP.o(.text);
         . = 0x3EA8C;   /* 0x8004EA8C */
-        build/skel/SOURCE/MISDAT.CPP.o(.text);
+        build/recon/source/misdat.cpp.o(.text);   /* reconstructed TU */
         . = 0x3EA9C;   /* 0x8004EA9C */
         build/skel/SOURCE/MSG.CPP.o(.text);
         . = 0x42BA4;   /* 0x80052BA4 */
@@ -52,7 +52,7 @@ SECTIONS
         . = 0x574B4;   /* 0x800674B4 */
         build/skel/SOURCE/QUESTS.CPP.o(.text);
         . = 0x5931C;   /* 0x8006931C */
-        build/skel/SOURCE/SCROLLRT.CPP.o(.text);
+        build/recon/source/scrollrt.cpp.o(.text);   /* reconstructed TU */
         . = 0x595A4;   /* 0x800695A4 */
         build/skel/SOURCE/STORES.CPP.o(.text);
         . = 0x64478;   /* 0x80074478 */
@@ -66,9 +66,9 @@ SECTIONS
         . = 0x67F90;   /* 0x80077F90 */
         build/skel/SOURCE/GAMEPAD.CPP.o(.text);
         . = 0x6B170;   /* 0x8007B170 */
-        build/skel/SOURCE/TESTCODE.CPP.o(.text);
+        build/recon/source/testcode.cpp.o(.text);   /* reconstructed TU */
         . = 0x6B1D0;   /* 0x8007B1D0 */
-        build/skel/SOURCE/STORM.CPP.o(.text);
+        build/recon/source/storm.cpp.o(.text);   /* reconstructed TU */
         . = 0x6B210;   /* 0x8007B210 */
         build/skel/SOURCE/GWIN.CPP.o(.text);
         . = 0x6B348;   /* 0x8007B348 */
@@ -96,7 +96,7 @@ SECTIONS
         . = 0x7271C;   /* 0x8008271C */
         build/recon/source/coreinv.cpp.o(.text);   /* reconstructed TU */
         . = 0x727D0;   /* 0x800827D0 */
-        build/skel/SOURCE/GAMEMENU.CPP.o(.text);
+        build/recon/source/gamemenu.cpp.o(.text);   /* reconstructed TU */
         . = 0x727D8;   /* 0x800827D8 */
         build/skel/SOURCE/DPIECE.CPP.o(.text);
         . = 0x73100;   /* 0x80083100 */
@@ -108,7 +108,7 @@ SECTIONS
         . = 0x74030;   /* 0x80084030 */
         build/skel/PSXSRC/VID.CPP.o(.text);
         . = 0x74424;   /* 0x80084424 */
-        build/skel/PSXSRC/MEM.CPP.o(.text);
+        build/recon/psxsrc/mem.cpp.o(.text);   /* reconstructed TU */
         . = 0x7444C;   /* 0x8008444C */
         build/skel/PSXSRC/SYSINIT.CPP.o(.text);
         . = 0x745BC;   /* 0x800845BC */
@@ -116,7 +116,7 @@ SECTIONS
         . = 0x7463C;   /* 0x8008463C */
         build/skel/PSXSRC/DAVEO.CPP.o(.text);
         . = 0x7584C;   /* 0x8008584C */
-        build/skel/PSXSRC/TIMS.CPP.o(.text);
+        build/recon/psxsrc/tims.cpp.o(.text);   /* reconstructed TU */
         . = 0x7587C;   /* 0x8008587C */
         build/skel/PSXSRC/FILEIO.CPP.o(.text);
         . = 0x760B4;   /* 0x800860B4 */
@@ -130,7 +130,7 @@ SECTIONS
         . = 0x7725C;   /* 0x8008725C */
         build/skel/PSXSRC/BIGLUMP.CPP.o(.text);
         . = 0x781D4;   /* 0x800881D4 */
-        build/skel/PSXSRC/LZNP.CPP.o(.text);
+        build/recon/psxsrc/lznp.cpp.o(.text);   /* reconstructed TU */
         . = 0x782A8;   /* 0x800882A8 */
         build/skel/PSXSRC/TMALLOC.CPP.o(.text);
         . = 0x784C8;   /* 0x800884C8 */
@@ -150,7 +150,7 @@ SECTIONS
         . = 0x853F8;   /* 0x800953F8 */
         build/skel/PSXSRC/OVERLAY.CPP.o(.text);
         . = 0x85844;   /* 0x80095844 */
-        build/skel/PSXSRC/LAMBO.CPP.o(.text);
+        build/recon/psxsrc/lambo.cpp.o(.text);   /* reconstructed TU */
         . = 0x85854;   /* 0x80095854 */
         build/skel/PSXSRC/CPLAYER.CPP.o(.text);
         . = 0x86838;   /* 0x80096838 */
@@ -196,11 +196,11 @@ SECTIONS
         . = 0x9D1F0;   /* 0x800AD1F0 */
         build/skel/PSXSRC/KANJI.CPP.o(.text);
         . = 0x9DF9C;   /* 0x800ADF9C */
-        build/skel/PSXSRC/PAK.CPP.o(.text);
+        build/recon/psxsrc/pak.cpp.o(.text);   /* reconstructed TU */
         . = 0x9E38C;   /* 0x800AE38C */
         build/skel/PSXSRC/PSXHELP.CPP.o(.text);
         . = 0x9F0E8;   /* 0x800AF0E8 */
-        build/skel/PSXSRC/MONSVIEW.CPP.o(.text);
+        build/recon/psxsrc/monsview.cpp.o(.text);   /* reconstructed TU */
         . = 0x9F0F0;   /* 0x800AF0F0 */
         build/skel/PSXSRC/SPLTARGT.CPP.o(.text);
         . = 0xA031C;   /* 0x800B031C */
@@ -601,3 +601,5 @@ SECTIONS
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }
 }
+PROVIDE(DrawAutomap__Fv = 0x80162E50); /* game retail export */
+PROVIDE(DrawInv__Fv = 0x801590B4); /* game retail export */

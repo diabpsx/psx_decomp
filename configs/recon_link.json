@@ -1,5 +1,24 @@
 {
   "coremon": "recon/source/coremon.cpp",
   "async": "recon/psxsrc/async.cpp",
-  "coreinv": "recon/source/coreinv.cpp"
+  "coreinv": "recon/source/coreinv.cpp",
+  "gamemenu": "recon/source/gamemenu.cpp",
+  "gameonly": "recon/psxsrc/gameonly.cpp",
+  "itemdat": "recon/source/itemdat.cpp",
+  "lambo": "recon/psxsrc/lambo.cpp",
+  "lznp": "recon/psxsrc/lznp.cpp",
+  "mem": "recon/psxsrc/mem.cpp",
+  "misdat": "recon/source/misdat.cpp",
+  "monsview": "recon/psxsrc/monsview.cpp",
+  "pak": "recon/psxsrc/pak.cpp",
+  "preinv": "recon/source/preinv.cpp",
+  "premiss": "recon/source/premiss.cpp",
+  "premsg": "recon/source/premsg.cpp",
+  "preport": "recon/source/preport.cpp",
+  "prestore": "recon/source/prestore.cpp",
+  "pretrigs": "recon/source/pretrigs.cpp",
+  "scrollrt": "recon/source/scrollrt.cpp",
+  "storm": "recon/source/storm.cpp",
+  "testcode": "recon/source/testcode.cpp",
+  "tims": "recon/psxsrc/tims.cpp"
 }
