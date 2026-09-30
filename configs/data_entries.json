@@ -1,0 +1,8 @@
+{
+  "source": "recon/psxsrc/dlg_2.cpp",
+  "pieces": [
+    {"entry": "func_80143604", "segment": "dlg", "section": ".rodata", "offset": 0, "size": 72, "va": "0x80143604", "image": "FRONTEND.BIN", "image_base": "0x80139BF8"},
+    {"entry": "func_801436A0", "segment": "dlg_1", "section": ".rodata", "offset": 72, "size": 76, "va": "0x801436A0", "image": "FRONTEND.BIN", "image_base": "0x80139BF8"},
+    {"entry": "DLG_sdata", "section": ".sdata", "offset": 0, "size": 96, "va": "0x8011B410", "image": "DIABPSX.BIN", "image_base": "0x80010000"}
+  ]
+}

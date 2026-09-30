@@ -8,17 +8,13 @@
 #include "psxsrc/dlg.h"
 
 /* ---- TU-owned globals (SYM EXT; %gp_rel in this oracle -> defined here) ---- */
-int AlertTxt = 0;
-int StatusTxt = 0;
-int current_card = 0;
-int LoadType = 0;
-int McMenuPos = 0;
-FeTable *McCurMenu = 0;
-BOOL fileinfoflag = 0;
+extern int AlertTxt, StatusTxt, current_card, LoadType, McMenuPos;
+extern FeTable *McCurMenu;
 char *DiabloGameFile = "BISLPS-01416-DIAB-01";
 char *DiabloOptionFile = "BISLPS-01416-DIAB-69";
 char *DiabloCharacterFile = "BISLPS-01416-DIAB-88";
 char *McState[2] = { "", "" };
+BOOL fileinfoflag = 0;
 
 /* @0x80159590 DLG.CPP:188 */
 int GetFileNumber(int side, char *file_name)
@@ -735,3 +731,11 @@ char *ReconstructSlotName(int side, int file)
     }
     return TempStr;
 }
+
+/* Keep initialized scalar globals after the TU's small literals, as in retail. */
+int AlertTxt = 0;
+int StatusTxt = 0;
+int current_card = 0;
+int LoadType = 0;
+int McMenuPos = 0;
+FeTable *McCurMenu = 0;

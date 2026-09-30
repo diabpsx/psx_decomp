@@ -9,7 +9,7 @@ lowercased MAP section name, e.g. recon/psxsrc/gman.cpp <-> src/gman.c <-> asm/n
 Per-function verdict comes from tools/verify_asm.py or a reviewed real-ASPSX
 entry, plus tools/symlane.py.  Call-target and jump-table audits remain required
 for the project seal bar."""
-import re, subprocess, sys, collections
+import re, subprocess, sys, collections, json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -94,6 +94,11 @@ def sym_ok(tu: Path, fns):
 
 def main():
     tus = recon_tus()
+    data = json.loads((ROOT / "configs/data_entries.json").read_text())
+    data_entries = {p["segment"]: p for p in data["pieces"] if "segment" in p}
+    for seg in data_entries:
+        tus[seg] = ROOT / data["source"]
+    data_result = None
     focused = bool(sys.argv[1:])
     segs = sys.argv[1:] or sorted(tus)
     registry = aspsx_registry()
@@ -104,6 +109,21 @@ def main():
     for seg in segs:
         fns = seg_functions(seg)
         if seg not in tus or not fns: continue
+        if seg in data_entries:
+            if data_result is None:
+                data_result = subprocess.run([PY, str(ROOT / "tools/data_gate.py")],
+                                             cwd=ROOT, capture_output=True, text=True)
+            entry = data_entries[seg]
+            ok = data_result.returncode == 0 and re.search(
+                r"^" + re.escape(entry["entry"]) + r": DATA PASS\b", data_result.stdout, re.M)
+            grand_pass += bool(ok)
+            lines.append(f"## {seg}  ({data['source']}) — {int(bool(ok))}/1 DATA PASS")
+            lines.append(f"- {'✅' if ok else '❌'} {entry['entry']} — data ({entry['size']} bytes, no function SYM record)")
+            lines.append("")
+            print(f"{seg}: {int(bool(ok))}/1 DATA")
+            if not ok:
+                print(data_result.stdout + data_result.stderr, file=sys.stderr)
+            continue
         away = homes.get(seg, {})
         groups = collections.defaultdict(list)          # TU -> the segment functions gated there
         for f in fns:
@@ -137,7 +157,7 @@ def main():
     if focused:
         print(f"SELECTED TOTAL {grand_pass}/{sum(len(seg_functions(s)) for s in segs)}")
     else:
-        lines.insert(2, f"**Game code: {grand_pass} / {total_all} functions PASS ({100.0*grand_pass/total_all:.1f}%) — 837 PsyQ SDK functions excluded**\n")
+        lines.insert(2, f"**Game code: {grand_pass} / {total_all} entries PASS ({100.0*grand_pass/total_all:.1f}%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**\n")
         (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"TOTAL {grand_pass}/{total_all}")
 

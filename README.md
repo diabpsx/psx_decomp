@@ -29,7 +29,8 @@ normalized, local branch targets are exact, and symbolic call/jump targets are v
 The complete seal bar also requires an exact `tools/symlane.py` receipt plus the call-target
 and jump-table audits.  Functions affected by maspsx emulation differences are checked through
 the real PsyQ ASPSX 2.56 lane (`tools/aspsx_gate.py`) and listed in
-`configs/aspsx_passes.txt`.  The reconstruction target is 2727 game functions; the 837 PsyQ SDK
+`configs/aspsx_passes.txt`.  The reconstruction target is 2727 game entries (2725 functions
+and two data-only split artifacts); the 837 PsyQ SDK
 functions are linked from the retail Sony libraries and are excluded from the reconstruction count.
 
 Direct calls and tail calls can be checked with full C++ signatures:
@@ -52,5 +53,8 @@ outside their original segment's TU, matching the byte/SYM gate's ownership rout
 The rescan passes 2724/2725 real function entries, with only `MemcardPad`'s merged
 error-sound sites still differing. The board's two extra entries (`dlg` and
 `dlg_1`) contain memory-card strings and pointer/format data, not executable
-functions. Their bytes still require reconstruction and data classification;
-the requested 2727-entry scope remains unchanged.
+functions. `tools/data_gate.py` now verifies their source-emitted bytes, pointer
+relocations, and DLG small-data symbol placements against retail. The board counts
+these as data receipts, keeping the requested 2727-entry scope unchanged.
+
+Verify the source-emitted DLG data with `python tools/data_gate.py`.

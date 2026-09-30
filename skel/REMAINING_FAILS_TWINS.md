@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (49)
+# PC twins for the remaining non-PASS functions (47)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|

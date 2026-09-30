@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2678 / 2727 functions PASS (98.2%) — 837 PsyQ SDK functions excluded**
+**Game code: 2680 / 2727 entries PASS (98.3%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -511,6 +511,12 @@
 - ✅ SetOTpos__6Dialogi (5)
 - ✅ GetPal__7TextDati_8008d23c (7)
 - ✅ GetFr__7TextDati_8008d258 (7)
+
+## dlg  (recon/psxsrc/dlg_2.cpp) — 1/1 DATA PASS
+- ✅ func_80143604 — data (72 bytes, no function SYM record)
+
+## dlg_1  (recon/psxsrc/dlg_2.cpp) — 1/1 DATA PASS
+- ✅ func_801436A0 — data (76 bytes, no function SYM record)
 
 ## dlg_2  (recon/psxsrc/dlg_2.cpp) — 35/35 PASS
 - ✅ GetFileNumber__FiPc (48)
