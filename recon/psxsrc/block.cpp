@@ -254,9 +254,9 @@ extern "C" void *SetSp(void *newsp);
 
 TextDat *GM_UseTexData(int Id);
 void GM_FinishedUsing(TextDat *Fin);
-unsigned char GAL_Free(long Handle);
-void DBG_Error(char *Text, char *File, int Line);
-unsigned long GU_GetRndRange(unsigned int Range);
+extern "C" unsigned char GAL_Free(long Handle);
+extern "C" void DBG_Error(char *Text, char *File, int Line);
+extern "C" unsigned long GU_GetRndRange(unsigned int Range);
 extern unsigned short water_clut;
 extern unsigned short penta_clut;
 extern unsigned char leveltype;

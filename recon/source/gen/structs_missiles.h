@@ -400,6 +400,7 @@ struct CPlayer {   /* sizeof 144 */
     int LastScrX;   /* +0x84 */
     int LastScrY;   /* +0x88 */
     int LastOtPos;   /* +0x8C */
+    void SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg);
 };
 
 struct MisFileData {   /* sizeof 5 */
@@ -588,4 +589,3 @@ struct MonsterStruct {   /* sizeof 104 */
     struct CMonster *MType;   /* +0x60 */
     struct MonsterData *MData;   /* +0x64 */
 };
-

@@ -2306,7 +2306,7 @@ void TalktoMonster(int i)
         return;
 
     if (QuestStatus(Q_LTBANNER)) {
-        if (quests[Q_LTBANNER]._qvar1 == 2 && PlrHasItem(pnum, IDI_BANNER, &itm)) {
+        if (quests[Q_LTBANNER]._qvar1 == 2 && PlrHasItem(pnum, IDI_BANNER, itm)) {
             RemoveInvItem(pnum, itm);
             quests[Q_LTBANNER]._qactive = 3;
             Monst->mtalkmsg = TXT_BOL3;
@@ -2315,7 +2315,7 @@ void TalktoMonster(int i)
         }
     }
     if (QuestStatus(Q_VEIL)) {
-        if (Monst->mtalkmsg >= TXT_VEIL1 && PlrHasItem(pnum, IDI_GLDNELIX, &itm)) {
+        if (Monst->mtalkmsg >= TXT_VEIL1 && PlrHasItem(pnum, IDI_GLDNELIX, itm)) {
             RemoveInvItem(pnum, itm);
             Monst->mtalkmsg = TXT_VEIL3;
             Monst->_mgoal = MG_TALK;

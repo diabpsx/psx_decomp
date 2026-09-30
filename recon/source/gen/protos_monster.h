@@ -107,7 +107,7 @@ int GetDirection(int x1, int y1, int x2, int y2);   /* @0x8003DA28 ENGINE.CPP:45
 BOOL GetMISSILE(int x, int y);   /* @0x80082E40 DPIECE.CPP:219 */
 BOOL GetSOLID(int x, int y);   /* @0x80082CE0 DPIECE.CPP:194 */
 void M_StartStand(int i, int md);   /* @0x8007FE70 COREMON.CPP:526 */
-void play_movie(char *pszMovie);   /* @0x800AD128 COREFMV.CPP:197 */
+extern "C" void play_movie(char *pszMovie);   /* @0x800AD128 COREFMV.CPP:197 */
 void music_stop(void);   /* @0x80077E50 SOUND.CPP:227 */
 void HappyMan(int n);   /* @0x80077FEC GAMEPAD.CPP:127 */
 void PlayEffect(int i, int mode);   /* @0x8003D528 EFFECTS.CPP:433 */
@@ -146,7 +146,7 @@ void CheckArea(int x, int y, int rad, unsigned char a4, int a5);
 int AddLight(int x, int y, int r);
 void DoVision(int x, int y, int r, unsigned char a4, unsigned char a5);
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
-void AddPanelString(char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
+void AddPanelString(const char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
 void ChangeLightOff(int i, int x, int y);   /* @0x8004D3B8 LIGHTING.CPP:1265 */
 void SetLightFX(int x, int y, short s_r, short s_g, short s_b, unsigned char d_r, unsigned char d_g, unsigned char d_b);   /* @0x8004BD40 LIGHTING.CPP:416 */
 void MonstPartJump(int m);   /* @0x8009F594 DAVEL.CPP:461 */
@@ -170,6 +170,6 @@ void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
 void CheckQuestKill(int m, unsigned char sendmsg);   /* @0x80067C04 QUESTS.CPP:317 */
 void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP:94 */
 long GetRndSeed(void);   /* @0x8003DADC ENGINE.CPP:102 */
-ItemStruct * PlrHasItem(int pnum, int item, int *i);   /* @0x8003B768 TOWNERS.CPP:593 */
+ItemStruct * PlrHasItem(int pnum, int item, int &i);   /* @0x8003B768 TOWNERS.CPP:593 */
 void RemoveInvItem(int pnum, int iv);   /* @0x8015D6FC INV.CPP:2399 */
 void NetSendCmdQuest(unsigned char bHiPri, unsigned char q);   /* @0x8004F8C8 MSG.CPP:998 */

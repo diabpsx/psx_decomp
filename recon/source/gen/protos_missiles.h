@@ -143,8 +143,7 @@ void *BL_GetCurrentBlocks(void);   /* @0x800919EC BLOCK.CPP:2805 -- opaque point
                                        structs (a rendering-block struct here); called as plain
                                        functions with their exact mangled names to avoid the clash,
                                        not as C++ methods on gamepad.cpp's classes. */
-void SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks(void *thisPlayer, void *plrRef, void *blocksRef);
-void DBG_Error(char *Text, char *File, int Line);
+extern "C" void DBG_Error(char *Text, char *File, int Line);
 void PlrClrTrans(int x, int y);   /* @0x80060C6C PLAYER.CPP */
 void PlrDoTrans(int x, int y);   /* @0x80060CE4 PLAYER.CPP */
 void WorldToOffset(int pnum, int wx, int wy);   /* @0x80078440 (SYM: WorldToOffset__Fiii) */
@@ -165,7 +164,7 @@ void StartPlrBlock(int pnum, int dir);   /* @0x80066F08 PLAYER.CPP:4691 */
 void StartPlrHit(int pnum, int dam, unsigned char forcehit);   /* @0x80066F54 PLAYER.CPP:4692 */
 void SyncPlrKill(int pnum, int earflag);   /* @0x80066DD8 PLAYER.CPP:4687 */
 void PlaySfxLoc(int psfx, int x, int y);   /* @0x8003D784 EFFECTS.CPP:535 */
-unsigned char CheckMonsterHit(int m, unsigned char *ret);   /* @0x8015698C MONSTER.CPP:5531 */
+unsigned char CheckMonsterHit(int m, unsigned char &ret);   /* @0x8015698C MONSTER.CPP:5531 */
 void StartPlrKill(int pnum, int val);   /* @0x80066E24 PLAYER.CPP:4688 */
 unsigned char LineClear(int x1, int y1, int x2, int y2);   /* @0x80155478 MONSTER.CPP:4790 */
 void AddDead(int dx, int dy, char dv, int ddir);   /* @0x80037F8C DEAD.CPP:99 */

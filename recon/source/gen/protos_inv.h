@@ -1,4 +1,4 @@
-int sprintf(char *buf, const char *fmt, ...);
+extern "C" int sprintf(char *buf, const char *fmt, ...);
 void CalcPlrScrolls(int p);   /* @0x8003F130 ITEMS.CPP:945 */
 void CalcPlrStaff(PlayerStruct *ptrplr);   /* @0x8003F4B0 ITEMS.CPP:984 */
 unsigned char TryInvPut(void);   /* @0x8015F020 INV.CPP:2928 */
@@ -48,12 +48,12 @@ unsigned char TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
 void NetSendCmdDelItem(unsigned char bHiPri, unsigned char bLoc);   /* @0x8004FD98 MSG.CPP:1212 */
 CPad *PAD_GetPad(int PadNum, unsigned char both);   /* @0x800897F4 PADS.CPP:251 */
 void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
 void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
 void VID_SetDBuffer(BOOL DBuf);   /* @0x80084190 VID.CPP:313 */
-void TSK_Kill(struct TASK *T);   /* @0x80020548 TASKER.C:350 */
+extern "C" void TSK_Kill(struct TASK *T);   /* @0x80020548 TASKER.C:350 */
 CBlocks *BL_GetCurrentBlocks(void);   /* @0x800919EC BLOCK.CPP:2805 */
 struct TextDat *GM_UseTexData(int Id);   /* @0x80093C10 GMAN.CPP:1312 */
 void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP:1952 */
@@ -69,7 +69,7 @@ void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int T
 void DrawInfoBox(RECT *InfoRect);   /* @0x80032FA4 CONTROL.CPP:2079 */
 void PRIM_Clip(RECT *R, int Depth);   /* @0x800839EC PRIMPOOL.CPP:216 */
 void PRIM_FullScreen(int Depth);   /* @0x80083B20 PRIMPOOL.CPP:257 */
-struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
 void DrawInvTSK(struct TASK *T);   /* @0x801590FC INV.CPP:1049 */
 void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */
 int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */

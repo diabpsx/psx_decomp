@@ -3345,7 +3345,7 @@ unsigned char MonsterMHit(int pnum, int m, int mindam, int maxdam, int dist, int
         hper = 95;
     if (monster[m]._mmode == MM_STONE)
         hit = 0;
-    if (CheckMonsterHit(m, &ret))
+    if (CheckMonsterHit(m, ret))
         return ret;
     else if (hit < hper) {
         if (t == MIS_BONESPIRIT)
@@ -3437,7 +3437,7 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
         hper = 5;
     if (hper > 95)
         hper = 95;
-    if (CheckMonsterHit(m, &ret))
+    if (CheckMonsterHit(m, ret))
         return ret;
 
     if (hit < hper || monster[m]._mmode == MM_STONE) {
@@ -3864,7 +3864,7 @@ void MI_Teleport(int i)
         ViewY = plr[id]._py - ScrollInfo._sdy;
     }
 
-    SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks((void *)gplayer, &plr[id], gblocks);
+    gplayer->SetScrollTarget(plr[id], *gblocks);
     gblocks->MoveToScrollTarget();
 
     if (plr[id ^ 1].plractive)
