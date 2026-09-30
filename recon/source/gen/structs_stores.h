@@ -50,6 +50,8 @@ public:
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 
+enum TXT_JUST { JustRight = 2, JustCentre = 1, JustLeft = 0 };
+
 struct CFont {   /* sizeof 540 */
     int TextureId;   /* +0x0 */
     unsigned short FontTab[256];   /* +0x4 */
@@ -60,16 +62,11 @@ struct CFont {   /* sizeof 540 */
     struct TextDat *ThisDat;   /* +0x214 */
     unsigned char FontHeight;   /* +0x218 */
 
-    int Print(int X, int Y, char *Str, int Justify, struct RECT *TextWindow, int R, int G, int B);
+    int Print(int X, int Y, char *Str, TXT_JUST Justify, struct RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
     int GetStrWidth(char *Str);
     int GetWrap(char *Str, struct RECT *TextWindow);
 };
 
-enum TXT_JUST {
-    JustRight = 2,
-    JustCentre = 1,
-    JustLeft = 0
-};
 
 /* CBlocks/Dialog -- copied verbatim from recon/psxsrc/psxhelp.cpp (canonical layout used across the
  * whole TU family). Declaring a `static Dialog SBack;` object below makes the compiler synthesize

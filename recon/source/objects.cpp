@@ -437,7 +437,7 @@ void AddObject(int ot, int ox, int oy)
         dung_map[ox][oy].dObject = oi + 1;
         SetupObject(oi, ox, oy, ot);
         if (ot != 0x53)
-            func_80159C74(ot, ox, oy, oi);
+            PreObjObjAddSwitch(ot, ox, oy, oi);
         numobjects++;
     }
 }
@@ -1186,7 +1186,7 @@ void OperateMushPatch(int pnum, int i)
             PlaySfxLoc(0x12, object[i]._ox, object[i]._oy);
         object[i]._oAnimFrame = 2;
         if (quests[1].pad_for_laz == 0) {
-            GetSuperItemLoc(object[i]._ox, object[i]._oy, &x, &y);
+            GetSuperItemLoc(object[i]._ox, object[i]._oy, x, y);
             SpawnQuestItem(0x11, x, y, 0, 0);
         }
         if (!deltaload) {
@@ -1224,7 +1224,7 @@ void OperateInnSignChest(int pnum, int i)
     object[i]._oAnimFrame = 2;
     if (deltaload)
         return;
-    GetSuperItemLoc(object[i]._ox, object[i]._oy, &x, &y);
+    GetSuperItemLoc(object[i]._ox, object[i]._oy, x, y);
     SpawnQuestItem(0xC, x, y, 0, 0);
     NetSendCmdParam1(0, 0x2D, i);
 }
@@ -1751,7 +1751,7 @@ void OperatePedistal(int pnum, int i)
     }
     if (!deltaload) {
         if (object[i]._oVar6 != 3) {
-            if (PlrHasItem(pnum, 0x15, &jstn) != 0) {
+            if (PlrHasItem(pnum, 0x15, jstn) != 0) {
                 RemoveInvItem(pnum, jstn);
                 object[i]._oAnimFrame++;
                 object[i]._oVar6++;
@@ -2669,7 +2669,7 @@ void OperateLazStand(int pnum, int i)
             if (pnum == myplr) {
                 object[i]._oSelFlag = 0;
                 object[i]._oAnimFrame++;
-                GetSuperItemLoc(object[i]._ox, object[i]._oy, &x, &y);
+                GetSuperItemLoc(object[i]._ox, object[i]._oy, x, y);
                 SpawnQuestItem(0x21, x, y, 0, 0);
                 NetSendCmdParam1(0, 0x2D, i);
             }

@@ -41,8 +41,8 @@ void SetSpdbarGoldCurs(int pnum, int i);
 void SetGoldCurs(int pnum, int i);
 void GetGoldSeed(int pnum, ItemStruct *itm);
 struct TextDat * GM_UseTexData(int Id);
-void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, bool Sparkle, int OtPos, bool cross, bool iso, int SinStep);
-int sprintf(char *buf, const char *fmt, ...);
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, bool Sparkle, int OtPos, bool cross, bool iso, unsigned char SinStep);
+extern "C" int sprintf(char *buf, const char *fmt, ...);
 void S_SmithEnter(void);
 void S_SSellEnter(void);
 void S_WRechargeEnter(void);
@@ -50,8 +50,8 @@ void S_SIDEnter(void);
 void S_SRepairEnter(void);
 void S_WSellEnter(void);
 void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */
-int func_80159F24(int pnum, int i, int x, int y, int seed);
-int func_8015A24C(int pnum, int i, int x, int y, int seed);
+unsigned char AutoPlace(int pnum, int i, int x, int y, unsigned char saveflag);
+unsigned char SpecialAutoPlace(int pnum, int i, int x, int y, unsigned char saveflag);
 void S_HBuyEnter(void);
 int StoreAutoPlace(void);
 int CalcPlrInv(int pnum, unsigned char loadgfx);
@@ -88,7 +88,7 @@ void S_BarmaidEnter(void);
 void S_DrunkEnter(void);
 unsigned char StoreGoldFit(int idx);
 void DrawStoreHelpText(void);
-struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
 void DrawSTextTSK(struct TASK *T);
 void DrawSText(void);
 BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
@@ -96,7 +96,7 @@ BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
 void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
 void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
 BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 void DoThatDrawSText(void);
 void DrawSLine(int y);
 void DrawStoreArrows(void);

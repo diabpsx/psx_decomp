@@ -53,7 +53,7 @@ struct TextDat {   /* sizeof 112 (SYM); only Frames is named */
 TextDat * GM_UseTexData(int idx);   /* @0x80093C10 */
 void GM_FinishedUsing(TextDat *td);   /* @0x80093D80 */
 extern short Circle[64];   /* @0x800CD2E0 -- sin/cos lookup table, another module */
-unsigned long GU_GetRnd(void);   /* @0x80020CF4 */
+extern "C" unsigned long GU_GetRnd(void);   /* @0x80020CF4 */
 unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP */
 
 struct CFont {   /* sizeof 540 */
@@ -67,7 +67,7 @@ struct CFont {   /* sizeof 540 */
     unsigned char FontHeight;   /* +0x218 */
 
     int GetStrWidth(char *Str);
-    int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, int R, int G, int B);
+    int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
 };
 
 struct CPad {   /* sizeof 236 */
@@ -207,9 +207,9 @@ void STR_pauseall(void);   /* @0x80099234 STREAM.CPP:816 */
 void snd_stop_snd(TSnd *pSnd);   /* @0x80077D1C SOUND.CPP:132 */
 void STR_setvolume(SFXHDR *sfh);   /* @0x80099010 STREAM.CPP:736 */
 void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 CPad * PAD_GetPad(int PadNum, unsigned char both);   /* @0x800897F4 PADS.CPP:251 */
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 
 BOOL IS_GameOver(void);   /* @0x800821DC GAMEOVER.CPP:83 */
 BOOL RemoveCtrlScreen(void);   /* @0x8009C7C4 CTRL.CPP:396 */
@@ -217,7 +217,7 @@ void MemcardOFF(void);   /* @0x800A5558 CARDCORE.CPP:396 */
 void OVR_LoadGame(void);   /* @0x80095474 OVERLAY.CPP:146 */
 void stream_pause(void);   /* @0x8003CFB8 EFFECTS.CPP:127 */
 void stream_resume(void);   /* @0x8003D01C EFFECTS.CPP:148 */
-TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
 enum GM_SPEEDS GetSpeed(void);   /* @0x80039BBC DIABLO.CPP:3169 */
 void SetSpeed(enum GM_SPEEDS Speed);   /* @0x80039BA8 DIABLO.CPP:3163 */
 
@@ -317,7 +317,7 @@ void pad_func_Chr(int pad);   /* @0x800A1FE0 */
 void DrawHelp(void);   /* @0x800AECD0 */
 BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP */
 void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP */
-TASK * TSK_Exist(TASK *T, unsigned long Id, unsigned long Mask);   /* @0x800206D8 TASKER.C */
+extern "C" TASK * TSK_Exist(TASK *T, unsigned long Id, unsigned long Mask);   /* @0x800206D8 TASKER.C */
 extern unsigned char invflag;
 extern char msgflag;
 extern BOOL initchr;

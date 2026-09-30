@@ -459,41 +459,41 @@ int StoreAutoPlace(void)
             }
         }
         for (i = 30; i <= 39 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 20; i <= 29 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 10; i <= 19 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 0; i <= 9 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 1 && h == 2) {
         for (i = 29; i >= 20 && !done; i--)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 9; i >= 0 && !done; i--)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 19; i >= 10 && !done; i--)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 1 && h == 3) {
         for (i = 0; i < 20 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 2 && h == 2) {
         for (i = 0; i < 10 && !done; i++)
-            done = func_80159F24(myplr, AP2x2Tbl[i], w, h, 1);
+            done = AutoPlace(myplr, AP2x2Tbl[i], w, h, 1);
         for (i = 21; i < 29 && !done; i += 2)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 1; i < 9 && !done; i += 2)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 10; i < 19 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 2 && h == 3) {
         for (i = 0; i < 9 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
         for (i = 10; i < 19 && !done; i++)
-            done = func_80159F24(myplr, i, w, h, 1);
+            done = AutoPlace(myplr, i, w, h, 1);
     }
     return done;
 }
@@ -1908,7 +1908,7 @@ void S_SBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
-        done = func_80159F24(myplr, i, cursW / 16, cursH / 16, 0);
+        done = AutoPlace(myplr, i, cursW / 16, cursH / 16, 0);
         i++;
     } while (i < 0x28 && done == 0);
     if (done != 0) {
@@ -1948,7 +1948,7 @@ void S_WBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
-        done = func_8015A24C(myplr, i, cursW / 16, cursH / 16, 0);
+        done = SpecialAutoPlace(myplr, i, cursW / 16, cursH / 16, 0);
         i++;
     } while (i < 0x28 && done == 0);
     if (done != 0) {
@@ -1978,7 +1978,7 @@ void S_BBuyEnter(void)
         SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
         i = 0;
         do {
-            done = func_80159F24(myplr, i, cursW / 16, cursH / 16, 0);
+            done = AutoPlace(myplr, i, cursW / 16, cursH / 16, 0);
             i++;
         } while (i < 0x28 && done == 0);
         if (done != 0) {
@@ -2325,7 +2325,7 @@ void S_SPBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
-        done = func_80159F24(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
+        done = AutoPlace(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
         i++;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
@@ -2906,7 +2906,7 @@ void S_HBuyEnter(void)
     SetCursor(plr[myplr].HoldItem._iCurs + 0xC);
     i = 0;
     do {
-        done = func_8015A24C(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
+        done = SpecialAutoPlace(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
         i++;
     } while (i < 0x28 && done == 0);
     StartStore(done != 0 ? 0xB : 0xA);
@@ -2995,5 +2995,5 @@ void S_DrunkEnter(void)
 /* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each
  * conflict hunk, kept for reference. Winner = PASS (bytes+SYM) first, then SLD line agreement. ---- */
 #if 0 /* MERGE ALT S_BBuyEnter: master side -- lost because: both PASS, identical SLD; branch taken */
-            done = func_80159F24(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
+            done = AutoPlace(myplr, i, cursW / 16, cursH / 16, 0) & 0xFF;
 #endif

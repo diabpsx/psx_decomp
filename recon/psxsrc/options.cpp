@@ -1204,7 +1204,11 @@ void SoundPad(void)
     }
     if (!(P->GetDown() & 0x100))
         return;
-    if (cmenu != 8) {
+    if (cmenu == 8) {
+        PlaySFX(0x3D3);
+        return;
+    }
+    {
         int link;
 
         if (Qfromoptions != 0) {
@@ -1252,7 +1256,6 @@ void SoundPad(void)
         OVR_LoadGame();
         return;
     }
-    PlaySFX(0x3D3);
 }
 
 void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB,

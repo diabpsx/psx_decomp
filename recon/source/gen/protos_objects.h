@@ -97,8 +97,8 @@ void TryDisarm(int pnum, int i);   /* @0x8005A258 OBJECTS.CPP:2595 */
 /* external helpers (defined/owned in other TUs), exact signatures from their oracle FCN records */
 int AddLight(int x, int y, int r);
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl);   /* @0x80142A04 MISSILES.CPP:3451 */
-void MonsterTrapHit(int m, int mind, int maxd, int a4, int mtype, int a6);   /* @0x8013B04C */
-void PlayerMHit(int pnum, int mnum, int mindam, int maxdam, int dist, int mtype, int a7, int a8);   /* @0x8013BB90 */
+unsigned char MonsterTrapHit(int m, int mind, int maxd, int dist, int mtype, unsigned char shift);   /* @0x8013B04C */
+unsigned char PlayerMHit(int pnum, int mnum, int dist, int mindam, int maxdam, int mtype, unsigned char shift, unsigned char earflag);   /* @0x8013BB90 */
 void AddUnLight(int i);
 struct CBlocks * BL_GetCurrentBlocks(void);
 void CalcPlrInv(int p, unsigned char Loadgfx);
@@ -119,7 +119,7 @@ void CreateRndItem(int x, int y, unsigned char onlygood, unsigned char sendmsg, 
 void CreateRndUseful(int pnum, int x, int y, unsigned char sendmsg);
 void CreateSpellBook(int x, int y, int ispell, unsigned char sendmsg, unsigned char delta);
 void CreateTypeItem(int x, int y, unsigned char onlygood, int itype, int imisc, unsigned char sendmsg, unsigned char delta);
-void DBG_Error(char *Text, char *File, int Line);
+extern "C" void DBG_Error(char *Text, char *File, int Line);
 void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, unsigned char SinStep);
 long ENG_random(long v);
 void FillCrapBits(void);
@@ -132,7 +132,7 @@ void GetPlrHandSeed(struct ItemStruct *h);
 long GetRndSeed(void);
 BOOL GetSOLID(int x, int y);
 char * GetStr(int StrId);
-void GetSuperItemLoc(int x, int y, int *xx, int *yy);
+void GetSuperItemLoc(int x, int y, int &xx, int &yy);
 unsigned char GetdDead(int x, int y);
 void InitDiabloMsg(char e);
 void InitLighting(void);
@@ -149,7 +149,7 @@ void NetSendCmdQuest(unsigned char bHiPri, unsigned char q);
 void NewCursor(int i);
 void PlaySFX(int psfx);
 void PlaySfxLoc(int psfx, int x, int y);
-struct ItemStruct * PlrHasItem(int pnum, int item, int *i);
+struct ItemStruct * PlrHasItem(int pnum, int item, int &i);
 unsigned char QuestStatus(int i);
 void SetBLOCK(int x, int y);
 void SetDPiece(int x, int y, short v);
@@ -165,4 +165,4 @@ void StartPlrKill(int pnum, int val);
 void StartStand(int pnum, int dir);
 void mem_free_dbg(void *p);
 void RemoveInvItem(int pnum, int iv);   /* @0x8015D6FC INV.CPP:2399 */
-void func_80159C74(int ot, int ox, int oy, int oi);   /* unnamed helper, not in this TU/segment */
+void PreObjObjAddSwitch(int ot, int ox, int oy, int oi);   /* @0x80159C74 PREOBJ.CPP */
