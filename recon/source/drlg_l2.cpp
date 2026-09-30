@@ -116,14 +116,11 @@ static unsigned char DRLG_L2PlaceMiniSet(unsigned char *miniset, int tmin, int t
     } while (!failed);
 
     for (i = 0; i < numt; i++) {
-        int r;
-
-        r = ENG_random(rcount);
+        const int r = ENG_random(rcount);
         sx = randxy[r * 2 + 0];
         sy = randxy[r * 2 + 1];
 
-        r = sh * sw;
-        ii = r + 2;
+        ii = sh * sw + 2;
         for (yy = 0; yy < sh; yy++) {
             for (xx = 0; xx < sw; xx++) {
                 if (miniset[ii] != 0) {
