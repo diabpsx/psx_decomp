@@ -299,7 +299,7 @@ void sound_stop(void)
         for (mode = 0; mode < 4; mode++) {
             for (nr = 0; nr < 2; nr++) {
                 TSFX *pSnd = (TSFX *)0;
-                snd_stop_snd(pSnd);
+                snd_stop_snd((TSnd *)pSnd);
             }
         }
     }

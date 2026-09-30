@@ -1,5 +1,5 @@
 short GetDPiece(int x, int y);   /* @0x80082A44 DPIECE.CPP:151 */
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void StartNewLvl(int pnum, int fom, int lvl);   /* @0x80066C04 PLAYER.CPP:4681 */
 void PlacePlayer(int pnum, int x, int y, unsigned char do_current);   /* @0x800A4080 PADFUNCS.CPP:1492 */
@@ -13,7 +13,7 @@ void music_fade(void);   /* @0x80077E90 SOUND.CPP:245 */
 void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
 BOOL PaletteFadeOut(int fr);   /* @0x8007F2F8 PALETTE.CPP:403 */
 BOOL GetFadeState(void);   /* @0x8007EEAC PALETTE.CPP:179 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
 BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
 void BlackPalette(void);   /* @0x8007F064 PALETTE.CPP:287 */

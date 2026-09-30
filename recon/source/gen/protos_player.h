@@ -131,7 +131,7 @@ BOOL ismyplr(PlayerStruct *ptrplr);   /* @0x8005FD9C PLAYER.CPP:282 */
 int plrind(PlayerStruct *ptrplr);   /* @0x8005FDE0 PLAYER.CPP:287 */
 
 /* Externs: functions defined in other (not-yet-built or already-built) TUs that PLAYER.CPP calls. */
-void DBG_Error(char *Text, char *File, int Line);
+extern "C" void DBG_Error(char *Text, char *File, int Line);
 void AddDead(int dx, int dy, char dv, int ddir);   /* @0x80037F8C DEAD.CPP:99 */
 int AddLight(int x, int y, int r);   /* @0x8004D2E8 LIGHTING.CPP:1184 */
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl);   /* @0x80142A04 MISSILES.CPP:3451 */
@@ -160,7 +160,7 @@ BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
 void GM_FinishedUsing(TextDat *Fin);   /* @0x80093D80 GMAN.CPP:1349 */
 TextDat * GM_UseTexData(int Id);   /* @0x80093C10 GMAN.CPP:1312 */
 unsigned char GRL_PostMessage(unsigned long hWnd, unsigned int Msg, long wParam, unsigned long lParam);   /* @0x8007B254 GWIN.CPP:133 */
-unsigned long GTIMSYS_GetTimer(void);   /* @0x80020EF0 GTIMSYS.C:52 */
+extern "C" unsigned long GTIMSYS_GetTimer(void);   /* @0x80020EF0 GTIMSYS.C:52 */
 int GetDirection(int x1, int y1, int x2, int y2);   /* @0x8003DA28 ENGINE.CPP:45 */
 void GetGoldSeed(int pnum, ItemStruct *h);   /* @0x8003FD0C ITEMS.CPP:1178 */
 BOOL GetSOLID(int x, int y);   /* @0x80082CE0 DPIECE.CPP:194 */
@@ -203,8 +203,8 @@ void SetPlrHandItem(ItemStruct *h, int idata);   /* @0x8003FBC8 ITEMS.CPP:1130 *
 void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP:94 */
 void SetSpdbarGoldCurs(int pnum, int i);   /* @0x800706C8 STORES.CPP:2458 */
 void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed);   /* @0x8015EEB8 INV.CPP:2842 */
-void TSK_Kill(TASK *T);   /* @0x80020548 TASKER.C:350 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Kill(TASK *T);   /* @0x80020548 TASKER.C:350 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 void TalkToTowner(int p, int t);   /* @0x8003B998 TOWNERS.CPP:673 */
 void TalktoMonster(int i);   /* @0x801565DC MONSTER.CPP:5445 */
 void TeleStart(int plr);   /* @0x800A034C DAVEL.CPP:739 */

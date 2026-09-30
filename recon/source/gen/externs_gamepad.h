@@ -22,8 +22,8 @@ extern unsigned char gbActivePlayers;   /* @0x8011B9A3 */
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 
 extern void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
-extern struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
-extern void TSK_Kill(struct TASK *T);   /* @0x80020548 TASKER.C:350 */
+extern "C" struct TASK *TSK_AddTask(unsigned long Id, void (*Main)(struct TASK *), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" void TSK_Kill(struct TASK *T);   /* @0x80020548 TASKER.C:350 */
 extern void RemoveTargetCursor(int pnum);   /* @0x800A178C PADFUNCS.CPP:466 */
 extern void TeleStop(int plr);   /* @0x800A040C DAVEL.CPP:749 */
 extern void ClrDiabloMsg(void);
@@ -45,7 +45,7 @@ extern unsigned char PosOkPlayer(int pnum, int x, int y);   /* @0x80066B6C PLAYE
 extern BOOL GetFadeState(void);   /* @0x8007EEAC PALETTE.CPP:179 */
 extern BOOL GLUE_Finished(void);   /* @0x8009BB04 GLUE.CPP:331 */
 extern BOOL IS_GameOver(void);   /* @0x800821DC GAMEOVER.CPP:83 */
-extern void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 extern int myplr;   /* @0x8011BA08 */
 extern int sel_data;   /* @0x8011B72C */
 extern BOOL CDWAIT;   /* @0x8011ADEC */

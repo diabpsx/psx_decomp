@@ -14,6 +14,6 @@ void ResetPal(void);   /* @0x8007EE74 PALETTE.CPP:123 */
 
 /* PSXSRC callees (GMAN.CPP / TASKER.C / VID.CPP / BLOCK.H) */
 TextDat * GM_UseTexData(int Id);   /* @0x80093C10 GMAN.CPP:1312 */
-TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */

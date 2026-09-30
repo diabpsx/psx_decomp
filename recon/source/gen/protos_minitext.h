@@ -9,11 +9,11 @@ void DrawQTextBack(void);   /* @0x8004DECC MINITEXT.CPP:397 */
 /* PSXSRC callees */
 enum LANG_TYPE LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 */
 int BL_FileLength(char *Name, char LumpID);   /* @0x80087C34 BIGLUMP.CPP:475 */
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 void stream_stop(void);   /* @0x8003CF5C EFFECTS.CPP:107 */
 void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
-TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
 BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
 void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
@@ -37,4 +37,4 @@ void SpuSetKey(long on, unsigned long voice_bit);
 #ifdef __cplusplus
 }
 #endif
-int sprintf(char *buf, const char *fmt, ...);
+extern "C" int sprintf(char *buf, const char *fmt, ...);

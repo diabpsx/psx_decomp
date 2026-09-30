@@ -35,7 +35,7 @@ struct CFont {   /* sizeof 540 */
     int SetOTpos(int OT);
     int GetStrWidth(char *Str);
     int GetWrap(char *Str, RECT *TextWindow);
-    int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, int R, int G, int B);
+    int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
     int GetCharWidth(unsigned char ch);
 };
 

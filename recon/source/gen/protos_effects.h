@@ -2,13 +2,14 @@
 void STR_setvolume(SFXHDR *sfh);   /* @0x80099010 STREAM.CPP:736 */
 void STR_SoundCommand(SFXHDR *sfh, int Command);   /* @0x80099388 STREAM.CPP:876 */
 SFXHDR * STR_PlaySound(unsigned short Name, char flag, int volume, char loop);   /* @0x80098DC8 STREAM.CPP:597 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 CBlocks * BL_GetCurrentBlocks(void);   /* @0x800919EC BLOCK.CPP:2805 */
 int SND_PlaySnd(unsigned short Name, int vol, int pan, int pitchadj);   /* @0x8009A79C SNDBANK.CPP:498 */
 unsigned char snd_playing(int SFXNo);   /* @0x80077F70 SOUND.CPP:315 */
 void snd_play_snd(TSFX *pSFX, long lVolume, long lPan);   /* @0x80077D58 SOUND.CPP:145 */
 void snd_play_msnd(unsigned short pszName, long lVolume, long lPan);   /* @0x80077DA0 SOUND.CPP:172 */
-void snd_stop_snd(TSFX *pSnd);   /* @0x80077D1C SOUND.CPP:132 */
+struct TSnd;
+void snd_stop_snd(TSnd *pSnd);   /* @0x80077D1C SOUND.CPP:132 */
 void snd_update(unsigned char bStopAll);   /* @0x80077D14 SOUND.CPP:108 */
 long ENG_random(long v);   /* @0x8003DB24 ENGINE.CPP:113 */
 

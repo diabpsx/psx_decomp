@@ -50,7 +50,7 @@ void CheckCursMove(void);   /* @0x80037D80 CURSOR.CPP:284 */
 void CheckIdentify(int pnum, int cii);   /* @0x80045D20 ITEMS.CPP:3310 */
 void CheckQuests(void);   /* @0x800674F4 QUESTS.CPP:185 */
 void CheckTriggers(int pnum);   /* @0x80076AC8 TRIGS.CPP:895 */
-void DBG_Halt(void);   /* @0x80020E64 GDEBUG.C:88 */
+extern "C" void DBG_Halt(void);   /* @0x80020E64 GDEBUG.C:88 */
 void ClearPanel(void);   /* @0x80031F20 CONTROL.CPP:1291 */
 void ClrDiabloMsg(void);   /* @0x8003DCD8 ERROR.CPP:173 */
 void ConvertdPiece(void);   /* @0x8008287C DPIECE.CPP:113 */
@@ -71,7 +71,7 @@ void FreedPiece(void);   /* @0x80082838 DPIECE.CPP:105 */
 void Freeupstairs(void);   /* @0x80076390 TRIGS.CPP:699 */
 unsigned char GRL_PostMessage(unsigned long hWnd, unsigned int Msg, long wParam, unsigned long lParam);   /* @0x8007B254 GWIN.CPP:133 */
 WNDPROC GRL_SetWindowProc(WNDPROC NewProc);   /* @0x8007B21C GWIN.CPP:106 */
-void GSYS_SetStackAndJump(void *Stack, void (*Func)(void *), void *Param);   /* @0x8002117C GSYS.C:89 */
+extern "C" void GSYS_SetStackAndJump(void *Stack, void (*Func)(void *), void *Param);   /* @0x8002117C GSYS.C:89 */
 BOOL GetFadeState(void);   /* @0x8007EEAC PALETTE.CPP:179 */
 void GetPortalLvlPos(void);   /* @0x80081554 PORTAL.CPP:346 */
 void GetReturnLvlPos(void);   /* @0x800682DC QUESTS.CPP:491 */
@@ -134,7 +134,7 @@ void SetSOLID(int x, int y);   /* @0x80082BC8 DPIECE.CPP:182 */
 void ShowProgress(unsigned int uMsg);   /* @0x8003DE40 INTERFAC.CPP:336 */
 void SpawnQuestItem(int itemid, int x, int y, int randarea, int selflag);   /* @0x80045208 ITEMS.CPP:3000 */
 void SpawnRock(void);   /* @0x80045454 ITEMS.CPP:3055 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 void Tfree(void *Addr);   /* @0x8008839C TMALLOC.CPP:119 */
 void *Tmalloc(int MemSize);   /* @0x800882A8 TMALLOC.CPP:78 */
 unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */

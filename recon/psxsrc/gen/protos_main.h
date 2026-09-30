@@ -25,9 +25,9 @@ void GLUE_SetFinished(BOOL NewFinished);   /* @0x8009BB10 GLUE.CPP:342 */
 void DoEnding(int p);   /* @0x8014EB1C MONSTER.CPP:2016 */
 
 /* TASKER.C/TICK.C/GAL.C -- plain-C library callees, own local prototypes */
-TASK *TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
-void TSK_RepointProc(TASK *T, void (*Func)());   /* @0x8002066C TASKER.C:430 */
-void TSK_DoTasks(void);   /* @0x800201F8 TASKER.C:218 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
-void TICK_Update(void);   /* @0x80020C2C TICK.C:58 */
-void GAL_SetTimeStamp(int Time);   /* @0x800227A0 GAL.C:1731 */
+extern "C" TASK *TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" void TSK_RepointProc(TASK *T, void (*Func)());   /* @0x8002066C TASKER.C:430 */
+extern "C" void TSK_DoTasks(void);   /* @0x800201F8 TASKER.C:218 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TICK_Update(void);   /* @0x80020C2C TICK.C:58 */
+extern "C" void GAL_SetTimeStamp(int Time);   /* @0x800227A0 GAL.C:1731 */

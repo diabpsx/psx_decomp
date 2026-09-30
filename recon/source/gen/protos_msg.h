@@ -4,7 +4,7 @@ void ClrPlrPath(int pnum);   /* @0x80067254 PLAYER.CPP:4704 */
 void DeactivatePortal(int i);   /* @0x800811C8 PORTAL.CPP:253 */
 void FadeGameOut(void);   /* @0x800768F0 TRIGS.CPP:833 */
 int FindGetItem(int idx, unsigned short ci, int iseed);   /* @0x8008271C COREINV.CPP:52 */
-long GAL_AlignSizeToType(unsigned long Size, unsigned long MemType);   /* @0x800227E0 GAL.C:1769 */
+extern "C" long GAL_AlignSizeToType(unsigned long Size, unsigned long MemType);   /* @0x800227E0 GAL.C:1769 */
 DLevel * GetDLevel(int LevNum, BOOL SetLevel);   /* @0x80052888 MSG.CPP:2790 */
 int GetDirection(int x1, int y1, int x2, int y2);   /* @0x8003DA28 ENGINE.CPP:45 */
 long GetRndSeed(void);   /* @0x8003DADC ENGINE.CPP:102 */
@@ -42,7 +42,7 @@ void SyncOpObject(int pnum, int cmd, int i);   /* @0x8005E1A4 OBJECTS.CPP:3845 *
 void SyncPlrKill(int pnum, int earflag);   /* @0x80066DD8 PLAYER.CPP:4687 */
 void TeleStop(int plr);   /* @0x800A040C DAVEL.CPP:749 */
 int encode_enemy(int m);   /* @0x80080974 COREMON.CPP:739 */
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 void DeleteMissile(int mi, int i);   /* @0x8013A8E8 MISSILES.CPP:622 */
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl);   /* @0x80142A04 MISSILES.CPP:3451 */
 void ClearMissileSpot(int mi);   /* @0x8014AAC0 MISSILES.CPP:5885 */

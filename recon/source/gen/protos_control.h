@@ -14,10 +14,10 @@ void RedBack(void);   /* @0x800360F8 CONTROL.CPP:3112 */
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void mem_free_dbg(void *p);   /* @0x8003DBDC ENGINE.CPP:432 */
 void RemoveTargetCursor(int pnum);   /* @0x800A178C PADFUNCS.CPP:466 */
-void TSK_Kill(TASK *T);   /* @0x80020548 TASKER.C:350 */
+extern "C" void TSK_Kill(TASK *T);   /* @0x80020548 TASKER.C:350 */
 void PostGamePad(int val, int var1, int var2, int var3);   /* @0x8007AD4C GAMEPAD.CPP:1952 */
 BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP:404 */
-TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
+extern "C" TASK * TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* @0x80020010 TASKER.C:141 */
 void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
 TextDat * GM_UseTexData(int Id);   /* @0x80093C10 GMAN.CPP:1312 */
 void InitDiabloMsg(char e);   /* @0x8003DC44 ERROR.CPP:156 */
@@ -36,7 +36,7 @@ BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP:392 */
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* @0x8009BB84 GLUE.CPP:371 */
 void GLUE_SuspendGame(void);   /* @0x8009BA24 GLUE.CPP:266 */
 void stream_pause(void);   /* @0x8003CFB8 EFFECTS.CPP:127 */
-void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
+extern "C" void TSK_Sleep(int Frames);   /* @0x800203B8 TASKER.C:287 */
 void DrawChr(void);   /* @0x80035698 CONTROL.CPP:2808 */
 void stream_resume(void);   /* @0x8003D01C EFFECTS.CPP:148 */
 void GLUE_ResumeGame(void);   /* @0x8009BA78 GLUE.CPP:281 */
@@ -70,6 +70,6 @@ int GetManaAmount(int id, int sn);   /* @0x80077054 SPELLS.CPP */
 void GetDamageAmt(int i, int *mind, int *maxd);   /* @0x80139C04 (overlay) */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel);   /* @0x800301B4 CONTROL.CPP:551 */
 POLY_GT4 * PRIM_GetNextPolyGt4(void);   /* @0x80083E54 PRIMPOOL.CPP */
-void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, bool Sel, int Ot, int SpinSpeed, int SpinOffset, unsigned char Type);   /* @0x800A6A44 */
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, bool Sparkle, int Ot, bool cross, bool iso, unsigned char Type);   /* @0x800A6A44 */
 #include "glibdev/gdebug.h"
 unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */

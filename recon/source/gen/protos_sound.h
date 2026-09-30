@@ -12,5 +12,5 @@ int SND_PlaySnd(unsigned short Name, int vol, int pan, int pitchadj);   /* @0x80
 BOOL SND_IsSfxPlaying(int SFXNo);   /* @0x8009A6EC SNDBANK.CPP:466 */
 void STR_SoundCommand(SFXHDR *sfh, int Command);   /* @0x80099388 STREAM.CPP:876 */
 SFXHDR * STR_PlaySound(unsigned short Name, char flag, int volume, char loop);   /* @0x80098DC8 STREAM.CPP:597 */
-unsigned long GU_GetRnd(void);   /* @0x80020CF4 GUTILS.C:76 */
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" unsigned long GU_GetRnd(void);   /* @0x80020CF4 GUTILS.C:76 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
