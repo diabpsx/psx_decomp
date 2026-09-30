@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2681 / 2727 entries PASS (98.3%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2682 / 2727 entries PASS (98.3%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -969,7 +969,7 @@
 - ✅ SkipThemeRoom__Fii (51)
 - ✅ InitLevels__Fv (17)
 
-## glue  (recon/psxsrc/glue.cpp) — 26/28 PASS
+## glue  (recon/psxsrc/glue.cpp) — 27/28 PASS
 - ✅ GLUE_SetMonsterList__Fi (3)
 - ✅ GLUE_GetMonsterList__Fv (3)
 - ✅ GLUE_SuspendGame__Fv (21)
@@ -993,7 +993,7 @@
 - ✅ FindPlayerChar__FP12PlayerStructb (51)
 - ✅ MakeSurePlayerDressedProperly__FR7CPlayerR12PlayerStructbT2 (44)
 - ✅ GLUE_GetCurrentList__Fi (43)
-- 🟡 GLUE_StartGameExit__Fv — bytes PASS, SYM differs
+- ✅ GLUE_StartGameExit__Fv (27)
 - ✅ GLUE_Init__Fv (2)
 - ✅ GetTexId__7CPlayer (3)
 - ✅ SetTown__7CBlocksb (2)

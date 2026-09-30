@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (46)
+# PC twins for the remaining non-PASS functions (45)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -40,7 +40,6 @@
 | ResyncQuests__Fv | quests | 6 diffs (ours 315) | quests.cpp:739 | QUESTS.CPP:779 | quests.cpp:397 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LOADSAVE.CPP; JAP_1998_05_29/DIABPSX/SOURCE/QUES |
 | PrintCDWaitTask__FP4TASK | stream | 17 diffs (ours 79) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.H; PAL_1997_12_12/DIABPSX/PSXSRC/STREAM.C |
 
-| GLUE_StartGameExit__Fv | glue | bytes PASS, SYM differs | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.CPP |
 | M_ChangeLightOffset__Fi | monster | bytes PASS, SYM differs | monster.cpp:2323 | MONSTER.CPP:2702 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
 | MAI_Counselor__Fi | monster | bytes PASS, SYM differs | monster.cpp:5075 | MONSTER.CPP:5885 | - | JAP_1998_05_29/DIABPSX/SOURCE/MONSTER.CPP |
 | MI_Manashield__Fi | missiles | bytes PASS, SYM differs | missiles.cpp:4848 | MISSILES.CPP:5626 | - | JAP_1998_05_29/DIABPSX/SOURCE/MISSILES.CPP |
@@ -55,5 +54,5 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 ## Verified SYM-only clusters
 
 - Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
-- Optimized temporary records: `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `DRLG_L2PlaceMiniSet__FPUciiiiii` now passes: a const random-selection index plus a direct tile-offset expression removes its reused `r` record without changing the 228 instructions. `CheckMissileCol__FiiiUciiUcb` now passes: function-scope `int earflag` preserves the bytes and loses the extra record emitted for `unsigned char earflag`. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now also passes: a `const unsigned short W` temporary fixes its mask scheduling without adding a SYM record.
+- Optimized temporary records: `PrintGameOver__Fv` and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `GLUE_StartGameExit__Fv` now passes: declaring the actual `PlayerStruct plr[2]` and clearing its `plractive` fields in an ascending two-player loop lets the compiler reverse and eliminate the source induction variable, reproducing all 27 instructions without an `i` record. A cast from the old byte-array declaration does not produce the same loop optimization. `DRLG_L2PlaceMiniSet__FPUciiiiii` now passes: a const random-selection index plus a direct tile-offset expression removes its reused `r` record without changing the 228 instructions. `CheckMissileCol__FiiiUciiUcb` now passes: function-scope `int earflag` preserves the bytes and loses the extra record emitted for `unsigned char earflag`. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now also passes: a `const unsigned short W` temporary fixes its mask scheduling without adding a SYM record.
 `PrintItemPower__FcPC10ItemStruct` also passes after c3d42ca: explicit in-place output-pointer updates raise tstr's allocator priority above x's (confirmed with the 9cc6504 instrumented compiler lane). MATCH_PROGRESS.md is the authoritative gate board.

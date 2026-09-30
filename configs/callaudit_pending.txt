@@ -1,7 +1,7 @@
 # Strict direct-call audit, 2026-09-30: 129 reconstructed TUs scanned.
 # Initial scan found 29 TUs; 28 repaired/routed and re-audited, 1 remains below.
 # Full rescan: 2724/2725 real function entries pass strict direct-call checks.
-# This is separate from the 46 byte/SYM non-PASS functions on MATCH_PROGRESS.md.
+# This is separate from the 45 byte/SYM non-PASS functions on MATCH_PROGRESS.md.
 # Rerun tools/callaudit.py on each TU after changes; do not normalize signatures.
 options       # MemcardPad only: 32/33 physical call sites; merged error-sound paths
 # SoundPad now has all 41 calls in retail order, but remains byte/SYM nonmatching.

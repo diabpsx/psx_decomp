@@ -39,7 +39,8 @@ class CPlayer;
 void MAIN_RestartGameTask(void);
 void SPU_Init(void);
 void MSG_ClearOutCompMap(void);
-extern unsigned char plr[];   /* PlayerStruct plr[2] -- only address-of used here */
+struct PlayerStruct;
+extern PlayerStruct plr[2];
 
 /* Minimal PlayerStruct field slice (offsets from recon/source/gen/structs_player.h). */
 struct PlayerStruct {
@@ -290,8 +291,8 @@ void GLUE_StartGameExit(void)
 {
     {
         int i;
-        for (i = 0x19E8; i >= 0; i -= 0x19E8) {
-            plr[0x1D + i] = 0;
+        for (i = 0; i < 2; i++) {
+            plr[i].plractive = 0;
         }
     }
     GLUE_SuspendGame();
@@ -394,21 +395,21 @@ void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTo
 
 void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
 {
-    if (plr[0x1D] != 0) {
-        if (plr[0x1A05] != 0) {
+    if (plr[0].plractive != 0) {
+        if (plr[1].plractive != 0) {
             sel_data = 0;
-            P1->Print(&DefP1PanelXY2, (struct PlayerStruct *)&plr[0]);
+            P1->Print(&DefP1PanelXY2, &plr[0]);
             sel_data = 1;
-            P2->Print(&DefP2PanelXY2, (struct PlayerStruct *)&plr[0x19E8]);
+            P2->Print(&DefP2PanelXY2, &plr[1]);
         } else {
             sel_data = 0;
-            P1->Print(&DefP1PanelXY, (struct PlayerStruct *)&plr[0]);
+            P1->Print(&DefP1PanelXY, &plr[0]);
         }
         return;
     }
-    if (plr[0x1A05] != 0) {
+    if (plr[1].plractive != 0) {
         sel_data = 1;
-        P2->Print(&DefP2PanelXY, (struct PlayerStruct *)&plr[0x19E8]);
+        P2->Print(&DefP2PanelXY, &plr[1]);
     }
 }
 
@@ -436,8 +437,8 @@ void BgTask(struct TASK *T)
     GLUE_SetHomingScrollFlag(0);
     GLUE_SetShowPanelFlag(0);
     GLUE_SetFinished(0);
-    Plr1 = (struct PlayerStruct *)&plr[0];
-    Plr2 = (struct PlayerStruct *)&plr[0x19E8];
+    Plr1 = &plr[0];
+    Plr2 = &plr[1];
     if ((unsigned int)(currlevel - 0xF) < 2) {
         TSK_AddTask(0x8000, (void *)penta_cycle_task__FP4TASK, 0xC78, 0);
     }
@@ -502,7 +503,7 @@ void BgTask(struct TASK *T)
                 D_8011C6C0 -= 1;
             }
             Plr = Plr1;
-            if (plr[0x1D] == 0) {
+            if (plr[0].plractive == 0) {
                 Plr = Plr2;
             }
             P1.SetScrollTarget(*Plr, Blocks);

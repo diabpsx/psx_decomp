@@ -539,6 +539,27 @@ compiler dump: MemSize pseudo 74 -> s0, MyHnd 75 -> s1, Name 72 -> s2,
 and ah 77 -> s2. This diagnostic-only prototype removal is not a gate or
 source change. No source experiment above was retained or marked PASS.
 
+### GLUE_StartGameExit__Fv
+
+The old byte-array declaration `extern unsigned char plr[]` and a descending
+byte-offset loop gave exact bytes but retained an extra `i` debug record.
+Casting that array to `PlayerStruct *` and using a two-player ascending loop
+does not solve it: the real `loop` dump reverses the loop but says
+`Cannot eliminate biv 72: biv used in insn 101`; it retains both a source
+counter and a complete pointer (12 byte-diff lines, wrong `i` record).
+
+Declaring the actual `extern PlayerStruct plr[2]`, then using
+`for (i = 0; i < 2; i++) plr[i].plractive = 0`, fixes the source representation.
+The real compiler now recognizes a destination-address induction variable
+`6632*i + (plr+29)`, combines it with the scalar offset, reverses the loop,
+and reports `biv 72 was eliminated`. This reproduces retail's 27 instructions
+and removes the extra record. Both byte lanes, exact SYM and all seven calls
+pass; the other 26 already-passing GLUE entries remain passing.
+
+Use actual array/field declarations before diagnosing a loop from casts on
+opaque byte buffers. Identical layouts and addresses do not imply identical
+front-end trees or induction-variable transformations.
+
 Nothing under `C:/temp/dmt-cc1/` is committed (outside the repo entirely,
 per the task's rules); everything under `tools/instr/` is small text and
 safe to commit if the user wants the diagnostic lane kept.
