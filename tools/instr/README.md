@@ -268,7 +268,18 @@ python tools/instr/real_rtl.py recon/psxsrc/gpanel.cpp DrawDurThingy --dump loop
 python tools/instr/real_rtl.py recon/psxsrc/gpanel.cpp DrawDurThingy --dump greg
 ```
 
-The supported dumps are `loop`, `greg`, `lreg`, and `flow`. Each invocation
+The supported dumps are `loop`, `greg`, `lreg`, `flow`, `sched`, `sched2`, and
+`dbr`. The last three expose pre-allocation scheduling (`-dS`), post-allocation
+scheduling (`-dR`), and final delay-slot filling (`-dd`), respectively. These
+old GCC option letters were checked against its `toplev.c`; do not substitute
+newer GCC's dump spellings. For example:
+
+```sh
+python tools/instr/real_rtl.py recon/psxsrc/biglump.cpp BL_AsyncReadFile --dump sched2
+python tools/instr/real_rtl.py recon/psxsrc/biglump.cpp BL_AsyncReadFile --dump dbr
+```
+
+Each invocation
 retains its preprocessed input, assembly, and dump in a unique directory under
 `build/rtl/`. It uses the gate compiler, flags, and per-TU overrides; no source
 or assembly is rewritten. A missing source, compiler failure, absent dump, or
@@ -503,6 +514,30 @@ first-colour index gives 181 / 96 diffs, and a const short index gives 183 / 98.
 Changing only the switch selector to const unsigned short gives count-exact
 179 instructions but 100 diffs and the wrong SYM parameter locations. The
 committed source remains at 180 instructions / 97 diffs.
+
+### BL_AsyncReadFile__FPcUl
+
+Baseline is 88/88 instructions with four scheduling diff lines: ours puts
+the status-result copy before `TSK_Sleep` and its constant argument in the
+delay slot; retail puts the argument first and the result copy in the slot.
+The real `sched2`/`dbr` dumps expose the affected result-copy, argument-set,
+and call instructions rather than relying on inferred source order.
+
+Measured and restored: a loop-local `const int status`, assigned to `MemSize`
+after sleeping, gives exact bytes but an extra empty SYM scope at +0xe4.
+A function-scope mutable status gives exact bytes but an extra REG record.
+Putting the sleep in the loop condition's comma expression keeps the original
+four diffs and exact SYM. A function-scope const status in a label/goto loop
+has 88 instructions without the empty scope, but changes Name/MyHnd/ah
+allocation (32 diff lines); adding const to Name does not fix it.
+
+The isolated stock/instrumented compiler initially ICEs on the unused
+`int strlen(const char *)` declaration, even after function-body isolation.
+Removing that declaration only from the diagnostic input allows a successful
+trace. For the goto experiment its allocation agrees with the full real
+compiler dump: MemSize pseudo 74 -> s0, MyHnd 75 -> s1, Name 72 -> s2,
+and ah 77 -> s2. This diagnostic-only prototype removal is not a gate or
+source change. No source experiment above was retained or marked PASS.
 
 Nothing under `C:/temp/dmt-cc1/` is committed (outside the repo entirely,
 per the task's rules); everything under `tools/instr/` is small text and

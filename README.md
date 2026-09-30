@@ -30,8 +30,9 @@ The complete seal bar also requires an exact `tools/symlane.py` receipt plus the
 and jump-table audits.  Functions affected by maspsx emulation differences are checked through
 the real PsyQ ASPSX 2.56 lane (`tools/aspsx_gate.py`) and listed in
 `configs/aspsx_passes.txt`.  The reconstruction target is 2727 game entries (2725 functions
-and two data-only split artifacts); the 837 PsyQ SDK
-functions are linked from the retail Sony libraries and are excluded from the reconstruction count.
+and two data-only split artifacts); the 837 library-region entries are excluded
+from the reconstruction count. PsyQ SDK functions must be supplied from the
+retail Sony archives, not reconstructed.
 
 Direct calls and tail calls can be checked with full C++ signatures:
 ```
@@ -58,3 +59,15 @@ relocations, and DLG small-data symbol placements against retail. The board coun
 these as data receipts, keeping the requested 2727-entry scope unchanged.
 
 Verify the source-emitted DLG data with `python tools/data_gate.py`.
+
+## Final-image integration is still pending
+
+The function board is not a final reconstructed-image or SDK-linkage receipt.
+Currently `configs/recon_link.json` selects only `coremon`; `tools/gen_ld.py`
+otherwise selects skeleton/scaffold objects, and `src/lib.c` supplies the library
+region through `INCLUDE_ASM`. The linker does not yet substitute PsyQ archives.
+That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
+so the 837 excluded entries are not all Sony SDK functions. Final integration
+must replace scaffolds with verified reconstructed TUs and the appropriate
+retail library inputs, then verify all linked images and relocations. None of
+these integration requirements is waived by the per-function PASS count.
