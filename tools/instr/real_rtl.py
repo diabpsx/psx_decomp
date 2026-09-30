@@ -17,7 +17,8 @@ import build as B
 DUMPS = {"greg": ("-dg", ".greg"), "lreg": ("-dl", ".lreg"),
          "loop": ("-dL", ".loop"), "flow": ("-df", ".flow"),
          "sched": ("-dS", ".sched"), "sched2": ("-dR", ".sched2"),
-         "dbr": ("-dd", ".dbr")}
+         "dbr": ("-dd", ".dbr"), "cse": ("-ds", ".cse"),
+         "cse2": ("-dt", ".cse2"), "combine": ("-dc", ".combine")}
 
 
 def main():
@@ -25,6 +26,8 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("function", help="exact RTL function heading, or an unambiguous bare name")
     parser.add_argument("--dump", choices=DUMPS, default="greg")
+    parser.add_argument("--output-path-only", action="store_true",
+                        help="validate the function but print only the retained dump path")
     args = parser.parse_args()
     source = args.source.resolve()
     if not source.is_file():
@@ -67,7 +70,8 @@ def main():
     index, match = matches[0]
     end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
     print(f"Real compiler RTL: {dump}")
-    print(text[match.start():end].rstrip())
+    if not args.output_path_only:
+        print(text[match.start():end].rstrip())
 
 
 if __name__ == "__main__":

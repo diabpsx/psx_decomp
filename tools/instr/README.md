@@ -268,8 +268,10 @@ python tools/instr/real_rtl.py recon/psxsrc/gpanel.cpp DrawDurThingy --dump loop
 python tools/instr/real_rtl.py recon/psxsrc/gpanel.cpp DrawDurThingy --dump greg
 ```
 
-The supported dumps are `loop`, `greg`, `lreg`, `flow`, `sched`, `sched2`, and
-`dbr`. The last three expose pre-allocation scheduling (`-dS`), post-allocation
+The supported dumps are `loop`, `greg`, `lreg`, `flow`, `cse`, `cse2`, `combine`,
+`sched`, `sched2`, and `dbr`. CSE (`-ds`), post-loop CSE (`-dt`), and combine
+(`-dc`) expose earlier expression/narrowing transformations. The last three
+expose pre-allocation scheduling (`-dS`), post-allocation
 scheduling (`-dR`), and final delay-slot filling (`-dd`), respectively. These
 old GCC option letters were checked against its `toplev.c`; do not substitute
 newer GCC's dump spellings. For example:
@@ -286,6 +288,10 @@ or assembly is rewritten. A missing source, compiler failure, absent dump, or
 missing/ambiguous function heading is an error. Old GCC sometimes omits the
 class from a heading; a qualified name may fall back to its bare name only when
 that name identifies exactly one function in the dump.
+
+Use `--output-path-only` to retain/validate a stage without printing its large
+RTL body. It still rejects an absent or ambiguous function; it is not a bypass.
+This also avoids broken-pipe errors from truncating output with Select-Object.
 
 ## 5. The instrumentation (ported from NFS4's gcc-2.8.1 `apply_traces.py`)
 
@@ -580,11 +586,14 @@ where retail stores directly from s6 and schedules u0 reads around the
 x/y stores. Const By, chained y assignments, short/unsigned-short casts,
 and const u0 snapshots did not fix this residue and were restored.
 
-The real `lreg` dump narrows the extra-copy cause: insn 1086 sets an HI-mode
-pseudo from the low half of By (SI pseudo 80), carrying REG_EQUIV to the
-primitive's y1 memory at +18. Its subsequent allocation/reload produces the
-extra move. Diagnose this real-compiler equivalence before treating the
-residue as an assembler issue or adding source operations to influence it.
+The real `lreg` dump identifies insn 1086 setting HI pseudo 350 from the low
+half of By (SI pseudo 80), carrying REG_EQUIV to y1 memory at +18. Earlier
+`cse`, `cse2`, and `combine` dumps now prove that the same copy already exists
+without REG_EQUIV: allocation/reload preserves it rather than introducing it.
+The next investigation must address expression expansion or early elimination,
+not allocator priority. Reversing coordinate order only reverses stores;
+a const short Top and a comma expression grouping y stores with u1 retain the
+same extra copy. All three new source tests were restored.
 
 The progress parser formerly displayed its regex's oracle count as 'ours'.
 status.py now reports the actual source count (covered by parser regression
