@@ -23,5 +23,5 @@ struct CFont {   /* sizeof 540 */
     struct TextDat *ThisDat;   /* +0x214 */
     unsigned char FontHeight;   /* +0x218 */
 
-    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, int R, int G, int B);   /* @0x8008A090 PRINTY.CPP:746 */
+    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);   /* @0x8008A090 PRINTY.CPP:746 */
 };

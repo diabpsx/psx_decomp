@@ -24,3 +24,4 @@ void ClearQuestFlags(void);   /* @0x800857F8 */
 int RestoreLoadedData(BOOL firstflag);   /* @0x8015C9CC LOADSAVE.CPP:1358 */
 void DeltaSaveLevel(void);   /* @0x8004F5D4 MSG.CPP:780 */
 int DeltaExportData(char *Dst);   /* @0x8004F560 MSG.CPP:731 */
+void GLUE_SetShowGameScreenFlag(BOOL NewFlag);   /* GLUE.CPP: game C++ entry */

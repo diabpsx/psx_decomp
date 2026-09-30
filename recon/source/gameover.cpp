@@ -42,32 +42,33 @@ struct CPad {
 };
 
 struct RECT { short x, y, w, h; };
+enum TXT_JUST { JustLeft, JustCentre, JustRight };
 
 struct CFont {   /* opaque body; only the methods this TU calls are declared */
     int SetOTpos(int NewOt);
-    void Print(int X, int Y, const char *Str, int Just, struct RECT *R, unsigned char R2, unsigned char G2, unsigned char B2);
+    int Print(int X, int Y, char *Str, TXT_JUST Just, struct RECT *R, unsigned char R2, unsigned char G2, unsigned char B2);
 };
 extern struct CFont MediumFont;
 
 extern "C" struct TASK *TSK_Exist(void *List, int Type, int Id);
 extern "C" void *TSK_AddTask(int List, void *Func, int StackSize, int Arg);
 extern "C" void TSK_Sleep(int Ticks);
-extern "C" void GLUE_SuspendGame(void);
-extern "C" void GLUE_ResumeGame(void);
-extern "C" void GLUE_SetFinished(BOOL NewFinished);
-extern "C" void MAIN_RestartGameTask(void);
-extern "C" void PA_SetPauseOk(BOOL Ok);
-extern "C" void InitGamePadVars(void);
-extern "C" void ToggleOptions(void);
-extern "C" int VID_GetTick(void);
-extern "C" CPad *PAD_GetPad(int Idx, unsigned char PlayerNo);
+void GLUE_SuspendGame(void);
+void GLUE_ResumeGame(void);
+void GLUE_SetFinished(BOOL NewFinished);
+void MAIN_RestartGameTask(void);
+void PA_SetPauseOk(BOOL Ok);
+void InitGamePadVars(void);
+void ToggleOptions(void);
+unsigned long VID_GetTick(void);
+CPad *PAD_GetPad(int Idx, unsigned char PlayerNo);
 extern "C" int abs(int);
-extern "C" void music_fade(void);
-extern "C" void stream_fade(void);
-extern "C" void RedBack(void);
-extern "C" int PaletteFadeOut(int Ticks);
-extern "C" int GetFadeState(void);
-extern "C" const char *GetStr(int Id);
+void music_fade(void);
+void stream_fade(void);
+void RedBack(void);
+BOOL PaletteFadeOut(int Ticks);
+BOOL GetFadeState(void);
+char *GetStr(int Id);
 
 extern unsigned char automapflag;
 extern unsigned char deathflag;
@@ -159,7 +160,7 @@ void PrintGameOver(void)
     PRect.y = 0x70;
     PRect.w = 0xA0;
     PRect.h = 0x10;
-    Font->Print(0, 0xC, GetStr(0x177), 1, &PRect, 0xFF, 0xFF, 0xFF);
+    Font->Print(0, 0xC, GetStr(0x177), JustCentre, &PRect, 0xFF, 0xFF, 0xFF);
     Font->SetOTpos(oldTotpos);
     PBack.SetOTpos(oldDotpos);
 }

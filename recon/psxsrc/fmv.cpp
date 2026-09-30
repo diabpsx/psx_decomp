@@ -104,6 +104,21 @@ struct _mdecanim {   /* sizeof 20 -- one queued PlayFMVOverLay-less streamed mov
 };
 
 /* ---------------------------------------------------------------- externs (BIOS/PsyQ, other TUs) */
+enum LANG_TYPE { LANG_ENGLISH, LANG_FRENCH, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_JAPANESE };
+BOOL CD_GetCdlFILE(const char *name, CdlFILE *p);
+unsigned char PRIM_GetCurrentScreen(void);
+LANG_TYPE LANG_GetLang(void);
+void SPU_Init(void);
+long ENG_random(long n);
+unsigned long VID_GetTick(void);
+void STR_AllocBuffer(void);
+void *Tmalloc(int size);
+void Tfree(void *p);
+void PAD_Handler(void);
+void VID_AfterDisplay(void);
+void VID_SetDBuffer(BOOL on);
+class CPad *PAD_GetPad(int pnum, unsigned char mode);
+
 extern "C" {
 CdlLOC *CdIntToPos(int i, CdlLOC *p);
 int CdControlB(u_char com, void *param, void *result);
@@ -113,7 +128,6 @@ int CdReset(int mode);
 int CdGetSector(void *madr, int size);
 int CdPosToInt(CdlLOC *p);
 void *CdReadyCallback(void (*func)(unsigned char, unsigned char *));
-void CD_GetCdlFILE(const char *name, CdlFILE *p);   /* mangled CD_GetCdlFILE__FPCcP7CdlFILE */
 int ReloadGP(void);
 void SetGP(int gp);
 void DBG_Error(int code, const char *file, int line);
@@ -123,9 +137,7 @@ void ExitCriticalSection(void);
 int printf(const char *fmt, ...);
 int fileexists(char *name);
 int filesize(char *name);
-int PRIM_GetCurrentScreen(void);
 void SetPolyFT4(POLY_FT4 *p);
-int LANG_GetLang(void);
 void ClearImage(RECT *rect, u_char r, u_char g, u_char b);
 int SpuMalloc(int size);
 int SpuFree(int addr);
@@ -138,23 +150,14 @@ int SpuSetTransferMode(int mode);
 int SpuIsTransferCompleted(int mode);
 int SpuSetCommonAttr(void *attr);
 int SpuSetVoiceAttr(void *attr);
-void SPU_Init(void);
-int ENG_random(long n);
 int VSync(int mode);
-int VID_GetTick(void);
 void systemtask(int);
 int strcmp(const char *a, const char *b);
 char *strcpy(char *dst, const char *src);
 int sprintf(char *dst, const char *fmt, ...);
-int STR_AllocBuffer(void);
-void *Tmalloc(int size);
-int Tfree(void *p);
 int GetVideoMode(void);
 int SetDispMask(int mask);
 void TICK_Update(void);
-void PAD_Handler(void);
-void VID_AfterDisplay(void);
-void VID_SetDBuffer(BOOL on);
 int TSK_Sleep(int frames);
 /* MDEC/VLC decoder-core library helpers (linked from another TU/lib -- unlabeled in the raw, real
  * retail names unknown; kept as func_<VA> per the raw oracle). */
@@ -166,7 +169,6 @@ void func_8013AD94(void *data);
 void func_8013ADA0(void *vlcbuf_half, int mode);
 void func_8013AE1C(void *dst, int size);
 /* PAD / audio / misc engine helpers used by LoPlayFMVOverLay's main loop (other TUs). */
-class CPad *PAD_GetPad(int pnum, int mode);
 void PA_SetPauseOk(int on);
 }
 
@@ -1331,7 +1333,6 @@ extern "C" int setjmp(jmp_buf);
 extern "C" void longjmp(jmp_buf, int);
 extern "C" void GSYS_SetStackAndJump(void *Stack, void (*Func)(void *), void *Param);
 extern "C" void LoPlayFMVOverLay(void *);
-enum LANG_TYPE { LANG_ENGLISH, LANG_FRENCH, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_JAPANESE };
 extern int sglMasterVolume;
 
 static jmp_buf D_80121D08;     /* PlayFMVOverLay's own setjmp env (right after g_movie_filename[32],

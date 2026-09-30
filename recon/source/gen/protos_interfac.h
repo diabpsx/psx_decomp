@@ -3,7 +3,7 @@ unsigned long (*GRL_SetWindowProc(unsigned long (*NewProc)(unsigned long, unsign
 unsigned long DisableInputWndProc(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam);   /* @0x80038894 DIABLO.CPP:2191 */
 void sound_init(void);   /* @0x8003D940 EFFECTS.CPP:631 */
 void DeltaSaveLevel(void);   /* @0x8004F5D4 MSG.CPP:780 */
-void app_fatal(char *pszFile);   /* @0x80039F08 DIABLO.CPP:3593 */
+extern "C" void app_fatal(char *pszFile, ...);   /* @0x80039F08 DIABLO.CPP:3593 */
 void FreeGameMem(void);   /* @0x80037FAC DIABLO.CPP:292 */
 void LoadGameLevel(unsigned char firstflag, int lvldir);   /* @0x80039270 DIABLO.CPP:2785 */
 void SetReturnLvlPos(void);   /* @0x800681CC QUESTS.CPP:458 */

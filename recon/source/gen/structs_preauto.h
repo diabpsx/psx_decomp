@@ -12,8 +12,8 @@ struct FileIO {   /* sizeof 20 */
     void *_vf;   /* +0x10 vptr (gcc 2.7 places it after the members; declared only to give this
                   * TU's local copy the retail sizeof 20 -- FileLen/ReadAtAddr are called here by
                   * direct jal, so the real virtuals are not modeled). */
-    int FileLen(char *Name);
-    BOOL ReadAtAddr(char *Name, unsigned char *Dest, int Len);
+    int FileLen(const char *Name);
+    BOOL ReadAtAddr(const char *Name, unsigned char *Dest, int Len);
 };
 
 struct map_info {   /* sizeof 8 */

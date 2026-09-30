@@ -127,7 +127,7 @@ extern const unsigned char BORDERR, BORDERG, BORDERB;
 void PrintSelectBack(unsigned short Id);
 char *GetStr(int StrId);
 void DrawFeTwinkle(int x, int y);
-void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, int SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, int SinStep);
+void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB, int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross, BOOL iso, unsigned char SinStep);
 static int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp);
 extern "C" int sprintf(char *buf, const char *fmt, ...);
 

@@ -5,7 +5,7 @@ void LoadPreL2Dungeon(char *sFileName, int vx, int vy);   /* @0x80148358 DRLG_L2
 void LoadL2Dungeon(char *sFileName, int vx, int vy);   /* @0x8014813C DRLG_L2.CPP:3098 */
 void LoadPreL3Dungeon(char *sFileName, int vx, int vy);   /* @0x8014D64C DRLG_L3.CPP:2286 */
 void LoadL3Dungeon(char *sFileName, int vx, int vy);   /* @0x8014D4C8 DRLG_L3.CPP:2218 */
-void LoadPalette(char *pszFileName);   /* @0x8007EE64 PALETTE.CPP:78 */
+void LoadPalette(const char *pszFileName);   /* @0x8007EE64 PALETTE.CPP:78 */
 void DRLG_ListTrans(int num, unsigned char *List);   /* @0x8015A1A0 GENDUNG.CPP:270 */
 void DRLG_AreaTrans(int num, unsigned char *List);   /* @0x8015A214 GENDUNG.CPP:287 */
 void AddL1Objs(int x1, int y1, int x2, int y2);   /* @0x801583A0 PREOBJ.CPP:1188 */

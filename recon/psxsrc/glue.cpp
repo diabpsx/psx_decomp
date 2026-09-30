@@ -36,9 +36,9 @@ extern void BgTask(struct TASK *T);
 class CBlocks;
 class CPlayer;
 
-extern "C" void MAIN_RestartGameTask(void);
-extern "C" void SPU_Init(void);
-extern "C" void MSG_ClearOutCompMap(void);
+void MAIN_RestartGameTask(void);
+void SPU_Init(void);
+void MSG_ClearOutCompMap(void);
 extern unsigned char plr[];   /* PlayerStruct plr[2] -- only address-of used here */
 
 /* Minimal PlayerStruct field slice (offsets from recon/source/gen/structs_player.h). */
