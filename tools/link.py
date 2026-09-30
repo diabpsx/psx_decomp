@@ -13,10 +13,22 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import build as B
+from data_gate import Elf
 
 LD = B.MIPS / "mipsel-none-elf-ld.exe"
 OBJCOPY = B.MIPS / "mipsel-none-elf-objcopy.exe"
 IMAGES = {"diabpsx": "DIABPSX.BIN", "frontend": "FRONTEND.BIN", "pregame": "PREGAME.BIN", "game": "GAME.BIN", "fmv": "FMV.BIN"}
+
+def validate_runtime_sections(elf, selected):
+    """Do not silently let unplaced source data become linker orphan sections."""
+    discarded = {".reginfo", ".comment", ".pdr", ".gnu.attributes", ".MIPS.abiflags"}
+    for name, section in zip(elf.names, elf.sections):
+        if section[2] & 2 and section[5] and name not in selected:
+            if name not in discarded and not name.startswith(".mdebug"):
+                raise ValueError(f"source runtime section has no explicit placement: {name}")
+    if any(index == 0xFFF2 for symbols in elf.symbols.values()
+           for name, value, size, info, other, index in symbols):
+        raise ValueError("source common symbols need explicit placement support")
 
 def assemble_raw(s: Path, obj: Path):
     """splat data/asm .s (uses glabel/dlabel macros) -> .o with plain GNU as"""
@@ -33,6 +45,9 @@ def link(name: str):
     ld_script = ROOT / "linkers" / f"{name}.ld"
     txt = ld_script.read_text()
     objs = sorted(set(re.findall(r"(build/\S+?\.o)\(", txt)))
+    inputs = {}
+    for obj, section in re.findall(r"(build/\S+?\.o)\((\.[\w.]+)\)", txt):
+        inputs.setdefault(obj, set()).add(section)
     for o in objs:
         op = ROOT / o
         if o.startswith("build/asm/"):
@@ -59,6 +74,8 @@ def link(name: str):
                 B.compile_any(src)
         else:
             sys.exit(f"unknown object in ld script: {o}")
+        if o.startswith("build/recon/"):
+            validate_runtime_sections(Elf(op), inputs[o])
     extra = [ROOT / "linkers" / f"undefined_syms_auto{'' if name == 'diabpsx' else '_' + name}.txt",
              ROOT / "linkers" / f"undefined_funcs_auto{'' if name == 'diabpsx' else '_' + name}.txt"]
     cmd = [str(LD), "-EL", "-T", str(ld_script)] + sum([["-T", str(e)] for e in extra if e.exists() and e.stat().st_size], []) + \

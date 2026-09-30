@@ -20,5 +20,7 @@
   "scrollrt": "recon/source/scrollrt.cpp",
   "storm": "recon/source/storm.cpp",
   "testcode": "recon/source/testcode.cpp",
-  "tims": "recon/psxsrc/tims.cpp"
+  "tims": "recon/psxsrc/tims.cpp",
+  "pcio": "recon/psxsrc/pcio.cpp",
+  "datio": "recon/psxsrc/datio.cpp"
 }

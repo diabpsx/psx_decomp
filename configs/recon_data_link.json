@@ -1,0 +1,6 @@
+{
+  "diabpsx": {
+    "rodata_pcio": {"owner": "pcio", "section": ".rodata", "size": 104},
+    "rodata_datio": {"owner": "datio", "section": ".rodata", "size": 88}
+  }
+}

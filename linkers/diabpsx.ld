@@ -120,11 +120,11 @@ SECTIONS
         . = 0x7587C;   /* 0x8008587C */
         build/skel/PSXSRC/FILEIO.CPP.o(.text);
         . = 0x760B4;   /* 0x800860B4 */
-        build/skel/PSXSRC/PCIO.CPP.o(.text);
+        build/recon/psxsrc/pcio.cpp.o(.text);   /* reconstructed TU */
         . = 0x76618;   /* 0x80086618 */
         build/skel/PSXSRC/SYSOBJ.CPP.o(.text);
         . = 0x76744;   /* 0x80086744 */
-        build/skel/PSXSRC/DATIO.CPP.o(.text);
+        build/recon/psxsrc/datio.cpp.o(.text);   /* reconstructed TU */
         . = 0x76C40;   /* 0x80086C40 */
         build/skel/PSXSRC/CDIO.CPP.o(.text);
         . = 0x7725C;   /* 0x8008725C */
@@ -374,11 +374,15 @@ SECTIONS
         . = 0x1000E0;   /* 0x801100E0 */
         build/asm/data/rodata_fileio.rodata.s.o(.rodata);
         . = 0x100130;   /* 0x80110130 */
-        build/asm/data/rodata_pcio.rodata.s.o(.rodata);
+        __recon_diabpsx_rodata_pcio_start = .;
+        build/recon/psxsrc/pcio.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_pcio_start == 0x68, "wrong source data extent: rodata_pcio");
         . = 0x100198;   /* 0x80110198 */
         build/asm/data/rodata_sysobj.rodata.s.o(.rodata);
         . = 0x1001AC;   /* 0x801101AC */
-        build/asm/data/rodata_datio.rodata.s.o(.rodata);
+        __recon_diabpsx_rodata_datio_start = .;
+        build/recon/psxsrc/datio.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_datio_start == 0x58, "wrong source data extent: rodata_datio");
         . = 0x100204;   /* 0x80110204 */
         build/asm/data/rodata_cdio.rodata.s.o(.rodata);
         . = 0x10026C;   /* 0x8011026C */

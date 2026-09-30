@@ -72,9 +72,11 @@ Relocated pointer tables are rejected and need a relocation-aware gate.
 ## Final-image integration is still pending
 
 The function board is not a final reconstructed-image or SDK-linkage receipt.
-Currently `configs/recon_link.json` selects 22 reconstructed TUs covering
-65 verified function entries. These source objects contain no owned runtime
-data/tables and replace their text scaffolds at the original addresses.
+Currently `configs/recon_link.json` selects 24 reconstructed TUs covering
+79 verified function entries. They replace their text scaffolds at the original
+addresses. PCIO and DatIO also supply their complete read-only sections,
+including diagnostic strings and relocated virtual-method tables, through
+`configs/recon_data_link.json`. The other selected objects own no runtime data.
 `python tools/link.py` verifies the resulting mixed-source images: the main
 image's 1,099,272 retail bytes plus 120,300 bytes of zero BSS, and all four
 overlay images, match exactly. This checks callback-address, cross-image-call,
@@ -87,6 +89,13 @@ otherwise selects skeleton/scaffold objects, and `src/lib.c` supplies the librar
 region through `INCLUDE_ASM`. The linker does not yet substitute PsyQ archives.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
-must replace scaffolds with verified reconstructed TUs and the appropriate
+must replace the remaining scaffolds with verified reconstructed TUs and the appropriate
 retail library inputs, then verify all linked images and relocations. None of
 these integration requirements is waived by the per-function PASS count.
+
+Whole source-data placements must match the retail fragment kind and extent,
+belong to reconstructed text in that image, and cannot place a source section
+twice. The linker asserts the emitted extent and rejects orphan runtime
+sections or common storage needing placement support. Partial/sparse source
+sections and source global constructor/destructor lists still require further
+integration support.
