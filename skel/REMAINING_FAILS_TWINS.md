@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (51)
+# PC twins for the remaining non-PASS functions (50)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -28,7 +28,6 @@
 | CheckInvPaste__Fiii | inv | 1575 diffs (ours 1890; 37/37 calls exact, 12-insn length gap) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | GetUniqueItem__Fii | items | 88 diffs (ours 216) | items.cpp:2838 | ITEMS.CPP:2798 | items.cpp:1452 | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; PAL_1997_12_12/DIABPSX/SOURCE/ITEMS.CPP; |
 | ProcessItems__Fv | items | 136 diffs (ours 169) | items.cpp:3488 | ITEMS.CPP:3460 | items.cpp:3781 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H |
-| PrintItemPower__FcPC10ItemStruct | items | 134 diffs (ours 497) | items.cpp:3946 | ITEMS.CPP:3923 | - | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; JAP_1998_05_29/DIABPSX/SOURCE/STORES.CPP |
 | DoLighting__Fiiii | lighting | 373 diffs (ours 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
 | read_card_directory__Fi | memcard | 3 diffs (ours 151; one -1 comparison lowering) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.H |
 | delta_get_item__FPC9TCmdGItemUc | msg | 103 diffs (ours 115) | msg.cpp:548 | MSG.CPP:1065 | - | JAP_1998_05_29/DIABPSX/SOURCE/MSG.CPP; JAP_1998_05_29/DIABPSX/SOURCE/MSG.H; PAL_1997_12_12/DIABPSX/SOURCE/MSG.CPP; PAL_1 |
@@ -59,4 +58,4 @@ Legend: devilution/hellfire/devilutionx = PC twin definition file:line under ref
 
 - Local-static membership: `set_mdec_audio_volume`, `stream_cdready_handler`, `MI_Manashield__Fi`, and `ProcessMonsters__Fv` are byte-exact, but the current PsyQ 4.0 debug lane emits their function-local `STAT` records inside the outer block while retail emits them immediately before it. PsyQ 4.1, 4.3, and 4.6 were tested and change code bytes, so they are not valid substitutes.
 - Optimized temporary records: `DRLG_L2PlaceMiniSet__FPUciiiiii`, `PrintGameOver__Fv`, `GLUE_StartGameExit__Fv`, and `wait_cdstream` are byte-exact but retain one source temporary record absent from retail. `CheckMissileCol__FiiiUciiUcb` now passes: function-scope `int earflag` preserves the bytes and loses the extra record emitted for `unsigned char earflag`. `MakeGt4__7CBlocksP8POLY_GT4P9FRAME_HDR` now has exact SYM and instruction count; only the width/height mask scheduling order remains.
-Updated after e45ec18; MATCH_PROGRESS.md is the authoritative gate board.
+`PrintItemPower__FcPC10ItemStruct` also passes after c3d42ca: explicit in-place output-pointer updates raise tstr's allocator priority above x's (confirmed with the 9cc6504 instrumented compiler lane). MATCH_PROGRESS.md is the authoritative gate board.

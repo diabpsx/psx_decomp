@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
 
-**Game code: 2676 / 2727 functions PASS (98.1%) — 837 PsyQ SDK functions excluded**
+**Game code: 2677 / 2727 functions PASS (98.2%) — 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1172,7 +1172,7 @@
 ## itemdat  (recon/source/itemdat.cpp) — 1/1 PASS
 - ✅ InitAllItemsUseable__Fv (14)
 
-## items  (recon/source/items.cpp) — 103/106 PASS
+## items  (recon/source/items.cpp) — 104/106 PASS
 - ✅ InitItemGFX__Fv (2)
 - ✅ ItemPlace__Fii (39)
 - ✅ AddInitItems__Fv (130)
@@ -1237,7 +1237,7 @@
 - ✅ RechargeItem__FP10ItemStructi (26)
 - ✅ DoRecharge__Fii (73)
 - ✅ PrintItemOil__Fc (63)
-- ❌ PrintItemPower__FcPC10ItemStruct — 134 diffs (ours 497)
+- ✅ PrintItemPower__FcPC10ItemStruct (497)
 - ✅ PrintItemMisc__FPC10ItemStruct (152)
 - ✅ PrintItemDetails__FPC10ItemStruct (287)
 - ✅ PrintItemDur__FPC10ItemStruct (219)
