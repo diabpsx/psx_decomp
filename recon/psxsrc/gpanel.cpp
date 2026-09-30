@@ -355,14 +355,7 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
     Ft4->b0 = NewB;
 
     Ft4 = PanelTData->PrintFt4(0x94, X, Y, 0, GPanelOt + 1, 0);
-    Ft4->y0 = (short)(Y - 2);
-    Ft4->y1 = (short)(Y - 2);
-    Ft4->x0 = (short)(X + 0x14);
-    Ft4->x2 = (short)(X + 0x14);
-    Ft4->x1 = (short)(X + 0x18);
-    Ft4->y2 = (short)(Y + 0x17);
-    Ft4->x3 = (short)(X + 0x18);
-    Ft4->y3 = (short)(Y + 0x17);
+    setXYWH(Ft4, X + 0x14, Y - 2, 4, 25);
     Ft4->r0 = 0;
     Ft4->g0 = 0;
     Ft4->b0 = 0;

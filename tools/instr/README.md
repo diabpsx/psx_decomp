@@ -527,7 +527,7 @@ including its source SDB extent; five negative tests rejected a wrong VA,
 wrong extent including padding, missing symbol, zero size, and pointer
 relocations. This data-byte receipt does not count as a new function PASS.
 
-Current source: 178/179 instructions, 57 diff lines, an 80-byte frame versus
+After matrix reconstruction: 178/179 instructions, 57 diff lines, an 80-byte frame versus
 retail's 88. The unrecorded Y-1 row anchor and initial rectangle scheduling
 still differ. Adding an explicit const YBase restores the anchor's register
 but introduces an extra REG record/scope and stays nonmatching (180/179,
@@ -539,6 +539,15 @@ from that result. The shared SDK header is now included and implicit checks
 use the real source path. A valid experiment chaining y1=y0 gives 179/179
 but 62 lines. Those coordinate experiments were
 restored; only the SYM-confirmed matrix declaration/initializer was retained.
+
+With psyq.h actually included, a valid setXYWH(Ft4, X+20, Y-2, 4, 25)
+for the initial black rectangle fixes its scheduling and reduces the current
+source to 49 diff lines (still 178/179 instructions and frame 80 versus 88).
+Replacing the inner rectangles with setXYWH as well produces identical code,
+so their explicit stores remain. The retained macro passes the real-path
+implicit check; GPANEL's 13/13 direct-call audits (including DrawSpeedBar's
+28 sites) and its ten existing function passes remain unchanged. The Y-1
+anchor still needs a source-level explanation.
 
 ### DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct
 
