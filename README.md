@@ -99,3 +99,12 @@ twice. The linker asserts the emitted extent and rejects orphan runtime
 sections or common storage needing placement support. Partial/sparse source
 sections and source global constructor/destructor lists still require further
 integration support.
+
+`python tools/sdk_provenance.py` screens the excluded library region against
+original PsyQ 4.0 archive members and writes `build/sdk_provenance.json`.
+Current strict screening identifies 122/837 entries with archive-backed
+candidates; this is NOT a library PASS or link receipt. It checks exact archive
+membership, function extents, and unrelocated instruction bits, records input
+hashes, and rejects unknown/full-word patch masks. Relocation target expressions,
+archive extraction/selection, stripped-function boundaries, and non-Sony library
+provenance still need their own verification before the scaffold can be replaced.
