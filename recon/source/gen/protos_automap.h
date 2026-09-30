@@ -16,7 +16,7 @@ void DrawHorzArch(int X, int Y);   /* @0x80162BA4 AUTOMAP.CPP:546 */
 void DrawAutoMapStairs(int X, int Y);   /* @0x80162CD8 AUTOMAP.CPP:628 */
 void DrawAutomap(void);   /* @0x80162E50 AUTOMAP.CPP:666 */
 
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 extern "C" {
 void SetLineF2(LINE_F2 *p);   /* PsyQ libgpu -- lib segment */

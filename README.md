@@ -31,3 +31,14 @@ and jump-table audits.  Functions affected by maspsx emulation differences are c
 the real PsyQ ASPSX 2.56 lane (`tools/aspsx_gate.py`) and listed in
 `configs/aspsx_passes.txt`.  The reconstruction target is 2727 game functions; the 837 PsyQ SDK
 functions are linked from the retail Sony libraries and are excluded from the reconstruction count.
+
+Direct calls and tail calls can be checked with full C++ signatures:
+```
+python tools/callaudit.py recon/source/items.cpp
+python tools/callaudit.py recon/source/automap.cpp DrawAutomap__Fv
+```
+This compiles the current TU and compares ordered target symbols against its oracles.
+It accepts proven address aliases and TU-owned header copies, while preserving parameter
+types. SDK and Climax C-library declarations must use C linkage. Jump tables and indirect
+function-pointer sources still need their separate checks. The older scratch call audit
+strips signatures and must not be used as the final call-target receipt.

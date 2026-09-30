@@ -3,7 +3,7 @@ long ENG_random(long v);   /* @0x8003DB24 ENGINE.CPP:113 */
 BOOL GetSOLID(int x, int y);   /* @0x80082CE0 DPIECE.CPP:194 */
 void NewCursor(int i);   /* @0x80037804 CURSOR.CPP:179 */
 void PlaySfxLoc(int psfx, int x, int y);   /* @0x8003D784 EFFECTS.CPP:535 */
-void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
+extern "C" void DBG_Error(char *Text, char *File, int Line);   /* @0x80020E94 GDEBUG.C:146 */
 void SetRndSeed(long s);   /* @0x8003DACC ENGINE.CPP:94 */
 void PlaySFX(int psfx);   /* @0x8003D718 EFFECTS.CPP:520 */
 void NetSendCmdDItem(unsigned char a, int ii);
@@ -118,7 +118,7 @@ unsigned char WitchItemOk(int i);   /* @0x80049774 ITEMS.CPP:5487 */
 unsigned char IsDplayer(int x, int y);   /* @0x8005FD10 PLAYER.CPP:262 */
 char * GetStr(int StrId);   /* @0x8007B528 LANG.CPP:171 */
 void AddPanelString(const char *str, int just);   /* @0x80031E60 CONTROL.CPP:1279 */
-int sprintf(char *buf, const char *fmt, ...);
+extern "C" int sprintf(char *buf, const char *fmt, ...);   /* retail LIBC entry, not a C++ overload */
 char * get_pieces_str(int nGold);   /* @0x8003751C CONTROL.CPP:3563 */
 BOOL TargetingSpell(int sp);   /* @0x800A17D4 PADFUNCS.CPP:482 */
 void InitTargetCursor(int pnum);   /* @0x800A1758 PADFUNCS.CPP:458 */

@@ -12,7 +12,7 @@ enum TXT_JUST {
 };
 
 struct CFont {   /* sizeof 540 -- only Print/GetStrWidth used here, rest opaque */
-    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, int R, int G, int B);   /* @0x8008A090 PRINTY.CPP:746 */
+    int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);   /* @0x8008A090 PRINTY.CPP:746 */
     int GetStrWidth(char *Str);   /* @0x8008AAA4 PRINTY.CPP:1196 */
 };
 
