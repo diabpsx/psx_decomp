@@ -68,7 +68,7 @@ def gate(tu: Path, fns):
     for m in re.finditer(r"^\s+(\S+): (PASS \((\d+) insns\)|FAIL (\d+) diffs \(ours (\d+) / oracle (\d+)\)|NOT IN OBJECT|NO ORACLE)", r.stdout, re.M):
         name = m.group(1)
         if m.group(2).startswith("PASS"): res[name] = ("PASS", int(m.group(3)), 0)
-        elif m.group(2).startswith("FAIL"): res[name] = ("FAIL", int(m.group(6)), int(m.group(4)))
+        elif m.group(2).startswith("FAIL"): res[name] = ("FAIL", int(m.group(5)), int(m.group(4)))
         else: res[name] = (m.group(2), 0, 0)
     if not res and r.returncode:
         print(f"[{tu}] gate error:\n{r.stdout}{r.stderr}", file=sys.stderr)

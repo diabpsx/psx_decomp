@@ -532,9 +532,54 @@ retail's 88. The unrecorded Y-1 row anchor and initial rectangle scheduling
 still differ. Adding an explicit const YBase restores the anchor's register
 but introduces an extra REG record/scope and stays nonmatching (180/179,
 57 diff lines). Reading row fields back for y2/y3 adds loads (181/179,
-86 lines); a setXYWH macro changes allocation (177/179, 160 lines);
-chaining y1=y0 gives 179/179 but 62 lines. Those coordinate experiments were
+86 lines). The earlier setXYWH experiment (177/179, 160 lines) was invalid:
+gpanel.cpp did not yet include the macro header, so it compiled as an implicit
+function call, not a macro. It was discarded; do not infer macro behavior
+from that result. The shared SDK header is now included and implicit checks
+use the real source path. A valid experiment chaining y1=y0 gives 179/179
+but 62 lines. Those coordinate experiments were
 restored; only the SYM-confirmed matrix declaration/initializer was retained.
+
+### DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct
+
+The former 380-line mismatch contained genuine reconstruction errors, not
+just allocation residue. Retail uses a 36-byte POLY_G4; the source used a
+POLY_FT4 view with a length written into its code byte and three halfword
+colour stores. The actual PsyQ 4.0 LIBGPU.H definition is now shared in
+psyq.h, replacing identical local definitions in loading/options/primpool.
+
+Repaired from retail instructions and SYM: four upper/lower colour bounces
+(the fourth upper bounce was absent), byte conversion BEFORE halving the
+red channels, the primitive's correct vertex rows, and addPrim at
+ThisOt[GPanelOt-2]. The original Bx/By bar origin is preserved while X/Y walk
+the middle frames and typed PlayerStruct::SpdList[8] items. The background
+quad now uses that saved origin, correct top/bottom rows, and a function-scope
+Ft4 local matching SYM rather than Ft4b plus unrecorded coordinate locals.
+
+Four single-use const selector snapshots preserve each retail global read
+before that vertex's coordinate stores, without extra instructions or SYM
+records. Single-use InnerX/InnerY values preserve the corresponding +2
+computations. Moving the middle-loop initializations after the first fixed
+corner print also reproduces its argument and delay-slot order.
+
+Current: 460/459 instructions, 11 diff lines in the final background quad;
+both assemblers fail, so this is NOT a PASS receipt. Parameter/local types,
+registers, record order, and nested block offsets now match; the extra final
+instruction changes the function length/end offset. The real compiler's
+assembly still contains a move from s6 into v1 before the two y stores,
+where retail stores directly from s6 and schedules u0 reads around the
+x/y stores. Const By, chained y assignments, short/unsigned-short casts,
+and const u0 snapshots did not fix this residue and were restored.
+
+The real `lreg` dump narrows the extra-copy cause: insn 1086 sets an HI-mode
+pseudo from the low half of By (SI pseudo 80), carrying REG_EQUIV to the
+primitive's y1 memory at +18. Its subsequent allocation/reload produces the
+extra move. Diagnose this real-compiler equivalence before treating the
+residue as an assembler issue or adding source operations to influence it.
+
+The progress parser formerly displayed its regex's oracle count as 'ours'.
+status.py now reports the actual source count (covered by parser regression
+tests); this corrects diagnostics, not any PASS verdict.
 
 ### BL_AsyncReadFile__FPcUl
 

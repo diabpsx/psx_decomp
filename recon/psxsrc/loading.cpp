@@ -29,14 +29,6 @@ struct DEF_ARGS {   /* sizeof 16 */
     unsigned long a3;
 };
 
-typedef struct POLY_G4 {   /* sizeof 36 */
-    u_long tag;
-    u_char r0, g0, b0, code; short x0, y0;
-    u_char r1, g1, b1, pad1; short x1, y1;
-    u_char r2, g2, b2, pad2; short x2, y2;
-    u_char r3, g3, b3, pad3; short x3, y3;
-} POLY_G4;
-
 #define setPolyG4(p) setlen(p, 8), setcode(p, 0x38)
 #define setRGB0(p, _r, _g, _b) ((p)->r0 = (_r), (p)->g0 = (_g), (p)->b0 = (_b))
 #define setRGB1(p, _r, _g, _b) ((p)->r1 = (_r), (p)->g1 = (_g), (p)->b1 = (_b))
