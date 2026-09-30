@@ -42,3 +42,7 @@ It accepts proven address aliases and TU-owned header copies, while preserving p
 types. SDK and Climax C-library declarations must use C linkage. Jump tables and indirect
 function-pointer sources still need their separate checks. The older scratch call audit
 strips signatures and must not be used as the final call-target receipt.
+The first full strict scan (2026-09-30) checked 129 reconstructed TUs and found
+29 needing target fixes or audit routing work; they are tracked in
+`configs/callaudit_pending.txt`. These are additional seal requirements beyond
+the byte/SYM progress count.
