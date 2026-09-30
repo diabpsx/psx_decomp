@@ -1,3 +1,5 @@
 {
-  "coremon": "recon/source/coremon.cpp"
+  "coremon": "recon/source/coremon.cpp",
+  "async": "recon/psxsrc/async.cpp",
+  "coreinv": "recon/source/coreinv.cpp"
 }

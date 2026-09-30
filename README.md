@@ -72,7 +72,13 @@ Relocated pointer tables are rejected and need a relocation-aware gate.
 ## Final-image integration is still pending
 
 The function board is not a final reconstructed-image or SDK-linkage receipt.
-Currently `configs/recon_link.json` selects only `coremon`; `tools/gen_ld.py`
+Currently `configs/recon_link.json` selects `coremon`, `async`, and `coreinv`
+(24 verified function entries). The latter two contain no owned runtime data;
+their source objects now replace their text scaffolds at the original addresses.
+`python tools/link.py diabpsx` verifies the resulting mixed-source main image:
+1,099,272 retail bytes identical, plus 120,300 bytes of zero BSS.
+This also checks the async callback-address and external-data relocations after
+linking, not merely normalized instruction fields. `tools/gen_ld.py`
 otherwise selects skeleton/scaffold objects, and `src/lib.c` supplies the library
 region through `INCLUDE_ASM`. The linker does not yet substitute PsyQ archives.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),

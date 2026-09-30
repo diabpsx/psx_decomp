@@ -94,7 +94,7 @@ SECTIONS
         . = 0x726A0;   /* 0x800826A0 */
         build/src/version.c.o(.text);
         . = 0x7271C;   /* 0x8008271C */
-        build/skel/SOURCE/COREINV.CPP.o(.text);
+        build/recon/source/coreinv.cpp.o(.text);   /* reconstructed TU */
         . = 0x727D0;   /* 0x800827D0 */
         build/skel/SOURCE/GAMEMENU.CPP.o(.text);
         . = 0x727D8;   /* 0x800827D8 */
@@ -164,7 +164,7 @@ SECTIONS
         . = 0x8A198;   /* 0x8009A198 */
         build/skel/PSXSRC/SNDBANK.CPP.o(.text);
         . = 0x8A9B4;   /* 0x8009A9B4 */
-        build/skel/PSXSRC/ASYNC.CPP.o(.text);
+        build/recon/psxsrc/async.cpp.o(.text);   /* reconstructed TU */
         . = 0x8AC78;   /* 0x8009AC78 */
         build/skel/PSXSRC/SCRATCH.CPP.o(.text);
         . = 0x8B338;   /* 0x8009B338 */
