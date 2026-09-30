@@ -325,88 +325,84 @@ pseudos close enough in priority (or ordered oppositely between two
 otherwise-similar builds) that whichever is processed first grabs the
 lower-numbered register.
 
-## 6. Worked example: `PrintItemPower__FcPC10ItemStruct` (`recon/source/items.cpp:3414`)
+## 6. Worked example: `PrintItemPower__FcPC10ItemStruct`
 
-Current status (`tools/verify_asm.py`): **134 diffs**, and per
-`MATCH_PROGRESS.md` a documented near-miss. `verify_asm.py`'s diff isolates
-it to exactly one register swap right at function entry:
+Before the 2026-09-30 fix, the focused gate had **134 diffs, 497/497 instructions**:
+our full `items.cpp` build put `x` in **s1** and the `tempstr` base in **s2**;
+retail puts `x` in **s2** and the base in **s1**. The function now passes both
+byte lanes, exact SYM, all 69 call targets, and its jump table.
 
-```
-      +sw s2,32(sp)
-      +addu s2,a1,zero          <- OURS:   x (2nd param, a1) -> $s2
-      +lb v0,105(s2)
-      -addu s1,a1,zero          <- ORACLE: x (2nd param, a1) -> $s1
-      -lb v0,105(s1)
-      -sw s2,32(sp)
-      -lui s2,0                 <- ORACLE: the OTHER var (tempstr addr)  -> $s2
-      -addiu s2,s2,0
-      +lui s1,0                 <- OURS:   the OTHER var (tempstr addr)  -> $s1
-      +addiu s1,s1,0
-```
-
-i.e. exactly the task's "pure s1/s2 swap" — `x` (the `const ItemStruct *`
-parameter) and the pointer that materializes `tempstr`'s address are
-call-crossing, so GLOBAL alloc (not local-alloc) decides their homes.
-`items.cpp` itself ICEs on an unrelated earlier function (`GetItemStr`,
-line 1690, a `switch` with a nested `sprintf` — the destructor bug from §3
-doesn't apply here, this looks like a different, not-yet-diagnosed FSF-2.7.2
-ICE, but it's before `PrintItemPower` either way and blocks the whole-TU
-trace), so `isolate_fn.py` was used to extract just `PrintItemPower` (see
-`tools/instr/README.md` §4's exact recipe; the isolated single-function TU
-compiles cleanly under BOTH the real PsyQ CC1PLPSX and our stock cc1plus,
-producing an **IDENTICAL** `.s` — confirming the instrumented build's trace
-for this specific function is retail-accurate, not just FSF-accurate).
-
-The full trace is saved at `tools/instr/printitempower_trace_example.txt`.
-The relevant `[allocno_compare]`/`[find_reg]` block (`global.c`, the whole-
-function call-crossing allocator — this is GLOBAL alloc, not local-alloc,
-since both `x` and the tempstr-address var live across many `sprintf`/
-`strcpy`/`strcat` calls in the `switch`):
+**Diff direction matters:** `verify_asm.py` calls
+`difflib.unified_diff(ours, oracle)`. A minus line is OURS; a plus line is
+RETAIL. The original version of this example reversed that direction and
+consequently reversed the variable-to-pseudo mapping and the proposed priority
+adjustment. The correction below was checked directly against the full gate
+compiler's assembly, its `-dg` dump, and the immutable oracle on 2026-09-30.
 
 ```
-[allocno_compare]  order (allocno/pseudo:refs/live/calls/size=pri):
+      -addu s1,a1,zero          OURS: x -> s1
+      +addu s2,a1,zero          RETAIL: x -> s2
+      -lui s2,0                OURS: tempstr base -> s2
+      +lui s1,0                RETAIL: tempstr base -> s1
+```
+
+The saved instrumented trace is
+`tools/instr/printitempower_trace_example.txt`. Its global allocation order:
+
+```
+[allocno_compare] order (allocno/pseudo:refs/live/calls/size=pri):
   1/74:40/168/35/1=11904   2/75:4/10/2/1=8000   14/434:3/4/0/1=7500
   3/76:14/76/21/1=5526     0/73:2/4/0/1=5000    8/163:4/16/4/1=5000
-  13/425:3/7/1/1=4285      12/376:4/19/4/1=4210 4/119:3/8/1/1=3750
   ...
-[find_reg] allocno 1 pseudo 74  refs 40 live 168 calls 35 -> reg 17  ($s1)
-[find_reg] allocno 2 pseudo 75  refs 4  live 10  calls 2  -> reg 16  ($s0)
-[find_reg] allocno 14 pseudo 434 refs 3 live 4   calls 0  -> reg 3
-[find_reg] allocno 3 pseudo 76  refs 14 live 76  calls 21 -> reg 18  ($s2)   <- this is `x`
+[find_reg] allocno 1 pseudo 74 refs 40 live 168 calls 35 -> reg 17 (s1): x
+[find_reg] allocno 2 pseudo 75 refs 4 live 10 calls 2 -> reg 16 (s0)
+[find_reg] allocno 3 pseudo 76 refs 14 live 76 calls 21 -> reg 18 (s2): tempstr base
 ```
 
-Reading it against the `.s` output confirms **pseudo 76 = `x`** (`addu
-s2,a1,zero` in our build matches `find_reg`'s `pseudo 76 -> reg 18`
-exactly — `reg 18` = `$s2`), and **pseudo 74** (the highest-priority
-allocno, 40 refs/168 live/35 calls — `tstr`/the `tempstr` base pointer,
-referenced as an sprintf-destination or `strlen` operand in nearly every
-`switch` case) is what's currently sitting in `$s1` (`reg 17`).
+The real PsyQ full-TU `-dg` dump confirms the same dispositions: pseudo 74
+is assigned register 17, and pseudo 76 register 18. The parameter-copy instruction
+moves **a1 into s1**, identifying pseudo 74 as `x`; the symbol-load instruction
+sets **s2 to symbol_ref("tempstr")**, identifying pseudo 76 as the base.
+Map pseudos from these defining instructions, not from inferred reference counts.
 
-`x`'s priority (`5526`, rank 4 of the allocno order) is well below pseudo
-74's (`11904`, rank 1) — that's WHY pseudo 74 is processed first and claims
-the first callee-saved slot (`$s1`, since `$s0`/reg 16 was presumably
-already spoken for or simply the class-order picks 17 first — the trace's
-`[find_reg]` line for allocno 2/pseudo 75 shows it landing on reg 16 = $s0,
-so the two "top" allocnos (74, 75) exhaust s1 and s0, leaving pseudo 76 to
-land on s2). **For `x` to land on `$s1` instead (matching retail), its
-priority needs to overtake pseudo 74's 11904** — since
-`pri = floor_log2(refs)*refs*size/live_length*10000`, and `x`'s `refs=14`
-is fixed by how many times the source actually dereferences `x` (one
-`floor_log2(14)*14 = 3*14 = 42`), the lever is **`live_length`**: `x`'s
-current `live=76` (`pri = 42/76*10000 = 5526`); shrinking `live_length` to
-`≤ 42*10000/11904 ≈ 35` would push `x`'s priority above pseudo 74's 11904
-and flip the swap. Concretely this means **narrowing the span between `x`'s
-first and last use** — e.g. reading every `x->_iPL*` field the function
-needs into locals in one tight block near the top (shortening how far `x`
-the pointer itself has to stay live across the `switch`'s later,
-`sprintf`-heavy cases) rather than dereferencing it freshly in each distant
-`case`. The alternative lever is the mirror image: reduce pseudo 74's own
-priority (fewer `refs` on the `tempstr`/`tstr` pointer — e.g. using the
-`tempstr` global directly in the branches that don't need the `char *tstr`
-alias, cutting its ref count) so pseudo 76 overtakes it without `x` itself
-changing at all. Both are legitimate, pin-free, C-source-level levers
-(§3.12b of the shared methodology doc) — neither has been applied/verified
-in-tree yet; this is the diagnostic reading only, per this task's scope.
+Thus `x` currently has higher priority (11904) than the base (5526).
+A candidate source shape would need to **raise the base's priority above x's,
+or lower x's below the base's**, while preserving retail instructions, debug
+records, calls, and table targets. With refs/live otherwise unchanged, shortening
+the base's live length from 76 to at most 35 would exceed x's current priority.
+This arithmetic is a diagnostic constraint, not authorization for artificial
+uses, register pins, eager field loads, or instruction rewrites.
+
+A measured source experiment replacing every `tempstr` use with the existing
+`tstr` alias reduced the function to 450 instructions and 169 diffs; it was
+reverted. Changing only the first `strcpy` destination to `tstr` kept 497
+instructions but increased the diff to 148; it was also reverted. Consistent
+alias spelling alone does not reproduce the retail source shape.
+
+The successful source form updates the existing pointer explicitly before each
+format call: `tstr += strlen(tempstr); sprintf(tstr, ...);`, and, where the text
+has a placeholder, `tstr -= 3` or `tstr -= 5` before `sprintf`. These are live
+pointer computations required to select the output position. Keeping them as
+assignments to the original local doubles its allocator ref count without adding
+instructions or debug records:
+
+```
+[allocno_compare] order:
+  3/76:28/76/21/1=14736  1/74:40/168/35/1=11904  2/75:4/10/2/1=8000 ...
+[find_reg] allocno 3 pseudo 76 refs 28 live 76 calls 21 -> reg 17 (s1): tstr
+[find_reg] allocno 1 pseudo 74 refs 40 live 168 calls 35 -> reg 18 (s2): x
+```
+
+This after-fix trace was produced with the instrumented compiler using
+`--drop-only GetItemStr,SpawnQuestItem`; the real full-TU `-dg` dump independently
+confirms the same allocation order and dispositions. The full gate remains
+497/497 instructions with zero diffs.
+
+The stock compiler ICEs on `GetItemStr` and `SpawnQuestItem`. Isolation or
+`--drop-only` can bypass those bodies for diagnosis, but always compare the
+resulting target's code and pseudo definitions with the **full real gate TU**.
+Stock-versus-PsyQ agreement on an isolated input does not by itself establish
+agreement with the unmodified full-TU build.
 
 ## 7. File inventory
 

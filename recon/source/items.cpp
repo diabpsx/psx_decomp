@@ -3414,8 +3414,9 @@ void SaveItemPower(int i, int power, int param1, int param2, int minval, int max
 
 /* @0x80046258 ITEMS.CPP:3637 — PSX: every power line is a language-table string (GetStr id); numeric
  * parts are appended at tstr (= tempstr + strlen, sometimes backed up over the text's placeholder).
- * NEAR-MISS (count-exact 497, pure s1/s2 swap): retail tstr->s1, x->s2; ours x->s1 (-dg: allocno x(74)
- * first). Falsified: decl order, late `tstr = tempstr`, if-wrap vs early return. */
+ * PASS: update tstr in place before each sprintf, including backing over placeholders. The
+ * instrumented allocator shows these ordinary pointer updates raise tstr(76) from 14 to 28 refs,
+ * giving it retail's s1 before x(74) takes s2; bytes, SYM, calls and the jump table all match. */
 void PrintItemPower(char plidx, const ItemStruct *x)
 {
     int v;
@@ -3427,7 +3428,8 @@ void PrintItemPower(char plidx, const ItemStruct *x)
     case 0:
     case 1:
         strcpy(tempstr, GetStr(0xAB));
-        sprintf(tstr + strlen(tempstr), "%+i%%", x->_iPLToHit);
+        tstr += strlen(tempstr);
+        sprintf(tstr, "%+i%%", x->_iPLToHit);
         break;
     case 2:
     case 3:
@@ -3477,11 +3479,13 @@ void PrintItemPower(char plidx, const ItemStruct *x)
         break;
     case 16:
         strcpy(tempstr, GetStr(0x155));
-        sprintf(tstr + strlen(tempstr), "%i-%i", x->_iFMinDam, x->_iFMaxDam);
+        tstr += strlen(tempstr);
+        sprintf(tstr, "%i-%i", x->_iFMinDam, x->_iFMaxDam);
         break;
     case 17:
         strcpy(tempstr, GetStr(0x253));
-        sprintf(tstr + strlen(tempstr), "%i-%i", x->_iLMinDam, x->_iLMaxDam);
+        tstr += strlen(tempstr);
+        sprintf(tstr, "%i-%i", x->_iLMinDam, x->_iLMaxDam);
         break;
     case 19:
     case 20:
@@ -3507,7 +3511,8 @@ void PrintItemPower(char plidx, const ItemStruct *x)
     case 30:
         strcpy(tempstr, GetStr(0x51F));
         tstr += strlen(tempstr);
-        sprintf(tstr - 3, "%+i", x->_iPLGetHit);
+        tstr -= 3;
+        sprintf(tstr, "%+i", x->_iPLGetHit);
         break;
     case 31:
     case 32:
@@ -3534,12 +3539,14 @@ void PrintItemPower(char plidx, const ItemStruct *x)
     case 42:
         strcpy(tempstr, GetStr(0x151));
         tstr += strlen(tempstr);
-        sprintf(tstr - 5, "%i-%i", x->_iFMinDam, x->_iFMaxDam);
+        tstr -= 5;
+        sprintf(tstr, "%i-%i", x->_iFMinDam, x->_iFMaxDam);
         break;
     case 43:
         strcpy(tempstr, GetStr(0x251));
         tstr += strlen(tempstr);
-        sprintf(tstr - 5, "%i-%i", x->_iLMinDam, x->_iLMaxDam);
+        tstr -= 5;
+        sprintf(tstr, "%i-%i", x->_iLMinDam, x->_iLMaxDam);
         break;
     case 45: strcpy(tempstr, GetStr(0x31)); break;
     case 46: strcpy(tempstr, GetStr(0x4AA)); break;
@@ -3572,7 +3579,8 @@ void PrintItemPower(char plidx, const ItemStruct *x)
     case 60: strcpy(tempstr, GetStr(0x146)); break;
     case 61:
         strcpy(tempstr, GetStr(0xB));
-        sprintf(tstr + strlen(tempstr), "%i", x->_iPLDamMod);
+        tstr += strlen(tempstr);
+        sprintf(tstr, "%i", x->_iPLDamMod);
         break;
     case 62: strcpy(tempstr, GetStr(0x14E)); break;
     case 63: strcpy(tempstr, GetStr(0x4A6)); break;
