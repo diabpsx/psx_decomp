@@ -41,6 +41,9 @@ def assemble_raw(s: Path, obj: Path):
         sys.exit(f"[as] {s}\n{r.stderr}")
 
 def link(name: str):
+    if name == "diabpsx":
+        import sdk_link
+        sdk_link.build()
     subprocess.run([sys.executable, str(ROOT / 'tools' / 'gen_ld.py'), name], check=True, cwd=ROOT)   # ROM-order script, pinned addresses
     ld_script = ROOT / "linkers" / f"{name}.ld"
     txt = ld_script.read_text()
@@ -58,7 +61,7 @@ def link(name: str):
             src = ROOT / o[len("build/"):-2]
             seg_dir = ROOT / "asm" / "nonmatchings" / src.stem        # the INCLUDE_ASM'd .s files are inputs too
             newest = max([src.stat().st_mtime] + [f.stat().st_mtime for f in seg_dir.glob("*.s")] if seg_dir.exists() else [src.stat().st_mtime])
-            if not op.exists() or op.stat().st_mtime < newest:
+            if src.stem == "lib" or not op.exists() or op.stat().st_mtime < newest:
                 B.compile_any(src)
         elif o.startswith("build/skel/"):
             src = ROOT / o[len("build/"):-2]

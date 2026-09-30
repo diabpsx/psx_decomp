@@ -86,7 +86,14 @@ and external-data relocations after linking, not merely normalized fields.
 retail function address in the home image's symbol map and emits `PROVIDE`,
 so it cannot override a source/object definition. `tools/gen_ld.py`
 otherwise selects skeleton/scaffold objects, and `src/lib.c` supplies the library
-region through `INCLUDE_ASM`. The linker does not yet substitute PsyQ archives.
+region through `INCLUDE_ASM`, except for `InitHeap`: `tools/sdk_link.py` extracts
+the unchanged `LIBAPI.LIB` member `C57` and links it at its retail address with
+original PSYLINK. The GNU scaffold imports the verified, unchanged CPE payload
+through a format bridge. `configs/sdk_link.json` selects this one entry; archive,
+member, and linked-payload hashes are recorded in `build/sdk/native/receipts.json`.
+This lane currently supports only self-contained, single-entry text members.
+The remaining library entries still use scaffolds; this does not increase the
+game-function board, which remains 2682/2727 with 45 functions not PASS.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate

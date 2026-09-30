@@ -98,7 +98,7 @@ INCLUDE_ASM("asm/nonmatchings/lib", __builtin_delete);
 
 INCLUDE_ASM("asm/nonmatchings/lib", __udivmoddi4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitHeap);
+INCLUDE_ASM("build/sdk/native", InitHeap);
 
 INCLUDE_ASM("asm/nonmatchings/lib", FlushCache);
 
