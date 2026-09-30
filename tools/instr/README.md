@@ -260,6 +260,22 @@ the real PsyQ compiler shown in §3 (uses `tools/build.py`'s own
 `CC1PL_FLAGS`/`CPP_FLAGS`/paths, so it always tracks the gate's actual
 flags).
 
+When the stock compiler transforms a function differently, use the real
+compiler's RTL dumps to check its actual loop decisions and allocation order:
+
+```sh
+python tools/instr/real_rtl.py recon/psxsrc/gpanel.cpp DrawDurThingy --dump loop
+python tools/instr/real_rtl.py recon/psxsrc/gpanel.cpp DrawDurThingy --dump greg
+```
+
+The supported dumps are `loop`, `greg`, `lreg`, and `flow`. Each invocation
+retains its preprocessed input, assembly, and dump in a unique directory under
+`build/rtl/`. It uses the gate compiler, flags, and per-TU overrides; no source
+or assembly is rewritten. A missing source, compiler failure, absent dump, or
+missing/ambiguous function heading is an error. Old GCC sometimes omits the
+class from a heading; a qualified name may fall back to its bare name only when
+that name identifies exactly one function in the dump.
+
 ## 5. The instrumentation (ported from NFS4's gcc-2.8.1 `apply_traces.py`)
 
 `apply_traces_272.py` = the NFS4 gcc-2.8.1 `apply_traces.py`
@@ -416,6 +432,7 @@ agreement with the unmodified full-TU build.
 | `tools/instr/compare_tu.py` | byte-identity validator vs real PsyQ CC1PLPSX |
 | `tools/instr/isolate_fn.py` | extracts one function from a TU that ICEs elsewhere |
 | `tools/instr/gen_i.py` | produces a `.i` via `tools/build.py`'s own cpp step |
+| `tools/instr/real_rtl.py` | extracts a function's authoritative real-compiler RTL in a private output directory |
 | `tools/instr/host-fixes-configure.patch`, `host-fixes-obstack.patch` | the two textual diffs vs pristine 2.7.2 |
 | `tools/instr/xm-mingw32.h.reference` | the finished host xm file (diff against 2.8.1's for the two additions) |
 | `tools/instr/printitempower_trace_example.txt` | full `GCC_TRACE_ALLOC=1` trace for §6 |
@@ -463,6 +480,29 @@ ICEing in a later static initializer. Its dispositions agree with the full
 PsyQ dump (Dl pseudo 75 -> t8; command pseudo 85 -> a0). A nonzero final compiler
 exit must still be reported: a completed target trace is useful diagnostic data,
 but does not establish successful compilation of the isolated TU.
+
+### DrawDurThingy__6GPaneliiP10ItemStructi
+
+The full gpanel.cpp compiles successfully with both compilers, but comparison
+shows a larger transformed-RTL discrepancy than a register permutation. PsyQ
+uses an 88-byte frame; stock gcc uses 104 bytes and spills the item pointer.
+The real global allocator has 19 allocnos, versus 23 in the instrumented stock
+trace. Inspect the real `loop`/`greg` dumps here rather than treating the stock
+trace's final registers as the gate compiler's choices.
+
+The real loop dump combines the red-channel address induction variable with
+its memory use and retains both the complete red-table pointer and the scalar
+Loop*3 offset. Retail instead retains the scalar offset plus a Y-1 row anchor.
+That is the source of the saved-register displacement, not a hoisted flip
+argument: the real assembly still materializes flip=1 inside the loop.
+
+Measured and reverted: caching Y-1 as a const local grows the frame to 96 bytes
+(182 instructions / 153 diffs); a three-byte RGB struct view reduces the frame
+to 80 bytes but changes the instruction stream (168 / 101 diffs); a const int
+first-colour index gives 181 / 96 diffs, and a const short index gives 183 / 98.
+Changing only the switch selector to const unsigned short gives count-exact
+179 instructions but 100 diffs and the wrong SYM parameter locations. The
+committed source remains at 180 instructions / 97 diffs.
 
 Nothing under `C:/temp/dmt-cc1/` is committed (outside the repo entirely,
 per the task's rules); everything under `tools/instr/` is small text and
