@@ -3,6 +3,7 @@
  * PSX deltas: dTransVal/dFlags live in dung_map[x][y] (scans over 96x96), dungeon is unsigned short [48][48],
  * the .SOL tables load through GRL_LoadFileInMemSig and are followed by ConvertdPiece (no nTransTable / block_lvid). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_gendung.h"
 #include "source/gen/externs_gendung.h"
 #include "source/gen/protos_gendung.h"
@@ -20,16 +21,54 @@
 #define BFLAG_POPULATED 0x08
 #define DIRTEDGED2 16
 
-/* TU-owned small data (.sdata/.sbss, gp-relative in retail) */
-unsigned char currlevel;
-unsigned char leveltype;
-unsigned char setlevel;
-int setpc_x;
-int setpc_y;
-int setpc_w;
-int setpc_h;
-char TransVal;
-int themeCount;
+/* Complete initialized small-data group, in retail declaration order.
+ * Types and ownership follow GENDUNG's global SYM records. */
+int setpc_x = 0;
+int setpc_y = 0;
+int setpc_w = 0;
+int setpc_h = 0;
+unsigned char setloadflag = 0;
+int dminx = 0;
+int dminy = 0;
+int dmaxx = 0;
+int dmaxy = 0;
+int gnDifficulty = 0;
+unsigned char currlevel = 0;
+unsigned char leveltype = 0;
+unsigned char setlevel = 0;
+unsigned char setlvlnum = 0;
+unsigned char setlvltype = 0;
+int ViewX = 0;
+int ViewY = 0;
+int ViewDX = 0;
+int ViewDY = 0;
+int ViewBX = 0;
+int ViewBY = 0;
+int LvlViewX = 0;
+int LvlViewY = 0;
+int btmbx = 0;
+int btmby = 0;
+int btmdx = 0;
+int btmdy = 0;
+int MicroTileLen = 0;
+char TransVal = 0;
+int themeCount = 0;
+
+/* Complete zero-initialized .GENDUNG_data group (0x800E40C4..0x80102728).
+ * The original PC globals map to these PSX-specific dimensions and map cells. */
+unsigned short dungeon[48][48] = {0};
+unsigned char pdungeon[40][40] = {0};
+unsigned char nBlockTable[2049] = {0};
+unsigned char nSolidTable[2049] = {0};
+unsigned char nMissileTable[2049] = {0};
+unsigned char nTrapTable[2049] = {0};
+ScrollStruct ScrollInfo = {0};
+unsigned char TransList[256] = {0};
+map_info dung_map[112][112] = {0};
+unsigned char dung_map_r[56][56] = {0};
+unsigned char dung_map_g[56][56] = {0};
+unsigned char dung_map_b[56][56] = {0};
+int nSxy[16] = {0};
 
 void FillSolidBlockTbls()
 {

@@ -1,4 +1,5 @@
-/* FMV.CPP -- Diablo PSX (Climax 1998) reconstruction (PSXSRC).  PSX-only (no PC twin): the MDEC full-
+/* FMV.CPP -- Diablo PSX (Climax 1998) reconstruction (PSXSRC). PSX-only; the CD-stream/MDEC layers
+ * have original Climax source twins in ps1-decomp-refs/warcraft2/{cdstream,mdec}.c. The MDEC full-
  * motion-video player -- a background CD-streaming ring buffer (cdstream_* / stream_cdready_handler,
  * driven off the CdReadyCallback interrupt), the MDEC bitstream decoder front-end (mdec_* / DCT_out_handler,
  * driven off the MDEC "slice done" interrupt), the on-screen quad mesh the decoded frame is textured onto
@@ -22,10 +23,10 @@ typedef struct strheader {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
 } StHEADER;
 
 /* ---------------------------------------------------------------- SPU types (LIBSPU.H, PsyQ 4.0) --
- * confirmed against the raw oracle field-by-field (set_mdec_audio_volume's global `voice_attr` +
+ * confirmed against the raw oracle field-by-field (set_mdec_audio_volume's static `voice_attr` +
  * play_mdec_audio's local SpuSetKeyOnWithAttr struct), not just the shipped header's declared shape;
  * the previous reconstruction used ad-hoc fabricated structs for both call sites that didn't match
- * either the real field layout OR (for set_mdec_audio_volume) that this is a GLOBAL, not a local. */
+ * either the real field layout OR its static storage duration (not a stack-local attribute). */
 typedef struct { short left, right; } SpuVolume;
 typedef struct SpuVoiceAttr {   /* sizeof 64 (SYM: STRUCT size 64 tag SpuVoiceAttr name voice_attr) */
     unsigned long voice;
@@ -119,6 +120,7 @@ void VID_AfterDisplay(void);
 void VID_SetDBuffer(BOOL on);
 class CPad *PAD_GetPad(int pnum, unsigned char mode);
 
+struct SpuCommonAttr;
 extern "C" {
 CdlLOC *CdIntToPos(int i, CdlLOC *p);
 int CdControlB(u_char com, void *param, void *result);
@@ -139,17 +141,17 @@ int fileexists(char *name);
 int filesize(char *name);
 void SetPolyFT4(POLY_FT4 *p);
 void ClearImage(RECT *rect, u_char r, u_char g, u_char b);
-int SpuMalloc(int size);
-int SpuFree(int addr);
-int SpuSetKey(int mode, unsigned long voice_mask);
-int SpuSetKeyOnWithAttr(void *attr);
-int SpuWrite(void *addr, int size);
-int SpuWrite0(int size);
-int SpuSetTransferStartAddr(unsigned long addr);
-int SpuSetTransferMode(int mode);
-int SpuIsTransferCompleted(int mode);
-int SpuSetCommonAttr(void *attr);
-int SpuSetVoiceAttr(void *attr);
+long SpuMalloc(long size);
+void SpuFree(unsigned long addr);
+void SpuSetKey(long mode, unsigned long voice_mask);
+void SpuSetKeyOnWithAttr(SpuVoiceAttr *attr);
+unsigned long SpuWrite(unsigned char *addr, unsigned long size);
+unsigned long SpuWrite0(unsigned long size);
+unsigned long SpuSetTransferStartAddr(unsigned long addr);
+long SpuSetTransferMode(long mode);
+long SpuIsTransferCompleted(long mode);
+void SpuSetCommonAttr(SpuCommonAttr *attr);
+void SpuSetVoiceAttr(SpuVoiceAttr *attr);
 int VSync(int mode);
 void systemtask(int);
 int strcmp(const char *a, const char *b);
@@ -475,16 +477,10 @@ extern "C" void close_cdstream(void)
 /* @0x80156540 FMV.CPP:691 */
 extern "C" void wait_cdstream(void)
 {
-    int start_wait;   /* SYM AUTO local; unreferenced in the raw -- a genuine frame-hole (see catalog
-                       * 13A "SYM-LOCAL STAGING LAW"): its declared-but-unused presence supplies the
-                       * fsize=32/sp-0x10 slot the allocator needs, it carries no live value. */
-    int wait = 1;   /* NB: SYM shows one spurious REG record for this local that retail's SYM lacks --
-                     * tried register/const/static/for-scope/comma/global-const/unsigned/copy-from-
-                     * start_wait variants, all either keep the record or break the bytes (see project
-                     * notes); kept as the only form that reproduces the exact 46/46 bytes. Parked. */
-
-    (void)&start_wait;
-    while (((stream_open != 0) || (stream_ending != 0)) && wait) {
+    /* Original Climax cdstream.c (Warcraft II): five-second frame timeout.
+     * Preserve the retail nonvolatile clock and its resulting optimization. */
+    int start_wait = time_in_frames;
+    while (((stream_open != 0) || (stream_ending != 0)) && (time_in_frames < start_wait + 5 * 60)) {
         /* spin -- volatile stream_open/stream_ending force a fresh reload each pass */
     }
     if ((stream_open != 0) || (stream_ending != 0)) {
@@ -920,16 +916,16 @@ extern "C" int init_mdec_stream(unsigned char *buftop, int sectors_per_frame, in
 }
 
 /* @0x801578AC FMV.CPP:1283 */
-extern "C" int kill_mdec_audio(void)
+extern "C" void kill_mdec_audio(void)
 {
     SpuFree(mdec_audio_buffer[0]);
-    return SpuFree(mdec_audio_buffer[1]);
+    SpuFree(mdec_audio_buffer[1]);
 }
 
 /* @0x801578DC FMV.CPP:1290 */
-extern "C" int stop_mdec_audio(void)
+extern "C" void stop_mdec_audio(void)
 {
-    return SpuSetKey(0, 3);
+    SpuSetKey(0, 3);
 }
 
 /* Content-bug fix: struct was a fabricated shape (int sample_rate/short a,b/int loop/short c,d,e,f)
@@ -944,8 +940,8 @@ extern "C" int stop_mdec_audio(void)
  * the raw sets it right after both SpuMalloc calls, before the -1 checks. */
 typedef struct SpuCommonAttr { unsigned long mask; SpuVolume mvol, mvolmode, mvolx; SpuVolume cd_volume; long cd_reverb, cd_mix; SpuVolume ext_volume; long ext_reverb, ext_mix; } SpuCommonAttr;
 
-/* WIP -- NOT byte-verified (SPU streaming setup; no PC twin). @0x80157794 FMV.CPP:1191 */
-extern "C" int init_mdec_audio(int rate)
+/* SPU streaming setup; original Climax mdec.c twin. @0x80157794 FMV.CPP:1191 */
+extern "C" void init_mdec_audio(int rate)
 {
     SpuCommonAttr comm_attr;
 
@@ -974,7 +970,7 @@ extern "C" int init_mdec_audio(int rate)
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(mdec_audio_buffer[1]);
     SpuWrite0(6144);
-    return SpuIsTransferCompleted(1);
+    SpuIsTransferCompleted(1);
 }
 
 /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/play_mdec_audio.s) -- confirmed
@@ -1100,7 +1096,7 @@ extern "C" void resync_audio(void)
  * UNSIGNED (srl) >>14 of the product's low word, not the previously-guessed `mdec_audio_rate`; the
  * shifted result overwrites the `vol` parameter itself (no separate local) to match its SYM register.
  * mask is the constant 3 (SPU_VOICE_VOLL|SPU_VOICE_VOLR) every iteration. @0x80157C34 FMV.CPP:1418 */
-extern "C" int set_mdec_audio_volume(short vol)
+extern "C" void set_mdec_audio_volume(short vol)
 {
     static SpuVoiceAttr voice_attr; /* function-local STAT @0x80121CA8; declared before i in retail */
     int i;
@@ -1112,20 +1108,18 @@ extern "C" int set_mdec_audio_volume(short vol)
         voice_attr.voice = 1 << i;
         SpuSetVoiceAttr(&voice_attr);
     }
-    /* raw never sets $v0 on the loop-exit fallthrough (plain `nop`) -- no `return i<2;`/`return 0;`
-     * here; the return value on this path is whatever v0 held (unspecified), matching the same
-     * "no explicit return on this arm" pattern seen in dequeue_animation's early-out. */
+    /* Retail SYM and the original Climax routine both declare a void result. */
 }
 
 /* @0x80157D10 FMV.CPP:1448 */
-extern "C" int stop_mdec_stream(void)
+extern "C" void stop_mdec_stream(void)
 {
     SpuIsTransferCompleted(1);
     close_cdstream();
     wait_cdstream();
     mdec_streaming = 0;
     flush_cdstream();
-    return stop_mdec_audio();
+    stop_mdec_audio();
 }
 
 /* @0x80157D54 FMV.CPP:1460 */

@@ -73,6 +73,13 @@ struct MonstList {   /* sizeof 16 */
     unsigned long QuestBits;        /* +0xC */
 };
 
+struct CCreatureHdr;
+struct PAL {   /* retail SYM: sizeof 8 */
+    unsigned int InVram : 1;
+    unsigned int NumOfCols : 31;
+    unsigned short Cols[1];
+};
+
 struct TextDat {   /* sizeof 112 -- matches recon/psxsrc/gman.cpp's TextDat exactly (its owner);
                        here only the accessor methods this TU emits out-of-line are declared. */
     BOOL OwnDat;             /* +0x0 */
@@ -101,10 +108,10 @@ struct TextDat {   /* sizeof 112 -- matches recon/psxsrc/gman.cpp's TextDat exac
 
     TextDat();
     ~TextDat();
-    void *GetCreature(int Creature);
+    CCreatureHdr *GetCreature(int Creature);
     int GetNumOfActions(int Creature);
     int GetNumOfFrames(int Creature, int Action);
-    void *GetPal(int PalNum);
+    PAL *GetPal(int PalNum);
     void SetFileInfo(const struct CTextFileInfo *NewInfo, int Id);
     void Use(long NewHndDat, BOOL DatLoaded, int size);
     int GetNumOfFrames();
@@ -552,9 +559,9 @@ int TownToCreature::GetCreature(int GameCreature)
 }
 
 /* @0x80091DE0 GMAN.H (header copy):284 */
-void *TextDat::GetCreature(int Creature)
+CCreatureHdr *TextDat::GetCreature(int Creature)
 {
-    return (char *)CreatureAnims + CreatureOffset[Creature];
+    return (CCreatureHdr *)((char *)CreatureAnims + CreatureOffset[Creature]);
 }
 
 /* @0x80091DBC GMAN.H (header copy):252 */
@@ -577,9 +584,9 @@ FRAME_HDR *TextDat::GetFr(int FrNum)
 }
 
 /* @0x80091E1C GMAN.H (header copy):232 */
-void *TextDat::GetPal(int PalNum)
+PAL *TextDat::GetPal(int PalNum)
 {
-    return (char *)Pals + PalOffset[PalNum];
+    return (PAL *)((char *)Pals + PalOffset[PalNum]);
 }
 
 /* @0x80091DFC GMAN.H (header copy):240 */

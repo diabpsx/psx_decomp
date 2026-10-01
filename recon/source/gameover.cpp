@@ -11,8 +11,8 @@ struct TASK { unsigned char pad[92]; };   /* sizeof 92 per retail SYM; only used
 
 class CBlocks {
 public:
-    static int GetOverlayOtBase() { return 0x1E8; }
     static int GetMaxOtPos() { return 0x1FF; }
+    static int GetOverlayOtBase() { return 0x1E8; }
 };
 
 struct Dialog {   /* sizeof 16, real field names from the retail SYM STRTAG record */
@@ -44,7 +44,14 @@ struct CPad {
 struct RECT { short x, y, w, h; };
 enum TXT_JUST { JustLeft, JustCentre, JustRight };
 
-struct CFont {   /* opaque body; only the methods this TU calls are declared */
+struct TextDat;
+struct CFont {   /* retail SYM: sizeof 540 */
+    int TextureId;
+    unsigned short FontTab[256];
+    int PrintyOTpos;
+    int MinX, MaxX, Width;
+    TextDat *ThisDat;
+    unsigned char FontHeight;
     int SetOTpos(int NewOt);
     int Print(int X, int Y, char *Str, TXT_JUST Just, struct RECT *R, unsigned char R2, unsigned char G2, unsigned char B2);
 };
@@ -82,6 +89,7 @@ extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 extern unsigned char BORDERR, BORDERG, BORDERB;
 
 void GameOverTask(struct TASK *T);
+void PrintGameOver(void);
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -96,73 +104,6 @@ void GO_DoGameOver(void)
     if (!IS_GameOver()) {
         TSK_AddTask(0x8001, (void *)GameOverTask, 0x800, 0);
     }
-}
-
-unsigned short CPad::GetDown(void) const
-{
-    if (AnalogMode != 0) {
-        return DownA;
-    }
-    return Down;
-}
-
-void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R;
-    DialogGreen = G;
-    DialogBlue = B;
-}
-
-void Dialog::SetBack(int Type)
-{
-    BackGfx = Type;
-}
-
-void Dialog::SetBorder(int Type)
-{
-    BorderGfx = Type;
-}
-
-Dialog::~Dialog()
-{
-}
-
-Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
-
-void PrintGameOver(void)
-{
-    struct Dialog PBack;
-    RECT PRect;
-    struct CFont *Font = &MediumFont;
-    int otpos;
-    int oldDotpos, oldTotpos;
-
-    otpos = CBlocks::GetMaxOtPos();
-    oldDotpos = PBack.SetOTpos(otpos - 3);
-    oldTotpos = Font->SetOTpos(otpos - 2);
-    PBack.SetRGB(BORDERR, BORDERG, BORDERB);
-    PBack.SetBack(0x94);
-    PBack.SetBorder(0x12);
-    PBack.Back(0x50, 0x70, 0xA0, 0x10);
-    PRect.x = 0x50;
-    PRect.y = 0x70;
-    PRect.w = 0xA0;
-    PRect.h = 0x10;
-    Font->Print(0, 0xC, GetStr(0x177), JustCentre, &PRect, 0xFF, 0xFF, 0xFF);
-    Font->SetOTpos(oldTotpos);
-    PBack.SetOTpos(oldDotpos);
 }
 
 void GameOverTask(struct TASK *T)
@@ -233,4 +174,70 @@ void GameOverTask(struct TASK *T)
     PauseMode = 0;
     MAIN_RestartGameTask();
     GLUE_ResumeGame();
+}
+
+void PrintGameOver(void)
+{
+    struct Dialog PBack;
+    RECT PRect;
+    int otpos;
+    int oldDotpos, oldTotpos;
+
+    otpos = CBlocks::GetMaxOtPos();
+    oldDotpos = PBack.SetOTpos(otpos - 3);
+    oldTotpos = MediumFont.SetOTpos(otpos - 2);
+    PBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    PBack.SetBack(0x94);
+    PBack.SetBorder(0x12);
+    PBack.Back(0x50, 0x70, 0xA0, 0x10);
+    PRect.x = 0x50;
+    PRect.y = 0x70;
+    PRect.w = 0xA0;
+    PRect.h = 0x10;
+    MediumFont.Print(0, 0xC, GetStr(0x177), JustCentre, &PRect, 0xFF, 0xFF, 0xFF);
+    MediumFont.SetOTpos(oldTotpos);
+    PBack.SetOTpos(oldDotpos);
+}
+
+unsigned short CPad::GetDown(void) const
+{
+    if (AnalogMode != 0) {
+        return DownA;
+    }
+    return Down;
+}
+
+void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R;
+    DialogGreen = G;
+    DialogBlue = B;
+}
+
+void Dialog::SetBack(int Type)
+{
+    BackGfx = Type;
+}
+
+void Dialog::SetBorder(int Type)
+{
+    BorderGfx = Type;
+}
+
+Dialog::~Dialog()
+{
+}
+
+Dialog::Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
 }

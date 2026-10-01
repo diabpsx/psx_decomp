@@ -8034,15 +8034,21 @@ nonmatching __heapsize
 
 dlabel __heapsize
     /* A4298 800B4298 00000000 */ .word 0x00000000
-    /* A429C 800B429C 0C000180 */ .word GTE_SetTransXYZ
 enddlabel __heapsize
+
+dlabel __text
+    /* A429C 800B429C 0C000180 */ .word GTE_SetTransXYZ
+enddlabel __text
 
 nonmatching __textlen
 
 dlabel __textlen
     /* A42A0 800B42A0 70010200 */ .word 0x00020170
-    /* A42A4 800B42A4 000D0B80 */ .word costab
 enddlabel __textlen
+
+dlabel __data
+    /* A42A4 800B42A4 000D0B80 */ .word costab
+enddlabel __data
 
 nonmatching __datalen
 

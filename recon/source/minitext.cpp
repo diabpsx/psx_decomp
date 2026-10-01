@@ -6,6 +6,7 @@
  * VAG voice-file length instead of the PC's fixed qtextDelaySpd[] table.  Reconstructed from the retail
  * asm oracle + skel/SOURCE/MINITEXT.CPP (Ghidra/IDA draft). */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_minitext.h"
 #include "source/gen/externs_minitext.h"
 #include "source/gen/protos_minitext.h"
@@ -20,19 +21,22 @@ static unsigned char *pMedTextCels;
 static unsigned char *pTextBoxCels;
 static const char *qtextptr;
 static int qtexty;
-static BOOL qtbodge;
-static int textadj;
-static int fetextadj;
-static char FadeState;
-static BOOL MusicFading;
-static int iBookName;
+static unsigned long qtextDelay;
 static unsigned long sgLastScroll;
 static unsigned long scrolltexty;
 static int TextNum;
-int TextWait;   /* @0x8011B95C EXT, gp-rel in the oracle -> TU-owned */
 static BOOL qtextonflag;
 
+/* Retail initialized small-data values, distinct from the statics above. */
+static BOOL qtbodge = 0;
+static int textadj = 120;
+static int fetextadj = 120;
+static char FadeState = 0;
+static BOOL MusicFading = 0;
+static int iBookName = 0;
+
 Dialog QBack;   /* @0x800D6790 -- first initialized public global: names the _GLOBAL_.I/D.QBack thunks */
+char MtPrevText[80] = {0};
 
 void FreeQuestText(void)
 {
@@ -41,20 +45,6 @@ void FreeQuestText(void)
 void InitQuestText(void)
 {
     qtextflag = 0;
-}
-
-int KANJI_strlen(char *str)
-{
-    int l;
-
-    l = 0;
-    while (*str != 0) {
-        if ((unsigned char)*str & 0x80)
-            str++;
-        str++;
-        l++;
-    }
-    return l;
 }
 
 void CalcTextSpeed(const char *Name)
@@ -260,7 +250,16 @@ void DrawQTextBack(void)
     }
 }
 
-Dialog::Dialog()
+inline unsigned short CPad::GetDown() const
+{
+    if (get_both != 0)
+        return both_Down;
+    return Down;
+}
+
+inline int CBlocks::GetOverlayOtBase() { return 0x1E8; }
+
+inline Dialog::Dialog()
 {
     BackGfx = 0x94;
     BevelGfx = 0x1A;
@@ -274,22 +273,17 @@ Dialog::Dialog()
     DialogOTpos = CBlocks::GetOverlayOtBase();
 }
 
-Dialog::~Dialog()
+inline Dialog::~Dialog()
 {
 }
 
-void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+inline void Dialog::SetBorder(int Type) { BorderGfx = Type; }
+
+inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
 {
     DialogRed = R;
     DialogGreen = G;
     DialogBlue = B;
-}
-
-unsigned short CPad::GetDown() const
-{
-    if (get_both != 0)
-        return both_Down;
-    return Down;
 }
 
 void DrawQTextTSK(TASK *T)
@@ -352,6 +346,25 @@ void DrawQTextTSK(TASK *T)
     }
     LANG_ReloadMainTXT();
 }
+
+/* These follow DrawQTextTSK's format string in retail small data. */
+int KANJI_strlen(char *str)
+{
+    int l;
+
+    l = 0;
+    while (*str != 0) {
+        if ((unsigned char)*str & 0x80)
+            str++;
+        str++;
+        l++;
+    }
+    return l;
+}
+
+int mytx = 32;
+int myty = 32;
+int TextWait = 200;
 
 void DrawQText(void)
 {

@@ -2,6 +2,7 @@
  * PSX deltas: only the UI-hero helpers survive (no save archives); two classes map to UI ids,
  * everything else is the sorcerer; SetupLocalPlayer just marks the save file valid. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_pfile.h"
 #include "source/gen/protos_pfile.h"
 #include "source/diablo.h"

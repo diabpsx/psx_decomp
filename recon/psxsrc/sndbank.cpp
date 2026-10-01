@@ -3,6 +3,7 @@
  * voice allocation, SFX lookup/remap and key-on, plus the channel-status monitor task.
  * Reconstructed from the raw oracle (asm/nonmatchings/sndbank/*.s) + the SYM; libspu calls = PsyQ 4.0 LIBSPU. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "psxsrc/fileio.h"
 #include "psxsrc/sysinit.h"
 

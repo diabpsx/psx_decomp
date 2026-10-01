@@ -3,6 +3,7 @@
  * Bodies from the retail oracle (asm/nonmatchings/dpiece) + SYM (scratch/tuinfo.py DPIECE.CPP).
  * dBits: bit0 SOLID, bit1 MISSILE, bit2 BLOCK, bit3 TRAP, high nibble dDead. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "glibdev/gdebug.h"
 #include "source/gen/structs_dpiece.h"
 #include "source/gen/externs_dpiece.h"
@@ -10,7 +11,7 @@
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "source/DPIECE.cpp", line)   /* retail line literals */
 
-short *dPiece;   /* @0x8011BE44 (.sbss; gp-relative only here -> owned) */
+short *dPiece;   /* @0x8011BE44, initialized small-data pointer owned here */
 
 extern void SetSOLID(int x, int y);
 extern void ClearSOLID(int x, int y);

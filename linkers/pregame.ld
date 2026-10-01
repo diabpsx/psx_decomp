@@ -218,33 +218,11 @@ SECTIONS
         . = 0x9810;   /* 0x80143408 */
         build/skel/SOURCE/DRLG_L2.CPP.o(.text);
         . = 0xEAAC;   /* 0x801486A4 */
-        build/asm/data/drlg_l3_rodata_801486a4.rodata.s.o(.rodata);
-        . = 0xEACC;   /* 0x801486C4 */
-        build/asm/data/drlg_l3_rodata_801486c4.rodata.s.o(.rodata);
-        . = 0xEADC;   /* 0x801486D4 */
-        build/asm/data/drlg_l3_rodata_801486d4.rodata.s.o(.rodata);
+        build/native_source/drlg_l3_pool.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xEAEC;   /* 0x801486E4 */
-        build/asm/data/drlg_l3_rodata_801486e4.rodata.s.o(.rodata);
-        . = 0xEB5C;   /* 0x80148754 */
-        build/asm/data/drlg_l3_rodata_80148754.rodata.s.o(.rodata);
-        . = 0xEB80;   /* 0x80148778 */
-        build/asm/data/drlg_l3_rodata_80148778.rodata.s.o(.rodata);
-        . = 0xEBA4;   /* 0x8014879C */
-        build/asm/data/drlg_l3_rodata_8014879c.rodata.s.o(.rodata);
-        . = 0xEBD0;   /* 0x801487C8 */
-        build/asm/data/drlg_l3_rodata_801487c8.rodata.s.o(.rodata);
-        . = 0xEC30;   /* 0x80148828 */
-        build/asm/data/drlg_l3_rodata_80148828.rodata.s.o(.rodata);
-        . = 0xEC40;   /* 0x80148838 */
-        build/asm/data/drlg_l3_rodata_80148838.rodata.s.o(.rodata);
-        . = 0xEC50;   /* 0x80148848 */
-        build/asm/data/drlg_l3_rodata_80148848.rodata.s.o(.rodata);
-        . = 0xEC60;   /* 0x80148858 */
-        build/asm/data/drlg_l3_rodata_80148858.rodata.s.o(.rodata);
-        . = 0xEC6C;   /* 0x80148864 */
-        build/asm/data/drlg_l3_rodata_80148864.rodata.s.o(.rodata);
+        build/native_source/drlg_l3_tables.data.s.o(.data);   /* verified native source data */
         . = 0xF3A0;   /* 0x80148F98 */
-        build/skel/SOURCE/DRLG_L3.CPP.o(.text);
+        build/native_source/drlg_l3.text.s.o(.text);   /* verified native-assembled source */
         . = 0x13C00;   /* 0x8014D7F8 */
         build/asm/data/drlg_l4_rodata_8014d7f8.rodata.s.o(.rodata);
         . = 0x1575C;   /* 0x8014F354 */
@@ -258,25 +236,25 @@ SECTIONS
         . = 0x1BE0C;   /* 0x80155A04 */
         build/skel/SOURCE/CHOOSEM.CPP.o(.text);
         . = 0x1C3E0;   /* 0x80155FD8 */
-        build/skel/SOURCE/PREOBJ.CPP.o(.text);
+        build/native_source/preobj.text.s.o(.text);   /* verified native-assembled source */
         . = 0x202E4;   /* 0x80159EDC */
-        build/skel/SOURCE/GENDUNG.CPP.o(.text);
+        build/native_source/gendung.text.s.o(.text);   /* verified native-assembled source */
         . = 0x22014;   /* 0x8015BC0C */
-        build/skel/SOURCE/THEMES.CPP.o(.text);
+        build/native_source/themes.text.s.o(.text);   /* verified native-assembled source */
         . = 0x24B84;   /* 0x8015E77C */
         build/recon/source/preport.cpp.o(.text);   /* reconstructed TU */
         . = 0x24BE4;   /* 0x8015E7DC */
-        build/skel/SOURCE/PREQUEST.CPP.o(.text);
+        build/native_source/prequest.text.s.o(.text);   /* verified native-assembled source */
         . = 0x25878;   /* 0x8015F470 */
         build/recon/source/preinv.cpp.o(.text);   /* reconstructed TU */
         . = 0x258CC;   /* 0x8015F4C4 */
         build/skel/SOURCE/PREAUTO.CPP.o(.text);
         . = 0x25AF0;   /* 0x8015F6E8 */
-        build/skel/SOURCE/PREMON.CPP.o(.text);
+        build/native_source/premon.text.s.o(.text);   /* verified native-assembled source */
         . = 0x283E4;   /* 0x80161FDC */
         build/recon/source/premiss.cpp.o(.text);   /* reconstructed TU */
         . = 0x285B4;   /* 0x801621AC */
-        build/recon/source/pretrigs.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/pretrigs.text.s.o(.text);   /* verified native-assembled source */
         . = 0x290E4;   /* 0x80162CDC */
         build/recon/source/prestore.cpp.o(.text);   /* reconstructed TU */
         . = 0x293DC;   /* 0x80162FD4 */

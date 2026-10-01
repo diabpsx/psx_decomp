@@ -5,6 +5,7 @@ Use FUNC@VA when two file-static functions have the same retail name and the
 oracle filename must be selected by address (for example locaterequest@800FC4E4).
 Reloc-name + branch-target lenient. Prints PASS/diff per function."""
 import os, re, sys, subprocess, struct
+from disasm_constants import literal_dlabel_value
 from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MIPS = Path(r'C:/Tools/mips-ps1/mips/bin')
@@ -70,32 +71,15 @@ dis = subprocess.run([OBJD, '-d', '-r', '-z', str(obj)], capture_output=True, te
 # points, or rdiv/fixeddiv-style co-equal pairs). objdump -d labels the disassembly with the
 # ALPHABETICALLY-FIRST symbol at the address, so a request for a non-alpha-first CANONICAL name
 # (setclipwindow, intcos, rdiv) would miss it. Map name->addr (objdump -t) and addr->disasm label,
-# then diff the block at the requested symbol's address whatever objdump happened to name it.
+# then diff the block at the requested symbol's section-relative coordinate whatever
+# objdump happened to name it. Offsets alone collide across named function sections.
 _symtab = subprocess.run([OBJD, '-t', str(obj)], capture_output=True, text=True).stdout
-_name2addr = {}
-for _ln in _symtab.splitlines():
-    # Skip UNDEFINED (`*UND*`) and file/abs (`*ABS*`) symbols: an undefined extern decl has a
-    # bogus address 00000000 that would otherwise alias-resolve to whatever real function objdump
-    # labels at offset 0 (false PASS/FAIL). Only DEFINED symbols (real section) get an addr entry.
-    if '*UND*' in _ln or '*ABS*' in _ln:
-        continue
-    _t = _ln.split()
-    if len(_t) >= 2 and re.match(r'^[0-9a-f]{8}$', _t[0]):
-        _name2addr[_t[-1]] = _t[0]
-_addr2label = {}
-for _ln in dis.splitlines():
-    _m = re.match(r'^([0-9a-f]{8}) <(.+)>:', _ln)
-    if _m:
-        _addr2label.setdefault(_m.group(1), _m.group(2))
+from disasm_index import symbol_coordinates, label_coordinates, resolve_label
+_name2coord = symbol_coordinates(_symtab)
+_name2addr = {name: coordinate[1] for name, coordinate in _name2coord.items()}
+_coord2label = label_coordinates(dis)
 def _resolve(fn):
-    a = _name2addr.get(fn)
-    if a is None:
-        # header-defined methods are compiled once per including TU; configs/symbol_addrs.txt suffixes
-        # the 2nd+ copies `NAME_<va>` while our object naturally emits the plain NAME -- fall back to it.
-        m = re.match(r'^(.*)_[0-9a-f]{8}$', fn)
-        if m and m.group(1) in _name2addr:
-            a = _name2addr[m.group(1)]
-    return _addr2label.get(a, fn) if a else fn
+    return resolve_label(fn, _name2coord, _coord2label)[0]
 
 def _compiler_debug_label(name):
     """Old GCC/ASPSX line marker embedded inside the current function."""
@@ -129,14 +113,16 @@ def norm_ins(t):
     # a synthetic `D_<hex>` data label. This includes PSX scratchpad addresses (0x1F80xxxx)
     # and short, unmapped values such as D_100FF; neither can be a relocatable executable
     # symbol (the image is linked in KSEG0). Resolve those literals before the blanket
-    # %hi/%lo->0 handling below, while leaving eight-digit KSEG0 labels reloc-normalized.
+    # %hi/%lo->0 handling below. KSEG0 anchors below the loaded-image base
+    # (0x80010000) are fixed literals too; preserve their exact field offsets.
     # Values outside KSEG0 are constants too: notably spimdisasm turns -0x62FFFF into
     # D_FF9D0001 in R3DCar_CalcCarDimensions even though the raw `lui 0xFF9D` / `addiu 1`
     # pair contains no address relocation.
     def _literal_dlabel(m):
-        digits = m.group(1)
-        addr = int(digits, 16)
-        return addr, len(digits) < 8 or not (0x80000000 <= addr < 0xA0000000)
+        addend = int(m.group(3)) if m.group(3) else 0
+        if m.group(2) == '-': addend = -addend
+        value = literal_dlabel_value(m.group(1), addend)
+        return value, value is not None
     def _dlabel_lo(m):
         # w52-a9 gate fix (proposal b): objdump renders %lo SIGNED.
         addr, is_literal = _literal_dlabel(m)
@@ -149,8 +135,8 @@ def norm_ins(t):
         addr, is_literal = _literal_dlabel(m)
         if not is_literal: return '0'
         return str(((addr + 0x8000) >> 16) & 0xFFFF)
-    t = re.sub(r'%lo\(D_([0-9A-Fa-f]{1,8})\)', _dlabel_lo, t)
-    t = re.sub(r'%hi\(D_([0-9A-Fa-f]{1,8})\)', _dlabel_hi, t)
+    t = re.sub(r'%lo\(D_([0-9A-Fa-f]{1,8})(?:\s*([+-])\s*(\d+))?\)', _dlabel_lo, t)
+    t = re.sub(r'%hi\(D_([0-9A-Fa-f]{1,8})(?:\s*([+-])\s*(\d+))?\)', _dlabel_hi, t)
     t = re.sub(r'%hi\([^)]*\)', '0', t)            # %hi(SYM) -> 0 (objdump shows lui r,0)
     t = re.sub(r'%lo\([^)]*\)', '0', t)            # %lo(SYM) -> 0
     t = re.sub(r'%gp_rel\([^)]*\)', '0', t)        # %gp_rel(SYM) -> 0
@@ -191,15 +177,20 @@ def ours(fn, oracle_va=None):
     # Collect the function's raw objdump lines (instructions + the reloc lines that
     # objdump -r interleaves AFTER each relocated instruction).
     interior = _oracle_alabels(fn, oracle_va)
-    fn = _resolve(fn)                 # follow aliases to the block objdump actually labeled
-    lines=[]; inb=False
+    fn, wanted_section = resolve_label(fn, _name2coord, _coord2label)
+    lines=[]; inb=False; section=None
     for ln in dis.splitlines():
+        header = re.match(r'^Disassembly of section (.+):$', ln)
+        if header:
+            if inb: break
+            section = header[1]
+            continue
         m=re.match(r'^[0-9a-f]{8} <(.+)>:',ln)
         if m:
             if inb and (m.group(1) in interior or _compiler_debug_label(m.group(1))):
                 continue                                  # same function body
             if inb: break
-            inb=(m.group(1)==fn); continue
+            inb=(m.group(1)==fn and (wanted_section is None or section == wanted_section)); continue
         if inb: lines.append(ln)
     out=[]; tg=[]; base=None
     for i,ln in enumerate(lines):
@@ -417,6 +408,9 @@ for target in funcs:
     o=ours(fn, oracle_va); e=oracle(fn, oracle_va)
     if e is None: print(f"  {target}: NO ORACLE"); allpass=False; continue
     if not o: print(f"  {target}: NOT IN OBJECT"); allpass=False; continue
+    if fn in _EMBEDDED_TEXT_TABLES and resolve_label(fn, _name2coord, _coord2label)[1] != '.text':
+        print(f"  {target}: FAIL embedded-table ownership for named sections is not yet supported")
+        allpass=False; continue
     if fn in _EMBEDDED_TEXT_TABLES and not object_rodata_table_matches(_resolve(fn), _TABLE_TARGETS.get('oracle', [])):
         print(f"  {target}: FAIL embedded jump table differs (ours {_TABLE_TARGETS.get('ours')} / oracle {_TABLE_TARGETS.get('oracle')})")
         allpass=False; continue

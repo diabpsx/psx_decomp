@@ -2186,9 +2186,10 @@ void ProcessItems(void)
         }
         if (item[ii]._iAnimFlag && !PauseMode && !CDWAIT) {
             item[ii]._iAnimFrame++;
+            const unsigned char frame = item[ii]._iAnimFrame;
             if (dung_map[item[ii]._ix][item[ii]._iy].dFlags & 3) {
-                if ((unsigned char)item[ii]._iAnimFrame == 4) PlaySfxLoc(0x15, item[ii]._ix, item[ii]._iy);
-                if (SinTab[(unsigned char)item[ii]._iAnimFrame & 0x1F] >= 0) continue;
+                if (frame == 4) PlaySfxLoc(0x15, item[ii]._ix, item[ii]._iy);
+                if (SinTab[frame & 0x1F] >= 0) continue;
                 {
                     int it = ItemCAnimTbl[item[ii]._iCurs];
                     PlaySfxLoc(ItemAnimSnds[it], item[ii]._ix, item[ii]._iy);

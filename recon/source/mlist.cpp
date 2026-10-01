@@ -22,8 +22,8 @@ void DBG_Error(char *Text, char *File, int Line);
 unsigned long GU_GetRndRange(unsigned int Range);
 }
 
-extern char MlTab[16];
-extern char QlTab[16];
+char MlTab[16] = {0};   /* Retail initialized data at 0x800E39C4. */
+char QlTab[16] = {0};   /* Retail initialized data at 0x800E39D4. */
 extern struct MonstLevel AllLevels[16];
 extern unsigned char setlevel;
 

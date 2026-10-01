@@ -3,6 +3,7 @@
  * PSX deltas: nSolidTable/nTrapTable -> GetSOLID/GetTRAP, random_(idx, n) -> ENG_random(n), the dungeon
  * scan loops run over 96x96, dMonster/dFlags/dObject/dItem/dTransVal live in dung_map[x][y]. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_themes.h"
 #include "source/gen/externs_themes.h"
 #include "source/gen/protos_themes.h"
@@ -70,21 +71,13 @@
 #define BFLAG_POPULATED 0x08
 #define Q_ZHAR 3
 
-/* TU-owned small data (.sdata/.sbss, gp-relative in retail) */
-int numthemes;
-unsigned char armorFlag;
-unsigned char weaponFlag;
-unsigned char treasureFlag;
-unsigned char mFountainFlag;
-unsigned char cauldronFlag;
-unsigned char tFountainFlag;
-int zharlib;
-int themex;
-int themey;
-int themeVar1;
-unsigned char pFountainFlag;
-unsigned char bFountainFlag;
-unsigned char bCrossFlag;
+/* Original THEMES tables, with the retail PSX ThemeStruct dimensions. */
+int ThemeGood[4] = { THEME_GOATSHRINE, THEME_SHRINE, THEME_SKELROOM, THEME_LIBRARY };
+int trm5x[25] = { -2,-1,0,1,2, -2,-1,0,1,2, -2,-1,0,1,2, -2,-1,0,1,2, -2,-1,0,1,2 };
+int trm5y[25] = { -2,-2,-2,-2,-2, -1,-1,-1,-1,-1, 0,0,0,0,0, 1,1,1,1,1, 2,2,2,2,2 };
+int trm3x[9] = { -1,0,1, -1,0,1, -1,0,1 };
+int trm3y[9] = { -1,-1,-1, 0,0,0, 1,1,1 };
+ThemeStruct theme[50] = {0};
 
 unsigned char TFit_Shrine(int i)
 {
@@ -929,3 +922,21 @@ void CreateThemeRooms()
     if (leveltype == DTYPE_HELL && themeCount > 0)
         UpdateL4Trans();
 }
+
+/* Definitions follow the local constant templates, matching the retail pool.
+ * Declarations above remain available through externs_themes.h. */
+int numthemes = 0;
+int zharlib = 0;
+unsigned char armorFlag = 0;
+unsigned char bCrossFlag = 0;
+unsigned char weaponFlag = 0;
+int themex = 0;
+int themey = 0;
+int themeVar1 = 0;
+unsigned char bFountainFlag = 0;
+unsigned char cauldronFlag = 0;
+unsigned char mFountainFlag = 0;
+unsigned char pFountainFlag = 0;
+unsigned char tFountainFlag = 0;
+unsigned char treasureFlag = 0;
+unsigned char ThemeGoodIn[4] = {0};

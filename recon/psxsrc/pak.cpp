@@ -26,7 +26,7 @@ struct block {   /* sizeof 532 */
 };
 
 /* @0x800ADF9C PAK.CPP:85 */
-int writeblock(struct block *theblock)
+void writeblock(struct block *theblock)
 {
     if (theblock->blockrep && theblock->blocksize == 0) {
         theblock->fputc(0x80);

@@ -436,7 +436,7 @@ void AddStoreHoldRecharge(ItemStruct itm, int i)
 }
 
 /* @0x8006A408 */
-int StoreAutoPlace(void)
+unsigned char StoreAutoPlace(void)
 {
     int i;
     int w;

@@ -3,11 +3,7 @@
  * every registered requestor once per call. */
 #include "diabpsx_types.h"
 
-class TextDat {   /* sizeof 112; layout in GMAN */
-public:
-    unsigned char data[112];
-    void DoDecompRequests();
-};
+#include "psxsrc/textdat_header.h"
 
 extern "C" void DBG_Error(char *Text, char *File, int Line);
 int FindThisTd(TextDat *Td);
@@ -16,6 +12,7 @@ int FindEmptyIndex(void);
 static TextDat *DecRequestors[10];
 
 /* @0x800B07A4 DECOMP.CPP:61 (linked into the startup segment) */
+void DEC_Open(void) __attribute__((section(".text.decomp_startup")));
 void DEC_Open(void)
 {
     for (int f = 0; f < 10; f++)

@@ -88,8 +88,8 @@ def sym_ok(tu: Path, fns):
     r = subprocess.run([PY, str(ROOT / "tools" / "symlane.py"), str(tu.relative_to(ROOT)), ",".join(fns)],
                        cwd=ROOT, capture_output=True, text=True)
     out = {}
-    for m in re.finditer(r"^\s+(\S+): (SYM ok|SYM n/a|SYM DIFF|NO RETAIL SYM|NOT IN OBJECT)", r.stdout, re.M):
-        out[m.group(1)] = m.group(2) in ("SYM ok", "SYM n/a")
+    for m in re.finditer(r"^\s+(\S+): (SYM ok|SYM DIFF|NO RETAIL SYM|NOT IN OBJECT)", r.stdout, re.M):
+        out[m.group(1)] = m.group(2) == "SYM ok"
     return out
 
 def main():
@@ -104,7 +104,7 @@ def main():
     registry = aspsx_registry()
     homes = segment_homes()
     total_all = sum(len(seg_functions(s)) for s in sorted(p.stem for p in (ROOT / "src").glob("*.c")) if s != "lib")
-    lines = ["# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only", ""]
+    lines = ["# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only", ""]
     grand_pass = 0
     for seg in segs:
         fns = seg_functions(seg)

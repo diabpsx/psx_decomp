@@ -1,4 +1,4 @@
-short TrimCol(short col);   /* @0x8003017C CONTROL.CPP:542 -- SYM types it unsigned char but oracle sign-extends 16 bits on return (no 0xff mask) */
+unsigned char TrimCol(short col);   /* @0x8003017C CONTROL.CPP:542; retail UCHAR result */
 void SetSpellTrans(char t);   /* @0x80030D38 CONTROL.CPP:742 */
 void ClearPanel(void);   /* @0x80031F20 CONTROL.CPP:1291 */
 void InitPanelStr(void);   /* @0x80031F50 CONTROL.CPP:1346 */

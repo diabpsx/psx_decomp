@@ -59,4 +59,4 @@ extern char _infoclr[2];   /* @0x8011B6BC */
 extern char _infostr[2][256];   /* @0x800CE810 */
 
 
-/* TU-owned (gp-rel in the oracle): numobjects, numobjfiles, InitObjFlag are tentative-defined in objects.cpp itself, not extern'd here */
+/* TU-owned (gp-rel in the oracle): numobjects, numobjfiles, InitObjFlag are defined in objects.cpp itself, not extern'd here */

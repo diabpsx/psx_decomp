@@ -253,32 +253,34 @@ void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 }
 
 /* @0x8004EF98 MSG.CPP:439 */
-BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
+unsigned char delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
 {
     DLevel *Dl;
+    TCmdPItem *pD;
+    int i;
     Dl = GetDLevel(bLevel, setlevel);
-    {
-        TCmdPItem *pD = Dl->item;
-        unsigned char bc;
-        for (int i = 0; i < MAXITEMS; i++, pD++) {
-            bc = pD->bCmd;
-            if (bc == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
-                continue;
+    pD = Dl->item;
+    for (i = 0; i < MAXITEMS; i++, pD++) {
+        if (pD->bCmd == 0xFF || pD->wIndx != pI->wIndx || pD->wCI != pI->wCI || pD->dwSeed != pI->dwSeed)
+            continue;
 
-            if (bc == CMD_WALKXY)
-                goto ret1;
-            if (bc == CMD_STAND) {
-                sgbDeltaChanged = 1;
-                pD->bCmd = CMD_WALKXY;
-                goto ret1;
-            }
-            if (bc == CMD_ACK_PLRINFO) {
-                sgbDeltaChanged = 1;
-                pD->bCmd = 0xFF;
-                goto ret1;
-            }
-            break;
+        if (pD->bCmd == CMD_WALKXY) {
+            ReleaseDLevel(Dl);
+            return 1;
         }
+        if (pD->bCmd == CMD_STAND) {
+            sgbDeltaChanged = 1;
+            pD->bCmd = CMD_WALKXY;
+            ReleaseDLevel(Dl);
+            return 1;
+        }
+        if (pD->bCmd == CMD_ACK_PLRINFO) {
+            sgbDeltaChanged = 1;
+            pD->bCmd = 0xFF;
+            ReleaseDLevel(Dl);
+            return 1;
+        }
+        break;
     }
     ReleaseDLevel(Dl);
 
@@ -286,9 +288,8 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
         return 0;
 
     Dl = GetDLevel(bLevel, setlevel);
-    {
-    TCmdPItem *pD = Dl->item;
-    for (int i = 0; i < MAXITEMS; i++, pD++) {
+    pD = Dl->item;
+    for (i = 0; i < MAXITEMS; i++, pD++) {
         if (pD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
             pD->bCmd = CMD_WALKXY;
@@ -304,11 +305,10 @@ BOOL delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
             pD->bMCh = pI->bMCh;
             pD->wValue = pI->wValue;
             pD->dwBuff = pI->dwBuff;
-            break;
+            ReleaseDLevel(Dl);
+            return 1;
         }
     }
-    }
-ret1:
     ReleaseDLevel(Dl);
     return 1;
 }
@@ -358,13 +358,13 @@ void delta_put_item(const TCmdPItem *pI, int x, int y, unsigned char bLevel)
 }
 
 /* @0x8004F2F0 MSG.CPP:636 */
-BOOL delta_portal_inited(int i)
+unsigned char delta_portal_inited(int i)
 {
     return sgJunk.portal[i].x == 0xFF;
 }
 
 /* @0x8004F314 MSG.CPP:645 */
-BOOL delta_quest_inited(int i)
+unsigned char delta_quest_inited(int i)
 {
     return sgJunk.quests[i].qstate != 0xFF;
 }
@@ -379,7 +379,8 @@ void DeltaAddItem(int ii)
     int i;
 
     Dl = GetDLevel(currlevel, setlevel);
-    OpD = pD = Dl->item;
+    OpD = Dl->item;
+    pD = OpD;
     for (i = 0; i < MAXITEMS; i++, pD++) {
         if (pD->bCmd == 0xFF)
             continue;
@@ -395,32 +396,34 @@ void DeltaAddItem(int ii)
         }
     }
 
-    for (i = 0; i < MAXITEMS; i++, OpD++) {
-        if (OpD->bCmd == 0xFF) {
+    pD = OpD;
+    for (i = 0; i < MAXITEMS; i++, pD++) {
+        if (pD->bCmd == 0xFF) {
             sgbDeltaChanged = 1;
-            OpD->bCmd = 0;
-            OpD->x = item[ii]._ix;
-            OpD->y = item[ii]._iy;
-            OpD->wIndx = item[ii].IDidx;
-            OpD->wCI = item[ii]._iCreateInfo;
-            OpD->dwSeed = item[ii]._iSeed;
-            OpD->bId = item[ii]._iIdentified;
-            OpD->bDur = (unsigned char)item[ii]._iDurability;
-            OpD->bMDur = (unsigned char)item[ii]._iMaxDur;
-            OpD->bCh = item[ii]._iCharges;
-            OpD->bMCh = item[ii]._iMaxCharges;
-            OpD->wValue = (unsigned short)item[ii]._ivalue;
-            OpD->dwBuff = item[ii]._PlrCreate;
-            break;
+            pD->bCmd = 0;
+            pD->x = item[ii]._ix;
+            pD->y = item[ii]._iy;
+            pD->wIndx = item[ii].IDidx;
+            pD->wCI = item[ii]._iCreateInfo;
+            pD->dwSeed = item[ii]._iSeed;
+            pD->bId = item[ii]._iIdentified;
+            pD->bDur = (unsigned char)item[ii]._iDurability;
+            pD->bMDur = (unsigned char)item[ii]._iMaxDur;
+            pD->bCh = item[ii]._iCharges;
+            pD->bMCh = item[ii]._iMaxCharges;
+            pD->wValue = (unsigned short)item[ii]._ivalue;
+            pD->dwBuff = item[ii]._PlrCreate;
+            ReleaseDLevel(Dl);
+            return;
         }
     }
     ReleaseDLevel(Dl);
 }
 
 /* @0x8004F560 MSG.CPP:731 */
-void DeltaExportData(char *Dst)
+int DeltaExportData(char *Dst)
 {
-    GameMaps.ExportData((unsigned char *)Dst);
+    return GameMaps.ExportData((unsigned char *)Dst);
 }
 
 /* @0x8004F58C MSG.CPP:754 -- single-arg (char *Src is reinterpreted straight as CompressedLevs*);
@@ -681,7 +684,7 @@ void NetSendCmdDItem(unsigned char bHiPri, int ii)
 }
 
 /* @0x8004FEF0 MSG.CPP:1274 */
-BOOL i_own_level(int nReqLevel)
+unsigned char i_own_level(int nReqLevel)
 {
     return 1;
 }
@@ -1427,7 +1430,7 @@ void On_SYNCQUEST(const TCmd *pCmd, int pnum)
 
 /* @0x80052468 MSG.CPP:2676 -- bare switch(pCmd->bCmd) dispatch; no bLen/plractive validation.
  * Case order and CMD_ values are read directly from jtbl_80116868 (see the #defines above). */
-int ParseCmd(int pnum, const TCmd *pCmd)
+unsigned long ParseCmd(int pnum, const TCmd *pCmd)
 {
     static unsigned char sbLastCmd;
     sbLastCmd = pCmd->bCmd;

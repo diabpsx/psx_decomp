@@ -1,0 +1,398 @@
+{
+  "verified": 2699,
+  "total": 2725,
+  "pending": [],
+  "unrecorded_thunks": [
+    {
+      "segment": "control",
+      "function": "_GLOBAL__D_DrawLevelUpFlag",
+      "source": "recon/source/control.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "control",
+      "function": "_GLOBAL__I_DrawLevelUpFlag",
+      "source": "recon/source/control.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "ctrl",
+      "function": "_GLOBAL__D_ctrlflag",
+      "source": "recon/psxsrc/ctrl.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "ctrl",
+      "function": "_GLOBAL__I_ctrlflag",
+      "source": "recon/psxsrc/ctrl.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "gamepad",
+      "function": "_GLOBAL__I_flyflag",
+      "source": "recon/source/gamepad.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "gman",
+      "function": "_GLOBAL__D_DatPool",
+      "source": "recon/psxsrc/gman.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "gman",
+      "function": "_GLOBAL__I_DatPool",
+      "source": "recon/psxsrc/gman.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "loading",
+      "function": "_GLOBAL__D_CutScr",
+      "source": "recon/psxsrc/loading.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "loading",
+      "function": "_GLOBAL__I_CutScr",
+      "source": "recon/psxsrc/loading.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "minitext",
+      "function": "_GLOBAL__D_QBack",
+      "source": "recon/source/minitext.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "minitext",
+      "function": "_GLOBAL__I_QBack",
+      "source": "recon/source/minitext.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "msg",
+      "function": "_GLOBAL__D_deltaload",
+      "source": "recon/source/msg.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "msg",
+      "function": "_GLOBAL__I_deltaload",
+      "source": "recon/source/msg.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "overlay",
+      "function": "_GLOBAL__I_OVR_Open__Fv",
+      "source": "recon/psxsrc/overlay.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "padfuncs",
+      "function": "_GLOBAL__D_gplayer",
+      "source": "recon/psxsrc/padfuncs.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "padfuncs",
+      "function": "_GLOBAL__I_gplayer",
+      "source": "recon/psxsrc/padfuncs.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "pads",
+      "function": "_GLOBAL__I_Pad0",
+      "source": "recon/psxsrc/pads.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "pause",
+      "function": "_GLOBAL__D_DoPause__14CPauseMessagesi",
+      "source": "recon/psxsrc/pause.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "pause",
+      "function": "_GLOBAL__I_DoPause__14CPauseMessagesi",
+      "source": "recon/psxsrc/pause.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "printy",
+      "function": "_GLOBAL__I_WHITER",
+      "source": "recon/psxsrc/printy.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "psxhelp",
+      "function": "_GLOBAL__D_DrawHelp__Fv",
+      "source": "recon/psxsrc/psxhelp.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "psxhelp",
+      "function": "_GLOBAL__I_DrawHelp__Fv",
+      "source": "recon/psxsrc/psxhelp.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "quests",
+      "function": "_GLOBAL__D_questlog",
+      "source": "recon/source/quests.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "quests",
+      "function": "_GLOBAL__I_questlog",
+      "source": "recon/source/quests.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "stores",
+      "function": "_GLOBAL__D_pSTextBoxCels",
+      "source": "recon/source/stores.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    },
+    {
+      "segment": "stores",
+      "function": "_GLOBAL__I_pSTextBoxCels",
+      "source": "recon/source/stores.cpp",
+      "kind": "no_retail_thunk_declaration",
+      "actual": [
+        [
+          "FCN VOID",
+          0,
+          "",
+          ""
+        ]
+      ],
+      "retail": []
+    }
+  ],
+  "comparable": 2699
+}

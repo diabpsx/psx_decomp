@@ -1124,7 +1124,7 @@ static void L4drawRoom(int x, int y, int width, int height)
 }
 
 /* @0x80152CF4 */
-static int L4checkRoom(int x, int y, int width, int height)
+static unsigned char L4checkRoom(int x, int y, int width, int height)
 {
     int i, j;
 
@@ -1422,7 +1422,7 @@ void DRLG_LoadDiabQuads(unsigned char preflag)
 }
 
 /* @0x80153614 */
-static int DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir)
+static unsigned char DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir)
 {
     int sx, sy;
     int sw, sh;

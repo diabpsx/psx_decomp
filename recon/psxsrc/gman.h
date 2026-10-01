@@ -181,7 +181,7 @@ struct TextDat {                      /* sizeof 112 */
     void DecompFrame(FRAME_HDR *Fr);
     POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
     POLY_GT4 *PrintGt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-    void PrintMonster(int Creature, int Action, int Dir, int Frm, int X, int Y, int OtOffset);
+    POLY_FT4 *PrintMonster(int Creature, int Action, int Dir, int Frm, int X, int Y, int OtOffset);
     POLY_FT4 *PrintMonsterA(int Frm, int X, int Y, BOOL XFlip, int OtPos);
     unsigned char *GetDecompBufffer(int Size);
     void MakePalOffsetTab();
@@ -198,7 +198,7 @@ struct TextDat {                      /* sizeof 112 */
     BOOL IsLoaded() const { return LoadCount != 0; }                                               /* 257 */
     BOOL CanXferPal() const { return PalX >= 0 && PalY >= 0; }                                     /* 258 */
     BOOL CanXferFrame() const { return DecX >= 0 && DecY >= 0; }                                   /* 259 */
-    unsigned char *GetCreature(int Creature) { return CreatureAnims + CreatureOffset[Creature]; }  /* 284 */
+    CCreatureHdr *GetCreature(int Creature) { return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]); }  /* 284 */
 
     static CTextFileInfo *GetFileInfo(int Id);
 };

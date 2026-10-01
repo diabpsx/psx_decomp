@@ -71,7 +71,7 @@ extern int timerhz;
 
 void *Tmalloc(int Size);
 void Tfree(void *p);
-char *strupr(char *s);
+void strupr(char *s);
 LANG_TYPE LANG_GetLang(void);
 extern unsigned char FeFlag;
 

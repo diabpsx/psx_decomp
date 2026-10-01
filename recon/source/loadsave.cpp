@@ -61,7 +61,7 @@ int ILoad(void)
 }
 
 /* @0x8015B9E8 */
-BOOL OLoad(void)
+unsigned char OLoad(void)
 {
     if (*tbuff++ == TRUE)
         return TRUE;

@@ -892,12 +892,12 @@ void TextDat::Use(long NewHndDat, BOOL DatLoaded, int size)
 }
 
 /* line 495 @0x8009262C */
-void TextDat::PrintMonster(int Creature, int Action, int Dir, int Frame, int x, int y, int OtPos)
+POLY_FT4 *TextDat::PrintMonster(int Creature, int Action, int Dir, int Frame, int x, int y, int OtPos)
 {
     int PhysFrame;
 
     PhysFrame = GetFrNum(Creature, Action, Dir, Frame);
-    PrintMonsterA(PhysFrame, x, y, IsDirAliased(Creature, Action, Dir), OtPos);
+    return PrintMonsterA(PhysFrame, x, y, IsDirAliased(Creature, Action, Dir), OtPos);
 }
 
 /* line 508 @0x800926D8 */

@@ -852,21 +852,10 @@ void M_SyncStartKill(int i, int x, int y, int pnum)
         SyncMonstStartKill(i, pnum, 0);
 }
 
-/* bytes PASS; SYM OPEN only on `ly` ($6 ours, $4 retail -- every other local incl. x2/y2/ox/oy/
- * xm/ym now matches the retail SYM list). The locals are the retail SYM set: ox/oy = raw offset
- * sums, x2/y2 = the *100/202 results (adjusted in place), xm/ym = LightList _lx/_ly read early, and
- * the base pointer is a `const MonsterStruct *` (so its loads don't depend on the `sw ra` save --
- * lets sched2 sink the prologue below the mults as retail does).
- * Older note: logic/divide VERIFIED
- * correct -- `(x*100)/202` (D=202 solved from ceil(2^37/D)==0x288DF0CB per the orchestrator's hint)
- * reproduces the oracle's whole magic-multiply sequence exactly once the base pointer is cached as
- * `MonsterStruct *base = monster;` (array decay, NOT `&monster[monst]` -- that indexed-pointer cache
- * made it worse) and `base[monst]._mxoff + (base[monst]._myoff<<1)` (mxoff-first operand order,
- * matching the oracle's `addu v0,a1,a0` with a1=mxoff).  Residual: the prologue (`addiu sp,-24;
- * sw ra`) is scheduled by the oracle much LATER (right before the first `mult`), ours emits it as
- * the classic leading prologue -- a pure gcc instruction-scheduling placement, not reachable by
- * reordering the lx/ly statements (tried swapping which is computed first: regressed to 91/90).
- * Next angle: an RTL scheduler dump (-dS/-dR) to see what dependency is delaying the oracle's sp/ra. */
+/* PSX uses *100/202 projection rather than the PC twin's eighth-tile shift.
+ * y2 retains the projected offset; ly is assigned the direction-corrected
+ * offset in each branch. The final scaled Y argument is a separate temporary.
+ * Both assembler lanes and all local SYM records match retail. */
 void M_ChangeLightOffset(int monst)
 {
     int lx, ly;
@@ -888,15 +877,17 @@ void M_ChangeLightOffset(int monst)
             x2 = 32 - x2;
     }
     if (y2 < 0) {
-        y2 += 32;
+        ly = y2 + 32;
     } else if (pmonster[monst]._mdir == 6) {
-        y2 = 31 - y2;
+        ly = 31 - y2;
+    } else {
+        ly = y2;
     }
 
     lx = (x2 >> 2) + ((xm & 1) << 3);
-    ly = (y2 >> 2) + ((ym & 1) << 3);
 
-    ChangeLightOff(pmonster[monst].mlid, lx - 8, ly - 8);
+    const int final_y = (ly >> 2) + ((ym & 1) << 3);
+    ChangeLightOff(pmonster[monst].mlid, lx - 8, final_y - 8);
 }
 
 /* PSX adds the Diablo-Apocalypse light effect before entering ranged-special mode. */

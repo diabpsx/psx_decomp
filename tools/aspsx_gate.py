@@ -77,7 +77,7 @@ def main():
     for n0 in names:
         n = re.sub(r"_(?:[0-9a-f]{8}|ci)$", "", n0)
         ora = oracle(seg, n0)
-        if ora is None: print(f"  {n0}: NO ORACLE"); continue
+        if not ora: print(f"  {n0}: NO ORACLE"); continue
         f = ours.get(n)
         if f is None: print(f"  {n0}: NOT IN OBJECT"); continue
         ours_len = f.get("end", 0) // 4        # SYM 'Function end' offset = function length
@@ -99,6 +99,7 @@ def main():
                 print(f"      {tag} ours[{i1}:{i2}] oracle[{j1}:{j2}]: " +
                       " ".join(f"{w:08x}" for w in words[i1:i2][:3]) + " | " + "; ".join(t for _, t in ora[j1:j2][:3]))
     print(f"ASPSX: {n_ok}/{len(names)} PASS")
+    return 0 if names and n_ok == len(names) else 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

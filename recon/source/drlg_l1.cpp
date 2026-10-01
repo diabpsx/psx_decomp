@@ -80,7 +80,7 @@ void L5drawRoom(int x, int y, int w, int h)
     }
 }
 
-BOOL L5checkRoom(int x, int y, int width, int height)
+unsigned char L5checkRoom(int x, int y, int width, int height)
 {
     int i, j;
 

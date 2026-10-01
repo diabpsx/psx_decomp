@@ -19,11 +19,9 @@ struct Overlay {   /* sizeof 16 */
     void Load(void);
 };
 
-/* 12-byte "return" stub written at the end of a cleared overlay area (break; jr ra; nop) */
-struct OVER_STUB { unsigned char Code[12]; };
-
 extern "C" {
 void *memset(void *s, int c, unsigned long n);
+void *memcpy(void *dest, const void *src, unsigned long n);
 int DrawSync(int mode);
 void EnterCriticalSection(void);
 void ExitCriticalSection(void);
@@ -46,17 +44,11 @@ void ClearOutOverlays(void);
 void LoadOver(Overlay &Ovr);
 
 /* @0x800B0784 OVERLAY.CPP:110 (.STARTUP_text) */
+void OVR_Open(void) __attribute__((section(".text.overlay_startup")));
 void OVR_Open(void)
 {
     ClearOutOverlays();
 }
-
-OVER_TYPE CurrentOverlay = OVR_NONE;   /* @0x8011AD34 */
-static Overlay FrontEndOver = { OVR_FrontEndAddress, OVR_FrontEndSize, "frontend.bin", OVR_FRONTEND };   /* @0x8011CC28 */
-static Overlay PregameOver = { OVR_PregameAddress, OVR_PregameSize, "pregame.bin", OVR_PREGAME };       /* @0x8011CC38 */
-static Overlay GameOver = { OVR_GameAddress, OVR_GameSize, "game.bin", OVR_GAME };                      /* @0x8011CC48 */
-static Overlay FmvOver = { OVR_FmvAddress, OVR_FmvSize, "fmv.bin", OVR_FMV };                           /* @0x8011CC58 */
-static const OVER_STUB RetStub = { { 0xCD, 0x01, 0x01, 0x00, 0x08, 0x00, 0xE0, 0x03, 0x00, 0x00, 0x00, 0x00 } };   /* @0x801105F8 */
 
 /* @0x800953F8 OVERLAY.CPP:119 */
 BOOL OVR_IsMemcardOverlayBlank(void)
@@ -64,6 +56,14 @@ BOOL OVR_IsMemcardOverlayBlank(void)
     ASSERT(0, 120);
     return 1;
 }
+
+static Overlay FrontEndOver = { OVR_FrontEndAddress, OVR_FrontEndSize, "frontend.bin", OVR_FRONTEND };
+static Overlay PregameOver = { OVR_PregameAddress, OVR_PregameSize, "pregame.bin", OVR_PREGAME };
+static Overlay GameOver = { OVR_GameAddress, OVR_GameSize, "game.bin", OVR_GAME };
+static Overlay FmvOver = { OVR_FmvAddress, OVR_FmvSize, "fmv.bin", OVR_FMV };
+/* Retail's runtime halt/return template, copied to a cleared overlay's end. */
+static const unsigned long HaltTab[3] = {0x000101CD, 0x03E00008, 0};
+OVER_TYPE CurrentOverlay;   /* zero-initialized after the generated initializer's small literals */
 
 /* @0x80095424 OVERLAY.CPP:129 */
 void OVR_LoadPregame(void)
@@ -109,7 +109,7 @@ void Overlay::ClearOut(void)
 {
     ASSERT(Size >= 12, 188);
     memset(Addr, 0, Size);
-    *(OVER_STUB *)(Addr + Size - sizeof(OVER_STUB)) = RetStub;
+    memcpy(Addr + Size - sizeof(HaltTab), HaltTab, sizeof(HaltTab));
     DrawSync(0);
     EnterCriticalSection();
     FlushCache();

@@ -14,7 +14,7 @@ void LoadPreL1Dungeon(char *sFileName, int vx, int vy);   /* @0x8013D138 DRLG_L1
 void InitL5Dungeon(void);   /* @0x8013D2F8 DRLG_L1.CPP:1054 */
 void L5ClearFlags(void);   /* @0x8013D37C DRLG_L1.CPP:1081 */
 void L5drawRoom(int x, int y, int w, int h);   /* @0x8013D3CC DRLG_L1.CPP:1092 */
-BOOL L5checkRoom(int x, int y, int width, int height);   /* @0x8013D438 DRLG_L1.CPP:1108 */
+unsigned char L5checkRoom(int x, int y, int width, int height);   /* @0x8013D438 DRLG_L1.CPP:1108 */
 void L5roomGen(int x, int y, int w, int h, int dir);   /* @0x8013D4CC DRLG_L1.CPP:1124 */
 void L5firstRoom(void);   /* @0x8013D7FC DRLG_L1.CPP:1216 */
 long L5GetArea(void);   /* @0x8013DB9C DRLG_L1.CPP:1274 */

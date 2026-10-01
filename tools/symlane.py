@@ -46,7 +46,7 @@ EMBEDDED_TEXT_TABLES = embedded_text_tables()
 def crlf(p: Path):
     b = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"); p.write_bytes(b)
 
-def compile_g(src: Path) -> Path:
+def compile_g(src: Path, assembler=None) -> Path:
     """cc1/cc1plus with the lane flags + -g, SN-ready .s"""
     rel = src.resolve().relative_to(ROOT)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -67,7 +67,7 @@ def compile_g(src: Path) -> Path:
     s_file.write_text(txt); crlf(s_file)
     obj = stem.with_suffix(".g.obj")
     # -0: no div/rem zero-divide guard expansion (retail form; guard expansion is ASPSX's default)
-    r = subprocess.run([str(ASPSX), "-q", "-g", "-0", f"-G{g}", "-o", str(obj), str(s_file)], capture_output=True, text=True, cwd=ROOT, env=ENV)
+    r = subprocess.run([str(ASPSX if assembler is None else assembler), "-q", "-g", "-0", f"-G{g}", "-o", str(obj), str(s_file)], capture_output=True, text=True, cwd=ROOT, env=ENV)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     return obj
 
@@ -137,7 +137,17 @@ def functions(txt: str, every=False):
 def oracle_va(seg: str, board: str):
     """start VA of this segment's copy of `board` (from its asm/nonmatchings oracle), or None"""
     p = ROOT / "asm" / "nonmatchings" / seg / (board + ".s")
-    if not p.is_file(): return None
+    if not p.is_file():
+        # Default TU audits use compiler names, while header-copy oracles carry
+        # address suffixes. Resolve only one copy in this TU, never the first
+        # same-named function from another TU or a misspelled explicit suffix.
+        if re.sub(r'_(?:[0-9a-f]{8}|ci)$', '', board) != board:
+            return None
+        copies = [q for q in p.parent.glob('*.s')
+                  if re.sub(r'_(?:[0-9a-f]{8}|ci)$', '', q.stem) == board]
+        if len(copies) != 1:
+            return None
+        p = copies[0]
     m = re.search(r"/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s", p.read_text())
     return int(m.group(1), 16) if m else None
 
@@ -197,19 +207,24 @@ def main():
     ours = functions(txt.read_text(encoding="utf-8", errors="replace"))
     retail_all = functions(RETAIL.read_text(encoding="latin-1"), every=True)
     retail = {k: v[0] for k, v in retail_all.items()}
-    names = want or [n for n in ours if not n.startswith(("__maspsx", "_GLOBAL__"))]   # static-init thunks have no retail SYM
+    names = want or [n for n in ours if not n.startswith("__maspsx")]
     n_ok = 0
     for n0 in names:
         n = re.sub(r"_(?:[0-9a-f]{8}|ci)$", "", n0)      # board names carry the dup-copy suffix; the object/SYM name does not
-        if n.startswith("_GLOBAL__"):
-            print(f"  {n0}: SYM n/a (static-init thunk, no retail record)"); n_ok += 1; continue
         if n not in ours: print(f"  {n0}: NOT IN OBJECT"); continue
         rn = n if n in retail else ("_._" + n[3:] if n.startswith("___") and ("_._" + n[3:]) in retail else None)   # cfront dtor spelling
+        if rn is None and re.fullmatch(r'_GLOBAL__[ID]_\w+', n):
+            candidate = n.replace('_GLOBAL__I_', '_GLOBAL_.I.').replace('_GLOBAL__D_', '_GLOBAL_.D.')
+            if candidate in retail:
+                rn = candidate
         if rn is None: print(f"  {n0}: NO RETAIL SYM"); continue
         rf = retail[rn]
         if len(retail_all[rn]) > 1:     # same-named copies: take the one at this segment's oracle VA
             va = oracle_va(src.stem.lower(), n0)
-            rf = next((c for c in retail_all[rn] if c["start"] == va), rf)
+            copies = [c for c in retail_all[rn] if c['start'] == va]
+            if len(copies) != 1:
+                print(f'  {n0}: NO RETAIL SYM (missing or ambiguous TU copy)'); continue
+            rf = copies[0]
         rf = normalize_embedded_text_table(rf, n)
         ok, msg = compare(ours[n], rf)
         if os.environ.get("SYM_BLOCKS"):
@@ -217,6 +232,7 @@ def main():
         n_ok += ok
         print(f"  {n0}: {'SYM ok' if ok else 'SYM DIFF — ' + msg}")
     print(f"SYM: {n_ok}/{len(names)} ok  ({txt})")
+    return 0 if names and n_ok == len(names) else 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

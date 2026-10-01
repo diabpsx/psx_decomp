@@ -3,6 +3,7 @@
  * files are read in 32K slices into the stream buffer and handed to a callback; saves go to the
  * PC link (PCopen/PCwrite). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 
 struct CdlLOC {   /* sizeof 4 */
     unsigned char minute, second, sector, track;
@@ -153,7 +154,7 @@ BOOL CD_GetCdlFILE(const char *Name, struct CdlFILE *RetFile)
 {
     char SearchBuffer[256];
 
-    sprintf(SearchBuffer, "\%s;1", Name);
+    sprintf(SearchBuffer, "\\%s;1", Name);
     while (!CdSearchFile(RetFile, SearchBuffer))
         ;
     return 1;

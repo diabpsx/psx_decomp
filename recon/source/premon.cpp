@@ -10,6 +10,7 @@
  * pick/swap loop (matching GetMonsterTypes's body) because CC1PL_FLAGS carries -fno-inline (no
  * inlining occurs; this is genuine PSX-side source duplication, not a compiler artifact). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_premon.h"
 #include "source/gen/externs_premon.h"
 #include "source/gen/protos_premon.h"
@@ -206,86 +207,6 @@ void InitLevelMonsters(void)
 }
 
 /* --------------------------------------------------------------------- */
-void LoadDiabMonsts(void)
-{
-    unsigned char *lpSetPiece;
-
-    { int dummy1; }
-    { int dummy2; }
-    { int dummy3; }
-    {
-        int dummy4;
-        lpSetPiece = GRL_LoadFileInMemSig("diab1.DUN", NULL);
-        SetMapMonsters(lpSetPiece, 2 * diabquad1x, 2 * diabquad1y);
-        mem_free_dbg(lpSetPiece);
-        lpSetPiece = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
-        SetMapMonsters(lpSetPiece, 2 * diabquad2x, 2 * diabquad2y);
-        mem_free_dbg(lpSetPiece);
-        lpSetPiece = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
-        SetMapMonsters(lpSetPiece, 2 * diabquad3x, 2 * diabquad3y);
-        mem_free_dbg(lpSetPiece);
-        lpSetPiece = GRL_LoadFileInMemSig("diab4a.DUN", NULL);
-        SetMapMonsters(lpSetPiece, 2 * diabquad4x, 2 * diabquad4y);
-        mem_free_dbg(lpSetPiece);
-    }
-}
-
-/* --------------------------------------------------------------------- */
-int PreSpawnSkeleton(void)
-{
-    int i, j;
-    int skeltypes;
-    int skel;
-
-    skeltypes = 0;
-    for (i = 0; i < nummtypes; i++) {
-        if (IsSkel(Monsters[i].mtype))
-            skeltypes++;
-    }
-
-    if (skeltypes == 0)
-        return -1;
-
-    j = ENG_random(skeltypes);
-    skeltypes = 0;
-    for (i = 0; i < nummtypes; i++) {
-        if (j < skeltypes)
-            break;
-        if (IsSkel(Monsters[i].mtype))
-            skeltypes++;
-    }
-
-    skel = AddMonster(0, 0, 0, i - 1, 0);
-    if (skel != -1)
-        M_StartStand(skel, 0);
-
-    return skel;
-}
-
-/* --------------------------------------------------------------------- */
-void decode_enemy(int m, int enemy)
-{
-    if (enemy < 2) {
-        monster[m]._menemy = enemy;
-        monster[m]._mFlags = monster[m]._mFlags & ~0x10;
-        monster[m]._menemyx = plr[enemy]._px;
-        monster[m]._menemyy = plr[enemy]._py;
-    } else {
-        enemy -= 2;
-        monster[m]._menemy = enemy;
-        monster[m]._mFlags = monster[m]._mFlags | 0x10;
-        monster[m]._menemyx = monster[enemy]._mfutx;
-        monster[m]._menemyy = monster[enemy]._mfuty;
-    }
-}
-
-/* --------------------------------------------------------------------- */
-unsigned char IsGoat(int mt)
-{
-    return (unsigned)(mt - 0x22) < 4 || (unsigned)(mt - 0x2A) < 4;
-}
-
-/* --------------------------------------------------------------------- */
 /* PSX GetLevelMTypes: builds a QuestMask bitpattern from every active quest
  * (CM_QuestToBitPattern), passes it to ML_GetPresetMonsters (MLIST.CPP -- a
  * PSX-only precomputed-per-level monster table, CD-friendly replacement for
@@ -429,7 +350,7 @@ void PlaceQuestMonsters(void)
 
         if (QuestStatus(7)) {
             int dummy;
-            setp = GRL_LoadFileInMemSig("Levels\L1Data\Banner1.DUN", NULL);
+            setp = GRL_LoadFileInMemSig("Levels\\L1Data\\Banner1.DUN", NULL);
             {
                 int dummy2;
                 SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
@@ -438,7 +359,7 @@ void PlaceQuestMonsters(void)
         }
         if (QuestStatus(9)) {
             int dummy;
-            setp = GRL_LoadFileInMemSig("Levels\L2Data\Blood2.DUN", NULL);
+            setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blood2.DUN", NULL);
             {
                 int dummy2;
                 SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
@@ -447,7 +368,7 @@ void PlaceQuestMonsters(void)
         }
         if (QuestStatus(8)) {
             int dummy;
-            setp = GRL_LoadFileInMemSig("Levels\L2Data\Blind2.DUN", NULL);
+            setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", NULL);
             {
                 int dummy2;
                 SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
@@ -456,7 +377,7 @@ void PlaceQuestMonsters(void)
         }
         if (QuestStatus(0xA)) {
             int dummy;
-            setp = GRL_LoadFileInMemSig("Levels\L3Data\Anvil.DUN", NULL);
+            setp = GRL_LoadFileInMemSig("Levels\\L3Data\\Anvil.DUN", NULL);
             {
                 int dummy2;
                 SetMapMonsters(setp, 2 * (setpc_x + 1), 2 * (setpc_y + 1));
@@ -465,7 +386,7 @@ void PlaceQuestMonsters(void)
         }
         if (QuestStatus(0xB)) {
             int dummy;
-            setp = GRL_LoadFileInMemSig("Levels\L4Data\Warlord.DUN", NULL);
+            setp = GRL_LoadFileInMemSig("Levels\\L4Data\\Warlord.DUN", NULL);
             {
                 int dummy2;
                 SetMapMonsters(setp, 2 * setpc_x, 2 * setpc_y);
@@ -499,46 +420,27 @@ void PlaceQuestMonsters(void)
 }
 
 /* --------------------------------------------------------------------- */
-void SetMapMonsters(unsigned char *pMap, int startx, int starty)
+void LoadDiabMonsts(void)
 {
-    int i, j;
-    unsigned short rw, rh;
-    unsigned short *lm;
-    int mt;
+    unsigned char *lpSetPiece;
 
-    AddMonsterType(MT_GOLEM, 2);
-    AddMonster(1, 0, 0, 0, 0);
-    AddMonster(1, 0, 0, 0, 0);
-    AddMonster(1, 0, 0, 0, 0);
-    AddMonster(1, 0, 0, 0, 0);
-
-    if (setlevel && setlvlnum == 5) {
-        AddMonsterType(UniqMonst[4].mtype, 4);
-        AddMonsterType(UniqMonst[5].mtype, 4);
-        AddMonsterType(UniqMonst[6].mtype, 4);
-        PlaceUniqueMonst(4, 0, 0);
-        PlaceUniqueMonst(5, 0, 0);
-        PlaceUniqueMonst(6, 0, 0);
-    }
-
-    lm = (unsigned short *)pMap;
-    rw = *lm++;
-    rh = *lm++;
-    lm += rw * rh;
-    rw = rw << 1;
-    rh = rh << 1;
-    lm += rw * rh;
-
-    for (j = 0; j < rh; j++) {
-        for (i = 0; i < rw; i++) {
-            if (*lm != 0) {
-                mt = *lm;
-                mt = MonstConvTbl[mt - 1];
-                SwapMonsterType(&mt);
-                PlaceMonster(nummonsters++, AddMonsterType(mt, MPFLAG_SPECIAL), i + 16 + startx, j + 16 + starty);
-            }
-            lm++;
-        }
+    { int dummy1; }
+    { int dummy2; }
+    { int dummy3; }
+    {
+        int dummy4;
+        lpSetPiece = GRL_LoadFileInMemSig("diab1.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad1x, 2 * diabquad1y);
+        mem_free_dbg(lpSetPiece);
+        lpSetPiece = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad2x, 2 * diabquad2y);
+        mem_free_dbg(lpSetPiece);
+        lpSetPiece = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad3x, 2 * diabquad3y);
+        mem_free_dbg(lpSetPiece);
+        lpSetPiece = GRL_LoadFileInMemSig("diab4a.DUN", NULL);
+        SetMapMonsters(lpSetPiece, 2 * diabquad4x, 2 * diabquad4y);
+        mem_free_dbg(lpSetPiece);
     }
 }
 
@@ -562,7 +464,7 @@ void PlaceGroup(int mtype, int num, unsigned char leaderf, int leader)
             nummonsters--;
             placed--;
             if ((unsigned char)monster[nummonsters]._mx >= MAXDUNX || (unsigned char)monster[nummonsters]._my >= MAXDUNY)
-                DBG_SendMessage("psxsrc/gman.h", "Warning - GT 4 DO XXX. Group monster off of map. %s %d", 0x2F1);
+                DBG_SendMessage("Warning - GT 4 DO XXX. Group monster off of map. %s %d", "source/PREMON.cpp", 0x2F1);
             dung_map[monster[nummonsters]._mx][monster[nummonsters]._my].dMonster = 0;
         }
 
@@ -618,6 +520,50 @@ void PlaceGroup(int mtype, int num, unsigned char leaderf, int leader)
 
     if (leaderf & 2)
         monster[leader].packsize = placed;
+}
+
+/* --------------------------------------------------------------------- */
+void SetMapMonsters(unsigned char *pMap, int startx, int starty)
+{
+    int i, j;
+    unsigned short rw, rh;
+    unsigned short *lm;
+    int mt;
+
+    AddMonsterType(MT_GOLEM, 2);
+    AddMonster(1, 0, 0, 0, 0);
+    AddMonster(1, 0, 0, 0, 0);
+    AddMonster(1, 0, 0, 0, 0);
+    AddMonster(1, 0, 0, 0, 0);
+
+    if (setlevel && setlvlnum == 5) {
+        AddMonsterType(UniqMonst[4].mtype, 4);
+        AddMonsterType(UniqMonst[5].mtype, 4);
+        AddMonsterType(UniqMonst[6].mtype, 4);
+        PlaceUniqueMonst(4, 0, 0);
+        PlaceUniqueMonst(5, 0, 0);
+        PlaceUniqueMonst(6, 0, 0);
+    }
+
+    lm = (unsigned short *)pMap;
+    rw = *lm++;
+    rh = *lm++;
+    lm += rw * rh;
+    rw = rw << 1;
+    rh = rh << 1;
+    lm += rw * rh;
+
+    for (j = 0; j < rh; j++) {
+        for (i = 0; i < rw; i++) {
+            if (*lm != 0) {
+                mt = *lm;
+                mt = MonstConvTbl[mt - 1];
+                SwapMonsterType(&mt);
+                PlaceMonster(nummonsters++, AddMonsterType(mt, MPFLAG_SPECIAL), i + 16 + startx, j + 16 + starty);
+            }
+            lm++;
+        }
+    }
 }
 
 /* --------------------------------------------------------------------- */
@@ -963,4 +909,59 @@ void PlaceUniques(void)
                 PlaceUniqueMonst(u, mt, 8);
         }
     }
+}
+
+/* --------------------------------------------------------------------- */
+int PreSpawnSkeleton(void)
+{
+    int i, j;
+    int skeltypes;
+    int skel;
+
+    skeltypes = 0;
+    for (i = 0; i < nummtypes; i++) {
+        if (IsSkel(Monsters[i].mtype))
+            skeltypes++;
+    }
+
+    if (skeltypes == 0)
+        return -1;
+
+    j = ENG_random(skeltypes);
+    skeltypes = 0;
+    for (i = 0; i < nummtypes; i++) {
+        if (j < skeltypes)
+            break;
+        if (IsSkel(Monsters[i].mtype))
+            skeltypes++;
+    }
+
+    skel = AddMonster(0, 0, 0, i - 1, 0);
+    if (skel != -1)
+        M_StartStand(skel, 0);
+
+    return skel;
+}
+
+/* --------------------------------------------------------------------- */
+void decode_enemy(int m, int enemy)
+{
+    if (enemy < 2) {
+        monster[m]._menemy = enemy;
+        monster[m]._mFlags = monster[m]._mFlags & ~0x10;
+        monster[m]._menemyx = plr[enemy]._px;
+        monster[m]._menemyy = plr[enemy]._py;
+    } else {
+        enemy -= 2;
+        monster[m]._menemy = enemy;
+        monster[m]._mFlags = monster[m]._mFlags | 0x10;
+        monster[m]._menemyx = monster[enemy]._mfutx;
+        monster[m]._menemyy = monster[enemy]._mfuty;
+    }
+}
+
+/* --------------------------------------------------------------------- */
+unsigned char IsGoat(int mt)
+{
+    return (unsigned)(mt - 0x22) < 4 || (unsigned)(mt - 0x2A) < 4;
 }

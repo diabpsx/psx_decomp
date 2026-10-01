@@ -14,7 +14,7 @@ void *SMemAlloc(unsigned long bytes, char *filename, int linenumber, unsigned lo
 }
 
 /* @0x8007B1F0 STORM.CPP:74 */
-BOOL SMemFree(void *ptr, char *filename, int linenumber, unsigned long flags)
+unsigned char SMemFree(void *ptr, char *filename, int linenumber, unsigned long flags)
 {
     Tfree(ptr);
     return 1;

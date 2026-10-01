@@ -1011,7 +1011,7 @@ void DaveLTask(TASK *T)
     PAD_GetPad(1, 0);
     do {
         if (!CDWAIT) {
-            anyfuckingmenus = (questlog | sbookflag | chrflag | PauseMode | invflag) != 0;
+            anyfuckingmenus = (PauseMode | invflag | chrflag | sbookflag | questlog) != 0;
             mteleportfx();
             invistimer();
             healFX();

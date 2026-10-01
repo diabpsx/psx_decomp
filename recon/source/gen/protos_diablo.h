@@ -11,7 +11,7 @@ void free_game(void);   /* @0x800380D4 DIABLO.CPP:357 */
 void LittleStart(unsigned char bNewGame, unsigned char bSinglePlayer);   /* @0x80038148 DIABLO.CPP:390 */
 unsigned char StartGame(unsigned char bNewGame, unsigned char bSinglePlayer);   /* @0x8003820C DIABLO.CPP:433 */
 void run_game_loop(unsigned int uMsg);   /* @0x8003840C DIABLO.CPP:532 */
-BOOL TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
+unsigned char TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
 unsigned long DisableInputWndProc(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam);   /* @0x80038894 DIABLO.CPP:2191 */
 unsigned long GM_Game(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam);   /* @0x8003889C DIABLO.CPP:2245 */
 void LoadLvlGFX(void);   /* @0x80038930 DIABLO.CPP:2413 */

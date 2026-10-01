@@ -10331,9 +10331,3 @@ nonmatching tickval
 dlabel tickval
     /* 10C600 8011C600 00000000 */ .word 0x00000000
 enddlabel tickval
-
-nonmatching D_8011C604
-
-dlabel D_8011C604
-    /* 10C604 8011C604 642CA102 */ .word 0x02A12C64
-enddlabel D_8011C604

@@ -197,7 +197,7 @@ void StartGoldDrop(void)
     dropGoldValue = 0;
 }
 
-int CalculateGold(int pnum)
+long CalculateGold(int pnum)
 {
     int i;
     long gold;

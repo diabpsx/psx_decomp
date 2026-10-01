@@ -3,7 +3,7 @@
  * PSX deltas: DeadStruct only carries {_deadtype, _deadFrame, _deadtrans} (no sprite-pointer
  * _deadData[]/_deadWidth/_deadWidth2 — those live in a separate PSX asset table indexed by
  * _deadtype); the two hardcoded blood-spurt/stonecurse entries never assign _deadtype (left at
- * its BSS-zero value, a genuine retail quirk, not an omission here); AddDead's `ddir` parameter
+ * its initial zero value, a genuine retail quirk, not an omission here); AddDead's `ddir` parameter
  * is dropped entirely (never read) — only dv reaches SetdDead, masked to 5 bits. */
 #include "diabpsx_types.h"
 #include "source/gen/structs_dead.h"
@@ -18,6 +18,8 @@
  * %gp_rel(spurtndx)/%gp_rel(stonendx) stores (both are 4-byte ints defined in this TU, like devilution). */
 int spurtndx;
 int stonendx;
+/* Retail owns this zero-initialized 372-byte array in .data at 0x800CEB10. */
+DeadStruct dead[31] = {0};
 
 void InitDead(void)
 {

@@ -1,6 +1,6 @@
 /* PROF.CPP -- Diablo PSX (Climax 1998) reconstruction: CPU / GPU frame-time profiler bars.
  * Bodies from the retail oracle (asm/nonmatchings/prof) + SYM (scratch/tuinfo.py PROF.CPP).
- * The five timer words are file statics (.sbss @0x8011C684.., no SYM data record). */
+ * The five timer words are named INT statics in retail SYM (.sbss @0x8011C684..). */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
 
@@ -21,16 +21,16 @@ POLY_F3 *PRIM_GetNextPolyF3(void);
 extern void PROF_Restart();
 
 BOOL ProfOn = 0;                     /* @0x8011AD60 (.sdata) */
-static long TicksPerFrame;  /* @0x8011C684 */
-static long CpuStart;       /* @0x8011C688 */
-static long CpuTime;        /* @0x8011C68C */
-static long DrawTime;       /* @0x8011C690 */
-static long DrawStart;      /* @0x8011C694 */
+static int TimePerFrame;    /* @0x8011C684 */
+static int CpuStart;        /* @0x8011C688 */
+static int CpuTime;         /* @0x8011C68C */
+static int DrawTime;        /* @0x8011C690 */
+static int DrawStart;       /* @0x8011C694 */
 
 /* @0x80096838 PROF.CPP:87 */
 void PROF_Open(void)
 {
-    TicksPerFrame = GTIMSYS_InitTimer();
+    TimePerFrame = GTIMSYS_InitTimer();
     PROF_Restart();
     CpuTime = 0;
     CpuStart = 0;
@@ -88,8 +88,8 @@ void PROF_Draw(unsigned long *Ot)
     {
         POLY_F4 *F4;
         int Scale = 70;
-        int CpuW = CpuTime * Scale / TicksPerFrame;
-        int DrawW = DrawTime * Scale / TicksPerFrame;
+        int CpuW = CpuTime * Scale / TimePerFrame;
+        int DrawW = DrawTime * Scale / TimePerFrame;
 
         F4 = PRIM_GetNextPolyF4();
         setPolyF4(F4);

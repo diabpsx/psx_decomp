@@ -17,17 +17,21 @@ extern "C" void TSK_MakeTaskActive(struct TASK *T);
 extern "C" void *TSK_AddTask(int List, void *Func, int StackSize, int Arg);
 extern "C" void TSK_Sleep(int Ticks);
 extern "C" void DBG_Error(int a0, const char *File, int Line);
-extern "C" int GRL_PostMessage__FUlUilUl(unsigned long Wnd, unsigned int Msg, unsigned long a2, unsigned long a3);
+extern "C" unsigned char GRL_PostMessage__FUlUilUl(unsigned long Wnd, unsigned int Msg, long a2, unsigned long a3);
 extern unsigned long ghMainWnd;
 extern const char D_80110B58[];   /* @0x80110B58 -- "GLUE.CPP" (DBG_Error filename literal) */
 
 extern int NumOfMonsterListLevels;
-struct MonstListLevel {   /* sizeof 16 */
-    unsigned char _opaque[16];
+struct MonstList {   /* retail SYM: sizeof 16 */
+    unsigned short NumOfMonsters;
+    unsigned short TexNum;
+    unsigned char *TheList;
+    char *ListName;
+    unsigned long QuestBits;
 };
 struct MonstLevel {   /* sizeof 8 */
-    int Count;
-    struct MonstListLevel *List;
+    int NumOfLists;
+    struct MonstList *TheLists;
 };
 extern struct MonstLevel AllLevels[];
 
@@ -102,7 +106,7 @@ extern unsigned char deathflag;
 struct Quests { unsigned char pad[0xF3]; };   /* only +0xF2 read here */
 extern struct Quests quests;
 extern void *gplayer;
-int D_8011AFF0;   /* TU-owned; only written here (paired with D_8011AFF4/HasGameStarted) */
+static unsigned char JustLoadedPlayer = 0;   /* @0x8011AFF0; retail SYM STAT UCHAR, .sdata */
 
 extern "C" int GM_UseTexData__Fi(int Id);
 extern int MissDat;
@@ -156,9 +160,9 @@ public:
 
 /* TU-owned small data */
 int D_8011C6BC;   /* MonsterList (GLUE_Set/GetMonsterList) */
-int D_8011C6B0;   /* Finished flag */
+BOOL D_8011C6B0;   /* retail GlueFinished: BOOL */
 BOOL DoHomingScroll;   /* @0x8011C6B4 */
-int D_8011AFF4;   /* HasGameStarted flag */
+BOOL D_8011AFF4;   /* retail GameStarted: BOOL */
 int D_8011C6C0;   /* GLUE_DoQuake Time */
 int D_8011C6C4;   /* GLUE_DoQuake Amount */
 BOOL DoDrawBg;    /* @0x8011B004 */
@@ -207,7 +211,7 @@ void GLUE_PreDun(void)
 {
 }
 
-int GLUE_Finished(void)
+BOOL GLUE_Finished(void)
 {
     return D_8011C6B0;
 }
@@ -236,7 +240,7 @@ BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag)
     return OldFlag;
 }
 
-int GLUE_GetShowGameScreenFlag(void)
+BOOL GLUE_GetShowGameScreenFlag(void)
 {
     return DoDrawBg;
 }
@@ -259,7 +263,7 @@ BOOL GLUE_SetShowPanelFlag(BOOL NewFlag)
     return OldFlag;
 }
 
-int GLUE_HasGameStarted(void)
+BOOL GLUE_HasGameStarted(void)
 {
     return D_8011AFF4;
 }
@@ -270,7 +274,7 @@ void GLUE_DoQuake(int Time, int Amount)
     D_8011C6C4 = Amount;
 }
 
-struct MonstListLevel *GLUE_GetCurrentList(int Level)
+struct MonstList *GLUE_GetCurrentList(int Level)
 {
     struct MonstLevel *MLev;
     int List;
@@ -281,10 +285,10 @@ struct MonstListLevel *GLUE_GetCurrentList(int Level)
     }
     MLev = &AllLevels[Level];
     List = GLUE_GetMonsterList();
-    if (List < 0 || MLev->Count < List) {
+    if (List < 0 || MLev->NumOfLists < List) {
         DBG_Error(0, D_80110B58, 0x2EF);
     }
-    return &MLev->List[List];
+    return &MLev->TheLists[List];
 }
 
 void GLUE_StartGameExit(void)
@@ -416,29 +420,28 @@ void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
 void BgTask(struct TASK *T)
 {
     struct DEF_ARGS *Args;
-    int Level;
-    int MLev;
     BOOL IsTown;
-    void *List;
     int TextId;
-    struct PlayerStruct *Plr1;
-    struct PlayerStruct *Plr2;
-    struct PlayerStruct *Plr;
+    int Level;
+    int ObjId;
+    int List;
+    struct PlayerStruct *plr1;
+    struct PlayerStruct *plr2;
 
-    MLev = -1;
-    List = (void *)-1;
+    ObjId = -1;
+    List = -1;
     Args = *(struct DEF_ARGS **)((char *)T + 0x1C);
     D_8011C6C0 = 0;
     D_8011C6C4 = 0;
+    IsTown = Args->a1 != 0;
     Level = Args->a2;
     TextId = Args->a0;
-    IsTown = Args->a1 != 0;
     GLUE_SetShowGameScreenFlag(0);
     GLUE_SetHomingScrollFlag(0);
     GLUE_SetShowPanelFlag(0);
     GLUE_SetFinished(0);
-    Plr1 = &plr[0];
-    Plr2 = &plr[1];
+    plr1 = &plr[0];
+    plr2 = &plr[1];
     if ((unsigned int)(currlevel - 0xF) < 2) {
         TSK_AddTask(0x8000, (void *)penta_cycle_task__FP4TASK, 0xC78, 0);
     }
@@ -450,17 +453,17 @@ void BgTask(struct TASK *T)
     if (IsTown) {
         Level = 0;
     } else {
-        MLev = 0xCE;
-        List = (void *)GLUE_GetMonsterList();
+        ObjId = 0xCE;
+        List = GLUE_GetMonsterList();
     }
-    CBlocks Blocks(TextId, MLev, 0, Level, (int)List);
-    Blocks.SetTown(IsTown);
+    CBlocks MyBlocks(TextId, ObjId, 0, Level, List);
+    MyBlocks.SetTown(IsTown);
     UPDATEPROGRESS__Fi(4);
-    CPlayer P1(IsTown, 0, FePlayerNo);
-    CPlayer P2(IsTown, 1, FePlayerNo);
-    MakeSurePlayerDressedProperly(P1, *Plr1, IsTown, 1);
+    CPlayer MyPlayer(IsTown, 0, FePlayerNo);
+    CPlayer MyPlayer2(IsTown, 1, FePlayerNo);
+    MakeSurePlayerDressedProperly(MyPlayer, *plr1, IsTown, 1);
     if (FePlayerNo != 0) {
-        MakeSurePlayerDressedProperly(P2, *Plr2, IsTown, 1);
+        MakeSurePlayerDressedProperly(MyPlayer2, *plr2, IsTown, 1);
     }
     UPDATEPROGRESS__Fi(1);
     FinishProgress__Fv();
@@ -468,24 +471,22 @@ void BgTask(struct TASK *T)
     if (leveltype != 0) {
         MissDat = GM_UseTexData__Fi(0xD0);
     } else {
-        Blocks.SetTownersGraphics();
+        MyBlocks.SetTownersGraphics();
         MissDat = GM_UseTexData__Fi(0xCD);
     }
     music_start__Fi(leveltype);
     PaletteFadeIn__Fi(8);
-    P1.SetScrollTarget(*Plr1, Blocks);
-    Blocks.MoveToScrollTarget();
+    MyPlayer.SetScrollTarget(plr[0], MyBlocks);
+    MyBlocks.MoveToScrollTarget();
     GLUE_SetShowGameScreenFlag(1);
     GLUE_SetHomingScrollFlag(1);
     GLUE_SetShowPanelFlag(1);
     TSK_AddTask(0x8000, (void *)DaveLTask__FP4TASK, 0x1000, 0);
-    struct GPanel Panel1Obj(0);
-    struct GPanel Panel2Obj(0);
-    struct GPanel *Panel1 = &Panel1Obj;
-    struct GPanel *Panel2 = &Panel2Obj;
-    gplayer = &P1;
+    struct GPanel P1Panel(0);
+    struct GPanel P2Panel(0);
+    gplayer = &MyPlayer;
     VID_GetTick__Fv();
-    D_8011AFF0 = 0;
+    JustLoadedPlayer = 0;
     D_8011AFF4 = 1;
     if (setlevel != 0 && setlvlnum == 1) {
         if (*((unsigned char *)&quests + 0xF2) == 2) {
@@ -493,33 +494,29 @@ void BgTask(struct TASK *T)
         }
     }
 
-    while ((GLUE_Finished__Fv() ^ 1) != 0) {
+    while ((GLUE_Finished() ^ 1) != 0) {
         VID_GetTick__Fv();
         VID_GetTick__Fv();
         ResetFlames__Fv();
         if (DoDrawBg != 0) {
             if (PauseMode == 0 && D_8011C6C0 != 0) {
-                Blocks.SetRandOffset(D_8011C6C4);
+                MyBlocks.SetRandOffset(D_8011C6C4);
                 D_8011C6C0 -= 1;
             }
-            Plr = Plr1;
-            if (plr[0].plractive == 0) {
-                Plr = Plr2;
-            }
-            P1.SetScrollTarget(*Plr, Blocks);
+            MyPlayer.SetScrollTarget(plr[0].plractive ? plr[0] : plr[1], MyBlocks);
             if (DoHomingScroll != 0 && deathflag == 0) {
-                Blocks.DoScroll();
+                MyBlocks.DoScroll();
             }
-            Blocks.Print();
+            MyBlocks.Print();
             DrawAndBlit__Fv();
             if (DoShowPanel != 0) {
-                DoShowPanelGFX(Panel1, Panel2);
+                DoShowPanelGFX(&P1Panel, &P2Panel);
             }
-            MakeSurePlayerDressedProperly(P1, *Plr1, IsTown, 0);
-            P1.Print(*Plr1, Blocks);
+            MakeSurePlayerDressedProperly(MyPlayer, plr[0], IsTown, 0);
+            MyPlayer.Print(plr[0], MyBlocks);
             if (FePlayerNo != 0) {
-                MakeSurePlayerDressedProperly(P2, *Plr2, IsTown, 0);
-                P2.Print(*Plr2, Blocks);
+                MakeSurePlayerDressedProperly(MyPlayer2, plr[1], IsTown, 0);
+                MyPlayer2.Print(plr[1], MyBlocks);
             }
             if (IsTown) {
                 DrawLBird__Fv();

@@ -2,7 +2,8 @@
  * Bodies from the retail oracle (asm/nonmatchings/primpool) + SYM (scratch/tuinfo.py PRIMPOOL.CPP).
  * File statics per SYM class STAT; ThisOt / ThisPrimAddr / AddrToAvoid are this module's EXT .sdata. */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
+#include "psxsrc/psyq.h"
+#include "psxsrc/textdat_header.h"
 #include "glibdev/gal.h"
 
 typedef struct POLY_F3 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1, x2, y2; } POLY_F3;   /* 20 */

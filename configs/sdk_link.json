@@ -1,3 +1,2115 @@
 {
-  "InitHeap": {"library": "LIBAPI.LIB", "member": "C57"}
+    "__SN_ENTRY_POINT": {
+        "sdk": "4.1", "library": "LIBSN.LIB", "member": "SNMAIN",
+        "whole_layout": "snmain",
+        "exports": ["__SN_ENTRY_POINT", "__main", "__do_global_dtors"],
+        "externs": ["InitHeap", "main"],
+        "data_externs": ["_stacksize", "_ramsize"],
+        "data_exports": ["__bss", "__heapsize", "__bsslen", "__data", "__text", "__datalen", "__textlen", "__heapbase"],
+        "data_sections": {".data": {"va": "0x800B4290", "size": 36, "scaffold": "data.data"}},
+        "bss_sections": {".sbss": {"va": "0x8011C908", "size": 4, "exports": []}}
+    },
+    "data_ready_callback": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "C_004",
+        "exports": [
+            "data_ready_callback",
+            "StGetBackloc"
+        ],
+        "externs": [
+            "CdPosToInt",
+            "CdIntToPos"
+        ],
+        "data_externs": [
+            "StRingIdx2",
+            "StRingAddr",
+            "StRingIdx1",
+            "StFunc1",
+            "StFinalSector",
+            "StMode"
+        ],
+        "data_exports": [],
+        "common_symbols": {},
+        "data_sections": {
+            ".data": {
+                "va": "0x800b625c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80132570",
+                "size": 16
+            }
+        },
+        "internal_entries": []
+    },
+    "StSetRing": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "CDROM",
+        "exports": [
+            "StSetRing"
+        ],
+        "externs": [
+            "StClearRing"
+        ],
+        "data_externs": [],
+        "data_exports": [],
+        "common_symbols": {
+            "StRingAddr": {
+                "va": "0x80139bd8",
+                "size": 4
+            },
+            "StRingSize": {
+                "va": "0x80139bf0",
+                "size": 4
+            },
+            "StRingBase": {
+                "va": "0x80139bd4",
+                "size": 4
+            },
+            "StRgb24": {
+                "va": "0x801351d4",
+                "size": 4
+            },
+            "StEmu_Addr": {
+                "va": "0x80139bc8",
+                "size": 4
+            },
+            "StEmu_Idx": {
+                "va": "0x801383b0",
+                "size": 4
+            },
+            "StRingIdx1": {
+                "va": "0x80139bb8",
+                "size": 4
+            },
+            "StRingIdx2": {
+                "va": "0x80139bbc",
+                "size": 4
+            },
+            "StRingIdx3": {
+                "va": "0x80139bc0",
+                "size": 4
+            },
+            "StSTART_FLAG": {
+                "va": "0x80139bd0",
+                "size": 4
+            },
+            "StStartFrame": {
+                "va": "0x80135218",
+                "size": 4
+            },
+            "StEndFrame": {
+                "va": "0x80139bcc",
+                "size": 4
+            },
+            "StFinalSector": {
+                "va": "0x80137228",
+                "size": 4
+            },
+            "Stframe_no": {
+                "va": "0x80135040",
+                "size": 4
+            },
+            "Stsector_offset": {
+                "va": "0x801351d0",
+                "size": 2
+            },
+            "StCdIntrFlag": {
+                "va": "0x801351e4",
+                "size": 4
+            },
+            "StCHANNEL": {
+                "va": "0x80135214",
+                "size": 4
+            },
+            "CChannel": {
+                "va": "0x8013521c",
+                "size": 4
+            }
+        },
+        "data_sections": {
+            ".data": {
+                "va": "0x800b626c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {},
+        "internal_entries": []
+    },
+    "StClearRing": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "C_002",
+        "exports": [
+            "StClearRing"
+        ],
+        "externs": [
+            "init_ring_status"
+        ],
+        "data_externs": [
+            "StRingSize",
+            "StRingIdx3",
+            "StRingIdx2",
+            "StRingIdx1",
+            "StFinalSector",
+            "StCdIntrFlag",
+            "Stsector_offset",
+            "Stframe_no"
+        ],
+        "data_exports": [],
+        "common_symbols": {},
+        "data_sections": {
+            ".data": {
+                "va": "0x800b627c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {},
+        "internal_entries": []
+    },
+    "StSetStream": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "C_005",
+        "exports": [
+            "StSetStream"
+        ],
+        "externs": [
+            "StSetMask"
+        ],
+        "data_externs": [
+            "StEmu_Addr",
+            "StRgb24",
+            "CChannel",
+            "StCHANNEL",
+            "Stsector_offset",
+            "Stframe_no"
+        ],
+        "data_exports": [],
+        "common_symbols": {
+            "StFunc1": {
+                "va": "0x801351dc",
+                "size": 4
+            },
+            "StFunc2": {
+                "va": "0x801351e0",
+                "size": 4
+            }
+        },
+        "data_sections": {
+            ".data": {
+                "va": "0x800b628c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {},
+        "internal_entries": []
+    },
+    "init_ring_status": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "C_008",
+        "exports": [
+            "init_ring_status"
+        ],
+        "externs": [],
+        "data_externs": [
+            "StRingAddr"
+        ],
+        "data_exports": [],
+        "common_symbols": {},
+        "data_sections": {
+            ".data": {
+                "va": "0x800b629c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {},
+        "internal_entries": []
+    },
+    "StSetMask": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "C_010",
+        "exports": [
+            "StSetMask"
+        ],
+        "externs": [],
+        "data_externs": [
+            "StSTART_FLAG",
+            "StStartFrame",
+            "StEndFrame"
+        ],
+        "data_exports": [],
+        "common_symbols": {},
+        "data_sections": {
+            ".data": {
+                "va": "0x800b62ac",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {},
+        "internal_entries": []
+    },
+    "StCdInterrupt": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "C_011",
+        "exports": [
+            "StCdInterrupt"
+        ],
+        "externs": [
+            "CdReady",
+            "init_ring_status",
+            "data_ready_callback",
+            "printf"
+        ],
+        "data_externs": [
+            "StFinalSector",
+            "StRgb24",
+            "StEmu_Addr",
+            "StCdIntrFlag",
+            "StEmu_Idx",
+            "StRingIdx1",
+            "StRingAddr",
+            "StMode",
+            "StSTART_FLAG",
+            "StStartFrame",
+            "CChannel",
+            "Stsector_offset",
+            "Stframe_no",
+            "StRingIdx2",
+            "StEndFrame",
+            "StFunc2",
+            "StRingSize",
+            "StRingBase",
+            "StCHANNEL"
+        ],
+        "data_exports": [
+            "debug_cause"
+        ],
+        "common_symbols": {},
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010e708",
+                "size": 32,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800b62bc",
+                "size": 80,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80132580",
+                "size": 16
+            }
+        },
+        "internal_entries": [
+            "func_8001E908",
+            "func_8001E934"
+        ]
+    },
+    "InitTAP": {
+        "sdk": "4.1",
+        "library": "LIBTAP.LIB",
+        "member": "TAP",
+        "exports": [
+            "InitTAP",
+            "StartTAP",
+            "StopTAP",
+            "SendTAP",
+            "EnableTAP",
+            "DisableTAP"
+        ],
+        "internal_entries": [
+            "func_8001EADC",
+            "func_8001EAF4",
+            "func_8001EB68",
+            "func_8001EBA4",
+            "func_8001FAE0",
+            "func_8001FB14",
+            "func_8001FBBC",
+            "func_8001FBDC",
+            "func_8001FC5C",
+            "func_8001FCA0",
+            "func_8001FCB0"
+        ],
+        "externs": [
+            "PAD_dr",
+            "printf",
+            "bzero",
+            "EnterCriticalSection",
+            "SysDeqIntRP",
+            "SysEnqIntRP",
+            "ChangeClearRCnt",
+            "ExitCriticalSection"
+        ],
+        "data_sections": {
+            ".data": {
+                "va": "0x800B630C",
+                "size": 64,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".sbss": {
+                "va": "0x8011C90C",
+                "size": 128
+            }
+        }
+    },
+    "sprintf": {
+        "sdk": "4.1",
+        "library": "LIBC.LIB",
+        "member": "SPRINTF",
+        "externs": [
+            "strlen",
+            "memchr",
+            "memmove"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010E168",
+                "size": 224,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800B5E4C",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "CdSearchFile": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "ISO9660",
+        "exports": [
+            "CdSearchFile"
+        ],
+        "internal_entries": [
+            "func_8001CE74",
+            "func_8001CE94",
+            "func_8001D158",
+            "func_8001D1FC",
+            "func_8001D498"
+        ],
+        "externs": [
+            "printf",
+            "strncmp",
+            "memcpy",
+            "strcmp",
+            "CdIntToPos",
+            "CdControl",
+            "CdRead",
+            "CdReadSync"
+        ],
+        "data_externs": [
+            "CD_nopen",
+            "CD_debug"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010e4c8",
+                "size": 496,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800b620c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80130170",
+                "size": 9216
+            }
+        }
+    },
+    "CdReadBreak": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "CDREAD",
+        "exports": [
+            "CdReadBreak",
+            "CdRead",
+            "CdReadSync",
+            "CdReadCallback",
+            "CdReadMode"
+        ],
+        "internal_entries": [
+            "func_8001D848"
+        ],
+        "externs": [
+            "CdDataCallback",
+            "CdGetSector2",
+            "CdDataSync",
+            "CdGetSector",
+            "CdPosToInt",
+            "puts",
+            "VSync",
+            "CdSyncCallback",
+            "CdReadyCallback",
+            "CdControlF",
+            "CdStatus",
+            "CdControl",
+            "CdLastPos",
+            "CdFlush",
+            "CdMode",
+            "CdControlB",
+            "CdReady"
+        ],
+        "data_externs": [],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010e6b8",
+                "size": 80,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800b621c",
+                "size": 64,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {},
+        "prefix_owner": "strncmp"
+    },
+    "strncmp": {
+        "sdk": "4.1",
+        "library": "LIBC.LIB",
+        "member": "C24"
+    },
+    "CD_sync": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "BIOS",
+        "exports": [
+            "CD_sync",
+            "CD_ready",
+            "CD_cw",
+            "CD_vol",
+            "CD_flush",
+            "CD_initvol",
+            "CD_initintr",
+            "CD_init",
+            "CD_datasync",
+            "CD_getsector",
+            "CD_getsector2",
+            "CD_set_test_parmnum"
+        ],
+        "internal_entries": [
+            "func_8001B43C"
+        ],
+        "externs": [
+            "printf",
+            "puts",
+            "VSync",
+            "CheckCallback",
+            "ResetCallback",
+            "InterruptCallback"
+        ],
+        "data_exports": [
+            "CD_cbsync",
+            "CD_cbready",
+            "CD_cbread",
+            "CD_debug",
+            "CD_status",
+            "CD_status1",
+            "CD_nopen",
+            "CD_pos",
+            "CD_mode",
+            "CD_com",
+            "DS_active",
+            "CD_comstr",
+            "CD_intstr"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010E278",
+                "size": 592,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800B5EEC",
+                "size": 800,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80130140",
+                "size": 48
+            }
+        },
+        "common_symbols": {
+            "StMode": {
+                "va": "0x801351d8",
+                "size": 4
+            }
+        }
+    },
+    "ResetGraph": {
+        "sdk": "4.1",
+        "library": "LIBGPU.LIB",
+        "member": "SYS",
+        "exports": [
+            "ResetGraph",
+            "SetGraphDebug",
+            "SetGraphQueue",
+            "GetGraphDebug",
+            "DrawSyncCallback",
+            "SetDispMask",
+            "DrawSync",
+            "ClearImage",
+            "ClearImage2",
+            "LoadImage",
+            "StoreImage",
+            "MoveImage",
+            "ClearOTag",
+            "ClearOTagR",
+            "DrawPrim",
+            "DrawOTag",
+            "PutDrawEnv",
+            "DrawOTagEnv",
+            "GetDrawEnv",
+            "PutDispEnv",
+            "GetDispEnv",
+            "GetODE",
+            "SetTexWindow",
+            "SetDrawArea",
+            "SetDrawOffset",
+            "SetPriority",
+            "SetDrawStp",
+            "SetDrawMode",
+            "SetDrawEnv",
+            "LoadImage2",
+            "StoreImage2",
+            "MoveImage2",
+            "DrawOTag2"
+        ],
+        "internal_entries": [
+            "func_80013AE0",
+            "func_80014AD4",
+            "func_80014D44",
+            "func_80014D64",
+            "func_80014DFC",
+            "func_80014E94",
+            "func_80014EB0",
+            "func_8001578C",
+            "func_800157D4",
+            "func_80015828",
+            "func_80015AD8",
+            "func_80015D38",
+            "func_80015FC4",
+            "func_80015FF8",
+            "func_8001613C",
+            "func_8001661C"
+        ],
+        "externs": [
+            "printf",
+            "ResetCallback",
+            "GPU_cw",
+            "DMACallback",
+            "memcpy",
+            "GetVideoMode",
+            "SetIntrMask",
+            "VSync"
+        ],
+        "data_exports": [
+            "GPU_printf",
+            "GEnv",
+            "_qin",
+            "_qout"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010DE78",
+                "size": 544,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800B545C",
+                "size": 368,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x8012FFD0",
+                "size": 336
+            }
+        },
+        "common_symbols": {
+            "_que": {
+                "va": "0x801383b8",
+                "size": 6144
+            }
+        }
+    },
+    "ResetCallback": {
+        "sdk": "4.1",
+        "library": "LIBETC.LIB",
+        "member": "INTR",
+        "exports": [
+            "ResetCallback",
+            "InterruptCallback",
+            "DMACallback",
+            "VSyncCallback",
+            "VSyncCallbacks",
+            "StopCallback",
+            "RestartCallback",
+            "CheckCallback",
+            "GetIntrMask",
+            "SetIntrMask"
+        ],
+        "internal_entries": [
+            "func_800124E8",
+            "func_80012918"
+        ],
+        "externs": [
+            "setjmp",
+            "HookEntryInt",
+            "startIntrVSync",
+            "startIntrDMA",
+            "_96_remove",
+            "ExitCriticalSection",
+            "printf",
+            "ReturnFromException",
+            "ChangeClearPAD",
+            "ChangeClearRCnt",
+            "EnterCriticalSection",
+            "ResetEntryInt"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010DD08",
+                "size": 112,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800B42EC",
+                "size": 4352,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "startIntrDMA": {
+        "sdk": "4.1",
+        "library": "LIBETC.LIB",
+        "member": "INTR_DMA",
+        "exports": [
+            "startIntrDMA"
+        ],
+        "internal_entries": [
+            "func_80012D24"
+        ],
+        "externs": [
+            "InterruptCallback",
+            "printf"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010DD78",
+                "size": 48,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800B541C",
+                "size": 48,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "_96_remove": {
+        "sdk": "4.1",
+        "library": "LIBAPI.LIB",
+        "member": "C114",
+        "prefix_owner": "func_80012918"
+    },
+    "_SpuInit": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_INI",
+        "exports": [
+            "_SpuInit",
+            "SpuStart"
+        ],
+        "externs": [
+            "ResetCallback",
+            "_spu_init",
+            "_spu_FsetRXX",
+            "EnterCriticalSection",
+            "_spu_FiDMA",
+            "_SpuDataCallback",
+            "OpenEvent",
+            "EnableEvent",
+            "ExitCriticalSection"
+        ],
+        "data_externs": [
+            "_spu_rev_startaddr",
+            "_spu_AllocBlockNum",
+            "_spu_AllocLastNum",
+            "_spu_memList",
+            "_spu_transMode"
+        ],
+        "data_exports": [
+            "_spu_EVdma",
+            "_spu_keystat",
+            "_spu_trans_mode",
+            "_spu_rev_flag",
+            "_spu_rev_reserve_wa",
+            "_spu_rev_offsetaddr",
+            "_spu_rev_attr",
+            "_spu_RQvoice",
+            "_spu_RQmask",
+            "_spu_voice_centerNote",
+            "_spu_zerobuf",
+            "_spu_env",
+            "_spu_isCalled"
+        ],
+        "data_sections": {
+            ".data": {
+                "va": "0x800b55cc",
+                "size": 1152,
+                "scaffold": "data.data"
+            }
+        },
+        "common_symbols": {}
+    },
+    "_spu_init": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "SPU",
+        "exports": [
+            "_spu_init",
+            "_spu_FiDMA",
+            "_spu_Fr_",
+            "_spu_t",
+            "_spu_Fw",
+            "_spu_Fr",
+            "_spu_FsetRXX",
+            "_spu_FsetRXXa",
+            "_spu_FgetRXXa",
+            "_spu_FsetPCR",
+            "_spu_Fw1ts"
+        ],
+        "data_exports": [
+            "_spu_RXX",
+            "_spu_tsa",
+            "_spu_transMode",
+            "_spu_addrMode",
+            "_spu_mem_mode",
+            "_spu_mem_mode_plus",
+            "_spu_mem_mode_unit",
+            "_spu_mem_mode_unitM",
+            "_spu_inTransfer",
+            "_spu_transferCallback",
+            "_spu_IRQCallback"
+        ],
+        "common_symbols": {
+            "_spu_RQ": {
+                "va": "0x80135200",
+                "size": 20
+            }
+        },
+        "externs": [
+            "printf",
+            "DeliverEvent"
+        ],
+        "data_externs": [],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010e098",
+                "size": 80,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800b5a4c",
+                "size": 96,
+                "scaffold": "data.data"
+            }
+        },
+        "internal_entries": [
+            "func_80016A5C",
+            "func_80017264",
+            "func_8001728C"
+        ]
+    },
+    "startIntrVSync": {
+        "sdk": "4.1",
+        "library": "LIBETC.LIB",
+        "member": "INTR_VB",
+        "exports": [
+            "startIntrVSync"
+        ],
+        "data_exports": [
+            "Vcount"
+        ],
+        "common_symbols": {},
+        "externs": [
+            "InterruptCallback"
+        ],
+        "data_externs": [],
+        "data_sections": {
+            ".data": {
+                "va": "0x800b53ec",
+                "size": 48,
+                "scaffold": "data.data"
+            }
+        },
+        "internal_entries": [
+            "func_80012A7C"
+        ]
+    },
+    "VSync": {
+        "sdk": "4.1",
+        "library": "LIBETC.LIB",
+        "member": "VSYNC",
+        "internal_entries": [
+            "func_800121D4"
+        ],
+        "externs": [
+            "puts",
+            "ChangeClearPAD",
+            "ChangeClearRCnt"
+        ],
+        "data_externs": [
+            "Vcount"
+        ],
+        "data_exports": [
+            "Hcount"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010DCF8",
+                "size": 16,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800B42CC",
+                "size": 32,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "SetInitPadFlag": {
+        "sdk": "4.1",
+        "library": "LIBAPI.LIB",
+        "member": "PAD",
+        "exports": [
+            "SetInitPadFlag",
+            "ReadInitPadFlag",
+            "PAD_init",
+            "InitPAD",
+            "StartPAD",
+            "StopPAD"
+        ],
+        "internal_entries": [
+            "func_80011CC0",
+            "func_80011D38"
+        ],
+        "externs": [
+            "_remove_ChgclrPAD",
+            "EnterCriticalSection",
+            "_patch_pad",
+            "ExitCriticalSection",
+            "ChangeClearPAD",
+            "PAD_init2",
+            "_send_pad",
+            "InitPAD2",
+            "StartPAD2",
+            "EnablePAD",
+            "DisablePAD",
+            "StopPAD2",
+            "SysDeqIntRP",
+            "SysEnqIntRP"
+        ],
+        "data_sections": {
+            ".data": {
+                "va": "0x800B42BC",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x8012FF90",
+                "size": 16
+            }
+        }
+    },
+    "PadInit": {
+        "sdk": "4.1",
+        "library": "LIBETC.LIB",
+        "member": "PAD",
+        "exports": [
+            "PadInit",
+            "PadRead",
+            "PadStop"
+        ],
+        "externs": [
+            "ResetCallback",
+            "PAD_init",
+            "ChangeClearPAD",
+            "PAD_dr",
+            "StopPAD"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x8012FF80",
+                "size": 16
+            }
+        },
+        "common_symbols": {
+            "PadIdentifier": {
+                "va": "0x80135220",
+                "size": 4
+            }
+        }
+    },
+    "StopCARD2": {
+        "sdk": "4.1",
+        "library": "LIBCARD.LIB",
+        "member": "A76"
+    },
+    "_patch_card": {
+        "sdk": "4.1",
+        "library": "LIBCARD.LIB",
+        "member": "PATCH",
+        "exports": [
+            "_patch_card",
+            "_patch_card2",
+            "_copy_memcard_patch"
+        ],
+        "prefix_owner": "StopCARD2",
+        "externs": [
+            "EnterCriticalSection",
+            "FlushCache"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80130120",
+                "size": 16
+            }
+        }
+    },
+    "_SendPAD": {
+        "sdk": "4.1",
+        "library": "LIBAPI.LIB",
+        "member": "SENDPAD",
+        "exports": [
+            "_SendPAD",
+            "_send_pad"
+        ],
+        "externs": [
+            "EnterCriticalSection",
+            "FlushCache",
+            "ExitCriticalSection"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x8012FFB0",
+                "size": 16
+            }
+        }
+    },
+    "_remove_ChgclrPAD": {
+        "sdk": "4.1",
+        "library": "LIBAPI.LIB",
+        "member": "CHCLRPAD",
+        "externs": [
+            "EnterCriticalSection",
+            "FlushCache",
+            "ExitCriticalSection"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x8012FFC0",
+                "size": 16
+            }
+        }
+    },
+    "_ExitCard": {
+        "sdk": "4.1",
+        "library": "LIBCARD.LIB",
+        "member": "END",
+        "externs": [
+            "EnterCriticalSection",
+            "FlushCache",
+            "ExitCriticalSection"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80130130",
+                "size": 16
+            }
+        }
+    },
+    "_patch_gte": {
+        "sdk": "4.1",
+        "library": "LIBGTE.LIB",
+        "member": "PATCHGTE",
+        "externs": [
+            "EnterCriticalSection",
+            "FlushCache",
+            "ExitCriticalSection"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80132590",
+                "size": 16
+            }
+        }
+    },
+    "EnablePAD": {
+        "sdk": "4.1",
+        "library": "LIBAPI.LIB",
+        "member": "PATCH",
+        "exports": [
+            "EnablePAD",
+            "DisablePAD",
+            "_patch_pad"
+        ],
+        "externs": [
+            "EnterCriticalSection",
+            "FlushCache"
+        ],
+        "bss_sections": {
+            ".bss": {
+                "va": "0x8012FFA0",
+                "size": 16
+            }
+        }
+    },
+    "SpuSetCommonAttr": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SCA",
+        "data_externs": [
+            "_spu_RXX"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010E0E8",
+                "size": 64,
+                "scaffold": "rodata.rodata"
+            }
+        },
+        "bss_sections": {
+            ".bss": {
+                "va": "0x80139BC4",
+                "size": 4,
+                "exports": [
+                    "SpuCommonError"
+                ]
+            }
+        }
+    },
+    "SetVideoMode": {
+        "sdk": "4.1",
+        "library": "LIBETC.LIB",
+        "member": "VMODE",
+        "exports": [
+            "SetVideoMode",
+            "GetVideoMode"
+        ],
+        "data_sections": {
+            ".data": {
+                "va": "0x800B544C",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "bzero": {
+        "sdk": "4.1",
+        "library": "LIBC.LIB",
+        "member": "C40"
+    },
+    "InitGeom": {
+        "sdk": "4.1",
+        "library": "LIBGTE.LIB",
+        "member": "MSC00",
+        "prefix_owner": "bzero",
+        "externs": [
+            "_patch_gte"
+        ],
+        "data_sections": {
+            ".data": {
+                "va": "0x800B634C",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "SpuSetVoiceAttr": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SVA",
+        "externs": [
+            "_spu_note2pitch",
+            "_spu_FsetRXXa"
+        ],
+        "data_externs": [
+            "_spu_voice_centerNote",
+            "_spu_RXX"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010E128",
+                "size": 64,
+                "scaffold": "rodata.rodata"
+            }
+        }
+    },
+    "SetRCnt": {
+        "sdk": "4.1",
+        "library": "LIBAPI.LIB",
+        "member": "COUNTER",
+        "exports": [
+            "SetRCnt",
+            "GetRCnt",
+            "StartRCnt",
+            "StopRCnt",
+            "ResetRCnt"
+        ],
+        "externs": [],
+        "data_externs": [],
+        "data_sections": {
+            ".data": {
+                "va": "0x800b6374",
+                "size": 32,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "CdInit": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "EVENT",
+        "exports": [
+            "CdInit"
+        ],
+        "externs": [
+            "CdReset",
+            "CdSyncCallback",
+            "CdReadyCallback",
+            "CdReadCallback",
+            "CdReadMode",
+            "printf",
+            "DeliverEvent"
+        ],
+        "data_externs": [],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010e248",
+                "size": 32,
+                "scaffold": "rodata.rodata"
+            }
+        }
+    },
+    "__udivmoddi4": {
+        "sdk": "4.1",
+        "library": "LIBSN.LIB",
+        "member": "_UDIVMOD",
+        "exports": [
+            "__udivmoddi4"
+        ],
+        "externs": [],
+        "data_externs": [],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010dbf8",
+                "size": 256,
+                "scaffold": "rodata.rodata"
+            }
+        }
+    },
+    "CdRead2": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "CDREAD2",
+        "exports": [
+            "CdRead2"
+        ],
+        "externs": [
+            "CdControl",
+            "data_ready_callback",
+            "CdDataCallback",
+            "CdReadyCallback",
+            "StCdInterrupt"
+        ],
+        "data_externs": [
+            "StMode"
+        ]
+    },
+    "__divdi3": {
+        "sdk": "4.1",
+        "library": "LIBSN.LIB",
+        "member": "_DIVDI3",
+        "exports": [
+            "__divdi3"
+        ],
+        "externs": [
+            "__udivmoddi4"
+        ],
+        "data_externs": []
+    },
+    "__builtin_delete": {
+        "sdk": "4.1",
+        "library": "LIBSN.LIB",
+        "member": "_OP_DELE",
+        "exports": [
+            "__builtin_delete"
+        ],
+        "externs": [
+            "free"
+        ],
+        "data_externs": []
+    },
+    "_spu_gcSPU": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_M_INT",
+        "exports": [
+            "_spu_gcSPU"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_AllocLastNum",
+            "_spu_memList"
+        ]
+    },
+    "SpuInitMalloc": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_M_INIT",
+        "exports": [
+            "SpuInitMalloc"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_mem_mode_plus",
+            "_spu_memList",
+            "_spu_AllocLastNum",
+            "_spu_AllocBlockNum"
+        ]
+    },
+    "_SpuIsInAllocateArea": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_M_UTIL",
+        "exports": [
+            "_SpuIsInAllocateArea",
+            "_SpuIsInAllocateArea_"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_memList",
+            "_spu_mem_mode_plus"
+        ]
+    },
+    "SpuMalloc": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_M_M",
+        "exports": [
+            "SpuMalloc"
+        ],
+        "externs": [
+            "_spu_gcSPU"
+        ],
+        "data_externs": [
+            "_spu_rev_reserve_wa",
+            "_spu_rev_offsetaddr",
+            "_spu_mem_mode_plus",
+            "_spu_mem_mode_unitM",
+            "_spu_memList",
+            "_spu_AllocBlockNum",
+            "_spu_AllocLastNum"
+        ]
+    },
+    "SpuFree": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_M_F",
+        "exports": [
+            "SpuFree"
+        ],
+        "externs": [
+            "_spu_gcSPU"
+        ],
+        "data_externs": [
+            "_spu_AllocBlockNum",
+            "_spu_memList"
+        ]
+    },
+    "_SpuSetAnyVoice": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SAV",
+        "exports": [
+            "_SpuSetAnyVoice"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_env",
+            "_spu_RQ",
+            "_spu_RXX",
+            "_spu_RQmask"
+        ]
+    },
+    "SpuSetReverb": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SR",
+        "exports": [
+            "SpuSetReverb"
+        ],
+        "externs": [
+            "_SpuIsInAllocateArea_"
+        ],
+        "data_externs": [
+            "_spu_RXX",
+            "_spu_rev_flag",
+            "_spu_rev_reserve_wa",
+            "_spu_rev_offsetaddr"
+        ]
+    },
+    "SpuSetReverbModeParam": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SRMP",
+        "exports": [
+            "SpuSetReverbModeParam"
+        ],
+        "externs": [
+            "_SpuIsInAllocateArea_",
+            "_spu_setReverbAttr",
+            "SpuClearReverbWorkArea",
+            "_spu_FsetRXX"
+        ],
+        "data_externs": [
+            "_spu_rev_startaddr",
+            "_spu_rev_attr",
+            "_spu_rev_param",
+            "_spu_rev_offsetaddr",
+            "_spu_RXX"
+        ]
+    },
+    "_spu_setReverbAttr": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SRA",
+        "exports": [
+            "_spu_setReverbAttr"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_RXX"
+        ]
+    },
+    "SpuReserveReverbWorkArea": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_RRWA",
+        "exports": [
+            "SpuReserveReverbWorkArea"
+        ],
+        "externs": [
+            "_SpuIsInAllocateArea_"
+        ],
+        "data_externs": [
+            "_spu_rev_offsetaddr",
+            "_spu_rev_reserve_wa"
+        ]
+    },
+    "SpuSetReverbDepth": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SRD",
+        "exports": [
+            "SpuSetReverbDepth"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_RXX",
+            "_spu_rev_attr"
+        ]
+    },
+    "SpuClearReverbWorkArea": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_CRWA",
+        "exports": [
+            "SpuClearReverbWorkArea"
+        ],
+        "externs": [
+            "_SpuIsInAllocateArea_",
+            "_spu_t",
+            "WaitEvent"
+        ],
+        "data_externs": [
+            "_spu_rev_startaddr",
+            "_spu_mem_mode_plus",
+            "_spu_transMode",
+            "_spu_transferCallback",
+            "_spu_zerobuf",
+            "_spu_EVdma"
+        ]
+    },
+    "SpuSetKey": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SK",
+        "exports": [
+            "SpuSetKey"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_env",
+            "_spu_RQ",
+            "_spu_RQmask",
+            "_spu_RQvoice",
+            "_spu_keystat",
+            "_spu_RXX"
+        ]
+    },
+    "SpuWrite": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_W",
+        "exports": [
+            "SpuWrite"
+        ],
+        "externs": [
+            "_spu_Fw"
+        ],
+        "data_externs": [
+            "_spu_transferCallback",
+            "_spu_inTransfer"
+        ]
+    },
+    "SpuWrite0": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_W0",
+        "exports": [
+            "SpuWrite0"
+        ],
+        "externs": [
+            "_spu_t",
+            "WaitEvent"
+        ],
+        "data_externs": [
+            "_spu_transMode",
+            "_spu_tsa",
+            "_spu_mem_mode_plus",
+            "_spu_transferCallback",
+            "_spu_zerobuf",
+            "_spu_EVdma"
+        ]
+    },
+    "SpuSetTransferStartAddr": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_STSA",
+        "exports": [
+            "SpuSetTransferStartAddr"
+        ],
+        "externs": [
+            "_spu_FsetRXXa"
+        ],
+        "data_externs": [
+            "_spu_tsa",
+            "_spu_mem_mode_plus"
+        ]
+    },
+    "SpuSetTransferMode": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_STM",
+        "exports": [
+            "SpuSetTransferMode"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_trans_mode",
+            "_spu_transMode"
+        ]
+    },
+    "SpuIsTransferCompleted": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_ITC",
+        "exports": [
+            "SpuIsTransferCompleted"
+        ],
+        "externs": [
+            "TestEvent"
+        ],
+        "data_externs": [
+            "_spu_trans_mode",
+            "_spu_inTransfer",
+            "_spu_EVdma"
+        ]
+    },
+    "SpuRGetAllKeysStatus": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "SR_GAKS",
+        "exports": [
+            "SpuRGetAllKeysStatus",
+            "SpuGetAllKeysStatus"
+        ],
+        "externs": [],
+        "data_externs": [
+            "_spu_RXX",
+            "_spu_keystat"
+        ]
+    },
+    "CdStatus": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "SYS",
+        "exports": [
+            "CdStatus",
+            "CdMode",
+            "CdLastCom",
+            "CdLastPos",
+            "CdReset",
+            "CdFlush",
+            "CdSetDebug",
+            "CdComstr",
+            "CdIntstr",
+            "CdSync",
+            "CdReady",
+            "CdSyncCallback",
+            "CdReadyCallback",
+            "CdControl",
+            "CdControlF",
+            "CdControlB",
+            "CdMix",
+            "CdGetSector",
+            "CdGetSector2",
+            "CdDataCallback",
+            "CdDataSync",
+            "CdIntToPos",
+            "CdPosToInt"
+        ],
+        "externs": [
+            "CD_initintr",
+            "CD_init",
+            "CD_initvol",
+            "CD_flush",
+            "CD_sync",
+            "CD_ready",
+            "CD_cw",
+            "CD_vol",
+            "CD_getsector",
+            "CD_getsector2",
+            "DMACallback",
+            "CD_datasync"
+        ],
+        "data_externs": [
+            "CD_status",
+            "CD_mode",
+            "CD_com",
+            "CD_pos",
+            "CD_debug",
+            "CD_comstr",
+            "CD_intstr",
+            "CD_cbsync",
+            "CD_cbready"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010e268",
+                "size": 16,
+                "scaffold": "rodata.rodata"
+            },
+            ".data": {
+                "va": "0x800b5e6c",
+                "size": 128,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "CdGetToc": {
+        "sdk": "4.1",
+        "library": "LIBCD.LIB",
+        "member": "TOC",
+        "exports": [
+            "CdGetToc",
+            "CdGetToc2"
+        ],
+        "externs": [
+            "CdSyncCallback",
+            "CdControlB",
+            "printf"
+        ],
+        "data_externs": [
+            "CD_debug"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010f0f0",
+                "size": 64,
+                "scaffold": "rodata.rodata"
+            }
+        }
+    },
+    "InitCARD": {
+        "sdk": "4.1",
+        "library": "LIBCARD.LIB",
+        "member": "INIT",
+        "exports": [
+            "InitCARD",
+            "StartCARD",
+            "StopCARD"
+        ],
+        "externs": [
+            "ChangeClearPAD",
+            "EnterCriticalSection",
+            "ReadInitPadFlag",
+            "InitCARD2",
+            "_copy_memcard_patch",
+            "_patch_card",
+            "_patch_card2",
+            "ExitCriticalSection",
+            "StartCARD2",
+            "StopCARD2",
+            "_ExitCard"
+        ],
+        "data_externs": [],
+        "data_sections": {
+            ".data": {
+                "va": "0x800b5e5c",
+                "size": 16,
+                "scaffold": "data.data"
+            }
+        }
+    },
+    "GetTPage": {
+        "sdk": "4.1",
+        "library": "LIBGPU.LIB",
+        "member": "PRIM",
+        "exports": [
+            "GetTPage",
+            "GetClut",
+            "DumpTPage",
+            "DumpClut",
+            "NextPrim",
+            "IsEndPrim",
+            "AddPrim",
+            "AddPrims",
+            "CatPrim",
+            "TermPrim",
+            "SetSemiTrans",
+            "SetShadeTex",
+            "SetPolyF3",
+            "SetPolyFT3",
+            "SetPolyG3",
+            "SetPolyGT3",
+            "SetPolyF4",
+            "SetPolyFT4",
+            "SetPolyG4",
+            "SetPolyGT4",
+            "SetSprt8",
+            "SetSprt16",
+            "SetSprt",
+            "SetTile1",
+            "SetTile8",
+            "SetTile16",
+            "SetTile",
+            "SetLineF2",
+            "SetLineG2",
+            "SetLineF3",
+            "SetLineG3",
+            "SetLineF4",
+            "SetLineG4",
+            "SetDrawTPage",
+            "SetDrawMove",
+            "SetDrawLoad",
+            "MargePrim",
+            "DumpDrawEnv",
+            "DumpDispEnv"
+        ],
+        "data_externs": [
+            "GPU_printf"
+        ],
+        "data_sections": {
+            ".rdata": {
+                "va": "0x8010DDA8",
+                "size": 208,
+                "scaffold": "rodata.rodata"
+            }
+        }
+    },
+    "_spu_2pitch": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_N2P",
+        "exports": [
+            "_spu_2pitch",
+            "_spu_note2pitch",
+            "_spu_pitch2note"
+        ]
+    },
+    "puts": {
+        "sdk": "4.1",
+        "library": "LIBC.LIB",
+        "member": "A63",
+        "prefix_owner": "_spu_pitch2note"
+    },
+    "_card_clear": {
+        "sdk": "4.1",
+        "library": "LIBCARD.LIB",
+        "member": "CARD",
+        "externs": [
+            "_new_card",
+            "_card_write"
+        ]
+    },
+    "memcmp": {
+        "sdk": "4.1",
+        "library": "LIBC.LIB",
+        "member": "MEMCMP"
+    },
+    "memmove": {
+        "sdk": "4.1",
+        "library": "LIBC.LIB",
+        "member": "MEMMOVE"
+    },
+    "_SpuDataCallback": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_DCB",
+        "externs": [
+            "DMACallback"
+        ]
+    },
+    "SpuSetKeyOnWithAttr": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SKOWA",
+        "externs": [
+            "SpuSetVoiceAttr",
+            "SpuSetKey"
+        ]
+    },
+    "SpuSetReverbVoice": {
+        "sdk": "4.1",
+        "library": "LIBSPU.LIB",
+        "member": "S_SRV",
+        "externs": [
+            "_SpuSetAnyVoice"
+        ]
+    },
+    "LoadTPage": {
+        "sdk": "4.1",
+        "library": "LIBGPU.LIB",
+        "member": "EXT",
+        "exports": [
+            "LoadTPage",
+            "LoadClut",
+            "LoadClut2",
+            "SetDefDrawEnv",
+            "SetDefDispEnv"
+        ],
+        "externs": [
+            "LoadImage",
+            "GetVideoMode",
+            "GetClut",
+            "GetTPage"
+        ]
+    },
+    "PCread": {
+        "library": "LIBSN.LIB",
+        "member": "READ",
+        "externs": [
+            "_SN_read"
+        ]
+    },
+    "PCwrite": {
+        "library": "LIBSN.LIB",
+        "member": "WRITE",
+        "externs": [
+            "_SN_write"
+        ]
+    },
+    "SpuInit": {
+        "library": "LIBSPU.LIB",
+        "member": "S_I",
+        "externs": [
+            "_SpuInit"
+        ]
+    },
+    "_96_init": {
+        "library": "LIBAPI.LIB",
+        "member": "C113"
+    },
+    "__pure_virtual": {
+        "library": "LIBSN.LIB",
+        "member": "PUREV"
+    },
+    "_bu_init": {
+        "library": "LIBAPI.LIB",
+        "member": "C112"
+    },
+    "_card_info": {
+        "library": "LIBCARD.LIB",
+        "member": "C171"
+    },
+    "_card_load": {
+        "library": "LIBCARD.LIB",
+        "member": "C172"
+    },
+    "_card_read": {
+        "library": "LIBCARD.LIB",
+        "member": "A79"
+    },
+    "_card_wait": {
+        "library": "LIBCARD.LIB",
+        "member": "A93"
+    },
+    "_card_write": {
+        "library": "LIBCARD.LIB",
+        "member": "A78"
+    },
+    "_get_errno": {
+        "library": "LIBAPI.LIB",
+        "member": "A84"
+    },
+    "_new_card": {
+        "library": "LIBCARD.LIB",
+        "member": "A80"
+    },
+    "_SN_read": {
+        "library": "LIBSN.LIB",
+        "member": "SNREAD"
+    },
+    "_SN_write": {
+        "library": "LIBSN.LIB",
+        "member": "SNWRITE"
+    },
+    "ChangeClearPAD": {
+        "library": "LIBAPI.LIB",
+        "member": "A91"
+    },
+    "ChangeClearRCnt": {
+        "library": "LIBAPI.LIB",
+        "member": "L10"
+    },
+    "close": {
+        "library": "LIBAPI.LIB",
+        "member": "A54"
+    },
+    "DeliverEvent": {
+        "library": "LIBAPI.LIB",
+        "member": "A07"
+    },
+    "EnableEvent": {
+        "library": "LIBAPI.LIB",
+        "member": "A12"
+    },
+    "EnterCriticalSection": {
+        "library": "LIBAPI.LIB",
+        "member": "A36"
+    },
+    "erase": {
+        "library": "LIBAPI.LIB",
+        "member": "A69"
+    },
+    "exit": {
+        "library": "LIBC.LIB",
+        "member": "A56"
+    },
+    "ExitCriticalSection": {
+        "library": "LIBAPI.LIB",
+        "member": "A37"
+    },
+    "firstfile": {
+        "library": "LIBAPI.LIB",
+        "member": "A66"
+    },
+    "FlushCache": {
+        "library": "LIBAPI.LIB",
+        "member": "C68"
+    },
+    "format": {
+        "library": "LIBAPI.LIB",
+        "member": "A65"
+    },
+    "free": {
+        "library": "LIBC.LIB",
+        "member": "C52"
+    },
+    "GetSp": {
+        "library": "LIBAPI.LIB",
+        "member": "A95"
+    },
+    "GPU_cw": {
+        "library": "LIBAPI.LIB",
+        "member": "C73"
+    },
+    "HookEntryInt": {
+        "library": "LIBAPI.LIB",
+        "member": "A25"
+    },
+    "InitCARD2": {
+        "library": "LIBCARD.LIB",
+        "member": "A74"
+    },
+    "InitHeap": {
+        "library": "LIBAPI.LIB",
+        "member": "C57"
+    },
+    "InitPAD2": {
+        "library": "LIBAPI.LIB",
+        "member": "A18"
+    },
+    "lseek": {
+        "library": "LIBAPI.LIB",
+        "member": "A51"
+    },
+    "memchr": {
+        "library": "LIBC.LIB",
+        "member": "C46"
+    },
+    "memcpy": {
+        "library": "LIBC.LIB",
+        "member": "C42"
+    },
+    "nextfile": {
+        "library": "LIBAPI.LIB",
+        "member": "A67"
+    },
+    "open": {
+        "library": "LIBAPI.LIB",
+        "member": "A50"
+    },
+    "OpenEvent": {
+        "library": "LIBAPI.LIB",
+        "member": "A08"
+    },
+    "PAD_dr": {
+        "library": "LIBAPI.LIB",
+        "member": "A22"
+    },
+    "PAD_init2": {
+        "library": "LIBAPI.LIB",
+        "member": "A21"
+    },
+    "PCclose": {
+        "library": "LIBSN.LIB",
+        "member": "CLOSE"
+    },
+    "PCcreat": {
+        "library": "LIBSN.LIB",
+        "member": "CREAT"
+    },
+    "PCinit": {
+        "library": "LIBSN.LIB",
+        "member": "FSINIT"
+    },
+    "PClseek": {
+        "library": "LIBSN.LIB",
+        "member": "LSEEK"
+    },
+    "PCopen": {
+        "library": "LIBSN.LIB",
+        "member": "OPEN"
+    },
+    "printf": {
+        "library": "LIBC.LIB",
+        "member": "C63"
+    },
+    "putc": {
+        "library": "LIBC.LIB",
+        "member": "A59"
+    },
+    "read": {
+        "library": "LIBAPI.LIB",
+        "member": "A52"
+    },
+    "ResetEntryInt": {
+        "library": "LIBAPI.LIB",
+        "member": "A24"
+    },
+    "ReturnFromException": {
+        "library": "LIBAPI.LIB",
+        "member": "A23"
+    },
+    "SetSp": {
+        "library": "LIBAPI.LIB",
+        "member": "A39"
+    },
+    "StartCARD2": {
+        "library": "LIBCARD.LIB",
+        "member": "A75"
+    },
+    "StartPAD2": {
+        "library": "LIBAPI.LIB",
+        "member": "A19"
+    },
+    "StopPAD2": {
+        "library": "LIBAPI.LIB",
+        "member": "A20"
+    },
+    "strcmp": {
+        "library": "LIBC.LIB",
+        "member": "C23"
+    },
+    "strlen": {
+        "library": "LIBC.LIB",
+        "member": "C27"
+    },
+    "strncat": {
+        "library": "LIBC.LIB",
+        "member": "C22"
+    },
+    "strncpy": {
+        "library": "LIBC.LIB",
+        "member": "C26"
+    },
+    "SysDeqIntRP": {
+        "library": "LIBAPI.LIB",
+        "member": "L03"
+    },
+    "SysEnqIntRP": {
+        "library": "LIBAPI.LIB",
+        "member": "L02"
+    },
+    "TestEvent": {
+        "library": "LIBAPI.LIB",
+        "member": "A11"
+    },
+    "toupper": {
+        "library": "LIBC.LIB",
+        "member": "C37"
+    },
+    "WaitEvent": {
+        "library": "LIBAPI.LIB",
+        "member": "A10"
+    },
+    "write": {
+        "library": "LIBAPI.LIB",
+        "member": "A53"
+    }
 }

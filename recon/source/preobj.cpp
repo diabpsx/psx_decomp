@@ -39,6 +39,7 @@
  *    keeps as `dPiece[x][y]`; AddL1Door additionally zeroes `_oAnimFlag` (devilution does not).
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_preobj.h"
 #include "source/gen/externs_preobj.h"
 #include "source/gen/protos_preobj.h"
@@ -549,7 +550,7 @@ unsigned char RndLocOk(int xp, int yp)
     return 1;
 }
 
-BOOL TrapLocOk(int xp, int yp)
+unsigned char TrapLocOk(int xp, int yp)
 {
     if (dung_map[xp][yp].dFlags & BFLAG_POPULATED)
         return 0;
@@ -929,7 +930,7 @@ unsigned char WallTrapLocOk(int xp, int yp)
     return 1;
 }
 
-BOOL TorchLocOK(int xp, int yp)
+unsigned char TorchLocOK(int xp, int yp)
 {
     if (dung_map[xp][yp].dFlags & BFLAG_POPULATED)
         return 0;

@@ -22,7 +22,7 @@ public:
     void operator delete(void *ptr);
 };
 
-long SysObj::NewHnd;
+long SysObj::NewHnd = -1;
 
 /* @0x80086618 SYSOBJ.CPP */
 SysObj::SysObj()

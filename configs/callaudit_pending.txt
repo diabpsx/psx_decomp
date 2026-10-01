@@ -1,9 +1,8 @@
-# Strict direct-call audit, 2026-09-30: 129 reconstructed TUs scanned.
-# Initial scan found 29 TUs; 28 repaired/routed and re-audited, 1 remains below.
-# Full rescan: 2724/2725 real function entries pass strict direct-call checks.
-# This is separate from the 45 byte/SYM non-PASS functions on MATCH_PROGRESS.md.
+# Strict direct-call audit, 2026-10-01: full reconstructed-TU rescan completed.
+# All 2725/2725 real function entries pass strict direct-call checks.
+# No pending TU entries. This is separate from the 43 byte/SYM non-PASS entries.
 # Rerun tools/callaudit.py on each TU after changes; do not normalize signatures.
-options       # MemcardPad only: 32/33 physical call sites; merged error-sound paths
+# MemcardPad now has all 33 call sites in retail order; byte/SYM still nonmatching.
 # SoundPad now has all 41 calls in retail order, but remains byte/SYM nonmatching.
 # dlg/func_80143604 and dlg_1/func_801436A0 are data, not callable code:
 # respectively memory-card identifier strings, and a pointer/format-string block.

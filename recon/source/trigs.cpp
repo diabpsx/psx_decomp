@@ -9,6 +9,7 @@
  * CheckTrigForce() also gained an 8-neighbour offset_x/offset_y probe (the PSX pad cursor isn't
  * pixel-precise) trying each Force*Trig() around the cursor tile until one hits. */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_trigs.h"
 #include "source/gen/externs_trigs.h"
 #include "source/gen/protos_trigs.h"
@@ -55,17 +56,26 @@ extern "C" int sprintf(char *buf, const char *fmt, ...);
 #define TRUE  1
 #define FALSE 0
 
-/* TU-owned globals (retail TRIGS.CPP itself; oracle reaches these via %gp_rel -> tentative defs here,
- * not extern -- PRETRIGS.CPP/CURSOR.CPP etc. reference them via a plain `extern` instead). */
-int numtrigs;
-int TWarpFrom;
-unsigned char townwarps[3];
-BOOL FRIGFLAG;
+#include "source/gen/tables_trigs.h"
 
-/* file-scope statics (SYM class STAT; shared across ChangeBlock/ScanBlocks/BuildLevTrigs). */
-static int NoBlocks;
-static short *levlist;
-static int FRIGFirst;
+/* Retail initialized small-data state, in original placement order. */
+static int NoBlocks = 0;
+static short *levlist = 0;
+BOOL FRIGFLAG = 0;
+static int FRIGCheat = 0;
+static int FRIGTime = 0;
+static int FRIGState = 0;
+static int FRIGFlip = 0;
+static int FRIGFlipit = 0;
+static int FRIGFirst = 0;
+int FRIGX = 55;
+int FRIGY = 71;
+int FRIGZ = 24;
+int fot = 0;
+unsigned char _trigflag[2] = {0};
+int numtrigs = 0;
+unsigned char townwarps[3] = {0};
+int TWarpFrom = 0;
 
 /* @0x80075018 */
 void InitVPTriggers(void)
@@ -101,7 +111,7 @@ void ScanMap(short *list, int l)
             for (int x = 0; x < 112; x++) {
                 if (GetDPiece(x, y) == *list) {
                     if (NoTrigs >= 32)
-                        DBG_Error(NULL, "psxsrc/TRIGS.CPP", 0x99);
+                        DBG_Error(NULL, "source/TRIGS.cpp", 0x99);
                     TrigList[l][NoTrigs * 2] = x;
                     TrigList[l][NoTrigs * 2 + 1] = y;
                     NoTrigs++;
@@ -150,7 +160,7 @@ void ChangeBlock(int x, int y, int bl)
         while (*list != -1) {
             if (bl == *list++) {
                 if (NoBlocks >= 160)
-                    DBG_Error(NULL, "psxsrc/TRIGS.CPP", 0xD9);
+                    DBG_Error(NULL, "source/TRIGS.cpp", 0xD9);
                 ptr->x = x;
                 ptr->y = y;
                 ptr->block = bl;
@@ -176,7 +186,7 @@ void ScanBlocks(short *list)
             for (int x = 0; x < 112; x++) {
                 if (GetDPiece(x, y) == bl) {
                     if (NoBlocks >= 160)
-                        DBG_Error(NULL, "psxsrc/TRIGS.CPP", 0xF3);
+                        DBG_Error(NULL, "source/TRIGS.cpp", 0xF3);
                     ptr->x = x;
                     ptr->y = y;
                     ptr->block = bl;
@@ -239,7 +249,7 @@ void DrawFRIG(void)
 }
 
 /* @0x8007569C */
-BOOL ForceTownTrig(void)
+unsigned char ForceTownTrig(void)
 {
     if (FindLevTrig(cursmx, cursmy, 0)) {
         strcpy(_infostr[sel_data], GetStr(0x113));
@@ -279,7 +289,7 @@ BOOL ForceTownTrig(void)
 }
 
 /* @0x80075888 */
-BOOL ForceL1Trig(void)
+unsigned char ForceL1Trig(void)
 {
     int j;
 
@@ -312,7 +322,7 @@ BOOL ForceL1Trig(void)
 }
 
 /* @0x80075A48 */
-BOOL ForceL2Trig(void)
+unsigned char ForceL2Trig(void)
 {
     int j;
     int dx, dy;
@@ -364,7 +374,7 @@ BOOL ForceL2Trig(void)
 }
 
 /* @0x80075D48 */
-BOOL ForceL3Trig(void)
+unsigned char ForceL3Trig(void)
 {
     int j;
     int dx, dy;
@@ -412,7 +422,7 @@ BOOL ForceL3Trig(void)
 }
 
 /* @0x80076054 */
-BOOL ForceL4Trig(void)
+unsigned char ForceL4Trig(void)
 {
     int j;
     int dx, dy;
@@ -491,7 +501,7 @@ void Freeupstairs(void)
 }
 
 /* @0x80076440 */
-BOOL ForceSKingTrig(void)
+unsigned char ForceSKingTrig(void)
 {
     if (FindLevTrig(cursmx, cursmy, 0)) {
         sprintf(_infostr[sel_data], GetStr(0x3B), quests[Q_SKELKING]._qlevel);
@@ -504,7 +514,7 @@ BOOL ForceSKingTrig(void)
 }
 
 /* @0x800764CC */
-BOOL ForceSChambTrig(void)
+unsigned char ForceSChambTrig(void)
 {
     if (FindLevTrig(cursmx, cursmy, 1)) {
         sprintf(_infostr[sel_data], GetStr(0x3B), quests[Q_SCHAMB]._qlevel);
@@ -517,7 +527,7 @@ BOOL ForceSChambTrig(void)
 }
 
 /* @0x80076558 */
-BOOL ForcePWaterTrig(void)
+unsigned char ForcePWaterTrig(void)
 {
     if (FindLevTrig(cursmx, cursmy, 1)) {
         sprintf(_infostr[sel_data], GetStr(0x3B), quests[Q_PWATER]._qlevel);
@@ -623,7 +633,7 @@ BOOL IsTrigger(int x, int y)
     }
 
     for (i = 0; i < 16; i++) {
-        if (currlevel == quests[i]._qlevel && quests[i]._qlog != 0 && quests[i]._qtype != 0
+        if (currlevel == quests[i]._qlevel && quests[i]._qslvl != 0 && quests[i]._qactive != 0
             && x == quests[i]._qtx && y == quests[i]._qty)
             return TRUE;
     }

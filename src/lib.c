@@ -66,677 +66,677 @@ INCLUDE_ASM("asm/nonmatchings/lib", ABL_SetBlockRGBXY);
 
 INCLUDE_ASM("asm/nonmatchings/lib", ABL_PrintPart);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PCopen);
+INCLUDE_ASM("build/sdk/native", PCopen);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PCclose);
+INCLUDE_ASM("build/sdk/native", PCclose);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PClseek);
+INCLUDE_ASM("build/sdk/native", PClseek);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PCcreat);
+INCLUDE_ASM("build/sdk/native", PCcreat);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __SN_ENTRY_POINT);
+INCLUDE_ASM("build/sdk/native", __SN_ENTRY_POINT);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __main);
+INCLUDE_ASM("build/sdk/native", __main);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __do_global_dtors);
+INCLUDE_ASM("build/sdk/native", __do_global_dtors);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PCinit);
+INCLUDE_ASM("build/sdk/native", PCinit);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PCread);
+INCLUDE_ASM("build/sdk/native", PCread);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SN_read);
+INCLUDE_ASM("build/sdk/native", _SN_read);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PCwrite);
+INCLUDE_ASM("build/sdk/native", PCwrite);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SN_write);
+INCLUDE_ASM("build/sdk/native", _SN_write);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __pure_virtual);
+INCLUDE_ASM("build/sdk/native", __pure_virtual);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __divdi3);
+INCLUDE_ASM("build/sdk/native", __divdi3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __builtin_delete);
+INCLUDE_ASM("build/sdk/native", __builtin_delete);
 
-INCLUDE_ASM("asm/nonmatchings/lib", __udivmoddi4);
+INCLUDE_ASM("build/sdk/native", __udivmoddi4);
 
 INCLUDE_ASM("build/sdk/native", InitHeap);
 
-INCLUDE_ASM("asm/nonmatchings/lib", FlushCache);
+INCLUDE_ASM("build/sdk/native", FlushCache);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _bu_init);
+INCLUDE_ASM("build/sdk/native", _bu_init);
 
-INCLUDE_ASM("asm/nonmatchings/lib", OpenEvent);
+INCLUDE_ASM("build/sdk/native", OpenEvent);
 
-INCLUDE_ASM("asm/nonmatchings/lib", TestEvent);
+INCLUDE_ASM("build/sdk/native", TestEvent);
 
-INCLUDE_ASM("asm/nonmatchings/lib", EnableEvent);
+INCLUDE_ASM("build/sdk/native", EnableEvent);
 
-INCLUDE_ASM("asm/nonmatchings/lib", EnterCriticalSection);
+INCLUDE_ASM("build/sdk/native", EnterCriticalSection);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ExitCriticalSection);
+INCLUDE_ASM("build/sdk/native", ExitCriticalSection);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetSp);
+INCLUDE_ASM("build/sdk/native", SetSp);
 
-INCLUDE_ASM("asm/nonmatchings/lib", open);
+INCLUDE_ASM("build/sdk/native", open);
 
-INCLUDE_ASM("asm/nonmatchings/lib", read);
+INCLUDE_ASM("build/sdk/native", read);
 
-INCLUDE_ASM("asm/nonmatchings/lib", write);
+INCLUDE_ASM("build/sdk/native", write);
 
-INCLUDE_ASM("asm/nonmatchings/lib", close);
+INCLUDE_ASM("build/sdk/native", close);
 
-INCLUDE_ASM("asm/nonmatchings/lib", format);
+INCLUDE_ASM("build/sdk/native", format);
 
-INCLUDE_ASM("asm/nonmatchings/lib", firstfile);
+INCLUDE_ASM("build/sdk/native", firstfile);
 
-INCLUDE_ASM("asm/nonmatchings/lib", nextfile);
+INCLUDE_ASM("build/sdk/native", nextfile);
 
-INCLUDE_ASM("asm/nonmatchings/lib", erase);
+INCLUDE_ASM("build/sdk/native", erase);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _get_errno);
+INCLUDE_ASM("build/sdk/native", _get_errno);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ChangeClearPAD);
+INCLUDE_ASM("build/sdk/native", ChangeClearPAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PadInit);
+INCLUDE_ASM("build/sdk/native", PadInit);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PadRead);
+INCLUDE_ASM("build/sdk/native", PadRead);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PadStop);
+INCLUDE_ASM("build/sdk/native", PadStop);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PAD_dr);
+INCLUDE_ASM("build/sdk/native", PAD_dr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetInitPadFlag);
+INCLUDE_ASM("build/sdk/native", SetInitPadFlag);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ReadInitPadFlag);
+INCLUDE_ASM("build/sdk/native", ReadInitPadFlag);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PAD_init);
+INCLUDE_ASM("build/sdk/native", PAD_init);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitPAD);
+INCLUDE_ASM("build/sdk/native", InitPAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StartPAD);
+INCLUDE_ASM("build/sdk/native", StartPAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopPAD);
+INCLUDE_ASM("build/sdk/native", StopPAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80011CC0);
+INCLUDE_ASM("build/sdk/native", func_80011CC0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80011D38);
+INCLUDE_ASM("build/sdk/native", func_80011D38);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitPAD2);
+INCLUDE_ASM("build/sdk/native", InitPAD2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StartPAD2);
+INCLUDE_ASM("build/sdk/native", StartPAD2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopPAD2);
+INCLUDE_ASM("build/sdk/native", StopPAD2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PAD_init2);
+INCLUDE_ASM("build/sdk/native", PAD_init2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SysEnqIntRP);
+INCLUDE_ASM("build/sdk/native", SysEnqIntRP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SysDeqIntRP);
+INCLUDE_ASM("build/sdk/native", SysDeqIntRP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", EnablePAD);
+INCLUDE_ASM("build/sdk/native", EnablePAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DisablePAD);
+INCLUDE_ASM("build/sdk/native", DisablePAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _patch_pad);
+INCLUDE_ASM("build/sdk/native", _patch_pad);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SendPAD);
+INCLUDE_ASM("build/sdk/native", _SendPAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _send_pad);
+INCLUDE_ASM("build/sdk/native", _send_pad);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _remove_ChgclrPAD);
+INCLUDE_ASM("build/sdk/native", _remove_ChgclrPAD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", VSync);
+INCLUDE_ASM("build/sdk/native", VSync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_800121D4);
+INCLUDE_ASM("build/sdk/native", func_800121D4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ChangeClearRCnt);
+INCLUDE_ASM("build/sdk/native", ChangeClearRCnt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ResetCallback);
+INCLUDE_ASM("build/sdk/native", ResetCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InterruptCallback);
+INCLUDE_ASM("build/sdk/native", InterruptCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DMACallback);
+INCLUDE_ASM("build/sdk/native", DMACallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", VSyncCallback);
+INCLUDE_ASM("build/sdk/native", VSyncCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", VSyncCallbacks);
+INCLUDE_ASM("build/sdk/native", VSyncCallbacks);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopCallback);
+INCLUDE_ASM("build/sdk/native", StopCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", RestartCallback);
+INCLUDE_ASM("build/sdk/native", RestartCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CheckCallback);
+INCLUDE_ASM("build/sdk/native", CheckCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetIntrMask);
+INCLUDE_ASM("build/sdk/native", GetIntrMask);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetIntrMask);
+INCLUDE_ASM("build/sdk/native", SetIntrMask);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_800124E8);
+INCLUDE_ASM("build/sdk/native", func_800124E8);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80012918);
+INCLUDE_ASM("build/sdk/native", func_80012918);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _96_remove);
+INCLUDE_ASM("build/sdk/native", _96_remove);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ReturnFromException);
+INCLUDE_ASM("build/sdk/native", ReturnFromException);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ResetEntryInt);
+INCLUDE_ASM("build/sdk/native", ResetEntryInt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", HookEntryInt);
+INCLUDE_ASM("build/sdk/native", HookEntryInt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", startIntrVSync);
+INCLUDE_ASM("build/sdk/native", startIntrVSync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80012A7C);
+INCLUDE_ASM("build/sdk/native", func_80012A7C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", startIntrDMA);
+INCLUDE_ASM("build/sdk/native", startIntrDMA);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80012D24);
+INCLUDE_ASM("build/sdk/native", func_80012D24);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetVideoMode);
+INCLUDE_ASM("build/sdk/native", SetVideoMode);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetVideoMode);
+INCLUDE_ASM("build/sdk/native", GetVideoMode);
 
-INCLUDE_ASM("asm/nonmatchings/lib", LoadTPage);
+INCLUDE_ASM("build/sdk/native", LoadTPage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", LoadClut);
+INCLUDE_ASM("build/sdk/native", LoadClut);
 
-INCLUDE_ASM("asm/nonmatchings/lib", LoadClut2);
+INCLUDE_ASM("build/sdk/native", LoadClut2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDefDrawEnv);
+INCLUDE_ASM("build/sdk/native", SetDefDrawEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDefDispEnv);
+INCLUDE_ASM("build/sdk/native", SetDefDispEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetTPage);
+INCLUDE_ASM("build/sdk/native", GetTPage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetClut);
+INCLUDE_ASM("build/sdk/native", GetClut);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DumpTPage);
+INCLUDE_ASM("build/sdk/native", DumpTPage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DumpClut);
+INCLUDE_ASM("build/sdk/native", DumpClut);
 
-INCLUDE_ASM("asm/nonmatchings/lib", NextPrim);
+INCLUDE_ASM("build/sdk/native", NextPrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", IsEndPrim);
+INCLUDE_ASM("build/sdk/native", IsEndPrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", AddPrim);
+INCLUDE_ASM("build/sdk/native", AddPrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", AddPrims);
+INCLUDE_ASM("build/sdk/native", AddPrims);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CatPrim);
+INCLUDE_ASM("build/sdk/native", CatPrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", TermPrim);
+INCLUDE_ASM("build/sdk/native", TermPrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetSemiTrans);
+INCLUDE_ASM("build/sdk/native", SetSemiTrans);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetShadeTex);
+INCLUDE_ASM("build/sdk/native", SetShadeTex);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyF3);
+INCLUDE_ASM("build/sdk/native", SetPolyF3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyFT3);
+INCLUDE_ASM("build/sdk/native", SetPolyFT3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyG3);
+INCLUDE_ASM("build/sdk/native", SetPolyG3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyGT3);
+INCLUDE_ASM("build/sdk/native", SetPolyGT3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyF4);
+INCLUDE_ASM("build/sdk/native", SetPolyF4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyFT4);
+INCLUDE_ASM("build/sdk/native", SetPolyFT4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyG4);
+INCLUDE_ASM("build/sdk/native", SetPolyG4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPolyGT4);
+INCLUDE_ASM("build/sdk/native", SetPolyGT4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetSprt8);
+INCLUDE_ASM("build/sdk/native", SetSprt8);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetSprt16);
+INCLUDE_ASM("build/sdk/native", SetSprt16);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetSprt);
+INCLUDE_ASM("build/sdk/native", SetSprt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetTile1);
+INCLUDE_ASM("build/sdk/native", SetTile1);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetTile8);
+INCLUDE_ASM("build/sdk/native", SetTile8);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetTile16);
+INCLUDE_ASM("build/sdk/native", SetTile16);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetTile);
+INCLUDE_ASM("build/sdk/native", SetTile);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetLineF2);
+INCLUDE_ASM("build/sdk/native", SetLineF2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetLineG2);
+INCLUDE_ASM("build/sdk/native", SetLineG2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetLineF3);
+INCLUDE_ASM("build/sdk/native", SetLineF3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetLineG3);
+INCLUDE_ASM("build/sdk/native", SetLineG3);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetLineF4);
+INCLUDE_ASM("build/sdk/native", SetLineF4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetLineG4);
+INCLUDE_ASM("build/sdk/native", SetLineG4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawTPage);
+INCLUDE_ASM("build/sdk/native", SetDrawTPage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawMove);
+INCLUDE_ASM("build/sdk/native", SetDrawMove);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawLoad);
+INCLUDE_ASM("build/sdk/native", SetDrawLoad);
 
-INCLUDE_ASM("asm/nonmatchings/lib", MargePrim);
+INCLUDE_ASM("build/sdk/native", MargePrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DumpDrawEnv);
+INCLUDE_ASM("build/sdk/native", DumpDrawEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DumpDispEnv);
+INCLUDE_ASM("build/sdk/native", DumpDispEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ResetGraph);
+INCLUDE_ASM("build/sdk/native", ResetGraph);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetGraphDebug);
+INCLUDE_ASM("build/sdk/native", SetGraphDebug);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetGraphQueue);
+INCLUDE_ASM("build/sdk/native", SetGraphQueue);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetGraphDebug);
+INCLUDE_ASM("build/sdk/native", GetGraphDebug);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DrawSyncCallback);
+INCLUDE_ASM("build/sdk/native", DrawSyncCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDispMask);
+INCLUDE_ASM("build/sdk/native", SetDispMask);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DrawSync);
+INCLUDE_ASM("build/sdk/native", DrawSync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80013AE0);
+INCLUDE_ASM("build/sdk/native", func_80013AE0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ClearImage);
+INCLUDE_ASM("build/sdk/native", ClearImage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ClearImage2);
+INCLUDE_ASM("build/sdk/native", ClearImage2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", LoadImage);
+INCLUDE_ASM("build/sdk/native", LoadImage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StoreImage);
+INCLUDE_ASM("build/sdk/native", StoreImage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", MoveImage);
+INCLUDE_ASM("build/sdk/native", MoveImage);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ClearOTag);
+INCLUDE_ASM("build/sdk/native", ClearOTag);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ClearOTagR);
+INCLUDE_ASM("build/sdk/native", ClearOTagR);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DrawPrim);
+INCLUDE_ASM("build/sdk/native", DrawPrim);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DrawOTag);
+INCLUDE_ASM("build/sdk/native", DrawOTag);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PutDrawEnv);
+INCLUDE_ASM("build/sdk/native", PutDrawEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DrawOTagEnv);
+INCLUDE_ASM("build/sdk/native", DrawOTagEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetDrawEnv);
+INCLUDE_ASM("build/sdk/native", GetDrawEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", PutDispEnv);
+INCLUDE_ASM("build/sdk/native", PutDispEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetDispEnv);
+INCLUDE_ASM("build/sdk/native", GetDispEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetODE);
+INCLUDE_ASM("build/sdk/native", GetODE);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetTexWindow);
+INCLUDE_ASM("build/sdk/native", SetTexWindow);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawArea);
+INCLUDE_ASM("build/sdk/native", SetDrawArea);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawOffset);
+INCLUDE_ASM("build/sdk/native", SetDrawOffset);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetPriority);
+INCLUDE_ASM("build/sdk/native", SetPriority);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawStp);
+INCLUDE_ASM("build/sdk/native", SetDrawStp);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawMode);
+INCLUDE_ASM("build/sdk/native", SetDrawMode);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetDrawEnv);
+INCLUDE_ASM("build/sdk/native", SetDrawEnv);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80014AD4);
+INCLUDE_ASM("build/sdk/native", func_80014AD4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80014D44);
+INCLUDE_ASM("build/sdk/native", func_80014D44);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80014D64);
+INCLUDE_ASM("build/sdk/native", func_80014D64);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80014DFC);
+INCLUDE_ASM("build/sdk/native", func_80014DFC);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80014E94);
+INCLUDE_ASM("build/sdk/native", func_80014E94);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80014EB0);
+INCLUDE_ASM("build/sdk/native", func_80014EB0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001578C);
+INCLUDE_ASM("build/sdk/native", func_8001578C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_800157D4);
+INCLUDE_ASM("build/sdk/native", func_800157D4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80015828);
+INCLUDE_ASM("build/sdk/native", func_80015828);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80015AD8);
+INCLUDE_ASM("build/sdk/native", func_80015AD8);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80015D38);
+INCLUDE_ASM("build/sdk/native", func_80015D38);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80015FC4);
+INCLUDE_ASM("build/sdk/native", func_80015FC4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80015FF8);
+INCLUDE_ASM("build/sdk/native", func_80015FF8);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001613C);
+INCLUDE_ASM("build/sdk/native", func_8001613C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", LoadImage2);
+INCLUDE_ASM("build/sdk/native", LoadImage2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StoreImage2);
+INCLUDE_ASM("build/sdk/native", StoreImage2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", MoveImage2);
+INCLUDE_ASM("build/sdk/native", MoveImage2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DrawOTag2);
+INCLUDE_ASM("build/sdk/native", DrawOTag2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001661C);
+INCLUDE_ASM("build/sdk/native", func_8001661C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GPU_cw);
+INCLUDE_ASM("build/sdk/native", GPU_cw);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuInit);
+INCLUDE_ASM("build/sdk/native", SpuInit);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SpuInit);
+INCLUDE_ASM("build/sdk/native", _SpuInit);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuStart);
+INCLUDE_ASM("build/sdk/native", SpuStart);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_init);
+INCLUDE_ASM("build/sdk/native", _spu_init);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80016A5C);
+INCLUDE_ASM("build/sdk/native", func_80016A5C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_FiDMA);
+INCLUDE_ASM("build/sdk/native", _spu_FiDMA);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_Fr_);
+INCLUDE_ASM("build/sdk/native", _spu_Fr_);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_t);
+INCLUDE_ASM("build/sdk/native", _spu_t);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_Fw);
+INCLUDE_ASM("build/sdk/native", _spu_Fw);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_Fr);
+INCLUDE_ASM("build/sdk/native", _spu_Fr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_FsetRXX);
+INCLUDE_ASM("build/sdk/native", _spu_FsetRXX);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_FsetRXXa);
+INCLUDE_ASM("build/sdk/native", _spu_FsetRXXa);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_FgetRXXa);
+INCLUDE_ASM("build/sdk/native", _spu_FgetRXXa);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_FsetPCR);
+INCLUDE_ASM("build/sdk/native", _spu_FsetPCR);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_80017264);
+INCLUDE_ASM("build/sdk/native", func_80017264);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001728C);
+INCLUDE_ASM("build/sdk/native", func_8001728C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_Fw1ts);
+INCLUDE_ASM("build/sdk/native", _spu_Fw1ts);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DeliverEvent);
+INCLUDE_ASM("build/sdk/native", DeliverEvent);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SpuDataCallback);
+INCLUDE_ASM("build/sdk/native", _SpuDataCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuInitMalloc);
+INCLUDE_ASM("build/sdk/native", SpuInitMalloc);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuMalloc);
+INCLUDE_ASM("build/sdk/native", SpuMalloc);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_gcSPU);
+INCLUDE_ASM("build/sdk/native", _spu_gcSPU);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuFree);
+INCLUDE_ASM("build/sdk/native", SpuFree);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetReverb);
+INCLUDE_ASM("build/sdk/native", SpuSetReverb);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SpuIsInAllocateArea);
+INCLUDE_ASM("build/sdk/native", _SpuIsInAllocateArea);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SpuIsInAllocateArea_);
+INCLUDE_ASM("build/sdk/native", _SpuIsInAllocateArea_);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetReverbModeParam);
+INCLUDE_ASM("build/sdk/native", SpuSetReverbModeParam);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_setReverbAttr);
+INCLUDE_ASM("build/sdk/native", _spu_setReverbAttr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuReserveReverbWorkArea);
+INCLUDE_ASM("build/sdk/native", SpuReserveReverbWorkArea);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetReverbDepth);
+INCLUDE_ASM("build/sdk/native", SpuSetReverbDepth);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetReverbVoice);
+INCLUDE_ASM("build/sdk/native", SpuSetReverbVoice);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _SpuSetAnyVoice);
+INCLUDE_ASM("build/sdk/native", _SpuSetAnyVoice);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuClearReverbWorkArea);
+INCLUDE_ASM("build/sdk/native", SpuClearReverbWorkArea);
 
-INCLUDE_ASM("asm/nonmatchings/lib", WaitEvent);
+INCLUDE_ASM("build/sdk/native", WaitEvent);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetKey);
+INCLUDE_ASM("build/sdk/native", SpuSetKey);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetKeyOnWithAttr);
+INCLUDE_ASM("build/sdk/native", SpuSetKeyOnWithAttr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuWrite);
+INCLUDE_ASM("build/sdk/native", SpuWrite);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuWrite0);
+INCLUDE_ASM("build/sdk/native", SpuWrite0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetTransferStartAddr);
+INCLUDE_ASM("build/sdk/native", SpuSetTransferStartAddr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetTransferMode);
+INCLUDE_ASM("build/sdk/native", SpuSetTransferMode);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuIsTransferCompleted);
+INCLUDE_ASM("build/sdk/native", SpuIsTransferCompleted);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetCommonAttr);
+INCLUDE_ASM("build/sdk/native", SpuSetCommonAttr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuRGetAllKeysStatus);
+INCLUDE_ASM("build/sdk/native", SpuRGetAllKeysStatus);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuGetAllKeysStatus);
+INCLUDE_ASM("build/sdk/native", SpuGetAllKeysStatus);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SpuSetVoiceAttr);
+INCLUDE_ASM("build/sdk/native", SpuSetVoiceAttr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_2pitch);
+INCLUDE_ASM("build/sdk/native", _spu_2pitch);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_note2pitch);
+INCLUDE_ASM("build/sdk/native", _spu_note2pitch);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _spu_pitch2note);
+INCLUDE_ASM("build/sdk/native", _spu_pitch2note);
 
-INCLUDE_ASM("asm/nonmatchings/lib", puts);
+INCLUDE_ASM("build/sdk/native", puts);
 
-INCLUDE_ASM("asm/nonmatchings/lib", strncat);
+INCLUDE_ASM("build/sdk/native", strncat);
 
-INCLUDE_ASM("asm/nonmatchings/lib", strcmp);
+INCLUDE_ASM("build/sdk/native", strcmp);
 
-INCLUDE_ASM("asm/nonmatchings/lib", strncpy);
+INCLUDE_ASM("build/sdk/native", strncpy);
 
-INCLUDE_ASM("asm/nonmatchings/lib", strlen);
+INCLUDE_ASM("build/sdk/native", strlen);
 
-INCLUDE_ASM("asm/nonmatchings/lib", memcpy);
+INCLUDE_ASM("build/sdk/native", memcpy);
 
-INCLUDE_ASM("asm/nonmatchings/lib", free);
+INCLUDE_ASM("build/sdk/native", free);
 
-INCLUDE_ASM("asm/nonmatchings/lib", printf);
+INCLUDE_ASM("build/sdk/native", printf);
 
-INCLUDE_ASM("asm/nonmatchings/lib", sprintf);
+INCLUDE_ASM("build/sdk/native", sprintf);
 
-INCLUDE_ASM("asm/nonmatchings/lib", memchr);
+INCLUDE_ASM("build/sdk/native", memchr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", memmove);
+INCLUDE_ASM("build/sdk/native", memmove);
 
-INCLUDE_ASM("asm/nonmatchings/lib", memcmp);
+INCLUDE_ASM("build/sdk/native", memcmp);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _card_info);
+INCLUDE_ASM("build/sdk/native", _card_info);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _card_load);
+INCLUDE_ASM("build/sdk/native", _card_load);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _card_read);
+INCLUDE_ASM("build/sdk/native", _card_read);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _card_wait);
+INCLUDE_ASM("build/sdk/native", _card_wait);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _card_clear);
+INCLUDE_ASM("build/sdk/native", _card_clear);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _card_write);
+INCLUDE_ASM("build/sdk/native", _card_write);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _new_card);
+INCLUDE_ASM("build/sdk/native", _new_card);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitCARD);
+INCLUDE_ASM("build/sdk/native", InitCARD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StartCARD);
+INCLUDE_ASM("build/sdk/native", StartCARD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopCARD);
+INCLUDE_ASM("build/sdk/native", StopCARD);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitCARD2);
+INCLUDE_ASM("build/sdk/native", InitCARD2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StartCARD2);
+INCLUDE_ASM("build/sdk/native", StartCARD2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopCARD2);
+INCLUDE_ASM("build/sdk/native", StopCARD2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _patch_card);
+INCLUDE_ASM("build/sdk/native", _patch_card);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _patch_card2);
+INCLUDE_ASM("build/sdk/native", _patch_card2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _copy_memcard_patch);
+INCLUDE_ASM("build/sdk/native", _copy_memcard_patch);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _ExitCard);
+INCLUDE_ASM("build/sdk/native", _ExitCard);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdInit);
+INCLUDE_ASM("build/sdk/native", CdInit);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdStatus);
+INCLUDE_ASM("build/sdk/native", CdStatus);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdMode);
+INCLUDE_ASM("build/sdk/native", CdMode);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdLastCom);
+INCLUDE_ASM("build/sdk/native", CdLastCom);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdLastPos);
+INCLUDE_ASM("build/sdk/native", CdLastPos);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReset);
+INCLUDE_ASM("build/sdk/native", CdReset);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdFlush);
+INCLUDE_ASM("build/sdk/native", CdFlush);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdSetDebug);
+INCLUDE_ASM("build/sdk/native", CdSetDebug);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdComstr);
+INCLUDE_ASM("build/sdk/native", CdComstr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdIntstr);
+INCLUDE_ASM("build/sdk/native", CdIntstr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdSync);
+INCLUDE_ASM("build/sdk/native", CdSync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReady);
+INCLUDE_ASM("build/sdk/native", CdReady);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdSyncCallback);
+INCLUDE_ASM("build/sdk/native", CdSyncCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReadyCallback);
+INCLUDE_ASM("build/sdk/native", CdReadyCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdControl);
+INCLUDE_ASM("build/sdk/native", CdControl);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdControlF);
+INCLUDE_ASM("build/sdk/native", CdControlF);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdControlB);
+INCLUDE_ASM("build/sdk/native", CdControlB);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdMix);
+INCLUDE_ASM("build/sdk/native", CdMix);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdGetSector);
+INCLUDE_ASM("build/sdk/native", CdGetSector);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdGetSector2);
+INCLUDE_ASM("build/sdk/native", CdGetSector2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdDataCallback);
+INCLUDE_ASM("build/sdk/native", CdDataCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdDataSync);
+INCLUDE_ASM("build/sdk/native", CdDataSync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdIntToPos);
+INCLUDE_ASM("build/sdk/native", CdIntToPos);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdPosToInt);
+INCLUDE_ASM("build/sdk/native", CdPosToInt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001B43C);
+INCLUDE_ASM("build/sdk/native", func_8001B43C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_sync);
+INCLUDE_ASM("build/sdk/native", CD_sync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_ready);
+INCLUDE_ASM("build/sdk/native", CD_ready);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_cw);
+INCLUDE_ASM("build/sdk/native", CD_cw);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_vol);
+INCLUDE_ASM("build/sdk/native", CD_vol);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_flush);
+INCLUDE_ASM("build/sdk/native", CD_flush);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_initvol);
+INCLUDE_ASM("build/sdk/native", CD_initvol);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_initintr);
+INCLUDE_ASM("build/sdk/native", CD_initintr);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_init);
+INCLUDE_ASM("build/sdk/native", CD_init);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_datasync);
+INCLUDE_ASM("build/sdk/native", CD_datasync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_getsector);
+INCLUDE_ASM("build/sdk/native", CD_getsector);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_getsector2);
+INCLUDE_ASM("build/sdk/native", CD_getsector2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CD_set_test_parmnum);
+INCLUDE_ASM("build/sdk/native", CD_set_test_parmnum);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdSearchFile);
+INCLUDE_ASM("build/sdk/native", CdSearchFile);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001CE74);
+INCLUDE_ASM("build/sdk/native", func_8001CE74);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001CE94);
+INCLUDE_ASM("build/sdk/native", func_8001CE94);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001D158);
+INCLUDE_ASM("build/sdk/native", func_8001D158);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001D1FC);
+INCLUDE_ASM("build/sdk/native", func_8001D1FC);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001D498);
+INCLUDE_ASM("build/sdk/native", func_8001D498);
 
-INCLUDE_ASM("asm/nonmatchings/lib", strncmp);
+INCLUDE_ASM("build/sdk/native", strncmp);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001D848);
+INCLUDE_ASM("build/sdk/native", func_8001D848);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReadBreak);
+INCLUDE_ASM("build/sdk/native", CdReadBreak);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdRead);
+INCLUDE_ASM("build/sdk/native", CdRead);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReadSync);
+INCLUDE_ASM("build/sdk/native", CdReadSync);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReadCallback);
+INCLUDE_ASM("build/sdk/native", CdReadCallback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdReadMode);
+INCLUDE_ASM("build/sdk/native", CdReadMode);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdRead2);
+INCLUDE_ASM("build/sdk/native", CdRead2);
 
-INCLUDE_ASM("asm/nonmatchings/lib", data_ready_callback);
+INCLUDE_ASM("build/sdk/native", data_ready_callback);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StGetBackloc);
+INCLUDE_ASM("build/sdk/native", StGetBackloc);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StSetRing);
+INCLUDE_ASM("build/sdk/native", StSetRing);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StClearRing);
+INCLUDE_ASM("build/sdk/native", StClearRing);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StSetStream);
+INCLUDE_ASM("build/sdk/native", StSetStream);
 
-INCLUDE_ASM("asm/nonmatchings/lib", init_ring_status);
+INCLUDE_ASM("build/sdk/native", init_ring_status);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StSetMask);
+INCLUDE_ASM("build/sdk/native", StSetMask);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StCdInterrupt);
+INCLUDE_ASM("build/sdk/native", StCdInterrupt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001E908);
+INCLUDE_ASM("build/sdk/native", func_8001E908);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001E934);
+INCLUDE_ASM("build/sdk/native", func_8001E934);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001EADC);
+INCLUDE_ASM("build/sdk/native", func_8001EADC);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001EAF4);
+INCLUDE_ASM("build/sdk/native", func_8001EAF4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001EB68);
+INCLUDE_ASM("build/sdk/native", func_8001EB68);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001EBA4);
+INCLUDE_ASM("build/sdk/native", func_8001EBA4);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FAE0);
+INCLUDE_ASM("build/sdk/native", func_8001FAE0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FB14);
+INCLUDE_ASM("build/sdk/native", func_8001FB14);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FBBC);
+INCLUDE_ASM("build/sdk/native", func_8001FBBC);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FBDC);
+INCLUDE_ASM("build/sdk/native", func_8001FBDC);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FC5C);
+INCLUDE_ASM("build/sdk/native", func_8001FC5C);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FCA0);
+INCLUDE_ASM("build/sdk/native", func_8001FCA0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", func_8001FCB0);
+INCLUDE_ASM("build/sdk/native", func_8001FCB0);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitTAP);
+INCLUDE_ASM("build/sdk/native", InitTAP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StartTAP);
+INCLUDE_ASM("build/sdk/native", StartTAP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopTAP);
+INCLUDE_ASM("build/sdk/native", StopTAP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SendTAP);
+INCLUDE_ASM("build/sdk/native", SendTAP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", EnableTAP);
+INCLUDE_ASM("build/sdk/native", EnableTAP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", DisableTAP);
+INCLUDE_ASM("build/sdk/native", DisableTAP);
 
-INCLUDE_ASM("asm/nonmatchings/lib", bzero);
+INCLUDE_ASM("build/sdk/native", bzero);
 
-INCLUDE_ASM("asm/nonmatchings/lib", InitGeom);
+INCLUDE_ASM("build/sdk/native", InitGeom);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _patch_gte);
+INCLUDE_ASM("build/sdk/native", _patch_gte);
 
 INCLUDE_ASM("asm/nonmatchings/lib", DoEpi);
 
@@ -874,15 +874,15 @@ INCLUDE_ASM("asm/nonmatchings/lib", GTIMSYS_ResetTimer);
 
 INCLUDE_ASM("asm/nonmatchings/lib", GTIMSYS_InitTimer);
 
-INCLUDE_ASM("asm/nonmatchings/lib", SetRCnt);
+INCLUDE_ASM("build/sdk/native", SetRCnt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetRCnt);
+INCLUDE_ASM("build/sdk/native", GetRCnt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StartRCnt);
+INCLUDE_ASM("build/sdk/native", StartRCnt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", StopRCnt);
+INCLUDE_ASM("build/sdk/native", StopRCnt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", ResetRCnt);
+INCLUDE_ASM("build/sdk/native", ResetRCnt);
 
 INCLUDE_ASM("asm/nonmatchings/lib", GSYS_GetWorkMemInfo);
 
@@ -898,7 +898,7 @@ INCLUDE_ASM("asm/nonmatchings/lib", GSYS_CheckPtr);
 
 INCLUDE_ASM("asm/nonmatchings/lib", GSYS_IsStackOutOfBounds);
 
-INCLUDE_ASM("asm/nonmatchings/lib", GetSp);
+INCLUDE_ASM("build/sdk/native", GetSp);
 
 INCLUDE_ASM("asm/nonmatchings/lib", GAL_SetErrorChecking);
 
@@ -1138,7 +1138,7 @@ INCLUDE_ASM("asm/nonmatchings/lib", vsprintf);
 
 INCLUDE_ASM("asm/nonmatchings/lib", _doprnt);
 
-INCLUDE_ASM("asm/nonmatchings/lib", putc);
+INCLUDE_ASM("build/sdk/native", putc);
 
 INCLUDE_ASM("asm/nonmatchings/lib", print);
 
@@ -1232,11 +1232,11 @@ INCLUDE_ASM("asm/nonmatchings/lib", setdirentrycallback);
 
 INCLUDE_ASM("asm/nonmatchings/lib", asyncdirentry);
 
-INCLUDE_ASM("asm/nonmatchings/lib", toupper);
+INCLUDE_ASM("build/sdk/native", toupper);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdGetToc);
+INCLUDE_ASM("build/sdk/native", CdGetToc);
 
-INCLUDE_ASM("asm/nonmatchings/lib", CdGetToc2);
+INCLUDE_ASM("build/sdk/native", CdGetToc2);
 
 INCLUDE_ASM("asm/nonmatchings/lib", PCfilelen);
 
@@ -1264,9 +1264,9 @@ INCLUDE_ASM("asm/nonmatchings/lib", writehandle);
 
 INCLUDE_ASM("asm/nonmatchings/lib", seekhandle);
 
-INCLUDE_ASM("asm/nonmatchings/lib", _96_init);
+INCLUDE_ASM("build/sdk/native", _96_init);
 
-INCLUDE_ASM("asm/nonmatchings/lib", lseek);
+INCLUDE_ASM("build/sdk/native", lseek);
 
 INCLUDE_ASM("asm/nonmatchings/lib", filesize);
 
@@ -1614,7 +1614,7 @@ INCLUDE_ASM("asm/nonmatchings/lib", addexit);
 
 INCLUDE_ASM("asm/nonmatchings/lib", removeexit);
 
-INCLUDE_ASM("asm/nonmatchings/lib", exit);
+INCLUDE_ASM("build/sdk/native", exit);
 
 INCLUDE_ASM("asm/nonmatchings/lib", getlocksemaphore);
 

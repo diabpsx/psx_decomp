@@ -18,7 +18,7 @@ struct SpellTarget {   /* sizeof 72 */
     short lastx[8];   /* +0x28 */
     short lasty[8];   /* +0x38 */
 
-    BOOL Active() { return active; }   /* SPLTARGT.H:17 */
+    BOOL Active();   /* SPLTARGT.H:17; inline definition follows the dependent types */
     void ClearTrails(void);
     void Init(int plrn);
     void Remove(void);
@@ -555,3 +555,5 @@ struct GamePad {   /* sizeof 212 */
     unsigned char await_combo;   /* +0xD0 */
     unsigned char combo_menu_active;   /* +0xD1 */
 };
+
+inline BOOL SpellTarget::Active() { return active; }

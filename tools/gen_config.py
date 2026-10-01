@@ -14,7 +14,10 @@ ROOT = Path(__file__).resolve().parent.parent
 VRAM = 0x80010000
 IMG = ROOT / "rom" / "DIABPSX.BIN"
 img_size = IMG.stat().st_size
-IMG_END = VRAM + img_size
+from image_trailer import map_extents, decode
+payload_size, runtime_bss_size = map_extents((ROOT / 'rom/DIABPSX.MAP').read_text(encoding='latin-1'))
+decode(IMG.read_bytes(), payload_size)
+IMG_END = VRAM + payload_size
 
 secs = json.load(open(ROOT / "configs" / "sections.json"))
 fns = json.load(open(ROOT / "configs" / "sym_fns.json"))
@@ -121,6 +124,7 @@ yaml = [
 ]
 for o, k, n in sub:
     yaml.append(f"      - [0x{o:06X}, {k}, {n}]")
+yaml.append(f"  - [0x{payload_size:06X}, bin, diabpsx_checksum]")
 yaml.append(f"  - [0x{img_size:06X}]")
 (ROOT / "configs" / "diabpsx.yaml").write_text("\n".join(yaml) + "\n")
 print("subsegments:", len(sub))

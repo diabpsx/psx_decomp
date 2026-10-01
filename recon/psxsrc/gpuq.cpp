@@ -16,7 +16,7 @@
 extern "C" int MoveImage(RECT *rect, int x, int y);
 
 /* TU-owned (EXT class in the SYM, defined here -- 30-entry queue drained once per frame). */
-struct LOAD_IMAGE_ARGS AllArgs[30];
+struct LOAD_IMAGE_ARGS AllArgs[30] = {{0}};
 int ArgsSoFar;
 
 void GPUQ_FlushQ(void);

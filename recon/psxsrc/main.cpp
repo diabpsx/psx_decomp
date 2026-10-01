@@ -24,6 +24,17 @@ static TASK *GameTaskPtr;
 void GameTask(TASK *T);
 void MAIN_MainLoop(void);
 
+/* Texture-page helpers precede MAIN's entry points in the retail TU. */
+int GetTpY(unsigned short tpage)
+{
+    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
+}
+
+int GetTpX(unsigned short tpage)
+{
+    return (tpage << 6) & 0x3C0;
+}
+
 /* @0x80083128 MAIN.CPP:116 */
 void Remove96(void)
 {
@@ -104,16 +115,4 @@ void MAIN_MainLoop(void)
     DEC_DoDecompRequests();
     TICK_Update();
     SCR_Handler();
-}
-
-/* @0x8008311C MAIN.CPP:? -- texpage X coordinate bits from a texture-page word */
-unsigned short GetTpX(unsigned short tpage)
-{
-    return (tpage << 6) & 0x3C0;
-}
-
-/* @0x80083100 MAIN.CPP:? -- texpage Y coordinate bits (split hi/lo per PSX GPU texpage encoding) */
-unsigned short GetTpY(unsigned short tpage)
-{
-    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
 }

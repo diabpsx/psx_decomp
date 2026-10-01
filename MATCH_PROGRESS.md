@@ -1,6 +1,6 @@
-# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact SYM records; 🟡 = bytes only
+# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2682 / 2727 entries PASS (98.3%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2689 / 2727 entries PASS (98.6%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -112,17 +112,17 @@
 - ❌ PrintMap__7CBlocksii — 254 diffs (ours 740)
 - ❌ IterateVisibleMap__7CBlocksiiPFP9CacheInfoP8map_infoii_ib — 160 diffs (ours 284)
 - ✅ AddMonst__FP9CacheInfoP8map_infoii (58)
-- ❌ PrintMonsters__7CBlocksii — 295 diffs (ours 682)
+- ❌ PrintMonsters__7CBlocksii — 275 diffs (ours 682)
 - ✅ AddTowners__FP9CacheInfoP8map_infoii (23)
 - ✅ PrintTowners__7CBlocksii (238)
 - ✅ AddObject__FP9CacheInfoP8map_infoii (23)
-- ❌ PrintObjects__7CBlocksii — 179 diffs (ours 280)
+- ❌ PrintObjects__7CBlocksii — 167 diffs (ours 280)
 - ✅ AddDead__FP9CacheInfoP8map_infoii (35)
 - ✅ PrintDead__7CBlocksii (177)
 - ✅ AddItem__FP9CacheInfoP8map_infoii (23)
-- ❌ PrintItems__7CBlocksii — 405 diffs (ours 385)
+- ❌ PrintItems__7CBlocksii — 403 diffs (ours 385)
 - ✅ AddMissile__FP9CacheInfoP8map_infoii (70)
-- ✅ PrintMissiles__7CBlocksii (126, ASPSX)
+- ✅ PrintMissiles__7CBlocksii (126)
 - ✅ ScrToWorldX__7CBlocksii (5)
 - ✅ ScrToWorldY__7CBlocksii (5)
 - ✅ SetScrollTarget__7CBlocksii (49)
@@ -836,7 +836,7 @@
 - ✅ SearchPathExists__6FileIO (5)
 - ✅ Save__6FileIOPCcPUci (15)
 
-## fmv  (recon/psxsrc/fmv.cpp) — 39/44 PASS
+## fmv  (recon/psxsrc/fmv.cpp) — 40/44 PASS
 - ✅ _cd_seek (14)
 - ✅ init_cdstream (10)
 - ✅ flush_cdstream (21)
@@ -849,7 +849,7 @@
 - ✅ cdstream_is_last_chunk (6)
 - ✅ cdstream_discard_chunk (72)
 - ✅ close_cdstream (16)
-- 🟡 wait_cdstream — bytes PASS, SYM differs
+- ✅ wait_cdstream (46)
 - ✅ open_cdstream (74)
 - ❌ set_mdec_img_buffer — 2 diffs (ours 13)
 - ✅ start_mdec_decode (87, ASPSX)
@@ -888,11 +888,11 @@
 ## gameonly  (recon/psxsrc/gameonly.cpp) — 1/1 PASS
 - ✅ GameOnlyTestRoutine__Fv (2)
 
-## gameover  (recon/source/gameover.cpp) — 11/12 PASS
+## gameover  (recon/source/gameover.cpp) — 12/12 PASS
 - ✅ IS_GameOver__Fv (10)
 - ✅ GO_DoGameOver__Fv (18)
 - ✅ GameOverTask__FP4TASK (129)
-- 🟡 PrintGameOver__Fv — bytes PASS, SYM differs
+- ✅ PrintGameOver__Fv (80)
 - ✅ GetDown__C4CPad_80082590 (10)
 - ✅ SetRGB__6DialogUcUcUc_800825b8 (8)
 - ✅ SetBack__6Dialogi_800825d8 (2)
@@ -902,7 +902,7 @@
 - ✅ GetOverlayOtBase__7CBlocks_80082690 (2)
 - ✅ GetMaxOtPos__7CBlocks_80082698 (2)
 
-## gamepad  (recon/source/gamepad.cpp) — 41/42 PASS
+## gamepad  (recon/source/gamepad.cpp) — 42/42 PASS
 - ✅ ClrCursor__Fi (23)
 - ✅ HappyMan__Fi (4)
 - ✅ flyabout__7GamePad (255)
@@ -926,7 +926,7 @@
 - ✅ CheckSide__7GamePadi (16)
 - ✅ newDirOk__7GamePadi (44)
 - ✅ CheckDiagBodge__7GamePadi (189)
-- ❌ CheckIsoBodge__7GamePadi — 110 diffs (ours 219)
+- ✅ CheckIsoBodge__7GamePadi (219)
 - ✅ CheckBodge__7GamePadi (88)
 - ✅ walk__7GamePadi (210)
 - ✅ check_around_player__7GamePad (207)
@@ -969,7 +969,7 @@
 - ✅ SkipThemeRoom__Fii (51)
 - ✅ InitLevels__Fv (17)
 
-## glue  (recon/psxsrc/glue.cpp) — 27/28 PASS
+## glue  (recon/psxsrc/glue.cpp) — 28/28 PASS
 - ✅ GLUE_SetMonsterList__Fi (3)
 - ✅ GLUE_GetMonsterList__Fv (3)
 - ✅ GLUE_SuspendGame__Fv (21)
@@ -986,7 +986,7 @@
 - ✅ GLUE_HasGameStarted__Fv (3)
 - ✅ DoShowPanelGFX__FP6GPanelT0 (54)
 - ✅ GLUE_DoQuake__Fii (4)
-- ❌ BgTask__FP4TASK — 186 diffs (ours 297)
+- ✅ BgTask__FP4TASK (299)
 - ✅ FindPlayerChar__FPc (38)
 - ✅ FindPlayerChar__Fiii (23)
 - ✅ FindPlayerChar__FP12PlayerStruct (12)
@@ -1234,7 +1234,7 @@
 - ✅ RespawnItem__FiUc (110)
 - ✅ DeleteItem__Fii (21)
 - ✅ ItemDoppel__Fv (48)
-- ❌ ProcessItems__Fv — 136 diffs (ours 193)
+- ❌ ProcessItems__Fv — 93 diffs (ours 192)
 - ✅ FreeItemGFX__Fv (2)
 - ✅ GetItemStr__Fi (106)
 - ✅ CheckIdentify__Fii (63)
@@ -1623,7 +1623,7 @@
 - ✅ ML_SetList__Fii (44)
 - ✅ ML_GetPresetMonsters__FiPiUl (124)
 
-## monster  (recon/source/monster.cpp) — 102/105 PASS
+## monster  (recon/source/monster.cpp) — 103/105 PASS
 - ✅ DeleteMonster__Fi (14)
 - ✅ M_GetDir__Fi (25)
 - ✅ M_StartDelay__Fii (20)
@@ -1643,7 +1643,7 @@
 - ✅ M_StartFadein__FiiUc (87)
 - ✅ M_StartFadeout__FiiUc (84)
 - ✅ M_StartHeal__Fi (35)
-- 🟡 M_ChangeLightOffset__Fi — bytes PASS, SYM differs
+- ✅ M_ChangeLightOffset__Fi (90)
 - ✅ M_DoStand__Fi (24)
 - ✅ M_DoWalk__Fi (156)
 - ✅ M_DoWalk2__Fi (123)
@@ -1733,17 +1733,17 @@
 ## monsview  (recon/psxsrc/monsview.cpp) — 1/1 PASS
 - ✅ DisplayMonsterTypes__Fv (2)
 
-## msg  (recon/source/msg.cpp) — 109/111 PASS
+## msg  (recon/source/msg.cpp) — 111/111 PASS
 - ✅ delta_init__Fv (22)
 - ✅ delta_kill_monster__FiUcUcUc (39)
 - ✅ delta_monster_hp__FilUc (31)
 - ✅ delta_leave_sync__FUc (203)
 - ✅ delta_sync_object__FiUcUc (24)
-- ❌ delta_get_item__FPC9TCmdGItemUc — 103 diffs (ours 116)
+- ✅ delta_get_item__FPC9TCmdGItemUc (115)
 - ✅ delta_put_item__FPC9TCmdPItemiiUc (99)
 - ✅ delta_portal_inited__Fi (9)
 - ✅ delta_quest_inited__Fi (9)
-- ❌ DeltaAddItem__Fi — 92 diffs (ours 138)
+- ✅ DeltaAddItem__Fi (138)
 - ✅ DeltaExportData__FPc (11)
 - ✅ DeltaImportData__FPc (18)
 - ✅ DeltaSaveLevel__Fv (63)
@@ -1994,7 +1994,7 @@
 - ❌ DrawMenu__Fi — 965 diffs (ours 1007)
 - ✅ who_pressed__Fi (34)
 - ✅ CharacterLoadPad__Fv (341)
-- ❌ MemcardPad__Fv — 124 diffs (ours 577)
+- ❌ MemcardPad__Fv — 8 diffs (ours 583)
 - ✅ SwitchMONO__Fv (19)
 - ❌ SoundPad__Fv — 535 diffs (ours 611)
 - ✅ CentrePad__Fv (145)
@@ -2967,7 +2967,7 @@
 - ✅ ForceSKingTrig__Fv (35)
 - ✅ ForceSChambTrig__Fv (35)
 - ✅ ForcePWaterTrig__Fv (35)
-- ✅ CheckTrigForce__Fv (195)
+- ✅ CheckTrigForce__Fv (195, ASPSX)
 - ✅ FadeGameOut__Fv (41)
 - ✅ IsTrigger__Fii (62)
 - ✅ CheckTrigLevel__Fi (15)

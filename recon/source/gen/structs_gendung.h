@@ -6,6 +6,14 @@ struct THEME_LOC {   /* sizeof 20 */
     int height;   /* +0x10 */
 };
 
+struct ScrollStruct {   /* sizeof 20, retail SYM */
+    int _sxoff;
+    int _syoff;
+    int _sdx;
+    int _sdy;
+    int _sdir;
+};
+
 struct map_info {   /* sizeof 8 */
     short dMonster;   /* +0x0 */
     unsigned char dBits;   /* +0x2 */

@@ -2,6 +2,7 @@
  * SYSI_Init brings up memory, video, the file system, the tasker and every module; the file
  * system is the PC link (PCIO) or packed data file (DatIO) on a dev kit, else the CD (CdIO). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 
 struct RECT {   /* sizeof 8 */
     short x, y, w, h;
@@ -45,7 +46,7 @@ int ResetCallback(void);
 unsigned char TSK_OpenModule(unsigned long MemType);
 void TSK_SetExtraStackProtection(unsigned char OnOff);
 void GU_InitModule(void);
-int SpuInit(void);
+void SpuInit(void);
 }
 void MEM_SetupMem(void);
 void InitTmalloc(void);
@@ -73,6 +74,19 @@ static FileIO *FileSystem;
 static FileIO *OverlayFileSystem;
 
 /* @0x800B059C SYSINIT.CPP:97 (linked into the startup segment) */
+void SYSI_Init(void) __attribute__((section(".text.sysinit_startup")));
+
+/* TUTILS.H helpers precede SYSINIT's ordinary code in retail. */
+static int GetTpY(unsigned short tpage)
+{
+    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
+}
+
+static int GetTpX(unsigned short tpage)
+{
+    return (tpage << 6) & 0x3C0;
+}
+
 void SYSI_Init(void)
 {
     struct RECT clrRect;
@@ -156,15 +170,4 @@ void SortOutFileSystem(void)
     FileSystem->SetSearchPath(SearchPath);
     if (OverlayFileSystem != FileSystem)
         OverlayFileSystem->SetSearchPath(SearchPath);
-}
-
-/* TUTILS.H */
-static int GetTpY(unsigned short tpage)
-{
-    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
-}
-
-static int GetTpX(unsigned short tpage)
-{
-    return (tpage << 6) & 0x3C0;
 }

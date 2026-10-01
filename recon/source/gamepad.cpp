@@ -772,47 +772,41 @@ int GamePad::CheckIsoBodge(int dir)
     y += oy;
 
     if (!PosOkPlayer(pnum, x, y)) {
-        BOOL l, r;
-
-        wy += oy;
-        if (CheckDirs(newdir, wx + ox, wy) != -1)
+        const int checked = CheckDirs(newdir, wx + ox, wy + oy);
+        if (checked != -1)
             return newdir;
-        l = PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])
-            && PosOkPlayer(pnum, player->_px + poffset_x[lnd], player->_py + poffset_y[lnd]);
-        if (l) {
+        if (PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])
+            && PosOkPlayer(pnum, player->_px + poffset_x[lnd], player->_py + poffset_y[lnd])) {
             newdir = lnd;
             if (PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
                 return newdir;
             newdir = CheckDirs(newdir);
-            return newdir;
         } else {
-            r = PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])
-                && PosOkPlayer(pnum, player->_px + poffset_x[rnd], player->_py + poffset_y[rnd]);
-            if (r) {
+            if (PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])
+                && PosOkPlayer(pnum, player->_px + poffset_x[rnd], player->_py + poffset_y[rnd])) {
                 newdir = rnd;
                 if (PosOkPlayer(pnum, player->_px + poffset_x[newdir], player->_py + poffset_y[newdir]))
                     return newdir;
                 newdir = CheckDirs(newdir);
-                return newdir;
             } else
-                newdir = CheckDirs(newdir, wx + ox, wy);
+                newdir = CheckDirs(newdir, wx + ox, wy + oy);
         }
     } else {
-        if (CheckCentre(newdir))
-            return newdir;
-        switch (CheckSide(newdir)) {
-        case 2:
-            if (!PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])) {
-                if (CheckDirs(rnd) == -1)
-                    newdir = lnd;
+        if (!CheckCentre(newdir)) {
+            switch (CheckSide(newdir)) {
+            case 2:
+                if (!PosOkPlayer(pnum, player->_px + poffset_x[(newdir + 1) & 7], player->_py + poffset_y[(newdir + 1) & 7])) {
+                    if (CheckDirs(rnd) == -1)
+                        newdir = lnd;
+                }
+                break;
+            case 1:
+                if (!PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])) {
+                    if (CheckDirs(lnd) == -1)
+                        newdir = rnd;
+                }
+                break;
             }
-            break;
-        case 1:
-            if (!PosOkPlayer(pnum, player->_px + poffset_x[(newdir - 1) & 7], player->_py + poffset_y[(newdir - 1) & 7])) {
-                if (CheckDirs(lnd) == -1)
-                    newdir = rnd;
-            }
-            break;
         }
     }
     return newdir;

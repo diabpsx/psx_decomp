@@ -11,7 +11,28 @@
 
 /* ---- shared game-engine layouts (kept minimal/local) ---- */
 
-struct FRAME_HDR;   /* opaque; only used as a pointer, +6 is a UCHAR palette-index field */
+struct FRAME_HDR {   /* retail SYM: sizeof 12 */
+    unsigned int FrOffset : 32;
+    int X : 8;
+    int Y : 8;
+    unsigned int PalNum : 8;
+    unsigned int NotTrans : 1;
+    unsigned int Rotated : 1;
+    unsigned int InVRAM : 1;
+    unsigned int CompType : 2;
+    unsigned int Floor : 1;
+    unsigned int Cycle : 1;
+    unsigned int pad : 1;
+    unsigned int W : 9;
+    unsigned int H : 9;
+    unsigned int PentaGram : 1;
+    unsigned int pad2 : 13;
+};
+struct PAL {   /* retail SYM: sizeof 8 */
+    unsigned int InVram : 1;
+    unsigned int NumOfCols : 31;
+    unsigned short Cols[1];
+};
 
 struct TextDat {   /* sizeof 112 -- matches block.cpp's TextDat (its owner); only fields/methods
                        this TU's out-of-line accessor copies touch are declared. */
@@ -23,7 +44,7 @@ struct TextDat {   /* sizeof 112 -- matches block.cpp's TextDat (its owner); onl
     unsigned char pad2[112 - 0x34];
 
     struct FRAME_HDR *GetFr(int FrNum);
-    void *GetPal(int PalNum);
+    PAL *GetPal(int PalNum);
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 
@@ -66,7 +87,7 @@ struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record
     int GPanelOt;           /* +0x18 */
 
     GPanel(int Ofs);
-    unsigned short GetPal(int Frm);
+    unsigned int GetPal(int Frm);
     void DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr);
     void DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr);
     void DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr);
@@ -108,7 +129,7 @@ struct PlayerStruct {
 };
 
 extern "C" int GM_UseTexData__Fi(int Id);
-extern "C" int GLUE_Finished__Fv(void);
+extern "C" BOOL GLUE_Finished__Fv(void);
 extern "C" int VID_GetTick__Fv(void);
 extern "C" void DrawInfoBox__FP4RECT(struct RECT *R);
 extern "C" POLY_G4 *PRIM_GetNextPolyG4__Fv(void);
@@ -138,7 +159,7 @@ int D_8011ADA4, D_8011ADA8, D_8011ADAC, D_8011ADB0;
 
 /* -------------------------------------------------------------------------------------------- */
 
-unsigned short GPanel::GetPal(int Frm)
+unsigned int GPanel::GetPal(int Frm)
 {
     struct FRAME_HDR *Fr;
     void *Pal;
@@ -157,7 +178,7 @@ GPanel::GPanel(int Ofs)
     GPanelOt = CBlocks::GetMaxOtPos() - 2;
 }
 
-short SpdTrimCol(short col)
+unsigned char SpdTrimCol(short col)
 {
     if (col < 0) col = 0;
     if (col > 255) col = 255;
@@ -268,9 +289,9 @@ struct FRAME_HDR *TextDat::GetFr(int FrNum)
     return (struct FRAME_HDR *)((char *)Frames + (FrNum & 0xFFFF) * 0xC);
 }
 
-void *TextDat::GetPal(int PalNum)
+PAL *TextDat::GetPal(int PalNum)
 {
-    return (char *)Pals + PalOffset[PalNum];
+    return (PAL *)((char *)Pals + PalOffset[PalNum]);
 }
 
 void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)

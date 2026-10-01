@@ -5,8 +5,9 @@
     python tools/link.py [diabpsx|frontend|pregame|game|fmv ...]   # default: all five
 
 For each image: build/<name>.elf, build/<name>.bin, build/<name>.map and a byte comparison
-against rom/<IMAGE>.BIN (the .bin may be longer because .bss is materialised as zero fill;
-only the retail length is compared and the tail must be all zero)."""
+against rom/<IMAGE>.BIN. Main also emits a .runtime.bin with exact MAP-derived
+zero BSS; its .bin serializes only initialized payload plus computed checksum.
+Other images may have a zero-filled tail after the retail file extent."""
 import os, re, subprocess, sys
 from pathlib import Path
 
@@ -44,6 +45,15 @@ def link(name: str):
     if name == "diabpsx":
         import sdk_link
         sdk_link.build()
+    import native_recon
+    import json
+    native_registry = json.loads((ROOT / 'configs/native_recon_link.json').read_text())
+    bss_path = ROOT / 'configs/recon_bss_link.json'
+    conventional_bss = json.loads(bss_path.read_text()).get(name, {}) if bss_path.exists() else {}
+    conventional_sources = json.loads((ROOT / 'configs/recon_link.json').read_text())
+    if any(name == spec['image'] or any(row.get('image', spec['image']) == name
+           for row in spec['sections'].values()) for spec in native_registry.values()):
+        native_recon.build()
     subprocess.run([sys.executable, str(ROOT / 'tools' / 'gen_ld.py'), name], check=True, cwd=ROOT)   # ROM-order script, pinned addresses
     ld_script = ROOT / "linkers" / f"{name}.ld"
     txt = ld_script.read_text()
@@ -53,7 +63,9 @@ def link(name: str):
         inputs.setdefault(obj, set()).add(section)
     for o in objs:
         op = ROOT / o
-        if o.startswith("build/asm/"):
+        if o.startswith(("build/sdk/native/", "build/native_source/")):
+            assemble_raw(ROOT / o[:-2], op)
+        elif o.startswith("build/asm/"):
             src = ROOT / o[len("build/"):-2]
             if not op.exists() or op.stat().st_mtime < src.stat().st_mtime:
                 assemble_raw(src, op)
@@ -79,6 +91,10 @@ def link(name: str):
             sys.exit(f"unknown object in ld script: {o}")
         if o.startswith("build/recon/"):
             validate_runtime_sections(Elf(op), inputs[o])
+            from recon_bss import validate_object
+            for owner, sections in conventional_bss.items():
+                if o == f'build/{conventional_sources[owner]}.o':
+                    validate_object(Elf(op), sections)
     extra = [ROOT / "linkers" / f"undefined_syms_auto{'' if name == 'diabpsx' else '_' + name}.txt",
              ROOT / "linkers" / f"undefined_funcs_auto{'' if name == 'diabpsx' else '_' + name}.txt"]
     cmd = [str(LD), "-EL", "-T", str(ld_script)] + sum([["-T", str(e)] for e in extra if e.exists() and e.stat().st_size], []) + \
@@ -86,7 +102,14 @@ def link(name: str):
     r = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
     if r.returncode:
         sys.exit(f"[ld] {name}\n{r.stdout}{r.stderr[-4000:]}")
-    subprocess.run([str(OBJCOPY), "-O", "binary", str(ROOT / "build" / f"{name}.elf"), str(ROOT / "build" / f"{name}.bin")], check=True, cwd=ROOT)
+    runtime_path = ROOT / 'build' / (f'{name}.runtime.bin' if name == 'diabpsx' else f'{name}.bin')
+    subprocess.run([str(OBJCOPY), "-O", "binary", str(ROOT / "build" / f"{name}.elf"), str(runtime_path)], check=True, cwd=ROOT)
+    if name == 'diabpsx':
+        from image_trailer import map_extents, serialize_runtime
+        payload_size, bss_size = map_extents((ROOT / 'rom/DIABPSX.MAP').read_text(encoding='latin-1'))
+        serialized = serialize_runtime(runtime_path.read_bytes(), payload_size, bss_size)
+        (ROOT / 'build' / f'{name}.bin').write_bytes(serialized)
+        print(f'{name}: runtime verified, {bss_size} zero BSS bytes; checksum serialized separately')
     ours = (ROOT / "build" / f"{name}.bin").read_bytes()
     retail = (ROOT / "rom" / IMAGES[name]).read_bytes()
     n = len(retail)

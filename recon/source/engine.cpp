@@ -17,9 +17,11 @@ public:
     void inline Enter() {}
 };
 
-int SeedCount;
+long orgseed = 0;
+int SeedCount = 0;
 static long sglGameSeed;
 static CCritSect sgMemCrit;
+static int sgnWidth;   /* retained in retail .sbss even though unused here */
 
 /* @0x8003DA28 ENGINE.CPP:45 */
 int GetDirection(int x1, int y1, int x2, int y2)

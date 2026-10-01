@@ -20,20 +20,6 @@ void GRL_CallWindowProc(unsigned long hw, unsigned int msg, long wp, unsigned lo
 
 static WNDPROC CurrentProc;
 
-static const struct MESSAGE_STR AllMsgs[11] = {
-    { 0x42, "WM_DIABNEXTLVL" },
-    { 0x43, "WM_DIABPREVLVL" },
-    { 0x44, "WM_DIABRTNLVL" },
-    { 0x45, "WM_DIABSETLVL" },
-    { 0x46, "WM_DIABWARPLVL" },
-    { 0x47, "WM_DIABTOWNWARP" },
-    { 0x48, "WM_DIABTWARPUP" },
-    { 0x49, "WM_DIABRETOWN" },
-    { 0x4A, "WM_DIABNEWGAME" },
-    { 0x4B, "WM_DIABLOADGAME" },
-    { 0x4D, "WM_DIAVNEWLVL" },
-};
-
 /* @0x8007B210 GWIN.CPP:94 */
 void GRL_InitGwin(void)
 {
@@ -56,7 +42,7 @@ void GRL_CallWindowProc(unsigned long hw, unsigned int msg, long wp, unsigned lo
 }
 
 /* @0x8007B254 GWIN.CPP:133 */
-BOOL GRL_PostMessage(unsigned long hWnd, unsigned int Msg, long wParam, unsigned long lParam)
+unsigned char GRL_PostMessage(unsigned long hWnd, unsigned int Msg, long wParam, unsigned long lParam)
 {
     if (!Msg2Txt(Msg))
         DBG_Error(NULL, "source/GWIN.cpp", 137);
@@ -68,6 +54,20 @@ BOOL GRL_PostMessage(unsigned long hWnd, unsigned int Msg, long wParam, unsigned
 }
 
 /* @0x8007B300 GWIN.CPP:160 */
+static const struct MESSAGE_STR AllMsgs[11] = {
+    { 0x42, "WM_DIABNEXTLVL" },
+    { 0x43, "WM_DIABPREVLVL" },
+    { 0x44, "WM_DIABRTNLVL" },
+    { 0x45, "WM_DIABSETLVL" },
+    { 0x46, "WM_DIABWARPLVL" },
+    { 0x47, "WM_DIABTOWNWARP" },
+    { 0x48, "WM_DIABTWARPUP" },
+    { 0x49, "WM_DIABRETOWN" },
+    { 0x4A, "WM_DIABNEWGAME" },
+    { 0x4B, "WM_DIABLOADGAME" },
+    { 0x4D, "WM_DIAVNEWLVL" },
+};
+
 char *Msg2Txt(int Msg)
 {
     for (int i = 0; i < sizeof(AllMsgs) / sizeof(struct MESSAGE_STR); i++) {

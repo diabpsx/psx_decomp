@@ -14,21 +14,21 @@ SECTIONS
         . = 0x2017C;   /* 0x8003017C */
         build/skel/SOURCE/CONTROL.CPP.o(.text);
         . = 0x27734;   /* 0x80037734 */
-        build/skel/SOURCE/CURSOR.CPP.o(.text);
+        build/native_source/cursor.text.s.o(.text);   /* verified native-assembled source */
         . = 0x27D88;   /* 0x80037D88 */
-        build/skel/SOURCE/DEAD.CPP.o(.text);
+        build/native_source/dead.text.s.o(.text);   /* verified native-assembled source */
         . = 0x27FAC;   /* 0x80037FAC */
         build/skel/SOURCE/DIABLO.CPP.o(.text);
         . = 0x29F88;   /* 0x80039F88 */
         build/skel/SOURCE/TOWNERS.CPP.o(.text);
         . = 0x2CF34;   /* 0x8003CF34 */
-        build/skel/SOURCE/EFFECTS.CPP.o(.text);
+        build/native_source/effects.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2DA28;   /* 0x8003DA28 */
-        build/skel/SOURCE/ENGINE.CPP.o(.text);
+        build/native_source/engine.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2DC44;   /* 0x8003DC44 */
-        build/skel/SOURCE/ERROR.CPP.o(.text);
+        build/native_source/error.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2DE38;   /* 0x8003DE38 */
-        build/skel/SOURCE/INTERFAC.CPP.o(.text);
+        build/recon/source/interfac.cpp.o(.text);   /* reconstructed TU */
         . = 0x2E214;   /* 0x8003E214 */
         build/recon/source/itemdat.cpp.o(.text);   /* reconstructed TU */
         . = 0x2E24C;   /* 0x8003E24C */
@@ -36,7 +36,7 @@ SECTIONS
         . = 0x3BC68;   /* 0x8004BC68 */
         build/skel/SOURCE/LIGHTING.CPP.o(.text);
         . = 0x3D95C;   /* 0x8004D95C */
-        build/skel/SOURCE/MINITEXT.CPP.o(.text);
+        build/native_source/minitext.text.s.o(.text);   /* verified native-assembled source */
         . = 0x3EA8C;   /* 0x8004EA8C */
         build/recon/source/misdat.cpp.o(.text);   /* reconstructed TU */
         . = 0x3EA9C;   /* 0x8004EA9C */
@@ -44,9 +44,9 @@ SECTIONS
         . = 0x42BA4;   /* 0x80052BA4 */
         build/skel/SOURCE/MULTI.CPP.o(.text);
         . = 0x43080;   /* 0x80053080 */
-        build/skel/SOURCE/OBJECTS.CPP.o(.text);
+        build/native_source/objects.text.s.o(.text);   /* verified native-assembled source */
         . = 0x4FC20;   /* 0x8005FC20 */
-        build/skel/SOURCE/PFILE.CPP.o(.text);
+        build/native_source/pfile.text.s.o(.text);   /* verified native-assembled source */
         . = 0x4FD10;   /* 0x8005FD10 */
         build/skel/SOURCE/PLAYER.CPP.o(.text);
         . = 0x574B4;   /* 0x800674B4 */
@@ -56,13 +56,13 @@ SECTIONS
         . = 0x595A4;   /* 0x800695A4 */
         build/skel/SOURCE/STORES.CPP.o(.text);
         . = 0x64478;   /* 0x80074478 */
-        build/skel/SOURCE/TOWN.CPP.o(.text);
+        build/native_source/town.text.s.o(.text);   /* verified native-assembled source */
         . = 0x65018;   /* 0x80075018 */
-        build/skel/SOURCE/TRIGS.CPP.o(.text);
+        build/native_source/trigs.text.s.o(.text);   /* verified native-assembled source */
         . = 0x67054;   /* 0x80077054 */
-        build/skel/SOURCE/SPELLS.CPP.o(.text);
+        build/recon/source/spells.cpp.o(.text);   /* reconstructed TU */
         . = 0x67D14;   /* 0x80077D14 */
-        build/skel/SOURCE/SOUND.CPP.o(.text);
+        build/native_source/sound.text.s.o(.text);   /* verified native-assembled source */
         . = 0x67F90;   /* 0x80077F90 */
         build/skel/SOURCE/GAMEPAD.CPP.o(.text);
         . = 0x6B170;   /* 0x8007B170 */
@@ -70,13 +70,13 @@ SECTIONS
         . = 0x6B1D0;   /* 0x8007B1D0 */
         build/recon/source/storm.cpp.o(.text);   /* reconstructed TU */
         . = 0x6B210;   /* 0x8007B210 */
-        build/skel/SOURCE/GWIN.CPP.o(.text);
+        build/native_source/gwin.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6B348;   /* 0x8007B348 */
         build/skel/SOURCE/LANG.CPP.o(.text);
         . = 0x6B8C4;   /* 0x8007B8C4 */
         build/skel/SOURCE/MISPRINT.CPP.o(.text);
         . = 0x6D5F8;   /* 0x8007D5F8 */
-        build/skel/SOURCE/MLIST.CPP.o(.text);
+        build/recon/source/mlist.cpp.o(.text);   /* reconstructed TU */
         . = 0x6D9E8;   /* 0x8007D9E8 */
         build/skel/SOURCE/OBJPRINT.CPP.o(.text);
         . = 0x6EE64;   /* 0x8007EE64 */
@@ -84,57 +84,57 @@ SECTIONS
         . = 0x6F354;   /* 0x8007F354 */
         build/recon/source/coremon.cpp.o(.text);   /* reconstructed TU */
         . = 0x709D4;   /* 0x800809D4 */
-        build/skel/SOURCE/COREAUTO.CPP.o(.text);
+        build/recon/source/coreauto.cpp.o(.text);   /* reconstructed TU */
         . = 0x70EF8;   /* 0x80080EF8 */
-        build/skel/SOURCE/PORTAL.CPP.o(.text);
+        build/native_source/portal.text.s.o(.text);   /* verified native-assembled source */
         . = 0x71608;   /* 0x80081608 */
         build/skel/SOURCE/COMPMAP.CPP.o(.text);
         . = 0x721DC;   /* 0x800821DC */
-        build/skel/SOURCE/GAMEOVER.CPP.o(.text);
+        build/native_source/gameover.text.s.o(.text);   /* verified native-assembled source */
         . = 0x726A0;   /* 0x800826A0 */
-        build/src/version.c.o(.text);
+        build/recon/source/version.cpp.o(.text);   /* reconstructed TU */
         . = 0x7271C;   /* 0x8008271C */
         build/recon/source/coreinv.cpp.o(.text);   /* reconstructed TU */
         . = 0x727D0;   /* 0x800827D0 */
         build/recon/source/gamemenu.cpp.o(.text);   /* reconstructed TU */
         . = 0x727D8;   /* 0x800827D8 */
-        build/skel/SOURCE/DPIECE.CPP.o(.text);
+        build/native_source/dpiece.text.s.o(.text);   /* verified native-assembled source */
         . = 0x73100;   /* 0x80083100 */
-        build/skel/PSXSRC/MAIN.CPP.o(.text);
+        build/native_source/main.text.s.o(.text);   /* verified native-assembled source */
         . = 0x733B0;   /* 0x800833B0 */
-        build/skel/PSXSRC/GPUQ.CPP.o(.text);
+        build/native_source/gpuq.text.s.o(.text);   /* verified native-assembled source */
         . = 0x737F4;   /* 0x800837F4 */
-        build/skel/PSXSRC/PRIMPOOL.CPP.o(.text);
+        build/recon/psxsrc/primpool.cpp.o(.text);   /* reconstructed TU */
         . = 0x74030;   /* 0x80084030 */
-        build/skel/PSXSRC/VID.CPP.o(.text);
+        build/native_source/vid.text.s.o(.text);   /* verified native-assembled source */
         . = 0x74424;   /* 0x80084424 */
         build/recon/psxsrc/mem.cpp.o(.text);   /* reconstructed TU */
         . = 0x7444C;   /* 0x8008444C */
-        build/skel/PSXSRC/SYSINIT.CPP.o(.text);
+        build/native_source/sysinit.text.s.o(.text);   /* verified native-assembled source */
         . = 0x745BC;   /* 0x800845BC */
-        build/skel/PSXSRC/GARYL.CPP.o(.text);
+        build/native_source/garyl.text.s.o(.text);   /* verified native-assembled source */
         . = 0x7463C;   /* 0x8008463C */
-        build/skel/PSXSRC/DAVEO.CPP.o(.text);
+        build/native_source/daveo.text.s.o(.text);   /* verified native-assembled source */
         . = 0x7584C;   /* 0x8008584C */
         build/recon/psxsrc/tims.cpp.o(.text);   /* reconstructed TU */
         . = 0x7587C;   /* 0x8008587C */
-        build/skel/PSXSRC/FILEIO.CPP.o(.text);
+        build/native_source/fileio.text.s.o(.text);   /* verified native-assembled source */
         . = 0x760B4;   /* 0x800860B4 */
         build/recon/psxsrc/pcio.cpp.o(.text);   /* reconstructed TU */
         . = 0x76618;   /* 0x80086618 */
-        build/skel/PSXSRC/SYSOBJ.CPP.o(.text);
+        build/native_source/sysobj.text.s.o(.text);   /* verified native-assembled source */
         . = 0x76744;   /* 0x80086744 */
         build/recon/psxsrc/datio.cpp.o(.text);   /* reconstructed TU */
         . = 0x76C40;   /* 0x80086C40 */
-        build/skel/PSXSRC/CDIO.CPP.o(.text);
+        build/native_source/cdio.text.s.o(.text);   /* verified native-assembled source */
         . = 0x7725C;   /* 0x8008725C */
         build/skel/PSXSRC/BIGLUMP.CPP.o(.text);
         . = 0x781D4;   /* 0x800881D4 */
         build/recon/psxsrc/lznp.cpp.o(.text);   /* reconstructed TU */
         . = 0x782A8;   /* 0x800882A8 */
-        build/skel/PSXSRC/TMALLOC.CPP.o(.text);
+        build/native_source/tmalloc.text.s.o(.text);   /* verified native-assembled source */
         . = 0x784C8;   /* 0x800884C8 */
-        build/skel/PSXSRC/PAUSE.CPP.o(.text);
+        build/native_source/pause.text.s.o(.text);   /* verified native-assembled source */
         . = 0x794E0;   /* 0x800894E0 */
         build/skel/PSXSRC/PADS.CPP.o(.text);
         . = 0x79C60;   /* 0x80089C60 */
@@ -142,47 +142,47 @@ SECTIONS
         . = 0x7AD90;   /* 0x8008AD90 */
         build/skel/PSXSRC/DIALOG.CPP.o(.text);
         . = 0x7D274;   /* 0x8008D274 */
-        build/skel/PSXSRC/ATTRACT.CPP.o(.text);
+        build/recon/psxsrc/attract.cpp.o(.text);   /* reconstructed TU */
         . = 0x7D41C;   /* 0x8008D41C */
         build/skel/PSXSRC/BLOCK.CPP.o(.text);
         . = 0x81E54;   /* 0x80091E54 */
         build/skel/PSXSRC/GMAN.CPP.o(.text);
         . = 0x853F8;   /* 0x800953F8 */
-        build/skel/PSXSRC/OVERLAY.CPP.o(.text);
+        build/native_source/overlay.text.s.o(.text);   /* verified native-assembled source */
         . = 0x85844;   /* 0x80095844 */
         build/recon/psxsrc/lambo.cpp.o(.text);   /* reconstructed TU */
         . = 0x85854;   /* 0x80095854 */
         build/skel/PSXSRC/CPLAYER.CPP.o(.text);
         . = 0x86838;   /* 0x80096838 */
-        build/skel/PSXSRC/PROF.CPP.o(.text);
+        build/native_source/prof.text.s.o(.text);   /* verified native-assembled source */
         . = 0x86B5C;   /* 0x80096B5C */
-        build/skel/PSXSRC/PSXMSG.CPP.o(.text);
+        build/native_source/psxmsg.text.s.o(.text);   /* verified native-assembled source */
         . = 0x875CC;   /* 0x800975CC */
         build/skel/PSXSRC/GPANEL.CPP.o(.text);
         . = 0x88988;   /* 0x80098988 */
         build/skel/PSXSRC/STREAM.CPP.o(.text);
         . = 0x8A198;   /* 0x8009A198 */
-        build/skel/PSXSRC/SNDBANK.CPP.o(.text);
+        build/native_source/sndbank.text.s.o(.text);   /* verified native-assembled source */
         . = 0x8A9B4;   /* 0x8009A9B4 */
         build/recon/psxsrc/async.cpp.o(.text);   /* reconstructed TU */
         . = 0x8AC78;   /* 0x8009AC78 */
-        build/skel/PSXSRC/SCRATCH.CPP.o(.text);
+        build/native_source/scratch.text.s.o(.text);   /* verified native-assembled source */
         . = 0x8B338;   /* 0x8009B338 */
-        build/skel/PSXSRC/TONY.CPP.o(.text);
+        build/native_source/tony.text.s.o(.text);   /* verified native-assembled source */
         . = 0x8BA0C;   /* 0x8009BA0C */
         build/skel/PSXSRC/GLUE.CPP.o(.text);
         . = 0x8C548;   /* 0x8009C548 */
         build/skel/PSXSRC/CTRL.CPP.o(.text);
         . = 0x8DCB0;   /* 0x8009DCB0 */
-        build/skel/PSXSRC/GRAHAM.CPP.o(.text);
+        build/native_source/graham.text.s.o(.text);   /* verified native-assembled source */
         . = 0x8E1F0;   /* 0x8009E1F0 */
         build/skel/PSXSRC/TITLESCR.CPP.o(.text);
         . = 0x8E3F4;   /* 0x8009E3F4 */
-        build/skel/PSXSRC/DAVEL.CPP.o(.text);
+        build/native_source/davel.text.s.o(.text);   /* verified native-assembled source */
         . = 0x909DC;   /* 0x800A09DC */
         build/skel/PSXSRC/PADFUNCS.CPP.o(.text);
         . = 0x94384;   /* 0x800A4384 */
-        build/skel/PSXSRC/DECOMP.CPP.o(.text);
+        build/native_source/decomp.text.s.o(.text);   /* verified native-assembled source */
         . = 0x94524;   /* 0x800A4524 */
         build/skel/PSXSRC/LOADING.CPP.o(.text);
         . = 0x95004;   /* 0x800A5004 */
@@ -192,7 +192,7 @@ SECTIONS
         . = 0x9B6B0;   /* 0x800AB6B0 */
         build/skel/PSXSRC/BIRD.CPP.o(.text);
         . = 0x9CF58;   /* 0x800ACF58 */
-        build/skel/PSXSRC/COREFMV.CPP.o(.text);
+        build/recon/psxsrc/corefmv.cpp.o(.text);   /* reconstructed TU */
         . = 0x9D1F0;   /* 0x800AD1F0 */
         build/skel/PSXSRC/KANJI.CPP.o(.text);
         . = 0x9DF9C;   /* 0x800ADF9C */
@@ -202,11 +202,11 @@ SECTIONS
         . = 0x9F0E8;   /* 0x800AF0E8 */
         build/recon/psxsrc/monsview.cpp.o(.text);   /* reconstructed TU */
         . = 0x9F0F0;   /* 0x800AF0F0 */
-        build/skel/PSXSRC/SPLTARGT.CPP.o(.text);
+        build/recon/psxsrc/spltargt.cpp.o(.text);   /* reconstructed TU */
         . = 0xA031C;   /* 0x800B031C */
         build/asm/data/startup_text_hdr.data.s.o(.data);
         . = 0xA0320;   /* 0x800B0320 */
-        build/src/startup.c.o(.text);
+        build/native_source/startup.text.s.o(.text);   /* verified native-assembled source */
         . = 0xA07C8;   /* 0x800B07C8 */
         build/asm/data/startup_rodata_800b07c8.rodata.s.o(.rodata);
         . = 0xA07E0;   /* 0x800B07E0 */
@@ -214,23 +214,23 @@ SECTIONS
         . = 0xA0A18;   /* 0x800B0A18 */
         build/src/startup_1.c.o(.text);
         . = 0xA0C98;   /* 0x800B0C98 */
-        build/asm/data/ctors.data.s.o(.data);
+        build/native_source/ctors.data.s.o(.data);   /* verified native source data */
         . = 0xA0CD4;   /* 0x800B0CD4 */
-        build/asm/data/dtors.data.s.o(.data);
+        build/native_source/dtors.data.s.o(.data);   /* verified native source data */
         . = 0xA0D00;   /* 0x800B0D00 */
-        build/asm/data/data.data.s.o(.data);
+        build/sdk/native/data.data.s.o(.data);   /* original SDK data bridge */
         . = 0xA7088;   /* 0x800B7088 */
         build/asm/data/data_monstlst.data.s.o(.data);
         . = 0xA75D8;   /* 0x800B75D8 */
-        build/asm/data/data_gpuq.data.s.o(.data);
+        build/native_source/data_gpuq.data.s.o(.data);   /* verified native source data */
         . = 0xA7920;   /* 0x800B7920 */
         build/asm/data/data_mem.data.s.o(.data);
         . = 0xA7970;   /* 0x800B7970 */
-        build/asm/data/data_fileio.data.s.o(.data);
+        build/native_source/data_fileio.data.s.o(.data);   /* verified native source data */
         . = 0xA79A4;   /* 0x800B79A4 */
         build/asm/data/data_biglump.data.s.o(.data);
         . = 0xA7B54;   /* 0x800B7B54 */
-        build/asm/data/data_tmalloc.data.s.o(.data);
+        build/native_source/data_tmalloc.data.s.o(.data);   /* verified native source data */
         . = 0xA7D34;   /* 0x800B7D34 */
         build/asm/data/data_pads.data.s.o(.data);
         . = 0xA82D8;   /* 0x800B82D8 */
@@ -242,13 +242,13 @@ SECTIONS
         . = 0xA8B94;   /* 0x800B8B94 */
         build/asm/data/data_gman.data.s.o(.data);
         . = 0xA9A58;   /* 0x800B9A58 */
-        build/asm/data/data_psxmsg.data.s.o(.data);
+        build/native_source/data_psxmsg.data.s.o(.data);   /* verified native source data */
         . = 0xA9A6C;   /* 0x800B9A6C */
         build/asm/data/data_gpanel.data.s.o(.data);
         . = 0xA9BE0;   /* 0x800B9BE0 */
         build/asm/data/data_stream.data.s.o(.data);
         . = 0xBBDAC;   /* 0x800CBDAC */
-        build/asm/data/data_scratch.data.s.o(.data);
+        build/native_source/data_scratch.data.s.o(.data);   /* verified native source data */
         . = 0xBBF98;   /* 0x800CBF98 */
         build/asm/data/data_glue.data.s.o(.data);
         . = 0xBC364;   /* 0x800CC364 */
@@ -256,7 +256,7 @@ SECTIONS
         . = 0xBC68C;   /* 0x800CC68C */
         build/asm/data/data_titlescr.data.s.o(.data);
         . = 0xBC6BC;   /* 0x800CC6BC */
-        build/asm/data/data_davel.data.s.o(.data);
+        build/native_source/data_davel.data.s.o(.data);   /* verified native source data */
         . = 0xBC76C;   /* 0x800CC76C */
         build/asm/data/data_loading.data.s.o(.data);
         . = 0xBC7E8;   /* 0x800CC7E8 */
@@ -266,25 +266,29 @@ SECTIONS
         . = 0xBD374;   /* 0x800CD374 */
         build/asm/data/data_bird.data.s.o(.data);
         . = 0xBD4F4;   /* 0x800CD4F4 */
-        build/asm/data/data_corefmv.data.s.o(.data);
+        __recon_diabpsx_data_corefmv_start = .;
+        build/recon/psxsrc/corefmv.cpp.o(.data);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_data_corefmv_start == 0x30, "wrong source data extent: data_corefmv");
         . = 0xBD524;   /* 0x800CD524 */
         build/asm/data/data_psxhelp.data.s.o(.data);
         . = 0xBD650;   /* 0x800CD650 */
-        build/asm/data/data_spltargt.data.s.o(.data);
+        __recon_diabpsx_data_spltargt_start = .;
+        build/recon/psxsrc/spltargt.cpp.o(.data);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_data_spltargt_start == 0x30, "wrong source data extent: data_spltargt");
         . = 0xBD680;   /* 0x800CD680 */
         build/asm/data/data_fe.data.s.o(.data);
         . = 0xBE310;   /* 0x800CE310 */
         build/asm/data/data_control.data.s.o(.data);
         . = 0xBEB10;   /* 0x800CEB10 */
-        build/asm/data/data_dead.data.s.o(.data);
+        build/native_source/data_dead.data.s.o(.data);   /* verified native source data */
         . = 0xBEC84;   /* 0x800CEC84 */
         build/asm/data/data_diablo.data.s.o(.data);
         . = 0xBF7E4;   /* 0x800CF7E4 */
         build/asm/data/data_towners.data.s.o(.data);
         . = 0xC0AC0;   /* 0x800D0AC0 */
-        build/asm/data/data_effects.data.s.o(.data);
+        build/native_source/data_effects.data.s.o(.data);   /* verified native source data */
         . = 0xC1A40;   /* 0x800D1A40 */
-        build/asm/data/data_error.data.s.o(.data);
+        build/native_source/data_error.data.s.o(.data);   /* verified native source data */
         . = 0xC1B40;   /* 0x800D1B40 */
         build/asm/data/data_itemdat.data.s.o(.data);
         . = 0xC1BE0;   /* 0x800D1BE0 */
@@ -292,7 +296,7 @@ SECTIONS
         . = 0xC5554;   /* 0x800D5554 */
         build/asm/data/data_lighting.data.s.o(.data);
         . = 0xC6790;   /* 0x800D6790 */
-        build/asm/data/data_minitext.data.s.o(.data);
+        build/native_source/data_minitext.data.s.o(.data);   /* verified native source data */
         . = 0xC67F0;   /* 0x800D67F0 */
         build/asm/data/data_misdat.data.s.o(.data);
         . = 0xC704C;   /* 0x800D704C */
@@ -310,23 +314,27 @@ SECTIONS
         . = 0xCE304;   /* 0x800DE304 */
         build/asm/data/data_stores.data.s.o(.data);
         . = 0xD31F8;   /* 0x800E31F8 */
-        build/asm/data/data_trigs.data.s.o(.data);
+        build/native_source/data_trigs.data.s.o(.data);   /* verified native source data */
         . = 0xD389C;   /* 0x800E389C */
-        build/asm/data/data_sound.data.s.o(.data);
+        build/native_source/data_sound.data.s.o(.data);   /* verified native source data */
         . = 0xD38A8;   /* 0x800E38A8 */
         build/asm/data/data_gamepad.data.s.o(.data);
         . = 0xD38E4;   /* 0x800E38E4 */
         build/asm/data/data_misprint.data.s.o(.data);
         . = 0xD39C4;   /* 0x800E39C4 */
-        build/asm/data/data_mlist.data.s.o(.data);
+        __recon_diabpsx_data_mlist_start = .;
+        build/recon/source/mlist.cpp.o(.data);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_data_mlist_start == 0x20, "wrong source data extent: data_mlist");
         . = 0xD39E4;   /* 0x800E39E4 */
         build/asm/data/data_objprint.data.s.o(.data);
         . = 0xD3BAC;   /* 0x800E3BAC */
         build/asm/data/data_coreauto.data.s.o(.data);
         . = 0xD3BCC;   /* 0x800E3BCC */
-        build/asm/data/data_portal.data.s.o(.data);
+        build/native_source/data_portal.data.s.o(.data);   /* verified native source data */
         . = 0xD3C1C;   /* 0x800E3C1C */
-        build/asm/data/data_version.data.s.o(.data);
+        __recon_diabpsx_data_version_start = .;
+        build/recon/source/version.cpp.o(.data);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_data_version_start == 0x78, "wrong source data extent: data_version");
         . = 0xD3C94;   /* 0x800E3C94 */
         build/asm/data/data_loadsave.data.s.o(.data);
         . = 0xD3FC0;   /* 0x800E3FC0 */
@@ -336,9 +344,9 @@ SECTIONS
         . = 0xD40B0;   /* 0x800E40B0 */
         build/asm/data/data_preobj.data.s.o(.data);
         . = 0xD40C4;   /* 0x800E40C4 */
-        build/asm/data/data_gendung.data.s.o(.data);
+        build/native_source/data_gendung.data.s.o(.data);   /* verified native source data */
         . = 0xF2728;   /* 0x80102728 */
-        build/asm/data/data_themes.data.s.o(.data);
+        build/native_source/data_themes.data.s.o(.data);   /* verified native source data */
         . = 0xF29D8;   /* 0x801029D8 */
         build/asm/data/data_missiles.data.s.o(.data);
         . = 0xF51F4;   /* 0x801051F4 */
@@ -350,47 +358,53 @@ SECTIONS
         . = 0xFD6CC;   /* 0x8010D6CC */
         build/asm/data/data_automap.data.s.o(.data);
         . = 0xFDBAC;   /* 0x8010DBAC */
-        build/asm/data/rodata.rodata.s.o(.rodata);
+        build/sdk/native/rodata.rodata.s.o(.rodata);   /* original SDK data bridge */
         . = 0xFFF90;   /* 0x8010FF90 */
         build/asm/data/rodata_main.rodata.s.o(.rodata);
         . = 0xFFFB4;   /* 0x8010FFB4 */
-        build/asm/data/rodata_gpuq.rodata.s.o(.rodata);
+        build/native_source/rodata_gpuq.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFC4;   /* 0x8010FFC4 */
-        build/asm/data/rodata_primpool.rodata.s.o(.rodata);
+        __recon_diabpsx_rodata_primpool_native_start = .;
+        build/recon/psxsrc/primpool.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_primpool_native_start == 0x19, "wrong source payload extent: rodata_primpool_native");
+        BYTE(0x49); /* preserved retail alignment byte */
+        BYTE(0x41); /* preserved retail alignment byte */
+        BYTE(0x42); /* preserved retail alignment byte */
+        ASSERT(. - __recon_diabpsx_rodata_primpool_native_start == 0x1C, "wrong source data extent: rodata_primpool_native");
         . = 0xFFFE0;   /* 0x8010FFE0 */
-        build/asm/data/rodata_vid.rodata.s.o(.rodata);
+        build/native_source/rodata_vid.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFF0;   /* 0x8010FFF0 */
         build/asm/data/rodata_mem.rodata.s.o(.rodata);
         . = 0x100008;   /* 0x80110008 */
-        build/asm/data/rodata_sysinit.rodata.s.o(.rodata);
+        build/native_source/rodata_sysinit.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100078;   /* 0x80110078 */
         build/asm/data/rodata_garyl.rodata.s.o(.rodata);
         . = 0x10009C;   /* 0x8011009C */
-        build/asm/data/rodata_daveo.rodata.s.o(.rodata);
+        build/native_source/rodata_daveo_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1000AC;   /* 0x801100AC */
         build/asm/data/rodata_tims.rodata.s.o(.rodata);
         . = 0x1000BC;   /* 0x801100BC */
         build/asm/data/rodata_leigh.rodata.s.o(.rodata);
         . = 0x1000E0;   /* 0x801100E0 */
-        build/asm/data/rodata_fileio.rodata.s.o(.rodata);
+        build/native_source/rodata_fileio.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100130;   /* 0x80110130 */
         __recon_diabpsx_rodata_pcio_start = .;
         build/recon/psxsrc/pcio.cpp.o(.rodata);   /* source-owned data */
         ASSERT(. - __recon_diabpsx_rodata_pcio_start == 0x68, "wrong source data extent: rodata_pcio");
         . = 0x100198;   /* 0x80110198 */
-        build/asm/data/rodata_sysobj.rodata.s.o(.rodata);
+        build/native_source/rodata_sysobj_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1001AC;   /* 0x801101AC */
         __recon_diabpsx_rodata_datio_start = .;
         build/recon/psxsrc/datio.cpp.o(.rodata);   /* source-owned data */
         ASSERT(. - __recon_diabpsx_rodata_datio_start == 0x58, "wrong source data extent: rodata_datio");
         . = 0x100204;   /* 0x80110204 */
-        build/asm/data/rodata_cdio.rodata.s.o(.rodata);
+        build/native_source/rodata_cdio.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10026C;   /* 0x8011026C */
         build/asm/data/rodata_biglump.rodata.s.o(.rodata);
         . = 0x100394;   /* 0x80110394 */
-        build/asm/data/rodata_tmalloc.rodata.s.o(.rodata);
+        build/native_source/rodata_tmalloc_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1003C0;   /* 0x801103C0 */
-        build/asm/data/rodata_pause.rodata.s.o(.rodata);
+        build/native_source/rodata_pause.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100480;   /* 0x80110480 */
         build/asm/data/rodata_pads.rodata.s.o(.rodata);
         . = 0x1004B8;   /* 0x801104B8 */
@@ -398,13 +412,17 @@ SECTIONS
         . = 0x1004DC;   /* 0x801104DC */
         build/asm/data/rodata_dialog.rodata.s.o(.rodata);
         . = 0x100510;   /* 0x80110510 */
-        build/asm/data/rodata_attract.rodata.s.o(.rodata);
+        build/asm/data/rodata_attract_prefix.rodata.s.o(.rodata);
+        . = 0x100520;   /* 0x80110520 */
+        __recon_diabpsx_rodata_attract_source_start = .;
+        build/recon/psxsrc/attract.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_attract_source_start == 0x1C, "wrong source data extent: rodata_attract_source");
         . = 0x10053C;   /* 0x8011053C */
         build/asm/data/rodata_block.rodata.s.o(.rodata);
         . = 0x100588;   /* 0x80110588 */
         build/asm/data/rodata_gman.rodata.s.o(.rodata);
         . = 0x1005BC;   /* 0x801105BC */
-        build/asm/data/rodata_overlay.rodata.s.o(.rodata);
+        build/native_source/rodata_overlay.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100604;   /* 0x80110604 */
         build/asm/data/rodata_lambo.rodata.s.o(.rodata);
         . = 0x100614;   /* 0x80110614 */
@@ -412,37 +430,37 @@ SECTIONS
         . = 0x1006D4;   /* 0x801106D4 */
         build/asm/data/rodata_framehdr.rodata.s.o(.rodata);
         . = 0x1006E4;   /* 0x801106E4 */
-        build/asm/data/rodata_psxmsg.rodata.s.o(.rodata);
+        build/native_source/rodata_psxmsg.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100844;   /* 0x80110844 */
         build/asm/data/rodata_gpanel.rodata.s.o(.rodata);
         . = 0x1008A4;   /* 0x801108A4 */
         build/asm/data/rodata_stream.rodata.s.o(.rodata);
         . = 0x10098C;   /* 0x8011098C */
-        build/asm/data/rodata_sndbank.rodata.s.o(.rodata);
+        build/native_source/rodata_sndbank.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100A40;   /* 0x80110A40 */
         build/asm/data/rodata_async.rodata.s.o(.rodata);
         . = 0x100A50;   /* 0x80110A50 */
         build/asm/data/rodata_cmonst.rodata.s.o(.rodata);
         . = 0x100A60;   /* 0x80110A60 */
-        build/asm/data/rodata_scratch.rodata.s.o(.rodata);
+        build/native_source/rodata_scratch.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100AC4;   /* 0x80110AC4 */
-        build/asm/data/rodata_tony.rodata.s.o(.rodata);
+        build/native_source/rodata_tony_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100B34;   /* 0x80110B34 */
         build/asm/data/rodata_glue.rodata.s.o(.rodata);
         . = 0x100B74;   /* 0x80110B74 */
         build/asm/data/rodata_ctrl.rodata.s.o(.rodata);
         . = 0x100B98;   /* 0x80110B98 */
-        build/asm/data/rodata_graham.rodata.s.o(.rodata);
+        build/native_source/rodata_graham_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100BBC;   /* 0x80110BBC */
         build/asm/data/rodata_titlescr.rodata.s.o(.rodata);
         . = 0x100BCC;   /* 0x80110BCC */
         build/asm/data/rodata_creature.rodata.s.o(.rodata);
         . = 0x100BDC;   /* 0x80110BDC */
-        build/asm/data/rodata_davel.rodata.s.o(.rodata);
+        build/native_source/rodata_davel_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100C14;   /* 0x80110C14 */
         build/asm/data/rodata_padfuncs.rodata.s.o(.rodata);
         . = 0x100C38;   /* 0x80110C38 */
-        build/asm/data/rodata_decomp.rodata.s.o(.rodata);
+        build/native_source/rodata_decomp_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100C5C;   /* 0x80110C5C */
         build/asm/data/rodata_loading.rodata.s.o(.rodata);
         . = 0x100CC0;   /* 0x80110CC0 */
@@ -452,7 +470,11 @@ SECTIONS
         . = 0x100DC0;   /* 0x80110DC0 */
         build/asm/data/rodata_bird.rodata.s.o(.rodata);
         . = 0x100E30;   /* 0x80110E30 */
-        build/asm/data/rodata_corefmv.rodata.s.o(.rodata);
+        build/asm/data/rodata_corefmv_prefix.rodata.s.o(.rodata);
+        . = 0x100E40;   /* 0x80110E40 */
+        __recon_diabpsx_rodata_corefmv_source_start = .;
+        build/recon/psxsrc/corefmv.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_corefmv_source_start == 0x84, "wrong source data extent: rodata_corefmv_source");
         . = 0x100EC4;   /* 0x80110EC4 */
         build/asm/data/rodata_kanji.rodata.s.o(.rodata);
         . = 0x100F44;   /* 0x80110F44 */
@@ -476,13 +498,17 @@ SECTIONS
         . = 0x1011A8;   /* 0x801111A8 */
         build/asm/data/rodata_towners.rodata.s.o(.rodata);
         . = 0x101318;   /* 0x80111318 */
-        build/asm/data/rodata_effects.rodata.s.o(.rodata);
+        build/native_source/rodata_effects.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x101328;   /* 0x80111328 */
-        build/asm/data/rodata_engine.rodata.s.o(.rodata);
+        build/native_source/rodata_engine_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10133C;   /* 0x8011133C */
-        build/asm/data/rodata_error.rodata.s.o(.rodata);
+        build/native_source/rodata_error_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10134C;   /* 0x8011134C */
-        build/asm/data/rodata_interfac.rodata.s.o(.rodata);
+        build/asm/data/rodata_interfac_prefix.rodata.s.o(.rodata);
+        . = 0x10135C;   /* 0x8011135C */
+        __recon_diabpsx_rodata_interfac_source_start = .;
+        build/recon/source/interfac.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_interfac_source_start == 0x48, "wrong source data extent: rodata_interfac_source");
         . = 0x1013A4;   /* 0x801113A4 */
         build/asm/data/rodata_itemdat.rodata.s.o(.rodata);
         . = 0x106140;   /* 0x80116140 */
@@ -490,7 +516,7 @@ SECTIONS
         . = 0x1066E8;   /* 0x801166E8 */
         build/asm/data/rodata_lighting.rodata.s.o(.rodata);
         . = 0x1066F8;   /* 0x801166F8 */
-        build/asm/data/rodata_minitext.rodata.s.o(.rodata);
+        build/native_source/rodata_minitext.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x106798;   /* 0x80116798 */
         build/asm/data/rodata_misdat.rodata.s.o(.rodata);
         . = 0x1067A8;   /* 0x801167A8 */
@@ -500,9 +526,9 @@ SECTIONS
         . = 0x1069E0;   /* 0x801169E0 */
         build/asm/data/rodata_objdat.rodata.s.o(.rodata);
         . = 0x106AD0;   /* 0x80116AD0 */
-        build/asm/data/rodata_objects.rodata.s.o(.rodata);
+        build/native_source/rodata_objects.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10773C;   /* 0x8011773C */
-        build/asm/data/rodata_pfile.rodata.s.o(.rodata);
+        build/native_source/rodata_pfile_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10774C;   /* 0x8011774C */
         build/asm/data/rodata_player.rodata.s.o(.rodata);
         . = 0x1078E0;   /* 0x801178E0 */
@@ -516,23 +542,34 @@ SECTIONS
         . = 0x107C10;   /* 0x80117C10 */
         build/asm/data/rodata_textdat.rodata.s.o(.rodata);
         . = 0x1088BC;   /* 0x801188BC */
-        build/asm/data/rodata_town.rodata.s.o(.rodata);
+        build/native_source/rodata_town.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10893C;   /* 0x8011893C */
-        build/asm/data/rodata_trigs.rodata.s.o(.rodata);
+        build/native_source/rodata_trigs.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1089C0;   /* 0x801189C0 */
-        build/asm/data/rodata_spells.rodata.s.o(.rodata);
+        build/asm/data/rodata_spells_prefix.rodata.s.o(.rodata);
+        . = 0x1089E8;   /* 0x801189E8 */
+        __recon_diabpsx_rodata_spells_table_start = .;
+        build/recon/source/spells.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_spells_table_start == 0x14, "wrong source data extent: rodata_spells_table");
         . = 0x1089FC;   /* 0x801189FC */
-        build/asm/data/rodata_sound.rodata.s.o(.rodata);
+        build/native_source/rodata_sound_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108A20;   /* 0x80118A20 */
         build/asm/data/rodata_gamepad.rodata.s.o(.rodata);
         . = 0x108B18;   /* 0x80118B18 */
-        build/asm/data/rodata_gwin.rodata.s.o(.rodata);
+        build/native_source/rodata_gwin.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108C30;   /* 0x80118C30 */
         build/asm/data/rodata_lang.rodata.s.o(.rodata);
         . = 0x108C98;   /* 0x80118C98 */
         build/asm/data/rodata_misprint.rodata.s.o(.rodata);
         . = 0x108D68;   /* 0x80118D68 */
-        build/asm/data/rodata_mlist.rodata.s.o(.rodata);
+        build/asm/data/rodata_mlist_prefix.rodata.s.o(.rodata);
+        . = 0x108D78;   /* 0x80118D78 */
+        __recon_diabpsx_rodata_mlist_source_start = .;
+        build/recon/source/mlist.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_mlist_source_start == 0x11, "wrong source payload extent: rodata_mlist_source");
+        FILL(0);
+        . = ALIGN(4);
+        ASSERT(. - __recon_diabpsx_rodata_mlist_source_start == 0x14, "wrong source data extent: rodata_mlist_source");
         . = 0x108D8C;   /* 0x80118D8C */
         build/asm/data/rodata_objprint.rodata.s.o(.rodata);
         . = 0x108DB0;   /* 0x80118DB0 */
@@ -540,21 +577,31 @@ SECTIONS
         . = 0x108DC0;   /* 0x80118DC0 */
         build/asm/data/rodata_coremon.rodata.s.o(.rodata);
         . = 0x108DD0;   /* 0x80118DD0 */
-        build/asm/data/rodata_coreauto.rodata.s.o(.rodata);
+        build/asm/data/rodata_coreauto_prefix.rodata.s.o(.rodata);
+        . = 0x108DE0;   /* 0x80118DE0 */
+        __recon_diabpsx_rodata_coreauto_source_start = .;
+        build/recon/source/coreauto.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_coreauto_source_start == 0x44, "wrong source data extent: rodata_coreauto_source");
         . = 0x108E24;   /* 0x80118E24 */
-        build/asm/data/rodata_portal.rodata.s.o(.rodata);
+        build/native_source/rodata_portal_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108E34;   /* 0x80118E34 */
         build/asm/data/rodata_compmap.rodata.s.o(.rodata);
         . = 0x108E6C;   /* 0x80118E6C */
         build/asm/data/rodata_gameover.rodata.s.o(.rodata);
         . = 0x108E90;   /* 0x80118E90 */
-        build/asm/data/rodata_version.rodata.s.o(.rodata);
+        build/asm/data/rodata_version_prefix.rodata.s.o(.rodata);
+        . = 0x10944C;   /* 0x8011944C */
+        __recon_diabpsx_rodata_version_source_start = .;
+        build/recon/source/version.cpp.o(.rodata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_rodata_version_source_start == 0x18, "wrong source data extent: rodata_version_source");
+        . = 0x109464;   /* 0x80119464 */
+        build/asm/data/rodata_version_suffix.rodata.s.o(.rodata);
         . = 0x109490;   /* 0x80119490 */
         build/asm/data/rodata_coreinv.rodata.s.o(.rodata);
         . = 0x1094B4;   /* 0x801194B4 */
         build/asm/data/rodata_gamemenu.rodata.s.o(.rodata);
         . = 0x1094D8;   /* 0x801194D8 */
-        build/asm/data/rodata_dpiece.rodata.s.o(.rodata);
+        build/native_source/rodata_dpiece_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1094FC;   /* 0x801194FC */
         build/asm/data/rodata_loadsave.rodata.s.o(.rodata);
         . = 0x109540;   /* 0x80119540 */
@@ -562,25 +609,25 @@ SECTIONS
         . = 0x1096D4;   /* 0x801196D4 */
         build/asm/data/rodata_choosem.rodata.s.o(.rodata);
         . = 0x1097AC;   /* 0x801197AC */
-        build/asm/data/rodata_preobj.rodata.s.o(.rodata);
+        build/native_source/rodata_preobj.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109990;   /* 0x80119990 */
-        build/asm/data/rodata_gendung.rodata.s.o(.rodata);
+        build/native_source/rodata_gendung.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109A34;   /* 0x80119A34 */
-        build/asm/data/rodata_themes.rodata.s.o(.rodata);
+        build/native_source/rodata_themes.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109B08;   /* 0x80119B08 */
         build/asm/data/rodata_preport.rodata.s.o(.rodata);
         . = 0x109B18;   /* 0x80119B18 */
-        build/asm/data/rodata_prequest.rodata.s.o(.rodata);
+        build/native_source/rodata_prequest.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109BA4;   /* 0x80119BA4 */
         build/asm/data/rodata_preinv.rodata.s.o(.rodata);
         . = 0x109BC8;   /* 0x80119BC8 */
         build/asm/data/rodata_preauto.rodata.s.o(.rodata);
         . = 0x109C00;   /* 0x80119C00 */
-        build/asm/data/rodata_premon.rodata.s.o(.rodata);
+        build/native_source/rodata_premon_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D20;   /* 0x80119D20 */
         build/asm/data/rodata_premiss.rodata.s.o(.rodata);
         . = 0x109D44;   /* 0x80119D44 */
-        build/asm/data/rodata_pretrigs.rodata.s.o(.rodata);
+        build/native_source/rodata_pretrigs_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D68;   /* 0x80119D68 */
         build/asm/data/rodata_prestore.rodata.s.o(.rodata);
         . = 0x109D8C;   /* 0x80119D8C */
@@ -598,12 +645,272 @@ SECTIONS
         . = 0x10A738;   /* 0x8011A738 */
         build/asm/data/rodata_automap.rodata.s.o(.rodata);
         . = 0x10A780;   /* 0x8011A780 */
-        build/asm/data/sdata.sdata.s.o(.sdata);
-        . = 0x10C608;   /* image end 0x8011C608 */
+        build/native_source/sdata_before_primpool.sdata.s.o(.sdata);   /* verified native source data */
+        . = 0x10AAB4;   /* 0x8011AAB4 */
+        __recon_diabpsx_sdata_primpool_start = .;
+        build/recon/psxsrc/primpool.cpp.o(.sdata);   /* source-owned data */
+        ASSERT(. - __recon_diabpsx_sdata_primpool_start == 0x14, "wrong source data extent: sdata_primpool");
+        . = 0x10AAC8;   /* 0x8011AAC8 */
+        build/native_source/sdata_after_primpool.sdata.s.o(.sdata);   /* verified native source data */
+        . = 0x10C604;   /* image end 0x8011C604 */
         diabpsx_BSS_START = .;
-        . += 0x1D5EC;   /* .sbss + .bss zero fill (not in the file) */
+        D_8011C604 = .; /* startup zero-fill boundary, not file checksum */
+        . = 0x10C604;
+        __source_main_sbss_start = .;
+        build/native_source/main.sbss.s.o(.sbss);
+        ASSERT(. - __source_main_sbss_start == 0x4, "wrong BSS extent: main");
+        . = 0x10C608;
+        __recon_primpool_sbss_start = .;
+        build/recon/psxsrc/primpool.cpp.o(.sbss);
+        ASSERT(. - __recon_primpool_sbss_start == 0x20, "wrong BSS extent: primpool");
+        . = 0x10C628;
+        __source_vid_sbss_start = .;
+        build/native_source/vid.sbss.s.o(.sbss);
+        ASSERT(. - __source_vid_sbss_start == 0x14, "wrong BSS extent: vid");
+        . = 0x10C63C;
+        __source_sysinit_sbss_start = .;
+        build/native_source/sysinit.sbss.s.o(.sbss);
+        ASSERT(. - __source_sysinit_sbss_start == 0x8, "wrong BSS extent: sysinit");
+        . = 0x10C644;
+        __source_pause_sbss_start = .;
+        build/native_source/pause.sbss.s.o(.sbss);
+        ASSERT(. - __source_pause_sbss_start == 0x8, "wrong BSS extent: pause");
+        . = 0x10C684;
+        __source_prof_sbss_start = .;
+        build/native_source/prof.sbss.s.o(.sbss);
+        ASSERT(. - __source_prof_sbss_start == 0x14, "wrong BSS extent: prof");
+        . = 0x10C6A8;
+        __source_sndbank_sbss_start = .;
+        build/native_source/sndbank.sbss.s.o(.sbss);
+        ASSERT(. - __source_sndbank_sbss_start == 0x6, "wrong BSS extent: sndbank");
+        . = 0x10C6D8;
+        __source_davel_sbss_start = .;
+        build/native_source/davel.sbss.s.o(.sbss);
+        ASSERT(. - __source_davel_sbss_start == 0x8, "wrong BSS extent: davel");
+        . = 0x10C7C4;
+        __source_engine_sbss_start = .;
+        build/native_source/engine.sbss.s.o(.sbss);
+        ASSERT(. - __source_engine_sbss_start == 0xC, "wrong BSS extent: engine");
+        . = 0x10C808;
+        __source_minitext_sbss_start = .;
+        build/native_source/minitext.sbss.s.o(.sbss);
+        ASSERT(. - __source_minitext_sbss_start == 0x24, "wrong BSS extent: minitext");
+        . = 0x10C8C8;
+        __source_town_sbss_start = .;
+        build/native_source/town.sbss.s.o(.sbss);
+        ASSERT(. - __source_town_sbss_start == 0x4, "wrong BSS extent: town");
+        . = 0x10C8CC;
+        __source_gwin_sbss_start = .;
+        build/native_source/gwin.sbss.s.o(.sbss);
+        ASSERT(. - __source_gwin_sbss_start == 0x4, "wrong BSS extent: gwin");
+        . = 0x10C8D0;
+        __source_portal_sbss_start = .;
+        build/native_source/portal.sbss.s.o(.sbss);
+        ASSERT(. - __source_portal_sbss_start == 0x4, "wrong BSS extent: portal");
+        . = 0x10C8E0;
+        __source_drlg_l3_sbss_start = .;
+        build/native_source/drlg_l3.sbss.s.o(.sbss);
+        ASSERT(. - __source_drlg_l3_sbss_start == 0x8, "wrong BSS extent: drlg_l3");
+        . = 0x10C908;
+        __sdk___SN_ENTRY_POINT_sbss_start = .;
+        build/sdk/native/__SN_ENTRY_POINT.sbss.s.o(.sbss);
+        ASSERT(. - __sdk___SN_ENTRY_POINT_sbss_start == 0x4, "wrong BSS extent: __SN_ENTRY_POINT");
+        . = 0x10C90C;
+        __sdk_InitTAP_sbss_start = .;
+        build/sdk/native/InitTAP.sbss.s.o(.sbss);
+        ASSERT(. - __sdk_InitTAP_sbss_start == 0x80, "wrong BSS extent: InitTAP");
+        . = 0x10CAE0;
+        __source_vid_bss_start = .;
+        build/native_source/vid.bss.s.o(.bss);
+        ASSERT(. - __source_vid_bss_start == 0xE0, "wrong BSS extent: vid");
+        . = 0x10CBC0;
+        __source_pause_bss_start = .;
+        build/native_source/pause.bss.s.o(.bss);
+        ASSERT(. - __source_pause_bss_start == 0x10, "wrong BSS extent: pause");
+        . = 0x10CC28;
+        __source_overlay_bss_start = .;
+        build/native_source/overlay.bss.s.o(.bss);
+        ASSERT(. - __source_overlay_bss_start == 0x40, "wrong BSS extent: overlay");
+        . = 0x10CC68;
+        __source_sndbank_bss_start = .;
+        build/native_source/sndbank.bss.s.o(.bss);
+        ASSERT(. - __source_sndbank_bss_start == 0x160, "wrong BSS extent: sndbank");
+        . = 0x10CDC8;
+        __source_tony_bss_start = .;
+        build/native_source/tony.bss.s.o(.bss);
+        ASSERT(. - __source_tony_bss_start == 0x28, "wrong BSS extent: tony");
+        . = 0x10CE00;
+        __source_davel_bss_start = .;
+        build/native_source/davel.bss.s.o(.bss);
+        ASSERT(. - __source_davel_bss_start == 0x240, "wrong BSS extent: davel");
+        . = 0x10D050;
+        __source_decomp_bss_start = .;
+        build/native_source/decomp.bss.s.o(.bss);
+        ASSERT(. - __source_decomp_bss_start == 0x28, "wrong BSS extent: decomp");
+        . = 0x11FF80;
+        __sdk_PadInit_bss_start = .;
+        build/sdk/native/PadInit.bss.s.o(.bss);
+        ASSERT(. - __sdk_PadInit_bss_start == 0x10, "wrong BSS extent: PadInit");
+        . = 0x11FF90;
+        __sdk_SetInitPadFlag_bss_start = .;
+        build/sdk/native/SetInitPadFlag.bss.s.o(.bss);
+        ASSERT(. - __sdk_SetInitPadFlag_bss_start == 0x10, "wrong BSS extent: SetInitPadFlag");
+        . = 0x11FFA0;
+        __sdk_EnablePAD_bss_start = .;
+        build/sdk/native/EnablePAD.bss.s.o(.bss);
+        ASSERT(. - __sdk_EnablePAD_bss_start == 0x10, "wrong BSS extent: EnablePAD");
+        . = 0x11FFB0;
+        __sdk__SendPAD_bss_start = .;
+        build/sdk/native/_SendPAD.bss.s.o(.bss);
+        ASSERT(. - __sdk__SendPAD_bss_start == 0x10, "wrong BSS extent: _SendPAD");
+        . = 0x11FFC0;
+        __sdk__remove_ChgclrPAD_bss_start = .;
+        build/sdk/native/_remove_ChgclrPAD.bss.s.o(.bss);
+        ASSERT(. - __sdk__remove_ChgclrPAD_bss_start == 0x10, "wrong BSS extent: _remove_ChgclrPAD");
+        . = 0x11FFD0;
+        __sdk_ResetGraph_bss_start = .;
+        build/sdk/native/ResetGraph.bss.s.o(.bss);
+        ASSERT(. - __sdk_ResetGraph_bss_start == 0x150, "wrong BSS extent: ResetGraph");
+        . = 0x120120;
+        __sdk__patch_card_bss_start = .;
+        build/sdk/native/_patch_card.bss.s.o(.bss);
+        ASSERT(. - __sdk__patch_card_bss_start == 0x10, "wrong BSS extent: _patch_card");
+        . = 0x120130;
+        __sdk__ExitCard_bss_start = .;
+        build/sdk/native/_ExitCard.bss.s.o(.bss);
+        ASSERT(. - __sdk__ExitCard_bss_start == 0x10, "wrong BSS extent: _ExitCard");
+        . = 0x120140;
+        __sdk_CD_sync_bss_start = .;
+        build/sdk/native/CD_sync.bss.s.o(.bss);
+        ASSERT(. - __sdk_CD_sync_bss_start == 0x30, "wrong BSS extent: CD_sync");
+        . = 0x120170;
+        __sdk_CdSearchFile_bss_start = .;
+        build/sdk/native/CdSearchFile.bss.s.o(.bss);
+        ASSERT(. - __sdk_CdSearchFile_bss_start == 0x2400, "wrong BSS extent: CdSearchFile");
+        . = 0x122570;
+        __sdk_data_ready_callback_bss_start = .;
+        build/sdk/native/data_ready_callback.bss.s.o(.bss);
+        ASSERT(. - __sdk_data_ready_callback_bss_start == 0x10, "wrong BSS extent: data_ready_callback");
+        . = 0x122580;
+        __sdk_StCdInterrupt_bss_start = .;
+        build/sdk/native/StCdInterrupt.bss.s.o(.bss);
+        ASSERT(. - __sdk_StCdInterrupt_bss_start == 0x10, "wrong BSS extent: StCdInterrupt");
+        . = 0x122590;
+        __sdk__patch_gte_bss_start = .;
+        build/sdk/native/_patch_gte.bss.s.o(.bss);
+        ASSERT(. - __sdk__patch_gte_bss_start == 0x10, "wrong BSS extent: _patch_gte");
+        . = 0x125040;
+        __sdk_StSetRing_Stframe_no_bss_start = .;
+        build/sdk/native/StSetRing_Stframe_no.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_Stframe_no_bss_start == 0x4, "wrong BSS extent: StSetRing_Stframe_no");
+        . = 0x1251D0;
+        __sdk_StSetRing_Stsector_offset_bss_start = .;
+        build/sdk/native/StSetRing_Stsector_offset.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_Stsector_offset_bss_start == 0x2, "wrong BSS extent: StSetRing_Stsector_offset");
+        . = 0x1251D4;
+        __sdk_StSetRing_StRgb24_bss_start = .;
+        build/sdk/native/StSetRing_StRgb24.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRgb24_bss_start == 0x4, "wrong BSS extent: StSetRing_StRgb24");
+        . = 0x1251D8;
+        __sdk_CD_sync_StMode_bss_start = .;
+        build/sdk/native/CD_sync_StMode.bss.s.o(.bss);
+        ASSERT(. - __sdk_CD_sync_StMode_bss_start == 0x4, "wrong BSS extent: CD_sync_StMode");
+        . = 0x1251DC;
+        __sdk_StSetStream_StFunc1_bss_start = .;
+        build/sdk/native/StSetStream_StFunc1.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetStream_StFunc1_bss_start == 0x4, "wrong BSS extent: StSetStream_StFunc1");
+        . = 0x1251E0;
+        __sdk_StSetStream_StFunc2_bss_start = .;
+        build/sdk/native/StSetStream_StFunc2.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetStream_StFunc2_bss_start == 0x4, "wrong BSS extent: StSetStream_StFunc2");
+        . = 0x1251E4;
+        __sdk_StSetRing_StCdIntrFlag_bss_start = .;
+        build/sdk/native/StSetRing_StCdIntrFlag.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StCdIntrFlag_bss_start == 0x4, "wrong BSS extent: StSetRing_StCdIntrFlag");
+        . = 0x125200;
+        __sdk__spu_init__spu_RQ_bss_start = .;
+        build/sdk/native/_spu_init__spu_RQ.bss.s.o(.bss);
+        ASSERT(. - __sdk__spu_init__spu_RQ_bss_start == 0x14, "wrong BSS extent: _spu_init__spu_RQ");
+        . = 0x125214;
+        __sdk_StSetRing_StCHANNEL_bss_start = .;
+        build/sdk/native/StSetRing_StCHANNEL.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StCHANNEL_bss_start == 0x4, "wrong BSS extent: StSetRing_StCHANNEL");
+        . = 0x125218;
+        __sdk_StSetRing_StStartFrame_bss_start = .;
+        build/sdk/native/StSetRing_StStartFrame.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StStartFrame_bss_start == 0x4, "wrong BSS extent: StSetRing_StStartFrame");
+        . = 0x12521C;
+        __sdk_StSetRing_CChannel_bss_start = .;
+        build/sdk/native/StSetRing_CChannel.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_CChannel_bss_start == 0x4, "wrong BSS extent: StSetRing_CChannel");
+        . = 0x125220;
+        __sdk_PadInit_PadIdentifier_bss_start = .;
+        build/sdk/native/PadInit_PadIdentifier.bss.s.o(.bss);
+        ASSERT(. - __sdk_PadInit_PadIdentifier_bss_start == 0x4, "wrong BSS extent: PadInit_PadIdentifier");
+        . = 0x127228;
+        __sdk_StSetRing_StFinalSector_bss_start = .;
+        build/sdk/native/StSetRing_StFinalSector.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StFinalSector_bss_start == 0x4, "wrong BSS extent: StSetRing_StFinalSector");
+        . = 0x1283B0;
+        __sdk_StSetRing_StEmu_Idx_bss_start = .;
+        build/sdk/native/StSetRing_StEmu_Idx.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StEmu_Idx_bss_start == 0x4, "wrong BSS extent: StSetRing_StEmu_Idx");
+        . = 0x1283B8;
+        __sdk_ResetGraph__que_bss_start = .;
+        build/sdk/native/ResetGraph__que.bss.s.o(.bss);
+        ASSERT(. - __sdk_ResetGraph__que_bss_start == 0x1800, "wrong BSS extent: ResetGraph__que");
+        . = 0x129BB8;
+        __sdk_StSetRing_StRingIdx1_bss_start = .;
+        build/sdk/native/StSetRing_StRingIdx1.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRingIdx1_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingIdx1");
+        . = 0x129BBC;
+        __sdk_StSetRing_StRingIdx2_bss_start = .;
+        build/sdk/native/StSetRing_StRingIdx2.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRingIdx2_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingIdx2");
+        . = 0x129BC0;
+        __sdk_StSetRing_StRingIdx3_bss_start = .;
+        build/sdk/native/StSetRing_StRingIdx3.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRingIdx3_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingIdx3");
+        . = 0x129BC4;
+        __sdk_SpuSetCommonAttr_bss_start = .;
+        build/sdk/native/SpuSetCommonAttr.bss.s.o(.bss);
+        ASSERT(. - __sdk_SpuSetCommonAttr_bss_start == 0x4, "wrong BSS extent: SpuSetCommonAttr");
+        . = 0x129BC8;
+        __sdk_StSetRing_StEmu_Addr_bss_start = .;
+        build/sdk/native/StSetRing_StEmu_Addr.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StEmu_Addr_bss_start == 0x4, "wrong BSS extent: StSetRing_StEmu_Addr");
+        . = 0x129BCC;
+        __sdk_StSetRing_StEndFrame_bss_start = .;
+        build/sdk/native/StSetRing_StEndFrame.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StEndFrame_bss_start == 0x4, "wrong BSS extent: StSetRing_StEndFrame");
+        . = 0x129BD0;
+        __sdk_StSetRing_StSTART_FLAG_bss_start = .;
+        build/sdk/native/StSetRing_StSTART_FLAG.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StSTART_FLAG_bss_start == 0x4, "wrong BSS extent: StSetRing_StSTART_FLAG");
+        . = 0x129BD4;
+        __sdk_StSetRing_StRingBase_bss_start = .;
+        build/sdk/native/StSetRing_StRingBase.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRingBase_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingBase");
+        . = 0x129BD8;
+        __sdk_StSetRing_StRingAddr_bss_start = .;
+        build/sdk/native/StSetRing_StRingAddr.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRingAddr_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingAddr");
+        . = 0x129BF0;
+        __sdk_StSetRing_StRingSize_bss_start = .;
+        build/sdk/native/StSetRing_StRingSize.bss.s.o(.bss);
+        ASSERT(. - __sdk_StSetRing_StRingSize_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingSize");
+        . = 0x129BF4;   /* remaining .sbss + .bss zero fill */
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }
 }
+PROVIDE(CM_ChooseMonsterList__FiUl = 0x80155AE4); /* pregame retail export */
+PROVIDE(CM_ShowMonsterList__Fii = 0x80155ADC); /* pregame retail export */
+PROVIDE(PlayFMVOverLay = 0x80158358); /* fmv retail export */
+PROVIDE(InitFrontEnd__FP9FE_CREATE = 0x8013AA70); /* frontend retail export */
 PROVIDE(DrawAutomap__Fv = 0x80162E50); /* game retail export */
 PROVIDE(DrawInv__Fv = 0x801590B4); /* game retail export */
+PROVIDE(RemoveScroll__Fi = 0x8015FDFC); /* game retail export */
+PROVIDE(UseStaffCharge__FP12PlayerStruct = 0x80160248); /* game retail export */
+PROVIDE(GetSpellLevel__Fii = 0x8013A43C); /* game retail export */
+PROVIDE(AddMissile__Fiiiiiiciii = 0x80142A04); /* game retail export */
+PROVIDE(CanTalkToMonst__Fi = 0x8015694C); /* game retail export */

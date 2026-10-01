@@ -7,6 +7,7 @@
  * only gates the update); DelMis is PORTAL's own copy of the missile-list removal;
  * RemovePortalMissile sets _miDelFlag; GetPortalLevel always deactivates the portal it used. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_portal.h"
 #include "source/gen/externs_portal.h"
 #include "source/gen/protos_portal.h"

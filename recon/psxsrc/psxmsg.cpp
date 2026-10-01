@@ -4,6 +4,7 @@
  * PSX_PostWndProc runs the Post* half after the new level is in.
  * Reconstructed from the raw oracle (asm/nonmatchings/psxmsg/*.s) + the SYM + refs/diablo-hellfire/src/INTERFAC.CPP. */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
 
 struct TASK;
 
@@ -80,7 +81,7 @@ extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
 extern unsigned char currlevel;   /* @0x8011C10C */
 extern unsigned char leveltype;   /* @0x8011C10D */
-extern unsigned char LevPals[17];   /* @0x800B9A58 */
+unsigned char LevPals[17] = {0, 1, 3, 4, 0, 1, 2, 4, 0, 1, 3, 4, 0, 1, 2, 3, 0};
 extern unsigned char setlvlnum;   /* @0x8011C10F */
 extern int gnLevelTypeTbl[17];   /* @0x800CF7A0 */
 extern int myplr;   /* @0x8011BA08 */
@@ -130,7 +131,7 @@ void LevelToLevelInit(void);
 
 /* ---------------------------------------------------------------- data (TU-owned) */
 static int CutScreen = 0;   /* @0x8011AD7C */
-static unsigned short Level2Bgdata[25] = {   /* @0x8011073C: [leveltype * 5 + palette] -> backdrop text id */
+static const unsigned short Level2Bgdata[25] = {   /* @0x8011073C: [leveltype * 5 + palette] -> backdrop text id */
     39, 39, 39, 39, 39, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38
 };
 

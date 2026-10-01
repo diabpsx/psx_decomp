@@ -20,7 +20,7 @@ extern char _ctype_[];
 #define isalpha(c) ((_ctype_ + 1)[(unsigned char)(c)] & 3)
 #define _toupper(c) ((unsigned char)(c) - 'a' + 'A')
 
-extern struct MEMSTRUCT MemBlock[60];
+struct MEMSTRUCT MemBlock[60] = {{0}};
 int NoTAllocs;
 
 /* @0x800882A8 TMALLOC.CPP:78 */

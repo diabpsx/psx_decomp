@@ -43,7 +43,7 @@ void SetDrawEnv(DR_ENV *dr_env, DRAWENV *env);
 int ResetGraph(int mode);
 int SetGraphDebug(int level);
 void InitGeom(void);
-void SetVideoMode(long mode);
+long SetVideoMode(long mode);
 int VSyncCallback(void (*f)());
 void DBG_Error(char *Text, char *File, int Line);
 }
@@ -65,7 +65,9 @@ static SCREEN_ENV screen[2];        /* @0x8011CAE0 bss */
 extern "C" {
 static void VID_DispEnvSend(void);
 }
-void InitScreens(void);
+/* These two functions belong to the retail STARTUP text region. */
+void InitScreens(void) __attribute__((section(".text.vid_startup")));
+void VID_OpenModule(void) __attribute__((section(".text.vid_startup")));
 void VID_SetXYOff(int x, int y);
 int VID_GetXOff(void);
 int VID_GetYOff(void);

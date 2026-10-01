@@ -7,10 +7,12 @@
  * main-image data in this build (D_8011BEEC..D_8011BF64) -- content confirmed byte-identical to devilution's
  * named arrays via direct ROM read, so the devilution names are used here for readability. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l3.h"
 #include "source/gen/externs_drlg_l3.h"
 #include "source/gen/protos_drlg_l3.h"
 #include "source/diablo.h"
+#include "source/gen/tables_drlg_l3.h"
 
 extern "C" void *memcpy(void *dst, const void *src, unsigned long n);
 
@@ -24,8 +26,8 @@ extern "C" void *memcpy(void *dst, const void *src, unsigned long n);
 #define ENTRY_PREV 1
 
 /* TU-owned small data (gp-relative in retail -- confirmed via %gp_rel/D_ scan of the oracle) */
-unsigned char lavapool;
-int abyssx;   /* set once, never read (retail comment: "Unused") */
+static int abyssx;   /* retail STAT, set once and never read */
+static unsigned char lavapool;   /* retail STAT, follows abyssx in .sbss */
 int lockoutcnt;
 unsigned char lockout[40][40];
 
@@ -407,7 +409,7 @@ void DRLG_L3MakeMegas(void)
             }
             dungeon[i][j] = L3ConvTbl[v];
         }
-        dungeon[46][j] = 8;
+        dungeon[DMAXX - 1][j] = 8;
     }
     for (i = 0; i < 47; i++) {
         dungeon[i][DMAXY - 1] = 8;

@@ -5,6 +5,7 @@
  * (Dialog, CBlocks, CPad) are emitted out of line in this object (-fno-inline).
  * Sources: retail asm oracle > SYM (scratch/tuinfo.py PAUSE.CPP) > refs/skeleton PAUSE.H (prototypes). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 
 struct RECT {   /* sizeof 8 */
     short x, y, w, h;
@@ -37,10 +38,39 @@ struct TextDat;
 extern unsigned char DialogRed, DialogGreen, DialogBlue;
 extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
+class CPad {
+public:
+    unsigned char get_both;       /* +0x0 */
+    unsigned char active;         /* +0x1 */
+    unsigned char PadType;        /* +0x2 */
+    unsigned char PADTICK;        /* +0x3 */
+    unsigned short PADTICKMASK;   /* +0x4 */
+    unsigned short PadNum;        /* +0x6 */
+    unsigned short Cur;           /* +0x8 */
+    unsigned short Up;            /* +0xA */
+    unsigned short Down;          /* +0xC */
+    unsigned short Tick;          /* +0xE */
+    unsigned short Old;           /* +0x10 */
+    unsigned short both_Cur;      /* +0x12 */
+    unsigned short both_Up;       /* +0x14 */
+    unsigned short both_Down;     /* +0x16 */
+    unsigned short both_Tick;     /* +0x18 */
+    unsigned short both_Old;      /* +0x1A */
+    unsigned char rest[236 - 0x1C];
+
+    unsigned char CheckActive() { return active; }
+    unsigned short GetDown() const
+    {
+        if (get_both)
+            return both_Down;
+        return Down;
+    }
+};
+
 class CBlocks {
 public:
-    static int GetOverlayOtBase() { return 0x1E8; }
     static int GetMaxOtPos() { return 0x1FF; }
+    static int GetOverlayOtBase() { return 0x1E8; }
 };
 
 class Dialog {
@@ -64,45 +94,16 @@ public:
         DialogOTpos = CBlocks::GetOverlayOtBase();
     }
     ~Dialog() {}
+    void SetBorder(int Type) { BorderGfx = Type; }
+    void SetBack(int Type) { BackGfx = Type; }
     void SetRGB(unsigned char R, unsigned char G, unsigned char B)
     {
         DialogRed = R;
         DialogGreen = G;
         DialogBlue = B;
     }
-    void SetBack(int Type) { BackGfx = Type; }
-    void SetBorder(int Type) { BorderGfx = Type; }
     void Back(int DX, int DY, int DW, int DH);
     int SetOTpos(int OT);
-};
-
-class CPad {
-public:
-    unsigned char get_both;       /* +0x0 */
-    unsigned char active;         /* +0x1 */
-    unsigned char PadType;        /* +0x2 */
-    unsigned char PADTICK;        /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;        /* +0x6 */
-    unsigned short Cur;           /* +0x8 */
-    unsigned short Up;            /* +0xA */
-    unsigned short Down;          /* +0xC */
-    unsigned short Tick;          /* +0xE */
-    unsigned short Old;           /* +0x10 */
-    unsigned short both_Cur;      /* +0x12 */
-    unsigned short both_Up;       /* +0x14 */
-    unsigned short both_Down;     /* +0x16 */
-    unsigned short both_Tick;     /* +0x18 */
-    unsigned short both_Old;      /* +0x1A */
-    unsigned char rest[236 - 0x1C];
-
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-    unsigned char CheckActive() { return active; }
 };
 
 class CFont {
@@ -216,9 +217,9 @@ extern const unsigned char BORDERR, BORDERG, BORDERB;
 
 /* ---- TU data ---- */
 TASK *TPtr;                     /* SYM EXT, gp-rel here -> owned */
-static BOOL D_8011C644;         /* sbss: the "pause allowed" flag (PA_Set/GetPauseOk); no SYM record */
-static int D_8011C648;          /* sbss: cleared by PauseTask/PA_Open; no SYM record */
-static Dialog D_8011CBC0;       /* bss: the pause dialog back (constructed by the _GLOBAL_ thunks) */
+static BOOL CanPause;           /* retail STAT BOOL, 0x8011C644 */
+static BOOL Paused;             /* retail STAT BOOL, 0x8011C648 */
+static Dialog PBack;            /* retail STAT Dialog, 0x8011CBC0 */
 
 /* Only the CPauseMessages methods onward have external callers: PauseTask/GetPausePad/
  * TryPadForPause are file statics, so the static-object thunks are _GLOBAL__I/D_DoPause. */
@@ -232,7 +233,7 @@ static void PauseTask(TASK *T)
     while (1) {
         CTempPauseMessage Cpm;
         Cpm.DoPause(GetPausePad());
-        D_8011C648 = 0;
+        Paused = 0;
     }
 }
 
@@ -243,7 +244,7 @@ static int GetPausePad(void)
     int PadVal = -1;
 
     while (!Done) {
-        if (D_8011C644 && !optionsflag && !ignore_buttons && !demo_pad_time) {
+        if (CanPause && !optionsflag && !ignore_buttons && !demo_pad_time) {
             for (int f = 0; f <= FePlayerNo && !Done; f++) {
                 CPad *Pad;
                 if (plr[f].plractive) {
@@ -410,25 +411,26 @@ BOOL CPauseMessages::AreYouSureMessage()
 
 /* @0x800B06E4 PAUSE.CPP:560 -- retail links this one into .STARTUP_text (startup segment); kept at its
  * source position here (it is also what keeps the static PauseTask referenced). */
+void PA_Open(void) __attribute__((section(".text.pause_startup")));
 void PA_Open(void)
 {
-    D_8011C644 = false;
-    D_8011C648 = 0;
+    CanPause = false;
+    Paused = 0;
     TSK_AddTask(0x8000, (void (*)())PauseTask, 0x800, 0);
 }
 
 /* @0x80088BF4 PAUSE.CPP:573 */
 BOOL PA_SetPauseOk(BOOL NewPause)
 {
-    BOOL Ret = D_8011C644;
-    D_8011C644 = NewPause;
+    BOOL Ret = CanPause;
+    CanPause = NewPause;
     return Ret;
 }
 
 /* @0x80088C04 PAUSE.CPP:586 */
 BOOL PA_GetPauseOk(void)
 {
-    return D_8011C644;
+    return CanPause;
 }
 
 /* @0x80088C10 PAUSE.CPP:610 */
@@ -472,12 +474,12 @@ void CTempPauseMessage::PrintQuitMessage(int Menu)
 
     RedBack();
     otpos = CBlocks::GetMaxOtPos();
-    oldDotpos = D_8011CBC0.SetOTpos(otpos - 3);
+    oldDotpos = PBack.SetOTpos(otpos - 3);
     oldTotpos = MediumFont.SetOTpos(otpos - 2);
-    D_8011CBC0.SetRGB(BORDERR, BORDERG, BORDERB);
-    D_8011CBC0.SetBack(0x94);
-    D_8011CBC0.SetBorder(0x12);
-    D_8011CBC0.Back(0x5F, 0x60, 0x82, 0x30);
+    PBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    PBack.SetBack(0x94);
+    PBack.SetBorder(0x12);
+    PBack.Back(0x5F, 0x60, 0x82, 0x30);
     PRect.x = 0x5F;
     PRect.y = 0x60;
     PRect.w = 0x82;
@@ -487,7 +489,7 @@ void CTempPauseMessage::PrintQuitMessage(int Menu)
     MY_PausePrint(3, 0x135, Menu, &PRect);
     PrintSelectBack(0x4E6);
     MediumFont.SetOTpos(oldTotpos);
-    D_8011CBC0.SetOTpos(oldDotpos);
+    PBack.SetOTpos(oldDotpos);
 }
 
 /* @0x80088FD0 PAUSE.CPP:669 */
@@ -510,12 +512,12 @@ void CTempPauseMessage::PrintAreYouSure(int Menu)
 
     RedBack();
     otpos = CBlocks::GetMaxOtPos();
-    oldDotpos = D_8011CBC0.SetOTpos(otpos - 3);
+    oldDotpos = PBack.SetOTpos(otpos - 3);
     oldTotpos = MediumFont.SetOTpos(otpos - 2);
-    D_8011CBC0.SetRGB(BORDERR, BORDERG, BORDERB);
-    D_8011CBC0.SetBack(0x94);
-    D_8011CBC0.SetBorder(0x12);
-    D_8011CBC0.Back(0x50, 0x60, 0xA0, 0x30);
+    PBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    PBack.SetBack(0x94);
+    PBack.SetBorder(0x12);
+    PBack.Back(0x50, 0x60, 0xA0, 0x30);
     PRect.x = 0x50;
     PRect.y = 0x60;
     PRect.w = 0xA0;
@@ -525,7 +527,7 @@ void CTempPauseMessage::PrintAreYouSure(int Menu)
     MY_PausePrint(3, 0x2C9, Menu, &PRect);
     PrintSelectBack(0x4E6);
     MediumFont.SetOTpos(oldTotpos);
-    D_8011CBC0.SetOTpos(oldDotpos);
+    PBack.SetOTpos(oldDotpos);
 }
 
 /* @0x80089158 PAUSE.CPP:706 */
@@ -549,19 +551,19 @@ void CTempPauseMessage::PrintPaused()
     if (IsGameLoading() == 0) {
         RedBack();
         otpos = CBlocks::GetMaxOtPos();
-        oldDotpos = D_8011CBC0.SetOTpos(otpos - 3);
+        oldDotpos = PBack.SetOTpos(otpos - 3);
         oldTotpos = MediumFont.SetOTpos(otpos - 2);
-        D_8011CBC0.SetRGB(BORDERR, BORDERG, BORDERB);
-        D_8011CBC0.SetBack(0x94);
-        D_8011CBC0.SetBorder(0x12);
-        D_8011CBC0.Back(0x80, 0x70, 0x40, 0xF);
+        PBack.SetRGB(BORDERR, BORDERG, BORDERB);
+        PBack.SetBack(0x94);
+        PBack.SetBorder(0x12);
+        PBack.Back(0x80, 0x70, 0x40, 0xF);
         PRect.x = 0x80;
         PRect.y = 0x70;
         PRect.w = 0x40;
         PRect.h = 0xF;
         MediumFont.Print(0, 0xB, GetStr(0x302), JustCentre, &PRect, 0xFF, 0xFF, 0xFF);
         MediumFont.SetOTpos(oldTotpos);
-        D_8011CBC0.SetOTpos(oldDotpos);
+        PBack.SetOTpos(oldDotpos);
     }
 }
 

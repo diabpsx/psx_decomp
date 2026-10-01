@@ -24,6 +24,14 @@ _rl = ROOT / "configs" / "recon_link.json"
 RECON_MAP = json.loads(_rl.read_text()) if _rl.exists() else {}   # seg -> recon TU whose .text replaces the skeleton (bytes-proven TUs)
 _rd = ROOT / "configs" / "recon_data_link.json"
 DATA_MAP = json.loads(_rd.read_text()) if _rd.exists() else {}
+_sd = ROOT / "configs/sdk_link.json"
+SDK_DATA = {placement["scaffold"]
+            for member in (json.loads(_sd.read_text()).values() if _sd.exists() else [])
+            for placement in member.get("data_sections", {}).values()}
+_nr = ROOT / "configs" / "native_recon_link.json"
+NATIVE_RECON = json.loads(_nr.read_text()) if _nr.exists() else {}
+_rb = ROOT / 'configs/recon_bss_link.json'
+RECON_BSS = json.loads(_rb.read_text()) if _rb.exists() else {}
 SECT = {"data": ".data", "rodata": ".rodata", "sdata": ".sdata", "bss": ".bss", "sbss": ".sbss"}
 
 def cross_image_provisions(name):
@@ -53,7 +61,7 @@ def cross_image_provisions(name):
             out.append(f"PROVIDE({symbol} = 0x{addresses.pop():08X}); /* {home} retail export */")
     return out
 
-def validate_data_bindings(subs, end, bindings):
+def validate_data_bindings(subs, end, bindings, vram=0):
     if not isinstance(bindings, dict):
         raise ValueError("source data bindings must be a segment mapping")
     code = {n for off, kind, n in subs if kind == "c"}
@@ -71,7 +79,20 @@ def validate_data_bindings(subs, end, bindings):
         limit = subs[i + 1][0] if i + 1 < len(subs) else end
         if not isinstance(size, int) or isinstance(size, bool) or size <= 0 or size != limit - offset:
             raise ValueError(f"{name}: source extent must equal the whole retail fragment")
+        payload = binding.get("payload_size", size)
+        alignment = binding.get("alignment", 1)
+        if (not isinstance(payload, int) or isinstance(payload, bool) or payload <= 0
+                or not isinstance(alignment, int) or isinstance(alignment, bool)
+                or alignment not in (1, 2, 4, 8, 16)
+                or (vram + offset) % alignment
+                or (payload + alignment - 1) // alignment * alignment != size):
+            raise ValueError(f"{name}: source payload and alignment must exactly fill the retail fragment")
         key = (RECON_MAP[owner], section)
+        padding = binding.get('padding_hex')
+        if 'padding_hex' in binding and (not isinstance(padding, str) or payload >= size
+                                    or not re.fullmatch(r'[0-9a-fA-F]+', padding)
+                                    or len(padding) != 2 * (size - payload)):
+            raise ValueError(f'{name}: explicit alignment bytes must exactly fill the padding')
         if key in used:
             raise ValueError(f"{name}: a source section cannot be placed twice in one image")
         used.add(key)
@@ -84,9 +105,34 @@ def gen(name: str):
     gp = re.search(r"gp_value: (0x[0-9A-F]+)", y).group(1)
     subs = [(int(o, 16), k, n) for o, k, n in re.findall(r"^\s+- \[0x([0-9A-F]+), (\w+), (\w+)\]", y, re.M)]
     end = int(re.search(r"^\s+- \[0x([0-9A-F]+)\]\s*$", y, re.M).group(1), 16)
+    if name == 'diabpsx':
+        from image_trailer import runtime_segments
+        subs, end = runtime_segments(subs, end)
     data_bindings = DATA_MAP.get(name, {})
-    validate_data_bindings(subs, end, data_bindings)
+    validate_data_bindings(subs, end, data_bindings, vram)
+    native = {segment: spec for segment, spec in NATIVE_RECON.items() if spec["image"] == name}
+    extra_text = {row['segment'] for spec in NATIVE_RECON.values()
+                  for section, row in spec['sections'].items()
+                  if section.startswith('.text.') and row.get('image', spec['image']) == name}
+    native_data = {row["scaffold"] for spec in NATIVE_RECON.values()
+                   for section, row in spec["sections"].items()
+                   if section not in (".text", ".sbss", ".bss") and not section.startswith('.text.')
+                   and row.get("image", spec["image"]) == name}
+    if set(NATIVE_RECON) & set(RECON_MAP):
+        raise ValueError("source TU cannot use both GNU and native source inputs")
+    if extra_text & (set(native) | set(RECON_MAP)):
+        raise ValueError('mixed native text cannot overlap a whole-TU source selection')
+    if (set(native) | extra_text) - {n for off, kind, n in subs if kind == "c"}:
+        raise ValueError("native source owner has no retail text fragment")
+    available = {f"{n}.{kind}" for off, kind, n in subs if kind in SECT}
+    sdk_data = SDK_DATA if name == "diabpsx" else set()
+    if (sdk_data | native_data) - available:
+        raise ValueError("native data placement names a missing retail fragment")
+    if sdk_data & native_data or any(f"{n}.{kind}" in sdk_data | native_data and n in data_bindings for off, kind, n in subs):
+        raise ValueError("native and reconstructed data cannot own the same fragment")
     bss = re.search(r"bss_size: (0x[0-9A-F]+)", y)
+    if RECON_BSS.get(name) and (not bss or name != 'diabpsx'):
+        raise ValueError('conventional BSS requires main runtime zero-fill placement')
     out = ["/* generated by tools/gen_ld.py: true ROM order, every subsegment pinned to its retail address */",
            "SECTIONS", "{", f"    _gp = {gp};", f"    __romPos = 0;",
            f"    .{name} 0x{vram:08X} : AT(0) SUBALIGN(4)", "    {"]
@@ -95,7 +141,9 @@ def gen(name: str):
         out.append(f"        . = 0x{off:X};   /* 0x{va:08X} */")   # inside an output section `.` is the offset from its start
         if kind == "c":
             skel = SKEL_MAP.get(n)
-            if n in RECON_MAP:
+            if n in native or n in extra_text:
+                out.append(f"        build/native_source/{n}.text.s.o(.text);   /* verified native-assembled source */")
+            elif n in RECON_MAP:
                 out.append(f"        build/{RECON_MAP[n]}.o(.text);   /* reconstructed TU */")
             else:
                 out.append(f"        build/skel/{skel}.o(.text);" if skel else f"        build/src/{n}.c.o(.text);")
@@ -106,8 +154,20 @@ def gen(name: str):
             if binding:
                 marker = f"__recon_{name}_{n}_start"
                 out.extend([f"        {marker} = .;",
-                            f"        build/{RECON_MAP[binding['owner']]}.o({binding['section']});   /* source-owned data */",
-                            f"        ASSERT(. - {marker} == 0x{binding['size']:X}, \"wrong source data extent: {n}\");"])
+                            f"        build/{RECON_MAP[binding['owner']]}.o({binding['section']});   /* source-owned data */"])
+                payload = binding.get("payload_size", binding["size"])
+                if payload != binding["size"]:
+                    out.append(f'        ASSERT(. - {marker} == 0x{payload:X}, "wrong source payload extent: {n}");')
+                    if 'padding_hex' in binding:
+                        out.extend(f'        BYTE(0x{byte:02X}); /* preserved retail alignment byte */'
+                                   for byte in bytes.fromhex(binding['padding_hex']))
+                    else:
+                        out.extend(["        FILL(0);", f"        . = ALIGN({binding['alignment']});"])
+                out.append(f"        ASSERT(. - {marker} == 0x{binding['size']:X}, \"wrong source data extent: {n}\");")
+            elif f"{n}.{kind}" in native_data:
+                out.append(f"        build/native_source/{n}.{kind}.s.o({SECT[kind]});   /* verified native source data */")
+            elif name == "diabpsx" and f"{n}.{kind}" in SDK_DATA:
+                out.append(f"        build/sdk/native/{n}.{kind}.s.o({SECT[kind]});   /* original SDK data bridge */")
             else:
                 out.append(f"        build/asm/data/{n}.{kind}.s.o({SECT[kind]});")
         else:
@@ -115,7 +175,27 @@ def gen(name: str):
     out.append(f"        . = 0x{end:X};   /* image end 0x{vram + end:08X} */")
     if bss:
         out.append(f"        {name}_BSS_START = .;")
-        out.append(f"        . += {bss.group(1)};   /* .sbss + .bss zero fill (not in the file) */")
+        if name == 'diabpsx':
+            out.append('        D_8011C604 = .; /* startup zero-fill boundary, not file checksum */')
+        limit = end + int(bss.group(1), 16)
+        if name == "diabpsx":
+            from sdk_link import bss_placements
+            from native_recon import bss_placements as source_bss, check_bss_overlap
+            sdk_bss = bss_placements(json.loads(_sd.read_text()) if _sd.exists() else {}, vram + end, vram + limit)
+            native_bss = source_bss(NATIVE_RECON, vram + end, vram + limit)
+            from recon_bss import placements as conventional_bss
+            gnu_bss = conventional_bss(RECON_BSS.get(name, {}), RECON_MAP, vram + end, vram + limit)
+            check_bss_overlap(native_bss + gnu_bss, sdk_bss)
+            placed = [(a, z, e, s, f'build/sdk/native/{e}{s}.s.o', 'sdk') for a,z,e,s in sdk_bss]
+            placed += [(a, z, e, s, f'build/native_source/{e}{s}.s.o', 'source') for a,z,e,s in native_bss]
+            placed += [(a, z, e, s, f'build/{RECON_MAP[e]}.o', 'recon') for a,z,e,s in gnu_bss]
+            for address, size, entry, section, obj, owner in sorted(placed):
+                marker = f"__{owner}_{entry}_{section[1:]}_start"
+                out.extend([f"        . = 0x{address - vram:X};",
+                            f"        {marker} = .;",
+                            f"        {obj}({section});",
+                            f'        ASSERT(. - {marker} == 0x{size:X}, "wrong BSS extent: {entry}");'])
+        out.append(f"        . = 0x{limit:X};   /* remaining .sbss + .bss zero fill */")
     out += ["    }", "    /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }", "}", *provisions]
     (ROOT / "linkers" / f"{name}.ld").write_text("\n".join(out) + "\n")
     print(f"{name}: {len(subs)} subsegments -> linkers/{name}.ld")

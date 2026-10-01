@@ -3,6 +3,8 @@
  * ramp that fades towards the original colours); penta_cycle_task pulses the pentagram CLUT
  * (penta_clut) red once the Diablo quest is active (always in multiplayer). */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
+#include "psxsrc/textfileinfo_header.h"
 
 struct RECT {   /* sizeof 8 */
     short x, y, w, h;
@@ -63,9 +65,17 @@ extern unsigned char setlevel;
 extern unsigned char setlvlnum;
 extern BOOL WaterDone;
 
-unsigned short water_clut;
-unsigned short penta_clut;
-BOOL penta_cycle;
+/* Full retail small-data group; types/order/initial values from SYM and ROM. */
+char last_type = -1;
+int gr_scrxoff = 0;
+int gr_scryoff = 0;
+unsigned int water_count = 0;
+unsigned short water_clut = 0;
+unsigned short penta_clut = 0;
+char visible_level = 0;
+char daylight = 1;
+int daytimer = 0;
+BOOL penta_cycle = 0;
 
 /* @0x8009DCB0 GRAHAM.CPP:233 */
 void color_cycle(struct TASK *T)

@@ -12,6 +12,8 @@
  * without going through the screen check, matching "sound source at the reference point is always
  * audible"). stream_pause/stream_resume/stream_fade are PSX-only additions (no PC counterpart). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_effects.h"
 #include "source/gen/externs_effects.h"
 #include "source/gen/protos_effects.h"
@@ -32,17 +34,17 @@
 
 #define NUM_SFX 992   /* sizeof(sgSFX)/sizeof(sgSFX[0]) -- oracle loop bound 0xF80 / sizeof(TSFX)=4 */
 
-/* EFFECTS.CPP-owned globals (.sdata; SYM has no EXT record for any of these -- sole consumer is this
-   TU per the %gp_rel scan, so tentative definitions here make them gp-relative like retail). sghStream/
-   sgpStreamSFX mirror hellfire's `static HSFILE sghStream`/`static TSFX *sgpStreamSFX`. The screen-bounds
-   quad (image bytes 0,0,320,240) has no SYM name; inferred as the visible-screen rect calc_snd_position
-   clips against. */
-static SFXHDR *sghStream;
-static TSFX *sgpStreamSFX;
-static int gnScreenX;
-static int gnScreenY;
-static int gnScreenWidth = 320;
-static int gnScreenHeight = 240;
+/* Retail PSX ownership and names, including the externally visible stream state. */
+SFXHDR *sghStream = 0;
+TSFX *sgpStreamSFX = 0;
+static int SFXX = 0;
+static int SFXY = 0;
+static int SFXW = 320;
+static int SFXH = 240;
+int mypan = 0x8000;
+int sfxdelay = 0;
+int sfxdnum = 0;
+#include "source/gen/table_effects.h"
 
 /* line 83 @0x8003CF34 */
 unsigned char effect_is_playing(int nSFX)
@@ -158,10 +160,10 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     scrx = R.x;
     scry = R.y;
 
-    if (scrx < gnScreenX) return 0;
-    if (gnScreenX + gnScreenWidth < scrx) return 0;
-    if (scry < gnScreenY) return 0;
-    if (gnScreenY + gnScreenHeight < scry) return 0;
+    if (scrx < SFXX) return 0;
+    if (SFXX + SFXW < scrx) return 0;
+    if (scry < SFXY) return 0;
+    if (SFXY + SFXH < scry) return 0;
 
     if (MONO) return 1;
 
@@ -170,9 +172,9 @@ static unsigned char calc_snd_position(int x, int y, long *plVolume, long *plPan
     if (pan > 0x10000) pan = 0x10000;
 
     vol = (sglSoundVolume * sglMasterVolume) << 8;
-    scry = gnScreenWidth / 2;
+    scry = SFXW / 2;
     if (scry < scrx)
-        scrx = gnScreenWidth - scrx;
+        scrx = SFXW - scrx;
     /* Identical arms: jump2 cross-jumps them after register allocation, so the test costs no code,
      * but the extra scry reference lifts scry's allocation priority above scrx (retail a0/a1). */
     if (scry) {

@@ -196,7 +196,7 @@ void run_game_loop(unsigned int uMsg)
     music_stop();
 }
 
-BOOL TryIconCurs(void)
+unsigned char TryIconCurs(void)
 {
     if (_pcurs[myplr] == 8) {                   /* CURSOR_RESURRECT */
         NetSendCmdParam1(1, 0x1A, _pcursplr[sel_data]);

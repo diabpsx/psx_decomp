@@ -55,7 +55,7 @@ char *strcpy(char *dst, const char *src);
 char *strcat(char *dst, const char *src);
 void *memcpy(void *dst, const void *src, unsigned long n);
 }
-char *strupr(char *Str);
+void strupr(char *Str);
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "psxsrc/FILEIO.CPP", line)   /* retail line literals */
 

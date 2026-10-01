@@ -2,6 +2,7 @@
  * (the InitXTriggers() family only -- the rest of trigs.cpp/TRIGS.CPP is a separate TU).
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_pretrigs.h"
 #include "source/gen/externs_pretrigs.h"
 #include "source/gen/protos_pretrigs.h"

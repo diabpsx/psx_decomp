@@ -53,7 +53,7 @@ void SetCursor(int i);   /* @0x800377A0 CURSOR.CPP:165 */
 unsigned char AutoPlace(int pnum, int i, int x, int y, unsigned char saveflag);
 unsigned char SpecialAutoPlace(int pnum, int i, int x, int y, unsigned char saveflag);
 void S_HBuyEnter(void);
-int StoreAutoPlace(void);
+unsigned char StoreAutoPlace(void);
 int CalcPlrInv(int pnum, unsigned char loadgfx);
 void SmithBuyItem(void);
 void WitchRechargeItem(void);

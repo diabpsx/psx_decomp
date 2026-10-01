@@ -1,5 +1,8 @@
 {
   "diabpsx": {
-    "game": ["DrawAutomap__Fv", "DrawInv__Fv"]
+    "pregame": ["CM_ChooseMonsterList__FiUl", "CM_ShowMonsterList__Fii"],
+    "fmv": ["PlayFMVOverLay"],
+    "frontend": ["InitFrontEnd__FP9FE_CREATE"],
+    "game": ["DrawAutomap__Fv", "DrawInv__Fv", "RemoveScroll__Fi", "UseStaffCharge__FP12PlayerStruct", "GetSpellLevel__Fii", "AddMissile__Fiiiiiiciii", "CanTalkToMonst__Fi"]
   }
 }

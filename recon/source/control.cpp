@@ -126,7 +126,7 @@ inline Dialog::Dialog()
     DialogOTpos = CBlocks::GetOverlayOtBase();
 }
 
-short TrimCol(short col)
+unsigned char TrimCol(short col)
 {
     if (col < 0)
         col = 0;

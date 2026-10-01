@@ -18,7 +18,14 @@ struct FMVDAT {   /* sizeof 8 */
     unsigned short Height;
 };
 
-extern struct FMVDAT FmvTab[6];   /* @0x800CD4F4 */
+struct FMVDAT FmvTab[6] = {   /* @0x800CD4F4; six 8-byte entries in retail SYM */
+    {"EACLOGO.MOV", 320, 144},
+    {"DIABEND.MOV", 320, 144},
+    {"FPRST3.MOV", 320, 144},
+    {"DIABVIC1.MOV", 320, 144},
+    {"DIABVIC2.MOV", 320, 144},
+    {"DIABVIC3.MOV", 320, 144}
+};
 extern BOOL user_start;           /* @0x8011B4E4 */
 extern int FileSYS;               /* @0x8011AAEC */
 

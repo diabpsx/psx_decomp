@@ -1,0 +1,10 @@
+{
+  "diabpsx": {
+    "primpool": {".sbss": {
+      "va": "0x8011C608", "size": 32,
+      "symbols": {"hndPrimBuffers": 0, "PrimBuffers": 4, "BufferDepth": 8,
+                  "WorkRamId": 9, "ScrNum": 10, "Screens": 12, "PbToClear": 16,
+                  "BufferNum": 20, "LastBuffer": 21, "DispEnvToPut": 24, "ThisOtSize": 28}
+    }}
+  }
+}

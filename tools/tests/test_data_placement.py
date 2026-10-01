@@ -20,6 +20,32 @@ class DataPlacementTests(unittest.TestCase):
     def test_whole_fragment(self):
         self.validate({"owner": "owner", "section": ".rodata", "size": 16})
 
+    def test_exact_alignment_padding(self):
+        self.validate({"owner": "owner", "section": ".rodata", "size": 16,
+                       "payload_size": 13, "alignment": 4})
+
+    def test_explicit_retail_padding_has_exact_extent(self):
+        self.validate({'owner': 'owner', 'section': '.rodata', 'size': 16,
+                       'payload_size': 13, 'alignment': 4, 'padding_hex': '494142'})
+        for padding in ('', '49', '49414200', 'zz4142', None, 123):
+            with self.subTest(padding=padding), self.assertRaises(ValueError):
+                self.validate({'owner': 'owner', 'section': '.rodata', 'size': 16,
+                               'payload_size': 13, 'alignment': 4, 'padding_hex': padding})
+
+    def test_padding_cannot_hide_arbitrary_extent_or_invalid_alignment(self):
+        for payload, alignment in ((12, 4), (17, 4), (0, 4), (True, 4),
+                                   (13, 3), (13, 0), (13, True)):
+            with self.subTest(payload=payload, alignment=alignment), self.assertRaises(ValueError):
+                self.validate({"owner": "owner", "section": ".rodata", "size": 16,
+                               "payload_size": payload, "alignment": alignment})
+
+    def test_padding_requires_aligned_runtime_start(self):
+        binding = {"owner": "owner", "section": ".rodata", "size": 16,
+                   "payload_size": 13, "alignment": 4}
+        with patch.object(gen_ld, "RECON_MAP", {"owner": "recon/source/example.cpp"}):
+            with self.assertRaises(ValueError):
+                gen_ld.validate_data_bindings(self.subs, 48, {"data": binding}, vram=2)
+
     def test_partial_fragment(self):
         with self.assertRaisesRegex(ValueError, "whole retail fragment"):
             self.validate({"owner": "owner", "section": ".rodata", "size": 12})

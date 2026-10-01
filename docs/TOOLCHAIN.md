@@ -26,7 +26,7 @@
 | 800B0D00–8010DBAB | `.data` (+ per-TU `.NAME_data`) |
 | 8010DBAC–8011A77F | `.rdata` |
 | 8011A780–8011C603 | `.sdata`  (**$gp = 0x8011A780** = .sdata start, from the boot code) |
-| 8011C604–80139BF3 | `.sbss` + `.bss` (zero-fill, not in the file; image ends at 8011C608) |
+| 8011C604–80139BF3 | Runtime `.sbss` + `.bss`; the raw file instead has a four-byte additive checksum at its 8011C604 boundary (see `tools/image_trailer.py`) |
 | 80139BF8+ | overlays b–e: pregame / frontend / game / fmv (+libpress) — separate binaries in LUMP.BIN |
 
 ## Open items

@@ -8,6 +8,7 @@
  * AllItemsUseable[] for a player-held Specular Elixir (IDI_SPECELIX) once the Black Mushroom quest
  * is not yet done. */
 #include "diabpsx_types.h"
+#include "source/gen/header_methods_prequest.h"
 #include "source/gen/structs_prequest.h"
 #include "source/gen/externs_prequest.h"
 #include "source/gen/protos_prequest.h"

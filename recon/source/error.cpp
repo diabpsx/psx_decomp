@@ -7,18 +7,27 @@
  * CFont::Print with a fixed RECT, using localized strings via MsgStrings[]+GetStr() (ids into the
  * language table) instead of devilution's literal string table. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_error.h"
 #include "source/gen/externs_error.h"
 #include "source/gen/protos_error.h"
 #include "source/diablo.h"
 
-/* file-scope msg-box state (TU-owned tentative defs; SYM places them right after these 3 fns) */
+/* Localized PSX message IDs; PC ERROR.CPP supplies the corresponding text list. */
+int MsgStrings[44] = {
+    0x4FA, 0x2CA, 0x4FA, 0x4FA, 0x4FA, 0x4FA, 0x2D0, 0x4FA,
+    0x4FA, 0x4FA, 0x25A, 0x38B, 0x3E5, 0x2B4, 0x486, 0x474,
+    0x4D1, 0x46A, 0x489, 0x271, 0x4CC, 0x21E, 0x01B, 0x433,
+    0x0D8, 0x234, 0x11C, 0x4CD, 0x12F, 0x36B, 0x4CE, 0x059,
+    0x45A, 0x41A, 0x44F, 0x47D, 0x381, 0x2AC, 0x485, 0x17D,
+    0x4F2, 0x4F0, 0x4F1, 0x01C
+};
 char msgtable[80];
-char msgdelay;
-char msgflag;
-char msgcnt;
-char msgholdflag;
-int MsgStrings[44];
+char msgholdflag = 0;
+char msgcnt = 0;
+char msgflag = 0;
+char msgdelay = 0;
 
 void InitDiabloMsg(char e)
 {

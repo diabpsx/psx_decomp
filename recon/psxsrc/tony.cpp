@@ -216,9 +216,9 @@ void SetAmbientLight()
     int x, y;
 
     if (leveltype == 0)
-        restore_r = restore_g = restore_b = 0x80;
+        restore_b = restore_g = restore_r = 0x80;
     else
-        restore_r = restore_g = restore_b = 0x1E;
+        restore_b = restore_g = restore_r = 0x1E;
     for (y = 0; y < 56; y++) {
         for (x = 0; x < 56; x++) {
             dung_map_r[x][y] = restore_r;

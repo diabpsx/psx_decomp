@@ -7,6 +7,7 @@
  * warps are closed from plr[myplr].pTownWarps; GRL_LoadFileInMemSig loads through the
  * FileIO system (directory stripped) into Tmalloc'd memory. */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_town.h"
 #include "source/gen/externs_town.h"
 #include "cstring.h"

@@ -73,7 +73,7 @@ struct Dialog {   /* sizeof 16 */
 
     Dialog();
     ~Dialog();
-    void SetBorder(int Type) { BorderGfx = Type; }
+    void SetBorder(int Type);
     void SetRGB(unsigned char R, unsigned char G, unsigned char B);
     void Back(int DX, int DY, int DW, int DH);
     int SetOTpos(int OT);
@@ -81,7 +81,7 @@ struct Dialog {   /* sizeof 16 */
 
 class CBlocks {
 public:
-    static int GetOverlayOtBase() { return 0x1E8; }
+    static int GetOverlayOtBase();
 };
 
 struct TASK {   /* sizeof 92 */

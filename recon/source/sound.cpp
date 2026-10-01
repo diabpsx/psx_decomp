@@ -5,6 +5,8 @@
  * update) carry over; the bodies below are transcribed straight from the retail oracle.
  * Layouts, prototypes, externs generated from DIABPSX.SYM (tools/symhdr.py -> gen headers). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_sound.h"
 #include "source/gen/externs_sound.h"
 #include "source/gen/protos_sound.h"
@@ -14,11 +16,16 @@
 /* SOUND.CPP-owned globals (.sdata; SYM class EXT).  Tentative definitions in the OWNER TU make them
  * gp-relative (`lw/sb ...,%gp_rel(sym)($gp)`) exactly like retail; `extern` would materialize
  * absolute lui/lw (methodology 3.12 #6). */
-unsigned char gbSndInited;
-long sglMasterVolume;
-long sglMusicVolume;
-int sgnMusicTrack;
-SFXHDR *sghMusic;
+unsigned char gbSndInited = 0;
+unsigned char gbDupSounds = 1;
+long sglMasterVolume = 230;
+long sglMusicVolume = 8191;
+long sglSoundVolume = 8191;
+long sglSpeechVolume = 8191;
+int sgnMusicTrack = 5;
+BOOL MONO = 0;
+SFXHDR *sghMusic = 0;
+unsigned short sgszMusicTracks[6] = {0x3CD, 0x3CE, 0x3CF, 0x3D0, 0x3D1, 0x3D2};
 
 /* line 108 @0x80077D14 */
 void snd_update(unsigned char bStopAll)

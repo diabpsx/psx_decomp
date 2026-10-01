@@ -8,7 +8,7 @@ extern "C" int sprintf(char *buf, const char *fmt, ...);
 char *GetVersionString(char *VersionString2);
 char *GetWord(char *VStr);
 
-extern char MyVerString[120];
+char MyVerString[120] = {0};   /* Retail initialized buffer at 0x800E3C1C. */
 
 /* @0x800826A0 VERSION.CPP:230 */
 void VER_InitVersion(void)

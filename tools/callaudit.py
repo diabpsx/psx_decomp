@@ -56,20 +56,27 @@ def equivalent(actual, expected, defined, owned, addrs):
 
 def calls(obj, objdump):
     symbols = B.run([objdump, "-t", obj])
-    disassembly = B.run([objdump, "-drz", "-j", ".text", obj])
+    disassembly = B.run([objdump, "-drz", obj])
     if symbols.returncode or disassembly.returncode:
         sys.exit("objdump failed:\n" + symbols.stderr + disassembly.stderr)
-    functions = {}
+    functions, locations = {}, {}
     for line in symbols.stdout.splitlines():
-        match = re.match(r"([0-9a-f]+) .* F \.text\s+([0-9a-f]+) (\S+)$", line)
+        match = re.match(r"([0-9a-f]+) .* F (\.[\w.]+)\s+([0-9a-f]+) (\S+)$", line)
         if match:
-            functions[spelling(match[3])] = (int(match[1], 16), int(match[2], 16))
+            name = spelling(match[4])
+            functions[name] = (int(match[1], 16), int(match[3], 16))
+            locations[name] = match[2]
     by_start = {}
     for name, (start, size) in functions.items():
-        by_start.setdefault(start, []).append(name)
+        by_start.setdefault((locations[name], start), []).append(name)
     result = {name: [] for name in functions}
     instruction = None
+    section = None
     for line in disassembly.stdout.splitlines():
+        heading = re.match(r'Disassembly of section (\S+):', line)
+        if heading:
+            section, instruction = heading[1], None
+            continue
         match = re.match(r"\s*([0-9a-f]+):\s+([0-9a-f]{8})\s+(.*)", line)
         if match:
             instruction = (int(match[1], 16), int(match[2], 16))
@@ -79,17 +86,17 @@ def calls(obj, objdump):
             continue
         pc, word = instruction
         owners = [name for name, (start, size) in functions.items()
-                  if start <= pc < start + size]
+                  if locations[name] == section and start <= pc < start + size]
         if not owners:
             continue
         target = relocation[1]
-        if target == ".text":
+        if target in set(locations.values()):
             destination = (word & 0x3FFFFFF) << 2
-            if word >> 26 == 2 and all(functions[name][0] <= destination
+            if target == section and word >> 26 == 2 and all(functions[name][0] <= destination
                                       < sum(functions[name]) for name in owners):
                 continue  # ordinary local jump, covered by the byte gate
-            names = by_start.get(destination, [])
-            target = names[0] if len(names) == 1 else f".text+0x{destination:x}"
+            names = by_start.get((target, destination), [])
+            target = names[0] if len(names) == 1 else f"{target}+0x{destination:x}"
         for owner in owners:
             result[owner].append(spelling(target))
     return functions, result

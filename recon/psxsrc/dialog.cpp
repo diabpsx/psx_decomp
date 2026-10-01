@@ -246,7 +246,7 @@ static char GShadeY;                        /* @0x8011C64E */
 static unsigned char RandBTab[8];           /* @0x8011C654 */
 
 /* @0x8008AD90 DIALOG.CPP:112 */
-short TrimCol(short col)
+unsigned char TrimCol(short col)
 {
     if (col < 0)
         col = 0;
