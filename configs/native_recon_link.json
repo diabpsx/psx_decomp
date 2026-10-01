@@ -1,4 +1,265 @@
 {
+  "premiss": {
+    "source": "recon/source/premiss.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x80161FDC", "size": 464},
+      ".rdata": {"image": "diabpsx", "va": "0x80119D20", "size": 33, "scaffold": "rodata_premiss.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["CalcPlrItemVals__FiUc", "dung_map", "missile", "missileactive", "missileavail", "myplr", "nummissiles", "plr"]
+  },
+  "prestore": {
+    "source": "recon/source/prestore.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x80162CDC", "size": 760},
+      ".rdata": {"image": "diabpsx", "va": "0x80119D68", "size": 33, "scaffold": "rodata_prestore.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["ClearSText__Fii", "GetRndSeed__Fv", "SetRndSeed__Fl", "SpawnBoy__Fi", "SpawnHealer__Fi", "SpawnPremium__Fi", "SpawnSmith__Fi", "SpawnStoreGold__Fv", "SpawnWitch__Fi", "StorePlrNo", "_boyitem", "_boylevel", "_numpremium", "_premiumitem", "_premiumlevel", "gbMaxPlayers", "myplr", "plr", "stextflag", "stextscrl", "stextsize"]
+  },
+  "preport": {
+    "source": "recon/source/preport.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x8015E77C", "size": 96},
+      ".rdata": {"image": "diabpsx", "va": "0x80119B08", "size": 14, "scaffold": "rodata_preport.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["delta_portal_inited__Fi", "portal"]
+  },
+  "preinv": {
+    "source": "recon/source/preinv.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x8015F470", "size": 84},
+      ".rdata": {"image": "diabpsx", "va": "0x80119BA4", "size": 33, "scaffold": "rodata_preinv.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["GM_UseTexData__Fi", "InvBackY", "InvCursPos", "InvGfxTData", "InvPanelTData", "drawsbarflag", "invflag"]
+  },
+  "corefmv": {
+    "source": "recon/psxsrc/corefmv.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800ACF58", "size": 664},
+      ".data": {"va": "0x800CD4F4", "size": 48, "scaffold": "data_corefmv.data"},
+      ".rdata": {"va": "0x80110E30", "size": 148, "scaffold": "rodata_corefmv.rodata"}
+    },
+    "data_symbols": ["FmvTab"],
+    "externals": ["FileSYS", "OVR_GetCurrentOverlay__Fv", "OVR_LoadFmv__Fv", "OVR_LoadFrontend__Fv", "OVR_LoadGame__Fv", "OVR_LoadPregame__Fv", "PA_SetPauseOk__Fb", "PlayFMVOverLay", "SCR_DumpClut__Fv", "fileexists", "music_stop__Fv", "strcmp", "user_start"]
+  },
+  "coreinv": {
+    "source": "recon/source/coreinv.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8008271C", "size": 180},
+      ".rdata": {"va": "0x80119490", "size": 33, "scaffold": "rodata_coreinv.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["item", "itemactive", "numitems"]
+  },
+  "monsview": {
+    "source": "recon/psxsrc/monsview.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800AF0E8", "size": 8},
+      ".rdata": {"va": "0x80110F74", "size": 14, "scaffold": "rodata_monsview.rodata"}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "gameonly": {
+    "source": "recon/psxsrc/gameonly.cpp", "image": "game",
+    "sections": {
+      ".text": {"va": "0x80139BFC", "size": 8}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "gamemenu": {
+    "source": "recon/source/gamemenu.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800827D0", "size": 8},
+      ".rdata": {"va": "0x801194B4", "size": 33, "scaffold": "rodata_gamemenu.rodata"}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "testcode": {
+    "source": "recon/source/testcode.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007B170", "size": 96}
+    },
+    "data_symbols": [],
+    "externals": ["GRL_InitGwin__Fv", "LittleStart__FUcUc", "StartGame__FUcUc", "alloc_plr__Fv"]
+  },
+  "storm": {
+    "source": "recon/source/storm.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007B1D0", "size": 64}
+    },
+    "data_symbols": [],
+    "externals": ["Tfree__FPv", "Tmalloc__Fi"]
+  },
+  "mem": {
+    "source": "recon/psxsrc/mem.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80084424", "size": 40},
+      ".data": {"va": "0x800B7920", "size": 80, "scaffold": "data_mem.data"},
+      ".rdata": {"va": "0x8010FFF0", "size": 21, "scaffold": "rodata_mem.rodata"}
+    },
+    "data_symbols": ["PsxMem", "PsxFastMem"],
+    "externals": ["memmove"]
+  },
+  "lznp": {
+    "source": "recon/psxsrc/lznp.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800881D4", "size": 212}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "lambo": {
+    "source": "recon/psxsrc/lambo.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80095844", "size": 16},
+      ".rdata": {"va": "0x80110604", "size": 14, "scaffold": "rodata_lambo.rodata"}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "mlist": {
+    "source": "recon/source/mlist.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007D5F8", "size": 1008},
+      ".data": {"va": "0x800E39C4", "size": 32, "scaffold": "data_mlist.data"},
+      ".rdata": {"va": "0x80118D68", "size": 33, "scaffold": "rodata_mlist_native.rodata"}
+    },
+    "data_symbols": ["MlTab", "QlTab"],
+    "externals": ["AllLevels", "CM_ChooseMonsterList__FiUl", "CM_ShowMonsterList__Fii", "DBG_Error", "GLUE_GetCurrentList__Fi", "GLUE_SetMonsterList__Fi", "GU_GetRndRange", "OPT_NoQuests", "SetRndSeed__Fl", "glSeedTbl", "monsterdata", "setlevel"]
+  },
+  "attract": {
+    "source": "recon/psxsrc/attract.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8008D274", "size": 424},
+      ".rdata": {"va": "0x80110510", "size": 44, "scaffold": "rodata_attract_native.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["CalcPlrInv__FiUc", "ClearLoadCharItems__Fv", "CreatePlayer__Fic", "DoLoadedChar", "DoLoadedGame", "FeFlag", "InitFrontEnd__FP9FE_CREATE", "LoadedChar", "OVR_LoadGame__Fv", "PA_SetPauseOk__Fb", "TSK_Sleep", "plr", "printf", "strcpy"]
+  },
+  "loading": {
+    "source": "recon/psxsrc/loading.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800A4524", "size": 2784},
+      ".data": {"va": "0x800CC76C", "size": 124, "scaffold": "data_loading.data"},
+      ".rdata": {"va": "0x80110C5C", "size": 100, "scaffold": "rodata_loading.rodata"},
+      ".sdata": {"va": "0x8011B134", "size": 32, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C6EC", "size": 4},
+      ".ctors": {"va": "0x800B0CB4", "size": 4, "scaffold": "ctors.data"},
+      ".dtors": {"va": "0x800B0CE4", "size": 4, "scaffold": "dtors.data"}
+    },
+    "data_symbols": ["CutScr", "TitleFlag", "Level2CutScreen", "CutScreenTSK", "GameLoading", "BootScreen", "ThisLev", "progress"],
+    "externals": ["AddrToAvoid", "BORDERB", "BORDERG", "BORDERR", "Back__6Dialogiiii", "DBG_Error", "DialogBlue", "DialogGreen", "DialogRed", "DialogTBlue", "DialogTGreen", "DialogTRed", "Display__7CScreeniiii", "GetFadeState__Fv", "GetStrWidth__5CFontPc", "GetStr__Fi", "Load__7CScreeniii", "MediumFont", "PAD_Handler__Fv", "PA_SetPauseOk__Fb", "PaletteFadeIn__Fi", "PaletteFadeOut__Fi", "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc", "SetOTpos__5CFonti", "SetOTpos__6Dialogi", "TICK_Update", "TSK_AddTask", "TSK_Kill", "TSK_Sleep", "ThisOt", "ThisPrimAddr", "Unload__7CScreen", "VID_AfterDisplay__Fv", "VID_SetDBuffer__Fb", "WHITEG", "WHITER", "__7CScreen", "___7TextDat", "__builtin_delete", "music_stop__Fv", "stream_stop__Fv"]
+  },
+  "setmaps": {
+    "source": "recon/source/setmaps.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x801552D8", "size": 1836},
+      ".data": {"image": "diabpsx", "va": "0x800E3FC0", "size": 104, "scaffold": "data_setmaps.data"},
+      ".rdata": {"image": "diabpsx", "va": "0x80119540", "size": 404, "scaffold": "rodata_setmaps.rodata"},
+      ".sdata": {"image": "diabpsx", "va": "0x8011BFB4", "size": 36, "scaffold": "sdata_after_primpool.sdata"}
+    },
+    "data_symbols": ["SkelKingTrans1", "SkelKingTrans2", "SkelKingTrans3", "SkelKingTrans4", "SkelChamTrans1", "SkelChamTrans2", "SkelChamTrans3"],
+    "externals": ["AddL1Objs__Fiiii", "AddL2Objs__Fiiii", "DRLG_AreaTrans__FiPUc", "DRLG_ListTrans__FiPUc", "GRL_LoadFileInMemSig__FPCcPUl", "InitNoTriggers__Fv", "InitPWaterTriggers__Fv", "InitSChambTriggers__Fv", "InitSKingTriggers__Fv", "LoadL1Dungeon__FPcii", "LoadL2Dungeon__FPcii", "LoadL3Dungeon__FPcii", "LoadPalette__FPCc", "LoadPreL1Dungeon__FPcii", "LoadPreL2Dungeon__FPcii", "LoadPreL3Dungeon__FPcii", "SetObjMapRange__Fiiiiii", "WaterDone", "app_fatal", "dung_map", "mem_free_dbg__FPv", "numobjects", "object", "objectactive", "quests", "setlvlnum"]
+  },
+  "choosem": {
+    "source": "recon/source/choosem.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x80155A04", "size": 1492},
+      ".data": {"image": "diabpsx", "va": "0x800E4028", "size": 136, "scaffold": "data_choosem.data"},
+      ".rdata": {"image": "diabpsx", "va": "0x801196D4", "size": 216, "scaffold": "rodata_choosem.rodata"},
+      ".sdata": {"image": "diabpsx", "va": "0x8011BFD8", "size": 232, "scaffold": "sdata_after_primpool.sdata"}
+    },
+    "data_symbols": ["MgToText", "DoUiForChooseMonster"],
+    "externals": ["AllLevels", "DBG_Error", "ENG_random__Fl", "GLUE_ResumeGame__Fv", "GLUE_SuspendGame__Fv", "MediumFont", "NumOfMonsterListLevels", "PAD_GetPad__FiUc", "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc", "TSK_AddTask", "TSK_Exist", "TSK_Sleep", "WHITEG", "WHITER", "demo_pad_time", "sprintf"]
+  },
+  "loadsave": {
+    "source": "recon/source/loadsave.cpp", "image": "frontend",
+    "sections": {
+      ".text": {"va": "0x8015B958", "size": 5332},
+      ".data": {"image": "diabpsx", "va": "0x800E3C94", "size": 812, "scaffold": "data_loadsave.data"},
+      ".rdata": {"image": "diabpsx", "va": "0x801194FC", "size": 49, "scaffold": "rodata_loadsave.rodata"},
+      ".sdata": {"image": "diabpsx", "va": "0x8011BE48", "size": 28, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"image": "diabpsx", "va": "0x8011C8D4", "size": 4}
+    },
+    "data_symbols": ["DiabloStr", "SaveCharName", "OptSaveName", "IconBuffer", "ADirtyFlagThatGaryWillLove", "DirtyVidx", "DirtyVidY", "tbuff"],
+    "externals": ["CalcVolumes__Fv", "CharDataStruct", "ClearQuestFlags__Fv", "DeltaExportData__FPc", "DeltaImportData__FPc", "DeltaSaveLevel__Fv", "DiabloCharacterFile", "DiabloGameFile", "DiabloOptionFile", "FePlayerNo", "FreeGameMem__Fv", "GLUE_SetShowGameScreenFlag__Fb", "GetFileNumber__FiPc", "GetSpeed__Fv", "LANG_GetLang__Fv", "LevPals", "MONO", "MlTab", "PackPlayer__FP14PkPlayerStructi", "PostGamePad__Fiiii", "QSpell", "QlTab", "ReadAtAddr__6FileIOPCcPUci", "ResyncQuests__Fv", "SYSI_GetFs__Fv", "SetLoadedLang__F9LANG_TYPE", "SetLoadedVolumes__Fv", "SetReturnLvlPos__Fv", "SetSpeed__F9GM_SPEEDS", "StorePlrNo", "UnPackPlayer__FPC14PkPlayerStructiUc", "VID_GetXOff__Fv", "VID_GetYOff__Fv", "VID_SetXYOff__Fii", "ViewX", "ViewY", "_numpremium", "_premiumlevel", "_spltotype", "current_card", "currlevel", "deathflag", "delete_card_file__Fii", "delta_init__Fv", "gbActivePlayers", "gbMaxPlayers", "gbProcessPlayers", "gbRunGame", "gbValidSaveFile", "glSeedTbl", "gnDifficulty", "leveltype", "options_pad", "orgseed", "plr", "portal", "quests", "read_card_file__FiiiPc", "save_buffer", "setlevel", "setlvlnum", "sgLocals", "sglMasterVolume", "sglMusicVolume", "sglSoundVolume", "sglSpeechVolume", "sprintf", "txt_actions", "write_card_file__FiiPcT2PUcPUsiT4"]
+  },
+  "compmap": {
+    "source": "recon/source/compmap.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80081608", "size": 3028},
+      ".rdata": {"va": "0x80118E34", "size": 55, "scaffold": "rodata_compmap.rodata"},
+      ".sdata": {"va": "0x8011BCBC", "size": 9, "scaffold": "sdata_after_primpool.sdata"}
+    },
+    "data_symbols": [],
+    "externals": ["DBG_Error", "GAL_AlignSizeToType", "GAL_Alloc", "GAL_Free", "GAL_Lock", "GAL_SplitBlock", "GAL_Unlock", "__builtin_delete", "memcpy", "memset"]
+  },
+  "pads": {
+    "source": "recon/psxsrc/pads.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800894E0", "size": 1920},
+      ".data": {"va": "0x800B7D34", "size": 1444, "scaffold": "data_pads.data"},
+      ".rdata": {"va": "0x80110480", "size": 56, "scaffold": "rodata_pads.rodata"},
+      ".sdata": {"va": "0x8011ABA8", "size": 32, "scaffold": "sdata_after_primpool.sdata"},
+      ".ctors": {"va": "0x800B0C9C", "size": 4, "scaffold": "ctors.data"}
+    },
+    "data_symbols": ["Pad0", "Pad1", "RawPadData0", "RawPadData1", "demo_buffer", "demo_pad_time", "demo_pad_count", "demo_finish", "demo_start", "cac_pad"],
+    "externals": ["DBG_Error", "GLUE_Finished__Fv", "IsGameLoading__Fv", "PA_SetPauseOk__Fb", "deathflag", "demo_level", "demo_record_load", "printf", "save_demo_pad_data__FUl", "user_start"]
+  },
+  "psxhelp": {
+    "source": "recon/psxsrc/psxhelp.cpp", "image": "diabpsx", "assembler": "2.67",
+    "sections": {
+      ".text": {"va": "0x800AE38C", "size": 3420},
+      ".data": {"va": "0x800CD524", "size": 300, "scaffold": "data_psxhelp.data"},
+      ".rdata": {"va": "0x80110F44", "size": 47, "scaffold": "rodata_psxhelp.rodata"},
+      ".sdata": {"va": "0x8011B2D4", "size": 40, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C73C", "size": 10},
+      ".bss": {"va": "0x80121C78", "size": 32},
+      ".ctors": {"va": "0x800B0CB8", "size": 4, "scaffold": "ctors.data"},
+      ".dtors": {"va": "0x800B0CE8", "size": 4, "scaffold": "dtors.data"}
+    },
+    "data_symbols": ["HelpList", "HelpRect", "HelpTop", "help_select_line", "displayinghelp", "HelpBack", "helpflag", "txtBack"],
+    "externals": ["BLUEB", "BLUEG", "BLUER", "BORDERB", "BORDERG", "BORDERR", "Back__6Dialogiiii", "DialogBlue", "DialogGreen", "DialogRed", "DialogTBlue", "DialogTGreen", "DialogTRed", "DrawFeTwinkle__Fii", "DrawSpinner__FiiUcUcUciiibiT8T8Uc", "FeFlag", "GOLDB", "GOLDG", "GOLDR", "GetStrWidth__5CFontPc", "GetStr__Fi", "LargeFont", "MediumFont", "PAD_GetPad__FiUc", "PlaySFX__Fi", "PostGamePad__Fiiii", "PrintSelectBack__FUs", "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc", "REDB", "REDG", "REDR", "SetOTpos__5CFonti", "SetOTpos__6Dialogi", "WHITEB", "WHITEG", "WHITER", "__builtin_delete", "cmenu", "get_key_pad__Fi", "options_pad", "pad_txt", "sprintf", "tempstr", "txt_actions"]
+  },
+  "multi": {
+    "source": "recon/source/multi.cpp", "image": "diabpsx", "assembler": "2.67",
+    "sections": {
+      ".text": {"va": "0x80052BA4", "size": 1244},
+      ".rdata": {"va": "0x801169D0", "size": 14, "scaffold": "rodata_multi.rodata"},
+      ".sdata": {"va": "0x8011B99C", "size": 12, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C840", "size": 56}
+    },
+    "data_symbols": ["sgpCurrPkt", "sgnCurrMegaPlayer", "sgbSentThisCycle", "sgdwGameLoops", "sgwPackPlrOffsetTbl", "sgbPlayerLeftGameTbl", "sgdwPlayerLeftReasonTbl", "sgbSendDeltaTbl", "sgGameInitInfo", "sgbTimeout", "sglTimeoutStart", "gszVersionNumber", "sgbNetInited", "gbMaxPlayers", "gbActivePlayers", "gbGameDestroyed", "gbDeltaSender", "gbSelectProvider", "gbSomebodyWonGameKludge"],
+    "externals": ["FePlayerNo", "GetRndSeed__Fv", "OptionsSeed", "OptionsSetSeed", "ParseCmd__FiPC4TCmd", "SetQuest__Fv", "SetRndSeed__Fl", "SetupLocalPlayer__Fv", "VID_GetTick__Fv", "cheat_quest_flag", "currlevel", "delta_init__Fv", "demo_pad_time", "game_2_ui_player__FPC12PlayerStructP11_uiheroinfoUc", "gbValidSaveFile", "glSeedTbl", "gnDifficulty", "gnLevelTypeTbl", "leveldebug", "leveltype", "memset", "myplr", "orgseed", "plr", "plrxoff", "plryoff", "setlevel", "veclen2__Fii"]
+  },
+  "towners": {
+    "source": "recon/source/towners.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80039F88", "size": 12204},
+      ".data": {"va": "0x800CF7E4", "size": 4828, "scaffold": "data_towners.data"},
+      ".rdata": {"va": "0x801111A8", "size": 368, "scaffold": "rodata_towners.rodata"},
+      ".sdata": {"va": "0x8011B808", "size": 32, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C7BC", "size": 8}
+    },
+    "data_symbols": ["towner", "AnimOrder", "TownCowX", "TownCowY", "TownCowDir", "cowoffx", "cowoffy", "Qtalklist", "numtowners", "storeflag", "boyloadflag", "bannerflag", "pCowCels", "CowPlaying", "sgdwCowClicks", "sgnCowMsg", "snSFX", "snLastCowSFX"],
+    "externals": ["AllItemsUseable", "CreateItem__Fiii", "DropItemBeforeTrig__Fv", "ENG_random__Fl", "GetRndSeed__Fv", "InitQTextMsg__Fi", "IsDplayer__Fii", "LoadFileInMem__FPCcPUl", "NetSendCmdQuest__FUcUc", "PlaySFX__Fi", "PlaySfxLoc__Fiii", "RemoveInvItem__Fii", "SpawnQuestItem__Fiiiii", "StartStore__Fc", "_pcurs", "abs", "dung_map", "effect_is_playing__Fi", "gbMaxPlayers", "mem_free_dbg__FPv", "memset", "myplr", "options_pad", "plr", "qtextflag", "quests", "stextflag"]
+  },
+  "lang": {
+    "source": "recon/source/lang.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007B348", "size": 1404},
+      ".rdata": {"va": "0x80118C30", "size": 104, "scaffold": "rodata_lang.rodata"},
+      ".sdata": {"va": "0x8011BBE0", "size": 60, "scaffold": "sdata_after_primpool.sdata"}
+    },
+    "data_symbols": ["LanguageType", "hndText", "TextPtr", "LangDbNo", "NumOfStrings"],
+    "externals": ["BL_LoadFileAsync__FPcc", "BL_WaitForAsyncFinish__Fv", "CDWAIT", "DBG_Error", "FileSYS", "GAL_Free", "GAL_Lock", "GAL_SetMemName", "IsGameLoading__Fv", "IsKanjiLoaded__Fv", "KANJI_SetDb__F10LANG_DB_NO", "Read__6FileIOPCcUl", "SYSI_GetFs__Fv", "TSK_Sleep", "strcat"]
+  },
   "objprint": {
     "source": "recon/source/objprint.cpp", "image": "diabpsx",
     "sections": {

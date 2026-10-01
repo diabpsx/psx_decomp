@@ -20,7 +20,7 @@ SECTIONS
         . = 0x27FAC;   /* 0x80037FAC */
         build/skel/SOURCE/DIABLO.CPP.o(.text);
         . = 0x29F88;   /* 0x80039F88 */
-        build/skel/SOURCE/TOWNERS.CPP.o(.text);
+        build/native_source/towners.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2CF34;   /* 0x8003CF34 */
         build/native_source/effects.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2DA28;   /* 0x8003DA28 */
@@ -42,7 +42,7 @@ SECTIONS
         . = 0x3EA9C;   /* 0x8004EA9C */
         build/skel/SOURCE/MSG.CPP.o(.text);
         . = 0x42BA4;   /* 0x80052BA4 */
-        build/skel/SOURCE/MULTI.CPP.o(.text);
+        build/native_source/multi.text.s.o(.text);   /* verified native-assembled source */
         . = 0x43080;   /* 0x80053080 */
         build/native_source/objects.text.s.o(.text);   /* verified native-assembled source */
         . = 0x4FC20;   /* 0x8005FC20 */
@@ -66,17 +66,17 @@ SECTIONS
         . = 0x67F90;   /* 0x80077F90 */
         build/native_source/gamepad.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6B170;   /* 0x8007B170 */
-        build/recon/source/testcode.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/testcode.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6B1D0;   /* 0x8007B1D0 */
-        build/recon/source/storm.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/storm.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6B210;   /* 0x8007B210 */
         build/native_source/gwin.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6B348;   /* 0x8007B348 */
-        build/skel/SOURCE/LANG.CPP.o(.text);
+        build/native_source/lang.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6B8C4;   /* 0x8007B8C4 */
         build/skel/SOURCE/MISPRINT.CPP.o(.text);
         . = 0x6D5F8;   /* 0x8007D5F8 */
-        build/recon/source/mlist.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/mlist.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6D9E8;   /* 0x8007D9E8 */
         build/native_source/objprint.text.s.o(.text);   /* verified native-assembled source */
         . = 0x6EE64;   /* 0x8007EE64 */
@@ -88,15 +88,15 @@ SECTIONS
         . = 0x70EF8;   /* 0x80080EF8 */
         build/native_source/portal.text.s.o(.text);   /* verified native-assembled source */
         . = 0x71608;   /* 0x80081608 */
-        build/skel/SOURCE/COMPMAP.CPP.o(.text);
+        build/native_source/compmap.text.s.o(.text);   /* verified native-assembled source */
         . = 0x721DC;   /* 0x800821DC */
         build/native_source/gameover.text.s.o(.text);   /* verified native-assembled source */
         . = 0x726A0;   /* 0x800826A0 */
         build/recon/source/version.cpp.o(.text);   /* reconstructed TU */
         . = 0x7271C;   /* 0x8008271C */
-        build/recon/source/coreinv.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/coreinv.text.s.o(.text);   /* verified native-assembled source */
         . = 0x727D0;   /* 0x800827D0 */
-        build/recon/source/gamemenu.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/gamemenu.text.s.o(.text);   /* verified native-assembled source */
         . = 0x727D8;   /* 0x800827D8 */
         build/native_source/dpiece.text.s.o(.text);   /* verified native-assembled source */
         . = 0x73100;   /* 0x80083100 */
@@ -108,7 +108,7 @@ SECTIONS
         . = 0x74030;   /* 0x80084030 */
         build/native_source/vid.text.s.o(.text);   /* verified native-assembled source */
         . = 0x74424;   /* 0x80084424 */
-        build/recon/psxsrc/mem.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/mem.text.s.o(.text);   /* verified native-assembled source */
         . = 0x7444C;   /* 0x8008444C */
         build/native_source/sysinit.text.s.o(.text);   /* verified native-assembled source */
         . = 0x745BC;   /* 0x800845BC */
@@ -130,19 +130,19 @@ SECTIONS
         . = 0x7725C;   /* 0x8008725C */
         build/skel/PSXSRC/BIGLUMP.CPP.o(.text);
         . = 0x781D4;   /* 0x800881D4 */
-        build/recon/psxsrc/lznp.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/lznp.text.s.o(.text);   /* verified native-assembled source */
         . = 0x782A8;   /* 0x800882A8 */
         build/native_source/tmalloc.text.s.o(.text);   /* verified native-assembled source */
         . = 0x784C8;   /* 0x800884C8 */
         build/native_source/pause.text.s.o(.text);   /* verified native-assembled source */
         . = 0x794E0;   /* 0x800894E0 */
-        build/skel/PSXSRC/PADS.CPP.o(.text);
+        build/native_source/pads.text.s.o(.text);   /* verified native-assembled source */
         . = 0x79C60;   /* 0x80089C60 */
         build/native_source/printy.text.s.o(.text);   /* verified native-assembled source */
         . = 0x7AD90;   /* 0x8008AD90 */
         build/skel/PSXSRC/DIALOG.CPP.o(.text);
         . = 0x7D274;   /* 0x8008D274 */
-        build/recon/psxsrc/attract.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/attract.text.s.o(.text);   /* verified native-assembled source */
         . = 0x7D41C;   /* 0x8008D41C */
         build/skel/PSXSRC/BLOCK.CPP.o(.text);
         . = 0x81E54;   /* 0x80091E54 */
@@ -150,7 +150,7 @@ SECTIONS
         . = 0x853F8;   /* 0x800953F8 */
         build/native_source/overlay.text.s.o(.text);   /* verified native-assembled source */
         . = 0x85844;   /* 0x80095844 */
-        build/recon/psxsrc/lambo.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/lambo.text.s.o(.text);   /* verified native-assembled source */
         . = 0x85854;   /* 0x80095854 */
         build/skel/PSXSRC/CPLAYER.CPP.o(.text);
         . = 0x86838;   /* 0x80096838 */
@@ -184,7 +184,7 @@ SECTIONS
         . = 0x94384;   /* 0x800A4384 */
         build/native_source/decomp.text.s.o(.text);   /* verified native-assembled source */
         . = 0x94524;   /* 0x800A4524 */
-        build/skel/PSXSRC/LOADING.CPP.o(.text);
+        build/native_source/loading.text.s.o(.text);   /* verified native-assembled source */
         . = 0x95004;   /* 0x800A5004 */
         build/skel/PSXSRC/CARDCORE.CPP.o(.text);
         . = 0x968D0;   /* 0x800A68D0 */
@@ -192,15 +192,15 @@ SECTIONS
         . = 0x9B6B0;   /* 0x800AB6B0 */
         build/native_source/bird.text.s.o(.text);   /* verified native-assembled source */
         . = 0x9CF58;   /* 0x800ACF58 */
-        build/recon/psxsrc/corefmv.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/corefmv.text.s.o(.text);   /* verified native-assembled source */
         . = 0x9D1F0;   /* 0x800AD1F0 */
         build/native_source/kanji.text.s.o(.text);   /* verified native-assembled source */
         . = 0x9DF9C;   /* 0x800ADF9C */
         build/recon/psxsrc/pak.cpp.o(.text);   /* reconstructed TU */
         . = 0x9E38C;   /* 0x800AE38C */
-        build/skel/PSXSRC/PSXHELP.CPP.o(.text);
+        build/native_source/psxhelp.text.s.o(.text);   /* verified native-assembled source */
         . = 0x9F0E8;   /* 0x800AF0E8 */
-        build/recon/psxsrc/monsview.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/monsview.text.s.o(.text);   /* verified native-assembled source */
         . = 0x9F0F0;   /* 0x800AF0F0 */
         build/recon/psxsrc/spltargt.cpp.o(.text);   /* reconstructed TU */
         . = 0xA031C;   /* 0x800B031C */
@@ -224,7 +224,7 @@ SECTIONS
         . = 0xA75D8;   /* 0x800B75D8 */
         build/native_source/data_gpuq.data.s.o(.data);   /* verified native source data */
         . = 0xA7920;   /* 0x800B7920 */
-        build/asm/data/data_mem.data.s.o(.data);
+        build/native_source/data_mem.data.s.o(.data);   /* verified native source data */
         . = 0xA7970;   /* 0x800B7970 */
         build/native_source/data_fileio.data.s.o(.data);   /* verified native source data */
         . = 0xA79A4;   /* 0x800B79A4 */
@@ -232,7 +232,7 @@ SECTIONS
         . = 0xA7B54;   /* 0x800B7B54 */
         build/native_source/data_tmalloc.data.s.o(.data);   /* verified native source data */
         . = 0xA7D34;   /* 0x800B7D34 */
-        build/asm/data/data_pads.data.s.o(.data);
+        build/native_source/data_pads.data.s.o(.data);   /* verified native source data */
         . = 0xA82D8;   /* 0x800B82D8 */
         build/native_source/data_printy.data.s.o(.data);   /* verified native source data */
         . = 0xA8AD0;   /* 0x800B8AD0 */
@@ -258,7 +258,7 @@ SECTIONS
         . = 0xBC6BC;   /* 0x800CC6BC */
         build/native_source/data_davel.data.s.o(.data);   /* verified native source data */
         . = 0xBC76C;   /* 0x800CC76C */
-        build/asm/data/data_loading.data.s.o(.data);
+        build/native_source/data_loading.data.s.o(.data);   /* verified native source data */
         . = 0xBC7E8;   /* 0x800CC7E8 */
         build/asm/data/data_cardcore.data.s.o(.data);
         . = 0xBC868;   /* 0x800CC868 */
@@ -266,11 +266,9 @@ SECTIONS
         . = 0xBD374;   /* 0x800CD374 */
         build/native_source/data_bird.data.s.o(.data);   /* verified native source data */
         . = 0xBD4F4;   /* 0x800CD4F4 */
-        __recon_diabpsx_data_corefmv_start = .;
-        build/recon/psxsrc/corefmv.cpp.o(.data);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_data_corefmv_start == 0x30, "wrong source data extent: data_corefmv");
+        build/native_source/data_corefmv.data.s.o(.data);   /* verified native source data */
         . = 0xBD524;   /* 0x800CD524 */
-        build/asm/data/data_psxhelp.data.s.o(.data);
+        build/native_source/data_psxhelp.data.s.o(.data);   /* verified native source data */
         . = 0xBD650;   /* 0x800CD650 */
         __recon_diabpsx_data_spltargt_start = .;
         build/recon/psxsrc/spltargt.cpp.o(.data);   /* source-owned data */
@@ -284,7 +282,7 @@ SECTIONS
         . = 0xBEC84;   /* 0x800CEC84 */
         build/asm/data/data_diablo.data.s.o(.data);
         . = 0xBF7E4;   /* 0x800CF7E4 */
-        build/asm/data/data_towners.data.s.o(.data);
+        build/native_source/data_towners.data.s.o(.data);   /* verified native source data */
         . = 0xC0AC0;   /* 0x800D0AC0 */
         build/native_source/data_effects.data.s.o(.data);   /* verified native source data */
         . = 0xC1A40;   /* 0x800D1A40 */
@@ -322,9 +320,7 @@ SECTIONS
         . = 0xD38E4;   /* 0x800E38E4 */
         build/asm/data/data_misprint.data.s.o(.data);
         . = 0xD39C4;   /* 0x800E39C4 */
-        __recon_diabpsx_data_mlist_start = .;
-        build/recon/source/mlist.cpp.o(.data);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_data_mlist_start == 0x20, "wrong source data extent: data_mlist");
+        build/native_source/data_mlist.data.s.o(.data);   /* verified native source data */
         . = 0xD39E4;   /* 0x800E39E4 */
         build/native_source/data_objprint.data.s.o(.data);   /* verified native source data */
         . = 0xD3BAC;   /* 0x800E3BAC */
@@ -336,11 +332,11 @@ SECTIONS
         build/recon/source/version.cpp.o(.data);   /* source-owned data */
         ASSERT(. - __recon_diabpsx_data_version_start == 0x78, "wrong source data extent: data_version");
         . = 0xD3C94;   /* 0x800E3C94 */
-        build/asm/data/data_loadsave.data.s.o(.data);
+        build/native_source/data_loadsave.data.s.o(.data);   /* verified native source data */
         . = 0xD3FC0;   /* 0x800E3FC0 */
-        build/asm/data/data_setmaps.data.s.o(.data);
+        build/native_source/data_setmaps.data.s.o(.data);   /* verified native source data */
         . = 0xD4028;   /* 0x800E4028 */
-        build/asm/data/data_choosem.data.s.o(.data);
+        build/native_source/data_choosem.data.s.o(.data);   /* verified native source data */
         . = 0xD40B0;   /* 0x800E40B0 */
         build/asm/data/data_preobj.data.s.o(.data);
         . = 0xD40C4;   /* 0x800E40C4 */
@@ -374,7 +370,7 @@ SECTIONS
         . = 0xFFFE0;   /* 0x8010FFE0 */
         build/native_source/rodata_vid.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFF0;   /* 0x8010FFF0 */
-        build/asm/data/rodata_mem.rodata.s.o(.rodata);
+        build/native_source/rodata_mem.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100008;   /* 0x80110008 */
         build/native_source/rodata_sysinit.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100078;   /* 0x80110078 */
@@ -406,17 +402,13 @@ SECTIONS
         . = 0x1003C0;   /* 0x801103C0 */
         build/native_source/rodata_pause.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100480;   /* 0x80110480 */
-        build/asm/data/rodata_pads.rodata.s.o(.rodata);
+        build/native_source/rodata_pads.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1004B8;   /* 0x801104B8 */
         build/native_source/rodata_printy_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1004DC;   /* 0x801104DC */
         build/asm/data/rodata_dialog.rodata.s.o(.rodata);
         . = 0x100510;   /* 0x80110510 */
-        build/asm/data/rodata_attract_prefix.rodata.s.o(.rodata);
-        . = 0x100520;   /* 0x80110520 */
-        __recon_diabpsx_rodata_attract_source_start = .;
-        build/recon/psxsrc/attract.cpp.o(.rodata);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_rodata_attract_source_start == 0x1C, "wrong source data extent: rodata_attract_source");
+        build/native_source/rodata_attract_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10053C;   /* 0x8011053C */
         build/asm/data/rodata_block.rodata.s.o(.rodata);
         . = 0x100588;   /* 0x80110588 */
@@ -424,7 +416,7 @@ SECTIONS
         . = 0x1005BC;   /* 0x801105BC */
         build/native_source/rodata_overlay.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100604;   /* 0x80110604 */
-        build/asm/data/rodata_lambo.rodata.s.o(.rodata);
+        build/native_source/rodata_lambo.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100614;   /* 0x80110614 */
         build/asm/data/rodata_cplayer.rodata.s.o(.rodata);
         . = 0x1006D4;   /* 0x801106D4 */
@@ -462,7 +454,7 @@ SECTIONS
         . = 0x100C38;   /* 0x80110C38 */
         build/native_source/rodata_decomp_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100C5C;   /* 0x80110C5C */
-        build/asm/data/rodata_loading.rodata.s.o(.rodata);
+        build/native_source/rodata_loading.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100CC0;   /* 0x80110CC0 */
         build/asm/data/rodata_cardcore.rodata.s.o(.rodata);
         . = 0x100CF0;   /* 0x80110CF0 */
@@ -470,17 +462,13 @@ SECTIONS
         . = 0x100DC0;   /* 0x80110DC0 */
         build/native_source/rodata_bird.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100E30;   /* 0x80110E30 */
-        build/asm/data/rodata_corefmv_prefix.rodata.s.o(.rodata);
-        . = 0x100E40;   /* 0x80110E40 */
-        __recon_diabpsx_rodata_corefmv_source_start = .;
-        build/recon/psxsrc/corefmv.cpp.o(.rodata);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_rodata_corefmv_source_start == 0x84, "wrong source data extent: rodata_corefmv_source");
+        build/native_source/rodata_corefmv.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100EC4;   /* 0x80110EC4 */
         build/native_source/rodata_kanji.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100F44;   /* 0x80110F44 */
-        build/asm/data/rodata_psxhelp.rodata.s.o(.rodata);
+        build/native_source/rodata_psxhelp.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100F74;   /* 0x80110F74 */
-        build/asm/data/rodata_monsview.rodata.s.o(.rodata);
+        build/native_source/rodata_monsview.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100F84;   /* 0x80110F84 */
         build/asm/data/rodata_spltargt.rodata.s.o(.rodata);
         . = 0x100FA8;   /* 0x80110FA8 */
@@ -496,7 +484,7 @@ SECTIONS
         . = 0x101134;   /* 0x80111134 */
         build/asm/data/rodata_diablo.rodata.s.o(.rodata);
         . = 0x1011A8;   /* 0x801111A8 */
-        build/asm/data/rodata_towners.rodata.s.o(.rodata);
+        build/native_source/rodata_towners.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x101318;   /* 0x80111318 */
         build/native_source/rodata_effects.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x101328;   /* 0x80111328 */
@@ -522,7 +510,7 @@ SECTIONS
         . = 0x1067A8;   /* 0x801167A8 */
         build/asm/data/rodata_msg.rodata.s.o(.rodata);
         . = 0x1069D0;   /* 0x801169D0 */
-        build/asm/data/rodata_multi.rodata.s.o(.rodata);
+        build/native_source/rodata_multi.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1069E0;   /* 0x801169E0 */
         build/asm/data/rodata_objdat.rodata.s.o(.rodata);
         . = 0x106AD0;   /* 0x80116AD0 */
@@ -558,18 +546,11 @@ SECTIONS
         . = 0x108B18;   /* 0x80118B18 */
         build/native_source/rodata_gwin.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108C30;   /* 0x80118C30 */
-        build/asm/data/rodata_lang.rodata.s.o(.rodata);
+        build/native_source/rodata_lang.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108C98;   /* 0x80118C98 */
         build/asm/data/rodata_misprint.rodata.s.o(.rodata);
         . = 0x108D68;   /* 0x80118D68 */
-        build/asm/data/rodata_mlist_prefix.rodata.s.o(.rodata);
-        . = 0x108D78;   /* 0x80118D78 */
-        __recon_diabpsx_rodata_mlist_source_start = .;
-        build/recon/source/mlist.cpp.o(.rodata);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_rodata_mlist_source_start == 0x11, "wrong source payload extent: rodata_mlist_source");
-        FILL(0);
-        . = ALIGN(4);
-        ASSERT(. - __recon_diabpsx_rodata_mlist_source_start == 0x14, "wrong source data extent: rodata_mlist_source");
+        build/native_source/rodata_mlist_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108D8C;   /* 0x80118D8C */
         build/native_source/rodata_objprint.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108DB0;   /* 0x80118DB0 */
@@ -585,7 +566,7 @@ SECTIONS
         . = 0x108E24;   /* 0x80118E24 */
         build/native_source/rodata_portal_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108E34;   /* 0x80118E34 */
-        build/asm/data/rodata_compmap.rodata.s.o(.rodata);
+        build/native_source/rodata_compmap.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108E6C;   /* 0x80118E6C */
         build/asm/data/rodata_gameover.rodata.s.o(.rodata);
         . = 0x108E90;   /* 0x80118E90 */
@@ -597,17 +578,17 @@ SECTIONS
         . = 0x109464;   /* 0x80119464 */
         build/asm/data/rodata_version_suffix.rodata.s.o(.rodata);
         . = 0x109490;   /* 0x80119490 */
-        build/asm/data/rodata_coreinv.rodata.s.o(.rodata);
+        build/native_source/rodata_coreinv.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1094B4;   /* 0x801194B4 */
-        build/asm/data/rodata_gamemenu.rodata.s.o(.rodata);
+        build/native_source/rodata_gamemenu.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1094D8;   /* 0x801194D8 */
         build/native_source/rodata_dpiece_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1094FC;   /* 0x801194FC */
-        build/asm/data/rodata_loadsave.rodata.s.o(.rodata);
+        build/native_source/rodata_loadsave.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109540;   /* 0x80119540 */
-        build/asm/data/rodata_setmaps.rodata.s.o(.rodata);
+        build/native_source/rodata_setmaps.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1096D4;   /* 0x801196D4 */
-        build/asm/data/rodata_choosem.rodata.s.o(.rodata);
+        build/native_source/rodata_choosem.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1097AC;   /* 0x801197AC */
         build/native_source/rodata_preobj.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109990;   /* 0x80119990 */
@@ -615,21 +596,21 @@ SECTIONS
         . = 0x109A34;   /* 0x80119A34 */
         build/native_source/rodata_themes.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109B08;   /* 0x80119B08 */
-        build/asm/data/rodata_preport.rodata.s.o(.rodata);
+        build/native_source/rodata_preport.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109B18;   /* 0x80119B18 */
         build/native_source/rodata_prequest.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109BA4;   /* 0x80119BA4 */
-        build/asm/data/rodata_preinv.rodata.s.o(.rodata);
+        build/native_source/rodata_preinv.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109BC8;   /* 0x80119BC8 */
         build/asm/data/rodata_preauto.rodata.s.o(.rodata);
         . = 0x109C00;   /* 0x80119C00 */
         build/native_source/rodata_premon_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D20;   /* 0x80119D20 */
-        build/asm/data/rodata_premiss.rodata.s.o(.rodata);
+        build/native_source/rodata_premiss.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D44;   /* 0x80119D44 */
         build/native_source/rodata_pretrigs_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D68;   /* 0x80119D68 */
-        build/asm/data/rodata_prestore.rodata.s.o(.rodata);
+        build/native_source/rodata_prestore.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D8C;   /* 0x80119D8C */
         build/asm/data/rodata_premsg.rodata.s.o(.rodata);
         . = 0x109D9C;   /* 0x80119D9C */
@@ -691,6 +672,10 @@ SECTIONS
         __source_davel_sbss_start = .;
         build/native_source/davel.sbss.s.o(.sbss);
         ASSERT(. - __source_davel_sbss_start == 0x8, "wrong BSS extent: davel");
+        . = 0x10C6EC;
+        __source_loading_sbss_start = .;
+        build/native_source/loading.sbss.s.o(.sbss);
+        ASSERT(. - __source_loading_sbss_start == 0x4, "wrong BSS extent: loading");
         . = 0x10C720;
         __source_bird_sbss_start = .;
         build/native_source/bird.sbss.s.o(.sbss);
@@ -699,6 +684,14 @@ SECTIONS
         __source_kanji_sbss_start = .;
         build/native_source/kanji.sbss.s.o(.sbss);
         ASSERT(. - __source_kanji_sbss_start == 0xC, "wrong BSS extent: kanji");
+        . = 0x10C73C;
+        __source_psxhelp_sbss_start = .;
+        build/native_source/psxhelp.sbss.s.o(.sbss);
+        ASSERT(. - __source_psxhelp_sbss_start == 0xA, "wrong BSS extent: psxhelp");
+        . = 0x10C7BC;
+        __source_towners_sbss_start = .;
+        build/native_source/towners.sbss.s.o(.sbss);
+        ASSERT(. - __source_towners_sbss_start == 0x8, "wrong BSS extent: towners");
         . = 0x10C7C4;
         __source_engine_sbss_start = .;
         build/native_source/engine.sbss.s.o(.sbss);
@@ -707,6 +700,10 @@ SECTIONS
         __source_minitext_sbss_start = .;
         build/native_source/minitext.sbss.s.o(.sbss);
         ASSERT(. - __source_minitext_sbss_start == 0x24, "wrong BSS extent: minitext");
+        . = 0x10C840;
+        __source_multi_sbss_start = .;
+        build/native_source/multi.sbss.s.o(.sbss);
+        ASSERT(. - __source_multi_sbss_start == 0x38, "wrong BSS extent: multi");
         . = 0x10C8C8;
         __source_town_sbss_start = .;
         build/native_source/town.sbss.s.o(.sbss);
@@ -719,6 +716,10 @@ SECTIONS
         __source_portal_sbss_start = .;
         build/native_source/portal.sbss.s.o(.sbss);
         ASSERT(. - __source_portal_sbss_start == 0x4, "wrong BSS extent: portal");
+        . = 0x10C8D4;
+        __source_loadsave_sbss_start = .;
+        build/native_source/loadsave.sbss.s.o(.sbss);
+        ASSERT(. - __source_loadsave_sbss_start == 0x4, "wrong BSS extent: loadsave");
         . = 0x10C8E0;
         __source_drlg_l3_sbss_start = .;
         build/native_source/drlg_l3.sbss.s.o(.sbss);
@@ -763,6 +764,10 @@ SECTIONS
         __source_kanji_bss_start = .;
         build/native_source/kanji.bss.s.o(.bss);
         ASSERT(. - __source_kanji_bss_start == 0x4BFC, "wrong BSS extent: kanji");
+        . = 0x111C78;
+        __source_psxhelp_bss_start = .;
+        build/native_source/psxhelp.bss.s.o(.bss);
+        ASSERT(. - __source_psxhelp_bss_start == 0x20, "wrong BSS extent: psxhelp");
         . = 0x11FB68;
         __source_gamepad_bss_start = .;
         build/native_source/gamepad.bss.s.o(.bss);

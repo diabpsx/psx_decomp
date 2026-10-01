@@ -13,6 +13,33 @@
  * (gamemenu_on, gamemenu_handle_previous, gamemenu_previous, ...) was dropped entirely; whatever
  * still calls gamemenu_off() elsewhere in this port only needs the empty stub. */
 #include "diabpsx_types.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+
+struct TextDat {
+    BOOL OwnDat;
+    int TexNum, LastFrame;
+    BOOL DatLoaded;
+    long hndDat;
+    inline void DumpDatFile();
+};
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+class CPlayer : public TextDat {
+public:
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
+};
 #include "source/gen/structs_gamemenu.h"
 #include "source/gen/externs_gamemenu.h"
 #include "source/gen/protos_gamemenu.h"

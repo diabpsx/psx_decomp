@@ -15,5 +15,10 @@ dlabel D_80119490
     /* 1094A4 801194A4 72632F63 */ .word 0x632F6372
     /* 1094A8 801194A8 706C6179 */ .word 0x79616C70
     /* 1094AC 801194AC 65722E68 */ .word 0x682E7265
-    /* 1094B0 801194B0 00D56800 */ .word 0x0068D500
+    /* 1094B0 801194B0 */ .byte 0x00
 enddlabel D_80119490
+
+dlabel coreinv_rodata_padding
+    /* 1094B1 801194B1 */ .byte 0xD5
+    /* 1094B2 801194B2 */ .short 0x0068
+enddlabel coreinv_rodata_padding

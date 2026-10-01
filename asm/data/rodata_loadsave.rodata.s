@@ -11,16 +11,22 @@ dlabel D_801194FC
     /* 1094FC 801194FC */ .asciz "psxsrc/gman.h"
     /* 7073787372632F676D616E2E68000000 */
 .align 2
+enddlabel D_801194FC
 .align 2
+dlabel D_8011950C
     /* 10950C 8011950C */ .asciz "psxsrc/cplayer.h"
     /* 7073787372632F63706C617965722E6800000000 */
 .align 2
+enddlabel D_8011950C
 .align 2
+dlabel D_80119520
     /* 109520 80119520 */ .asciz "DIABICON.RAW"
     /* 4449414249434F4E2E52415700000000 */
 .align 2
+enddlabel D_80119520
 .align 2
+dlabel D_80119530
     /* 109530 80119530 */ .asciz "DIABLO-OPTIONS"
     /* 444941424C4F2D4F5054494F4E530000 */
 .align 2
-enddlabel D_801194FC
+enddlabel D_80119530

@@ -15,5 +15,10 @@ dlabel D_80119D68
     /* 109D7C 80119D7C 72632F63 */ .word 0x632F6372
     /* 109D80 80119D80 706C6179 */ .word 0x79616C70
     /* 109D84 80119D84 65722E68 */ .word 0x682E7265
-    /* 109D88 80119D88 00010000 */ .word 0x00000100
+    /* 109D88 80119D88 */ .byte 0x00
 enddlabel D_80119D68
+
+dlabel prestore_rodata_padding
+    /* 109D89 80119D89 */ .byte 0x01
+    /* 109D8A 80119D8A */ .short 0x0000
+enddlabel prestore_rodata_padding

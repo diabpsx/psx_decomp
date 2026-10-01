@@ -1,8 +1,25 @@
-/* PSXHELP.CPP — Diablo PSX (Climax 1998) reconstruction (PSXSRC).  No PC twin: the in-game controls
+/* PSXHELP.CPP вЂ” Diablo PSX (Climax 1998) reconstruction (PSXSRC).  No PC twin: the in-game controls
  * help screen (HelpList of 25 lines, scrolled with the pad, each action line showing the pad
  * button assigned to it).  The header inlines (Dialog, CPad, CBlocks) are emitted out of line in
  * this object (-fno-inline). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
+
+class CPlayer : public TextDat {
+public:
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
+};
 
 struct RECT {   /* sizeof 8 */
     short x, y, w, h;
@@ -13,10 +30,49 @@ enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
 extern unsigned char DialogRed, DialogGreen, DialogBlue;
 extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
+class CPad {
+public:
+    unsigned char get_both;       /* +0x0 */
+    unsigned char active;         /* +0x1 */
+    unsigned char PadType;        /* +0x2 */
+    unsigned char PADTICK;        /* +0x3 */
+    unsigned short PADTICKMASK;   /* +0x4 */
+    unsigned short PadNum;        /* +0x6 */
+    unsigned short Cur;           /* +0x8 */
+    unsigned short Up;            /* +0xA */
+    unsigned short Down;          /* +0xC */
+    unsigned short Tick;          /* +0xE */
+    unsigned short Old;           /* +0x10 */
+    unsigned short both_Cur;      /* +0x12 */
+    unsigned short both_Up;       /* +0x14 */
+    unsigned short both_Down;     /* +0x16 */
+    unsigned short both_Tick;     /* +0x18 */
+    unsigned short both_Old;      /* +0x1A */
+    unsigned char rest[236 - 0x1C];
+
+    void SetPadTick(unsigned short tick) { PADTICK = tick; }
+    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
+    unsigned short GetDown() const
+    {
+        if (get_both)
+            return both_Down;
+        return Down;
+    }
+    unsigned short GetTick() const
+    {
+        if (get_both)
+            return both_Tick;
+        return Tick;
+    }
+
+};
+
+
 class CBlocks {
 public:
     static int GetOverlayOtBase() { return 0x1E8; }
 };
+
 
 class Dialog {
 public:
@@ -52,41 +108,6 @@ public:
     int SetOTpos(int OT);
 };
 
-class CPad {
-public:
-    unsigned char get_both;       /* +0x0 */
-    unsigned char active;         /* +0x1 */
-    unsigned char PadType;        /* +0x2 */
-    unsigned char PADTICK;        /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;        /* +0x6 */
-    unsigned short Cur;           /* +0x8 */
-    unsigned short Up;            /* +0xA */
-    unsigned short Down;          /* +0xC */
-    unsigned short Tick;          /* +0xE */
-    unsigned short Old;           /* +0x10 */
-    unsigned short both_Cur;      /* +0x12 */
-    unsigned short both_Up;       /* +0x14 */
-    unsigned short both_Down;     /* +0x16 */
-    unsigned short both_Tick;     /* +0x18 */
-    unsigned short both_Old;      /* +0x1A */
-    unsigned char rest[236 - 0x1C];
-
-    unsigned short GetTick() const
-    {
-        if (get_both)
-            return both_Tick;
-        return Tick;
-    }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
-    void SetPadTick(unsigned short tick) { PADTICK = tick; }
-};
 
 struct HelpStruct {   /* sizeof 12 */
     char DisplayType;
@@ -147,10 +168,37 @@ static void RemoveHelp(void);
 static struct RECT HelpRect;
 static unsigned char HelpTop;
 static char help_select_line;
-BOOL displayinghelp;
+extern BOOL displayinghelp;
 static Dialog HelpBack;
-static BOOL helpflag;
-extern struct HelpStruct HelpList[25];
+static BOOL helpflag = 0;
+/* Retail HelpStruct records: display category, primary text ID, secondary text ID. */
+static struct HelpStruct HelpList[25] = {
+    { 4, 0x1C8, 0 },
+    { 1, 0x32, 0 },
+    { 1, 0x9, 0 },
+    { 1, 0xA2, 0 },
+    { 1, 0x4AB, 0 },
+    { 1, 0x45, 0 },
+    { 1, 0x3F3, 0 },
+    { 1, 0x33, 0 },
+    { 1, 0xC6, 0 },
+    { 1, 0x33B, 0 },
+    { 1, 0x21F, 0 },
+    { 1, 0xAE, 0 },
+    { 1, 0x3F7, 0 },
+    { 1, 0x33F, 0 },
+    { 1, 0x340, 0 },
+    { 1, 0x48D, 0 },
+    { 4, 0x1CD, 0 },
+    { 3, 0x1CF, 0x1CE },
+    { 3, 0x1D7, 0x1D6 },
+    { 3, 0x1DD, 0x1DC },
+    { 3, 0x1DB, 0x1DA },
+    { 3, 0x1D3, 0x1D2 },
+    { 3, 0x1D1, 0x1D0 },
+    { 3, 0x1D9, 0x1D8 },
+    { 3, 0x1D5, 0x1D4 },
+};
 
 /* Only DrawHelp is public (OPTIONS calls it): the helpers are file statics, which is why the
  * static-object thunks are named _GLOBAL__I/D_DrawHelp__Fv. */
@@ -369,3 +417,5 @@ void DrawHelp(void)
     HelpBack.SetOTpos(oldDot);
     MediumFont.SetOTpos(OldPrintOT);
 }
+
+BOOL displayinghelp = 0;

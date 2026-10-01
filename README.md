@@ -124,9 +124,9 @@ header/string/jump-table pool, 52 small-data bytes, 36 BSS bytes, and both
 constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects 32 reconstructed TUs covering
-129 verified function entries, while `configs/native_recon_link.json` supplies
-868 functions across forty-nine TUs through real ASPSX/PSYLINK: 997 source-linked
-functions across 81 TUs in total. They replace their text scaffolds at the original
+101 verified function entries, while `configs/native_recon_link.json` supplies
+1052 functions across seventy-five TUs through real ASPSX/PSYLINK: 1153 source-linked
+functions across 91 TUs in total. They replace their text scaffolds at the original
 addresses. PCIO and DatIO also supply their complete read-only sections,
 including diagnostic strings and relocated virtual-method tables, through
 `configs/recon_data_link.json`. SPELLS supplies its complete 20-byte jump table

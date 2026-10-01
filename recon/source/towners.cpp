@@ -1,48 +1,20 @@
 /* TOWNERS.CPP — Diablo PSX (Climax 1998) reconstruction.  Twin: refs/devilution/Source/towners.cpp.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_towners.h"
 #include "source/gen/externs_towners.h"
 #include "source/gen/protos_towners.h"
 #include "source/diablo.h"
+#include "source/gen/tables_towners.h"
 
-/* TU data (.sdata / .sbss, tentative definitions) */
-unsigned char storeflag;
-unsigned char boyloadflag;
-unsigned char bannerflag;
-int numtowners;
-unsigned long CowPlaying;
-unsigned char *pCowCels;
+struct TownerStruct towner[16] = { { 0 } };
+
+/* Initialized globals follow the local sound state below in retail small data. */
+unsigned long CowPlaying = 0;
 static unsigned long sgdwCowClicks;
 static int sgnCowMsg;
-
-static void CowSFX(int pnum)
-{
-    static int snSFX[3][3] = {
-        { PS_WARR52, PS_ROGUE52, PS_MAGE52 },
-        { PS_WARR49, PS_ROGUE49, PS_MAGE49 },
-        { PS_WARR50, PS_ROGUE50, PS_MAGE50 },
-    };
-    static int snLastCowSFX;
-
-    sgdwCowClicks++;
-    if (!CowPlaying) {
-        if (sgdwCowClicks >= 4) {
-            sgdwCowClicks = 0;
-            snLastCowSFX = snSFX[sgnCowMsg][plr[pnum]._pClass];
-            sgnCowMsg++;
-            if (sgnCowMsg >= 3)
-                sgnCowMsg = 0;
-        } else {
-            if (sgdwCowClicks == 1)
-                snLastCowSFX = TSFX_COW2;
-            else
-                snLastCowSFX = TSFX_COW1;
-            CowPlaying = 100;
-        }
-        PlaySfxLoc(snLastCowSFX, plr[pnum]._px, plr[pnum]._py);
-    }
-}
 
 int GetActiveTowner(int t)
 {
@@ -432,6 +404,40 @@ ItemStruct *PlrHasItem(int pnum, int item, int &i)
     return NULL;
 }
 
+static void CowSFX(int pnum)
+{
+    static const int snSFX[3][3] = {
+        { PS_WARR52, PS_ROGUE52, PS_MAGE52 },
+        { PS_WARR49, PS_ROGUE49, PS_MAGE49 },
+        { PS_WARR50, PS_ROGUE50, PS_MAGE50 },
+    };
+    static int snLastCowSFX = -1;
+
+    sgdwCowClicks++;
+    if (!CowPlaying) {
+        if (sgdwCowClicks >= 4) {
+            sgdwCowClicks = 0;
+            snLastCowSFX = snSFX[sgnCowMsg][plr[pnum]._pClass];
+            sgnCowMsg++;
+            if (sgnCowMsg >= 3)
+                sgnCowMsg = 0;
+        } else {
+            if (sgdwCowClicks == 1)
+                snLastCowSFX = TSFX_COW2;
+            else
+                snLastCowSFX = TSFX_COW1;
+            CowPlaying = 100;
+        }
+        PlaySfxLoc(snLastCowSFX, plr[pnum]._px, plr[pnum]._py);
+    }
+}
+
+int numtowners = 0;
+unsigned char storeflag = 0;
+unsigned char boyloadflag = 0;
+unsigned char bannerflag = 0;
+unsigned char *pCowCels = 0;
+
 void TownerTalk(int first, int t)
 {
     sgdwCowClicks = 0;
@@ -461,13 +467,13 @@ void TalkToTowner(int p, int t)
     if (_pcurs[myplr] >= CURSOR_FIRSTITEM && !DropItemBeforeTrig())
         return;
     if (t == GetActiveTowner(TOWN_TAVERN)) {
-        if (!plr[p]._pLvlVisited[0] && !towner[t]._tMsgSaid) {
+        if (!plr[p]._pLvlVisited[1] && !towner[t]._tMsgSaid) {
             towner[t]._tbtcnt = 150;
             towner[t]._tVar1 = p;
             InitQTextMsg(TEXT_INTRO);
             towner[t]._tMsgSaid = 1;
         }
-        if ((plr[p]._pLvlVisited[1] || plr[p]._pLvlVisited[3]) && quests[Q_SKELKING]._qactive != QUEST_NOTAVAIL) {
+        if ((plr[p]._pLvlVisited[2] || plr[p]._pLvlVisited[4]) && quests[Q_SKELKING]._qactive != QUEST_NOTAVAIL) {
             if (quests[Q_SKELKING]._qvar2 == 0 && !towner[t]._tMsgSaid) {
                 quests[Q_SKELKING]._qvar2 = 1;
                 quests[Q_SKELKING]._qlog = 1;
@@ -491,7 +497,7 @@ void TalkToTowner(int p, int t)
                 NetSendCmdQuest(1, Q_SKELKING);
             }
         }
-        if (gbMaxPlayers == 1 && plr[p]._pLvlVisited[2] && quests[Q_LTBANNER]._qactive != QUEST_NOTAVAIL) {
+        if (gbMaxPlayers == 1 && plr[p]._pLvlVisited[3] && quests[Q_LTBANNER]._qactive != QUEST_NOTAVAIL) {
             if ((quests[Q_LTBANNER]._qactive == QUEST_INIT || quests[Q_LTBANNER]._qactive == QUEST_ACTIVE) && quests[Q_LTBANNER]._qvar2 == 0 && !towner[t]._tMsgSaid) {
                 quests[Q_LTBANNER]._qvar2 = 1;
                 if (quests[Q_LTBANNER]._qactive == QUEST_INIT) {
@@ -557,7 +563,7 @@ void TalkToTowner(int p, int t)
         }
     } else if (t == GetActiveTowner(TOWN_SMITH)) {
         if (gbMaxPlayers == 1) {
-            if (plr[p]._pLvlVisited[3] && quests[Q_ROCK]._qactive != QUEST_NOTAVAIL) {
+            if (plr[p]._pLvlVisited[4] && quests[Q_ROCK]._qactive != QUEST_NOTAVAIL) {
                 if (quests[Q_ROCK]._qvar2 == 0) {
                     quests[Q_ROCK]._qvar2 = 1;
                     quests[Q_ROCK]._qlog = 1;
@@ -584,7 +590,7 @@ void TalkToTowner(int p, int t)
                     NetSendCmdQuest(1, Q_ROCK);
                 }
             }
-            if (plr[p]._pLvlVisited[8] && quests[Q_ANVIL]._qactive != QUEST_NOTAVAIL) {
+            if (plr[p]._pLvlVisited[9] && quests[Q_ANVIL]._qactive != QUEST_NOTAVAIL) {
                 if ((quests[Q_ANVIL]._qactive == QUEST_INIT || quests[Q_ANVIL]._qactive == QUEST_ACTIVE) && quests[Q_ANVIL]._qvar2 == 0 && !towner[t]._tMsgSaid) {
                     if (quests[Q_ROCK]._qvar2 == 2 || quests[Q_ROCK]._qactive == QUEST_ACTIVE && quests[Q_ROCK]._qvar2 == 1) {
                         quests[Q_ANVIL]._qvar2 = 1;
@@ -699,7 +705,7 @@ void TalkToTowner(int p, int t)
                     Qtalklist[TOWN_HEALER][1] = -1;
                     NetSendCmdQuest(1, Q_MUSHROOM);
                 }
-            } else if (plr[p]._pLvlVisited[0]) {
+            } else if (plr[p]._pLvlVisited[1]) {
                 if (!towner[t]._tMsgSaid) {
                     if (quests[Q_PWATER]._qactive == QUEST_INIT) {
                         quests[Q_PWATER]._qactive = QUEST_ACTIVE;

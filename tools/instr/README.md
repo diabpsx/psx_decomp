@@ -590,6 +590,16 @@ but does not establish successful compilation of the isolated TU.
 
 ### DrawDurThingy__6GPaneliiP10ItemStructi
 
+Post-matrix coordinate follow-up (2026-10-01): revisited Top=Y-1 and a
+full-width Row=Y-1+(3-Loop)*5 now that DurColors is correctly declared.
+Top alone, Row alone, and both together all produce 180 instructions versus
+retail 179, with 49 diff lines. The Top variant saves fp (real frame comment:
+vars=8, regs=10/0, args=32), but frame size remains 80 rather than retail 88;
+SYM correctly rejects it. This differs from the older pre-matrix 96-byte
+experiment and isolates an outstanding stack-layout issue even when the
+extra saved register is restored. Diagnostic copies/results: `build/da`.
+No source change was retained; live baseline remains 178/179 and non-PASS.
+
 Before the DurColors matrix reconstruction, the full gpanel.cpp compiled
 successfully with both compilers, but comparison
 shows a larger transformed-RTL discrepancy than a register permutation. PsyQ
@@ -1867,6 +1877,15 @@ The game function board remains 2686/2727.
 
 ### MemcardPad reload: volatile declarations do not explain retail
 
+Argument-expression follow-up (2026-10-01): three full-TU copies in
+`build/margs` test assigning Savefilename in the second call argument,
+reading Savefilename instead of DiabloGameFile, and combining the two
+assignments with a comma expression. All produce the unchanged eight diffs,
+583/585 instructions. Retail reloads save_blocks after loading DiabloGameFile
+but before storing Savefilename, so merely changing the latter store's source
+ordering is not sufficient. None of these variants was retained; this does
+not justify volatile accesses, alias barriers or extra control-flow guards.
+
 `tools/instr/probe_memcard_reload.py` creates isolated full-TU copies, keeping
 the correct options.cpp basename and real gate settings. Baseline remains
 8 differences / 583 instructions versus retail 585. Qualifying save_blocks
@@ -2569,6 +2588,17 @@ native, 129/32 conventional); matching remains 2687/2727.
 
 ### DRLG_L5TransFix paired loop coordinates
 
+Tile-read follow-up (2026-10-02): replacing both cached-v comparisons against
+seven with direct dungeon reads stops the unwanted seven hoist and reduces
+the raw diff count to 186, but introduces reloads and grows to 277 instructions
+versus retail 273. Replacing only the last seven test gives 272 instructions
+and 349 diffs; restoring direct reads for the five gold-shared rules gives
+276/403. Read-only views at the seven tests or also at v's initial load grow
+to 283/284 instructions and a 32-byte frame (retail 24). All five full-TU
+copies under `build/treads` were rejected. This isolates a CSE/load-reuse
+versus loop-hoisting interaction; fewer differing register names alone is
+not a match. Live source remains the 270/273, 333-difference baseline.
+
 Rechecked the gold Hellfire source at DRLG_L1.CPP:2990: it confirms the five
 shared transparency rules, while the remaining rules are PSX additions and
 must retain retail behavior. Pairing xx/yy updates with i/j in the for headers
@@ -2922,7 +2952,427 @@ introduced. The whole GAMEPAD TU now passes 42/42, including call audits.
 The completed full-board refresh confirms 2688/2727 (39 remaining), with all
 147 tool tests passing. Source-link coverage is unchanged by this gate fix.
 
-### DRLG_L2 gold-table reconstruction
+### PREMISS native-lane conversion
+
+Moved PREMISS's single already-passing InitMissiles overlay function from
+conventional to native ownership. Restored the original unused GMAN/CPlayer
+header inlines and their 33 main-image source bytes; three following alignment
+bytes remain scaffold. Native verification proves all 464 pregame text bytes,
+the cross-image pool, function SYM record and eight bindings. Its one-call
+audit, all 166 tests, and both complete main/pregame comparisons pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,052/75 native and
+101/16 conventional. The board remains 2693/2727.
+
+### PRESTORE native-lane conversion
+
+Moved PRESTORE's two already-passing store initialization functions from
+conventional to native ownership. Restored the original unused GMAN/CPlayer
+header inlines and their 33 source-owned main-image bytes; three following
+alignment bytes remain scaffold. Native verification proves all 760 pregame
+text bytes, both SYM records, the cross-image header pool and 21 external
+bindings. Function/call audits, all 166 tests and both complete main/pregame
+image comparisons pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,051/74 native and
+102/17 conventional. The board remains 2693/2727.
+
+### PREPORT native-lane conversion
+
+Moved PREPORT's single already-passing InitPortals overlay function from
+conventional to native ownership. Restored the unused original GMAN
+DumpDatFile inline and its fourteen-byte main-image literal; two following
+alignment bytes remain scaffold behind an explicit boundary. Native verification
+proves all 96 pregame text bytes, the function SYM record, delta_portal_inited
+and portal bindings, and the cross-image literal. The one-call audit, all 166
+tests, and both complete main/pregame comparisons pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,049/73 native and
+104/18 conventional. The board remains 2693/2727.
+
+### PREINV native-lane conversion
+
+Moved PREINV's single already-passing InitInv overlay function from
+conventional to native ownership. Restored the original unused GMAN/CPlayer
+header inlines and their 33 source-owned filename bytes, with the following
+three alignment bytes kept in scaffold. Native verification proves all 84
+pregame text bytes, the main-image header pool, the function SYM record and
+seven external bindings. Its one-call audit, all 166 tests, and both complete
+main/pregame image comparisons pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,048/72 native and
+105/19 conventional. The board remains 2693/2727.
+
+### COREFMV native-lane conversion
+
+Moved COREFMV's two already-passing movie entry points and full data payload
+from conventional to native ownership. Restored the unused GMAN DumpDatFile
+inline's filename literal and merged the former prefix/source read-only
+fragments into the original complete 148-byte scaffold.
+
+Native verification proves all 664 text bytes, the 48-byte FmvTab with six
+movie-name relocations, 148 read-only bytes including all movie names and the
+five-entry overlay reload switch table, both function SYM records and thirteen
+external bindings. Function/call audits, all 166 tests and the complete main
+image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,047/71 native and
+106/20 conventional. The board remains 2693/2727.
+
+### COREINV native-lane conversion
+
+Moved COREINV's single already-passing FindGetItem function from conventional
+to native ownership. Restored its unused original GMAN/CPlayer header inlines
+and their 33 source-owned filename bytes. An explicit boundary preserves three
+following scaffold alignment bytes. Native verification proves all 180 text
+bytes, the complete header pool, the function SYM record and its item,
+itemactive and numitems bindings. The no-call audit, all 166 tests and the full
+main-image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,045/70 native and
+108/21 conventional. The board remains 2693/2727.
+
+### MONSVIEW native-lane conversion
+
+Moved MONSVIEW's single empty, already-passing debug viewer from conventional
+to native ownership. Restored the unused original GMAN DumpDatFile inline so
+its filename literal is source-emitted. Native verification proves all eight
+text bytes, fourteen read-only bytes and the function SYM record; the two
+trailing alignment bytes remain scaffold. Its no-call audit, all 166 tests
+and the full main-image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,044/69 native and
+109/22 conventional. The board remains 2693/2727.
+
+### GAMEONLY native-lane conversion
+
+Moved the game overlay's single empty presence-probe function from conventional
+to native ownership. The TU owns exactly eight text bytes and no data, literals,
+relocations or bindings. Native code and its function SYM record match retail;
+the no-call audit, all 166 tests and the full 172,584-byte GAME.BIN comparison
+pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,043/68 native and
+110/23 conventional. The board remains 2693/2727.
+
+### GAMEMENU native-lane conversion
+
+Moved the single empty, already-passing PSX gamemenu_off stub from conventional
+to native ownership. Restored the unused GMAN/CPlayer header inlines so their
+two retail filename literals are source-emitted. Native verification proves
+all eight text bytes, 33 source-owned read-only bytes and the function SYM
+record. An explicit label boundary preserves the following three scaffold
+alignment bytes. Its no-call audit, all 166 tests and the complete main-image
+comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,042/67 native and
+111/24 conventional. The board remains 2693/2727.
+
+### TESTCODE native-lane conversion
+
+Moved TESTCODE's two already-passing direct-start debug entry points from
+conventional to native ownership. The TU owns exactly 96 text bytes and no
+data or read-only payload. Native code, both function SYM records and all four
+external bindings match retail. Both call audits, all 166 tests and the full
+1,099,272-byte main-image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,041/66 native and
+112/25 conventional. The board remains 2693/2727.
+
+### STORM native-lane conversion
+
+Moved STORM's two already-passing C-linkage memory wrappers from conventional
+to native ownership. The unit owns exactly 64 text bytes, has no data or
+read-only payload, and binds only Tmalloc/Tfree. Native code and both function
+SYM records match retail; both call audits, all 166 tests and the full
+1,099,272-byte main-image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,039/65 native and
+114/26 conventional. The board remains 2693/2727.
+
+### MEM native-lane conversion
+
+Moved MEM's two already-passing wrappers from conventional to native ownership
+and restored its two 40-byte MEM_INIT_INFO descriptors. Each record has its
+retail RAM label, alignment four and relocated SlowMemMove callback. Declaring
+the two labels const places their 21 source bytes in the retail read-only
+section; mutable arrays incorrectly grew initialized data to 104 bytes and were
+rejected. A final scaffold-word split preserves three trailing non-source bytes.
+
+Native verification proves all 40 text bytes, 80 initialized-data bytes with
+four relocations, 21 read-only bytes, both function SYM records and both static
+descriptor records/addresses. Function/call audits, all 166 tests and the full
+1,099,272-byte main-image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,037/64 native and
+116/27 conventional. The board remains 2693/2727.
+
+### LZNP native-lane conversion
+
+Moved LZNP's single already-passing decoder from conventional to native
+ownership. The TU owns exactly 212 text bytes and no data, literals,
+relocations or external bindings. Native code and its one function SYM record
+match retail; its no-call audit, all 166 tests and the complete 1,099,272-byte
+main-image comparison pass.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,035/63 native and
+118/28 conventional. The function board remains 2693/2727.
+
+### LAMBO native-lane conversion
+
+Moved LAMBO's two empty, already-passing scratch functions from conventional
+to native ownership. Restored the unused GMAN DumpDatFile inline's filename
+literal and split the final scaffold word so its two trailing alignment bytes
+remain original scaffold. Native verification proves all 16 text bytes, the
+14 source-owned read-only bytes and both function SYM records. Both call audits,
+all 166 tests and the complete 1,099,272-byte main-image comparison pass.
+
+Coverage stays 1,153 functions / 91 TUs, now split as 1,034/62 native and
+119/29 conventional. The board remains 2693/2727.
+
+### MLIST native-lane conversion
+
+Moved MLIST's five already-passing functions and both 16-byte list-selection
+arrays from conventional to native ownership. Restored the unused original
+GMAN DumpDatFile inline's filename literal, merged its two read-only scaffold
+fragments into a bounded 33-byte source pool, and left the final three alignment
+bytes scaffold-owned. Native verification proves all 1,008 text bytes, 32 data
+bytes, five function SYM records, two global records/placements and twelve
+external bindings. All five function/call audits and 166 tests pass; the full
+1,099,272-byte main image remains exact.
+
+Coverage stays 1,153 functions / 91 TUs, now split as 1,032/61 native and
+121/30 conventional. No function-board increase is claimed.
+
+### ATTRACT native-lane conversion
+
+Moved ATTRACT's three already-passing functions from the conventional lane to
+native ASPSX/PSYLINK ownership. Restored the original unused GMAN DumpDatFile
+inline's diagnostic string without importing unrelated header literals. The
+two formerly separate read-only fragments are now one exact 44-byte native
+pool; the obsolete conventional data binding was removed.
+
+Native verification proves all 424 text bytes, both read-only strings, all
+three function SYM records and fourteen external bindings. Standard function
+and call audits stay 3/3, all 166 tests pass, and the final 1,099,272-byte
+main image remains exact. Coverage is unchanged at 1,153 functions / 91 TUs,
+but the split is now 1,027/60 native and 126/31 conventional.
+
+### LOADING native integration
+
+Restored the real TextDat layout/destructor declaration, TASK bitfields and
+original GMAN/CPlayer/CTextFileInfo literals. Reordered the deferred Dialog
+helpers without modifying their bodies, kept CScreen's destructor implicit
+to preserve its block-free SYM, and emitted the file-static POLY_G4 primitive
+helper before the initialization thunks at its retail address. Its top-level
+STAT declaration was checked explicitly, not only its function body.
+
+Native validation caught and fixed BootScreen's incorrect zero initializer:
+retail starts it true. All 2,784 text bytes, 124 CScreen data bytes, 100
+read-only bytes, 32 small-data bytes, four naturally allocated small-BSS
+bytes and both constructor/destructor pointers now match. All nineteen
+function SYM and eight named global records/placements pass, as do all
+nineteen ordinary function/call checks and 166 tests. The shared TextDat
+header's existing native consumers are also recompiled and checked.
+The completed main-image rebuild matches all 1,099,272 retail bytes. Receipts
+confirm 1,024 native functions / 59 TUs, giving 1,153 source-linked functions /
+91 TUs overall. The function PASS board remains 2693/2727.
+
+### SETMAPS native integration
+
+Restored the GMAN/CTextFileInfo header pool and the seven transition arrays'
+retail file-static linkage. The arrays remain writable as in the original
+data/small-data placement; corrected a stale comment claiming they were const.
+Native verification proves all 1,836 pregame text bytes, 104 initialized-data
+bytes, 404 read-only bytes including filenames and switch targets, 36 small-
+data bytes, six function SYM records and all seven array records/addresses.
+All six ordinary function and call audits pass, and all 166 tests pass.
+The final main and pregame images match all 1,099,272 and 171,468 retail
+bytes respectively. Receipts confirm 1,005 native functions / 58 TUs, or
+1,134 source-linked functions / 90 TUs overall. The board remains 2693/2727.
+
+### CHOOSEM native integration
+
+Restored MgToText's 34 initialized monster-name pointers and literals, replacing
+the uninitialized declaration. Restored the original BOOL type of
+DoUiForChooseMonster (initial value one) and the GMAN/CTextFileInfo header
+pools. Native verification proves all 1,492 pregame text bytes, 136 main-image
+data bytes with all 34 relocations, 216 read-only bytes including the
+fourteen-entry quest dispatch table, 232 small-data bytes and both global
+SYM records/placements. All eight function SYM and call checks pass; all
+166 tests pass. A scaffold label boundary after FIREM exposes the following
+flag without changing its bytes or losing alignment padding.
+The completed main and pregame rebuilds match all 1,099,272 and 171,468
+retail bytes respectively. Receipts confirm 999 native functions / 57 TUs,
+or 1,128 source-linked functions / 89 TUs overall. The board remains 2693/2727.
+
+### LOADSAVE data preparation
+
+Native integration follow-up: reordered all 23 function definitions by
+retail address and supplied the missing LoadOptions prototype before its
+first call. Without that prototype, the old compiler introduced an implicit
+unmangled call and extra debug scopes; no checker was weakened to admit it.
+All 23 function/SYM and call checks pass after the correction.
+
+Native verification covers 5,332 frontend text bytes, 812 main-image data
+bytes, 49 source-owned read-only bytes, 28 small-data bytes and four small-BSS
+bytes, plus all eight named data records/placements. The unused trailing
+DIABLO-OPTIONS literal and intervening alignment remain original scaffold;
+no fake source use was introduced. The completed final-image rebuild verifies
+all 1,099,272 main-image bytes and 143,924 frontend-overlay bytes against
+retail. All 166 tests pass. Receipts confirm 991 native functions / 56 TUs,
+or 1,120 source-linked functions / 88 TUs overall. The board remains 2693/2727.
+
+Earlier data preparation:
+
+Restored the retail named writable Shift-JIS arrays DiabloStr[11],
+SaveCharName[19] and OptSaveName[11], replacing anonymous literals in the
+title accessors and save-title formatting calls. Restored initialized
+IconBuffer[768] and the zero-initialized dirty-video globals after the format
+pool. Original GMAN/CPlayer/CTextFileInfo inlines restore the header literals.
+Independent compiled-symbol gates verify all three strings and the icon
+buffer, including exact SDB extents and no overlapping relocations. All
+23 ordinary function/SYM and call checks still pass; all 166 tests pass.
+
+No native registration or linkage-count increase yet: function order and
+absolute data/overlay placement still need verification. Retail also retains
+an unused `DIABLO-OPTIONS` literal after the compiled read-only pool; its
+source provenance is not established and no artificial use was added.
+The old source banner incorrectly claiming thirteen routines were absent
+was corrected; their implementations were already present.
+
+### COMPMAP native integration
+
+Restored the original unused GMAN inline's filename literal. The compiler's
+two allocation labels (`DL`, `DECB`) occupy nine source-owned small-data
+bytes at 8011BCBC. Exact scaffold-word splits expose their final null byte
+and the final source-filename null byte without changing or discarding the
+following original padding. This TU owns no persistent global objects; its
+map state is held in instances allocated by callers.
+
+Native verification covers all 3,028 text bytes, 55 read-only bytes, nine
+small-data bytes and all twenty function SYM records, including constructors,
+destructors and deferred header copies. Whole-TU relocation and ordinary
+function/call checks pass 20/20; all 166 tests pass. No compiler/gate changes.
+The completed main-image rebuild matches all 1,099,272 retail bytes. Receipts
+confirm 968 native functions / 55 TUs, or 1,097 source-linked functions /
+87 TUs overall. The matching board remains 2693/2727.
+
+### PADS integration details
+
+Replaced the broad reconstructed GMAN include with the original focused
+TextDat/CTextFileInfo definitions. This removes unrelated primpool.h/.hdr
+literals while retaining retail's gman.h and .tp/.dat pool. No controller
+logic or compiler settings changed.
+
+Native verification covers all 1,920 text bytes, 1,444 initialized-data
+bytes (both CPad objects, both raw controller buffers and the demo buffer),
+56 read-only bytes, 32 small-data bytes and the constructor-table pointer.
+All fifteen function SYM records and ten named data records/placements match.
+The ordinary function/call checks remain 15/15 and all 166 tests pass.
+PAD_Open's separately reconstructed startup copy is not counted again here.
+The final main-image rebuild matches all 1,099,272 retail bytes. Receipts
+confirm 948 native functions / 54 TUs, giving 1,077 source-linked functions /
+86 TUs overall. The function PASS board remains 2693/2727.
+
+### PSXHELP native integration
+
+Restored HelpList as 25 typed HelpStruct records (300 bytes), verified by
+the independent compiled-data gate. Restored GMAN/CPlayer/CTextFileInfo
+header literals, helpflag=0, and displayinghelp=0 after the extension/format
+strings while preserving the original DrawHelp-named initializer thunks.
+Reordered the deferred CPad/Dialog/CBlocks definitions to reproduce the exact
+retail helper addresses, without altering their instructions.
+
+ASPSX 2.67 naturally packs HelpTop/help_select_line after HelpRect into the
+retail ten-byte small-BSS extent; 2.56 incorrectly separates the bytes. Both
+Dialog objects (local txtBack and global HelpBack) own 32 BSS bytes starting
+at 80121C78. Native verification proves 3,420 text bytes, 300 initialized-data
+bytes, 47 read-only bytes, 40 small-data bytes, both BSS extents and the
+constructor/destructor pointers. All eighteen function SYM records and eight
+named data records/placements match, with 18/18 ordinary function/call audits
+and all 166 tests passing. Unowned alignment bytes remain scaffold.
+The final main-image rebuild matches all 1,099,272 retail bytes. Receipts now
+confirm 933 native functions / 53 TUs, or 1,062 source-linked functions /
+85 TUs overall. The function board remains 2693/2727, with 34 non-PASS entries.
+
+### MULTI integration details
+
+Replaced NetInit's artificial `if (0)`/dummy scope with the original PC
+single-player provider branch and dwID declaration, omitting the Storm-only
+operations absent from PSX. This inferred PSX adaptation preserves all 164
+NetInit instructions and exact debug scopes; it does not claim recovery of
+the original PSX source text. Restored the GMAN header pool, gszVersionNumber
+as the retail five-byte `NULL` string, and seven initialized state bytes.
+Restored the complete 32,008-byte TMegaPkt type for its global pointer SYM.
+
+Native BSS with ASPSX 2.56 was 52 bytes, placing sgGameInitInfo four bytes
+early. ASPSX 2.67 naturally produces retail's 56 bytes and exact addresses,
+without source padding or relaxed extents. Its selection is explicit in the
+registry and its binary hash is captured by the existing receipt mechanism.
+All 1,244 text bytes, 14 read-only bytes, 12 small-data bytes, 56 small-BSS
+bytes, five function SYM records and nineteen data records/placements match.
+Ordinary function and call audits remain 5/5; all 166 tests pass.
+The completed main-image rebuild matches all 1,099,272 retail bytes. Receipts
+confirm 915 native functions / 52 TUs, giving 1,044 source-linked functions /
+84 TUs overall. The matching board remains 2693/2727.
+
+### TOWNERS integration details
+
+Native integration follow-up: restored GMAN/CTextFileInfo header literals,
+the retail initialized small-data order, snLastCowSFX=-1 and the const cow
+sound table (also const in gold PC source). CowSFX now follows PlrHasItem at
+its original text address. Exact native relocation exposed seven off-by-one
+_pLvlVisited reads in TalkToTowner, formerly hidden by immediate/address
+normalization. Retail accesses levels 1, 2/4, 3, 4, 9 and 1 in those tests;
+the source is corrected. Gold confirms the king/banner/rock/anvil levels;
+retail remains authoritative for PSX-specific greeting tests.
+
+All 12,204 text bytes, 4,828 initialized-data bytes, 368 read-only bytes
+(including sound data and the ten-way NPC switch table), 32 small-data bytes,
+eight BSS bytes, 33 function SYM records and eighteen named data records/
+placements now pass native verification. Ordinary function/call audits remain
+33/33, and all 166 tests pass. No instruction patching or gate changes.
+The main-image rebuild matches all 1,099,272 retail bytes. Receipts confirm
+910 native functions / 51 TUs, or 1,039 source-linked functions / 83 TUs
+including the conventional lane. The board remains 2693/2727.
+
+Earlier source-data preparation:
+
+`tools/gen_towner_tables.py` reconstructs seven arrays (1,692 bytes) from
+original Hellfire TOWNERS.CPP and its PLAYER.H/TEXTDAT.H constants. Explicit
+retail PSX differences are reviewed rather than copied blindly: TownCowDir
+is 1/0/2 (southwest/south/west), not PC 1/3/4; Qtalklist retains ten base-game
+NPC rows and sixteen quests, with an eleventh zero-filled row. AnimOrder,
+positions, offsets and all retained dialogue cells otherwise match gold.
+The generator refuses changed gold direction values or matrix dimensions.
+
+TOWNERS now owns these tables and the explicit zero-initialized 3,136-byte
+towner array. Individual compiled-data gates check all eight symbols' bytes,
+exact SDB extents and absence of overlapping relocations. All pass. The
+ordinary function/SYM and call gates remain 33/33; all 166 tests pass,
+including two new tests for the PSX direction and dialogue projections.
+This does not yet register TOWNERS for native linkage: small-data defaults,
+local-static sound data, source/header order and complete native relocation
+still need verification. Source-linked and function PASS counts are unchanged.
+
+### LANG integration details
+
+Restored the original TextDat/CTextFileInfo header inlines, emitting gman.h
+and .tp/.dat literals. NumOfStrings is defined after GetLangFileNameExt so
+the TEXTDB label and five extension strings precede it in small data, matching
+retail. LANG now uses the shared GAL declarations; the previous local
+GAL_SetMemName declaration incorrectly returned void instead of UCHAR.
+
+Native verification proves all 1,404 text bytes, 104 read-only bytes including
+the six-entry language jump table, 60 small-data bytes, nine function SYM
+records and all five global records/placements. The ordinary function and
+call checks remain 9/9; all 164 tests pass. No compiler/gate changes.
+The completed main-image rebuild matches all 1,099,272 retail bytes. Source
+linkage is now 1,006 functions / 82 TUs (877/50 native, 129/32 conventional).
+The function PASS board remains 2693/2727, with 34 entries still open.
+
+### DRLG_L2 table reconstruction details
 
 Writable-string diagnostic (2026-10-01): `build/probe_l2_writable.py`
 compiles a separate source copy with `-fwritable-strings`, moving the two
@@ -3086,6 +3536,17 @@ handled separately by the existing image serializer.
 
 ### ProcessItems index scope and diagnostic path sensitivity
 
+Unnamed-access follow-up (2026-10-02): direct `(item + ii)->field` and
+`(&item[ii])->field` forms avoid the extra named-reference SYM record, but
+still fail. Converting all item accesses gives 159 instructions; converting
+only the animation body gives 172 (retail 169). Commuted array indexing is
+unchanged at 192. Six narrower variants beginning at the animation guard,
+frame snapshot or map test, with either pointer or indexed final-length reads,
+produce 171--179 instructions and retain wrong saved-register lifetimes.
+Results/sources are under `build/pia`; none was retained. These measurements
+confirm that named-pointer debug records were not the only obstacle: the
+anonymous pointer spelling also changes loop address-hoisting behavior.
+
 Address-use follow-up (2026-10-01): eight full-TU copies under `build/ipa0`
 through `ipa7` vary reference creation before the animation condition versus
 before the increment, and indexed versus reference increment/final-length
@@ -3116,6 +3577,23 @@ that the C++ construct itself is unsupported. This observation does not alter
 compiler/assembler binaries, source semantics, or gate rules.
 
 ### MAI_Counselor declaration order versus stack slots
+
+Authentic-toolchain follow-up (2026-10-02): switching only ASPSX to 2.67
+does not resolve the local-static/record-membership failures in MAI_Counselor,
+ProcessMonsters, MI_Manashield, set_mdec_audio_volume or stream_cdready_handler.
+No debug records were rewritten and no normalization rule changed.
+
+A read-only binary inventory found two additional native Win32 C++ builds:
+SN32.3.7.0002 at `C:/Temp/PSYQ/psyq-400-DTL-S2002/GNU/CC1PLPSX.EXE`
+(SHA256 65837f430b20683a9123e221b478ca4154eb5a54f43372425936b9b91b542e2d),
+and SN32.3.7.0003 at `C:/Temp/ps1-decomp-refs/glover/bin/CC1PLPSX.EXE`
+(0b28d05cef35ee0ba5584e05c295a990fad26ef539fb563251a1ec51f3e3d754).
+Both retain MI_Manashield's exact 192 instructions but the same incorrect
+xoffset block membership. Both also retain set_mdec_img_buffer's two-diff
+initial-zero mismatch. Thus these authentic revisions do not solve either
+representative failure. Tests used process-local DIAB_CC1PL overrides only;
+the production compiler remains Build 0001. DOS variants were inventoried,
+not executed; no conclusion about their code/debug equivalence is claimed.
 
 Related local-static investigation (2026-10-01): MI_Manashield's baseline is
 192 exact instructions, but its xoffset STAT is inside rather than before
@@ -3148,6 +3626,16 @@ was restored and its byte pass rechecked; the total remains 2687/2727.
 
 ### Dialog::Back early-CSE corner reuse
 
+Corner-flag follow-up (2026-10-02): using the existing trans value at the
+first or second upper corner yields 1,099 or 1,100 real-ASPSX instructions;
+using it at both yields 1,105 (retail 1,094). This disrupts Y-1 sharing and
+adds flag handling without solving the full function. Replacing either/both
+upper-corner flag-clear pairs with `code &= 0xFC` instead preserves the
+baseline 1,095-instruction native output and four aligned diff lines. All
+six full-TU variants under `build/dtc` were rejected; no live source change.
+These results do not support a transparency-macro fix for the retained X-1
+temporary. Maspsx's additional small-data expansion remains a separate issue.
+
 Current real ASPSX output is 1095 instructions versus retail's 1094; maspsx
 adds a separate small-data-store expansion and reports 1096. The substantive
 extra instruction comes from retaining X-1 in s1 across the first two corner
@@ -3168,6 +3656,31 @@ was retained. The next useful target is the early-CSE expression lifetime,
 not assembler selection or those equivalent coordinate spellings.
 
 ### DrawInvTSK entry scheduling probes
+
+Declaration-order follow-up (2026-10-02): reversing omp/osel declarations,
+with either assignment order or a combined declaration, does not improve
+bytes and breaks the retail record order (osel appears before omp). All
+three full-TU probes under `build/ivdecl` were rejected. The isolated
+three-compiler probe `build/probes/a-n9qmo84z` is explicitly unvalidated:
+stock/instrumented FSF ICE on the unused Dialog destructor in structs_inv.h.
+Real PsyQ dumps remain useful: lreg assigns omp pseudo 73 two references
+over 234 instructions and osel pseudo 74 two over 237, both crossing 49
+calls; greg confirms s6 and s7 respectively. At the documented allocator
+formula these priorities are 85 and 84. The narrow lifetime difference
+explains why declaration-only changes cannot resolve the saved-state/entry
+schedule. Live reconstruction remains unchanged.
+
+Saved-state lifetime follow-up (2026-10-02): loading omp before osel and
+restoring `myplr=omp; invflag=0; sel_data=osel` fixes the complete entry
+schedule and keeps exact SYM/390 instructions. It remains non-PASS: maspsx
+reports four diff lines and real ASPSX reports two aligned diff lines for
+the misplaced invflag byte store at the exit. All six tail-store permutations
+were checked; none passes. Root inventory-flag snapshots, original-player/
+selection snapshots and an early restore-value copy do not solve both ends.
+Artifacts: `build/ivs`, particularly `restore_interleave` and `tail1`.
+The candidate is retained only as diagnostic evidence; live source remains
+the previous eight-difference baseline. This demonstrates coupling between
+saved-value lifetimes and the entry schedule rather than an assembler issue.
 
 Both byte lanes retain eight aligned differences at the entry, with exactly
 390 instructions and matching SYM. Real pre-allocation scheduling already

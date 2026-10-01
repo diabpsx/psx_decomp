@@ -6,7 +6,8 @@
  * skeleton (refs/skeleton/.../PADS.H) as shape hints.  PADS.H inlines used here are emitted out of line
  * in this object (-fno-inline), in reverse header order (SetPadType, CheckActive, SetActive,
  * SetBothFlag, ctor).  PAD_Open (PADS.CPP:103) lives in the startup segment, not here. */
-#include "psxsrc/gman.h"   /* retail PADS.CPP includes GMAN.H: its "psxsrc/gman.h" assert string sits in this TU's .rodata */
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 
 /* ---------------------------------------------------------------- PADS.H (SYM layout, sizeof 236) */
 class CPad {

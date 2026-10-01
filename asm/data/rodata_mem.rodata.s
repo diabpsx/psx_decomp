@@ -18,5 +18,7 @@ nonmatching D_8010FFFC
 dlabel D_8010FFFC
     /* FFFFC 8010FFFC 46617374 */ .word 0x74736146
     /* 100000 80110000 2052616D */ .word 0x6D615220
-    /* 100004 80110004 00A77401 */ .word 0x0174A700
+    /* 100004 80110004 */ .byte 0x00
+    /* 100005 80110005 */ .byte 0xA7
+    /* 100006 80110006 */ .short 0x0174
 enddlabel D_8010FFFC

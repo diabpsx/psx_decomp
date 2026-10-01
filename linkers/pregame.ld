@@ -232,9 +232,9 @@ SECTIONS
         . = 0x158B0;   /* 0x8014F4A8 */
         build/skel/SOURCE/DRLG_L4.CPP.o(.text);
         . = 0x1B6E0;   /* 0x801552D8 */
-        build/skel/SOURCE/SETMAPS.CPP.o(.text);
+        build/native_source/setmaps.text.s.o(.text);   /* verified native-assembled source */
         . = 0x1BE0C;   /* 0x80155A04 */
-        build/skel/SOURCE/CHOOSEM.CPP.o(.text);
+        build/native_source/choosem.text.s.o(.text);   /* verified native-assembled source */
         . = 0x1C3E0;   /* 0x80155FD8 */
         build/native_source/preobj.text.s.o(.text);   /* verified native-assembled source */
         . = 0x202E4;   /* 0x80159EDC */
@@ -242,21 +242,21 @@ SECTIONS
         . = 0x22014;   /* 0x8015BC0C */
         build/native_source/themes.text.s.o(.text);   /* verified native-assembled source */
         . = 0x24B84;   /* 0x8015E77C */
-        build/recon/source/preport.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/preport.text.s.o(.text);   /* verified native-assembled source */
         . = 0x24BE4;   /* 0x8015E7DC */
         build/native_source/prequest.text.s.o(.text);   /* verified native-assembled source */
         . = 0x25878;   /* 0x8015F470 */
-        build/recon/source/preinv.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/preinv.text.s.o(.text);   /* verified native-assembled source */
         . = 0x258CC;   /* 0x8015F4C4 */
         build/skel/SOURCE/PREAUTO.CPP.o(.text);
         . = 0x25AF0;   /* 0x8015F6E8 */
         build/native_source/premon.text.s.o(.text);   /* verified native-assembled source */
         . = 0x283E4;   /* 0x80161FDC */
-        build/recon/source/premiss.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/premiss.text.s.o(.text);   /* verified native-assembled source */
         . = 0x285B4;   /* 0x801621AC */
         build/native_source/pretrigs.text.s.o(.text);   /* verified native-assembled source */
         . = 0x290E4;   /* 0x80162CDC */
-        build/recon/source/prestore.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/prestore.text.s.o(.text);   /* verified native-assembled source */
         . = 0x293DC;   /* 0x80162FD4 */
         build/recon/source/premsg.cpp.o(.text);   /* reconstructed TU */
         . = 0x29DCC;   /* image end 0x801639C4 */

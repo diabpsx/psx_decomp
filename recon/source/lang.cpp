@@ -3,6 +3,8 @@
  * strings; it is loaded whole, the offsets rebased to pointers, and GetStr picks the database
  * from the high bits of the string id. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 
 enum LANG_TYPE {
     LANG_ENGLISH = 0,
@@ -35,11 +37,7 @@ public:
 };
 
 extern "C" {
-void DBG_Error(char *Text, char *File, int Line);
 void TSK_Sleep(int Frames);
-void GAL_SetMemName(long Hnd, char *Text);
-void *GAL_Lock(long Hnd);
-unsigned char GAL_Free(long Hnd);
 char *strcat(char *dst, const char *src);
 }
 FileIO *SYSI_GetFs(void);
@@ -61,7 +59,7 @@ enum LANG_TYPE LanguageType = LANG_NONE;
 long hndText = -1;
 char **TextPtr = 0;
 enum LANG_DB_NO LangDbNo = LANG_DB_MAIN;
-int NumOfStrings = 0;
+extern int NumOfStrings;
 
 /* @0x8007B348 LANG.CPP:84 */
 enum LANG_TYPE LANG_GetLang(void)
@@ -225,3 +223,5 @@ char *GetLangFileNameExt(enum LANG_TYPE NewLanguageType)
     }
     return 0;
 }
+
+int NumOfStrings = 0;

@@ -30,6 +30,7 @@ struct TextDat {
     int DecX, DecY, PalX, PalY, Scr;
     int NumOfBuffers[2];
     long hndDecompArrays;
+    ~TextDat();
     void DumpDatFile();
     void DoDecompRequests();
     void PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);

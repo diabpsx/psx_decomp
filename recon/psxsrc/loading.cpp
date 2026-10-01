@@ -2,7 +2,24 @@
  * Bodies from the retail oracle (asm/nonmatchings/loading) + SYM (scratch/tuinfo.py LOADING.CPP).
  * Class shapes (TextDat/CScreen/CFont/Dialog/CBlocks) as in psxsrc/fe.h, redeclared locally. */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
+#include "psxsrc/psyq.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
+
+class CPlayer : public TextDat {
+public:
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
+};
 
 enum TXT_JUST { JustRight = 2, JustCentre = 1, JustLeft = 0 };
 
@@ -11,7 +28,11 @@ struct TASK {   /* sizeof 92 */
     TASK *Prev;
     unsigned long Id;
     unsigned long SleepTime;
-    unsigned long Flags;
+    unsigned long fToInit : 1;
+    unsigned long fToDie : 1;
+    unsigned long fKillable : 1;
+    unsigned long fActive : 1;
+    unsigned long fXtraStack : 1;
     void *Stack;
     unsigned long StackSize;
     void *Data;              /* +0x1C */
@@ -39,22 +60,11 @@ struct DEF_ARGS {   /* sizeof 16 */
      (p)->x2 = (_x2), (p)->y2 = (_y2), (p)->x3 = (_x3), (p)->y3 = (_y3))
 
 /* PRIMPOOL.H PRIM_GetPrim, POLY_G4 copy (line 68) */
-inline void PRIM_GetPrim(POLY_G4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_G4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 68);
-    *Prim = (POLY_G4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_G4 *)ThisPrimAddr + 1);
-}
+static void PRIM_GetPrim(POLY_G4 **Prim);
 
 struct FRAME_HDR;
 struct SPR_HDR;
 struct CTextFileInfo;
-
-struct TextDat {   /* sizeof 112 */
-    unsigned char _pad[0x70];
-    ~TextDat();
-};
 
 struct CScreen : TextDat {   /* sizeof 124 */
     int LoadedId;   /* +0x70 */
@@ -80,7 +90,7 @@ extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
 class CBlocks {
 public:
-    static int GetOverlayOtBase() { return 0x1E8; }   /* BLOCK.H */
+    static inline int GetOverlayOtBase();   /* BLOCK.H */
 };
 
 struct Dialog {   /* sizeof 16 */
@@ -89,23 +99,11 @@ struct Dialog {   /* sizeof 16 */
     int BackGfx;       /* +0x8 */
     int DialogOTpos;   /* +0xC */
 
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B) { DialogRed = R; DialogGreen = G; DialogBlue = B; }
-    void SetBack(int Type) { BackGfx = Type; }
-    void SetBorder(int Type) { BorderGfx = Type; }
+    inline Dialog();
+    inline ~Dialog();
+    inline void SetRGB(unsigned char R, unsigned char G, unsigned char B);
+    inline void SetBack(int Type);
+    inline void SetBorder(int Type);
     int SetOTpos(int OT);
     void Back(int DX, int DY, int DW, int DH);
 };
@@ -139,7 +137,7 @@ BOOL TitleFlag = 0;                       /* @0x8011B140 */
 static const unsigned short Level2CutScreen[12] = { 9, 5, 1, 2, 3, 6, 7, 8, 4, 8, 0x12, 0x11 };   /* @0x80110CA8 */
 static TASK *CutScreenTSK = NULL;         /* @0x8011B144 */
 static BOOL GameLoading = 0;              /* @0x8011B148 */
-static BOOL BootScreen = 0;               /* @0x8011B14C */
+static BOOL BootScreen = true;            /* @0x8011B14C: retail boot-screen default */
 static int ThisLev = 0;                   /* @0x8011B150 */
 static unsigned short progress;           /* @0x8011C6EC */
 
@@ -336,5 +334,35 @@ void FinishProgress(void)
     } else {
         FinishBootProgress();
     }
+}
+
+#include "psxsrc/primpool.h"
+static void PRIM_GetPrim(POLY_G4 **Prim)
+{
+    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_G4) * 10) >= AddrToAvoid)
+        DBG_Error(NULL, "psxsrc/primpool.h", 68);
+    *Prim = (POLY_G4 *)ThisPrimAddr;
+    ThisPrimAddr = (POLY_FT4 *)((POLY_G4 *)ThisPrimAddr + 1);
+}
+inline int CBlocks::GetOverlayOtBase() { return 0x1E8; }
+inline Dialog::Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+inline Dialog::~Dialog() {}
+inline void Dialog::SetBorder(int Type) { BorderGfx = Type; }
+inline void Dialog::SetBack(int Type) { BackGfx = Type; }
+inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R; DialogGreen = G; DialogBlue = B;
 }
 

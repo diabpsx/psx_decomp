@@ -15,5 +15,10 @@ dlabel D_801194B4
     /* 1094C8 801194C8 72632F63 */ .word 0x632F6372
     /* 1094CC 801194CC 706C6179 */ .word 0x79616C70
     /* 1094D0 801194D0 65722E68 */ .word 0x682E7265
-    /* 1094D4 801194D4 00070180 */ .word 0x80010700
+    /* 1094D4 801194D4 */ .byte 0x00
 enddlabel D_801194B4
+
+dlabel gamemenu_rodata_padding
+    /* 1094D5 801194D5 */ .byte 0x07
+    /* 1094D6 801194D6 */ .short 0x8001
+enddlabel gamemenu_rodata_padding

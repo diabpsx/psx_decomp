@@ -1,0 +1,14 @@
+.include "macro.inc"
+
+.section .rodata, "a"
+
+dlabel D_80110510
+    /* 100510 80110510 */ .asciz "psxsrc/gman.h"
+    /* 7073787372632F676D616E2E68000000 */
+.align 2
+enddlabel D_80110510
+
+dlabel D_80110520
+    /* 100520 80110520 */ .asciz "Cleared loaded char items \n"
+    /* 436C6561726564206C6F616465642063686172206974656D73200A00 */
+enddlabel D_80110520

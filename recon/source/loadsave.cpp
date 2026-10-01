@@ -3,12 +3,28 @@
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py, see gen headers).
  * PSX deltas: PC's memcpy/pointer-file save-game is entirely replaced by a memory-card block save
  * (PSX_GM_SaveGame, PSX_GM_LoadGame, the PSX_CH_ family, RestorePads, StorePads, GetIcon, the
- * PSX_OPT_ family, LoadOptions, SaveOptions, RestoreLoadedData) -- NOT YET RECONSTRUCTED (13 of 23
- * functions; see the final report).
+ * PSX_OPT_ family, LoadOptions, SaveOptions, RestoreLoadedData), reconstructed from retail PSX.
  * LoadQuest/SaveQuest on PSX are a straight memcpy of QuestStruct with NO trailing WLoad() calls for
  * ReturnLvlX/Y/ReturnLvl/ReturnLvlT/DoomQuestState (devilution's LoadQuest reads those 5 extra ints
  * after the quest struct; PSX's LoadQuest does not touch them here). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
+
+class CPlayer : public TextDat {
+public:
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
+};
 #include "source/gen/structs_loadsave.h"
 #include "source/gen/externs_loadsave.h"
 #include "source/gen/protos_loadsave.h"
@@ -19,12 +35,17 @@
 
 extern "C" int sprintf(char *buf, const char *fmt, ...);
 void SaveOptions(void);
+void LoadOptions(void);
 void GetIcon(void);
 
-/* TU-owned globals (oracle reaches these via %gp_rel -> tentative defs here). */
-unsigned char ADirtyFlagThatGaryWillLove;
-int DirtyVidx;
-int DirtyVidY;
+/* Retail writable Shift-JIS titles and memory-card icon storage. */
+static char DiabloStr[11] = "\x83\x66\x83\x42\x83\x41\x83\x75\x83\x8D";
+static char SaveCharName[19] = "\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x83\x66\x81\x5B\x83\x5E";
+static char OptSaveName[11] = "\x83\x49\x83\x76\x83\x56\x83\x87\x83\x93";
+unsigned char IconBuffer[768] = { 0 };
+extern unsigned char ADirtyFlagThatGaryWillLove;
+extern int DirtyVidx;
+extern int DirtyVidY;
 
 /* file-scope static (SYM class STAT; the load/save cursor into the decoded save-file buffer). */
 static unsigned char *tbuff;
@@ -32,13 +53,13 @@ static unsigned char *tbuff;
 /* @0x8015B958 */
 char *GetOptStr(void)
 {
-    return "\x83\x49\x83\x76\x83\x56\x83\x87\x83\x93";   /* Shift-JIS "オプション" ("Option") */
+    return OptSaveName;
 }
 
 /* @0x8015B968 */
 char *GetDiabloStr(void)
 {
-    return "\x83\x66\x83\x42\x83\x41\x83\x75\x83\x8D";   /* Shift-JIS "ディアブロ" ("Diablo") */
+    return DiabloStr;
 }
 
 /* @0x8015B978 */
@@ -202,6 +223,42 @@ int PSX_GM_SaveGame(int card_number, char *name, char *title)
     return result;
 }
 
+/* @0x8015C1BC */
+int PSX_GM_LoadGame(unsigned char firstflag, int card_number, int file)
+{
+    int result;
+    unsigned char *LoadBuff;
+
+    LoadBuff = save_buffer;
+    tbuff = LoadBuff;
+    FreeGameMem();
+    result = read_card_file(card_number, file, 0x3001, (char *)tbuff);
+    if (result != 0)
+        return result;
+
+    gbRunGame = 0;
+    delta_init();
+    GLUE_SetShowGameScreenFlag(0);
+    result = RestoreLoadedData(firstflag != 0);
+    if (result != (int)(tbuff - LoadBuff)) {
+        VID_SetXYOff(0, 0);
+        return -2;
+    }
+
+    gbMaxPlayers = FePlayerNo + 1;
+    SetReturnLvlPos();
+    ResyncQuests();
+    SetLoadedVolumes();
+    CalcVolumes();
+    ClearQuestFlags();
+    gbProcessPlayers = 1;
+    *(int *)((char *)&plr[0] + 0x64) = -1;
+    *(int *)((char *)&plr[1] + 0x64) = -1;
+    options_pad = -1;
+    deathflag = 0;
+    return 0;
+}
+
 /* @0x8015C2E8 */
 void PSX_CH_LoadGame(int slot)
 {
@@ -224,9 +281,7 @@ int PSX_CH_SaveGame(int card_number, int slot)
     int tries;
     char TempStr[64];
 
-    sprintf(TempStr, "%s %s",
-        "\x83\x66\x83\x42\x83\x41\x83\x75\x83\x8D",   /* Shift-JIS "ディアブロ" ("Diablo") */
-        "\x83\x4C\x83\x83\x83\x89\x83\x4E\x83\x5E\x81\x5B\x83\x66\x81\x5B\x83\x5E");   /* Shift-JIS "キャラクターデータ" ("Character Data") */
+    sprintf(TempStr, "%s %s", DiabloStr, SaveCharName);
     GetIcon();
     tries = 4;
 
@@ -289,26 +344,6 @@ void GetIcon(void)
     SYSI_GetFs()->ReadAtAddr("DIABICON.RAW", IconBuffer, -1);
 }
 
-/* @0x8015C850 */
-void LoadOptions(void)
-{
-    sglMasterVolume = ILoad();
-    sglMusicVolume = ILoad();
-    sglSoundVolume = ILoad();
-    sglSpeechVolume = ILoad();
-
-    if (!ADirtyFlagThatGaryWillLove) {
-        VID_SetXYOff(ILoad(), ILoad());
-    } else {
-        DirtyVidx = ILoad();
-        DirtyVidY = ILoad();
-    }
-
-    RestorePads();
-    MONO = BLoad() != 0;
-    SetSpeed((enum GM_SPEEDS)BLoad());
-}
-
 /* @0x8015C6D4 */
 int PSX_OPT_LoadGame(int card_number, int file, BOOL KillHandler)
 {
@@ -334,9 +369,7 @@ int PSX_OPT_SaveGame(int card_number, char *filename)
     unsigned char *SaveBuff;
 
     tries = 4;
-    sprintf(TempStr, "%s %s",
-        "\x83\x66\x83\x42\x83\x41\x83\x75\x83\x8D",   /* Shift-JIS "ディアブロ" ("Diablo") */
-        "\x83\x49\x83\x76\x83\x56\x83\x87\x83\x93");   /* Shift-JIS "オプション" ("Option") */
+    sprintf(TempStr, "%s %s", DiabloStr, OptSaveName);
     SaveBuff = save_buffer;
     tbuff = SaveBuff;
     SaveOptions();
@@ -356,6 +389,26 @@ int PSX_OPT_SaveGame(int card_number, char *filename)
     return result;
 }
 
+/* @0x8015C850 */
+void LoadOptions(void)
+{
+    sglMasterVolume = ILoad();
+    sglMusicVolume = ILoad();
+    sglSoundVolume = ILoad();
+    sglSpeechVolume = ILoad();
+
+    if (!ADirtyFlagThatGaryWillLove) {
+        VID_SetXYOff(ILoad(), ILoad());
+    } else {
+        DirtyVidx = ILoad();
+        DirtyVidY = ILoad();
+    }
+
+    RestorePads();
+    MONO = BLoad() != 0;
+    SetSpeed((enum GM_SPEEDS)BLoad());
+}
+
 /* @0x8015C928 */
 void SaveOptions(void)
 {
@@ -368,42 +421,6 @@ void SaveOptions(void)
     StorePads();
     BSave(MONO);
     BSave((char)GetSpeed());
-}
-
-/* @0x8015C1BC */
-int PSX_GM_LoadGame(unsigned char firstflag, int card_number, int file)
-{
-    int result;
-    unsigned char *LoadBuff;
-
-    LoadBuff = save_buffer;
-    tbuff = LoadBuff;
-    FreeGameMem();
-    result = read_card_file(card_number, file, 0x3001, (char *)tbuff);
-    if (result != 0)
-        return result;
-
-    gbRunGame = 0;
-    delta_init();
-    GLUE_SetShowGameScreenFlag(0);
-    result = RestoreLoadedData(firstflag != 0);
-    if (result != (int)(tbuff - LoadBuff)) {
-        VID_SetXYOff(0, 0);
-        return -2;
-    }
-
-    gbMaxPlayers = FePlayerNo + 1;
-    SetReturnLvlPos();
-    ResyncQuests();
-    SetLoadedVolumes();
-    CalcVolumes();
-    ClearQuestFlags();
-    gbProcessPlayers = 1;
-    *(int *)((char *)&plr[0] + 0x64) = -1;
-    *(int *)((char *)&plr[1] + 0x64) = -1;
-    options_pad = -1;
-    deathflag = 0;
-    return 0;
 }
 
 /* @0x8015C9CC */
@@ -474,3 +491,7 @@ int RestoreLoadedData(BOOL firstflag)
 
     return DataSize;
 }
+
+unsigned char ADirtyFlagThatGaryWillLove = 0;
+int DirtyVidx = 0;
+int DirtyVidY = 0;

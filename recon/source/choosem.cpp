@@ -3,6 +3,8 @@
  * they need; a list matching the current quest mask is chosen at random (optionally in a task, so
  * the choice can be shown on screen). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 
 struct RECT {   /* sizeof 8 */
     short x, y, w, h;
@@ -105,9 +107,16 @@ extern struct MonstLevel AllLevels[16];
 extern int demo_pad_time;
 extern CFont MediumFont;
 extern const unsigned char WHITER, WHITEG;
-static char *MgToText[34];
+static char *MgToText[34] = {
+    "ACID", "BAT", "BIGFALL", "BLACK", "DARKMAGE", "DEMSKL",
+    "FALSPEAR", "FALSWORD", "FAT", "FATC", "GARGOYLE", "GOATBOW",
+    "GOATMACE", "GOLEM", "MAGE", "MAGMA", "SCAV", "SKELAXE",
+    "SKELSD", "SKING", "SNAKE", "SNEAK", "SUCC", "TSNEAK",
+    "ZOMBIE", "WORM", "GOATLORD", "RHINO", "SKELBOW", "DIABLO",
+    "THIN", "MEGA", "UNRAV", "FIREM"
+};
 
-static int DoUiForChooseMonster = 1;
+static BOOL DoUiForChooseMonster = true;
 
 /* @0x80155A04 CHOOSEM.CPP:134 */
 unsigned long CM_QuestToBitPattern(int QuestNum)

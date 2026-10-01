@@ -7,6 +7,8 @@
  * WaterDone (fade-flag) update + a VILEBETRAYER map-size variant directly into the switch (both handled
  * by devilution/devilutionx elsewhere, in quests.cpp's ResyncQuests). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_setmaps.h"
 #include "source/gen/externs_setmaps.h"
 #include "source/gen/protos_setmaps.h"
@@ -21,18 +23,18 @@
 #define SL_POISONWATER  4
 #define SL_VILEBETRAYER 5
 
-/* BUGFIX (retail too): constant transition tables should be const. */
-unsigned char SkelKingTrans1[] = {
+/* TU-owned transition arrays; retail stores these in writable data/small data. */
+static unsigned char SkelKingTrans1[] = {
     19, 47, 26, 55,
     26, 49, 30, 53
 };
 
-unsigned char SkelKingTrans2[] = {
+static unsigned char SkelKingTrans2[] = {
     33, 19, 47, 29,
     37, 29, 43, 39
 };
 
-unsigned char SkelKingTrans3[] = {
+static unsigned char SkelKingTrans3[] = {
     27, 53, 35, 61,
     27, 35, 34, 42,
     45, 35, 53, 43,
@@ -40,7 +42,7 @@ unsigned char SkelKingTrans3[] = {
     31, 39, 49, 57
 };
 
-unsigned char SkelKingTrans4[] = {
+static unsigned char SkelKingTrans4[] = {
     49, 45, 58, 51,
     57, 31, 62, 37,
     63, 31, 69, 40,
@@ -50,7 +52,7 @@ unsigned char SkelKingTrans4[] = {
     79, 43, 89, 53
 };
 
-unsigned char SkelChamTrans1[] = {
+static unsigned char SkelChamTrans1[] = {
     43, 19, 50, 26,
     51, 19, 59, 26,
     35, 27, 42, 34,
@@ -58,12 +60,12 @@ unsigned char SkelChamTrans1[] = {
     50, 27, 59, 34
 };
 
-unsigned char SkelChamTrans2[] = {
+static unsigned char SkelChamTrans2[] = {
     19, 31, 34, 47,
     34, 35, 42, 42
 };
 
-unsigned char SkelChamTrans3[] = {
+static unsigned char SkelChamTrans3[] = {
     43, 35, 50, 42,
     51, 35, 62, 42,
     63, 31, 66, 46,

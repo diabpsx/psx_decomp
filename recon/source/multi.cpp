@@ -5,6 +5,7 @@
  * fut/targ coords); NetInit is the local two-controller setup: player 1 exists when FePlayerNo is
  * set, the seed comes from the VID tick (or OptionsSeed / the demo seed). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_multi.h"
 #include "source/gen/externs_multi.h"
 #include "source/gen/protos_multi.h"
@@ -27,14 +28,15 @@ static unsigned char sgbSendDeltaTbl[2];
 static struct _gamedata sgGameInitInfo;
 static unsigned char sgbTimeout;
 static long sglTimeoutStart;
-static unsigned char sgbNetInited;
+char gszVersionNumber[5] = "NULL";
+static unsigned char sgbNetInited = 0;
 
-unsigned char gbMaxPlayers;
-unsigned char gbActivePlayers;
-unsigned char gbGameDestroyed;
-unsigned char gbDeltaSender;
-unsigned char gbSelectProvider;
-unsigned char gbSomebodyWonGameKludge;
+unsigned char gbMaxPlayers = 0;
+unsigned char gbActivePlayers = 0;
+unsigned char gbGameDestroyed = 0;
+unsigned char gbDeltaSender = 0;
+unsigned char gbSelectProvider = 0;
+unsigned char gbSomebodyWonGameKludge = 0;
 
 /* @0x80052BA4 MULTI.CPP:168 */
 void NetSendLoPri(const unsigned char *pbMsg, unsigned char bLen)
@@ -99,10 +101,10 @@ unsigned char NetInit(unsigned char bSinglePlayer, unsigned char *pfExitProgram)
         SetupLocalPlayer();
         game_2_ui_player(&plr[0], &heroinfo, gbValidSaveFile);
     }
-    /* Retail has a compiled-out conditional here (an if-level + a then-block with a local, both
-     * empty in the SYM); the original condition/body is unknown (PC: the Storm program-data setup). */
-    if (0) {
-        int dummy;
+    /* Retain the PC single-player provider scope and ID declaration; the PSX
+     * build omits its Storm provider/game-creation operations. */
+    if (bSinglePlayer) {
+        unsigned long dwID;
     }
 
     SetRndSeed(0);

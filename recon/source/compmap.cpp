@@ -2,6 +2,7 @@
  * Bodies from the retail oracle (asm/nonmatchings/compmap) + SYM (scratch/tuinfo.py COMPMAP.CPP / COMPMAP.H).
  * CompClass is the abstract compressor (DoComp / DoDecomp virtuals, vtable slots 1/2), same shape as msg.cpp. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "glibdev/gal.h"
 #include "glibdev/gdebug.h"
 

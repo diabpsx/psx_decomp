@@ -241,6 +241,12 @@ struct _uiheroinfo {   /* sizeof 40 */
     unsigned char spawned;   /* +0x25 */
 };
 
+struct TMegaPkt {   /* retail sizeof 32008 */
+    struct TMegaPkt *pNext;
+    unsigned long dwSpaceLeft;
+    unsigned char data[32000];
+};
+
 struct _gamedata {   /* sizeof 8 */
     unsigned long dwSeed;   /* +0x0 */
     unsigned char bDiff;   /* +0x4 */

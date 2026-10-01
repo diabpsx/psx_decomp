@@ -32,7 +32,7 @@ SECTIONS
         . = 0x1F998;   /* 0x80159590 */
         build/skel/PSXSRC/DLG.CPP.o(.text);
         . = 0x21D60;   /* 0x8015B958 */
-        build/skel/SOURCE/LOADSAVE.CPP.o(.text);
+        build/native_source/loadsave.text.s.o(.text);   /* verified native-assembled source */
         . = 0x23234;   /* image end 0x8015CE2C */
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }

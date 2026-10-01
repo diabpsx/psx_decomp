@@ -3,6 +3,24 @@
  * chosen per level for normal and quest (setlevel) maps, and ML_GetPresetMonsters picks the
  * monster types of the chosen list that the current quests allow. */
 #include "diabpsx_types.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+
+struct TextDat {
+    BOOL OwnDat;
+    int TexNum, LastFrame;
+    BOOL DatLoaded;
+    long hndDat;
+    inline void DumpDatFile();
+};
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
 
 struct MonstList {   /* sizeof 16 */
     unsigned short NumOfMonsters;

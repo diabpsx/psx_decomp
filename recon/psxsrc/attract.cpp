@@ -3,6 +3,25 @@
  * drops FeFlag, then -- unless a saved game is being loaded -- loads the game overlay and creates
  * the players the front end set up (keeping characters loaded from a memory card). */
 #include "diabpsx_types.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+
+/* Original unused GMAN.H inline retains its diagnostic filename literal. */
+struct TextDat {
+    BOOL OwnDat;
+    int TexNum, LastFrame;
+    BOOL DatLoaded;
+    long hndDat;
+    inline void DumpDatFile();
+};
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
 
 struct PlayerStruct {   /* sizeof 6632; only the fields this file touches */
     unsigned char pad0[0xD6];

@@ -15,5 +15,10 @@ dlabel D_80119D20
     /* 109D34 80119D34 72632F63 */ .word 0x632F6372
     /* 109D38 80119D38 706C6179 */ .word 0x79616C70
     /* 109D3C 80119D3C 65722E68 */ .word 0x682E7265
-    /* 109D40 80119D40 00DD6800 */ .word 0x0068DD00
+    /* 109D40 80119D40 */ .byte 0x00
 enddlabel D_80119D20
+
+dlabel premiss_rodata_padding
+    /* 109D41 80119D41 */ .byte 0xDD
+    /* 109D42 80119D42 */ .short 0x0068
+enddlabel premiss_rodata_padding
