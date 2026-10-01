@@ -5,10 +5,11 @@ using IDENTICAL flags (CC1PL_FLAGS from tools/build.py), then diff the two
 .s outputs after stripping filename/ident-only lines and applying the same
 dtor-name normalization build.py itself does. Reports IDENTICAL / DIFFERS.
 """
-import sys, subprocess, re
-sys.path.insert(0, r"C:/temp/diablo-psx/psx_decomp/tools")
-import build as B
+import argparse
+import sys, subprocess, re, tempfile
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import build as B
 
 OURS = Path(r"C:/temp/dmt-cc1/gccbuild-ecoff/cc1plus.exe")
 
@@ -29,7 +30,10 @@ def one(src):
     rel = src.relative_to(B.ROOT)
     flags = B.per_tu_flags(src)
     g = str(flags.get("g_value", B.G_VALUE))
-    tmp = B.ROOT / "build" / "tmp_cmp"; tmp.mkdir(parents=True, exist_ok=True)
+    parent = B.BUILD / "tmp_cmp"
+    parent.mkdir(parents=True, exist_ok=True)
+    tmp = Path(tempfile.mkdtemp(prefix='c-', dir=parent))
+    print('Artifacts:', tmp)
     i_file = tmp / (src.stem + ".i")
     cpp = [B.CPP, "-x", "c", "-D__cplusplus=1", *B.CPP_FLAGS, src, "-o", i_file]
     r = B.run(cpp)
@@ -59,9 +63,17 @@ def one(src):
             print("   ", l)
         return False
 
-if __name__ == "__main__":
-    results = [one(s) for s in sys.argv[1:]]
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('sources', nargs='+')
+    args = parser.parse_args(argv)
+    results = [one(s) for s in args.sources]
     n_id = sum(1 for r in results if r is True)
     n_diff = sum(1 for r in results if r is False)
     n_fail = sum(1 for r in results if r is None)
     print(f"\nSUMMARY: {n_id} identical / {n_diff} differ / {n_fail} failed (of {len(results)})")
+    return 2 if n_fail else 1 if n_diff else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,4 +1,87 @@
 {
+  "objprint": {
+    "source": "recon/source/objprint.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007D9E8", "size": 5244},
+      ".data": {"va": "0x800E39E4", "size": 456, "scaffold": "data_objprint.data"},
+      ".rdata": {"va": "0x80118D8C", "size": 34, "scaffold": "rodata_objprint.rodata"},
+      ".sdata": {"va": "0x8011BC38", "size": 36, "scaffold": "sdata_after_primpool.sdata"},
+      ".bss": {"va": "0x8012FD20", "size": 96}
+    },
+    "data_symbols": ["Cinders", "ObjPrintFuncs", "lasttick", "FireInit", "FirstFire", "DoorOffsets", "lox", "loy", "lot"],
+    "externals": ["AddrToAvoid", "AllObjects", "BL_GetCurrentBlocks__Fv", "DBG_Error", "DrawObjExpl__FP12ObjectStructiii", "DrawSpinner__FiiUcUcUciiibiT8T8Uc", "GM_FinishedUsing__FP7TextDat", "GM_UseTexData__Fi", "GU_GetRnd", "GetAction__C12CCreatureHdri", "GetFrNum__7TextDatiiii", "ObjMasterLoadList", "PauseMode", "PrintFt4__7TextDatiiiiii", "ShadScaleSkew__7CBlocksP8POLY_FT4", "TICK_Get", "ThisOt", "ThisPrimAddr", "VID_GetTick__Fv"]
+  },
+  "bird": {
+    "source": "recon/psxsrc/bird.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800AB6B0", "size": 6312},
+      ".data": {"va": "0x800CD374", "size": 384, "scaffold": "data_bird.data"},
+      ".rdata": {"va": "0x80110DC0", "size": 112, "scaffold": "rodata_bird.rodata"},
+      ".sdata": {"va": "0x8011B294", "size": 24, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C720", "size": 16}
+    },
+    "data_symbols": ["BirdList", "hop_height", "perches", "BirdFrig", "last_seenx", "last_seeny"],
+    "externals": ["AddrToAvoid", "BL_GetCurrentBlocks__Fv", "DBG_Error", "ENG_random__Fl", "GetDirection__Fiiii", "GetScrXY__7CBlocksR4RECTiiii", "HappyMan__Fi", "MissDat", "PauseMode", "PlaySFX__Fi", "PosAdj", "PrepareFt4__7TextDatP8POLY_FT4iiiii", "ShadScaleSkew__7CBlocksP8POLY_FT4", "SolidLoc__Fii", "ThisOt", "ThisPrimAddr", "abs", "leveltype", "offset_x", "offset_y", "plr", "qtextflag", "stextflag"]
+  },
+  "kanji": {
+    "source": "recon/psxsrc/kanji.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800AD1F0", "size": 3500},
+      ".rdata": {"va": "0x80110EC4", "size": 126, "scaffold": "rodata_kanji.rodata"},
+      ".sdata": {"va": "0x8011B2B8", "size": 28, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C730", "size": 12},
+      ".bss": {"va": "0x8011D078", "size": 19452}
+    },
+    "data_symbols": ["KanjiCacheType", "KanjiList", "KanjiBuffers", "KanjiPalFrame", "KanjiFontData", "KanjiGfxTData", "KanjiCache", "CacheLen", "KanjiLoaded"],
+    "externals": ["AddrToAvoid", "AllDats", "BL_GetCurrentBlocks__Fv", "BL_LoadFileAtAddr__FPcPUcc", "BL_WaitForAsyncFinish__Fv", "CDWAIT", "DBG_Error", "DumpGraphics__7CBlocksPP7TextDatPi", "FeFlag", "FileSYS", "GLUE_ResumeGame__Fv", "GLUE_SetShowGameScreenFlag__Fb", "GM_FinishedUsing__FP7TextDat", "GM_ForceTpLoad__Fi", "GM_UseTexData__Fi", "IsGameLoading__Fv", "LoadImage2", "PauseMode", "ReadAtAddr__6FileIOPCcPUci", "SYSI_GetFs__Fv", "SetPal__7TextDatP9FRAME_HDRP8POLY_FT4", "SetTownersGraphics__7CBlocks", "TSK_AddTask", "TSK_Exist", "TSK_Sleep", "ThisPrimAddr", "gbProcessPlayers", "leveltype", "memset", "qtextflag", "questlog", "stextflag", "stream_stop__Fv"]
+  },
+  "palette": {
+    "source": "recon/source/palette.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007EE64", "size": 1264},
+      ".rdata": {"va": "0x80118DB0", "size": 14, "scaffold": "rodata_palette.rodata"},
+      ".sdata": {"va": "0x8011BC5C", "size": 48, "scaffold": "sdata_after_primpool.sdata"}
+    },
+    "data_symbols": ["sgbFadedIn", "screenbright", "faderate", "fading", "FADE_OT", "st", "mode", "FadeCoords", "FadeCoords2"],
+    "externals": ["GM_UseTexData__Fi", "PrintGt4__7TextDatiiiiii", "PrintFt4__7TextDatiiiiii", "TitleFlag", "TSK_Sleep", "VID_GetTick__Fv", "TSK_AddTask"]
+  },
+  "gamepad": {
+    "source": "recon/source/gamepad.cpp", "image": "diabpsx", "assembler": "2.67",
+    "sections": {
+      ".text": {"va": "0x80077F90", "size": 12768},
+      ".data": {"va": "0x800E38A8", "size": 60, "scaffold": "data_gamepad.data"},
+      ".rdata": {"va": "0x80118A20", "size": 248, "scaffold": "rodata_gamepad.rodata"},
+      ".sdata": {"va": "0x8011BBB8", "size": 39, "scaffold": "sdata_after_primpool.sdata"},
+      ".bss": {"va": "0x8012FB68", "size": 436},
+      ".ctors": {"va": "0x800B0CD0", "size": 4, "scaffold": "ctors.data"}
+    },
+    "data_symbols": ["flyflag", "_SpdBeltSelFlag", "HappyManFlag", "seen_combo", "ignore_buttons", "_pcurr_inv", "_pfind_list", "_pfind_index", "automapmoved", "GPad1", "GPad2"],
+    "externals": ["AutomapDown__Fv", "AutomapLeft__Fv", "AutomapRight__Fv", "AutomapUp__Fv", "BL_GetCurrentBlocks__Fv", "CDWAIT", "ChangeLightXY__Fiii", "ChangeVisionXY__Fiii", "CheckArea__FiiiUci", "CheckChrBtns__Fv", "CheckPanelInfo__Fv", "CheckRportal__Fv", "CheckSBook__Fv", "CheckStoreBtn__Fv", "CheckTown__Fv", "CheckTrigForce__Fv", "ChkPlrOffsets__Fiiii", "ClearPanel__Fv", "ClrDiabloMsg__Fv", "FeFlag", "FePlayerNo", "GLUE_Finished__Fv", "GetDirection__Fiiii", "GetFadeState__Fv", "IS_GameOver__Fv", "IsDplayer__Fii", "IsGameLoading__Fv", "MakeItemStr__FP10ItemStructUsUs", "MediumFont", "NewPlrAnim__Fiiii", "PAD_GetPad__FiUc", "PM_ChangeLightOff__Fi", "PauseMode", "PlaySFX__Fi", "PlrClrTrans__Fii", "PlrDoTrans__Fii", "PosOkPlayer__Fiii", "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc", "Qfromoptions", "QuestlogESC__Fv", "QuestlogEnter__Fv", "RemoveTargetCursor__Fi", "ScrollFlag", "ScrollInfo", "SetQSpell__Fiii", "SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks", "SetSpell__Fi", "Show__11SpellTarget", "StartPlrKill__Fii", "StartStand__Fii", "TSK_AddTask", "TSK_Kill", "TSK_Sleep", "TeleStop__Fi", "ToggleSpell__Fi", "TryIconCurs__Fv", "ViewX", "ViewY", "WHITEG", "WHITER", "_7CPlayer_PActiveArray", "_infoclr", "_infostr", "_pcursinvitem", "_pcursitem", "_pcursmonst", "_pcursobj", "_pcursplr", "_spselflag", "abs", "any_belt_items__Fv", "automapflag", "chrflag", "cursmx", "cursmy", "demo_finish", "demo_pad_time", "dung_map", "gbActivePlayers", "gbRunGame", "get_action_str__Fii", "get_key_pad__Fi", "get_last_inv__Fv", "get_next_inv__Fv", "goldcheat", "gplayer", "invflag", "leveltype", "msgholdflag", "myplr", "offset_x", "offset_y", "options_pad", "optionsflag", "pad_func_AutoMap__Fi", "pad_func_down__Fi", "pad_func_left__Fi", "pad_func_right__Fi", "pad_func_select__Fi", "pad_func_up__Fi", "pad_txt", "plr", "qtextflag", "questlog", "restore_controller_settings__F8CTRL_SET", "sbookflag", "sel_data", "select_belt_item__Fi", "select_flag", "sprintf", "stextflag", "strcpy", "svgamode", "tempstr", "txt_actions"]
+  },
+  "printy": {
+    "source": "recon/psxsrc/printy.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80089C60", "size": 4400},
+      ".data": {"va": "0x800B82D8", "size": 2040, "scaffold": "data_printy.data"},
+      ".rdata": {"va": "0x801104B8", "size": 34, "scaffold": "rodata_printy_native.rodata"},
+      ".sdata": {"va": "0x8011ABC8", "size": 36, "scaffold": "sdata_after_primpool.sdata"},
+      ".ctors": {"va": "0x800B0CA0", "size": 4, "scaffold": "ctors.data"}
+    },
+    "data_symbols": ["WHITER", "WHITEG", "WHITEB", "BLUER", "BLUEG", "BLUEB", "REDR", "REDG", "REDB", "GOLDR", "GOLDG", "GOLDB", "buttoncol", "CharFt4", "CharFrm", "MediumFont", "LargeFont", "LFontTab", "MFontTab", "LFont", "MFont"],
+    "externals": ["DBG_Error", "GM_FinishedUsing__FP7TextDat", "GM_UseTexData__Fi", "GetKanjiFrm__FUs", "IsKanjiLoaded__Fv", "LANG_GetLang__Fv", "PRIM_Clip__FP4RECTi", "PRIM_FullScreen__Fi", "PrintFt4__7TextDatiiiiii", "TSK_Sleep", "ThisOt"]
+  },
+  "glue": {
+    "source": "recon/psxsrc/glue.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8009BA0C", "size": 2876},
+      ".data": {"va": "0x800CBF98", "size": 972, "scaffold": "data_glue.data"},
+      ".rdata": {"va": "0x80110B34", "size": 62, "scaffold": "rodata_glue_native.rodata"},
+      ".sdata": {"va": "0x8011AEAC", "size": 356, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C6B0", "size": 24}
+    },
+    "data_symbols": ["PlayerInfo", "JustLoadedPlayer", "GameStarted", "DoShowPanel", "DoDrawBg", "ArmourChar", "CharChar", "WepChar", "GlueFinished", "DoHomingScroll", "TownerGfx", "CurrentMonsterList", "QuakeTime", "QuakeAmount"],
+    "externals": ["AllLevels", "DBG_Error", "DaveLTask__FP4TASK", "DefP1PanelXY", "DefP1PanelXY2", "DefP2PanelXY", "DefP2PanelXY2", "DoScroll__7CBlocks", "DrawAndBlit__Fv", "DrawLBird__Fv", "FePlayerNo", "FinishProgress__Fv", "GM_UseTexData__Fi", "GO_DoGameOver__Fv", "GRL_PostMessage__FUlUilUl", "GetFadeState__Fv", "Load__7CPlayeri", "MAIN_RestartGameTask__Fv", "MSG_ClearOutCompMap__Fv", "MissDat", "NonBlockingLoadNewGFX__7CPlayeri", "NumOfMonsterListLevels", "PaletteFadeIn__Fi", "PauseMode", "PlaySFX__Fi", "Print__6GPanelP7PanelXYP12PlayerStruct", "Print__7CBlocks", "Print__7CPlayerR12PlayerStructR7CBlocks", "ResetFlames__Fv", "SPU_Init__Fv", "SetRandOffset__7CBlocksi", "SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks", "SetTownersGraphics__7CBlocks", "StartStand__FP12PlayerStructi", "TSK_AddTask", "TSK_Exist", "TSK_MakeTaskActive", "TSK_MakeTaskInactive", "TSK_Sleep", "TakeDownCutScreen__Fv", "UPDATEPROGRESS__Fi", "VID_GetTick__Fv", "_7CPlayer_PActiveArray", "__6GPaneli", "__7CBlocksiiiii", "__7CPlayerbii", "___7CBlocks", "___7CPlayer", "color_cycle__FP4TASK", "currlevel", "deathflag", "ghMainWnd", "gplayer", "leveltype", "music_start__Fi", "penta_cycle_task__FP4TASK", "plr", "quests", "sel_data", "setlevel", "setlvlnum", "sprintf", "strcmp"]
+  },
   "tony": {
     "source": "recon/psxsrc/tony.cpp", "image": "diabpsx",
     "sections": {

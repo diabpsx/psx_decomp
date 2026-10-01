@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2689 / 2727 entries PASS (98.6%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2693 / 2727 entries PASS (98.8%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -613,7 +613,7 @@
 - ✅ L5FillChambers__Fv (443)
 - ✅ DRLG_L5FTVR__Fiiiii (290)
 - ✅ DRLG_L5FloodTVal__Fv (62)
-- ❌ DRLG_L5TransFix__Fv — 357 diffs (ours 270)
+- ❌ DRLG_L5TransFix__Fv — 333 diffs (ours 270)
 - ✅ DRLG_L5DirtFix__Fv (95)
 - ✅ DRLG_L5CornerFix__Fv (67)
 - ✅ DRLG_L5__Fi (333)
@@ -1082,7 +1082,7 @@
 - ✅ __6GPaneli (25)
 - ❌ DrawFlask__6GPanelP7PanelXYP12PlayerStruct — 74 diffs (ours 285)
 - ✅ SpdTrimCol__Fs (14)
-- ❌ DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct — 11 diffs (ours 460)
+- ❌ DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct — 6 diffs (ours 459)
 - ✅ DrawSpell__6GPanelP7PanelXYP12PlayerStruct (103)
 - ✅ DrawMsgWindow__6GPanelP7PanelXYP12PlayerStruct (20)
 - ❌ DrawDurThingy__6GPaneliiP10ItemStructi — 49 diffs (ours 178)
@@ -1178,7 +1178,7 @@
 ## itemdat  (recon/source/itemdat.cpp) — 1/1 PASS
 - ✅ InitAllItemsUseable__Fv (14)
 
-## items  (recon/source/items.cpp) — 104/106 PASS
+## items  (recon/source/items.cpp) — 105/106 PASS
 - ✅ InitItemGFX__Fv (2)
 - ✅ ItemPlace__Fii (39)
 - ✅ AddInitItems__Fv (130)
@@ -1218,7 +1218,7 @@
 - ✅ RndAllItems__Fv (89)
 - ✅ RndTypeItems__Fii (92)
 - ✅ CheckUnique__FiiiUc (105)
-- ❌ GetUniqueItem__Fii — 88 diffs (ours 216)
+- ✅ GetUniqueItem__Fii (216)
 - ✅ SpawnUnique__Fiii (80)
 - ✅ ItemRndDur__Fi (39)
 - ✅ SetupAllItems__FiiiiiUcUcUc (206)
@@ -1983,27 +1983,27 @@
 - ✅ GetCreature__7TextDati_8007ee2c (7)
 - ✅ GetFr__7TextDati_8007ee48 (7)
 
-## options  (recon/psxsrc/options.cpp) — 33/38 PASS
+## options  (recon/psxsrc/options.cpp) — 35/38 PASS
 - ✅ PrintSelectBack__FUs (36)
 - ✅ DrawDialogBox__FiiP4RECTiiii (57)
-- ❌ DrawSpinner__FiiUcUcUciiibiT8T8Uc — 641 diffs (ours 392)
+- ❌ DrawSpinner__FiiUcUcUciiibiT8T8Uc — 589 diffs (ours 416)
 - ✅ SetLoadedLang__F9LANG_TYPE (44)
 - ✅ ChangeLang__Fv (49)
 - ✅ DrawLeftRight__Fv (2)
 - ✅ PrintMono__Fi (46)
-- ❌ DrawMenu__Fi — 965 diffs (ours 1007)
+- ❌ DrawMenu__Fi — 751 diffs (ours 1033)
 - ✅ who_pressed__Fi (34)
 - ✅ CharacterLoadPad__Fv (341)
 - ❌ MemcardPad__Fv — 8 diffs (ours 583)
 - ✅ SwitchMONO__Fv (19)
-- ❌ SoundPad__Fv — 535 diffs (ours 611)
+- ✅ SoundPad__Fv (642)
 - ✅ CentrePad__Fv (145)
 - ✅ CalcVolumes__Fv (87)
 - ✅ SetLoadedVolumes__Fv (44)
 - ✅ GetVolumes__Fv (39)
 - ✅ AlterSpeedMenu__F9GM_SPEEDS (21)
 - ✅ GameSpeedPad__Fv (74)
-- ❌ DrawOptions__FP4TASK — 164 diffs (ours 451)
+- ✅ DrawOptions__FP4TASK (447)
 - ✅ ToggleOptions__Fv (106)
 - ✅ FormatPad__Fv (194)
 - ✅ SaveOverwritePad__Fv (143)
@@ -2483,13 +2483,13 @@
 - ✅ ClipRect__FRC4RECTR4RECT (69)
 - ✅ IsColiding__FRC4RECTT0 (26)
 
-## printy  (recon/psxsrc/printy.cpp) — 18/19 PASS
+## printy  (recon/psxsrc/printy.cpp) — 19/19 PASS
 - ✅ Set__7FontTab (39)
 - ✅ InitPrinty__Fv (44)
 - ✅ SetTextDat__5CFontP7TextDat (2)
 - ✅ KanjiPrintChar__5CFontUsUsUsUcUcUc (78)
 - ✅ PrintChar__5CFontUsUsUcUcUcUc (105)
-- ❌ Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc — 62 diffs (ours 398)
+- ✅ Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc (398)
 - ✅ GetWrap__5CFontPcP4RECT (156)
 - ✅ GetWrapWidth__5CFontPcP4RECT (91)
 - ✅ GetStrWidth__5CFontPc (31)

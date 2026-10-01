@@ -19,10 +19,10 @@ const unsigned char REDB = 0x20;
 const unsigned char GOLDR = 0x80;
 const unsigned char GOLDG = 0x60;
 const unsigned char GOLDB = 0x20;
+BOOL buttoncol = 0;
 POLY_FT4 *CharFt4 = 0;
 int CharFrm = 0;
-BOOL buttoncol = 0;
-CFont MediumFont;
+CFont MediumFont = { 0 };
 CFont LargeFont = MediumFont;
 FontItem LFontTab[114] = {
     { 0x20, 8 }, { 'A', 0 }, { 'B', 1 }, { 'C', 2 }, { 'D', 3 }, { 'E', 4 }, { 'F', 5 }, { 'G', 6 },
@@ -41,6 +41,7 @@ FontItem LFontTab[114] = {
     { 0xF1, 64 }, { 0xEA, 65 }, { 0xE6, 66 }, { 0xE5, 67 }, { 0xDF, 68 }, { 0xE7, 69 }, { 0x7C, 70 }, { 0x7E, 71 },
     { 0x7F, 72 }, { 0x1F, 73 },
 };
+FontTab LFont = { &LargeFont, LFontTab, 114, 0 };
 FontItem MFontTab[118] = {
     { 0x20, 8 }, { 'A', 0 }, { 'B', 1 }, { 'C', 2 }, { 'D', 3 }, { 'E', 4 }, { 'F', 5 }, { 'G', 6 },
     { 'H', 7 }, { 'I', 8 }, { 'J', 9 }, { 'K', 10 }, { 'L', 11 }, { 'M', 12 }, { 'N', 13 }, { 'O', 14 },
@@ -58,7 +59,6 @@ FontItem MFontTab[118] = {
     { 0x7D, 67 }, { 0x5E, 68 }, { 0x3C, 58 }, { 0x3E, 59 }, { 0x5F, 60 }, { 0x24, 61 }, { 0x7C, 62 }, { 0x7E, 63 },
     { 0x7F, 64 }, { 0x1F, 65 }, { 0xAE, 70 }, { 0xAF, 71 }, { 0xB0, 72 }, { 0xB1, 73 },
 };
-FontTab LFont = { &LargeFont, LFontTab, 114, 0 };
 FontTab MFont = { &MediumFont, MFontTab, 118, 0x39 };
 
 /* @0x80089C60 PRINTY.CPP:102 */
@@ -260,8 +260,9 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
             while (Str != EndPtr) {
                 char c = *Str++;
                 if (c & 0x80) {
-                    kan = ((c & 0xFF) << 8) | (unsigned char)*Str++;
-                    Cx += KanjiPrintChar(Cx, Cy, kan, R, G, B);
+                    kan = (unsigned char)c;
+                    c = *Str++;
+                    Cx += KanjiPrintChar(Cx, Cy, (kan << 8) | (unsigned char)c, R, G, B);
                 } else if (c) {
                     Cx += PrintChar(Cx, Cy + 1, c, R, G, B);
                 }
@@ -273,7 +274,7 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
                 MinX = Cx;
             while (Str != EndPtr) {
                 if (*Str & 0x80) {
-                    kan = *Str++ << 8;
+                    kan = (unsigned char)*Str++ << 8;
                     kan |= (unsigned char)*Str++;
                     Cx += KanjiPrintChar(Cx, Cy, kan, R, G, B);
                 } else if (*Str) {
@@ -289,7 +290,7 @@ int CFont::Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, un
                 MinX = Cx;
             while (Str != EndPtr) {
                 if (*Str & 0x80) {
-                    kan = *Str++ << 8;
+                    kan = (unsigned char)*Str++ << 8;
                     kan |= (unsigned char)*Str++;
                     Cx += KanjiPrintChar(Cx, Cy, kan, R, G, B);
                 } else if (*Str) {

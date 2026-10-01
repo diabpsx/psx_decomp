@@ -139,7 +139,22 @@ struct TSFX {   /* sizeof unknown -- only byte offset +1 accessed here */
 };
 
 struct TSnd;
-struct TASK;
+struct TASK {   /* retail task scheduler layout, sizeof 92 */
+    TASK *Next, *Prev;
+    unsigned long Id, SleepTime;
+    unsigned long fToInit : 1;
+    unsigned long fToDie : 1;
+    unsigned long fKillable : 1;
+    unsigned long fActive : 1;
+    unsigned long fXtraStack : 1;
+    void *Stack;
+    unsigned long StackSize;
+    void *Data;
+    int TskEnv[12];
+    void (*Main)();
+    long hndTask;
+    unsigned short XtraLongs, MaxStackSizeBytes;
+};
 
 struct OMENUITEM {   /* sizeof 24 */
     unsigned char y;   /* +0x0 */

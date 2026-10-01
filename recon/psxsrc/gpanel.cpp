@@ -555,8 +555,9 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
     Ft4 = PanelTData->PrintFt4(0x94, Bx, By, 0, GPanelOt - 1, 0);
     Ft4->x0 = Bx + 1;
     Ft4->x2 = Bx + 1;
-    Ft4->y2 = By + 0x14;
-    Ft4->y3 = By + 0x14;
+    const int Bottom = By + 0x14;
+    Ft4->y2 = Bottom;
+    Ft4->y3 = Bottom;
     Ft4->r0 = 0x14;
     Ft4->g0 = 0x14;
     Ft4->b0 = 0x14;

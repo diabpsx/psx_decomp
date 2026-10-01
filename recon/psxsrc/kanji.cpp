@@ -5,7 +5,10 @@
  * text also gives each function its STAT/EXT class) > skel/PSXSRC/KANJI.CPP drafts.
  * TUTILS.H's static tpage helpers and the GMAN.H/BLOCK.H/PRIMPOOL.H inlines are emitted in this object. */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
+#include "psxsrc/psyq.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/fileio.h"
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "psxsrc/KANJI.CPP", line)   /* retail line literals */
@@ -123,13 +126,34 @@ struct TextDat {   /* sizeof 112 */
 
     void SetPal(struct FRAME_HDR *Fr, POLY_FT4 *FT4);   /* @0x80093DD4 GMAN.CPP:1358 */
     /* GMAN.H in-class inlines (out-of-line copies land in this TU) */
-    struct ALL_DECOMP_BUFFERS *GetDecompBuffers()
-    {
-        if (Hdr->DecompOffset)
-            return (struct ALL_DECOMP_BUFFERS *)((unsigned char *)Hdr + Hdr->DecompOffset);
-        return NULL;
+    inline struct ALL_DECOMP_BUFFERS *GetDecompBuffers();
+    inline struct FRAME_HDR *GetFr(int FrNum);
+    void DumpDatFile();
+};
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
     }
-    struct FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
+}
+
+/* Original CPLAYER.H layout and unused inline retain its diagnostic filename. */
+class CPlayer : public TextDat {
+public:
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
 };
 
 class CBlocks : public TextDat {   /* sizeof 264; only the fields touched here are named */
@@ -144,11 +168,7 @@ public:
     void SetTownersGraphics();                              /* @BLOCK.CPP */
     void DumpGraphics(struct TextDat **TDat, int *Id);     /* @BLOCK.CPP */
     /* BLOCK.H:228 */
-    void DumpMonsters()
-    {
-        MonsterList = NULL;
-        DumpGraphics(&MonstTexDat, &MonstTexId);
-    }
+    inline void DumpMonsters();
 };
 
 /* ---- externals ---- */
@@ -533,6 +553,23 @@ KANJI_FRMS GetKanjiCacheFrm(void)
 }
 
 /* @0x800ADC2C KANJI.CPP:535 */
+inline FRAME_HDR *TextDat::GetFr(int FrNum)
+{
+    return Frames + (unsigned short)FrNum;
+}
+inline ALL_DECOMP_BUFFERS *TextDat::GetDecompBuffers()
+{
+    if (Hdr->DecompOffset)
+        return (ALL_DECOMP_BUFFERS *)((unsigned char *)Hdr + Hdr->DecompOffset);
+    return NULL;
+}
+inline void CBlocks::DumpMonsters()
+{
+    MonsterList = NULL;
+    DumpGraphics(&MonstTexDat, &MonstTexId);
+}
+#include "psxsrc/primpool.h"
+
 POLY_FT4 *GetKanjiFrm(unsigned short kan)
 {
     POLY_FT4 *ft4;

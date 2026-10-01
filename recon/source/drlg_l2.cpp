@@ -8,6 +8,7 @@
  * random_(0,n) -> ENG_random(n); LoadFileInMem -> GRL_LoadFileInMemSig; MemFreeDbg macro (source/diablo.h)
  * matches DRLG_FreeL2SP's load/null/free-call oracle shape exactly. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l2.h"
 #include "source/gen/externs_drlg_l2.h"
 #include "source/gen/protos_drlg_l2.h"
@@ -30,15 +31,20 @@
 int Area_Min = 2;
 int Room_Max = 10;
 int Room_Min = 4;
-int nRoomCnt;
-int nSx1;
-int nSy1;
-int nSx2;
-int nSy2;
 extern int nSxy[16]; /* @0x801026E8 (source/gen/externs_gendung.h) -- level-indexed exclusion box, read here */
-struct NODE *pHallList;
-/* PSX-only diagnostic marker written when DoPatternCheck matches cell (9, 19). */
-int myk;
+
+#include "source/gen/tables_drlg_l2.h"
+
+/* Retail initialized storage, after the small minisets. */
+int myk = 0;
+struct NODE *pHallList = 0;
+int nRoomCnt = 0;
+int nSx1 = 0;
+int nSy1 = 0;
+int nSx2 = 0;
+int nSy2 = 0;
+struct ROOMNODE RoomList[81] = { { 0 } };
+unsigned char predungeon[40][40] = { { 0 } };
 
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -296,13 +302,13 @@ static void DRLG_LoadL2SP(void)
     setloadflag = false;
 
     if (QuestStatus(Q_BLIND)) {
-        pSetPiece = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", 0);
+        pSetPiece = GRL_LoadFileInMemSig("Blind2.DUN", 0);
         setloadflag = true;
     } else if (QuestStatus(Q_BLOOD)) {
-        pSetPiece = GRL_LoadFileInMemSig("Levels\\L2Data\\Blood1.DUN", 0);
+        pSetPiece = GRL_LoadFileInMemSig("Blood1.DUN", 0);
         setloadflag = true;
     } else if (QuestStatus(Q_SCHAMB)) {
-        pSetPiece = GRL_LoadFileInMemSig("Levels\\L2Data\\Bonestr2.DUN", 0);
+        pSetPiece = GRL_LoadFileInMemSig("Bonestr2.DUN", 0);
         setloadflag = true;
     }
 }

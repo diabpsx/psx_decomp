@@ -4,8 +4,33 @@
  * its STAT/EXT class, so the handlers reached only through ObjPrintFuncs are file statics).
  * Layouts from DIABPSX.SYM (tools/symhdr.py -> gen/structs_objprint.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
+#include "psxsrc/psyq.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_objprint.h"
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+inline FRAME_HDR *TextDat::GetFr(int FrNum)
+{
+    return Frames + (unsigned short)FrNum;
+}
+inline CCreatureHdr *TextDat::GetCreature(int Creature)
+{
+    return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
+}
+inline int TextDat::GetNumOfFrames(int Creature, int Action)
+{
+    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
+}
+#include "psxsrc/primpool.h"
 
 /* ---- externals ---- */
 extern "C" {
@@ -29,12 +54,7 @@ static struct CINDER Cinders[16];   /* @0x8012FD20 (bss, SYM STAT) */
 static int lasttick = 0;            /* @0x8011BC44 (.sdata, SYM STAT) */
 static BOOL FireInit = true;        /* @0x8011BC48 */
 static BOOL FirstFire = true;       /* @0x8011BC4C */
-struct DoorOff DoorOffsets[4][4] = {   /* @0x800E3B6C */
-    { { 0, 0, -6, 0 }, { 0, 0, 7, 0 }, { -1, -3, 0, 0 }, { 0, 0, 0, 0 } },
-    { { 0, -4, -10, 0 }, { 0, -4, -8, 0 }, { 0, -4, 0, 0 }, { 0, -4, 0, 0 } },
-    { { 0, -5, 11, 0 }, { 0, -5, 1, 0 }, { 0, -5, 2, 0 }, { 0, -5, 0, 0 } },
-    { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } },
-};
+extern struct DoorOff DoorOffsets[4][4];
 int lox = 0;   /* @0x8011BC50 (.sdata, SYM EXT) */
 int loy = 0;   /* @0x8011BC54 */
 int lot = 0;   /* @0x8011BC58 */
@@ -42,8 +62,8 @@ int lot = 0;   /* @0x8011BC58 */
 static void PrintOBJ_FIRE(int, int, int);
 void DrawLightSpark(int, int, int);
 void PrintTorchStick(int, int, int, int);
-POLY_FT4 *PRIM_GetCopy(POLY_FT4 *);
-void PRIM_CopyPrim(POLY_FT4 *, POLY_FT4 *);
+inline POLY_FT4 *PRIM_GetCopy(POLY_FT4 *);
+inline void PRIM_CopyPrim(POLY_FT4 *, POLY_FT4 *);
 
 /* @0x8007D9E8 OBJPRINT.CPP:277 */
 static POLY_FT4 *DefaultObjPrint(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos, int XOffSet, int YOffSet)
@@ -428,7 +448,7 @@ static POLY_FT4 *PrintOBJ_SKFIRE(ObjectStruct *OStr, int ScrX, int ScrY, TextDat
 /* ---- PRIMPOOL.H / GMAN.H header copies (out of line here: -fno-inline) ---- */
 
 /* @0x8007ED50 PRIMPOOL.H:75 */
-void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
+inline void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
 {
     unsigned long *Dest32 = (unsigned long *)Dest;
     unsigned long *Source32 = (unsigned long *)Source;
@@ -437,30 +457,12 @@ void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
 }
 
 /* @0x8007ED14 PRIMPOOL.H:84 */
-POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
+inline POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
 {
     POLY_FT4 *RetPrim;
     PRIM_GetPrim(&RetPrim);
     PRIM_CopyPrim(RetPrim, Prim);
     return RetPrim;
-}
-
-/* @0x8007EDF4 GMAN.H:253 */
-int TextDat::GetNumOfFrames(int Creature, int Action)
-{
-    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
-}
-
-/* @0x8007EE2C GMAN.H:284 */
-struct CCreatureHdr *TextDat::GetCreature(int Creature)
-{
-    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
-}
-
-/* @0x8007EE48 GMAN.H:229 */
-struct FRAME_HDR *TextDat::GetFr(int FrNum)
-{
-    return Frames + (unsigned short)FrNum;
 }
 
 /* @0x800E39E4 (SYM EXT) -- object type -> draw handler */
@@ -564,4 +566,11 @@ OBJPRINTFUNC ObjPrintFuncs[98] = {
     NULL,   /* 95 */
     NULL,   /* 96 */
     NULL,   /* 97 */
+};
+
+struct DoorOff DoorOffsets[4][4] = {   /* @0x800E3B6C */
+    { { 0, 0, -6, 0 }, { 0, 0, 7, 0 }, { -1, -3, 0, 0 }, { 0, 0, 0, 0 } },
+    { { 0, -4, -10, 0 }, { 0, -4, -8, 0 }, { 0, -4, 0, 0 }, { 0, -4, 0, 0 } },
+    { { 0, -5, 11, 0 }, { 0, -5, 1, 0 }, { 0, -5, 2, 0 }, { 0, -5, 0, 0 } },
+    { { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } },
 };

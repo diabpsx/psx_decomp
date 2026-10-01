@@ -2444,7 +2444,8 @@ void GetUniqueItem(int i, int _uid)
     long OUid;
 
     OUid = _uid;
-    uid = _uid & 0xFF;
+    uid = OUid;
+    uid &= 0xFF;
 
     SaveItemPower(i, UniqueItemList[uid].UIPower1, UniqueItemList[uid].UIParam1, UniqueItemList[uid].UIParam2, 0, 0, 1);
     if (UniqueItemList[uid].UINumPL > 1)

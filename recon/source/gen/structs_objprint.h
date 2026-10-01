@@ -44,6 +44,7 @@ struct TextDat {   /* sizeof 112 */
     struct CCreatureHdr *GetCreature(int Creature);
     struct FRAME_HDR *GetFr(int FrNum);
     int GetNumOfFrames(int Creature, int Action);
+    void DumpDatFile();
 };
 
 struct CCreatureAction {   /* sizeof 14 */

@@ -268,8 +268,7 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
 
     Frm &= 0xFFFF;
     if (DialogGBack == 2) {
-        int Bits = RandBTab[(char)(GShadeY % 8)] >> (GShadeX % 8);
-        if (Bits & 1) {
+        if ((RandBTab[(char)(GShadeY % 8)] >> (GShadeX % 8)) & 1) {
             if (Frm == 7)
                 Frm = 14;
             if (Frm == 12)

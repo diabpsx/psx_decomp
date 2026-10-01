@@ -9,6 +9,78 @@ near-miss. `tools/build.py` / the gate toolchain were not touched.
 
 ## Status (2026-09-28)
 
+### Current quick start: reproducible matching diagnostics
+
+`match_probe.py` builds the **same preprocessed input** with real PsyQ,
+stock FSF and instrumented FSF compilers using the project's current flags.
+It selects one exact assembly symbol and one unambiguous trace heading, then
+checks both stock/PsyQ agreement and instrumentation transparency. It never
+changes reconstruction, compiler sources or gate rules.
+
+```powershell
+python tools/instr/match_probe.py recon/psxsrc/dialog.cpp DialogPrint__Fiiiiiiiiii --function DialogPrint --gates
+```
+
+If unrelated frontend crashes require isolation, explicitly create a diagnostic
+copy, then retain gates against the original TU:
+
+```powershell
+python tools/instr/isolate_fn.py recon/psxsrc/dialog.cpp DialogPrint build/dialogprint_iso.cpp
+python tools/instr/match_probe.py build/dialogprint_iso.cpp DialogPrint__Fiiiiiiiiii --function DialogPrint --gates --gate-source recon/psxsrc/dialog.cpp
+```
+
+Each run uses a fresh short directory under `build/probes/`. `report.txt` is
+the compact summary; `report.json` includes input/source/compiler hashes,
+flags, exit statuses, global allocation ranks and all attempts, plus ordered
+local allocator events (quantity IDs are **not** merged across blocks).
+Each compiler's raw output, target assembly, requested RTL dumps and stderr are
+retained. Divergent targets produce unified diff files. Requested gate output
+is saved separately for maspsx, real ASPSX, SYM and ordered calls.
+
+The default dumps are `greg,lreg`. To distinguish allocation from late control-flow
+optimization and delay-slot scheduling, capture several passes in one run:
+
+```powershell
+python tools/instr/match_probe.py build/soundpad_iso.cpp SoundPad__Fv --function SoundPad --dump cse2,greg,sched2,jump2,dbr
+```
+
+`jump` is the early jump pass (`-dj`); `jump2` is the late jump pass (`-dJ`).
+Both are also available through `real_rtl.py --dump`. Unknown or duplicate dump
+names are rejected, and a missing requested dump makes the probe fail.
+
+Worked diagnostic: in the pre-fix isolated SoundPad, real PsyQ `sched2` retains
+two cancellation-path `cmenu` stores (RTL UIDs 1643 and 1673). In `jump2`, UID
+1643 disappears and jump 1649 targets new label 1764 before store 1673. Thus
+the shared store appears during late jump optimization, after hard-register
+assignment, rather than during initial CSE. This input agrees across all three
+compiler lanes; that agreement does not establish a retail byte match. Reproduce
+with the command above; UID numbers depend on the exact source revision.
+
+This diagnosis led to a verified source fix: move `Adjust = 0` after the
+`cmenu` and `cs` assignments in the special cancellation branch. Both byte
+lanes now match all 642 instructions, SYM is exact and all 41 calls match.
+No additional locals, register constraints or gate changes are involved.
+The completed full-board refresh confirms 2692/2727 PASS, with OPTIONS at
+35/38 and 35 entries remaining. The 160-test suite passes.
+
+For overloaded functions, supply the full trace heading with `--function`.
+No source-variable names are guessed from pseudo numbers. Allocation attempts
+are not claimed to be final reload assignments. A validated isolated trace
+applies only to that input: it does **not** establish equivalence to the original
+TU, and successful compiler agreement is **not** a retail PASS. Native data,
+relocation/jump-table and final-image checks still apply separately.
+
+Exit 0 requires a validated trace and success of every requested check; exit 1
+means the report is incomplete/divergent or a requested check failed. Argument
+errors exit 2. A real-ASPSX pass may legitimately coexist with a maspsx failure;
+the report exposes both and does not decide project exception policy.
+
+`compare_tu.py` now also uses unique artifact directories and meaningful exit
+codes: 0 identical, 1 differing, 2 compiler failure or invalid invocation.
+It no longer silently exits successfully after a reported compiler failure.
+
+The historical build recipe and original validation results follow.
+
 - **Stock (uninstrumented) gcc-2.7.2 cc1 + cc1plus: BUILT AND VALIDATED.**
   Binaries: `C:/temp/dmt-cc1/gccbuild-ecoff/cc1.exe`, `cc1plus.exe`
   (mipsel-unknown-ecoff target, built as a native i686 Windows exe via
@@ -458,6 +530,24 @@ agreement with the unmodified full-TU build.
 
 ### GetUniqueItem__Fii
 
+Resolved (2026-10-01): use the natural staged ID extraction
+`OUid = _uid; uid = OUid; uid &= 0xFF;`. Both byte lanes now match all 216
+instructions; exact SYM and all seven call targets pass. This adds no locals,
+artificial uses or register constraints. Merely using `uid = OUid & 0xFF`
+does not have the same compiler result and remains at the old 88 differences.
+
+The new validated three-compiler probe `build/probes/a-2u6jughq` confirms the
+predicted allocation threshold: uid pseudo 74 now has 13 references / 119
+live instructions / seven calls, priority 3277, selecting s1. i pseudo 72
+stays at 13 / 120 / seven, priority 3250, selecting s2. This reproduces retail
+exactly and validates the earlier quantitative diagnosis through real gates.
+Moving OUid's snapshot later or reversing initialization order instead
+produced 214 instructions and was rejected. All 164 tests pass.
+The completed full-board refresh confirms 2693/2727 PASS, 34 remaining,
+with ITEMS at 105/106 and no regressions.
+
+Historical evidence before the fix:
+
 The `--drop-only GetItemStr,SpawnQuestItem` input compiles successfully with the
 instrumented compiler. Its current trace agrees with the full PsyQ `-dg` dump:
 
@@ -557,6 +647,39 @@ anchor still needs a source-level explanation.
 
 ### DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct
 
+Update (2026-10-01): retaining `const int Bottom = By + 0x14` before the
+two bottom-coordinate stores removes the unwanted HI copy of By. Current
+source is 459/459 instructions, exact SYM including length and block ends,
+and all 28 call targets match. Both byte lanes still show six diff lines:
+the right-edge add/store group uses v1 before the u0 load rather than a0
+after that load. This is NOT a PASS; GPANEL remains 10/13.
+
+The fresh isolated probe `build/probes/a-y9we6kgm` independently proves
+stock FSF and real PsyQ differ in the inventory-item comparison (v1/v0
+versus v0/t1), though instrumentation itself is transparent. Do not treat
+its allocator choices as validated PsyQ choices. Real initial RTL shows
+the top y stores directly use By's subreg; CSE reuses the earlier narrowed
+By operand from the bottom-edge expressions. Keeping the addition in SI
+before narrowing removes that dependency. Reordering UV/coordinate stores,
+unsigned/masked casts, explicit UV snapshots and earlier Right snapshots
+did not solve the remaining schedule; only Bottom was retained. Fresh real
+CSE dump: `build/rtl/gpanel-543ochh0/input.i.cse`. All 160 tests pass.
+
+Historical investigation before this update:
+
+Further right-edge probes (2026-10-01) retain the six-diff baseline for
+interleaved x/y stores, a chained right coordinate, unsigned right arithmetic,
+and int/unsigned/byte snapshots of `u0 + 1`. Putting both y stores first
+swaps Bx/By's saved registers throughout the function (68 differences);
+deriving the right edge from stored x0 adds three instructions (69 diffs).
+None was retained. Real first-scheduler dump `gpanel-iuqkoraa` and lreg dump
+`gpanel-hflatdq7` both place UID 1114 (right edge, pseudo 356) followed by
+stores 1116/1123 before the u0 reads. In second-scheduler dump
+`gpanel-96_pqus6`, that result is already v1, so its later u0 load into v1
+cannot move above these stores. Investigate pre-allocation scheduling of the
+right-edge live range, not merely final delay-slot scheduling. Diagnostics
+are under `build/sbr`; live executable source stays unchanged.
+
 The former 380-line mismatch contained genuine reconstruction errors, not
 just allocation residue. Retail uses a 36-byte POLY_G4; the source used a
 POLY_FT4 view with a length written into its code byte and three halfword
@@ -600,6 +723,17 @@ status.py now reports the actual source count (covered by parser regression
 tests); this corrects diagnostics, not any PASS verdict.
 
 ### BL_AsyncReadFile__FPcUl
+
+Status-width follow-up (2026-10-01): full-TU copies in `build/asstat` test
+signed/unsigned-byte status conversion, explicit low-byte masking, unsigned
+shift arithmetic, and a signed-byte loop condition. None passes. Signed
+conversion adds an instruction (89/88); unsigned conversion/masking retains
+88 but substitutes ANDI for retail's raw result copy; unsigned shifting
+keeps the baseline schedule; a cast-only condition shifts into v0 instead
+of MemSize/s0. The baseline raw-int return declaration is unchanged: no
+authoritative EA header supporting a narrower return type was found in the
+local reference collections. These results do not justify changing an API
+declaration or weakening SYM to admit a new temporary. No live source edit.
 
 Baseline is 88/88 instructions with four scheduling diff lines: ours puts
 the status-result copy before `TSK_Sleep` and its constant argument in the
@@ -897,6 +1031,18 @@ between that store and the call, ruling out a simple shared-case entry there.
 Neither investigation changed live source or the PASS count.
 
 ### PrintCDWaitTask address formation and SPLTARGT integration
+
+Follow-up (2026-10-01): four full-TU member-access spellings (C++ pointer
+to member, dereferenced plr+1, commuted array indexing, explicit member
+address/dereference) all retain the 76/79-instruction, 17-diff baseline.
+No live source changes. Diagnostic sources/results are under `build/cdm`.
+The three-compiler probe `build/probes/a-f14_60im` rejects trace validation:
+instrumentation is transparent, but stock FSF hoists constants 288 and 510,
+adds two saved registers, and grows the frame to 64 bytes versus real PsyQ's
+56. Both loop dumps nonetheless use the same plr+6661 constant address.
+Thus the stock compiler is not a solution to retail's plr+29 base hoist,
+and its final allocations must not be applied to this target. This separates
+the shared address-folding problem from the SN-specific invariant policy.
 
 PrintCDWaitTask still differs by 17 lines (76 instructions versus retail 79).
 Retail preserves plr+0x1D in s3 and loads the second player's active flag at
@@ -1753,6 +1899,13 @@ No register pin, volatile access, or debug-record normalization was introduced.
 
 ### read_card_directory conditional-expression probes
 
+Direct-control-flow follow-up (2026-10-01), `build/cdirect`: a switch guarding
+the read and an explicit success-label form both produce 149/151 instructions
+with fh/r swapped (14 diff lines). Splitting the two error checks produces
+148 instructions and a 144-byte frame; a one-iteration while produces 152
+instructions and a 160-byte frame. None passes or is retained. These forms
+do not recover the second direct comparison without changing other code.
+
 Six additional full-TU diagnostics in build/card_condition_probe were rejected.
 Returning fh through a conditional expression produces 120 diff lines / 157
 instructions; conditional error/success expressions produce 126 / 155 and
@@ -1821,6 +1974,24 @@ and its independent runtime BSS check also pass with MINITEXT selected.
 
 ### DoCredits transition expression/scoping follow-up
 
+Late-pass follow-up (2026-10-01): the real compiler now establishes where the
+Mode-first variant diverges. In `build/rtl/credits-j7tc8d5i/input.i.sched2`,
+UID 418 is the separate Fade decrement after UID 415 (Mode=2). In
+`build/rtl/credits-easp4_gb/input.i.jump2`, UID 418 has disappeared and jump
+423 targets label 486 at case 2's decrement (UID 490). The lost instruction
+is therefore late cross-jumping, not an assembler delay-slot discrepancy.
+The baseline `credits-chfuljif` jump2 dump preserves both assignments;
+the existing dbr dump puts Mode=2, rather than Fade--, in the jump delay slot.
+
+Six additional full-TU tests in `build/clate` were rejected: Mode-first
+unsigned/long subtraction and Mode-derived subtraction remain 249/250;
+`Fade -= Mode++` remains the original four differences at 250/250;
+subtracting the existing `one` variable grows to 252 instructions and a
+200-byte frame. Live DoCredits is unchanged: exact SYM and 28 call targets,
+but four byte-diff lines. The board remains 2692/2727. A future source fix
+must avoid late sharing while preserving retail's decrement delay slot;
+more constant-folding spellings of the same arithmetic are not promising.
+
 Six further full-TU variants in build/credits_transition_probe do not solve
 the four-difference baseline. Mode-first comma expressions, prefix decrement,
 a const nextFade snapshot, and a nested decrement block all produce the same
@@ -1849,6 +2020,19 @@ The final main image and runtime BSS check pass; all nine call audits and
 functions in 21 TUs). The matching board remains 2687/2727, with 40 open.
 
 ### set_mdec_img_buffer: loop form versus initial copy
+
+Validated CSE evidence (2026-10-01): `build/probes/a-yyqt77mo` agrees exactly
+across real PsyQ, stock FSF and instrumented FSF for this target. In initial
+RTL, UID 15 copies tsz pseudo 74 into i pseudo 73; after first CSE the same
+UID assigns constant zero with REG_EQUAL zero. The final allocations are
+already correct (p/a0, i/a1, tsz/a2); this is not a register-priority problem.
+Six full-TU trials under `build/mdc` reject chained initializers, pre-increment
+conditions, post-increment indexing, a bottom-tested loop and swapped pointer/
+size updates. Chains and pre-increment keep two diffs; post-indexing gives
+eight; swapped updates give four; bottom testing folds the return and yields
+12 rather than 13 instructions. No executable change was retained. Exact
+SYM still passes; the stale source comment describing an older guard trial
+was replaced with the current two-diff/CSE evidence.
 
 Fresh real-gate output confirms the two-difference baseline is the initial
 `addu a1,zero,zero` versus retail `addu a1,a2,zero`, not the final return.
@@ -1919,6 +2103,14 @@ runtime BSS; 119 tests pass. Source linkage reaches 543 functions / 56 TUs
 (424 / 24 native). The individual matching board remains 2687/2727.
 
 ### ResyncQuests declaration/prologue probes
+
+Result-lifetime follow-up (2026-10-01): root-scope const BOOL/int/unsigned
+snapshots of the first QuestStatus result keep 315 instructions, exact SYM
+and the same six prologue differences. Assigning the result to existing tren
+also keeps exact SYM, but changes the result mask/test register and gives ten
+diff lines. Explicit function return and equivalent Boolean conversion do
+not affect the prologue. All six full-TU diagnostics under `build/qstat`
+were rejected; executable source and compiler settings remain unchanged.
 
 Four full-TU copies in build/quest_prologue_probe test the remaining scheduler
 tie without changing compiler flags. Initializing i (alone or with tren) grows
@@ -2375,6 +2567,313 @@ function records and three global records. All fifteen calls, main-image/BSS
 checks, and 147 tests pass. Coverage reaches 795 functions / 73 TUs (666/41
 native, 129/32 conventional); matching remains 2687/2727.
 
+### DRLG_L5TransFix paired loop coordinates
+
+Rechecked the gold Hellfire source at DRLG_L1.CPP:2990: it confirms the five
+shared transparency rules, while the remaining rules are PSX additions and
+must retain retail behavior. Pairing xx/yy updates with i/j in the for headers
+preserves every map access and update and reduces 357 differences to 333 at
+270/273 instructions. Retained this natural induction form. Recomputing each
+coordinate from its index produces 390 instructions and was rejected. All
+call checks pass (no calls), and DRLG_L1 remains 39/40. Not a new PASS.
+
+### DialogPrint extra local and read-only-view probe
+
+Validated isolated allocator trace is captured in build/dialogprint_alloc.
+v1 (pseudo 99) has 6 references / 28 live instructions / two crossed calls,
+priority 4285, ahead of u0 (94): 7/40/2, priority 3500. v3 (101) has 4/25/2,
+priority 3200, while u2 (96) has 5/34/2, priority 2941 and spills. Retail
+instead puts u0 first and spills v3. Earlier v1/v3 assignment probes do change
+allocation but fail the real gates: 610/160, 611/161 and combined 610/280
+(instructions/differences). None was retained; the trace is diagnostic, not
+authorization for register pins or added fake references.
+
+Coordinate-order follow-up (build/duv): paired corner assignments produce
+605 instructions/209 differences; direct per-corner expressions produce
+610/168. Staging rotated v0 through multiple assignments gives 610/330;
+decrementing UOfs before its expression gives 610/158, only a small scheduling
+change without restoring retail's allocation. None was retained. These trials
+preserve corner values but do not meet either complete byte or SYM gates.
+The supplied isolate_fn.py/compare_tu.py lane reports IDENTICAL assembly for
+build/dialogprint_iso.cpp under stock and real PsyQ compilers, so this isolated
+function is a validated candidate for the allocator trace lane.
+
+Removed the draft-only Bits local by testing the shade-table expression
+directly; retail has no such record. Instruction output is unchanged at
+610/608 with 162 differences and all thirty calls exact. Read-only Fr/Tp
+views shortened code to 601 instructions and increased the differences to
+209, so they were reverted. The real greg dump is retained at
+build/rtl/dialog-tdu8rfd5. Remaining issues include UV allocation (source spills
+u2, retail spills v3) and shade-table scheduling; DIALOG remains 9/11.
+
+### GAMEPAD complete native linkage
+
+Restored original TextDat/CPlayer/CTextFileInfo headers and retail function/
+deferred-inline order. Original ASPSX 2.67 naturally places the 212-byte GamePad
+instances 224 bytes apart, matching the 436-byte BSS extent. Native verification
+proves all 12768 text bytes, 60 initialized-data bytes, 248 readonly bytes
+including jump tables, 39 small-data bytes, BSS and the constructor pointer,
+plus 42 function records and eleven named global records.
+
+Full relocation caught two errors invisible to normalized instruction checks:
+SetWalkStyle must use txt_actions[2].pad_val (offset 0x24), not entry 9; and
+InitGamePadVars clears _spselflag[1] before [0]. Both are corrected. All 42
+standard passes and call audits remain green. Production main-image bytes,
+120304 runtime zero BSS bytes and checksum all verify; all 150 tests pass.
+Source linkage is now 901 functions / 77 TUs (772/45 native, 129/32 conventional).
+Matching remains 2691/2727; this integration does not claim a new board PASS.
+
+### DrawMenu retail logic and packet-address repairs
+
+Comparison-form probe: changing the remaining interior tests together to
+one-based forms raises output to 1040 instructions/886 differences without
+fixing the stack-slot displacement. Reverted that batch to the verified
+1033-instruction/751-difference baseline. Real greg/lreg dumps are retained
+at build/rtl/options-irfthy04 and options-1b9e6o1c for the spill investigation;
+the frame size matches, but mptr and subsequent locals start one spill slot
+earlier than retail. No artificial stack slot or register constraint added.
+
+Text-path follow-up replaces decompiler gotos/shared_print and Str/x2 locals
+with structured frontend/in-game branches and direct string lookup arguments.
+Final help-text selection uses direct calls without Str_00. All 27 ordered
+calls remain exact. The initial one-based menu test restores the retail
+232-byte frame and removes the initial code differences; current output is
+1033/1032 instructions with 751 differences. Local names now match retail,
+but allocation and stack slots still differ. OPTIONS remains 34/38 and all
+150 tests pass. This remains non-PASS.
+
+Packet/highlight follow-up restores sxp/syp integer coordinates and reuses len
+for the slider's right edge, removing four decompiler short temporaries.
+Highlight uses retail cx/cy and the shared len width rather than y2/Frm2/x/iVal.
+Most importantly, retail falls through from selected-item spinners to the
+common text renderer; the draft's else incorrectly skipped selected labels.
+That control-flow error is repaired. Current source is 1033/1032 instructions
+with 989 differences and a 224-byte frame versus retail 232. All 27 calls and
+150 tests pass; OPTIONS stays 34/38. Numerical diff improvement is not claimed
+for this correctness checkpoint; frame, scopes and text-path reconstruction
+remain open.
+
+Rectangle/local follow-up separates my (menu origin), yoff (per-row spacing)
+and len (cached slider length), following their retail stack/register roles.
+Restored mptrx/mptry and uses iptr=mptr->Item; explicit selected/unselected
+slider calls remove the draft-only Frm/Str/Font temporaries. Current result
+is 963 differences at 1027/1032 instructions, with all 27 calls exact and
+OPTIONS still 34/38. Stack/local layout and the remaining packet/text scopes
+are not yet exact; this is not a PASS.
+
+Corrected SoundMenu rows: frontend uses rows 2/3/4 at 1/2/3 and row 1 at zero;
+in-game uses rows 1/2/3/4 at 1/2/3/4. The prior draft omitted row 4. Slider
+selection is based on item index i, not its length; position, gradient and
+width use len, not the Just enum. Corrected addPrim's double-scaled ordering
+table index (ThisOt+depth, not ThisOt+(depth<<2)). Restored signed half-height
+division and byte-sized barg/barr before halving gradient colors, as shown
+by the retail shifts and masks. Initial menu branch order follows retail.
+
+All 27 calls remain exact and OPTIONS stays 34/38. The current 1015 instructions
+are still short of retail's 1032 and give 991 differences; these are concrete
+logic repairs, not a new byte/SYM PASS or a claim that the diff count improved.
+All 150 tool tests pass. Local layout and the remaining drawing flow still
+need reconstruction against the oracle.
+
+### DrawSpinner coordinate and color lifetimes restored
+
+Allocation follow-up: expressing the paused/non-sparkling case first gives
+589 differences at 416 instructions with calls unchanged. Moving the y3
+origin addition outside the projection branch does not help and was reverted.
+The real local-allocation dump (build/rtl/options-3lbkankg) reports x and y
+each with 24 references, 281 live instructions and seven crossed calls.
+Retail spills y and retains Sparkle, whereas current source retains y and
+does not allocate Sparkle to a saved register. Stock comparison of
+build/spin_iso.cpp diverges substantially (176-byte frame versus real's 160),
+so its final register choices must not substitute for real PsyQ evidence.
+
+Retail retains radius=spinradius/2 independently instead of overwriting the
+argument and reusing radius for a sine entry. Restored separate x1/y1, x2/y2
+and x3/y3 calculations in retail order, with absolute outer coordinates and
+relative middle offsets. The frame f no longer doubles as loop angular stride.
+Quarter-bright colors are computed before the loop, and the cross packet
+updates its middle offsets in place. Packet code-bit operations follow retail.
+
+The result is 416 instructions versus retail's 415 (previously 392), with 593
+differences versus the previous 641 and all eight calls matching. The current
+160-byte frame still differs from retail's 168; this is not a new PASS.
+Explicit unsigned color-product casts did not change code and were reverted.
+OPTIONS remains 34/38 and the board remains 2691/2727.
+
+### SoundPad retail logic corrections (still non-PASS)
+
+Tail-only probes in build/stail leave the eight-difference baseline unchanged
+for unsigned/long link conversions, a const table view and a nested assignment.
+Staging the selection through cs emits 644 instructions, while decrementing
+cmenu after resetting cs emits 641; neither is retail's 642. No variant was
+retained. Real cse2 is captured at build/rtl/options-21lqn87n. These probes
+do not justify adding volatile, artificial guards or weakening the gate.
+
+Scope repair now leaves eight differences at 640/642 instructions. l belongs
+only to the language for-loop; link tests use their source expressions and
+speed selection uses a switch without an invented spd local. All local record
+tuples and internal block boundaries now match retail; only the root end and
+function length remain eight bytes short. The remaining difference is the
+cmenu==7 cancellation update, where the compiler shares an end-of-branch
+store. Extra staging through cs produces 644 instructions; staging through
+cmenu does not solve it. Those trials were rejected. OPTIONS stays 34/38 and
+all 41 SoundPad calls match. Full SYM/PASS is still not achieved.
+
+Latest lifetime follow-up reaches 14 differences at the exact 642-instruction
+length. Carrying the cancellation selection through its cs store before
+loading the link removes the unwanted v1 interference. Keeping the later
+destination snapshot separate and decrementing the special cancellation link
+in place avoids non-retail tail merging. Reusing root l for that snapshot
+regresses to 87 differences/643 instructions and was rejected. All 41 calls
+remain exact and OPTIONS is still 34/38. SYM is not solved: retail's l record
+is in the language-loop scope, while the current source has a function-scope
+l and extra destination scopes. Both that scope mismatch and the remaining
+fourteen register differences must be resolved; no new PASS is claimed.
+
+Follow-up restores the default link dispatch before the language case, retail
+one-based menu comparisons, the death-first cancellation branch and l reuse
+for the language loop and speed selection. An explicit link switch preserves
+the language fall-through behavior. Current result is 59 differences at
+641/642 instructions, with all 41 calls exact and OPTIONS still 34/38. Real
+greg (build/rtl/options-8bap19sx) exposes l's conflict with v1; the current
+allocation uses a0 where retail uses v1. Moving the loop initializer outside
+the language branch does not fix this and was reverted. No new PASS claimed.
+
+Retail confirms lcs is the selection before movement; the previous draft
+overwrote it during movement and blank-row skipping, suppressing normal
+navigation sounds. Restored that snapshot and the missing separate wrap rules
+for main/game-over menus. The language marker is row NewLang+1, not NewLang;
+its five-row clearing loop now follows retail indexing. The death/menu-range
+checks are unsigned, preventing negative differences from selecting unrelated
+menus. Restored owned DiabloDieFlag/they_pressed with their zero initial
+values and retail's l local name. Input is read before indexing the key table.
+
+Current result: 152 differences, 636 instructions versus 642 retail, down from
+this turn's 364 differences / 604 instructions. All 41 calls match and OPTIONS
+remains 34/38, including DrawOptions. Remaining work starts in confirmation/
+link dispatch; retail uses move for repeated button tests and lays out the
+non-language dispatch before the l==-2 language case. This is not a PASS and
+does not increase the 2691/2727 board count.
+
+### DrawOptions resolved: globals, branches and TASK layout
+
+Qfromoptions, PadFrig and old_pad were extern-only despite retail ownership
+in OPTIONS. Their typed definitions with original 0/false/-1 initial values
+restore GP-relative accesses without regressing the 33 existing passes.
+Explicit control/help selection stores, the retail controller-exit branch
+order and one-based menu comparison eliminate the remaining scheduling and
+branch differences. Replaced TASK's forward declaration with its real
+92-byte scheduler layout, resolving the last parameter SYM mismatch.
+
+Both byte lanes now match all 447 instructions and local branch targets;
+exact SYM and all 63 calls pass. OPTIONS is 34/38 with all 38 call audits
+passing, and all 150 tests remain green. No gate exceptions were added.
+The completed full-board refresh confirms 2691/2727 (36 remaining).
+
+### PRINTY complete native linkage
+
+Explicitly initialized MediumFont and restored LFont's position before the
+medium-font character table, matching all 2040 initialized-data bytes. The
+original TextDat/CTextFileInfo inlines restore the gman.h and .tp/.dat pools;
+the latter explain WHITER starting at odd address 0x8011ABD1, without invented
+padding. Reordered independent CBlocks/CFont header declarations so deferred
+inline methods occupy retail addresses. All 4400 text bytes, 34 readonly
+bytes, 36 small-data bytes and the four-byte constructor pointer match, with
+nineteen exact function records and 21 named global records. Original readonly
+alignment bytes 04 00 remain scaffold-owned.
+
+Production main-image linkage is byte-identical and its 120304-byte runtime
+BSS verifies zero. All nineteen call audits and 150 tests pass. Source-linked
+coverage reaches 859 functions / 76 TUs (730/44 native, 129/32 conventional).
+The matching board remains 2690/2727.
+
+### DrawFlask expression and packet-store probes
+
+Baseline is 285 instructions with 74 differences and exact SYM. Staging the
+height through BarY and expressing mirrored X offsets with ternaries changes
+allocation broadly (283 instructions); reverting the staging still gives
+132 differences. Moving u3 ahead of the tpage store alone increases the
+baseline to 82 differences. Reversing height-addition operands or using an
+unsigned margin leaves the original 74 differences. All trials were reverted;
+no packet-store reordering or integer-type workaround was retained. The next
+investigation needs the real CSE/scheduling dependency evidence rather than
+these source spelling changes. The matching total remains 2690/2727.
+Follow-up: combining boolean negation/masking before assigning xof produces
+282 instructions and 77 differences. Staging only the height through BarY,
+without changing the original flip logic, keeps 285 instructions but changes
+allocation to 208 differences and loses HealthHeight's retail register. Both
+were reverted. Retail has only the root lexical block, so adding scoped
+temporary locals is not automatically compatible with the exact SYM gate.
+Fresh baseline dumps: build/rtl/gpanel-_cnm_pfn (rtl) and gpanel-cgp1bh56 (cse).
+
+### CFont::Print resolved: unsigned lead bytes
+
+The real greg dump identified kan as pseudo 96, with hard-register preferences
+v1/a3 despite no call-crossing lifetime. Explicit pointer increments, reversed
+OR, addition and a split shift did not help; a paired indexed load shortened
+the function incorrectly. Casting the centre/right lead bytes to unsigned
+char before shifting, together with the left-case c reuse below, reproduces
+all 398 instructions, local branch targets and the complete SYM record set.
+Both assemblers and all thirteen calls pass; PRINTY is now 19/19 with all call
+audits passing. The isolated stock compiler ICEs on this function, so these
+decisions were checked against the real compiler rather than stock traces.
+All 150 tests pass. Source-linked coverage is unchanged by this matching fix.
+The completed full-board refresh confirms 2690/2727 (37 remaining).
+
+### CFont::Print left-justified Kanji byte reuse (superseded by the pass above)
+
+Retail reuses the local c for the second byte and holds the unsigned first
+byte in kan before combining the call argument. Restoring that source flow
+reduces 62 differences to 44 at the same 398-instruction length, with all
+thirteen calls exact. The unsigned-char conversion matters: replacing it
+with c & 0xFF restores the worse signed-temporary allocation. Splitting the
+centre/right branch shifts differently does not help and was not retained.
+The remaining gate failure includes kan in v1 instead of retail v0 and
+different transient registers in the other two justification branches.
+PRINTY stays 18/19 and the board remains 2689/2727; this is not a new PASS.
+
+### GLUE complete native linkage
+
+Moving the display-flag definitions below the first format-string use restores
+all 356 small-data bytes without padding or assembly edits. Reordered source
+definitions to retail TU order and verified the original-assembler object at
+retail addresses: 2876 text bytes, 972 initialized-data bytes, 62 readonly
+bytes, 356 small-data bytes and 24 zero BSS bytes, with all 28 function records
+and fourteen named globals. Two trailing readonly alignment bytes stay in
+the scaffold. Production main-image linkage is byte-identical, and runtime
+verification proves all 120304 BSS bytes zero with the separate checksum.
+All GLUE function and call checks pass, along with 150 tests. Source linkage
+reaches 840 functions / 75 TUs (711/43 native, 129/32 conventional); matching
+remains 2689/2727. This resolves the pending layout noted below.
+
+### GLUE remaining globals and header pool restored
+
+Restored the real TextDat/CPlayer header declarations, GLUE filename literal,
+weapon/class/armour lookups, and six static small-BSS globals in retail order.
+The data verification command additionally proves the entire 62-byte readonly
+pool and all six offsets within the 24-byte zero-initialized region. GLUE
+remains 28/28 with exact SYM; all 150 tests pass. Const character lookup arrays
+are needed to preserve FindPlayerChar's retail scheduling.
+
+Native registration remains pending: in the current 356-byte small-data
+section, DoShowPanel/DoDrawBg precede the format literal instead of following
+it. Their source offsets are 332/336, while retail needs 340/344. The table,
+string pool, JustLoadedPlayer/GameStarted and final character-array offsets
+are already correct. Do not approve native linkage until the middle ordering
+is restored and fully relocated text/data verification passes.
+
+### GLUE PlayerInfo source-data ownership
+
+Restored the real PInf fields (Tx, GameTex, TownTex, TwoPlayerTex) and its
+81-entry initialized PlayerInfo table instead of an external scaffold import.
+gen_glue_player_info.py decodes only retail data and validates all original
+pointers, identifier lengths and padding. Its --verify mode checks the actual
+compiler-emitted 972-byte table, all 81 R_MIPS_32 relocations and the complete
+324-byte owned string pool against retail, without changing the object.
+GLUE remains 28/28 with all calls verified. Final native GLUE integration is
+still pending its other global declarations and header/string pool; this does
+not yet increase the 812 source-linked-function count or the 2689/2727 board.
+
 ### BgTask resolved: retail locals and player-pointer lifetimes
 
 Restored BgTask's retail declaration order, ObjId/List integer types and the
@@ -2423,7 +2922,182 @@ introduced. The whole GAMEPAD TU now passes 42/42, including call audits.
 The completed full-board refresh confirms 2688/2727 (39 remaining), with all
 147 tool tests passing. Source-link coverage is unchanged by this gate fix.
 
+### DRLG_L2 gold-table reconstruction
+
+Writable-string diagnostic (2026-10-01): `build/probe_l2_writable.py`
+compiles a separate source copy with `-fwritable-strings`, moving the two
+zero-array definitions after the function bodies. This naturally reproduces
+the complete 9,492-byte overlay initialized-data region at 80140EF4, including
+GMAN's filename, all large tables, the three short PSX filenames and both
+zero arrays. Its 100-byte owned small-data region at 8011BE7C also matches
+(the diagnostic additionally checks the unchanged 5,884-byte GP prefix).
+No production compiler flag was changed.
+
+The diagnostic is NOT a native seal: real PsyQ still emits DoPatternCheck's
+nine-entry jump table in a separate 36-byte .rdata section, leaving text
+40 bytes short (table plus retail alignment). `configs/embedded_text_tables.txt`
+already documents that embedded table; individual gates normalize it, while
+the strict native whole-TU check correctly rejects the layout. The diagnostic
+puts the separate table at an explicitly non-retail scratch address solely
+to compare the data region, never as an integration proposal. Stock GCC's
+MIPS backend supports text tables for embedded PIC, but that also changes
+the addressing model and conflicts with -G; it is not established as a
+matching alternative. Resolve authentic table emission/placement before
+registering this TU; do not rewrite object instructions or relax extents.
+
+Follow-up options audit: the installed GNUCC.PDF (PsyQ 4.3 documentation)
+describes writable strings on page 177, backend table-section macros on
+page 210, and embedded PIC on page 276. The CCPSX introduction documents
+driver pass-through but no inline-table switch. Direct real-PsyQ probes
+in `build/l2flags`, generated by `build/probe_l2_table_options.py`, establish:
+`-mmips-as` still emits DoPatternCheck's table in .rdata; embedded PIC at
+G0 emits it in .text but changes the entries to label differences and adds
+PC-relative `bal` sequences, unlike retail's absolute table. Thus neither
+is a matching alternative. ASPSX 2.56 rejects the proposed `-r` switch.
+Production compiler settings, gate normalization and native registration
+remain unchanged. These rejected configurations should not be retried as
+simple placement fixes.
+
+Storage/filename follow-up: RoomList[81] and predungeon[40][40] are now
+explicit initialized source arrays; independent compiled-symbol gates prove
+their 1,620 and 1,600 zero bytes and exact SDB sizes. Restored initialized
+myk, pHallList, nRoomCnt, nSx1/nSy1/nSx2/nSy2 after the small minisets, matching
+the main-image zero initial values and declaration order. Restored the GMAN
+header filename through its original unused DumpDatFile inline.
+
+The PSX load filenames are `Blind2.DUN`, `Blood1.DUN`, `Bonestr2.DUN` at
+8014274C/80142758/80142764, not the full PC `Levels\\L2Data\\...` paths formerly
+in the source. This source bug was hidden by the individual byte gate's
+address normalization. The filenames are now corrected; function/SYM and
+call gates still pass 36/36, all 117 table gates still pass, and 164 tests pass.
+Native registration is still absent: retail interleaves the GMAN string,
+tables, these three strings and zero arrays in the overlay prefix, while
+the current compiler places all literals in a separate .rdata section.
+This layout needs compiler/link evidence, not invented padding or rewritten
+instructions. No gate flags were changed and no source-link count is claimed.
+
+`tools/gen_drlg_l2_tables.py` reconstructs 117 initialized arrays directly
+from the original Hellfire DRLG_L2.CPP/H, expanding its numeric tile and
+pattern constants. All 6,082 payload bytes independently match the PSX main
+image/overlay at their authoritative declared addresses. This includes both
+direction arrays, SPATSL2, both tile-type tables, the arch/stair/door/miniset
+families, the 100-by-10 Patterns matrix, and eleven small-data minisets.
+
+The source now includes `recon/source/gen/tables_drlg_l2.h` instead of relying
+solely on external declarations for these arrays. `--verify` compiles the
+actual TU and checks each complete array's ELF bytes, exact SDB extent, and
+absence of overlapping relocations; all 117 pass. `--write` regenerates only
+after gold/retail agreement. Four tests cover aggregate zero fill, invalid
+shapes/types, initializer round trips and rejection of executable expressions.
+All 164 tests pass; DRLG_L2 remains 36/36 function PASS and 36/36 call audits.
+
+This is source-data preparation, not native overlay integration. RoomList and
+predungeon storage, section layout/padding, absolute function order, globals,
+and final linked overlay still need native verification. Source-linked counts
+and the 2692/2727 function board have not increased from this change.
+
+### OBJPRINT integration details
+
+Restored the original GMAN/CTextFileInfo header literals and the source-level
+inline definitions/order of PRIM_GetCopy, PRIM_CopyPrim, PRIM_GetPrim,
+GetNumOfFrames, GetCreature and GetFr. Moved DoorOffsets after the 98-entry
+ObjPrintFuncs table to restore their original initialized-data layout.
+
+Native verification proves all 5,244 text bytes, 456 initialized-data bytes,
+34 read-only bytes, 36 small-data bytes, 96 BSS bytes, 30 function SYM
+records and nine named globals. In particular, the complete relocated
+ObjPrintFuncs table matches retail rather than merely passing individual
+handler bodies. The ordinary board/call checks remain 30/30, and all 160
+tests pass. No gate rules or compiler flags were changed.
+The final main-image rebuild matches all 1,099,272 retail bytes. Receipts
+confirm 868 native functions / 49 TUs and 997 source-linked functions /
+81 TUs overall. The function PASS board remains 2692/2727.
+
+### BIRD integration details
+
+Restored BirdList as explicit zero-initialized 384-byte data, replacing its
+tentative BSS declaration. The real TextDat layout/header inline, CPlayer
+header inline, and CTextFileInfo extension literals reproduce the original
+header pools. PRIM_GetPrim now precedes GetOtPos in emitted text, as retail
+requires. The shared TextDat header gains only the original PrepareFt4 method
+declaration; all existing native consumers were recompiled and verified.
+
+Native checks prove 6,312 text bytes, 384 data bytes, 112 read-only bytes
+(including both relocated jump tables), 24 small-data bytes, 16 small-BSS
+bytes, all 28 function SYM records, and six named globals. The ordinary
+function/call audits remain 28/28 and all 160 tests pass. The main-image
+rebuild matches all 1,099,272 retail bytes. Receipts confirm 838 native
+functions / 48 TUs: 967 source-linked functions / 80 TUs overall. The board
+remains 2692/2727; no new function PASS is claimed by this integration.
+
+### KANJI integration details
+
+Restored the original TextDat::DumpDatFile and CPlayer::GetPlayer header
+inlines, plus CTextFileInfo's extension literals. Read-only pool order now
+matches gman.h, cplayer.h, KANJI.CPP, the four database filenames, primpool.h.
+Deferred helper definitions are ordered so their emitted copies follow the
+retail sequence: PRIM_GetPrim, DumpMonsters, GetDecompBuffers, GetFr.
+Individual function gates alone did not detect their previous wrong absolute
+placements; the native whole-TU check did.
+
+Native verification covers 3,500 text bytes, 126 read-only bytes, 28 small-data
+bytes (including KanjiCache's relocation to KanjiList), 12 small-BSS bytes,
+and 19,452 BSS bytes including native alignment. All 24 function SYM records
+and nine global records/placements match. The original final read-only word
+was split into two explicit halfwords without changing its bytes: the last
+two bytes of the primpool.h string belong to source, and the following 70 01
+remain original scaffold. No bytes were fabricated or discarded.
+The ordinary board and call audits remain 24/24; all 160 tests pass.
+The final main image rebuild matches all 1,099,272 retail bytes. Receipts now
+confirm 810 native functions / 47 TUs, giving 939 source-linked functions /
+79 TUs overall. This does not change the 2692/2727 function PASS board.
+
+### PALETTE native integration details
+
+Retail SYM names nine PALETTE globals in initialized small data: sgbFadedIn
+at 8011BC65, screenbright at BC66, faderate at BC68, fading at BC6C, FADE_OT
+at BC70, st at BC74, mode at BC78, FadeCoords at BC7C, FadeCoords2 at BC84.
+The ROM initializes FADE_OT to 511, st to 1, and the other scalar values to
+zero. Source now owns those initial values instead of tentative BSS and
+includes the original unused DumpDatFile inline's `psxsrc/gman.h` literal.
+All 14 real-ASPSX byte gates, exact function SYM records and call audits pass.
+
+The initial native-registration attempt was deferred: the emitted small-data
+scalars begin at offset 0/1, whereas the retail region beginning 8011BC64
+has the first named bytes at offsets 1/2; the aligned integers/tables then
+agree. The leading byte's provenance must be established, not supplied as
+invented padding or a fabricated unused string. Retail read-only extent is
+14 bytes plus two scaffold alignment bytes. No source-linked count increase
+was claimed until whole-TU relocation and data-symbol placement passed.
+
+Resolved by checking the preceding bytes: 8011BC5C holds `.tp\0`, followed
+by `.dat\0` at 8011BC60. The byte at BC64 is the latter string's terminator,
+not padding. Restoring the existing original CTextFileInfo HasTp/HasDat
+header inlines emits both literals and places sgbFadedIn at BC65 naturally.
+Native ASPSX/PSYLINK now verifies all 1,264 text bytes, 14 read-only bytes,
+48 small-data bytes, fourteen function SYM records and nine global records
+and placements. The final two read-only alignment bytes remain scaffold.
+The registry and generated linker now select this payload; source linkage
+is 915 functions / 78 TUs (786/46 native, 129/32 conventional). All 160 tests
+pass. This integration does not add a function PASS to the 2692/2727 board.
+The final main-image rebuild passes: all 1,099,272 serialized bytes match
+retail, with 120,304 verified zero-fill BSS bytes and the checksum trailer
+handled separately by the existing image serializer.
+
 ### ProcessItems index scope and diagnostic path sensitivity
+
+Address-use follow-up (2026-10-01): eight full-TU copies under `build/ipa0`
+through `ipa7` vary reference creation before the animation condition versus
+before the increment, and indexed versus reference increment/final-length
+access. Results span 161--174 instructions, none matching retail's 169.
+The closest count (`ipa5`) is 170 with the correct 56-byte frame, but 81
+diff lines. Its real debug assembly also exposes `anim` as an extra ItemStruct
+reference REG record (s0) and keeps ii in s1 instead of retail a1. Thus the
+cached-reference approach has an independent SYM defect, not merely a final
+instruction-count problem. No executable source change was retained.
+Generator and results: `build/probe_item_address.py`,
+`build/item_address_results.json`. The live frame snapshot remains necessary
+to preserve the pre-sound-call frame value seen in retail.
 
 Gold Hellfire source confirms the common animation/sound sequence; PSX's
 deduplicated list and frame snapshot remain retail-specific. Four scope probes
@@ -2442,6 +3116,19 @@ that the C++ construct itself is unsupported. This observation does not alter
 compiler/assembler binaries, source semantics, or gate rules.
 
 ### MAI_Counselor declaration order versus stack slots
+
+Related local-static investigation (2026-10-01): MI_Manashield's baseline is
+192 exact instructions, but its xoffset STAT is inside rather than before
+the locals' block. The full-TU `build/mscope/missiles.cpp` experiment puts
+all automatic locals/statements in a nested block after xoffset. Bytes stay
+exact, but SYM now contains two blocks rather than retail's one. Rejected.
+The real generated `build/sn/missiles.g.s` puts `.begin` before xoffset's
+`.def`. Stock GCC 2.7.2 `sdbout.c:sdbout_begin_block` likewise emits
+PUT_SDB_BLOCK_START before sdbout_block/sdbout_syms. This is concrete evidence
+against adding source braces to solve the static-record membership cluster;
+it does not authorize reordering debug records or relaxing the gate. The
+misleading live-source comment claiming an already-matching outer brace was
+corrected; executable source is unchanged.
 
 Revalidated the live 295-instruction match and compared complete SYM records.
 Retail orders counsmiss, _mx and _my before the main block, then fx/fy/mx/my/

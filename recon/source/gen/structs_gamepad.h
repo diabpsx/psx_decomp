@@ -267,26 +267,7 @@ struct CFont {   /* sizeof 540 */
     int Print(int X, int Y, char *Str, enum TXT_JUST Justify, struct RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
 };
 
-struct SpellTarget {   /* sizeof 72 */
-    unsigned char forcespell;   /* +0x0 */
-    BOOL active;   /* +0x4 */
-    short _sx;   /* +0x8 */
-    short _sy;   /* +0xA */
-    short _nsx;   /* +0xC */
-    short _nsy;   /* +0xE */
-    unsigned char _stx;   /* +0x10 */
-    unsigned char _sty;   /* +0x11 */
-    BOOL changed;   /* +0x14 */
-    struct PlayerStruct *player;   /* +0x18 */
-    int pnum;   /* +0x1C */
-    int angle;   /* +0x20 */
-    int spotid;   /* +0x24 */
-    short lastx[8];   /* +0x28 */
-    short lasty[8];   /* +0x38 */
 
-    BOOL Active() { return active; }
-    void Show(void);
-};
 
 struct CPad {   /* sizeof 236 */
     unsigned char get_both;   /* +0x0 */
@@ -360,11 +341,43 @@ struct ScrollStruct {   /* sizeof 20 */
     int _sdir;   /* +0x10 */
 };
 
-struct CPlayer {   /* layout not needed here */
+struct CPlayer : public TextDat {   /* retail CPLAYER.H, sizeof 144 */
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
     void SetScrollTarget(struct PlayerStruct &Plr, struct CBlocks &Bg);
 };
 
 struct CPad;
+
+struct SpellTarget {   /* sizeof 72 */
+    unsigned char forcespell;   /* +0x0 */
+    BOOL active;   /* +0x4 */
+    short _sx;   /* +0x8 */
+    short _sy;   /* +0xA */
+    short _nsx;   /* +0xC */
+    short _nsy;   /* +0xE */
+    unsigned char _stx;   /* +0x10 */
+    unsigned char _sty;   /* +0x11 */
+    BOOL changed;   /* +0x14 */
+    struct PlayerStruct *player;   /* +0x18 */
+    int pnum;   /* +0x1C */
+    int angle;   /* +0x20 */
+    int spotid;   /* +0x24 */
+    short lastx[8];   /* +0x28 */
+    short lasty[8];   /* +0x38 */
+
+    BOOL Active() { return active; }
+    void Show(void);
+};
 
 struct GamePad {   /* sizeof 212 */
     struct PlayerStruct *player;   /* +0x0 */

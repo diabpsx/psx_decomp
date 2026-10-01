@@ -14,7 +14,8 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build as B
 
-DUMPS = {"rtl": ("-dr", ".rtl"), "greg": ("-dg", ".greg"), "lreg": ("-dl", ".lreg"),
+DUMPS = {"rtl": ("-dr", ".rtl"), "jump": ("-dj", ".jump"), "jump2": ("-dJ", ".jump2"),
+         "greg": ("-dg", ".greg"), "lreg": ("-dl", ".lreg"),
          "loop": ("-dL", ".loop"), "flow": ("-df", ".flow"),
          "sched": ("-dS", ".sched"), "sched2": ("-dR", ".sched2"),
          "dbr": ("-dd", ".dbr"), "cse": ("-ds", ".cse"),

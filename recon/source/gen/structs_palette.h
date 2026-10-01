@@ -121,4 +121,5 @@ struct TextDat {   /* sizeof 112 */
 
     POLY_GT4 *PrintGt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
     POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
+    void DumpDatFile();
 };

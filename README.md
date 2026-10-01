@@ -125,8 +125,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects 32 reconstructed TUs covering
 129 verified function entries, while `configs/native_recon_link.json` supplies
-683 functions across forty-two TUs through real ASPSX/PSYLINK: 812 source-linked
-functions across 74 TUs in total. They replace their text scaffolds at the original
+868 functions across forty-nine TUs through real ASPSX/PSYLINK: 997 source-linked
+functions across 81 TUs in total. They replace their text scaffolds at the original
 addresses. PCIO and DatIO also supply their complete read-only sections,
 including diagnostic strings and relocated virtual-method tables, through
 `configs/recon_data_link.json`. SPELLS supplies its complete 20-byte jump table
@@ -233,6 +233,20 @@ backdrop tables, complete header/string/jump-table pool, and CutScreen state.
 TONY supplies all seventeen functions and its demo-control tables/state, with
 all 25 named globals verified. Its ambient-light initialization stores now
 follow retail order; the mutable demo filename pool label is explicitly bound.
+GLUE supplies all 28 functions, the 81-entry PlayerInfo table, 62 read-only
+bytes, 356 small-data bytes and 24 zero-initialized bytes. All fourteen named
+globals and fully relocated source bytes match retail; the two trailing
+read-only alignment bytes remain scaffold-owned.
+PRINTY supplies all 19 functions, 2040 initialized bytes for both fonts and
+their character/descriptor tables, 34 read-only bytes, 36 small-data bytes,
+and its original constructor pointer. All 21 named globals match retail.
+The actual header extension literals account for the colors' odd start address;
+the original 04 00 read-only alignment bytes remain scaffold-owned.
+GAMEPAD supplies 42 functions, its 60-byte found-object array, complete 248-byte
+read-only pool, 39 small-data bytes, 436 BSS bytes and constructor pointer.
+Original ASPSX 2.67 reproduces the two GamePad instances' packing; all eleven
+globals match retail. Full relocation also corrected SetWalkStyle's table index
+and the order of the spell-selection flag clears.
 GENDUNG supplies its 16 functions, 164-byte constant pool, complete 108-byte
 small-data group, and all 124,516 initialized data bytes. Its 43 named globals,
 including the dungeon/map arrays and ScrollInfo, have verified addresses and
@@ -302,7 +316,7 @@ no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
 The remaining 488 library-region entries are not native-linked: 484 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
-game-function board, now 2689/2727 with 38 functions not PASS.
+game-function board, now 2693/2727 with 34 functions not PASS.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate

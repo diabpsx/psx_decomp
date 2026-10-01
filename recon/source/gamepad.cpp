@@ -5,6 +5,8 @@
  * drafts as secondary shape hints only.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_gamepad.h"
 #include "source/gen/externs_gamepad.h"
 #include "source/gen/protos_gamepad.h"
@@ -43,29 +45,6 @@ void ClrCursor(int num)
 void HappyMan(int n)
 {
     HappyManFlag = n * 2;
-}
-
-/* --------------------------------------------------------------------- */
-void WorldToOffset(int pnum, int WorldX, int WorldY)
-{
-    int x, y;
-    struct PlayerStruct *player;
-
-    x = WorldX & 7;
-    y = WorldY & 7;
-    player = &plr[pnum];
-
-    if (WorldX < 0)
-        WorldX = 0;
-    if (WorldY < 0)
-        WorldY = 0;
-
-    player->_px = WorldX >> 3;
-    player->_py = WorldY >> 3;
-    player->_pxoff = (x - y) * 4;
-    player->WorldX = WorldX;
-    player->WorldY = WorldY;
-    player->_pyoff = (x + y - 8) * 2;
 }
 
 /* --------------------------------------------------------------------- */
@@ -132,341 +111,59 @@ void CloseInvChr(void)
 }
 
 /* --------------------------------------------------------------------- */
-int GamePad::GetActionButton(void (*func)(int))
+void WorldToOffset(int pnum, int WorldX, int WorldY)
 {
-    for (int i = 0; i < 14; i++) {
-        if (await_combo) {
-            if (button_combo[i] == func)
-                return pad_txt[i].pnum;
-        } else {
-            if (button_down[i] == func)
-                return pad_txt[i].pnum;
-        }
-    }
-    return 0;
+    int x, y;
+    struct PlayerStruct *player;
+
+    x = WorldX & 7;
+    y = WorldY & 7;
+    player = &plr[pnum];
+
+    if (WorldX < 0)
+        WorldX = 0;
+    if (WorldY < 0)
+        WorldY = 0;
+
+    player->_px = WorldX >> 3;
+    player->_py = WorldY >> 3;
+    player->_pxoff = (x - y) * 4;
+    player->WorldX = WorldX;
+    player->WorldY = WorldY;
+    player->_pyoff = (x + y - 8) * 2;
 }
 
 /* --------------------------------------------------------------------- */
-void GamePad::Handle(void)
+char pad_UpIsUpRight(int pval, char other)
 {
-    int cp;
+    int walk_dir;
 
-    Pad = PAD_GetPad(pnum, 0);
-    if (FeFlag) {
-        if (qtextflag) {
-            TSK_Sleep(1);
-            options_pad = pnum;
-            CheckStoreBtn();
-        }
-        return;
-    }
-    if (!player->plractive || IsGameLoading() || player->_pmode == PM_DEATH || (player->_pHitPoints >> 6) <= 0) {
-        ClrCursor(pnum);
-        return;
-    }
-    if ((!spell.Active() && !(invflag | chrflag)) || (_spselflag[pnum] && sbookflag)) {
-        if (TryIconCurs())
-            _pcursplr[sel_data] = -1;
-    }
-    ClearPanel();
-    player->_pLvlChanging = 0;
-    if (options_pad != -1 && pnum != options_pad)
-        return;
-    if (allow_walking <= 0 && player->_pmode < PM_WALK2)
-        StartStand(pnum, player->_pdir);
-    if (player->_pmode == PM_NEWLVL)
-        player->_pmode = PM_STAND;
-    await_combo = 0;
-    cp = Pad->GetCur();
-    if (!_SpdBeltSelFlag[pnum]) {
-        if (pad_up_action == select_belt_item)
-            allow_walking = 1;
-        pad_up_action = 0;
-        pad_up_button = 0;
-    } else
-        allow_walking = 0;
-    if (!any_belt_items()) {
-        _pcurr_inv[sel_data] = -1;
-        if (_SpdBeltSelFlag[pnum])
-            allow_walking = 1;
-        _SpdBeltSelFlag[pnum] = 0;
+    walk_dir = -1;
+    /* case body order == retail layout; values from jtbl_80118A68 (index pval-1) */
+    switch (pval) {
+    case 5: walk_dir = 4; break;
+    case 10: walk_dir = 0; break;
+    case 6: walk_dir = 2; break;
+    case 9: walk_dir = 6; break;
+    case 4: walk_dir = 3; break;
+    case 8: walk_dir = 7; break;
+    case 2: walk_dir = 1; break;
+    case 1: walk_dir = 5; break;
     }
 
-    if (qtextflag || stextflag) {
-        CheckStoreBtn();
-    } else {
-        if (!PauseMode && gbRunGame) {
-            check_around_player();
-            if (cp & combo_key) {
-                if (!(invflag | (questlog | chrflag)))
-                    await_combo = 1;
-            } else {
-                await_combo = 0;
-                if (seen_combo == pnum)
-                    seen_combo = -1;
-            }
-            if (allow_walking > 0) {
-                if (automapflag && player->_pmode == PM_STAND) {
-                    int abut = GetActionButton(pad_func_AutoMap);
-                    if (!abut) {
-                        int owait = await_combo;
-                        await_combo = 1;
-                        abut = GetActionButton(pad_func_AutoMap);
-                        await_combo = owait;
-                    }
-                    if ((cp & abut) && (cp & 0xF) && player->_pmode == PM_STAND) {
-                        automapmoved = 1;
-                        if (cp & 1)
-                            AutomapUp();
-                        if (cp & 2)
-                            AutomapDown();
-                        if (cp & 4)
-                            AutomapLeft();
-                        if (cp & 8)
-                            AutomapRight();
-                        return;
-                    }
-                    automapmoved = 0;
-                }
-                show_combos();
-                spell.Show();
-                if (flyflag) {
-                    if (!spell.Active())
-                        flyabout();
-                } else {
-                    int dir = pad_UpIsUpRight(Pad->GetCur() & 0xF, style);
-                    if (dir != -1)
-                        walk(dir);
-                    else if (player->_pmode != PM_STAND && player->_pmode < PM_ATTACK && !automapmoved)
-                        StartStand(pnum, player->_pdir);
-                }
-            }
-        }
-        if (!invflag) {
-            if ((player->_pmode != PM_SPELL && !select_flag && !PauseMode) || sbookflag)
-                TestButtons();
-        } else if (Pad->GetDown() & 0x100) {
-            CloseInvChr();
-            StartStand(pnum, player->_pdir);
-        }
+    if (walk_dir != -1 && other != 0) {
+        do {
+            walk_dir = (walk_dir - 1) & 7;
+            other--;
+        } while (other != 0);
     }
 
-    if (goldcheat && invflag && _pcursinvitem[sel_data]) {
-        char inv;
-        if ((Pad->GetCur() & 0x2420) == 0x2420) {
-            inv = _pcursinvitem[sel_data];
-            if (player->InvList[inv - 7]._itype == 11)
-                player->InvList[inv - 7]._ivalue += 500;
-        }
-    }
-}
-
-/* --------------------------------------------------------------------- */
-GamePad *GetGamePad(int pnum)
-{
-    if (pnum == 0)
-        return &GPad1;
-    return &GPad2;
-}
-
-/* --------------------------------------------------------------------- */
-char GetPadStyle(int pnum)
-{
-    GamePad *GPad;
-
-    if (pnum != 0)
-        GPad = &GPad2;
-    else
-        GPad = &GPad1;
-    return GPad->style;
-}
-
-/* --------------------------------------------------------------------- */
-int SetWalkStyle(int pnum, int style)
-{
-    int ret;
-    struct KEY_ASSIGNS *ta = txt_actions;
-
-    PostGamePad(0xB, 0, (int)ta, 0);
-    ret = txt_actions[9].pad_val;
-    txt_actions[9].pad_val = style;
-    PostGamePad(9, 0, (int)ta, 0);
-    return ret;
-}
-
-/* --------------------------------------------------------------------- */
-void Init_GamePad(void)
-{
-    TSK_AddTask(0x42, GamePadTask, 0x1000, 0);
-}
-
-/* --------------------------------------------------------------------- */
-void InitGamePadVars(void)
-{
-    HappyManFlag = 0;
-    RemoveTargetCursor(-1);
-    TeleStop(0);
-    TeleStop(1);
-
-    ScrollFlag[0] = 0;
-    ScrollFlag[1] = 0;
-    automapmoved = 0;
-    if (_spselflag[0])
-        TSK_Kill(_spselflag[0]);
-    if (_spselflag[1])
-        TSK_Kill(_spselflag[1]);
-    _spselflag[0] = 0;
-    _spselflag[1] = 0;
-
-    _SpdBeltSelFlag[0] = 0;
-    _SpdBeltSelFlag[1] = 0;
-    PauseMode = 0;
-    chrflag = 0;
-    invflag = 0;
-    optionsflag = 0;
-    sbookflag = 0;
-    questlog = 0;
-    qtextflag = 0;
-    stextflag = 0;
-
-    ClrDiabloMsg();
-    ClrCursor(0);
-    ClrCursor(1);
-
-    _pcursplr[0] = -1;
-    _pcursplr[1] = -1;
-    gbActivePlayers = 0;
-
-    if (FePlayerNo != 0) {
-        if (plr[0].plractive)
-            gbActivePlayers = 1;
-        if (plr[1].plractive)
-            gbActivePlayers = gbActivePlayers + 1;
-    } else {
-        plr[1].plractive = 0;
-        if (plr[0].plractive)
-            gbActivePlayers = 1;
+    if (HappyManFlag != 0) {
+        walk_dir = (HappyManFlag >> 1) & 7;
+        HappyManFlag--;
     }
 
-    PostGamePad(5, 0, 0, 0);
-}
-
-/* --------------------------------------------------------------------- */
-/* PSX button-dispatch entry point (jtbl_80118AF0, val 2..11): 2/3/4 walking off (both/GP1/GP2),
- * 5/6/7 walking on, 8 nothing, 9 SetAllButtons, 10 SetUpAction, 11 GetAllButtons (SetWalkStyle
- * posts 11 then reads txt_actions back). Case body order == retail layout (2>4, 3, 5>7, 6, 9, 11, 10). */
-void PostGamePad(int val, int var1, int var2, int var3)
-{
-    struct GamePad *GP1 = &GPad1;
-    struct GamePad *GP2 = &GPad2;
-
-    switch (val) {
-    case 2:
-        GP1->allow_walking = 0;
-    case 4:
-        GP2->allow_walking = 0;
-        break;
-    case 3:
-        GP1->allow_walking = 0;
-        break;
-    case 5:
-        GP1->allow_walking = 1;
-    case 7:
-        GP2->allow_walking = 1;
-        break;
-    case 6:
-        GP1->allow_walking = 1;
-        break;
-    case 8:
-        break;
-    case 9:
-        switch (var1) {
-        case 0: GP1->SetAllButtons((struct KEY_ASSIGNS *)var2); break;
-        case 1: GP2->SetAllButtons((struct KEY_ASSIGNS *)var2); break;
-        }
-        break;
-    case 11:
-        switch (var1) {
-        case 0: GP1->GetAllButtons((struct KEY_ASSIGNS *)var2); break;
-        case 1: GP2->GetAllButtons((struct KEY_ASSIGNS *)var2); break;
-        }
-        break;
-    case 10:
-        switch (var1) {
-        case 0: GP1->SetUpAction((void (*)(int))var2, (void (*)(int))var3); break;
-        case 1: GP2->SetUpAction((void (*)(int))var2, (void (*)(int))var3); break;
-        }
-        break;
-    }
-}
-
-/* --------------------------------------------------------------------- */
-void GamePad::SetMoveStyle(char style_num)
-{
-    style = style_num;
-}
-
-/* --------------------------------------------------------------------- */
-void GamePad::SetDownButton(int pad_val, void (*func)(int))
-{
-    button_down[get_key_pad(pad_val)] = func;
-}
-
-/* --------------------------------------------------------------------- */
-void GamePad::SetComboDownButton(int pad_val, void (*func)(int))
-{
-    button_combo[get_key_pad(pad_val)] = func;
-}
-
-/* --------------------------------------------------------------------- */
-void GamePad::SetUpAction(void (*func)(int), void (*upfunc)(int))
-{
-    pad_up_button = GetActionButton(func);
-    pad_up_action = upfunc;
-}
-
-/* --------------------------------------------------------------------- */
-int GamePad::CheckDirs(int dir)
-{
-    return CheckDirs(dir, player->WorldX, player->WorldY);
-}
-
-/* --------------------------------------------------------------------- */
-int GamePad::CheckSide(int dir)
-{
-    dir = (dir - 1) & 7;
-    dir = (dir - 1) & 7;
-    if (CheckDirs(dir) == -1)
-        return 1;
-    return 2;
-}
-
-/* --------------------------------------------------------------------- */
-void GamePad::RunFunc(int pad)
-{
-    int i;
-
-    if (FeFlag)
-        return;
-    if ((player->_pHitPoints >> 6) == 0)
-        return;
-
-    i = get_key_pad(pad);
-    if (await_combo) {
-        if (button_combo[i]) {
-            if (leveltype == 0) {
-                if (button_combo[i] == pad_func_AutoMap) {
-                    if (seen_combo == -1)
-                        button_combo[i](pnum);
-                } else
-                    button_combo[i](pnum);
-            } else
-                button_combo[i](pnum);
-        }
-    } else {
-        if (button_down[i])
-            button_down[i](pnum);
-    }
+    return walk_dir;
 }
 
 /* --------------------------------------------------------------------- */
@@ -486,47 +183,21 @@ GamePad::GamePad(int player_num)
 }
 
 /* --------------------------------------------------------------------- */
-int GamePad::CheckDirs(int dir, int wx, int wy)
+void GamePad::SetMoveStyle(char style_num)
 {
-    wx %= 8;
-    wy %= 8;
+    style = style_num;
+}
 
-    /* case body order == retail layout (jtbl_80118AB0) */
-    switch (dir) {
-    case 4:
-        if (wx < 4 && wy < 4)
-            dir = -1;
-        break;
-    case 5:
-        if (wy < 4)
-            dir = -1;
-        break;
-    case 6:
-        if (wx >= 4 && wy < 4)
-            dir = -1;
-        break;
-    case 7:
-        if (wx >= 4)
-            dir = -1;
-        break;
-    case 0:
-        if (wx >= 4 && wy >= 4)
-            dir = -1;
-        break;
-    case 1:
-        if (wy >= 4)
-            dir = -1;
-        break;
-    case 2:
-        if (wx < 4 && wy >= 4)
-            dir = -1;
-        break;
-    case 3:
-        if (wx < 4)
-            dir = -1;
-        break;
-    }
-    return dir;
+/* --------------------------------------------------------------------- */
+void GamePad::SetDownButton(int pad_val, void (*func)(int))
+{
+    button_down[get_key_pad(pad_val)] = func;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::SetComboDownButton(int pad_val, void (*func)(int))
+{
+    button_combo[get_key_pad(pad_val)] = func;
 }
 
 /* --------------------------------------------------------------------- */
@@ -624,6 +295,184 @@ void GamePad::GetAllButtons(struct KEY_ASSIGNS *actions)
     await_combo = oc;
 }
 
+/* --------------------------------------------------------------------- */
+int GamePad::GetActionButton(void (*func)(int))
+{
+    for (int i = 0; i < 14; i++) {
+        if (await_combo) {
+            if (button_combo[i] == func)
+                return pad_txt[i].pnum;
+        } else {
+            if (button_down[i] == func)
+                return pad_txt[i].pnum;
+        }
+    }
+    return 0;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::SetUpAction(void (*func)(int), void (*upfunc)(int))
+{
+    pad_up_button = GetActionButton(func);
+    pad_up_action = upfunc;
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::RunFunc(int pad)
+{
+    int i;
+
+    if (FeFlag)
+        return;
+    if ((player->_pHitPoints >> 6) == 0)
+        return;
+
+    i = get_key_pad(pad);
+    if (await_combo) {
+        if (button_combo[i]) {
+            if (leveltype == 0) {
+                if (button_combo[i] == pad_func_AutoMap) {
+                    if (seen_combo == -1)
+                        button_combo[i](pnum);
+                } else
+                    button_combo[i](pnum);
+            } else
+                button_combo[i](pnum);
+        }
+    } else {
+        if (button_down[i])
+            button_down[i](pnum);
+    }
+}
+
+/* --------------------------------------------------------------------- */
+/* case body order == retail layout */
+void GamePad::ButtonDown(int button)
+{
+    switch (button) {
+    case 0x40:
+        if (pad_up_action == select_belt_item) {
+            PlaySFX(0x33);
+            pad_up_action = 0;
+            allow_walking = 1;
+            _SpdBeltSelFlag[pnum] = 0;
+        } else if (sbookflag)
+            CheckSBook();
+        else if (questlog)
+            QuestlogEnter();
+        else if (chrflag)
+            CheckChrBtns();
+        else if (_spselflag[pnum]) {
+            SetSpell(pnum);
+            options_pad = -1;
+        } else if (!(optionsflag | invflag))
+            RunFunc(0x40);
+        break;
+    case 4:
+        if (pad_up_action == select_belt_item) {
+            PlaySFX(0x32);
+            get_last_inv();
+        } else
+            RunFunc(4);
+        break;
+    case 8:
+        if (pad_up_action == select_belt_item) {
+            get_next_inv();
+            PlaySFX(0x32);
+        } else
+            RunFunc(8);
+        break;
+    case 2:
+        RunFunc(2);
+        break;
+    case 0x20:
+        if (!PauseMode) {
+            if (questlog)
+                QuestlogESC();
+            else {
+                msgholdflag = 1;
+                RunFunc(0x20);
+            }
+        }
+        break;
+    case 0x100:
+        if (pad_up_action == select_belt_item) {
+            PlaySFX(0x33);
+            allow_walking = 1;
+            pad_up_action = 0;
+            _SpdBeltSelFlag[pnum] = 0;
+            break;
+        }
+        if (select_flag) {
+            select_flag = 0;
+            break;
+        }
+        if (invflag | chrflag) {
+            CloseInvChr();
+            break;
+        }
+        if (questlog) {
+            QuestlogESC();
+            break;
+        }
+        if (sbookflag) {
+            BOOL fromopt = Qfromoptions;
+            sbookflag = 0;
+            if (!fromopt) {
+                PostGamePad(5, 0, 0, 0);
+                options_pad = -1;
+            }
+            break;
+        }
+        if (optionsflag)
+            break;
+        if (_spselflag[pnum]) {
+            PlaySFX(0x33);
+            ToggleSpell(pnum);
+            break;
+        }
+        /* fall through */
+    case 1:
+    case 0x80:
+    case 0x200:
+    case 0x400:
+    case 0x800:
+    case 0x1000:
+    case 0x2000:
+        RunFunc(button);
+        break;
+    }
+}
+
+/* --------------------------------------------------------------------- */
+void GamePad::TestButtons(void)
+{
+    int hand = 1;
+    int joydown;
+
+    if (ignore_buttons) {
+        ignore_buttons = 0;
+        return;
+    }
+    if (GetFadeState())
+        return;
+
+    joydown = Pad->GetDown() & 0x3FFF;
+    Pad->GetUp();
+
+    while (hand) {
+        if (pnum != myplr)
+            return;
+        if (pnum != sel_data)
+            return;
+        if (joydown & hand) {
+            ButtonDown(hand);
+            if (invflag | stextflag | qtextflag | sbookflag | questlog | optionsflag)
+                return;
+        }
+        hand <<= 1;
+    }
+}
 
 /* --------------------------------------------------------------------- */
 BOOL GamePad::CheckCentre(int dir)
@@ -667,6 +516,66 @@ BOOL GamePad::CheckCentre(int dir)
         break;
     }
     return ret;
+}
+
+/* --------------------------------------------------------------------- */
+int GamePad::CheckDirs(int dir)
+{
+    return CheckDirs(dir, player->WorldX, player->WorldY);
+}
+
+/* --------------------------------------------------------------------- */
+int GamePad::CheckDirs(int dir, int wx, int wy)
+{
+    wx %= 8;
+    wy %= 8;
+
+    /* case body order == retail layout (jtbl_80118AB0) */
+    switch (dir) {
+    case 4:
+        if (wx < 4 && wy < 4)
+            dir = -1;
+        break;
+    case 5:
+        if (wy < 4)
+            dir = -1;
+        break;
+    case 6:
+        if (wx >= 4 && wy < 4)
+            dir = -1;
+        break;
+    case 7:
+        if (wx >= 4)
+            dir = -1;
+        break;
+    case 0:
+        if (wx >= 4 && wy >= 4)
+            dir = -1;
+        break;
+    case 1:
+        if (wy >= 4)
+            dir = -1;
+        break;
+    case 2:
+        if (wx < 4 && wy >= 4)
+            dir = -1;
+        break;
+    case 3:
+        if (wx < 4)
+            dir = -1;
+        break;
+    }
+    return dir;
+}
+
+/* --------------------------------------------------------------------- */
+int GamePad::CheckSide(int dir)
+{
+    dir = (dir - 1) & 7;
+    dir = (dir - 1) & 7;
+    if (CheckDirs(dir) == -1)
+        return 1;
+    return 2;
 }
 
 /* --------------------------------------------------------------------- */
@@ -1005,165 +914,118 @@ void GamePad::show_combos(void)
 }
 
 /* --------------------------------------------------------------------- */
-/* case body order == retail layout */
-void GamePad::ButtonDown(int button)
+void GamePad::Handle(void)
 {
-    switch (button) {
-    case 0x40:
-        if (pad_up_action == select_belt_item) {
-            PlaySFX(0x33);
-            pad_up_action = 0;
+    int cp;
+
+    Pad = PAD_GetPad(pnum, 0);
+    if (FeFlag) {
+        if (qtextflag) {
+            TSK_Sleep(1);
+            options_pad = pnum;
+            CheckStoreBtn();
+        }
+        return;
+    }
+    if (!player->plractive || IsGameLoading() || player->_pmode == PM_DEATH || (player->_pHitPoints >> 6) <= 0) {
+        ClrCursor(pnum);
+        return;
+    }
+    if ((!spell.Active() && !(invflag | chrflag)) || (_spselflag[pnum] && sbookflag)) {
+        if (TryIconCurs())
+            _pcursplr[sel_data] = -1;
+    }
+    ClearPanel();
+    player->_pLvlChanging = 0;
+    if (options_pad != -1 && pnum != options_pad)
+        return;
+    if (allow_walking <= 0 && player->_pmode < PM_WALK2)
+        StartStand(pnum, player->_pdir);
+    if (player->_pmode == PM_NEWLVL)
+        player->_pmode = PM_STAND;
+    await_combo = 0;
+    cp = Pad->GetCur();
+    if (!_SpdBeltSelFlag[pnum]) {
+        if (pad_up_action == select_belt_item)
             allow_walking = 1;
-            _SpdBeltSelFlag[pnum] = 0;
-        } else if (sbookflag)
-            CheckSBook();
-        else if (questlog)
-            QuestlogEnter();
-        else if (chrflag)
-            CheckChrBtns();
-        else if (_spselflag[pnum]) {
-            SetSpell(pnum);
-            options_pad = -1;
-        } else if (!(optionsflag | invflag))
-            RunFunc(0x40);
-        break;
-    case 4:
-        if (pad_up_action == select_belt_item) {
-            PlaySFX(0x32);
-            get_last_inv();
-        } else
-            RunFunc(4);
-        break;
-    case 8:
-        if (pad_up_action == select_belt_item) {
-            get_next_inv();
-            PlaySFX(0x32);
-        } else
-            RunFunc(8);
-        break;
-    case 2:
-        RunFunc(2);
-        break;
-    case 0x20:
-        if (!PauseMode) {
-            if (questlog)
-                QuestlogESC();
-            else {
-                msgholdflag = 1;
-                RunFunc(0x20);
+        pad_up_action = 0;
+        pad_up_button = 0;
+    } else
+        allow_walking = 0;
+    if (!any_belt_items()) {
+        _pcurr_inv[sel_data] = -1;
+        if (_SpdBeltSelFlag[pnum])
+            allow_walking = 1;
+        _SpdBeltSelFlag[pnum] = 0;
+    }
+
+    if (qtextflag || stextflag) {
+        CheckStoreBtn();
+    } else {
+        if (!PauseMode && gbRunGame) {
+            check_around_player();
+            if (cp & combo_key) {
+                if (!(invflag | (questlog | chrflag)))
+                    await_combo = 1;
+            } else {
+                await_combo = 0;
+                if (seen_combo == pnum)
+                    seen_combo = -1;
+            }
+            if (allow_walking > 0) {
+                if (automapflag && player->_pmode == PM_STAND) {
+                    int abut = GetActionButton(pad_func_AutoMap);
+                    if (!abut) {
+                        int owait = await_combo;
+                        await_combo = 1;
+                        abut = GetActionButton(pad_func_AutoMap);
+                        await_combo = owait;
+                    }
+                    if ((cp & abut) && (cp & 0xF) && player->_pmode == PM_STAND) {
+                        automapmoved = 1;
+                        if (cp & 1)
+                            AutomapUp();
+                        if (cp & 2)
+                            AutomapDown();
+                        if (cp & 4)
+                            AutomapLeft();
+                        if (cp & 8)
+                            AutomapRight();
+                        return;
+                    }
+                    automapmoved = 0;
+                }
+                show_combos();
+                spell.Show();
+                if (flyflag) {
+                    if (!spell.Active())
+                        flyabout();
+                } else {
+                    int dir = pad_UpIsUpRight(Pad->GetCur() & 0xF, style);
+                    if (dir != -1)
+                        walk(dir);
+                    else if (player->_pmode != PM_STAND && player->_pmode < PM_ATTACK && !automapmoved)
+                        StartStand(pnum, player->_pdir);
+                }
             }
         }
-        break;
-    case 0x100:
-        if (pad_up_action == select_belt_item) {
-            PlaySFX(0x33);
-            allow_walking = 1;
-            pad_up_action = 0;
-            _SpdBeltSelFlag[pnum] = 0;
-            break;
-        }
-        if (select_flag) {
-            select_flag = 0;
-            break;
-        }
-        if (invflag | chrflag) {
+        if (!invflag) {
+            if ((player->_pmode != PM_SPELL && !select_flag && !PauseMode) || sbookflag)
+                TestButtons();
+        } else if (Pad->GetDown() & 0x100) {
             CloseInvChr();
-            break;
+            StartStand(pnum, player->_pdir);
         }
-        if (questlog) {
-            QuestlogESC();
-            break;
+    }
+
+    if (goldcheat && invflag && _pcursinvitem[sel_data]) {
+        char inv;
+        if ((Pad->GetCur() & 0x2420) == 0x2420) {
+            inv = _pcursinvitem[sel_data];
+            if (player->InvList[inv - 7]._itype == 11)
+                player->InvList[inv - 7]._ivalue += 500;
         }
-        if (sbookflag) {
-            BOOL fromopt = Qfromoptions;
-            sbookflag = 0;
-            if (!fromopt) {
-                PostGamePad(5, 0, 0, 0);
-                options_pad = -1;
-            }
-            break;
-        }
-        if (optionsflag)
-            break;
-        if (_spselflag[pnum]) {
-            PlaySFX(0x33);
-            ToggleSpell(pnum);
-            break;
-        }
-        /* fall through */
-    case 1:
-    case 0x80:
-    case 0x200:
-    case 0x400:
-    case 0x800:
-    case 0x1000:
-    case 0x2000:
-        RunFunc(button);
-        break;
     }
-}
-
-/* --------------------------------------------------------------------- */
-void GamePad::TestButtons(void)
-{
-    int hand = 1;
-    int joydown;
-
-    if (ignore_buttons) {
-        ignore_buttons = 0;
-        return;
-    }
-    if (GetFadeState())
-        return;
-
-    joydown = Pad->GetDown() & 0x3FFF;
-    Pad->GetUp();
-
-    while (hand) {
-        if (pnum != myplr)
-            return;
-        if (pnum != sel_data)
-            return;
-        if (joydown & hand) {
-            ButtonDown(hand);
-            if (invflag | stextflag | qtextflag | sbookflag | questlog | optionsflag)
-                return;
-        }
-        hand <<= 1;
-    }
-}
-
-/* --------------------------------------------------------------------- */
-char pad_UpIsUpRight(int pval, char other)
-{
-    int walk_dir;
-
-    walk_dir = -1;
-    /* case body order == retail layout; values from jtbl_80118A68 (index pval-1) */
-    switch (pval) {
-    case 5: walk_dir = 4; break;
-    case 10: walk_dir = 0; break;
-    case 6: walk_dir = 2; break;
-    case 9: walk_dir = 6; break;
-    case 4: walk_dir = 3; break;
-    case 8: walk_dir = 7; break;
-    case 2: walk_dir = 1; break;
-    case 1: walk_dir = 5; break;
-    }
-
-    if (walk_dir != -1 && other != 0) {
-        do {
-            walk_dir = (walk_dir - 1) & 7;
-            other--;
-        } while (other != 0);
-    }
-
-    if (HappyManFlag != 0) {
-        walk_dir = (HappyManFlag >> 1) & 7;
-        HappyManFlag--;
-    }
-
-    return walk_dir;
 }
 
 /* --------------------------------------------------------------------- */
@@ -1186,4 +1048,143 @@ void GamePadTask(struct TASK *T)
         sel_data = oms;
         TSK_Sleep(1);
     }
+}
+
+/* --------------------------------------------------------------------- */
+GamePad *GetGamePad(int pnum)
+{
+    if (pnum == 0)
+        return &GPad1;
+    return &GPad2;
+}
+
+/* --------------------------------------------------------------------- */
+/* PSX button-dispatch entry point (jtbl_80118AF0, val 2..11): 2/3/4 walking off (both/GP1/GP2),
+ * 5/6/7 walking on, 8 nothing, 9 SetAllButtons, 10 SetUpAction, 11 GetAllButtons (SetWalkStyle
+ * posts 11 then reads txt_actions back). Case body order == retail layout (2>4, 3, 5>7, 6, 9, 11, 10). */
+void PostGamePad(int val, int var1, int var2, int var3)
+{
+    struct GamePad *GP1 = &GPad1;
+    struct GamePad *GP2 = &GPad2;
+
+    switch (val) {
+    case 2:
+        GP1->allow_walking = 0;
+    case 4:
+        GP2->allow_walking = 0;
+        break;
+    case 3:
+        GP1->allow_walking = 0;
+        break;
+    case 5:
+        GP1->allow_walking = 1;
+    case 7:
+        GP2->allow_walking = 1;
+        break;
+    case 6:
+        GP1->allow_walking = 1;
+        break;
+    case 8:
+        break;
+    case 9:
+        switch (var1) {
+        case 0: GP1->SetAllButtons((struct KEY_ASSIGNS *)var2); break;
+        case 1: GP2->SetAllButtons((struct KEY_ASSIGNS *)var2); break;
+        }
+        break;
+    case 11:
+        switch (var1) {
+        case 0: GP1->GetAllButtons((struct KEY_ASSIGNS *)var2); break;
+        case 1: GP2->GetAllButtons((struct KEY_ASSIGNS *)var2); break;
+        }
+        break;
+    case 10:
+        switch (var1) {
+        case 0: GP1->SetUpAction((void (*)(int))var2, (void (*)(int))var3); break;
+        case 1: GP2->SetUpAction((void (*)(int))var2, (void (*)(int))var3); break;
+        }
+        break;
+    }
+}
+
+/* --------------------------------------------------------------------- */
+void Init_GamePad(void)
+{
+    TSK_AddTask(0x42, GamePadTask, 0x1000, 0);
+}
+
+/* --------------------------------------------------------------------- */
+void InitGamePadVars(void)
+{
+    HappyManFlag = 0;
+    RemoveTargetCursor(-1);
+    TeleStop(0);
+    TeleStop(1);
+
+    ScrollFlag[0] = 0;
+    ScrollFlag[1] = 0;
+    automapmoved = 0;
+    if (_spselflag[0])
+        TSK_Kill(_spselflag[0]);
+    if (_spselflag[1])
+        TSK_Kill(_spselflag[1]);
+    _spselflag[1] = 0;
+    _spselflag[0] = 0;
+
+    _SpdBeltSelFlag[0] = 0;
+    _SpdBeltSelFlag[1] = 0;
+    PauseMode = 0;
+    chrflag = 0;
+    invflag = 0;
+    optionsflag = 0;
+    sbookflag = 0;
+    questlog = 0;
+    qtextflag = 0;
+    stextflag = 0;
+
+    ClrDiabloMsg();
+    ClrCursor(0);
+    ClrCursor(1);
+
+    _pcursplr[0] = -1;
+    _pcursplr[1] = -1;
+    gbActivePlayers = 0;
+
+    if (FePlayerNo != 0) {
+        if (plr[0].plractive)
+            gbActivePlayers = 1;
+        if (plr[1].plractive)
+            gbActivePlayers = gbActivePlayers + 1;
+    } else {
+        plr[1].plractive = 0;
+        if (plr[0].plractive)
+            gbActivePlayers = 1;
+    }
+
+    PostGamePad(5, 0, 0, 0);
+}
+
+/* --------------------------------------------------------------------- */
+int SetWalkStyle(int pnum, int style)
+{
+    int ret;
+    struct KEY_ASSIGNS *ta = txt_actions;
+
+    PostGamePad(0xB, 0, (int)ta, 0);
+    ret = txt_actions[2].pad_val;
+    txt_actions[2].pad_val = style;
+    PostGamePad(9, 0, (int)ta, 0);
+    return ret;
+}
+
+/* --------------------------------------------------------------------- */
+char GetPadStyle(int pnum)
+{
+    GamePad *GPad;
+
+    if (pnum != 0)
+        GPad = &GPad2;
+    else
+        GPad = &GPad1;
+    return GPad->style;
 }

@@ -5,6 +5,9 @@
  * retail mangled names. */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
 
 enum TXT_JUST { JustRight = 2, JustCentre = 1, JustLeft = 0 };
 
@@ -57,18 +60,23 @@ struct TextDat {   /* sizeof 112 */
     int Scr;   /* +0x60 */
     int NumOfBuffers[2];   /* +0x64 */
     long hndDecompArrays;   /* +0x6C */
+    void DumpDatFile();
 
     FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
     POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
 TextDat *GM_UseTexData(int Id);   /* GMAN.CPP:1312 */
 void GM_FinishedUsing(TextDat *Fin);   /* GMAN.CPP:1349 */
-
-class CBlocks {
-public:
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
 
 struct CFont {   /* sizeof 540 */
     int TextureId;   /* +0x0 */
@@ -95,6 +103,11 @@ struct CFont {   /* sizeof 540 */
     void SetChar(int ch, unsigned short Frm);
     int SetOTpos(int OT);
     int GetCharWidth(unsigned char ch);
+};
+
+class CBlocks {
+public:
+    static int GetOverlayOtBase() { return 0x1E8; }
 };
 
 struct FontItem {   /* sizeof 4 */

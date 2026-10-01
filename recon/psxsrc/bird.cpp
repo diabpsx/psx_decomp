@@ -2,17 +2,29 @@
  * Bodies from the retail oracle (asm/nonmatchings/bird) + SYM (scratch/tuinfo.py BIRD.CPP) + refs/skeleton drafts.
  * Layouts / externs / prototypes from DIABPSX.SYM (tools/symhdr.py -> psxsrc/gen/*_bird.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
+#include "psxsrc/psyq.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 #include "psxsrc/gen/structs_bird.h"
 #include "psxsrc/gen/externs_bird.h"
 #include "psxsrc/gen/protos_bird.h"
 
 #define TSFX_BIRDCHR1 0xDC
 
-/* GMAN.H TextDat: only the member this TU calls (layout irrelevant here, sizeof 112) */
-struct TextDat {
-    unsigned char _pad[0x70];
-    void PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);   /* @0x80092A80 GMAN.CPP:630 */
+/* Original CPLAYER.H layout and unused diagnostic inline. */
+class CPlayer : public TextDat {
+public:
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
 };
 
 /* BLOCK.H CBlocks (sizeof 264): ClipRect @+0xC0 is the only field this TU reads */
@@ -32,7 +44,9 @@ struct CBlocks {
     }
 };
 
-struct BIRDSTRUCT BirdList[16];   /* @0x800CD374 */
+#include "psxsrc/primpool.h"
+
+struct BIRDSTRUCT BirdList[16] = { { 0 } };   /* @0x800CD374, initialized storage */
 char hop_height = 6;              /* @0x8011B29D (.sdata) */
 static Perch perches[4] = { { 0x3A, 0x44 }, { 0x11, 0x1B }, { 0x22, 0x1E }, { 0x4B, 0x18 } };   /* @0x8011B2A0 */
 static BOOL BirdFrig = 0;         /* @0x8011B2A8 */

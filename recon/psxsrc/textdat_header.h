@@ -11,6 +11,7 @@
 struct FRAME_HDR;
 struct SPR_HDR;
 struct CTextFileInfo;
+struct POLY_FT4;
 struct TextDat {
     BOOL OwnDat;
     int TexNum;
@@ -31,6 +32,7 @@ struct TextDat {
     long hndDecompArrays;
     void DumpDatFile();
     void DoDecompRequests();
+    void PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);
 };
 
 inline void TextDat::DumpDatFile()

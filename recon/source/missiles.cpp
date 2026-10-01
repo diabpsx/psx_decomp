@@ -2212,8 +2212,9 @@ void MI_Manashield(int i)
     /* PSX-only: a class(3) x direction(8) pixel-offset table with no PC-twin equivalent, looked
      * up by player class/facing and stashed into _miVar6 (NOT _mix -- confirmed via raw oracle
      * field offset 0x28). Values read directly from rom/DIABPSX.BIN @ VA 0x8011A13C. Retail's SYM
-     * nests it ONE LEVEL UP from the rest of this function's locals (its own block, sibling to
-     * `i`), so it's declared in an outer brace here to match that block structure. */
+     * records it before the locals' block, alongside `i`. The current compiler instead emits
+     * this STAT inside the block; adding braces creates an extra block, not a matching SYM.
+     * Keep this discrepancy open: byte equality alone does not seal this function. */
     static int xoffset[3][8] = {
         { -2, -1, 4, 6, 9, 10, 6, 2 },
         { 3, 2, 2, 4, 5, 6, 6, 4 },

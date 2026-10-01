@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (38)
+# PC twins for the remaining non-PASS functions (34)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -14,25 +14,21 @@
 | DoCredits__Fv | credits | 4 diffs (ours 250) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.H |
 | DialogPrint__Fiiiiiiiiii | dialog | 162 diffs (ours 608) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.H; PAL_1997_12_12/DIABPSX/PSXSRC/DIALOG.C |
 | Back__6Dialogiiii | dialog | 8 diffs (ours 1094) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG |
-| DRLG_L5TransFix__Fv | drlg_l1 | 357 diffs (ours 273) | drlg_l1.cpp:2486 | DRLG_L1.CPP:2990 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
+| DRLG_L5TransFix__Fv | drlg_l1 | 333 diffs (270/273; paired loop coordinates) | drlg_l1.cpp:2486 | DRLG_L1.CPP:2990 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
 | set_mdec_img_buffer | fmv | 2 diffs (ours 13) | - | - | - | - |
 | LoPlayFMVOverLay | fmv | 2 diffs (ours 274) | - | - | - | - |
 | DrawFlask__6GPanelP7PanelXYP12PlayerStruct | gpanel | 74 diffs (ours 285) | control.cpp:1127 | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
-| DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct | gpanel | 11 diffs (ours 460 / retail 459; packet/origin/OT/bounce bugs repaired) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
+| DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct | gpanel | 6 diffs (459/459; exact SYM, right-edge scheduling remains) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
 | DrawDurThingy__6GPaneliiP10ItemStructi | gpanel | 49 diffs (ours 178 / retail 179; DurColors matrix and valid rectangle macro) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/GPANEL.H; PAL_1997_12_12/DIABPSX/PSXSRC/GPANEL.C |
 | DrawInvTSK__FP4TASK | inv | 8 diffs (ours 390) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | CheckInvPaste__Fiii | inv | 1575 diffs (ours 1890; 37/37 calls exact, 12-insn length gap) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
-| GetUniqueItem__Fii | items | 88 diffs (ours 216) | items.cpp:2838 | ITEMS.CPP:2798 | items.cpp:1452 | JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H; PAL_1997_12_12/DIABPSX/SOURCE/ITEMS.CPP; |
 | ProcessItems__Fv | items | 93 diffs (ours 192 / retail 169; frame snapshot across sound call repaired) | items.cpp:3488 | ITEMS.CPP:3460 | items.cpp:3781 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H |
 | DoLighting__Fiiii | lighting | 373 diffs (ours 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
 | read_card_directory__Fi | memcard | 3 diffs (ours 151; one -1 comparison lowering) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.H |
-| DrawSpinner__FiiUcUcUciiibiT8T8Uc | options | 641 diffs (ours 415) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS |
-| DrawMenu__Fi | options | 965 diffs (ours 1032) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
+| DrawSpinner__FiiUcUcUciiibiT8T8Uc | options | 589 diffs (416/415; coordinate/color lifetimes restored) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS |
+| DrawMenu__Fi | options | 751 diffs (1033/1032; frame and local names restored, allocation open) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
 | MemcardPad__Fv | options | 8 diffs (ours 583 / retail 585; selection/save control flow repaired, 33 calls exact) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| SoundPad__Fv | options | 535 diffs (ours 642) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| DrawOptions__FP4TASK | options | 164 diffs (ours 447) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
 | DrawObjSelector__FiP12PlayerStruct | padfuncs | 237 diffs (ours 514) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.H |
-| Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc | printy | 62 diffs (ours 398) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CARDCORE.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DLG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/FE.CPP; |
 | ResyncQuests__Fv | quests | 6 diffs (ours 315) | quests.cpp:739 | QUESTS.CPP:779 | quests.cpp:397 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LOADSAVE.CPP; JAP_1998_05_29/DIABPSX/SOURCE/QUES |
 | PrintCDWaitTask__FP4TASK | stream | 17 diffs (ours 79) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.H; PAL_1997_12_12/DIABPSX/PSXSRC/STREAM.C |
 
@@ -45,6 +41,24 @@
 Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions.
 
 ## Verified SYM-only clusters
+
+Resolved `GetUniqueItem`: preserve OUid, copy it to uid, then apply uid's
+low-byte mask in a separate statement. Both byte lanes match 216 instructions,
+exact SYM and all seven calls pass. No additional locals or forced registers.
+
+Resolved `SoundPad`: move the special cancellation branch's Adjust reset after
+the cmenu/cs assignments. The late jump pass no longer merges the cmenu store.
+Both byte lanes match all 642 instructions, exact SYM and 41 calls pass.
+OPTIONS is now 35/38; no additional locals or compiler/gate changes were needed.
+
+Resolved `DrawOptions`: restored owned Qfromoptions/PadFrig/old_pad with their
+retail initial values, explicit menu-selection stores and controller-exit
+branch order. The TASK definition now has its actual 92-byte layout. Both
+byte lanes match 447 instructions, exact SYM and 63 calls; OPTIONS is 34/38.
+
+Resolved `CFont::Print`: reuse c for the second left-justified Kanji byte and
+zero-extend the centre/right lead bytes before shifting. All 398 instructions,
+exact SYM and thirteen calls pass in both byte lanes. PRINTY is 19/19.
 
 Resolved `BgTask`: retail local types/names and separate startup/render player
 address lifetimes restore all 299 instructions. JustLoadedPlayer's byte type

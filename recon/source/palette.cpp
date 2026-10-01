@@ -6,7 +6,19 @@
  * asm oracle + skel/SOURCE/PALETTE.CPP (Ghidra/IDA draft).  LoadPalette/LoadRndLvlPal/ResetPal/
  * SmearScreen compile to empty stubs in this build (PSX has no software palette to load/reset). */
 #include "diabpsx_types.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_palette.h"
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
 
 #define MAXOTPOS 0x1FF
 
@@ -21,13 +33,14 @@ public:
 #define P_setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)
 #define P_setXYWH(p, _x0, _y0, _w, _h) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x0)+(_w), (p)->y1 = (_y0), (p)->x2 = (_x0), (p)->y2 = (_y0)+(_h), (p)->x3 = (_x0)+(_w), (p)->y3 = (_y0)+(_h)
 
-/* file statics (SYM: sgbFadedIn/screenbright/faderate/fading/FADE_OT/FadeCoords/FadeCoords2) -- all
- * TU-owned, gp-rel in the oracle -> tentative definitions here. */
-static unsigned char sgbFadedIn;
-static unsigned char screenbright;
-static int faderate;
-static BOOL fading;
-static int FADE_OT;
+/* TU-owned initialized small data, including the retail initial fade depth. */
+static unsigned char sgbFadedIn = 0;
+static unsigned char screenbright = 0;
+static int faderate = 0;
+static BOOL fading = 0;
+static int FADE_OT = MAXOTPOS;
+int st = 1;
+int mode = 0;
 static unsigned char FadeCoords[8]  = { 0, 0, 0xB0, 0, 0, 0x78, 0xB0, 0x78 };
 static unsigned char FadeCoords2[8] = { 0, 0x58, 0xB0, 0x55, 0, 0x78, 0xB0, 0x78 };
 

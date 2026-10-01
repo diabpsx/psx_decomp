@@ -1,11 +1,12 @@
-/* PSXSRC/GLUE.CPP — Diablo PSX (Climax 1998) reconstruction (PSXSRC, splat segment glue).
+/* PSXSRC/GLUE.CPP вЂ” Diablo PSX (Climax 1998) reconstruction (PSXSRC, splat segment glue).
  * No PC twin: this is a PSX-only "glue" layer between the DAVE/MAIN task scheduler and the
- * game engine (CBlocks/CPlayer) — background game task (BgTask), player-character-graphics
+ * game engine (CBlocks/CPlayer) вЂ” background game task (BgTask), player-character-graphics
  * lookup (FindPlayerChar/MakeSurePlayerDressedProperly), and small flag get/set glue funcs.
  * Reconstructed from the retail oracle disassembly plus the m2c/Hex-Rays drafts recorded in
  * skel/PSXSRC/GLUE.CPP (generated from the retail SYM before this file existed).
- * TU-owned small data (gp-relative in retail, D_ prefix = unnamed at the confirmed VA). */
+ * TU-owned data and globals use the retail SYM names and layouts. */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 
 /* ---- externs from other TUs (types kept minimal/opaque; only the fields this TU touches) ---- */
 struct TASK { unsigned char pad[92]; };   /* sizeof 92 per retail SYM; only used as an untyped handle here */
@@ -16,10 +17,8 @@ extern "C" void TSK_MakeTaskInactive(struct TASK *T);
 extern "C" void TSK_MakeTaskActive(struct TASK *T);
 extern "C" void *TSK_AddTask(int List, void *Func, int StackSize, int Arg);
 extern "C" void TSK_Sleep(int Ticks);
-extern "C" void DBG_Error(int a0, const char *File, int Line);
 extern "C" unsigned char GRL_PostMessage__FUlUilUl(unsigned long Wnd, unsigned int Msg, long a2, unsigned long a3);
 extern unsigned long ghMainWnd;
-extern const char D_80110B58[];   /* @0x80110B58 -- "GLUE.CPP" (DBG_Error filename literal) */
 
 extern int NumOfMonsterListLevels;
 struct MonstList {   /* retail SYM: sizeof 16 */
@@ -59,18 +58,14 @@ struct PlayerStruct {
     unsigned char pad3[6632 - 0xF7];   /* sizeof PlayerStruct = 6632 per retail SYM */
 };
 
-/* PlayerInfo[i]: only .Id (a char* at +0) is read here; sizeof 12 per retail stride (0xC). */
+/* Retail PInf layout: pointer and three texture IDs, sizeof 12. */
 struct PInf {
-    char *Id;
-    unsigned short w4, w6, w8;
+    char *Tx;
+    unsigned short GameTex, TownTex, TwoPlayerTex;
 };
-extern struct PInf PlayerInfo[0x51];
+#include "psxsrc/gen/table_glue_player_info.h"
 extern "C" int strcmp(const char *, const char *);
 extern "C" int sprintf(char *, const char *, ...);
-extern const char D_8011AFF8[];    /* "%c%c%c" */
-extern const char D_8011B00C[];    /* class-char lookup */
-extern const char D_8011B008[];
-extern const char D_80110B68[];
 extern int FePlayerNo;
 extern "C" void StartStand__FP12PlayerStructi(struct PlayerStruct *P, int Dir);
 
@@ -121,12 +116,20 @@ extern "C" void VID_GetTick__Fv(void);
 extern "C" void FinishProgress__Fv(void);
 extern "C" void TakeDownCutScreen__Fv(void);
 
-/* Minimal local layouts (this TU only touches these fields; matches davel.cpp's CPlayer). */
-class CPlayer {
+/* Original CPlayer header layout and GetPlayer inline retain the header pool. */
+class CPlayer : public TextDat {
 public:
-    unsigned char pad0[0x80];
-    int TexId;   /* +0x80 */
-    unsigned char pad1[144 - 0x84];   /* sizeof CPlayer = 144 per retail SYM */
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
 
     CPlayer(BOOL InTown, int Which, int PlayerNum);
     ~CPlayer();
@@ -159,25 +162,33 @@ public:
 };
 
 /* TU-owned small data */
-int D_8011C6BC;   /* MonsterList (GLUE_Set/GetMonsterList) */
-BOOL D_8011C6B0;   /* retail GlueFinished: BOOL */
-BOOL DoHomingScroll;   /* @0x8011C6B4 */
-BOOL D_8011AFF4;   /* retail GameStarted: BOOL */
-int D_8011C6C0;   /* GLUE_DoQuake Time */
-int D_8011C6C4;   /* GLUE_DoQuake Amount */
-BOOL DoDrawBg;    /* @0x8011B004 */
-BOOL DoShowPanel; /* @0x8011B000 */
+static BOOL GlueFinished;
+static BOOL DoHomingScroll;
+static TextDat *TownerGfx;
+static int CurrentMonsterList;
+static int QuakeTime;
+static int QuakeAmount;
+static BOOL GameStarted = false;
+static const char *const PlayerFormat = "%c%c%c";
+extern BOOL DoShowPanel;
+extern BOOL DoDrawBg;
+static const char ArmourChar[4] = "LMH";
+static const char CharChar[4] = "WRS";
 
 /* -------------------------------------------------------------------------------------------- */
 
+void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking);
+
+
+
 void GLUE_SetMonsterList(int List)
 {
-    D_8011C6BC = List;
+    CurrentMonsterList = List;
 }
 
 int GLUE_GetMonsterList(void)
 {
-    return D_8011C6BC;
+    return CurrentMonsterList;
 }
 
 void GLUE_SuspendGame(void)
@@ -186,7 +197,7 @@ void GLUE_SuspendGame(void)
 
     T = TSK_Exist(0, 0x4000, -1);
     if (T == 0) {
-        DBG_Error(0, D_80110B58, 0x10E);
+        DBG_Error(0, "psxsrc/GLUE.CPP", 0x10E);
     }
     TSK_MakeTaskInactive(T);
 }
@@ -197,7 +208,7 @@ void GLUE_ResumeGame(void)
 
     T = TSK_Exist(0, 0x4000, -1);
     if (T == 0) {
-        DBG_Error(0, D_80110B58, 0x11D);
+        DBG_Error(0, "psxsrc/GLUE.CPP", 0x11D);
     }
     TSK_MakeTaskActive(T);
 }
@@ -213,12 +224,12 @@ void GLUE_PreDun(void)
 
 BOOL GLUE_Finished(void)
 {
-    return D_8011C6B0;
+    return GlueFinished;
 }
 
 void GLUE_SetFinished(BOOL NewFinished)
 {
-    D_8011C6B0 = NewFinished;
+    GlueFinished = NewFinished;
 }
 
 void GLUE_StartBg(int TextId, BOOL IsTown, int Level)
@@ -265,136 +276,7 @@ BOOL GLUE_SetShowPanelFlag(BOOL NewFlag)
 
 BOOL GLUE_HasGameStarted(void)
 {
-    return D_8011AFF4;
-}
-
-void GLUE_DoQuake(int Time, int Amount)
-{
-    D_8011C6C0 = Time;
-    D_8011C6C4 = Amount;
-}
-
-struct MonstList *GLUE_GetCurrentList(int Level)
-{
-    struct MonstLevel *MLev;
-    int List;
-
-    Level--;
-    if (Level < 0 || !(Level < NumOfMonsterListLevels)) {
-        DBG_Error(0, D_80110B58, 0x2EC);
-    }
-    MLev = &AllLevels[Level];
-    List = GLUE_GetMonsterList();
-    if (List < 0 || MLev->NumOfLists < List) {
-        DBG_Error(0, D_80110B58, 0x2EF);
-    }
-    return &MLev->TheLists[List];
-}
-
-void GLUE_StartGameExit(void)
-{
-    {
-        int i;
-        for (i = 0; i < 2; i++) {
-            plr[i].plractive = 0;
-        }
-    }
-    GLUE_SuspendGame();
-    GLUE_SetFinished(1);
-    MAIN_RestartGameTask();
-    TSK_Sleep(3);
-    GLUE_ResumeGame();
-    SPU_Init();
-    MSG_ClearOutCompMap();
-}
-
-void GLUE_Init(void)
-{
-}
-
-int CPlayer::GetTexId(void)
-{
-    return TexId;
-}
-
-void CBlocks::SetTown(BOOL Val)
-{
-    Town = Val;
-}
-
-void CBlocks::MoveToScrollTarget(void)
-{
-    ScrollX = ScrollTargetX;
-    ScrollY = ScrollTargetY;
-}
-
-struct PInf *FindPlayerChar(char *Id)
-{
-    for (int f = 0; f < 0x51; f++) {
-        if (strcmp(PlayerInfo[f].Id, Id) == 0)
-            return &PlayerInfo[f];
-    }
-    DBG_Error(0, D_80110B58, 0x288);
-    return 0;
-}
-
-struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
-{
-    char TxBuff[20];
-
-    sprintf(TxBuff, D_8011AFF8, D_8011B00C[Char], D_8011B008[Arm], D_80110B68[Wep]);
-    return FindPlayerChar(TxBuff);
-}
-
-struct PInf *FindPlayerChar(struct PlayerStruct *P)
-{
-    return FindPlayerChar((int)P->_pClass, P->_pgfxnum & 0xF, (int)(P->_pgfxnum << 24) >> 28);
-}
-
-int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
-{
-    char Class;
-
-    if (P->_pmode == 8) {
-        Class = P->_pClass;
-        switch (Class) {
-        case 1:
-            return 0x126;
-        case 0:
-            return 0x124;
-        case 2:
-            return 0x125;
-        }
-        DBG_Error(0, D_80110B58, 0x2AF);
-        return -1;
-    } else {
-        struct PInf *Inf = FindPlayerChar(P);
-
-        if (InTown != 0) {
-            return Inf->w6;
-        }
-        if (FePlayerNo == 0) {
-            return Inf->w4;
-        }
-        return Inf->w8;
-    }
-}
-
-void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
-{
-    int Id;
-
-    Id = FindPlayerChar(&Plr, InTown);
-    if (Id != Player.GetTexId()) {
-        if (Blocking != 0) {
-            Player.Load(Id);
-        } else {
-            Player.NonBlockingLoadNewGFX(Id);
-        }
-        if (Plr.plractive != 0 && Plr._pmode != 8) {
-            StartStand__FP12PlayerStructi(&Plr, Plr._pdir);
-        }
-    }
+    return GameStarted;
 }
 
 void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
@@ -417,6 +299,12 @@ void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
     }
 }
 
+void GLUE_DoQuake(int Time, int Amount)
+{
+    QuakeTime = Time;
+    QuakeAmount = Amount;
+}
+
 void BgTask(struct TASK *T)
 {
     struct DEF_ARGS *Args;
@@ -431,8 +319,8 @@ void BgTask(struct TASK *T)
     ObjId = -1;
     List = -1;
     Args = *(struct DEF_ARGS **)((char *)T + 0x1C);
-    D_8011C6C0 = 0;
-    D_8011C6C4 = 0;
+    QuakeTime = 0;
+    QuakeAmount = 0;
     IsTown = Args->a1 != 0;
     Level = Args->a2;
     TextId = Args->a0;
@@ -487,7 +375,7 @@ void BgTask(struct TASK *T)
     gplayer = &MyPlayer;
     VID_GetTick__Fv();
     JustLoadedPlayer = 0;
-    D_8011AFF4 = 1;
+    GameStarted = 1;
     if (setlevel != 0 && setlvlnum == 1) {
         if (*((unsigned char *)&quests + 0xF2) == 2) {
             PlaySFX__Fi(0x354);
@@ -499,9 +387,9 @@ void BgTask(struct TASK *T)
         VID_GetTick__Fv();
         ResetFlames__Fv();
         if (DoDrawBg != 0) {
-            if (PauseMode == 0 && D_8011C6C0 != 0) {
-                MyBlocks.SetRandOffset(D_8011C6C4);
-                D_8011C6C0 -= 1;
+            if (PauseMode == 0 && QuakeTime != 0) {
+                MyBlocks.SetRandOffset(QuakeAmount);
+                QuakeTime -= 1;
             }
             MyPlayer.SetScrollTarget(plr[0].plractive ? plr[0] : plr[1], MyBlocks);
             if (DoHomingScroll != 0 && deathflag == 0) {
@@ -527,5 +415,133 @@ void BgTask(struct TASK *T)
         }
         TSK_Sleep(1);
     }
-    D_8011AFF4 = 0;
+    GameStarted = 0;
+}
+
+static const char WepChar[10] = "NUSDBAMHT";
+
+struct PInf *FindPlayerChar(char *Id)
+{
+    for (int f = 0; f < 0x51; f++) {
+        if (strcmp(PlayerInfo[f].Tx, Id) == 0)
+            return &PlayerInfo[f];
+    }
+    DBG_Error(0, "psxsrc/GLUE.CPP", 0x288);
+    return 0;
+}
+
+struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
+{
+    char TxBuff[20];
+
+    sprintf(TxBuff, PlayerFormat, CharChar[Char], ArmourChar[Arm], WepChar[Wep]);
+    return FindPlayerChar(TxBuff);
+}
+
+BOOL DoShowPanel = false;
+BOOL DoDrawBg = false;
+
+struct PInf *FindPlayerChar(struct PlayerStruct *P)
+{
+    return FindPlayerChar((int)P->_pClass, P->_pgfxnum & 0xF, (int)(P->_pgfxnum << 24) >> 28);
+}
+
+int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
+{
+    char Class;
+
+    if (P->_pmode == 8) {
+        Class = P->_pClass;
+        switch (Class) {
+        case 1:
+            return 0x126;
+        case 0:
+            return 0x124;
+        case 2:
+            return 0x125;
+        }
+        DBG_Error(0, "psxsrc/GLUE.CPP", 0x2AF);
+        return -1;
+    } else {
+        struct PInf *Inf = FindPlayerChar(P);
+
+        if (InTown != 0) {
+            return Inf->TownTex;
+        }
+        if (FePlayerNo == 0) {
+            return Inf->GameTex;
+        }
+        return Inf->TwoPlayerTex;
+    }
+}
+
+void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
+{
+    int Id;
+
+    Id = FindPlayerChar(&Plr, InTown);
+    if (Id != Player.GetTexId()) {
+        if (Blocking != 0) {
+            Player.Load(Id);
+        } else {
+            Player.NonBlockingLoadNewGFX(Id);
+        }
+        if (Plr.plractive != 0 && Plr._pmode != 8) {
+            StartStand__FP12PlayerStructi(&Plr, Plr._pdir);
+        }
+    }
+}
+
+struct MonstList *GLUE_GetCurrentList(int Level)
+{
+    struct MonstLevel *MLev;
+    int List;
+
+    Level--;
+    if (Level < 0 || !(Level < NumOfMonsterListLevels)) {
+        DBG_Error(0, "psxsrc/GLUE.CPP", 0x2EC);
+    }
+    MLev = &AllLevels[Level];
+    List = GLUE_GetMonsterList();
+    if (List < 0 || MLev->NumOfLists < List) {
+        DBG_Error(0, "psxsrc/GLUE.CPP", 0x2EF);
+    }
+    return &MLev->TheLists[List];
+}
+
+void GLUE_StartGameExit(void)
+{
+    {
+        int i;
+        for (i = 0; i < 2; i++) {
+            plr[i].plractive = 0;
+        }
+    }
+    GLUE_SuspendGame();
+    GLUE_SetFinished(1);
+    MAIN_RestartGameTask();
+    TSK_Sleep(3);
+    GLUE_ResumeGame();
+    SPU_Init();
+    MSG_ClearOutCompMap();
+}
+
+void GLUE_Init(void)
+{
+}
+
+int CPlayer::GetTexId(void)
+{
+    return TexId;
+}
+
+void CBlocks::SetTown(BOOL Val)
+{
+    Town = Val;
+}
+
+void CBlocks::MoveToScrollTarget(void)
+{
+    ScrollX = ScrollTargetX;
+    ScrollY = ScrollTargetY;
 }
