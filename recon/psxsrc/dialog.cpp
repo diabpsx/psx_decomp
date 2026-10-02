@@ -726,7 +726,7 @@ void Dialog::Back(int DX, int DY, int DW, int DH)
     setRGB0(Ft4, DialogRed, DialogGreen, DialogBlue);
     setSemiTrans(Ft4, 0);
     setShadeTex(Ft4, 0);
-    Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 5, X - 1, Y + H, 0, MY_DialogOTpos, 0);
+    Ft4 = DialogTData->PrintFt4(DialogBorderGfx + 5, ~(-X), Y + H, 0, MY_DialogOTpos, 0);
     setRGB0(Ft4, DialogRed, DialogGreen, DialogBlue);
     setSemiTrans(Ft4, trans);
     setShadeTex(Ft4, 0);

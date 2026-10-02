@@ -1420,15 +1420,16 @@ static void DrawObjSelector(int pnum, PlayerStruct *player)
         item_select = list_size - 1;
     else if (item_select < 0)
         item_select = 0;
-        nx = ((256 - nw) >> 1) + 32;
+        nx = 0x23;
         nh = add_wrap + 12;
-        ny = (176 - nh) / 2 + 32;
+        ny = (176 - nh) / 2;
         SelectRect.x = nx;
-        SelectRect.y = ny - 22;
+        SelectRect.y = ny + 10;
         SelectRect.w = nw;
         SelectRect.h = 16;
-        SelectBack.Back(nx, ny - 22, nw, 16);
+        SelectBack.Back(nx, ny + 10, nw, 16);
         MediumFont.Print(0, 12, player->_pName, JustCentre, &SelectRect, WHITER, WHITEG, WHITEG);
+        ny += 32;
         SelectRect.x = nx;
         SelectRect.y = ny;
         SelectRect.w = nw;

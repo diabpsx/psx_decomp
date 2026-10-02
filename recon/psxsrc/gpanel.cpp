@@ -236,7 +236,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     PanelTData->PrintFt4(0x34, X, Y, 0, GPanelOt, 0);
     PanelTData->PrintFt4(0x35, X, Y, 0, GPanelOt, 0);
     if (HealthHeight > 0) {
-        BarY = Y - (8 + HealthHeight);
+        BarY = -(HealthHeight + 8) + Y;
         xof = XY->FlaskFlip != 0;
         xof = -xof;
         xof &= 0x18;
@@ -246,11 +246,11 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->g0 = 0;
         Ft4->b0 = 0;
         Ft4->y2 = (short)(Ft4->y0 + HealthHeight);
-        Ft4->u2 = (unsigned char)((Ft4->u0 + HealthHeight) - 1);
         Ft4->y3 = (short)(Ft4->y1 + HealthHeight);
-        Ft4->tpage = Ft4->tpage | 0x20;
+        Ft4->u2 = (unsigned char)((Ft4->u0 + HealthHeight) - 1);
         Ft4->u3 = (unsigned char)((Ft4->u1 + HealthHeight) - 1);
         Ft4->code = Ft4->code & 0xFC;
+        Ft4->tpage = Ft4->tpage | 0x20;
         Ft4 = PanelTData->PrintFt4(HealthAnim + 0x84, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
@@ -259,7 +259,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->tpage = Ft4->tpage | 0x20;
     }
     if (ManaHeight > 0) {
-        BarY = Y - (8 + ManaHeight);
+        BarY = -(ManaHeight + 8) + Y;
         xof = XY->FlaskFlip != 0;
         xof = -xof;
         xof &= ~1;
@@ -270,11 +270,11 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->g0 = 0;
         Ft4->b0 = 0x7F;
         Ft4->y2 = (short)(Ft4->y0 + ManaHeight);
-        Ft4->u2 = (unsigned char)((Ft4->u0 + ManaHeight) - 1);
         Ft4->y3 = (short)(Ft4->y1 + ManaHeight);
-        Ft4->tpage = Ft4->tpage | 0x20;
+        Ft4->u2 = (unsigned char)((Ft4->u0 + ManaHeight) - 1);
         Ft4->u3 = (unsigned char)((Ft4->u1 + ManaHeight) - 1);
         Ft4->code = Ft4->code & 0xFC;
+        Ft4->tpage = Ft4->tpage | 0x20;
         Ft4 = PanelTData->PrintFt4(ManaAnim + 0x8C, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;

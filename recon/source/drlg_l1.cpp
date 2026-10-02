@@ -990,8 +990,12 @@ void DRLG_L5TransFix(void)
 {
     int i, j, xx, yy, v;
 
-    for (j = 0, yy = 16; j < DMAXY; j++, yy += 2) {
-        for (i = 0, xx = 16; i < DMAXX; i++, xx += 2) {
+    yy = 16;
+
+    for (j = 0; j < DMAXY; j++) {
+        xx = 16;
+
+        for (i = 0; i < DMAXX; i++) {
             v = dungeon[i][j];
 
             if (v == 23 && dungeon[i][j - 1] == 18) {
@@ -1033,7 +1037,7 @@ void DRLG_L5TransFix(void)
                 if (dungeon[i - 1][j] == 13)
                     dung_map[xx][yy].dTransVal = dung_map[xx - 1][yy - 1].dTransVal;
             }
-            if (v == 7 && dungeon[i - 1][j] == 13) {
+            if (v + 1 == 8 && dungeon[i - 1][j] == 13) {
                 dung_map[xx][yy].dTransVal = -1;
             }
             if (v == 12 && dungeon[i - 1][j] == 2) {
@@ -1045,7 +1049,9 @@ void DRLG_L5TransFix(void)
             if (v == 21 && dungeon[i][j - 1] == 1) {
                 dung_map[xx][yy].dTransVal = -1;
             }
+            xx += 2;
         }
+        yy += 2;
     }
 }
 

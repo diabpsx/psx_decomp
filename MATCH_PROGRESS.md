@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2695 / 2727 entries PASS (98.8%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2696 / 2727 entries PASS (98.9%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -499,14 +499,14 @@
 - ✅ DoMemCardFromFrontEnd__Fv (10)
 - ✅ DoMemCardFromInGame__Fv (10)
 
-## dialog  (recon/psxsrc/dialog.cpp) — 9/11 PASS
+## dialog  (recon/psxsrc/dialog.cpp) — 10/11 PASS
 - ✅ TrimCol__Fs_8008ad90 (14)
 - ❌ DialogPrint__Fiiiiiiiiii — 162 diffs (ours 610)
 - ✅ GetDropShadowG4__FUcUcUcUcUcUcUcUcUcUcUcUc (78)
 - ✅ DropShadows__Fiiii (169)
 - ✅ InitDialog__Fv (78)
 - ✅ GetSizes__6Dialog (161)
-- ❌ Back__6Dialogiiii — 8 diffs (ours 1096)
+- ✅ Back__6Dialogiiii (1094, ASPSX)
 - ✅ Line__6Dialogiii (140)
 - ✅ SetOTpos__6Dialogi (5)
 - ✅ GetPal__7TextDati_8008d23c (7)
@@ -613,7 +613,7 @@
 - ✅ L5FillChambers__Fv (443)
 - ✅ DRLG_L5FTVR__Fiiiii (290)
 - ✅ DRLG_L5FloodTVal__Fv (62)
-- ❌ DRLG_L5TransFix__Fv — 333 diffs (ours 270)
+- ❌ DRLG_L5TransFix__Fv — 10 diffs (ours 273)
 - ✅ DRLG_L5DirtFix__Fv (95)
 - ✅ DRLG_L5CornerFix__Fv (67)
 - ✅ DRLG_L5__Fi (333)
@@ -1080,12 +1080,12 @@
 ## gpanel  (recon/psxsrc/gpanel.cpp) — 10/13 PASS
 - ✅ GetPal__6GPaneli (17)
 - ✅ __6GPaneli (25)
-- ❌ DrawFlask__6GPanelP7PanelXYP12PlayerStruct — 74 diffs (ours 285)
+- ❌ DrawFlask__6GPanelP7PanelXYP12PlayerStruct — 34 diffs (ours 285)
 - ✅ SpdTrimCol__Fs (14)
 - ❌ DrawSpeedBar__6GPanelP7PanelXYP12PlayerStruct — 6 diffs (ours 459)
 - ✅ DrawSpell__6GPanelP7PanelXYP12PlayerStruct (103)
 - ✅ DrawMsgWindow__6GPanelP7PanelXYP12PlayerStruct (20)
-- ❌ DrawDurThingy__6GPaneliiP10ItemStructi — 49 diffs (ours 178)
+- ❌ DrawDurThingy__6GPaneliiP10ItemStructi — 48 diffs (ours 179)
 - ✅ DrawDurIcon__6GPanelP7PanelXYP12PlayerStruct (75)
 - ✅ Print__6GPanelP7PanelXYP12PlayerStruct (70)
 - ✅ GetMaxOtPos__7CBlocks_80098948 (2)
@@ -2070,7 +2070,7 @@
 - ✅ pad_func_Quick_Use_Health__Fi (10)
 - ✅ pad_func_Quick_Use_Mana__Fi (10)
 - ✅ sort_gold__Fi (66)
-- ❌ DrawObjSelector__FiP12PlayerStruct — 237 diffs (ours 503)
+- ❌ DrawObjSelector__FiP12PlayerStruct — 190 diffs (ours 504)
 - ✅ SelectorActive__Fv (3)
 - ✅ DrawObjTask__FP4TASK (207)
 - ✅ add_area_find_object__Fiii (28)

@@ -351,10 +351,45 @@ newer GCC's dump spellings. For example:
 ```sh
 python tools/instr/real_rtl.py recon/psxsrc/biglump.cpp BL_AsyncReadFile --dump sched2
 python tools/instr/real_rtl.py recon/psxsrc/biglump.cpp BL_AsyncReadFile --dump dbr
+python tools/instr/real_rtl.py recon/psxsrc/biglump.cpp BL_AsyncReadFile \
+  --dump greg,sched2,dbr --around TSK_Sleep --context 18
 ```
 
-Each invocation
-retains its preprocessed input, assembly, and dump in a unique directory under
+`real_rtl.py` accepts a comma-separated pass list and compiles the shared input
+only once. `--around REGEX` prints merged, line-numbered windows around every
+matching line in each selected function body; `--context` controls the number
+of surrounding lines. A missing or invalid expression is a hard error, so a
+typo cannot masquerade as an empty diagnostic. The complete raw dumps remain
+in the artifact directory even when focused output is requested.
+
+The focused BL_AsyncReadFile receipt shows the two-instruction ordering root cause
+without the former 2,000-line combined output: in `greg` and `sched2`, UID 148
+saves `getasyncreadstatus`'s `$v0` to `$s0`, UID 151 loads argument 1 into
+`$a0`, and UID 153 calls `TSK_Sleep`. The `dbr` pass chooses immediately
+preceding UID 151 for the call delay slot, while retail instead orders the
+argument load before the call and puts the `$v0` save in its delay slot. Moving
+the sleep into the loop condition, comma-expression ownership, and optimized
+constant-local forms preserve the same four textual diff lines; a mutable
+loop-local adds a non-retail nested SYM block. No source variant was retained.
+
+For the normalized byte gate itself, `VA_CTX` reveals instruction indices and
+side-by-side context without changing comparison behavior:
+
+```powershell
+$env:VA_CTX=3
+python tools/verify_asm.py recon/psxsrc/fmv.cpp LoPlayFMVOverLay
+Remove-Item Env:VA_CTX
+```
+
+This disambiguates repeated normalized instructions. For `LoPlayFMVOverLay`,
+the two otherwise-identical `sw v0,0(gp)` diff lines are one moved
+`user_start` store: ours stores at instruction 210 before `li s5,1`, while
+retail loads `fade` first and stores at 211. The natural chained assignment
+`user_start = fade = user_quit` was screened and rejected: it emits 273 rather
+than 274 instructions, swaps the long-lived s4/s5 allocation, and fails SYM;
+all 48 calls remain ordered only. The original source was restored.
+
+Each invocation retains its preprocessed input, assembly, and dump in a unique directory under
 `build/rtl/`. It uses the gate compiler, flags, and per-TU overrides; no source
 or assembly is rewritten. A missing source, compiler failure, absent dump, or
 missing/ambiguous function heading is an error. Old GCC sometimes omits the
@@ -695,6 +730,13 @@ stores 1116/1123 before the u0 reads. In second-scheduler dump
 cannot move above these stores. Investigate pre-allocation scheduling of the
 right-edge live range, not merely final delay-slot scheduling. Diagnostics
 are under `build/sbr`; live executable source stays unchanged.
+
+Late-combine identity follow-up: all 256 pairs from sixteen equivalent
+spellings of the two `Bx + 0x89` right-edge assignments retain the exact
+459-instruction/six-difference result (or regress). This includes the
+Dialog-derived `~(-(Bx + 0x8A))` and `-~(Bx + 0x88)` forms. Results are under
+`build/speedbar_right_probe`; arithmetic CSE timing does not free v1 for the
+first u0 load, so live source remains unchanged.
 
 The former 380-line mismatch contained genuine reconstruction errors, not
 just allocation residue. Retail uses a 36-byte POLY_G4; the source used a
@@ -2656,6 +2698,48 @@ preserves every map access and update and reduces 357 differences to 333 at
 coordinate from its index produces 390 instructions and was rejected. All
 call checks pass (no calls), and DRLG_L1 remains 39/40. Not a new PASS.
 
+Late-combine comparison follow-up: all 512 combinations of eight equivalent
+spellings for the three semantic `== 7` tests were compiled and gated. Changing
+only the first cached-v test to `v + 1 == 8` prevents the unwanted saved
+constant-seven hoist while combine still produces the required comparison.
+The live function reaches retail's exact 273-instruction length and reduces
+333 differences to 106; exact SYM and the no-call audit pass. The best raw
+count is 98 at 275 instructions and is rejected. Results are retained at
+`build/transfix_seven_probe/results.json`. This is a substantial retained
+improvement but not a PASS; DRLG_L1 remains 39/40.
+
+After that allocation change, restoring the retail initialization order inside
+the paired for-header (`yy = 16, j = 0`) becomes effective: yy is now s0 and j
+is s1, so their saves/initializations move into exact retail order. This removes
+the four prologue differences and leaves 102 at the same 273/273 length and
+exact SYM. The earlier 270-instruction allocation made this spelling neutral;
+the two retained changes therefore have to be evaluated together.
+
+Loop-ownership follow-up: screening 25 combinations of combined/separate loop
+initialization and header/body coordinate updates found the full gold shape is
+decisive once the comparison identity is present. Initializing yy and xx before
+their loops and advancing both in their loop bodies reproduces every induction
+register and update sequence, reducing 102 differences to ten at 273/273 with
+exact SYM. The comparison must remain `v + 1 == 8`: reverting it to `v == 7`
+reintroduces the saved-seven hoist and the old 270/357 allocation. Results are
+under `build/transfix_loop_probe`; the combined identity-plus-gold-loop source
+is retained. Only the three seven-comparison instruction groups remain.
+
+The eight-form three-site comparison screen was rerun against the gold loops;
+ten differences remains the exact-length minimum. A further middle-test screen
+of integer-width casts and zero-comparison identities (`v - 7 == 0`,
+`!(v ^ 7)`, and variants) either retains those ten, restores the old
+270/357 saved-constant allocation, or adds instructions. Results are under
+`build/transfix_seven_probe` and `build/transfix_cast_probe`. No direct
+`v == 7` spelling currently preserves the retail allocator state.
+
+A 100-case follow-up combined direct middle `v == 7` with ten integer-width
+casts on the neighbor and final seven tests. Code-neutral casts fold back to
+the old 270/357 constant hoist; signed/byte-distinguishing pairs bottom out at
+28 differences but grow to 275 instructions. Results are under
+`build/transfix_cast_sites_probe`; the retained ten-difference form remains
+strictly closer on bytes, length and SYM.
+
 ### DialogPrint extra local and read-only-view probe
 
 Validated isolated allocator trace is captured in build/dialogprint_alloc.
@@ -2893,6 +2977,32 @@ instructions per branch, grows to 289/285, and fails function length. The
 existing-BarY two-step form retains 285 instructions but changes allocator
 order broadly (208 differences). All forms were reverted.
 
+Packet-order follow-up (2026-10-02): all 720 permutations of the six
+independent y2/u2/y3/u3/code/tpage updates were compiled in isolated full-TU
+copies and scored with the unchanged retail gate. Applying the same order to
+both flask halves, `y2, y3, u2, u3, code, tpage`, is uniquely best at the
+retail 285-instruction length and reduces 74 differences to 42. Exact SYM and
+all eleven calls still pass; both byte lanes report the same remaining
+source-order/register residue. The exhaustive result set is retained at
+`build/drawflask_order_probe/results.json`. The winning order is retained in
+live source. Reusing xof as the height-plus-eight temporary remains 42 but
+puts the temporary in s0 instead of retail v0; splitting the final health X
+offset and commuting both final additions regresses to 46. Those follow-ups
+were reverted.
+
+Expression follow-up: 810 combinations of ten equivalent BarY spellings,
+nine health-xof forms and nine mana-xof forms were screened on top of the
+winning packet order. `BarY = -(height + 8) + Y` is the only further retained
+change: both branches now emit retail's `addiu height,8` followed by
+`subu Y,temp`, reducing 42 differences to 34 while preserving 285/285,
+exact SYM and all eleven calls. Results are in
+`build/drawflask_expr_probe/results.json`. The best shorter result is 33
+differences at 282 instructions and is not a match. All exact-length winners
+bottom out at 34; combined and argument-local xof expressions change
+temporaries but do not move the shared FlaskFlip stack store before the
+boolean sequence. The remaining residue is now confined to that call-argument
+dependency and operand/register order in the two mirrored-X calculations.
+
 ### CFont::Print resolved: unsigned lead bytes
 
 The real greg dump identified kan as pseudo 96, with hard-register preferences
@@ -2994,6 +3104,14 @@ only the known C++ static-member spelling difference (dot versus dollar in
 PActiveArray), with identical function assembly. Thus stock diagnostics are
 usable for this isolated function, but the failure has not been resolved and
 retail/SYM remain mandatory gates. The board remains 2688/2727.
+
+Follow-up after the Dialog pass-timing discovery: anonymous grouped expressions
+for the final `plr[0]` mode access still fold to a direct symbolic load; the
+compiler does not retain a base. Retail SYM also contains root local `wtime` in
+v0, while the current two dead WorldToScr assignments emit no record. Adding
+the natural `register` hint is codegen- and SYM-neutral and does not restore
+either wtime or s7. The missing base and missing debug lifetime are therefore
+coupled source-shape evidence, not merely pointer spelling.
 
 ### CheckIsoBodge resolved: coordinate lifetime and structured return
 
@@ -3127,6 +3245,14 @@ TASK parameter or the existing Ft4 local are rematerialized back to the
 mutable pointer lifetime: the known named-pointer form creates the desired
 `s3 + 6632` access, but its debug record and `s3/s4` swap remain unacceptable.
 
+Anonymous-address follow-up: sixteen array, pointer-to-array, commuted-index,
+member-address and byte-offset spellings were screened, including the natural
+`&plr[0].plractive + sizeof(PlayerStruct)` grouping and late-combine identities
+for the 29-byte member offset. Every form folds to the same direct symbolic
+load and 76/79, seventeen-difference baseline. Results are under
+`build/cdwait_address_probe`; a real retained lifetime rather than expression
+syntax is required to produce retail's unnamed s3 base.
+
 ### Two-diff FMV and Resync source-shape follow-up
 
 `set_mdec_img_buffer` remains at 13 instructions / two normalized differences
@@ -3135,17 +3261,41 @@ Writing through a second anonymous-union member still CSEs `i` to literal zero
 and additionally emits the alias member in SYM. These forms do not preserve the
 retail `a2 -> a1` copy.
 
+Pass-timing follow-up: 41 algebraic identity spellings of `i = tsz` were
+screened, including double negation/complement, paired add/subtract, casts,
+bitwise identities, conditionals and multiply-by-minus-one. Every form folds
+during early CSE and retains the same 13-instruction/two-difference baseline.
+The exact Climax `int i, tsz=0; for (i=0; ...)` source instead constant-folds
+the accumulated return, emits only twelve instructions, and fails SYM length.
+Chained `i = tsz = 0` also retains two literal-zero moves. Results are under
+`build/mdec_identity_probe`; live FMV source remains unchanged.
+
 For LoPlayFMVOverLay, both the direct retail-order swap and
 `user_start = (fade = 1, user_quit)` produce the same 273-instruction
 `s4/s5` allocation regression. Using independent literal-one assignments also
 canonicalizes to that result; the retail standalone `v0 = 1` is not recovered.
 The live 274-instruction/two-difference order remains the closest form.
 
+Twenty-three equivalent constant-one spellings for the first fade assignment,
+including `~(-2)`, `-~0` and expressions based on the already-true user_quit,
+all retain the same 274-instruction/two-difference order. The result set is at
+`build/fmv_fade_identity_probe`; no source change was retained.
+
 ResyncQuests is unchanged at 315 instructions / six prologue-order differences
 when the gold source's unused `x/y` locals are restored, whether grouped with
 `i/tren` or declared separately. A pre-call cached banner-quest pointer grows
 the frame to 64, adds an `s1` local and 27 differences. The residue is therefore
 not explained by omitted gold declarations or an early quest pointer cache.
+
+Twenty-three equivalent spellings of the initial Q_LTBANNER value 7 likewise
+fold before scheduling and retain the same prologue order. Results are under
+`build/resync_constant_probe`; the callee-save/argument delay-slot residue is
+not an arithmetic-constant pass-timing issue.
+
+For BL_AsyncReadFile, twenty-two late-combine identity wrappers around
+`getasyncreadstatus(ah)` all retain 88 instructions and the same four ordering
+differences. Results are under `build/async_identity_probe`; the status-result
+copy remains before the sleep argument load in every form.
 
 ### DrawDurThingy loop body resolved; frame reservation remains
 
@@ -3176,9 +3326,29 @@ positive-durability block grows to 180 instructions and restores the unwanted
 early return constant. The retained outer const remains the closest natural
 form.
 
+Unnamed-aggregate follow-up: standalone `RECT()` reserves compiler-owned
+temporary storage but emits two initialization instructions, improving the
+frame-only 48 differences to 24 while growing to 181/179. Copying MsgRect into
+the temporary emits three instructions (182/179), and conditional aggregate
+temporaries grow to 185-186 instructions. Unnamed lvalue casts, references and
+sizeof expressions optimize away and retain the 80-byte frame. Results are
+under `build/durthingy_temp_probe`; none satisfies both bytes and SYM, so live
+source is unchanged.
+
 DoCredits case-label follow-up: adding a semantics-neutral `case 3` at the
 case-1 break join does not survive `jump2`; the pass still redirects to the
 case-2 decrement and deletes the local decrement, leaving 249 instructions.
+
+Decrement-spelling follow-up: all 400 pairs drawn from twenty equivalent
+case-1/case-2 decrement expressions were compiled with case 1 in retail source
+order (`Mode = 2` before the decrement). Prefix/postfix decrement, compound
+assignment, direct subtraction, commuted addition, casts, bitwise identities,
+and reuse of the existing constant `one` all canonicalize before `jump2` and
+produce the same 249/250 cross-jumped result (or worse). Results are retained
+at `build/credits_decrement_probe/results.json`. No live Credits source was
+changed. The remaining lever is therefore CFG ownership that keeps the two
+decrements distinct through late jump optimization, not arithmetic spelling,
+allocation, assembler version, or delay-slot filling.
 
 ### SPLTARGT native-lane conversion
 
@@ -4056,6 +4226,17 @@ declaration produces 1083, both broad regressions. No reconstruction change
 was retained. The next useful target is the early-CSE expression lifetime,
 not assembler selection or those equivalent coordinate spellings.
 
+Resolved follow-up (2026-10-02): an exhaustive 13x13 screen of equivalent
+top-left/bottom-left `X - 1` identities found the missing pass-order shape.
+Keeping the first corner as `X - 1` and spelling the third as `~(-X)` prevents
+early CSE from retaining one shared s1 value; combine later lowers the identity
+to retail's direct `addiu a2,fp,-1`. Real ASPSX now matches all 1,094 retail
+instructions, exact SYM and all forty calls. Maspsx still expands the known
+GP-relative DialogGBack byte store to a two-instruction absolute store, so the
+function is registered as a reviewed real-ASPSX pass rather than weakening the
+default gate. Results are retained under `build/dialog_xminus_probe`. DIALOG
+advances to 10/11 and the full board to 2696/2727 (31 remaining).
+
 ### DrawInvTSK entry scheduling probes
 
 Declaration-order follow-up (2026-10-02): reversing omp/osel declarations,
@@ -4099,6 +4280,17 @@ None were retained in reconstruction. Live source was rechecked at eight
 differences with exact SYM; the board remains 2687/2727. The next investigation
 must account for entry scheduling without sacrificing retail's saved-state
 register assignments, rather than repeating these source spelling changes.
+
+### DrawObjSelector coordinate staging
+
+The retail decompile's coordinate ownership was restored directly: `nx` starts
+at 0x23, the unshifted centered `ny` is used for the title at `ny + 10`, and
+then advanced by 32 for the item panel. This reduces the byte gate from 237 to
+190 differences (504 instructions versus retail's 514), with all thirty calls
+still exact. The frame is 256 bytes versus retail's 280, so this remains a
+partial reconstruction rather than a PASS. Moving the initial width loop to a
+guarded `do` form regresses to 194 differences and a 248-byte frame and was
+reverted.
 
 ### TONY complete native linkage
 

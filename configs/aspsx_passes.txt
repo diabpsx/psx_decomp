@@ -6,6 +6,7 @@ control SetSpell__Fi
 control GetSBookTrans__FiUc
 control DrawSpellBook__Fb
 control CheckSBook__Fv
+dialog Back__6Dialogiiii
 fe FeNewNameMenuCtrl__Fv
 gamepad Handle__7GamePad
 items CalcPlrStaff__FP12PlayerStruct

@@ -316,7 +316,7 @@ no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
 The remaining 488 library-region entries are not native-linked: 484 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
-game-function board, now 2694/2727 with 33 functions not PASS.
+game-function board, now 2696/2727 with 31 functions not PASS.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate
