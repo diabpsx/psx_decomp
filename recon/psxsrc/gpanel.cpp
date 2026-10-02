@@ -382,6 +382,7 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
     Ft4->b0 = 0;
     Ft4->code = (Ft4->code | 2) & 0xFE;
 
+    const short DurY = (short)(Y - 1);
     if (Item->_iDurability > 0) {
         int Loop = 0;
         do {
@@ -389,14 +390,14 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
             NewR = DurColors[Loop][0];
             NewG = DurColors[Loop][1];
             NewB = DurColors[Loop][2];
-            Ft4->y0 = (short)(Y - 1 + (3 - Loop) * 5);
-            Ft4->y1 = (short)(Y - 1 + (3 - Loop) * 5);
+            Ft4->y0 = (short)(DurY + (3 - Loop) * 5);
+            Ft4->y1 = (short)(DurY + (3 - Loop) * 5);
             Ft4->x0 = (short)(X + 0x15);
             Ft4->x1 = (short)(X + 0x17);
             Ft4->x2 = (short)(X + 0x15);
-            Ft4->y2 = (short)(Y - 1 + (3 - Loop) * 5 + 5);
+            Ft4->y2 = (short)(DurY + (3 - Loop) * 5 + 5);
             Ft4->x3 = (short)(X + 0x17);
-            Ft4->y3 = (short)(Y - 1 + (3 - Loop) * 5 + 5);
+            Ft4->y3 = (short)(DurY + (3 - Loop) * 5 + 5);
             Ft4->r0 = NewR;
             Ft4->g0 = NewG;
             Ft4->b0 = NewB;

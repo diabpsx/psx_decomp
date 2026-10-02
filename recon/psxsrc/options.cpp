@@ -780,7 +780,6 @@ void MemcardPad(void)
     CPad *P;
     int move;
     OMENUITEM *iptr;
-    int lcs;
 
     iptr = MenuList[cmenu].Item;
     P = PAD_GetPad(options_pad, 0);
@@ -796,13 +795,8 @@ void MemcardPad(void)
             return;
         }
     }
-    if (AlertTxt != 0)
-        goto L_9080;
-    if (saveflag != 0)
-        goto L_9124;
-    if (loadflag != 0)
-        goto L_9080;
-
+    if (AlertTxt == 0 && saveflag == 0 && loadflag == 0) {
+    int lcs;
     ShowCardActionText();
     if (P->GetTick() & 1)
         move = -1;
@@ -828,26 +822,17 @@ void MemcardPad(void)
     if (cs != lcs)
         PlaySFX(0x32);
     if (P->GetDown() & 0x100) {
-        int n, link;
-
         PlaySFX(0x33);
-        n = MenuList[cmenu].NoEntries - 1;
-        cs = n;
-        link = iptr[n].Link;
-        if (link != -2) {
-            cmenu = link - 1;
+        cs = MenuList[cmenu].NoEntries - 1;
+        if (iptr[cs].Link != -2) {
+            cmenu = iptr[cs].Link - 1;
             cardondelay = 5;
             cs = lastcs;
             return;
         }
     }
 
-    if (!(P->GetDown() & 0x40))
-        goto L_8FC8;
-    if (saveflag != 0)
-        goto L_8FC8;
-    if (loadflag != 0)
-        goto L_9114;
+    if ((P->GetDown() & 0x40) && saveflag == 0 && loadflag == 0) {
 
     if (cs == 1)
         current_card = 0;
@@ -859,8 +844,10 @@ void MemcardPad(void)
     case 8: /* L800A8C28 */
         Savefilename = DiabloOptionFile;
         save_blocks = 1;
-        if (GetSaveStatusMessage(1, DiabloOptionFile) == 0)
-            goto L_8E4C;
+        if (GetSaveStatusMessage(1, DiabloOptionFile) == 0) {
+            PlaySFX(0x3D3);
+            break;
+        }
         saveflag = 1;
         move = 0;
         if (test_card_format(current_card) != 0) {
@@ -869,104 +856,101 @@ void MemcardPad(void)
             else
                 move = 1;
         }
-        if (move != 0)
-            goto L_8DA8;
-        goto L_8F0C;
+        if (move != 0) {
+            ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
+            ReturnCards = 2;
+            ReturnMenu = cmenu;
+            lastlastcs = cs;
+            cmenu = 0x13;
+            cs = 2;
+            return;
+        }
+        break;
 
     case 9: /* L800A8CA4 */
         if (card_status[current_card] == 2) {
             AlertTxt = card_side_empty[current_card];
             PlaySFX(0x3D3);
-            goto L_8F0C;
+            break;
         }
         if (card_usable[current_card] == 0) {
             AlertTxt = 0x509;
-            goto L_8E4C;
+            PlaySFX(0x3D3);
+            break;
         }
         if (GetFileNumber(current_card, DiabloOptionFile) == -1) {
             AlertTxt = card_side_noopt[current_card];
             PlaySFX(0x3D3);
-            goto L_8F0C;
+            break;
         } else {
             loadflag = 4;
             Loadfilename = DiabloOptionFile;
-            goto L_8F0C;
+            break;
         }
 
     case 3: /* L800A8D48 */
-        save_blocks = 10;
-        Savefilename = DiabloGameFile;
-        if (GetSaveStatusMessage(save_blocks, DiabloGameFile) == 0)
-            goto L_8E4C;
+        /* The memory-card worker owns these asynchronously. Volatile accesses preserve retail's
+         * store/load order while forwarding one DiabloGameFile value to Savefilename and a1. */
+        *(volatile int *)&save_blocks = 10;
+        Savefilename = *(char *volatile *)&DiabloGameFile;
+        if (GetSaveStatusMessage(*(volatile int *)&save_blocks, Savefilename) == 0) {
+            PlaySFX(0x3D3);
+            break;
+        }
         saveflag = 1;
         if (GetFileNumber(current_card, Savefilename) == -1)
-            goto L_8F0C;
-        goto L_8DA8;
-
-L_8DA8:
+            break;
         ActivateMemcard(current_card == 0, (current_card ^ 1) == 0);
         ReturnCards = 2;
         ReturnMenu = cmenu;
         lastlastcs = cs;
         cmenu = 0x13;
         cs = 2;
-        goto L_91F8;
+        return;
 
     case 0:
     case 2: /* L800A8DF0 */
         if (card_status[current_card] == 2) {
             AlertTxt = card_side_empty[current_card];
             PlaySFX(0x3D3);
-            goto L_8F0C;
+            break;
         }
         if (card_usable[current_card] == 0) {
             AlertTxt = 0x509;
-L_8E4C:
             PlaySFX(0x3D3);
-            goto L_8F0C;
+            break;
         }
         if (GetFileNumber(current_card, DiabloGameFile) == -1) {
             AlertTxt = card_side_nogame[current_card];
             PlaySFX(0x3D3);
-            goto L_8F0C;
+            break;
         } else {
             loadflag = 4;
             Loadfilename = DiabloGameFile;
-            goto L_8F0C;
+            break;
         }
 
     default: /* L800A8ECC */
-        {
-            int n, link;
-
-            n = cs;
-            link = iptr[n].Link;
-            if (link == -2)
-                goto L_8F0C;
-            cmenu = link - 1;
-            lastcs = n;
-            cs = 1;
-            goto L_91F8;
-        }
+        if (iptr[cs].Link == -2)
+            break;
+        cmenu = iptr[cs].Link - 1;
+        lastcs = cs;
+        cs = 1;
+        return;
     }
 
-L_8F0C:
     if (saveflag != 0) {
         if (card_status[current_card] != 2) {
             if (card_usable[current_card] == 0) {
                 if (read_card_block(current_card, 0) != 0) {
                     if (block_buf[0] != 0x4D) {
                         if (block_buf[1] != 0x43) {
-                            int oldcmenu, oldcs;
-
-                            oldcmenu = cmenu;
-                            oldcs = cs;
+                            ReturnMenu = cmenu;
+                            lastlastcs = cs;
                             cmenu = 0x10;
                             formatflag = 0;
                             cs = 2;
-                            ReturnMenu = oldcmenu;
-                            lastlastcs = oldcs;
-                            goto L_91F8;
+                            return;
                         }
                     }
                 }
@@ -974,24 +958,14 @@ L_8F0C:
             }
         }
     }
-L_8FC8:
-    if (loadflag != 0)
-        goto L_9114;
-    if (saveflag != 0)
-        goto L_9124;
-    if ((unsigned)(cmenu - 0x11) < 2) {
-        ShowGameFiles(DiabloOptionFile, 0, 0xD, ORect, 0x1C);
-    } else {
-        ShowGameFiles(DiabloGameFile, 0, 0xD, ORect, 0x1C);
     }
-    goto L_9114;
-
-L_9080:
-    if (saveflag != 0)
-        goto L_9124;
-    if (loadflag != 0)
-        goto L_9114;
-    {
+    if (loadflag == 0 && saveflag == 0) {
+        if ((unsigned)(cmenu - 0x11) < 2)
+            ShowGameFiles(DiabloOptionFile, 0, 0xD, ORect, 0x1C);
+        else
+            ShowGameFiles(DiabloGameFile, 0, 0xD, ORect, 0x1C);
+    }
+    } else if (saveflag == 0 && loadflag == 0) {
         ShowAlertBox();
         if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
             loadflag = 0;
@@ -1002,8 +976,6 @@ L_9080:
             PlaySFX(0x33);
         }
     }
-L_9114:
-L_9124:
     if (saveflag >= 3) {
         if (AlertTxt == 0)
             ShowLoadingBox(card_side_save[current_card]);
@@ -1016,7 +988,6 @@ L_9124:
     }
     if (saveflag > 0)
         saveflag = CountdownSave(saveflag);
-L_91F8:
     return;
 }
 

@@ -3035,6 +3035,151 @@ earlier LoPlayFMVOverLay result, this rules out the locally available authentic
 compiler revisions as solutions for these scheduling/CSE residues; no compiler
 override or source change was retained.
 
+### DoCredits four-line residue: late delay-slot selection, not allocation
+
+An isolated real-CC1PLPSX run with `greg,sched2,jump2,dbr` now identifies the
+remaining four-line difference precisely. With the live source order
+`Fade -= 1; Mode = 2;`, RTL insns 415 and 418 remain in that order through
+`jump2`; the delayed-branch pass then places insn 418 (`Mode = 2`) in the
+unconditional jump's delay slot. Retail instead has `Mode = 2` before the
+jump and the fade decrement in its delay slot.
+
+Reversing the two source statements initially produces exactly that desired
+RTL order through `sched2`, but `jump2` recognizes the decrement as identical
+to the later case-2 decrement (insn 490), redirects the jump to that block and
+deletes the local decrement. The result is 249 rather than 250 instructions.
+The old frontend has no `-fno-crossjumping` option (it rejects the flag), and
+`-fno-schedule-insns` broadly regresses the TU to 7/11. Therefore the next
+source experiment must change the case-1/case-2 CFG so the two decrements are
+not cross-jump candidates while still lowering to the same final instruction;
+allocator or compiler-revision changes cannot address this residue. No live
+source or compiler override was retained. The isolated stock FSF target is
+not byte-identical to the SN compiler for this function, so its allocator trace
+is explicitly unvalidated; the real PsyQ RTL dumps remain authoritative.
+
+### DrawSpellCel frame-gap and ProcessItems spelling screens
+
+`DrawSpellCel` retains its 184-byte frame versus retail's 216-byte frame under
+all 24 permutations of the four initial `X/Y/SW/SH` assignments. The best four
+orders remain the live 94-difference result; the others range from 116 to 172
+differences. Both other available authentic SN32.3.7 revisions reproduce the
+same 184-byte frame. A 32-byte volatile aggregate, tested in each relevant
+nested scope and on both sides of `st`, does grow the frame but is allocated
+below the already-correct outer slots, shifting them by 32 and producing 160
+differences plus a named SYM record. The retail-only region from physical
+`sp+0x78` through `sp+0xA4` is wholly unreferenced; only `st` at `sp+0xA8` is
+used. This rules out a missing ordinary local and points to reserved/padding
+state produced by a still-missing C++ source construct.
+
+For `ProcessItems`, all 64 combinations of pointer spelling across the six
+animation phases (frame update, map lookup, first sound, sound-table lookup,
+second sound, final stores) were compiled and gated. The best unnamed form is
+183 instructions/74 differences; none beats the saved reference form at
+172/69. The reference form creates the desired retained item base in `s0`, but
+also emits a non-retail reference record and changes allocation (`i` moves to
+`s2`, while the frame snapshot takes `s3`). Reconstructing the retail load
+order with named const frame/x/y snapshots gives 194/113; x/y optimize out of
+SYM, but the call-crossing frame remains a named record. An implementation-
+reserved `__anim` name is still emitted by this GCC and does not solve the SYM
+gate. No live source change was retained. The remaining source-shape problem is
+to create the anonymous `s0` base and call-crossing `s1` frame snapshot while
+letting the original `ii` die in `a1`, without a source-visible pointer or
+frame record.
+
+### MemcardPad resolved: asynchronous accesses and structured control flow
+
+`MemcardPad` now matches all 585 instructions through both maspsx and real
+ASPSX, and all 33 ordered calls remain exact. Retail stores 10 to
+`save_blocks`, loads `DiabloGameFile` once, reloads `save_blocks`, stores that
+same filename value to `Savefilename`, and calls `GetSaveStatusMessage` with a
+nop delay slot. The live source previously let cc1plus constant-forward 10 and
+hoist the filename load, producing 583 instructions. Treating only the
+asynchronously owned count store/read and filename load as volatile recreates
+the exact sequence without a helper local or post-cc1 intervention.
+
+The remaining SYM mismatch was entirely structural. Replacing direct-return
+gotos with `return`, duplicating the two activation/error tails, and replacing
+the switch join gotos with `break` lets GCC cross-jump them back to the same
+retail blocks without source LABEL records. The outer alert/normal dispatch is
+now structured as the JAP block map requires: root block to `+0x908`, nested
+blocks `+0x90..+0x824` and `+0xCC..+0x74C`, with `lcs` as the only inner local.
+Removing draft-only `n`, `link`, `oldcmenu`, and `oldcs` restores the exact
+record stream while direct global handoff stores keep identical instructions.
+Both byte lanes, exact SYM, and all 33 calls pass. OPTIONS reaches 36/38 and the
+full board reaches 2695/2727 with 32 entries remaining.
+
+### DrawInvTSK and PrintCDWaitTask allocation follow-up
+
+The retail DrawInvTSK decompile confirms the semantic initialization order is
+`omp = myplr; osel = sel_data`, even though the live reversed statements are
+what retain retail's `omp=s6`, `osel=s7` allocation. Direct natural order,
+declaration initializers, a combined comma expression, `const`, and `register`
+storage spellings all swap the two locals (`omp=s7`, `osel=s6`) and introduce
+four tail-store differences. Reversing the two restore statements repairs the
+tail but not the allocation or SYM. No live source change was retained.
+
+For PrintCDWaitTask, a volatile typed view reaches the retail 79-instruction
+length and gives CDGfxData its correct `s4`, but it still folds the `plr[1]`
+address to a symbolic load and introduces a call-crossing boolean, shifting
+`cdy` from `s1` to `s2`. Pointer-to-member access and reusing either the unused
+TASK parameter or the existing Ft4 local are rematerialized back to the
+76-instruction baseline. Thus the remaining lever is specifically an anonymous
+mutable pointer lifetime: the known named-pointer form creates the desired
+`s3 + 6632` access, but its debug record and `s3/s4` swap remain unacceptable.
+
+### Two-diff FMV and Resync source-shape follow-up
+
+`set_mdec_img_buffer` remains at 13 instructions / two normalized differences
+after exact-SYM `register` declarations and an anonymous-union `tsz` member.
+Writing through a second anonymous-union member still CSEs `i` to literal zero
+and additionally emits the alias member in SYM. These forms do not preserve the
+retail `a2 -> a1` copy.
+
+For LoPlayFMVOverLay, both the direct retail-order swap and
+`user_start = (fade = 1, user_quit)` produce the same 273-instruction
+`s4/s5` allocation regression. Using independent literal-one assignments also
+canonicalizes to that result; the retail standalone `v0 = 1` is not recovered.
+The live 274-instruction/two-difference order remains the closest form.
+
+ResyncQuests is unchanged at 315 instructions / six prologue-order differences
+when the gold source's unused `x/y` locals are restored, whether grouped with
+`i/tren` or declared separately. A pre-call cached banner-quest pointer grows
+the frame to 64, adds an `s1` local and 27 differences. The residue is therefore
+not explained by omitted gold declarations or an early quest pointer cache.
+
+### DrawDurThingy loop body resolved; frame reservation remains
+
+Hoisting `const short DurY = (short)(Y - 1)` before the durability loop and
+using it for all four loop Y coordinates restores retail's `$fp = Y - 1`
+temporary. The function grows from 178 to the correct 179 instructions, and
+every non-frame instruction now aligns; the diff falls from 49 to 48 and all
+three calls remain exact. The only remaining mismatch is the frame header and
+all stack-relative save/restore/argument offsets: ours is 80 bytes, retail 88.
+
+An unused `RECT R` proves the missing reservation is exactly eight bytes: it
+produces the retail 88-byte frame and leaves only the `$fp` initialization
+order mismatch, but emits a non-retail AUTO `R` record. Constant-size
+`__builtin_alloca(8)` is not equivalent: it turns `$fp` into the ABI frame
+pointer and adds dynamic-stack instructions. `register RECT R` still emits the
+same AUTO record, while a const reference bound to `RECT()` invokes aggregate
+initialization and grows the function to 181 instructions. The retained source
+keeps the correct loop body and exact SYM variable set; the next lever must
+create an unnamed eight-byte compiler temporary rather than a named local,
+reference, or alloca.
+
+Further follow-up: widening the DurY expression through `long long` folds back
+to the same 80-byte frame. A block-local GNU `__label__` does reserve exactly
+eight bytes and produces the 88-byte/179-instruction shape with only the `$fp`
+initialization order left, but it also makes DurY source-visible in SYM and has
+no original-source justification; it was rejected. Moving DurY inside the
+positive-durability block grows to 180 instructions and restores the unwanted
+early return constant. The retained outer const remains the closest natural
+form.
+
+DoCredits case-label follow-up: adding a semantics-neutral `case 3` at the
+case-1 break join does not survive `jump2`; the pass still redirects to the
+case-2 decrement and deletes the local decrement, leaving 249 instructions.
+
 ### SPLTARGT native-lane conversion
 
 Moved SPLTARGT's seventeen already-passing spell-target/gamepad functions and

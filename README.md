@@ -57,9 +57,9 @@ These are additional seal requirements beyond
 the byte/SYM progress count.
 The call audit follows `configs/segment_homes.txt` for functions reconstructed
 outside their original segment's TU, matching the byte/SYM gate's ownership routing.
-The full 2026-10-01 rescan passes 2725/2725 real function entries. MemcardPad's
-33 call sites now match after restoring its error store/call branch structure;
-it still has eight instruction differences and is not byte/SYM PASS.
+The full call-target rescan passes 2725/2725 real function entries. MemcardPad's
+33 call sites, both byte lanes, and exact SYM now match after restoring its
+asynchronous save-state accesses and structured control flow.
 The board's two extra entries (`dlg` and
 `dlg_1`) contain memory-card strings and pointer/format data, not executable
 functions. `tools/data_gate.py` now verifies their source-emitted bytes, pointer
