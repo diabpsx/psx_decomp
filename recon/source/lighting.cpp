@@ -135,7 +135,7 @@ void SetWeirdFX(void)
  * (arm A: nYPos = block_y + y per row; arm B: rows counted in nYPos with y = nYPos copied at the row head and the loads indexed through y; unclipped arms: nYPos walks beside the y counter).
  * dist_y is set inside the x loop (retail computes it after the inner entry test). The shake jitter
  * (two GU_GetRnd calls) is dead in this build: shake is the constant 1.
- * NEAR-MISS: 804/821 insns; the remaining gap is register allocation, caller-save slots and the plr[0]
+ * NEAR-MISS: 812/821 insns; the remaining gap is register allocation, caller-save slots and the plr[0]
  * preload -- see the report. */
 void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
 {

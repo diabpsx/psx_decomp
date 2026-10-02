@@ -2,7 +2,7 @@
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
-| DrawAutomap__Fv | automap | 1337 diffs (ours 979) | automap.cpp:648 | AUTOMAP.CPP:685 | automap.cpp:1752 | JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.CPP; JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.H; JAP_1998_05_29/DIABPSX/SOURCE/SCROLL |
+| DrawAutomap__Fv | automap | 1292 diffs (979/979; LineY/AMPlayer restored, 8 lifetime-name SYM records corrected; PSX custom rasterizer) | automap.cpp:648 | AUTOMAP.CPP:685 | automap.cpp:1752 | JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.CPP; JAP_1998_05_29/DIABPSX/SOURCE/AUTOMAP.H; JAP_1998_05_29/DIABPSX/SOURCE/SCROLL |
 | BL_AsyncReadFile__FPcUl | biglump | 4 diffs (ours 88) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BIGLUMP.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BIGLUMP.H; PAL_1997_12_12/DIABPSX/PSXSRC/BIGLUM |
 | PrintMap__7CBlocksii | block | 254 diffs (ours 732) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H; PAL_1997_12_12/DIABPSX/PSXSRC/BLOCK.CPP; |
 | IterateVisibleMap__7CBlocksiiPFP9CacheInfoP8map_infoii_ib | block | 160 diffs (ours 286) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/BLOCK.H |
@@ -12,7 +12,7 @@
 | DrawSpellCel__FllUclUcc | control | 94 diffs (737/737; 32-byte unreferenced retail frame gap survives all assignment-order/compiler screens) | control.cpp:286 | CONTROL.CPP:408 | - | JAP_1998_05_29/DIABPSX/SOURCE/CONTROL.CPP; JAP_1998_05_29/DIABPSX/SOURCE/CONTROL.H |
 | SetScrollTarget__7CPlayerR12PlayerStructR7CBlocks | cplayer | 113 diffs (ours 249) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CPLAYER.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CPLAYER.H; JAP_1998_05_29/DIABPSX/PSXSRC/GLUE.C |
 | DoCredits__Fv | credits | 4 diffs (250/250; real RTL: dbr chooses Mode for delay slot; reversed source is cross-jumped to case-2 decrement) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/CREDITS.H |
-| DialogPrint__Fiiiiiiiiii | dialog | 162 diffs (ours 608) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.H; PAL_1997_12_12/DIABPSX/PSXSRC/DIALOG.C |
+| DialogPrint__Fiiiiiiiiii | dialog | 116 diffs (608/608; shade/Y order plus 8 u/v SYM lifetimes restored, extra GX record, 30 calls exact) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/DIALOG.H; PAL_1997_12_12/DIABPSX/PSXSRC/DIALOG.C |
 | DRLG_L5TransFix__Fv | drlg_l1 | 10 diffs (273/273; exact SYM, gold loop ownership plus late-combine comparison) | drlg_l1.cpp:2486 | DRLG_L1.CPP:2990 | - | JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.CPP; JAP_1998_05_29/DIABPSX/SOURCE/DRLG_L1.H |
 | set_mdec_img_buffer | fmv | 2 diffs (ours 13) | - | - | - | - |
 | LoPlayFMVOverLay | fmv | 2 diffs (ours 274) | - | - | - | - |
@@ -22,10 +22,10 @@
 | DrawInvTSK__FP4TASK | inv | 8 diffs (390/390; natural omp/osel order swaps s6/s7; comma/init/storage-class forms rejected) | - | - | - | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | CheckInvPaste__Fiii | inv | 1575 diffs (ours 1890; 37/37 calls exact, 12-insn length gap) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | ProcessItems__Fv | items | 93 diffs (192/169; exhaustive six-phase pointer spelling screen bottoms at 74, named reference at 69 but fails SYM) | items.cpp:3488 | ITEMS.CPP:3460 | items.cpp:3781 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H |
-| DoLighting__Fiiii | lighting | 373 diffs (ours 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
+| DoLighting__Fiiii | lighting | 373 diffs (ours 812 / retail 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
 | DrawSpinner__FiiUcUcUciiibiT8T8Uc | options | 589 diffs (416/415; coordinate/color lifetimes restored) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS |
 | DrawMenu__Fi | options | 751 diffs (1033/1032; frame and local names restored, allocation open) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
-| DrawObjSelector__FiP12PlayerStruct | padfuncs | 190 diffs (ours 504; retail coordinate staging restored, 30 calls exact) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.H |
+| DrawObjSelector__FiP12PlayerStruct | padfuncs | 237 diffs (503/514; exact retail nx/ny formulas restore one spill and a 264-byte frame; 30 calls exact) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/PADFUNCS.H |
 | ResyncQuests__Fv | quests | 6 diffs (315/315; unused gold x/y and cached banner-pointer forms rejected) | quests.cpp:739 | QUESTS.CPP:779 | quests.cpp:397 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LOADSAVE.CPP; JAP_1998_05_29/DIABPSX/SOURCE/QUES |
 | PrintCDWaitTask__FP4TASK | stream | 17 diffs (76/79; unnamed mutable plr-base lifetime still needed; volatile/member/parameter forms rejected) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/STREAM.H; PAL_1997_12_12/DIABPSX/PSXSRC/STREAM.C |
 

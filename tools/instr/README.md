@@ -738,6 +738,15 @@ Dialog-derived `~(-(Bx + 0x8A))` and `-~(Bx + 0x88)` forms. Results are under
 `build/speedbar_right_probe`; arithmetic CSE timing does not free v1 for the
 first u0 load, so live source remains unchanged.
 
+Tail-order follow-up (2026-10-02): all 90 interleavings of the x1/x3, y0/y1
+and u1/u3 assignment pairs were compiled while preserving order inside each
+pair. Seventy-two retain 459 instructions and the same six differences;
+eighteen that put both y stores ahead of the x pair produce the known
+68-difference Bx/By allocation regression. None moves the first u0 load ahead
+of the right edge. Explicit overlapping const snapshots for `u0` and the
+right edge are also code- and SYM-neutral. Results are under
+`build/speedbar_tail_order_probe`; live source remains unchanged.
+
 The former 380-line mismatch contained genuine reconstruction errors, not
 just allocation residue. Retail uses a 36-byte POLY_G4; the source used a
 POLY_FT4 view with a length written into its code byte and three halfword
@@ -855,6 +864,16 @@ real's seven (both frames are 56 bytes). Do not copy that extra allocation
 into the reconstruction. The diagnostic artifacts are
 `build/processitems_current_diag.{cpp,i,s,trace}`; full real RTL was captured
 with `real_rtl.py recon/source/items.cpp ProcessItems --dump greg`.
+
+Existing-local pointer follow-up (2026-10-02): the first-phase `count` and the
+index `ii` were each reused as `(int)&item[ii]` after the animation increment,
+then every later field used that base. Both create the desired compact s0-based
+body without adding a new name: count gives 166 instructions / 89 differences,
+ii gives 166 / 99 (66 aligned). They are rejected because the frame collapses
+to 48 bytes and the reused variable's root SYM location changes to s0 instead
+of retail count=a0 or ii=a1. This proves an existing named integer cannot own
+the retail anonymous pointer lifetime. The 192-instruction frame-snapshot
+source remains live.
 
 ### M_ChangeLightOffset__Fi: SYM-only register mismatch
 
@@ -2148,6 +2167,14 @@ retain the exact 13-instruction/two-difference baseline. No new guard, volatile
 access, or source change was retained; these natural loop/initializer forms do
 not explain retail's surviving tsz-to-i copy.
 
+Initializer follow-up (2026-10-02): twenty ways of producing `tsz == 0`
+before `i = tsz` were screened, including complement/add pairs, pointer-self
+subtraction/XOR/comparisons and multi-statement increment/decrement forms.
+Code-neutral forms all reach first CSE as literal zero and retain the two-diff
+baseline; pointer-derived forms that survive CSE add instructions or broadly
+change allocation. Results are under `build/mdec_tsz_init_probe`. The live
+literal initialization remains the closest permitted source.
+
 ### GWIN complete native source linkage
 
 Moved AllMsgs after GRL_PostMessage so its message strings follow the source
@@ -2742,6 +2769,33 @@ strictly closer on bytes, length and SYM.
 
 ### DialogPrint extra local and read-only-view probe
 
+Shade-index follow-up (2026-10-02): retail evaluates GShadeX first, then
+GShadeY, uses the shared base for G1/G2, and only then computes the next-row
+index. Three single-use const snapshots in that order reproduce the sharing.
+GX remains as one extra REG record (t0); GY and GY1 are omitted. A record-free
+form that repeats GX reaches only 609/608 and 159 differences, while reusing U
+broadly regresses allocation. Crucially, GY1 must remain an `int` modulo result;
+the old `(char)` cast emitted one extra sign-extension instruction before the
+multiply. DialogPrint improves from 162 differences at 610/608 to 118 at exact
+608/608, with all thirty calls still exact. The first SYM mismatch is now the
+SH saved register (s6 versus retail s4), followed by the extra GX record—not
+function length. Attribution is retained at
+`build/dialogprint_shade_xy_phased.txt`.
+
+First-branch ordering follow-up: moving only `y1 = y0` (and the code-neutral
+`x2 = x0`) ahead of UV setup preserves 608 instructions and reduces 118 to 116
+differences. Moving all XY assignments first over-optimizes to 605; reordering
+only the rotated branch gives 609/107, both branches 605/105, early y2 gives
+608/122, and early x3 gives 608/120. The retained partial reorder is therefore
+the exact-length minimum among these source-order screens.
+
+Finally, the eight INT u/v identifiers were mapped by lifetime rather than the
+guessed semantic axis. Two same-type cycles map current s3/s4/s2/s5/s6 and
+s7/fp/stack lifetimes onto retail u0/u1/v1/v0/v2 and u2/u3/v3 names. After
+restoring declaration order and excluding structure member tokens from the
+mechanical rename, all eight records match exactly with byte-identical output.
+The reproducible probe is `build/probe_dialog_uv_names.py`.
+
 Validated isolated allocator trace is captured in build/dialogprint_alloc.
 v1 (pseudo 99) has 6 references / 28 live instructions / two crossed calls,
 priority 4285, ahead of u0 (94): 7/40/2, priority 3500. v3 (101) has 4/25/2,
@@ -3245,6 +3299,16 @@ TASK parameter or the existing Ft4 local are rematerialized back to the
 mutable pointer lifetime: the known named-pointer form creates the desired
 `s3 + 6632` access, but its debug record and `s3/s4` swap remain unacceptable.
 
+Unused-parameter follow-up (2026-10-02): assigning the incoming `TASK *T` to
+the player-array base before the loop reaches retail's exact 79-instruction
+length and creates the base-plus-6632 access, reducing 17 differences to 12.
+It is rejected because base and CDGfxData take s4/s3 in reverse and T's SYM
+location changes from incoming a0 to s4. Assigning T inside the CDWAIT block or
+in the cdx initializer optimizes back to the 76-instruction baseline; assigning
+it in the final short-circuit operand keeps 79 instructions but perturbs the
+BOOL branches and cdx/cdy allocation (32 differences). This proves the unused
+parameter cannot legally own the anonymous base while preserving exact SYM.
+
 Anonymous-address follow-up: sixteen array, pointer-to-array, commuted-index,
 member-address and byte-offset spellings were screened, including the natural
 `&plr[0].plractive + sizeof(PlayerStruct)` grouping and late-combine identities
@@ -3349,6 +3413,15 @@ at `build/credits_decrement_probe/results.json`. No live Credits source was
 changed. The remaining lever is therefore CFG ownership that keeps the two
 decrements distinct through late jump optimization, not arithmetic spelling,
 allocation, assembler version, or delay-slot filling.
+
+CFG follow-up (2026-10-02): all six textual orders of switch cases 0/1/2 were
+compiled. Only 0/1/2 retains the 250-instruction four-difference baseline;
+four orders produce 36 differences and the two case-2-first orders cross-jump
+to 249 instructions with 73 differences. Giving case 2's decrement an empty
+conditional or an explicit user label still lets `jump2` merge the common
+tail when case 1 is written in retail order. Results are under
+`build/credits_case_order_probe`; live source remains the four-difference
+reversed-assignment form.
 
 ### SPLTARGT native-lane conversion
 
@@ -4159,8 +4232,25 @@ Both retain MI_Manashield's exact 192 instructions but the same incorrect
 xoffset block membership. Both also retain set_mdec_img_buffer's two-diff
 initial-zero mismatch. Thus these authentic revisions do not solve either
 representative failure. Tests used process-local DIAB_CC1PL overrides only;
-the production compiler remains Build 0001. DOS variants were inventoried,
-not executed; no conclusion about their code/debug equivalence is claimed.
+the production compiler remains Build 0001.
+
+The PsyQ 4.0 DOS frontend has now been executed under a build-local DOSBox
+Staging runner against the exact FMV preprocessed input. It identifies itself
+as gcc 2.7.2.SN16.3.7 Build 0001. Its `set_mdec_img_buffer` assembly is
+instruction-for-instruction identical to the SN32 frontend, including the
+second literal-zero initialization. After authentic ASPSX/PSYLINK, both
+`set_mdec_audio_volume` and `stream_cdready_handler` retain the same incorrect
+inside-block static membership. Therefore the DOS/Windows host frontend split
+does not explain either failure cluster. Diagnostic files are under
+`build/dcc`, `build/dosbox_staging_portable`, and
+`build/sn/dos_fmv_g.sym.txt`; none is tracked or used by production gates.
+
+The DOS comparison was extended to the other smallest scheduling failures.
+SN16 emits the same instruction order as all three SN32 builds for DoCredits,
+BL_AsyncReadFile, DrawSpeedBar and ResyncQuests as well as both FMV targets.
+The four-, four-, six-, six- and two-difference residues are therefore not
+frontend build/host-version artifacts. Exact DOS outputs are retained as
+`build/dcc/{CRED,BIG,GPAN,QUES}.S`.
 
 Related local-static investigation (2026-10-01): MI_Manashield's baseline is
 192 exact instructions, but its xoffset STAT is inside rather than before
@@ -4283,14 +4373,126 @@ register assignments, rather than repeating these source spelling changes.
 
 ### DrawObjSelector coordinate staging
 
-The retail decompile's coordinate ownership was restored directly: `nx` starts
-at 0x23, the unshifted centered `ny` is used for the title at `ny + 10`, and
-then advanced by 32 for the item panel. This reduces the byte gate from 237 to
-190 differences (504 instructions versus retail's 514), with all thirty calls
-still exact. The frame is 256 bytes versus retail's 280, so this remains a
-partial reconstruction rather than a PASS. Moving the initial width loop to a
-guarded `do` form regresses to 194 differences and a 248-byte frame and was
-reverted.
+The Ghidra draft initially made `nx` look like the folded constant 0x23 and
+`ny` like an unshifted center advanced later. Restoring that shape reduced the
+raw diff count from 237 to 190, but it was a false local optimum: retail SLD and
+the actual instructions prove line 1088 computes
+`nx = ((256 - nw) >> 1) + 32`, line 1089 computes
+`ny = (176 - nh) / 2 + 32`, and the title uses `ny - 22`. Those formulas are
+restored. They make `ny` AUTO again and grow the frame from 256 to 264 bytes,
+toward retail's 280, while preserving all thirty calls; the gate is 237 diffs
+at 503/514 instructions. `nx` still remains in a register rather than retail's
+sp-72 slot. Retail's loop-counter zero is scheduled into `SetRGB`'s delay slot,
+but its SLD belongs to the later loop line; the ordinary `for (i = 0; ...)`
+source is therefore retained. A guarded `do` loop, moving the later item-loop
+increment, and early `ypos` initialization all regress allocation and were
+rejected.
+
+The repaired `tools/diffsrc.py` now defaults to the repository's
+`rom/DIABPSX-SYM.txt` and mirrors the current PsyQ 4.0 build API (the old copy
+still imported a removed `retail_sym` module and called NFS4-only compiler
+splice helpers). Its `-g` twin is instruction-exact for PADFUNCS and attributes
+the remaining mismatch to 58 blocks. The decisive first-loop residue is a
+single saved-register swap: retail keeps `add_wrap` in s0 and the generated
+three-byte index induction in s1; live output reverses them. The isolated
+instrumented 2.7.2 trace is retained under `build/probes/a-rauadtdd`, but is
+diagnostic only: vanilla stock produces a 256-byte frame while the SN frontend
+produces 264, so its final allocation is not authoritative.
+
+Both other authentic SN32.3.7 frontends (Build 0002 and 0003) reproduce the
+same 503/514 instructions, 264-byte frame and 237-difference result for this
+function, so the allocation is not a Build-0001-only quirk. Declaration order,
+same-scope declaration timing, storage-class hints, commuted subscripting and
+reciprocal/literal `maxlen`/`nw` ownership are code-neutral or regress. Reusing
+`nx` explicitly as the three-byte loop induction reaches retail's exact 514
+instruction count but collapses the frame to 256 and causes 266 differences;
+making `nx` volatile reaches the 280-byte frame but grows to 526 instructions
+and corrupts parameter/local ownership. These diagnostics prove the missing
+eleven instructions are the natural spill/reloads of `nx`, coupled to the
+`add_wrap`/induction s0/s1 priority swap—not omitted behavior or compiler
+revision. Neither diagnostic source form is retained.
+
+### BL_AsyncReadFile across-call status lifetime
+
+A block-local `const int status = getasyncreadstatus(ah)` followed by
+`TSK_Sleep(1)` and `MemSize = status` produces all 88 retail instructions: the
+sleep argument is loaded before the call and the status copy occupies its delay
+slot. It is not retained because cc1plus emits two extra nested block pairs,
+while retail has only the function block. Moving the temporary to function
+scope avoids those blocks but swaps saved-register ownership and causes 32 byte
+differences. Comma expressions, condition-owned calls, and destination-based
+XOR/add/sub identities preserve the four-difference baseline. This narrows the
+remaining problem to an unnamed across-call temporary lifetime with no lexical
+debug block.
+
+For `LoPlayFMVOverLay`, thirty equivalent expressions for the `user_start =
+user_quit` store were screened, including late-combine complement identities,
+casts, boolean forms and arithmetic identities. Every valid identity retains
+274 instructions and the same two-line store/fade ordering residue; the result
+set is under `build/user_start_probe`. The live source remains unchanged.
+
+### DrawAutomap LineY reconstruction
+
+Retail SYM contains root local `LineY`, but the live function previously only
+declared it and recomputed `MapY + 1` at each use, so cc1plus removed its record.
+The JAP decompile shows the corresponding value initialized to one beside
+`MapY = 0`, used for the leveltype-3 horizontal/vertical neighbor coordinates,
+and incremented with MapY. Restoring that induction reduces the gate from 1337
+to 1297 differences and restores the missing SYM name, although current
+allocation records fp while retail records its initial v1 range. A
+per-iteration `LineY = MapY + 1` form is one instruction shorter and 1298
+differences, so the explicit induction is retained.
+
+Retail SLD also shows the scaled and halved AMPlayerX/Y values stored back to
+their globals before the final offsets are formed. Keeping the products in
+`Lx/Ly` while explicitly emitting those intermediate stores adds exactly the
+five missing instructions: DrawAutomap is now 979/979. Moving `LineY = 1`
+after the four run-length clears matches retail initialization order and lowers
+the final count to 1292 differences.
+Both SYM names survive; Ly has retail a0 while Lx remains v1 instead of a1.
+All 42 calls remain exact. `build/drawautomap_liney_diffsrc.txt` contains the
+first exact `-g` attribution; the refreshed source is directly reproducible
+with `tools/diffsrc.py`.
+
+The four endpoint temporaries were then mapped by actual lifetime rather than
+their guessed player-number semantics. The byte-identical P1x/P2x/P2y
+three-cycle maps current a3/t0/a1 lifetimes to retail names a1/a3/t0; restoring
+the declaration list to P1x/P1y/P2x/P2y preserves retail record order. All four
+P records now match exactly without changing any instruction. The reproducible
+probe is `build/probe_automap_pcycle.py`.
+
+A further byte-identical same-type swap maps the old Lx v1 lifetime to retail's
+LineY name. LineY is now exact; Lx moves to fp and remains nonmatching (it was
+already nonmatching in v1). This adds one exact record without losing another.
+The probe is `build/probe_automap_lx_liney.py`.
+
+The same byte-identical mapping fixes three saved-register records: cycling the
+current MapX/RLen and MapY/LLen lifetimes while restoring declaration order
+places MapX=s5, MapY=s4 and RLen=s3 exactly as retail. LLen remains s2 rather
+than s1, paired with the wall flags remaining s1 rather than s2. Completing
+that last cycle crosses retail INT/UCHAR types; a mechanical swap grows the
+function to 996 instructions and is rejected. The retained same-type probe is
+`build/probe_automap_saved_names.py`; the rejected boundary probe is
+`build/probe_automap_flag_length.py`.
+
+Frame follow-up: the extra eight bytes are one strength-reduced
+`dungeon[MapY]` row pointer spilled at sp+184 and advanced by 96 at the inner
+loop tail. Retail recomputes that address and has no slot. A volatile typed
+view suppresses the induction and reaches the exact 224-byte frame, but drops
+to 977 instructions and broadly regresses allocation, so it is diagnostic only
+and was reverted. A non-volatile byte-address spelling regresses to 1398
+differences, while a block-local const row pointer folds back to the retained
+baseline. The next source fix must make the induction rematerializable without
+volatile semantics or changing the exact 979-instruction body.
+
+Loop-recurrence diagnostics reach the same conclusion without volatile data.
+`MapY = LineY++` removes the spilled pointer and reaches frame 224 but combines
+the row updates, yielding 977 instructions. `LineY++; MapY = LineY; MapY--`
+keeps frame 224 and restores 979 instructions, but is an artificial three-step
+identity and worsens allocation to 1342 differences; it is rejected. Natural
+two-statement recurrences fold to 977-978 instructions or restore the spilled
+pointer. The live independent `MapY++`/`LineY++` remains the faithful closest
+form until another missing retail lifetime accounts for those two instructions.
 
 ### TONY complete native linkage
 

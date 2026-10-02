@@ -15,14 +15,14 @@ normalized instruction sequence is identical to the gate object's (gcc guarantee
 -g does not change code; the check enforces it — on mismatch, attribution falls
 back to fuzzy alignment and says so).
 
-Env: DIFFSRC_SYM overrides the SLD source (default nfs4-f-v3.txt path below).
+Env: DIFFSRC_SYM overrides the SLD source (default: this repository's retail
+DIABPSX-SYM.txt).
 """
 import os, re, sys, subprocess, difflib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SYM_TXT = Path(os.environ.get(
-    "DIFFSRC_SYM", __import__('retail_sym').txt()))
+SYM_TXT = Path(os.environ.get("DIFFSRC_SYM", ROOT / "rom" / "DIABPSX-SYM.txt"))
 
 if len(sys.argv) != 3 or ',' in sys.argv[2]:
     sys.exit("usage: diffsrc.py <recon/....cpp|.c> <MANGLED_FUNC>   (one function)")
@@ -47,22 +47,9 @@ if not o:
     sys.exit(f"{func}: NOT IN OBJECT")
 
 # ---- 2. -g twin compile: mirror build.py's pipeline with -g, outputs redirected.
-def _per_tu_cc1_adds(tu_flags):
-    return [flag for key, flag in (
-        ("no_delayed_branch", "-fno-delayed-branch"),
-        ("no_thread_jumps", "-fno-thread-jumps"),
-        ("no_split_addresses", "-mno-split-addresses"),
-        ("no_schedule_insns", "-fno-schedule-insns"),
-        ("no_schedule_insns2", "-fno-schedule-insns2"),
-        ("no_strength_reduce", "-fno-strength-reduce"),
-        ("no_builtin", "-fno-builtin")) if tu_flags.get(key)]
-
 def _uniquify_dbg_labels(s_file: Path):
-    """cc1 -g numbers its LM/LBB/LBE debug labels from 1 per COMPILE, and
-    build.py's _apply_fn_splice splices per-function recompiles into the same
-    .s -> duplicate label definitions ('symbol LM252 already defined'). Line
-    info rides on the .loc directives, not these labels, so renaming the
-    2nd+ definition of any duplicate is safe."""
+    """Make any repeated LM/LBB/LBE debug labels assembler-safe. Line info
+    rides on the .loc directives, not these labels."""
     lines = s_file.read_text().splitlines(keepends=True)
     seen, dup = set(), 0
     for i, ln in enumerate(lines):
@@ -79,8 +66,8 @@ def _uniquify_dbg_labels(s_file: Path):
 
 def compile_debug_twin(src: Path) -> Path:
     """build.py's pipeline for this TU with -g inserted, outputs under
-    build/diffsrc/. Mirrors compile_c / compile_cpp / the cc1_272 lane; any
-    mirror drift is caught by the o_g==o self-check below (falls to fuzzy)."""
+    build/diffsrc/. Any mirror drift is caught by the o_g==o self-check below
+    (and falls back to fuzzy attribution)."""
     rel = src.relative_to(ROOT)
     tu_flags = bld.per_tu_flags(src)
     tu_g = str(tu_flags.get("g_value", bld.G_VALUE))
@@ -88,60 +75,28 @@ def compile_debug_twin(src: Path) -> Path:
     obj.parent.mkdir(parents=True, exist_ok=True)
     i_file, s_file = obj.with_suffix(".i"), obj.with_suffix(".s")
     is_c = src.suffix == ".c"
-    if is_c:
-        r = bld.run([bld.CPP, *bld.CPP_FLAGS, src, "-o", i_file])
-    else:
-        r = bld.run([bld.CPP, "-x", "c", "-D__cplusplus=1", "-nostdinc", "-undef",
-                     "-Dmips", "-D__mips__", "-D__psx__",
-                     f"-I{bld.RECON}", src, "-o", i_file])
+    cpp = [bld.CPP, *([] if is_c else ["-x", "c", "-D__cplusplus=1"]),
+           *bld.CPP_FLAGS, src, "-o", i_file]
+    r = bld.run(cpp)
     if r.returncode:
         sys.exit(f"[diffsrc cpp] {rel}\n{r.stderr}")
-
-    if is_c and tu_flags.get("cc1_272") and getattr(bld, "CC1_272", None):
-        # 2.7.2 lane: cc1_272 -> move->addu rewrite -> direct GNU as (no maspsx)
-        flags = ["-quiet", "-O2", "-g", f"-G{tu_g}", "-mgas"]
-        r = bld.run([bld.CC1_272, *flags, i_file, "-o", s_file])
-        if r.returncode:
-            sys.exit(f"[diffsrc cc1-272 -g] {rel}\n{r.stdout}{r.stderr}")
-        txt = bld._MOVE_RE.sub(lambda m: "\taddu\t%s,%s,$0" % (m.group(2), m.group(3)),
-                               s_file.read_text())
-        s_file.write_text(txt)
-        r = bld.run([bld.AS, *bld.AS_ARCH, f"-G{tu_g}", "-I", ROOT / "include",
-                     "-I", ROOT, "-o", obj, s_file])
-        if r.returncode or not obj.exists():
-            sys.exit(f"[diffsrc as-272 -g] {rel}\n{r.stderr}")
-        return obj
 
     if is_c:
         cc1 = bld.CC1
         flags = [f"-G{tu_g}" if f == f"-G{bld.G_VALUE}" else f for f in bld.CC1_FLAGS]
-        flags += ["-g"] + _per_tu_cc1_adds(tu_flags)
-        maspsx_inc = ["-I", ROOT / "include", "-I", ROOT]
+        flags += ["-g"]
     else:
-        # P877: honor whole-TU retail C++ identity, exactly like compile_cpp.
-        # Otherwise a valid 2.8.1 gate is falsely compared with a 2.8.0 twin.
-        cc1 = bld.cpp_compiler(src)
-        flags = ["-quiet", "-O2", "-g", f"-G{tu_g}"] + _per_tu_cc1_adds(tu_flags)
-        maspsx_inc = ["-I", bld.RECON]
+        cc1 = bld.CC1PL
+        flags = [f"-G{tu_g}" if f == f"-G{bld.G_VALUE}" else f for f in bld.CC1PL_FLAGS]
+        flags += ["-g"]
     r = bld.run([cc1, *flags, i_file, "-o", s_file])
     if r.returncode:
         sys.exit(f"[diffsrc cc1 -g] {rel}\n{r.stdout}{r.stderr}")
-    # Keep the attribution twin on the same retail C++ compiler identity as
-    # the gate object.  Without this mirror, a per-function 2.8.1 source body
-    # is compared against a 2.8.0 -g twin and is falsely reported as FUZZY.
-    if not is_c:
-        bld._apply_cc1plus_ver_splice(rel.as_posix(), s_file, i_file, flags)
-    bld._apply_fn_splice(rel.as_posix(), s_file, i_file, cc1, flags)
     _uniquify_dbg_labels(s_file)
     maspsx_cmd = [bld.PY, bld.MASPSX, f"--aspsx-version={bld.ASPSX_VERSION}",
-                  "--expand-div", "--run-assembler", f"--gnu-as-path={bld.AS}",
-                  *bld.AS_ARCH, f"-G{tu_g}", *maspsx_inc, "-o", obj]
-    if bld.JTBL_AT_FUSION or tu_flags.get("jtbl_at_fusion"):
-        maspsx_cmd.append("--jtbl-at-fusion")
-    # P905: debug attribution must see the same real source storage/binding
-    # as the normal object. This changes assembler input options, not labels.
-    if tu_flags.get("preserve_small_common_binding"):
-        maspsx_cmd.append("--preserve-small-common-binding")
+                  "--run-assembler", f"--gnu-as-path={bld.AS}",
+                  *bld.AS_ARCH, f"-G{tu_g}", "-I", ROOT / "include", "-I", ROOT,
+                  "-o", obj]
     s_text = s_file.read_text()
     if not is_c:
         s_text = s_text.replace("_._", "___")

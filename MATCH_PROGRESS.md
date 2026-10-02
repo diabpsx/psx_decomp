@@ -32,7 +32,7 @@
 - ✅ DrawVertArch__Fii (77)
 - ✅ DrawHorzArch__Fii (77)
 - ✅ DrawAutoMapStairs__Fii (94)
-- ❌ DrawAutomap__Fv — 1337 diffs (ours 974)
+- ❌ DrawAutomap__Fv — 1292 diffs (979/979; LineY/AMPlayer restored, 8 lifetime-name SYM records corrected)
 - ✅ PRIM_GetPrim__FPP7LINE_F2 (31)
 - ✅ GetOverlayOtBase__7CBlocks_80163e18 (2)
 
@@ -501,7 +501,7 @@
 
 ## dialog  (recon/psxsrc/dialog.cpp) — 10/11 PASS
 - ✅ TrimCol__Fs_8008ad90 (14)
-- ❌ DialogPrint__Fiiiiiiiiii — 162 diffs (ours 610)
+- ❌ DialogPrint__Fiiiiiiiiii — 116 diffs (608/608; shade/Y order plus 8 u/v SYM lifetimes restored, extra GX record)
 - ✅ GetDropShadowG4__FUcUcUcUcUcUcUcUcUcUcUcUc (78)
 - ✅ DropShadows__Fiiii (169)
 - ✅ InitDialog__Fv (78)
@@ -2070,7 +2070,7 @@
 - ✅ pad_func_Quick_Use_Health__Fi (10)
 - ✅ pad_func_Quick_Use_Mana__Fi (10)
 - ✅ sort_gold__Fi (66)
-- ❌ DrawObjSelector__FiP12PlayerStruct — 190 diffs (ours 504)
+- ❌ DrawObjSelector__FiP12PlayerStruct — 237 diffs (ours 503; retail coordinate formulas restored, frame 264/280)
 - ✅ SelectorActive__Fv (3)
 - ✅ DrawObjTask__FP4TASK (207)
 - ✅ add_area_find_object__Fiii (28)
