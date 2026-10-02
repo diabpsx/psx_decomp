@@ -2223,7 +2223,7 @@ void MI_Manashield(int i)
     long diff, pct;
     MissileStruct *miss = &missile[i];
     PlayerStruct *player;
-    static int xoffset[3][8] = {
+    static const int xoffset[3][8] = {
         { -2, -1, 4, 6, 9, 10, 6, 2 },
         { 3, 2, 2, 4, 5, 6, 6, 4 },
         { 1, -1, -2, 0, 3, 5, 5, 4 },
