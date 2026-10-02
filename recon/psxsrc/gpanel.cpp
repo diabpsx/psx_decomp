@@ -237,10 +237,8 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     PanelTData->PrintFt4(0x35, X, Y, 0, GPanelOt, 0);
     if (HealthHeight > 0) {
         BarY = -(HealthHeight + 8) + Y;
-        xof = XY->FlaskFlip != 0;
-        xof = -xof;
-        xof &= 0x18;
-        xof += X - 0xB;
+        xof = XY->FlaskFlip ? 0x18 : 0;
+        xof = X + (xof -= 0xB);
         Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
@@ -260,11 +258,9 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     }
     if (ManaHeight > 0) {
         BarY = -(ManaHeight + 8) + Y;
-        xof = XY->FlaskFlip != 0;
-        xof = -xof;
-        xof &= ~1;
-        xof += 2;
-        xof += X;
+        xof = -2;
+        if (!XY->FlaskFlip) xof = 0;
+        xof = X + (xof += 2);
         Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
@@ -366,44 +362,35 @@ int GPanel::DrawDurThingy(int X, int Y, struct ItemStruct *Item, int ItemType)
         ItemType = 7;
         break;
     }
-    Ft4 = PanelTData->PrintFt4(ItemType + 0x29, X, Y, 0, GPanelOt + 1, 0);
-    NewR = DurColors[Item->_iDurability - 1][0];
-    NewG = DurColors[Item->_iDurability - 1][1];
-    NewB = DurColors[Item->_iDurability - 1][2];
-    Ft4->code = (Ft4->code | 2) & 0xFE;
-    Ft4->r0 = NewR;
-    Ft4->g0 = NewG;
-    Ft4->b0 = NewB;
+    {   /* retail SYM: Loop is declared in a block opening after the switch */
+        int Loop;
+        Ft4 = PanelTData->PrintFt4(ItemType + 0x29, X, Y, 0, GPanelOt + 1, 0);
+        NewR = DurColors[Item->_iDurability - 1][0];
+        NewG = DurColors[Item->_iDurability - 1][1];
+        NewB = DurColors[Item->_iDurability - 1][2];
+        Ft4->code = (Ft4->code | 2) & 0xFE;
+        Ft4->r0 = NewR;
+        Ft4->g0 = NewG;
+        Ft4->b0 = NewB;
 
-    Ft4 = PanelTData->PrintFt4(0x94, X, Y, 0, GPanelOt + 1, 0);
-    setXYWH(Ft4, X + 0x14, Y - 2, 4, 25);
-    Ft4->r0 = 0;
-    Ft4->g0 = 0;
-    Ft4->b0 = 0;
-    Ft4->code = (Ft4->code | 2) & 0xFE;
+        Ft4 = PanelTData->PrintFt4(0x94, X, Y, 0, GPanelOt + 1, 0);
+        setXYWH(Ft4, X + 0x14, Y - 2, 4, 25);
+        Ft4->r0 = 0;
+        Ft4->g0 = 0;
+        Ft4->b0 = 0;
+        Ft4->code = (Ft4->code | 2) & 0xFE;
 
-    const short DurY = (short)(Y - 1);
-    if (Item->_iDurability > 0) {
-        int Loop = 0;
-        do {
+        for (Loop = 0; Loop < Item->_iDurability; Loop++) {
             Ft4 = PanelTData->PrintFt4(0x94, X, Y, 1, GPanelOt + 1, 0);
             NewR = DurColors[Loop][0];
             NewG = DurColors[Loop][1];
             NewB = DurColors[Loop][2];
-            Ft4->y0 = (short)(DurY + (3 - Loop) * 5);
-            Ft4->y1 = (short)(DurY + (3 - Loop) * 5);
-            Ft4->x0 = (short)(X + 0x15);
-            Ft4->x1 = (short)(X + 0x17);
-            Ft4->x2 = (short)(X + 0x15);
-            Ft4->y2 = (short)(DurY + (3 - Loop) * 5 + 5);
-            Ft4->x3 = (short)(X + 0x17);
-            Ft4->y3 = (short)(DurY + (3 - Loop) * 5 + 5);
+            setXYWH(Ft4, X + 0x15, (short)(Y - 1) + (3 - Loop) * 5, 2, 5);
             Ft4->r0 = NewR;
             Ft4->g0 = NewG;
             Ft4->b0 = NewB;
             Ft4->code = (Ft4->code | 2) & 0xFE;
-            Loop++;
-        } while (Loop < Item->_iDurability);
+        }
     }
     return 1;
 }
@@ -554,18 +541,10 @@ void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
         Loop++;
     } while (Loop < 8);
     Ft4 = PanelTData->PrintFt4(0x94, Bx, By, 0, GPanelOt - 1, 0);
-    Ft4->x0 = Bx + 1;
-    Ft4->x2 = Bx + 1;
-    const int Bottom = By + 0x14;
-    Ft4->y2 = Bottom;
-    Ft4->y3 = Bottom;
+    setXYWH(Ft4, Bx + 1, By, 0x88, 0x14);
     Ft4->r0 = 0x14;
     Ft4->g0 = 0x14;
     Ft4->b0 = 0x14;
-    Ft4->x1 = Bx + 0x89;
-    Ft4->x3 = Bx + 0x89;
-    Ft4->y0 = By;
-    Ft4->y1 = By;
     Ft4->u1 = Ft4->u0 + 1;
     Ft4->u3 = Ft4->u0 + 1;
     Ft4->v2 = Ft4->v0 + 1;
