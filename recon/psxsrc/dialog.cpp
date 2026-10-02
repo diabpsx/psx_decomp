@@ -263,14 +263,18 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
     POLY_FT4 *FT4;
     TP_LOAD_HDR *Tp;
     int x0, x1, x2, x3, y0, y1, y2, y3;
-    /* These u/v identifiers follow retail SYM lifetimes, not semantic axis roles; the two UV
-     * branches reuse the eight INT temporaries in different permutations. */
+    /* u0..v3 are the four vertices' texture coordinates.  Retail SLD (DIALOG.CPP 245-295) orders
+     * each arm as (x,y) vertex pairs, then (u,v) pairs, with the header reads U,V,W,H before X,Y;
+     * that source order is what gives retail's u/v/SH/UOfs/VOfs register homes. */
     int u0, u1, u2, u3, v0, v1, v2, v3;
     int U, V, W, H;
 
     Frm &= 0xFFFF;
     if (DialogGBack == 2) {
-        if ((RandBTab[(char)(GShadeY % 8)] >> (GShadeX % 8)) & 1) {
+        /* retail SLD 219/220: the row index is its own (record-less) declaration, which also
+         * gives the if's then-block its SYM level */
+        const int GY = (char)(GShadeY % 8);
+        if ((RandBTab[GY] >> (GShadeX % 8)) & 1) {
             if (Frm == 7)
                 Frm = 14;
             if (Frm == 12)
@@ -283,59 +287,75 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
     }
     Fr = DialogTData->GetFr(Frm);
     Tp = (TP_LOAD_HDR *)Fr;
-    W = Fr->W;
-    H = Fr->H;
-    X += Fr->X;
-    Y += Fr->Y;
+
     U = Tp->U;
     V = Tp->V;
+    W = Fr->W;
+    H = Fr->H;
+
+    X += Fr->X;
+    Y += Fr->Y;
     if (!(((unsigned long *)Fr)[1] & 0x2000000)) {
         x0 = X;
-        x1 = X + SW;
         y0 = Y;
+
+        x1 = X + SW;
         y1 = y0;
+
         x2 = x0;
-        u1 = U;
-        v2 = V;
-        v0 = u1 + W + UOfs;
-        v3 = u1;
         y2 = y1 + SH;
-        u0 = v2;
-        v1 = u0 + H + VOfs;
+
         x3 = x1;
         y3 = y2;
-        u2 = v0;
-        u3 = v1;
+
+        u0 = U;
+        v0 = V;
+
+        u1 = u0 + W + UOfs;
+        v1 = v0;
+
+        u2 = u0;
+        v2 = v1 + H + VOfs;
+
+        u3 = u1;
+        v3 = v2;
     } else {
         x0 = X - 1;
-        x1 = X + SW - 1;
         y0 = Y;
-        u1 = U;
-        v2 = V + W + UOfs - 1;
-        v0 = u1;
+
+        x1 = X + SW - 1;
         y1 = y0;
+
         x2 = x0;
-        v3 = v0 + H + VOfs;
         y2 = y1 + SH;
-        u0 = V;
-        v1 = v2;
+
         x3 = x1;
         y3 = y2;
-        u2 = v3;
-        u3 = u0;
+
+        u0 = U;
+        v0 = V + W - 1 + UOfs;
+
+        u1 = u0;
+        v1 = V;
+
+        u2 = u1 + H + VOfs;
+        v2 = v0;
+
+        u3 = u2;
+        v3 = v1;
     }
     if (DialogGBack == 0) {
         PAL *Pal;
 
         FT4 = PRIM_GetNextPolyFt4();
-        FT4->u0 = u1;
-        FT4->v0 = v2;
-        FT4->u1 = v0;
-        FT4->v1 = u0;
-        FT4->u2 = v3;
-        FT4->v2 = v1;
-        FT4->u3 = u2;
-        FT4->v3 = u3;
+        FT4->u0 = u0;
+        FT4->v0 = v0;
+        FT4->u1 = u1;
+        FT4->v1 = v1;
+        FT4->u2 = u2;
+        FT4->v2 = v2;
+        FT4->u3 = u3;
+        FT4->v3 = v3;
         FT4->x0 = x0;
         FT4->y0 = y0;
         FT4->x1 = x1;
@@ -370,14 +390,14 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
         short G1, G2, G3, G4;
 
         GT4 = PRIM_GetNextPolyGt4();
-        GT4->u0 = u1;
-        GT4->v0 = v2;
-        GT4->u1 = v0;
-        GT4->v1 = u0;
-        GT4->u2 = v3;
-        GT4->v2 = v1;
-        GT4->u3 = u2;
-        GT4->v3 = u3;
+        GT4->u0 = u0;
+        GT4->v0 = v0;
+        GT4->u1 = u1;
+        GT4->v1 = v1;
+        GT4->u2 = u2;
+        GT4->v2 = v2;
+        GT4->u3 = u3;
+        GT4->v3 = v3;
         GT4->x0 = x0;
         GT4->y0 = y0;
         GT4->x1 = x1;
@@ -395,13 +415,11 @@ POLY_GT4 *DialogPrint(int Frm, int X, int Y, int SW, int SH, int UW, int UH, int
         setPolyGT4(GT4);
         setSemiTrans(GT4, Trans);
         setShadeTex(GT4, 0);
-        const int GX = (char)(GShadeX % 8);
-        const int GY = (char)(GShadeY % 8);
-        G1 = GShadeTab[GY * 8 + GX];
-        G2 = GShadeTab[GY * 8 + GX + 1];
-        const int GY1 = (GShadeY + 1) % 8;
-        G3 = GShadeTab[GY1 * 8 + GX];
-        G4 = GShadeTab[GY1 * 8 + GX + 1];
+        /* column term first and no named column/row temporaries: retail SYM has no GX/GY/GY1 */
+        G1 = GShadeTab[(char)(GShadeX % 8) + (char)(GShadeY % 8) * 8];
+        G2 = GShadeTab[(char)(GShadeX % 8) + (char)(GShadeY % 8) * 8 + 1];
+        G3 = GShadeTab[(char)(GShadeX % 8) + ((GShadeY + 1) % 8) * 8];
+        G4 = GShadeTab[(char)(GShadeX % 8) + ((GShadeY + 1) % 8) * 8 + 1];
         if (DialogGBack == 2) {
             GT4->r0 = TrimCol(DialogRed - G1);
             GT4->g0 = TrimCol(DialogGreen - G1);

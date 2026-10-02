@@ -145,7 +145,7 @@ unsigned char TrimCol(short col)
  * (lines 612-615) keep Y=s7/xp=fp (now Y 1607 vs xp 1613 priority). Source construct still open. */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel)
 {
-    TextDat *ThisDat;
+    TextDat *ThisDat = GM_UseTexData(0);
     FRAME_HDR *Fr;
     POLY_FT4 *Ft4;
     POLY_GT4 *GT4;
@@ -156,10 +156,8 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
     int y0, y1, y2, y3;
     int u0, u1, u2, u3;
     int v0, v1, v2, v3;
-    int otpos;
-
-    ThisDat = GM_UseTexData(0);
-    otpos = CBlocks::GetOverlayOtBase() + 1;
+    int otpos = CBlocks::GetOverlayOtBase();
+    otpos++;
     nCel--;
     if (w == 1 && !sbookflag) {
         int dummy;   /* stand-in for the record-less declaration that opens retail's level here (lane fact 61) */
