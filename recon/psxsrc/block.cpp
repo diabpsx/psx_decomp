@@ -1398,11 +1398,13 @@ void CBlocks::PrintObjects(int x, int y)
     int Wy;
     int Cx;
     int Cy;
+    CachedInfoList *InfoList = (CachedInfoList *)0x1F800000;
 
     IterateVisibleMap(x, y, AddObject, 0);
-    Total = ((CachedInfoList *)0x1F800000)->NumOfItems;
-    Wx = WorldToScrX(x -= 7, y -= 11);
-    Wy = WorldToScrY(x, y);
+    Total = InfoList->NumOfItems;
+    /* x - 7 / y - 11 as fresh single-set values: sched1 interleaves a0/x-7/a1/y-11/a2 as retail. */
+    Wx = WorldToScrX(x - 7, y - 11);
+    Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
     for (int z = 0; z < 2; z++) {
@@ -1415,8 +1417,8 @@ void CBlocks::PrintObjects(int x, int y)
             OBJ_PFUNC PFunc;
             int Index;
 
-            Index = ((CachedInfoList *)0x1F800000)->Items[f].uOStr.Index;
-            OStr = (ObjectStruct *)(((CachedInfoList *)0x1F800000)->Items[f].uOStr.MyObject | 0x80000000);
+            OStr = (ObjectStruct *)(InfoList->Items[f].uOStr.MyObject | 0x80000000);
+            Index = InfoList->Items[f].uOStr.Index;
             PFunc = ObjPrintFuncs[OStr->_otype];
             if (z)
                 DoCreature = PFunc != 0;
@@ -1441,17 +1443,15 @@ void CBlocks::PrintObjects(int x, int y)
                     ObjDat = BgTexDat;
                 else
                     ObjDat = ObjTexDat;
-                /* Accumulated *20 keeps each product in its retail saved register. */
-                y = OStr->_ox * 4;
-                y += OStr->_ox;
-                y *= 4;
-                x = OStr->_oy * 4;
-                x += OStr->_oy;
-                x *= 4;
-                by = OStr->_oy / 2 - 8;
+                /* Block-local, record-less product holders (retail SYM has none; the mid-block
+                   declaration opens retail's record-less level at the products).  Keeping them
+                   apart from the x/y parameters lets x - 7 / y - 11 tie with x/y (retail s0/s1). */
+                int x = OStr->_ox * 20;
+                int y = OStr->_oy * 20;
                 bx = OStr->_ox / 2 - 8;
-                Sx = Cx + WorldToScrX(y, x) - Wx;
-                Sy = Cy + WorldToScrY(y, x) - Wy;
+                by = OStr->_oy / 2 - 8;
+                Sx = Cx + WorldToScrX(x, y) - Wx;
+                Sy = Cy + WorldToScrY(x, y) - Wy;
                 OtPos = GetOtPos(Sy);
                 AnimFrame = OStr->_oAnimFrame - 1;
                 LoadIndex = AllObjects[OStr->_otype].ofindex;
@@ -1499,9 +1499,10 @@ void CBlocks::PrintItems(int x, int y)
     int Wy;
     int Cx;
     int Cy;
+    CachedInfoList *InfoList = (CachedInfoList *)0x1F800000;
 
     IterateVisibleMap(x, y, AddItem, 0);
-    Total = ((CachedInfoList *)0x1F800000)->NumOfItems;
+    Total = InfoList->NumOfItems;
     Wx = WorldToScrX(x - 7, y - 11);
     Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
@@ -1523,18 +1524,15 @@ void CBlocks::PrintItems(int x, int y)
             int blockb;
 
             Ft4 = NULL;
-            IStr = (ItemStruct *)(((CachedInfoList *)0x1F800000)->Items[f].uIStr.MyItem | 0x80000000);
-            x = IStr->_iy * 4;
-            x += IStr->_iy;
-            x *= 4;
-            y = IStr->_ix * 4;
-            y += IStr->_ix;
-            y *= 4;
+            IStr = (ItemStruct *)(InfoList->Items[f].uIStr.MyItem | 0x80000000);
+            Index = InfoList->Items[f].uIStr.Index;
+            /* Block-local, record-less products: x/y parameters die at the Wx/Wy setup (retail s0/s1). */
+            int x = IStr->_ix * 20;
+            int y = IStr->_iy * 20;
             bx = IStr->_ix / 2 - 8;
             by = IStr->_iy / 2 - 8;
-            Index = ((CachedInfoList *)0x1F800000)->Items[f].uIStr.Index;
-            Sx = Cx + WorldToScrX(y, x) - Wx;
-            Sy = Cy + WorldToScrY(y, x) - Wy;
+            Sx = Cx + WorldToScrX(x, y) - Wx;
+            Sy = Cy + WorldToScrY(x, y) - Wy;
             OtPos = GetOtPos(Sy);
             if (DoAnim) {
                 if (IStr->_iAnimFlag) {
@@ -1554,10 +1552,15 @@ void CBlocks::PrintItems(int x, int y)
                         Ft4->v0--;
                         Ft4->v2--;
                     }
+                    /* Record-less retail holder (s6, BLOCK.CPP:2409; its mid-block declaration opens the
+                       record-less level at 0x80090F6C).  A char holder copy-propagates away like retail. */
+                    char Ang = IStr->_iAnimFrame & 0x1F;
                     W >>= 1;
                     H >>= 1;
-                    GTE_RotateFT4(Ft4, Ft4->x0 + W, Ft4->y0 + H, (IStr->_iAnimFrame & 0x1F) << 8);
-                    height = SinTab[IStr->_iAnimFrame & 0x1F] >> 2;
+                    GTE_RotateFT4(Ft4, Ft4->x0 + W, Ft4->y0 + H, Ang << 8);
+                    /* == SinTab[Ang] >> 2 for every 16-bit entry; the scaled spelling keeps CSE from
+                       folding the extendhisi2 shift pair into one sra 18, so combine forms retail's lh; sra 2. */
+                    height = SinTab[Ang] * 4 >> 4;
                     if (height < 0) {
                         int it = ItemCAnimTbl[IStr->_iCurs];
                         PlaySfxLoc(ItemAnimSnds[it], IStr->_ix, IStr->_iy);
@@ -1577,19 +1580,16 @@ void CBlocks::PrintItems(int x, int y)
                     W += Fr->X;
                     H += Fr->Y + height;
                     if (!IStr->IDidx)
-                        DrawSpinner(Sx + W, Sy + H, 0x80, 0x60, 0x20, 0x30, -height * 2, -((IStr->_iAnimFrame & 0x1F) * 4), 0, OtPos + 1, 1, 0, 8);
+                        DrawSpinner(Sx + W, Sy + H, 0x80, 0x60, 0x20, 0x30, -height * 2, -(Ang * 4), 0, OtPos + 1, 1, 0, 8);
                     else
-                        DrawSpinner(Sx + W, Sy + H, 0x60, 0x60, 0x60, 0x10, -height * 2, -((IStr->_iAnimFrame & 0x1F) * 4), 0, OtPos + 1, 1, 0, 8);
+                        DrawSpinner(Sx + W, Sy + H, 0x60, 0x60, 0x60, 0x10, -height * 2, -(Ang * 4), 0, OtPos + 1, 1, 0, 8);
                 }
             } else {
                 if (!IStr->_iAnimFlag) {
-                    if (IStr->IDidx == 9 && IStr->_iSelFlag == 2) {
-                        TextDat *const data = ItemTexDat;
-                        Ft4 = data->PrintFt4(IStr->ItemFrame, Sx, Sy, 0, OtPos, 0);
-                    } else {
-                        const unsigned short frame = IStr->ItemFrame;
-                        Ft4 = ItemTexDat->PrintFt4(frame, Sx, Sy, 0, OtPos, 0);
-                    }
+                    if (IStr->IDidx == 9 && IStr->_iSelFlag == 2)
+                        Ft4 = ItemTexDat->PrintFt4(IStr->ItemFrame, Sx, Sy, 0, OtPos, 0);
+                    else
+                        Ft4 = ItemTexDat->PrintFt4(IStr->ItemFrame, Sx, Sy, 0, OtPos, 0);
                 }
             }
             Col = GetHighlightCol(Index, _pcursitem, P1ItemSelCol | 0x8000, P2ItemSelCol | 0x8000, P12ItemSelCol | 0x8000);
@@ -1601,11 +1601,8 @@ void CBlocks::PrintItems(int x, int y)
             blockr = dung_map_r[bx][by];
             blockg = dung_map_g[bx][by];
             blockb = dung_map_b[bx][by];
-            if (!leveltype) {
-                blockb = 0x80;
-                blockg = 0x80;
-                blockr = 0x80;
-            }
+            if (!leveltype)
+                blockr = blockg = blockb = 0x80;
             setRGB0(Ft4, blockr, blockg, blockb);
             setShadeTex(Ft4, 0);
         }
@@ -1897,8 +1894,8 @@ void CBlocks::PrintMonsters(int x, int y)
     IterateVisibleMap(x, y, AddMonst, 1);
     Total = InfoList->NumOfItems;
     CMonstGraphics = MonstTexDat;
-    Wx = WorldToScrX(x -= 7, y -= 11);
-    Wy = WorldToScrY(x, y);
+    Wx = WorldToScrX(x - 7, y - 11);
+    Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
     GolemGraphics = GM_UseTexData(0xD0);
@@ -1921,28 +1918,24 @@ void CBlocks::PrintMonsters(int x, int y)
             static int AddVal[4];   /* @0x8011CBD0 */
             int bx;
             int by;
-            int Sx;
-            int Sy;
-            int OtPos;
 
             StartAnim = 0;
             MyMonst = (MonsterStruct *)(InfoList->Items[f].uMStr.MyMonst | 0x80000000);
-            x = MyMonst->_mx * 4;
-            x += MyMonst->_mx;
-            x *= 4;
-            y = MyMonst->_my * 4;
-            y += MyMonst->_my;
-            y *= 4;
             bx = MyMonst->_mx / 2 - 8;
+            by = MyMonst->_my / 2 - 8;
             ScrXOff = MyMonst->_mxoff * 625 / 1000;
             ScrYOff = MyMonst->_myoff * 625 / 1000;
-            by = MyMonst->_my / 2 - 8;
-            Sx = Cx + WorldToScrX(x, y) + ScrXOff - Wx;
-            Sy = Cy + WorldToScrY(x, y) + ScrYOff - Wy;
-            OtPos = GetOtPos(Sy);
+            /* Block-local, record-less products (x/y parameters die at the Wx/Wy setup, retail s0/s1).
+               Sx/Sy/OtPos are declared after the 625/1000 divisions: retail's spill slots put the
+               division constant ahead of Sx/Sy/OtPos. */
+            int x = MyMonst->_mx * 20;
+            int y = MyMonst->_my * 20;
+            int Sx = Cx + WorldToScrX(x, y) + ScrXOff - Wx;
+            int Sy = Cy + WorldToScrY(x, y) + ScrYOff - Wy;
+            Creature = 1;
+            int OtPos = GetOtPos(Sy);
             Action = MyMonst->Action;
             Frame = MyMonst->_mAnimFrame - 1;
-            Creature = 1;
             if (Action == 5) {
                 Action = 0;
                 StartAnim = 1;
@@ -1957,10 +1950,10 @@ void CBlocks::PrintMonsters(int x, int y)
                 int blockg;
                 int blockb;
 
-                Dir = MyMonst->_mdir;
-                blockg = dung_map_g[bx][by];
                 blockr = dung_map_r[bx][by];
+                blockg = dung_map_g[bx][by];
                 blockb = dung_map_b[bx][by];
+                Dir = MyMonst->_mdir;
                 PhysFrame = GolemGraphics->GetFrNum(Creature, Action, Dir, Frame);
                 Ft4 = GolemGraphics->PrintFt4(PhysFrame, Sx, Sy, GolemGraphics->IsDirAliased(Creature, Action, Dir), OtPos, 0);
                 setRGB0(Ft4, blockr, blockg, blockb);
@@ -2055,10 +2048,11 @@ void CBlocks::PrintMonsters(int x, int y)
                             else {
                                 int NumFrames = CMonstGraphics->GetNumOfFrames(Creature, Action);
                                 if (NumFrames != 1) {
-                                    if (Frame)
-                                        Frame--;
-                                    else
+                                    /* zero-test arm first: dbr then drops the join's redundant sll (retail) */
+                                    if (!Frame)
                                         Frame = 1;
+                                    else
+                                        Frame--;
                                 }
                             }
                         }
@@ -2083,7 +2077,8 @@ void CBlocks::PrintMonsters(int x, int y)
                         addPrim(&ThisOt[OtPos], ShadFt4);
                         paloff = Action == 4;
                         if (MyMonst->_uniqtype)
-                            transfile = UniqTransPals[(MyMonst->_uniqtype - 1) * 2 + paloff];
+                            /* shift spelling: keeps the -1 out of pointer_int_sum's constant split (retail addiu -1) */
+                            transfile = UniqTransPals[((MyMonst->_uniqtype - 1) << 1) + paloff];
                         else
                             transfile = TransPals[MyMonst->MData->TransFile * 2 + paloff];
                         if (MyMonst->_mmode == 15 || (Mg == 10 && (MyMonst->_mFlags & 4))) {
@@ -2094,8 +2089,11 @@ void CBlocks::PrintMonsters(int x, int y)
                                 SPal += Action;
                             transfile = SPal;
                             ObjTexDat->SetPal(ObjTexDat->GetFr(transfile), Ft4);
-                        } else if (transfile)
-                            ObjTexDat->SetPal(ObjTexDat->GetFr(transfile), Ft4);
+                        } else if (transfile) {
+                            /* record-less single-use holder: retail's three record-less levels at 0x8008FF70 */
+                            FRAME_HDR *Fr = ObjTexDat->GetFr(transfile);
+                            ObjTexDat->SetPal(Fr, Ft4);
+                        }
                         if (Mg == 1) {
                             ShadFt4->y0 += 20;
                             ShadFt4->y1 += 20;
