@@ -499,8 +499,8 @@ void DoCredits(void)
         case 1:
             PrintCredits(CreditsText[TextNo].Text, Y, Fade, 255, 255, 255);
             if (VID_GetTick() - CreditsCount > 25) {
-                Fade -= 1;
                 Mode = 2;
+                Fade -= one;
             }
             break;
         case 2:
@@ -516,7 +516,7 @@ void DoCredits(void)
         CreditsBack.Display(0xE, 0xB, 0, 0);
         if (InCredits >= 4)
             PrintSelectBack(0x4000);
-        TSK_Sleep(one);
+        TSK_Sleep(1);
         if (InCredits == 2) {
             InCredits = 3;
             PaletteFadeOut(8);
