@@ -2211,19 +2211,23 @@ void MI_Manashield(int i)
 {
     /* PSX-only: a class(3) x direction(8) pixel-offset table with no PC-twin equivalent, looked
      * up by player class/facing and stashed into _miVar6 (NOT _mix -- confirmed via raw oracle
-     * field offset 0x28). Values read directly from rom/DIABPSX.BIN @ VA 0x8011A13C. Retail's SYM
-     * records it before the locals' block, alongside `i`. The current compiler instead emits
-     * this STAT inside the block; adding braces creates an extra block, not a matching SYM.
-     * Keep this discrepancy open: byte equality alone does not seal this function. */
+     * field offset 0x28). Values read directly from rom/DIABPSX.BIN @ VA 0x8011A13C. Declared
+     * after hellfire's j/id/diff/pct and the PSX miss/player locals (retail SYM block order).
+     * SYM: every record now equals retail (class/type/reg/stack slot) except one toolchain-level
+     * emission difference shared by all five GAME/FMV-overlay functions with a body-level static
+     * (MAI_Counselor, ProcessMonsters, MI_Manashield, stream_cdready_handler, set_mdec_audio_volume):
+     * retail lists the records from the static to the end of the body block BEFORE the body's
+     * Block start (ours: inside it, right after the earlier locals). Not reproducible from source
+     * with CC1PLPSX/ASPSX/PSYLINK as gated (probes: scratch/monster/probe_*.py); see agent report. */
+    int j, id;
+    long diff, pct;
+    MissileStruct *miss = &missile[i];
+    PlayerStruct *player;
     static int xoffset[3][8] = {
         { -2, -1, 4, 6, 9, 10, 6, 2 },
         { 3, 2, 2, 4, 5, 6, 6, 4 },
         { 1, -1, -2, 0, 3, 5, 5, 4 },
     };
-    int j, id;
-    long diff, pct;
-    MissileStruct *miss = &missile[i];
-    PlayerStruct *player;
 
     id = miss->_misource;
     player = &plr[id];

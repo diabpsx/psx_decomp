@@ -1907,22 +1907,22 @@ void MAI_Fireman(int i)
     }
 }
 
-/* OPEN: bytes near-miss (165 diffs, 298 vs 295 insns) -- logic transcribed from hellfire; the
- * `D_8011C2C0[]` static rodata table (values {1,52,7,6} read directly from the ROM image at
- * 0x8011C2C0) confirmed as `counsmiss[] = {MIT_FIREBOLT,MIT_CBOLT,MIT_LIGHTCTRL,MIT_FIREBALL}`.
- * NOW bytes PASS: the retail stack-slot order (fy < v < i*104 spill < _my) shows counsmiss/_mx/_my
- * are declared AFTER the `Monst = &monster[i];` statement; _mx/_my are read through the const view
- * (see MAI_Lachdanan); AddMissile takes the cached _mx/_my; conditions follow the retail flags.
- * SYM OPEN: retail lists exactly those late-declared counsmiss/_mx/_my at FUNCTION level (before
- * the body block) -- same artifact as ProcessMonsters; our compile keeps them inside the block. */
+/* Bytes PASS. counsmiss = the .sdata table {1,52,7,6} @0x8011C2C0 (MIT_FIREBOLT, MIT_CBOLT,
+ * MIT_LIGHTCTRL, MIT_FIREBALL); _mx/_my are read through the const view (see MAI_Lachdanan) and
+ * AddMissile takes the cached _mx/_my. Declarations follow hellfire MONSTER.CPP:5887-5898 (fx..v,
+ * dist, `MonsterStruct *Monst = &monster[i];`, then the static table) plus PSX _mx/_my after it.
+ * SYM: every record now equals retail (class/type/reg/stack slot) except one toolchain-level
+ * emission difference shared by all five GAME/FMV-overlay functions with a body-level static
+ * (MAI_Counselor, ProcessMonsters, MI_Manashield, stream_cdready_handler, set_mdec_audio_volume):
+ * retail lists the records from the static to the end of the body block BEFORE the body's
+ * Block start (ours: inside it, right after the earlier locals). Not reproducible from source
+ * with CC1PLPSX/ASPSX/PSYLINK as gated (probes: scratch/monster/probe_*.py); see agent report. */
 void MAI_Counselor(int i)
 {
-    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
     int fx, fy, mx, my, md, v;
     int dist;
-    MonsterStruct *Monst;
-
-    Monst = &monster[i];
+    MonsterStruct *Monst = &monster[i];
+    static const unsigned char counsmiss[4] = { MIT_FIREBOLT, MIT_CBOLT, MIT_LIGHTCTRL, MIT_FIREBALL };
     int _mx, _my;
 
     _mx = ((const MonsterStruct *)Monst)->_mx;
@@ -2400,53 +2400,30 @@ unsigned char PosOkMonst3(int i, int x, int y)
 
 void ProcessMonsters(void)
 {
-    static unsigned int WipeCount;
+    /* Bytes PASS. Declarations: hellfire's `int i, mi; int raflag; int mx, my;` + PSX _menemy,
+     * then the PSX wipe counter/flag and hellfire's Monst/oldmode. WipeCount is an initialised
+     * .sdata word (retail 0x8011C2C4 = 0, right after counsmiss), hence `= 0`. DoWipe is `bool`
+     * (SYM BOOL, int-sized: no andi 0xff on the test); raflag is zeroed after the mx/my reads.
+     * SYM: every record now equals retail (class/type/reg/stack slot) except one toolchain-level
+     * emission difference shared by all five GAME/FMV-overlay functions with a body-level static
+     * (MAI_Counselor, ProcessMonsters, MI_Manashield, stream_cdready_handler, set_mdec_audio_volume):
+     * retail lists the records from the static to the end of the body block BEFORE the body's
+     * Block start (ours: inside it, right after the earlier locals). Not reproducible from source
+     * with CC1PLPSX/ASPSX/PSYLINK as gated (probes: scratch/monster/probe_*.py); see agent report. */
+    int i, mi;
+    int raflag;
+    int mx, my;
+    int _menemy;
+    static unsigned int WipeCount = 0;
     bool DoWipe;
     MonsterStruct *Monst;
     int oldmode;
 
     DeleteMonsterList();
 
-    /* bytes PASS: DoWipe is `bool` (SYM type BOOL, int-sized -- no andi 0xff
-     * on the test), set by `DoWipe = 0; if (...) DoWipe = 1;`, and raflag is
-     * zeroed per monster right after the mx/my reads (fills the NOHEAL branch
-     * delay slot). SYM OPEN -- two falsified angles now: (a) wrapping
-     * i/mi/raflag/mx/my/_menemy in `{ }` around just the for-loop: block
-     * START address doesn't match retail's (starts later than offset 0) --
-     * "blocks differ". (b) widening that same `{ }` to cover the WHOLE rest
-     * of the function (both DeleteMonsterList() calls + DoWipe setup + the
-     * loop, so the block genuinely starts at relative offset 0 and ends at
-     * the same 0x598/366-insn offset retail's single block does): this gets
-     * `ours["blocks"]` SIZE-and-END-matching but gcc still emits it as a
-     * SECOND, separate block record (a real nested C scope, even one with
-     * an identical address range to the function, still gets its own
-     * block-start/end pair) -- "blocks differ" again, now 2 pairs vs
-     * retail's 1. Reverted to flat (this state): `ours["blocks"] ==
-     * retail["blocks"]` (both truly ONE block, confirmed) but the raw SYM
-     * record STREAM interleaves the block-start marker with the variable
-     * records differently ("record/level membership" seq mismatch) --
-     * retail's single block-start token is written to the stream AFTER the
-     * WipeCount/DoWipe/Monst/oldmode variable records even though the block
-     * itself spans the whole function (same address as the flat case). This
-     * looks like a debug-info EMISSION-ORDER quirk of the retail compiler/
-     * assembler pass tied to the `static` local specifically (same family
-     * as MAI_Counselor's counsmiss-ordering fix) rather than something a
-     * real nested C scope can reproduce without ALSO duplicating the block
-     * count. Next angle: check whether cc1's SLD/debug pass treats a
-     * `static` declaration as forcing a block boundary token immediately
-     * after itself as a side effect, independent of any C-level braces --
-     * would need a source form that has ONLY the `static` local emit that
-     * marker, not a real scope. */
     DoWipe = 0;
     if (++WipeCount % 200 == 0)
         DoWipe = 1;
-    int i;
-    int mi;
-    int raflag;
-    int mx;
-    int my;
-    int _menemy;
-
     for (i = 0; i < nummonsters; i++) {
         mi = monstactive[i];
         Monst = &monster[mi];
