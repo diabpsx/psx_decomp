@@ -2157,12 +2157,11 @@ static char itemactivelist[127];
 
 /* @0x800458CC ITEMS.CPP:3173 — PSX-only rewrite: de-duplicated active list, rock frame by select flag,
  * animation frozen while paused / CD-waiting, drop sounds only for visible tiles (SinTab<0 = anim end).
- * NEAR-MISS (ours 193 / retail 169): retail keeps the new frame in s1 (unsigned char, no SYM record), the
- * item offset in s2 AND &item[ii] in s0 across the PlaySfxLoc calls (ii dies before any call); ours keeps
- * ii live and recomputes. Falsified: frame temp; `ItemStruct *pi` (163 insns, 72 diffs, adds a record);
- * repeated `(&item[ii])->` macro spelling (158 insns, 139 diffs); block-local `ItemStruct *const`
- * (142 insns, 115 diffs); duplicated finish arms. Next: find the spelling that retains the dynamic
- * base in s0 across calls without a named pointer or over-folding the address chain. */
+ * Retail shape (raw + SYM block tree): three nested ifs (anim / visible / SinTab) with the finish stores
+ * in both the SinTab body and the invisible else arm (jump2 cross-jumps them into the one retail tail);
+ * `count` (a0) carries the new frame, the item base is the record-less `(item + ii)` address (s0) shared
+ * by cse across both arms, and the frame snapshot is the record-less const `frame` (s1) declared after
+ * the frame-4 sound so cse folds its pseudo into the compare's zero-extend. */
 void ProcessItems(void)
 {
     int i, ii, numitemslist, count;
@@ -2185,19 +2184,23 @@ void ProcessItems(void)
             if (item[ii]._iSelFlag == ISEL_TOP) item[ii].ItemFrame = 0x12B;
         }
         if (item[ii]._iAnimFlag && !PauseMode && !CDWAIT) {
-            item[ii]._iAnimFrame++;
-            const unsigned char frame = item[ii]._iAnimFrame;
-            if (dung_map[item[ii]._ix][item[ii]._iy].dFlags & 3) {
-                if (frame == 4) PlaySfxLoc(0x15, item[ii]._ix, item[ii]._iy);
-                if (SinTab[frame & 0x1F] >= 0) continue;
-                {
-                    int it = ItemCAnimTbl[item[ii]._iCurs];
-                    PlaySfxLoc(ItemAnimSnds[it], item[ii]._ix, item[ii]._iy);
+            count = (unsigned char)item[ii]._iAnimFrame + 1;
+            (item + ii)->_iAnimFrame = count;
+            if (dung_map[(item + ii)->_ix][(item + ii)->_iy].dFlags & 3) {
+                if ((unsigned char)count == 4) PlaySfxLoc(0x15, (item + ii)->_ix, (item + ii)->_iy);
+                const int frame = (unsigned char)count;
+                if (SinTab[frame & 0x1F] < 0) {
+                    int it = ItemCAnimTbl[(item + ii)->_iCurs];
+                    PlaySfxLoc(ItemAnimSnds[it], (item + ii)->_ix, (item + ii)->_iy);
+                    (item + ii)->_iAnimFrame = item[ii]._iAnimLen;
+                    (item + ii)->_iAnimFlag = FALSE;
+                    (item + ii)->_iSelFlag = ISEL_FLR;
                 }
+            } else {
+                (item + ii)->_iAnimFrame = item[ii]._iAnimLen;
+                (item + ii)->_iAnimFlag = FALSE;
+                (item + ii)->_iSelFlag = ISEL_FLR;
             }
-            item[ii]._iAnimFrame = item[ii]._iAnimLen;
-            item[ii]._iAnimFlag = FALSE;
-            item[ii]._iSelFlag = ISEL_FLR;
         }
     }
 
