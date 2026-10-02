@@ -49,7 +49,7 @@ void ioreader(int);
 void setasyncfile(char *name);
 int asyncloadsegment(unsigned long pos, unsigned char *dest, int size);
 int asyncloadsegmentcallback(unsigned long pos, unsigned char *dest, int size, void (*cb)(int));
-int getasyncreadstatus(int ah);   /* int (EA lib): BL_AsyncReadFile keeps the raw status; BL_LoadFileAtAddr masks it */
+int getasyncreadstatus(int ah);   /* int (EA lib): BL_AsyncReadFile narrows it to a char status; BL_LoadFileAtAddr masks it */
 void cancelasyncload(int ah);
 void systemtask(int);
 int asyncstructsize(int n);
@@ -148,9 +148,10 @@ long BL_AsyncReadFile(char *Name, unsigned long RamId)
     long MyHnd;
     unsigned char *LoadAddr;
     int ah;
+    char status;   /* no retail SYM record: the int->char narrowing goes through an anonymous temp that cse
+                    * copy-propagates, so status itself is eliminated (the temp carries the value in s0) */
 
-    MemSize = fileexists(Name);   /* the extra MemSize refs give it retail's s0 (greg priority over ah) */
-    if (!MemSize)
+    if (!fileexists(Name))
         ASSERT(!"CANT FIND FILE", 0xCA);
     MemSize = filesize(Name);
     ASSERT(MemSize, 0xCF);
@@ -160,11 +161,12 @@ long BL_AsyncReadFile(char *Name, unsigned long RamId)
     ASSERT(MyHnd, 0xD5);
     setasyncfile(Name);
     ah = asyncloadsegment(0, LoadAddr, MemSize);
-    do {
+    status = 0;
+    while (!status) {   /* while-form: the entry test folds; the rotated bottom test has no line note (= retail SLD) */
         systemtask(0);
-        MemSize = getasyncreadstatus(ah);
+        status = getasyncreadstatus(ah);
         TSK_Sleep(1);
-    } while (!(MemSize <<= 24));   /* == !(char)status; retail shifts MemSize in place (dead after the loop) */
+    }
     cancelasyncload(ah);
     ASSERT(GAL_Unlock(MyHnd), 0xEB);
     return MyHnd;
