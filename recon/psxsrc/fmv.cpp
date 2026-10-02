@@ -313,16 +313,13 @@ extern "C" void kill_stream_handlers(void)
 /* @0x80155F30 FMV.CPP:384 */
 extern "C" void stream_cdready_handler(unsigned char status, unsigned char *result)
 {
-    static int idx;   /* retail SYM: function statics idx/i/sec/subcode (sbss/bss @0x8011C74C..) */
-    static int i;
-    static int sec;
+    static int idx, i, sec;   /* original Climax declarations, warcraft2/cdstream.c:214-215 */
+    static CdlLOC subcode[3];
     unsigned long OldGp = (unsigned long)ReloadGP();
-    static CdlLOC subcode[3];   /* declared AFTER OldGp: source-order swap needed to avoid a nested
-     * lexical block cc1plus opens whenever this static struct ARRAY is declared immediately before
-     * OldGp's call-initializer (scalars idx/i/sec don't trigger it, only this array does) -- costs an
-     * adjacent record-order swap (ours: ...sec OldGp subcode / retail: ...sec subcode OldGp) instead
-     * of the earlier full block-nesting mismatch. Several placements/split-init forms tried; this is
-     * the closest (bytes PASS, single adjacent SYM record swap). */
+    /* Record ORDER now equals retail (idx i sec subcode OldGp).  Remaining SYM delta is block
+     * membership only: retail emits all five records before the body Block start (the class shared
+     * by every function-scope static in FMV.CPP/MONSTER.CPP/MISSILES.CPP: set_mdec_audio_volume,
+     * ProcessMonsters, MAI_Counselor, MI_Manashield); our cc1plus emits them after it. */
 
     if (stream_ending == 0)
         first_handler_event = 1;
@@ -1340,7 +1337,7 @@ extern "C" short PlayFMVOverLay(char *filename, int w, int h)
     return 0;
 }
 
-/* @0x801583E0 FMV.CPP:1737 -- see near-miss note: main FMV playback loop, uses ~15 other-TU helpers. */
+/* @0x801583E0 FMV.CPP:1737 -- main FMV playback loop (Climax play_anim lineage), uses ~15 other-TU helpers. */
 
 extern "C" void LoPlayFMVOverLay(void *)
 {
@@ -1444,13 +1441,20 @@ extern "C" void LoPlayFMVOverLay(void *)
             start_time = time_in_frames;
         P1 = PAD_GetPad(0, 1);
         P2 = PAD_GetPad(0, 2);
+        /* Original Climax play_anim pad test (warcraft2/mdec.c:1196) is `{ fade=1; user_quit=1; }`;
+         * Diablo splits it per button and adds the user_start store.  Both pairs are kept in that
+         * order (retail SLD: fade 1919 / user_start 1921, fade 1926).  The second, dead user_quit
+         * store is load-bearing for cse: its later mention makes user_quit (not fade) the quantity
+         * head, so user_start stores user_quit's own v0 while fade keeps a separate `li s5,1`. */
         if ((P1->GetDown() & 0x10) || (P2->GetDown() & 0x10)) {
+            fade = 1;
             user_quit = 1;
             user_start = user_quit;
-            fade = 1;
         }
-        if ((P1->GetDown() & 0x40) || (P2->GetDown() & 0x40))
+        if ((P1->GetDown() & 0x40) || (P2->GetDown() & 0x40)) {
             fade = 1;
+            user_quit = 1;
+        }
     } while (mdec_streaming != 0 && br >= 0);
     stop_mdec_stream();
     wait_cdstream();
