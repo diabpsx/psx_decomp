@@ -1398,10 +1398,11 @@ void InvMoveCursUp(void)
 
     if (_pcurs[myplr] < 12) {
         switch (InvCursPos) {
+        case 0:
+            break;
         case 5:
             InvCursPos = 6;
             break;
-        case 0:
         case 4:
         case 6:
         case 7:
