@@ -123,9 +123,9 @@ MINITEXT now supplies all 17 functions, 96 initialized-data bytes, its 160-byte
 header/string/jump-table pool, 52 small-data bytes, 36 BSS bytes, and both
 constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
-Currently `configs/recon_link.json` selects 32 reconstructed TUs covering
-101 verified function entries, while `configs/native_recon_link.json` supplies
-1052 functions across seventy-five TUs through real ASPSX/PSYLINK: 1153 source-linked
+Currently `configs/recon_link.json` selects one reconstructed TU covering
+19 verified function entries, while `configs/native_recon_link.json` supplies
+1134 functions across ninety TUs through real ASPSX/PSYLINK: 1153 source-linked
 functions across 91 TUs in total. They replace their text scaffolds at the original
 addresses. PCIO and DatIO also supply their complete read-only sections,
 including diagnostic strings and relocated virtual-method tables, through
@@ -316,7 +316,7 @@ no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
 The remaining 488 library-region entries are not native-linked: 484 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
-game-function board, now 2693/2727 with 34 functions not PASS.
+game-function board, now 2694/2727 with 33 functions not PASS.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate

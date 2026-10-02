@@ -1,14 +1,6 @@
 {
   "diabpsx": {
     "sdata_primpool": {"owner": "primpool", "section": ".sdata", "size": 20},
-    "rodata_primpool_native": {"owner": "primpool", "section": ".rodata", "size": 28, "payload_size": 25, "alignment": 4, "padding_hex": "494142"},
-    "data_spltargt": {"owner": "spltargt", "section": ".data", "size": 48},
-    "data_version": {"owner": "version", "section": ".data", "size": 120},
-    "rodata_version_source": {"owner": "version", "section": ".rodata", "size": 24},
-    "rodata_coreauto_source": {"owner": "coreauto", "section": ".rodata", "size": 68},
-    "rodata_interfac_source": {"owner": "interfac", "section": ".rodata", "size": 72},
-    "rodata_spells_table": {"owner": "spells", "section": ".rodata", "size": 20},
-    "rodata_pcio": {"owner": "pcio", "section": ".rodata", "size": 104},
-    "rodata_datio": {"owner": "datio", "section": ".rodata", "size": 88}
+    "rodata_primpool_native": {"owner": "primpool", "section": ".rodata", "size": 28, "payload_size": 25, "alignment": 4, "padding_hex": "494142"}
   }
 }

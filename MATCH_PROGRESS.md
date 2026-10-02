@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2693 / 2727 entries PASS (98.8%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2694 / 2727 entries PASS (98.8%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1419,7 +1419,7 @@
 - ✅ MyFilter__FUlUlPCc (2)
 - ✅ SlowMemMove__FPvT0Ul (8)
 
-## memcard  (recon/psxsrc/memcard.cpp) — 15/16 PASS
+## memcard  (recon/psxsrc/memcard.cpp) — 16/16 PASS
 - ✅ endian_swap__FPUci (13)
 - ✅ sjis_endian_swap__FPUci (18)
 - ✅ to_sjis__Fc (32)
@@ -1427,7 +1427,7 @@
 - ✅ ascii_to_sjis__FPUcPUs (34)
 - ✅ is_sjis__FPUc (3)
 - ✅ sjis_to_ascii__FPUsPc (34)
-- ❌ read_card_directory__Fi — 3 diffs (ours 152)
+- ✅ read_card_directory__Fi (151)
 - ✅ test_card_format__Fi (60)
 - ✅ checksum_data__FPci (15)
 - ✅ delete_card_file__Fii (62)

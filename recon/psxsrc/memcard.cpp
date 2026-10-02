@@ -215,12 +215,9 @@ void new_card(int card_number)
 void read_card_directory(int card_number)
 {
     char path[80];
-    struct DIRENTRY *dir;
-    int i;
-    int fh;
-    int r;
+    struct DIRENTRY *dir = card_dir[card_number];
+    int i, fh, r;
 
-    dir = card_dir[card_number];
     if (mem_card_event_handler) mem_card_event_handler(0, card_number);
     if (card_usable[card_number]) {
         sprintf(path, "bu%d0:*", card_number);
@@ -233,13 +230,13 @@ void read_card_directory(int card_number)
         }
         for (i = 0; i < card_files[card_number]; i++) {
             sprintf(path, "bu%d0:%s", card_number, card_dir[card_number][i].name);
-            fh = open(path, 1);
-            if (fh == -1
-                || (r = read(fh, &card_header[card_number][i], 0x200),
-                    endian_swap(card_header[card_number][i].title, 64),
-                    sjis_to_ascii((unsigned short *)card_header[card_number][i].title, (char *)card_header[card_number][i].title),
-                    close(fh), fh == -1)
-                || r == -1) {
+            if ((fh = open(path, 1)) != -1) {
+                r = read(fh, &card_header[card_number][i], 0x200);
+                endian_swap(card_header[card_number][i].title, 64);
+                sjis_to_ascii((unsigned short *)card_header[card_number][i].title, (char *)card_header[card_number][i].title);
+                close(fh);
+            }
+            if (fh == -1 || r == -1) {
                 card_removed(card_number);
                 PantsDelay();
                 return;

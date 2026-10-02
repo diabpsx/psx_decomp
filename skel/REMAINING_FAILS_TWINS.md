@@ -1,4 +1,4 @@
-# PC twins for the remaining non-PASS functions (34)
+# PC twins for the remaining non-PASS functions (33)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|
@@ -24,7 +24,6 @@
 | CheckInvPaste__Fiii | inv | 1575 diffs (ours 1890; 37/37 calls exact, 12-insn length gap) | inv.cpp:1010 | INV.CPP:752 | inv.cpp:562 | JAP_1998_05_29/DIABPSX/SOURCE/INV.CPP; JAP_1998_05_29/DIABPSX/SOURCE/INV.H; PAL_1997_12_12/DIABPSX/SOURCE/INV.CPP; PAL_1 |
 | ProcessItems__Fv | items | 93 diffs (ours 192 / retail 169; frame snapshot across sound call repaired) | items.cpp:3488 | ITEMS.CPP:3460 | items.cpp:3781 | JAP_1998_05_29/DIABPSX/SOURCE/DIABLO.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.CPP; JAP_1998_05_29/DIABPSX/SOURCE/ITEMS.H |
 | DoLighting__Fiiii | lighting | 373 diffs (ours 821) | lighting.cpp:509 | LIGHTING.CPP:304 | lighting.cpp:117 | JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.CPP; JAP_1998_05_29/DIABPSX/SOURCE/LIGHTING.H; PAL_1997_12_12/DIABPSX/SOURCE/LIGH |
-| read_card_directory__Fi | memcard | 3 diffs (ours 151; one -1 comparison lowering) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/MEMCARD.H |
 | DrawSpinner__FiiUcUcUciiibiT8T8Uc | options | 589 diffs (416/415; coordinate/color lifetimes restored) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/CTRL.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS |
 | DrawMenu__Fi | options | 751 diffs (1033/1032; frame and local names restored, allocation open) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
 | MemcardPad__Fv | options | 8 diffs (ours 583 / retail 585; selection/save control flow repaired, 33 calls exact) | - | - | - | JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.CPP; JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H; PAL_1997_12_12/DIABPSX/PSXSRC/OPTION |
@@ -41,6 +40,14 @@
 Legend: devilution/hellfire/devilutionx = PC twin definition file:line under refs/<repo>/Source|src; '-' = PSX-only (Climax) code, no PC twin. skeleton = Ghidra-decompiled retail PSX builds (mangled names) in refs/skeleton, the only reference for PSX-only functions.
 
 ## Verified SYM-only clusters
+
+Resolved `read_card_directory`: restored the complete original Climax control
+and declaration shape from `C:/Temp/ps1-decomp-refs/warcraft2/memcard.c`:
+declaration-initialized `dir`, one `i, fh, r` declaration, `fh = open(...)`
+inside the success condition, and a separate `fh == -1 || r == -1` error
+test. This removes the redundant `nor/beqz` lowering while preserving Diablo's
+title conversion, delay, and dirty-slot behavior. Both byte lanes match all
+151 instructions, exact SYM passes, and all eleven calls match.
 
 Resolved `GetUniqueItem`: preserve OUid, copy it to uid, then apply uid's
 low-byte mask in a separate statement. Both byte lanes match 216 instructions,

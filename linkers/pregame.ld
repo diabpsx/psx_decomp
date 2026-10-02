@@ -258,7 +258,7 @@ SECTIONS
         . = 0x290E4;   /* 0x80162CDC */
         build/native_source/prestore.text.s.o(.text);   /* verified native-assembled source */
         . = 0x293DC;   /* 0x80162FD4 */
-        build/recon/source/premsg.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/premsg.text.s.o(.text);   /* verified native-assembled source */
         . = 0x29DCC;   /* image end 0x801639C4 */
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }

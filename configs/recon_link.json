@@ -1,18 +1,3 @@
 {
-  "primpool": "recon/psxsrc/primpool.cpp",
-  "spltargt": "recon/psxsrc/spltargt.cpp",
-  "version": "recon/source/version.cpp",
-  "coreauto": "recon/source/coreauto.cpp",
-  "interfac": "recon/source/interfac.cpp",
-  "spells": "recon/source/spells.cpp",
-  "coremon": "recon/source/coremon.cpp",
-  "async": "recon/psxsrc/async.cpp",
-  "itemdat": "recon/source/itemdat.cpp",
-  "misdat": "recon/source/misdat.cpp",
-  "pak": "recon/psxsrc/pak.cpp",
-  "premsg": "recon/source/premsg.cpp",
-  "scrollrt": "recon/source/scrollrt.cpp",
-  "tims": "recon/psxsrc/tims.cpp",
-  "pcio": "recon/psxsrc/pcio.cpp",
-  "datio": "recon/psxsrc/datio.cpp"
+  "primpool": "recon/psxsrc/primpool.cpp"
 }

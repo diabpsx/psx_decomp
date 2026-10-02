@@ -646,6 +646,12 @@ use the real source path. A valid experiment chaining y1=y0 gives 179/179
 but 62 lines. Those coordinate experiments were
 restored; only the SYM-confirmed matrix declaration/initializer was retained.
 
+Existing-local follow-up (2026-10-02): reusing the now-dead `ItemType`
+parameter for `Y - 1` does create a persistent anchor, but changes method
+parameter allocation, grows to 180/179 instructions and 127 raw differences,
+and retains the 80-byte frame. The retail fp anchor is therefore not a second
+value range of an existing named parameter; live source was restored.
+
 With psyq.h actually included, a valid setXYWH(Ft4, X+20, Y-2, 4, 25)
 for the initial black rectangle fixes its scheduling and reduces the current
 source to 49 diff lines (still 178/179 instructions and frame 80 versus 88).
@@ -1063,6 +1069,15 @@ named second-player index instead hoists offset 6632 and gives 33 differences;
 moving that index into the conditional returns to the baseline. No diagnostic
 was applied to live source. The real loop dump is retained at
 build/rtl/stream-5pfu8g8z/input.i.loop.
+
+Field-base follow-up (2026-10-02): an anonymous or const pointer expression
+rooted at `&plr[0].plractive` still folds to the absolute plr+6661 load. A
+mutable `unsigned char *active` local produces the exact 79-instruction count
+and desired base+stride decomposition, but allocates active to s4 and
+CDGfxData to s3 (retail is the reverse) and adds a non-retail named SYM local.
+This proves the missing three instructions are the recordless field-base
+temporary while ruling out a named pointer as a seal-compliant fix. The live
+source was restored.
 
 SPLTARGT now replaces its complete text scaffold and the 48-byte
 AutoTargetSpells data scaffold in the final image. Moving SpellTarget::Active's
@@ -1677,8 +1692,19 @@ A pure-C diagnostic of the original Climax volume routine reproduces all 51
 instructions but not the retail static-record placement. With static-first
 declaration order it has the same `vol { voice_attr i }` sequence as C++.
 Moving i into an inner block preserves bytes but adds an extra nested SYM block.
-Neither experiment was applied; compiler-language switching and scope nesting
-do not explain this remaining mismatch.
+Restoring the original C++ declaration order (`int i` before static
+`voice_attr`) also preserves all 51 instructions, but emits `vol { i
+voice_attr }`, which is farther from retail's `vol voice_attr { i }`. None of
+these experiments was applied; compiler-language switching, declaration order,
+and scope nesting do not explain this remaining mismatch.
+
+The exact `cdstream.c` handler declarations were also gated as one unit:
+combined `static int idx, i, sec`, then `static CdlLOC subcode[3]`, then
+Diablo's `OldGp` call initializer. All 149 instructions and nine calls remain
+exact and record order becomes correct, but the compiler places every record
+inside the function block (`status result { idx i sec subcode OldGp }`) while
+retail places them before it. The live split/late-array form's single adjacent
+record swap is therefore closer and was restored.
 
 The original PsyQ 4.0 and 4.1 LIBSPU.H declarations exposed eleven imprecise
 FMV API prototypes. They now use the SDK's void/long/unsigned-long results,
@@ -1694,8 +1720,10 @@ no debug-record rewriting or verifier exception was added.
 Both assembler lanes still show the same six-line difference at the first
 QuestStatus call (315 instructions on each side), while exact SYM already
 passes. Reusing the existing i variable for the quest argument and spelling
-the condition explicitly as !=0 leave the mismatch unchanged; neither was
-applied to live source.
+the condition explicitly as !=0 leave the mismatch unchanged. Initializing
+the existing `tren` local to Q_LTBANNER and passing it likewise retains the
+same six lines, 315 instructions, and exact SYM. None was applied to live
+source.
 
 The real sched2 dump at build/rtl/quests-aos3aeuv/input.i.sched2 shows equal
 priority 1 for the stack adjustment, two register saves, argument constant,
@@ -1886,6 +1914,12 @@ but before storing Savefilename, so merely changing the latter store's source
 ordering is not sufficient. None of these variants was retained; this does
 not justify volatile accesses, alias barriers or extra control-flow guards.
 
+A typed indirect spelling, `*(char **)&Savefilename = DiabloGameFile`, is
+canonicalized back to the same direct store and also retains the eight-diff,
+583/585 baseline with exact calls. It does not create the retail global
+`save_blocks` reload and was reverted; there remains no source evidence for a
+volatile qualifier.
+
 `tools/instr/probe_memcard_reload.py` creates isolated full-TU copies, keeping
 the correct options.cpp basename and real gate settings. Baseline remains
 8 differences / 583 instructions versus retail 585. Qualifying save_blocks
@@ -2055,6 +2089,14 @@ was replaced with the current two-diff/CSE evidence.
 
 Fresh real-gate output confirms the two-difference baseline is the initial
 `addu a1,zero,zero` versus retail `addu a1,a2,zero`, not the final return.
+Compiling the complete FMV TU with the authentic frontend at `-O1` does not
+preserve that copy: the function grows to 14 instructions/21 diff lines, while
+LoPlayFMVOverLay, set_mdec_audio_volume, and stream_cdready_handler regress to
+78, 61, and 122 diff lines respectively with SYM failures. The production
+`-O2` setting was restored; this is not an optimization-level fingerprint.
+An isolated pure-C build of the live 13-instruction loop also retains exact
+SYM and the same two normalized diff lines (`i` is still initialized directly
+from zero), so C-versus-C++ frontend selection is not the missing factor.
 Full-TU diagnostic copies under build/mdec_loop_probe test for-initializers,
 for post-increment, do/break, a bounded while, and four declaration-initializer
 arrangements. Infinite for/do forms peel the first iteration (16 instructions,
@@ -2575,6 +2617,13 @@ Copies are under build/async_forms_probe. Live source was unchanged; these
 ordinary polling-loop forms do not recover the retail delay-slot choice.
 Matching and source-link coverage remain 2687/2727 and 780 respectively.
 
+Authentic frontend flag follow-up (2026-10-02): disabling the second scheduler
+for the complete TUs is not the retail fingerprint. ResyncQuests grows to 321
+instructions/160 differences, DoCredits reaches 16 differences and different
+block offsets, and BL_AsyncReadFile reaches 14 differences with different block
+offsets. The production scheduler setting was restored; the close residues are
+not explained by a TU-level `-fno-schedule-insns2` flag.
+
 ### PSXMSG complete native linkage and level tables
 
 Restored LevPals[17] as TU-owned initialized data and Level2Bgdata[25] as a
@@ -2836,6 +2885,14 @@ were reverted. Retail has only the root lexical block, so adding scoped
 temporary locals is not automatically compatible with the exact SYM gate.
 Fresh baseline dumps: build/rtl/gpanel-_cnm_pfn (rtl) and gpanel-cgp1bh56 (cse).
 
+Grouping follow-up (2026-10-02): unsigned casts and the equivalent nested
+subtraction `height - (-8)` are folded back to the 285/74 baseline. A signed
+short cast around `height + 8` does preserve retail's add-before-subtract
+shape and reduces the raw difference count to 70, but emits two sign-extension
+instructions per branch, grows to 289/285, and fails function length. The
+existing-BarY two-step form retains 285 instructions but changes allocator
+order broadly (208 differences). All forms were reverted.
+
 ### CFont::Print resolved: unsigned lead bytes
 
 The real greg dump identified kan as pseudo 96, with hard-register preferences
@@ -2951,6 +3008,201 @@ without extra l/r debug records. No register pins or artificial guards were
 introduced. The whole GAMEPAD TU now passes 42/42, including call audits.
 The completed full-board refresh confirms 2688/2727 (39 remaining), with all
 147 tool tests passing. Source-link coverage is unchanged by this gate fix.
+
+### read_card_directory resolved from the original Climax twin
+
+The complete source shape in `C:/Temp/ps1-decomp-refs/warcraft2/memcard.c`
+resolved the last three diff lines. The decisive combination is a
+declaration-initialized `dir`, one `int i, fh, r` declaration, assigning
+`fh = open(...)` in the success condition, and testing `fh == -1 || r == -1`
+in a separate following `if`. Earlier probes changed only subsets of this
+shape and therefore changed register allocation or retained the redundant
+`nor/beqz` pair.
+
+The live Diablo body preserves its additional title conversion, `PantsDelay`,
+and unusable-card dirty-slot handling. Maspsx and real ASPSX now match all 151
+instructions, exact SYM passes, and all eleven ordered calls pass. MEMCARD is
+16/16 and the full board is 2694/2727 with 33 remaining.
+
+### Authentic SN32.3.7 revision screen for close near-misses
+
+Both additional native Win32 revisions (`.0002` and `.0003`) reproduced the
+then-live Build-0001 output exactly for eight close failures: DoCredits (4
+diffs), BL_AsyncReadFile (4), read_card_directory (3), ResyncQuests (6), DrawSpeedBar
+(6), DrawInvTSK (8), Dialog::Back (8), and MemcardPad (8). Instruction counts
+and normalized differences are unchanged in every case. Together with the
+earlier LoPlayFMVOverLay result, this rules out the locally available authentic
+compiler revisions as solutions for these scheduling/CSE residues; no compiler
+override or source change was retained.
+
+### SPLTARGT native-lane conversion
+
+Moved SPLTARGT's seventeen already-passing spell-target/gamepad functions and
+48-byte private `AutoTargetSpells` table from conventional to native ownership.
+Native verification proves all 4,652 text bytes, all seventeen function SYM
+records, the initialized table, and 36 external bindings. Its unused read-only
+literal remains scaffold-owned. Coverage stays 1,153 functions / 91 TUs, now
+split as 1,134/90 native and 19/1 conventional. PRIMPOOL remains conventional
+because native ASPSX does not reproduce its required packed BSS layout. The
+board remains 2693/2727.
+
+### PCIO and DATIO native-lane conversions
+
+Moved both seven-function file backends from conventional to native ownership.
+PCIO supplies 1,380 text bytes and 104 relocated read-only bytes; DATIO supplies
+1,276 text bytes and 88 relocated read-only bytes. Native verification proves
+all fourteen function SYM records and each backend's fourteen external SDK/
+base-class bindings. Neither TU owns writable or BSS storage. Coverage stays
+1,153 functions / 91 TUs, now split as 1,117/89 native and 36/2 conventional.
+The board remains 2693/2727.
+
+### VERSION native-lane conversion
+
+Moved VERSION's three already-passing functions, 120-byte mutable
+`MyVerString` array, and 24-byte format string from conventional to native
+ownership. Native verification proves all 124 text bytes, all three function
+SYM records, the array's global type/address, and the three external bindings.
+The large codeword prefix and compile-date suffix remain scaffold-owned.
+Coverage stays 1,153 functions / 91 TUs, now split as 1,103/87 native and
+50/4 conventional. The board remains 2693/2727.
+
+### INTERFAC and COREAUTO native-lane conversions
+
+Moved both two-function TUs from conventional to native ownership. INTERFAC
+now supplies 988 text bytes plus its 72-byte diagnostic-string/dispatch-table
+pool with 23 external bindings. COREAUTO supplies 1,316 text bytes and both
+relocated jump tables (68 bytes) with three external bindings. Native
+verification proves all four function SYM records and both pools. Their
+separate 16-byte GMAN prefixes remain scaffold-owned, as does COREAUTO's
+initialized data fragment. Coverage stays 1,153 functions / 91 TUs, now split
+as 1,100/86 native and 53/5 conventional. The board remains 2693/2727.
+
+### SPELLS native-lane conversion
+
+Moved SPELLS's six already-passing functions and relocated five-entry dispatch
+table from conventional to native ownership. Native verification proves all
+3,264 text bytes, the complete 20-byte read-only table, six function SYM
+records, and 35 external bindings. The preceding 40 bytes of unused GMAN/
+CPlayer header literals remain scaffold-owned. Coverage stays 1,153 functions
+/ 91 TUs, now split as 1,096/84 native and 57/7 conventional. The board
+remains 2693/2727.
+
+### COREMON native-lane conversion
+
+Moved COREMON's seventeen already-passing monster utility functions from
+conventional to native text ownership. Native verification proves the complete
+5,760-byte text section, all seventeen function SYM records, and nineteen
+external bindings. Its unused literal remains scaffold-owned. Coverage stays
+1,153 functions / 91 TUs, now split as 1,090/83 native and 63/8 conventional.
+The board remains 2693/2727.
+
+### PAK native-lane conversion
+
+Moved PAK's four already-passing block pack/unpack functions from conventional
+to native text ownership. Native verification proves the complete 1,008-byte
+text section, all four function SYM records, and the `memcmp`/`memcpy`
+relocations. The TU has no data sections. Coverage stays 1,153 functions / 91
+TUs, now split as 1,073/82 native and 80/9 conventional. The board remains
+2693/2727.
+
+### ASYNC native-lane conversion
+
+Moved ASYNC's six already-passing streamed-audio helpers from conventional to
+native text ownership. Native verification proves all 708 text bytes, six
+function SYM records, and eight external bindings. The TU has no owned data;
+its unused literal remains scaffold-owned. Coverage stays 1,153 functions /
+91 TUs, now split as 1,069/81 native and 84/10 conventional. The board remains
+2693/2727.
+
+### TIMS native-lane conversion
+
+Moved TIMS's three already-passing functions from conventional to native text
+ownership: the two file-static TUTILS.H texture-page helpers and empty
+`TimSwann`. Native verification proves the complete 48-byte text section and
+all three SYM records; the TU has no relocations or source-owned data. Its
+unused literal remains scaffold-owned. Coverage stays 1,153 functions / 91
+TUs, now split as 1,063/80 native and 90/11 conventional. The board remains
+2693/2727.
+
+### SCROLLRT native-lane conversion
+
+Moved SCROLLRT's two already-passing frame-overlay functions from conventional
+to native text ownership. Native verification proves all 648 text bytes, both
+function SYM records, and 23 external bindings. Its unused header literal
+remains explicitly scaffold-owned. Coverage stays 1,153 functions / 91 TUs,
+now split as 1,060/79 native and 93/12 conventional. The board remains
+2693/2727.
+
+### ITEMDAT native-lane conversion
+
+Moved ITEMDAT's already-passing `InitAllItemsUseable` from conventional to
+native text ownership. Native verification proves its complete 56-byte text
+slice, function SYM record, and relocations to `AllItemsList` and
+`AllItemsUseable`. The initialized item tables and read-only pool remain
+explicitly scaffold-owned. Coverage remains 1,153 functions / 91 TUs, now
+split as 1,058/78 native and 95/13 conventional. The board remains 2693/2727.
+
+### MISDAT native-lane conversion
+
+Moved MISDAT's two already-passing empty missile hooks from conventional to
+native text ownership. Native verification proves the complete contiguous
+16-byte text slice and both function SYM records; the TU has no relocations or
+source-owned data. The initialized missile tables and read-only table remain
+explicitly scaffold-owned. Coverage remains 1,153 functions / 91 TUs, now
+split as 1,057/77 native and 96/14 conventional. The board remains 2693/2727.
+
+### LoPlayFMVOverLay assignment-order allocator probe
+
+The remaining maspsx mismatch is only the order of `fade = 1` and the
+`user_start` store: 274 instructions and exact SYM. Moving the fade assignment
+first produces that local order, but it is not a fix: the function drops to
+273 instructions, swaps `start_time`/`fade` between s4 and s5, grows to 27
+normalized differences, and loses exact function length.
+
+The 9cc6504 allocator lane localizes the coupling. In the baseline, pseudo 75
+(`start_time`) has 9 refs / 182 live / 39 calls (priority 1483, s4), while
+pseudo 77 (`fade`) has 7 / 178 / 39 (priority 786, s5). Reordering raises
+`fade` to 9 / 179 / 39 (1508), just ahead of `start_time` at 9 / 181 / 39
+(1491), so the register swap is expected; the real compiler output confirms
+the final picks. Reports are `build/probes/a-i5feow1t` (baseline) and
+`build/probes/a-0qeasw38` (reordered). Stock differs from the SN compiler for
+this function, so the traces remain diagnostic rather than a seal.
+
+Both other available authentic SN32.3.7 revisions (`.0002` and `.0003`)
+reproduce the same 274-instruction/two-line ordering residue with exact SYM.
+The PsyQ 4.1 compiler changes the embedded language jump-table layout and is
+not a valid substitute. The mismatch is therefore not resolved by selecting
+another locally available retail compiler build.
+
+Chained assignment forms reproduce either the two-difference baseline or the
+same 273-instruction regression. A conditional assignment that explicitly
+preserves `start_time` on the false path grows to 275 instructions and 47
+differences. The exact Warcraft II combined declaration plus its `fade = 1;
+user_quit = 1` order also gives the 273-instruction/27-difference register
+swap once Diablo's `user_start` store is included. No FMV source change was
+retained.
+
+Predicate-lifetime follow-up: assigning the short-circuit pad predicate to
+`user_quit` before the branch preserves 274 instructions and fixes the
+fade-before-store order, but maps `user_quit` to predicate register s0 and
+stores s0 directly. It leaves four byte diff lines and fails retail's v0 SYM
+record. Explicitly normalizing `user_quit = 1` inside the branch, or storing a
+literal one, reintroduces the 273-instruction s4/s5 allocator swap. Making the
+post-store fade assignment conditional compiles identically to the live
+two-difference baseline. All forms were reverted.
+
+### PREMSG native-lane conversion
+
+Moved PREMSG's three already-passing multiplayer-delta helpers from
+conventional to native ownership. Restored the original unused GMAN
+DumpDatFile inline and its fourteen-byte main-image literal; two following
+alignment bytes remain scaffold. Native verification proves all 2,544
+pregame text bytes, all three function SYM records, the cross-image literal
+and all 39 external bindings. Both complete main/pregame image comparisons
+pass byte-for-byte.
+
+Coverage remains 1,153 functions / 91 TUs, now split as 1,055/76 native and
+98/15 conventional. The board remains 2693/2727.
 
 ### PREMISS native-lane conversion
 
@@ -3600,6 +3852,10 @@ Related local-static investigation (2026-10-01): MI_Manashield's baseline is
 the locals' block. The full-TU `build/mscope/missiles.cpp` experiment puts
 all automatic locals/statements in a nested block after xoffset. Bytes stay
 exact, but SYM now contains two blocks rather than retail's one. Rejected.
+Moving the unchanged table to file scope also preserves all 192 instructions
+and five calls, but removes `xoffset` from the function record entirely (the
+first function local becomes `j`); retail genuinely owns it as a function
+static before the block. The local-static form was restored.
 The real generated `build/sn/missiles.g.s` puts `.begin` before xoffset's
 `.def`. Stock GCC 2.7.2 `sdbout.c:sdbout_begin_block` likewise emits
 PUT_SDB_BLOCK_START before sdbout_block/sdbout_syms. This is concrete evidence

@@ -1,4 +1,133 @@
 {
+  "spltargt": {
+    "source": "recon/psxsrc/spltargt.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800AF0F0", "size": 4652},
+      ".data": {"va": "0x800CD650", "size": 48, "scaffold": "data_spltargt.data"}
+    },
+    "data_symbols": [],
+    "externals": ["AddLight__Fiii", "AddUnLight__Fi", "BL_GetCurrentBlocks__Fv", "CanTalkToMonst__Fi", "ChangeLightOff__Fiii", "ChangeLightXY__Fiii", "CheckRangeObject__Fiii", "CheckSpell__FiicUc", "ClrCursor__Fi", "DrawSpinner__FiiUcUcUciiibiT8T8Uc", "ENG_random__Fl", "GLUE_Finished__Fv", "GLUE_GetShowGameScreenFlag__Fv", "GetDirection__Fiiii", "GetGamePad__Fi", "GetPadStyle__Fi", "GetScrXY__7CBlocksR4RECTiiii", "NewCursor__Fi", "PAD_GetPad__FiUc", "PauseMode", "PlaySFX__Fi", "StartStand__Fii", "TSK_AddTask", "TSK_Sleep", "_pcurs", "deathflag", "dung_map", "invflag", "missile", "monster", "myplr", "offset_x", "offset_y", "pad_UpIsUpRight__Fic", "plr", "sel_data"]
+  },
+  "datio": {
+    "source": "recon/psxsrc/datio.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80086744", "size": 1276},
+      ".rdata": {"va": "0x801101AC", "size": 88, "scaffold": "rodata_datio.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["DBG_Error", "DDXclose", "DDXcreate", "DDXinit", "DDXlseek", "DDXopen", "DDXread", "DDXwrite", "GAL_Alloc", "GAL_Free", "GAL_Lock", "__6FileIOUl", "___6FileIO", "__dl__6SysObjPv"]
+  },
+  "pcio": {
+    "source": "recon/psxsrc/pcio.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800860B4", "size": 1380},
+      ".rdata": {"va": "0x80110130", "size": 104, "scaffold": "rodata_pcio.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["DBG_Error", "GAL_Alloc", "GAL_Free", "GAL_Lock", "PCclose", "PCcreat", "PCinit", "PClseek", "PCopen", "PCread", "PCwrite", "__6FileIOUl", "___6FileIO", "__dl__6SysObjPv"]
+  },
+  "version": {
+    "source": "recon/source/version.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800826A0", "size": 124},
+      ".data": {"va": "0x800E3C1C", "size": 120, "scaffold": "data_version.data"},
+      ".rdata": {"va": "0x8011944C", "size": 24, "scaffold": "rodata_version_source.rodata"}
+    },
+    "data_symbols": ["MyVerString"],
+    "externals": ["GetVersionString__FPc", "GetWord__FPc", "sprintf"]
+  },
+  "coreauto": {
+    "source": "recon/source/coreauto.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800809D4", "size": 1316},
+      ".rdata": {"va": "0x80118DE0", "size": 68, "scaffold": "rodata_coreauto_source.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["automaptype", "automapview", "dungeon"]
+  },
+  "interfac": {
+    "source": "recon/source/interfac.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8003DE38", "size": 988},
+      ".rdata": {"va": "0x8011135C", "size": 72, "scaffold": "rodata_interfac_source.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["DeltaSaveLevel__Fv", "DisableInputWndProc__FUlUilUl", "FreeGameMem__Fv", "GRL_SetWindowProc__FPFUlUilUl_Ul", "GetPortalLevel__Fv", "GetReturnLvlPos__Fv", "LoadGameLevel__FUci", "NetSendCmdLocParam1__FUcUcUcUcUs", "OVR_LoadGame__Fv", "OVR_LoadPregame__Fv", "ResetPal__Fv", "SetReturnLvlPos__Fv", "SyncPortals__Fv", "app_fatal", "currlevel", "gbSomebodyWonGameKludge", "gnLevelTypeTbl", "leveltype", "myplr", "plr", "setlevel", "setlvltype", "sound_init__Fv"]
+  },
+  "spells": {
+    "source": "recon/source/spells.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x80077054", "size": 3264},
+      ".rdata": {"va": "0x801189E8", "size": 20, "scaffold": "rodata_spells_table.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["AddLight__Fiii", "AddMissile__Fiiiiiiciii", "AddVision__FiiiUc", "CalcPlrInv__FiUc", "ChangeLightColour__Fii", "ChangeLightXY__Fiii", "ChangeVisionXY__Fiii", "ClrPlrPath__Fi", "ENG_random__Fl", "GetDirection__Fiiii", "GetSpellLevel__Fii", "NetSendCmdLocParam1__FUcUcUcUcUs", "NewCursor__Fi", "PlacePlayer__FiiiUc", "PostGamePad__Fiiii", "RemoveScroll__Fi", "ScrollFlag", "SetPlayerHitPoints__Fii", "StartStand__Fii", "UseStaffCharge__FP12PlayerStruct", "_pcursobj", "_pcursplr", "currlevel", "deathflag", "drawhpflag", "drawmanaflag", "gamemenu_off__Fv", "gbActivePlayers", "gbMaxPlayers", "light_rad", "monster", "myplr", "plr", "sel_data", "spelldata"]
+  },
+  "coremon": {
+    "source": "recon/source/coremon.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8007F354", "size": 5760}
+    },
+    "data_symbols": [],
+    "externals": ["ENG_random__Fl", "GetDirection__Fiiii", "GetSOLID__Fii", "IsDplayer__Fii", "Monsters", "SolidLoc__Fii", "abs", "currlevel", "dung_map", "gbMaxPlayers", "gnDifficulty", "missile", "missileactive", "monstactive", "monster", "nummissiles", "nummonsters", "object", "plr"]
+  },
+  "pak": {
+    "source": "recon/psxsrc/pak.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800ADF9C", "size": 1008}
+    },
+    "data_symbols": [],
+    "externals": ["memcmp", "memcpy"]
+  },
+  "async": {
+    "source": "recon/psxsrc/async.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8009A9B4", "size": 708}
+    },
+    "data_symbols": [],
+    "externals": ["ReloadGP", "SFXTab", "STREAM_BIN", "SetGP", "asyncloadsegmentcallback", "cancelasyncload", "setasyncfile", "systemtask"]
+  },
+  "tims": {
+    "source": "recon/psxsrc/tims.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8008584C", "size": 48}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "scrollrt": {
+    "source": "recon/source/scrollrt.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8006931C", "size": 648}
+    },
+    "data_symbols": [],
+    "externals": ["DoShowPanel", "DrawAutomap__Fv", "DrawDiabloMsg__Fv", "DrawInv__Fv", "DrawLevelUpIcon__Fi", "GLUE_Finished__Fv", "IsGameLoading__Fv", "PauseMode", "T_DrawView__Fii", "ViewX", "ViewY", "_spselflag", "automapflag", "chrflag", "drawbtnflag", "drawhpflag", "drawmanaflag", "drawsbarflag", "invflag", "leveltype", "msgflag", "plr", "questlog"]
+  },
+  "itemdat": {
+    "source": "recon/source/itemdat.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8003E214", "size": 56}
+    },
+    "data_symbols": [],
+    "externals": ["AllItemsList", "AllItemsUseable"]
+  },
+  "misdat": {
+    "source": "recon/source/misdat.cpp", "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8004EA8C", "size": 16}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "premsg": {
+    "source": "recon/source/premsg.cpp", "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x80162FD4", "size": 2544},
+      ".rdata": {"image": "diabpsx", "va": "0x80119D8C", "size": 14, "scaffold": "rodata_premsg.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["AddDead__Fiici", "BuildLevTrigs__Fv", "CanPut__Fii", "ConvertdPiece__Fv", "CreateItem__Fiii", "DeleteItem__Fii", "FindGetItem__FiUsi", "GetDLevel__Fib", "M_ClearSquares__Fi", "M_StartStand__Fii", "M_UpdateLeader__Fi", "Obj_Trap__Fi", "QuestStatus__Fi", "RecreateEar__FiUsiUciiiiii", "RecreateItem__FiiUsiii", "ReleaseDLevel__FP6DLevel", "RespawnItem__FiUc", "SyncBreakObj__Fii", "SyncOpObject__Fiii", "automapview", "currlevel", "decode_enemy__Fii", "deltaload", "dung_map", "item", "itemactive", "itemavail", "monster", "numitems", "nummonsters", "numobjects", "object", "objectactive", "quests", "setlevel", "setlvlnum", "setpc_x", "setpc_y", "sgLocals"]
+  },
   "premiss": {
     "source": "recon/source/premiss.cpp", "image": "pregame",
     "sections": {
