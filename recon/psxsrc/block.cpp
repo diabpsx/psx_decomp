@@ -1399,10 +1399,8 @@ void CBlocks::PrintObjects(int x, int y)
     int Cy;
 
     IterateVisibleMap(x, y, AddObject, 0);
-    x -= 7;
-    y -= 11;
     Total = ((CachedInfoList *)0x1F800000)->NumOfItems;
-    Wx = WorldToScrX(x, y);
+    Wx = WorldToScrX(x -= 7, y -= 11);
     Wy = WorldToScrY(x, y);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
@@ -1437,19 +1435,26 @@ void CBlocks::PrintObjects(int x, int y)
                 int blockg;
                 int blockb;
 
-                if (ObjMasterLoadList[AllObjects[OStr->_otype].ofindex].TexDat)
+                LoadIndex = AllObjects[OStr->_otype].ofindex;
+                if (ObjMasterLoadList[LoadIndex].TexDat)
                     ObjDat = BgTexDat;
                 else
                     ObjDat = ObjTexDat;
-                y = OStr->_ox * 20;
-                x = OStr->_oy * 20;
-                bx = OStr->_ox / 2 - 8;
+                /* Accumulated *20 keeps each product in its retail saved register. */
+                y = OStr->_ox * 4;
+                y += OStr->_ox;
+                y *= 4;
+                x = OStr->_oy * 4;
+                x += OStr->_oy;
+                x *= 4;
                 by = OStr->_oy / 2 - 8;
+                bx = OStr->_ox / 2 - 8;
                 Sx = Cx + WorldToScrX(y, x) - Wx;
                 Sy = Cy + WorldToScrY(y, x) - Wy;
                 OtPos = GetOtPos(Sy);
                 AnimFrame = OStr->_oAnimFrame - 1;
-                Creature = ObjMasterLoadList[AllObjects[OStr->_otype].ofindex].Creature;
+                LoadIndex = AllObjects[OStr->_otype].ofindex;
+                Creature = ObjMasterLoadList[LoadIndex].Creature;
                 ObjDat->GetCreature(Creature);
                 PhysFrame = ObjDat->GetFrNum(Creature, 0, 0, AnimFrame);
                 if (PFunc)
@@ -1495,11 +1500,9 @@ void CBlocks::PrintItems(int x, int y)
     int Cy;
 
     IterateVisibleMap(x, y, AddItem, 0);
-    x -= 7;
-    y -= 11;
     Total = ((CachedInfoList *)0x1F800000)->NumOfItems;
-    Wx = WorldToScrX(x, y);
-    Wy = WorldToScrY(x, y);
+    Wx = WorldToScrX(x - 7, y - 11);
+    Wy = WorldToScrY(x - 7, y - 11);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
     for (int z = 0; z < 2; z++) {
@@ -1520,8 +1523,12 @@ void CBlocks::PrintItems(int x, int y)
 
             Ft4 = NULL;
             IStr = (ItemStruct *)(((CachedInfoList *)0x1F800000)->Items[f].uIStr.MyItem | 0x80000000);
-            y = IStr->_ix * 20;
-            x = IStr->_iy * 20;
+            x = IStr->_iy * 4;
+            x += IStr->_iy;
+            x *= 4;
+            y = IStr->_ix * 4;
+            y += IStr->_ix;
+            y *= 4;
             bx = IStr->_ix / 2 - 8;
             by = IStr->_iy / 2 - 8;
             Index = ((CachedInfoList *)0x1F800000)->Items[f].uIStr.Index;
@@ -1553,6 +1560,7 @@ void CBlocks::PrintItems(int x, int y)
                     if (height < 0) {
                         int it = ItemCAnimTbl[IStr->_iCurs];
                         PlaySfxLoc(ItemAnimSnds[it], IStr->_ix, IStr->_iy);
+                        height = 0;
                         IStr->_iAnimFlag = 0;
                         IStr->_iSelFlag = 1;
                         IStr->_iAnimFrame = item[Index]._iAnimLen;
@@ -1574,10 +1582,13 @@ void CBlocks::PrintItems(int x, int y)
                 }
             } else {
                 if (!IStr->_iAnimFlag) {
-                    if (IStr->IDidx == 9 && IStr->_iSelFlag == 2)
-                        Ft4 = ItemTexDat->PrintFt4(IStr->ItemFrame, Sx, Sy, 0, OtPos, 0);
-                    else
-                        Ft4 = ItemTexDat->PrintFt4(IStr->ItemFrame, Sx, Sy, 0, OtPos, 0);
+                    if (IStr->IDidx == 9 && IStr->_iSelFlag == 2) {
+                        TextDat *const data = ItemTexDat;
+                        Ft4 = data->PrintFt4(IStr->ItemFrame, Sx, Sy, 0, OtPos, 0);
+                    } else {
+                        const unsigned short frame = IStr->ItemFrame;
+                        Ft4 = ItemTexDat->PrintFt4(frame, Sx, Sy, 0, OtPos, 0);
+                    }
                 }
             }
             Col = GetHighlightCol(Index, _pcursitem, P1ItemSelCol | 0x8000, P2ItemSelCol | 0x8000, P12ItemSelCol | 0x8000);
@@ -1880,15 +1891,12 @@ void CBlocks::PrintMonsters(int x, int y)
     int Cx;
     int Cy;
     TextDat *GolemGraphics;
-    BOOL MyInfraFlag;
     CachedInfoList *InfoList = (CachedInfoList *)0x1F800000;
 
     IterateVisibleMap(x, y, AddMonst, 1);
-    x -= 7;
-    y -= 11;
     Total = InfoList->NumOfItems;
     CMonstGraphics = MonstTexDat;
-    Wx = WorldToScrX(x, y);
+    Wx = WorldToScrX(x -= 7, y -= 11);
     Wy = WorldToScrY(x, y);
     Cx = ClipRect.x;
     Cy = ClipRect.y;
@@ -1918,11 +1926,15 @@ void CBlocks::PrintMonsters(int x, int y)
 
             StartAnim = 0;
             MyMonst = (MonsterStruct *)(InfoList->Items[f].uMStr.MyMonst | 0x80000000);
-            x = MyMonst->_mx * 20;
-            y = MyMonst->_my * 20;
+            x = MyMonst->_mx * 4;
+            x += MyMonst->_mx;
+            x *= 4;
+            y = MyMonst->_my * 4;
+            y += MyMonst->_my;
+            y *= 4;
+            bx = MyMonst->_mx / 2 - 8;
             ScrXOff = MyMonst->_mxoff * 625 / 1000;
             ScrYOff = MyMonst->_myoff * 625 / 1000;
-            bx = MyMonst->_mx / 2 - 8;
             by = MyMonst->_my / 2 - 8;
             Sx = Cx + WorldToScrX(x, y) + ScrXOff - Wx;
             Sy = Cy + WorldToScrY(x, y) + ScrYOff - Wy;
@@ -1972,6 +1984,7 @@ void CBlocks::PrintMonsters(int x, int y)
         }
     }
     GM_FinishedUsing(GolemGraphics);
+    BOOL MyInfraFlag;
     MyInfraFlag = InfraFlag;
     for (int DoCompress = 0; DoCompress < 2; DoCompress++) {
         int MaxDecompress = 8;
@@ -2005,6 +2018,7 @@ void CBlocks::PrintMonsters(int x, int y)
                     ScrYOff = MyMonst->_myoff * 625 / 1000;
                     Frame = MyMonst->_mAnimFrame - 1;
                     Mg = MyMonst->MData->GraphicType;
+                    GType = Mg;
                     mx = MyMonst->_mx;
                     my = MyMonst->_my;
                     Dir = MyMonst->_mdir;
@@ -2015,7 +2029,7 @@ void CBlocks::PrintMonsters(int x, int y)
                         Action = MyMonst->Action;
                     Creature = 0;
                     for (unsigned int g = 0; g < MonsterList->NumOfMonsters; g++) {
-                        if (MonsterList->TheList[g] == Mg) {
+                        if (MonsterList->TheList[g] == GType) {
                             Creature = g;
                             break;
                         }
@@ -2066,19 +2080,21 @@ void CBlocks::PrintMonsters(int x, int y)
                         ShadFt4 = PRIM_GetCopy(Ft4);
                         ShadScaleSkew(ShadFt4);
                         addPrim(&ThisOt[OtPos], ShadFt4);
-                        if (!MyMonst->_uniqtype)
-                            paloff = TransPals[MyMonst->MData->TransFile * 2 + (Action == 4)];
+                        paloff = Action == 4;
+                        if (MyMonst->_uniqtype)
+                            transfile = UniqTransPals[(MyMonst->_uniqtype - 1) * 2 + paloff];
                         else
-                            paloff = UniqTransPals[(MyMonst->_uniqtype - 1) * 2 + (Action == 4)];
+                            transfile = TransPals[MyMonst->MData->TransFile * 2 + paloff];
                         if (MyMonst->_mmode == 15 || (Mg == 10 && (MyMonst->_mFlags & 4))) {
                             int SPal = StonePals[Mg].StonePal;
                             if (Action == 4 && SPal == 2)
                                 SPal = 3;
                             if (Mg == 29)
                                 SPal += Action;
-                            ObjTexDat->SetPal(ObjTexDat->GetFr(SPal), Ft4);
-                        } else if (paloff)
-                            ObjTexDat->SetPal(ObjTexDat->GetFr(paloff), Ft4);
+                            transfile = SPal;
+                            ObjTexDat->SetPal(ObjTexDat->GetFr(transfile), Ft4);
+                        } else if (transfile)
+                            ObjTexDat->SetPal(ObjTexDat->GetFr(transfile), Ft4);
                         if (Mg == 1) {
                             ShadFt4->y0 += 20;
                             ShadFt4->y1 += 20;

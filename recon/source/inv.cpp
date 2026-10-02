@@ -2325,8 +2325,8 @@ void DrawInvTSK(struct TASK *T)
     int ThisIsShit;
     int OldPad;
 
-    osel = sel_data;
     omp = myplr;
+    osel = sel_data;
     if (!invflag || options_pad == -1) {
         D_8011C324 = 0;
         invflag = 0;
@@ -2453,8 +2453,8 @@ void DrawInvTSK(struct TASK *T)
     ClrCursor(0);
     ClrCursor(1);
     myplr = omp;
-    sel_data = osel;
     invflag = 0;
+    sel_data = osel;
     GLUE_ResumeGame();
     GLUE_SetShowPanelFlag(1);
     GLUE_SetShowGameScreenFlag(1);

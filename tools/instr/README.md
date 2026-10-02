@@ -1504,6 +1504,106 @@ read yields 284 instructions/135 diff lines; a preincrement loop-entry form
 yields 277 instructions/164 diff lines. None reproduces the retail layout or
 SYM. All remain in build/block_cache_probe; no live BLOCK source was changed.
 
+Retail-receipt follow-up (2026-10-02): `LoadIndex` was declared but unused in
+the reconstruction, so its required INT `$v1` record was absent. Retail loads
+`AllObjects[OStr->_otype].ofindex` into that local for the `TexDat` lookup and
+assigns it again before the later `Creature` lookup; it does not retain one
+value across the intervening calls. Restoring both assignments preserves the
+280-instruction/168-byte-frame shape and makes the `LoadIndex` record exact.
+Caching one value across both lookups over-optimizes to 273 instructions;
+combining the corrected lifetime with the `[f+1]` or explicit `InfoList`
+address forms still collapses the frame to 160 and was rejected.
+
+The object coordinates use the same accumulated-multiply source idiom already
+proven by `PrintTowners`: multiply by four, add the field again, then multiply
+by four. This makes the `*20` products accumulate directly in retail's s1/s0
+destinations instead of temporary v0 registers. Together with `LoadIndex`, it
+reduces the live gate from 167 to 35 differences with all fourteen calls
+exact. The in-argument `x -= 7` / `y -=
+11` spelling is code-identical and agrees with the retail SLD line ownership,
+so it is retained. The remaining length difference is one instruction: GCC
+folds the scratch-list member offset into a `0x1F800004` induction base, while
+retail advances `0x1F800000` and loads at offset four.
+
+Coordinate-order follow-up: all 24 permutations of the independent accumulated
+`x`, accumulated `y`, `bx` and `by` assignments were compiled in full-TU
+copies under `build/printobjects_order_probe`. Six orders bottom out at 23
+maspsx differences / 18 aligned real-ASPSX differences, all at 280/279.
+Assigning `by` immediately before `bx` is the minimal change from the semantic
+order: it gives the raw `_oy` lifetime retail's v1 and the sign-extended `_ox`
+lifetime retail's a3 without changing the final stack homes. Splitting `by`
+into raw and divide/update phases grows to 286 instructions; const snapshots
+and moving `bx` earlier are code-neutral. The simple `by`-then-`bx` form is
+retained. An explicit `CacheInfo *` induction proves the remaining base shape
+at exact 279 instructions, but adds a non-retail AUTO pointer and shifts the
+four inner stack locals, so it is diagnostic only and was rejected.
+
+### PrintMonsters retail lifetime reconstruction
+
+The complete retail/current SYM receipts exposed two eliminated second-loop
+locals and one incorrectly timed root local. Moving `MyInfraFlag` to its first
+use after `GM_FinishedUsing` gives it retail's sp-152 home and shifts the first
+loop's f/Index/StartAnim/bx stack homes into place without changing record
+order. `Mg` remains the stored `MData->GraphicType`, while `GType = Mg` owns the
+short MonsterList comparison lifetime in a2; comparing directly against Mg
+had eliminated that record and added loop reloads.
+
+The palette variables are lifetime names rather than their guessed semantic
+roles. `paloff` owns the `(Action == 4)` index in a0, `transfile` owns the
+selected normal/unique palette in a1, and nested `SPal` owns the stone palette
+in the same later a1 lifetime. The raw `MData->TransFile` byte remains unnamed.
+Restoring that ownership and using the positive unique-type arm reproduces all
+four records and retail branch polarity. Together these changes restore the
+exact 681-instruction length and reduce the gate from 275 to 138 differences.
+
+A full-TU 30-case screen under `build/printmonsters_order_probe` interleaved
+bx/by around the best fixed order of x/y/ScrXOff/ScrYOff. Moving bx before the
+two offset divisions while leaving by last lowers the result to 110 maspsx
+differences / 56 aligned real-ASPSX differences. A subsequent 8x8 screen of
+natural `*20` spellings under `build/printmonsters_product_probe` shows that,
+with that bx order in place, the accumulated multiply-by-four/add/multiply-by-
+four form for both coordinates reaches 100 / 50 at exact 681/681. It is now
+retained, matching the proven PrintTowners/PrintObjects idiom. All 27 calls
+remain exact. Const coordinate snapshots, a literal `x-7/y-11` call form,
+offset/parameter lifetime coalescing and the opposite frame-decrement polarity
+either compile neutral or broadly regress allocation/frame size and were
+rejected.
+
+### PrintItems negative-height path and frame correction
+
+The JAP retail body clears the sine-derived height to zero immediately after
+the negative-height sound call, before clearing the animation flag and
+resetting the frame. The reconstruction left the negative value live through
+the four polygon-Y updates and spinner arguments. Restoring `height = 0`
+removes that invented continuation and changes the frame from 208 to retail's
+192 bytes.
+
+The literal JAP entry expressions `WorldToScrX/Y(x - 7, y - 11)` compile
+identically to the previous explicit decrements and are retained. A separate
+int sine temporary adds a non-retail `h` record, while reconstructing the one
+shared DrawSpinner call with branch-selected locals introduces an extra saved
+register; both diagnostics were rejected. Retail and current named locals
+otherwise occupy identical physical stack addresses—the old 16-byte frame
+surplus was entirely compiler-owned temporary space removed by the height
+repair.
+
+The thirteen instructions apparently missing after the height repair were the
+retail `IDidx == 9 && _iSelFlag == 2` dispatch. GCC folded the reconstruction's
+textually identical render arms before RTL. A special-arm const ItemTexDat
+pointer and general-arm const frame snapshot keep the paths distinct until
+late cross-jumping, restore the retail checks and shared call, and emit no
+extra SYM records. This produces 372/368 instructions instead of 355/368.
+
+Finally, the accumulated multiply-by-four/add/multiply-by-four coordinate
+idiom moves the item products into their retail saved-register webs. A full
+24-order screen under `build/printitems_order_probe` confirms the retained
+`x, y, bx, by` order is in the best class. Together the live gate improves
+from 403 to 276 differences (164 aligned real-ASPSX differences) with all
+fourteen calls exact. The remaining four-instruction surplus is coupled to the
+`this/OtPos/Fr` saved-register cycle; source-visible spinner selectors, a
+shared pre-branch data pointer, and record-bearing sine temporaries are not
+valid fixes.
+
 ### ERROR localized IDs and original header pools restored
 
 ERROR's MsgStrings[44] was only a zero-initialized declaration, although retail
@@ -4350,26 +4450,24 @@ the misplaced invflag byte store at the exit. All six tail-store permutations
 were checked; none passes. Root inventory-flag snapshots, original-player/
 selection snapshots and an early restore-value copy do not solve both ends.
 Artifacts: `build/ivs`, particularly `restore_interleave` and `tail1`.
-The candidate is retained only as diagnostic evidence; live source remains
-the previous eight-difference baseline. This demonstrates coupling between
-saved-value lifetimes and the entry schedule rather than an assembler issue.
+This strictly closer ordinary-source form is now retained, improving the live
+eight-difference baseline while preserving exact length and SYM. The residue
+demonstrates coupling between saved-value lifetimes and the exit store order
+rather than an assembler issue.
 
-Both byte lanes retain eight aligned differences at the entry, with exactly
-390 instructions and matching SYM. Real pre-allocation scheduling already
-orders the sel_data load, invflag load, and myplr load differently from retail;
-this is not an ASPSX-only expansion issue. Captured sched, sched2 and lreg
-dumps are under build/rtl/inv-8g9aewe8, inv-rlwgk58p and inv-makiqbj0.
+The earlier eight-difference baseline placed every mismatch at the entry.
+Real pre-allocation scheduling ordered the sel_data load, invflag load and
+myplr load differently from retail; this was not an ASPSX-only expansion issue.
+Captured sched, sched2 and lreg dumps are under build/rtl/inv-8g9aewe8,
+inv-rlwgk58p and inv-makiqbj0. The retained saved-state lifetime form above
+now fixes that entry completely and moves the smaller residue to the exit.
 
 Six declaration/assignment forms and five equivalent guard forms were tested
-in full-TU copies under build/inv_entry_probe. Reversing saved-state assignment
-order also reverses omp/osel's registers and increases the differences to
-twelve. Initializers and comma expressions do not improve the baseline;
-reversing the guard operands gives 24 differences. Positive conjunction,
-explicit zero comparison and conditional-expression guards retain eight.
-None were retained in reconstruction. Live source was rechecked at eight
-differences with exact SYM; the board remains 2687/2727. The next investigation
-must account for entry scheduling without sacrificing retail's saved-state
-register assignments, rather than repeating these source spelling changes.
+in full-TU copies under build/inv_entry_probe. Initializers, comma expressions,
+guard reversal, positive conjunction and explicit-zero/conditional guards do
+not beat the retained four-maspsx/two-ASPSX-difference result. The remaining
+work is specifically to preserve omp/osel's retail allocation while scheduling
+the final selector restore before the inventory-flag clear.
 
 ### DrawObjSelector coordinate staging
 
