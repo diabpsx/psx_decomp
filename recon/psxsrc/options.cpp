@@ -1575,18 +1575,6 @@ void DrawOptions(TASK *T)
 
 void DrawMenu(int MenuNo)
 {
-    OMENULIST *mptr;
-    OMENUITEM *iptr;
-    int sh;
-    POLY_G4 *G4;
-    int yoff;
-    int len;
-    int depth;
-    unsigned char r, g, b;
-    int mx, my;
-    int BARFRAC;
-    int mptrx, mptry;
-    int i;
     if (cmenu + 1 == 3) {
         if (FeFlag != 0) {
             SoundMenu[2].y = 1;
@@ -1617,14 +1605,26 @@ void DrawMenu(int MenuNo)
         MenuNo = 0;
     }
 
+    OMENULIST *mptr;
+    OMENUITEM *iptr;
+    int sh;
+    POLY_G4 *G4;
+    int yoff;
+    int len;
+    int depth;
+    unsigned char r, g, b;
+    int mx, my;
+    int BARFRAC;
+    int mptrx, mptry;
     mptr = &MenuList[MenuNo];
     iptr = mptr->Item;
     sh = (Slider->GetFr(0x96)->H) - 4;
     depth = CBlocks::GetOverlayOtBase();
     depth = depth + 4;
-    mx = mptrx = ((0x100 - mptr->w) / 2) + 0x20;
-    mptry = ((0xB0 - mptr->h) / 2) + 0x20;
+    mptrx = ((0x100 - mptr->w) / 2) + 0x20;
     BARFRAC = 0x8000 / sw;
+    mptry = ((0xB0 - mptr->h) / 2) + 0x20;
+    mx = mptrx;
     if (FeFlag == 0) {
         Spacing = 0xD;
         my = mptry;
@@ -1655,22 +1655,21 @@ void DrawMenu(int MenuNo)
     }
 
     yoff = 0xC;
-    i = 0;
-    while (i < mptr->NoEntries) {
+    for (int i = 0; i < mptr->NoEntries; i++) {
         r = WHITER;
         g = WHITEG;
         b = WHITEB;
         if (i != 0)
             yoff = Spacing + 4;
-        if (iptr[i].var != NULL) {
+        if (iptr->var != NULL) {
             int sxp, syp;
             unsigned char barg, barr;
 
             sxp = (mx + mptr->w) - sw - 14;
-            syp = my + iptr[i].y * Spacing + yoff;
+            syp = my + iptr->y * Spacing + yoff;
             if (FeFlag != 0 && cmenu + 1 == 3)
                 syp += 0x20;
-            len = iptr[i].len;
+            len = iptr->len;
             if (i != cs)
                 Slider->PrintFt4(0x98, sxp + len - 3, syp - 8, 0, depth, 0);
             else
@@ -1698,16 +1697,7 @@ void DrawMenu(int MenuNo)
             G4->g3 = barg;
             sxp--;
             G4->b3 = 0;
-            len += sxp;
-            G4->x0 = sxp;
-            G4->y0 = syp;
-            G4->x1 = len;
-            G4->y1 = syp;
-            G4->x2 = sxp;
-            G4->x3 = len;
-            syp += sh / 2;
-            G4->y2 = syp;
-            G4->y3 = syp;
+            setXYWH(G4, sxp, syp, len, sh / 2);
             addPrim(ThisOt + depth, G4);
 
             PRIM_GetPrim(&G4);
@@ -1727,15 +1717,7 @@ void DrawMenu(int MenuNo)
             G4->r3 = barr >> 1;
             G4->g3 = barg >> 1;
             G4->b3 = 0;
-            G4->y0 = syp;
-            G4->y1 = syp;
-            syp += sh / 2;
-            G4->x0 = sxp;
-            G4->x1 = len;
-            G4->x2 = sxp;
-            G4->y2 = syp;
-            G4->x3 = len;
-            G4->y3 = syp;
+            setXYWH(G4, sxp, syp + sh / 2, len, sh / 2);
             addPrim(ThisOt + depth, G4);
 
         }
@@ -1744,109 +1726,107 @@ void DrawMenu(int MenuNo)
             g = BLUEG;
             b = BLUEB;
         }
-        if (i == cs) {
-            if (iptr[i].Text != 0) {
-                int cx, cy;
+        if (i == cs && iptr->Text != 0) {
+            int cx, cy;
 
 
-                g = GOLDG;
-                r = GOLDR;
-                b = GOLDB;
-                if ((unsigned)(MenuNo - 0xE) < 2 && MemCardActive != 0) {
-                    len = 0x280;
-                    if (card_status[current_card] == 0 && CharacterBlockLoaded != 0)
-                        len = GetSpinnerWidth(i - 1);
+            r = GOLDR;
+            g = GOLDG;
+            b = GOLDB;
+            if ((unsigned)(MenuNo - 0xE) < 2 && MemCardActive != 0) {
+                len = 0x280;
+                if (card_status[current_card] == 0 && CharacterBlockLoaded != 0)
+                    len = GetSpinnerWidth(i - 1);
+            } else {
+                if (FeFlag != 0 && i == 0) {
+                    len = LargeFont.GetStrWidth(GetStr(iptr->Text));
                 } else {
-                    if (FeFlag == 0 || i != 0) {
-                        len = MediumFont.GetStrWidth(GetStr(iptr[i].Text));
-                    } else {
-                        len = LargeFont.GetStrWidth(GetStr(iptr[i].Text));
-                    }
-                }
-                cy = (my + iptr[i].y * Spacing + yoff) - 2;
-                if (cmenu == 2 && cs != 7) {
-                    len = len + 10;
-                    cx = mx + 2;
-                    if (FeFlag != 0)
-                        cx = mx - 8;
-                } else {
-                    cx = (((0x100 - len)) / 2) + 0x14;
-                    len = len + 0x10;
-                    if (FeFlag != 0 && cmenu == 2)
-                        cy = (my + iptr[i].y * Spacing + yoff) + 0x1E;
-                }
-                if (MenuNo != 4) {
-                    if (AlertTxt == 0) {
-                        DrawSpinner(cx, cy, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
-                        DrawSpinner(cx + len, cy, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
-                    } else if (FeFlag != 0) {
-                        DrawSpinner(cx, cy, 0xA0, 0xA0, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
-                        DrawSpinner(cx + len, cy, 0xA0, 0xA0, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
-                    }
+                    len = MediumFont.GetStrWidth(GetStr(iptr->Text));
                 }
             }
-        }
-        {
-            if (iptr[i].Text != 0) {
-                if (Adjust != 0 && i == 3) {
-                    r = REDR;
-                    g = REDG;
-                    b = REDB;
-                }
-                if (MenuNo == 3 && iptr[i].len != 0 && iptr[i].Link != 1) {
-                    r = REDR;
-                    g = REDG;
-                    b = REDB;
-                }
-                if (MenuNo == 10 && iptr[i].len != 0 && iptr[i].Link == -2) {
-                    r = REDR;
-                    g = REDG;
-                    b = REDB;
-                }
-                if (DiabloDieFlag != 0) {
-                    if (MenuNo == 7 && iptr[i].Link == 0xD) {
-                        r = 0x28;
-                        g = 0x28;
-                        b = 0x28;
-                    }
-                    if (MenuNo == 1 && i != 0 && i < 5) {
-                        r = 0x28;
-                        g = 0x28;
-                        b = 0x28;
-                    }
-                }
+            cy = (my + iptr->y * Spacing + yoff) - 2;
+            if (cmenu + 1 == 3 && cs != 7) {
+                len = len + 10;
+                cx = mx + 2;
                 if (FeFlag != 0) {
-                    if (i == 0) {
-                        ORect.y -= 0x20;
-                        if (iptr[i].Text == 0x3B6) {
-                            ORect.x -= 0x40;
-                            ORect.w += 0x80;
-                        }
-                        LargeFont.Print(0, iptr[i].y * Spacing + yoff + 0x22, GetStr(iptr[i].Text), iptr[i].Just, &ORect, BLUER, BLUEG, BLUEB);
-                        if (iptr[i].Text == 0x3B6) {
-                            ORect.x += 0x40;
-                            ORect.w -= 0x80;
-                        }
-                        ORect.y += 0x20;
-                    } else if (cmenu + 1 == 3) {
-                        MediumFont.Print(0, iptr[i].y * Spacing + yoff + 0x20, GetStr(iptr[i].Text), iptr[i].Just, &ORect, r, g, b);
-                        if (i == 5)
-                            PrintMono(iptr[i].y * Spacing + yoff + 0x20);
-                    } else {
-                        MediumFont.Print(8, iptr[i].y * Spacing + yoff, GetStr(iptr[i].Text), iptr[i].Just, &ORect, r, g, b);
-                    }
-                } else {
-                    if (i != 0 && cmenu + 1 == 3) {
-                        MediumFont.Print(8, iptr[i].y * Spacing + yoff, GetStr(iptr[i].Text), iptr[i].Just, &ORect, r, g, b);
-                        if (i == 5)
-                            PrintMono(iptr[i].y * Spacing + yoff);
-                    } else {
-                        MediumFont.Print(0, iptr[i].y * Spacing + yoff, GetStr(iptr[i].Text), iptr[i].Just, &ORect, r, g, b);
-                    }
+                    cx = mx - 8;
+                    len = len + 6;
+                }
+            } else {
+                cx = (((0x100 - len)) / 2) + 0x14;
+                len = len + 0x10;
+            }
+            if (FeFlag != 0 && cmenu + 1 == 3)
+                cy = cy + 0x20;
+            if (MenuNo + 1 != 5) {
+                if (AlertTxt == 0) {
+                    DrawSpinner(cx, cy, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
+                    DrawSpinner(cx + len, cy, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, depth, 1, 0, 8);
+                } else if (FeFlag != 0) {
+                    DrawSpinner(cx, cy, 0xA0, 0xA0, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
+                    DrawSpinner(cx + len, cy, 0xA0, 0xA0, 0x40, 0x10, 0x40, 8, 0, depth, 1, 0, 8);
                 }
             }
         }
-        i = i + 1;
+        if (iptr->Text != 0) {
+            if (Adjust != 0 && i == 3) {
+                r = REDR;
+                g = REDG;
+                b = REDB;
+            }
+            if (MenuNo + 1 == 4 && iptr->len != 0 && iptr->Link != 1) {
+                r = REDR;
+                g = REDG;
+                b = REDB;
+            }
+            if (MenuNo + 1 == 11 && iptr->len != 0 && iptr->Link == -2) {
+                r = REDR;
+                g = REDG;
+                b = REDB;
+            }
+            if (DiabloDieFlag != 0) {
+                if (MenuNo + 1 == 8 && iptr->Link == 0xD) {
+                    b = 0x28;
+                    g = 0x28;
+                    r = 0x28;
+                }
+                if (MenuNo + 1 == 2 && i != 0 && i < 5) {
+                    b = 0x28;
+                    g = 0x28;
+                    r = 0x28;
+                }
+            }
+            if (FeFlag != 0) {
+                if (i == 0) {
+                    ORect.y -= 0x20;
+                    if (iptr->Text == 0x3B6) {
+                        ORect.x -= 0x40;
+                        ORect.w += 0x80;
+                    }
+                    LargeFont.Print(0, iptr->y * Spacing + yoff + 0x22, GetStr(iptr->Text), iptr->Just, &ORect, BLUER, BLUEG, BLUEB);
+                    if (iptr->Text == 0x3B6) {
+                        ORect.x += 0x40;
+                        ORect.w -= 0x80;
+                    }
+                    ORect.y += 0x20;
+                } else if (cmenu + 1 == 3) {
+                    MediumFont.Print(0, iptr->y * Spacing + yoff + 0x20, GetStr(iptr->Text), iptr->Just, &ORect, r, g, b);
+                    if (i == 5)
+                        PrintMono(iptr->y * Spacing + yoff + 0x20);
+                } else {
+                    MediumFont.Print(8, iptr->y * Spacing + yoff, GetStr(iptr->Text), iptr->Just, &ORect, r, g, b);
+                }
+            } else {
+                if (i != 0 && cmenu + 1 == 3) {
+                    MediumFont.Print(8, iptr->y * Spacing + yoff, GetStr(iptr->Text), iptr->Just, &ORect, r, g, b);
+                    if (i == 5)
+                        PrintMono(iptr->y * Spacing + yoff);
+                } else {
+                    MediumFont.Print(0, iptr->y * Spacing + yoff, GetStr(iptr->Text), iptr->Just, &ORect, r, g, b);
+                }
+            }
+        }
+        iptr++;
     }
     if (MenuNo == 2)
         PrintSelectBack(0x331);
