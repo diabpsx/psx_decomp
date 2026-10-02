@@ -986,9 +986,15 @@ void DRLG_L5FloodTVal(void)
     }
 }
 
+/* Rules 1-5 = Hellfire DRLG_L1.CPP:2990 (DRLG_L5TransFix); the rest are PSX additions.  Retail SLD puts
+ * each PSX rule's whole && condition on one line, hence the flat conjunctions.  y1 (yy - 1, the 23/13 rule's
+ * diagonal source row) is an inferred temp: retail SLD lines +9/+11 around the v load carry no code and SYM
+ * has no record for it (loop.c hoists it out of the i loop, then the j loop reduces it into the (yy-1)*8
+ * induction).  Hoisting it first lowers loop.c's move threshold so the constant 7 stays materialised at its
+ * three compares exactly as retail (with yy - 1 inline, 7 is hoisted into a saved register). */
 void DRLG_L5TransFix(void)
 {
-    int i, j, xx, yy, v;
+    int i, j, xx, yy, v, y1;
 
     yy = 16;
 
@@ -997,6 +1003,7 @@ void DRLG_L5TransFix(void)
 
         for (i = 0; i < DMAXX; i++) {
             v = dungeon[i][j];
+            y1 = yy - 1;
 
             if (v == 23 && dungeon[i][j - 1] == 18) {
                 dung_map[xx + 1][yy].dTransVal = dung_map[xx][yy].dTransVal;
@@ -1022,22 +1029,22 @@ void DRLG_L5TransFix(void)
             if (v == 24 && dungeon[i][j - 1] == 6) {
                 dung_map[xx][yy].dTransVal = dung_map[xx][yy - 2].dTransVal;
             }
-            if (v == 6) {
-                if (dungeon[i - 1][j] == 2)
-                    dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
-                if (dungeon[i - 1][j] == 37)
-                    dung_map[xx][yy].dTransVal = dung_map[xx][yy + 1].dTransVal;
+            if (v == 6 && dungeon[i - 1][j] == 2) {
+                dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
+            }
+            if (v == 6 && dungeon[i - 1][j] == 37) {
+                dung_map[xx][yy].dTransVal = dung_map[xx][yy + 1].dTransVal;
             }
             if (v == 27 && dungeon[i - 1][j] == 2) {
                 dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
             }
-            if (v == 23) {
-                if (dungeon[i - 1][j] == 7)
-                    dung_map[xx][yy].dTransVal = -1;
-                if (dungeon[i - 1][j] == 13)
-                    dung_map[xx][yy].dTransVal = dung_map[xx - 1][yy - 1].dTransVal;
+            if (v == 23 && dungeon[i - 1][j] == 7) {
+                dung_map[xx][yy].dTransVal = -1;
             }
-            if (v + 1 == 8 && dungeon[i - 1][j] == 13) {
+            if (v == 23 && dungeon[i - 1][j] == 13) {
+                dung_map[xx][yy].dTransVal = dung_map[xx - 1][y1].dTransVal;
+            }
+            if (v == 7 && dungeon[i - 1][j] == 13) {
                 dung_map[xx][yy].dTransVal = -1;
             }
             if (v == 12 && dungeon[i - 1][j] == 2) {
