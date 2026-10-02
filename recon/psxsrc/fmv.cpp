@@ -529,26 +529,22 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
     return len << 0xB;
 }
 
-/* @0x80156720 FMV.CPP:791 -- 13 instructions and exact SYM; not byte PASS.
- * The body and accumulated-size return match. Retail initializes i by copying
- * tsz; first CSE replaces our same source copy with constant zero. Validated
- * three-compiler evidence is documented in tools/instr/README.md. Do not add
- * artificial exits to suppress optimization; the only exit is the 21-buffer bound. */
+/* @0x80156720 FMV.CPP:791 -- original Climax routine (warcraft2/mdec.c:98) with i also initialized
+ * in its declaration.  That dead `i = 0` is load-bearing: when cse reaches the for-init, i already
+ * sits in const 0's class, so the equivalent-to-dest preference keeps a register copy from tsz
+ * (retail `addu a1,a2,zero`); loop.c then sees a register initial value, the iteration count is
+ * unknown and tsz stays a running total (13 insns rather than the folded 12). */
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
-    int i;
-    int tsz;
+    int i = 0, tsz = 0;
 
-    tsz = 0;
-    i = tsz;
-    while (1) {
+    for (i = 0; i < 21; i++)
+    {
         imgbuf[i] = (unsigned short *)p;
         p += 0x1900;
         tsz += 0x1900;
-        i++;
-        if (i >= 21)
-            break;
     }
+
     return tsz;
 }
 
