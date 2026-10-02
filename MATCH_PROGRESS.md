@@ -120,7 +120,7 @@
 - ✅ AddDead__FP9CacheInfoP8map_infoii (35)
 - ✅ PrintDead__7CBlocksii (177)
 - ✅ AddItem__FP9CacheInfoP8map_infoii (23)
-- ❌ PrintItems__7CBlocksii — 276 diffs (372/368; height/branch/coordinate lifetimes restored, 164 ASPSX aligned diffs, 14 calls exact)
+- ❌ PrintItems__7CBlocksii — 261 diffs (371/368; negative reset scheduling improved, height/branch/coordinate lifetimes restored, 145 ASPSX aligned diffs, 14 calls exact)
 - ✅ AddMissile__FP9CacheInfoP8map_infoii (70)
 - ✅ PrintMissiles__7CBlocksii (126)
 - ✅ ScrToWorldX__7CBlocksii (5)
@@ -501,7 +501,7 @@
 
 ## dialog  (recon/psxsrc/dialog.cpp) — 10/11 PASS
 - ✅ TrimCol__Fs_8008ad90 (14)
-- ❌ DialogPrint__Fiiiiiiiiii — 116 diffs (608/608; shade/Y order plus 8 u/v SYM lifetimes restored, extra GX record)
+- ❌ DialogPrint__Fiiiiiiiiii — 110 diffs (608/608; shade/Y order plus 8 u/v SYM lifetimes restored, 78 ASPSX aligned diffs, extra GX record)
 - ✅ GetDropShadowG4__FUcUcUcUcUcUcUcUcUcUcUcUc (78)
 - ✅ DropShadows__Fiiii (169)
 - ✅ InitDialog__Fv (78)

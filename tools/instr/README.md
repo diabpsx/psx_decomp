@@ -747,6 +747,14 @@ of the right edge. Explicit overlapping const snapshots for `u0` and the
 right edge are also code- and SYM-neutral. Results are under
 `build/speedbar_tail_order_probe`; live source remains unchanged.
 
+Existing-local snapshot follow-up: reusing dead `Loop`, `X`, `Y`, `Bx` or
+`By` for the first `u0` value was screened under `build/speedbar_reuse_probe`.
+All retain 459 instructions and exact calls. `Loop` and `Bx` preserve exact
+SYM but produce nine and 24 aligned real-ASPSX differences; the other forms
+also disturb saved-register records. In particular, `Loop` keeps the byte in
+s3 rather than retail's temporary v1, so it does not force the right edge into
+a0. No variant beats the six-difference live form.
+
 The former 380-line mismatch contained genuine reconstruction errors, not
 just allocation residue. Retail uses a 36-byte POLY_G4; the source used a
 POLY_FT4 view with a length written into its code byte and three halfword
@@ -1597,12 +1605,24 @@ extra SYM records. This produces 372/368 instructions instead of 355/368.
 Finally, the accumulated multiply-by-four/add/multiply-by-four coordinate
 idiom moves the item products into their retail saved-register webs. A full
 24-order screen under `build/printitems_order_probe` confirms the retained
-`x, y, bx, by` order is in the best class. Together the live gate improves
-from 403 to 276 differences (164 aligned real-ASPSX differences) with all
-fourteen calls exact. The remaining four-instruction surplus is coupled to the
-`this/OtPos/Fr` saved-register cycle; source-visible spinner selectors, a
-shared pre-branch data pointer, and record-bearing sine temporaries are not
-valid fixes.
+`x, y, bx, by` order is in the best class. Ordering the negative-height updates
+as frame reset, animation clear, selection enable, then height clear lets the
+compiler fill the item-index load delay slot and removes one instruction. The
+live gate is now 261 differences at 371/368 (145 aligned real-ASPSX
+differences), with all fourteen calls exact.
+
+The remaining three-instruction surplus is coupled to the missing animation-
+index lifetime and scratchpad address shape. Diagnostic screens under
+`build/printitems_angle_probe`, `build/printitems_cache_probe`,
+`build/printitems_branch_probe`, and `build/printitems_finalshape_probe` show
+that a saved index restores `this` to its retail stack slot and rotates
+`OtPos/Fr` to fp/s7; spelling the cache as a `CacheInfo` array removes the
+spilled invariant base. Combined with identical source render arms and the
+reset ordering, that reaches 370/368 and 156 differences. A named selector
+adds a non-retail SYM record, while an anonymous-union selector suppresses the
+record only by introducing an artificial source lifetime, so neither form is
+retained. The two isolated surplus instructions are the `0x1F800004` low-half
+materialization and an unsigned-load/sign-extension form for `SinTab`.
 
 ### ERROR localized IDs and original header pools restored
 
@@ -2895,6 +2915,16 @@ s7/fp/stack lifetimes onto retail u0/u1/v1/v0/v2 and u2/u3/v3 names. After
 restoring declaration order and excluding structure member tokens from the
 mechanical rename, all eight records match exactly with byte-identical output.
 The reproducible probe is `build/probe_dialog_uv_names.py`.
+
+Dead-local GX-carrier follow-up: reusing each of `W`, `H`, `U`, `V`, the four
+`x` coordinates, or the four `y` coordinates removes the explicit `GX` name
+but does not improve the seal. The best such form is 144 differences at
+606/608; others range from 150 to 369 differences and several lose exact
+length or earlier parameter records. Results are under
+`build/dialog_gx_reuse_probe`. The current authoritative baseline is 110
+maspsx differences / 78 aligned real-ASPSX differences at 608/608, with exact
+calls; the status board's older 116 count was refreshed. No carrier form was
+retained.
 
 Validated isolated allocator trace is captured in build/dialogprint_alloc.
 v1 (pseudo 99) has 6 references / 28 live instructions / two crossed calls,
@@ -4522,6 +4552,12 @@ differences. Comma expressions, condition-owned calls, and destination-based
 XOR/add/sub identities preserve the four-difference baseline. This narrows the
 remaining problem to an unnamed across-call temporary lifetime with no lexical
 debug block.
+
+An anonymous-union member in the existing loop scope also reproduces all 88
+retail instructions and preserves the sixteen ordered calls, but cc1plus emits
+that member as a non-retail `status` REG record. It therefore fails the exact
+SYM seal and is rejected rather than used as a record-suppression trick. The
+reproducible full-TU probe is `build/async_anonymous_probe`.
 
 For `LoPlayFMVOverLay`, thirty equivalent expressions for the `user_start =
 user_quit` store were screened, including late-combine complement identities,

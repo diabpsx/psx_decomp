@@ -1560,10 +1560,10 @@ void CBlocks::PrintItems(int x, int y)
                     if (height < 0) {
                         int it = ItemCAnimTbl[IStr->_iCurs];
                         PlaySfxLoc(ItemAnimSnds[it], IStr->_ix, IStr->_iy);
-                        height = 0;
+                        IStr->_iAnimFrame = item[Index]._iAnimLen;
                         IStr->_iAnimFlag = 0;
                         IStr->_iSelFlag = 1;
-                        IStr->_iAnimFrame = item[Index]._iAnimLen;
+                        height = 0;
                     }
                     if (height > 0)
                         height = -height;
