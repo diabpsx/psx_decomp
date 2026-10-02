@@ -114,46 +114,85 @@ void CPlayer::Load(int Id)
     TexId = Id;
 }
 
-/* @0x80095AA8 CPLAYER.CPP:210 */
+/* @0x80095AA8 CPLAYER.CPP:210.  Line layout below follows the retail SLD records exactly (relative to the
+ * opening brace = line 210).  The two PM_WALK blocks are the PAL-beta walk-lead code (refs/skeleton
+ * PAL_1997_12_12 CPLAYER.CPP: pdir/wtime locals, TxyAdd adds); in this build their adds are dead, flow
+ * deletes them, jump2 then deletes the emptied tests -- but only after allocation, which is what leaves
+ * retail's s7 = &plr base (second plr[0] access) and the wtime REG $v0 record with no code. */
 void CPlayer::SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg)
 {
-    int ScrX;
-    int ScrY;
+    int ScrX = Plr._pxoff * 652 / 1000;
+    int ScrY = Plr._pyoff * 625 / 1000;
     int WorldX;
     int WorldY;
-    int NWorldX;
-    int NWorldY;
+    int NWorldX = 0;
+    int NWorldY = 0;
     int wtime;
-    BOOL ok;
 
-    ScrX = Plr._pxoff * 652 / 1000;
-    ScrY = Plr._pyoff * 625 / 1000;
-    NWorldX = 0;
-    NWorldY = 0;
-    ok = false;
-    if (plr[0].plractive && plr[0]._pmode != PM_DEATH && plr[1].plractive && plr[1]._pmode != PM_DEATH) {
+
+    BOOL ok = false;
+
+    if (plr[0].plractive && plr[0]._pmode != PM_DEATH && plr[1].plractive && plr[1]._pmode != PM_DEATH)
+    {
+        ok = true;
         ScrX = (Plr._pxoff + plr[1]._pxoff) / 2 * 625 / 1000;
         ScrY = (Plr._pyoff + plr[1]._pyoff) / 2 * 625 / 1000;
+
         NWorldX = (plr[0]._px + plr[1]._px) * 10 + Bg.ScrToWorldX(ScrX, ScrY) + 10;
+
         NWorldY = (plr[0]._py + plr[1]._py) * 10 + Bg.ScrToWorldY(ScrX, ScrY) + 10;
+    }
+
+
+    else if (plr[1].plractive && plr[1]._pmode != PM_DEATH)
+    {
         ok = true;
-    } else if (plr[1].plractive && plr[1]._pmode != PM_DEATH) {
         ScrX = plr[1]._pxoff * 652 / 1000;
         ScrY = plr[1]._pyoff * 625 / 1000;
         WorldX = plr[1]._px * 20 + Bg.ScrToWorldX(ScrX, ScrY) + 10;
         WorldY = plr[1]._py * 20 + Bg.ScrToWorldY(ScrX, ScrY) + 10;
-        ok = true;
-        NWorldX = WorldX + (WWorldX - OWorldX) / 2;
-        NWorldY = WorldY + (WWorldY - OWorldY) / 2;
-    } else if (plr[0]._pmode != PM_DEATH) {
-        WorldX = Plr._px * 20 + Bg.ScrToWorldX(ScrX, ScrY) + 10;
-        WorldY = Plr._py * 20 + Bg.ScrToWorldY(ScrX, ScrY) + 10;
-        ok = true;
+        if (plr[1]._pmode == PM_WALK)
+        {
+            /* PAL beta: pdir = plr[1]._pdir; */
+            wtime = plr[1]._pVar8;
+            if (wtime > 16)
+                wtime = 16;
+            /* PAL beta: NWorldX += TxyAdd[pdir * 2] * wtime; */
+            /* PAL beta: NWorldY += TxyAdd[pdir * 2 + 1] * wtime; */
+        }
         NWorldX = WorldX + (WWorldX - OWorldX) / 2;
         NWorldY = WorldY + (WWorldY - OWorldY) / 2;
     }
-    wtime = Bg.WorldToScrX(0, 0);
-    wtime = Bg.WorldToScrY(0, 0);
+
+
+    else if (plr[0]._pmode != PM_DEATH)
+    {
+        ok = true;
+        WorldX = Plr._px * 20 + Bg.ScrToWorldX(ScrX, ScrY) + 10;
+        WorldY = Plr._py * 20 + Bg.ScrToWorldY(ScrX, ScrY) + 10;
+        if (plr[0]._pmode == PM_WALK)
+        {
+            /* PAL beta: pdir = plr[0]._pdir; */
+            wtime = plr[0]._pVar8;
+            if (wtime > 16)
+                wtime = 16;
+            /* PAL beta: NWorldX += TxyAdd[pdir * 2] * wtime; */
+            /* PAL beta: NWorldY += TxyAdd[pdir * 2 + 1] * wtime; */
+        }
+        NWorldX = WorldX + (WWorldX - OWorldX) / 2;
+        NWorldY = WorldY + (WWorldY - OWorldY) / 2;
+    }
+
+
+
+
+
+
+
+
+    Bg.WorldToScrX(0, 0);
+    Bg.WorldToScrY(0, 0);
+
     if (ok)
         Bg.SetScrollTarget(NWorldX, NWorldY);
 }
