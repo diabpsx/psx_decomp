@@ -378,6 +378,20 @@ void ResyncQuests(void)
     int i;
     int tren;
 
+    // for Poison Water quest only - inits the poison/not poison water pal
+    // (hellfire QUESTS.CPP 786-795).  The PSX PAL beta (1997-12-12) has this
+    // block calling TSK_AddTask(0, TSK_Lava2Water, 0x800, 0) when the quest
+    // is done; this build no longer has TSK_Lava2Water, but the emptied block
+    // is still compiled: retail's SLD spans the same 89 lines as the beta and
+    // its block-0 schedule (saves before the QuestStatus argument) needs it.
+    if (setlevel) {
+        if (setlvlnum == quests[Q_PWATER]._qslvl && quests[Q_PWATER]._qactive != QUEST_NOTACTIVE && leveltype == quests[Q_PWATER]._qlvltype) {
+            if (quests[Q_PWATER]._qactive == QUEST_DONE) {
+                // TSK_AddTask(0, TSK_Lava2Water, 0x800, 0);
+            }
+        }
+    }
+
     if (QuestStatus(Q_LTBANNER)) {
         if (quests[Q_LTBANNER]._qvar1 == 1) {
             ObjChangeMapResync(setpc_x + setpc_w - 2, setpc_y + setpc_h - 2, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1);

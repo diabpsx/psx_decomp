@@ -219,8 +219,18 @@ static void PrintCDWaitTask(TASK *T)
             PRIM_FullScreen(300);
             cdx = 0x120 - (((CDAngle >> 1) + 1) & 1);
             cdy = 0xD0;
-            if (!IsGameLoading() && !FeFlag && !qtextflag && plr[1].plractive)
-                cdx -= 0x80;
+            /* Retail SLD: this condition is line 179; the surviving plr[1] test and its
+             * cdx -= 0x80 share line 183 with code-free lines between.  The first arm's
+             * &plr[0].plractive reference is what makes cse address plr[1] as
+             * (plr+0x1D)+0x19E8 (retail's unique s3 base) and gives that base its
+             * priority over CDGfxData; jump2 later cross-jumps the identical arms and
+             * deletes the then-redundant plr[0] test. */
+            if (!IsGameLoading() && !FeFlag && !qtextflag)
+            {
+                if (plr[0].plractive && plr[1].plractive)
+                    cdx -= 0x80;
+                else if (plr[1].plractive) cdx -= 0x80;
+            }
             Ft4 = CDGfxData->PrintFt4(0, cdx, cdy, (CDAngle >> 1) & 1, 0x1FE, 0);
             Ft4->r0 = 0x80;
             Ft4->g0 = 0x80;
