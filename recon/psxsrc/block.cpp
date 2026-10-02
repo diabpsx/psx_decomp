@@ -1117,7 +1117,7 @@ void CBlocks::IterateVisibleMap(int x, int y, int (*Func)(CacheInfo *, map_info 
     int XPix;
     int YPix;
     int CRight;
-    CachedInfoList *List = (CachedInfoList *)0x1F800000;
+    CachedInfoList *List;
 
     if (Infra)
         DoVisCheck = 0;
@@ -1131,10 +1131,10 @@ void CBlocks::IterateVisibleMap(int x, int y, int (*Func)(CacheInfo *, map_info 
         MyXShifter = 0;
         MyYShifter = 0;
     }
+    XPix = x % 40;
+    YPix = y % 40;
     XPos = x / 40;
     YPos = y / 40;
-    XPix = x - XPos * 40;
-    YPix = y - YPos * 40;
     if (x < 0) {
         XPos--;
         XPix += 40;
@@ -1149,6 +1149,7 @@ void CBlocks::IterateVisibleMap(int x, int y, int (*Func)(CacheInfo *, map_info 
     } else
         xx = 0;
 
+    List = (CachedInfoList *)0x1F800000;
     while (1) {
         if (!(x < CRight))
             break;
@@ -1674,10 +1675,10 @@ void CBlocks::PrintMap(int x, int y)
         BlankBlock = 0;
         break;
     }
-    XPos = x / 40;
     XPix = x % 40;
-    YPos = y / 40;
     YPix = y % 40;
+    XPos = x / 40;
+    YPos = y / 40;
     if (x < 0) {
         XPos--;
         XPix += 40;
@@ -1692,16 +1693,16 @@ void CBlocks::PrintMap(int x, int y)
     }
     x = GMXAdj2 - nx;
     y = GMYAdj2 - ny;
+    x += ClipRect.x;
+    y += ClipRect.y;
     CLeft = ClipRect.x;
+    CRight = ClipRect.x + ClipRect.w;
     CTop = ClipRect.y;
-    x += CLeft;
-    y += CTop;
-    CRight = CLeft + ClipRect.w;
-    CBottom = CTop + ClipRect.h;
+    CBottom = ClipRect.y + ClipRect.h;
     if (XPix - YPix < 0) {
         XPos--;
-        xx = 1;
         x -= 40;
+        xx = 1;
     } else
         xx = 0;
 
@@ -1726,6 +1727,7 @@ void CBlocks::PrintMap(int x, int y)
             int by;
 
             if ((unsigned)ThisYPos < 47 && (unsigned)ThisXPos < 47) {
+                BlockNum = dungeon[ThisXPos][ThisYPos];
                 MyRgbData.rgbb.r1 = dung_map_r[ThisXPos - 1][ThisYPos];
                 MyRgbData.rgbb.g1 = dung_map_g[ThisXPos - 1][ThisYPos];
                 MyRgbData.rgbb.b1 = dung_map_b[ThisXPos - 1][ThisYPos];
@@ -1738,7 +1740,6 @@ void CBlocks::PrintMap(int x, int y)
                 MyRgbData.rgbb.r4 = dung_map_r[ThisXPos + 1][ThisYPos];
                 MyRgbData.rgbb.g4 = dung_map_g[ThisXPos + 1][ThisYPos];
                 MyRgbData.rgbb.b4 = dung_map_b[ThisXPos + 1][ThisYPos];
-                BlockNum = dungeon[ThisXPos][ThisYPos];
             } else {
                 MyRgbData.rgbb.r1 = MyRgbData.rgbb.r2 = MyRgbData.rgbb.r3 = MyRgbData.rgbb.r4 = restore_r;
                 MyRgbData.rgbb.g1 = MyRgbData.rgbb.g2 = MyRgbData.rgbb.g3 = MyRgbData.rgbb.g4 = restore_g;
@@ -1750,8 +1751,8 @@ void CBlocks::PrintMap(int x, int y)
                 MyRgbData.rgbb.g1 = restore_g;
                 MyRgbData.rgbb.b1 = restore_b;
             }
-            by = (ThisYPos + 8) * 2;
             bx = (ThisXPos + 8) * 2;
+            by = (ThisYPos + 8) * 2;
             if (BlockNum) {
                 RECT *BlockR;
                 int clipx;
@@ -1848,15 +1849,15 @@ void CBlocks::PrintMap(int x, int y)
                         } else {
                             GetGCol(Parts->X, 128 - Parts->Y, &DestGt4->r0, &MyRgbData);
                             GetGCol(Parts->X + W, 128 - Parts->Y, &DestGt4->r1, &MyRgbData);
-                            GetGCol(Parts->X, H + 128 - Parts->Y, &DestGt4->r2, &MyRgbData);
-                            GetGCol(Parts->X + W, H + 128 - Parts->Y, &DestGt4->r3, &MyRgbData);
+                            GetGCol(Parts->X, H + (128 - Parts->Y), &DestGt4->r2, &MyRgbData);
+                            GetGCol(Parts->X + W, H + (128 - Parts->Y), &DestGt4->r3, &MyRgbData);
                         }
                         Parts--;
                     }
                 }
             }
-            ThisYPos++;
             ThisXPos++;
+            ThisYPos++;
             ThisY += 40;
         }
         if (!(xx & 1))
