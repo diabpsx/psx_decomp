@@ -160,8 +160,8 @@ void CPlayer::SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg)
             /* PAL beta: NWorldX += TxyAdd[pdir * 2] * wtime; */
             /* PAL beta: NWorldY += TxyAdd[pdir * 2 + 1] * wtime; */
         }
-        NWorldX = WorldX + (WWorldX - OWorldX) / 2;
-        NWorldY = WorldY + (WWorldY - OWorldY) / 2;
+        NWorldX = WorldX; NWorldX += (WWorldX - OWorldX) / 2;   /* PAL-beta `NWorldX +=` accumulation */
+        NWorldY = WorldY; NWorldY += (WWorldY - OWorldY) / 2;
     }
 
 
@@ -179,8 +179,8 @@ void CPlayer::SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg)
             /* PAL beta: NWorldX += TxyAdd[pdir * 2] * wtime; */
             /* PAL beta: NWorldY += TxyAdd[pdir * 2 + 1] * wtime; */
         }
-        NWorldX = WorldX + (WWorldX - OWorldX) / 2;
-        NWorldY = WorldY + (WWorldY - OWorldY) / 2;
+        NWorldX = WorldX; NWorldX += (WWorldX - OWorldX) / 2;   /* PAL-beta `NWorldX +=` accumulation */
+        NWorldY = WorldY; NWorldY += (WWorldY - OWorldY) / 2;
     }
 
 

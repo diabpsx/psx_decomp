@@ -237,9 +237,11 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     PanelTData->PrintFt4(0x35, X, Y, 0, GPanelOt, 0);
     if (HealthHeight > 0) {
         BarY = -(HealthHeight + 8) + Y;
-        xof = XY->FlaskFlip ? 0x18 : 0;
-        xof = X + (xof -= 0xB);
-        Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
+        if (!XY->FlaskFlip)
+            xof = 0;
+        else
+            xof = 0x18;
+        Ft4 = PanelTData->PrintFt4(0x38, X - 0xB + xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
@@ -249,7 +251,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->u3 = (unsigned char)((Ft4->u1 + HealthHeight) - 1);
         Ft4->code = Ft4->code & 0xFC;
         Ft4->tpage = Ft4->tpage | 0x20;
-        Ft4 = PanelTData->PrintFt4(HealthAnim + 0x84, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
+        Ft4 = PanelTData->PrintFt4(HealthAnim + 0x84, X - 0xB + xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0x7F;
         Ft4->g0 = 0;
         Ft4->b0 = 0;
@@ -258,10 +260,11 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     }
     if (ManaHeight > 0) {
         BarY = -(ManaHeight + 8) + Y;
-        xof = -2;
-        if (!XY->FlaskFlip) xof = 0;
-        xof = X + (xof += 2);
-        Ft4 = PanelTData->PrintFt4(0x38, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
+        if (!XY->FlaskFlip)
+            xof = 0;
+        else
+            xof = -2;
+        Ft4 = PanelTData->PrintFt4(0x38, X + 2 + xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
         Ft4->b0 = 0x7F;
@@ -271,7 +274,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
         Ft4->u3 = (unsigned char)((Ft4->u1 + ManaHeight) - 1);
         Ft4->code = Ft4->code & 0xFC;
         Ft4->tpage = Ft4->tpage | 0x20;
-        Ft4 = PanelTData->PrintFt4(ManaAnim + 0x8C, xof, BarY, XY->FlaskFlip, GPanelOt, 0);
+        Ft4 = PanelTData->PrintFt4(ManaAnim + 0x8C, X + 2 + xof, BarY, XY->FlaskFlip, GPanelOt, 0);
         Ft4->r0 = 0;
         Ft4->g0 = 0;
         Ft4->b0 = 0x7F;
