@@ -2408,17 +2408,22 @@ void DrawInvTSK(struct TASK *T)
         if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4)
             _pcurs[myplr] = 1;
 
+        /* Retail SLD/JAP render: the TryInvPut-success arm has its own
+           NetSendCmdPItem call, cross-jumped by jump2 into the later copy.
+           The extra sched1-visible insns keep omp/osel in one allocation
+           priority bucket, so omp=s6/osel=s7 with the retail restore order. */
         if (_pcurs[myplr] >= 0xC) {
             if (!TryInvPut()) {
-                if (StoreAutoPlace())
-                    continue;
-                if (numitems >= 0x7A) {
-                    PlaySFX(0x3D3);
-                    ThisIsShit = 1;
-                    continue;
+                if (!StoreAutoPlace()) {
+                    if (numitems < 0x7A)
+                        NetSendCmdPItem(1, 0xA, 0, 0);
+                    else {
+                        PlaySFX(0x3D3);
+                        ThisIsShit = 1;
+                    }
                 }
-            }
-            NetSendCmdPItem(1, 0xA, 0, 0);
+            } else
+                NetSendCmdPItem(1, 0xA, 0, 0);
         }
     }
 
@@ -2453,8 +2458,8 @@ void DrawInvTSK(struct TASK *T)
     ClrCursor(0);
     ClrCursor(1);
     myplr = omp;
-    invflag = 0;
     sel_data = osel;
+    invflag = 0;
     GLUE_ResumeGame();
     GLUE_SetShowPanelFlag(1);
     GLUE_SetShowGameScreenFlag(1);
