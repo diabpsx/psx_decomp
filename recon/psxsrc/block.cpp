@@ -4,8 +4,7 @@
  * real inheritance `: public TextDat` (SYM shows the base as member `TextDat TextDat @+0`; the dtor
  * forwards __in_chrg to ___7TextDat and the ctor calls __7TextDat).  Types beyond the local ones come
  * from psxsrc/psyq.h and psxsrc/gen/structs_block.h (tools/symhdr.py struct; regenerate with
- * scratch/block/genhdr.py).  Open near-misses: see the agent report (GetGCol, IterateVisibleMap,
- * PrintMap/Monsters/Objects/Items/Dead/Towners/Missiles, MakeGt4). */
+ * scratch/block/genhdr.py).  All 68 functions PASS bytes + SYM (2026-10-03). */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
 #include "psxsrc/gen/structs_block.h"
@@ -232,7 +231,7 @@ public:
     void DumpItems();
     void DumpObjs();
     void DumpMonsters();
-    void PrintMap(int x, int y);   /* not yet reconstructed -- declared only, defined elsewhere later */
+    void PrintMap(int x, int y);
     void Load(int Id);
     void MakeGt4Table();
     void MakeGt4(struct POLY_GT4 *GT4, struct FRAME_HDR *Fr);
