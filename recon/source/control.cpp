@@ -138,8 +138,11 @@ unsigned char TrimCol(short col)
 /* Frame audit: retail and reconstruction already place every outer AUTO/ARG at the same physical
  * sp offset (yp=56, nCel=64, w=72, ThisDat=80, Tp=88, g=96, b=104, otpos=112). Retail alone has
  * a recordless 32-byte gap above those slots, moving inner `st` and the saved-register area by 32.
- * Aggregate/anonymous/scalar frame-hole experiments all allocate below the outer slots and therefore
- * shift correct offsets; they are not the missing source construct. */
+ * The gap is reload's ascending-pseudo spill-slot order: our 120/128 slots are two combine-orphaned
+ * SpellColors address pseudos (split 3-insn combines leave a USE + refs>0, no hard reg), st follows.
+ * Retail had four more such orphans before st's pseudo, with their USE insns outside Y's lifetime:
+ * that also lengthens xp's live range, which is what lets retail's SLD statement order X,Y,SW,SH
+ * (lines 612-615) keep Y=s7/xp=fp (now Y 1607 vs xp 1613 priority). Source construct still open. */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel)
 {
     TextDat *ThisDat;
@@ -241,7 +244,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             u1 = u0 + SH;
             v1 = v0;
             u2 = u0;
-            v2 = SW - (1 - Tp->V);
+            v2 = Tp->V - 1 + SW;
             u3 = u1;
             v3 = v2;
         }
@@ -328,14 +331,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         Ft4->r0 = 128 / st;
         Ft4->g0 = 128 / st;
         Ft4->b0 = 128 / st;
-        Ft4->x0 = Fr->X + xp;
-        Ft4->y0 = Fr->Y + yp;
-        Ft4->x1 = Fr->X + xp + SpellW;
-        Ft4->y1 = Fr->Y + yp;
-        Ft4->x2 = Fr->X + xp;
-        Ft4->y2 = Fr->Y + yp + SpellH;
-        Ft4->x3 = Fr->X + xp + SpellW;
-        Ft4->y3 = Fr->Y + yp + SpellH;
+        setXYWH(Ft4, xp + Fr->X, yp + Fr->Y, SpellW, SpellH);
     } else {
         Fr = ThisDat->GetFr(nCel + 166);
         SpellW = Fr->W;
@@ -346,14 +342,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         Ft4->b0 = 128;
         setShadeTex(Ft4, 0);
         setSemiTrans(Ft4, 1);
-        Ft4->x0 = Fr->X - (-1 - xp);
-        Ft4->y0 = Fr->Y - (-1 - yp);
-        Ft4->x1 = Fr->X + xp - (1 - SpellW);
-        Ft4->y1 = Fr->Y - (-1 - yp);
-        Ft4->x2 = Fr->X - (-1 - xp);
-        Ft4->y2 = Fr->Y + yp - (1 - SpellH);
-        Ft4->x3 = Fr->X + xp - (1 - SpellW);
-        Ft4->y3 = Fr->Y + yp - (1 - SpellH);
+        setXYWH(Ft4, xp + (short)(Fr->X + 1), yp + (short)(Fr->Y + 1), SpellW - 2, SpellH - 2);
         Fr = ThisDat->GetFr(165);
         SpellW = Fr->W;
         SpellH = Fr->H;
@@ -364,14 +353,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         setShadeTex(Ft4, 0);
         if (!sbookflag) {
             setSemiTrans(Ft4, 1);
-            Ft4->x0 = Fr->X - (-1 - xp);
-            Ft4->y0 = Fr->Y - (-1 - yp);
-            Ft4->x1 = Fr->X + xp - (1 - SpellW);
-            Ft4->y1 = Fr->Y - (-1 - yp);
-            Ft4->x2 = Fr->X - (-1 - xp);
-            Ft4->y2 = Fr->Y + yp - (1 - SpellH);
-            Ft4->x3 = Fr->X + xp - (1 - SpellW);
-            Ft4->y3 = Fr->Y + yp - (1 - SpellH);
+            setXYWH(Ft4, xp + (short)(Fr->X + 1), yp + (short)(Fr->Y + 1), SpellW - 2, SpellH - 2);
         }
     }
 }
