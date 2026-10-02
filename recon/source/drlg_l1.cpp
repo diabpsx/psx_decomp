@@ -17,6 +17,43 @@
 #include "source/gen/structs_drlg_l1.h"
 #include "source/gen/externs_drlg_l1.h"
 #include "source/gen/protos_drlg_l1.h"
+
+/* File-local helpers: retail SYM gives these class STAT (static), and no other segment calls them. */
+static void DRLG_PlaceDoor(int x, int y);   /* @0x8013BCB0 DRLG_L1.CPP:271 */
+static void DRLG_L1Shadows(void);   /* @0x8013C190 DRLG_L1.CPP:329 */
+static int DRLG_PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int noquad, int ldir);   /* @0x8013C5A0 DRLG_L1.CPP:399 */
+static void DRLG_SetWalls(void);   /* @0x8013CA08 DRLG_L1.CPP:614 */
+static void DRLG_L1Floor(void);   /* @0x8013CAC4 DRLG_L1.CPP:649 */
+static void DRLG_L1Pass3(void);   /* @0x8013CBA8 DRLG_L1.CPP:689 */
+static void DRLG_LoadL1SP(void);   /* @0x8013CDA0 DRLG_L1.CPP:787 */
+static void DRLG_FreeL1SP(void);   /* @0x8013CE7C DRLG_L1.CPP:805 */
+static void DRLG_InitL1Vals(void);   /* @0x8013CF5C DRLG_L1.CPP:870 */
+static void InitL5Dungeon(void);   /* @0x8013D2F8 DRLG_L1.CPP:1054 */
+static void L5ClearFlags(void);   /* @0x8013D37C DRLG_L1.CPP:1081 */
+static void L5drawRoom(int x, int y, int w, int h);   /* @0x8013D3CC DRLG_L1.CPP:1092 */
+static unsigned char L5checkRoom(int x, int y, int width, int height);   /* @0x8013D438 DRLG_L1.CPP:1108 */
+static void L5roomGen(int x, int y, int w, int h, int dir);   /* @0x8013D4CC DRLG_L1.CPP:1124 */
+static void L5firstRoom(void);   /* @0x8013D7FC DRLG_L1.CPP:1216 */
+static long L5GetArea(void);   /* @0x8013DB9C DRLG_L1.CPP:1274 */
+static void L5makeDungeon(void);   /* @0x8013DBFC DRLG_L1.CPP:1290 */
+static void L5makeDmt(void);   /* @0x8013DC88 DRLG_L1.CPP:1309 */
+static int L5HWallOk(int i, int j);   /* @0x8013DD70 DRLG_L1.CPP:1337 */
+static int L5VWallOk(int i, int j);   /* @0x8013DEAC DRLG_L1.CPP:1358 */
+static void L5HorizWall(int i, int j, char p, int dx);   /* @0x8013DFF4 DRLG_L1.CPP:1379 */
+static void L5VertWall(int i, int j, char p, int dy);   /* @0x8013E22C DRLG_L1.CPP:1418 */
+static void L5AddWall(void);   /* @0x8013E458 DRLG_L1.CPP:1458 */
+static void DRLG_L5GChamber(int sx, int sy, int topflag, int bottomflag, int leftflag, int rightflag);   /* @0x8013E6B4 DRLG_L1.CPP:1497 */
+static void DRLG_L5GHall(int x1, int y1, int x2, int y2);   /* @0x8013E974 DRLG_L1.CPP:1557 */
+static void L5tileFix(void);   /* @0x8013EA28 DRLG_L1.CPP:1579 */
+static void DRLG_L5Subs(void);   /* @0x8013F2EC DRLG_L1.CPP:1648 */
+static void DRLG_L5SetRoom(int rx1, int ry1);   /* @0x8013F4F8 DRLG_L1.CPP:1688 */
+static void L5FillChambers(void);   /* @0x8013F5F8 DRLG_L1.CPP:1722 */
+static void DRLG_L5FTVR(int i, int j, int x, int y, int d);   /* @0x8013FCE4 DRLG_L1.CPP:1807 */
+static void DRLG_L5FloodTVal(void);   /* @0x8014016C DRLG_L1.CPP:1852 */
+static void DRLG_L5TransFix(void);   /* @0x80140264 DRLG_L1.CPP:1875 */
+static void DRLG_L5DirtFix(void);   /* @0x801406A8 DRLG_L1.CPP:1987 */
+static void DRLG_L5CornerFix(void);   /* @0x80140824 DRLG_L1.CPP:2008 */
+static void DRLG_L5(int entry);   /* @0x80140930 DRLG_L1.CPP:2029 */
 #include "source/diablo.h"
 
 #define DMAXX 40
@@ -42,7 +79,7 @@ static unsigned char VR1;
 static unsigned char VR2;
 static unsigned char VR3;
 
-void InitL5Dungeon(void)
+static void InitL5Dungeon(void)
 {
     int i, j;
 
@@ -58,7 +95,7 @@ void InitL5Dungeon(void)
     }
 }
 
-void L5ClearFlags(void)
+static void L5ClearFlags(void)
 {
     int i, j;
 
@@ -69,7 +106,7 @@ void L5ClearFlags(void)
     }
 }
 
-void L5drawRoom(int x, int y, int w, int h)
+static void L5drawRoom(int x, int y, int w, int h)
 {
     int i, j;
 
@@ -80,7 +117,7 @@ void L5drawRoom(int x, int y, int w, int h)
     }
 }
 
-unsigned char L5checkRoom(int x, int y, int width, int height)
+static unsigned char L5checkRoom(int x, int y, int width, int height)
 {
     int i, j;
 
@@ -96,7 +133,7 @@ unsigned char L5checkRoom(int x, int y, int width, int height)
     return TRUE;
 }
 
-void L5roomGen(int x, int y, int w, int h, int dir)
+static void L5roomGen(int x, int y, int w, int h, int dir)
 {
     int rx, ry, rx2, ry2;
     int height, width;
@@ -191,7 +228,7 @@ void L5roomGen(int x, int y, int w, int h, int dir)
     }
 }
 
-void L5firstRoom(void)
+static void L5firstRoom(void)
 {
     int x, y;
     int xs, xe;
@@ -282,7 +319,7 @@ void L5firstRoom(void)
     }
 }
 
-long L5GetArea(void)
+static long L5GetArea(void)
 {
     int i, j;
     long rv;
@@ -299,7 +336,7 @@ long L5GetArea(void)
     return rv;
 }
 
-void L5makeDungeon(void)
+static void L5makeDungeon(void)
 {
     int i, j;
     int k, l;
@@ -318,7 +355,7 @@ void L5makeDungeon(void)
 
 static const unsigned char L5ConvTbl[16] = { 22, 13, 1, 13, 2, 13, 13, 13, 4, 13, 1, 13, 2, 13, 16, 13 };
 
-void L5makeDmt(void)
+static void L5makeDmt(void)
 {
     int i, j;
     int idx;
@@ -343,7 +380,7 @@ void L5makeDmt(void)
     }
 }
 
-int L5HWallOk(int i, int j)
+static int L5HWallOk(int i, int j)
 {
     int x;
     unsigned char wallok;
@@ -368,7 +405,7 @@ int L5HWallOk(int i, int j)
         return -1;
 }
 
-int L5VWallOk(int i, int j)
+static int L5VWallOk(int i, int j)
 {
     int y;
     unsigned char wallok;
@@ -393,7 +430,7 @@ int L5VWallOk(int i, int j)
         return -1;
 }
 
-void L5HorizWall(int i, int j, char p, int dx)
+static void L5HorizWall(int i, int j, char p, int dx)
 {
     int xx;
     char wt = 0, dt;
@@ -442,7 +479,7 @@ void L5HorizWall(int i, int j, char p, int dx)
     }
 }
 
-void L5VertWall(int i, int j, char p, int dy)
+static void L5VertWall(int i, int j, char p, int dy)
 {
     int yy;
     char wt = 0, dt;
@@ -491,7 +528,7 @@ void L5VertWall(int i, int j, char p, int dy)
     }
 }
 
-void L5AddWall(void)
+static void L5AddWall(void)
 {
     int i, j, x, y;
 
@@ -533,7 +570,7 @@ void L5AddWall(void)
     }
 }
 
-void DRLG_L5GChamber(int sx, int sy, int topflag, int bottomflag, int leftflag, int rightflag)
+static void DRLG_L5GChamber(int sx, int sy, int topflag, int bottomflag, int leftflag, int rightflag)
 {
     int i, j;
 
@@ -591,7 +628,7 @@ void DRLG_L5GChamber(int sx, int sy, int topflag, int bottomflag, int leftflag, 
     dungeon[sx + 7][sy + 7] = 15;
 }
 
-void DRLG_L5GHall(int x1, int y1, int x2, int y2)
+static void DRLG_L5GHall(int x1, int y1, int x2, int y2)
 {
     int i;
 
@@ -608,7 +645,7 @@ void DRLG_L5GHall(int x1, int y1, int x2, int y2)
     }
 }
 
-void L5tileFix(void)
+static void L5tileFix(void)
 {
     int i, j;
 
@@ -734,7 +771,7 @@ static const unsigned char L5BTYPES[206] = {
     0, 0, 0, 0, 0, 0, 0
 };
 
-void DRLG_L5Subs(void)
+static void DRLG_L5Subs(void)
 {
     int x, y, i, rv;
     unsigned char c;
@@ -778,7 +815,7 @@ void DRLG_L5Subs(void)
     }
 }
 
-void DRLG_L5SetRoom(int rx1, int ry1)
+static void DRLG_L5SetRoom(int rx1, int ry1)
 {
     int rw, rh, i, j;
     unsigned char *sp;
@@ -809,7 +846,7 @@ void DRLG_L5SetRoom(int rx1, int ry1)
     }
 }
 
-void L5FillChambers(void)
+static void L5FillChambers(void)
 {
     int c;
 
@@ -923,7 +960,7 @@ void L5FillChambers(void)
     }
 }
 
-void DRLG_L5FTVR(int i, int j, int x, int y, int d)
+static void DRLG_L5FTVR(int i, int j, int x, int y, int d)
 {
     if (!dung_map[x][y].dTransVal && dungeon[i][j] == 13) {
         dung_map[x][y].dTransVal = TransVal;
@@ -966,7 +1003,7 @@ void DRLG_L5FTVR(int i, int j, int x, int y, int d)
     }
 }
 
-void DRLG_L5FloodTVal(void)
+static void DRLG_L5FloodTVal(void)
 {
     int i, j, xx, yy;
 
@@ -992,7 +1029,7 @@ void DRLG_L5FloodTVal(void)
  * has no record for it (loop.c hoists it out of the i loop, then the j loop reduces it into the (yy-1)*8
  * induction).  Hoisting it first lowers loop.c's move threshold so the constant 7 stays materialised at its
  * three compares exactly as retail (with yy - 1 inline, 7 is hoisted into a saved register). */
-void DRLG_L5TransFix(void)
+static void DRLG_L5TransFix(void)
 {
     int i, j, xx, yy, v, y1;
 
@@ -1062,7 +1099,7 @@ void DRLG_L5TransFix(void)
     }
 }
 
-void DRLG_L5DirtFix(void)
+static void DRLG_L5DirtFix(void)
 {
     int i, j;
 
@@ -1100,7 +1137,7 @@ void DRLG_L5DirtFix(void)
     }
 }
 
-void DRLG_L5CornerFix(void)
+static void DRLG_L5CornerFix(void)
 {
     int i, j;
 
@@ -1136,7 +1173,7 @@ void CreateL5Dungeon(unsigned int rseed, int entry)
     DRLG_SetPC();
 }
 
-void DRLG_PlaceDoor(int x, int y)
+static void DRLG_PlaceDoor(int x, int y)
 {
     unsigned char c;
     unsigned char df;
@@ -1220,7 +1257,7 @@ static const unsigned char PWATERIN[] = {
     0, 0, 0, 0, 0, 0
 };
 
-int DRLG_PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int noquad, int ldir)
+static int DRLG_PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int noquad, int ldir)
 {
     int sx, sy;
     int sw, sh;
@@ -1340,7 +1377,7 @@ int DRLG_PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, 
         return 3;
 }
 
-void DRLG_L1Floor(void)
+static void DRLG_L1Floor(void)
 {
     int i, j;
     long rv;
@@ -1359,7 +1396,7 @@ void DRLG_L1Floor(void)
     }
 }
 
-void DRLG_L1Pass3(void)
+static void DRLG_L1Pass3(void)
 {
     int i, j, xx, yy;
     long v1, v2, v3, v4, lv;
@@ -1420,7 +1457,7 @@ void DRLG_Init_Globals(void)
 
 #define Q_SKELKING 12
 
-void DRLG_LoadL1SP(void)
+static void DRLG_LoadL1SP(void)
 {
     setloadflag = FALSE;
     if (QuestStatus(Q_BUTCHER)) {
@@ -1437,7 +1474,7 @@ void DRLG_LoadL1SP(void)
     }
 }
 
-void DRLG_FreeL1SP(void)
+static void DRLG_FreeL1SP(void)
 {
     {
         void *p__p = pSetPiece;
@@ -1446,7 +1483,7 @@ void DRLG_FreeL1SP(void)
     }
 }
 
-void DRLG_InitL1Vals(void)
+static void DRLG_InitL1Vals(void)
 {
 }
 
@@ -1617,7 +1654,7 @@ static const unsigned char BSTYPES[206] = {
     0, 0, 0, 0, 0, 0
 };
 
-void DRLG_L1Shadows(void)
+static void DRLG_L1Shadows(void)
 {
     int x, y, i, patflag;
     unsigned char sd[2][2];
@@ -1710,7 +1747,7 @@ void DRLG_L1Shadows(void)
 
 /* PSX-only (no devilution counterpart): marks dung_map.dFlags bit 0x20 wherever the underlying
  * dungeon tile is passable floor/dirt (13/22) at the 2x-scaled dung_map resolution. */
-void DRLG_SetWalls(void)
+static void DRLG_SetWalls(void)
 {
     int i, j;
     int yy = 16;
@@ -1782,7 +1819,7 @@ static const unsigned char LAMPS[] = {
     130, 128
 };
 
-void DRLG_L5(int entry)
+static void DRLG_L5(int entry)
 {
     long area, minarea;
     unsigned char doneflag;
