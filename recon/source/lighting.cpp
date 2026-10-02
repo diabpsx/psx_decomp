@@ -130,13 +130,16 @@ void SetWeirdFX(void)
     weird_cheat = 1;
 }
 
-/* @0x8004BE20 -- PSX-only coloured radial light-fill (no PC twin). All four paint arms are written from
- * the oracle: clipped/unclipped x shift_mask==0/!=0. Parameters are reused as loop rows/columns
- * (arm A: nYPos = block_y + y per row; arm B: rows counted in nYPos with y = nYPos copied at the row head and the loads indexed through y; unclipped arms: nYPos walks beside the y counter).
- * dist_y is set inside the x loop (retail computes it after the inner entry test). The shake jitter
- * (two GU_GetRnd calls) is dead in this build: shake is the constant 1.
- * NEAR-MISS: 812/821 insns; the remaining gap is register allocation, caller-save slots and the plr[0]
- * preload -- see the report. */
+/* @0x8004BE20 -- PSX-only coloured radial light-fill (no PC twin). Four paint arms:
+ * clipped/unclipped x shift_mask==0/!=0, every row loop counted by y from 0 with the row written as
+ * block_y + y (nYPos is only the entry parameter). Loop optimisation then gives retail's shape:
+ * the row expression becomes a strength-reduced induction register; in the clipped arms the per-row
+ * bounds test lets y itself be eliminated; in the shift arms the unconditional channel loads are
+ * hoisted out of the x loop, leaving the two row copies (one shared with dist_y's spelling for the
+ * red load, one for the other accesses) and the caller-save spills around veclen2 that the oracle has.
+ * Spelling of the row term (block_y + y vs y + block_y) is therefore load-bearing; it is the measured
+ * byte/SYM-exact form, not a claim of the literal original text. The shake jitter (two GU_GetRnd
+ * calls) is dead in this build: shake is the constant 1. */
 void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
 {
     int xoff, yoff;
@@ -228,10 +231,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
         if (block_y < 0 || block_y + radius_block > max_x || block_x < 0 || block_x + radius_block > max_x) {
             if (!shift_mask) {
                 for (y = 0; y <= radius_block; y++) {
-                    nYPos = block_y + y;
-                    if (nYPos >= 0) if (nYPos < 48) {
+                    if (block_y + y >= 0) if (block_y + y < 48) {
                         for (x = 0; x <= radius_block; x++) {
-                            dist_y = light_y - ((nYPos) << 4);
+                            dist_y = light_y - ((block_y + y) << 4);
                             mult_st = g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y);
                             if (mult_st < 0)
                                 mult_st = 0;
@@ -241,46 +243,45 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                         mult = g_lightband[(mult_st + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
                                     else
                                         mult = mult_st * g_light_amp2;
-                                    v = dung_map_r[block_x + x][nYPos] + (mult & 0xFF);
+                                    v = dung_map_r[block_x + x][y + block_y] + (mult & 0xFF);
                                     if (v > g_light_clamp)
                                         v = g_light_clamp;
-                                    dung_map_r[block_x + x][nYPos] = v;
+                                    dung_map_r[block_x + x][y + block_y] = v;
                                 }
                                 if (colour_mask & 2) {
                                     if (weirdy)
                                         mult = g_lightband[(mult_st + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
                                     else
                                         mult = mult_st * g_light_amp2;
-                                    v = dung_map_g[block_x + x][nYPos] + (mult & 0xFF);
+                                    v = dung_map_g[block_x + x][y + block_y] + (mult & 0xFF);
                                     if (v > g_light_clamp)
                                         v = g_light_clamp;
-                                    dung_map_g[block_x + x][nYPos] = v;
+                                    dung_map_g[block_x + x][y + block_y] = v;
                                 }
                                 if (colour_mask & 4) {
                                     if (weirdy)
                                         mult = g_lightband[(mult_st + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
                                     else
                                         mult = mult_st * g_light_amp2;
-                                    v = dung_map_b[block_x + x][nYPos] + (mult & 0xFF);
+                                    v = dung_map_b[block_x + x][y + block_y] + (mult & 0xFF);
                                     if (v > g_light_clamp)
                                         v = g_light_clamp;
-                                    dung_map_b[block_x + x][nYPos] = v;
+                                    dung_map_b[block_x + x][y + block_y] = v;
                                 }
                             }
                         }
                     }
                 }
             } else {
-                for (nYPos = block_y; nYPos <= block_y + radius_block; nYPos++) {
-                    if (nYPos >= 0) if (nYPos < 48) {
-                        y = nYPos;
+                for (y = 0; y <= radius_block; y++) {
+                    if (block_y + y >= 0) if (block_y + y < 48) {
                         for (x = 0; x <= radius_block; x++) {
-                            dist_y = light_y - ((nYPos) << 4);
+                            dist_y = light_y - ((block_y + y) << 4);
                             mult = (g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y)) * g_light_amp2;
                             if (mult < 0)
                                 mult = 0;
                             if (block_x + x >= 0 && block_x + x < max_x) {
-                                v = dung_map_r[block_x + x][y];
+                                v = dung_map_r[block_x + x][block_y + y];
                                 if (colour_mask & 1) {
                                     if (!(shift_mask & 0x9)) {
                                         v += mult;
@@ -292,9 +293,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                     }
                                     if (v > g_light_clamp)
                                         v = g_light_clamp;
-                                    dung_map_r[block_x + x][nYPos] = v;
+                                    dung_map_r[block_x + x][y + block_y] = v;
                                 }
-                                v = dung_map_g[block_x + x][y];
+                                v = dung_map_g[block_x + x][y + block_y];
                                 if (colour_mask & 2) {
                                     if (!(shift_mask & 0x12)) {
                                         v += mult;
@@ -306,9 +307,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                     }
                                     if (v > g_light_clamp)
                                         v = g_light_clamp;
-                                    dung_map_g[block_x + x][nYPos] = v;
+                                    dung_map_g[block_x + x][y + block_y] = v;
                                 }
-                                v = dung_map_b[block_x + x][y];
+                                v = dung_map_b[block_x + x][y + block_y];
                                 if (colour_mask & 4) {
                                     if (!(shift_mask & 0x24)) {
                                         v += mult;
@@ -320,7 +321,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                                     }
                                     if (v > g_light_clamp)
                                         v = g_light_clamp;
-                                    dung_map_b[block_x + x][nYPos] = v;
+                                    dung_map_b[block_x + x][y + block_y] = v;
                                 }
                             }
                         }
@@ -328,10 +329,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                 }
             }
         } else if (!shift_mask) {
-            nYPos = block_y;
-            for (y = 0; y <= radius_block; y++, nYPos++) {
+            for (y = 0; y <= radius_block; y++) {
                 for (x = 0; x <= radius_block; x++) {
-                    dist_y = light_y - ((nYPos) << 4);
+                    dist_y = light_y - ((block_y + y) << 4);
                     mult_st = g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y);
                     if (mult_st < 0)
                         mult_st = 0;
@@ -340,42 +340,41 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                             mult = g_lightband[(mult_st + (disp_tab_r >> 8)) & g_lightband_mask] * g_light_amp2;
                         else
                             mult = mult_st * g_light_amp2;
-                        v = dung_map_r[block_x + x][nYPos] + (mult & 0xFF);
+                        v = dung_map_r[block_x + x][y + block_y] + (mult & 0xFF);
                         if (v > g_light_clamp)
                             v = g_light_clamp;
-                        dung_map_r[block_x + x][nYPos] = v;
+                        dung_map_r[block_x + x][y + block_y] = v;
                     }
                     if (colour_mask & 2) {
                         if (weirdy)
                             mult = g_lightband[(mult_st + (disp_tab_g >> 8)) & g_lightband_mask] * g_light_amp2;
                         else
                             mult = mult_st * g_light_amp2;
-                        v = dung_map_g[block_x + x][nYPos] + (mult & 0xFF);
+                        v = dung_map_g[block_x + x][y + block_y] + (mult & 0xFF);
                         if (v > g_light_clamp)
                             v = g_light_clamp;
-                        dung_map_g[block_x + x][nYPos] = v;
+                        dung_map_g[block_x + x][y + block_y] = v;
                     }
                     if (colour_mask & 4) {
                         if (weirdy)
                             mult = g_lightband[(mult_st + (disp_tab_b >> 8)) & g_lightband_mask] * g_light_amp2;
                         else
                             mult = mult_st * g_light_amp2;
-                        v = dung_map_b[block_x + x][nYPos] + (mult & 0xFF);
+                        v = dung_map_b[block_x + x][y + block_y] + (mult & 0xFF);
                         if (v > g_light_clamp)
                             v = g_light_clamp;
-                        dung_map_b[block_x + x][nYPos] = v;
+                        dung_map_b[block_x + x][y + block_y] = v;
                     }
                 }
             }
         } else {
-            nYPos = block_y;
-            for (y = 0; y <= radius_block; y++, nYPos++) {
+            for (y = 0; y <= radius_block; y++) {
                 for (x = 0; x <= radius_block; x++) {
-                    dist_y = light_y - ((nYPos) << 4);
+                    dist_y = light_y - ((block_y + y) << 4);
                     mult = (g_light_amp - veclen2(light_x - ((block_x + x) << 4), dist_y)) * g_light_amp2;
                     if (mult < 0)
                         mult = 0;
-                    v = dung_map_r[block_x + x][nYPos];
+                    v = dung_map_r[block_x + x][block_y + y];
                     if (colour_mask & 1) {
                         if (!(shift_mask & 0x9)) {
                             v += mult;
@@ -387,9 +386,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                         }
                         if (v > g_light_clamp)
                             v = g_light_clamp;
-                        dung_map_r[block_x + x][nYPos] = v;
+                        dung_map_r[block_x + x][y + block_y] = v;
                     }
-                    v = dung_map_g[block_x + x][nYPos];
+                    v = dung_map_g[block_x + x][y + block_y];
                     if (colour_mask & 2) {
                         if (!(shift_mask & 0x12)) {
                             v += mult;
@@ -401,9 +400,9 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                         }
                         if (v > g_light_clamp)
                             v = g_light_clamp;
-                        dung_map_g[block_x + x][nYPos] = v;
+                        dung_map_g[block_x + x][y + block_y] = v;
                     }
-                    v = dung_map_b[block_x + x][nYPos];
+                    v = dung_map_b[block_x + x][y + block_y];
                     if (colour_mask & 4) {
                         if (!(shift_mask & 0x24)) {
                             v += mult;
@@ -415,7 +414,7 @@ void DoLighting(int nXPos, int nYPos, int nRadius, int Lnum)
                         }
                         if (v > g_light_clamp)
                             v = g_light_clamp;
-                        dung_map_b[block_x + x][nYPos] = v;
+                        dung_map_b[block_x + x][y + block_y] = v;
                     }
                 }
             }
