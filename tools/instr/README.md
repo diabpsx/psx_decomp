@@ -44,6 +44,58 @@ optimization and delay-slot scheduling, capture several passes in one run:
 python tools/instr/match_probe.py build/soundpad_iso.cpp SoundPad__Fv --function SoundPad --dump cse2,greg,sched2,jump2,dbr
 ```
 
+### Trace deleted setters behind standalone USE instructions
+
+`combine_uses.py` compares real-compiler flow and combine dumps, listing each
+standalone register USE, every earlier SET/CLOBBER of that register, and any
+surviving writes. It parses nested RTL, distinguishes memory-address reads from
+register destinations, and excludes call-argument USE notes. Partial-register
+SETs count as surviving writes; CLOBBERs remain separately identified.
+
+```powershell
+python tools/instr/real_rtl.py recon/source/control.cpp DrawSpellCel --dump flow,combine --debug --output-path-only
+python tools/instr/combine_uses.py build/rtl/control-<capture-id>/input.i DrawSpellCel
+```
+
+Use the actual unique capture directory printed by the first command. Optional
+`--debug` adds `-g` for source-line notes; this is diagnostic, not a gate flag
+change or a promise that debug output has identical code. Without line notes,
+locations are null rather than inferred. `real_rtl.py` now saves `capture.json`
+with the command and source, preprocessed-input, compiler, assembly and dump
+hashes. The analyzer verifies both dump hashes against that receipt. Older
+captures without a receipt are explicitly marked provenance-unverified.
+
+An absent surviving SET is evidence about combine, **not a count of stack
+slots** or proof of retail source. Reload, assembly, exact SYM and final bytes
+must still be checked independently. Missing/ambiguous functions, malformed RTL
+and mismatched capture hashes fail closed. Eleven regression tests cover these
+distinctions; the complete tool suite is 203 tests.
+
+Fresh captures on `216233f` confirm DrawSpellCel's two standalone USEs refer to
+registers 144 and 156, whose address-addition setters (UIDs 145 and 167) belong
+to the SpellColors assignments at CONTROL lines 188/189. DrawObjSelector also
+has two: register 129's indexed-object address at PADFUNCS line 1369, and
+register 430's first-loop preheader comparison at line 1401. Both setters
+disappear in combine. Captures: `build/rtl/control-ip9eviq7` and
+`build/rtl/padfuncs-qjvf1nni`; register/UID numbers are source-revision-specific.
+
+Bounded source-only screens, retained under `build/selector_center_probe`,
+tested center-coordinate staging, temporary half-width ownership/restoration,
+and four first-loop bound spellings on the live and SLD-aligned layouts (34
+builds including two baselines). Best raw count was 105 differences at 515/514
+instructions, frame 264 rather than 280: a width-restoration shift remains
+after the second spinner call, with incorrect saved-register ownership. Nothing
+was applied. Last-index/next-index/non-equality loop bounds instead shrink the
+frame to 256; unsigned comparison retains 264 but regresses the byte diff.
+These results do not establish an unavoidable source limitation.
+
+The earlier 13-build CONTROL UV-load-placement screen is also complete under
+`build/control_uv_lifetime_probe`: no improvement over 68 differences. Every
+case retains the same two standalone USEs; preloading both UV coordinates
+before primitive allocation raises the frame to 192 through other allocation
+changes, not additional orphan USEs. Production source and gate rules remain
+unchanged; the board remains 2725/2727.
+
 `jump` is the early jump pass (`-dj`); `jump2` is the late jump pass (`-dJ`).
 Both are also available through `real_rtl.py --dump`. Unknown or duplicate dump
 names are rejected, and a missing requested dump makes the probe fail.
@@ -4280,6 +4332,47 @@ linkage is now 1,006 functions / 82 TUs (877/50 native, 129/32 conventional).
 The function PASS board remains 2693/2727, with 34 entries still open.
 
 ### DRLG_L2 table reconstruction details
+
+2026-10-03 producer follow-up (diagnostic only; production remains unchanged):
+the live TU emits `.rdata=92`, `.data=9436`, `.text=21108` and `.sdata=100`.
+Retail code alone is 21,148 bytes: the difference is the nine-word switch table
+plus four-byte alignment inside DoPatternCheck. The complete retail MAP unit
+`.DRLG_L2_text` is 30,640 bytes, with zero separate `_data`/`_rdata` extents.
+Those facts motivate a section-coalescing build hypothesis, not an instruction
+rewrite or a completed native import.
+
+The original PsyQ 4.0 Japanese CCPSX text manual documents `-Wa,sNAME` for
+overlay grouping. Actual ASPSX `-sDRLG_L2` merely prefixes section names and
+creates a group; its `-s-DRLG_L2` variant prefixes without a group. Both retain
+all four original section sizes and leave the table separate. The 2.56 native
+option dispatcher also recognizes uppercase `-R`, but that branch is a no-op;
+the earlier lowercase `-r` rejection is not evidence about a merge feature.
+Neither option solves the layout. Artifacts: `build/l2_native_probe`.
+
+SuperSponge's original `makefile.gaz:428` invokes Climax `objbodge.exe` after
+DMPSX. Running that exact tool on the disposable DRLG_L2 object leaves its hash
+unchanged. The tool hash and before/after hashes are in
+`build/l2_native_probe/objbodge_report.json`; this rules out that invocation
+for this object, not every historical producer.
+
+The supplied SN SLINK 4.00d also reproduces the retail map's table format.
+Its ordinary link still lays out separate read-only/data/text sections.
+An include-prefix string produces `DRLG_L2.rdata/.text/.data/.sdata`, not the
+retail merged section. An `alias` directive aliases a symbol, not section
+contents; the tested forms fail and are not retained. Scripts, untouched input
+objects, logs and maps are under `build/l2_slink_probe`. Important runner trap:
+SLINK can return exit 0 on script syntax errors, so a future runner must reject
+error diagnostics and verify newly produced outputs, not trust exit status.
+
+The original PREFSECT sample likewise documents prefixing/grouping only;
+its README is under `C:/Temp/PSYQ/psyq-460/PSSN/BIN/PREFSMPL`. This agrees with
+the [Sony support archive's description of PREFSECT](https://psx.arthus.net/sdk/Psy-Q/DOCS/BBS/webmsg.pdf).
+It is not a demonstrated table-placement fix.
+
+A generic MAP-driven section-routing step (preserving emitted instructions,
+constants and symbols) has been proposed to the user. Approval and a complete
+native byte/SYM proof are still outstanding; **no routing transform, compiler
+flag, gate exception or DRLG_L2 production source change has been applied**.
 
 Writable-string diagnostic (2026-10-01): `build/probe_l2_writable.py`
 compiles a separate source copy with `-fwritable-strings`, moving the two

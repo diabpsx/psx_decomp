@@ -24,10 +24,18 @@
  *  - pMegaTiles entries are read as SIGNED 16-bit (`lh`), not unsigned (devilution's WORD/lhu).
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l4.h"
 #include "source/gen/externs_drlg_l4.h"
 #include "source/gen/protos_drlg_l4.h"
 #include "source/diablo.h"
+
+/* Native whole-TU receipt: 36 functions, 32 named globals, all relocated bytes.
+ * Standard compiler/ASPSX 2.56 flags suffice. File statics lpSetPiece1..4 and
+ * lppSetPiece2..4 use their recorded names and seven consecutive BSS homes.
+ * recurs is initialized small data; the three array owners and writable
+ * miniset tables occupy the original PREGAME prefix. The final string has one
+ * separate alignment byte, retained as scaffold rather than source payload. */
 
 #define DMAXX 40
 #define DMAXY 40
@@ -41,6 +49,15 @@
 #define DFLAGS(x, y) (mydflags[(y) * 40 + (x)])
 
 /* TU-owned scalar globals (tentative defs -> gp-relative addressing, matches the oracle) */
+static unsigned char *lpSetPiece1;
+static unsigned char *lpSetPiece2;
+static unsigned char *lpSetPiece3;
+static unsigned char *lpSetPiece4;
+static unsigned char *lppSetPiece2;
+static unsigned char *lppSetPiece3;
+static unsigned char *lppSetPiece4;
+
+static int recurs = 0;
 int diabquad1x;
 int diabquad2x;
 int diabquad3x;
@@ -56,12 +73,17 @@ int SP4y2;
 int l4holdx;
 int l4holdy;
 
+/* Original overlay-owned zero arrays, before the initialized miniset tables. */
+unsigned char dung[20][20] = {{0}};
+unsigned char hallok[20] = {0};
+unsigned char L4dungeon[80][80] = {{0}};
+
 /** A lookup table for the 16 possible patterns of a 2x2 area,
  *  where each cell either contains a SW wall or it doesn't. */
-static const unsigned char L4ConvTbl[16] = { 30, 6, 1, 6, 2, 6, 6, 6, 9, 6, 1, 6, 2, 6, 3, 6 };   /* @0x8014F318 */
+static unsigned char L4ConvTbl[16] = { 30, 6, 1, 6, 2, 6, 6, 6, 9, 6, 1, 6, 2, 6, 3, 6 };   /* @0x8014F318 */
 
 /** Miniset: Stairs up. */
-static const unsigned char L4USTAIRS[] = {   /* @0x8014F328 */
+static unsigned char L4USTAIRS[] = {   /* @0x8014F328 */
     4, 5,
 
     6, 6, 6, 6,
@@ -77,7 +99,7 @@ static const unsigned char L4USTAIRS[] = {   /* @0x8014F328 */
      0,  0,  0,  0,
 };
 /** Miniset: Stairs up to town. */
-static const unsigned char L4TWARP[] = {   /* @0x8014F354 */
+static unsigned char L4TWARP[] = {   /* @0x8014F354 */
     4, 5,
 
     6, 6, 6, 6,
@@ -93,7 +115,7 @@ static const unsigned char L4TWARP[] = {   /* @0x8014F354 */
       0,   0,   0,   0,
 };
 /** Miniset: Stairs down. */
-static const unsigned char L4DSTAIRS[] = {   /* @0x8014F380 */
+static unsigned char L4DSTAIRS[] = {   /* @0x8014F380 */
     5, 5,
 
     6, 6, 6, 6, 6,
@@ -109,7 +131,7 @@ static const unsigned char L4DSTAIRS[] = {   /* @0x8014F380 */
     0,  0,  0,  0, 0,
 };
 /** Miniset: Pentagram. */
-static const unsigned char L4PENTA[] = {   /* @0x8014F3B4 */
+static unsigned char L4PENTA[] = {   /* @0x8014F3B4 */
     5, 5,
 
     6, 6, 6, 6, 6,
@@ -125,7 +147,7 @@ static const unsigned char L4PENTA[] = {   /* @0x8014F3B4 */
     0,   0,   0,   0, 0,
 };
 /** Miniset: Pentagram portal. */
-static const unsigned char L4PENTA2[] = {   /* @0x8014F3E8 */
+static unsigned char L4PENTA2[] = {   /* @0x8014F3E8 */
     5, 5,
 
     6, 6, 6, 6, 6,
@@ -142,7 +164,7 @@ static const unsigned char L4PENTA2[] = {   /* @0x8014F3E8 */
 };
 
 /** Maps tile IDs to their corresponding undecorated tile ID. */
-static const unsigned char L4BTYPES[140] = {   /* @0x8014F41C */
+static unsigned char L4BTYPES[140] = {   /* @0x8014F41C */
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
     10, 11, 12, 13, 14, 15, 16, 17, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -160,6 +182,43 @@ static const unsigned char L4BTYPES[140] = {   /* @0x8014F41C */
 };
 
 /* @0x8014F4A8 */
+static void DRLG_L4Shadows();
+static void InitL4Dungeon();
+void DRLG_LoadL4SP();
+void DRLG_FreeL4SP();
+void DRLG_L4SetSPRoom(int rx1, int ry1);
+static void L4makeDmt();
+static int L4HWallOk(int i, int j);
+static int L4VWallOk(int i, int j);
+static void L4HorizWall(int i, int j, int dx);
+static void L4VertWall(int i, int j, int dy);
+static void L4AddWall();
+static void L4tileFix();
+static void DRLG_L4Subs();
+static void L4makeDungeon();
+static void uShape();
+static long GetArea();
+static void L4drawRoom(int x, int y, int width, int height);
+static unsigned char L4checkRoom(int x, int y, int width, int height);
+static void L4roomGen(int x, int y, int w, int h, int dir);
+static void L4firstRoom();
+void L4SaveQuads();
+void DRLG_L4SetRoom(unsigned char *pSetPiece, int rx1, int ry1);
+void DRLG_LoadDiabQuads(unsigned char preflag);
+static unsigned char DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir);
+static void DRLG_L4FTVR(int i, int j, int x, int y, int d);
+static void DRLG_L4FloodTVal();
+unsigned char IsDURWall(char d);
+unsigned char IsDLLWall(char dd);
+static void DRLG_L4TransFix();
+static void DRLG_L4Corners();
+void L4FixRim();
+void DRLG_L4GeneralFix();
+static void DRLG_L4SetWalls();
+static void DRLG_L4(int entry);
+static void DRLG_L4Pass3();
+void CreateL4Dungeon(unsigned int rseed, int entry);
+
 static void DRLG_L4Shadows()
 {
     int x, y;
@@ -1355,66 +1414,59 @@ void DRLG_L4SetRoom(unsigned char *pSetPiece, int rx1, int ry1)
  * from the oracle: 7 distinct gp-rel statics (quad1, quad2a, quad2b, quad3a, quad3b, quad4a, quad4b);
  * the diabquad*x/y formulas are devilution's simple immediate forms, NOT Hellfire's (39-11-x-((14-11)>>1)
  * style computes the SAME numeric result but the oracle uses the plain one-subtraction form). */
-static unsigned char *diabQuad1Cache;
-static unsigned char *diabQuad2aCache;
-static unsigned char *diabQuad2bCache;
-static unsigned char *diabQuad3aCache;
-static unsigned char *diabQuad3bCache;
-static unsigned char *diabQuad4aCache;
-static unsigned char *diabQuad4bCache;
 
 void DRLG_LoadDiabQuads(unsigned char preflag)
 {
     unsigned char *ptrSetPiece;
 
-    if (!diabQuad1Cache) {
-        diabQuad1Cache = GRL_LoadFileInMemSig("diab1.DUN", NULL);
+    if (!lpSetPiece1) {
+        lpSetPiece1 = GRL_LoadFileInMemSig("diab1.DUN", NULL);
     }
     diabquad1x = 4 + l4holdx;
     diabquad1y = 4 + l4holdy;
-    ptrSetPiece = diabQuad1Cache;
+    ptrSetPiece = lpSetPiece1;
     DRLG_L4SetRoom(ptrSetPiece, diabquad1x, diabquad1y);
 
     if (preflag) {
-        if (!diabQuad2bCache) {
-            diabQuad2bCache = GRL_LoadFileInMemSig("diab2b.DUN", NULL);
+        if (!lppSetPiece2) {
+            lppSetPiece2 = GRL_LoadFileInMemSig("diab2b.DUN", NULL);
         }
-        ptrSetPiece = diabQuad2bCache;
+        ptrSetPiece = lppSetPiece2;
     } else {
-        if (!diabQuad2aCache) {
-            diabQuad2aCache = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
+        if (!lpSetPiece2) {
+            lpSetPiece2 = GRL_LoadFileInMemSig("diab2a.DUN", NULL);
         }
-        ptrSetPiece = diabQuad2aCache;
+        ptrSetPiece = lpSetPiece2;
     }
     diabquad2x = 27 - l4holdx;
     diabquad2y = 1 + l4holdy;
     DRLG_L4SetRoom(ptrSetPiece, diabquad2x, diabquad2y);
 
     if (preflag) {
-        if (!diabQuad3bCache) {
-            diabQuad3bCache = GRL_LoadFileInMemSig("diab3b.DUN", NULL);
+        if (!lppSetPiece3) {
+            lppSetPiece3 = GRL_LoadFileInMemSig("diab3b.DUN", NULL);
         }
-        ptrSetPiece = diabQuad3bCache;
+        ptrSetPiece = lppSetPiece3;
     } else {
-        if (!diabQuad3aCache) {
-            diabQuad3aCache = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
+        if (!lpSetPiece3) {
+            lpSetPiece3 = GRL_LoadFileInMemSig("diab3a.DUN", NULL);
         }
-        ptrSetPiece = diabQuad3aCache;
+        ptrSetPiece = lpSetPiece3;
     }
     diabquad3x = 1 + l4holdx;
     diabquad3y = 27 - l4holdy;
     DRLG_L4SetRoom(ptrSetPiece, diabquad3x, diabquad3y);
 
     if (preflag) {
-        if (!diabQuad4bCache) {
-            diabQuad4bCache = GRL_LoadFileInMemSig("diab4b.DUN", NULL);
+        if (!lppSetPiece4) {
+            lppSetPiece4 = GRL_LoadFileInMemSig("diab4b.DUN", NULL);
         }
-        ptrSetPiece = diabQuad4bCache;
+        ptrSetPiece = lppSetPiece4;
     } else {
-        if (!diabQuad4aCache) {
-            diabQuad4aCache = GRL_LoadFileInMemSig("diab4a.DUN", NULL);
+        if (!lpSetPiece4) {
+            lpSetPiece4 = GRL_LoadFileInMemSig("diab4a.DUN", NULL);
         }
-        ptrSetPiece = diabQuad4aCache;
+        ptrSetPiece = lpSetPiece4;
     }
     diabquad4x = 28 - l4holdx;
     diabquad4y = 28 - l4holdy;
@@ -1516,7 +1568,7 @@ static unsigned char DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin,
 
 /* @0x80153A30 */
 /* PSX-only recursion-depth guard, incremented on entry, decremented on the shared exit path. */
-static int recurs;
+
 
 static void DRLG_L4FTVR(int i, int j, int x, int y, int d)
 {
@@ -1969,10 +2021,10 @@ void CreateL4Dungeon(unsigned int rseed, int entry)
 
     /* reset the 4 "non-b" quad-file caches (quad1, quad2a, quad3a, quad4a) so a fresh top-level
      * generation reloads them; the "b" variants (2b/3b/4b) are left alone -- matches the oracle. */
-    diabQuad1Cache = 0;
-    diabQuad2aCache = 0;
-    diabQuad3aCache = 0;
-    diabQuad4aCache = 0;
+    lpSetPiece1 = 0;
+    lpSetPiece2 = 0;
+    lpSetPiece3 = 0;
+    lpSetPiece4 = 0;
 
     DRLG_InitSetPC();
     DRLG_LoadL4SP();
@@ -1981,8 +2033,8 @@ void CreateL4Dungeon(unsigned int rseed, int entry)
     DRLG_FreeL4SP();
     DRLG_SetPC();
 
-    MemFreeDbg(diabQuad1Cache);
-    MemFreeDbg(diabQuad2aCache);
-    MemFreeDbg(diabQuad3aCache);
-    MemFreeDbg(diabQuad4aCache);
+    MemFreeDbg(lpSetPiece1);
+    MemFreeDbg(lpSetPiece2);
+    MemFreeDbg(lpSetPiece3);
+    MemFreeDbg(lpSetPiece4);
 }

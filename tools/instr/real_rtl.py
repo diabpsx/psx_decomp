@@ -10,6 +10,8 @@ a missing dump, an absent or ambiguous function, and an unmatched focus expressi
 all produce a nonzero exit.
 """
 import argparse
+import hashlib
+import json
 from pathlib import Path
 import re
 import sys
@@ -91,6 +93,8 @@ def main():
                         help="lines on either side of --around matches (default: 12)")
     parser.add_argument("--output-path-only", action="store_true",
                         help="validate the function but print only the retained dump path")
+    parser.add_argument("--debug", action="store_true",
+                        help="add -g for source-line notes; diagnostic only, verify code separately")
     args = parser.parse_args()
     try:
         dump_names = parse_dumps(args.dump)
@@ -109,6 +113,7 @@ def main():
     directory.mkdir(parents=True, exist_ok=True)
     output = Path(tempfile.mkdtemp(prefix=source.stem + "-", dir=directory))
     preprocessed = output / "input.i"
+    source_hash = hashlib.sha256(source.read_bytes()).hexdigest()
     cpp = source.suffix.lower() != ".c"
     result = B.run([B.CPP, "-x", "c", *(["-D__cplusplus=1"] if cpp else []),
                     *B.CPP_FLAGS, source, "-o", preprocessed])
@@ -118,15 +123,20 @@ def main():
     g = str(overrides.get("g_value", B.G_VALUE))
     flags = [f"-G{g}" if flag == f"-G{B.G_VALUE}" else flag
              for flag in (B.CC1PL_FLAGS if cpp else B.CC1_FLAGS)]
-    result = B.run([B.CC1PL if cpp else B.CC1, *flags, *overrides.get("extra", []),
+    compiler = B.CC1PL if cpp else B.CC1
+    command = [compiler, *flags, *overrides.get("extra", []),
+                    *(["-g"] if args.debug else []),
                     *(DUMPS[name][0] for name in dump_names),
-                    preprocessed, "-o", output / "output.s"], cwd=output)
+                    preprocessed, "-o", output / "output.s"]
+    result = B.run(command, cwd=output)
     if result.returncode:
         sys.exit(f"compiler failed; artifacts: {output}\n" + result.stdout + result.stderr)
+    dump_hashes = {}
     for name in dump_names:
         dump = Path(str(preprocessed) + DUMPS[name][1])
         if not dump.is_file():
             sys.exit(f"compiler did not produce {dump}")
+        dump_hashes[name] = hashlib.sha256(dump.read_bytes()).hexdigest()
         try:
             body = extract_function(dump.read_text(errors="replace"), args.function)
             if args.around:
@@ -136,6 +146,15 @@ def main():
         print(f"Real compiler RTL [{name}]: {dump}")
         if not args.output_path_only:
             print(body)
+    if hashlib.sha256(source.read_bytes()).hexdigest() != source_hash:
+        sys.exit("source changed during RTL capture; no provenance receipt written")
+    receipt = {'source':str(source), 'source_sha256':source_hash,
+               'preprocessed_sha256':hashlib.sha256(preprocessed.read_bytes()).hexdigest(),
+               'compiler':str(compiler), 'compiler_sha256':hashlib.sha256(Path(compiler).read_bytes()).hexdigest(),
+               'command':[str(part) for part in command], 'function':args.function,
+               'debug':args.debug, 'dump_sha256':dump_hashes,
+               'assembly_sha256':hashlib.sha256((output/'output.s').read_bytes()).hexdigest()}
+    (output/'capture.json').write_text(json.dumps(receipt, indent=2), encoding='utf-8')
 
 
 if __name__ == "__main__":

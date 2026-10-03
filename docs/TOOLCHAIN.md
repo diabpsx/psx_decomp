@@ -111,6 +111,59 @@ Native coverage is1,430 functions/94 TUs; including the conventional lane,
 1,449/95. GAME has297 source-linked functions and only its four-byte file ID
 outside those code fragments; referenced resident data can still be scaffolded.
 
+## DRLG_L1 packed zero storage and complete overlay import (2026-10-03)
+
+DRLG_L1's six file-static UCHAR flags distinguish original assemblers: ASPSX
+2.56 emits a 24-byte `.sbss` allocation, while 2.67 emits six contiguous bytes
+at retail's `0x8011C8D8..0x8011C8DD`. The native registry therefore explicitly
+selects 2.67 for this TU, retaining its uninitialized source declarations.
+Initialized-flag probes are not retained. A verified four-byte resident `.sdata`
+anchor supplies PSYLINK's internal GP base but is never exported as source data.
+
+The same import restores original table storage/order and the public themeLoc,
+L5ConvTbl and L5dungeon definitions, with unchanged bodies in retail function
+order. Complete sections are 21,060 text, 52 read-only, 8,280 initialized data
+and six BSS bytes; 40 function records and 17 global records match exactly.
+The former nine data scaffolds were mechanically regrouped into two compiler
+section extents, preserving all 2,593 addressed data directives and labels.
+Missing end-label metadata was supplied at original fragment boundaries;
+three end labels now also include their original alignment bytes. Otherwise
+the format bridge imports those bytes and then emits them a second time.
+The regression test assembles the final GNU data wrapper and checks all 8,280
+bytes, separately from the native object. No data value, instruction,
+comparator or compiler flag was changed.
+
+All five final-image comparisons and 204 tool tests pass; the selected board,
+ordered-call audit and return-declaration audit each pass 40/40. Native-source
+coverage is 1,470 functions in 95 TUs (1,489/96 including the conventional lane).
+This does not increase the 2725/2727 board or resolve broader source-review and
+library-linkage work.
+
+## DRLG_L4 original names and complete storage (2026-10-03)
+
+DRLG_L4 uses ordinary compiler flags and ASPSX 2.56. Native receipts reproduce
+all 24,112 text bytes, 123 read-only bytes, 7,220 initialized-data bytes, 60
+small-data bytes and 28 BSS bytes. The seven file-static pointers are restored
+as lpSetPiece1..4 then lppSetPiece2..4 at 0x8011C8E8..0x8011C900; the `b` files
+use the lpp slots, independently confirmed from each original call address.
+recurs belongs at the beginning of initialized small data (0x8011BF78), not in
+the cache-pointer BSS bank. The formerly external dung/hallok/L4dungeon arrays
+are defined in their original overlay, before the writable miniset tables.
+
+All 36 function records and 32 global type/address records match. The 6,136-byte
+GP prefix is borrowed scaffold, not exported source data. The final string-pool
+alignment byte likewise remains scaffold-owned. The dedicated native test also
+assembles both GNU data wrappers and compares their complete 124/7,220-byte
+extents, covering retained alignment and avoiding duplicate inter-label bytes.
+The three old scaffolds were regrouped without changing any of their 2,247
+addressed data directives. No section-routing transform or instruction rewrite
+is involved. Source body comparison against HEAD differs only in restoration
+of the seven recorded cache names.
+All five linked images and 205 tool tests pass. Source-linked coverage is now
+1,525 functions across 97 TUs (1,506/96 native plus 19/1 conventional).
+The overall 2725/2727 board and 349 original-library imports are unchanged;
+DRLG_L2 section-routing approval is still pending and no such route is used.
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record

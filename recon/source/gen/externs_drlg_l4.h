@@ -3,7 +3,7 @@
 /* owned by GENDUNG.CPP */
 extern unsigned short dungeon[48][48];   /* @0x800E40C4 */
 extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
-extern unsigned char currlevel;   /* @0x8011C10D */
+extern unsigned char currlevel;   /* @0x8011C10C */
 extern int setpc_x;   /* @0x8011C0E4 */
 extern int setpc_y;   /* @0x8011C0E8 */
 extern int setpc_w;   /* @0x8011C0EC */

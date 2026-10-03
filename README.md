@@ -164,6 +164,31 @@ are used. All five images remain exact. Resident arrays and other untranslated
 TUs still have scaffold ownership; complete GAME code is not whole-project
 completion.
 
+DRLG_L1 now adds 40 native-linked PREGAME functions: 21,060 text bytes,
+52 read-only bytes, 8,280 initialized-data bytes and six packed zero BSS bytes.
+Retail definition order, writable tables, the public L5ConvTbl/L5dungeon
+definitions and the missing themeLoc owner are restored; function bodies are
+unchanged. All 17 global type/address records match. This TU selects original
+ASPSX 2.67 because it packs byte-sized local commons exactly; 2.56 allocates
+four bytes per flag. A four-byte verified GP anchor remains scaffold-only.
+The native regression test checks every relocated code/data byte and all 40
+function SYM records without normalization. Broader source review and the two
+drawing-function failures remain open.
+All 204 tool tests pass, including an independently assembled data-wrapper
+check that prevents duplicating the original tables' inter-label alignment.
+All five final images are byte-identical after this import; DRLG_L1 also
+passes 40/40 ordered-call and return-declaration checks.
+
+DRLG_L4 additionally contributes 36 native-linked functions, 24,112 text bytes,
+123 read-only bytes, 7,220 initialized-data bytes, 60 small-data bytes and 28
+zero BSS bytes. Its 32 global records now match retail, including the original
+lpSetPiece/lppSetPiece cache names and order, recurs storage and the three
+overlay-owned arrays. Bodies are unchanged apart from those cache identifiers.
+Ordinary compiler flags and ASPSX 2.56 suffice. The pool's final alignment byte
+remains scaffold-owned; independent assembled-wrapper tests cover both pools.
+This import does not use the proposed DRLG_L2 section-routing change.
+All five final images remain byte-identical and all 205 tool tests pass.
+
 The main file contains 1,099,268 payload bytes followed by the four-byte
 additive checksum `0x02A12C64`. Its checksum is now a separate file-format
 segment, not initialized small data. `link.py` emits `build/diabpsx.runtime.bin`
@@ -191,8 +216,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1430 functions across ninety-four TUs through real ASPSX/PSYLINK: 1449 source-linked
-functions across 95 TUs in total. They replace their text scaffolds at the original
+1506 functions across ninety-six TUs through real ASPSX/PSYLINK: 1525 source-linked
+functions across 97 TUs in total. They replace their text scaffolds at the original
 addresses. PCIO and DatIO also supply their complete read-only sections,
 including diagnostic strings and relocated virtual-method tables, through
 `configs/recon_data_link.json`. SPELLS supplies its complete 20-byte jump table
@@ -563,6 +588,13 @@ rerun successfully for all 349 selected entries; no additional import is claimed
 Retail function-body SYM independently identifies 146 of the 488 unlinked
 library-region entries as Climax GLIB source, while 342 lack a matching body
 record. The latter are unclassified, not automatically Sony SDK functions.
+
+The two previously skipped LIB2 archives in the SuperSponge toolchain have now
+been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three
+members and `LIBSN.LIB` has 59. Neither exports a currently pending name.
+`build/lib2_inventory/report.json` retains tool/archive hashes and the original
+listings; the source archives were checked unchanged. This closes an export
+discovery gap, not a byte-content search or an additional library import.
 
 `LIBAPI/PAD` is now imported as one complete 784-byte text member with its
 16-byte data section at 0x800B42BC and 16-byte BSS at 0x8012FF90. Besides its

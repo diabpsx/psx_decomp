@@ -10,25 +10,11 @@ SECTIONS
         . = 0x4;   /* 0x80139BFC */
         build/skel/PSXSRC/PREGAME.CPP.o(.text);
         . = 0x2C;   /* 0x80139C24 */
-        build/asm/data/drlg_l1_rodata_80139c24.rodata.s.o(.rodata);
-        . = 0x55C;   /* 0x8013A154 */
-        build/asm/data/drlg_l1_rodata_8013a154.rodata.s.o(.rodata);
-        . = 0x62C;   /* 0x8013A224 */
-        build/asm/data/drlg_l1_rodata_8013a224.rodata.s.o(.rodata);
-        . = 0x6FC;   /* 0x8013A2F4 */
-        build/asm/data/drlg_l1_rodata_8013a2f4.rodata.s.o(.rodata);
-        . = 0x720;   /* 0x8013A318 */
-        build/asm/data/drlg_l1_rodata_8013a318.rodata.s.o(.rodata);
-        . = 0x744;   /* 0x8013A33C */
-        build/asm/data/drlg_l1_rodata_8013a33c.rodata.s.o(.rodata);
-        . = 0x760;   /* 0x8013A358 */
-        build/asm/data/drlg_l1_rodata_8013a358.rodata.s.o(.rodata);
-        . = 0x76C;   /* 0x8013A364 */
-        build/asm/data/drlg_l1_rodata_8013a364.rodata.s.o(.rodata);
-        . = 0x7B8;   /* 0x8013A3B0 */
-        build/asm/data/drlg_l1_rodata_8013a3b0.rodata.s.o(.rodata);
+        build/native_source/drlg_l1_pool.rodata.s.o(.rodata);   /* verified native source data */
+        . = 0x60;   /* 0x80139C58 */
+        build/native_source/drlg_l1_tables.data.s.o(.data);   /* verified native source data */
         . = 0x20B8;   /* 0x8013BCB0 */
-        build/skel/SOURCE/DRLG_L1.CPP.o(.text);
+        build/native_source/drlg_l1.text.s.o(.text);   /* verified native-assembled source */
         . = 0x72FC;   /* 0x80140EF4 */
         build/asm/data/drlg_l2_rodata_80140ef4.rodata.s.o(.rodata);
         . = 0x7344;   /* 0x80140F3C */
@@ -224,13 +210,11 @@ SECTIONS
         . = 0xF3A0;   /* 0x80148F98 */
         build/native_source/drlg_l3.text.s.o(.text);   /* verified native-assembled source */
         . = 0x13C00;   /* 0x8014D7F8 */
-        build/asm/data/drlg_l4_rodata_8014d7f8.rodata.s.o(.rodata);
-        . = 0x1575C;   /* 0x8014F354 */
-        build/asm/data/drlg_l4_rodata_8014f354.rodata.s.o(.rodata);
-        . = 0x15788;   /* 0x8014F380 */
-        build/asm/data/drlg_l4_rodata_8014f380.rodata.s.o(.rodata);
+        build/native_source/drlg_l4_pool.rodata.s.o(.rodata);   /* verified native source data */
+        . = 0x13C7C;   /* 0x8014D874 */
+        build/native_source/drlg_l4_tables.data.s.o(.data);   /* verified native source data */
         . = 0x158B0;   /* 0x8014F4A8 */
-        build/skel/SOURCE/DRLG_L4.CPP.o(.text);
+        build/native_source/drlg_l4.text.s.o(.text);   /* verified native-assembled source */
         . = 0x1B6E0;   /* 0x801552D8 */
         build/native_source/setmaps.text.s.o(.text);   /* verified native-assembled source */
         . = 0x1BE0C;   /* 0x80155A04 */

@@ -704,10 +704,18 @@ SECTIONS
         __source_loadsave_sbss_start = .;
         build/native_source/loadsave.sbss.s.o(.sbss);
         ASSERT(. - __source_loadsave_sbss_start == 0x4, "wrong BSS extent: loadsave");
+        . = 0x10C8D8;
+        __source_drlg_l1_sbss_start = .;
+        build/native_source/drlg_l1.sbss.s.o(.sbss);
+        ASSERT(. - __source_drlg_l1_sbss_start == 0x6, "wrong BSS extent: drlg_l1");
         . = 0x10C8E0;
         __source_drlg_l3_sbss_start = .;
         build/native_source/drlg_l3.sbss.s.o(.sbss);
         ASSERT(. - __source_drlg_l3_sbss_start == 0x8, "wrong BSS extent: drlg_l3");
+        . = 0x10C8E8;
+        __source_drlg_l4_sbss_start = .;
+        build/native_source/drlg_l4.sbss.s.o(.sbss);
+        ASSERT(. - __source_drlg_l4_sbss_start == 0x1C, "wrong BSS extent: drlg_l4");
         . = 0x10C908;
         __sdk___SN_ENTRY_POINT_sbss_start = .;
         build/sdk/native/__SN_ENTRY_POINT.sbss.s.o(.sbss);

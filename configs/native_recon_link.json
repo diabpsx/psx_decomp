@@ -1,4 +1,49 @@
 {
+  "drlg_l4": {
+    "source": "recon/source/drlg_l4.cpp",
+    "image": "pregame",
+    "sections": {
+      ".text": {"va": "0x8014F4A8", "size": 24112},
+      ".rdata": {"va": "0x8014D7F8", "size": 123, "scaffold": "drlg_l4_pool.rodata"},
+      ".data": {"va": "0x8014D874", "size": 7220, "scaffold": "drlg_l4_tables.data"},
+      ".sdata": {"image": "diabpsx", "va": "0x8011BF78", "size": 60, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"image": "diabpsx", "va": "0x8011C8E8", "size": 28}
+    },
+    "data_symbols": ["dung", "hallok", "L4dungeon", "L4ConvTbl", "L4USTAIRS", "L4TWARP",
+      "L4DSTAIRS", "L4PENTA", "L4PENTA2", "L4BTYPES", "recurs", "diabquad1x", "diabquad2x",
+      "diabquad3x", "diabquad4x", "diabquad1y", "diabquad2y", "diabquad3y", "diabquad4y",
+      "SP4x1", "SP4y1", "SP4x2", "SP4y2", "l4holdx", "l4holdy", "lpSetPiece1", "lpSetPiece2",
+      "lpSetPiece3", "lpSetPiece4", "lppSetPiece2", "lppSetPiece3", "lppSetPiece4"],
+    "externals": ["QuestStatus__Fi", "dminx", "dminy", "LvlViewX", "dmaxx", "LvlViewY", "dmaxy",
+      "ENG_random__Fl", "TransVal", "SetRndSeed__Fl", "Make_SetPC__Fiiii", "GRL_LoadFileInMemSig__FPCcPUl",
+      "dung_map", "DRLG_InitSetPC__Fv", "mydflags", "pdungeon", "pSetPiece", "setloadflag", "memset",
+      "mem_free_dbg__FPv", "DRLG_InitTrans__Fv", "SetDPiece__Fiis", "quests", "UPDATEPROGRESS__Fi",
+      "DRLG_Init_Globals__Fv", "DRLG_CheckQuests__Fii", "DRLG_SetPC__Fv", "gbMaxPlayers",
+      "DRLG_PlaceThemeRooms__FiiiiUc", "currlevel", "setpc_h", "pMegaTiles", "dungeon", "ViewX", "ViewY",
+      "setpc_w", "setpc_x", "setpc_y"]
+  },
+  "drlg_l1": {
+    "source": "recon/source/drlg_l1.cpp",
+    "image": "pregame",
+    "assembler": "2.67",
+    "sections": {
+      ".text": {"va": "0x8013BCB0", "size": 21060},
+      ".rdata": {"va": "0x80139C24", "size": 52, "scaffold": "drlg_l1_pool.rodata"},
+      ".data": {"va": "0x80139C58", "size": 8280, "scaffold": "drlg_l1_tables.data"},
+      ".sbss": {"image": "diabpsx", "va": "0x8011C8D8", "size": 6}
+    },
+    "data_symbols": ["L5ConvTbl", "themeLoc", "SPATS", "BSTYPES", "L5BTYPES",
+      "STAIRSUP", "L5STAIRSUP", "STAIRSDOWN", "LAMPS", "PWATERIN", "L5dungeon",
+      "HR1", "HR2", "HR3", "VR1", "VR2", "VR3"],
+    "externals": ["QuestStatus__Fi", "dung_map_b", "dung_map_g", "DRLG_MRectTrans__Fiiii",
+      "dung_map_r", "dminx", "dminy", "LvlViewX", "dmaxx", "LvlViewY", "dmaxy", "ENG_random__Fl",
+      "TransVal", "SetRndSeed__Fl", "GRL_LoadFileInMemSig__FPCcPUl", "dung_map", "DRLG_InitSetPC__Fv",
+      "mydflags", "pdungeon", "pSetPiece", "SetMapMonsters__FPUcii", "setloadflag", "mem_free_dbg__FPv",
+      "DRLG_InitTrans__Fv", "SetDPiece__Fiis", "quests", "UPDATEPROGRESS__Fi", "DRLG_CheckQuests__Fii",
+      "DRLG_SetPC__Fv", "restore_b", "restore_g", "gbMaxPlayers", "DRLG_CopyTrans__Fiiii", "currlevel",
+      "restore_r", "setpc_h", "pMegaTiles", "dungeon", "SetMapObjects__FPUcii", "ViewX", "ViewY",
+      "setpc_w", "setpc_x", "setpc_y"]
+  },
   "automap": {
     "source": "recon/source/automap.cpp",
     "image": "game",

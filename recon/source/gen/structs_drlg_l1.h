@@ -1,4 +1,12 @@
 /* DRLG_L1.CPP: struct types this TU references (owned elsewhere; local copies per TU convention). */
+struct THEME_LOC {   /* sizeof 20, original SYM; storage owned by DRLG_L1 */
+    int x;
+    int y;
+    int ttval;
+    int width;
+    int height;
+};
+
 struct map_info {   /* sizeof 8 */
     short dMonster;   /* +0x0 */
     unsigned char dBits;   /* +0x2 */
