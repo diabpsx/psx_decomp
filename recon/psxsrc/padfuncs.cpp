@@ -1339,25 +1339,16 @@ static BOOL sort_gold(int pnum)
 static void DrawObjSelector(int pnum, PlayerStruct *player)
 {
     char str[128];
-    CPad *Pad;
-    int cp;
+    CPad *Pad = PAD_GetPad(pnum, 0);
+    int cp = Pad->GetDown();
+    Pad->GetCur();
     int list_size;
     int maxlen;
-    found_objects *fo;
+    found_objects *fo = &_pfind_list[sel_data][0];
     int R, G, B;
     int i;
     int nwrap;
     int add_wrap;
-    int nx;
-    int ny;
-    int nw;
-    int nh;
-    int ypos;
-
-    Pad = PAD_GetPad(pnum, 0);
-    cp = Pad->GetDown();
-    Pad->GetCur();
-    fo = &_pfind_list[sel_data][0];
     CheckArea(player->_px, player->_py, 2, 1, pnum);
     maxlen = 250;
     if (!_pfind_index[sel_data]) {
@@ -1415,13 +1406,15 @@ static void DrawObjSelector(int pnum, PlayerStruct *player)
         else
             add_wrap += 12;
     }
-    nw = maxlen;
+    int nx;
+    int ny;
+    int nw = maxlen;
     if (item_select >= list_size)
         item_select = list_size - 1;
     else if (item_select < 0)
         item_select = 0;
+        int nh = add_wrap + 12;
         nx = ((256 - nw) >> 1) + 32;
-        nh = add_wrap + 12;
         ny = (176 - nh) / 2 + 32;
         SelectRect.x = nx;
         SelectRect.y = ny - 22;
@@ -1434,7 +1427,7 @@ static void DrawObjSelector(int pnum, PlayerStruct *player)
         SelectRect.w = nw;
         SelectRect.h = nh;
         SelectBack.Back(nx, ny, nw, nh);
-        ypos = 16;
+        int ypos = 16;
         for (i = 0; i < _pfind_index[sel_data]; i++) {
             _infoclr[sel_data] = 0;
             GetItemStr(fo->index);
