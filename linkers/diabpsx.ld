@@ -10,7 +10,7 @@ SECTIONS
         . = 0x8;   /* 0x80010008 */
         build/asm/data/boot_text.data.s.o(.data);
         . = 0xC;   /* 0x8001000C */
-        build/src/lib.c.o(.text);
+        build/native_source/lib.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2017C;   /* 0x8003017C */
         build/skel/SOURCE/CONTROL.CPP.o(.text);
         . = 0x27734;   /* 0x80037734 */
@@ -350,7 +350,7 @@ SECTIONS
         . = 0xFD6CC;   /* 0x8010D6CC */
         build/native_source/data_automap.data.s.o(.data);   /* verified native source data */
         . = 0xFDBAC;   /* 0x8010DBAC */
-        build/sdk/native/rodata.rodata.s.o(.rodata);   /* original SDK data bridge */
+        build/native_source/rodata.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFF90;   /* 0x8010FF90 */
         build/asm/data/rodata_main.rodata.s.o(.rodata);
         . = 0xFFFB4;   /* 0x8010FFB4 */
@@ -732,6 +732,10 @@ SECTIONS
         __sdk_InitTAP_sbss_start = .;
         build/sdk/native/InitTAP.sbss.s.o(.sbss);
         ASSERT(. - __sdk_InitTAP_sbss_start == 0x80, "wrong BSS extent: InitTAP");
+        . = 0x10CA60;
+        __source_tick_bss_start = .;
+        build/native_source/tick.bss.s.o(.bss);
+        ASSERT(. - __source_tick_bss_start == 0x4, "wrong BSS extent: tick");
         . = 0x10CAE0;
         __source_vid_bss_start = .;
         build/native_source/vid.bss.s.o(.bss);

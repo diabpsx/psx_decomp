@@ -77,8 +77,9 @@ def check_bss_overlap(native, sdk):
 
 def validate_placements(segment, spec, layouts):
     sections = spec['sections']
-    if '.text' not in sections or any(s not in {'.text', '.rdata', '.sdata', '.data', '.sbss', '.bss', '.ctors', '.dtors'}
-                                     and not re.fullmatch(r'\.text\.\w+', s) for s in sections):
+    text_sections = [s for s in sections if s == '.text' or re.fullmatch(r'\.text\.\w+',s)]
+    if not text_sections or any(s not in {'.text', '.rdata', '.sdata', '.data', '.sbss', '.bss', '.ctors', '.dtors'}
+                                and not re.fullmatch(r'\.text\.\w+', s) for s in sections):
         raise ValueError('unsupported native source section set')
     homes, regions, limits = {}, {}, {}
     for section, row in sections.items():
@@ -300,6 +301,9 @@ def text_bridge(segment, va, size):
 
 def build():
     registry = json.loads((B.ROOT / 'configs/native_recon_link.json').read_text())
+    sdk_registry = json.loads((B.ROOT/'configs/sdk_link.json').read_text())
+    sdk_scaffolds = {row['scaffold'] for spec in sdk_registry.values()
+                     for row in spec.get('data_sections',{}).values()}
     image = (B.ROOT / 'configs/diabpsx.yaml').read_text()
     subs = [(int(a, 16), kind, name) for a, kind, name in re.findall(
         r'^\s+- \[0x([0-9A-F]+), (\w+), (\w+)\]', image, re.M)]
@@ -443,7 +447,8 @@ def build():
                 filename = f'build/native_source/{segment}{section}.bin'
                 bridges.setdefault(scaffold, []).append((*regions[section], filename))
                 bridge_limits[scaffold] = limits[section]
-        (OUT / f'{segment}.text.s').write_text(text_bridge(segment, *regions['.text']))
+        if '.text' in regions:
+            (OUT / f'{segment}.text.s').write_text(text_bridge(segment, *regions['.text']))
         (OUT / f'{segment}.sym.txt').write_text(run.stdout)
         receipts.append({'segment': segment, 'source': spec['source'], 'functions': count,
                          'assembler_version': assembler_version, 'assembler_sha256': sha(assembler.read_bytes()),
@@ -453,6 +458,10 @@ def build():
                          'common_symbols': {name: {'va':hex(commons[name]['va']),'size':len(data),
                                                     'sha256':sha(data)} for name,data in common_payloads.items()},
                          'common_allocation': common_allocation,
+                         'composed_sdk_scaffolds': sorted({row['scaffold'] for section,row in spec['sections'].items()
+                                                          if section not in ('.text','.sbss','.bss')
+                                                          and not section.startswith('.text.')
+                                                          and row['scaffold'] in sdk_scaffolds}),
                          'untyped_data_symbols': untyped_receipts,
                          'source_sha256': sha(source.read_bytes()), 'object_sha256': sha(raw),
                          'preprocessed_sha256': sha((S.OUT / (source.stem + '.i')).read_bytes()),
@@ -472,7 +481,11 @@ def build():
             parts.append((address, data, labels[0], source, path.relative_to(B.ROOT).as_posix(), path.stem))
         (OUT/(target+'.text.s')).write_text(render_mixed(parts, owned, *extra_limits[target]))
     for scaffold, regions in bridges.items():
-        source = (B.ROOT / 'asm/data' / (scaffold + '.s')).read_text()
+        source_path = (B.BUILD/'sdk/native'/(scaffold+'.s') if scaffold in sdk_scaffolds
+                       else B.ROOT/'asm/data'/(scaffold+'.s'))
+        if not source_path.is_file():
+            raise ValueError('shared SDK/native data requires a fresh SDK bridge')
+        source = source_path.read_text()
         (OUT / (scaffold + '.s')).write_text(bounded_data_bridge(source, regions, bridge_limits[scaffold]))
     (OUT / 'receipts.json').write_text(json.dumps(receipts, indent=2) + '\n')
     return receipts

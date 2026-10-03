@@ -1,4 +1,25 @@
 {
+  "tick": {
+    "source": "recon/glibdev/tick.c",
+    "image": "diabpsx",
+    "sections": {
+      ".text.lib": {"segment": "lib", "va": "0x80020BEC", "size": 172,
+        "functions": ["TICK_InitModule", "TICK_Set", "TICK_Get", "TICK_Update", "TICK_GetAge", "TICK_GetDateString", "TICK_GetTimeString"]},
+      ".rdata": {"va": "0x8010E758", "size": 21, "scaffold": "rodata.rodata"},
+      ".bss": {"va": "0x8011CA60", "size": 4}
+    },
+    "data_symbols": ["GazTick"],
+    "externals": []
+  },
+  "gmain": {
+    "source": "recon/glibdev/gmain.c",
+    "image": "diabpsx",
+    "sections": {
+      ".text.lib": {"segment": "lib", "va": "0x80020E04", "size": 80, "functions": ["main"]}
+    },
+    "data_symbols": [],
+    "externals": ["__main", "GSYS_InitMachine", "GAL_InitModule", "TICK_InitModule", "GU_InitModule", "AppMain"]
+  },
   "quests": {
     "source": "recon/source/quests.cpp",
     "image": "diabpsx",

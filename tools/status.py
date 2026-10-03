@@ -161,7 +161,8 @@ def main():
         if grand_pass == total_all:
             lines.insert(3, "**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; "
                             "the five retail images link byte-identical to the ROM (`tools/link.py`). "
-                            "The library region (837 entries) is supplied from the retail Sony archives — see README.**\n")
+                            "The separately tracked library region is not fully integrated: 349 entries have Sony archive receipts; "
+                            "the remaining entries include Climax GLIB source and unclassified code — see README.**\n")
         (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"TOTAL {grand_pass}/{total_all}")
 

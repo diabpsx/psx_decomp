@@ -111,6 +111,7 @@ def gen(name: str):
     data_bindings = DATA_MAP.get(name, {})
     validate_data_bindings(subs, end, data_bindings, vram)
     native = {segment: spec for segment, spec in NATIVE_RECON.items() if spec["image"] == name}
+    native_whole = {segment for segment,spec in native.items() if '.text' in spec['sections']}
     extra_text = {row['segment'] for spec in NATIVE_RECON.values()
                   for section, row in spec['sections'].items()
                   if section.startswith('.text.') and row.get('image', spec['image']) == name}
@@ -123,15 +124,18 @@ def gen(name: str):
                            for row in spec.get('common_symbols',{}).values())
     if set(NATIVE_RECON) & set(RECON_MAP):
         raise ValueError("source TU cannot use both GNU and native source inputs")
-    if extra_text & (set(native) | set(RECON_MAP)):
+    if extra_text & (native_whole | set(RECON_MAP)):
         raise ValueError('mixed native text cannot overlap a whole-TU source selection')
-    if (set(native) | extra_text) - {n for off, kind, n in subs if kind == "c"}:
+    if (native_whole | extra_text) - {n for off, kind, n in subs if kind == "c"}:
         raise ValueError("native source owner has no retail text fragment")
     available = {f"{n}.{kind}" for off, kind, n in subs if kind in SECT}
     sdk_data = SDK_DATA if name == "diabpsx" else set()
     if (sdk_data | native_data) - available:
         raise ValueError("native data placement names a missing retail fragment")
-    if sdk_data & native_data or any(f"{n}.{kind}" in sdk_data | native_data and n in data_bindings for off, kind, n in subs):
+    # Native source may compose its exact ranges on top of the freshly generated
+    # SDK bridge. gen_ld selects that one combined wrapper below; independent
+    # native/conventional ownership of the same fragment remains forbidden.
+    if any(f"{n}.{kind}" in sdk_data | native_data and n in data_bindings for off, kind, n in subs):
         raise ValueError("native and reconstructed data cannot own the same fragment")
     bss = re.search(r"bss_size: (0x[0-9A-F]+)", y)
     if RECON_BSS.get(name) and (not bss or name != 'diabpsx'):
@@ -144,7 +148,7 @@ def gen(name: str):
         out.append(f"        . = 0x{off:X};   /* 0x{va:08X} */")   # inside an output section `.` is the offset from its start
         if kind == "c":
             skel = SKEL_MAP.get(n)
-            if n in native or n in extra_text:
+            if n in native_whole or n in extra_text:
                 out.append(f"        build/native_source/{n}.text.s.o(.text);   /* verified native-assembled source */")
             elif n in RECON_MAP:
                 out.append(f"        build/{RECON_MAP[n]}.o(.text);   /* reconstructed TU */")

@@ -264,21 +264,38 @@ The negative logical column is scaled and offset by left edge plus total strip
 width. GCC combines away that arithmetic, leaving the four USE reservations
 required for retail's 216-byte frame. With SLD order X,Y,SW,SH the function is
 737/737, exact SYM, 25/25 calls and exact return declaration. CONTROL is51/51;
-the complete board is **2727/2727 PASS**. The full suite is222/222.
+the complete board is **2727/2727 PASS**.
 
 This does not by itself complete library linkage. Native Sony archive receipts
-cover349 of the837 excluded-region entries. Retail body SYM assigns146 of the
-remaining488 to Climax GLIB source and leaves342 unclassified. A content-based
+cover349 of the837 excluded-region entries. Retail body SYM assigned146 of the
+then-remaining488 to Climax GLIB source and left342 unclassified. A content-based
 screen across7,274 unique local objects found no new Sony import. Relocation-
 masked raw hits are highly ambiguous for tiny wrappers; preserving patch
 expressions and symbol-number mappings reduces the nontrivial exact-target set
 to two GTIMSYS wrappers, and retail SYM proves those are Climax source. The
 screen is evidence for classification, not permission to alias GLIB names to
 LIBGS exports. `GTIMSYS_GetTimer` and ResetTimer source bodies independently
-PASS; InitTimer remains a five-difference near-match, so no GLIB TU integration
-is claimed. The broader goal remains active pending authoritative GLIB inputs
-or reconstruction of those non-Sony entries and classification/import receipts
-for the342 unknown entries.
+PASS; InitTimer remains a five-difference near-match.
+
+The first full GLIB source TU, GMAIN.C, is now native-linked through the
+extra-only routing lane. Its source object owns only `.text.lib`; the native
+registry verifies all 80 bytes/SYM/bindings, and the mixed `lib` wrapper replaces
+only `main` while preserving adjacent scaffolds. The main image remains exact.
+Coverage after GMAIN was 1,580 functions/100 TUs (1,561/99 native plus19/1 conventional).
+
+TICK.C establishes that these GLIB C objects use `-G0`: its TU-owned four-byte
+`GazTick` common is addressed absolutely in retail, whereas `-G8` produces
+gp-relative instructions. With the recovered flag, all seven functions, 172
+text bytes, 21 read-only bytes and the four-byte runtime-BSS common match, as do
+all function/global records. The generic read-only fragment already contains
+SDK imports, so native_recon composes its exact ranges on the freshly produced
+SDK bridge and gen_ld selects one combined wrapper. The main image remains
+byte-identical with 120,304 zero BSS bytes. Coverage is now 1,587 functions/
+101 TUs (1,568/100 native plus19/1 conventional), and the suite is224/224.
+The unlinked region is480 entries:138 confirmed GLIB and342 unclassified.
+The broader goal remains active pending authoritative GLIB
+inputs or reconstruction of those non-Sony entries and classification/import
+receipts for the342 unknown entries.
 
 ## Debug-object inspection (2026-10-03)
 

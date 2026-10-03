@@ -18,9 +18,10 @@ audits. The five retail images (`DIABPSX.BIN`, `FRONTEND.BIN`, `PREGAME.BIN`, `G
 `FMV.BIN`) link byte-identical to the ROM from this tree (`tools/link.py`). The last two
 functions, `DrawObjSelector` and `DrawSpellCel`, closed on 2026-10-03/04 (receipts under
 `scratch/padfuncs/r4` and `scratch/control/dsc5`; community decomp.me scratches
-`q8GOs`/`Cyqz5` supplied the final lever). The 837 library-region entries are supplied from
-the retail Sony archives and are outside this count; final-image integration of that region
-is tracked below and in `docs/TOOLCHAIN.md`.
+`q8GOs`/`Cyqz5` supplied the final lever). The 837-entry library region is outside this count
+and is separately tracked below and in `docs/TOOLCHAIN.md`: 349 entries currently have
+original Sony archive-link receipts, eight are reconstructed from Climax GMAIN/TICK source,
+and the remaining 480 comprise 138 confirmed Climax GLIB functions plus 342 unclassified entries.
 
 ## Toolchain (identified, see `docs/TOOLCHAIN.md`)
 * **PsyQ 4.0** — `CC1PSX.EXE` / `CC1PLPSX.EXE` = GNU C/C++ **2.7.2.SN32.3.7**, PsyQ 4.0 libraries.
@@ -232,8 +233,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1561 functions across ninety-nine TUs through real ASPSX/PSYLINK: 1580 source-linked
-functions across 100 TUs in total. They replace their text scaffolds at the original
+1568 functions across one hundred TUs through real ASPSX/PSYLINK: 1587 source-linked
+functions across 101 TUs in total. They replace their text scaffolds at the original
 addresses. LIGHTING supplies all 28 functions and all six original sections,
 including the gold-source CrawlTable, 31 exact global records, restored RGB
 defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
@@ -433,7 +434,7 @@ exactly cover each member's XREFs and resolve to unique retail function addresse
 PSYLINK performs the relocations, and the complete result must match retail with
 no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
-The remaining 487 library-region entries are not native-linked: 483 use assembly
+The remaining 480 library-region entries are not native-linked: 476 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
 game-function board, now **2727/2727 PASS**.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
@@ -658,6 +659,18 @@ wrapper retains every neighboring library scaffold byte. The main image and
 runtime BSS remain exact. This reduces the unlinked region to 487 entries:
 145 body-SYM-confirmed GLIB functions plus 342 unclassified entries. It is a
 source reconstruction, not one of the 349 Sony archive imports.
+
+`recon/glibdev/tick.c` adds the complete seven-function TICK.C unit. Its retail
+absolute accesses to the four-byte owned `GazTick` common establish a per-GLIB
+`-G0` identity; the normal game `-G8` form is two instructions shorter and
+wrong. Native linkage supplies 172 text bytes, the 21-byte date/time literal
+pool, and `GazTick` in runtime BSS at 0x8011CA60, with all function/global SYM
+records exact. Because the literals share `rodata.rodata` with original SDK
+payloads, native reconstruction composes its verified ranges on top of the
+fresh SDK bridge and emits one final wrapper; the final image remains exact.
+Coverage is now 1,587 functions/101 TUs (1,568/100 native plus 19/1
+conventional). The unlinked library region is 480 entries: 138 confirmed GLIB
+plus 342 unclassified.
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three
