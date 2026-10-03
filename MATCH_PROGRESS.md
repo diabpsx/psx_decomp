@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2726 / 2727 entries PASS (100.0%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2727 / 2727 entries PASS (100.0%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -227,9 +227,9 @@
 - ✅ ___4AMap (18)
 - ✅ __4AMap (13)
 
-## control  (recon/source/control.cpp) — 50/51 PASS
+## control  (recon/source/control.cpp) — 51/51 PASS
 - ✅ TrimCol__Fs (14)
-- ❌ DrawSpellCel__FllUclUcc — 68 diffs (ours 737)
+- ✅ DrawSpellCel__FllUclUcc (737)
 - ✅ SetSpellTrans__Fc (3)
 - ✅ DrawSpellBookTSK__FP4TASK (100)
 - ✅ DrawSpeedSpellTSK__FP4TASK (76)

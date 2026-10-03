@@ -11,6 +11,9 @@
 #include "source/diablo.h"
 
 #define infostr _infostr[sel_data]
+/* Gold CONTROL.CPP names both spell-strip edges. PSX keeps the right edge and
+ * dynamic icon count, so the corresponding left edge is derived. */
+#define SPLICONLEFT (SPLICONRIGHT - SPLICONNO * 18)
 #define pnumlines _pnumlines[sel_data]
 #define panelstr _panelstr[sel_data]
 #define pstrjust _pstrjust[sel_data]
@@ -138,22 +141,12 @@ unsigned char TrimCol(short col)
     return col;
 }
 
-/* Frame audit (rounds 1-3, receipts scratch/control + scratch/control/dsc3): retail and reconstruction place
- * every outer AUTO/ARG at the same sp offset (yp=56, nCel=64, w=72, ThisDat=80, Tp=88, g=96, b=104, otpos=112).
- * Retail has SIX record-less 8-byte slots (120..160) before `st` (168); ours has two (120,128) then `st` (136).
- * Mechanism (combine.c distribute_notes/REG_DEAD): a temp whose setter combine deleted gets a `(use (reg))`
- * after the nearest label, is then "live at function entry", never allocated, and reload gives it a slot.
- * Ours: the two SpellColors address temps `(plus idx symreg)` -- n accesses of one Global[idx] chain leave
- * n-1 such orphans (the last access's operands die). Slot order = pseudo order = declaration/statement order
- * (a mid-block `int X..st` moves their pseudos after the paloffset temps, SYM unchanged), so the four missing
- * retail orphans are pseudos created between `otpos` and `st`. Excluded by RTL inspection (no combinable chain):
- * GetFr/Tp, paloffset += pinc x4, the 8 bounce tests. The retail SLD-attested spellings below (setUV4/setXY4,
- * setRGB0..3 per corner, `st = 2` after setRGB3, setRGB0 before setSemiTrans/setShadeTex on the Ft4 tail,
- * Clut decl/assign idiom) are byte-, SYM- and orphan-neutral. Retail-attested orphan generators in PASSing
- * siblings (scratch/control/dsc3/catalog.txt): Global[idx] chains, rotated-loop duplicated exit tests,
- * narrow (char/short/bitfield) re-extraction from a shared narrow load, combine-folded compares.
- * SLD order X,Y,SW,SH (lines 612-615) is a 118-diff register swap at this frame; keep the current order.
- * Do not add fake locals, padding or barriers to force the missing reservation. */
+/* Final frame result (receipts scratch/control/dsc5 and build/control_spellicon_geometry_probe):
+ * retail's 216-byte frame comes from gcc combine deleting the natural left-edge/strip-width arithmetic
+ * below. The four eliminated pseudos retain USE notes and reserve four 8-byte reload slots. Together with
+ * the original X,Y,SW,SH statement order, this reproduces all register priorities and stack homes.
+ * `width` is record-less, but is real spell-strip geometry rather than padding or an allocator barrier.
+ * DrawSpellCel is 737/737 bytes, exact SYM, 25/25 calls, and has the exact return declaration. */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel)
 {
     TextDat *ThisDat = GM_UseTexData(0);
@@ -171,11 +164,11 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
     otpos++;
     nCel--;
     if (w == 1 && !sbookflag) {
-        int dummy;   /* stand-in for the record-less declaration that opens retail's level here (lane fact 61) */
+        const int width = SPLICONNO * 18;
 
         xp *= 18;
         yp *= 18;
-        xp += SPLICONRIGHT;
+        xp += SPLICONLEFT + width;
         yp += SPLICONY;
         xp += 32;
         yp += 32;
@@ -216,10 +209,10 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             pinc3 = 4;
         if (paloffset4 < -64)
             pinc4 = 4;
-        SH = Fr->H;
         X = xp + Fr->X;
-        SW = Fr->W;
         Y = yp + Fr->Y;
+        SW = Fr->W;
+        SH = Fr->H;
         GT4 = PRIM_GetNextPolyGt4();
         setPolyGT4(GT4);
         if (!Fr->Rotated) {
