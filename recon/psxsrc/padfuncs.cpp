@@ -1334,8 +1334,8 @@ static BOOL sort_gold(int pnum)
     return ngold;
 }
 
-/* @0x800A2B64  NEAR-MISS (237 diffs): register/spill assignment; our loop.c hoists &_infostr, nw/2,
- * nx+nw/2 and the DrawSpinner constants out of the item loop, retail only &MediumFont and 1. */
+/* @0x800A2B64  Centring halves are signed `/ 2` like retail's ny line: combine drops their sign terms (nw = 250 -> srl;
+ * spinner centre stays in the item loop at loop.c time) and the orphaned sign temps give retail's frame-280 slots. */
 static void DrawObjSelector(int pnum, PlayerStruct *player)
 {
     char str[128];
@@ -1392,12 +1392,12 @@ static void DrawObjSelector(int pnum, PlayerStruct *player)
     }
     SelectBack.SetBack(0x94);
     SelectBack.SetBorder(0x12);
-    add_wrap = 0;
     SelectBack.SetRGB(BACKR, BACKG, BACKB);
     SelectRect.x = 0;
-    SelectRect.y = ((164 - list_size * 12) >> 1) + 32;
+    SelectRect.y = (176 - (list_size * 12 + 12)) / 2 + 32;
     SelectRect.w = maxlen;
     SelectRect.h = list_size * 12 + 12;
+    add_wrap = 0;
     for (i = 0; i < list_size; i++) {
         GetItemStr(_pfind_list[sel_data][i].index);
         nwrap = MediumFont.GetWrap(_infostr[sel_data], &SelectRect);
@@ -1406,66 +1406,65 @@ static void DrawObjSelector(int pnum, PlayerStruct *player)
         else
             add_wrap += 12;
     }
-    int nx;
-    int ny;
-    int nw = maxlen;
     if (item_select >= list_size)
         item_select = list_size - 1;
     else if (item_select < 0)
         item_select = 0;
-        int nh = add_wrap + 12;
-        nx = ((256 - nw) >> 1) + 32;
-        ny = (176 - nh) / 2 + 32;
-        SelectRect.x = nx;
-        SelectRect.y = ny - 22;
-        SelectRect.w = nw;
-        SelectRect.h = 16;
-        SelectBack.Back(nx, ny - 22, nw, 16);
-        MediumFont.Print(0, 12, player->_pName, JustCentre, &SelectRect, WHITER, WHITEG, WHITEG);
-        SelectRect.x = nx;
-        SelectRect.y = ny;
-        SelectRect.w = nw;
-        SelectRect.h = nh;
-        SelectBack.Back(nx, ny, nw, nh);
-        int ypos = 16;
-        for (i = 0; i < _pfind_index[sel_data]; i++) {
-            _infoclr[sel_data] = 0;
-            GetItemStr(fo->index);
-            strcpy(str, _infostr[sel_data]);
-            if (i == item_select) {
-                int len = MediumFont.GetStrWidth(str) + 16;
-                if (MediumFont.GetWrap(_infostr[sel_data], &SelectRect))
-                    len = MediumFont.GetWrapWidth(_infostr[sel_data], &SelectRect);
-                DrawSpinner(nx + (unsigned)nw / 2 - len / 2 - 11, ypos + ny, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
-                DrawSpinner(nx + (unsigned)nw / 2 + len / 2 + 3, ypos + ny, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
-            }
-            switch (_infoclr[sel_data]) {
-            case 0:
-                R = WHITER;
-                G = WHITEG;
-                B = WHITEB;
-                break;
-            case 2:
-                R = REDR;
-                G = REDG;
-                B = REDB;
-                break;
-            case 1:
-                R = BLUER;
-                G = BLUEG;
-                B = BLUEB;
-                break;
-            default:
-                R = GOLDR;
-                G = GOLDG;
-                B = GOLDB;
-                break;
-            }
-            MediumFont.Print(0, ypos, str, JustCentre, &SelectRect, R, G, B);
-            fo++;
-            ypos += MediumFont.GetWrap(_infostr[sel_data], &SelectRect) * 12;
-            nwrap = MediumFont.GetWrap(_infostr[sel_data], &SelectRect);
+    int nx, ny, nw, nh, ypos;
+    nh = add_wrap + 12;
+    nw = maxlen;
+    nx = (256 - nw) / 2 + 32;
+    ny = (176 - nh) / 2 + 32;
+    SelectRect.x = nx;
+    SelectRect.y = ny - 22;
+    SelectRect.w = nw;
+    SelectRect.h = 16;
+    SelectBack.Back(nx, ny - 22, nw, 16);
+    MediumFont.Print(0, 12, player->_pName, JustCentre, &SelectRect, WHITER, WHITEG, WHITEG);
+    SelectRect.x = nx;
+    SelectRect.y = ny;
+    SelectRect.w = nw;
+    SelectRect.h = nh;
+    SelectBack.Back(nx, ny, nw, nh);
+    ypos = 16;
+    for (i = 0; i < _pfind_index[sel_data]; i++) {
+        _infoclr[sel_data] = 0;
+        GetItemStr(fo->index);
+        strcpy(str, _infostr[sel_data]);
+        if (i == item_select) {
+            int len = MediumFont.GetStrWidth(str) + 16;
+            if (MediumFont.GetWrap(_infostr[sel_data], &SelectRect))
+                len = MediumFont.GetWrapWidth(_infostr[sel_data], &SelectRect);
+            DrawSpinner(nx + nw / 2 - len / 2 - 11, ypos + ny, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
+            DrawSpinner(nx + nw / 2 + len / 2 + 3, ypos + ny, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);
         }
+        switch (_infoclr[sel_data]) {
+        case 0:
+            R = WHITER;
+            G = WHITEG;
+            B = WHITEB;
+            break;
+        case 2:
+            R = REDR;
+            G = REDG;
+            B = REDB;
+            break;
+        case 1:
+            R = BLUER;
+            G = BLUEG;
+            B = BLUEB;
+            break;
+        default:
+            R = GOLDR;
+            G = GOLDG;
+            B = GOLDB;
+            break;
+        }
+        MediumFont.Print(0, ypos, str, JustCentre, &SelectRect, R, G, B);
+        fo++;
+        ypos += MediumFont.GetWrap(_infostr[sel_data], &SelectRect) * 12;
+        nwrap = MediumFont.GetWrap(_infostr[sel_data], &SelectRect);
+    }
 }
 
 /* @0x800A336C */
