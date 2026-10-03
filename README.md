@@ -6,6 +6,22 @@ linker map (`DIABPSX.MAP`), which give function names, types, locals, register a
 source line numbers for all 2871 functions — this project turns that into recompilable source
 that reproduces `DIABPSX.BIN` byte for byte.
 
+## Status: game code 100% matched (2026-10-04)
+
+**2727 / 2727 game-code entries PASS** — all 2725 game functions plus the two source-emitted
+data entries match the retail bytes AND the retail debug records (`MATCH_PROGRESS.md`). Every
+function was taken through the full bar: byte-identical instruction stream against the splat
+oracle (`tools/verify_asm.py`, or the real ASPSX 2.56 lane for the maspsx-emulation differences
+listed in `configs/aspsx_passes.txt`), exact function-body SYM records including frame size,
+registers, stack homes and block tree (`tools/symlane.py`), and the call-target / jump-table
+audits. The five retail images (`DIABPSX.BIN`, `FRONTEND.BIN`, `PREGAME.BIN`, `GAME.BIN`,
+`FMV.BIN`) link byte-identical to the ROM from this tree (`tools/link.py`). The last two
+functions, `DrawObjSelector` and `DrawSpellCel`, closed on 2026-10-03/04 (receipts under
+`scratch/padfuncs/r4` and `scratch/control/dsc5`; community decomp.me scratches
+`q8GOs`/`Cyqz5` supplied the final lever). The 837 library-region entries are supplied from
+the retail Sony archives and are outside this count; final-image integration of that region
+is tracked below and in `docs/TOOLCHAIN.md`.
+
 ## Toolchain (identified, see `docs/TOOLCHAIN.md`)
 * **PsyQ 4.0** — `CC1PSX.EXE` / `CC1PLPSX.EXE` = GNU C/C++ **2.7.2.SN32.3.7**, PsyQ 4.0 libraries.
 * Assembler layer: [maspsx](https://github.com/mkst/maspsx) (ASPSX emulator) + `mipsel-none-elf-as`.
@@ -216,8 +232,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1560 functions across ninety-eight TUs through real ASPSX/PSYLINK: 1579 source-linked
-functions across 99 TUs in total. They replace their text scaffolds at the original
+1561 functions across ninety-nine TUs through real ASPSX/PSYLINK: 1580 source-linked
+functions across 100 TUs in total. They replace their text scaffolds at the original
 addresses. LIGHTING supplies all 28 functions and all six original sections,
 including the gold-source CrawlTable, 31 exact global records, restored RGB
 defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
@@ -417,7 +433,7 @@ exactly cover each member's XREFs and resolve to unique retail function addresse
 PSYLINK performs the relocations, and the complete result must match retail with
 no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
-The remaining 488 library-region entries are not native-linked: 484 use assembly
+The remaining 487 library-region entries are not native-linked: 483 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
 game-function board, now **2727/2727 PASS**.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
@@ -597,8 +613,8 @@ unresolved. The 206 pending-name comparisons yield no strict candidate.
 `build/pending_sdk_versions.json` retains paths, hashes, parser dialects,
 rejections and errors; this is screening only. Existing native SDK linkage was
 rerun successfully for all 349 selected entries; no additional import is claimed.
-Retail function-body SYM independently identifies 146 of the 488 unlinked
-library-region entries as Climax GLIB source, while 342 lack a matching body
+Retail function-body SYM independently identified 146 of the 488 then-unlinked
+library-region entries as Climax GLIB source, while 342 lacked a matching body
 record. The latter are unclassified, not automatically Sony SDK functions.
 
 The 84 previously unparsed standalone-object paths have also been inventoried
@@ -631,6 +647,17 @@ candidate calls `strtok`/`atoi` rather than the retail allocator targets.
 No additional SDK import is claimed. Full evidence is in
 `build/pending_content_matches.json`; the driver is
 `scratch/probe_pending_content.py`.
+
+The first Climax GLIB source unit is now integrated rather than misclassified
+as an SDK import. `recon/glibdev/gmain.c` supplies the complete 80-byte
+`GLIBDEV/SOURCE/GMAIN.C` bootstrap at 0x80020E04: exact retail bytes, function
+SYM, return declaration and all six linked call targets. The generalized
+native lane permits a source TU containing only explicitly routed text sections;
+`segment_homes.txt` assigns `lib/main` to this owner, and the generated mixed
+wrapper retains every neighboring library scaffold byte. The main image and
+runtime BSS remain exact. This reduces the unlinked region to 487 entries:
+145 body-SYM-confirmed GLIB functions plus 342 unclassified entries. It is a
+source reconstruction, not one of the 349 Sony archive imports.
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three

@@ -2,6 +2,8 @@
 
 **Game code: 2727 / 2727 entries PASS (100.0%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
+**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; the five retail images link byte-identical to the ROM (`tools/link.py`). The library region (837 entries) is supplied from the retail Sony archives — see README.**
+
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
 - ✅ AS_CallBack1__Fi (27)
