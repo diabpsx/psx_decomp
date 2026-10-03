@@ -25,6 +25,11 @@
 #define spselflag _spselflag[sel_data]
 #define pSplType _pSplType[sel_data]
 #define setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)
+#define setRGB1(p, _r1, _g1, _b1) (p)->r1 = (_r1), (p)->g1 = (_g1), (p)->b1 = (_b1)
+#define setRGB2(p, _r2, _g2, _b2) (p)->r2 = (_r2), (p)->g2 = (_g2), (p)->b2 = (_b2)
+#define setRGB3(p, _r3, _g3, _b3) (p)->r3 = (_r3), (p)->g3 = (_g3), (p)->b3 = (_b3)
+#define setXY4(p, _x0, _y0, _x1, _y1, _x2, _y2, _x3, _y3) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x1), (p)->y1 = (_y1), (p)->x2 = (_x2), (p)->y2 = (_y2), (p)->x3 = (_x3), (p)->y3 = (_y3)
+#define setUV4(p, _u0, _v0, _u1, _v1, _u2, _v2, _u3, _v3) (p)->u0 = (_u0), (p)->v0 = (_v0), (p)->u1 = (_u1), (p)->v1 = (_v1), (p)->u2 = (_u2), (p)->v2 = (_v2), (p)->u3 = (_u3), (p)->v3 = (_v3)
 #define setXYWH(p, _x0, _y0, _w, _h) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x0)+(_w), (p)->y1 = (_y0), (p)->x2 = (_x0), (p)->y2 = (_y0)+(_h), (p)->x3 = (_x0)+(_w), (p)->y3 = (_y0)+(_h)
 
 /* DrawLevelUpFlag is the first explicitly-initialised public definition -> names the
@@ -133,14 +138,21 @@ unsigned char TrimCol(short col)
     return col;
 }
 
-/* Frame audit: retail and reconstruction already place every outer AUTO/ARG at the same physical
- * sp offset (yp=56, nCel=64, w=72, ThisDat=80, Tp=88, g=96, b=104, otpos=112). Retail alone has
- * a recordless 32-byte gap above those slots, moving inner `st` and the saved-register area by 32.
- * The gap is reload's ascending-pseudo spill-slot order: our 120/128 slots are two combine-orphaned
- * SpellColors address pseudos (split 3-insn combines leave a USE + refs>0, no hard reg), st follows.
- * Four additional pre-st orphans could explain retail's extra 32 bytes, but retail RTL is
- * unavailable: neither that cause nor the source construct is proved. The existing USE notes
- * affect allocation priorities; retail's SLD order X,Y,SW,SH (lines 612-615) remains relevant.
+/* Frame audit (rounds 1-3, receipts scratch/control + scratch/control/dsc3): retail and reconstruction place
+ * every outer AUTO/ARG at the same sp offset (yp=56, nCel=64, w=72, ThisDat=80, Tp=88, g=96, b=104, otpos=112).
+ * Retail has SIX record-less 8-byte slots (120..160) before `st` (168); ours has two (120,128) then `st` (136).
+ * Mechanism (combine.c distribute_notes/REG_DEAD): a temp whose setter combine deleted gets a `(use (reg))`
+ * after the nearest label, is then "live at function entry", never allocated, and reload gives it a slot.
+ * Ours: the two SpellColors address temps `(plus idx symreg)` -- n accesses of one Global[idx] chain leave
+ * n-1 such orphans (the last access's operands die). Slot order = pseudo order = declaration/statement order
+ * (a mid-block `int X..st` moves their pseudos after the paloffset temps, SYM unchanged), so the four missing
+ * retail orphans are pseudos created between `otpos` and `st`. Excluded by RTL inspection (no combinable chain):
+ * GetFr/Tp, paloffset += pinc x4, the 8 bounce tests. The retail SLD-attested spellings below (setUV4/setXY4,
+ * setRGB0..3 per corner, `st = 2` after setRGB3, setRGB0 before setSemiTrans/setShadeTex on the Ft4 tail,
+ * Clut decl/assign idiom) are byte-, SYM- and orphan-neutral. Retail-attested orphan generators in PASSing
+ * siblings (scratch/control/dsc3/catalog.txt): Global[idx] chains, rotated-loop duplicated exit tests,
+ * narrow (char/short/bitfield) re-extraction from a shared narrow load, combine-folded compares.
+ * SLD order X,Y,SW,SH (lines 612-615) is a 118-diff register swap at this frame; keep the current order.
  * Do not add fake locals, padding or barriers to force the missing reservation. */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel)
 {
@@ -245,74 +257,38 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
             u3 = u1;
             v3 = v2;
         }
-        GT4->u0 = u0;
-        GT4->v0 = v0;
-        GT4->u1 = u1;
-        GT4->v1 = v1;
-        GT4->u2 = u2;
-        GT4->v2 = v2;
-        GT4->u3 = u3;
-        GT4->v3 = v3;
-        GT4->x0 = x0;
-        GT4->y0 = y0;
-        GT4->x1 = x1;
-        GT4->y1 = y1;
-        GT4->x2 = x2;
-        GT4->y2 = y2;
-        GT4->x3 = x3;
-        GT4->y3 = y3;
+        setUV4(GT4, u0, v0, u1, v1, u2, v2, u3, v3);
+        setXY4(GT4, x0, y0, x1, y1, x2, y2, x3, y3);
         Pal = ThisDat->GetPal(Fr->PalNum);
         if (Pal->InVram) {
-            unsigned short *Clut = (unsigned short *)Pal;   /* coalesced copy: record-less level (GMAN SetPal idiom) */
+            unsigned short *Clut;
+
+            Clut = (unsigned short *)Pal;
             GT4->clut = Clut[1];
         } else if (!(!"Pallete Prob!!"))
             DBG_Error(NULL, "source/CONTROL.cpp", 657);
         st = 1;
         switch (w) {
         case 1:
-            GT4->r0 = TrimCol(r + paloffset1);
-            GT4->g0 = TrimCol(g + paloffset1);
-            GT4->b0 = TrimCol(b + paloffset1);
-            GT4->r1 = TrimCol(r + paloffset2);
-            GT4->g1 = TrimCol(g + paloffset2);
-            GT4->b1 = TrimCol(b + paloffset2);
-            GT4->r2 = TrimCol(r + paloffset3);
-            GT4->g2 = TrimCol(g + paloffset3);
-            GT4->b2 = TrimCol(b + paloffset3);
-            GT4->r3 = TrimCol(r + paloffset4);
-            GT4->g3 = TrimCol(g + paloffset4);
-            GT4->b3 = TrimCol(b + paloffset4);
+            setRGB0(GT4, TrimCol(r + paloffset1), TrimCol(g + paloffset1), TrimCol(b + paloffset1));
+            setRGB1(GT4, TrimCol(r + paloffset2), TrimCol(g + paloffset2), TrimCol(b + paloffset2));
+            setRGB2(GT4, TrimCol(r + paloffset3), TrimCol(g + paloffset3), TrimCol(b + paloffset3));
+            setRGB3(GT4, TrimCol(r + paloffset4), TrimCol(g + paloffset4), TrimCol(b + paloffset4));
             DrawSpinner(X + SW / 2 - 3, Y + SH / 2 + 3, 160, 64, 240, 32, 96, 0, 0, 0xFFFF, st, 0, 8);
             break;
         case 2:
-            GT4->r0 = r;
-            GT4->g0 = g;
-            GT4->b0 = b;
-            GT4->r1 = r;
-            GT4->g1 = g;
-            GT4->b1 = b;
-            GT4->r2 = r;
-            GT4->g2 = g;
-            GT4->b2 = b;
-            GT4->r3 = r;
-            GT4->g3 = g;
-            GT4->b3 = b;
+            setRGB0(GT4, r, g, b);
+            setRGB1(GT4, r, g, b);
+            setRGB2(GT4, r, g, b);
+            setRGB3(GT4, r, g, b);
             DrawSpinner(X + SW / 2 - 3, Y + SH / 2 + 3, 160, 64, 240, 32, 96, 0, 0, 0xFFFF, st, 0, 8);
             break;
         default:
-            GT4->r0 = BACKR >> 1;
-            GT4->g0 = BACKG >> 1;
-            GT4->b0 = BACKB >> 1;
-            GT4->r1 = BACKR >> 1;
-            GT4->g1 = BACKG >> 1;
-            GT4->b1 = BACKB >> 1;
-            GT4->r2 = BACKR >> 1;
-            GT4->g2 = BACKG >> 1;
-            GT4->b2 = BACKB >> 1;
-            GT4->r3 = BACKR >> 1;
-            GT4->g3 = BACKG >> 1;
+            setRGB0(GT4, BACKR >> 1, BACKG >> 1, BACKB >> 1);
+            setRGB1(GT4, BACKR >> 1, BACKG >> 1, BACKB >> 1);
+            setRGB2(GT4, BACKR >> 1, BACKG >> 1, BACKB >> 1);
+            setRGB3(GT4, BACKR >> 1, BACKG >> 1, BACKB >> 1);
             st = 2;
-            GT4->b3 = BACKB >> 1;
             break;
         }
         GT4->tpage = Tp->tpage;
@@ -323,20 +299,16 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         SpellW = Fr->W;
         SpellH = Fr->H;
         Ft4 = ThisDat->PrintFt4(nCel + 166, xp, yp, 0, otpos, 0);
+        setRGB0(Ft4, 128 / st, 128 / st, 128 / st);
         setSemiTrans(Ft4, 0);
         setShadeTex(Ft4, 0);
-        Ft4->r0 = 128 / st;
-        Ft4->g0 = 128 / st;
-        Ft4->b0 = 128 / st;
         setXYWH(Ft4, xp + Fr->X, yp + Fr->Y, SpellW, SpellH);
     } else {
         Fr = ThisDat->GetFr(nCel + 166);
         SpellW = Fr->W;
         SpellH = Fr->H;
         Ft4 = ThisDat->PrintFt4(nCel + 166, xp, yp, 0, otpos, 0);
-        Ft4->r0 = 128;
-        Ft4->g0 = 128;
-        Ft4->b0 = 128;
+        setRGB0(Ft4, 128, 128, 128);
         setShadeTex(Ft4, 0);
         setSemiTrans(Ft4, 1);
         setXYWH(Ft4, xp + (short)(Fr->X + 1), yp + (short)(Fr->Y + 1), SpellW - 2, SpellH - 2);
@@ -344,9 +316,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         SpellW = Fr->W;
         SpellH = Fr->H;
         Ft4 = ThisDat->PrintFt4(165, xp, yp, 0, otpos, 0);
-        Ft4->r0 = r;
-        Ft4->g0 = g;
-        Ft4->b0 = b;
+        setRGB0(Ft4, r, g, b);
         setShadeTex(Ft4, 0);
         if (!sbookflag) {
             setSemiTrans(Ft4, 1);
