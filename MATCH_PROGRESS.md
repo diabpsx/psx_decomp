@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2725 / 2727 entries PASS (99.9%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2726 / 2727 entries PASS (100.0%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -1332,7 +1332,7 @@
 - ✅ set_light_bands__Fv (28)
 - ✅ SetLightFX__FiisssUcUcUc (27)
 - ✅ SetWeirdFX__Fv (29)
-- ✅ DoLighting__Fiiii (821)
+- ✅ DoLighting__Fiiii (821, ASPSX)
 - ✅ DoUnLight__Fv (145)
 - ✅ DoUnVision__Fiiii (66)
 - ✅ DoVision__FiiiUcUc (266)
@@ -2038,7 +2038,7 @@
 - ✅ _GLOBAL__I_OVR_Open__Fv (92)
 - ✅ GetOverType__7Overlay (3)
 
-## padfuncs  (recon/psxsrc/padfuncs.cpp) — 48/49 PASS
+## padfuncs  (recon/psxsrc/padfuncs.cpp) — 49/49 PASS
 - ✅ SetQSpell__Fiii (8)
 - ✅ release_spell__Fi (25)
 - ✅ select_belt_item__Fi (2)
@@ -2070,7 +2070,7 @@
 - ✅ pad_func_Quick_Use_Health__Fi (10)
 - ✅ pad_func_Quick_Use_Mana__Fi (10)
 - ✅ sort_gold__Fi (66)
-- ❌ DrawObjSelector__FiP12PlayerStruct — 237 diffs (ours 503)
+- ✅ DrawObjSelector__FiP12PlayerStruct (514)
 - ✅ SelectorActive__Fv (3)
 - ✅ DrawObjTask__FP4TASK (207)
 - ✅ add_area_find_object__Fiii (28)
