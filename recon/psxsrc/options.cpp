@@ -1225,6 +1225,17 @@ void SoundPad(void)
     }
 }
 
+/* PsyQ 4.0 LIBGPU.H primitive colour / screen-point macros (verbatim, one line each) */
+#ifndef setRGB0
+#define setRGB0(p,_r0,_g0,_b0) (p)->r0 = _r0,(p)->g0 = _g0,(p)->b0 = _b0
+#define setRGB1(p,_r1,_g1,_b1) (p)->r1 = _r1,(p)->g1 = _g1,(p)->b1 = _b1
+#define setRGB2(p,_r2,_g2,_b2) (p)->r2 = _r2,(p)->g2 = _g2,(p)->b2 = _b2
+#define setRGB3(p,_r3,_g3,_b3) (p)->r3 = _r3,(p)->g3 = _g3,(p)->b3 = _b3
+#endif
+#ifndef setXY4
+#define setXY4(p,_x0,_y0,_x1,_y1,_x2,_y2,_x3,_y3) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x1), (p)->y1 = (_y1), (p)->x2 = (_x2), (p)->y2 = (_y2), (p)->x3 = (_x3), (p)->y3 = (_y3)
+#endif
+
 void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB,
                   int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross,
                   BOOL iso, unsigned char SinStep)
@@ -1239,13 +1250,11 @@ void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigne
     unsigned short r2, g2, b2;
     int x1, y1, x2, y2, x3, y3;
     int radius;
-    int i;
 
-    if (OtPos == 0xFFFF) {
-        OtPos = CBlocks::GetOverlayOtBase();
-        OtPos = OtPos + 4;
-    }
+    if (OtPos == 0xFFFF) OtPos = CBlocks::GetOverlayOtBase() + 4;
+
     ThisDat = GM_UseTexData(0);
+
     if (PauseMode && !Sparkle) {
         rand = 0x10;
         f = 4;
@@ -1255,109 +1264,75 @@ void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigne
     }
     bright = rand + spinbright;
     radius = spinradius >> 1;
-    if ((int)(bright << 16) < 0)
+    if ((short)bright < 0)
         bright = 0;
-    bright = bright & 0xFFFF;
     r = (SpinR * bright) >> 8;
     g = (SpinG * bright) >> 8;
-    b = ((SpinB & 0xFF) * bright) >> 8;
-    if (((SpinR * bright) >> 8) > 0xFF)
-        r = 0xFF;
-    if (g > 0xFF)
-        g = 0xFF;
-    if (b > 0xFF)
-        b = 0xFF;
+    b = (SpinB * bright) >> 8;
+    if (r > 255) r = 255;
+    if (g > 255) g = 255;
+    if (b > 255) b = 255;
+
     if (Sparkle) {
-        FT4 = ThisDat->PrintFt4(f + 0xD0, x, y, 0, OtPos, 0);
-        FT4->r0 = SpinR;
-        FT4->g0 = SpinG;
-        FT4->b0 = (unsigned char)SpinB;
-        FT4->code = (FT4->code | 2) & 0xFE;
+        f += 0xD0;
+        FT4 = ThisDat->PrintFt4(f, x, y, 0, OtPos, 0);
+        setRGB0(FT4, SpinR, SpinG, SpinB);
+        setSemiTrans(FT4, 1);
+        setShadeTex(FT4, 0);
     }
-    y = y - 3;
-    x = x + 3;
+
+    x += 3;
+    y -= 3;
     r2 = r >> 2;
     g2 = g >> 2;
     b2 = b >> 2;
-    SinStep = SinStep & 0xFF;
-    i = 0;
-    do {
+    for (int i = 0; i < 64; i += SinStep * 2) {
         GT4 = ThisDat->PrintGt4(0xD8, x, y, 0, OtPos + 1, 0);
-        GT4->tpage = GT4->tpage | 0x20;
-        GT4->v2 = GT4->v2 - 1;
+        GT4->tpage |= 0x20;
         GT4->u1 = GT4->u1 - 1;
-        GT4->v3 = GT4->v3 - 1;
+        GT4->v2 = GT4->v2 - 1;
         GT4->u3 = GT4->u3 - 1;
-        if (iso == 0) {
-            x1 = x + ((Circle[angle & 0x3F] * radius) >> 8);
-            y1 = y + ((Circle[(angle + 0x10) & 0x3F] * radius) >> 8);
-            x2 = (Circle[(angle + SinStep) & 0x3F] * radius) >> 8;
-            y2 = (Circle[(angle + SinStep + 0x10) & 0x3F] * radius) >> 8;
-            x3 = x + ((Circle[(angle + SinStep * 2) & 0x3F] * radius) >> 8);
-            y3 = y + ((Circle[(angle + SinStep * 2 + 0x10) & 0x3F] * radius) >> 8);
+        GT4->v3 = GT4->v3 - 1;
+        if (!iso) {
+            x1 = x + ((Circle[(angle + i) & 0x3F] * radius) >> 8);
+            y1 = y + ((Circle[(angle + i + 0x10) & 0x3F] * radius) >> 8);
+            x2 = (Circle[(angle + i + SinStep) & 0x3F] * radius) >> 8;
+            y2 = (Circle[(angle + i + SinStep + 0x10) & 0x3F] * radius) >> 8;
+            x3 = x + ((Circle[(angle + i + SinStep * 2) & 0x3F] * radius) >> 8);
+            y3 = y + ((Circle[(angle + i + SinStep * 2 + 0x10) & 0x3F] * radius) >> 8);
         } else {
-            x1 = x + ((Circle[angle & 0x3F] * radius) >> 8);
-            y1 = y + ((Circle[(angle + 0x10) & 0x3F] * radius) >> 9);
-            x2 = (Circle[(angle + SinStep) & 0x3F] * radius) >> 8;
-            y2 = (Circle[(angle + SinStep + 0x10) & 0x3F] * radius) >> 9;
-            x3 = x + ((Circle[(angle + SinStep * 2) & 0x3F] * radius) >> 8);
-            y3 = y + ((Circle[(angle + SinStep * 2 + 0x10) & 0x3F] * radius) >> 9);
+            x1 = x + ((Circle[(angle + i) & 0x3F] * radius) >> 8);
+            y1 = y + ((Circle[(angle + i + 0x10) & 0x3F] * radius) >> 9);
+            x2 = (Circle[(angle + i + SinStep) & 0x3F] * radius) >> 8;
+            y2 = (Circle[(angle + i + SinStep + 0x10) & 0x3F] * radius) >> 9;
+            x3 = x + ((Circle[(angle + i + SinStep * 2) & 0x3F] * radius) >> 8);
+            y3 = y + ((Circle[(angle + i + SinStep * 2 + 0x10) & 0x3F] * radius) >> 9);
         }
-        GT4->x0 = x1;
-        GT4->y0 = y1;
-        GT4->x1 = x;
-        GT4->x2 = x + x2;
-        GT4->y1 = y;
-        GT4->x3 = x3;
-        GT4->y3 = y3;
-        GT4->r0 = 0;
-        GT4->g0 = 0;
-        GT4->b0 = 0;
-        GT4->y2 = y + y2;
-        GT4->r1 = (unsigned char)r;
-        GT4->g1 = (unsigned char)g;
-        GT4->r2 = 0;
-        GT4->g2 = 0;
-        GT4->b2 = 0;
-        GT4->r3 = 0;
-        GT4->g3 = 0;
-        GT4->b3 = 0;
-        GT4->code = (GT4->code | 2) & 0xFE;
-        GT4->b1 = (unsigned char)b;
-        if (cross != 0) {
+        setXY4(GT4, x1, y1, x, y, x + x2, y + y2, x3, y3);
+        setSemiTrans(GT4, 1);
+        setShadeTex(GT4, 0);
+        setRGB0(GT4, 0, 0, 0);
+        setRGB1(GT4, r, g, b);
+        setRGB2(GT4, 0, 0, 0);
+        setRGB3(GT4, 0, 0, 0);
+        if (cross) {
             GT4 = ThisDat->PrintGt4(0xD8, x, y, 0, OtPos + 1, 0);
+            GT4->tpage |= 0x20;
             x2 >>= 3;
-            GT4->x0 = x1;
-            GT4->y0 = y1;
-            GT4->x1 = x;
-            GT4->x2 = x + x2;
-            GT4->y1 = y;
-            GT4->x3 = x3;
-            GT4->y3 = y3;
             y2 >>= 3;
-            GT4->y2 = y + y2;
-            GT4->r0 = (unsigned char)r2;
-            GT4->g0 = (unsigned char)g2;
-            GT4->b0 = (unsigned char)b2;
-            GT4->r1 = (unsigned char)r;
-            GT4->g1 = (unsigned char)g;
-            GT4->b1 = (unsigned char)b;
-            GT4->r2 = (unsigned char)r2;
-            GT4->g2 = (unsigned char)g2;
-            GT4->b2 = (unsigned char)b2;
-            GT4->r3 = (unsigned char)r2;
-            GT4->g3 = (unsigned char)g2;
-            GT4->tpage = GT4->tpage | 0x20;
             GT4->u1 = GT4->u1 - 1;
             GT4->v2 = GT4->v2 - 1;
             GT4->u3 = GT4->u3 - 1;
-            GT4->b3 = (unsigned char)b2;
             GT4->v3 = GT4->v3 - 1;
-            GT4->code = (GT4->code | 2) & 0xFE;
+            setXY4(GT4, x1, y1, x, y, x + x2, y + y2, x3, y3);
+            setSemiTrans(GT4, 1);
+            setShadeTex(GT4, 0);
+            setRGB0(GT4, r2, g2, b2);
+            setRGB1(GT4, r, g, b);
+            setRGB2(GT4, r2, g2, b2);
+            setRGB3(GT4, r2, g2, b2);
         }
-        angle = angle + SinStep * 2;
-        i = i + SinStep * 2;
-    } while (i < 0x40);
+    }
     GM_FinishedUsing(ThisDat);
 }
 
