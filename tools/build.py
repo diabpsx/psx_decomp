@@ -43,6 +43,11 @@ CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline", "-fsigned-char"] 
 
 # per-TU flag overrides: {repo-relative posix path: {"g_value": "0", "lane": "c"...}}
 PER_TU_FLAGS = {
+    # Climax GLIB C modules use absolute addressing even for four-byte owned
+    # commons (TICK/GazTick), proving their original small-data threshold was 0.
+    "recon/glibdev/gmain.c": {"g_value": "0"},
+    "recon/glibdev/tick.c": {"g_value": "0"},
+    "recon/glibdev/tasker.c": {"g_value": "0"},   # 16 four-byte statics at 8011C98C.. reached absolutely (scratch/glib/tasker)
     # Reproduce linker-placed zero commons. These unchanged GAME objects link
     # all text/pool bytes and their typed globals at the retail homes.
     "recon/source/missiles.cpp": {"extra": ["-fconserve-space"]},
