@@ -34,7 +34,7 @@ SECTIONS
         . = 0x2E24C;   /* 0x8003E24C */
         build/skel/SOURCE/ITEMS.CPP.o(.text);
         . = 0x3BC68;   /* 0x8004BC68 */
-        build/skel/SOURCE/LIGHTING.CPP.o(.text);
+        build/native_source/lighting.text.s.o(.text);   /* verified native-assembled source */
         . = 0x3D95C;   /* 0x8004D95C */
         build/native_source/minitext.text.s.o(.text);   /* verified native-assembled source */
         . = 0x3EA8C;   /* 0x8004EA8C */
@@ -50,7 +50,7 @@ SECTIONS
         . = 0x4FD10;   /* 0x8005FD10 */
         build/skel/SOURCE/PLAYER.CPP.o(.text);
         . = 0x574B4;   /* 0x800674B4 */
-        build/skel/SOURCE/QUESTS.CPP.o(.text);
+        build/native_source/quests.text.s.o(.text);   /* verified native-assembled source */
         . = 0x5931C;   /* 0x8006931C */
         build/native_source/scrollrt.text.s.o(.text);   /* verified native-assembled source */
         . = 0x595A4;   /* 0x800695A4 */
@@ -290,7 +290,7 @@ SECTIONS
         . = 0xC1BE0;   /* 0x800D1BE0 */
         build/asm/data/data_items.data.s.o(.data);
         . = 0xC5554;   /* 0x800D5554 */
-        build/asm/data/data_lighting.data.s.o(.data);
+        build/native_source/data_lighting.data.s.o(.data);   /* verified native source data */
         . = 0xC6790;   /* 0x800D6790 */
         build/native_source/data_minitext.data.s.o(.data);   /* verified native source data */
         . = 0xC67F0;   /* 0x800D67F0 */
@@ -304,7 +304,7 @@ SECTIONS
         . = 0xCA348;   /* 0x800DA348 */
         build/asm/data/data_player.data.s.o(.data);
         . = 0xCD908;   /* 0x800DD908 */
-        build/asm/data/data_quests.data.s.o(.data);
+        build/native_source/data_quests.data.s.o(.data);   /* verified native source data */
         . = 0xCDB80;   /* 0x800DDB80 */
         build/asm/data/data_spelldat.data.s.o(.data);
         . = 0xCE304;   /* 0x800DE304 */
@@ -492,7 +492,7 @@ SECTIONS
         . = 0x106140;   /* 0x80116140 */
         build/asm/data/rodata_items.rodata.s.o(.rodata);
         . = 0x1066E8;   /* 0x801166E8 */
-        build/asm/data/rodata_lighting.rodata.s.o(.rodata);
+        build/native_source/rodata_lighting.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1066F8;   /* 0x801166F8 */
         build/native_source/rodata_minitext.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x106798;   /* 0x80116798 */
@@ -510,7 +510,7 @@ SECTIONS
         . = 0x10774C;   /* 0x8011774C */
         build/asm/data/rodata_player.rodata.s.o(.rodata);
         . = 0x1078E0;   /* 0x801178E0 */
-        build/asm/data/rodata_quests.rodata.s.o(.rodata);
+        build/native_source/rodata_quests.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x107904;   /* 0x80117904 */
         build/asm/data/rodata_scrollrt.rodata.s.o(.rodata);
         . = 0x107928;   /* 0x80117928 */
@@ -680,6 +680,10 @@ SECTIONS
         __source_engine_sbss_start = .;
         build/native_source/engine.sbss.s.o(.sbss);
         ASSERT(. - __source_engine_sbss_start == 0xC, "wrong BSS extent: engine");
+        . = 0x10C7DC;
+        __source_lighting_sbss_start = .;
+        build/native_source/lighting.sbss.s.o(.sbss);
+        ASSERT(. - __source_lighting_sbss_start == 0x2C, "wrong BSS extent: lighting");
         . = 0x10C808;
         __source_minitext_sbss_start = .;
         build/native_source/minitext.sbss.s.o(.sbss);
@@ -688,6 +692,10 @@ SECTIONS
         __source_multi_sbss_start = .;
         build/native_source/multi.sbss.s.o(.sbss);
         ASSERT(. - __source_multi_sbss_start == 0x38, "wrong BSS extent: multi");
+        . = 0x10C87C;
+        __source_quests_sbss_start = .;
+        build/native_source/quests.sbss.s.o(.sbss);
+        ASSERT(. - __source_quests_sbss_start == 0x8, "wrong BSS extent: quests");
         . = 0x10C8C8;
         __source_town_sbss_start = .;
         build/native_source/town.sbss.s.o(.sbss);
@@ -760,6 +768,14 @@ SECTIONS
         __source_psxhelp_bss_start = .;
         build/native_source/psxhelp.bss.s.o(.bss);
         ASSERT(. - __source_psxhelp_bss_start == 0x20, "wrong BSS extent: psxhelp");
+        . = 0x11ED58;
+        __source_lighting_bss_start = .;
+        build/native_source/lighting.bss.s.o(.bss);
+        ASSERT(. - __source_lighting_bss_start == 0x80, "wrong BSS extent: lighting");
+        . = 0x11EDF8;
+        __source_quests_bss_start = .;
+        build/native_source/quests.bss.s.o(.bss);
+        ASSERT(. - __source_quests_bss_start == 0x50, "wrong BSS extent: quests");
         . = 0x11FB68;
         __source_gamepad_bss_start = .;
         build/native_source/gamepad.bss.s.o(.bss);

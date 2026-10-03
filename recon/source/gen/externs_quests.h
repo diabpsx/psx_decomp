@@ -1,15 +1,4 @@
 /* TU-owned globals (this is the segment that materializes them) */
-extern struct QuestStruct quests[16];    /* @0x800DDA40 */
-extern struct QuestData questlist[16];   /* @0x800DD908 */
-extern int QuestGroup1[3];               /* @0x800DDA1C */
-extern int QuestGroup2[3];               /* @0x800DDA28 */
-extern int QuestGroup3[3];               /* @0x800DDA34 */
-extern int QuestGroup4[2];               /* @0x8011BA30 */
-extern int qtopline;                     /* @0x8011BA70 */
-extern unsigned char questlog;                    /* @0x8011BA29 */
-extern unsigned char *pQLogCel;          /* @0x8011BA50 */
-extern int ALLQUESTS;                    /* @0x8011BA2C */
-extern BOOL WaterDone;                   /* @0x8011BA48 */
 
 /* other TUs */
 extern unsigned char gbMaxPlayers;       /* @0x8011B9A2 */
@@ -21,10 +10,6 @@ extern unsigned char setlvlnum;          /* @0x8011C10F */
 extern unsigned char setlvltype;         /* @0x8011C110 */
 extern int ViewX;                        /* @0x8011C114 */
 extern int ViewY;                        /* @0x8011C118 */
-extern int ReturnLvlX;                   /* @0x8011BA54 */
-extern int ReturnLvlY;                   /* @0x8011BA58 */
-extern int ReturnLvl;                    /* @0x8011BA5C */
-extern int ReturnLvlT;                   /* @0x8011BA60 */
 extern int myplr;                        /* @0x8011BA08 */
 extern struct PlayerStruct plr[2];       /* @0x800DA538 */
 extern int setpc_x;                      /* @0x8011C0E4 */
@@ -43,7 +28,6 @@ extern int numobjects;                   /* @0x8011B9CC */
 extern char TransVal;                     /* @0x8011C148 */
 extern char offset_x[8];                 /* @0x8011C2A8 */
 extern char offset_y[8];                 /* @0x8011C2B0 */
-extern int questtrigstr[5];              /* @0x800DDA08 -- GetStr() text ids, not char* */
 extern int sel_data;                     /* @0x8011B72C */
 extern char _infostr[2][256];            /* @0x800CE810 */
 extern int cursmx;                       /* @0x8011B750 */
@@ -53,8 +37,6 @@ extern unsigned char Qfromoptions;                 /* @0x8011B228 */
 extern char **TextPtr;                      /* @0x8011BBF4 */
 extern int CDWAIT;                       /* @0x8011ADEC */
 extern unsigned char qtextflag;          /* @0x8011B960 */
-extern int qline;                        /* @0x8011BA68 */
-extern int numqlines;                    /* @0x8011BA6C */
 extern int options_pad;                  /* @0x8011B250 */
 extern struct CFont MediumFont;          /* @0x800B82D8 */
 extern unsigned char DialogRed, DialogGreen, DialogBlue;     /* @0x8011ABFD.. */

@@ -19,6 +19,17 @@ def object_with(debug):
 
 
 class PsyqSLDTests(unittest.TestCase):
+    def test_patch_expression_and_xref_number_are_retained(self):
+        raw = (b'LNK\x02\x10' + struct.pack('<HHB',1,0,4) + string(b'.text')
+               + b'\x06\x01\x00\x02\x04\x00' + bytes.fromhex('0000000c')
+               + b'\x0a\x4a\x00\x00\x02\x09\x00'
+               + b'\x0e\x09\x00' + string(b'callee') + b'\x00')
+        obj=P.parse_obj_complete(raw)
+        self.assertEqual(obj['patches'],[{'sect':1,'off':0,'type':0x4a,'expr':'020900'}])
+        self.assertEqual(obj['xrefs'],['callee'])
+        self.assertEqual(obj['xref_symbols'],{9:'callee'})
+        self.assertEqual(obj['symbol_names'],{9:'callee'})
+
     def test_line_records_are_numeric_not_strings(self):
         debug = (b'\x32' + struct.pack('<H', 0)
                  + b'\x34' + struct.pack('<HB', 0, 255)

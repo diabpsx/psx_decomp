@@ -1,4 +1,58 @@
 {
+  "quests": {
+    "source": "recon/source/quests.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x800674B4", "size": 7784},
+      ".rdata": {"va": "0x801178E0", "size": 33, "scaffold": "rodata_quests.rodata"},
+      ".data": {"va": "0x800DD908", "size": 632, "scaffold": "data_quests.data"},
+      ".sdata": {"va": "0x8011BA20", "size": 84, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C87C", "size": 8},
+      ".bss": {"va": "0x8012EDF8", "size": 80},
+      ".ctors": {"va": "0x800B0CC8", "size": 4, "scaffold": "ctors.data"},
+      ".dtors": {"va": "0x800B0CF8", "size": 4, "scaffold": "dtors.data"}
+    },
+    "data_symbols": ["ReturnLvlT", "ReturnLvlX", "ReturnLvlY", "qline", "questtrigstr",
+      "QuestGroup1", "QuestGroup2", "QuestGroup3", "QuestGroup4", "qtopline", "questlog",
+      "WaterDone", "quests", "ReturnLvl", "ALLQUESTS", "numqlines", "questlist", "pQLogCel",
+      "rporttest", "QSBack", "qlist", "QSRect", "qtoffset", "QS_PH", "QS_PW", "QS_PX", "QS_PY"],
+    "externals": ["BORDERB", "BORDERG", "sfxdnum", "sprintf", "monster", "BORDERR", "Qfromoptions",
+      "DRLG_MRectTrans__Fiiii", "GLUE_SetShowGameScreenFlag__Fb", "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "REDB", "InitQTextMsg__Fi", "REDG", "trigs", "GLUE_SetShowPanelFlag__Fb", "TransVal",
+      "stream_stop__Fv", "DialogTBlue", "REDR", "myplr", "numobjects", "sel_data", "DialogGreen",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc", "FindBlock__Fii", "TSK_Sleep", "NetSendCmdQuest__FUcUc",
+      "plr", "BACKB", "BACKG", "Back__6Dialogiiii", "setlvltype", "offset_x", "offset_y", "sfxdelay",
+      "GLUE_SuspendGame__Fv", "BACKR", "_infostr", "setlevel", "GOLDB", "GLUE_SetHomingScrollFlag__Fb",
+      "BLUEB", "DialogRed", "GOLDG", "BLUEG", "GOLDR", "numtrigs", "BLUER", "__builtin_delete",
+      "DialogTGreen", "ObjChangeMapResync__Fiiii", "FadeGameOut__Fv", "AddObject__Fiii", "options_pad",
+      "cursmx", "cursmy", "StartNewLvl__Fiii", "deltaload", "PrintSelectBack__FUs", "UniqMonst",
+      "Qtalklist", "SpawnQuestItem__Fiiiii", "CDWAIT", "DialogTRed", "WHITEB", "GetStr__Fi", "WHITEG",
+      "ToggleOptions__Fv", "nummonsters", "gbMaxPlayers", "qtextflag", "WHITER", "currlevel",
+      "DialogBlue", "GetStrWidth__5CFontPc", "leveltype", "TextPtr", "PostGamePad__Fiiii", "setpc_h",
+      "SyncObjectAnim__Fi", "setlvlnum", "TSK_AddTask", "GLUE_ResumeGame__Fv", "objectactive", "ViewX",
+      "ViewY", "PlaySFX__Fi", "setpc_w", "setpc_x", "setpc_y", "AddMissile__Fiiiiiiciii",
+      "MediumFont", "InitVPTriggers__Fv"]
+  },
+  "lighting": {
+    "source": "recon/source/lighting.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {"va": "0x8004BC68", "size": 7412},
+      ".rdata": {"va": "0x801166E8", "size": 14, "scaffold": "rodata_lighting.rodata"},
+      ".data": {"va": "0x800D5554", "size": 4668, "scaffold": "data_lighting.data"},
+      ".sdata": {"va": "0x8011B8F4", "size": 52, "scaffold": "sdata_after_primpool.sdata"},
+      ".sbss": {"va": "0x8011C7DC", "size": 44},
+      ".bss": {"va": "0x8012ED58", "size": 128}
+    },
+    "data_symbols": ["CrawlTable", "vCrawlTable", "RadiusAdj", "radius_tab", "bright_tab",
+      "LightList", "lightactive", "VisionList", "weird_cheat", "restore_r", "restore_g",
+      "restore_b", "light_level", "level_lamp", "numlights", "lightmax", "numvision", "dovision",
+      "visionid", "disp_mask", "weird", "disp_tab_r", "dispy_r", "disp_tab_g", "dispy_g",
+      "disp_tab_b", "dispy_b", "radius", "bright", "max_bright", "mult_tab"],
+    "externals": ["dung_map_b", "dung_map_g", "dung_map_r", "TransVal", "gr_scrxoff", "gr_scryoff",
+      "GU_GetRnd", "dung_map", "plr", "GetBLOCK__Fii", "SetAutomapView__Fii", "TransList",
+      "leveltype", "light4flag"]
+  },
   "drlg_l4": {
     "source": "recon/source/drlg_l4.cpp",
     "image": "pregame",

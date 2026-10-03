@@ -4,6 +4,7 @@
 First capture: python tools/instr/real_rtl.py SOURCE FUNCTION --dump flow,combine
 Then inspect: python tools/instr/combine_uses.py build/rtl/TU-ID/input.i FUNCTION
 The input prefix selects sibling .flow and .combine files from the same capture.
+Add --reload (capture --dump flow,combine,greg) to follow USE UIDs into .greg.
 """
 import argparse
 import hashlib
@@ -49,6 +50,50 @@ def opcode(node):
     if not isinstance(node, list) or not node or not isinstance(node[0], str):
         return ''
     return node[0].split(':', 1)[0].split('/', 1)[0]
+
+
+def first_form(text):
+    """Isolate one balanced RTL form before later reload diagnostic prose."""
+    closing=[]
+    for token in TOKEN.finditer(text):
+        value=token[0]
+        if not closing and value!='(':
+            raise ValueError('expected RTL opening delimiter')
+        if value in ('(', '['):
+            closing.append(')' if value=='(' else ']')
+        elif value in (')', ']'):
+            if not closing or value!=closing.pop():
+                raise ValueError('mismatched RTL delimiter')
+            if not closing:
+                return text[:token.end()]
+    raise ValueError('truncated RTL form')
+
+
+def reload_use(text, uid):
+    """Follow the exact USE UID, without inferring unobserved stack reservations."""
+    matches=list(re.finditer(r'^\(insn '+str(uid)+r'\s',text,re.M))
+    if len(matches)>1:
+        raise ValueError('ambiguous post-reload instruction UID %d' % uid)
+    if not matches:
+        return {'uid':uid,'state':'not_present'}
+    raw=first_form(text[matches[0].start():]);node=parse_form(raw)
+    result={'uid':uid,'rtl':' '.join(raw.split())}
+    if len(node)<5 or opcode(node[4])!='use':
+        return {**result,'state':'not_use'}
+    operand=node[4][1]
+    if register(operand) is not None:
+        return {**result,'state':'register','register':register(operand)}
+    if opcode(operand)!='mem':
+        return {**result,'state':'other'}
+    result.update(state='memory',mode=operand[0].split(':',1)[-1])
+    address=operand[1]
+    if register(address)==29:
+        result.update(state='sp_relative',byte_offset=0)
+    elif opcode(address)=='plus' and len(address)==3:
+        for base,offset in ((address[1],address[2]),(address[2],address[1])):
+            if register(base)==29 and opcode(offset)=='const_int':
+                result.update(state='sp_relative',byte_offset=int(offset[1],0))
+    return result
 
 
 def register(node):
@@ -103,7 +148,7 @@ def records(text):
     return result
 
 
-def analyze(flow, combine, function):
+def analyze(flow, combine, function, greg=None):
     before = records(extract_function(flow, function))
     after = records(extract_function(combine, function))
     before_writes, after_writes = {}, {}
@@ -124,6 +169,7 @@ def analyze(flow, combine, function):
         if reg is not None:
             groups.setdefault(reg, []).append(item['uid'])
     rows = []
+    allocated = extract_function(greg, function) if greg is not None else None
     for reg, uses in sorted(groups.items()):
         prior = before_writes.get(reg, [])
         remaining = after_writes.get(reg, [])
@@ -131,6 +177,8 @@ def analyze(flow, combine, function):
                      'flow_writes':prior, 'combine_writes':remaining,
                      'lost_all_sets':any(x['kind']=='set' for x in prior)
                                      and not any(x['kind']=='set' for x in remaining)})
+        if allocated is not None:
+            rows[-1]['post_reload_uses']=[reload_use(allocated,uid) for uid in uses]
     return {'function':function, 'standalone_uses':sum(len(x) for x in groups.values()),
             'registers_with_lost_sets':sum(row['lost_all_sets'] for row in rows),
             'registers':rows,
@@ -142,11 +190,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input', type=Path, help='capture prefix, normally input.i')
     parser.add_argument('function', help='exact or unambiguous RTL function heading')
+    parser.add_argument('--reload', action='store_true', help='also follow USE UIDs through the sibling .greg dump')
     args = parser.parse_args()
     paths = {name:Path(str(args.input)+'.'+name) for name in ('flow','combine')}
+    if args.reload:
+        paths['greg']=Path(str(args.input)+'.greg')
     try:
         data = {name:path.read_bytes() for name,path in paths.items()}
-        report = analyze(data['flow'].decode('utf-8'), data['combine'].decode('utf-8'), args.function)
+        report = analyze(data['flow'].decode('utf-8'), data['combine'].decode('utf-8'), args.function,
+                         data['greg'].decode('utf-8') if args.reload else None)
         report['inputs'] = {name:{'path':str(paths[name].resolve()),
                                  'sha256':hashlib.sha256(blob).hexdigest()}
                             for name,blob in data.items()}

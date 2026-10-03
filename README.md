@@ -216,9 +216,21 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1506 functions across ninety-six TUs through real ASPSX/PSYLINK: 1525 source-linked
-functions across 97 TUs in total. They replace their text scaffolds at the original
-addresses. PCIO and DatIO also supply their complete read-only sections,
+1560 functions across ninety-eight TUs through real ASPSX/PSYLINK: 1579 source-linked
+functions across 99 TUs in total. They replace their text scaffolds at the original
+addresses. LIGHTING supplies all 28 functions and all six original sections,
+including the gold-source CrawlTable, 31 exact global records, restored RGB
+defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
+is byte-identical; DoLighting uses the reviewed real-ASPSX gate.
+QUESTS supplies all 26 functions, its complete text/read-only/data/small-data/
+BSS sections, and both constructor/destructor table entries. The original
+`CTextFileInfo::HasTp`/`HasDat` header inlines emit the otherwise-unused
+`.tp`/`.dat` literals that place `questlog` at its exact unaligned address;
+all 27 named global records match. The full-address verification also corrected
+thirteen wrong quest/data references that normalized function comparison could
+not distinguish. Dedicated tests cover the complete native object and those
+linked instruction operands.
+PCIO and DatIO also supply their complete read-only sections,
 including diagnostic strings and relocated virtual-method tables, through
 `configs/recon_data_link.json`. SPELLS supplies its complete 20-byte jump table
 at 0x801189E8; the preceding 40 bytes of unused header literals remain in a
@@ -407,7 +419,7 @@ no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
 The remaining 488 library-region entries are not native-linked: 484 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
-game-function board, now 2725/2727 with two functions not PASS.
+game-function board, now **2727/2727 PASS**.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate
@@ -588,6 +600,37 @@ rerun successfully for all 349 selected entries; no additional import is claimed
 Retail function-body SYM independently identifies 146 of the 488 unlinked
 library-region entries as Climax GLIB source, while 342 lack a matching body
 record. The latter are unclassified, not automatically Sony SDK functions.
+
+The 84 previously unparsed standalone-object paths have also been inventoried
+with original DUMPOBJ 2.00 under the existing headless DOSBox Staging runner.
+They contain 53 unique objects; every vendor listing reaches its END record,
+and together they expose 811 exports. Only two exported names intersect the
+488 pending names: `main` in Chill's CLUTTER.OBJ and NORMAN.OBJ. Vendor function
+records identify 7,392- and 7,332-byte bodies with frame56, unlike Diablo's
+80-byte main. Neither is a candidate. Original-file hashes were checked
+unchanged. Listings, tool hashes and name/extent evidence are retained in
+`build/dumpobj_inventory/report.json`; reproducible drivers are
+`scratch/probe_dumpobj_inventory.py` and `scratch/summarize_dumpobj_inventory.py`.
+This closes the vendor export-inventory gap, not the Python parser failures or
+a content search for anonymous/differently named routines. No import or parser
+relaxation was made. A path to original Climax GLIB libraries/build objects
+outside the searched roots has been requested from the user.
+
+A subsequent relocation-masked content search removes the same-name limitation.
+It screened 28,243 object occurrences (7,274 unique parsed objects), 13,749
+candidate functions and 136,796 size-compatible comparisons across all local
+PsyQ archives and standalone reference objects. Raw patch expressions and
+symbol-number mappings are now retained by `psyq_extract.py`, so jump/call
+targets are checked rather than silently hidden by relocation masks. Of 1,679
+raw masked hits covering only 23 pending retail names, the sole nontrivial
+target-exact bodies are `GTIMSYS_GetTimer`/`ResetTimer`, byte twins of PsyQ
+`GsGetVcount`/`GsClearVcount` through SDK 3.3-4.0. Retail SYM explicitly owns
+them as `GLIBDEV/SOURCE/PSX/GTIMSYS.C`, so they are Climax wrappers, not Sony
+archive imports. The unique-looking purge-wrapper hit is rejected because its
+candidate calls `strtok`/`atoi` rather than the retail allocator targets.
+No additional SDK import is claimed. Full evidence is in
+`build/pending_content_matches.json`; the driver is
+`scratch/probe_pending_content.py`.
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three

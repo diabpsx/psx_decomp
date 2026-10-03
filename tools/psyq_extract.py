@@ -107,6 +107,7 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
         raise Desync("bad magic")
     p, cur = 4, None
     sections, xdefs, xrefs, locs, patches = {}, [], [], [], []
+    xref_symbols = {}
     groups = {}
     code, bss, fname = {}, {}, None
     chunk_base = 0
@@ -132,10 +133,12 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
         elif op == 0x0A:                                   # patch (RELOCATION)
             ptype = d[p]; p += 1
             poff = struct.unpack('<H', d[p:p+2])[0]; p += 2
+            expr_start = p
             p = _expr(d, p, alt_debug)
             # PROVEN chunk-relative: section-relative put only 67% of LIBETC/INTR patches on a
             # relocatable insn, chunk-relative puts 132/132 = 100%.
-            patches.append(dict(sect=cur, off=chunk_base + poff, type=ptype))
+            patches.append(dict(sect=cur, off=chunk_base + poff, type=ptype,
+                                expr=d[expr_start:p].hex()))
         elif op == 0x0C:                                   # XDEF
             sym, sect = struct.unpack('<HH', d[p:p+4]); p += 4
             off = struct.unpack('<I', d[p:p+4])[0]; p += 4
@@ -145,7 +148,11 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
         elif op == 0x0E:                                   # XREF
             sym = struct.unpack('<H', d[p:p+2])[0]; p += 2
             ln = d[p]; p += 1
-            xrefs.append(d[p:p+ln].decode('ascii', 'replace')); p += ln
+            nm = d[p:p+ln].decode('ascii', 'replace'); p += ln
+            if sym in xref_symbols and xref_symbols[sym] != nm:
+                raise Desync('duplicate XREF symbol number')
+            xref_symbols[sym] = nm
+            xrefs.append(nm)
         elif op == 0x10:                                   # section def
             sect, grp = struct.unpack('<HH', d[p:p+4]); p += 4
             al = d[p]; p += 1
@@ -242,7 +249,13 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
             raise Desync("op 0x%02x @%d" % (op, p - 1))
         if sld_debug and p > n:
             raise Desync("truncated record 0x%02x" % op)
-    return dict(sections=sections, xdefs=xdefs, xrefs=xrefs, locals=locs, patches=patches,
+    symbol_names = dict(xref_symbols)
+    for row in xdefs:
+        if row['sym'] in symbol_names and symbol_names[row['sym']] != row['name']:
+            raise Desync('duplicate symbol number')
+        symbol_names[row['sym']] = row['name']
+    return dict(sections=sections, xdefs=xdefs, xrefs=xrefs, xref_symbols=xref_symbols,
+                symbol_names=symbol_names, locals=locs, patches=patches,
                 code=code, bss=bss, filename=fname, consumed=p, total=n, terminated=terminated,
                 groups=groups)
 

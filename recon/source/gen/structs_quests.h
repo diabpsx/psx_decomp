@@ -64,7 +64,7 @@ struct MonsterStruct {   /* sizeof 104 */
 };
 
 struct CBlocks {
-    static int GetOverlayOtBase(void);
+    static int GetOverlayOtBase(void) { return 0x1E8; }
 };
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
@@ -76,16 +76,36 @@ struct CFont {   /* sizeof 540 (printy.h); layout opaque here, size load-bearing
     int GetStrWidth(char *Str);
 };
 
+extern unsigned char DialogRed, DialogGreen, DialogBlue, DialogTRed, DialogTGreen, DialogTBlue;
 struct Dialog {   /* sizeof 16 */
     int BevelGfx;    /* +0x0 */
     int BorderGfx;   /* +0x4  (SetBorder) */
     int BackGfx;     /* +0x8  (SetBack) */
     int DialogOTpos; /* +0xC */
-    Dialog();
-    ~Dialog();
-    void SetBack(int Type) { BackGfx = Type; }
+    Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+    ~Dialog()
+{
+}
     void SetBorder(int Type) { BorderGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B);
+    void SetBack(int Type) { BackGfx = Type; }
+    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R;
+    DialogGreen = G;
+    DialogBlue = B;
+}
     void Back(int x, int y, int w, int h);
 };
 

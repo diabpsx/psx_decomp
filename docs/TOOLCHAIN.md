@@ -164,6 +164,122 @@ All five linked images and 205 tool tests pass. Source-linked coverage is now
 The overall 2725/2727 board and 349 original-library imports are unchanged;
 DRLG_L2 section-routing approval is still pending and no such route is used.
 
+## LIGHTING native integration (2026-10-03)
+
+LIGHTING now supplies all 7,412 text bytes, 14 read-only bytes, 4,668 data bytes,
+52 small-data bytes, 44 small-BSS bytes and 128 BSS bytes. All 28 function and
+31 global SYM records match at their retail addresses. The 2,749-byte CrawlTable
+is copied from the original Hellfire source and independently byte-compared;
+the existing vCrawlTable/RadiusAdj initializers likewise match. Restore RGB
+defaults are 16, and mult_tab is the recorded 128-byte static array, not the
+previous 192-byte reconstruction-only g_lightband. The eight reconstruction
+aliases are replaced by recorded static names. No function logic changed.
+
+The real header supplies the otherwise-unused gman.h literal. The two remaining
+pool alignment bytes and 4,468-byte borrowed GP prefix remain scaffold-owned.
+The dedicated regression verifies complete linked sections, every global, and
+both final GNU data wrappers. Standard compiler flags and ASPSX 2.56 suffice.
+DoLighting is separately reviewed in aspsx_passes.txt: real ASPSX matches 821
+instructions; maspsx adds one nop after the global declaration restoration.
+The exact comparator is unchanged. Focused status and call audit are 28/28;
+all 219 tool tests pass. The main final image is 1,099,272 bytes identical,
+with 120,304 zero runtime
+BSS bytes verified and checksum serialized separately. Overlay links were not
+rerun for this main-only integration.
+
+Source-linked coverage is now 1,553 functions/98 TUs (1,534/97 native plus 19/1
+conventional). The game board remains 2725/2727; no additional drawing PASS is
+claimed. DRLG_L2 routing remains unapproved and inactive.
+
+## QUESTS native integration complete (2026-10-03)
+
+QUESTS now supplies all 7,784 text bytes, 33 read-only bytes, 632 data bytes,
+84 small-data bytes, 8 small-BSS bytes, 80 BSS bytes and both four-byte
+constructor/destructor entries. All 26 function and 27 global SYM records match.
+Standard flags and ASPSX 2.56 are used; no section routing, common allocation,
+symbol alias or generated-name rewrite is involved.
+
+The decisive missing source was the original `CTextFileInfo::HasTp()` and
+`HasDat()` inline header. Even unused, those inlines emit `.tp\0.dat\0` at the
+start of the TU's small-data section: nine bytes from BA20 through BA28,
+placing initialized `questlog` at BA29 and the aligned `ALLQUESTS` at BA2C.
+The source's original CPlayer header contributes its read-only diagnostic name;
+Dialog and CBlocks methods are restored to their original in-class form and
+emission order. The read-only scaffold now spells the same 36 retail bytes as
+two strings plus explicit retained alignment/tail bytes, allowing the strict
+bridge to attribute exactly 33 source bytes without hiding the three following
+scaffold bytes.
+
+A full-address scratch link exposed thirteen incorrect data operands hidden by
+the normalized 26/26 function gate. SetReturnLvlPos's Poisoned Water arm read
+the Banner quest. ResyncQuests confused Mushroom active/var1/var2 fields,
+addressed the wrong healer row in Qtalklist, and used the Veil sublevel/var2
+instead of level/var1. DrawQuestLog used questlist's message instead of log-text
+ID. Retail addresses and original Hellfire QUESTS.CPP agree on the corrections;
+the literal SpawnQuestItem selection flag of 1 also preserves the retail stream.
+The source corrections remain 26/26 byte/SYM PASS and 26/26 ordered calls.
+test_quests_data_offsets.py compiles and links the live source with the original
+tools and checks all thirteen affected instruction words without masking their
+data relocations. It is a targeted regression, not a whole-TU native seal.
+
+Before the original header was identified, a scratch candidate restored declaration order, original header
+methods and owned storage. Its 33-byte pool, 632-byte data, 76-byte small-data,
+8-byte small-BSS, 80-byte BSS and both constructor/destructor words agree.
+All 26 function records agree, but questlog is still placed at 0x8011BA28 rather
+than the recorded 0x8011BA29. Five text operands therefore differ across the
+7,784-byte section. No fabricated byte or symbol alias is added to conceal this;
+That intermediate result is superseded by the exact native integration. Its
+diagnostic history remains under build/quests_native_probe, produced by
+scratch/prepare_quests_native.py and scratch/probe_quests_native.py.
+
+The existing common-symbol route was tested separately (`--common` on both
+scratch scripts). A tentative questlog with `-fconserve-space`, bound at BA29,
+and initialized small data starting at BA2C makes every emitted section byte
+exact. It is nevertheless rejected: GCC names the generated initialization
+functions `_GLOBAL_.I.ALLQUESTS` / `_GLOBAL_.D.ALLQUESTS`, not retail's questlog
+names. The original SN16 DOS frontend gives the same names on the identical
+preprocessed input. Stock 2.7.2 varasm.c explains this: common emission skips
+the first_global_object_name assignment used by tree.c's initializer naming.
+No flags, common allocation, function aliases or name rewrites are adopted.
+The DOS diagnostic and hashes are in build/quests_dos_common/report.json;
+the native common experiment is build/quests_native_probe/common_report.json.
+
+`test_quests_native.py` proves complete sections, all records, the four final
+data wrappers and the two header literals. `test_quests_data_offsets.py` keeps
+the thirteen formerly hidden operands under direct linked-word comparison.
+Focused status and ordered calls are 26/26; all 221 tool tests pass. The main
+image is 1,099,272 bytes identical, including 120,304 zero runtime-BSS bytes
+and the separately serialized checksum. Source-linked coverage is now 1,579
+functions/99 TUs (1,560/98 native plus 19/1 conventional). At QUESTS integration
+time the game board remained 2725/2727. A subsequent independent
+DrawObjSelector source update passes its full byte/SYM/call seal, bringing the
+freshly rescanned board to 2726/2727; only DrawSpellCel remains.
+
+## Game board complete; library-region content audit (2026-10-04)
+
+`DrawSpellCel` now matches from authentic spell-strip geometry rather than the
+previously parked cancellation device. Gold CONTROL.CPP names left/right spell
+edges; PSX derives `SPLICONLEFT` from the dynamic right edge and icon count.
+The negative logical column is scaled and offset by left edge plus total strip
+width. GCC combines away that arithmetic, leaving the four USE reservations
+required for retail's 216-byte frame. With SLD order X,Y,SW,SH the function is
+737/737, exact SYM, 25/25 calls and exact return declaration. CONTROL is51/51;
+the complete board is **2727/2727 PASS**. The full suite is222/222.
+
+This does not by itself complete library linkage. Native Sony archive receipts
+cover349 of the837 excluded-region entries. Retail body SYM assigns146 of the
+remaining488 to Climax GLIB source and leaves342 unclassified. A content-based
+screen across7,274 unique local objects found no new Sony import. Relocation-
+masked raw hits are highly ambiguous for tiny wrappers; preserving patch
+expressions and symbol-number mappings reduces the nontrivial exact-target set
+to two GTIMSYS wrappers, and retail SYM proves those are Climax source. The
+screen is evidence for classification, not permission to alias GLIB names to
+LIBGS exports. `GTIMSYS_GetTimer` and ResetTimer source bodies independently
+PASS; InitTimer remains a five-difference near-match, so no GLIB TU integration
+is claimed. The broader goal remains active pending authoritative GLIB inputs
+or reconstruction of those non-Sony entries and classification/import receipts
+for the342 unknown entries.
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record

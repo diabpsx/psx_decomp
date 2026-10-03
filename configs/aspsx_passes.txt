@@ -13,6 +13,7 @@ items CalcPlrStaff__FP12PlayerStruct
 items CalcPlrScrolls__Fi
 items CalcPlrItemVals__FiUc
 items UseItem__Fiii
+lighting DoLighting__Fiiii
 loadsave LoadQuest__Fi
 padfuncs pad_func_Quick_Spell__Fi
 player ValidatePlayer__Fv

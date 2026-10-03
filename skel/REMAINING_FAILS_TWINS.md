@@ -2,13 +2,22 @@
 
 ## Current snapshot — 2026-10-03
 
-Full `python tools/status.py` rescan: **2725/2727 PASS**. Only these two
-entries remain non-PASS; the older 31-entry table below is historical.
+Full `python tools/status.py` rescan: **2727/2727 PASS**. No game entry remains
+non-PASS; the tables below are historical.
 
-| Function | TU | Current gate | Source reference |
-|---|---|---|---|
-| DrawSpellCel__FllUclUcc | control | 68 differences, 737/737 instructions; frame 184 vs retail 216 | Devilution `control.cpp:286`, Hellfire `CONTROL.CPP:408`; PSX skeleton CONTROL.CPP |
-| DrawObjSelector__FiP12PlayerStruct | padfuncs | 237 differences, 503/514 instructions; frame 264 vs retail 280 | PSX-only; skeleton PADFUNCS.CPP |
+`DrawSpellCel__FllUclUcc` is now PASS: 737/737 instructions, exact SYM,
+25/25 calls and exact return declaration. Gold CONTROL.CPP supplies the
+`SPLICONLEFT`/`SPLICONRIGHT` geometry vocabulary; on PSX the dynamic left edge
+is `SPLICONRIGHT - SPLICONNO * 18`. Mapping the negative logical column as
+scaled column + left edge + total strip width creates the four combine-deleted
+pseudos that account for retail's frame and register allocation. This replaces
+the old dummy declaration and rejected algebraic device with real UI geometry.
+
+`DrawObjSelector__FiP12PlayerStruct` is now PASS: 514/514 instructions,
+exact SYM, and 30/30 calls. Its winning form combines the SLD declaration
+layout, late `add_wrap` initialization, explicit signed vertical-centering
+arithmetic, and signed `/2` forms for both the box and spinner centers. Earlier
+one-axis probes did not test this complete basin and are not exclusions.
 
 The five former byte-PASS/SYM-differs functions are now PASS:
 `stream_cdready_handler`, `set_mdec_audio_volume`, `MI_Manashield__Fi`,

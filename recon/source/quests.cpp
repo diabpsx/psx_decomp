@@ -7,6 +7,8 @@
  * not present in the PC source) with per-TU out-of-line copies of its small inline methods.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_quests.h"
 #include "source/gen/externs_quests.h"
 #include "source/gen/protos_quests.h"
@@ -58,20 +60,20 @@ extern "C" int sprintf(char *buf, const char *fmt, ...);
 
 #define infostr (_infostr[sel_data])
 
-/* --- TU-owned data (this segment materializes it) --- */
 unsigned char questlog = 0;
-struct QuestStruct quests[16];
-
-int ReturnLvlX;
-int ReturnLvlY;
-int ReturnLvl;
-int ReturnLvlT;
-unsigned char rporttest;
-int qline;
-int numqlines;
-int qtopline;
-static int qlist[16];
+int ALLQUESTS = MAXQUESTS;
+int QuestGroup4[2] = { Q_VEIL, Q_WARLORD };
+static int QS_PX = 28, QS_PY = 32, QS_PW = 256, QS_PH = 176;
+BOOL WaterDone = 0;
+static int qtoffset = 0;
+unsigned char *pQLogCel = 0;
+int ReturnLvlX = 0, ReturnLvlY = 0, ReturnLvl = 0, ReturnLvlT = 0;
+unsigned char rporttest = 0;
+int qline = 0, numqlines = 0, qtopline = 0;
 static RECT QSRect;
+static int qlist[16];
+static Dialog QSBack;
+
 struct QuestData questlist[16] = {
     { 5, -1, 255, 0, 100, 0, 0, 0x73, 0x461 },  /* ROCK */
     { 9, -1, 255, 1, 100, 0, 0, 0x80, 0x53 },   /* MUSHROOM */
@@ -90,48 +92,11 @@ struct QuestData questlist[16] = {
     { 6, -1, 2, 14, 100, 2, 0, 0xeb, 0x445 },   /* SCHAMB */
     { 15, 15, 1, 15, 100, 5, 1, 0x17, 0x1d },   /* BETRAYER */
 };
-
-int ALLQUESTS = MAXQUESTS;
+int questtrigstr[5] = { 0x22f, 0x445, 0x286, 0x39, 0x4a2 };
 int QuestGroup1[3] = { Q_BUTCHER, Q_LTBANNER, Q_GARBUD };
 int QuestGroup2[3] = { Q_BLIND, Q_ROCK, Q_BLOOD };
 int QuestGroup3[3] = { Q_MUSHROOM, Q_ZHAR, Q_ANVIL };
-int QuestGroup4[2] = { Q_VEIL, Q_WARLORD };
-BOOL WaterDone;
-int questtrigstr[5] = { 0x22f, 0x445, 0x286, 0x39, 0x4a2 };
-static int QS_PX = 0x1C, QS_PY = 0x20, QS_PW = 0x100, QS_PH = 0xB0;
-static Dialog QSBack;
-static int qtoffset;
-unsigned char *pQLogCel;
-
-int CBlocks::GetOverlayOtBase(void)
-{
-    return 0x1E8;
-}
-
-Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
-
-Dialog::~Dialog()
-{
-}
-
-void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R;
-    DialogGreen = G;
-    DialogBlue = B;
-}
+QuestStruct quests[16] = { 0 };
 
 static void CheckRPortalOK(int *rx, int *ry)
 {
@@ -352,9 +317,9 @@ void SetReturnLvlPos(void)
         ReturnLvlT = 2;
         break;
     case 4:
-        ReturnLvlX = quests[Q_LTBANNER]._qtx;
-        ReturnLvlY = quests[Q_LTBANNER]._qty + 1;
-        ReturnLvl = quests[Q_LTBANNER]._qlevel;
+        ReturnLvlX = quests[Q_PWATER]._qtx;
+        ReturnLvlY = quests[Q_PWATER]._qty + 1;
+        ReturnLvl = quests[Q_PWATER]._qlevel;
         ReturnLvlT = 1;
         break;
     case 5:
@@ -427,20 +392,20 @@ void ResyncQuests(void)
         }
     }
     if (currlevel == quests[Q_MUSHROOM]._qlevel) {
-        if (quests[Q_MUSHROOM]._qvar1 == 1 && quests[Q_MUSHROOM]._qvar2 == 0) {
-            SpawnQuestItem(0x13, 0, 0, 5, quests[Q_MUSHROOM]._qvar1);
-            quests[Q_MUSHROOM]._qvar2 = 1;
-        } else if (quests[Q_MUSHROOM]._qvar1 == 2) {
-            if (quests[Q_MUSHROOM]._qvar2 >= 5) {
-                Qtalklist[2][1] = 0x7B;
+        if (quests[Q_MUSHROOM]._qactive == QUEST_NOTACTIVE && quests[Q_MUSHROOM]._qvar1 == 0) {
+            SpawnQuestItem(0x13, 0, 0, 5, 1);
+            quests[Q_MUSHROOM]._qvar1 = 1;
+        } else if (quests[Q_MUSHROOM]._qactive == QUEST_ACTIVE) {
+            if (quests[Q_MUSHROOM]._qvar1 >= 5) {
+                Qtalklist[1][1] = 0x7B;
                 Qtalklist[6][1] = -1;
-            } else if (quests[Q_MUSHROOM]._qvar2 >= 7) {
-                Qtalklist[2][1] = -1;
+            } else if (quests[Q_MUSHROOM]._qvar1 >= 7) {
+                Qtalklist[1][1] = -1;
             }
         }
     }
-    if (currlevel == quests[Q_VEIL]._qslvl + 1 && quests[Q_VEIL]._qactive == QUEST_ACTIVE && quests[Q_VEIL]._qvar2 == 0) {
-        quests[Q_VEIL]._qvar2 = 1;
+    if (currlevel == quests[Q_VEIL]._qlevel + 1 && quests[Q_VEIL]._qactive == QUEST_ACTIVE && quests[Q_VEIL]._qvar1 == 0) {
+        quests[Q_VEIL]._qvar1 = 1;
         SpawnQuestItem(0xF, 0, 0, 5, 1);
     }
     if (setlevel != 0 && setlvlnum == SL_VILEBETRAYER) {
@@ -513,7 +478,7 @@ void DrawQuestLog(void)
     for (i = 0; i < totlines; i++) {
         q = qlist[i + qtoffset];
         if (qtextflag == 0) {
-            PrintQLString(0, l, 1, GetStr(questlist[q]._qdmsg), 0);
+            PrintQLString(0, l, 1, GetStr(questlist[q]._qlstr), 0);
         }
         l += 2;
     }

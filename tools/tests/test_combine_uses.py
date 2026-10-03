@@ -87,6 +87,50 @@ class CombineUsesTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'does not match combine'):
                 C.verify_capture(path, {**data, 'combine':b'different capture'})
 
+    def test_reload_uid_proves_stack_reference_not_slot_extent(self):
+        flow=';; Function target\n(insn 1 0 0 (set (reg:SI 144) (const_int 0)) -1 (nil))'
+        combine=';; Function target\n(insn 3 0 0 (use (reg:SI 144)) -1 (nil))'
+        greg=';; Function target\nReloads for insn #123\n(insn 3 0 0 (use (mem/f:SI (plus:SI (reg:SI 29 sp) (const_int 120)))) -1 (nil))\nTrailing diagnostic prose'
+        result=C.analyze(flow,combine,'target',greg)['registers'][0]['post_reload_uses'][0]
+        self.assertEqual((result['state'],result['byte_offset'],result['mode']),('sp_relative',120,'SI'))
+        self.assertNotIn('slot_size',result)
+
+    def test_reload_accepts_commuted_and_zero_stack_addresses(self):
+        for address,offset in [('(plus:SI (const_int -8) (reg:SI 29 sp))',-8),('(reg:SI 29 sp)',0)]:
+            row=C.reload_use('(insn 3 0 0 (use (mem:QI '+address+')) -1 (nil))',3)
+            self.assertEqual((row['state'],row['byte_offset']),('sp_relative',offset))
+
+    def test_reload_does_not_guess_frame_pointer_or_other_memory(self):
+        row=C.reload_use('(insn 3 0 0 (use (mem:SI (plus:SI (reg:SI 30 fp) (const_int 8)))) -1 (nil))',3)
+        self.assertEqual(row['state'],'memory')
+        self.assertNotIn('byte_offset',row)
+
+    def test_reload_register_changed_kind_and_absent_uid(self):
+        self.assertEqual(C.reload_use('',3),{'uid':3,'state':'not_present'})
+        row=C.reload_use('(insn 3 0 0 (use (reg:SI 16 s0)) -1 (nil))',3)
+        self.assertEqual((row['state'],row['register']),('register',16))
+        row=C.reload_use('(insn 3 0 0 (set (reg:SI 16) (const_int 0)) -1 (nil))',3)
+        self.assertEqual(row['state'],'not_use')
+
+    def test_reload_duplicate_uid_is_an_error(self):
+        with self.assertRaisesRegex(ValueError,'ambiguous'):
+            C.reload_use('(insn 3 0 0 (use (reg:SI 16)))\n(insn 3 0 0 (use (reg:SI 17)))',3)
+
+    def test_first_form_handles_quoted_delimiters_and_rejects_damage(self):
+        text='(parallel[(use (symbol_ref:SI ("(quoted)")))])\nextra text'
+        self.assertEqual(C.first_form(text),text.split('\n')[0])
+        for bad in ('not an RTL form','(parallel[)','(use (reg:SI 72)'):
+            with self.assertRaises(ValueError):C.first_form(bad)
+
+    def test_capture_receipt_checks_optional_greg(self):
+        data={'flow':b'before','combine':b'after','greg':b'allocated'}
+        receipt={'dump_sha256':{name:hashlib.sha256(blob).hexdigest() for name,blob in data.items()}}
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'capture.json';path.write_text(json.dumps(receipt),encoding='utf-8')
+            self.assertEqual(C.verify_capture(path,data),receipt)
+            with self.assertRaisesRegex(ValueError,'does not match greg'):
+                C.verify_capture(path,{**data,'greg':b'unrelated'})
+
 
 if __name__ == '__main__':
     unittest.main()

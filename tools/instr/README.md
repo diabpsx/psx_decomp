@@ -53,8 +53,8 @@ register destinations, and excludes call-argument USE notes. Partial-register
 SETs count as surviving writes; CLOBBERs remain separately identified.
 
 ```powershell
-python tools/instr/real_rtl.py recon/source/control.cpp DrawSpellCel --dump flow,combine --debug --output-path-only
-python tools/instr/combine_uses.py build/rtl/control-<capture-id>/input.i DrawSpellCel
+python tools/instr/real_rtl.py recon/source/control.cpp DrawSpellCel --dump flow,combine,greg --debug --output-path-only
+python tools/instr/combine_uses.py build/rtl/control-<capture-id>/input.i DrawSpellCel --reload
 ```
 
 Use the actual unique capture directory printed by the first command. Optional
@@ -62,14 +62,95 @@ Use the actual unique capture directory printed by the first command. Optional
 change or a promise that debug output has identical code. Without line notes,
 locations are null rather than inferred. `real_rtl.py` now saves `capture.json`
 with the command and source, preprocessed-input, compiler, assembly and dump
-hashes. The analyzer verifies both dump hashes against that receipt. Older
+hashes. The analyzer verifies every consumed dump hash against that receipt. Older
 captures without a receipt are explicitly marked provenance-unverified.
 
 An absent surviving SET is evidence about combine, **not a count of stack
 slots** or proof of retail source. Reload, assembly, exact SYM and final bytes
 must still be checked independently. Missing/ambiguous functions, malformed RTL
-and mismatched capture hashes fail closed. Eleven regression tests cover these
-distinctions; the complete tool suite is 203 tests.
+and mismatched capture hashes fail closed.
+
+Optional `--reload` follows each exact USE instruction UID into the same
+function's `.greg` dump. It reports the actual operand and recognizes direct
+sp-relative memory addresses; absent instructions, surviving registers and
+other memory addresses stay distinct. It does not guess frame-pointer
+elimination, reserved slot extents or missing retail temporaries. Duplicate
+UIDs are an error. Reload diagnostic prose is skipped only after isolating the
+selected balanced RTL form; flow/combine parsing remains strict. Eighteen
+regression tests cover these distinctions; the complete suite passes 218 tests.
+
+Original-compiler captures `build/rtl/control-boupcgd4` and
+`build/rtl/padfuncs-jh1sqnua` prove these post-reload references:
+
+| Function | Combine pseudo | USE UID | Post-reload reference |
+| --- | ---: | ---: | --- |
+| DrawSpellCel | 144 | 1812 | SI memory at sp+120 |
+| DrawSpellCel | 156 | 1813 | SI memory at sp+128 |
+| DrawObjSelector | 129 | 1238 | SI memory at sp+192 |
+| DrawObjSelector | 430 | 1239 | SI memory at sp+216 |
+
+The selector's emitted assembly independently names `ny` at frame-relative
+-64 (sp+200 with frame264). The sp+208 store holds `nx + (unsigned)nw/2`,
+hoisted ahead of the item loop and reloaded for both spinner calls. It is not
+another missing-setter USE. This corrects the tentative reversed ny/center
+slot map; no unused retail-frame hole is attributed from its offset alone.
+
+The complete/incomplete array-declaration screen is neutral: all eight
+PADFUNCS combinations for `_pcursitem`, `_pfind_index`, `_pfind_list`, and both
+CONTROL `SpellColors` declarations retain the baseline target differences,
+frames, two deleted setters and whole-TU neighbor pass counts. Receipts are
+under `build/drawing_array_decl_probe`; no source declaration change retained.
+
+The subsequent 16-build selector argument-reassociation screen used both live
+and SLD-aligned declaration layouts, with unsigned arithmetic preserving the
+original modulo semantics and signed `len/2` truncation. Moving width to the
+end of each coordinate expression reaches 514/514 instructions on the aligned
+layout, but still has 158 differences and frame272. Its assembly spills the
+hoisted half-width and half-width-plus-three at sp208/216; it does not restore
+retail's nx/ny homes or in-loop center computation. Other forms yield 137..259
+differences and 503..521 words. All retain two lost setters. An eight-build
+follow-up assigning the half-length back to the existing `len` (before calls
+or in the first argument, plus negative-half representation) also fails to
+remove the center hoist: frame264 throughout, 245..256 differences outside
+baselines. Receipts: `build/selector_arithmetic_probe` and
+`build/selector_len_phase_probe`, driven by `scratch/probe_selector_arithmetic.py`.
+No candidate is retained. Count-exactness and increased frame size alone are
+not evidence of the retail spill mechanism or an exact SYM match.
+
+CONTROL color staging was repriced in 18 complete-TU builds, rather than the
+earlier isolated sink examples (`scratch/probe_control_color_stages.py`, receipts
+`build/control_color_stages_probe`). Splitting selected/table byte loads from
+their shifts, paired or grouped in either arm, remains 68 differences at737
+words/frame184; post-reload USE references remain sp120/128. Moving all three
+shifts after the selection join is167 differences/738words. Per-channel
+conditional expressions remove both USEs and shrink the frame to168, but leave
+139 differences/748words. Late declaration of st is neutral for every form.
+Nothing is retained. The source's old claim that retail necessarily has six
+orphan slots is corrected: retail's unnamed frame gap does not establish a
+partition, reserved extent, or the producer of each unused byte.
+
+### DrawSpellCel final match: original spell-strip geometry
+
+The allocator mechanism was already reproduced in `scratch/control/dsc5`: a
+four-pseudo arithmetic chain deleted by combine leaves four USE notes, hence
+four eight-byte reload reservations. Together with retail's SLD order
+`X,Y,SW,SH`, this produces the exact 216-byte frame and complete instruction
+stream. Earlier variants parked the result because they expressed it as a bare
+algebraic identity.
+
+The authentic source interpretation comes from gold `CONTROL.CPP`, which names
+both `SPLICONLEFT` and `SPLICONRIGHT`. PSX keeps a dynamic icon count and right
+edge, so `SPLICONLEFT = SPLICONRIGHT - SPLICONNO * 18`. The incoming logical
+column is negative; after scaling it, adding `SPLICONLEFT + width` where
+`const int width = SPLICONNO * 18` maps it to the strip. This is real UI
+geometry, although combine cancels the left-edge subtraction against width.
+The complete-TU screen in `scratch/probe_control_spellicon_geometry.py` confirms
+the compound two-stage spelling is uniquely successful among six natural
+groupings: 737/737 PASS and frame216; direct reassociations leave 94-197
+differences or extra instructions. The identical short-path candidate passes
+exact SYM, 25/25 calls and return type. It replaces the dummy declaration and
+lands CONTROL at 51/51. Full board rescan is 2727/2727; the subsequent object-
+relocation regression raises the passing tool suite to 222 tests.
 
 Fresh captures on `216233f` confirm DrawSpellCel's two standalone USEs refer to
 registers 144 and 156, whose address-addition setters (UIDs 145 and 167) belong
@@ -88,6 +169,21 @@ after the second spinner call, with incorrect saved-register ownership. Nothing
 was applied. Last-index/next-index/non-equality loop bounds instead shrink the
 frame to 256; unsigned comparison retains 264 but regresses the byte diff.
 These results do not establish an unavoidable source limitation.
+
+### DrawObjSelector complete-basin result
+
+The earlier selector probes priced their changes independently or against only
+one of two declaration layouts. A later complete source combination reaches
+PASS: 514/514 instructions, exact function SYM and 30/30 ordered calls. It uses
+the SLD-aligned `nx,ny,nw,nh,ypos` declaration ownership, initializes
+`add_wrap` after the initial SelectRect fields, spells the initial vertical
+center as `(176 - (list_size * 12 + 12)) / 2 + 32`, and uses signed `/ 2`
+for `nx`, `nw` and `len` in the box/spinner coordinates. The full combination
+also removes the previously hoisted center spill and yields retail's 280-byte
+frame. This is a multi-change compiler basin: the negative single-expression,
+center-staging and declaration-only screens above remain valid for their exact
+bases but do not rule out the combined form. At that checkpoint the full board
+was 2726/2727; the DrawSpellCel result above subsequently completed it.
 
 The earlier 13-build CONTROL UV-load-placement screen is also complete under
 `build/control_uv_lifetime_probe`: no improvement over 68 differences. Every
@@ -3523,6 +3619,41 @@ counts exclude reviewed real-ASPSX exceptions and are not board regressions.
 The result rules out these individual option changes, not all combinations
 or all historical build configurations.
 
+2026-10-03 opt-in follow-up: the exclusion screen had not tested enabling
+`-fforce-addr`. Stock 2.7.2 toplev.c initializes force_addr to zero and enables
+force_mem, but not force_addr, at O2. Ten new full-TU builds explicitly verify
+delivery of baseline, force-addr, force-mem, force-addr/no-force-mem, and
+force-addr/no-expensive-optimizations. CONTROL keeps frame184/two deleted
+setters in all cases; force-addr retains the target's68 differences but drops
+the maspsx-only neighbor pass count46->35. PADFUNCS force-addr grows frame264
+to272 and two deleted setters to three, but worsens237->270 differences
+(510/514 instructions) and neighbor passes47->34. The extra deleted setter
+materializes the selected `_pfind_list` element's address (register162/UID233
+for this input), alongside the existing `_pcursitem` address and loop compare.
+No option is retained. Reports/actual commands: `build/force_address_probe`.
+
+Twenty-two baseline-flag full-TU selected-item lookup forms then test whether
+that address effect is source-reachable locally, on live and SLD-aligned
+layouts: array, pointer, address/dereference, row pointer, commuted subscript,
+byte view, and both integer address-term orders. Every case remains frame264
+with two deleted setters; none improves the live237-difference baseline.
+Reports: `build/selector_lookup_probe`. Twelve CONTROL field-first/staged X/Y
+coordinate forms (including late st declarations) likewise retain frame184,
+737 instructions and two deleted setters, at68..122 differences. Reports:
+`build/control_coord_stages_probe`. These are bounded negative results, not
+proof of an unreachable source shape. Production source/flags are unchanged.
+
+The user supplied `C:/Temp/diablo-psx/diablo-psx-symdump-disasm.txt` as an
+additional reference. `scratch/audit_user_symdump.py` checks full address and
+direct-call coverage for DrawSpellCel (line44704,737 instructions,25 calls)
+and DrawObjSelector (line200669,514 instructions,30 calls). The five latter
+call-name differences are header-copy suffixes: each is resolved against the
+dump's exact callee definition address AND caller XRef. Its frame annotations
+confirm216/280 bytes. `build/user_symdump_audit.json` records hashes and scope:
+this is coverage/call evidence, not instruction-byte verification, since this
+auxiliary text has no raw opcode column. Raw ROM/SYM remain authoritative;
+rendered prototypes and delay-slot pseudocode are not source replacements.
+
 `scratch/probe_color_lifetimes.py` then screened twelve full-TU byte-color
 ownership forms. All seven combinations of splitting SpellColors load from
 `r/g/b >>= 1`, and grouping the shifts at each branch's end, remain 737/737,
@@ -4698,8 +4829,10 @@ whitelist. DRLG_L3 is the essential negative control: its static tables belong
 to the same overlay as its code, so they must not be treated as resident data.
 Its full 37-function byte/SYM board passes with the correct section placement.
 The combined FMV/MISSILES/MONSTER/DRLG_L3 focused scan passes 301/301.
-The subsequent full board scan passes **2725/2727**: only DrawSpellCel and
-DrawObjSelector remain. All five resolved functions also pass real-ASPSX bytes
+That full board scan passed **2725/2727** at the time: DrawSpellCel and
+DrawObjSelector remained. DrawObjSelector was subsequently solved by the
+complete-basin form documented above, so the current board is 2726/2727.
+All five resolved functions also pass real-ASPSX bytes
 and call-target audits (149/51/192/295/370 instructions and 9/1/5/27/21 calls,
 respectively). Return declarations pass all 264 entries in the three TUs.
 All 175 tool tests pass. Final-image/SDK-linkage integration remains separate.
