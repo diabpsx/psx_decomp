@@ -211,7 +211,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
         Y = yp + Fr->Y;
         GT4 = PRIM_GetNextPolyGt4();
         setPolyGT4(GT4);
-        if (!(((unsigned long *)Fr)[1] & 0x2000000)) {
+        if (!Fr->Rotated) {
             x0 = X;
             y0 = Y;
             x1 = X + SW;
