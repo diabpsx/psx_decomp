@@ -56,7 +56,7 @@ def main():
     for name in names:
         provider = providers.get(name, source).resolve()
         if provider not in compiled:
-            output = S.link(S.compile_g(provider))
+            output = S.link(S.compile_g(provider), source=provider)
             compiled[provider] = declarations(output.read_text(encoding='utf-8', errors='replace'))
         key = canonical(name)
         actual, wanted = compiled[provider].get(key, set()), expected.get(key, set())

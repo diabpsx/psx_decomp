@@ -57,7 +57,7 @@ def main():
         # Era GCC/ASPSX input often omits ELF .type/.size. Do not guess an
         # object's extent from a caller's requested range or section padding:
         # recover the array extent from the same source's real SDB receipt.
-        receipt = SL.link(SL.compile_g(source)).read_text(errors="replace")
+        receipt = SL.link(SL.compile_g(source), source=source).read_text(errors="replace")
         sizes = re.findall(r"^\w+:\s+\$\w+\s+\d+ Def2 class (?:STAT|EXT) "
                            r"type ARY.*? size (\d+).*? name " + re.escape(name) + r"\s*$",
                            receipt, re.M)

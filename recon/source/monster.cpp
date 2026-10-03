@@ -1914,12 +1914,9 @@ void MAI_Fireman(int i)
  * MIT_LIGHTCTRL, MIT_FIREBALL); _mx/_my are read through the const view (see MAI_Lachdanan) and
  * AddMissile takes the cached _mx/_my. Declarations follow hellfire MONSTER.CPP:5887-5898 (fx..v,
  * dist, `MonsterStruct *Monst = &monster[i];`, then the static table) plus PSX _mx/_my after it.
- * SYM: every record now equals retail (class/type/reg/stack slot) except one toolchain-level
- * emission difference shared by all five GAME/FMV-overlay functions with a body-level static
- * (MAI_Counselor, ProcessMonsters, MI_Manashield, stream_cdready_handler, set_mdec_audio_volume):
- * retail lists the records from the static to the end of the body block BEFORE the body's
- * Block start (ours: inside it, right after the earlier locals). Not reproducible from source
- * with CC1PLPSX/ASPSX/PSYLINK as gated (probes: scratch/monster/probe_*.py); see agent report. */
+ * PSYLINK /v plus SYMMUNGE moves counsmiss and the following _mx/_my records
+ * before the body block when resident data is referenced by overlay code.
+ * This declaration order now reproduces the exact retail SYM receipt. */
 void MAI_Counselor(int i)
 {
     int fx, fy, mx, my, md, v;
@@ -2407,12 +2404,8 @@ void ProcessMonsters(void)
      * then the PSX wipe counter/flag and hellfire's Monst/oldmode. WipeCount is an initialised
      * .sdata word (retail 0x8011C2C4 = 0, right after counsmiss), hence `= 0`. DoWipe is `bool`
      * (SYM BOOL, int-sized: no andi 0xff on the test); raflag is zeroed after the mx/my reads.
-     * SYM: every record now equals retail (class/type/reg/stack slot) except one toolchain-level
-     * emission difference shared by all five GAME/FMV-overlay functions with a body-level static
-     * (MAI_Counselor, ProcessMonsters, MI_Manashield, stream_cdready_handler, set_mdec_audio_volume):
-     * retail lists the records from the static to the end of the body block BEFORE the body's
-     * Block start (ours: inside it, right after the earlier locals). Not reproducible from source
-     * with CC1PLPSX/ASPSX/PSYLINK as gated (probes: scratch/monster/probe_*.py); see agent report. */
+     * PSYLINK /v plus SYMMUNGE moves the WipeCount/DoWipe/Monst/oldmode suffix
+     * before the body block. The original overlay pipeline reproduces exact SYM. */
     int i, mi;
     int raflag;
     int mx, my;

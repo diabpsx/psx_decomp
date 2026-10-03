@@ -37,6 +37,14 @@ retail Sony archives, not reconstructed.
 The standalone SYM command exits nonzero for missing, mismatching, or empty
 results. Generated initializer/destructor bodies are compared with retail
 under their canonical names; they are not automatic N/A passes.
+Overlay SYM receipts follow the retail MAP's text ownership: PSYLINK `OVER(...)`
+groups with `/v`, followed by the original `SYMMUNGE /i` compactor. This is
+necessary for function-local statics referencing resident data. The raw SYM
+and compactor log are retained beside each receipt; the linked CPE is unchanged.
+The native runner uses hash-verified SYMMUNGE 1.56 at
+`C:/Temp/psq45/BIN/SYMMUNGE.EXE` (override its location with `DIAB_SYMMUNGE`).
+The same five previously failing local-static records were independently
+reproduced with PsyQ 4.0's DOS SYMMUNGE 1.3. Exact record comparison is unchanged.
 The real-ASPSX command likewise exits nonzero for incomplete or mismatching
 results, including absent or empty oracles.
 
@@ -97,6 +105,24 @@ real SDB array-size record; section padding is not treated as array data.
 Relocated pointer tables are rejected and need a relocation-aware gate.
 
 ## Final-image integration is still pending
+
+MISSILES follow-up (2026-10-03): restored retail function order, the original
+GMAN/CPLAYER header inlines and seven real CrawlNum local initializers. The
+complete 1,272-byte read-only pool now matches, including both relocated jump
+tables. Unmasked linking exposed and corrected errors hidden by normalized
+instruction matching: Firewall's two direction fields were reversed, Nova's
+table columns were off by one, Teleport's second light-fix used the vision ID,
+its diagnostic filename had wrong case, and two light tables had a nonzero
+final element instead of the gold source's implicit zero.
+MISSILES remains 115/115 for bytes/SYM, calls and return declarations.
+
+`tools/tests/test_missiles_native_probe.py` additionally checks all 69,488
+relocated text bytes, the complete pool and 45 constant small-data bytes
+without masking. This diagnostic uses PsyQ `-fconserve-space` and binds seven
+common globals at their retail addresses. It does not allocate those globals
+in the final image or provide the native overlay-compacted SYM receipt yet;
+production flags and the native-import registry remain unchanged. The retained
+source is not counted as a new final-image import. All 182 tool tests pass.
 
 The main file contains 1,099,268 payload bytes followed by the four-byte
 additive checksum `0x02A12C64`. Its checksum is now a separate file-format
@@ -316,7 +342,7 @@ no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
 The remaining 488 library-region entries are not native-linked: 484 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
-game-function board, now 2696/2727 with 31 functions not PASS.
+game-function board, now 2725/2727 with two functions not PASS.
 That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
 so the 837 excluded entries are not all Sony SDK functions. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate
@@ -478,13 +504,25 @@ repeated unreferenced data patterns still need additional placement evidence.
 
 The broader `tools/sdk_archive_inventory.py` scan now checks all archive names
 under those two supplied reference roots, including ignored files. It inspected
-319 archives, parsed 260 complete SN archives, and screened 97 pending-name
-export/member pairs without finding a strict byte candidate. The MAINSYS object
-remains unsupported by the screening parser, but an independent original-PSYLINK
-probe rules out its `main`: 1392 bytes and an initial 112-byte stack adjustment,
+319 archives, parsed 260 complete SN archives, and screened 98 pending-name
+export/member pairs without finding a strict byte candidate. The MAINSYS debug
+object is now supported by the corrected SLD reader. An independent original-PSYLINK
+probe also rules out its `main`: 1392 bytes and an initial 112-byte stack adjustment,
 versus Diablo's 80 bytes and 24-byte adjustment. The report
 is `build/sdk_archive_inventory.json`. This is conservative provenance screening,
 not a linkage receipt or proof that unrecognized archive formats contain no match.
+
+The 2026-10-03 expanded investigation also inspected 2,088 paths across the
+local `C:/Temp/PSYQ` archive versions and standalone `.OBJ` files in both
+reference roots. The corrected reader parses 848 relevant object occurrences
+(456 unique contents), versus 244 before the fix; 84 object parses remain
+unresolved. The 206 pending-name comparisons yield no strict candidate.
+`build/pending_sdk_versions.json` retains paths, hashes, parser dialects,
+rejections and errors; this is screening only. Existing native SDK linkage was
+rerun successfully for all 349 selected entries; no additional import is claimed.
+Retail function-body SYM independently identifies 146 of the 488 unlinked
+library-region entries as Climax GLIB source, while 342 lack a matching body
+record. The latter are unclassified, not automatically Sony SDK functions.
 
 `LIBAPI/PAD` is now imported as one complete 784-byte text member with its
 16-byte data section at 0x800B42BC and 16-byte BSS at 0x8012FF90. Besides its

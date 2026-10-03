@@ -83,7 +83,7 @@ def _expr(d, p, alt_debug=False):
         p = _expr(d, p, alt_debug); return _expr(d, p, alt_debug)
     raise Desync("expr op 0x%02x @%d" % (op, p - 1))
 
-def parse_obj(d, alt_debug=False, pad_even=False):
+def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
     """-> dict(sections, xdefs, xrefs, locals, code{sect:bytes}, filename, clean)
     alt_debug: PsyQ 3.x-era format deltas (psyq360, 1995 objects), used ONLY as a
     Desync/truncation retry -- never for objects the 4.0-proven map parses clean:
@@ -96,17 +96,26 @@ def parse_obj(d, alt_debug=False, pad_even=False):
       psyq300 MOUSE.OBJ has an odd record (NUL included in the length) with NO pad,
       and padding it there desyncs. So the driver ladder tries (4.0) -> (3.x, no pad)
       -> (3.x + pad). The pad is part of the section stream -- keep it in code[] so
-      offsets match the linker layout; without it the pad reads as a bogus END op."""
+      offsets match the linker layout; without it the pad reads as a bogus END op.
+    sld_debug: standard SN source-line records (32..3C) plus function/block
+      records (4A..50). Confirmed with original PsyQ 4.0 DUMPOBJ on debug
+      objects and independently documented in psy-k's Section/FunctionStart:
+      https://docs.rs/psy-k/0.4.0/psyk/enum.Section.html
+      This is a record dialect, not a claim about the producer SDK version.
+      The historical parser remains the default for existing archive receipts."""
     if d[:4] != b'LNK\x02':
         raise Desync("bad magic")
     p, cur = 4, None
     sections, xdefs, xrefs, locs, patches = {}, [], [], [], []
+    groups = {}
     code, bss, fname = {}, {}, None
     chunk_base = 0
     n = len(d)
+    terminated = False
     while p < n:
         op = d[p]; p += 1
         if op == 0x00:
+            terminated = True
             break
         elif op == 0x02:                                   # code
             ln = struct.unpack('<H', d[p:p+2])[0]; p += 2
@@ -149,6 +158,12 @@ def parse_obj(d, alt_debug=False, pad_even=False):
             ln = d[p]; p += 1
             nm = d[p:p+ln].decode('ascii', 'replace'); p += ln
             locs.append(dict(sect=sect, off=val, name=nm))
+        elif sld_debug and op == 0x14:                     # group ID, type, counted name
+            group = struct.unpack_from('<H', d, p)[0]; p += 2
+            kind = d[p]; p += 1
+            ln = d[p]; p += 1
+            groups[group] = {'type': kind, 'name': d[p:p+ln].decode('ascii', 'replace')}
+            p += ln
         elif op in (0x14, 0x30):                           # XBSS / local-BSS (0x30 same shape:
                                                            # `30 sym16 sect16 size32 len8 name`)
             sym, sect = struct.unpack('<HH', d[p:p+4]); p += 4
@@ -163,7 +178,20 @@ def parse_obj(d, alt_debug=False, pad_even=False):
             if fname is None: fname = nm
         elif op == 0x2E:                                   # processor
             p += 1
-        elif op == 0x32:                                   # SLD: set line
+        elif sld_debug and op in (0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C):
+            # offset16; then increment8/increment32/line32/line32+file16.
+            # 0x34's final byte is a number, NOT a length-prefixed string.
+            p += {0x32: 2, 0x34: 3, 0x36: 6, 0x38: 6, 0x3A: 8, 0x3C: 2}[op]
+        elif sld_debug and op == 0x4A:                     # function start
+            p += 28
+            ln = d[p]; p += 1 + ln
+        elif sld_debug and op in (0x4C, 0x4E, 0x50):        # function/block end/start
+            p += 2 + 4 + 4
+        elif sld_debug and op in (0x3E, 0x40, 0x42, 0x44, 0x46, 0x48):
+            # These mean repeat/procedure records in this dialect, not the
+            # historical debug shapes below. Never silently skip unknown data.
+            raise Desync("unsupported SLD-dialect op 0x%02x @%d" % (op, p - 1))
+        elif op == 0x32:                                   # historical debug shape
             p += 2
         elif op == 0x34:                                   # SLD: line+file
             p += 2
@@ -212,14 +240,46 @@ def parse_obj(d, alt_debug=False, pad_even=False):
                 p += 2 + 1
         else:
             raise Desync("op 0x%02x @%d" % (op, p - 1))
+        if sld_debug and p > n:
+            raise Desync("truncated record 0x%02x" % op)
     return dict(sections=sections, xdefs=xdefs, xrefs=xrefs, locals=locs, patches=patches,
-                code=code, bss=bss, filename=fname, consumed=p, total=n)
+                code=code, bss=bss, filename=fname, consumed=p, total=n, terminated=terminated,
+                groups=groups)
+
+
+def parse_obj_complete(data):
+    """Read a complete unchanged object; report the successful record dialect.
+
+    Zero alignment after END is allowed, but a missing END, overrun or any
+    unparsed nonzero suffix is not. This is parsing, never matching evidence.
+    """
+    errors = []
+    for label, options in (
+        ('historical', {}),
+        ('historical-alt', {'alt_debug': True}),
+        ('historical-alt-pad', {'alt_debug': True, 'pad_even': True}),
+        ('sld', {'sld_debug': True}),
+        ('sld-alt', {'sld_debug': True, 'alt_debug': True}),
+        ('sld-alt-pad', {'sld_debug': True, 'alt_debug': True, 'pad_even': True}),
+    ):
+        try:
+            obj = parse_obj(data, **options)
+            end = obj['consumed']
+            if not obj['terminated'] or end <= 4 or end > len(data):
+                raise Desync('missing END or record overrun')
+            if any(data[end:]):
+                raise Desync('unparsed nonzero suffix')
+            obj['parser_dialect'] = label
+            return obj
+        except (Desync, ValueError, IndexError, KeyError, struct.error) as exc:
+            errors.append(label + ': ' + str(exc))
+    raise Desync(' | '.join(errors))
 
 def safe(s):
     return re.sub(r'[^A-Za-z0-9_.+@$-]', '_', s)[:120]
 
 def is_code_section(nm):
-    return nm is not None and nm.startswith('.text')
+    return nm is not None and (nm.startswith('.text') or nm.endswith('.text'))
 
 # ---------------- driver ----------------
 def main():
@@ -256,12 +316,17 @@ def main():
         # non-zero bytes after the END op mean the parse stopped at a stray 0x00 and
         # must NOT count clean), retry with the PsyQ 3.x shapes, then 3.x + even-pad.
         o, clean, errs = None, False, []
-        for alt, pad in ((False, False), (True, False), (True, True)):
-            label = '4.0' if not alt else ('3.x' if not pad else '3.x+pad')
+        for alt, pad, sld in ((False, False, False), (True, False, False), (True, True, False),
+                              (False, False, True), (True, False, True), (True, True, True)):
+            label = ('sld' + ('+alt' if alt else '') + ('+pad' if pad else '') if sld
+                     else '4.0' if not alt else ('3.x' if not pad else '3.x+pad'))
             try:
-                cand = parse_obj(blob, alt_debug=alt, pad_even=pad)
-            except Desync as e:
+                cand = parse_obj(blob, alt_debug=alt, pad_even=pad, sld_debug=sld)
+            except (Desync, ValueError, IndexError, KeyError, struct.error) as e:
                 errs.append("%s-map: %s" % (label, e))
+                continue
+            if not cand['terminated'] or cand['consumed'] > len(blob):
+                errs.append('%s-map: missing END or record overrun' % label)
                 continue
             if any(blob[cand['consumed']:]):
                 errs.append("%s-map: TRAILING NON-ZERO bytes after END op (consumed %d of %d)"
@@ -269,7 +334,7 @@ def main():
                 continue
             o, clean = cand, True
             stats['clean'] += 1
-            if alt:
+            if alt or sld:
                 stats[label] = stats.get(label, 0) + 1
             break
         if not clean:

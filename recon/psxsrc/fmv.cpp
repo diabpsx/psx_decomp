@@ -316,10 +316,8 @@ extern "C" void stream_cdready_handler(unsigned char status, unsigned char *resu
     static int idx, i, sec;   /* original Climax declarations, warcraft2/cdstream.c:214-215 */
     static CdlLOC subcode[3];
     unsigned long OldGp = (unsigned long)ReloadGP();
-    /* Record ORDER now equals retail (idx i sec subcode OldGp).  Remaining SYM delta is block
-     * membership only: retail emits all five records before the body Block start (the class shared
-     * by every function-scope static in FMV.CPP/MONSTER.CPP/MISSILES.CPP: set_mdec_audio_volume,
-     * ProcessMonsters, MAI_Counselor, MI_Manashield); our cc1plus emits them after it. */
+    /* PSYLINK /v plus SYMMUNGE moves this static-led declaration suffix before the
+     * body block, reproducing retail's idx/i/sec/subcode/OldGp record sequence. */
 
     if (stream_ending == 0)
         first_handler_event = 1;
@@ -1080,8 +1078,8 @@ extern "C" void resync_audio(void)
  * mask is the constant 3 (SPU_VOICE_VOLL|SPU_VOICE_VOLR) every iteration. @0x80157C34 FMV.CPP:1418 */
 extern "C" void set_mdec_audio_volume(short vol)
 {
-    static SpuVoiceAttr voice_attr; /* function-local STAT @0x80121CA8; declared before i in retail */
     int i;
+    static SpuVoiceAttr voice_attr; /* Climax mdec.c order; overlay SYMMUNGE emits this before the block. */
     vol = (short)(((int)(sfx_volume * (int)vol)) >> 14);
     for (i = 0; i < 2; i++) {
         voice_attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR;

@@ -13,9 +13,7 @@ from sdk_provenance import oracle, compare_words
 
 def screen_member(raw, names):
     """Conservative same-name screening; never substitutes for native linkage."""
-    obj = P.parse_obj(raw)
-    if any(raw[obj['consumed']:]):
-        raise ValueError('object has unparsed nonzero bytes')
+    obj = P.parse_obj_complete(raw)
     marks = obj['xdefs'] + obj['locals']
     results = []
     for name in names:

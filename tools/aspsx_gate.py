@@ -68,7 +68,7 @@ def main():
     want = sys.argv[2].split(",") if len(sys.argv) > 2 else None
     seg = src.stem.lower()
     obj = SL.compile_g(src)
-    txt = SL.link(obj)
+    txt = SL.link(obj, source=src)
     cpe = txt.with_name(txt.name.replace(".sym.txt", ".cpe"))
     mem = read_cpe(cpe)
     ours = SL.functions(txt.read_text(encoding="utf-8", errors="replace"))

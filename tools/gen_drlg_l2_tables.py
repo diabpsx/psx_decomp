@@ -104,7 +104,7 @@ def verify_compiled(rows):
     import symlane as S
     source = ROOT/'recon/source/drlg_l2.cpp'
     elf = Elf(B.compile_any(source))
-    receipt = S.link(S.compile_g(source)).read_text(errors='replace')
+    receipt = S.link(S.compile_g(source), source=source).read_text(errors='replace')
     for typ, name, dims, value, va, wanted_size in rows:
         matches = [s for group in elf.symbols.values() for s in group if s[0] == name]
         if len(matches) != 1:

@@ -9,35 +9,7 @@ struct SPR_HDR;
 
 struct CTextFileInfo;
 
-struct TextDat {   /* sizeof 112 */
-    BOOL OwnDat;   /* +0x0 */
-    int TexNum;   /* +0x4 */
-    int LastFrame;   /* +0x8 */
-    BOOL DatLoaded;   /* +0xC */
-    long hndDat;   /* +0x10 */
-    long hndHdr;   /* +0x14 */
-    long hndPalOffset;   /* +0x18 */
-    long hndCreatureOffset;   /* +0x1C */
-    long hndBlockOffsets;   /* +0x20 */
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    struct SPR_HDR *Hdr;   /* +0x28 */
-    void *Pals;   /* +0x2C */
-    int *PalOffset;   /* +0x30 */
-    int *CreatureOffset;   /* +0x34 */
-    unsigned char *CreatureAnims;   /* +0x38 */
-    unsigned char *Blocks;   /* +0x3C */
-    BOOL Loaded;   /* +0x40 */
-    int LoadCount;   /* +0x44 */
-    struct CTextFileInfo *FileInfo;   /* +0x48 */
-    long hndDecompBuffer;   /* +0x4C */
-    int DecX;   /* +0x50 */
-    int DecY;   /* +0x54 */
-    int PalX;   /* +0x58 */
-    int PalY;   /* +0x5C */
-    int Scr;   /* +0x60 */
-    int NumOfBuffers[2];   /* +0x64 */
-    long hndDecompArrays;   /* +0x6C */
-};
+#include "psxsrc/textdat_header.h"
 
 struct MonstList;
 
@@ -389,8 +361,7 @@ struct ScrollStruct {   /* sizeof 20 */
     int _sdir;   /* +0x10 */
 };
 
-struct CPlayer {   /* sizeof 144 */
-    struct TextDat TextDat;   /* +0x0 */
+struct CPlayer : public TextDat {   /* sizeof 144; original CPLAYER.H base */
     long hndDatMem;   /* +0x70 */
     unsigned short NumOfPlayers;   /* +0x74 */
     BOOL InTown;   /* +0x78 */
@@ -401,6 +372,12 @@ struct CPlayer {   /* sizeof 144 */
     int LastScrY;   /* +0x88 */
     int LastOtPos;   /* +0x8C */
     void SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg);
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
 };
 
 struct MisFileData {   /* sizeof 5 */

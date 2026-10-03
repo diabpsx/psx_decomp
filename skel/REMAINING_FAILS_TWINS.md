@@ -1,4 +1,29 @@
-# PC twins for the remaining non-PASS functions (31)
+# PC twins for the remaining non-PASS functions
+
+## Current snapshot — 2026-10-03
+
+Full `python tools/status.py` rescan: **2725/2727 PASS**. Only these two
+entries remain non-PASS; the older 31-entry table below is historical.
+
+| Function | TU | Current gate | Source reference |
+|---|---|---|---|
+| DrawSpellCel__FllUclUcc | control | 68 differences, 737/737 instructions; frame 184 vs retail 216 | Devilution `control.cpp:286`, Hellfire `CONTROL.CPP:408`; PSX skeleton CONTROL.CPP |
+| DrawObjSelector__FiP12PlayerStruct | padfuncs | 237 differences, 503/514 instructions; frame 264 vs retail 280 | PSX-only; skeleton PADFUNCS.CPP |
+
+The five former byte-PASS/SYM-differs functions are now PASS:
+`stream_cdready_handler`, `set_mdec_audio_volume`, `MI_Manashield__Fi`,
+`MAI_Counselor__Fi`, and `ProcessMonsters__Fv`. Actual PSYLINK overlay groups
+(`OVER` plus `/v`) followed by the original SYMMUNGE `/i` reproduce their
+retail declaration membership; the exact comparator was not relaxed.
+All five also pass real-ASPSX bytes and call-target audits. Full return-type
+audits pass FMV 44/44, MISSILES 115/115 and MONSTER 105/105.
+
+Reference macro probes (`setRECT`, `setRGB0..3`) did not improve either
+remaining function. See `tools/instr/README.md` for the tested definitions,
+negative results and the successful overlay-producer investigation.
+This board is not a complete final-image/SDK-linkage seal.
+
+## Historical 31-entry worklist (superseded; retained for twin locations)
 
 | fn | TU | state | devilution | hellfire | devilutionx | skeleton (JAP/PAL Ghidra) |
 |---|---|---|---|---|---|---|

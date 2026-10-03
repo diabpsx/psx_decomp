@@ -1969,6 +1969,37 @@ or patching generated instructions.
 
 ### DrawSpellCel field-order search bounded and rejected
 
+Reference macro audit (2026-10-03): inspected historical and reconstructed
+headers under `C:/Temp/ps1-decomp-refs`, including Wipeout's
+`WIPESRC/PSX26/INCLUDE/Libgpu.h:90` (setRECT), `:105` (setRGB0..3),
+`:144` (setXYWH), and `:172` (setUVWH), plus the equivalent PsyQ definitions
+in `chrono-cross-decomp/include/psyq/libgpu.h`. The standard definitions use
+comma-separated field stores, with repeated macro arguments and no hidden
+local declarations. The latter file supplies the exact definitions extracted
+by `scratch/probe_reference_macros.py` for reproducible full-TU probes.
+All eight combinations of converting DrawObjSelector's three rectangle store
+groups to setRECT retain 503/514 instructions, 237 verify_asm diff lines and
+the 264-byte frame. Converting DrawSpellCel's RGB triplets (TrimCol calls,
+plain assignments, or both) to setRGB0..3 retains 737/737 instructions,
+68 verify_asm diff lines and the 184-byte frame. Original-ASPSX checks on the
+all-macro variants also fail (120 and six aligned differences respectively);
+these are a different metric from verify_asm's diff-line counts and do not
+remove the separate SYM frame requirement. Receipts: `build/reference_macro_probe`.
+
+Other useful reference families were inspected but have incompatible store
+or primitive layouts for these two targets: Glover's
+`Whack/glovsrc/maths.h:195` SETRGBC packs RGB/code into one word;
+`Whack/glovsrc/poly.h:225` PUTPACKETINTABLE writes a combined length/address
+tag. SuperSponge's `source/gfx/primplus.h:135` addPrimSize similarly combines
+tag setup, while its setTPoly/setTDrawTPage macros add a tpage command word.
+Its `source/utils/cmxmacro.h` contains Climax GTE operations absent from these
+oracles. Silent Hill's reconstructed `include/gpu.h:115` setRECTFast and
+`:178` setRGB0Fast use wider packed stores, unlike the retail coordinate and
+RGB stores here. Warcraft II's original `H/gds.h:221` get_rgb reads a 2D RGB
+table and includes an assertion; it is useful provenance for Climax colour
+lookup style, but does not establish Diablo's source spelling. No inspected
+macro supplies evidence for an extra stack-padding local or a register pin.
+
 The live function has 737 instructions, like retail, but a 184-byte frame
 instead of 216 and different register assignments. A register-neutral diagnostic
 alignment also highlights the X/Y/width/height load scheduling before primitive
@@ -3361,6 +3392,51 @@ is explicitly unvalidated; the real PsyQ RTL dumps remain authoritative.
 
 ### DrawSpellCel frame-gap and ProcessItems spelling screens
 
+Related native-link result (2026-10-03): the corrected and retail-ordered
+MISSILES TU links exactly with `-fconserve-space` and explicit retail bindings
+for its seven uninitialized common globals: 69,488 text bytes, 1,272 read-only
+bytes (including jump tables), 45 constant small-data bytes. This is not a
+production flag change or a final-image storage receipt. Stock GCC 2.7.2
+`cp/decl.c:6027-6033` shows this option controls `DECL_COMMON`; the default
+strong definitions instead leave 22 relocated words wrong because the globals
+are at different locations. Artifacts: `build/missiles_native_probe/common_report.json`.
+`test_missiles_native_probe.py` preserves the unmasked regression check.
+Applying the same option diagnostically to the two remaining game failures
+does not improve either: DrawSpellCel remains 68 differences/frame184 and
+DrawObjSelector 237/frame264. Actual commands were logged by the corrected
+wrapper; copies are under `build/conserve_source_probe`.
+
+Current full-TU follow-up (2026-10-03, after the 2725/2727 board): the old
+`scratch/run_verify_extra.py` option wrapper is invalid evidence. It patches
+an import named `build`, whereas `verify_asm.py` loads a private `bld` module;
+those options never reached the actual compiler. The replacement diagnostic
+`scratch/probe_real_flags.py` intercepts that exact loader, logs each real
+CC1 command, asserts option delivery and keeps every candidate under
+`build/real_flag_probe`. No production flags or comparison code are changed.
+
+The corrected screen tested baseline plus twelve single-option exclusions on
+both complete CONTROL and PADFUNCS TUs: cse-follow-jumps, cse-skip-blocks,
+expensive-optimizations, strength-reduce, schedule-insns, schedule-insns2,
+delayed-branch, caller-saves, force-mem, force-addr, thread-jumps and
+rerun-cse-after-loop. None improves either target. Every CONTROL result keeps
+frame 184 (retail 216); PADFUNCS stays 264 except no-expensive-optimizations,
+which shrinks it to 256 (retail 280). Baseline maspsx-only whole-TU pass counts
+are 46 and 47; every non-neutral option also loses passing neighbors. Those
+counts exclude reviewed real-ASPSX exceptions and are not board regressions.
+The result rules out these individual option changes, not all combinations
+or all historical build configurations.
+
+`scratch/probe_color_lifetimes.py` then screened twelve full-TU byte-color
+ownership forms. All seven combinations of splitting SpellColors load from
+`r/g/b >>= 1`, and grouping the shifts at each branch's end, remain 737/737,
+68 differences, two combine USE pseudos and frame 184. Moving the three shifts
+to a common post-selection block (shift, division or explicit assignment)
+instead produces 738 instructions/167 differences with the same two USEs and
+frame. Receipts include actual preprocessed input, assembly and target combine
+RTL under `build/color_lifetime_probe`. No candidate was retained. Four more
+orphan pseudos remain a possible explanation for the retail frame gap, not a
+proved fact about unavailable retail RTL; the source comment now says so.
+
 `DrawSpellCel` retains its 184-byte frame versus retail's 216-byte frame under
 all 24 permutations of the four initial `X/Y/SW/SH` assignments. The best four
 orders remain the live 94-difference result; the others range from 116 to 172
@@ -3372,6 +3448,22 @@ differences plus a named SYM record. The retail-only region from physical
 `sp+0x78` through `sp+0xA4` is wholly unreferenced; only `st` at `sp+0xA8` is
 used. This rules out a missing ordinary local and points to reserved/padding
 state produced by a still-missing C++ source construct.
+
+Follow-up (2026-10-03): real RTL identifies the live frame-only words at
+sp+120 and sp+128 as pseudos 144 and 156, the first two repeated
+`SpellColors[SpellCol * 3 + k]` addresses. Combine folds their address
+computations into the loads but leaves `USE` records, and reload consequently
+assigns each an otherwise-unused eight-byte slot. Retail's additional 32-byte
+gap is consistent with four more such pre-`st` compiler temporaries, not a
+named source local. A focused screen covered shared integer indices, pointer
+and reference forms, two-dimensional/three-byte-struct views, casts, commuted
+index arithmetic, duplicated/default color assignments, and ternaries. SDK
+`setXY4`/`setUV4` comma macros and replacing each later `setXYWH` with explicit
+`setXY4` arguments were also tested. Code-neutral forms retain exactly two
+orphans and the 184-byte frame; forms that remove them shrink the frame to 168,
+and none creates the required six-orphan/216-byte shape. Results are under
+`build/drawspell_color_probe` and `build/drawspell_macro_probe`; no live source
+change was retained.
 
 For `ProcessItems`, all 64 combinations of pointer spelling across the six
 animation phases (frame update, map lookup, first sound, sound-table lookup,
@@ -4415,6 +4507,89 @@ pre-block records. This remains a debug-emission/source-scope investigation,
 not a reason to ignore record ordering or change the SYM gate. Live source
 was restored and its byte pass rechecked; the total remains 2687/2727.
 
+Historical overlay-build follow-up (2026-10-03; conclusion superseded below): the five byte-exact failures were run
+through the historical producer stages that differ from the ordinary SYM
+lane. Retail-like multi-origin placement (overlay text plus main-image static
+storage) and PSYLINK 2.52 `/v` without `OVER(...)` both preserve the generated
+membership. These probes did not emit real overlay-switch records and therefore
+did not test the required combination. PsyQ 3.6's DOS C
+frontend (`gcc 2.7.2.SN.1`) still emits `.begin` before the representative FMV
+statics. ASPSX 2.21 and 2.34 produce the same record order from the current
+compiler assembly. PREFSECT 1.00, with and without `-g`, renames/groups the
+sections without moving the function records. SYMMUNGE 1.3, 1.4 and 1.56,
+including the Climax/Warcraft II `/i` in-place invocation, also leave both FMV
+sequences unchanged; Beta 2.04 rejects the PSYLINK 2.52 output as already
+munged.
+
+The original build material in `C:/Temp/ps1-decomp-refs` supplied two further
+checks. Resident Evil 2's PsyQ overlay recipes use `CCPSX ... -Wa,sOVERLAY`
+and `GROUP OBJ(...),FILE(...)`; direct ASPSX `-sFMV` section-prefix assembly
+still emits `status result { idx ... }` and `vol { voice_attr i }`. Climax's
+Warcraft II makefile invokes `CCPSX`, PSYLINK `/m`, then `SYMMUNGE /i`.
+Capturing PsyQ 4.0 CCPSX with `-v -g -O2 -G8 -fno-inline -fsigned-char`
+shows that it passes exactly those frontend flags plus diagnostic `-version`,
+then invokes ASPSX as `-q -g -G8`; the driver-produced object has the same two
+membership failures. No hidden driver debug option was missing from symlane.
+
+The original conclusion that no locally available producer could reproduce the
+anomaly was incorrect: the combined overlay-link/compactor probe below does.
+No record rewrite or comparison exception was introduced. Historical negative
+probe artifacts are under `build/overlay_sym_probe`,
+`build/symmunge_probe`, and the external throwaway DOS runner
+`C:/Temp/diablo-psx-tool-probes`.
+
+### Resolved: actual overlay switches plus vendor SYMMUNGE reproduce all five
+
+The missing producer stage was **PSYLINK `OVER(anchor)` with `/v`, followed by
+SYMMUNGE `/i`**, not a different compiler or a source-level macro. `ORG`, `OBJ`
+and `FILE` placement alone do not emit the `overlay length` and `set overlay`
+records the compactor needs. With those records present, the original compactor
+moves the declaration suffix starting at a resident-data static out of the
+overlay body's block. The compiler's `.begin`/`.def` order remains untouched.
+
+Exact unchanged `symlane.compare` passes for `stream_cdready_handler`,
+`set_mdec_audio_volume`, `MI_Manashield__Fi`, `MAI_Counselor__Fi` and
+`ProcessMonsters__Fv`. For the volume function, original Climax
+`warcraft2/mdec.c:829-832` supplies the declaration order `int i;` followed by
+`static SpuVoiceAttr voice_attr;`: compaction moves only the latter before the
+block. Declaring the static first was the reconstruction mistake.
+
+Production `tools/symlane.py` now derives overlay ownership from the retail MAP
+and pool placement from the verified native-link registry, without a function
+whitelist. DRLG_L3 is the essential negative control: its static tables belong
+to the same overlay as its code, so they must not be treated as resident data.
+Its full 37-function byte/SYM board passes with the correct section placement.
+The combined FMV/MISSILES/MONSTER/DRLG_L3 focused scan passes 301/301.
+The subsequent full board scan passes **2725/2727**: only DrawSpellCel and
+DrawObjSelector remain. All five resolved functions also pass real-ASPSX bytes
+and call-target audits (149/51/192/295/370 instructions and 9/1/5/27/21 calls,
+respectively). Return declarations pass all 264 entries in the three TUs.
+All 175 tool tests pass. Final-image/SDK-linkage integration remains separate.
+
+The native runner uses original SYMMUNGE 1.56, pinned by SHA-256
+`bd51481d903a5d8b55a2f30e7fede023772a5b6e656f50aa242a4663a4e60630`.
+PsyQ 4.0 DOS SYMMUNGE 1.3 independently reproduces all five exact receipts,
+so the effect is not specific to the later native runner. The original retail
+invocation/version is not uniquely proved; this is a reproduced producer
+mechanism consistent with the Climax build recipe and retail output.
+
+Reproduce through the ordinary gates:
+
+```powershell
+python tools/symlane.py recon/psxsrc/fmv.cpp stream_cdready_handler,set_mdec_audio_volume
+python tools/symlane.py recon/source/missiles.cpp MI_Manashield__Fi
+python tools/symlane.py recon/source/monster.cpp MAI_Counselor__Fi,ProcessMonsters__Fv
+python -m unittest discover -s tools/tests -p test_symlane_overlay.py
+```
+
+`build/sn/<tu>_g.raw.sym.txt` retains the pre-compaction records;
+`<tu>_g.sym.txt` is the vendor-produced final receipt; `<tu>_g.symmunge.log`
+records the invocation result. The compaction step checks that linked CPE bytes
+remain unchanged. Tests exercise the actual vendor pipeline, unchanged object
+bytes, the static/suffix split, rejection of a genuine register mismatch and
+rejection of an unverified compactor. No instruction rewriting, record sorting,
+relaxed comparator or fake source scope is involved.
+
 ### Dialog::Back early-CSE corner reuse
 
 Corner-flag follow-up (2026-10-02): using the existing trans value at the
@@ -4539,6 +4714,30 @@ and corrupts parameter/local ownership. These diagnostics prove the missing
 eleven instructions are the natural spill/reloads of `nx`, coupled to the
 `add_wrap`/induction s0/s1 priority swap—not omitted behavior or compiler
 revision. Neither diagnostic source form is retained.
+
+Follow-up (2026-10-03): the first-loop allocation is now isolated more
+precisely. In the validated-shape RTL, the anonymous three-byte array induction
+has seven references across 26 instructions/two calls (instrumented FSF
+priority 5384), while `add_wrap` has ten references across 64 instructions/
+three calls (priority 4687). The generated order therefore gives the induction
+s0 and `add_wrap` s1. Retail does the reverse; `add_wrap` then remains s0 as
+`nh`, leaving no local register for `nx`, which creates the exact sp-72 spill
+and blocks the later `_infostr`, `nw/2`, and spinner-constant hoists.
+
+Equivalent `for` headers/increments, pointer/index spellings, signedness casts,
+declaration grouping/timing, initialization scheduling, chained zero stores,
+`register` hints, `nw` initialization forms, and add/update arithmetic all
+retain the 237-difference result or regress. Moving `nw` to old-style root
+declarations is also neutral. Rewriting `ny` directly as
+`(164 - add_wrap) / 2 + 32` reaches 507 instructions and 187 differences but
+shrinks the frame to 256 and disrupts several retail register owners, so it is
+not retained. A diagnostic explicit s0 constraint on `add_wrap` improves the
+gate to 229 differences, confirming the dependency, but reserves s0 too early:
+retail first uses s0 for `SelectBack` and only then reuses it for `add_wrap`.
+It is evidence, not admissible reconstruction. The authentic PsyQ 4.0 SN16
+DOS C++ frontend reproduces the live SN32 264-byte frame and prologue exactly.
+Probe sources/results are under `build/drawobj_*_probe` and
+`C:/Temp/diablo-psx-tool-probes/drawobj`.
 
 ### BL_AsyncReadFile across-call status lifetime
 

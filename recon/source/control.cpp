@@ -1,9 +1,7 @@
 /* SOURCE/CONTROL.CPP -- Diablo PSX (Climax 1998) reconstruction.  Twin: refs/diablo-hellfire/src/CONTROL.CPP.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h).
- * All 51 functions of the segment are written.  Open near-misses (see the report / comments):
- * DrawSpellCel (allocation + reassociation), PrintInfo (X - (P - 1) reassociation, 4 diffs;
- * SYM: the pre-branch InfoBoxRect load keeps a Rect record), ChrCheckValidButton / CheckChrBtns
- * (loop-invariant &chrbtn / &MaxStats[pc] hoist), RedBack (one load scheduled early).
+ * All 51 functions of the segment are written; 50 PASS. DrawSpellCel remains open
+ * (frame reservation and register allocation; see its audit comment).
  * SetSpell / GetSBookTrans / DrawSpellBook / CheckSBook differ only in maspsx-vs-ASPSX assembly
  * (nop / `b` vs `bgez $0`) and pass on the ASPSX lane (tools/aspsx_gate.py). */
 #include "diabpsx_types.h"
@@ -140,9 +138,10 @@ unsigned char TrimCol(short col)
  * a recordless 32-byte gap above those slots, moving inner `st` and the saved-register area by 32.
  * The gap is reload's ascending-pseudo spill-slot order: our 120/128 slots are two combine-orphaned
  * SpellColors address pseudos (split 3-insn combines leave a USE + refs>0, no hard reg), st follows.
- * Retail had four more such orphans before st's pseudo, with their USE insns outside Y's lifetime:
- * that also lengthens xp's live range, which is what lets retail's SLD statement order X,Y,SW,SH
- * (lines 612-615) keep Y=s7/xp=fp (now Y 1607 vs xp 1613 priority). Source construct still open. */
+ * Four additional pre-st orphans could explain retail's extra 32 bytes, but retail RTL is
+ * unavailable: neither that cause nor the source construct is proved. The existing USE notes
+ * affect allocation priorities; retail's SLD order X,Y,SW,SH (lines 612-615) remains relevant.
+ * Do not add fake locals, padding or barriers to force the missing reservation. */
 void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned char w, char sel)
 {
     TextDat *ThisDat = GM_UseTexData(0);

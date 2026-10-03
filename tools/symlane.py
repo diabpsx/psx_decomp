@@ -3,9 +3,11 @@
 
     python tools/symlane.py recon/psxsrc/gman.cpp [FN,FN...]      # default: every function the TU defines
 
-Pipeline (era toolchain, all Win32 natives from PsyQ 4.0):
+Pipeline (PsyQ 4.0 compiler/assembler/linker, native vendor symbol compactor):
     cc1plus <lane flags> -g  ->  .s (CRLF, cfront-name rewrites)  ->  ASPSX 2.56 -q -g  ->  .obj
     PSYLINK 2.52 /c /m (TU object + auto stub for its externals)  ->  .sym  ->  dumpsym  ->  text
+Overlay TUs use MAP-derived OVER groups, PSYLINK /v, then original SYMMUNGE /i.
+This reproduces retail's cross-overlay static-record ordering before comparison.
 then every function's debug records are compared with rom/DIABPSX-SYM.txt:
     header   fsize / mask / maskoffs / fp / retreg
     records  in order: class, type (+tag), size, dims, name, and the location
@@ -13,7 +15,7 @@ then every function's debug records are compared with rom/DIABPSX-SYM.txt:
     blocks   nesting + address relative to the function start
 Line numbers (SLD, block `line =`, function line) are NOT compared (rule: fix later).
 Prints `SYM ok` / `SYM DIFF` per function with the first differing record."""
-import os, re, subprocess, sys
+import hashlib, json, os, re, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -24,6 +26,8 @@ PSYQ = Path("C:/Temp/nfs3-clean/psyq400/PSYQ")
 ASPSX = Path(os.environ.get("DIAB_ASPSX", PSYQ / "ASPSX.EXE"))
 PSYLINK = Path(os.environ.get("DIAB_PSYLINK", PSYQ / "PSYLINK.EXE"))
 DUMPSYM = Path(os.environ.get("DIAB_DUMPSYM", "C:/Temp/claud/dumpsym_clean/dumpsym_src/dumpsym.exe"))
+SYMMUNGE = Path(os.environ.get("DIAB_SYMMUNGE", "C:/Temp/psq45/BIN/SYMMUNGE.EXE"))
+SYMMUNGE_SHA256 = "bd51481d903a5d8b55a2f30e7fede023772a5b6e656f50aa242a4663a4e60630"
 RETAIL = ROOT / "rom" / "DIABPSX-SYM.txt"
 OUT = ROOT / "build" / "sn"
 ENV = dict(os.environ, MSYS2_ARG_CONV_EXCL="*")
@@ -71,17 +75,73 @@ def compile_g(src: Path, assembler=None) -> Path:
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     return obj
 
-def link(obj: Path) -> Path:
-    """PSYLINK the object alone; externals get a nop stub object (a long /e list crashes PSYLINK 2.52)"""
+def overlay_group(source):
+    """Identify overlay text from the retail MAP inventory, including diagnostic TUs."""
+    if source is None:
+        return None
+    section = '.' + Path(source).stem.upper() + '_text'
+    rows = json.loads((ROOT / 'configs/sections.json').read_text())
+    groups = {r['group'] for r in rows if r['name'] == section and r['len']}
+    overlays = groups & {'frontend_text', 'pregame_text', 'game_text', 'fmv_text'}
+    if len(overlays) > 1:
+        raise ValueError('ambiguous overlay ownership for ' + section)
+    return next(iter(overlays), None)
+
+
+def overlay_sections(source, group):
+    """Place pools with code only where native receipts/MAP establish that home."""
+    if not group:
+        return set()
+    segment = Path(source).stem.lower()
+    image = group.removesuffix('_text')
+    registry = json.loads((ROOT / 'configs/native_recon_link.json').read_text())
+    spec = registry.get(segment, {})
+    rows = json.loads((ROOT / 'configs/sections.json').read_text())
+    result = {'.text'}
+    for section in ('.rdata', '.data'):
+        native = spec.get('sections', {}).get(section)
+        if native:
+            if native.get('image', spec.get('image')) == image:
+                result.add(section)
+        elif not any(r['name'] == '.' + segment.upper() + '_' + section[1:] and r['len'] for r in rows):
+            # E.g. FMV's large data/pool prefix is part of .FMV_text in MAP.
+            result.add(section)
+    return result
+
+
+def link(obj: Path, source=None) -> Path:
+    """PSYLINK one object plus stubs; source selects the authentic overlay SYM route.
+
+    No source requests a resident diagnostic link. Production callers pass the
+    source so MAP-owned overlay TUs also run the original symbol compactor.
+    """
     name = obj.stem.replace(".", "_")
     lnk = OUT / f"{name}.lnk"
+    overlay = overlay_group(source)
+    in_overlay = overlay_sections(source, overlay)
+    if overlay and (not SYMMUNGE.is_file() or
+                    hashlib.sha256(SYMMUNGE.read_bytes()).hexdigest() != SYMMUNGE_SHA256):
+        sys.exit('[symmunge] overlay SYM requires the verified original SYMMUNGE 1.56 executable; '
+                 'set DIAB_SYMMUNGE to its path')
     def write_lnk(with_stub):
-        lines = ["\torg\t$80010000", "text\tgroup", "\tsection\t.text,text", "\tsection\t.rdata,text", "\tsection\t.data,text",
-                 "\tsection\t.sdata,text", "\tsection\t.sbss,text", "\tsection\t.bss,text", "\tsection\t.ctors,text", "\tsection\t.dtors,text",
-                 f"\tinclude\t{obj.name}"] + ([f"\tinclude\t{name}_stub.obj"] if with_stub else [])
+        lines = ["\torg\t$80010000", "text\tgroup"]
+        if not overlay:
+            lines += ["\tsection\t.text,text"]
+        sections = ('.rdata', '.data', '.sdata', '.sbss', '.bss', '.ctors', '.dtors')
+        lines += [f'\tsection {section},text' for section in sections if section not in in_overlay]
+        if overlay:
+            # OVER plus /v is essential: ORG/OBJ alone never emits overlay
+            # switches. The empty anchor reserves PsyQ's four-byte overlay ID.
+            # Keep the diagnostic image in one CPE so the bytes gate reads the
+            # very same link; retail splits these groups into separate files.
+            lines += ['overlay_anchor group org($80139BF8)', f'{overlay} group over(overlay_anchor)']
+            lines += [f'\tsection {section},{overlay}' for section in ('.rdata', '.data', '.text')
+                      if section in in_overlay]
+        lines += [f"\tinclude\t{obj.name}"] + ([f"\tinclude\t{name}_stub.obj"] if with_stub else [])
         lnk.write_bytes(("\r\n".join(lines) + "\r\n").encode())
     def run():
-        return subprocess.run([str(PSYLINK), "/c", "/m", f"@{lnk.name},{name}.cpe,{name}.sym,{name}.map"],
+        sym_name = f'{name}.raw.sym' if overlay else f'{name}.sym'
+        return subprocess.run([str(PSYLINK), "/c", "/m", *(['/v'] if overlay else []), f"@{lnk.name},{name}.cpe,{sym_name},{name}.map"],
                               capture_output=True, text=True, cwd=OUT, env=ENV)
     write_lnk(False); r = run()
     undef = sorted(set(re.findall(r"Symbol '([^']+)' not defined", r.stdout + r.stderr)))
@@ -94,7 +154,24 @@ def link(obj: Path) -> Path:
         sys.exit(f"[psylink] {name}\n{r.stdout}{r.stderr}")
     sym = OUT / f"{name}.sym"
     txt = OUT / f"{name}.sym.txt"
+    if overlay:
+        raw = OUT / f'{name}.raw.sym'
+        dump = subprocess.run([str(DUMPSYM), str(raw)], capture_output=True, text=True, cwd=OUT)
+        (OUT / f'{name}.raw.sym.txt').write_text(dump.stdout, encoding='utf-8', errors='replace')
+        if dump.returncode or ' overlay length ' not in dump.stdout or ' set overlay' not in dump.stdout:
+            sys.exit('[psylink] missing real overlay records before SYMMUNGE')
+        cpe = OUT / f'{name}.cpe'
+        before = hashlib.sha256(cpe.read_bytes()).hexdigest()
+        r = subprocess.run([str(SYMMUNGE), '/i', str(raw), str(sym)],
+                           capture_output=True, text=True, cwd=OUT, env=ENV)
+        (OUT / f'{name}.symmunge.log').write_text(r.stdout + r.stderr)
+        if r.returncode or 'Symbol file compacted OK' not in r.stdout or not sym.is_file():
+            sys.exit(f'[symmunge] {name}\n{r.stdout}{r.stderr}')
+        if hashlib.sha256(cpe.read_bytes()).hexdigest() != before:
+            sys.exit('[symmunge] linked bytes changed unexpectedly')
     r = subprocess.run([str(DUMPSYM), str(sym)], capture_output=True, text=True, cwd=OUT)
+    if r.returncode:
+        sys.exit(f'[dumpsym] {name}\n{r.stdout}{r.stderr}')
     txt.write_text(r.stdout, encoding="utf-8", errors="replace")
     return txt
 
@@ -203,7 +280,7 @@ def main():
     src = ROOT / sys.argv[1]
     want = sys.argv[2].split(",") if len(sys.argv) > 2 else None
     obj = compile_g(src)
-    txt = link(obj)
+    txt = link(obj, source=src)
     ours = functions(txt.read_text(encoding="utf-8", errors="replace"))
     retail_all = functions(RETAIL.read_text(encoding="latin-1"), every=True)
     retail = {k: v[0] for k, v in retail_all.items()}

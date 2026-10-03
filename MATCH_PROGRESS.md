@@ -1,6 +1,6 @@
 # Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only
 
-**Game code: 2720 / 2727 entries PASS (99.7%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
+**Game code: 2725 / 2727 entries PASS (99.9%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -836,13 +836,13 @@
 - ✅ SearchPathExists__6FileIO (5)
 - ✅ Save__6FileIOPCcPUci (15)
 
-## fmv  (recon/psxsrc/fmv.cpp) — 42/44 PASS
+## fmv  (recon/psxsrc/fmv.cpp) — 44/44 PASS
 - ✅ _cd_seek (14)
 - ✅ init_cdstream (10)
 - ✅ flush_cdstream (21)
 - ✅ reset_cdstream (12)
 - ✅ kill_stream_handlers (12)
-- 🟡 stream_cdready_handler — bytes PASS, SYM differs
+- ✅ stream_cdready_handler (149)
 - ✅ install_stream_handlers (15)
 - ✅ cdstream_service (60)
 - ✅ cdstream_get_chunk (70)
@@ -869,7 +869,7 @@
 - ✅ kill_mdec_audio (12)
 - ✅ stop_mdec_audio (9)
 - ✅ play_mdec_audio (205)
-- 🟡 set_mdec_audio_volume — bytes PASS, SYM differs
+- ✅ set_mdec_audio_volume (51)
 - ✅ resync_audio (4)
 - ✅ stop_mdec_stream (17)
 - ✅ dequeue_stream (59)
@@ -1499,7 +1499,7 @@
 - ✅ GetNumOfFrames__7TextDat (5)
 - ✅ GetFr__7TextDati_8007d5dc (7)
 
-## missiles  (recon/source/missiles.cpp) — 114/115 PASS
+## missiles  (recon/source/missiles.cpp) — 115/115 PASS
 - ✅ GetDamageAmt__FiPiT1 (382)
 - ✅ CheckBlock__Fiiii (45)
 - ✅ FindClosest__Fiii (99)
@@ -1587,7 +1587,7 @@
 - ✅ MI_Town__Fi (214)
 - ✅ MI_Flash__Fi (221)
 - ✅ MI_Flash2__Fi (119)
-- 🟡 MI_Manashield__Fi — bytes PASS, SYM differs
+- ✅ MI_Manashield__Fi (192)
 - ✅ MI_Firemove__Fi (168)
 - ✅ MI_Guardian__Fi (174)
 - ✅ MI_Chain__Fi (154)
@@ -1623,7 +1623,7 @@
 - ✅ ML_SetList__Fii (44)
 - ✅ ML_GetPresetMonsters__FiPiUl (124)
 
-## monster  (recon/source/monster.cpp) — 103/105 PASS
+## monster  (recon/source/monster.cpp) — 105/105 PASS
 - ✅ DeleteMonster__Fi (14)
 - ✅ M_GetDir__Fi (25)
 - ✅ M_StartDelay__Fii (20)
@@ -1699,7 +1699,7 @@
 - ✅ MAI_Mega__Fi (9)
 - ✅ MAI_SkelKing__Fi (335)
 - ✅ MAI_Rhino__Fi (303)
-- 🟡 MAI_Counselor__Fi — bytes PASS, SYM differs
+- ✅ MAI_Counselor__Fi (295)
 - ✅ MAI_Garbud__Fi (132)
 - ✅ MAI_Zhar__Fi (127)
 - ✅ MAI_SnotSpil__Fi (148)
@@ -1708,7 +1708,7 @@
 - ✅ MAI_Lachdanan__Fi (108)
 - ✅ MAI_Warlord__Fi (90)
 - ✅ DeleteMonsterList__Fv (73)
-- 🟡 ProcessMonsters__Fv — bytes PASS, SYM differs
+- ✅ ProcessMonsters__Fv (370)
 - ✅ DirOK__Fii (107)
 - ✅ PosOkMissile__Fii (30)
 - ✅ CheckNoSolid__Fii (8)
