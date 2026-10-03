@@ -72,21 +72,45 @@ def cpe_regions(data, regions):
     return {name: bytes(payload) for name, payload in result.items()}
 
 
-def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=None):
+def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=None, overlay_text=False):
     """Link an unchanged original object, with explicitly placed complete sections."""
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", entry):
         raise ValueError("invalid SDK output name")
+    if type(overlay_text) is not bool:
+        raise ValueError('native overlay selection must be Boolean')
+    if overlay_text:
+        # This route has overlay code and resident initialized pools. Same-bank
+        # pools and zero-fill groups need their own explicit layout support.
+        if '.text' not in regions or any(s not in ('.text', '.rdata', '.data', '.sdata') for s in regions):
+            raise ValueError('native overlay requires text and resident initialized pools')
+        rows = sorted(regions.values())
+        start, length = regions['.text']
+        if (start < 4 or start % 4 or length % 4
+                or any(type(a) is not int or type(n) is not int or n <= 0 for a,n in rows)
+                or any(a+n > b for (a,n),(b,m) in zip(rows,rows[1:]))
+                or any(a < start and a+n > start-4 for a,n in rows)):
+            raise ValueError('native overlay has invalid/overlapping regions or ID header')
+        SL.require_symmunge()
     out = OUT if output_dir is None else Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     prefix_objects = [Path(prefix).resolve() for prefix in prefix_objects]
     if any(prefix == (out / f"{entry}.obj").resolve() for prefix in prefix_objects):
         raise ValueError("native prefix object cannot alias the linked object's output path")
     (out / f"{entry}.obj").write_bytes(raw)
-    commands = []
+    commands, files = [], {}
+    if overlay_text:
+        commands.append(f'overlay_anchor group org(${regions[".text"][0]-4:08X}),file("{entry}_anchor.bin")')
     for index, (section, (va, size)) in enumerate(regions.items()):
         if not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", section):
             raise ValueError("invalid SDK section name")
-        commands.extend([f"sdk_{index} group org(${va:08X})", f"\tsection {section},sdk_{index}"])
+        if overlay_text:
+            filename = out / f'{entry}_group{index}.bin'
+            files[section] = filename
+            placement = 'over(overlay_anchor)' if section == '.text' else f'org(${va:08X})'
+            commands.append(f'sdk_{index} group {placement},file("{filename.name}")')
+            commands.append(f'\tsection {section},sdk_{index}')
+        else:
+            commands.extend([f"sdk_{index} group org(${va:08X})", f"\tsection {section},sdk_{index}"])
     for name, address in bindings.items():
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
             raise ValueError("invalid SDK binding name")
@@ -98,11 +122,38 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         commands.append(f'\tinclude "{prefix}"')
     commands.append(f"\tinclude {entry}.obj")
     (out / f"{entry}.lnk").write_bytes(("\r\n".join(commands) + "\r\n").encode("ascii"))
-    run = subprocess.run([str(SL.PSYLINK), "/c", "/m",
-                          f"@{entry}.lnk,{entry}.cpe,{entry}.sym,{entry}.map"],
+    sym_name = f'{entry}.raw.sym' if overlay_text else f'{entry}.sym'
+    run = subprocess.run([str(SL.PSYLINK), "/c", "/m", *(['/v'] if overlay_text else []),
+                          f"@{entry}.lnk,{entry}.cpe,{sym_name},{entry}.map"],
                          cwd=out, env=SL.ENV, capture_output=True, text=True)
     if run.returncode or "0 error(s)" not in run.stdout:
         raise ValueError("native SDK link failed: " + run.stdout + run.stderr)
+    if overlay_text:
+        map_text = (out / f'{entry}.map').read_text()
+        payloads = list(files.values()) + [out / f'{entry}_anchor.bin']
+        raw_text = SL.compact_overlay_sym(out / sym_name, out / f'{entry}.sym', payloads)
+        headers = [(int(a,16),int(n,16),int(i,16)) for a,n,i in re.findall(
+            r'^\w+: \$([0-9a-f]{8}) overlay length \$([0-9a-f]{8}) id \$([0-9a-f]+)', raw_text,re.M|re.I)]
+        blocks = {}
+        for section,path in files.items():
+            va,size = regions[section]
+            data = path.read_bytes()
+            if section == '.text':
+                ids = [i for a,n,i in headers if (a,n)==(va-4,size+4)]
+                if len(ids)!=1 or len(data)!=size+4 or data[:4]!=struct.pack('<I',ids[0]):
+                    raise ValueError('native overlay ID metadata does not match its payload')
+                # Remove only the vendor file-format header, never source code.
+                data = data[4:]
+            actual = re.findall(r'^\s*([0-9a-f]{8})\s+[0-9a-f]{8}\s+([0-9a-f]{8})\s+'
+                                r'[0-9a-f]{8}\s+\w+\s+'+re.escape(section)+r'\s*$',map_text,re.M|re.I)
+            if len(data)!=size or [(int(a,16),int(n,16)) for a,n in actual]!=[(va,size)]:
+                raise ValueError('native overlay section extent/placement differs')
+            blocks[section] = data
+        anchor = (out/f'{entry}_anchor.bin').read_bytes()
+        ids = [i for a,n,i in headers if (a,n)==(regions['.text'][0]-4,4)]
+        if len(ids)!=1 or anchor!=struct.pack('<I',ids[0]):
+            raise ValueError('native overlay anchor metadata differs')
+        return blocks, map_text
     return (cpe_regions((out / f"{entry}.cpe").read_bytes(), regions),
             (out / f"{entry}.map").read_text())
 
@@ -281,11 +332,27 @@ def data_bridge(source, regions):
                 rows.sort(key=lambda row: row[1])
                 position = first
                 for match, address, width in rows:
-                    if address != position or address + width > limit:
+                    if address != position:
                         raise ValueError("data boundaries need contiguous explicit scalar rows")
-                    position += width
+                    used_width = min(width,limit-address)
+                    suffix = ''
+                    if used_width != width:
+                        # A byte-array payload may end inside a literal word
+                        # holding its existing alignment bytes. Preserve those
+                        # exact bytes as scaffold; do not claim them as source.
+                        if match.re.groups!=3 or match[3]!='word' or not match[2]:
+                            raise ValueError('partial data tail requires a literal word')
+                        try:
+                            literal = int(match[0].split('.word',1)[1].strip(),0)
+                            original = bytes.fromhex(match[2])
+                            if not -(1<<31)<=literal<(1<<32) or (literal & 0xffffffff).to_bytes(4,'little') != original:
+                                raise ValueError('word literal disagrees with byte annotation')
+                        except ValueError:
+                            raise ValueError('partial data tail requires verified literal bytes')
+                        suffix = '\n    .byte '+','.join(f'0x{v:02X}' for v in original[used_width:])
+                    position += used_width
                     replacements.append((match.start(), match.end(),
-                                         f'    .incbin "{filename}", {address - va}, {width}'))
+                                         f'    .incbin "{filename}", {address - va}, {used_width}'+suffix))
                 if position != limit:
                     raise ValueError("data boundaries need contiguous explicit scalar rows")
             continue

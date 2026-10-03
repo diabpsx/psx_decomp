@@ -15,6 +15,8 @@ import build as B
 import sdk_link as N
 import symlane as S
 import return_type_audit as RTA
+import psyq_extract as P
+import native_commons as C
 
 OUT = B.BUILD / 'native_source'
 IMAGES = {'diabpsx': 'DIABPSX.BIN', 'pregame': 'PREGAME.BIN',
@@ -373,10 +375,27 @@ def build():
         raw = original_obj.read_bytes()
         if raw[:4] != b'LNK\x02':
             raise ValueError('compiler did not produce a native LNK object')
+        commons = C.placements(P.parse_obj_complete(raw), spec['common_symbols'], symbol_text,
+                               layouts, spec['data_symbols']) if 'common_symbols' in spec else {}
+        for row in commons.values():
+            va, size = row['va'], row['size']
+            if any(home == 'diabpsx' and va < stop and start < va+size for home,start,stop in occupied):
+                raise ValueError('source common overlaps another native payload')
+            occupied.append(('diabpsx',va,va+size))
         bindings = resolve_bindings(spec['externals'], symbol_text)
+        if set(commons) & set(bindings):
+            raise ValueError('source common cannot also be an external binding')
+        bindings.update({name: row['va'] for name,row in commons.items()})
         bindings['_gp'] = gp
+        compaction = spec.get('symbol_compaction')
+        if compaction not in (None,'overlay_text'):
+            raise ValueError('unknown native symbol-compaction route')
+        if compaction and (not S.overlay_group(source) or spec['image']=='diabpsx'
+                           or any(home!='diabpsx' for section,home in homes.items() if section!='.text')):
+            raise ValueError('native overlay compaction requires overlay text and resident pools')
         blocks, map_text = N.native_link(segment, raw, combined, bindings,
-                                         prefix_objects=prefix_objects, output_dir=OUT)
+                                         prefix_objects=prefix_objects, output_dir=OUT,
+                                         overlay_text=bool(compaction))
         payloads = {}
         for section, data in blocks.items():
             home = homes.get(section, 'diabpsx')
@@ -404,6 +423,13 @@ def build():
             raise ValueError('typed and untyped source data declarations must be disjoint')
         untyped_receipts = {name: verify_untyped_export(map_text, symbol_text, retail_sym, run.stdout, name, alias)
                             for name, alias in untyped.items()}
+        common_payloads, common_allocation = C.allocate(segment,commons,retail,assembler,OUT)
+        for name,data in common_payloads.items():
+            row = commons[name]
+            filename = f'build/native_source/{segment}.common_{name}.bin'
+            (B.ROOT/filename).write_bytes(data)
+            bridges.setdefault(row['scaffold'],[]).append((row['va'],row['size'],filename))
+            bridge_limits[row['scaffold']] = row['limit']
         for section, data in payloads.items():
             (OUT / f'{segment}{section}.bin').write_bytes(data)
             if section in ('.sbss', '.bss'):
@@ -421,6 +447,12 @@ def build():
         (OUT / f'{segment}.sym.txt').write_text(run.stdout)
         receipts.append({'segment': segment, 'source': spec['source'], 'functions': count,
                          'assembler_version': assembler_version, 'assembler_sha256': sha(assembler.read_bytes()),
+                         'compiler_overrides': B.per_tu_flags(source),
+                         'symbol_compaction': compaction,
+                         'symmunge_sha256': S.SYMMUNGE_SHA256 if compaction else None,
+                         'common_symbols': {name: {'va':hex(commons[name]['va']),'size':len(data),
+                                                    'sha256':sha(data)} for name,data in common_payloads.items()},
+                         'common_allocation': common_allocation,
                          'untyped_data_symbols': untyped_receipts,
                          'source_sha256': sha(source.read_bytes()), 'object_sha256': sha(raw),
                          'preprocessed_sha256': sha((S.OUT / (source.stem + '.i')).read_bytes()),
@@ -428,7 +460,7 @@ def build():
                                       for s, b in payloads.items()},
                          'scaffold_gp_prefix': {'va': f'0x{gp:08X}', 'size': len(prefix), 'sha256': sha(prefix), 'mode': carrier_mode},
                          'bindings': {n: f'0x{v:08X}' for n, v in bindings.items()}})
-        print(f'{segment}: native source bytes and {count} SYM records match retail; {len(prefix)} GP-prefix bytes remain scaffold')
+        print(f'{segment}: native source bytes and {count} SYM records match retail; {len(prefix)} borrowed GP-prefix carrier bytes')
     for target, owned in extra_bridges.items():
         parts = []
         for path in (B.ROOT/'asm/nonmatchings'/target).glob('*.s'):

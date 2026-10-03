@@ -51,6 +51,66 @@ PsyQ 4.0 DOS SYMMUNGE 1.3 was independently tested and gives the same exact
 five function receipts. Climax's original Warcraft II makefile also invokes
 SYMMUNGE `/i`; details and reproduction commands are in `tools/instr/README.md`.
 
+## Native MISSILES common storage and overlay receipts (2026-10-03)
+
+The MISSILES native import now uses `-fconserve-space` for its uninitialized
+public definitions. Stock GCC 2.7.2 `cp/decl.c:6027-6033` documents its
+`DECL_COMMON` behavior. This reproduces the required link ownership and all
+relocated bytes; it does not uniquely recover the original driver command.
+No per-function instruction or record exception is used.
+
+`native_commons.py` validates every compiler XBSS against explicit retail
+symbol/size/storage metadata, assembles zero storage with original ASPSX and
+links it with PSYLINK. One aligned bank holds seven named allocations (ten
+bytes); 49 intervening/alignment bytes are scaffold carriers, not source
+payload. Only the verified allocation slices enter the main data bridge.
+The constant small-data section owns 45 bytes. Its final byte shares a scalar
+scaffold row with three alignment bytes; the bridge requires matching literal
+and byte annotation before preserving that suffix verbatim outside the import.
+
+For overlay text with resident initialized pools, `sdk_link.native_link` uses
+separate vendor `FILE` outputs so overlapping anchor/overlay-ID headers never
+enter the runtime payload. Each section's extent/address is checked against
+the native map. Raw SYM identifies the exact four-byte headers; SYMMUNGE then
+produces all 115 exact function receipts without changing any payload file.
+The ordinary CPE reader remains strict and unchanged.
+
+All 69,488 text bytes, 1,272 read-only bytes (including jump tables), 45
+constant small-data bytes and seven typed commons match. The main image and
+four overlays pass complete comparisons. Native-source coverage is now
+1,249 functions in 91 TUs at the MISSILES checkpoint, plus 19 conventional
+source functions in one TU.
+
+The subsequent MONSTER import adds 105 functions, 50,944 exact text bytes,
+240 read-only bytes, 19 small-data bytes and two exact four-byte commons.
+Its counselor table and wipe-counter records pass original overlay compaction
+at the retail addresses. The source retains ordinary declarations and uses
+the same measured common-data lane. All five images and 189 tests pass;
+native-source coverage at that checkpoint is 1,354 functions in 92 TUs (1,373/93 including
+the conventional lane). Large data arrays still supplied by scaffolds are
+not counted as reconstructed by these emitted-section receipts.
+
+INV subsequently adds 57 functions and uses the ordinary compiler flags.
+Applying `-fconserve-space` there incorrectly changes three BRect member stores
+to absolute addressing. Correct original owner declaration order, initializers
+and header-constructor placement instead produce 44,260 exact text bytes,
+896 read-only bytes, 104 small-data bytes and 23 exact global SYM records.
+All five images and the full board remain exact at their existing scope;
+190 tests pass. Current coverage is 1,411 native functions in 93 TUs plus
+19 conventional functions, or 1,430 functions in 94 TUs. Function-level
+relocation normalization alone had hidden reversed texture selection and
+missing global initial values in this TU.
+
+AUTOMAP then completes GAME's five source-text owners. Its 19 functions,
+7,880 text bytes, 72 read-only bytes, 60 small-data bytes and 24 initialized
+data bytes match, along with 12 global records. Restored ordinary declarations
+give AutoMapScale its original4 initializer and AutoMapOt its original240
+initializer; previously anonymous/missing storage is named from retail SYM.
+No new compiler override is needed. All five images and192 tests pass.
+Native coverage is1,430 functions/94 TUs; including the conventional lane,
+1,449/95. GAME has297 source-linked functions and only its four-byte file ID
+outside those code fragments; referenced resident data can still be scaffolded.
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record

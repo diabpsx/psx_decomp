@@ -75,7 +75,19 @@ public:
     int BackGfx;   /* +0x8 */
     int DialogOTpos;   /* +0xC */
 
-    inline Dialog();
+    Dialog()
+    {
+        BackGfx = 0x94;
+        BevelGfx = 0x1A;
+        BorderGfx = 0x1A;
+        DialogRed = 0x80;
+        DialogGreen = 0x80;
+        DialogBlue = 0x80;
+        DialogTRed = 0x20;
+        DialogTGreen = 0x20;
+        DialogTBlue = 0x20;
+        DialogOTpos = CBlocks::GetOverlayOtBase();
+    }
     ~Dialog() {}
     void SetBorder(int v) { BorderGfx = v; }
     void SetBack(int Type) { BackGfx = Type; }
@@ -89,19 +101,6 @@ public:
     int SetOTpos(int OT);
 };
 
-inline Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
 
 struct POLY_FT4 {   /* sizeof 40 */
     unsigned long tag;   /* +0x0 */
@@ -131,10 +130,6 @@ struct POLY_FT4 {   /* sizeof 40 */
     unsigned short pad2;   /* +0x26 */
 };
 
-struct TextDat {
-    unsigned char _opaque[112];
-    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);   /* @0x80093418 GMAN.CPP:989 */
-};
 
 enum PLR_MODE {
     PM_QUIT = 11,

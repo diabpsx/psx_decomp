@@ -5,6 +5,7 @@
  * InvMoveCurs*) are PSX-native (no PC twin) and are reconstructed separately from the oracle+SYM.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_inv.h"
 #include "source/gen/externs_inv.h"
 #include "source/gen/protos_inv.h"
@@ -54,309 +55,853 @@ typedef unsigned long u_long;
 	((tge)?setcode(p, getcode(p)|0x01):setcode(p, getcode(p)&~0x01))
 #define setRGB0(p, _r0, _g0, _b0) (p)->r0 = _r0, (p)->g0 = _g0, (p)->b0 = _b0
 
-/* TU data (.sdata, tentative definitions) — this TU owns these (every %gp_rel oracle reference
- * is inside asm/nonmatchings/inv/); preinv.cpp/coreinv.cpp only `extern` them. */
+/* Retail global types, initial values and order from SYM and the image. */
+static int clipit = 249;
+static int backot = 249;
+static int slotot = 250;
+static int slotbackot = 250;
+static int itemot = 250;
+TextDat *InvPanelTData = 0;
+TextDat *InvGfxTData = 0;
+int CursGlow = 0;
+int CursGlowDx = 8;
+unsigned char invflag;
+unsigned char drawsbarflag;
 int InvBackY;
-struct TextDat *InvPanelTData;
-struct TextDat *InvGfxTData;
 int InvCursPos;
-int ItemNo;
-int ItemW;
-int ItemH;
 int InvPageNo;
 int InvPageFlag;
 int InvBackAY;
-unsigned char invflag;
-unsigned char drawsbarflag;
-int D_8011C324;
-int D_8011C2FC;
-int D_8011C2F8;
-int D_8011C304;
-struct RECT BRect;
-int D_8011C300;
-int CursGlow;
-int CursGlowDx;
-int D_8011C2F4;
+int InvSel;
+int ItemW;
+int ItemH;
+int ItemNo;
+RECT BRect;
 
 void FreeInvGFX(void)
 {
 }
 
-void RemoveSpdBarItem(int pnum, int iv)
+void InvDrawSlot(int X, int Y, int Frame)
 {
-    plr[pnum].SpdList[iv]._itype = ITYPE_NONE;
-    CalcPlrScrolls(pnum);
-    if (plr[pnum]._pRSplType == 2 /* RSPLTYPE_SCROLL */) {
-        if (plr[pnum]._pRSpell != -1 /* SPL_INVALID */) {
-            if (!(plr[pnum]._pScrlSpells & (1 << (plr[pnum]._pRSpell - 1)))) {
-                plr[pnum]._pRSpell = -1;
-            }
+    struct POLY_FT4 *Ft4;
+
+    Ft4 = InvGfxTData->PrintFt4(Frame, X + 0x80, Y - InvBackY + 0x20, 0, slotot, 0);
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+    Ft4->r0 = BORDERR;
+    Ft4->g0 = BORDERG;
+    Ft4->b0 = BORDERB;
+}
+
+void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag)
+{
+    struct POLY_FT4 *Ft4;
+
+    Ft4 = InvPanelTData->PrintFt4(0x94, X, Y, 0, slotbackot, 0);
+
+    Ft4->x0 = X + 0x81;
+    Ft4->y0 = Y - InvBackY + 0x21;
+    Ft4->x1 = X + 0x81 + (W - 2);
+    Ft4->y1 = Y - InvBackY + 0x21;
+    Ft4->x2 = X + 0x81;
+    Ft4->y2 = Y - InvBackY + 0x21 + (H - 2);
+    Ft4->x3 = X + 0x81 + (W - 2);
+    Ft4->y3 = Y - InvBackY + 0x21 + (H - 2);
+    Ft4->tpage |= 0x40;
+    Ft4->u1 = Ft4->u0 + 1;
+    Ft4->u3 = Ft4->u0 + 1;
+    Ft4->v2 = Ft4->v0 + 1;
+    Ft4->v3 = Ft4->v0 + 1;
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+
+    switch (Flag) {
+    case 0:
+        Ft4->r0 = 0x20;
+        Ft4->g0 = 0x20;
+        Ft4->b0 = 0x20;
+        Ft4->tpage |= 0x40;
+        break;
+    case 1:
+        Ft4->r0 = 0xD0;
+        Ft4->g0 = 0;
+        Ft4->b0 = 0;
+        Ft4->tpage |= 0x20;
+        break;
+    case 2:
+        Ft4->tpage |= 0x20;
+        if (_pcurs[myplr] == 2) {
+            Ft4->r0 = 0;
+            Ft4->g0 = 0;
+            Ft4->b0 = CursGlow - 0x80;
+        } else if (_pcurs[myplr] == 3) {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = CursGlow - 0x80;
+            Ft4->b0 = 0;
+        } else if (_pcurs[myplr] == 4) {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = 0;
+            Ft4->b0 = CursGlow - 0x80;
+        } else if (_pcurs[myplr] < 12) {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = CursGlow - 0x80;
+            Ft4->b0 = CursGlow - 0x80;
+        } else {
+            Ft4->r0 = CursGlow - 0x80;
+            Ft4->g0 = (CursGlow + 0x80) >> 2;
+            Ft4->b0 = (CursGlow + 0x80) >> 2;
         }
+        break;
+    case 3:
+        Ft4->r0 = 0x80;
+        Ft4->g0 = (CursGlow >> 2) + 0x20;
+        Ft4->b0 = (CursGlow >> 2) + 0x20;
+        Ft4->tpage |= 0x20;
+        break;
     }
 }
 
-void CheckInvScrn(void)
+void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int TransFlag)
 {
-    if (_pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */) {
-        CheckInvPaste(myplr, MouseX, MouseY);
-    } else {
-        CheckInvCut(myplr, MouseX, MouseY);
-    }
-}
+    struct POLY_FT4 *Ft4;
+    struct TextDat *TData;
 
-void CheckItemStats(int pnum)
-{
-    PlayerStruct *p = &plr[pnum];
-
-    p->HoldItem._iStatFlag = 0;
-    if (p->_pStrength >= p->HoldItem._iMinStr
-        && p->_pMagic >= (unsigned char)p->HoldItem._iMinMag
-        && p->_pDexterity >= p->HoldItem._iMinDex) {
-        p->HoldItem._iStatFlag = 1;
-    }
-}
-
-void CheckBookLevel(int pnum)
-{
-    int slvl;
-
-    if (plr[pnum].HoldItem._iMiscId != IMISC_BOOK)
-        return;
-    plr[pnum].HoldItem._iMinMag = spelldata[plr[pnum].HoldItem._iSpell].sMinInt;
-    slvl = plr[pnum]._pSplLvl[plr[pnum].HoldItem._iSpell];
-    while (slvl != 0) {
-        plr[pnum].HoldItem._iMinMag += 20 * plr[pnum].HoldItem._iMinMag / 100;
-        slvl--;
-        if (plr[pnum].HoldItem._iMinMag + 20 * plr[pnum].HoldItem._iMinMag / 100 > 255) {
-            plr[pnum].HoldItem._iMinMag = 255;
-            slvl = 0;
-        }
-    }
-}
-
-unsigned char UseScroll(void)
-{
-    int i;
-
-    if (_pcurs[myplr] != CURSOR_HAND)
-        return 0;
-    if (leveltype == 0 /* DTYPE_TOWN */ && !spelldata[plr[myplr]._pRSpell].sTownSpell)
-        return 0;
-
-    for (i = 0; i < plr[myplr]._pNumInv; i++) {
-        if (plr[myplr].InvList[i]._itype != ITYPE_NONE
-            && (plr[myplr].InvList[i]._iMiscId == IMISC_SCROLL || plr[myplr].InvList[i]._iMiscId == IMISC_SCROLLT)
-            && plr[myplr].InvList[i]._iSpell == plr[myplr]._pRSpell) {
-            return 1;
-        }
-    }
-    for (i = 0; i < MAXBELTITEMS; i++) {
-        if (plr[myplr].SpdList[i]._itype != ITYPE_NONE
-            && (plr[myplr].SpdList[i]._iMiscId == IMISC_SCROLL || plr[myplr].SpdList[i]._iMiscId == IMISC_SCROLLT)
-            && plr[myplr].SpdList[i]._iSpell == plr[myplr]._pRSpell) {
-            return 1;
-        }
-    }
-
-    return 0;
-}
-
-void UseStaffCharge(PlayerStruct *ptrplr)
-{
-    if (ptrplr->InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE
-        && ptrplr->InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF
-        && ptrplr->InvBody[INVLOC_HAND_LEFT]._iSpell == ptrplr->_pRSpell
-        && ptrplr->InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
-        ptrplr->InvBody[INVLOC_HAND_LEFT]._iCharges--;
-        CalcPlrStaff(ptrplr);
-    }
-}
-
-unsigned char UseStaff(void)
-{
-    if (_pcurs[myplr] != CURSOR_HAND)
-        return 0;
-    if (plr[myplr].InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE
-        && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF
-        && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iSpell == plr[myplr]._pRSpell
-        && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
-        return 1;
-    }
-
-    return 0;
-}
-
-void StartGoldDrop(void)
-{
-    initialDropGoldIndex = _pcursinvitem[sel_data];
-    if (_pcursinvitem[sel_data] < 0x2F /* INVITEM_INV_LAST+1 */)
-        initialDropGoldValue = plr[myplr].InvList[_pcursinvitem[sel_data] - 7 /* INVITEM_INV_FIRST */]._ivalue;
+    if (ItemNo < 0x32)
+        TData = InvPanelTData;
     else
-        initialDropGoldValue = plr[myplr].SpdList[_pcursinvitem[sel_data] - 0x2F /* INVITEM_BELT_FIRST */]._ivalue;
-    dropGoldFlag = 1;
-    dropGoldValue = 0;
-}
+        TData = InvGfxTData;
 
-long CalculateGold(int pnum)
-{
-    int i;
-    long gold;
+    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x80, ItemY - InvBackY + 0x20, 0, itemot, 0);
 
-    gold = 0;
-    for (i = 0; i < MAXBELTITEMS; i++) {
-        if (plr[pnum].SpdList[i]._itype == ITYPE_GOLD) {
-            gold += plr[pnum].SpdList[i]._ivalue;
-            force_redraw = 255;
-        }
-    }
-    for (i = 0; i < plr[pnum]._pNumInv; i++) {
-        if (plr[pnum].InvList[i]._itype == ITYPE_GOLD)
-            gold += plr[pnum].InvList[i]._ivalue;
-    }
+    setShadeTex(Ft4, 0);
+    setSemiTrans(Ft4, TransFlag);
 
-    return gold;
-}
-
-void RemoveInvItem(int pnum, int iv)
-{
-    int i, j;
-
-    iv++;
-
-    for (i = 0; i < 40 /* NUM_INV_GRID_ELEM */; i++) {
-        if (plr[pnum].InvGrid[i] == iv || plr[pnum].InvGrid[i] == -iv) {
-            plr[pnum].InvGrid[i] = 0;
-        }
-    }
-
-    iv--;
-    plr[pnum]._pNumInv--;
-
-    if (plr[pnum]._pNumInv > 0 && plr[pnum]._pNumInv != iv) {
-        plr[pnum].InvList[iv] = plr[pnum].InvList[plr[pnum]._pNumInv];
-
-        for (j = 0; j < 40 /* NUM_INV_GRID_ELEM */; j++) {
-            if (plr[pnum].InvGrid[j] == plr[pnum]._pNumInv + 1) {
-                plr[pnum].InvGrid[j] = iv + 1;
-            }
-            if (plr[pnum].InvGrid[j] == -(plr[pnum]._pNumInv + 1)) {
-                plr[pnum].InvGrid[j] = -(iv + 1);
-            }
-        }
-    }
-
-    CalcPlrScrolls(pnum);
-
-    if (plr[pnum]._pRSplType == 2 /* RSPLTYPE_SCROLL */) {
-        if (plr[pnum]._pRSpell != -1 /* SPL_INVALID */) {
-            if (!(plr[pnum]._pScrlSpells & (1 << (plr[pnum]._pRSpell - 1)))) {
-                plr[pnum]._pRSpell = -1;
-            }
-            force_redraw = 255;
-        }
+    if (StatFlag) {
+        setRGB0(Ft4, 0x80, 0x80, 0x80);
+    } else {
+        setRGB0(Ft4, 0x80, 0, 0);
     }
 }
 
-void RemoveScroll(int pnum)
+void InvDrawSlots(void)
 {
+    int Bx, By;
     int i;
 
-    for (i = 0; i < plr[pnum]._pNumInv; i++) {
-        if (plr[pnum].InvList[i]._itype != ITYPE_NONE
-            && (plr[pnum].InvList[i]._iMiscId == IMISC_SCROLL || plr[pnum].InvList[i]._iMiscId == IMISC_SCROLLT)
-            && plr[pnum].InvList[i]._iSpell == plr[pnum]._pSpell) {
-            RemoveInvItem(pnum, i);
-            CalcPlrScrolls(pnum);
-            return;
-        }
+    CursGlow += CursGlowDx;
+    if (CursGlow > 0) {
+        CursGlow = 0;
+        CursGlowDx = -8;
     }
-    for (i = 0; i < MAXBELTITEMS; i++) {
-        if (plr[pnum].SpdList[i]._itype != ITYPE_NONE
-            && (plr[pnum].SpdList[i]._iMiscId == IMISC_SCROLL || plr[pnum].SpdList[i]._iMiscId == IMISC_SCROLLT)
-            && plr[pnum].SpdList[i]._iSpell == plr[pnum]._pSpell) {
-            RemoveSpdBarItem(pnum, i);
-            CalcPlrScrolls(pnum);
-            return;
-        }
+    if (CursGlow < -0x7F) {
+        CursGlow = -0x7F;
+        CursGlowDx = 8;
+    }
+
+    Bx = InvRect[0].X;
+    By = InvRect[0].Y;
+    InvDrawSlot(Bx, By, 0x5C);
+    InvDrawSlotBack(Bx, By, 0x20, 0x20, InvSlotTable[0]);
+
+    Bx = InvRect[4].X;
+    By = InvRect[4].Y;
+    InvDrawSlot(Bx, By, 0x5B);
+    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[4]);
+
+    Bx = InvRect[5].X;
+    By = InvRect[5].Y;
+    InvDrawSlot(Bx, By, 0x5B);
+    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[5]);
+
+    Bx = InvRect[6].X;
+    By = InvRect[6].Y;
+    InvDrawSlot(Bx, By, 0x5B);
+    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[6]);
+
+    Bx = InvRect[7].X;
+    By = InvRect[7].Y;
+    InvDrawSlot(Bx, By, 0x5D);
+    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[7]);
+
+    Bx = InvRect[13].X;
+    By = InvRect[13].Y;
+    InvDrawSlot(Bx, By, 0x5D);
+    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[13]);
+
+    Bx = InvRect[19].X;
+    By = InvRect[19].Y;
+    InvDrawSlot(Bx, By, 0x5D);
+    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[19]);
+
+    InvDrawSlot(InvRect[25].X, InvRect[25].Y, 0x5F);
+    for (i = 0; i < 40; i++) {
+        Bx = InvRect[i + 25].X;
+        By = InvRect[i + 25].Y;
+        InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[i + 25]);
+    }
+
+    InvDrawSlot(InvRect[65].X, InvRect[65].Y, 0x5E);
+    for (i = 0; i < 8; i++) {
+        Bx = InvRect[i + 65].X;
+        By = InvRect[i + 65].Y;
+        InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[i + 65]);
     }
 }
 
-unsigned char TryInvPut(void)
+void PrintStat(int Y, int Txt0, char *Txt1, unsigned char Col)
 {
-    int Dist;
+    char *str;
 
-    if (numitems >= 0x7A /* MAXITEMS */) {
-        PlaySFX(0x3D3);
-        return 0;
-    }
-
-    if (CanPut(plr[myplr]._px, plr[myplr]._py))
-        return 1;
-
-    Dist = 1;
-    {
-        for (int d = 0; d < 8; d++) {
-            int dir;
-            if (CanPut(plr[myplr]._px + offset_x[d] * Dist, plr[myplr]._py + offset_y[d] * Dist))
-                return 1;
-        }
-    }
-    return 0;
+    str = GetStr(Txt0);
+    MediumFont.Print(0, Y, str, JustLeft, &BRect, WHITER, WHITEG, WHITEG);
+    MediumFont.Print(0, Y, Txt1, JustRight, &BRect, WHITER, WHITEG, WHITEG);
 }
 
-void DoTelekinesis(void)
+void DrawInvStats(void)
 {
-    if (_pcursobj[sel_data] != -1)
-        NetSendCmdParam1(1, 0x1B /* CMD_OPOBJT */, _pcursobj[sel_data]);
-    if (_pcursitem[sel_data] != -1)
-        NetSendCmdGItem(1, 0x28 /* CMD_REQUESTAGITEM */, myplr, myplr, _pcursitem[sel_data]);
-    if (_pcursmonst[sel_data] != -1 && !M_Talker(_pcursmonst[sel_data]) && monster[_pcursmonst[sel_data]].mtalkmsg == 0)
-        NetSendCmdParam1(1, 0x1C /* CMD_KNOCKBACK */, _pcursmonst[sel_data]);
-    NewCursor(CURSOR_HAND);
+    Dialog InvBack;
+    char c;
+    char chrstr[10];
+    long mind, maxd;
+    int hper, ac;
+
+    InvBack.SetOTpos(0xF9);
+    InvBack.SetBack(5);
+    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    InvBack.Back(0xA, 0x20, 0x74, 0xB0);
+
+    BRect.x = 0xB;
+    BRect.y = 0x20;
+    BRect.w = 0x72;
+    BRect.h = 0xB0;
+
+    c = plr[options_pad]._pStrength > plr[options_pad]._pBaseStr;
+    if (plr[options_pad]._pStrength < plr[options_pad]._pBaseStr)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pStrength);
+    PrintStat(0xC, 0x419, chrstr, c);
+
+    c = plr[options_pad]._pMagic > plr[options_pad]._pBaseMag;
+    if (plr[options_pad]._pMagic < plr[options_pad]._pBaseMag)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pMagic);
+    PrintStat(0x19, 0x26F, chrstr, c);
+
+    c = plr[options_pad]._pDexterity > plr[options_pad]._pBaseDex;
+    if (plr[options_pad]._pDexterity < plr[options_pad]._pBaseDex)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pDexterity);
+    PrintStat(0x26, 0xFF, chrstr, c);
+
+    c = plr[options_pad]._pVitality > plr[options_pad]._pBaseVit;
+    if (plr[options_pad]._pVitality < plr[options_pad]._pBaseVit)
+        c = 2;
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pVitality);
+    PrintStat(0x32, 0x4B7, chrstr, c);
+
+    c = plr[options_pad]._pIBonusToHit > 0;
+    if (plr[options_pad]._pIBonusToHit < 0)
+        c = 2;
+    hper = 50 + (plr[options_pad]._pDexterity >> 1) + plr[options_pad]._pIBonusToHit;
+    sprintf(chrstr, GetStr(0x503), hper);
+    PrintStat(0x40, 0x495, chrstr, c);
+
+    c = plr[options_pad]._pIBonusDam > 0;
+    if (plr[options_pad]._pIBonusDam < 0)
+        c = 2;
+    mind = plr[options_pad]._pIMinDam;
+    mind += mind * plr[options_pad]._pIBonusDam / 100;
+    mind += plr[options_pad]._pIBonusDamMod;
+    if (plr[options_pad].InvBody[4]._itype == 3) {
+        if (plr[options_pad]._pClass == 1)
+            mind += plr[options_pad]._pDamageMod;
+        else
+            mind += plr[options_pad]._pDamageMod >> 1;
+    } else {
+        mind += plr[options_pad]._pDamageMod;
+    }
+    maxd = plr[options_pad]._pIMaxDam;
+    maxd += maxd * plr[options_pad]._pIBonusDam / 100;
+    maxd += plr[options_pad]._pIBonusDamMod;
+    if (plr[options_pad].InvBody[4]._itype == 3) {
+        if (plr[options_pad]._pClass == 1)
+            maxd += plr[options_pad]._pDamageMod;
+        else
+            maxd += plr[options_pad]._pDamageMod >> 1;
+    } else {
+        maxd += plr[options_pad]._pDamageMod;
+    }
+    sprintf(chrstr, GetStr(0x501), mind, maxd);
+    PrintStat(0x4D, 0xE1, chrstr, c);
+
+    c = plr[options_pad]._pMaxHP > plr[options_pad]._pMaxHPBase;
+    if (plr[options_pad]._pHitPoints != plr[options_pad]._pMaxHP)
+        c = 2;
+    sprintf(chrstr, "%i/%i", plr[options_pad]._pHitPoints >> 6, plr[options_pad]._pMaxHP >> 6);
+    PrintStat(0x5C, 0x24D, chrstr, c);
+
+    c = plr[options_pad]._pMaxMana > plr[options_pad]._pMaxManaBase;
+    if (plr[options_pad]._pMana != plr[options_pad]._pMaxMana)
+        c = 2;
+    sprintf(chrstr, "%i/%i", plr[options_pad]._pMana >> 6, plr[options_pad]._pMaxMana >> 6);
+    PrintStat(0x68, 0x27A, chrstr, c);
+
+    c = plr[options_pad]._pIBonusAC > 0;
+    if (plr[options_pad]._pIBonusAC < 0)
+        c = 2;
+    ac = plr[options_pad]._pIAC + plr[options_pad]._pIBonusAC + (short)(plr[options_pad]._pDexterity / 5);
+    sprintf(chrstr, GetStr(0x4FD), ac);
+    PrintStat(0x75, 0x2A, chrstr, c);
+
+    c = plr[options_pad]._pMagResist != 0;
+    if (plr[options_pad]._pMagResist < 0x4B) {
+        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pMagResist);
+    } else {
+        c = 3;
+        sprintf(chrstr, GetStr(0x285));
+    }
+    PrintStat(0x84, 0x273, chrstr, c);
+
+    c = plr[options_pad]._pFireResist != 0;
+    if (plr[options_pad]._pFireResist < 0x4B) {
+        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pFireResist);
+    } else {
+        c = 3;
+        sprintf(chrstr, GetStr(0x285));
+    }
+    PrintStat(0x91, 0x157, chrstr, c);
+
+    c = plr[options_pad]._pLghtResist != 0;
+    if (plr[options_pad]._pLghtResist < 0x4B) {
+        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pLghtResist);
+    } else {
+        c = 3;
+        sprintf(chrstr, GetStr(0x285));
+    }
+    PrintStat(0x9E, 0x254, chrstr, c);
+
+    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pGold);
+    PrintStat(0xAC, 0x191, chrstr, 0);
 }
 
-void InvGetItem(int pnum, int ii)
+void DrawInvBack(void)
 {
-    int j, jj;
+    Dialog InvBack;
 
-    if (dropGoldFlag) {
-        dropGoldFlag = 0;
-        dropGoldValue = 0;
-    }
+    InvBack.SetOTpos(backot);
+    InvBack.SetBack(5);
+    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    InvBack.Back(0x80, -InvBackY + 0x80, 0xB0, 0xBE);
+    InvBack.Back(0x80, -InvBackY + 0x20, 0xB0, 0x5E);
+}
 
-    if (dung_map[item[ii]._ix][item[ii]._iy].dItem != 0) {
-        if (myplr == pnum && _pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */)
-            NetSendCmdPItem(1, 0x56 /* CMD_SYNCPUTITEM */, plr[myplr]._px, plr[myplr]._py);
-        item[ii]._iCreateInfo &= 0x7FFF /* ~CF_PREGEN */;
-        plr[pnum].HoldItem = item[ii];
-        CheckQuestItem(pnum);
-        CheckBookLevel(pnum);
-        CheckItemStats(pnum);
-        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
-        j = 0;
-        while (j < numitems) {
-            jj = itemactive[j];
-            if (jj == ii) {
-                DeleteItem(jj, j);
-                j = 0;
+void DrawInvCursor(void)
+{
+    int ItemX, ItemY;
+    int LoopX, LoopY;
+    struct POLY_FT4 *Ft4;
+    struct TextDat *TData;
+
+    ItemH = 1;
+    ItemW = 1;
+
+    if (_pcurs[myplr] >= 12) {
+        if (plr[myplr].HoldItem._itype != ITYPE_NONE) {
+            if (plr[myplr].HoldItem._itype == ITYPE_GOLD) {
+                int GoldAmount = plr[myplr].HoldItem._ivalue;
+                if (GoldAmount >= 2500)
+                    plr[myplr].HoldItem._iCurs = 6;
+                else if (GoldAmount <= 1000)
+                    plr[myplr].HoldItem._iCurs = 4;
+                else
+                    plr[myplr].HoldItem._iCurs = 5;
+            }
+
+            ItemNo = plr[myplr].HoldItem._iCurs;
+            ItemW = InvItemWidth[ItemNo + 12] >> 4;
+            ItemH = InvItemHeight[ItemNo + 12] >> 4;
+            ItemX = InvRect[InvCursPos].X;
+            ItemY = InvRect[InvCursPos].Y;
+
+            if (ItemNo < 0x32)
+                TData = InvPanelTData;
+            else
+                TData = InvGfxTData;
+
+            if (InvCursPos == 7 || InvCursPos == 0x13 || InvCursPos == 0xD) {
+                if (ItemW == 1)
+                    ItemX += 8;
+                if (ItemH == 1)
+                    ItemY += 0x10;
+                if (ItemH == 2)
+                    ItemY += 8;
+            }
+
+            Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x7A, ItemY - InvBackY + 0x1A, 0, itemot + 1, 0);
+            Ft4->code = Ft4->code & 0xFC;
+            if (plr[myplr].HoldItem._iStatFlag) {
+                Ft4->r0 = 0x80;
+                Ft4->g0 = 0x80;
+                Ft4->b0 = 0x80;
             } else {
-                j++;
+                Ft4->r0 = 0x80;
+                Ft4->g0 = 0;
+                Ft4->b0 = 0;
             }
+
+            Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x82, ItemY - InvBackY + 0x22, 0, itemot + 1, 0);
+            Ft4->r0 = 0x10;
+            Ft4->g0 = 0x10;
+            Ft4->b0 = 0x10;
+            Ft4->code = (Ft4->code | 2) & 0xFE;
+
+            InvSlotTable[InvCursPos] |= 2;
         }
-        _pcursitem[sel_data] = -1;
-        NewCursor(plr[pnum].HoldItem._iCurs + 12 /* ICSTART */);
+    } else {
+        if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+            InvSetItemCurs();
+            InvGetItemWH(InvCursPos - 25);
+        }
+        if (InvCursPos >= 0x41) {
+            ItemH = 1;
+            ItemW = 1;
+        }
+        for (LoopY = 0; LoopY < ItemH; LoopY++) {
+            for (LoopX = 0; LoopX < ItemW; LoopX++)
+                InvSlotTable[InvCursPos + LoopX + LoopY * 10] = 2;
+        }
+
+        if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4) {
+            switch (InvCursPos) {
+            case 0:
+                ItemW = 2;
+                ItemH = 2;
+                break;
+            case 4:
+            case 5:
+            case 6:
+                ItemW = 1;
+                ItemH = 1;
+                break;
+            case 7:
+            case 13:
+            case 19:
+                ItemW = 2;
+                ItemH = 3;
+                break;
+            default:
+                ItemW = 1;
+                ItemH = 1;
+                InvGetItemWH(InvCursPos - 25);
+                break;
+            }
+
+            ItemX = InvRect[InvCursPos].X + 8;
+            ItemY = InvRect[InvCursPos].Y + 8;
+            if (ItemW == 2)
+                ItemX = InvRect[InvCursPos].X + 0x10;
+            if (ItemH == 2)
+                ItemY = InvRect[InvCursPos].Y + 0x10;
+            if (ItemH == 3)
+                ItemY += 0x10;
+
+            InvGfxTData->PrintFt4(_pcurs[myplr] - 2, ItemX + 0x80, ItemY - InvBackY + 0x20, 0, 0x100, 0);
+        }
+    }
+
+    if (InvCursPos >= 0x19) {
+        for (LoopY = 0; LoopY < ItemH; LoopY++) {
+            for (LoopX = 0; LoopX < ItemW; LoopX++)
+                InvSlotTable[InvCursPos + LoopX + LoopY * 10] |= 2;
+        }
     }
 }
 
-unsigned char DropItemBeforeTrig(void)
+void DrawInvMsg(void)
 {
-    if (TryInvPut()) {
-        NetSendCmdPItem(1, CMD_PUTITEM, cursmx, cursmy);
-        NewCursor(CURSOR_HAND);
-        return 1;
+    struct POLY_FT4 *Ft4;
+    RECT InfoRect;
+    int InfoY;
+    int InfoW;
+    int InfoH;
+    Dialog InvBack;
+    int OldOt;
+
+    OldOt = MediumFont.SetOTpos(0xFA);
+    MediumFont.SetOTpos(OldOt - 1);
+    PRIM_FullScreen(OldOt);
+
+    InfoY = 0x80;
+    InfoW = 0xB0;
+    InfoH = 0x50;
+    InfoRect.x = InfoY;
+    InfoRect.y = InfoY + 1;
+    InfoRect.w = InfoW;
+    InfoRect.h = InfoH - 2;
+    if (invflag)
+        DrawInfoBox(&InfoRect);
+
+    InvBack.SetOTpos(0xF9);
+    InvBack.SetBack(5);
+    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    InvBack.Back(0x80, 0x80, 0xB0, InfoH);
+
+    Ft4 = InvPanelTData->PrintFt4(0x94, 0, 0, 0, OldOt, 0);
+
+    Ft4->x0 = 0x80;
+    Ft4->y0 = 0x80;
+    Ft4->x1 = 0x80 + 0xB0;
+    Ft4->y1 = 0x80;
+    Ft4->x2 = 0x80;
+    Ft4->y2 = 0x80 + 0x50;
+    Ft4->x3 = 0x80 + 0xB0;
+    Ft4->y3 = 0x80 + 0x50;
+    Ft4->tpage |= 0x40;
+    Ft4->u1 = Ft4->u0 + 1;
+    Ft4->u3 = Ft4->u0 + 1;
+    Ft4->v2 = Ft4->v0 + 1;
+    Ft4->v3 = Ft4->v0 + 1;
+    Ft4->code = (Ft4->code | 2) & 0xFE;
+    Ft4->r0 = 0x20;
+    Ft4->g0 = 0x20;
+    Ft4->b0 = 0x20;
+    MediumFont.SetOTpos(OldOt);
+
+    PRIM_Clip(&InfoRect, OldOt);
+}
+
+void DrawInvHelpTxt(void)
+{
+    char TempStr[128];
+
+    TempStr[0] = 0;
+    if (LANG_GetLang() == 1) {
+        if (_pcurs[myplr] == 2)
+            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x208));
+        else if (_pcurs[myplr] == 3)
+            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x35A));
+        else if (_pcurs[myplr] == 4)
+            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x34C));
+        else if (_pcurs[myplr] >= 0xC)
+            sprintf(TempStr, "%s  < %s", GetStr(0x4E6), GetStr(0x11D));
+        else
+            sprintf(TempStr, "%s", GetStr(0x4E6));
+    } else {
+        if (_pcurs[myplr] == 2)
+            sprintf(TempStr, "_ %s  %s", GetStr(0x208), GetStr(0x331));
+        else if (_pcurs[myplr] == 3)
+            sprintf(TempStr, "_ %s  %s", GetStr(0x35A), GetStr(0x331));
+        else if (_pcurs[myplr] == 4)
+            sprintf(TempStr, "_ %s  %s", GetStr(0x34C), GetStr(0x331));
+        else if (_pcurs[myplr] >= 0xC)
+            sprintf(TempStr, "< %s  %s", GetStr(0x11D), GetStr(0x4E6));
+        else
+            sprintf(TempStr, "%s", GetStr(0x4E6));
     }
 
-    return 0;
+    if (InvBackY == 0) {
+        MediumFont.SetChar(0x2E, 0x80);
+        sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x2FE));
+    } else {
+        MediumFont.SetChar(0x2E, 0x7F);
+        sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x132));
+    }
+
+    if (InvPageFlag)
+        sprintf(TempStr, "%s  | %s ", TempStr, GetStr(0x2A4));
+
+    MediumFont.Print(0, 0xE0, TempStr, JustCentre, NULL, WHITER, WHITEG, WHITEB);
+    MediumFont.SetChar(0x2E, 0x6D);
+}
+
+static BOOL InvOn = 0;
+static unsigned long sgdwLastTime = 0;
+
+void DrawInv(void)
+{
+    if (InvOn == 0) {
+        InvOn = 1;
+        InvPageFlag = 0;
+        InvPageNo = 0;
+        TSK_AddTask(0, DrawInvTSK, 0x1000, 0);
+    }
+}
+
+void DrawInvTSK(struct TASK *T)
+{
+    int omp;
+    int osel;
+    CBlocks *BgBlocks;
+    int ThisIsShit;
+    int OldPad;
+
+    omp = myplr;
+    osel = sel_data;
+    if (!invflag || options_pad == -1) {
+        InvOn = 0;
+        invflag = 0;
+        options_pad = -1;
+        return;
+    }
+
+    myplr = options_pad;
+    PAD_GetPad(options_pad, 0)->Flush();
+    CDWAIT = 1;
+    PauseMode = 1;
+    GLUE_SuspendGame();
+    if (sghMusic) {
+        while (sghMusic->sec_num < 4) {
+            PauseMode = 1;
+            GLUE_SuspendGame();
+            TSK_Sleep(1);
+        }
+    }
+    GLUE_SetShowPanelFlag(0);
+    TSK_Sleep(1);
+    stream_stop();
+    while (SFXTab[1].used) {
+        stream_stop();
+        TSK_Sleep(1);
+    }
+    GLUE_SuspendGame();
+    GLUE_SetShowGameScreenFlag(0);
+    TSK_Sleep(1);
+    VID_SetDBuffer(1);
+    if (_spselflag[0])
+        TSK_Kill(_spselflag[0]);
+    if (_spselflag[1])
+        TSK_Kill(_spselflag[1]);
+    _spselflag[0] = 0;
+    _spselflag[1] = 0;
+    _trigflag[sel_data] = 0;
+    ClrCursor(0);
+    ClrCursor(1);
+    BgBlocks = BL_GetCurrentBlocks();
+    if (leveltype == 0)
+        BgBlocks->DumpMonsters();
+    if (!InvGfxTData)
+        InvGfxTData = GM_UseTexData(0xCF);
+    if (_pcurs[myplr] == 9)
+        _pcurs[myplr] = 1;
+    InvSetItemCurs();
+    ThisIsShit = 1;
+    VID_SetDBuffer(0);
+    TSK_Sleep(1);
+    CDWAIT = 0;
+    PauseMode = 0;
+    OldPad = options_pad;
+
+    while (ThisIsShit) {
+        ThisIsShit = 0;
+        options_pad = OldPad;
+        invflag = 1;
+        while (invflag && options_pad >= 0) {
+            int OldOt = MediumFont.SetOTpos(0xFC);
+            myplr = options_pad;
+            sel_data = options_pad;
+            ControlInv();
+            if (options_pad != -1) {
+                myplr = options_pad;
+                sel_data = options_pad;
+                DoThatDrawInv();
+            }
+            MediumFont.SetOTpos(OldOt);
+            GLUE_SuspendGame();
+            TSK_Sleep(1);
+            if (plr[options_pad]._pHitPoints >> 6 <= 0) {
+                PostGamePad(5, 0, 0, 0);
+                options_pad = -1;
+                break;
+            }
+        }
+
+        if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4)
+            _pcurs[myplr] = 1;
+
+        /* Retail SLD/JAP render: the TryInvPut-success arm has its own
+           NetSendCmdPItem call, cross-jumped by jump2 into the later copy.
+           The extra sched1-visible insns keep omp/osel in one allocation
+           priority bucket, so omp=s6/osel=s7 with the retail restore order. */
+        if (_pcurs[myplr] >= 0xC) {
+            if (!TryInvPut()) {
+                if (!StoreAutoPlace()) {
+                    if (numitems < 0x7A)
+                        NetSendCmdPItem(1, 0xA, 0, 0);
+                    else {
+                        PlaySFX(0x3D3);
+                        ThisIsShit = 1;
+                    }
+                }
+            } else
+                NetSendCmdPItem(1, 0xA, 0, 0);
+        }
+    }
+
+    ClearPanel();
+    stream_stop();
+    while (SFXTab[1].used) {
+        stream_stop();
+        TSK_Sleep(1);
+    }
+    VID_SetDBuffer(1);
+    CDWAIT = 1;
+    PauseMode = 1;
+    GM_FinishedUsing(InvGfxTData);
+    InvGfxTData = 0;
+    if (leveltype != 0) {
+        GM_ForceTpLoad(0xD0);
+    } else {
+        BgBlocks->SetTownersGraphics();
+        GM_ForceTpLoad(0xCD);
+    }
+    CDWAIT = 0;
+    PauseMode = 0;
+    VID_SetDBuffer(0);
+    ClearPanel();
+    InvOn = 0;
+    if (options_pad >= 0 && ScrollFlag[options_pad]) {
+        PostGamePad(5, 0, 0, 0);
+        options_pad = -1;
+    } else {
+        _pcurs[myplr] = 1;
+    }
+    ClrCursor(0);
+    ClrCursor(1);
+    myplr = omp;
+    sel_data = osel;
+    invflag = 0;
+    GLUE_ResumeGame();
+    GLUE_SetShowPanelFlag(1);
+    GLUE_SetShowGameScreenFlag(1);
+    GLUE_SetHomingScrollFlag(1);
+}
+void DoThatDrawInv(void)
+{
+    int Loop;
+    int ii;
+    int ItemX, ItemY, ItemNo;
+    struct RECT ClipRect;
+
+    PRIM_FullScreen(0xFB);
+    InvPageFlag = 0;
+    GLUE_SetShowGameScreenFlag(0);
+    GLUE_SetShowPanelFlag(0);
+
+    for (Loop = 0; Loop < 0x49; Loop++)
+        InvSlotTable[Loop] = 0;
+
+    DrawInvBack();
+
+    ClipRect.x = 0x7E;
+    ClipRect.y = 0x1E;
+    ClipRect.w = 0xB8;
+    ClipRect.h = 0x60;
+    PRIM_Clip(&ClipRect, clipit);
+
+    DrawInvStats();
+    DrawInvMsg();
+    DrawInvHelpTxt();
+
+    if (plr[myplr].InvBody[0]._itype != -1) {
+        InvSlotTable[0] = 1;
+        ItemX = InvRect[0].X;
+        ItemY = InvRect[0].Y;
+        ItemNo = plr[myplr].InvBody[0]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[0]._iStatFlag == 1, 0);
+    }
+
+    if (plr[myplr].InvBody[1]._itype != -1) {
+        InvSlotTable[4] = 1;
+        ItemX = InvRect[4].X;
+        ItemY = InvRect[4].Y;
+        ItemNo = plr[myplr].InvBody[1]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[1]._iStatFlag == 1, 0);
+    }
+
+    if (plr[myplr].InvBody[2]._itype != -1) {
+        InvSlotTable[5] = 1;
+        ItemX = InvRect[5].X;
+        ItemY = InvRect[5].Y;
+        ItemNo = plr[myplr].InvBody[2]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[2]._iStatFlag == 1, 0);
+    }
+
+    if (plr[myplr].InvBody[3]._itype != -1) {
+        InvSlotTable[6] = 1;
+        ItemX = InvRect[6].X;
+        ItemY = InvRect[6].Y;
+        ItemNo = plr[myplr].InvBody[3]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[3]._iStatFlag == 1, 0);
+    }
+
+    if (plr[myplr].InvBody[4]._itype != -1) {
+        InvSlotTable[7] = 1;
+        ItemX = InvRect[7].X;
+        ItemY = InvRect[7].Y;
+        ItemNo = plr[myplr].InvBody[4]._iCurs;
+        if (InvItemWidth[ItemNo + 12] == 0x10)
+            ItemX = ItemX + 8;
+        if (InvItemHeight[ItemNo + 12] == 0x20)
+            ItemY = ItemY + 8;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[4]._iStatFlag == 1, 0);
+
+        if (plr[myplr].InvBody[4]._iLoc == ILOC_TWOHAND) {
+            InvSlotTable[13] = 1;
+            ItemNo = plr[myplr].InvBody[4]._iCurs;
+            ItemX = InvRect[13].X;
+            ItemY = InvRect[13].Y;
+            if (InvItemWidth[ItemNo + 12] == 0x10)
+                ItemX = ItemX + 8;
+            if (InvItemHeight[ItemNo + 12] == 0x20)
+                ItemY = ItemY + 8;
+            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[5]._iStatFlag == 1, 1);
+        }
+    }
+
+    if (plr[myplr].InvBody[5]._itype != -1) {
+        InvSlotTable[13] = 1;
+        ItemNo = plr[myplr].InvBody[5]._iCurs;
+        ItemX = InvRect[13].X;
+        ItemY = InvRect[13].Y;
+        if (InvItemWidth[ItemNo + 12] == 0x10)
+            ItemX = ItemX + 8;
+        if (InvItemHeight[ItemNo + 12] == 0x20)
+            ItemY = ItemY + 8;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[5]._iStatFlag == 1, 0);
+    }
+
+    if (plr[myplr].InvBody[6]._itype != -1) {
+        InvSlotTable[19] = 1;
+        ItemX = InvRect[19].X;
+        ItemY = InvRect[19].Y;
+        ItemNo = plr[myplr].InvBody[6]._iCurs;
+        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[6]._iStatFlag == 1, 0);
+    }
+
+    for (Loop = 0; Loop < 40; Loop++) {
+        InvSlotTable[25 + Loop] = plr[myplr].InvGrid[Loop] != 0;
+        ii = plr[myplr].InvGrid[Loop];
+        if (ii > 0 && ii <= plr[myplr]._pNumInv) {
+            ii--;
+            ItemX = InvRect[25 + Loop].X;
+            ItemY = InvRect[25 + Loop].Y;
+            ItemNo = plr[myplr].InvList[ii]._iCurs;
+            ItemY += 0x10 - InvItemHeight[ItemNo + 12];
+            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvList[ii]._iStatFlag == 1, 0);
+        }
+    }
+
+    for (Loop = 0; Loop < 8; Loop++) {
+        if (plr[myplr].SpdList[Loop]._itype != -1) {
+            InvSlotTable[65 + Loop] = 1;
+            ItemX = InvRect[65 + Loop].X;
+            ItemY = InvRect[65 + Loop].Y;
+            ItemNo = plr[myplr].SpdList[Loop]._iCurs;
+            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].SpdList[Loop]._iStatFlag == 1, 0);
+        }
+    }
+
+    DrawInvCursor();
+    InvDrawSlots();
 }
 
 unsigned char AutoPlace(int pnum, int ii, int sx, int sy, unsigned char saveflag)
@@ -583,1343 +1128,6 @@ int SwapItem(ItemStruct *a, ItemStruct *b)
     *b = h;
 
     return h._iCurs + 12 /* CURSOR_FIRSTITEM */;
-}
-
-void InvGetItemWH(int Pos)
-{
-    if (plr[myplr].InvGrid[Pos] == 0)
-        return;
-    if (plr[myplr].InvGrid[Pos] > 0)
-        ItemNo = plr[myplr].InvGrid[Pos];
-    else
-        ItemNo = -plr[myplr].InvGrid[Pos];
-    ItemNo = plr[myplr].InvList[ItemNo - 1]._iCurs;
-    ItemW = InvItemWidth[ItemNo + 12] >> 4;
-    ItemH = InvItemHeight[ItemNo + 12] >> 4;
-}
-
-void InvAlignObject(void)
-{
-    if (InvCursPos < 25 || InvCursPos > 64)
-        return;
-    if (_pcurs[myplr] < 12)
-        return;
-
-    ItemNo = plr[myplr].HoldItem._iCurs;
-    ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
-    ItemH = (InvItemHeight[ItemNo + 12] >> 4) - 1;
-
-    if (InvCursPos >= 25 && InvCursPos <= 34 && InvCursPos + ItemW > 34)
-        InvCursPos = 34 - ItemW;
-    if (InvCursPos >= 35 && InvCursPos <= 44 && InvCursPos + ItemW > 44)
-        InvCursPos = 44 - ItemW;
-    if (InvCursPos >= 45 && InvCursPos <= 54 && InvCursPos + ItemW > 54)
-        InvCursPos = 54 - ItemW;
-    if (InvCursPos >= 55 && InvCursPos <= 64 && InvCursPos + ItemW > 64)
-        InvCursPos = 64 - ItemW;
-    while (InvCursPos + ItemH * 10 > 64)
-        InvCursPos -= 10;
-}
-
-unsigned char UseInvItem(int pnum, int cii)
-{
-    int c;
-    int idata;
-    int it;
-    ItemStruct *Item;
-    unsigned char speedlist;
-
-    if (plr[pnum]._pInvincible && plr[pnum]._pHitPoints == 0 && pnum == myplr)
-        return 1;
-    if (_pcurs[myplr] != CURSOR_HAND)
-        return 1;
-    if (stextflag)
-        return 1;
-    if (cii < 6)
-        return 0;
-
-    if (cii < 0x2F) {
-        c = cii - 7;
-        Item = &plr[pnum].InvList[c];
-        speedlist = 0;
-    } else {
-        if (talkflag)
-            return 1;
-        c = cii - 0x2F;
-        Item = &plr[pnum].SpdList[c];
-        speedlist = 1;
-    }
-
-    it = Item->IDidx;
-    switch (it) {
-    case 0x11 /* IDI_MUSHROOM */:
-        sfxdelay = 10;
-        if (plr[pnum]._pClass == 0)
-            sfxdnum = 0x331;
-        else if (plr[pnum]._pClass == 1)
-            sfxdnum = 0x2C3;
-        else if (plr[pnum]._pClass == 2)
-            sfxdnum = 0x25B;
-        return 1;
-    case 0x13 /* IDI_FUNGALTM */:
-        PlaySFX(0x1C /* IS_IBOOK */);
-        sfxdelay = 10;
-        if (plr[pnum]._pClass == 0)
-            sfxdnum = 0x2EE;
-        else if (plr[pnum]._pClass == 1)
-            sfxdnum = 0x280;
-        else if (plr[pnum]._pClass == 2)
-            sfxdnum = 0x218;
-        return 1;
-    }
-
-    if (!AllItemsUseable[it])
-        return 0;
-
-    if (!Item->_iStatFlag) {
-        if (plr[pnum]._pClass == 0)
-            PlaySFX(0x2D8);
-        else if (plr[pnum]._pClass == 1)
-            PlaySFX(0x270);
-        else if (plr[pnum]._pClass == 2)
-            PlaySFX(0x208);
-        return 1;
-    }
-
-    if (Item->_iMiscId == 0 && Item->_itype == ITYPE_GOLD) {
-        StartGoldDrop();
-        return 1;
-    }
-    if (dropGoldFlag) {
-        dropGoldFlag = 0;
-        dropGoldValue = 0;
-    }
-
-    if ((Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) && gbMaxPlayers == 2
-        && Item->_iSpell == 0x20 && plr[pnum ^ 1].plractive)
-        return 0;
-    if ((Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) && currlevel == 0
-        && !spelldata[Item->_iSpell].sTownSpell) {
-        if (plr[pnum]._pClass == 0)
-            PlaySFX(0x2EC);
-        else if (plr[pnum]._pClass == 1)
-            PlaySFX(0x27E);
-        else if (plr[pnum]._pClass == 2)
-            PlaySFX(0x216);
-        return 0;
-    }
-
-    idata = ItemCAnimTbl[Item->_iCurs];
-    if (Item->_iMiscId == IMISC_BOOK)
-        PlaySFX(0x2E /* IS_RBOOK */);
-    else if (pnum == myplr)
-        PlaySFX(ItemInvSnds[idata]);
-
-    UseItem(pnum, Item->_iMiscId, Item->_iSpell);
-
-    if (speedlist) {
-        RemoveSpdBarItem(pnum, c);
-        return 1;
-    } else {
-        if (plr[pnum].InvList[c]._iMiscId == 0x2A)
-            return 1;
-        RemoveInvItem(pnum, c);
-    }
-    return 1;
-}
-
-void CheckQuestItem(int pnum)
-{
-    if (plr[pnum].HoldItem.IDidx == 0xA /* IDI_OPTAMULET */) {
-        quests[8]._qactive = 3 /* QUEST_DONE */;
-        quests[8].pad_for_laz = 1;
-    }
-
-    if (plr[pnum].HoldItem.IDidx == 0x11 /* IDI_MUSHROOM */) {
-        quests[1].pad_for_laz = 1;
-        if (quests[1]._qactive == 2 /* QUEST_ACTIVE */ && quests[1]._qvar1 == 3 /* QS_MUSHSPAWNED */) {
-            sfxdelay = 10;
-            if (plr[pnum]._pClass == 0)
-                sfxdnum = 0x331;
-            else if (plr[pnum]._pClass == 1)
-                sfxdnum = 0x2C3;
-            else if (plr[pnum]._pClass == 2)
-                sfxdnum = 0x25B;
-            quests[1]._qvar1 = 4 /* QS_MUSHPICKED */;
-        }
-        NetSendCmdQuest(1, 1);
-    }
-
-    if (plr[pnum].HoldItem.IDidx == 0x10 /* IDI_ANVIL */) {
-        quests[10].pad_for_laz = 1;
-        if (quests[10]._qactive == 1) {
-            quests[10]._qactive = 2;
-            quests[10]._qvar1 = 1;
-        }
-        if (quests[10]._qlog == 1) {
-            sfxdelay = 10;
-            if (plr[myplr]._pClass == 0)
-                sfxdnum = 0x32B;
-            else if (plr[myplr]._pClass == 1)
-                sfxdnum = 0x2BD;
-            else if (plr[myplr]._pClass == 2)
-                sfxdnum = 0x255;
-        }
-        NetSendCmdQuest(1, 0xA);
-    }
-
-    if (plr[pnum].HoldItem.IDidx == 0xF /* IDI_GLDNELIX */) {
-        if (quests[4]._qactive != 3 /* QUEST_DONE */) {
-            sfxdelay = 0x1E;
-            if (plr[myplr]._pClass == 0)
-                sfxdnum = 0x32A;
-            else if (plr[myplr]._pClass == 1)
-                sfxdnum = 0x2BC;
-            else if (plr[myplr]._pClass == 2)
-                sfxdnum = 0x254;
-        }
-    }
-
-    if (plr[pnum].HoldItem.IDidx == 0x9 /* IDI_ROCK */) {
-        quests[0].pad_for_laz = 1;
-        if (quests[0]._qactive == 1) {
-            quests[0]._qactive = 2;
-            quests[0]._qvar1 = 2;
-        }
-        if (quests[0]._qlog == 1) {
-            sfxdelay = 10;
-            if (plr[myplr]._pClass == 0)
-                sfxdnum = 0x329;
-            else if (plr[myplr]._pClass == 1)
-                sfxdnum = 0x2BB;
-            else if (plr[myplr]._pClass == 2)
-                sfxdnum = 0x253;
-        }
-        NetSendCmdQuest(1, 0);
-    }
-
-    if (plr[pnum].HoldItem.IDidx == 0x1C /* IDI_ARMOFVAL */) {
-        quests[9].pad_for_laz = 1;
-        quests[9]._qactive = 3 /* QUEST_DONE */;
-        NetSendCmdQuest(1, 9);
-        sfxdelay = 0x14;
-        if (plr[myplr]._pClass == 0)
-            sfxdnum = 0x32D;
-        else if (plr[myplr]._pClass == 1)
-            sfxdnum = 0x2BF;
-        else if (plr[myplr]._pClass == 2)
-            sfxdnum = 0x257;
-    }
-}
-
-char CheckInvHLight(void)
-{
-    int r;
-    char rv;
-    ItemStruct *pi;
-    PlayerStruct *p;
-
-    r = InvCursPos;
-    if (r >= 0x49)
-        return -1;
-
-    _infoclr[sel_data] = 0;
-    p = &plr[myplr];
-    ClearPanel();
-    rv = -1;
-    pi = NULL;
-    if (_pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */) {
-        pi = &p->HoldItem;
-    } else if (r >= 0 && r <= 3) {
-        rv = 0;
-        pi = &p->InvBody[0];
-    } else if (r == 4) {
-        rv = 1;
-        pi = &p->InvBody[1];
-    } else if (r == 5) {
-        rv = 2;
-        pi = &p->InvBody[2];
-    } else if (r == 6) {
-        rv = 3;
-        pi = &p->InvBody[3];
-    } else if (r >= 7 && r <= 12) {
-        rv = 4;
-        pi = &p->InvBody[4];
-    } else if (r >= 13 && r <= 18) {
-        pi = &p->InvBody[4];
-        if (pi->_itype != ITYPE_NONE && pi->_iLoc == ILOC_TWOHAND) {
-            rv = 4;
-        } else {
-            rv = 5;
-            pi = &p->InvBody[5];
-        }
-    } else if (r >= 19 && r <= 24) {
-        rv = 6;
-        pi = &p->InvBody[6];
-    } else if (r >= 25 && r <= 64) {
-        r = abs(p->InvGrid[r - 25]);
-        if (r == 0)
-            return -1;
-        r--;
-        rv = r + 7;
-        pi = &p->InvList[r];
-    } else if (r >= 0x41) {
-        r -= 0x41;
-        pi = &p->SpdList[r];
-        drawsbarflag = 1;
-        if (pi->_itype == ITYPE_NONE)
-            return -1;
-        rv = r + 0x2F;
-    }
-
-    if (pi->_itype == ITYPE_NONE)
-        return -1;
-
-    if (pi->_itype == ITYPE_GOLD) {
-        int nGold = pi->_ivalue;
-        sprintf(_infostr[sel_data], GetStr(0x4FF), nGold, get_pieces_str(nGold));
-    } else {
-        if (invflag) {
-            if (!pi->_iStatFlag)
-                _infoclr[sel_data] = 2;
-            else if (pi->_iMagical == 1)
-                _infoclr[sel_data] = 1;
-            else if (pi->_iMagical == 2)
-                _infoclr[sel_data] = 3;
-        } else {
-            if (pi->_iMagical == 1)
-                _infoclr[sel_data] = 1;
-            else if (pi->_iMagical == 2)
-                _infoclr[sel_data] = 3;
-        }
-
-        strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iName, 0x100));
-        if (pi->_iIdentified) {
-            strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iIName, 0x100));
-            PrintItemDetails(pi);
-        } else {
-            PrintItemDur(pi);
-        }
-    }
-
-    return rv;
-}
-
-void AutoGetItem(int pnum, int ii)
-{
-    int i, g;
-    int w, h;
-    int idx;
-    unsigned char done;
-
-    if (dropGoldFlag) {
-        dropGoldFlag = 0;
-        dropGoldValue = 0;
-    }
-
-    if (ii != 0x7F /* MAXITEMS */) {
-        if (dung_map[item[ii]._ix][item[ii]._iy].dItem == 0)
-            return;
-    }
-
-    item[ii]._iCreateInfo &= 0x7FFF /* ~CF_PREGEN */;
-    plr[pnum].HoldItem = item[ii];
-    CheckQuestItem(pnum);
-    CheckBookLevel(pnum);
-    CheckItemStats(pnum);
-    SetICursor(plr[pnum].HoldItem._iCurs + 12 /* CURSOR_FIRSTITEM */);
-    PlaySFX(0x32);
-    if (plr[pnum].HoldItem._itype == ITYPE_GOLD) {
-        done = GoldAutoPlace(pnum);
-    } else {
-        done = 0;
-        g = plr[pnum]._pgfxnum & 0xF;
-        if ((g == 0 /* ANIM_ID_UNARMED */ || g == 1 /* ANIM_ID_UNARMED_SHIELD */)
-            && plr[pnum]._pmode <= 3 /* PM_WALK3 */) {
-            if (plr[pnum].HoldItem._iStatFlag) {
-                if (plr[pnum].HoldItem._iClass == ICLASS_WEAPON) {
-                    done = WeaponAutoPlace(pnum);
-                    if (done)
-                        CalcPlrInv(pnum, 1);
-                }
-            }
-        }
-        if (!done) {
-            w = icursW28;
-            h = icursH28;
-            if (w == 1 && h == 1) {
-                idx = plr[pnum].HoldItem.IDidx;
-                if (plr[pnum].HoldItem._iStatFlag && AllItemsUseable[idx]) {
-                    for (i = 0; i < MAXBELTITEMS && !done; i++) {
-                        if (plr[pnum].SpdList[i]._itype == ITYPE_NONE) {
-                            plr[pnum].SpdList[i] = plr[pnum].HoldItem;
-                            CalcPlrScrolls(pnum);
-                            drawsbarflag = 1;
-                            done = 1;
-                        }
-                    }
-                }
-                for (i = 30; i <= 39 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 20; i <= 29 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 10; i <= 19 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 0; i <= 9 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-            }
-            if (w == 1 && h == 2) {
-                for (i = 29; i >= 20 && !done; i--) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 9; i >= 0 && !done; i--) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 19; i >= 10 && !done; i--) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-            }
-            if (w == 1 && h == 3) {
-                for (i = 0; i < 20 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-            }
-            if (w == 2 && h == 2) {
-                for (i = 0; i < 10 && !done; i++) {
-                    done = AutoPlace(pnum, AP2x2Tbl[i], w, h, 1);
-                }
-                for (i = 21; i < 29 && !done; i += 2) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 1; i < 9 && !done; i += 2) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 10; i < 19 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-            }
-            if (w == 2 && h == 3) {
-                for (i = 0; i < 9 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-                for (i = 10; i < 19 && !done; i++) {
-                    done = AutoPlace(pnum, i, w, h, 1);
-                }
-            }
-        }
-    }
-    if (done) {
-        int j, jj;
-
-        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
-        j = 0;
-        while (j < numitems) {
-            jj = itemactive[j];
-            if (jj == ii) {
-                DeleteItem(jj, j);
-                j = 0;
-            } else {
-                j++;
-            }
-        }
-    } else {
-        if (pnum == myplr) {
-            if (plr[pnum]._pClass == 0)
-                PlaySFX(ENG_random(3) + 0x2D9);
-            else if (plr[pnum]._pClass == 1)
-                PlaySFX(ENG_random(3) + 0x271);
-            else if (plr[pnum]._pClass == 2)
-                PlaySFX(ENG_random(3) + 0x209);
-        }
-        plr[pnum].HoldItem = item[ii];
-        RespawnItem(ii, 1);
-        NetSendCmdPItem(1, 0xB /* CMD_RESPAWNITEM */, item[ii]._ix, item[ii]._iy);
-        plr[pnum].HoldItem._itype = ITYPE_NONE;
-    }
-}
-
-int InvPutItem(int pnum, int x, int y)
-{
-    int ii;
-    unsigned char done;
-
-    if (numitems >= 0x7A) {
-        PlaySFX(0x3D3);
-        return -1;
-    }
-
-    if (FindGetItem(plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed) != -1) {
-        SyncGetItem(x, y, plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed);
-    }
-
-    done = 0;
-    x = plr[myplr]._px;
-    y = plr[myplr]._py;
-    if (!CanPut(x, y)) {
-        for (int Dist = 1; Dist < 8 && !done; Dist++) {
-            for (int d = 0; d < 8 && !done; d++) {
-                x = plr[myplr]._px + offset_x[d] * Dist;
-                y = plr[myplr]._py + offset_y[d] * Dist;
-                if (CanPut(x, y))
-                    done = 1;
-            }
-        }
-    }
-    if (!CanPut(x, y))
-        return -1;
-
-    ii = itemavail[0];
-    dung_map[x][y].dItem = ii + 1;
-    itemavail[0] = itemavail[0x7E - numitems];
-    itemactive[numitems] = ii;
-    item[ii] = plr[pnum].HoldItem;
-    item[ii]._ix = x;
-    item[ii]._iy = y;
-    RespawnItem(ii, 1);
-    numitems++;
-    NewCursor(CURSOR_HAND);
-    PlaySFX(0x1F);
-    return ii;
-}
-
-void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed)
-{
-    int ii;
-
-    if (dung_map[x][y].dItem) {
-        ii = dung_map[x][y].dItem - 1;
-        if (item[ii].IDidx == idx && item[ii]._iSeed == iseed && item[ii]._iCreateInfo == ci) {
-            /* ii already correct */
-        } else {
-            ii = FindGetItem(idx, ci, iseed);
-        }
-    } else {
-        ii = FindGetItem(idx, ci, iseed);
-    }
-
-    if (ii != -1) {
-        int j, jj;
-
-        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
-        j = 0;
-        while (j < numitems) {
-            jj = itemactive[j];
-            if (jj == ii) {
-                DeleteItem(jj, j);
-                j = 0;
-            } else {
-                j++;
-            }
-        }
-    }
-}
-
-int SyncPutItem(int pnum, int x, int y, int idx, unsigned short icreateinfo, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, unsigned long ibuff)
-{
-    int ii;
-    int d;
-    int dy;
-
-    if (numitems >= 0x7A) {
-        PlaySFX(0x3D3);
-        return -1;
-    }
-
-    if (FindGetItem(idx, icreateinfo, iseed) != -1) {
-        SyncGetItem(x, y, idx, icreateinfo, iseed);
-    }
-
-    d = GetDirection(plr[pnum]._px, plr[pnum]._py, x, y);
-    dy = y - plr[pnum]._py;
-    if (abs(x - plr[pnum]._px) > 1 || abs(dy) > 1) {
-        x = plr[pnum]._px + offset_x[d];
-        y = plr[pnum]._py + offset_y[d];
-    }
-    if (!CanPut(x, y)) {
-        d = (d - 1) & 7;
-        x = plr[pnum]._px + offset_x[d];
-        y = plr[pnum]._py + offset_y[d];
-        if (!CanPut(x, y)) {
-            d = (d + 2) & 7;
-            x = plr[pnum]._px + offset_x[d];
-            y = plr[pnum]._py + offset_y[d];
-            if (!CanPut(x, y)) {
-                unsigned char done = 0;
-                for (int l = 1; l < 50 && !done; l++) {
-                    for (int j = -l; j <= l && !done; j++) {
-                        int yy = plr[pnum]._py + j;
-                        for (int i = -l; i <= l && !done; i++) {
-                            int xx = plr[pnum]._px + i;
-                            if (CanPut(xx, yy)) {
-                                done = 1;
-                                x = xx;
-                                y = yy;
-                            }
-                        }
-                    }
-                }
-                if (!done)
-                    return -1;
-            }
-        }
-    }
-
-    ii = itemavail[0];
-    dung_map[x][y].dItem = ii + 1;
-    itemavail[0] = itemavail[0x7E - numitems];
-    itemactive[numitems] = ii;
-
-    if (idx == 0x17) {
-        RecreateEar(ii, icreateinfo, iseed, Id, dur, mdur, ch, mch, ivalue, ibuff);
-    } else {
-        RecreateItem(ii, idx, icreateinfo, iseed, ivalue, ibuff);
-        if (Id)
-            item[ii]._iIdentified = 1;
-        item[ii]._iDurability = dur;
-        item[ii]._iMaxDur = mdur;
-        item[ii]._iCharges = ch;
-        item[ii]._iMaxCharges = mch;
-    }
-
-    item[ii]._ix = x;
-    item[ii]._iy = y;
-    RespawnItem(ii, 1);
-    numitems++;
-    return ii;
-}
-
-void InvSetItemCurs(void)
-{
-    int ItemNo;
-
-    if (plr[myplr].InvGrid[InvCursPos - 25] == 0)
-        return;
-    if (_pcurs[myplr] >= 12)
-        return;
-    if ((unsigned int)(InvCursPos - 25) >= 40)
-        return;
-
-    ItemNo = plr[myplr].InvGrid[InvCursPos - 25];
-    if (InvCursPos >= 26) {
-        while (plr[myplr].InvGrid[InvCursPos - 26] == ItemNo || plr[myplr].InvGrid[InvCursPos - 26] == -ItemNo) {
-            InvCursPos--;
-        }
-    }
-
-    if (InvCursPos >= 35) {
-        while (plr[myplr].InvGrid[InvCursPos - 35] == ItemNo || plr[myplr].InvGrid[InvCursPos - 35] == -ItemNo) {
-            if (InvCursPos < 35)
-                break;
-            InvCursPos -= 10;
-        }
-    }
-
-    if (InvCursPos < 25)
-        InvCursPos = 25;
-}
-
-void InvMoveCursLeft(void)
-{
-    int ItemInc = 0;
-    int OldPos;
-
-    OldPos = InvCursPos;
-
-    if (_pcurs[myplr] < 12) {
-        switch (InvCursPos) {
-        case 0:
-        case 4:
-        case 6:
-            InvCursPos = 7;
-            break;
-        case 5:
-            InvCursPos = 19;
-            break;
-        case 7:
-            InvCursPos = 13;
-            break;
-        case 13:
-            InvCursPos = 5;
-            break;
-        case 19:
-            InvCursPos = 4;
-            break;
-        default:
-            if ((unsigned int)(InvCursPos - 25) < 40 || InvCursPos >= 0x41)
-                ItemInc = 1;
-            break;
-        }
-    } else {
-        switch (InvCursPos) {
-        case 0:
-        case 6:
-        case 19:
-            break;
-        case 4:
-            InvCursPos = 5;
-            break;
-        case 5:
-            InvCursPos = 4;
-            break;
-        case 7:
-            InvCursPos = 13;
-            break;
-        case 13:
-            InvCursPos = 7;
-            break;
-        default:
-            if ((unsigned int)(InvCursPos - 25) < 40 || InvCursPos >= 0x41)
-                ItemInc = 1;
-            break;
-        }
-    }
-
-    if ((unsigned int)(InvCursPos - 25) < 40) {
-        InvCursPos -= ItemInc;
-        if ((InvCursPos - 25) % 10 == 9 || (InvCursPos - 25) % 10 == -1) {
-            InvCursPos += 10;
-        }
-    } else if (InvCursPos < 0x41) {
-        /* nothing */
-    } else if (InvCursPos < 0x42) {
-        InvCursPos = InvCursPos + 7;
-    } else {
-        InvCursPos = InvCursPos - ItemInc;
-    }
-
-    InvSetItemCurs();
-    if (OldPos != InvCursPos)
-        PlaySFX(0x32);
-}
-
-void InvMoveCursRight(void)
-{
-    int ItemInc;
-    int OldPos;
-
-    OldPos = InvCursPos;
-    ItemInc = 0;
-
-    if (_pcurs[myplr] < 12) {
-        switch (InvCursPos) {
-        case 0:
-            InvCursPos = 6;
-            break;
-        case 4:
-            InvCursPos = 19;
-            break;
-        case 5:
-        case 6:
-            InvCursPos = 13;
-            break;
-        case 7:
-            InvCursPos = 4;
-            break;
-        case 13:
-            InvCursPos = 7;
-            break;
-        case 19:
-            InvCursPos = 5;
-            break;
-        default:
-            if ((unsigned int)(InvCursPos - 25) < 40) {
-                ItemInc = 1;
-                if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
-                    InvGetItemWH(InvCursPos - 25);
-                    ItemInc = ItemW;
-                }
-            } else if (InvCursPos >= 0x41) {
-                ItemInc = 1;
-            }
-            break;
-        }
-    } else {
-        switch (InvCursPos) {
-        case 0:
-        case 6:
-        case 19:
-            break;
-        case 4:
-            InvCursPos = 5;
-            break;
-        case 5:
-            InvCursPos = 4;
-            break;
-        case 7:
-            InvCursPos = 13;
-            break;
-        case 13:
-            InvCursPos = 7;
-            break;
-        default:
-            if ((unsigned int)(InvCursPos - 25) < 40)
-                ItemInc = 1;
-            else if (InvCursPos >= 0x41)
-                ItemInc = 1;
-            break;
-        }
-    }
-
-    if ((unsigned int)(InvCursPos - 25) < 40) {
-        if (_pcurs[myplr] >= 12) {
-            ItemNo = plr[myplr].HoldItem._iCurs;
-            ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
-        } else {
-            ItemW = 0;
-        }
-
-        InvCursPos = InvCursPos + ItemInc;
-        if ((InvCursPos - 25 + ItemW) % 10 == 0) {
-            InvCursPos += ItemW - 10;
-        }
-    } else if (InvCursPos >= 0x41) {
-        if (InvCursPos < 0x48) {
-            InvCursPos = InvCursPos + ItemInc;
-        } else {
-            InvCursPos = InvCursPos - 7;
-        }
-    }
-
-    InvSetItemCurs();
-    if (OldPos != InvCursPos)
-        PlaySFX(0x32);
-}
-
-void InvMoveCursUp(void)
-{
-    int ItemInc = 0;
-    int OldPos;
-
-    OldPos = InvCursPos;
-
-    if (_pcurs[myplr] < 12) {
-        switch (InvCursPos) {
-        case 0:
-            break;
-        case 5:
-            InvCursPos = 6;
-            break;
-        case 4:
-        case 6:
-        case 7:
-            InvCursPos = 0;
-            break;
-        case 13:
-            InvCursPos = 6;
-            break;
-        case 19:
-            InvCursPos = 6;
-            break;
-        default:
-            if ((unsigned int)(InvCursPos - 25) < 40) {
-                if (InvCursPos < 35)
-                    InvCursPos = 19;
-                else
-                    ItemInc = 1;
-            } else if (InvCursPos >= 0x41) {
-                InvCursPos -= 9;
-            }
-            break;
-        }
-    } else {
-        switch (InvCursPos) {
-        case 0:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 13:
-        case 19:
-            break;
-        default:
-            if ((unsigned int)(InvCursPos - 25) < 40)
-                ItemInc = 1;
-            else if (InvCursPos >= 0x41)
-                InvCursPos -= 9;
-            break;
-        }
-    }
-
-    if ((unsigned int)(InvCursPos - 25) < 40 && ItemInc != 0) {
-        if (InvCursPos < 35) {
-            switch (plr[myplr].HoldItem._iLoc) {
-            case 1:
-                InvCursPos = 7;
-                break;
-            case ILOC_TWOHAND:
-                InvCursPos = 7;
-                break;
-            case 3:
-                InvCursPos = 19;
-                break;
-            case 4:
-                InvCursPos = 0;
-                break;
-            case 5:
-                InvCursPos = 4;
-                break;
-            case 6:
-                InvCursPos = 6;
-                break;
-            case 7:
-            case 8:
-                break;
-            }
-        } else {
-            InvCursPos = InvCursPos - 10;
-        }
-    }
-
-    InvSetItemCurs();
-    if (OldPos != InvCursPos)
-        PlaySFX(0x32);
-}
-
-void InvDrawSlots(void)
-{
-    int Bx, By;
-    int i;
-
-    CursGlow += CursGlowDx;
-    if (CursGlow > 0) {
-        CursGlow = 0;
-        CursGlowDx = -8;
-    }
-    if (CursGlow < -0x7F) {
-        CursGlow = -0x7F;
-        CursGlowDx = 8;
-    }
-
-    Bx = InvRect[0].X;
-    By = InvRect[0].Y;
-    InvDrawSlot(Bx, By, 0x5C);
-    InvDrawSlotBack(Bx, By, 0x20, 0x20, InvSlotTable[0]);
-
-    Bx = InvRect[4].X;
-    By = InvRect[4].Y;
-    InvDrawSlot(Bx, By, 0x5B);
-    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[4]);
-
-    Bx = InvRect[5].X;
-    By = InvRect[5].Y;
-    InvDrawSlot(Bx, By, 0x5B);
-    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[5]);
-
-    Bx = InvRect[6].X;
-    By = InvRect[6].Y;
-    InvDrawSlot(Bx, By, 0x5B);
-    InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[6]);
-
-    Bx = InvRect[7].X;
-    By = InvRect[7].Y;
-    InvDrawSlot(Bx, By, 0x5D);
-    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[7]);
-
-    Bx = InvRect[13].X;
-    By = InvRect[13].Y;
-    InvDrawSlot(Bx, By, 0x5D);
-    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[13]);
-
-    Bx = InvRect[19].X;
-    By = InvRect[19].Y;
-    InvDrawSlot(Bx, By, 0x5D);
-    InvDrawSlotBack(Bx, By, 0x20, 0x30, InvSlotTable[19]);
-
-    InvDrawSlot(InvRect[25].X, InvRect[25].Y, 0x5F);
-    for (i = 0; i < 40; i++) {
-        Bx = InvRect[i + 25].X;
-        By = InvRect[i + 25].Y;
-        InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[i + 25]);
-    }
-
-    InvDrawSlot(InvRect[65].X, InvRect[65].Y, 0x5E);
-    for (i = 0; i < 8; i++) {
-        Bx = InvRect[i + 65].X;
-        By = InvRect[i + 65].Y;
-        InvDrawSlotBack(Bx, By, 0x10, 0x10, InvSlotTable[i + 65]);
-    }
-}
-
-void DrawInvCursor(void)
-{
-    int ItemX, ItemY;
-    int LoopX, LoopY;
-    struct POLY_FT4 *Ft4;
-    struct TextDat *TData;
-
-    ItemH = 1;
-    ItemW = 1;
-
-    if (_pcurs[myplr] >= 12) {
-        if (plr[myplr].HoldItem._itype != ITYPE_NONE) {
-            if (plr[myplr].HoldItem._itype == ITYPE_GOLD) {
-                int GoldAmount = plr[myplr].HoldItem._ivalue;
-                if (GoldAmount >= 2500)
-                    plr[myplr].HoldItem._iCurs = 6;
-                else if (GoldAmount <= 1000)
-                    plr[myplr].HoldItem._iCurs = 4;
-                else
-                    plr[myplr].HoldItem._iCurs = 5;
-            }
-
-            ItemNo = plr[myplr].HoldItem._iCurs;
-            ItemW = InvItemWidth[ItemNo + 12] >> 4;
-            ItemH = InvItemHeight[ItemNo + 12] >> 4;
-            ItemX = InvRect[InvCursPos].X;
-            ItemY = InvRect[InvCursPos].Y;
-
-            if (ItemNo < 0x32)
-                TData = InvPanelTData;
-            else
-                TData = InvGfxTData;
-
-            if (InvCursPos == 7 || InvCursPos == 0x13 || InvCursPos == 0xD) {
-                if (ItemW == 1)
-                    ItemX += 8;
-                if (ItemH == 1)
-                    ItemY += 0x10;
-                if (ItemH == 2)
-                    ItemY += 8;
-            }
-
-            Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x7A, ItemY - InvBackY + 0x1A, 0, D_8011C304 + 1, 0);
-            Ft4->code = Ft4->code & 0xFC;
-            if (plr[myplr].HoldItem._iStatFlag) {
-                Ft4->r0 = 0x80;
-                Ft4->g0 = 0x80;
-                Ft4->b0 = 0x80;
-            } else {
-                Ft4->r0 = 0x80;
-                Ft4->g0 = 0;
-                Ft4->b0 = 0;
-            }
-
-            Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x82, ItemY - InvBackY + 0x22, 0, D_8011C304 + 1, 0);
-            Ft4->r0 = 0x10;
-            Ft4->g0 = 0x10;
-            Ft4->b0 = 0x10;
-            Ft4->code = (Ft4->code | 2) & 0xFE;
-
-            InvSlotTable[InvCursPos] |= 2;
-        }
-    } else {
-        if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
-            InvSetItemCurs();
-            InvGetItemWH(InvCursPos - 25);
-        }
-        if (InvCursPos >= 0x41) {
-            ItemH = 1;
-            ItemW = 1;
-        }
-        for (LoopY = 0; LoopY < ItemH; LoopY++) {
-            for (LoopX = 0; LoopX < ItemW; LoopX++)
-                InvSlotTable[InvCursPos + LoopX + LoopY * 10] = 2;
-        }
-
-        if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4) {
-            switch (InvCursPos) {
-            case 0:
-                ItemW = 2;
-                ItemH = 2;
-                break;
-            case 4:
-            case 5:
-            case 6:
-                ItemW = 1;
-                ItemH = 1;
-                break;
-            case 7:
-            case 13:
-            case 19:
-                ItemW = 2;
-                ItemH = 3;
-                break;
-            default:
-                ItemW = 1;
-                ItemH = 1;
-                InvGetItemWH(InvCursPos - 25);
-                break;
-            }
-
-            ItemX = InvRect[InvCursPos].X + 8;
-            ItemY = InvRect[InvCursPos].Y + 8;
-            if (ItemW == 2)
-                ItemX = InvRect[InvCursPos].X + 0x10;
-            if (ItemH == 2)
-                ItemY = InvRect[InvCursPos].Y + 0x10;
-            if (ItemH == 3)
-                ItemY += 0x10;
-
-            InvGfxTData->PrintFt4(_pcurs[myplr] - 2, ItemX + 0x80, ItemY - InvBackY + 0x20, 0, 0x100, 0);
-        }
-    }
-
-    if (InvCursPos >= 0x19) {
-        for (LoopY = 0; LoopY < ItemH; LoopY++) {
-            for (LoopX = 0; LoopX < ItemW; LoopX++)
-                InvSlotTable[InvCursPos + LoopX + LoopY * 10] |= 2;
-        }
-    }
-}
-void DoThatDrawInv(void)
-{
-    int Loop;
-    int ii;
-    int ItemX, ItemY, ItemNo;
-    struct RECT ClipRect;
-
-    PRIM_FullScreen(0xFB);
-    InvPageFlag = 0;
-    GLUE_SetShowGameScreenFlag(0);
-    GLUE_SetShowPanelFlag(0);
-
-    for (Loop = 0; Loop < 0x49; Loop++)
-        InvSlotTable[Loop] = 0;
-
-    DrawInvBack();
-
-    ClipRect.x = 0x7E;
-    ClipRect.y = 0x1E;
-    ClipRect.w = 0xB8;
-    ClipRect.h = 0x60;
-    PRIM_Clip(&ClipRect, D_8011C2F4);
-
-    DrawInvStats();
-    DrawInvMsg();
-    DrawInvHelpTxt();
-
-    if (plr[myplr].InvBody[0]._itype != -1) {
-        InvSlotTable[0] = 1;
-        ItemX = InvRect[0].X;
-        ItemY = InvRect[0].Y;
-        ItemNo = plr[myplr].InvBody[0]._iCurs;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[0]._iStatFlag == 1, 0);
-    }
-
-    if (plr[myplr].InvBody[1]._itype != -1) {
-        InvSlotTable[4] = 1;
-        ItemX = InvRect[4].X;
-        ItemY = InvRect[4].Y;
-        ItemNo = plr[myplr].InvBody[1]._iCurs;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[1]._iStatFlag == 1, 0);
-    }
-
-    if (plr[myplr].InvBody[2]._itype != -1) {
-        InvSlotTable[5] = 1;
-        ItemX = InvRect[5].X;
-        ItemY = InvRect[5].Y;
-        ItemNo = plr[myplr].InvBody[2]._iCurs;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[2]._iStatFlag == 1, 0);
-    }
-
-    if (plr[myplr].InvBody[3]._itype != -1) {
-        InvSlotTable[6] = 1;
-        ItemX = InvRect[6].X;
-        ItemY = InvRect[6].Y;
-        ItemNo = plr[myplr].InvBody[3]._iCurs;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[3]._iStatFlag == 1, 0);
-    }
-
-    if (plr[myplr].InvBody[4]._itype != -1) {
-        InvSlotTable[7] = 1;
-        ItemX = InvRect[7].X;
-        ItemY = InvRect[7].Y;
-        ItemNo = plr[myplr].InvBody[4]._iCurs;
-        if (InvItemWidth[ItemNo + 12] == 0x10)
-            ItemX = ItemX + 8;
-        if (InvItemHeight[ItemNo + 12] == 0x20)
-            ItemY = ItemY + 8;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[4]._iStatFlag == 1, 0);
-
-        if (plr[myplr].InvBody[4]._iLoc == ILOC_TWOHAND) {
-            InvSlotTable[13] = 1;
-            ItemNo = plr[myplr].InvBody[4]._iCurs;
-            ItemX = InvRect[13].X;
-            ItemY = InvRect[13].Y;
-            if (InvItemWidth[ItemNo + 12] == 0x10)
-                ItemX = ItemX + 8;
-            if (InvItemHeight[ItemNo + 12] == 0x20)
-                ItemY = ItemY + 8;
-            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[5]._iStatFlag == 1, 1);
-        }
-    }
-
-    if (plr[myplr].InvBody[5]._itype != -1) {
-        InvSlotTable[13] = 1;
-        ItemNo = plr[myplr].InvBody[5]._iCurs;
-        ItemX = InvRect[13].X;
-        ItemY = InvRect[13].Y;
-        if (InvItemWidth[ItemNo + 12] == 0x10)
-            ItemX = ItemX + 8;
-        if (InvItemHeight[ItemNo + 12] == 0x20)
-            ItemY = ItemY + 8;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[5]._iStatFlag == 1, 0);
-    }
-
-    if (plr[myplr].InvBody[6]._itype != -1) {
-        InvSlotTable[19] = 1;
-        ItemX = InvRect[19].X;
-        ItemY = InvRect[19].Y;
-        ItemNo = plr[myplr].InvBody[6]._iCurs;
-        InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvBody[6]._iStatFlag == 1, 0);
-    }
-
-    for (Loop = 0; Loop < 40; Loop++) {
-        InvSlotTable[25 + Loop] = plr[myplr].InvGrid[Loop] != 0;
-        ii = plr[myplr].InvGrid[Loop];
-        if (ii > 0 && ii <= plr[myplr]._pNumInv) {
-            ii--;
-            ItemX = InvRect[25 + Loop].X;
-            ItemY = InvRect[25 + Loop].Y;
-            ItemNo = plr[myplr].InvList[ii]._iCurs;
-            ItemY += 0x10 - InvItemHeight[ItemNo + 12];
-            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].InvList[ii]._iStatFlag == 1, 0);
-        }
-    }
-
-    for (Loop = 0; Loop < 8; Loop++) {
-        if (plr[myplr].SpdList[Loop]._itype != -1) {
-            InvSlotTable[65 + Loop] = 1;
-            ItemX = InvRect[65 + Loop].X;
-            ItemY = InvRect[65 + Loop].Y;
-            ItemNo = plr[myplr].SpdList[Loop]._iCurs;
-            InvDrawItem(ItemX, ItemY, ItemNo, plr[myplr].SpdList[Loop]._iStatFlag == 1, 0);
-        }
-    }
-
-    DrawInvCursor();
-    InvDrawSlots();
-}
-
-void DrawInvStats(void)
-{
-    Dialog InvBack;
-    char c;
-    char chrstr[10];
-    long mind, maxd;
-    int hper, ac;
-
-    InvBack.SetOTpos(0xF9);
-    InvBack.SetBack(5);
-    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
-    InvBack.Back(0xA, 0x20, 0x74, 0xB0);
-
-    BRect.x = 0xB;
-    BRect.y = 0x20;
-    BRect.w = 0x72;
-    BRect.h = 0xB0;
-
-    c = plr[options_pad]._pStrength > plr[options_pad]._pBaseStr;
-    if (plr[options_pad]._pStrength < plr[options_pad]._pBaseStr)
-        c = 2;
-    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pStrength);
-    PrintStat(0xC, 0x419, chrstr, c);
-
-    c = plr[options_pad]._pMagic > plr[options_pad]._pBaseMag;
-    if (plr[options_pad]._pMagic < plr[options_pad]._pBaseMag)
-        c = 2;
-    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pMagic);
-    PrintStat(0x19, 0x26F, chrstr, c);
-
-    c = plr[options_pad]._pDexterity > plr[options_pad]._pBaseDex;
-    if (plr[options_pad]._pDexterity < plr[options_pad]._pBaseDex)
-        c = 2;
-    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pDexterity);
-    PrintStat(0x26, 0xFF, chrstr, c);
-
-    c = plr[options_pad]._pVitality > plr[options_pad]._pBaseVit;
-    if (plr[options_pad]._pVitality < plr[options_pad]._pBaseVit)
-        c = 2;
-    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pVitality);
-    PrintStat(0x32, 0x4B7, chrstr, c);
-
-    c = plr[options_pad]._pIBonusToHit > 0;
-    if (plr[options_pad]._pIBonusToHit < 0)
-        c = 2;
-    hper = 50 + (plr[options_pad]._pDexterity >> 1) + plr[options_pad]._pIBonusToHit;
-    sprintf(chrstr, GetStr(0x503), hper);
-    PrintStat(0x40, 0x495, chrstr, c);
-
-    c = plr[options_pad]._pIBonusDam > 0;
-    if (plr[options_pad]._pIBonusDam < 0)
-        c = 2;
-    mind = plr[options_pad]._pIMinDam;
-    mind += mind * plr[options_pad]._pIBonusDam / 100;
-    mind += plr[options_pad]._pIBonusDamMod;
-    if (plr[options_pad].InvBody[4]._itype == 3) {
-        if (plr[options_pad]._pClass == 1)
-            mind += plr[options_pad]._pDamageMod;
-        else
-            mind += plr[options_pad]._pDamageMod >> 1;
-    } else {
-        mind += plr[options_pad]._pDamageMod;
-    }
-    maxd = plr[options_pad]._pIMaxDam;
-    maxd += maxd * plr[options_pad]._pIBonusDam / 100;
-    maxd += plr[options_pad]._pIBonusDamMod;
-    if (plr[options_pad].InvBody[4]._itype == 3) {
-        if (plr[options_pad]._pClass == 1)
-            maxd += plr[options_pad]._pDamageMod;
-        else
-            maxd += plr[options_pad]._pDamageMod >> 1;
-    } else {
-        maxd += plr[options_pad]._pDamageMod;
-    }
-    sprintf(chrstr, GetStr(0x501), mind, maxd);
-    PrintStat(0x4D, 0xE1, chrstr, c);
-
-    c = plr[options_pad]._pMaxHP > plr[options_pad]._pMaxHPBase;
-    if (plr[options_pad]._pHitPoints != plr[options_pad]._pMaxHP)
-        c = 2;
-    sprintf(chrstr, "%li/%li", plr[options_pad]._pHitPoints >> 6, plr[options_pad]._pMaxHP >> 6);
-    PrintStat(0x5C, 0x24D, chrstr, c);
-
-    c = plr[options_pad]._pMaxMana > plr[options_pad]._pMaxManaBase;
-    if (plr[options_pad]._pMana != plr[options_pad]._pMaxMana)
-        c = 2;
-    sprintf(chrstr, "%li/%li", plr[options_pad]._pMana >> 6, plr[options_pad]._pMaxMana >> 6);
-    PrintStat(0x68, 0x27A, chrstr, c);
-
-    c = plr[options_pad]._pIBonusAC > 0;
-    if (plr[options_pad]._pIBonusAC < 0)
-        c = 2;
-    ac = plr[options_pad]._pIAC + plr[options_pad]._pIBonusAC + (short)(plr[options_pad]._pDexterity / 5);
-    sprintf(chrstr, GetStr(0x4FD), ac);
-    PrintStat(0x75, 0x2A, chrstr, c);
-
-    c = plr[options_pad]._pMagResist != 0;
-    if (plr[options_pad]._pMagResist < 0x4B) {
-        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pMagResist);
-    } else {
-        c = 3;
-        sprintf(chrstr, GetStr(0x285));
-    }
-    PrintStat(0x84, 0x273, chrstr, c);
-
-    c = plr[options_pad]._pFireResist != 0;
-    if (plr[options_pad]._pFireResist < 0x4B) {
-        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pFireResist);
-    } else {
-        c = 3;
-        sprintf(chrstr, GetStr(0x285));
-    }
-    PrintStat(0x91, 0x157, chrstr, c);
-
-    c = plr[options_pad]._pLghtResist != 0;
-    if (plr[options_pad]._pLghtResist < 0x4B) {
-        sprintf(chrstr, GetStr(0x503), plr[options_pad]._pLghtResist);
-    } else {
-        c = 3;
-        sprintf(chrstr, GetStr(0x285));
-    }
-    PrintStat(0x9E, 0x254, chrstr, c);
-
-    sprintf(chrstr, GetStr(0x4FD), plr[options_pad]._pGold);
-    PrintStat(0xAC, 0x191, chrstr, 0);
 }
 
 /* Structure follows the original Hellfire INV.CPP CheckInvPaste (hand/two-hand/staff/grid-fill arms,
@@ -2320,155 +1528,6 @@ void CheckInvPaste(int pnum, int mx, int my)
         PlaySFX(0x3D3);
 }
 
-void DrawInvTSK(struct TASK *T)
-{
-    int omp;
-    int osel;
-    CBlocks *BgBlocks;
-    int ThisIsShit;
-    int OldPad;
-
-    omp = myplr;
-    osel = sel_data;
-    if (!invflag || options_pad == -1) {
-        D_8011C324 = 0;
-        invflag = 0;
-        options_pad = -1;
-        return;
-    }
-
-    myplr = options_pad;
-    PAD_GetPad(options_pad, 0)->Flush();
-    CDWAIT = 1;
-    PauseMode = 1;
-    GLUE_SuspendGame();
-    if (sghMusic) {
-        while (sghMusic->sec_num < 4) {
-            PauseMode = 1;
-            GLUE_SuspendGame();
-            TSK_Sleep(1);
-        }
-    }
-    GLUE_SetShowPanelFlag(0);
-    TSK_Sleep(1);
-    stream_stop();
-    while (SFXTab[1].used) {
-        stream_stop();
-        TSK_Sleep(1);
-    }
-    GLUE_SuspendGame();
-    GLUE_SetShowGameScreenFlag(0);
-    TSK_Sleep(1);
-    VID_SetDBuffer(1);
-    if (_spselflag[0])
-        TSK_Kill(_spselflag[0]);
-    if (_spselflag[1])
-        TSK_Kill(_spselflag[1]);
-    _spselflag[0] = 0;
-    _spselflag[1] = 0;
-    _trigflag[sel_data] = 0;
-    ClrCursor(0);
-    ClrCursor(1);
-    BgBlocks = BL_GetCurrentBlocks();
-    if (leveltype == 0)
-        BgBlocks->DumpMonsters();
-    if (!InvGfxTData)
-        InvGfxTData = GM_UseTexData(0xCF);
-    if (_pcurs[myplr] == 9)
-        _pcurs[myplr] = 1;
-    InvSetItemCurs();
-    ThisIsShit = 1;
-    VID_SetDBuffer(0);
-    TSK_Sleep(1);
-    CDWAIT = 0;
-    PauseMode = 0;
-    OldPad = options_pad;
-
-    while (ThisIsShit) {
-        ThisIsShit = 0;
-        options_pad = OldPad;
-        invflag = 1;
-        while (invflag && options_pad >= 0) {
-            int OldOt = MediumFont.SetOTpos(0xFC);
-            myplr = options_pad;
-            sel_data = options_pad;
-            ControlInv();
-            if (options_pad != -1) {
-                myplr = options_pad;
-                sel_data = options_pad;
-                DoThatDrawInv();
-            }
-            MediumFont.SetOTpos(OldOt);
-            GLUE_SuspendGame();
-            TSK_Sleep(1);
-            if (plr[options_pad]._pHitPoints >> 6 <= 0) {
-                PostGamePad(5, 0, 0, 0);
-                options_pad = -1;
-                break;
-            }
-        }
-
-        if (_pcurs[myplr] == 2 || _pcurs[myplr] == 3 || _pcurs[myplr] == 4)
-            _pcurs[myplr] = 1;
-
-        /* Retail SLD/JAP render: the TryInvPut-success arm has its own
-           NetSendCmdPItem call, cross-jumped by jump2 into the later copy.
-           The extra sched1-visible insns keep omp/osel in one allocation
-           priority bucket, so omp=s6/osel=s7 with the retail restore order. */
-        if (_pcurs[myplr] >= 0xC) {
-            if (!TryInvPut()) {
-                if (!StoreAutoPlace()) {
-                    if (numitems < 0x7A)
-                        NetSendCmdPItem(1, 0xA, 0, 0);
-                    else {
-                        PlaySFX(0x3D3);
-                        ThisIsShit = 1;
-                    }
-                }
-            } else
-                NetSendCmdPItem(1, 0xA, 0, 0);
-        }
-    }
-
-    ClearPanel();
-    stream_stop();
-    while (SFXTab[1].used) {
-        stream_stop();
-        TSK_Sleep(1);
-    }
-    VID_SetDBuffer(1);
-    CDWAIT = 1;
-    PauseMode = 1;
-    GM_FinishedUsing(InvGfxTData);
-    InvGfxTData = 0;
-    if (leveltype != 0) {
-        GM_ForceTpLoad(0xD0);
-    } else {
-        BgBlocks->SetTownersGraphics();
-        GM_ForceTpLoad(0xCD);
-    }
-    CDWAIT = 0;
-    PauseMode = 0;
-    VID_SetDBuffer(0);
-    ClearPanel();
-    D_8011C324 = 0;
-    if (options_pad >= 0 && ScrollFlag[options_pad]) {
-        PostGamePad(5, 0, 0, 0);
-        options_pad = -1;
-    } else {
-        _pcurs[myplr] = 1;
-    }
-    ClrCursor(0);
-    ClrCursor(1);
-    myplr = omp;
-    sel_data = osel;
-    invflag = 0;
-    GLUE_ResumeGame();
-    GLUE_SetShowPanelFlag(1);
-    GLUE_SetShowGameScreenFlag(1);
-    GLUE_SetHomingScrollFlag(1);
-}
-
 void CheckInvCut(int pnum, int mx, int my)
 {
     int r;
@@ -2580,231 +1639,1265 @@ void CheckInvCut(int pnum, int mx, int my)
     }
 }
 
-void InvDrawSlot(int X, int Y, int Frame)
+void RemoveInvItem(int pnum, int iv)
 {
-    struct POLY_FT4 *Ft4;
+    int i, j;
 
-    Ft4 = InvGfxTData->PrintFt4(Frame, X + 0x80, Y - InvBackY + 0x20, 0, D_8011C2FC, 0);
-    Ft4->code = (Ft4->code | 2) & 0xFE;
-    Ft4->r0 = BORDERR;
-    Ft4->g0 = BORDERG;
-    Ft4->b0 = BORDERB;
-}
+    iv++;
 
-void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int TransFlag)
-{
-    struct POLY_FT4 *Ft4;
-    struct TextDat *TData;
-
-    if (ItemNo < 0x32)
-        TData = InvGfxTData;
-    else
-        TData = InvPanelTData;
-
-    Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x80, ItemY - InvBackY + 0x20, 0, D_8011C304, 0);
-
-    setShadeTex(Ft4, 0);
-    setSemiTrans(Ft4, TransFlag);
-
-    if (StatFlag) {
-        setRGB0(Ft4, 0x80, 0x80, 0x80);
-    } else {
-        setRGB0(Ft4, 0x80, 0, 0);
-    }
-}
-
-void PrintStat(int Y, int Txt0, char *Txt1, unsigned char Col)
-{
-    char *str;
-
-    str = GetStr(Txt0);
-    MediumFont.Print(0, Y, str, JustLeft, &BRect, WHITER, WHITEG, WHITEG);
-    MediumFont.Print(0, Y, Txt1, JustRight, &BRect, WHITER, WHITEG, WHITEG);
-}
-
-void DrawInvMsg(void)
-{
-    struct POLY_FT4 *Ft4;
-    RECT InfoRect;
-    int InfoY;
-    int InfoW;
-    int InfoH;
-    Dialog InvBack;
-    int OldOt;
-
-    OldOt = MediumFont.SetOTpos(0xFA);
-    MediumFont.SetOTpos(OldOt - 1);
-    PRIM_FullScreen(OldOt);
-
-    InfoY = 0x80;
-    InfoW = 0xB0;
-    InfoH = 0x50;
-    InfoRect.x = InfoY;
-    InfoRect.y = InfoY + 1;
-    InfoRect.w = InfoW;
-    InfoRect.h = InfoH - 2;
-    if (invflag)
-        DrawInfoBox(&InfoRect);
-
-    InvBack.SetOTpos(0xF9);
-    InvBack.SetBack(5);
-    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
-    InvBack.Back(0x80, 0x80, 0xB0, InfoH);
-
-    Ft4 = InvPanelTData->PrintFt4(0x94, 0, 0, 0, OldOt, 0);
-
-    Ft4->x0 = 0x80;
-    Ft4->y0 = 0x80;
-    Ft4->x1 = 0x80 + 0xB0;
-    Ft4->y1 = 0x80;
-    Ft4->x2 = 0x80;
-    Ft4->y2 = 0x80 + 0x50;
-    Ft4->x3 = 0x80 + 0xB0;
-    Ft4->y3 = 0x80 + 0x50;
-    Ft4->tpage |= 0x40;
-    Ft4->u1 = Ft4->u0 + 1;
-    Ft4->u3 = Ft4->u0 + 1;
-    Ft4->v2 = Ft4->v0 + 1;
-    Ft4->v3 = Ft4->v0 + 1;
-    Ft4->code = (Ft4->code | 2) & 0xFE;
-    Ft4->r0 = 0x20;
-    Ft4->g0 = 0x20;
-    Ft4->b0 = 0x20;
-    MediumFont.SetOTpos(OldOt);
-
-    PRIM_Clip(&InfoRect, OldOt);
-}
-
-void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag)
-{
-    struct POLY_FT4 *Ft4;
-
-    Ft4 = InvPanelTData->PrintFt4(0x94, X, Y, 0, D_8011C300, 0);
-
-    Ft4->x0 = X + 0x81;
-    Ft4->y0 = Y - InvBackY + 0x21;
-    Ft4->x1 = X + 0x81 + (W - 2);
-    Ft4->y1 = Y - InvBackY + 0x21;
-    Ft4->x2 = X + 0x81;
-    Ft4->y2 = Y - InvBackY + 0x21 + (H - 2);
-    Ft4->x3 = X + 0x81 + (W - 2);
-    Ft4->y3 = Y - InvBackY + 0x21 + (H - 2);
-    Ft4->tpage |= 0x40;
-    Ft4->u1 = Ft4->u0 + 1;
-    Ft4->u3 = Ft4->u0 + 1;
-    Ft4->v2 = Ft4->v0 + 1;
-    Ft4->v3 = Ft4->v0 + 1;
-    Ft4->code = (Ft4->code | 2) & 0xFE;
-
-    switch (Flag) {
-    case 0:
-        Ft4->r0 = 0x20;
-        Ft4->g0 = 0x20;
-        Ft4->b0 = 0x20;
-        Ft4->tpage |= 0x40;
-        break;
-    case 1:
-        Ft4->r0 = 0xD0;
-        Ft4->g0 = 0;
-        Ft4->b0 = 0;
-        Ft4->tpage |= 0x20;
-        break;
-    case 2:
-        Ft4->tpage |= 0x20;
-        if (_pcurs[myplr] == 2) {
-            Ft4->r0 = 0;
-            Ft4->g0 = 0;
-            Ft4->b0 = CursGlow - 0x80;
-        } else if (_pcurs[myplr] == 3) {
-            Ft4->r0 = CursGlow - 0x80;
-            Ft4->g0 = CursGlow - 0x80;
-            Ft4->b0 = 0;
-        } else if (_pcurs[myplr] == 4) {
-            Ft4->r0 = CursGlow - 0x80;
-            Ft4->g0 = 0;
-            Ft4->b0 = CursGlow - 0x80;
-        } else if (_pcurs[myplr] < 12) {
-            Ft4->r0 = CursGlow - 0x80;
-            Ft4->g0 = CursGlow - 0x80;
-            Ft4->b0 = CursGlow - 0x80;
-        } else {
-            Ft4->r0 = CursGlow - 0x80;
-            Ft4->g0 = (CursGlow + 0x80) >> 2;
-            Ft4->b0 = (CursGlow + 0x80) >> 2;
+    for (i = 0; i < 40 /* NUM_INV_GRID_ELEM */; i++) {
+        if (plr[pnum].InvGrid[i] == iv || plr[pnum].InvGrid[i] == -iv) {
+            plr[pnum].InvGrid[i] = 0;
         }
-        break;
-    case 3:
-        Ft4->r0 = 0x80;
-        Ft4->g0 = (CursGlow >> 2) + 0x20;
-        Ft4->b0 = (CursGlow >> 2) + 0x20;
-        Ft4->tpage |= 0x20;
-        break;
+    }
+
+    iv--;
+    plr[pnum]._pNumInv--;
+
+    if (plr[pnum]._pNumInv > 0 && plr[pnum]._pNumInv != iv) {
+        plr[pnum].InvList[iv] = plr[pnum].InvList[plr[pnum]._pNumInv];
+
+        for (j = 0; j < 40 /* NUM_INV_GRID_ELEM */; j++) {
+            if (plr[pnum].InvGrid[j] == plr[pnum]._pNumInv + 1) {
+                plr[pnum].InvGrid[j] = iv + 1;
+            }
+            if (plr[pnum].InvGrid[j] == -(plr[pnum]._pNumInv + 1)) {
+                plr[pnum].InvGrid[j] = -(iv + 1);
+            }
+        }
+    }
+
+    CalcPlrScrolls(pnum);
+
+    if (plr[pnum]._pRSplType == 2 /* RSPLTYPE_SCROLL */) {
+        if (plr[pnum]._pRSpell != -1 /* SPL_INVALID */) {
+            if (!(plr[pnum]._pScrlSpells & (1 << (plr[pnum]._pRSpell - 1)))) {
+                plr[pnum]._pRSpell = -1;
+            }
+            force_redraw = 255;
+        }
     }
 }
 
-void DrawInvHelpTxt(void)
+void RemoveSpdBarItem(int pnum, int iv)
 {
-    char TempStr[128];
+    plr[pnum].SpdList[iv]._itype = ITYPE_NONE;
+    CalcPlrScrolls(pnum);
+    if (plr[pnum]._pRSplType == 2 /* RSPLTYPE_SCROLL */) {
+        if (plr[pnum]._pRSpell != -1 /* SPL_INVALID */) {
+            if (!(plr[pnum]._pScrlSpells & (1 << (plr[pnum]._pRSpell - 1)))) {
+                plr[pnum]._pRSpell = -1;
+            }
+        }
+    }
+}
 
-    TempStr[0] = 0;
-    if (LANG_GetLang() == 1) {
-        if (_pcurs[myplr] == 2)
-            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x208));
-        else if (_pcurs[myplr] == 3)
-            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x35A));
-        else if (_pcurs[myplr] == 4)
-            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x34C));
-        else if (_pcurs[myplr] >= 0xC)
-            sprintf(TempStr, "%s  < %s", GetStr(0x4E6), GetStr(0x11D));
-        else
-            sprintf(TempStr, "%s", GetStr(0x4E6));
+void CheckInvScrn(void)
+{
+    if (_pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */) {
+        CheckInvPaste(myplr, MouseX, MouseY);
     } else {
-        if (_pcurs[myplr] == 2)
-            sprintf(TempStr, "_ %s  %s", GetStr(0x208), GetStr(0x331));
-        else if (_pcurs[myplr] == 3)
-            sprintf(TempStr, "_ %s  %s", GetStr(0x35A), GetStr(0x331));
-        else if (_pcurs[myplr] == 4)
-            sprintf(TempStr, "_ %s  %s", GetStr(0x34C), GetStr(0x331));
-        else if (_pcurs[myplr] >= 0xC)
-            sprintf(TempStr, "< %s  %s", GetStr(0x11D), GetStr(0x4E6));
-        else
-            sprintf(TempStr, "%s", GetStr(0x4E6));
+        CheckInvCut(myplr, MouseX, MouseY);
+    }
+}
+
+void CheckItemStats(int pnum)
+{
+    PlayerStruct *p = &plr[pnum];
+
+    p->HoldItem._iStatFlag = 0;
+    if (p->_pStrength >= p->HoldItem._iMinStr
+        && p->_pMagic >= (unsigned char)p->HoldItem._iMinMag
+        && p->_pDexterity >= p->HoldItem._iMinDex) {
+        p->HoldItem._iStatFlag = 1;
+    }
+}
+
+void CheckBookLevel(int pnum)
+{
+    int slvl;
+
+    if (plr[pnum].HoldItem._iMiscId != IMISC_BOOK)
+        return;
+    plr[pnum].HoldItem._iMinMag = spelldata[plr[pnum].HoldItem._iSpell].sMinInt;
+    slvl = plr[pnum]._pSplLvl[plr[pnum].HoldItem._iSpell];
+    while (slvl != 0) {
+        plr[pnum].HoldItem._iMinMag += 20 * plr[pnum].HoldItem._iMinMag / 100;
+        slvl--;
+        if (plr[pnum].HoldItem._iMinMag + 20 * plr[pnum].HoldItem._iMinMag / 100 > 255) {
+            plr[pnum].HoldItem._iMinMag = 255;
+            slvl = 0;
+        }
+    }
+}
+
+void CheckQuestItem(int pnum)
+{
+    if (plr[pnum].HoldItem.IDidx == 0xA /* IDI_OPTAMULET */) {
+        quests[8]._qactive = 3 /* QUEST_DONE */;
+        quests[8].pad_for_laz = 1;
     }
 
-    if (InvBackY == 0) {
-        MediumFont.SetChar(0x2E, 0x80);
-        sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x2FE));
+    if (plr[pnum].HoldItem.IDidx == 0x11 /* IDI_MUSHROOM */) {
+        quests[1].pad_for_laz = 1;
+        if (quests[1]._qactive == 2 /* QUEST_ACTIVE */ && quests[1]._qvar1 == 3 /* QS_MUSHSPAWNED */) {
+            sfxdelay = 10;
+            if (plr[pnum]._pClass == 0)
+                sfxdnum = 0x331;
+            else if (plr[pnum]._pClass == 1)
+                sfxdnum = 0x2C3;
+            else if (plr[pnum]._pClass == 2)
+                sfxdnum = 0x25B;
+            quests[1]._qvar1 = 4 /* QS_MUSHPICKED */;
+        }
+        NetSendCmdQuest(1, 1);
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x10 /* IDI_ANVIL */) {
+        quests[10].pad_for_laz = 1;
+        if (quests[10]._qactive == 1) {
+            quests[10]._qactive = 2;
+            quests[10]._qvar1 = 1;
+        }
+        if (quests[10]._qlog == 1) {
+            sfxdelay = 10;
+            if (plr[myplr]._pClass == 0)
+                sfxdnum = 0x32B;
+            else if (plr[myplr]._pClass == 1)
+                sfxdnum = 0x2BD;
+            else if (plr[myplr]._pClass == 2)
+                sfxdnum = 0x255;
+        }
+        NetSendCmdQuest(1, 0xA);
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0xF /* IDI_GLDNELIX */) {
+        if (quests[4]._qactive != 3 /* QUEST_DONE */) {
+            sfxdelay = 0x1E;
+            if (plr[myplr]._pClass == 0)
+                sfxdnum = 0x32A;
+            else if (plr[myplr]._pClass == 1)
+                sfxdnum = 0x2BC;
+            else if (plr[myplr]._pClass == 2)
+                sfxdnum = 0x254;
+        }
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x9 /* IDI_ROCK */) {
+        quests[0].pad_for_laz = 1;
+        if (quests[0]._qactive == 1) {
+            quests[0]._qactive = 2;
+            quests[0]._qvar1 = 2;
+        }
+        if (quests[0]._qlog == 1) {
+            sfxdelay = 10;
+            if (plr[myplr]._pClass == 0)
+                sfxdnum = 0x329;
+            else if (plr[myplr]._pClass == 1)
+                sfxdnum = 0x2BB;
+            else if (plr[myplr]._pClass == 2)
+                sfxdnum = 0x253;
+        }
+        NetSendCmdQuest(1, 0);
+    }
+
+    if (plr[pnum].HoldItem.IDidx == 0x1C /* IDI_ARMOFVAL */) {
+        quests[9].pad_for_laz = 1;
+        quests[9]._qactive = 3 /* QUEST_DONE */;
+        NetSendCmdQuest(1, 9);
+        sfxdelay = 0x14;
+        if (plr[myplr]._pClass == 0)
+            sfxdnum = 0x32D;
+        else if (plr[myplr]._pClass == 1)
+            sfxdnum = 0x2BF;
+        else if (plr[myplr]._pClass == 2)
+            sfxdnum = 0x257;
+    }
+}
+
+void InvGetItem(int pnum, int ii)
+{
+    int j, jj;
+
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+
+    if (dung_map[item[ii]._ix][item[ii]._iy].dItem != 0) {
+        if (myplr == pnum && _pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */)
+            NetSendCmdPItem(1, 0x56 /* CMD_SYNCPUTITEM */, plr[myplr]._px, plr[myplr]._py);
+        item[ii]._iCreateInfo &= 0x7FFF /* ~CF_PREGEN */;
+        plr[pnum].HoldItem = item[ii];
+        CheckQuestItem(pnum);
+        CheckBookLevel(pnum);
+        CheckItemStats(pnum);
+        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
+        j = 0;
+        while (j < numitems) {
+            jj = itemactive[j];
+            if (jj == ii) {
+                DeleteItem(jj, j);
+                j = 0;
+            } else {
+                j++;
+            }
+        }
+        _pcursitem[sel_data] = -1;
+        NewCursor(plr[pnum].HoldItem._iCurs + 12 /* ICSTART */);
+    }
+}
+
+void AutoGetItem(int pnum, int ii)
+{
+    int i, g;
+    int w, h;
+    int idx;
+    unsigned char done;
+
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+
+    if (ii != 0x7F /* MAXITEMS */) {
+        if (dung_map[item[ii]._ix][item[ii]._iy].dItem == 0)
+            return;
+    }
+
+    item[ii]._iCreateInfo &= 0x7FFF /* ~CF_PREGEN */;
+    plr[pnum].HoldItem = item[ii];
+    CheckQuestItem(pnum);
+    CheckBookLevel(pnum);
+    CheckItemStats(pnum);
+    SetICursor(plr[pnum].HoldItem._iCurs + 12 /* CURSOR_FIRSTITEM */);
+    PlaySFX(0x32);
+    if (plr[pnum].HoldItem._itype == ITYPE_GOLD) {
+        done = GoldAutoPlace(pnum);
     } else {
-        MediumFont.SetChar(0x2E, 0x7F);
-        sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x132));
+        done = 0;
+        g = plr[pnum]._pgfxnum & 0xF;
+        if ((g == 0 /* ANIM_ID_UNARMED */ || g == 1 /* ANIM_ID_UNARMED_SHIELD */)
+            && plr[pnum]._pmode <= 3 /* PM_WALK3 */) {
+            if (plr[pnum].HoldItem._iStatFlag) {
+                if (plr[pnum].HoldItem._iClass == ICLASS_WEAPON) {
+                    done = WeaponAutoPlace(pnum);
+                    if (done)
+                        CalcPlrInv(pnum, 1);
+                }
+            }
+        }
+        if (!done) {
+            w = icursW28;
+            h = icursH28;
+            if (w == 1 && h == 1) {
+                idx = plr[pnum].HoldItem.IDidx;
+                if (plr[pnum].HoldItem._iStatFlag && AllItemsUseable[idx]) {
+                    for (i = 0; i < MAXBELTITEMS && !done; i++) {
+                        if (plr[pnum].SpdList[i]._itype == ITYPE_NONE) {
+                            plr[pnum].SpdList[i] = plr[pnum].HoldItem;
+                            CalcPlrScrolls(pnum);
+                            drawsbarflag = 1;
+                            done = 1;
+                        }
+                    }
+                }
+                for (i = 30; i <= 39 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 20; i <= 29 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 10; i <= 19 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 0; i <= 9 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 1 && h == 2) {
+                for (i = 29; i >= 20 && !done; i--) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 9; i >= 0 && !done; i--) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 19; i >= 10 && !done; i--) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 1 && h == 3) {
+                for (i = 0; i < 20 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 2 && h == 2) {
+                for (i = 0; i < 10 && !done; i++) {
+                    done = AutoPlace(pnum, AP2x2Tbl[i], w, h, 1);
+                }
+                for (i = 21; i < 29 && !done; i += 2) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 1; i < 9 && !done; i += 2) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 10; i < 19 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+            if (w == 2 && h == 3) {
+                for (i = 0; i < 9 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+                for (i = 10; i < 19 && !done; i++) {
+                    done = AutoPlace(pnum, i, w, h, 1);
+                }
+            }
+        }
+    }
+    if (done) {
+        int j, jj;
+
+        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
+        j = 0;
+        while (j < numitems) {
+            jj = itemactive[j];
+            if (jj == ii) {
+                DeleteItem(jj, j);
+                j = 0;
+            } else {
+                j++;
+            }
+        }
+    } else {
+        if (pnum == myplr) {
+            if (plr[pnum]._pClass == 0)
+                PlaySFX(ENG_random(3) + 0x2D9);
+            else if (plr[pnum]._pClass == 1)
+                PlaySFX(ENG_random(3) + 0x271);
+            else if (plr[pnum]._pClass == 2)
+                PlaySFX(ENG_random(3) + 0x209);
+        }
+        plr[pnum].HoldItem = item[ii];
+        RespawnItem(ii, 1);
+        NetSendCmdPItem(1, 0xB /* CMD_RESPAWNITEM */, item[ii]._ix, item[ii]._iy);
+        plr[pnum].HoldItem._itype = ITYPE_NONE;
+    }
+}
+
+void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed)
+{
+    int ii;
+
+    if (dung_map[x][y].dItem) {
+        ii = dung_map[x][y].dItem - 1;
+        if (item[ii].IDidx == idx && item[ii]._iSeed == iseed && item[ii]._iCreateInfo == ci) {
+            /* ii already correct */
+        } else {
+            ii = FindGetItem(idx, ci, iseed);
+        }
+    } else {
+        ii = FindGetItem(idx, ci, iseed);
     }
 
-    if (InvPageFlag)
-        sprintf(TempStr, "%s  | %s ", TempStr, GetStr(0x2A4));
+    if (ii != -1) {
+        int j, jj;
 
-    MediumFont.Print(0, 0xE0, TempStr, JustCentre, NULL, WHITER, WHITEG, WHITEB);
-    MediumFont.SetChar(0x2E, 0x6D);
+        dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
+        j = 0;
+        while (j < numitems) {
+            jj = itemactive[j];
+            if (jj == ii) {
+                DeleteItem(jj, j);
+                j = 0;
+            } else {
+                j++;
+            }
+        }
+    }
 }
 
-void DrawInvBack(void)
+unsigned char TryInvPut(void)
 {
-    Dialog InvBack;
+    int Dist;
 
-    InvBack.SetOTpos(D_8011C2F8);
-    InvBack.SetBack(5);
-    InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
-    InvBack.Back(0x80, -InvBackY + 0x80, 0xB0, 0xBE);
-    InvBack.Back(0x80, -InvBackY + 0x20, 0xB0, 0x5E);
+    if (numitems >= 0x7A /* MAXITEMS */) {
+        PlaySFX(0x3D3);
+        return 0;
+    }
+
+    if (CanPut(plr[myplr]._px, plr[myplr]._py))
+        return 1;
+
+    Dist = 1;
+    {
+        for (int d = 0; d < 8; d++) {
+            int dir;
+            if (CanPut(plr[myplr]._px + offset_x[d] * Dist, plr[myplr]._py + offset_y[d] * Dist))
+                return 1;
+        }
+    }
+    return 0;
 }
 
-void DrawInv(void)
+int InvPutItem(int pnum, int x, int y)
 {
-    if (D_8011C324 == 0) {
-        D_8011C324 = 1;
-        InvPageFlag = 0;
+    int ii;
+    unsigned char done;
+
+    if (numitems >= 0x7A) {
+        PlaySFX(0x3D3);
+        return -1;
+    }
+
+    if (FindGetItem(plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed) != -1) {
+        SyncGetItem(x, y, plr[pnum].HoldItem.IDidx, plr[pnum].HoldItem._iCreateInfo, plr[pnum].HoldItem._iSeed);
+    }
+
+    done = 0;
+    x = plr[myplr]._px;
+    y = plr[myplr]._py;
+    if (!CanPut(x, y)) {
+        for (int Dist = 1; Dist < 8 && !done; Dist++) {
+            for (int d = 0; d < 8 && !done; d++) {
+                x = plr[myplr]._px + offset_x[d] * Dist;
+                y = plr[myplr]._py + offset_y[d] * Dist;
+                if (CanPut(x, y))
+                    done = 1;
+            }
+        }
+    }
+    if (!CanPut(x, y))
+        return -1;
+
+    ii = itemavail[0];
+    dung_map[x][y].dItem = ii + 1;
+    itemavail[0] = itemavail[0x7E - numitems];
+    itemactive[numitems] = ii;
+    item[ii] = plr[pnum].HoldItem;
+    item[ii]._ix = x;
+    item[ii]._iy = y;
+    RespawnItem(ii, 1);
+    numitems++;
+    NewCursor(CURSOR_HAND);
+    PlaySFX(0x1F);
+    return ii;
+}
+
+int SyncPutItem(int pnum, int x, int y, int idx, unsigned short icreateinfo, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, unsigned long ibuff)
+{
+    int ii;
+    int d;
+    int dy;
+
+    if (numitems >= 0x7A) {
+        PlaySFX(0x3D3);
+        return -1;
+    }
+
+    if (FindGetItem(idx, icreateinfo, iseed) != -1) {
+        SyncGetItem(x, y, idx, icreateinfo, iseed);
+    }
+
+    d = GetDirection(plr[pnum]._px, plr[pnum]._py, x, y);
+    dy = y - plr[pnum]._py;
+    if (abs(x - plr[pnum]._px) > 1 || abs(dy) > 1) {
+        x = plr[pnum]._px + offset_x[d];
+        y = plr[pnum]._py + offset_y[d];
+    }
+    if (!CanPut(x, y)) {
+        d = (d - 1) & 7;
+        x = plr[pnum]._px + offset_x[d];
+        y = plr[pnum]._py + offset_y[d];
+        if (!CanPut(x, y)) {
+            d = (d + 2) & 7;
+            x = plr[pnum]._px + offset_x[d];
+            y = plr[pnum]._py + offset_y[d];
+            if (!CanPut(x, y)) {
+                unsigned char done = 0;
+                for (int l = 1; l < 50 && !done; l++) {
+                    for (int j = -l; j <= l && !done; j++) {
+                        int yy = plr[pnum]._py + j;
+                        for (int i = -l; i <= l && !done; i++) {
+                            int xx = plr[pnum]._px + i;
+                            if (CanPut(xx, yy)) {
+                                done = 1;
+                                x = xx;
+                                y = yy;
+                            }
+                        }
+                    }
+                }
+                if (!done)
+                    return -1;
+            }
+        }
+    }
+
+    ii = itemavail[0];
+    dung_map[x][y].dItem = ii + 1;
+    itemavail[0] = itemavail[0x7E - numitems];
+    itemactive[numitems] = ii;
+
+    if (idx == 0x17) {
+        RecreateEar(ii, icreateinfo, iseed, Id, dur, mdur, ch, mch, ivalue, ibuff);
+    } else {
+        RecreateItem(ii, idx, icreateinfo, iseed, ivalue, ibuff);
+        if (Id)
+            item[ii]._iIdentified = 1;
+        item[ii]._iDurability = dur;
+        item[ii]._iMaxDur = mdur;
+        item[ii]._iCharges = ch;
+        item[ii]._iMaxCharges = mch;
+    }
+
+    item[ii]._ix = x;
+    item[ii]._iy = y;
+    RespawnItem(ii, 1);
+    numitems++;
+    return ii;
+}
+
+char CheckInvHLight(void)
+{
+    int r;
+    char rv;
+    ItemStruct *pi;
+    PlayerStruct *p;
+
+    r = InvCursPos;
+    if (r >= 0x49)
+        return -1;
+
+    _infoclr[sel_data] = 0;
+    p = &plr[myplr];
+    ClearPanel();
+    rv = -1;
+    pi = NULL;
+    if (_pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */) {
+        pi = &p->HoldItem;
+    } else if (r >= 0 && r <= 3) {
+        rv = 0;
+        pi = &p->InvBody[0];
+    } else if (r == 4) {
+        rv = 1;
+        pi = &p->InvBody[1];
+    } else if (r == 5) {
+        rv = 2;
+        pi = &p->InvBody[2];
+    } else if (r == 6) {
+        rv = 3;
+        pi = &p->InvBody[3];
+    } else if (r >= 7 && r <= 12) {
+        rv = 4;
+        pi = &p->InvBody[4];
+    } else if (r >= 13 && r <= 18) {
+        pi = &p->InvBody[4];
+        if (pi->_itype != ITYPE_NONE && pi->_iLoc == ILOC_TWOHAND) {
+            rv = 4;
+        } else {
+            rv = 5;
+            pi = &p->InvBody[5];
+        }
+    } else if (r >= 19 && r <= 24) {
+        rv = 6;
+        pi = &p->InvBody[6];
+    } else if (r >= 25 && r <= 64) {
+        r = abs(p->InvGrid[r - 25]);
+        if (r == 0)
+            return -1;
+        r--;
+        rv = r + 7;
+        pi = &p->InvList[r];
+    } else if (r >= 0x41) {
+        r -= 0x41;
+        pi = &p->SpdList[r];
+        drawsbarflag = 1;
+        if (pi->_itype == ITYPE_NONE)
+            return -1;
+        rv = r + 0x2F;
+    }
+
+    if (pi->_itype == ITYPE_NONE)
+        return -1;
+
+    if (pi->_itype == ITYPE_GOLD) {
+        int nGold = pi->_ivalue;
+        sprintf(_infostr[sel_data], GetStr(0x4FF), nGold, get_pieces_str(nGold));
+    } else {
+        if (invflag) {
+            if (!pi->_iStatFlag)
+                _infoclr[sel_data] = 2;
+            else if (pi->_iMagical == 1)
+                _infoclr[sel_data] = 1;
+            else if (pi->_iMagical == 2)
+                _infoclr[sel_data] = 3;
+        } else {
+            if (pi->_iMagical == 1)
+                _infoclr[sel_data] = 1;
+            else if (pi->_iMagical == 2)
+                _infoclr[sel_data] = 3;
+        }
+
+        strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iName, 0x100));
+        if (pi->_iIdentified) {
+            strcpy(_infostr[sel_data], MakeItemStr(pi, pi->_iIName, 0x100));
+            PrintItemDetails(pi);
+        } else {
+            PrintItemDur(pi);
+        }
+    }
+
+    return rv;
+}
+
+void RemoveScroll(int pnum)
+{
+    int i;
+
+    for (i = 0; i < plr[pnum]._pNumInv; i++) {
+        if (plr[pnum].InvList[i]._itype != ITYPE_NONE
+            && (plr[pnum].InvList[i]._iMiscId == IMISC_SCROLL || plr[pnum].InvList[i]._iMiscId == IMISC_SCROLLT)
+            && plr[pnum].InvList[i]._iSpell == plr[pnum]._pSpell) {
+            RemoveInvItem(pnum, i);
+            CalcPlrScrolls(pnum);
+            return;
+        }
+    }
+    for (i = 0; i < MAXBELTITEMS; i++) {
+        if (plr[pnum].SpdList[i]._itype != ITYPE_NONE
+            && (plr[pnum].SpdList[i]._iMiscId == IMISC_SCROLL || plr[pnum].SpdList[i]._iMiscId == IMISC_SCROLLT)
+            && plr[pnum].SpdList[i]._iSpell == plr[pnum]._pSpell) {
+            RemoveSpdBarItem(pnum, i);
+            CalcPlrScrolls(pnum);
+            return;
+        }
+    }
+}
+
+unsigned char UseScroll(void)
+{
+    int i;
+
+    if (_pcurs[myplr] != CURSOR_HAND)
+        return 0;
+    if (leveltype == 0 /* DTYPE_TOWN */ && !spelldata[plr[myplr]._pRSpell].sTownSpell)
+        return 0;
+
+    for (i = 0; i < plr[myplr]._pNumInv; i++) {
+        if (plr[myplr].InvList[i]._itype != ITYPE_NONE
+            && (plr[myplr].InvList[i]._iMiscId == IMISC_SCROLL || plr[myplr].InvList[i]._iMiscId == IMISC_SCROLLT)
+            && plr[myplr].InvList[i]._iSpell == plr[myplr]._pRSpell) {
+            return 1;
+        }
+    }
+    for (i = 0; i < MAXBELTITEMS; i++) {
+        if (plr[myplr].SpdList[i]._itype != ITYPE_NONE
+            && (plr[myplr].SpdList[i]._iMiscId == IMISC_SCROLL || plr[myplr].SpdList[i]._iMiscId == IMISC_SCROLLT)
+            && plr[myplr].SpdList[i]._iSpell == plr[myplr]._pRSpell) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void UseStaffCharge(PlayerStruct *ptrplr)
+{
+    if (ptrplr->InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE
+        && ptrplr->InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF
+        && ptrplr->InvBody[INVLOC_HAND_LEFT]._iSpell == ptrplr->_pRSpell
+        && ptrplr->InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
+        ptrplr->InvBody[INVLOC_HAND_LEFT]._iCharges--;
+        CalcPlrStaff(ptrplr);
+    }
+}
+
+unsigned char UseStaff(void)
+{
+    if (_pcurs[myplr] != CURSOR_HAND)
+        return 0;
+    if (plr[myplr].InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE
+        && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF
+        && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iSpell == plr[myplr]._pRSpell
+        && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+void StartGoldDrop(void)
+{
+    initialDropGoldIndex = _pcursinvitem[sel_data];
+    if (_pcursinvitem[sel_data] < 0x2F /* INVITEM_INV_LAST+1 */)
+        initialDropGoldValue = plr[myplr].InvList[_pcursinvitem[sel_data] - 7 /* INVITEM_INV_FIRST */]._ivalue;
+    else
+        initialDropGoldValue = plr[myplr].SpdList[_pcursinvitem[sel_data] - 0x2F /* INVITEM_BELT_FIRST */]._ivalue;
+    dropGoldFlag = 1;
+    dropGoldValue = 0;
+}
+
+unsigned char UseInvItem(int pnum, int cii)
+{
+    int c;
+    int idata;
+    int it;
+    ItemStruct *Item;
+    unsigned char speedlist;
+
+    if (plr[pnum]._pInvincible && plr[pnum]._pHitPoints == 0 && pnum == myplr)
+        return 1;
+    if (_pcurs[myplr] != CURSOR_HAND)
+        return 1;
+    if (stextflag)
+        return 1;
+    if (cii < 6)
+        return 0;
+
+    if (cii < 0x2F) {
+        c = cii - 7;
+        Item = &plr[pnum].InvList[c];
+        speedlist = 0;
+    } else {
+        if (talkflag)
+            return 1;
+        c = cii - 0x2F;
+        Item = &plr[pnum].SpdList[c];
+        speedlist = 1;
+    }
+
+    it = Item->IDidx;
+    switch (it) {
+    case 0x11 /* IDI_MUSHROOM */:
+        sfxdelay = 10;
+        if (plr[pnum]._pClass == 0)
+            sfxdnum = 0x331;
+        else if (plr[pnum]._pClass == 1)
+            sfxdnum = 0x2C3;
+        else if (plr[pnum]._pClass == 2)
+            sfxdnum = 0x25B;
+        return 1;
+    case 0x13 /* IDI_FUNGALTM */:
+        PlaySFX(0x1C /* IS_IBOOK */);
+        sfxdelay = 10;
+        if (plr[pnum]._pClass == 0)
+            sfxdnum = 0x2EE;
+        else if (plr[pnum]._pClass == 1)
+            sfxdnum = 0x280;
+        else if (plr[pnum]._pClass == 2)
+            sfxdnum = 0x218;
+        return 1;
+    }
+
+    if (!AllItemsUseable[it])
+        return 0;
+
+    if (!Item->_iStatFlag) {
+        if (plr[pnum]._pClass == 0)
+            PlaySFX(0x2D8);
+        else if (plr[pnum]._pClass == 1)
+            PlaySFX(0x270);
+        else if (plr[pnum]._pClass == 2)
+            PlaySFX(0x208);
+        return 1;
+    }
+
+    if (Item->_iMiscId == 0 && Item->_itype == ITYPE_GOLD) {
+        StartGoldDrop();
+        return 1;
+    }
+    if (dropGoldFlag) {
+        dropGoldFlag = 0;
+        dropGoldValue = 0;
+    }
+
+    if ((Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) && gbMaxPlayers == 2
+        && Item->_iSpell == 0x20 && plr[pnum ^ 1].plractive)
+        return 0;
+    if ((Item->_iMiscId == IMISC_SCROLL || Item->_iMiscId == IMISC_SCROLLT) && currlevel == 0
+        && !spelldata[Item->_iSpell].sTownSpell) {
+        if (plr[pnum]._pClass == 0)
+            PlaySFX(0x2EC);
+        else if (plr[pnum]._pClass == 1)
+            PlaySFX(0x27E);
+        else if (plr[pnum]._pClass == 2)
+            PlaySFX(0x216);
+        return 0;
+    }
+
+    idata = ItemCAnimTbl[Item->_iCurs];
+    if (Item->_iMiscId == IMISC_BOOK)
+        PlaySFX(0x2E /* IS_RBOOK */);
+    else if (pnum == myplr)
+        PlaySFX(ItemInvSnds[idata]);
+
+    UseItem(pnum, Item->_iMiscId, Item->_iSpell);
+
+    if (speedlist) {
+        RemoveSpdBarItem(pnum, c);
+        return 1;
+    } else {
+        if (plr[pnum].InvList[c]._iMiscId == 0x2A)
+            return 1;
+        RemoveInvItem(pnum, c);
+    }
+    return 1;
+}
+
+void DoTelekinesis(void)
+{
+    if (_pcursobj[sel_data] != -1)
+        NetSendCmdParam1(1, 0x1B /* CMD_OPOBJT */, _pcursobj[sel_data]);
+    if (_pcursitem[sel_data] != -1)
+        NetSendCmdGItem(1, 0x28 /* CMD_REQUESTAGITEM */, myplr, myplr, _pcursitem[sel_data]);
+    if (_pcursmonst[sel_data] != -1 && !M_Talker(_pcursmonst[sel_data]) && monster[_pcursmonst[sel_data]].mtalkmsg == 0)
+        NetSendCmdParam1(1, 0x1C /* CMD_KNOCKBACK */, _pcursmonst[sel_data]);
+    NewCursor(CURSOR_HAND);
+}
+
+long CalculateGold(int pnum)
+{
+    int i;
+    long gold;
+
+    gold = 0;
+    for (i = 0; i < MAXBELTITEMS; i++) {
+        if (plr[pnum].SpdList[i]._itype == ITYPE_GOLD) {
+            gold += plr[pnum].SpdList[i]._ivalue;
+            force_redraw = 255;
+        }
+    }
+    for (i = 0; i < plr[pnum]._pNumInv; i++) {
+        if (plr[pnum].InvList[i]._itype == ITYPE_GOLD)
+            gold += plr[pnum].InvList[i]._ivalue;
+    }
+
+    return gold;
+}
+
+unsigned char DropItemBeforeTrig(void)
+{
+    if (TryInvPut()) {
+        NetSendCmdPItem(1, CMD_PUTITEM, cursmx, cursmy);
+        NewCursor(CURSOR_HAND);
+        return 1;
+    }
+
+    return 0;
+}
+
+void ControlInv(void)
+{
+    CheckNewPath(myplr);
+    InvSetItemCurs();
+
+    if (sfxdelay > 0) {
+        sfxdelay--;
+        if (sfxdelay == 0)
+            PlaySFX(sfxdnum);
+    }
+
+    _pcursitem[sel_data] = -1;
+    uitemflag = 0;
+    ReadPad(-1);
+
+    if (_pcurs[myplr] == 9)
+        invflag = 0;
+
+    if (InvCursPos < 0x19)
+        InvBackAY = 0;
+    else
+        InvBackAY = 0x60;
+
+    if (InvBackY > InvBackAY) {
+        InvBackY -= 0x10;
+        if (InvBackY < InvBackAY)
+            InvBackY = InvBackAY;
+    } else if (InvBackY < InvBackAY) {
+        InvBackY += 0x10;
+        if (InvBackAY < InvBackY)
+            InvBackY = InvBackAY;
+    }
+
+    if (invflag) {
+        _pcursinvitem[sel_data] = CheckInvHLight();
+        if (_pcursinvitem[sel_data] == -1)
+            ClrCursor(options_pad);
+    } else {
+        ClearPanel();
+    }
+
+    if (InvPageFlag) {
+        if (DavesPad & 0x400) {
+            PlaySFX(0x32);
+            if (InvPageNo == 0)
+                InvPageNo = 1;
+            else
+                InvPageNo = 0;
+        }
+    } else {
         InvPageNo = 0;
-        TSK_AddTask(0, DrawInvTSK, 0x1000, 0);
     }
+
+    if (uitemflag)
+        DrawUniqueInfo();
+
+    if (DavesPad & 0x4)
+        InvMoveCursLeft();
+    if (DavesPad & 0x8)
+        InvMoveCursRight();
+    if (DavesPad & 0x1)
+        InvMoveCursUp();
+    if (DavesPad & 0x2)
+        InvMoveCursDown();
+
+    if (DavesPad & 0x40) {
+        if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4)
+            TryIconCurs();
+        else
+            CheckInvScrn();
+    }
+
+    if (DavesPad & 0x200) {
+        ignore_buttons = 1;
+        UseInvItem(myplr, _pcursinvitem[sel_data]);
+    }
+
+    if (DavesPad & 0x80) {
+        if (_pcurs[myplr] >= 12) {
+            if (numitems < 0x7A && TryInvPut()) {
+                NetSendCmdPItem(1, 0xA, 0, 0);
+            } else {
+                PlaySFX(0x3D3);
+            }
+        }
+    }
+
+    InvAlignObject();
+}
+
+void InvGetItemWH(int Pos)
+{
+    if (plr[myplr].InvGrid[Pos] == 0)
+        return;
+    if (plr[myplr].InvGrid[Pos] > 0)
+        ItemNo = plr[myplr].InvGrid[Pos];
+    else
+        ItemNo = -plr[myplr].InvGrid[Pos];
+    ItemNo = plr[myplr].InvList[ItemNo - 1]._iCurs;
+    ItemW = InvItemWidth[ItemNo + 12] >> 4;
+    ItemH = InvItemHeight[ItemNo + 12] >> 4;
+}
+
+void InvAlignObject(void)
+{
+    if (InvCursPos < 25 || InvCursPos > 64)
+        return;
+    if (_pcurs[myplr] < 12)
+        return;
+
+    ItemNo = plr[myplr].HoldItem._iCurs;
+    ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
+    ItemH = (InvItemHeight[ItemNo + 12] >> 4) - 1;
+
+    if (InvCursPos >= 25 && InvCursPos <= 34 && InvCursPos + ItemW > 34)
+        InvCursPos = 34 - ItemW;
+    if (InvCursPos >= 35 && InvCursPos <= 44 && InvCursPos + ItemW > 44)
+        InvCursPos = 44 - ItemW;
+    if (InvCursPos >= 45 && InvCursPos <= 54 && InvCursPos + ItemW > 54)
+        InvCursPos = 54 - ItemW;
+    if (InvCursPos >= 55 && InvCursPos <= 64 && InvCursPos + ItemW > 64)
+        InvCursPos = 64 - ItemW;
+    while (InvCursPos + ItemH * 10 > 64)
+        InvCursPos -= 10;
+}
+
+void InvSetItemCurs(void)
+{
+    int ItemNo;
+
+    if (plr[myplr].InvGrid[InvCursPos - 25] == 0)
+        return;
+    if (_pcurs[myplr] >= 12)
+        return;
+    if ((unsigned int)(InvCursPos - 25) >= 40)
+        return;
+
+    ItemNo = plr[myplr].InvGrid[InvCursPos - 25];
+    if (InvCursPos >= 26) {
+        while (plr[myplr].InvGrid[InvCursPos - 26] == ItemNo || plr[myplr].InvGrid[InvCursPos - 26] == -ItemNo) {
+            InvCursPos--;
+        }
+    }
+
+    if (InvCursPos >= 35) {
+        while (plr[myplr].InvGrid[InvCursPos - 35] == ItemNo || plr[myplr].InvGrid[InvCursPos - 35] == -ItemNo) {
+            if (InvCursPos < 35)
+                break;
+            InvCursPos -= 10;
+        }
+    }
+
+    if (InvCursPos < 25)
+        InvCursPos = 25;
+}
+
+void InvMoveCursLeft(void)
+{
+    int ItemInc = 0;
+    int OldPos;
+
+    OldPos = InvCursPos;
+
+    if (_pcurs[myplr] < 12) {
+        switch (InvCursPos) {
+        case 0:
+        case 4:
+        case 6:
+            InvCursPos = 7;
+            break;
+        case 5:
+            InvCursPos = 19;
+            break;
+        case 7:
+            InvCursPos = 13;
+            break;
+        case 13:
+            InvCursPos = 5;
+            break;
+        case 19:
+            InvCursPos = 4;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40 || InvCursPos >= 0x41)
+                ItemInc = 1;
+            break;
+        }
+    } else {
+        switch (InvCursPos) {
+        case 0:
+        case 6:
+        case 19:
+            break;
+        case 4:
+            InvCursPos = 5;
+            break;
+        case 5:
+            InvCursPos = 4;
+            break;
+        case 7:
+            InvCursPos = 13;
+            break;
+        case 13:
+            InvCursPos = 7;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40 || InvCursPos >= 0x41)
+                ItemInc = 1;
+            break;
+        }
+    }
+
+    if ((unsigned int)(InvCursPos - 25) < 40) {
+        InvCursPos -= ItemInc;
+        if ((InvCursPos - 25) % 10 == 9 || (InvCursPos - 25) % 10 == -1) {
+            InvCursPos += 10;
+        }
+    } else if (InvCursPos < 0x41) {
+        /* nothing */
+    } else if (InvCursPos < 0x42) {
+        InvCursPos = InvCursPos + 7;
+    } else {
+        InvCursPos = InvCursPos - ItemInc;
+    }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
+}
+
+void InvMoveCursRight(void)
+{
+    int ItemInc;
+    int OldPos;
+
+    OldPos = InvCursPos;
+    ItemInc = 0;
+
+    if (_pcurs[myplr] < 12) {
+        switch (InvCursPos) {
+        case 0:
+            InvCursPos = 6;
+            break;
+        case 4:
+            InvCursPos = 19;
+            break;
+        case 5:
+        case 6:
+            InvCursPos = 13;
+            break;
+        case 7:
+            InvCursPos = 4;
+            break;
+        case 13:
+            InvCursPos = 7;
+            break;
+        case 19:
+            InvCursPos = 5;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40) {
+                ItemInc = 1;
+                if (plr[myplr].InvGrid[InvCursPos - 25] != 0) {
+                    InvGetItemWH(InvCursPos - 25);
+                    ItemInc = ItemW;
+                }
+            } else if (InvCursPos >= 0x41) {
+                ItemInc = 1;
+            }
+            break;
+        }
+    } else {
+        switch (InvCursPos) {
+        case 0:
+        case 6:
+        case 19:
+            break;
+        case 4:
+            InvCursPos = 5;
+            break;
+        case 5:
+            InvCursPos = 4;
+            break;
+        case 7:
+            InvCursPos = 13;
+            break;
+        case 13:
+            InvCursPos = 7;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40)
+                ItemInc = 1;
+            else if (InvCursPos >= 0x41)
+                ItemInc = 1;
+            break;
+        }
+    }
+
+    if ((unsigned int)(InvCursPos - 25) < 40) {
+        if (_pcurs[myplr] >= 12) {
+            ItemNo = plr[myplr].HoldItem._iCurs;
+            ItemW = (InvItemWidth[ItemNo + 12] >> 4) - 1;
+        } else {
+            ItemW = 0;
+        }
+
+        InvCursPos = InvCursPos + ItemInc;
+        if ((InvCursPos - 25 + ItemW) % 10 == 0) {
+            InvCursPos += ItemW - 10;
+        }
+    } else if (InvCursPos >= 0x41) {
+        if (InvCursPos < 0x48) {
+            InvCursPos = InvCursPos + ItemInc;
+        } else {
+            InvCursPos = InvCursPos - 7;
+        }
+    }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
+}
+
+void InvMoveCursUp(void)
+{
+    int ItemInc = 0;
+    int OldPos;
+
+    OldPos = InvCursPos;
+
+    if (_pcurs[myplr] < 12) {
+        switch (InvCursPos) {
+        case 0:
+            break;
+        case 5:
+            InvCursPos = 6;
+            break;
+        case 4:
+        case 6:
+        case 7:
+            InvCursPos = 0;
+            break;
+        case 13:
+            InvCursPos = 6;
+            break;
+        case 19:
+            InvCursPos = 6;
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40) {
+                if (InvCursPos < 35)
+                    InvCursPos = 19;
+                else
+                    ItemInc = 1;
+            } else if (InvCursPos >= 0x41) {
+                InvCursPos -= 9;
+            }
+            break;
+        }
+    } else {
+        switch (InvCursPos) {
+        case 0:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 13:
+        case 19:
+            break;
+        default:
+            if ((unsigned int)(InvCursPos - 25) < 40)
+                ItemInc = 1;
+            else if (InvCursPos >= 0x41)
+                InvCursPos -= 9;
+            break;
+        }
+    }
+
+    if ((unsigned int)(InvCursPos - 25) < 40 && ItemInc != 0) {
+        if (InvCursPos < 35) {
+            switch (plr[myplr].HoldItem._iLoc) {
+            case 1:
+                InvCursPos = 7;
+                break;
+            case ILOC_TWOHAND:
+                InvCursPos = 7;
+                break;
+            case 3:
+                InvCursPos = 19;
+                break;
+            case 4:
+                InvCursPos = 0;
+                break;
+            case 5:
+                InvCursPos = 4;
+                break;
+            case 6:
+                InvCursPos = 6;
+                break;
+            case 7:
+            case 8:
+                break;
+            }
+        } else {
+            InvCursPos = InvCursPos - 10;
+        }
+    }
+
+    InvSetItemCurs();
+    if (OldPos != InvCursPos)
+        PlaySFX(0x32);
 }
 
 void InvMoveCursDown(void)
@@ -2896,94 +2989,4 @@ void InvMoveCursDown(void)
     InvSetItemCurs();
     if (OldPos != InvCursPos)
         PlaySFX(0x32);
-}
-
-void ControlInv(void)
-{
-    CheckNewPath(myplr);
-    InvSetItemCurs();
-
-    if (sfxdelay > 0) {
-        sfxdelay--;
-        if (sfxdelay == 0)
-            PlaySFX(sfxdnum);
-    }
-
-    _pcursitem[sel_data] = -1;
-    uitemflag = 0;
-    ReadPad(-1);
-
-    if (_pcurs[myplr] == 9)
-        invflag = 0;
-
-    if (InvCursPos < 0x19)
-        InvBackAY = 0;
-    else
-        InvBackAY = 0x60;
-
-    if (InvBackY > InvBackAY) {
-        InvBackY -= 0x10;
-        if (InvBackY < InvBackAY)
-            InvBackY = InvBackAY;
-    } else if (InvBackY < InvBackAY) {
-        InvBackY += 0x10;
-        if (InvBackAY < InvBackY)
-            InvBackY = InvBackAY;
-    }
-
-    if (invflag) {
-        _pcursinvitem[sel_data] = CheckInvHLight();
-        if (_pcursinvitem[sel_data] == -1)
-            ClrCursor(options_pad);
-    } else {
-        ClearPanel();
-    }
-
-    if (InvPageFlag) {
-        if (DavesPad & 0x400) {
-            PlaySFX(0x32);
-            if (InvPageNo == 0)
-                InvPageNo = 1;
-            else
-                InvPageNo = 0;
-        }
-    } else {
-        InvPageNo = 0;
-    }
-
-    if (uitemflag)
-        DrawUniqueInfo();
-
-    if (DavesPad & 0x4)
-        InvMoveCursLeft();
-    if (DavesPad & 0x8)
-        InvMoveCursRight();
-    if (DavesPad & 0x1)
-        InvMoveCursUp();
-    if (DavesPad & 0x2)
-        InvMoveCursDown();
-
-    if (DavesPad & 0x40) {
-        if ((unsigned int)(_pcurs[myplr] - 2) < 2 || _pcurs[myplr] == 4)
-            TryIconCurs();
-        else
-            CheckInvScrn();
-    }
-
-    if (DavesPad & 0x200) {
-        ignore_buttons = 1;
-        UseInvItem(myplr, _pcursinvitem[sel_data]);
-    }
-
-    if (DavesPad & 0x80) {
-        if (_pcurs[myplr] >= 12) {
-            if (numitems < 0x7A && TryInvPut()) {
-                NetSendCmdPItem(1, 0xA, 0, 0);
-            } else {
-                PlaySFX(0x3D3);
-            }
-        }
-    }
-
-    InvAlignObject();
 }

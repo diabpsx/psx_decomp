@@ -348,7 +348,7 @@ SECTIONS
         . = 0xFD008;   /* 0x8010D008 */
         build/asm/data/data_inv.data.s.o(.data);
         . = 0xFD6CC;   /* 0x8010D6CC */
-        build/asm/data/data_automap.data.s.o(.data);
+        build/native_source/data_automap.data.s.o(.data);   /* verified native source data */
         . = 0xFDBAC;   /* 0x8010DBAC */
         build/sdk/native/rodata.rodata.s.o(.rodata);   /* original SDK data bridge */
         . = 0xFFF90;   /* 0x8010FF90 */
@@ -600,15 +600,15 @@ SECTIONS
         . = 0x109D9C;   /* 0x80119D9C */
         build/asm/data/rodata_preitem.rodata.s.o(.rodata);
         . = 0x109DC0;   /* 0x80119DC0 */
-        build/asm/data/rodata_missiles.rodata.s.o(.rodata);
+        build/native_source/rodata_missiles.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10A2B8;   /* 0x8011A2B8 */
-        build/asm/data/rodata_monster.rodata.s.o(.rodata);
+        build/native_source/rodata_monster.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10A3A8;   /* 0x8011A3A8 */
         build/asm/data/rodata_monstdat.rodata.s.o(.rodata);
         . = 0x10A3B8;   /* 0x8011A3B8 */
-        build/asm/data/rodata_inv.rodata.s.o(.rodata);
+        build/native_source/rodata_inv.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10A738;   /* 0x8011A738 */
-        build/asm/data/rodata_automap.rodata.s.o(.rodata);
+        build/native_source/rodata_automap.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10A780;   /* 0x8011A780 */
         build/native_source/sdata_before_primpool.sdata.s.o(.sdata);   /* verified native source data */
         . = 0x10AAB4;   /* 0x8011AAB4 */

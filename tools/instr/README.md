@@ -3392,7 +3392,7 @@ is explicitly unvalidated; the real PsyQ RTL dumps remain authoritative.
 
 ### DrawSpellCel frame-gap and ProcessItems spelling screens
 
-Related native-link result (2026-10-03): the corrected and retail-ordered
+Initial native-link result (2026-10-03; subsequently integrated below): the corrected and retail-ordered
 MISSILES TU links exactly with `-fconserve-space` and explicit retail bindings
 for its seven uninitialized common globals: 69,488 text bytes, 1,272 read-only
 bytes (including jump tables), 45 constant small-data bytes. This is not a
@@ -3405,6 +3405,51 @@ Applying the same option diagnostically to the two remaining game failures
 does not improve either: DrawSpellCel remains 68 differences/frame184 and
 DrawObjSelector 237/frame264. Actual commands were logged by the corrected
 wrapper; copies are under `build/conserve_source_probe`.
+
+Production follow-up: MISSILES now uses the measured common-data lane through
+`tools/build.py` and `configs/native_recon_link.json`. `native_commons.py`
+allocates the seven exact XBSS declarations with original ASPSX/PSYLINK, imports
+only their ten zero bytes and records 49 carrier bytes separately. The native
+overlay route uses separate `FILE` outputs, `OVER`, `/v`, and vendor SYMMUNGE;
+all 115 function records and seven global records pass at retail addresses.
+All five final images match, with 1,268 source-linked functions in 92 TUs
+(1,249 native plus 19 conventional). The 188-test suite passes. The two
+remaining board failures are unchanged; neither flag screening nor integration
+is counted as a new DrawSpellCel/DrawObjSelector match.
+
+MONSTER follow-up: applying the same source-common/overlay pipeline after
+retail definition ordering gives 105 exact function receipts, 50,944 unmasked
+code bytes, 240 read-only bytes and 19 small-data bytes. The original unused
+GMAN/CPLAYER header inlines restore the missing literals; ordinary `", "`
+arguments replace the artificial external D_8011C2C8 string alias. Its two
+four-byte commons are independently allocated and address/type verified.
+All five final images pass. The shared native regression test now covers both
+GAME TUs; the full suite is 189 tests. Source-linked coverage is 1,373 functions
+in 93 TUs. The two board failures remain unresolved.
+
+INV follow-up: full native linking now verifies all 57 functions, 44,260 text
+bytes, 896 read-only bytes, 104 small-data bytes and 23 global records. This
+TU needs ordinary flags: the common-data option adds three absolute BRect
+accesses and twelve text bytes. Removing redundant early extern declarations
+for owned globals restores their strong-definition order. An in-class Dialog
+constructor restores the six header copies' original order; no instruction
+stream is rearranged after compilation. Complete forward prototypes avoid
+old-cc1plus implicit calls and their spurious empty SYM scopes after source
+reordering. Correct retail data initializers, names and the texture-selector
+branches close several normalization blind spots. All five final images,
+the unchanged 2725/2727 board and 190 tests pass. Source-linked coverage is
+now 1,430 functions in 94 TUs; SDK native imports remain 349.
+
+AUTOMAP follow-up: replacing the false unnamed D_8011C36C alias with the retail
+AutoMapOt static, restoring AutoMapScale=4/AutoMapOt=240 and AutoMapX/AutoMapY,
+removing redundant owned externs, restoring the original GMAN header inline
+and ordering the two player-drawing definitions yields the complete native
+receipt: 19 functions, 7,880 code bytes, 72 rdata bytes, 60 sdata bytes, 24
+data bytes and 12 global records. Ordinary flags suffice. All five linked
+images pass and the tool suite is192 tests. A dedicated ownership test proves
+all297 GAME functions now have source text; broader source/data integration
+and the two resident drawing failures remain open. Total source-linked
+coverage is1,449 functions in95 TUs.
 
 Current full-TU follow-up (2026-10-03, after the 2725/2727 board): the old
 `scratch/run_verify_extra.py` option wrapper is invalid evidence. It patches

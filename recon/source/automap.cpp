@@ -9,18 +9,19 @@
  * AMPlayerX/Y, AMPx/AMPy for the 2-player split-screen case).  Layouts, prototypes, externs
  * generated from DIABPSX.SYM (tools/symhdr.py -> gen headers). */
 #include "diabpsx_types.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_automap.h"
 #include "source/gen/externs_automap.h"
 #include "source/gen/protos_automap.h"
 
-/* AUTOMAP.CPP-owned globals (.sdata; SYM class EXT / unnamed D_ data).  Tentative definitions in the
- * OWNER TU make them gp-relative exactly like retail; preauto.cpp/coreauto.cpp reach these `extern`
- * (absolute), since only THIS TU's oracle reaches them via %gp_rel (methodology 3.12 #6). */
+/* Retail-owned storage, with original SYM names/types and image initializers. */
+int AutoMapScale = 4;
+static int AutoMapOt = 240;
 unsigned char automapflag;
-int AutoMapScale;
+int AutoMapX;
+int AutoMapY;
 int AutoMapXOfs;
 int AutoMapYOfs;
-int D_8011C36C;   /* OT layer/index scratch for AMGetLine's addPrim -- no SYM name, retail static data */
 int AMPlayerX;
 int AMPlayerY;
 int AMPx[2];   /* %gp_rel(AMPx) in DrawAutomap's oracle -> owned here */
@@ -87,8 +88,24 @@ LINE_F2 *AMGetLine(unsigned char R, unsigned char G, unsigned char B)
     L2->g0 = G;
     L2->b0 = B;
 
-    addPrim(&ThisOt[D_8011C36C], L2);
+    addPrim(&ThisOt[AutoMapOt], L2);
     return L2;
+}
+
+/* line 202 @0x801620A0 */
+void AmDrawPlayer(int x0, int y0, int x1, int y1, int PNum)
+{
+    LINE_F2 *L2;
+
+    if (PNum == 0)
+        L2 = AMGetLine(0x20, 0xFF, 0);
+    else
+        L2 = AMGetLine(0xFF, 0, 0xE0);
+
+    L2->x0 = x0;
+    L2->y0 = y0;
+    L2->x1 = x1;
+    L2->y1 = y1;
 }
 
 /* line 221 @0x80162124 -- twin: devilution DrawAutomapPlr's per-direction 3-segment marker, but each
@@ -153,22 +170,6 @@ void DrawAutomapPlr(void)
             break;
         }
     }
-}
-
-/* line 202 @0x801620A0 */
-void AmDrawPlayer(int x0, int y0, int x1, int y1, int PNum)
-{
-    LINE_F2 *L2;
-
-    if (PNum == 0)
-        L2 = AMGetLine(0x20, 0xFF, 0);
-    else
-        L2 = AMGetLine(0xFF, 0, 0xE0);
-
-    L2->x0 = x0;
-    L2->y0 = y0;
-    L2->x1 = x1;
-    L2->y1 = y1;
 }
 
 /* line 335 @0x80162490 */
@@ -494,7 +495,7 @@ void DrawAutomap(void)
         return;
     if (!plr[0].plractive && !plr[1].plractive)
         return;
-    D_8011C36C = CBlocks::GetOverlayOtBase();
+    AutoMapOt = CBlocks::GetOverlayOtBase();
     P1x = plr[0]._px - 16;
     P1y = plr[0]._py - 16;
     P2x = plr[1]._px - 16;

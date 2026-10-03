@@ -10,13 +10,13 @@ SECTIONS
         . = 0x4;   /* 0x80139BFC */
         build/native_source/gameonly.text.s.o(.text);   /* verified native-assembled source */
         . = 0xC;   /* 0x80139C04 */
-        build/skel/SOURCE/MISSILES.CPP.o(.text);
+        build/native_source/missiles.text.s.o(.text);   /* verified native-assembled source */
         . = 0x10F7C;   /* 0x8014AB74 */
-        build/skel/SOURCE/MONSTER.CPP.o(.text);
+        build/native_source/monster.text.s.o(.text);   /* verified native-assembled source */
         . = 0x1D67C;   /* 0x80157274 */
-        build/skel/SOURCE/INV.CPP.o(.text);
+        build/native_source/inv.text.s.o(.text);   /* verified native-assembled source */
         . = 0x28360;   /* 0x80161F58 */
-        build/skel/SOURCE/AUTOMAP.CPP.o(.text);
+        build/native_source/automap.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2A228;   /* image end 0x80163E20 */
     }
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }

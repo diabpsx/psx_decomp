@@ -116,13 +116,53 @@ its diagnostic filename had wrong case, and two light tables had a nonzero
 final element instead of the gold source's implicit zero.
 MISSILES remains 115/115 for bytes/SYM, calls and return declarations.
 
-`tools/tests/test_missiles_native_probe.py` additionally checks all 69,488
-relocated text bytes, the complete pool and 45 constant small-data bytes
-without masking. This diagnostic uses PsyQ `-fconserve-space` and binds seven
-common globals at their retail addresses. It does not allocate those globals
-in the final image or provide the native overlay-compacted SYM receipt yet;
-production flags and the native-import registry remain unchanged. The retained
-source is not counted as a new final-image import. All 182 tool tests pass.
+MISSILES is now integrated through the native-source registry. Its measured
+PsyQ `-fconserve-space` lane emits seven linker-placed zero commons. Original
+ASPSX/PSYLINK allocate their exact ten bytes at the retail addresses, with
+typed SYM, size, bounds, overlap and zero-value checks. The allocation bank's
+49 carrier bytes are not imported as common data. The 45-byte constant pool
+retains its three neighboring scaffold alignment bytes; none is claimed as
+reconstructed output.
+
+The native overlay link uses explicit `FILE` groups, `OVER`, `/v` and the
+hash-verified vendor SYMMUNGE. Overlay-ID file headers are verified against raw
+SYM and excluded from code payloads; no source instruction is changed. All
+115 exact function SYM records pass at their retail addresses.
+`tools/tests/test_missiles_native_probe.py` checks all 69,488 relocated text
+bytes, the complete read-only pool, constant small data and real common
+allocations without masking. All 192 tool tests and all five final-image
+comparisons pass. Other unreconstructed data and TUs remain scaffold.
+
+MONSTER now uses the same native route for all 105 functions: 50,944 text
+bytes, 240 read-only bytes, 19 small-data bytes and two four-byte common
+variables. Restoring retail function order, the original unused header inlines
+and the actual `", "` literal removes the reconstruction-only ROM-string alias.
+Only PrintMonstHistory's string arguments changed inside a function body;
+the other 104 bodies are unchanged. The two static-local functions also pass
+exact native SYM at their final addresses. The common allocation bank contains
+eight owned bytes and 44 non-exported carrier bytes. All five images were
+rechecked after this import; no additional SDK entry is claimed.
+
+INV adds another 57 native-linked functions, 44,260 exact text bytes, 896
+read-only bytes and 104 small-data bytes. Its 23 global records now have the
+retail names, types, initial values and addresses: this restores OT defaults
+249/250, CursGlowDx=8, the recorded InvOn/sgdwLastTime/InvSel storage and the
+original `%i/%i` format. It also fixes InvDrawItem's reversed texture selection.
+Complete forward declarations preserve call signatures after retail function
+ordering. The in-class Dialog constructor reproduces the original header-copy
+order. Redundant early externs for owned variables are removed; INV uses the
+ordinary compiler flags, not the common-data override. All five images and
+the complete 2725/2727 board were rechecked, with no regression.
+
+AUTOMAP completes source-text coverage of GAME: all 297 functions across its
+five code fragments are now native-linked (172,580 code bytes, plus the separate
+four-byte overlay ID). AUTOMAP supplies 7,880 text bytes, 72 read-only bytes,
+60 small-data bytes, the 24-byte SetLevelName table and 12 exact global records.
+This restores AutoMapScale=4, the real AutoMapOt=240 static, and the recorded
+AutoMapX/AutoMapY storage. Only ordinary source definitions and compiler flags
+are used. All five images remain exact. Resident arrays and other untranslated
+TUs still have scaffold ownership; complete GAME code is not whole-project
+completion.
 
 The main file contains 1,099,268 payload bytes followed by the four-byte
 additive checksum `0x02A12C64`. Its checksum is now a separate file-format
@@ -151,8 +191,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1134 functions across ninety TUs through real ASPSX/PSYLINK: 1153 source-linked
-functions across 91 TUs in total. They replace their text scaffolds at the original
+1430 functions across ninety-four TUs through real ASPSX/PSYLINK: 1449 source-linked
+functions across 95 TUs in total. They replace their text scaffolds at the original
 addresses. PCIO and DatIO also supply their complete read-only sections,
 including diagnostic strings and relocated virtual-method tables, through
 `configs/recon_data_link.json`. SPELLS supplies its complete 20-byte jump table
@@ -309,7 +349,7 @@ GAMEOVER supplies all twelve functions in retail order, including its own
 Dialog constructor/destructor and header-method copies. Unused header data
 still remains scaffold; this source TU emits no runtime data sections.
 `python tools/link.py` verifies the resulting mixed-source images: the main
-image's 1,099,272 retail bytes plus 120,300 bytes of zero BSS, and all four
+image's 1,099,272 serialized retail bytes, 120,304 zero runtime BSS bytes, and all four
 overlay images, match exactly. This checks callback-address, cross-image-call,
 and external-data relocations after linking, not merely normalized fields.
 `configs/cross_image_symbols.json` explicitly binds main's `DrawAutomap` and

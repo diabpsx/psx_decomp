@@ -42,7 +42,12 @@ CC1_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fsigned-char"]   # -fsigned-char
 CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline", "-fsigned-char"]   # retail never inlines in-class methods (out-of-line copies per TU, callers jal them)
 
 # per-TU flag overrides: {repo-relative posix path: {"g_value": "0", "lane": "c"...}}
-PER_TU_FLAGS = {}
+PER_TU_FLAGS = {
+    # Reproduce linker-placed zero commons. These unchanged GAME objects link
+    # all text/pool bytes and their typed globals at the retail homes.
+    "recon/source/missiles.cpp": {"extra": ["-fconserve-space"]},
+    "recon/source/monster.cpp": {"extra": ["-fconserve-space"]},
+}
 
 
 def per_tu_flags(src: Path) -> dict:
@@ -51,7 +56,7 @@ def per_tu_flags(src: Path) -> dict:
 
 
 def _cc1_env():
-    """PsyQ's DOS-era cc1/cc1plus write scratch files via TMPDIR/TMP/TEMP and need a
+    r"""PsyQ's DOS-era cc1/cc1plus write scratch files via TMPDIR/TMP/TEMP and need a
     WINDOWS path WITH a trailing backslash, else `\/ctaNNNNN: No such file or directory`."""
     tmp = BUILD / "tmp" / str(os.getpid()); tmp.mkdir(parents=True, exist_ok=True)   # per-process: parallel cc1 runs clobber fixed scratch names
     env = dict(os.environ); w = str(tmp).replace("/", "\\") + "\\"

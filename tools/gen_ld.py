@@ -118,6 +118,9 @@ def gen(name: str):
                    for section, row in spec["sections"].items()
                    if section not in (".text", ".sbss", ".bss") and not section.startswith('.text.')
                    and row.get("image", spec["image"]) == name}
+    if name == 'diabpsx':
+        native_data.update(row['scaffold'] for spec in NATIVE_RECON.values()
+                           for row in spec.get('common_symbols',{}).values())
     if set(NATIVE_RECON) & set(RECON_MAP):
         raise ValueError("source TU cannot use both GNU and native source inputs")
     if extra_text & (set(native) | set(RECON_MAP)):

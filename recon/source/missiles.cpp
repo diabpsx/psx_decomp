@@ -19,9 +19,9 @@
  *
  * All 115 entries now pass the byte/SYM board; definitions follow retail VA order.
  * Original header inlines and local-array initializers reproduce the full 1272-byte pool.
- * An unmasked native diagnostic with -fconserve-space and explicit retail common bindings
- * matches all 69488 text bytes as well. Production common-storage placement and native
- * overlay-SYM integration remain open; the diagnostic is not a final-image seal.
+ * The native source link uses -fconserve-space, verified common storage and original
+ * overlay SYM compaction. All 69488 text bytes, the pool, 45 constant small-data bytes,
+ * seven zero commons and 115 exact SYM records are integrated into the matching images.
  */
 #include "diabpsx_types.h"
 #include "source/gen/structs_missiles.h"

@@ -109,6 +109,30 @@ def overlay_sections(source, group):
     return result
 
 
+def require_symmunge():
+    if not SYMMUNGE.is_file() or hashlib.sha256(SYMMUNGE.read_bytes()).hexdigest() != SYMMUNGE_SHA256:
+        sys.exit('[symmunge] overlay SYM requires the verified original SYMMUNGE 1.56 executable; '
+                 'set DIAB_SYMMUNGE to its path')
+
+
+def compact_overlay_sym(raw: Path, final: Path, payloads):
+    """Original vendor compaction; preserve raw evidence and every linked payload."""
+    require_symmunge()
+    dump = subprocess.run([str(DUMPSYM), str(raw)], capture_output=True, text=True, cwd=raw.parent)
+    raw.with_suffix('.sym.txt').write_text(dump.stdout, encoding='utf-8', errors='replace')
+    if dump.returncode or ' overlay length ' not in dump.stdout or ' set overlay' not in dump.stdout:
+        sys.exit('[psylink] missing real overlay records before SYMMUNGE')
+    before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in payloads}
+    result = subprocess.run([str(SYMMUNGE), '/i', str(raw), str(final)],
+                            capture_output=True, text=True, cwd=raw.parent, env=ENV)
+    final.with_suffix('.symmunge.log').write_text(result.stdout + result.stderr)
+    if result.returncode or 'Symbol file compacted OK' not in result.stdout or not final.is_file():
+        sys.exit(f'[symmunge] {raw.name}\n{result.stdout}{result.stderr}')
+    if any(hashlib.sha256(p.read_bytes()).hexdigest() != digest for p,digest in before.items()):
+        sys.exit('[symmunge] linked bytes changed unexpectedly')
+    return dump.stdout
+
+
 def link(obj: Path, source=None) -> Path:
     """PSYLINK one object plus stubs; source selects the authentic overlay SYM route.
 
@@ -119,10 +143,8 @@ def link(obj: Path, source=None) -> Path:
     lnk = OUT / f"{name}.lnk"
     overlay = overlay_group(source)
     in_overlay = overlay_sections(source, overlay)
-    if overlay and (not SYMMUNGE.is_file() or
-                    hashlib.sha256(SYMMUNGE.read_bytes()).hexdigest() != SYMMUNGE_SHA256):
-        sys.exit('[symmunge] overlay SYM requires the verified original SYMMUNGE 1.56 executable; '
-                 'set DIAB_SYMMUNGE to its path')
+    if overlay:
+        require_symmunge()
     def write_lnk(with_stub):
         lines = ["\torg\t$80010000", "text\tgroup"]
         if not overlay:
@@ -156,19 +178,7 @@ def link(obj: Path, source=None) -> Path:
     txt = OUT / f"{name}.sym.txt"
     if overlay:
         raw = OUT / f'{name}.raw.sym'
-        dump = subprocess.run([str(DUMPSYM), str(raw)], capture_output=True, text=True, cwd=OUT)
-        (OUT / f'{name}.raw.sym.txt').write_text(dump.stdout, encoding='utf-8', errors='replace')
-        if dump.returncode or ' overlay length ' not in dump.stdout or ' set overlay' not in dump.stdout:
-            sys.exit('[psylink] missing real overlay records before SYMMUNGE')
-        cpe = OUT / f'{name}.cpe'
-        before = hashlib.sha256(cpe.read_bytes()).hexdigest()
-        r = subprocess.run([str(SYMMUNGE), '/i', str(raw), str(sym)],
-                           capture_output=True, text=True, cwd=OUT, env=ENV)
-        (OUT / f'{name}.symmunge.log').write_text(r.stdout + r.stderr)
-        if r.returncode or 'Symbol file compacted OK' not in r.stdout or not sym.is_file():
-            sys.exit(f'[symmunge] {name}\n{r.stdout}{r.stderr}')
-        if hashlib.sha256(cpe.read_bytes()).hexdigest() != before:
-            sys.exit('[symmunge] linked bytes changed unexpectedly')
+        compact_overlay_sym(raw, sym, [OUT / f'{name}.cpe'])
     r = subprocess.run([str(DUMPSYM), str(sym)], capture_output=True, text=True, cwd=OUT)
     if r.returncode:
         sys.exit(f'[dumpsym] {name}\n{r.stdout}{r.stderr}')

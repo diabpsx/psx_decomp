@@ -13,6 +13,16 @@ import sdk_link as S
 
 
 class NativeSdkTests(unittest.TestCase):
+    def test_overlay_layout_rejects_unsupported_and_overlapping_regions(self):
+        for regions in ({'.rdata': (0x1000,4)},
+                        {'.text': (0x1000,4),'.sbss': (0x2000,4)},
+                        {'.text': (0x1000,4),'.rdata': (0xffc,4)},
+                        {'.text': (0x1000,4),'.data': (0x1000,4)}):
+            with self.subTest(regions=regions), self.assertRaises(ValueError):
+                S.native_link('sample',b'unused',regions,{},overlay_text=True)
+        with self.assertRaises(ValueError):
+            S.native_link('sample',b'unused',{'.text':(0x1000,4)},{},overlay_text='yes')
+
     def test_compiler_named_section_is_safe_linker_input(self):
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary)
@@ -196,6 +206,15 @@ class NativeSdkTests(unittest.TestCase):
                 S.data_bridge(invalid, [(0x1004, 8, 'member.bin')])
         with self.assertRaises(ValueError):
             S.data_bridge(source, [(0x1004, 8, 'a.bin'), (0x1008, 4, 'b.bin')])
+
+    def test_data_bridge_preserves_unowned_literal_tail_bytes(self):
+        source = ('dlabel table\n /* 0 00001000 02000304 */ .word 0x04030002\nenddlabel table\n')
+        result = S.data_bridge(source,[(0x1000,1,'array.bin')])
+        self.assertIn('.incbin "array.bin", 0, 1\n    .byte 0x00,0x03,0x04',result)
+        for bad in (source.replace('0x04030002','address_symbol'),
+                    source.replace('0x04030002','0x00000002')):
+            with self.assertRaises(ValueError):
+                S.data_bridge(bad,[(0x1000,1,'array.bin')])
 
     def test_prefix_owner_must_be_present_unique_and_contiguous(self):
         previous = {'entry': 'first', 'va': 0x1000, 'size': 4,

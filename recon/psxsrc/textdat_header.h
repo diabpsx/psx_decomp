@@ -33,6 +33,7 @@ struct TextDat {
     ~TextDat();
     void DumpDatFile();
     void DoDecompRequests();
+    POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
     void PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);
 };
 

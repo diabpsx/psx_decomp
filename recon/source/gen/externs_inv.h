@@ -44,9 +44,6 @@ extern int icursH28;   /* @0x8011B74C */
 extern int AP2x2Tbl[10];   /* @0x8010D008 */
 extern char itemavail[127];   /* @0x800D53D4 */
 extern unsigned short DavesPad;   /* @0x8011AB12 */
-extern int InvPageFlag;   /* @0x8011C33C */
-extern int InvPageNo;   /* @0x8011C338 */
-extern int InvBackAY;   /* @0x8011C340 */
 extern int options_pad;   /* @0x8011B250 */
 extern BOOL ignore_buttons;   /* @0x8011BBD0 */
 extern unsigned char BORDERR;   /* @0x8011ABF7 */
