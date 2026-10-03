@@ -49,6 +49,11 @@ PER_TU_FLAGS = {
     "recon/glibdev/tick.c": {"g_value": "0"},
     "recon/glibdev/tasker.c": {"g_value": "0"},   # 16 four-byte statics at 8011C98C.. reached absolutely (scratch/glib/tasker)
     "recon/glibdev/gal.c": {"g_value": "0"},      # same: GAL statics addressed absolutely (scratch/glib/gal)
+    "recon/glibdev/gutils.c": {"g_value": "0"},
+    "recon/glibdev/gtimsys.c": {"g_value": "0"},
+    "recon/glibdev/vrip.c": {"g_value": "0"},
+    "recon/glibdev/gsys.c": {"g_value": "0"},
+    "recon/glibdev/gdebug.c": {"g_value": "0"},
     # Reproduce linker-placed zero commons. These unchanged GAME objects link
     # all text/pool bytes and their typed globals at the retail homes.
     "recon/source/missiles.cpp": {"extra": ["-fconserve-space"]},
