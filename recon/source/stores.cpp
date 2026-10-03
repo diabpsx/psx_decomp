@@ -290,7 +290,7 @@ unsigned char SmithRepairOk(int i)
 }
 
 /* @0x8006BBEC */
-void AddStoreHoldRepair(ItemStruct *itm, int i)
+static void AddStoreHoldRepair(ItemStruct *itm, int i)
 {
     int v;
 

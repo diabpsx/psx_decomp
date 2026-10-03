@@ -8,6 +8,11 @@
 #include "source/gen/structs_player.h"
 #include "source/gen/externs_player.h"
 #include "source/gen/protos_player.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void ArmorDur(PlayerStruct *ptrplr);   /* @0x80064320 PLAYER.CPP:3326 */
+static void CheckCheatStats(PlayerStruct *ptrplr);   /* @0x800650CC PLAYER.CPP:3877 */
+static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy);   /* @0x800615DC PLAYER.CPP:1987 */
 #include "source/diablo.h"
 
 /* ---- local constants (values confirmed from the oracle / hellfire source) ---- */
@@ -395,7 +400,7 @@ void GetGoldSeed(PlayerStruct *ptrplr, ItemStruct *h)
 
 /* PsyQ addPrim-style primitive-pool cursor advance (identical body wherever it's instantiated --
  * confirmed byte-identical across every PRIM_GetPrim__FPP8POLY_FT4 VA in refs/skeleton). */
-void PRIM_GetPrim(POLY_FT4 **Prim)
+static void PRIM_GetPrim(POLY_FT4 **Prim)
 {
     if (AddrToAvoid <= ThisPrimAddr + 10) {
         DBG_Error((char *)0x0, "psxsrc/primpool.h", 0x44);
@@ -1030,7 +1035,7 @@ void ShieldDur(PlayerStruct *ptrplr)
 
 /* SYM shows retail keeps a SEPARATE `PlayerStruct *p = ptrplr;` local (matching devilution's
  * original `p = &plr[pnum];`), not just the incoming `ptrplr` param reused directly. */
-void ArmorDur(PlayerStruct *ptrplr)
+static void ArmorDur(PlayerStruct *ptrplr)
 {
     if (!ismyplr(ptrplr)) {
         return;
@@ -1611,7 +1616,7 @@ unsigned char PlrHitObj(PlayerStruct *ptrplr, int mx, int my)
     return FALSE;
 }
 
-void CheckCheatStats(PlayerStruct *ptrplr)
+static void CheckCheatStats(PlayerStruct *ptrplr)
 {
     if (ptrplr->_pStrength > 750)
         ptrplr->_pStrength = 750;
@@ -1718,7 +1723,7 @@ void RespawnDeadItem(ItemStruct *itm, int x, int y)
     }
 }
 
-void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy)
+static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy)
 {
     if (itm->_itype == -1)
         return;

@@ -99,7 +99,6 @@ void TalktoMonster(int i);   /* @0x801565DC MONSTER.CPP:5445 */
 void SpawnGolum(int i, int x, int y, int mi);   /* @0x8015671C MONSTER.CPP:5485 */
 unsigned char CanTalkToMonst(int m);   /* @0x8015694C MONSTER.CPP:5519 */
 unsigned char CheckMonsterHit(int m, unsigned char &ret);   /* @0x8015698C MONSTER.CPP:5531 (R = reference, hand-fixed) */
-BOOL gSameRoom(int m, int i);   /* @0x80156A68 MONSTER.CPP:5556 */
 void MAI_Golum(int i);   /* @0x80156B00 MONSTER.CPP:5566 */
 void M_StartAttack(int i);   /* @0x8015702C MONSTER.CPP:5786 */
 void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir);   /* @0x8015711C MONSTER.CPP:5810 */

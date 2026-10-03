@@ -178,7 +178,7 @@ GPanel::GPanel(int Ofs)
     GPanelOt = CBlocks::GetMaxOtPos() - 2;
 }
 
-unsigned char SpdTrimCol(short col)
+static unsigned char SpdTrimCol(short col)
 {
     if (col < 0) col = 0;
     if (col > 255) col = 255;

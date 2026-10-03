@@ -88,8 +88,8 @@ extern unsigned char DialogRed, DialogGreen, DialogBlue;
 extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 extern unsigned char BORDERR, BORDERG, BORDERB;
 
-void GameOverTask(struct TASK *T);
-void PrintGameOver(void);
+static void GameOverTask(struct TASK *T);
+static void PrintGameOver(void);
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -106,7 +106,7 @@ void GO_DoGameOver(void)
     }
 }
 
-void GameOverTask(struct TASK *T)
+static void GameOverTask(struct TASK *T)
 {
     BOOL TimeOut;
     int TimeOutTime, lasttick;
@@ -176,7 +176,7 @@ void GameOverTask(struct TASK *T)
     GLUE_ResumeGame();
 }
 
-void PrintGameOver(void)
+static void PrintGameOver(void)
 {
     struct Dialog PBack;
     RECT PRect;

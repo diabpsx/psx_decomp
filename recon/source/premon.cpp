@@ -14,6 +14,10 @@
 #include "source/gen/structs_premon.h"
 #include "source/gen/externs_premon.h"
 #include "source/gen/protos_premon.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void SwapMonsterType(int *oldmt);   /* @0x8015F6E8 PREMON.CPP:111 */
+static void PlaceUniques(void);   /* @0x80161BCC PREMON.CPP:1279 */
 #include "source/diablo.h"
 
 #define MAXDUNX 96
@@ -30,7 +34,7 @@
 #define MT_GOLEM 109
 
 /* --------------------------------------------------------------------- */
-void SwapMonsterType(int *oldmt)
+static void SwapMonsterType(int *oldmt)
 {
     int mt;
 
@@ -880,7 +884,7 @@ void PlaceUniqueMonst(int uniqindex, int miniontype, int unpackfilesize)
 }
 
 /* --------------------------------------------------------------------- */
-void PlaceUniques(void)
+static void PlaceUniques(void)
 {
     int u, mt;
     unsigned char done;

@@ -6,8 +6,8 @@
 #include "psxsrc/textdat_header.h"
 
 extern "C" void DBG_Error(char *Text, char *File, int Line);
-int FindThisTd(TextDat *Td);
-int FindEmptyIndex(void);
+static int FindThisTd(TextDat *Td);
+static int FindEmptyIndex(void);
 
 static TextDat *DecRequestors[10];
 
@@ -54,7 +54,7 @@ void DEC_DoDecompRequests(void)
 }
 
 /* @0x800A44B4 DECOMP.CPP:116 */
-int FindThisTd(TextDat *Td)
+static int FindThisTd(TextDat *Td)
 {
     for (int f = 0; f < 10; f++) {
         if (DecRequestors[f] == Td)
@@ -64,7 +64,7 @@ int FindThisTd(TextDat *Td)
 }
 
 /* @0x800A44EC DECOMP.CPP:130 */
-int FindEmptyIndex(void)
+static int FindEmptyIndex(void)
 {
     for (int f = 0; f < 10; f++) {
         if (!DecRequestors[f])

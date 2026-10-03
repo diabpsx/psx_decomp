@@ -50,7 +50,7 @@ void StartStand(int pnum, int dir);   /* @0x80066CA4 PLAYER.CPP:4683 */
 /* @0x800CD650 (.data, no SYM record): spells that auto-target a monster */
 static int AutoTargetSpells[12] = { 0x1D, 0x1E, 0x1F, 0x23, 0x24, 0x0C, 0x0F, 0x14, 0x01, 0x03, 0x06, 0x08 };
 
-BOOL IsAutoTarget(int Spell)
+static BOOL IsAutoTarget(int Spell)
 {
     for (int i = 0; i < 12; i++) {
         if (AutoTargetSpells[i] == Spell)
@@ -59,21 +59,21 @@ BOOL IsAutoTarget(int Spell)
     return FALSE;
 }
 
-int GetXOff(int wx, int wy)
+static int GetXOff(int wx, int wy)
 {
     int xo = ((wx & 7) - (wy & 7)) << 2;
     xo = (xo * 625) / 1000;
     return xo;
 }
 
-int GetYOff(int wx, int wy)
+static int GetYOff(int wx, int wy)
 {
     int yo = ((wx & 7) + (wy & 7) - 8) << 1;
     yo = (yo * 625) / 1000;
     return yo;
 }
 
-void GetScrXY(int *wx, int *wy)
+static void GetScrXY(int *wx, int *wy)
 {
     CBlocks *gblocks = BL_GetCurrentBlocks();
     RECT R;
@@ -345,7 +345,7 @@ SpellTarget *GetSpellTarget(int pnum)
     return &GetGamePad(pnum)->spell;
 }
 
-void ArrowTask(TASK *T)
+static void ArrowTask(TASK *T)
 {
     DEF_ARGS *args = (DEF_ARGS *)T->Data;
     int pnum;

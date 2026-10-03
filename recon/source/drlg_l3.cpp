@@ -11,6 +11,35 @@
 #include "source/gen/structs_drlg_l3.h"
 #include "source/gen/externs_drlg_l3.h"
 #include "source/gen/protos_drlg_l3.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void InitL3Dungeon(void);   /* @0x80148F98 DRLG_L3.CPP:399 */
+static void SetBlankL3Dungeon(void);   /* @0x8014901C DRLG_L3.CPP:421 */
+static void FixL3Dungeon(void);   /* @0x80149078 DRLG_L3.CPP:431 */
+static int DRLG_L3FillRoom(int x1, int y1, int x2, int y2);   /* @0x801490EC DRLG_L3.CPP:444 */
+static void DRLG_L3CreateBlock(int x, int y, int obs, int dir);   /* @0x8014933C DRLG_L3.CPP:483 */
+static void DRLG_L3FloorArea(int x1, int y1, int x2, int y2);   /* @0x801495BC DRLG_L3.CPP:541 */
+static void DRLG_L3FillDiags(void);   /* @0x80149624 DRLG_L3.CPP:553 */
+static void DRLG_L3FillSingles(void);   /* @0x80149750 DRLG_L3.CPP:583 */
+static void DRLG_L3FillStraights(void);   /* @0x8014981C DRLG_L3.CPP:610 */
+static void DRLG_L3Edges(void);   /* @0x80149BC8 DRLG_L3.CPP:717 */
+static int DRLG_L3GetFloorArea(void);   /* @0x80149C08 DRLG_L3.CPP:727 */
+static void DRLG_L3MakeMegas(void);   /* @0x80149C58 DRLG_L3.CPP:741 */
+static void DRLG_L3River(void);   /* @0x80149D94 DRLG_L3.CPP:774 */
+static int DRLG_L3SpawnEdge(int x, int y, int *totarea);   /* @0x8014A7BC DRLG_L3.CPP:987 */
+static int DRLG_L3Spawn(int x, int y, int *totarea);   /* @0x8014AA48 DRLG_L3.CPP:1017 */
+static void DRLG_L3Pool(void);   /* @0x8014AC54 DRLG_L3.CPP:1052 */
+static void DRLG_L3PoolFix(void);   /* @0x8014AEA4 DRLG_L3.CPP:1105 */
+static int DRLG_L3PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir);   /* @0x8014B0C4 DRLG_L3.CPP:1145 */
+static void DRLG_L3PlaceRndSet(const unsigned char *miniset, int rndper);   /* @0x8014B430 DRLG_L3.CPP:1289 */
+static unsigned char WoodVertU(int i, int y);   /* @0x8014B76C DRLG_L3.CPP:1389 */
+static unsigned char WoodVertD(int i, int y);   /* @0x8014B818 DRLG_L3.CPP:1406 */
+static unsigned char WoodHorizL(int x, int j);   /* @0x8014B8B4 DRLG_L3.CPP:1421 */
+static unsigned char WoodHorizR(int x, int j);   /* @0x8014B948 DRLG_L3.CPP:1438 */
+static void DRLG_L3Wood(void);   /* @0x8014BCA4 DRLG_L3.CPP:1530 */
+static void DRLG_L3SetWalls(void);   /* @0x8014CA68 DRLG_L3.CPP:1884 */
+static void DRLG_L3(int entry);   /* @0x8014CB1C DRLG_L3.CPP:1919 */
+static void DRLG_L3Pass3(void);   /* @0x8014D238 DRLG_L3.CPP:2081 */
 #include "source/diablo.h"
 #include "source/gen/tables_drlg_l3.h"
 
@@ -33,7 +62,7 @@ unsigned char lockout[40][40];
 
 /* ---------------------------------------------------------------------------------------------- */
 
-void InitL3Dungeon(void)
+static void InitL3Dungeon(void)
 {
     int i, j;
 
@@ -49,7 +78,7 @@ void InitL3Dungeon(void)
     }
 }
 
-void SetBlankL3Dungeon(void)
+static void SetBlankL3Dungeon(void)
 {
     int x, y;
 
@@ -62,7 +91,7 @@ void SetBlankL3Dungeon(void)
     }
 }
 
-void FixL3Dungeon(void)
+static void FixL3Dungeon(void)
 {
     int x, y;
 
@@ -75,7 +104,7 @@ void FixL3Dungeon(void)
     }
 }
 
-int DRLG_L3FillRoom(int x1, int y1, int x2, int y2)
+static int DRLG_L3FillRoom(int x1, int y1, int x2, int y2)
 {
     int i, j, v, rf, rv;
 
@@ -122,7 +151,7 @@ int DRLG_L3FillRoom(int x1, int y1, int x2, int y2)
     return rv;
 }
 
-void DRLG_L3CreateBlock(int x, int y, int obs, int dir)
+static void DRLG_L3CreateBlock(int x, int y, int obs, int dir)
 {
     int blksizex, blksizey, cbd;
     int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
@@ -206,7 +235,7 @@ void DRLG_L3CreateBlock(int x, int y, int obs, int dir)
     }
 }
 
-void DRLG_L3FloorArea(int x1, int y1, int x2, int y2)
+static void DRLG_L3FloorArea(int x1, int y1, int x2, int y2)
 {
     int i, j;
 
@@ -217,7 +246,7 @@ void DRLG_L3FloorArea(int x1, int y1, int x2, int y2)
     }
 }
 
-void DRLG_L3FillDiags(void)
+static void DRLG_L3FillDiags(void)
 {
     int i, j, v, rv;
 
@@ -247,7 +276,7 @@ void DRLG_L3FillDiags(void)
     }
 }
 
-void DRLG_L3FillSingles(void)
+static void DRLG_L3FillSingles(void)
 {
     int i, j, v;
 
@@ -269,7 +298,7 @@ void DRLG_L3FillSingles(void)
     }
 }
 
-void DRLG_L3FillStraights(void)
+static void DRLG_L3FillStraights(void)
 {
     int i, j;
     int xc, xs = 0;
@@ -354,7 +383,7 @@ void DRLG_L3FillStraights(void)
     }
 }
 
-void DRLG_L3Edges(void)
+static void DRLG_L3Edges(void)
 {
     int i, j;
 
@@ -366,7 +395,7 @@ void DRLG_L3Edges(void)
     }
 }
 
-int DRLG_L3GetFloorArea(void)
+static int DRLG_L3GetFloorArea(void)
 {
     int i, j, gfa;
 
@@ -381,7 +410,7 @@ int DRLG_L3GetFloorArea(void)
     return gfa;
 }
 
-void DRLG_L3MakeMegas(void)
+static void DRLG_L3MakeMegas(void)
 {
     int i, j, k, v;
 
@@ -416,7 +445,7 @@ void DRLG_L3MakeMegas(void)
     }
 }
 
-void DRLG_L3River(void)
+static void DRLG_L3River(void)
 {
     int rx, ry, px, py, dir, pdir, nodir, nodir2, dircheck;
     int river[3][100];
@@ -663,7 +692,7 @@ void DRLG_L3River(void)
     }
 }
 
-int DRLG_L3SpawnEdge(int x, int y, int *totarea)
+static int DRLG_L3SpawnEdge(int x, int y, int *totarea)
 {
     unsigned char i;
     static const unsigned char spawntable[] = { 0x00, 0x0a, 0x43, 0x05, 0x2c, 0x06, 0x09, 0x00, 0x00, 0x1c, 0x83, 0x06, 0x09, 0x0a, 0x05 };
@@ -713,7 +742,7 @@ int DRLG_L3SpawnEdge(int x, int y, int *totarea)
     return false;
 }
 
-int DRLG_L3Spawn(int x, int y, int *totarea)
+static int DRLG_L3Spawn(int x, int y, int *totarea)
 {
     unsigned char i;
     static const unsigned char spawntable[15] = {0x00, 0x0A, 0x03, 0x05, 0x0C, 0x06, 0x09, 0x00, 0x00, 0x0C, 0x03, 0x06, 0x09, 0x0A, 0x05};
@@ -763,7 +792,7 @@ int DRLG_L3Spawn(int x, int y, int *totarea)
     return false;
 }
 
-void DRLG_L3Pool(void)
+static void DRLG_L3Pool(void)
 {
     int i, j, found;
     int dunx, duny;
@@ -815,7 +844,7 @@ void DRLG_L3Pool(void)
     }
 }
 
-void DRLG_L3PoolFix(void)
+static void DRLG_L3PoolFix(void)
 {
     int duny, dunx;
 #define p0 dungeon[dunx - 1]
@@ -855,7 +884,7 @@ void DRLG_L3PoolFix(void)
 #undef p2
 }
 
-int DRLG_L3PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir)
+static int DRLG_L3PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir)
 {
     int sx, sy;
     int sw, sh;
@@ -941,7 +970,7 @@ int DRLG_L3PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx
     return false;
 }
 
-void DRLG_L3PlaceRndSet(const unsigned char *miniset, int rndper)
+static void DRLG_L3PlaceRndSet(const unsigned char *miniset, int rndper)
 {
     int sx, sy, sw, sh, xx, yy, ii, kk;
     int found;
@@ -993,7 +1022,7 @@ void DRLG_L3PlaceRndSet(const unsigned char *miniset, int rndper)
     }
 }
 
-unsigned char WoodVertU(int i, int y)
+static unsigned char WoodVertU(int i, int y)
 {
     if ((dungeon[i + 1][y] > 152 || dungeon[i + 1][y] < 130)
         && (dungeon[i - 1][y] > 152 || dungeon[i - 1][y] < 130)) {
@@ -1020,7 +1049,7 @@ unsigned char WoodVertU(int i, int y)
     return false;
 }
 
-unsigned char WoodVertD(int i, int y)
+static unsigned char WoodVertD(int i, int y)
 {
     if ((dungeon[i + 1][y] > 152 || dungeon[i + 1][y] < 130)
         && (dungeon[i - 1][y] > 152 || dungeon[i - 1][y] < 130)) {
@@ -1041,7 +1070,7 @@ unsigned char WoodVertD(int i, int y)
     return false;
 }
 
-unsigned char WoodHorizL(int x, int j)
+static unsigned char WoodHorizL(int x, int j)
 {
     if ((dungeon[x][j + 1] > 152 || dungeon[x][j + 1] < 130)
         && (dungeon[x][j - 1] > 152 || dungeon[x][j - 1] < 130)) {
@@ -1068,7 +1097,7 @@ unsigned char WoodHorizL(int x, int j)
     return false;
 }
 
-unsigned char WoodHorizR(int x, int j)
+static unsigned char WoodHorizR(int x, int j)
 {
     if ((dungeon[x][j + 1] > 152 || dungeon[x][j + 1] < 130)
         && (dungeon[x][j - 1] > 152 || dungeon[x][j - 1] < 130)) {
@@ -1161,7 +1190,7 @@ void FenceDoorFix(void)
     }
 }
 
-void DRLG_L3Wood(void)
+static void DRLG_L3Wood(void)
 {
     int i, j;
     int x, y;
@@ -1506,7 +1535,7 @@ unsigned char DRLG_L3Lockout(void)
     return false;
 }
 
-void DRLG_L3SetWalls(void)
+static void DRLG_L3SetWalls(void)
 {
     int i, j, xx, yy;
 
@@ -1527,7 +1556,7 @@ void DRLG_L3SetWalls(void)
     }
 }
 
-void DRLG_L3(int entry)
+static void DRLG_L3(int entry)
 {
     int x1, y1, x2, y2, sx1, sy1;
     int i, j;
@@ -1667,7 +1696,7 @@ void DRLG_L3(int entry)
     DRLG_Init_Globals();
 }
 
-void DRLG_L3Pass3(void)
+static void DRLG_L3Pass3(void)
 {
     int i, j, xx, yy;
     long v1, v2, v3, v4, lv;

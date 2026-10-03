@@ -173,7 +173,7 @@ void ChangeBlock(int x, int y, int bl)
 }
 
 /* @0x800753E0 */
-void ScanBlocks(short *list)
+static void ScanBlocks(short *list)
 {
     struct BLOCK *ptr;
 
@@ -642,7 +642,7 @@ BOOL IsTrigger(int x, int y)
 }
 
 /* @0x80076A8C */
-BOOL CheckTrigLevel(int level)
+static BOOL CheckTrigLevel(int level)
 {
     if (plr[0]._pLevel >= level || plr[1]._pLevel >= level)
         return TRUE;

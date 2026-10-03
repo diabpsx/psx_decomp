@@ -12,6 +12,19 @@
 #include "glibdev/gal.h"
 #include "source/gen/externs_diablo.h"
 #include "source/gen/protos_diablo.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void start_game(unsigned int uMsg);   /* @0x80037FE4 DIABLO.CPP:312 */
+static void free_game(void);   /* @0x800380D4 DIABLO.CPP:357 */
+static void run_game_loop(unsigned int uMsg);   /* @0x8003840C DIABLO.CPP:532 */
+static unsigned long GM_Game(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam);   /* @0x8003889C DIABLO.CPP:2245 */
+static void AllSolid(int x, int y);   /* @0x80038F94 DIABLO.CPP:2710 */
+static void Lsaveplrpos(void);   /* @0x80039174 DIABLO.CPP:2755 */
+static void Lrestoreplrpos(void);   /* @0x80039220 DIABLO.CPP:2776 */
+static void game_logic(void);   /* @0x80039BC8 DIABLO.CPP:3175 */
+static void timeout_cursor(unsigned char bTimeout);   /* @0x80039DB0 DIABLO.CPP:3278 */
+static void game_loop(unsigned char bStartup);   /* @0x80039E58 DIABLO.CPP:3317 */
+static void plr_encrypt(unsigned char bEncrypt);   /* @0x80039EC0 DIABLO.CPP:3516 */
 #include "source/diablo.h"
 
 #define MAX_PLRS 2
@@ -30,7 +43,7 @@ void FreeGameMem(void)
     FreeTownerGFX();
 }
 
-void start_game(unsigned int uMsg)
+static void start_game(unsigned int uMsg)
 {
     gbDoEnding = 0;
     svgamode = 1;
@@ -61,7 +74,7 @@ void start_game(unsigned int uMsg)
     sgbMouseDown = 0;
 }
 
-void free_game(void)
+static void free_game(void)
 {
     FreeControlPan();
     FreeInvGFX();
@@ -151,7 +164,7 @@ unsigned char StartGame(unsigned char bNewGame, unsigned char bSinglePlayer)
     return gbRunGameResult;
 }
 
-void run_game_loop(unsigned int uMsg)
+static void run_game_loop(unsigned int uMsg)
 {
     WNDPROC saveProc;
     struct MSG msg;   /* unused PC message-loop leftover; retail's SYM keeps the frame slot */
@@ -248,7 +261,7 @@ unsigned long DisableInputWndProc(unsigned long hWnd, unsigned int uMsg, long wP
     return 0;
 }
 
-unsigned long GM_Game(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam)
+static unsigned long GM_Game(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam)
 {
     if (uMsg != 1) {
         if (uMsg == 0)
@@ -415,7 +428,7 @@ void AddQuestItems(void)
         SpawnQuestItem(IDI_ANVIL, 2 * setpc_x + 27, 2 * setpc_y + 27, 0, 1);
 }
 
-void AllSolid(int x, int y)
+static void AllSolid(int x, int y)
 {
     SetSOLID(x, y);
     SetMISSILE(x, y);
@@ -456,7 +469,7 @@ void FillCrapBits(void)
     }
 }
 
-void Lsaveplrpos(void)
+static void Lsaveplrpos(void)
 {
     plr[1]._pVar1 = ViewX;
     plr[1]._pVar2 = ViewY;
@@ -474,7 +487,7 @@ void Lsaveplrpos(void)
     }
 }
 
-void Lrestoreplrpos(void)
+static void Lrestoreplrpos(void)
 {
     PlacePlayer(1, plr[1]._pVar3, plr[1]._pVar4, 0);
     PlacePlayer(0, plr[1]._pVar5, plr[1]._pVar6, 0);
@@ -682,7 +695,7 @@ enum GM_SPEEDS GetSpeed(void)
     return GameSpeed;
 }
 
-void game_logic(void)
+static void game_logic(void)
 {
     int Frames, ThisTick, SinceLast;
 
@@ -750,7 +763,7 @@ void game_logic(void)
     force_redraw |= 1;
 }
 
-void timeout_cursor(unsigned char bTimeout)
+static void timeout_cursor(unsigned char bTimeout)
 {
     if (bTimeout) {
         if (D_8011B7A8 || sgbMouseDown)
@@ -769,7 +782,7 @@ void timeout_cursor(unsigned char bTimeout)
     }
 }
 
-void game_loop(unsigned char bStartup)
+static void game_loop(unsigned char bStartup)
 {
     if (IsGameLoading()) {
         D_8011C7B8 = 0;
@@ -787,7 +800,7 @@ void alloc_plr(void)
 {
 }
 
-void plr_encrypt(unsigned char bEncrypt)
+static void plr_encrypt(unsigned char bEncrypt)
 {
 }
 

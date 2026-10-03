@@ -3,7 +3,7 @@
 #include "diabpsx_types.h"
 
 extern "C" void *memmove(void *dst, const void *src, unsigned int n);
-void SlowMemMove(void *Dest, void *Source, unsigned long size);
+static void SlowMemMove(void *Dest, void *Source, unsigned long size);
 
 struct MEM_HDR;
 struct MEM_INIT_INFO {
@@ -30,7 +30,7 @@ void MyFilter(unsigned long MemType, unsigned long Size, const char *Name)
 }
 
 /* @0x8008442C MEM.CPP:150 */
-void SlowMemMove(void *Dest, void *Source, unsigned long size)
+static void SlowMemMove(void *Dest, void *Source, unsigned long size)
 {
     memmove(Dest, Source, size);
 }

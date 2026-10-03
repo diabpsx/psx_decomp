@@ -47,10 +47,10 @@ long BL_LoadFileAsync(char *Name, char RamId);
 void BL_WaitForAsyncFinish(void);
 void KANJI_SetDb(enum LANG_DB_NO NewLangDbNo);
 
-void DumpCurrentText(void);
-int CalcNumOfStrings(char **TPtr);
-void GetLangFileName(enum LANG_TYPE NewLanguageType, char *Dest);
-char *GetLangFileNameExt(enum LANG_TYPE NewLanguageType);
+static void DumpCurrentText(void);
+static int CalcNumOfStrings(char **TPtr);
+static void GetLangFileName(enum LANG_TYPE NewLanguageType, char *Dest);
+static char *GetLangFileNameExt(enum LANG_TYPE NewLanguageType);
 
 extern int FileSYS;
 extern int CDWAIT;
@@ -161,7 +161,7 @@ void LANG_SetLang(enum LANG_TYPE NewLanguageType)
 }
 
 /* @0x8007B700 LANG.CPP:276 */
-void DumpCurrentText(void)
+static void DumpCurrentText(void)
 {
     if (hndText != -1) {
         unsigned char Freed = GAL_Free(hndText);
@@ -173,13 +173,13 @@ void DumpCurrentText(void)
 }
 
 /* @0x8007B758 LANG.CPP:294 */
-int CalcNumOfStrings(char **TPtr)
+static int CalcNumOfStrings(char **TPtr)
 {
     return (unsigned long)*TPtr / 4;
 }
 
 /* @0x8007B764 LANG.CPP:306 */
-void GetLangFileName(enum LANG_TYPE NewLanguageType, char *Dest)
+static void GetLangFileName(enum LANG_TYPE NewLanguageType, char *Dest)
 {
     char *Ext;
 
@@ -205,7 +205,7 @@ void GetLangFileName(enum LANG_TYPE NewLanguageType, char *Dest)
 }
 
 /* @0x8007B844 LANG.CPP:334 */
-char *GetLangFileNameExt(enum LANG_TYPE NewLanguageType)
+static char *GetLangFileNameExt(enum LANG_TYPE NewLanguageType)
 {
     switch (NewLanguageType) {
     case LANG_ENGLISH:

@@ -10,6 +10,10 @@
 #include "source/gen/structs_quests.h"
 #include "source/gen/externs_quests.h"
 #include "source/gen/protos_quests.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void CheckRPortalOK(int *rx, int *ry);
+static void RemoveQLog(void);
 #include "source/diablo.h"
 
 extern "C" int sprintf(char *buf, const char *fmt, ...);
@@ -129,7 +133,7 @@ void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
     DialogBlue = B;
 }
 
-void CheckRPortalOK(int *rx, int *ry)
+static void CheckRPortalOK(int *rx, int *ry)
 {
     int nx, ny;
 
@@ -610,7 +614,7 @@ void QuestlogDown(void)
     }
 }
 
-void RemoveQLog(void)
+static void RemoveQLog(void)
 {
     if (questlog != 0) {
         GLUE_SetShowGameScreenFlag(1);

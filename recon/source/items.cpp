@@ -9,6 +9,11 @@
 #include "source/gen/structs_items.h"
 #include "source/gen/externs_items.h"
 #include "source/gen/protos_items.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x);   /* @0x8003F6DC ITEMS.CPP:1050 */
+static void RechargeItem(ItemStruct *i, int r);   /* @0x80045FD0 ITEMS.CPP:3374 */
+static void RepairItem(ItemStruct *i, int lvl);   /* @0x80045E1C ITEMS.CPP:3328 */
 #include "source/diablo.h"
 
 /* ITEMS.H (hellfire) cursor ids for the gold pile graphic */
@@ -199,7 +204,7 @@ unsigned char HealerItemOk(int i)
 }
 
 /* @0x80045FD0 ITEMS.CPP:3601 */
-void RechargeItem(ItemStruct *i, int r)
+static void RechargeItem(ItemStruct *i, int r)
 {
     if (i->_iCharges == i->_iMaxCharges) return;
 
@@ -496,7 +501,7 @@ void BubbleSwapItem(ItemStruct *a, ItemStruct *b)
 }
 
 /* @0x80045E1C ITEMS.CPP:3555 */
-void RepairItem(ItemStruct *i, int lvl)
+static void RepairItem(ItemStruct *i, int lvl)
 {
     int d, rep;
 
@@ -1332,7 +1337,7 @@ void CreateMagicWeapon(int x, int y, int imisc, int icurs, unsigned char sendmsg
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */
-unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x)
+static unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x)
 {
     if (p->_pMagic < x->_iMinMag) return FALSE;
     if (p->_pStrength < x->_iMinStr) return FALSE;

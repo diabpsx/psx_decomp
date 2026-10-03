@@ -1288,7 +1288,8 @@ extern "C" void clear_mdec_queue(void)
 }
 
 /* @0x80158298 FMV.CPP:1666 */
-extern "C" void StrClearVRAM(void)
+extern "C" { static void StrClearVRAM(void); }   /* retail SYM: STAT, C linkage */
+static void StrClearVRAM(void)
 {
     RECT clrRect;
 

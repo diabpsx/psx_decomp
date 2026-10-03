@@ -243,7 +243,7 @@ void delta_leave_sync(unsigned char bLevel)
 }
 
 /* @0x8004EF38 MSG.CPP:416 */
-void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
+static void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 {
     sgbDeltaChanged = 1;
     DLevel *Dl = GetDLevel(bLevel, setlevel);
@@ -253,7 +253,7 @@ void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 }
 
 /* @0x8004EF98 MSG.CPP:439 */
-unsigned char delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
+static unsigned char delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
 {
     DLevel *Dl;
     TCmdPItem *pD;
@@ -318,7 +318,7 @@ unsigned char delta_get_item(const TCmdGItem *pI, unsigned char bLevel)
  * keeps scanning (not an early-out) -- and a SEPARATE GetDLevel/ReleaseDLevel pair brackets each of
  * the two loops (not one shared acquisition). The free-slot write is a raw struct copy (*pD = *pI)
  * with bCmd/x/y overwritten afterward from the CALLER's own x/y (not pI's). */
-void delta_put_item(const TCmdPItem *pI, int x, int y, unsigned char bLevel)
+static void delta_put_item(const TCmdPItem *pI, int x, int y, unsigned char bLevel)
 {
     DLevel *Dl = GetDLevel(bLevel, setlevel);
     TCmdPItem *pD = Dl->item;
@@ -684,7 +684,7 @@ void NetSendCmdDItem(unsigned char bHiPri, int ii)
 }
 
 /* @0x8004FEF0 MSG.CPP:1274 */
-unsigned char i_own_level(int nReqLevel)
+static unsigned char i_own_level(int nReqLevel)
 {
     return 1;
 }
@@ -707,7 +707,7 @@ void delta_close_portal(int pnum)
 }
 
 /* @0x8004FF6C MSG.CPP:1348 */
-void check_update_plr(int pnum)
+static void check_update_plr(int pnum)
 {
 }
 
@@ -715,7 +715,7 @@ void check_update_plr(int pnum)
 /* On_* command handlers. */
 
 /* @0x8004FF74 MSG.CPP:1368 */
-void On_WALKXY(const TCmd *pCmd, int pnum)
+static void On_WALKXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLoc *p = (const TCmdLoc *)pCmd;
     ClrPlrPath(pnum);
@@ -724,7 +724,7 @@ void On_WALKXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8004FFF4 MSG.CPP:1384 */
-void On_ADDSTR(const TCmd *pCmd, int pnum)
+static void On_ADDSTR(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
@@ -732,7 +732,7 @@ void On_ADDSTR(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050024 MSG.CPP:1403 */
-void On_ADDMAG(const TCmd *pCmd, int pnum)
+static void On_ADDMAG(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
@@ -740,7 +740,7 @@ void On_ADDMAG(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050054 MSG.CPP:1416 */
-void On_ADDDEX(const TCmd *pCmd, int pnum)
+static void On_ADDDEX(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
@@ -748,7 +748,7 @@ void On_ADDDEX(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050084 MSG.CPP:1435 */
-void On_ADDVIT(const TCmd *pCmd, int pnum)
+static void On_ADDVIT(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
@@ -757,7 +757,7 @@ void On_ADDVIT(const TCmd *pCmd, int pnum)
 
 /* @0x800500B4 MSG.CPP:1454 -- sets a spellbook-cast destAction (0xC) using the spell id/type
  * (cmd->wParam1) and the PLAYER's own currently-set splType (plr[pnum]._pSplType), not the cmd's. */
-void On_SBSPELL(const TCmd *pCmd, int pnum)
+static void On_SBSPELL(const TCmd *pCmd, int pnum)
 {
     plr[pnum]._pSplFrom = 1;
     plr[pnum].destAction = 0xC;
@@ -766,7 +766,7 @@ void On_SBSPELL(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050128 MSG.CPP:1469 */
-void On_GOTOGETITEM(const TCmd *pCmd, int pnum)
+static void On_GOTOGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     MakePlrPath(pnum, p->x, p->y, 0);
@@ -775,7 +775,7 @@ void On_GOTOGETITEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800504C4 MSG.CPP:1589 */
-void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
+static void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     MakePlrPath(pnum, p->x, p->y, 0);
@@ -784,7 +784,7 @@ void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800501B0 MSG.CPP:1482 */
-void On_REQUESTGITEM(const TCmd *pCmd, int pnum)
+static void On_REQUESTGITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     unsigned char own = i_own_level(plr[pnum].plrlevel);
@@ -808,7 +808,7 @@ void On_REQUESTGITEM(const TCmd *pCmd, int pnum)
  * real, and the not-mine SyncGetItem echo re-reads wIndx from a register that survived from the
  * bPnum check (not the bLevel-equal arm at all) -- goto/labels used to guarantee the exact retail
  * block layout rather than risk the compiler re-threading an equivalent if/else differently. */
-void On_GETITEM(const TCmd *pCmd, int pnum)
+static void On_GETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     int nIndex = FindGetItem(p->wIndx, p->wCI, p->dwSeed);
@@ -837,7 +837,7 @@ void On_GETITEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8005054C MSG.CPP:1603 -- twin of On_REQUESTGITEM for the auto-pickup path (bCmd 9/0x27 reused). */
-void On_REQUESTAGITEM(const TCmd *pCmd, int pnum)
+static void On_REQUESTAGITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     unsigned char own = i_own_level(plr[pnum].plrlevel);
@@ -860,7 +860,7 @@ void On_REQUESTAGITEM(const TCmd *pCmd, int pnum)
  * skeleton (delta_get_item gate / currlevel-vs-bLevel / bMaster==myplr no-op / bPnum-not-mine echo),
  * but the currlevel==bLevel direct-pickup arm calls AutoGetItem(bPnum,bCursitem) -- NOT ii -- while
  * the SyncPutItem fallback arm still calls AutoGetItem(myplr,result) same as On_GETITEM's InvGetItem. */
-void On_AGETITEM(const TCmd *pCmd, int pnum)
+static void On_AGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     FindGetItem(p->wIndx, p->wCI, p->dwSeed);
@@ -889,7 +889,7 @@ void On_AGETITEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8005084C MSG.CPP:1717 */
-void On_ITEMEXTRA(const TCmd *pCmd, int pnum)
+static void On_ITEMEXTRA(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
     delta_get_item(p, p->bLevel);
@@ -897,7 +897,7 @@ void On_ITEMEXTRA(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051080 MSG.CPP:1971 */
-void On_OPOBJT(const TCmd *pCmd, int pnum)
+static void On_OPOBJT(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     plr[pnum].destAction = ACTION_OPERATE;
@@ -911,7 +911,7 @@ struct TCmdSpellXY { unsigned char bCmd, x, y, _pad; unsigned short wParam1, wPa
 struct TCmdSpellID { unsigned char bCmd, _pad; unsigned short wParam1, wParam2, wParam3; };
 
 /* @0x80050B98 MSG.CPP:1851 */
-void On_SATTACKXY(const TCmd *pCmd, int pnum)
+static void On_SATTACKXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLoc *p = (const TCmdLoc *)pCmd;
     ClrPlrPath(pnum);
@@ -921,7 +921,7 @@ void On_SATTACKXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050C24 MSG.CPP:1866 */
-void On_SPELLXYD(const TCmd *pCmd, int pnum)
+static void On_SPELLXYD(const TCmd *pCmd, int pnum)
 {
     const int spell = ((const TCmdSpellXY *)pCmd)->wParam1;
     ClrPlrPath(pnum);
@@ -936,7 +936,7 @@ void On_SPELLXYD(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050D0C MSG.CPP:1890 */
-void On_SPELLXY(const TCmd *pCmd, int pnum)
+static void On_SPELLXY(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellXY *const p = (const TCmdSpellXY *)pCmd;
     const int spell = p->wParam1;
@@ -951,7 +951,7 @@ void On_SPELLXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050DE4 MSG.CPP:1912 */
-void On_TSPELLXY(const TCmd *pCmd, int pnum)
+static void On_TSPELLXY(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellXY *const p = (const TCmdSpellXY *)pCmd;
     const int spell = p->wParam1;
@@ -966,7 +966,7 @@ void On_TSPELLXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051208 MSG.CPP:2003 */
-void On_SPELLID(const TCmd *pCmd, int pnum)
+static void On_SPELLID(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellID *const p = (const TCmdSpellID *)pCmd;
     const int spell = p->wParam2;
@@ -980,7 +980,7 @@ void On_SPELLID(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800512D0 MSG.CPP:2024 */
-void On_SPELLPID(const TCmd *pCmd, int pnum)
+static void On_SPELLPID(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellID *p = (const TCmdSpellID *)pCmd;
     ClrPlrPath(pnum);
@@ -993,7 +993,7 @@ void On_SPELLPID(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051390 MSG.CPP:2043 */
-void On_TSPELLID(const TCmd *pCmd, int pnum)
+static void On_TSPELLID(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellID *p = (const TCmdSpellID *)pCmd;
     ClrPlrPath(pnum);
@@ -1006,7 +1006,7 @@ void On_TSPELLID(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051454 MSG.CPP:2060 */
-void On_TSPELLPID(const TCmd *pCmd, int pnum)
+static void On_TSPELLPID(const TCmd *pCmd, int pnum)
 {
     const TCmdSpellID *p = (const TCmdSpellID *)pCmd;
     ClrPlrPath(pnum);
@@ -1019,20 +1019,20 @@ void On_TSPELLPID(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800515D4 MSG.CPP:2091 */
-void On_RESURRECT(const TCmd *pCmd, int pnum)
+static void On_RESURRECT(const TCmd *pCmd, int pnum)
 {
     DoResurrect(pnum, ((const TCmdParam1 *)pCmd)->wParam1);
     check_update_plr(pnum);
 }
 
 /* @0x8005160C MSG.CPP:2101 */
-void On_HEALOTHER(const TCmd *pCmd, int pnum)
+static void On_HEALOTHER(const TCmd *pCmd, int pnum)
 {
     DoHealOther(pnum, ((const TCmdParam1 *)pCmd)->wParam1);
 }
 
 /* @0x80051634 MSG.CPP:2112 */
-void On_TALKXY(const TCmd *pCmd, int pnum)
+static void On_TALKXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     MakePlrPath(pnum, p->x, p->y, 0);
@@ -1041,7 +1041,7 @@ void On_TALKXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800516BC MSG.CPP:2127 */
-void On_NEWLVL(const TCmd *pCmd, int pnum)
+static void On_NEWLVL(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
     StartNewLvl(pnum, p->wParam1, p->wParam2);
@@ -1053,7 +1053,7 @@ void On_NEWLVL(const TCmd *pCmd, int pnum)
  * plr[myplr].HoldItem @+0x1910, sizeof(ItemStruct)=0x64, into item + 0x64*127 = item+0x3194...
  * matches the observed +0x3594 dest only if ItemStruct is 0x6C; kept as item[127] via HoldItem
  * assignment, which is codegen-equivalent to the raw block-copy loop for a POD struct). */
-void On_WARP(const TCmd *pCmd, int pnum)
+static void On_WARP(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     InitGamePadVars();
@@ -1068,7 +1068,7 @@ void On_WARP(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051800 MSG.CPP:2161 */
-void On_MONSTDEATH(const TCmd *pCmd, int pnum)
+static void On_MONSTDEATH(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     if (pnum != myplr) {
@@ -1080,7 +1080,7 @@ void On_MONSTDEATH(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800518B4 MSG.CPP:2174 -- golem monster index == owning player index (golem slots 0..1). */
-void On_KILLGOLEM(const TCmd *pCmd, int pnum)
+static void On_KILLGOLEM(const TCmd *pCmd, int pnum)
 {
     const TCmdLoc *p = (const TCmdLoc *)pCmd;
     if (pnum != myplr) {
@@ -1091,7 +1091,7 @@ void On_KILLGOLEM(const TCmd *pCmd, int pnum)
 
 /* @0x80051920 MSG.CPP:2187 -- spawn/refresh the awakened golem missile unless one already targets
  * this player's golem (the loop over missileactive[] guards against a duplicate MIS_GOLEM(0x21)). */
-void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
+static void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 {
     {
     if (pnum != myplr) {
@@ -1108,7 +1108,7 @@ void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051A40 MSG.CPP:2216 */
-void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
+static void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
         int dummy1;
@@ -1124,7 +1124,7 @@ void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051B30 MSG.CPP:2246 */
-void On_PLRDEAD(const TCmd *pCmd, int pnum)
+static void On_PLRDEAD(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (pnum != myplr) {
@@ -1137,7 +1137,7 @@ void On_PLRDEAD(const TCmd *pCmd, int pnum)
 
 /* @0x80051B78 MSG.CPP:2260 -- damage-over-time application to another player, clamped against a
  * received-vs-buffered ordering check (gbBufferMsgs) and a 0x2EE00 (fixed-point) sanity bound. */
-void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
+static void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
 {
     /* the delta is applied to plr[pCmd->bPlr] (the player index embedded in the COMMAND), but the
      * kill-check right below is against plr[pnum] (ParseCmd's own index) -- confirmed asymmetry,
@@ -1160,7 +1160,7 @@ void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050EC0 MSG.CPP:1934 */
-void On_OPOBJXY(const TCmd *pCmd, int pnum)
+static void On_OPOBJXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
@@ -1172,7 +1172,7 @@ void On_OPOBJXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050FA0 MSG.CPP:1952 */
-void On_DISARMXY(const TCmd *pCmd, int pnum)
+static void On_DISARMXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
@@ -1184,7 +1184,7 @@ void On_DISARMXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800510CC MSG.CPP:1984 */
-void On_ATTACKID(const TCmd *pCmd, int pnum)
+static void On_ATTACKID(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     int dx = abs(plr[pnum]._px - monster[p->wParam1]._mfutx);
@@ -1196,7 +1196,7 @@ void On_ATTACKID(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051518 MSG.CPP:2078 */
-void On_KNOCKBACK(const TCmd *pCmd, int pnum)
+static void On_KNOCKBACK(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[p->wParam1]._mx, monster[p->wParam1]._my);
@@ -1208,21 +1208,21 @@ void On_KNOCKBACK(const TCmd *pCmd, int pnum)
  * command's own ParseCmd dispatch id (41) -- it is a distinct object-action constant (OPENDOOR=0x2B,
  * CLOSEDOOR=0x2C, OPERATEOBJ=0x2D, PLROPOBJ=0x2E, BREAKOBJ=0x2F below), read straight off the raw
  * immediates since it doesn't correlate with the CMD_* dispatch numbering above. */
-void On_OPENDOOR(const TCmd *pCmd, int pnum)
+static void On_OPENDOOR(const TCmd *pCmd, int pnum)
 {
     SyncOpObject(pnum, 0x2B, ((const TCmdParam1 *)pCmd)->wParam1);
     delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2B, plr[pnum].plrlevel);
 }
 
 /* @0x80051D08 MSG.CPP:2336 */
-void On_CLOSEDOOR(const TCmd *pCmd, int pnum)
+static void On_CLOSEDOOR(const TCmd *pCmd, int pnum)
 {
     SyncOpObject(pnum, 0x2C, ((const TCmdParam1 *)pCmd)->wParam1);
     delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2C, plr[pnum].plrlevel);
 }
 
 /* @0x80051D84 MSG.CPP:2349 */
-void On_OPERATEOBJ(const TCmd *pCmd, int pnum)
+static void On_OPERATEOBJ(const TCmd *pCmd, int pnum)
 {
     SyncOpObject(pnum, 0x2D, ((const TCmdParam1 *)pCmd)->wParam1);
     delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2D, plr[pnum].plrlevel);
@@ -1230,7 +1230,7 @@ void On_OPERATEOBJ(const TCmd *pCmd, int pnum)
 
 /* @0x80051E00 MSG.CPP:2362 -- TCmdParam2 shape (wParam1@+2 = the acting player index embedded in
  * the command, wParam2@+4 = oi); SyncOpObject's pnum arg comes from the COMMAND, not ParseCmd's pnum. */
-void On_PLROPOBJ(const TCmd *pCmd, int pnum)
+static void On_PLROPOBJ(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
     SyncOpObject(p->wParam1, 0x2E, p->wParam2);
@@ -1239,7 +1239,7 @@ void On_PLROPOBJ(const TCmd *pCmd, int pnum)
 
 /* @0x80051E7C MSG.CPP:2374 -- both SyncBreakObj args come from the command (TCmdParam2 shape:
  * wParam1@+2, wParam2@+4), NOT from the ParseCmd pnum -- the raw never reads pnum before the call. */
-void On_BREAKOBJ(const TCmd *pCmd, int pnum)
+static void On_BREAKOBJ(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
     SyncBreakObj(p->wParam1, p->wParam2);
@@ -1247,7 +1247,7 @@ void On_BREAKOBJ(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050898 MSG.CPP:1741 */
-void On_PUTITEM(const TCmd *pCmd, int pnum)
+static void On_PUTITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
     if (numitems >= 0x7A) {
@@ -1265,7 +1265,7 @@ void On_PUTITEM(const TCmd *pCmd, int pnum)
 /* @0x80050978 MSG.CPP:1795 -- re-derived from the raw: check_update_plr(pnum) is ALWAYS called after
  * a successful SyncPutItem (was previously missing), same "delta_put_item echoes the placed item's
  * own _ix/_iy" pattern as On_PUTITEM. */
-void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
+static void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
     int ii = SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
@@ -1278,7 +1278,7 @@ void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
 /* @0x80050A7C MSG.CPP:1794 -- re-derived from the raw: a plrlevel==currlevel gate wraps the
  * SyncPutItem echo (previously missing), and delta_put_item is ALWAYS called afterward regardless
  * of that gate, with the target player's (unsigned char)plrlevel as the bLevel arg. */
-void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
+static void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
     if (currlevel == plr[pnum].plrlevel) {
@@ -1292,7 +1292,7 @@ void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
 /* @0x80051F64 MSG.CPP:2428 -- UNVERIFIED (fsize 32, non-trivial fn not individually re-derived);
  * best-effort from devilution's On_PLAYER_JOINLEVEL (a remote player's PlayerStruct sync marker --
  * marks them active on our copy of their slot and re-syncs their local-visibility state). */
-void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
+static void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 {
     plr[pnum]._pLvlChanging = 0;
     if (plr[pnum].plractive && pnum) {
@@ -1322,7 +1322,7 @@ void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8005216C MSG.CPP:2487 -- UNVERIFIED. */
-void On_ACTIVATEPORTAL(const TCmd *pCmd, int pnum)
+static void On_ACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam3 *p = (const TCmdLocParam3 *)pCmd;
     ActivatePortal(pnum, p->x, p->y, p->wParam1, p->wParam2, (unsigned char)p->wParam3);
@@ -1331,7 +1331,7 @@ void On_ACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 /* @0x800521B0 MSG.CPP:2526 -- UNVERIFIED. */
 /* @0x800521B0 MSG.CPP:2494 -- re-derived: pnum is unused for anything BUT reused in place as the
  * 0..1 portal-index loop counter (SYM lists it at s0, matching the raw's loop register). */
-void On_DEACTIVATEPORTAL(const TCmd *pCmd, int pnum)
+static void On_DEACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 {
     for (pnum = 0; pnum < 2; pnum++) {
         if (PortalOnLevel(pnum))
@@ -1342,7 +1342,7 @@ void On_DEACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052210 MSG.CPP:2542 -- UNVERIFIED. */
-void On_RETOWN(const TCmd *pCmd, int pnum)
+static void On_RETOWN(const TCmd *pCmd, int pnum)
 {
     if (pnum == myplr)
         deathflag = 0;
@@ -1350,7 +1350,7 @@ void On_RETOWN(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052390 MSG.CPP:2624 -- UNVERIFIED (fsize 40, not individually re-derived). */
-void On_ENDSHIELD(const TCmd *pCmd, int pnum)
+static void On_ENDSHIELD(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
         for (int i = 0; i < nummissiles; i++) {
@@ -1364,29 +1364,29 @@ void On_ENDSHIELD(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051EF4 MSG.CPP:2385 -- no-op: PSX has no cross-player inventory transfer command. */
-void On_CHANGEPLRITEMS(const TCmd *pCmd, int pnum)
+static void On_CHANGEPLRITEMS(const TCmd *pCmd, int pnum)
 {
 }
 
 /* @0x80051EFC MSG.CPP:2398 -- no-op. */
-void On_DELPLRITEMS(const TCmd *pCmd, int pnum)
+static void On_DELPLRITEMS(const TCmd *pCmd, int pnum)
 {
 }
 
 /* @0x80051F04 MSG.CPP:2406 -- no-op. */
-void On_PLRLEVEL(const TCmd *pCmd, int pnum)
+static void On_PLRLEVEL(const TCmd *pCmd, int pnum)
 {
 }
 
 /* @0x80051F0C MSG.CPP:2417 */
-void On_DROPITEM(const TCmd *pCmd, int pnum)
+static void On_DROPITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
     delta_put_item(p, p->x, p->y, plr[pnum].plrlevel);
 }
 
 /* @0x80052248 MSG.CPP:2555 */
-void On_SETSTR(const TCmd *pCmd, int pnum)
+static void On_SETSTR(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 < 0x2EF && pnum != myplr)
@@ -1394,7 +1394,7 @@ void On_SETSTR(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052288 MSG.CPP:2568 */
-void On_SETDEX(const TCmd *pCmd, int pnum)
+static void On_SETDEX(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 < 0x2EF && pnum != myplr)
@@ -1402,7 +1402,7 @@ void On_SETDEX(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800522C8 MSG.CPP:2582 */
-void On_SETMAG(const TCmd *pCmd, int pnum)
+static void On_SETMAG(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 < 0x2EF && pnum != myplr)
@@ -1410,7 +1410,7 @@ void On_SETMAG(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052308 MSG.CPP:2596 */
-void On_SETVIT(const TCmd *pCmd, int pnum)
+static void On_SETVIT(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 < 0x2EF && pnum != myplr)
@@ -1418,7 +1418,7 @@ void On_SETVIT(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052348 MSG.CPP:2610 */
-void On_SYNCQUEST(const TCmd *pCmd, int pnum)
+static void On_SYNCQUEST(const TCmd *pCmd, int pnum)
 {
     const TCmdQuest *p = (const TCmdQuest *)pCmd;
     if (pnum != myplr) {

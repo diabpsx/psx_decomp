@@ -6,14 +6,10 @@ extern "C" int setjmp(jmp_buf);
 extern "C" void longjmp(jmp_buf, int);
 
 void FreeGameMem(void);   /* @0x80037FAC DIABLO.CPP:292 */
-void start_game(unsigned int uMsg);   /* @0x80037FE4 DIABLO.CPP:312 */
-void free_game(void);   /* @0x800380D4 DIABLO.CPP:357 */
 void LittleStart(unsigned char bNewGame, unsigned char bSinglePlayer);   /* @0x80038148 DIABLO.CPP:390 */
 unsigned char StartGame(unsigned char bNewGame, unsigned char bSinglePlayer);   /* @0x8003820C DIABLO.CPP:433 */
-void run_game_loop(unsigned int uMsg);   /* @0x8003840C DIABLO.CPP:532 */
 unsigned char TryIconCurs(void);   /* @0x80038574 DIABLO.CPP:1087 */
 unsigned long DisableInputWndProc(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam);   /* @0x80038894 DIABLO.CPP:2191 */
-unsigned long GM_Game(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam);   /* @0x8003889C DIABLO.CPP:2245 */
 void LoadLvlGFX(void);   /* @0x80038930 DIABLO.CPP:2413 */
 void LoadMegaTiles(const char *LoadFile);   /* @0x800389E8 DIABLO.CPP:2452 */
 void LoadAllGFX(void);   /* @0x80038A78 DIABLO.CPP:2472 */
@@ -21,19 +17,12 @@ void CreateLevel(int lvldir);   /* @0x80038A98 DIABLO.CPP:2505 */
 void LoCreateLevel(void *Param);   /* @0x80038B90 DIABLO.CPP:2534 -- SYM mangling LoCreateLevel__FPv needs a void* param even though the body ignores it (re-derives lvldir from D_8011C7B0) */
 void ClearOutDungeonMap(void);   /* @0x80038CF4 DIABLO.CPP:2592 */
 void AddQuestItems(void);   /* @0x80038EF4 DIABLO.CPP:2690 */
-void AllSolid(int x, int y);   /* @0x80038F94 DIABLO.CPP:2710 */
 void FreeInvGFX(void);   /* @0x80157274 INV.CPP:443 */
 void FillCrapBits(void);   /* @0x80038FD4 DIABLO.CPP:2716 */
-void Lsaveplrpos(void);   /* @0x80039174 DIABLO.CPP:2755 */
-void Lrestoreplrpos(void);   /* @0x80039220 DIABLO.CPP:2776 */
 void LoadGameLevel(unsigned char firstflag, int lvldir);   /* @0x80039270 DIABLO.CPP:2785 */
 void SetSpeed(enum GM_SPEEDS Speed);   /* @0x80039BA8 DIABLO.CPP:3163 */
 enum GM_SPEEDS GetSpeed(void);   /* @0x80039BBC DIABLO.CPP:3169 */
-void game_logic(void);   /* @0x80039BC8 DIABLO.CPP:3175 */
-void timeout_cursor(unsigned char bTimeout);   /* @0x80039DB0 DIABLO.CPP:3278 */
-void game_loop(unsigned char bStartup);   /* @0x80039E58 DIABLO.CPP:3317 */
 void alloc_plr(void);   /* @0x80039EB8 DIABLO.CPP:3448 */
-void plr_encrypt(unsigned char bEncrypt);   /* @0x80039EC0 DIABLO.CPP:3516 */
 void assert_fail(int nLineNo, const char *pszFile, const char *pszFail);   /* @0x80039EC8 DIABLO.CPP:3581 */
 void assert_fail(int nLineNo, const char *pszFile);   /* @0x80039EE8 DIABLO.CPP:3588 */
 extern "C" void app_fatal(char *pszFile, ...);   /* @0x80039F08 DIABLO.CPP:3593 (C linkage: no mangled suffix in the SYM) */

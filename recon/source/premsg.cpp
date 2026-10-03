@@ -24,9 +24,13 @@ inline void TextDat::DumpDatFile()
 #include "source/gen/structs_premsg.h"
 #include "source/gen/externs_premsg.h"
 #include "source/gen/protos_premsg.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void DefragItems(unsigned char *ilist, int num);   /* @0x80162FD4 PREMSG.CPP:92 */
+static void removellist(unsigned char *ilist, unsigned char val);   /* @0x8016301C PREMSG.CPP:102 */
 #include "source/diablo.h"
 
-void DefragItems(unsigned char *ilist, int num)
+static void DefragItems(unsigned char *ilist, int num)
 {
     int p = 0;
 
@@ -38,7 +42,7 @@ void DefragItems(unsigned char *ilist, int num)
     }
 }
 
-void removellist(unsigned char *ilist, unsigned char val)
+static void removellist(unsigned char *ilist, unsigned char val)
 {
     for (int i = 0; i < 127; i++) {
         if (ilist[i] == val)

@@ -64,7 +64,7 @@ void OVR_Open(void);
 void STR_Init(void);
 void SPU_OnceOnlyInit(void);
 void GLUE_Init(void);
-void SortOutFileSystem(void);
+static void SortOutFileSystem(void);
 
 extern int OPT_FileSystem;
 extern int OPT_DevKit;
@@ -139,7 +139,7 @@ FileIO *SYSI_GetOverlayFs(void)
 }
 
 /* @0x8008448C SYSINIT.CPP:201 */
-void SortOutFileSystem(void)
+static void SortOutFileSystem(void)
 {
     char *SearchPath;
 

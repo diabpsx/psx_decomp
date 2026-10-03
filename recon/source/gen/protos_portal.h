@@ -8,7 +8,6 @@ void SyncPortals(void);   /* @0x80080FE8 PORTAL.CPP:189 */
 void ActivatePortal(int i, int x, int y, int lvl, int lvltype, unsigned char sp);   /* @0x8008113C PORTAL.CPP:236 */
 void DeactivatePortal(int i);   /* @0x800811C8 PORTAL.CPP:253 */
 unsigned char PortalOnLevel(int i);   /* @0x800811E8 PORTAL.CPP:262 */
-void DelMis(int mi, int i);   /* @0x80081220 PORTAL.CPP:272 */
 void RemovePortalMissile(int id);   /* @0x80081280 PORTAL.CPP:285 */
 void SetCurrentPortal(int p);   /* @0x800813E4 PORTAL.CPP:306 */
 void GetPortalLevel(void);   /* @0x800813F0 PORTAL.CPP:312 */

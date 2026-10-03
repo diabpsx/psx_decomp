@@ -115,19 +115,19 @@ void RestoreObjectLight(void);   /* @0x8005F9C4 OBJECTS.CPP:4484 */
 void SetReturnLvlPos(void);   /* @0x800681CC QUESTS.CPP:458 */
 void SyncPortals(void);   /* @0x80080FE8 PORTAL.CPP:189 */
 
-void GoForwardLevel(void);
-void GoSetLevel(void);
-void GoBackLevel(void);
-void GoWarpLevel(void);
-void GoNewGame(void);
-void GoLoadGame(void);
-void GoNewLevel(void);
-void PostGoForwardLevel(void);
-void PostGoBackLevel(void);
-void PostNewGame(void);
-void PostLoadGame(void);
-void PostNewLevel(void);
-void LevelToLevelInit(void);
+static void GoForwardLevel(void);
+static void GoSetLevel(void);
+static void GoBackLevel(void);
+static void GoWarpLevel(void);
+static void GoNewGame(void);
+static void GoLoadGame(void);
+static void GoNewLevel(void);
+static void PostGoForwardLevel(void);
+static void PostGoBackLevel(void);
+static void PostNewGame(void);
+static void PostLoadGame(void);
+static void PostNewLevel(void);
+static void LevelToLevelInit(void);
 
 /* ---------------------------------------------------------------- data (TU-owned) */
 static int CutScreen = 0;   /* @0x8011AD7C */
@@ -330,7 +330,7 @@ void PSX_PostWndProc(unsigned int Msg, long wParam, unsigned long lParam)
 }
 
 /* @0x80096F98 PSXMSG.CPP:440 */
-void GoSetLevel(void)
+static void GoSetLevel(void)
 {
     LevelToLevelInit();
     if (!(currlevel > 0 && currlevel < 17))
@@ -341,7 +341,7 @@ void GoSetLevel(void)
 }
 
 /* @0x80097030 PSXMSG.CPP:453 */
-void GoBackLevel(void)
+static void GoBackLevel(void)
 {
     LevelToLevelInit();
     if (!(currlevel > 0 && currlevel < 17))
@@ -350,14 +350,14 @@ void GoBackLevel(void)
 }
 
 /* @0x8009708C PSXMSG.CPP:464 */
-void GoWarpLevel(void)
+static void GoWarpLevel(void)
 {
     LevelToLevelInit();
     PutUpCutScreen(CutScreen);
 }
 
 /* @0x800970B8 PSXMSG.CPP:475 */
-void PostLoadGame(void)
+static void PostLoadGame(void)
 {
     OVR_LoadGame();
     SyncPortals();
@@ -366,7 +366,7 @@ void PostLoadGame(void)
 }
 
 /* @0x80097130 PSXMSG.CPP:491 */
-void GoLoadGame(void)
+static void GoLoadGame(void)
 {
     LevelToLevelInit();
     RestoreLoadedData(1);
@@ -394,7 +394,7 @@ void GoLoadGame(void)
 }
 
 /* @0x80097288 PSXMSG.CPP:546 */
-void PostNewLevel(void)
+static void PostNewLevel(void)
 {
     int palnum;
 
@@ -407,7 +407,7 @@ void PostNewLevel(void)
 }
 
 /* @0x8009733C PSXMSG.CPP:556 */
-void GoNewLevel(void)
+static void GoNewLevel(void)
 {
     LevelToLevelInit();
     PutUpCutScreen(CutScreen);
@@ -417,7 +417,7 @@ void GoNewLevel(void)
 }
 
 /* @0x80097384 PSXMSG.CPP:574 */
-void PostGoBackLevel(void)
+static void PostGoBackLevel(void)
 {
     int palnum;
 
@@ -429,7 +429,7 @@ void PostGoBackLevel(void)
 }
 
 /* @0x80097430 PSXMSG.CPP:585 */
-void GoForwardLevel(void)
+static void GoForwardLevel(void)
 {
     LevelToLevelInit();
     if (!(currlevel < 16))
@@ -438,7 +438,7 @@ void GoForwardLevel(void)
 }
 
 /* @0x80097484 PSXMSG.CPP:592 */
-void PostGoForwardLevel(void)
+static void PostGoForwardLevel(void)
 {
     int palnum;
 
@@ -450,19 +450,19 @@ void PostGoForwardLevel(void)
 }
 
 /* @0x80097530 PSXMSG.CPP:604 */
-void GoNewGame(void)
+static void GoNewGame(void)
 {
     PutUpCutScreen(CutScreen);
 }
 
 /* @0x80097554 PSXMSG.CPP:613 */
-void PostNewGame(void)
+static void PostNewGame(void)
 {
     GLUE_StartBg(39, 1, -1);
 }
 
 /* @0x8009757C PSXMSG.CPP:623 */
-void LevelToLevelInit(void)
+static void LevelToLevelInit(void)
 {
     GLUE_SetFinished(1);
     while (TSK_Exist(NULL, 0x4001, 0xFFFFFFFF))

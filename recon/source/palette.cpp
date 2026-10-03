@@ -29,6 +29,10 @@ public:
 
 #include "source/gen/externs_palette.h"
 #include "source/gen/protos_palette.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void SetFadeLevel(int fadeval);   /* @0x8007EE7C PALETTE.CPP:137 */
+static void SetPolyXY(POLY_GT4 *gt4, unsigned char *coords);   /* @0x8007EEB8 PALETTE.CPP:200 */
 #include "source/diablo.h"
 #define P_setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)
 #define P_setXYWH(p, _x0, _y0, _w, _h) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x0)+(_w), (p)->y1 = (_y0), (p)->x2 = (_x0), (p)->y2 = (_y0)+(_h), (p)->x3 = (_x0)+(_w), (p)->y3 = (_y0)+(_h)
@@ -56,7 +60,7 @@ void ResetPal(void)
 {
 }
 
-void SetFadeLevel(int fadeval)
+static void SetFadeLevel(int fadeval)
 {
     int nval;
 
@@ -73,7 +77,7 @@ BOOL GetFadeState(void)
     return fading;
 }
 
-void SetPolyXY(POLY_GT4 *gt4, unsigned char *coords)
+static void SetPolyXY(POLY_GT4 *gt4, unsigned char *coords)
 {
     unsigned char bright1;
     unsigned char bright2;

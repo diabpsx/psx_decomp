@@ -52,7 +52,6 @@ unsigned char HealerItemOk(int i);   /* @0x80049D64 ITEMS.CPP:5651 */
 void InitItemGFX(void);   /* @0x8003E24C ITEMS.CPP:556 */
 void InitItems(BOOL re_init);   /* @0x8003E4F8 ITEMS.CPP:641 */
 void ItemDoppel(void);   /* @0x8004580C ITEMS.CPP:3141 */
-unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x);   /* @0x8003F6DC ITEMS.CPP:1050 */
 int ItemNoFlippy(void);   /* @0x80048B3C ITEMS.CPP:4805 */
 unsigned char ItemPlace(int xp, int yp);   /* @0x8003E254 ITEMS.CPP:573 */
 void ItemRndDur(int ii);   /* @0x800443F4 ITEMS.CPP:2659 */
@@ -67,7 +66,6 @@ void PrintItemOil(char IDidx);   /* @0x8004615C ITEMS.CPP:3516 */
 void PrintItemPower(char plidx, const ItemStruct *x);   /* @0x80046258 ITEMS.CPP:3637 */
 void ProcessItems(void);   /* @0x800458CC ITEMS.CPP:3173 */
 void RecalcStoreStats(void);   /* @0x80048858 ITEMS.CPP:4782 */
-void RechargeItem(ItemStruct *i, int r);   /* @0x80045FD0 ITEMS.CPP:3374 */
 void RecreateBoyItem(int ii, int idx, int lvl, int iseed);   /* @0x8004A3DC ITEMS.CPP:5848 */
 void RecreateEar(int ii, unsigned short ic, int iseed, unsigned char Id, int dur, int mdur, int ch, int mch, int ivalue, int ibuff);   /* @0x80045008 ITEMS.CPP:2962 */
 void RecreateHealerItem(int ii, int idx, int lvl, int iseed);   /* @0x8004A308 ITEMS.CPP:5821 */
@@ -76,7 +74,6 @@ void RecreatePremiumItem(int ii, int idx, int plvl, int iseed);   /* @0x8004A014
 void RecreateSmithItem(int ii, int idx, int lvl, int iseed);   /* @0x8004A258 ITEMS.CPP:5801 */
 void RecreateTownItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue);   /* @0x8004A4B4 ITEMS.CPP:5867 */
 void RecreateWitchItem(int ii, int idx, int lvl, int iseed);   /* @0x8004A0F0 ITEMS.CPP:5770 */
-void RepairItem(ItemStruct *i, int lvl);   /* @0x80045E1C ITEMS.CPP:3328 */
 void RespawnItem(int i, unsigned char FlipFlag);   /* @0x80045600 ITEMS.CPP:3088 */
 int RndAllItems(void);   /* @0x80043ADC ITEMS.CPP:2435 */
 int RndBoyItem(int lvl);   /* @0x80049C48 ITEMS.CPP:5621 */

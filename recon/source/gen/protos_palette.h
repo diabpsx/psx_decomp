@@ -1,6 +1,4 @@
-void SetFadeLevel(int fadeval);   /* @0x8007EE7C PALETTE.CPP:137 */
 BOOL GetFadeState(void);   /* @0x8007EEAC PALETTE.CPP:179 */
-void SetPolyXY(POLY_GT4 *gt4, unsigned char *coords);   /* @0x8007EEB8 PALETTE.CPP:200 */
 void SmearScreen(void);   /* @0x8007EFD4 PALETTE.CPP:232 */
 void DrawFadedScreen(void);   /* @0x8007EFDC PALETTE.CPP:258 */
 void BlackPalette(void);   /* @0x8007F064 PALETTE.CPP:287 */

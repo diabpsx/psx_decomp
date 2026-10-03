@@ -11,6 +11,9 @@
 #include "source/gen/structs_portal.h"
 #include "source/gen/externs_portal.h"
 #include "source/gen/protos_portal.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void DelMis(int mi, int i);   /* @0x80081220 PORTAL.CPP:272 */
 #include "source/diablo.h"
 
 #define MAXPORTAL 4
@@ -96,7 +99,7 @@ unsigned char PortalOnLevel(int i)
 }
 
 /* @0x80081220 PORTAL.CPP:272 */
-void DelMis(int mi, int i)
+static void DelMis(int mi, int i)
 {
     missileavail[MAXMISSILES - nummissiles] = mi;
     nummissiles--;

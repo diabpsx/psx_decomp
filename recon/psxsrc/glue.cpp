@@ -35,7 +35,7 @@ struct MonstLevel {   /* sizeof 8 */
 extern struct MonstLevel AllLevels[];
 
 struct TASK;
-extern void BgTask(struct TASK *T);
+static void BgTask(struct TASK *T);
 class CBlocks;
 class CPlayer;
 
@@ -177,7 +177,7 @@ static const char CharChar[4] = "WRS";
 
 /* -------------------------------------------------------------------------------------------- */
 
-void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking);
+static void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking);
 
 
 
@@ -305,7 +305,7 @@ void GLUE_DoQuake(int Time, int Amount)
     QuakeAmount = Amount;
 }
 
-void BgTask(struct TASK *T)
+static void BgTask(struct TASK *T)
 {
     struct DEF_ARGS *Args;
     BOOL IsTown;
@@ -420,7 +420,7 @@ void BgTask(struct TASK *T)
 
 static const char WepChar[10] = "NUSDBAMHT";
 
-struct PInf *FindPlayerChar(char *Id)
+static struct PInf *FindPlayerChar(char *Id)
 {
     for (int f = 0; f < 0x51; f++) {
         if (strcmp(PlayerInfo[f].Tx, Id) == 0)
@@ -430,7 +430,7 @@ struct PInf *FindPlayerChar(char *Id)
     return 0;
 }
 
-struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
+static struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
 {
     char TxBuff[20];
 
@@ -441,12 +441,12 @@ struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
 BOOL DoShowPanel = false;
 BOOL DoDrawBg = false;
 
-struct PInf *FindPlayerChar(struct PlayerStruct *P)
+static struct PInf *FindPlayerChar(struct PlayerStruct *P)
 {
     return FindPlayerChar((int)P->_pClass, P->_pgfxnum & 0xF, (int)(P->_pgfxnum << 24) >> 28);
 }
 
-int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
+static int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
 {
     char Class;
 
@@ -475,7 +475,7 @@ int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
     }
 }
 
-void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
+static void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
 {
     int Id;
 

@@ -6,6 +6,9 @@
 #include "source/gen/structs_monster.h"
 #include "source/gen/externs_monster.h"
 #include "source/gen/protos_monster.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static BOOL gSameRoom(int m, int i);   /* @0x80156A68 MONSTER.CPP:5556 */
 #include "source/diablo.h"
 
 /* monster types (_mMTidx / CMonster::mtype, retail values) */
@@ -260,7 +263,7 @@ unsigned char CheckMonsterHit(int m, unsigned char &ret)
     return 0;
 }
 
-BOOL gSameRoom(int m, int i)
+static BOOL gSameRoom(int m, int i)
 {
     MonsterStruct *m1 = &monster[m];
     MonsterStruct *m2 = &monster[i];

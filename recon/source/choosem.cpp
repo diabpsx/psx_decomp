@@ -98,9 +98,9 @@ void GLUE_ResumeGame(void);
 long ENG_random(long v);
 CPad *PAD_GetPad(int PadNum, unsigned char both);
 
-int NoUiListChoose(int Level, unsigned long QuestsNeededMask);
-void ChooseTask(struct TASK *T);
-int GetListsAvailable(int Level, unsigned long QuestsNeededMask, unsigned char *ListofLists);
+static int NoUiListChoose(int Level, unsigned long QuestsNeededMask);
+static void ChooseTask(struct TASK *T);
+static int GetListsAvailable(int Level, unsigned long QuestsNeededMask, unsigned char *ListofLists);
 
 extern int NumOfMonsterListLevels;
 extern struct MonstLevel AllLevels[16];
@@ -198,13 +198,13 @@ int CM_ChooseMonsterList(int Level, unsigned long QuestsNeededMask)
 }
 
 /* @0x80155B84 CHOOSEM.CPP:290 */
-int NoUiListChoose(int Level, unsigned long QuestsNeededMask)
+static int NoUiListChoose(int Level, unsigned long QuestsNeededMask)
 {
     return 0;
 }
 
 /* @0x80155B8C CHOOSEM.CPP:304 */
-void ChooseTask(struct TASK *T)
+static void ChooseTask(struct TASK *T)
 {
     struct DEF_ARGS *A;
     int *List;
@@ -233,7 +233,7 @@ void ChooseTask(struct TASK *T)
 }
 
 /* @0x80155C5C CHOOSEM.CPP:483 */
-void ShowTask(struct TASK *T)
+static void ShowTask(struct TASK *T)
 {
     struct DEF_ARGS *A;
     int List;
@@ -269,7 +269,7 @@ void ShowTask(struct TASK *T)
 }
 
 /* @0x80155E8C CHOOSEM.CPP:542 */
-int GetListsAvailable(int Level, unsigned long QuestsNeededMask, unsigned char *ListofLists)
+static int GetListsAvailable(int Level, unsigned long QuestsNeededMask, unsigned char *ListofLists)
 {
     int NumOfChoices;
     int NumOfLists;

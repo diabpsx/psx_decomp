@@ -2,13 +2,11 @@
 void AddPlrExperience(PlayerStruct *ptrplr, int lvl, long exp);   /* @0x8006067C PLAYER.CPP:917 */
 void AddPlrExperience(int pnum, int lvl, long exp);   /* @0x80066EBC PLAYER.CPP:4690 */
 void AddPlrMonstExper(int lvl, long exp, char pmask);   /* @0x800608A0 PLAYER.CPP:987 */
-void ArmorDur(PlayerStruct *ptrplr);   /* @0x80064320 PLAYER.CPP:3326 */
 void BreakObject(PlayerStruct *ptrplr, int val);   /* @0x8006684C PLAYER.CPP:4662 */
 void CalcPlrInv(PlayerStruct *ptrplr, unsigned char bl);   /* @0x80066880 PLAYER.CPP:4663 */
 int CalcStatDiff(PlayerStruct *ptrplr);   /* @0x80060498 PLAYER.CPP:858 */
 int CalcStatDiff(int pnum);   /* @0x80066BB8 PLAYER.CPP:4680 */
 int CalculateGold(PlayerStruct *ptrplr);   /* @0x800669A4 PLAYER.CPP:4669 */
-void CheckCheatStats(PlayerStruct *ptrplr);   /* @0x800650CC PLAYER.CPP:3877 */
 void CheckNewPath(PlayerStruct *ptrplr);   /* @0x800646A8 PLAYER.CPP:3448 */
 void CheckNewPath(int pnum);   /* @0x8006708C PLAYER.CPP:4698 */
 void CheckPlrDead(int pnum);   /* @0x80062198 PLAYER.CPP:2355 */
@@ -65,7 +63,6 @@ void PhaseEnd(PlayerStruct *ptrplr);   /* @0x80066A98 PLAYER.CPP:4674 */
 void PhaseStart(PlayerStruct *ptrplr);   /* @0x80066A3C PLAYER.CPP:4672 */
 void PlayDungMsgs(void);   /* @0x80066448 PLAYER.CPP:4588 */
 void PlrClrTrans(int x, int y);   /* @0x80060C6C PLAYER.CPP:1402 */
-void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy);   /* @0x800615DC PLAYER.CPP:1987 */
 unsigned char PlrDeathModeOK(int p);   /* @0x80064B68 PLAYER.CPP:3773 */
 void PlrDoTrans(int x, int y);   /* @0x80060CE4 PLAYER.CPP:1418 */
 unsigned char PlrHitMonst(PlayerStruct *ptrplr, int m);   /* @0x800629EC PLAYER.CPP:2746 */

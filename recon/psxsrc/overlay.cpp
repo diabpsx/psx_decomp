@@ -40,8 +40,8 @@ extern int OVR_FmvSize;
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "psxsrc/OVERLAY.CPP", line)   /* retail line literals */
 
-void ClearOutOverlays(void);
-void LoadOver(Overlay &Ovr);
+static void ClearOutOverlays(void);
+static void LoadOver(Overlay &Ovr);
 
 /* @0x800B0784 OVERLAY.CPP:110 (.STARTUP_text) */
 void OVR_Open(void) __attribute__((section(".text.overlay_startup")));
@@ -96,7 +96,7 @@ void OVR_LoadMemcard(void)
 }
 
 /* @0x800954F0 OVERLAY.CPP:174 */
-void ClearOutOverlays(void)
+static void ClearOutOverlays(void)
 {
     FrontEndOver.ClearOut();
     PregameOver.ClearOut();
@@ -135,7 +135,7 @@ OVER_TYPE OVR_GetCurrentOverlay(void)
 }
 
 /* @0x80095674 OVERLAY.CPP:234 */
-void LoadOver(Overlay &Ovr)
+static void LoadOver(Overlay &Ovr)
 {
     if (CurrentOverlay != Ovr.GetOverType()) {
         ClearOutOverlays();

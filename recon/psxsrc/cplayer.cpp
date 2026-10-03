@@ -60,7 +60,7 @@ static int WWorldX;   /* @0x8011C67C */
 static int WWorldY;   /* @0x8011C680 */
 
 static void FilthyTask(TASK *T);
-POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim);
+static POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim);
 
 /* @0x80095854 CPLAYER.CPP:72 */
 CPlayer::CPlayer(BOOL Town, int mPlayerNum, int NewNumOfPlayers)
@@ -408,7 +408,7 @@ static void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
 }
 
 /* @0x800966BC PRIMPOOL.H:84 */
-POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
+static POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
 {
     POLY_FT4 *RetPrim;
     PRIM_GetPrim(&RetPrim);

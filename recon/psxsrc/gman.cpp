@@ -1,6 +1,7 @@
 /* GMAN.CPP — Climax PSX layer, texture/graphics manager (C:\diabpsx\PSXSRC\GMAN.CPP).
  * MAP: .GMAN_text 0x80091E54-0x800953F7, .GMAN_data 0x800B8B94.  Lane: CC1PLPSX 2.7.2 (C++). */
 #include "psxsrc/gman.h"
+static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);   /* retail SYM: STAT (file-local) */
 
 /* GMAN.CPP-owned globals (.sdata @0x8011AD1C..; SYM class EXT INT).  Tentative definitions in the
  * OWNER TU make them gp-relative (`lw $v,%gp_rel(TpW)($gp)`) exactly like retail; `extern` would
@@ -1271,7 +1272,7 @@ void CTextFileInfo::LoadDat(long hnd, int size) const
 }
 
 /* line 1743 @0x80094788 -- run-length decoder */
-void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes)
+static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes)
 {
     unsigned char *EndDest;
     unsigned long *BigDest;

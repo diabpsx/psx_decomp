@@ -15,7 +15,7 @@ extern "C" void DBG_Error(char *Text, char *File, int Line);
 void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam);
 void PSX_PostWndProc(unsigned int Msg, long wParam, unsigned long lParam);
 void SetAmbientLight(void);
-char *Msg2Txt(int Msg);
+static char *Msg2Txt(int Msg);
 void GRL_CallWindowProc(unsigned long hw, unsigned int msg, long wp, unsigned long lp);
 
 static WNDPROC CurrentProc;
@@ -68,7 +68,7 @@ static const struct MESSAGE_STR AllMsgs[11] = {
     { 0x4D, "WM_DIAVNEWLVL" },
 };
 
-char *Msg2Txt(int Msg)
+static char *Msg2Txt(int Msg)
 {
     for (int i = 0; i < sizeof(AllMsgs) / sizeof(struct MESSAGE_STR); i++) {
         if (Msg == AllMsgs[i].Msg)

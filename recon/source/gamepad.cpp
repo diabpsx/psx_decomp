@@ -10,6 +10,10 @@
 #include "source/gen/structs_gamepad.h"
 #include "source/gen/externs_gamepad.h"
 #include "source/gen/protos_gamepad.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static void CloseInvChr(void);   /* @0x800783F8 GAMEPAD.CPP:216 */
+static void GamePadTask(struct TASK *T);   /* @0x8007AC34 GAMEPAD.CPP:1914 */
 #include "source/diablo.h"
 
 /* GAMEPAD.CPP data, in retail .sdata address order (= definition order). flyflag is the first
@@ -102,7 +106,7 @@ void GamePad::flyabout(void)
 }
 
 /* --------------------------------------------------------------------- */
-void CloseInvChr(void)
+static void CloseInvChr(void)
 {
     chrflag = 0;
     options_pad = -1;
@@ -1029,7 +1033,7 @@ void GamePad::Handle(void)
 }
 
 /* --------------------------------------------------------------------- */
-void GamePadTask(struct TASK *T)
+static void GamePadTask(struct TASK *T)
 {
     int omp, oms;
 

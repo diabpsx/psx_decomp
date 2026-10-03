@@ -8,7 +8,5 @@ unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP:264 */
 int veclen2(int ix, int iy);   /* @0x8004BC68 LIGHTING.CPP:328 */
 void SetQuest(void);   /* @0x8009B9B4 TONY.CPP:340 */
 void NetSendLoPri(const unsigned char *pbMsg, unsigned char bLen);   /* @0x80052BA4 MULTI.CPP:168 */
-int InitLevelType(int l);   /* @0x80052BD0 MULTI.CPP:559 */
-void SetupLocalCoords(void);   /* @0x80052C1C MULTI.CPP:570 */
 void InitNewSeed(long newseed);   /* @0x80052D7C MULTI.CPP:687 */
 unsigned char NetInit(unsigned char bSinglePlayer, unsigned char *pfExitProgram);   /* @0x80052DF0 MULTI.CPP:708 */

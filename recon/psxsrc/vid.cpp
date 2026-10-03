@@ -66,7 +66,7 @@ extern "C" {
 static void VID_DispEnvSend(void);
 }
 /* These two functions belong to the retail STARTUP text region. */
-void InitScreens(void) __attribute__((section(".text.vid_startup")));
+static void InitScreens(void) __attribute__((section(".text.vid_startup")));
 void VID_OpenModule(void) __attribute__((section(".text.vid_startup")));
 void VID_SetXYOff(int x, int y);
 int VID_GetXOff(void);
@@ -98,7 +98,7 @@ void VID_AfterDisplay(void)
 }
 
 /* @0x800B03E0 VID.CPP:184 (.STARTUP_text) */
-void InitScreens(void)
+static void InitScreens(void)
 {
     ResetGraph(0);
     SetGraphDebug(0);

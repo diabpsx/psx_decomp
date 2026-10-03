@@ -1222,7 +1222,7 @@ void AddLazStand()
  * fields as the save area. No PC twin; reconstructed purely from the retail oracle, which reaches
  * plr[1]'s _px/_py/plractive via the literal offsets sizeof(PlayerStruct)+0x30/+0x32/+0x1D
  * (0x1A18/0x1A1A/0x1A05) instead of an indexed plr[1] access. ---- */
-void saveplrpos()
+static void saveplrpos()
 {
     plr[0]._pVar1 = ViewX;
     plr[0]._pVar2 = ViewY;
@@ -1242,7 +1242,7 @@ void saveplrpos()
     ViewX = 0;
 }
 
-void restoreplrpos()
+static void restoreplrpos()
 {
     ViewX = plr[0]._pVar1;
     ViewY = plr[0]._pVar2;

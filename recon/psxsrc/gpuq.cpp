@@ -22,7 +22,7 @@ int ArgsSoFar;
 void GPUQ_FlushQ(void);
 
 /* @0x800833B0 GPUQ.CPP:76 */
-void CheckMaxArgs(void)
+static void CheckMaxArgs(void)
 {
     if (ArgsSoFar == 0x1E) {
         DrawSync(0);

@@ -12,6 +12,38 @@
 #include "source/gen/structs_drlg_l2.h"
 #include "source/gen/externs_drlg_l2.h"
 #include "source/gen/protos_drlg_l2.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static unsigned char DRLG_L2PlaceMiniSet(unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir);   /* @0x80143408 DRLG_L2.CPP:1205 */
+static void DRLG_L2PlaceRndSet(unsigned char *miniset, int rndper);   /* @0x80143798 DRLG_L2.CPP:1361 */
+static void DRLG_L2Subs(void);   /* @0x80143A90 DRLG_L2.CPP:1417 */
+static void DRLG_L2Shadows(void);   /* @0x80143C80 DRLG_L2.CPP:1458 */
+static void DRLG_LoadL2SP(void);   /* @0x80143E8C DRLG_L2.CPP:1509 */
+static void DRLG_FreeL2SP(void);   /* @0x80143F2C DRLG_L2.CPP:1531 */
+static void DRLG_L2SetRoom(int rx1, int ry1);   /* @0x80143F5C DRLG_L2.CPP:1540 */
+static void DefineRoom(int nX1, int nY1, int nX2, int nY2, int ForceHW);   /* @0x8014405C DRLG_L2.CPP:1576 */
+static void CreateDoorType(int nX, int nY);   /* @0x80144260 DRLG_L2.CPP:1627 */
+static void PlaceHallExt(int nX, int nY);   /* @0x80144344 DRLG_L2.CPP:1657 */
+static void AddHall(int nX1, int nY1, int nX2, int nY2, int nHd);   /* @0x8014437C DRLG_L2.CPP:1668 */
+static void CreateRoom(int nX1, int nY1, int nX2, int nY2, int nRDest, int nHDir, int ForceHW, int nH, int nW);   /* @0x80144454 DRLG_L2.CPP:1702 */
+static void GetHall(int *nX1, int *nY1, int *nX2, int *nY2, int *nHd);   /* @0x80144AC4 DRLG_L2.CPP:1826 */
+static void ConnectHall(int nX1, int nY1, int nX2, int nY2, int nHd);   /* @0x80144B5C DRLG_L2.CPP:1844 */
+static void DoPatternCheck(int i, int j);   /* @0x801451BC DRLG_L2.CPP:1998 */
+static void L2TileFix(void);   /* @0x80145494 DRLG_L2.CPP:2075 */
+static unsigned char DL2_Cont(unsigned char x1f, unsigned char y1f, unsigned char x2f, unsigned char y2f);   /* @0x801455B8 DRLG_L2.CPP:2099 */
+static int DL2_NumNoChar(void);   /* @0x80145638 DRLG_L2.CPP:2111 */
+static void DL2_DrawRoom(int x1, int y1, int x2, int y2);   /* @0x80145694 DRLG_L2.CPP:2125 */
+static void DL2_KnockWalls(int x1, int y1, int x2, int y2);   /* @0x80145798 DRLG_L2.CPP:2146 */
+static unsigned char DL2_FillVoids(void);   /* @0x80145968 DRLG_L2.CPP:2206 */
+static unsigned char CreateDungeon(void);   /* @0x801462E4 DRLG_L2.CPP:2410 */
+static void DRLG_L2Pass3(void);   /* @0x801465F0 DRLG_L2.CPP:2495 */
+static void DRLG_L2FTVR(int i, int j, int x, int y, int d);   /* @0x801467E8 DRLG_L2.CPP:2603 */
+static void DRLG_L2FloodTVal(void);   /* @0x80146C70 DRLG_L2.CPP:2647 */
+static void DRLG_L2TransFix(void);   /* @0x80146D68 DRLG_L2.CPP:2670 */
+static void L2DirtFix(void);   /* @0x80146F94 DRLG_L2.CPP:2710 */
+static void DRLG_L2SetWalls(void);   /* @0x80147528 DRLG_L2.CPP:2795 */
+static void DRLG_L2(int entry);   /* @0x801476E0 DRLG_L2.CPP:2834 */
+static void DRLG_InitL2Vals(void);   /* @0x80148134 DRLG_L2.CPP:3057 */
 #include "source/diablo.h"
 
 #define DMAXX 40
@@ -1558,7 +1590,7 @@ void L2DoorFix(void)
     }
 }
 
-void DRLG_L2SetWalls(void)
+static void DRLG_L2SetWalls(void)
 {
     int i, j, xx, yy;
 
@@ -1769,7 +1801,7 @@ static void DRLG_L2(int entry)
     DRLG_CheckQuests(nSx1, nSy1);
 }
 
-void DRLG_InitL2Vals(void)
+static void DRLG_InitL2Vals(void)
 {
     /* PSX oracle: empty (0x8-byte jr-ra stub) -- the retail dSpecial[] highlight-frame feature this
      * function implements in devilution is compiled out entirely on this build (LoadL2Dungeon's

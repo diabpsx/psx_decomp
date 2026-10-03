@@ -21,16 +21,16 @@ extern "C" void initpsxcdrom(void);
 /* TU-owned static (STAT class in the SYM, not EXT) -- GameTaskPtr's tentative def lives here. */
 static TASK *GameTaskPtr;
 
-void GameTask(TASK *T);
+static void GameTask(TASK *T);
 void MAIN_MainLoop(void);
 
 /* Texture-page helpers precede MAIN's entry points in the retail TU. */
-int GetTpY(unsigned short tpage)
+static int GetTpY(unsigned short tpage)
 {
     return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
 }
 
-int GetTpX(unsigned short tpage)
+static int GetTpX(unsigned short tpage)
 {
     return (tpage << 6) & 0x3C0;
 }
@@ -74,7 +74,7 @@ void MAIN_RestartGameTask(void)
 }
 
 /* @0x80083250 MAIN.CPP:356 */
-void GameTask(TASK *T)
+static void GameTask(TASK *T)
 {
     MSG_ClearOutCompMap();
     UPDATEPROGRESS(4);

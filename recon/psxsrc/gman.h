@@ -239,7 +239,6 @@ BOOL TpLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk)
 void GM_ForceTpLoad(int Id);
 void GM_FinishedUsing(TextDat *tex);
 TextDat *GM_UseTexData(int Id);
-void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);
 
 /* GMAN.H:290-296 — defined in the header (out-of-line copy per TU under -fno-inline) */
 inline void TextDat::DumpDatFile()

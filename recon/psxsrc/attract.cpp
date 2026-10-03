@@ -53,7 +53,7 @@ void ClearLoadCharItems(void);
 void CalcPlrInv(int p, unsigned char Loadgfx);
 void CreatePlayer(int pnum, char c);
 void CustomPlayerInit(struct PlayerStruct &P);
-void CreatePlayersFromFeData(struct FE_CREATE &CStruct);
+static void CreatePlayersFromFeData(struct FE_CREATE &CStruct);
 
 extern struct PlayerStruct plr[2];
 extern unsigned char FeFlag;
@@ -93,7 +93,7 @@ void CustomPlayerInit(struct PlayerStruct &P)
 }
 
 /* @0x8008D344 ATTRACT.CPP:149 */
-void CreatePlayersFromFeData(struct FE_CREATE &CStruct)
+static void CreatePlayersFromFeData(struct FE_CREATE &CStruct)
 {
     for (int Loop = 0; Loop < CStruct.NumOfPlayers; Loop++) {
         if (!LoadedChar[Loop]) {

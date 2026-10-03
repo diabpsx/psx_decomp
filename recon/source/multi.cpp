@@ -9,6 +9,10 @@
 #include "source/gen/structs_multi.h"
 #include "source/gen/externs_multi.h"
 #include "source/gen/protos_multi.h"
+
+/* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
+static int InitLevelType(int l);   /* @0x80052BD0 MULTI.CPP:559 */
+static void SetupLocalCoords(void);   /* @0x80052C1C MULTI.CPP:570 */
 #include "source/diablo.h"
 
 
@@ -45,7 +49,7 @@ void NetSendLoPri(const unsigned char *pbMsg, unsigned char bLen)
 }
 
 /* @0x80052BD0 MULTI.CPP:559 */
-int InitLevelType(int l)
+static int InitLevelType(int l)
 {
     if (l == 0) return 0;
     if ((l >= 1) && (l <= 4)) return 1;
@@ -55,7 +59,7 @@ int InitLevelType(int l)
 }
 
 /* @0x80052C1C MULTI.CPP:570 */
-void SetupLocalCoords(void)
+static void SetupLocalCoords(void)
 {
     if (!leveldebug || gbMaxPlayers > 1) {
         currlevel = 0;

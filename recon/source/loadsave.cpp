@@ -63,13 +63,13 @@ char *GetDiabloStr(void)
 }
 
 /* @0x8015B978 */
-char BLoad(void)
+static char BLoad(void)
 {
     return *tbuff++;
 }
 
 /* @0x8015B994 */
-int ILoad(void)
+static int ILoad(void)
 {
     int rv;
 
@@ -82,7 +82,7 @@ int ILoad(void)
 }
 
 /* @0x8015B9E8 */
-unsigned char OLoad(void)
+static unsigned char OLoad(void)
 {
     if (*tbuff++ == TRUE)
         return TRUE;
@@ -91,20 +91,20 @@ unsigned char OLoad(void)
 }
 
 /* @0x8015BA0C */
-void LoadQuest(int i)
+static void LoadQuest(int i)
 {
     memcpy(&quests[i], tbuff, sizeof(struct QuestStruct));
     tbuff += sizeof(struct QuestStruct);
 }
 
 /* @0x8015BAD4 */
-void BSave(char v)
+static void BSave(char v)
 {
     *tbuff++ = v;
 }
 
 /* @0x8015BAEC */
-void ISave(int v)
+static void ISave(int v)
 {
     *tbuff++ = v >> 24;
     *tbuff++ = v >> 16;
@@ -113,7 +113,7 @@ void ISave(int v)
 }
 
 /* @0x8015BB4C */
-void OSave(unsigned char v)
+static void OSave(unsigned char v)
 {
     if (v)
         *tbuff++ = 1;
@@ -122,7 +122,7 @@ void OSave(unsigned char v)
 }
 
 /* @0x8015BB90 */
-void SaveQuest(int i)
+static void SaveQuest(int i)
 {
     memcpy(tbuff, &quests[i], sizeof(struct QuestStruct));
     tbuff += sizeof(struct QuestStruct);
