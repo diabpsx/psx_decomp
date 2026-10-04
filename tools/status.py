@@ -240,31 +240,55 @@ def glib_files():
     return {f: [n for _, n in sorted(v)] for f, v in out.items()}
 
 
+def oracle_insns(segment, fn):
+    """instruction count of an oracle scaffold (its hex-word lines)"""
+    p = ROOT / "asm" / "nonmatchings" / segment / f"{fn}.s"
+    return sum(1 for l in p.read_text(errors="replace").splitlines()
+               if re.search(r"/\*\s*[0-9A-Fa-f]+\s+[0-9A-Fa-f]{8}\s+[0-9A-Fa-f]{8}\s*\*/", l)) if p.is_file() else 0
+
+
 def glib_board():
     """Separate board for the Climax GLIB C TUs reconstructed under recon/glibdev (not part of the game total).
     PASS = bytes (tools/verify_asm.py) + exact SYM (tools/symlane.py) on the project lane; the real-ASPSX
     alternate is not applied here (its segment is derived from the file name, which lib TUs do not share)."""
     files = glib_files()
     lines, gpass, gtotal = ["", "# Climax GLIB (lib segment) — separate count, not part of the game total", ""], 0, 0
+    # The native receipt (tools/native_recon.py) is the authoritative PASS source for a GLIB TU: it compiles the whole
+    # TU on its registered identity lane (tools/build.py PER_TU_FLAGS "compiler" + the registry assembler), links it at
+    # the retail addresses and verifies complete bytes, owned data AND every function/global SYM record.  The
+    # verify_asm/symlane gates below only know the PsyQ 4.0 maspsx lane (they ignore the per-TU compiler key) and are
+    # used for TUs without a receipt.
+    import json
+    receipts_path = ROOT / "build" / "native_source" / "receipts.json"
+    receipts = {r["segment"]: r for r in json.loads(receipts_path.read_text())} if receipts_path.is_file() else {}
     per = []
     for f in sorted(files, key=lambda k: -len(files[k])):
         fns = files[f]; gtotal += len(fns)
         tu = ROOT / "recon" / "glibdev" / (f[:-2].lower() + ".c")
-        res = {}
-        if tu.is_file():
+        res, lane = {}, ""
+        receipt = receipts.get(tu.stem)
+        if tu.is_file() and receipt and receipt.get("functions") == len(fns):
+            res = {fn: ("PASS", oracle_insns("lib", fn), 0) for fn in fns}
+            lane = (f" — native receipt: {receipt['compiler_overrides'].get('compiler') or 'PsyQ 4.0 CC1PSX'}"
+                    f" / ASPSX {receipt['assembler_version']}")
+        elif tu.is_file():
             res = gate(tu, fns)
             sym = sym_ok(tu, [n for n, v in res.items() if v[0] == "PASS"]) if res else {}
             for n, v in list(res.items()):
                 if v[0] == "PASS" and not sym.get(n, False): res[n] = ("SYMDIFF", v[1], 0)
+            lane = " — PsyQ 4.0 maspsx gates (no native receipt)"
         npass = sum(1 for v in res.values() if v[0] == "PASS"); gpass += npass
-        per.append((f, tu, fns, res, npass))
-        print(f"glib {f}: {npass}/{len(fns)}")
-    lines.insert(2, f"**Climax GLIB: {gpass} / {gtotal} functions PASS (bytes + exact SYM) on the per-TU lane configured in "
-                    f"tools/build.py PER_TU_FLAGS; source = Climax's own GLib (SpongeBob SuperSponge Utils/Libs/GLib, "
-                    f"warcraft2 VRIP.C). The GLIB objects were built with a gcc 2.6.x / ASPSX 2.3x toolchain — see README**\n")
-    for f, tu, fns, res, npass in per:
+        per.append((f, tu, fns, res, npass, lane))
+        print(f"glib {f}: {npass}/{len(fns)}{lane}")
+    lines.insert(2, f"**Climax GLIB: {gpass} / {gtotal} functions PASS — complete object bytes, owned data and every "
+                    f"function/global SYM record verified by the native link on the per-TU identity lane "
+                    f"(gcc 2.6.3-compatible C + original DOS ASPSX 2.34 for seven TUs, PsyQ 4.0 for GMAIN/TICK; "
+                    f"tools/build.py PER_TU_FLAGS, configs/native_recon_link.json, receipts in "
+                    f"build/native_source/receipts.json); source = Climax's own GLib (SpongeBob SuperSponge "
+                    f"Utils/Libs/GLib, warcraft2 VRIP.C) — see README**\n")
+    for f, tu, fns, res, npass, lane in per:
         where = tu.relative_to(ROOT).as_posix() if tu.is_file() else "(no recon TU yet)"
-        lines.append(f"## {f}  ({where}) — {npass}/{len(fns)} PASS")
+        lines.append(f"## {f}  ({where}) — {npass}/{len(fns)} PASS{lane}")
         for fn in fns:
             st = res.get(fn, ("TODO", 0, 0))
             if st[0] == "PASS": lines.append(f"- ✅ {fn} ({st[1]})")

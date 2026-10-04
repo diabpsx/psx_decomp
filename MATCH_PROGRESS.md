@@ -2995,17 +2995,17 @@
 
 
 # Climax GLIB (lib segment) — separate count, not part of the game total
-**Climax GLIB: 123 / 146 functions PASS (bytes + exact SYM) on the per-TU lane configured in tools/build.py PER_TU_FLAGS; source = Climax's own GLib (SpongeBob SuperSponge Utils/Libs/GLib, warcraft2 VRIP.C). The GLIB objects were built with a gcc 2.6.x / ASPSX 2.3x toolchain — see README**
+**Climax GLIB: 146 / 146 functions PASS — complete object bytes, owned data and every function/global SYM record verified by the native link on the per-TU identity lane (gcc 2.6.3-compatible C + original DOS ASPSX 2.34 for seven TUs, PsyQ 4.0 for GMAIN/TICK; tools/build.py PER_TU_FLAGS, configs/native_recon_link.json, receipts in build/native_source/receipts.json); source = Climax's own GLib (SpongeBob SuperSponge Utils/Libs/GLib, warcraft2 VRIP.C) — see README**
 
 
-## GAL.C  (recon/glibdev/gal.c) — 62/70 PASS
+## GAL.C  (recon/glibdev/gal.c) — 70/70 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
 - ✅ GAL_SetErrorChecking (4)
-- ❌ GAL_SplitBlock — 2 diffs (ours 72)
+- ✅ GAL_SplitBlock (72)
 - ✅ GAL_InitModule (46)
 - ✅ GAL_AddMemType (72)
 - ✅ GAL_Alloc (102)
 - ✅ GAL_Lock (26)
-- ❌ GAL_Unlock — 12 diffs (ours 31)
+- ✅ GAL_Unlock (33)
 - ✅ GAL_Free (42)
 - ✅ GAL_GetFreeMem (29)
 - ✅ GAL_GetUsedMem (29)
@@ -3013,15 +3013,15 @@
 - ✅ AttachHdrToList (8)
 - ✅ DetachHdrFromList (19)
 - ✅ IsActiveValidHandle (14)
-- ❌ AlignPtr — 3 diffs (ours 9)
-- ❌ AlignSize — 3 diffs (ours 9)
+- ✅ AlignPtr (12)
+- ✅ AlignSize (12)
 - ✅ FindClosestSizedBlock (22)
 - ✅ FindHighestMemBlock (26)
 - ✅ FindLowestMemBlock (26)
 - ✅ GetMemInitInfoBlockFromType (15)
 - ✅ MergeToEmptyList (53)
 - ✅ GAL_AllocAt (55)
-- ❌ LoAlloc — 10 diffs (ours 102)
+- ✅ LoAlloc (102)
 - ✅ FindBlockInTheseBounds (27)
 - ✅ GetFreeMemHdrBlock (34)
 - ✅ ReleaseMemHdrBlock (16)
@@ -3038,8 +3038,8 @@
 - ✅ GAL_GetErrorText (12)
 - ✅ GAL_GetLastErrorCode (4)
 - ✅ GAL_GetLastErrorText (10)
-- ❌ GAL_HowManyEmptyRegions — 7 diffs (ours 25)
-- ❌ GAL_HowManyUsedRegions — 7 diffs (ours 25)
+- ✅ GAL_HowManyEmptyRegions (26)
+- ✅ GAL_HowManyUsedRegions (26)
 - ✅ GAL_SetTimeStamp (4)
 - ✅ GAL_IncTimeStamp (8)
 - ✅ GAL_GetTimeStamp (4)
@@ -3047,7 +3047,7 @@
 - ✅ GAL_AllocMultiStruct (20)
 - ✅ GAL_ProcessMultiStruct (43)
 - ✅ GAL_GetSize (23)
-- ❌ GazDefragMem — 2 diffs (ours 90)
+- ✅ GazDefragMem (90)
 - ✅ PutBlocksInRegionIntoList (41)
 - ✅ CollideRegions (13)
 - ✅ DeleteEmptyBlocks (27)
@@ -3070,27 +3070,27 @@
 - ✅ SortAddr (4)
 - ✅ SortMemHdrList (60)
 
-## TASKER.C  (recon/glibdev/tasker.c) — 34/41 PASS
+## TASKER.C  (recon/glibdev/tasker.c) — 41/41 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
 - ✅ DoEpi (20)
 - ✅ DoPro (20)
-- ❌ TSK_OpenModule — 5 diffs (ours 28)
-- ❌ TSK_AddTask — 2 diffs (ours 122)
+- ✅ TSK_OpenModule (29)
+- ✅ TSK_AddTask (122)
 - ✅ TSK_DoTasks (112)
-- ❌ TSK_Sleep — 18 diffs (ours 55)
+- ✅ TSK_Sleep (55)
 - ✅ ReturnToSchedulerIfCurrentTask (34)
 - ✅ TSK_Die (11)
 - ✅ TSK_Kill (20)
 - ✅ TSK_GetFirstActive (4)
-- ❌ TSK_IsStackCorrupted — 2 diffs (ours 31)
+- ✅ TSK_IsStackCorrupted (31)
 - ✅ TSK_JumpAndResetStack (18)
 - ✅ TSK_RepointProc (17)
 - ✅ TSK_GetCurrentTask (4)
 - ✅ TSK_IsCurrentTask (6)
-- ❌ TSK_Exist — 2 diffs (ours 22)
+- ✅ TSK_Exist (22)
 - ✅ TSK_SetExecFilter (6)
 - ✅ TSK_ClearExecFilter (9)
-- ❌ TSK_KillTasks — 2 diffs (ours 64)
-- ❌ TSK_IterateTasks — 2 diffs (ours 30)
+- ✅ TSK_KillTasks (64)
+- ✅ TSK_IterateTasks (30)
 - ✅ TSK_MakeTaskInactive (5)
 - ✅ TSK_MakeTaskActive (5)
 - ✅ TSK_MakeTaskImmortal (5)
@@ -3113,10 +3113,10 @@
 - ✅ ExtraMarkStack (11)
 - ✅ CheckExtraStack (15)
 
-## GDEBUG.C  (recon/glibdev/gdebug.c) — 8/9 PASS
+## GDEBUG.C  (recon/glibdev/gdebug.c) — 9/9 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
 - ✅ DBG_OpenModule (2)
 - ✅ DBG_PollHost (2)
-- ⬜ DBG_Halt
+- ✅ DBG_Halt (2)
 - ✅ DBG_SendMessage (6)
 - ✅ DBG_SetMessageHandler (4)
 - ✅ DBG_Error (13)
@@ -3124,16 +3124,16 @@
 - ✅ SendPsyqString (2)
 - ✅ DBG_SetPollRoutine (4)
 
-## GSYS.C  (recon/glibdev/gsys.c) — 6/7 PASS
+## GSYS.C  (recon/glibdev/gsys.c) — 7/7 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
 - ✅ GSYS_GetWorkMemInfo (4)
 - ✅ GSYS_SetStackAndJump (15)
 - ✅ GSYS_MarkStack (4)
 - ✅ GSYS_IsStackCorrupted (6)
-- ❌ GSYS_InitMachine — 5 diffs (ours 20)
+- ✅ GSYS_InitMachine (21)
 - ✅ GSYS_CheckPtr (13)
 - ✅ GSYS_IsStackOutOfBounds (23)
 
-## TICK.C  (recon/glibdev/tick.c) — 7/7 PASS
+## TICK.C  (recon/glibdev/tick.c) — 7/7 PASS — native receipt: PsyQ 4.0 CC1PSX / ASPSX 2.56
 - ✅ TICK_InitModule (8)
 - ✅ TICK_Set (4)
 - ✅ TICK_Get (4)
@@ -3142,24 +3142,24 @@
 - ✅ TICK_GetDateString (4)
 - ✅ TICK_GetTimeString (4)
 
-## GUTILS.C  (recon/glibdev/gutils.c) — 3/6 PASS
-- ❌ GU_InitModule — 5 diffs (ours 10)
+## GUTILS.C  (recon/glibdev/gutils.c) — 6/6 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
+- ✅ GU_InitModule (11)
 - ✅ GU_SetRndSeed (12)
 - ✅ GU_GetRnd (36)
 - ✅ GU_GetSRnd (8)
-- ❌ GU_GetRndRange — 3 diffs (ours 12)
-- ❌ GU_AlignVal — 3 diffs (ours 6)
+- ✅ GU_GetRndRange (15)
+- ✅ GU_AlignVal (9)
 
-## GTIMSYS.C  (recon/glibdev/gtimsys.c) — 2/3 PASS
+## GTIMSYS.C  (recon/glibdev/gtimsys.c) — 3/3 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
 - ✅ GTIMSYS_GetTimer (9)
 - ✅ GTIMSYS_ResetTimer (9)
-- ❌ GTIMSYS_InitTimer — 5 diffs (ours 50)
+- ✅ GTIMSYS_InitTimer (49)
 
-## VRIP.C  (recon/glibdev/vrip.c) — 0/2 PASS
-- ❌ vsprintf — 6 diffs (ours 17)
-- ❌ _doprnt — 98 diffs (ours 498)
+## VRIP.C  (recon/glibdev/vrip.c) — 2/2 PASS — native receipt: gcc-2.6.3 / ASPSX 2.34
+- ✅ vsprintf (19)
+- ✅ _doprnt (506)
 
-## GMAIN.C  (recon/glibdev/gmain.c) — 1/1 PASS
+## GMAIN.C  (recon/glibdev/gmain.c) — 1/1 PASS — native receipt: PsyQ 4.0 CC1PSX / ASPSX 2.56
 - ✅ main (20)
 
 
