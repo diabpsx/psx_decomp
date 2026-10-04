@@ -2,6 +2,10 @@
 # recon/<dir>/<seg>.cpp (e.g. the startup segment links 8 source files).
 # tools/status.py gates each listed function in its home TU (bytes + SYM).
 # <seg> <function> <home TU relative to repo root>
+lib timedwait recon/eaclib/timedwait.c
+lib initgp recon/eaclib/savegp.c
+lib savegp_ci recon/eaclib/savegp.c
+lib restoregp recon/eaclib/savegp.c
 lib dumpasync recon/eaclib/nasync_debug.c
 lib validateasyncblocks recon/eaclib/nasync_debug.c
 lib blockclear recon/eaclib/blkfill.s

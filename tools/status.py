@@ -162,7 +162,7 @@ def main():
             lines.insert(3, "**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; "
                             "the five retail images link byte-identical to the ROM (`tools/link.py`). "
                             "The separately tracked library region is not fully integrated: 349 entries have Sony archive receipts, "
-                            "all 146 Climax GLIB and eleven EAC entries are source-linked, and 331 entries remain — see README.**\n")
+                            "all 146 Climax GLIB and fifteen EAC entries are source-linked, and 327 entries remain — see README.**\n")
         glib_lines, gpass, gtotal = glib_board()
         lines += glib_lines
         (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")

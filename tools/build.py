@@ -50,6 +50,8 @@ PER_TU_FLAGS = {
     "recon/eaclib/gettick.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/eaclib/nasync_debug.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/eaclib/resettick.c": {"g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/eaclib/savegp.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/eaclib/timedwait.c": {"g_value": "8", "compiler": "gcc-2.6.3"},
     "recon/eaclib/textcrnt.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     # Climax GLIB C modules use absolute addressing even for four-byte owned
     # commons (TICK/GazTick), proving their original small-data threshold was 0.

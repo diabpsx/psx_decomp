@@ -1,4 +1,29 @@
 {
+  "timedwait": {
+    "source": "recon/eaclib/timedwait.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8003013C", "size": 64,
+        "functions": ["timedwait"]}
+    },
+    "data_symbols": [],
+    "externals": ["gettick"]
+  },
+  "savegp": {
+    "source": "recon/eaclib/savegp.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8002FFF4", "size": 44,
+        "functions": ["initgp", "savegp_ci", "restoregp"]},
+      ".data": {"va": "0x800B7084", "size": 4, "scaffold": "data.data"}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
   "nasync_debug": {
     "source": "recon/eaclib/nasync_debug.c",
     "image": "diabpsx",

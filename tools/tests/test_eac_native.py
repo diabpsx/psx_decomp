@@ -22,6 +22,27 @@ ASPSX234 = Path("C:/Temp/nfs2-clean/psyq350/PSYQ/ASPSX.EXE")
                           B.ROOT / "rom/DIABPSX.BIN")),
                      "historical EAC toolchain/retail inputs unavailable")
 class EacNativeTests(unittest.TestCase):
+    def test_savegp_register_variables(self):
+        spec = json.loads((B.ROOT / "configs/native_recon_link.json").read_text())["savegp"]
+        retail = (B.ROOT / "rom/DIABPSX.BIN").read_bytes()
+        with tempfile.TemporaryDirectory(prefix="eac-savegp-", dir=B.BUILD) as directory:
+            folder = Path(directory)
+            with patch.object(S, "OUT", folder):
+                raw = S.compile_g(B.ROOT / spec["source"], assembler=ASPSX234,
+                                  assembler_dos=True, assembler_flags=[]).read_bytes()
+            obj = P.parse_obj_complete(raw)
+            regions = {".text": (0x8002FFF4, 44), ".data": (0x800B7084, 4)}
+            blocks, mapping = N.native_link("savegp", raw, regions,
+                                            {"_gp": 0x8011A780}, output_dir=folder)
+            for section, (address, size) in regions.items():
+                self.assertEqual(blocks[section],
+                                 retail[address - 0x80010000:address - 0x80010000 + size])
+            paths = [B.ROOT / "asm/nonmatchings/lib" / (name + ".s")
+                     for name in ("initgp", "savegp_ci", "restoregp")]
+            self.assertEqual(R.verify_stripped_library_members(
+                obj, spec, {".text.lib": regions[".text"], ".data": regions[".data"]},
+                mapping, S.RETAIL.read_text(encoding="latin-1"), paths), 3)
+
     def test_resettick_object_shape(self):
         source = B.ROOT / "recon/eaclib/resettick.c"
         with tempfile.TemporaryDirectory(prefix="eac-resettick-", dir=B.BUILD) as directory:
@@ -63,7 +84,8 @@ class EacNativeTests(unittest.TestCase):
                  "getm": (["getm", "geti"], {}),
                  "nasync_debug": (["dumpasync", "validateasyncblocks"], {}),
                  "textcrnt": (["putm", "puti"], {}),
-                 "gettick": (["gettick"], {"ticks": 0x8011C578})}
+                 "gettick": (["gettick"], {"ticks": 0x8011C578}),
+                 "timedwait": (["timedwait"], {"gettick": 0x80030020})}
         with tempfile.TemporaryDirectory(prefix="eac-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(S, "OUT", folder):

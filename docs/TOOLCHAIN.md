@@ -323,9 +323,13 @@ members supply `gettick` and `resettick`, including the latter's exact
 `tickset`/`tickval` small-data ownership. The complete original BLKFILL.ASM
 member supplies `blockclear`/`blockfill`, preserving Diablo's two-instruction
 tail-loop ordering variant. The two empty NASYNC debug hooks are also promoted
-from `src/lib.c` into an exact source member. Coverage is now 1,736 functions/
-115 TUs (1,717/114 native plus19/1 conventional), the suite is230/230, and331
-library entries remain:33 boot utilities plus298 EAC runtime.
+from `src/lib.c` into an exact source member. SAVEGP's three hand-assembly
+semantics are expressed in C with gcc 2.6.3 global register variables bound to
+`$gp` and `$zero`, retaining authentic relocations and the exact four-byte data
+word. Diablo's polling-only `timedwait` variant is separately reconstructed in
+natural C. Coverage is now 1,740 functions/117 TUs (1,721/116 native plus19/1
+conventional), the suite is231/231, and327 library entries remain:33 boot
+utilities plus294 EAC runtime.
 The machine-readable result is `build/eac_twin_screen.json`.
 
 ## Debug-object inspection (2026-10-03)
