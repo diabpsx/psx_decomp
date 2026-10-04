@@ -280,6 +280,38 @@ def data_address(symbols, name):
     return addresses.pop()
 
 
+_GAS_ESCAPES = {'n': 10, 't': 9, 'r': 13, 'b': 8, 'f': 12, 'a': 7, 'v': 11, '\\': 92, '"': 34, "'": 39}
+
+
+def gas_string_bytes(literal):
+    """Bytes of a GAS string literal body (without the implicit NUL): C escapes, octal \\NNN and hex \\xHH
+    decoded exactly as the assembler does; None for anything non-ASCII or malformed (the caller fails closed)."""
+    out, i = bytearray(), 0
+    while i < len(literal):
+        c = literal[i]
+        if c != '\\':
+            if ord(c) > 127:
+                return None
+            out.append(ord(c)); i += 1; continue
+        i += 1
+        if i >= len(literal):
+            return None
+        c = literal[i]
+        if c in _GAS_ESCAPES:
+            out.append(_GAS_ESCAPES[c]); i += 1
+        elif c in '01234567':
+            digits = re.match(r'[0-7]{1,3}', literal[i:])[0]
+            out.append(int(digits, 8) & 0xFF); i += len(digits)
+        elif c == 'x':
+            digits = re.match(r'[0-9A-Fa-f]{1,2}', literal[i + 1:])
+            if not digits:
+                return None
+            out.append(int(digits[0], 16)); i += 1 + len(digits[0])
+        else:
+            return None
+    return bytes(out)
+
+
 def data_bridge(source, regions):
     """Import SDK data while preserving labels, including inside a scaffold object."""
     pattern = re.compile(r"^dlabel (\w+)\r?\n(.*?)^enddlabel \1\s*$", re.M | re.S)
@@ -306,7 +338,7 @@ def data_bridge(source, regions):
                 r"^[ \t]*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})(?:\s+([0-9A-Fa-f]{8}))?\s*\*/[ \t]*\.(word|short|byte)[ \t]+[^,\r\n]+$",
                 source, re.M))
             strings = list(re.finditer(
-                r'^[ \t]*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s*\*/[ \t]*\.asciz[ \t]+"((?:[^"\\\r\n]|\\\\)*)"[ \t]*$',
+                r'^[ \t]*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s*\*/[ \t]*\.asciz[ \t]+"((?:[^"\\\r\n]|\\.)*)"[ \t]*$',
                 source, re.M))
             partial, cursor = [], va
             for i, match, address in selected:
@@ -326,9 +358,9 @@ def data_bridge(source, regions):
                 rows = [(match, int(match[1], 16), {'word': 4, 'short': 2, 'byte': 1}[match[3]])
                         for match in words if first <= int(match[1], 16) < limit
                         and (match[3] != 'word' or match[2] is not None)]
-                rows += [(match, int(match[1], 16), len(match[2].replace('\\\\', '\\')) + 1)
+                rows += [(match, int(match[1], 16), len(gas_string_bytes(match[2])) + 1)
                          for match in strings if first <= int(match[1], 16) < limit
-                         and match[2].isascii()]
+                         and gas_string_bytes(match[2]) is not None]
                 rows.sort(key=lambda row: row[1])
                 position = first
                 for match, address, width in rows:

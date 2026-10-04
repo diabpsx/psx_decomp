@@ -2,7 +2,7 @@
 
 **Game code: 2727 / 2727 entries PASS (100.0%) — 2725 functions + 2 source-emitted data entries; 837 PsyQ SDK functions excluded**
 
-**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; the five retail images link byte-identical to the ROM (`tools/link.py`). The separately tracked library region is not fully integrated: 349 entries have Sony archive receipts, all 146 Climax GLIB and fifteen EAC entries are source-linked, and 327 entries remain — see README.**
+**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; the five retail images link byte-identical to the ROM (`tools/link.py`). The separately tracked library region: 349 entries have Sony archive receipts, all 146 Climax GLIB entries and all 342 EA Canada EACLIB / Climax hand-assembly entries are source members (two further sections below) — see README.**
 
 ## async  (recon/psxsrc/async.cpp) — 6/6 PASS
 - ✅ AS_CallBack0__Fi (27)
@@ -3161,4 +3161,132 @@
 
 ## GMAIN.C  (recon/glibdev/gmain.c) — 1/1 PASS
 - ✅ main (20)
+
+
+# Lib-segment source members without retail body SYM (EA Canada EACLIB + Climax hand assembly) — separate count
+
+**344 / 344 functions in 41/41 members carry a native-link receipt (complete object bytes + owned data identical to the ROM at the retail addresses; per-member compiler/assembler identity in tools/build.py PER_TU_FLAGS and configs/native_recon_link.json). Identity lanes: EACLIB C = PsyQ 3.6 DOS CC1PSX + ASPSX 2.56 default divide guards; libddx = gcc 2.6.3-compatible -O1 -G0 + ASPSX 2.34; .ASM/.MIP = assembler-neutral transcriptions — see README.**
+
+## recon/eaclib/abortmsg.c — 2 functions — PASS (psyq36-dos/2.56)
+- abortmessage, abortoverride
+
+## recon/eaclib/addtimer.c — 4 functions — PASS (psyq36-dos/2.56)
+- addtimer, deltimer, delalltimers, timercount
+
+## recon/eaclib/blkfill.s — 2 functions — PASS (as/2.34)
+- blockclear, blockfill
+
+## recon/eaclib/blkmov.s — 1 functions — PASS (as/2.34)
+- blockmove
+
+## recon/eaclib/blockio.c — 20 functions — PASS (psyq36-dos/2.56)
+- handlesector, openblockhandlea, openblockhandle, openblockhandlez, asyncopenblockhandlea, asyncopenblockhandlebysector, asyncopenblockhandle, asyncopenblockhandlez, blockhandlefile, closeblockhandle, readblockhandle, asyncreadblockcallback, blockreadcallback, asyncreadblockhandle, seekblockhandlea, seekblockhandle, seekblockhandlez, asyncseekblockhandlea, asyncseekblockhandle, asyncseekblockhandlez
+
+## recon/eaclib/cache.c — 12 functions — PASS (psyq36-dos/2.56)
+- cachememadr, cachememblock, prioritycachememadr, prioritycachememblock, findnamedpurgeableblockinclass, findnamedpurgeableblock, cacheone, cacheonei, checkcacheadr, checkcacheblock, checkcacheinclassadr, checkcacheinclassblock
+
+## recon/eaclib/cdrom.c — 25 functions — PASS (psyq36-dos/2.56)
+- timetosector, sectortotime, initpsxcdrom, closecdrom, psxcdromseek, readdonecallback, psxcdromread, psxcdromasyncseek, setasyncreadcallback, psxcdromasyncpause, asyncinitread, asynctimer, psxcdromstopread, Iasyncreadcallback, psxcdromasyncread, parsedir, basefilename, setdirectorycache, initdirectorycache, cachedirectoryentry, directoryentrycached, cdromdirectoryentry, setdirentrycallback, asyncdirentry, asyncdirentrycallback
+
+## recon/eaclib/cdstream.c — 59 functions — PASS (psyq36-dos/2.56)
+- setstreamqueuesize, initstreamstructa, initstreamstructz, initstreamstruct, initstreama, initstreamz, initstream, setstreamspeed, defaultstreamspeed, delstreamstruct, delstream, streamcommanda, purgestreamcommanda, startstream, startstreamz, queuestartstream, queuestartstreamz, purgestartstream, purgestartstreamz, startstreamidle, startstreamidlez, queuestartstreamidle, queuestartstreamidlez, purgestartstreamidle, purgestartstreamidlez, seekstream, seekstreamz, queueseekstream, queueseekstreamz, purgeseekstream, purgeseekstreamz, purgestreamqueue, secondarystreamstruct, secondarystream, resetstreamstatus, getstreamstatus, PSXistreamreader, streamreader, coordinatestream, localstreamreader, releasechunks, streamspace, streamendspace, streamstartspace, getstreamchunk, releasestreamchunk, streamgetstatus, streamreleasestatus, streamidle, streamsetnotfull, streamfull, isendofstream, setstreamcrc, clearstreamcrc, initstreamblocks, putstreamblock, checkstreamblocksfree, streamblocksfree, getstreamblocka
+
+## recon/eaclib/compact.c — 4 functions — PASS (psyq36-dos/2.56)
+- compactup, compactupi, compactdown, compactdowni
+
+## recon/eaclib/crc.s — 1 functions — PASS (as/2.34)
+- crc16
+
+## recon/eaclib/ddx.c — 12 functions — PASS (gcc-2.6.3/2.34)
+- SwapByte, PutLong, GetLong, DDXinit, DDXcreate, DDXopen, DDXclose, DDXread, DDXwrite, DDXlseek, DDXpollhost, DDXputchar
+
+## recon/eaclib/eac_async.c — 31 functions — PASS (psyq36-dos/2.56)
+- asyncreadmsecs, asyncstructsize, initasyncstruct, initasyncstructsize, initasync, delasyncstruct, delasync, asyncloadfilecallback, asyncloadfile, asyncloadfileatcallback, asyncloadfileat, setasyncfile, asyncloadchunkcallback, asyncloadchunk, asyncloadsegmentcallback, asyncloadsegment, asyncreadcallback, asyncread, getasyncstatus, cancelasyncload, asyncidle, asyncreader, asynctopupoverride, localasyncreader, getasyncreadblock, getasyncreadstatus, initasyncblocks, putasyncblock, getasyncblock, internalupdateasyncqueue, PSXiasyncreader
+
+## recon/eaclib/eac_fileio.c — 13 functions — PASS (psyq36-dos/2.56)
+- PCfilelen, initfileio, setdirectory, getdirectory, openhandlea, openhandle, openhandlez, openhandlewa, openhandlew, libclosehandle, readhandle, writehandle, seekhandle
+
+## recon/eaclib/exit.c — 3 functions — PASS (psyq36-dos/2.56)
+- eacexit, addexit, removeexit
+
+## recon/eaclib/filename.c — 1 functions — PASS (psyq36-dos/2.56)
+- filename
+
+## recon/eaclib/filesize.c — 3 functions — PASS (psyq36-dos/2.56)
+- filesize, filesizez, filesizea
+
+## recon/eaclib/filexist.c — 1 functions — PASS (psyq36-dos/2.56)
+- fileexists
+
+## recon/eaclib/getcycle.c — 5 functions — PASS (psyq36-dos/2.56)
+- getcycleint, restoregetcycle, initgetcycle, getcycle, shortgetcycle
+
+## recon/eaclib/getm.s — 2 functions — PASS (as/2.34)
+- getm, geti
+
+## recon/eaclib/inittmr.c — 3 functions — PASS (psyq36-dos/2.56)
+- inittimer, restoretimer, tmrint
+
+## recon/eaclib/iocoord.c — 13 functions — PASS (psyq36-dos/2.56)
+- reserveioforasync, reserveioforstream, streamhasio, asynchasio, setstreamtopup, topupstream, signalstreamtopup, streamtoppedup, loadfiletopup, ioidle, ioreader, setstreameriofuncs, setasynciofuncs
+
+## recon/eaclib/loadcall.c — 4 functions — PASS (psyq36-dos/2.56)
+- iscrcblock, checkcrcblock, eacloadfilecallback, initloadfilecallback
+
+## recon/eaclib/loadfat.c — 3 functions — PASS (psyq36-dos/2.56)
+- loadfileatadra, loadfileatadr, loadfileatadrz
+
+## recon/eaclib/lock.c — 4 functions — PASS (psyq36-dos/2.56)
+- getlocksemaphore, locksemaphore, locksemaphorereturn, unlocksemaphore
+
+## recon/eaclib/memman.c — 47 functions — PASS (psyq36-dos/2.56)
+- initmemmanadr, creatememclass, libmembreak, reservememblock, reservememblockz, reservememadr, reservememadrz, reservememadra, reservememblocka, reservememblockai, findmemblocka, findmemblock, purgememadr, purgememblock, purgememblocki, purgememaboveadr, purgememaboveblock, purgeone, purgeonei, findnamedmemblockinclass, findnamedmemblock, updatehighwater, largestunused, largestunusedinclass, largestunusedinclassi, lockedmem, relocateablemem, purgeablemem, availablemem, largestreserveableinclass, initmemblocks, putmemblock, getmemblock, memsizeadr, getblockadr, getblockoffset, getblocklen, getblockname, getblocktype, lockmemblock, unlockmemblock, breakmemadr, breakmemblock, breakmemblocki, findcontainingmemblocka, findcontainingmemblock, findcontainingmemblockz
+
+## recon/eaclib/nasync_debug.c — 2 functions — PASS (gcc-2.6.3/2.34)
+- dumpasync, validateasyncblocks
+
+## recon/eaclib/print.s — 2 functions — PASS (as/2.34)
+- print, printxy
+
+## recon/eaclib/resize.c — 6 functions — PASS (psyq36-dos/2.56)
+- resizememadra, resizememadr, resizememadrz, resizememblock, resizememblockz, resizememblocka
+
+## recon/eaclib/savegp.c — 3 functions — PASS (gcc-2.6.3/2.34)
+- initgp, savegp_ci, restoregp
+
+## recon/eaclib/seekmsec.c — 2 functions — PASS (psyq36-dos/2.56)
+- seekmsecs, returnseekmsecs
+
+## recon/eaclib/stricmp.c — 1 functions — PASS (psyq36-dos/2.56)
+- stricmp
+
+## recon/eaclib/strnicmp.c — 1 functions — PASS (psyq36-dos/2.56)
+- strnicmp
+
+## recon/eaclib/systask.c — 4 functions — PASS (psyq36-dos/2.56)
+- addsystemtask, delsystemtask, systemtask, abortablewait
+
+## recon/eaclib/textcrnt.c — 2 functions — PASS (gcc-2.6.3/2.34)
+- putm, puti
+
+## recon/eaclib/timer.c — 8 functions — PASS (psyq36-dos/2.56)
+- gettick, tickcount, elapsedticks, resettick, setticks, waitticks, testticks, timedwait
+
+## recon/eaclib/validmem.c — 5 functions — PASS (psyq36-dos/2.56)
+- addsentinel, checksentinelz, validatemema, validatemem, validatememz
+
+## recon/psxsrc/ablock.s — 2 functions — PASS (as/2.56)
+- ABL_SetBlockRGBXY, ABL_PrintPart
+
+## recon/psxsrc/crunch.s — 8 functions — PASS (as/2.56)
+- crunch, func_800106D4, func_8001097C, func_80010A2C, func_80010A7C, decrunch, func_80010D14, func_80010D48
+
+## recon/psxsrc/gp.s — 3 functions — PASS (as/2.56)
+- SaveGP, ReloadGP, SetGP
+
+## recon/psxsrc/gte.s — 11 functions — PASS (as/2.56)
+- GTE_SetTransXYZ, GTE_RotateFT4, Ldv3Vec, GTE_GetCol, RGB, IR0, RGBFC, RGBRES, RES, GTE_Test, GTE_RotTrans2G4
+
+## recon/psxsrc/replace.s — 9 functions — PASS (as/2.56)
+- longjmp, setjmp, memset, strcpy, strcat, strrchr, strchr, strlen2, abs
 

@@ -161,13 +161,54 @@ def main():
         if grand_pass == total_all:
             lines.insert(3, "**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; "
                             "the five retail images link byte-identical to the ROM (`tools/link.py`). "
-                            "The separately tracked library region is not fully integrated: 349 entries have Sony archive receipts, "
-                            "all 146 Climax GLIB and fifteen EAC entries are source-linked, and 327 entries remain — see README.**\n")
+                            "The separately tracked library region: 349 entries have Sony archive receipts, all 146 Climax GLIB entries "
+                            "and all 342 EA Canada EACLIB / Climax hand-assembly entries are source members (two further sections below) — see README.**\n")
         glib_lines, gpass, gtotal = glib_board()
         lines += glib_lines
+        lib_lines, lpass, ltotal = lib_members_board()
+        lines += lib_lines
         (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"TOTAL {grand_pass}/{total_all}")
         print(f"GLIB {gpass}/{gtotal}")
+        print(f"LIB MEMBERS {lpass}/{ltotal}")
+
+
+def lib_members_board():
+    """Separate board for the stripped library members of the lib segment (EA Canada EACLIB C/.ASM and the Climax
+    PSXSRC/*.MIP hand assembly): these retail objects carry no function-body SYM records, so a member PASSes when
+    the native lane (tools/native_recon.py: per-TU compiler/assembler identity from tools/build.py PER_TU_FLAGS and
+    configs/native_recon_link.json) links its complete source object byte-identical to the ROM — the receipt in
+    build/native_source/receipts.json names every function. Members without a fresh receipt show as PENDING."""
+    import json
+    registry = json.loads((ROOT / "configs" / "native_recon_link.json").read_text())
+    receipts_path = ROOT / "build" / "native_source" / "receipts.json"
+    receipts = {r["segment"]: r for r in json.loads(receipts_path.read_text())} if receipts_path.is_file() else {}
+    rows = []
+    for segment, spec in registry.items():
+        if not spec.get("stripped_library_sym"):
+            continue
+        fns = [f for s, row in spec["sections"].items() if s.startswith(".text.") for f in row.get("functions", [])]
+        fns = [spec.get("function_aliases", {}).get(f, f) for f in fns] + list(spec.get("covered_functions", []))
+        receipt = receipts.get(segment)
+        ok = bool(receipt) and receipt.get("functions") == len(fns)
+        rows.append((spec["source"], segment, fns, ok, (receipt or {}).get("compiler_overrides", {}).get("compiler"),
+                     (receipt or {}).get("assembler_version")))
+    rows.sort(key=lambda r: r[0])
+    total = sum(len(r[2]) for r in rows)
+    passed = sum(len(r[2]) for r in rows if r[3])
+    lines = ["", "# Lib-segment source members without retail body SYM (EA Canada EACLIB + Climax hand assembly) — separate count", "",
+             f"**{passed} / {total} functions in {sum(1 for r in rows if r[3])}/{len(rows)} members carry a native-link receipt "
+             f"(complete object bytes + owned data identical to the ROM at the retail addresses; "
+             f"per-member compiler/assembler identity in tools/build.py PER_TU_FLAGS and configs/native_recon_link.json). "
+             f"Identity lanes: EACLIB C = PsyQ 3.6 DOS CC1PSX + ASPSX 2.56 default divide guards; libddx = gcc 2.6.3-compatible "
+             f"-O1 -G0 + ASPSX 2.34; .ASM/.MIP = assembler-neutral transcriptions — see README.**", ""]
+    for source, segment, fns, ok, compiler, assembler in rows:
+        lane = f"{compiler or 'as'}/{assembler or '?'}"
+        lines.append(f"## {source} — {len(fns)} functions — {'PASS' if ok else 'PENDING'} ({lane})")
+        lines.append("- " + ", ".join(fns))
+        lines.append("")
+    print("\n".join(f"lib {r[0]}: {'PASS' if r[3] else 'PENDING'} {len(r[2])}" for r in rows))
+    return lines, passed, total
 
 
 def glib_files():

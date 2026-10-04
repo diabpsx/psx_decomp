@@ -43,19 +43,37 @@ class EacNativeTests(unittest.TestCase):
                 obj, spec, {".text.lib": regions[".text"], ".data": regions[".data"]},
                 mapping, S.RETAIL.read_text(encoding="latin-1"), paths), 3)
 
-    def test_resettick_object_shape(self):
-        source = B.ROOT / "recon/eaclib/resettick.c"
-        with tempfile.TemporaryDirectory(prefix="eac-resettick-", dir=B.BUILD) as directory:
+    def test_eac_compiler_lane_and_divide_guard(self):
+        # EA Canada EACLIB objects: PsyQ 3.6 DOS CC1PSX + ASPSX 2.56 keeping its default divide guard
+        self.assertEqual(S.compiler_lane(B.ROOT / "recon/eaclib/timer.c"), (S.PSYQ36_CC1, True))
+        self.assertEqual(S.compiler_lane(B.ROOT / "recon/eaclib/ddx.c"), (S.GLIB_CC1, False))
+        version, path, dos, flags = R.source_assembler_options({"assembler": "2.56", "divide_guard": True})
+        self.assertEqual((version, path, dos, flags), ("2.56", S.ASPSX, False, []))
+        self.assertEqual(R.source_assembler_options({"assembler": "2.56"})[3], ["-0"])
+        with self.assertRaises(ValueError):
+            R.source_assembler_options({"assembler": "2.34", "divide_guard": False})
+
+    @unittest.skipUnless(S.PSYQ36_CC1.is_file(), "PsyQ 3.6 DOS CC1PSX unavailable")
+    def test_timer_object_shape(self):
+        # one TIMER object: gettick .. timedwait; tickset/tickval are its gp-relative small data
+        source = B.ROOT / "recon/eaclib/timer.c"
+        with tempfile.TemporaryDirectory(prefix="eac-timer-", dir=B.BUILD) as directory:
             with patch.object(S, "OUT", Path(directory)):
-                raw = S.compile_g(source, assembler=ASPSX234, assembler_dos=True,
+                raw = S.compile_g(source, assembler=S.ASPSX, assembler_dos=False,
                                   assembler_flags=[]).read_bytes()
         obj = P.parse_obj_complete(raw)
         self.assertEqual({obj["sections"][section]: len(data)
                           for section, data in obj["code"].items()},
-                         {".sdata": 8, ".text": 36})
+                         {".sdata": 8, ".text": 348})
         self.assertEqual({row["name"] for row in obj["xdefs"]},
-                         {"resettick", "tickset", "tickval"})
+                         {"gettick", "tickcount", "elapsedticks", "resettick", "setticks", "waitticks",
+                          "testticks", "timedwait", "tickset", "tickval"})
         self.assertEqual(obj["xrefs"], ["ticks"])
+        wanted = b"".join(N.scaffold_bytes(B.ROOT / "asm/nonmatchings/lib" / (name + ".s"))[1] for name in
+                          ("gettick", "tickcount", "elapsedticks", "resettick", "setticks", "waitticks",
+                           "testticks", "timedwait"))
+        section = next(index for index, name in obj["sections"].items() if name == ".text")
+        self.assertEqual(len(obj["code"][section]), len(wanted))
 
     def test_crc_assembly_and_table(self):
         spec = json.loads((B.ROOT / "configs/native_recon_link.json").read_text())["crc"]
@@ -83,9 +101,7 @@ class EacNativeTests(unittest.TestCase):
         cases = {"blkfill": (["blockclear", "blockfill"], {}),
                  "getm": (["getm", "geti"], {}),
                  "nasync_debug": (["dumpasync", "validateasyncblocks"], {}),
-                 "textcrnt": (["putm", "puti"], {}),
-                 "gettick": (["gettick"], {"ticks": 0x8011C578}),
-                 "timedwait": (["timedwait"], {"gettick": 0x80030020})}
+                 "textcrnt": (["putm", "puti"], {})}
         with tempfile.TemporaryDirectory(prefix="eac-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(S, "OUT", folder):

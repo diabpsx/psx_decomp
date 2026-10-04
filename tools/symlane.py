@@ -53,13 +53,50 @@ EMBEDDED_TEXT_TABLES = embedded_text_tables()
 def crlf(p: Path):
     b = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"); p.write_bytes(b)
 
-def compiler_for(src: Path, is_cpp=False) -> Path:
+# Reviewed per-TU C compiler lanes (toolchain identity, docs/TOOLCHAIN.md): name -> (executable, runs under DOSBox).
+# "gcc-2.6.3"  : FSF gcc 2.6.3 cc1 stand-in for the Climax GLIB objects (PsyQ 3.x era, ASPSX 2.34 behaviour).
+# "psyq36-dos" : PsyQ 3.6 DOS CC1PSX ("2.7.2.SN.1") for the EA Canada EACLIB objects (ASPSX 2.56 default guards).
+PSYQ36_CC1 = Path(os.environ.get("DIAB_PSYQ36_CC1", "C:/Temp/diablo-psx-tool-probes/psyq36/CC1PSX.EXE"))
+COMPILER_LANES = {"gcc-2.6.3": (GLIB_CC1, False), "psyq36-dos": (PSYQ36_CC1, True)}
+
+
+def compiler_lane(src: Path, is_cpp=False):
+    """(compiler executable, runs-under-DOSBox) for a source; None lane = the PsyQ 4.0 cc1/cc1plus."""
     lane = B.per_tu_flags(src).get("compiler")
     if lane is None:
-        return B.CC1PL if is_cpp else B.CC1
-    if lane != "gcc-2.6.3" or is_cpp:
+        return (B.CC1PL if is_cpp else B.CC1), False
+    if lane not in COMPILER_LANES or is_cpp:
         raise ValueError("unreviewed per-TU compiler lane")
-    return GLIB_CC1
+    return COMPILER_LANES[lane]
+
+
+def compiler_for(src: Path, is_cpp=False) -> Path:
+    return compiler_lane(src, is_cpp)[0]
+
+
+def compile_dos_cc1(compiler: Path, flags, i_file: Path, s_file: Path):
+    """Run a DOS-only cc1 (PsyQ 3.6 CC1PSX) under DOSBox: 8.3 names, TMP inside the work dir."""
+    if any(not re.fullmatch(r"-[A-Za-z0-9=_-]+", flag) for flag in flags):
+        raise ValueError("unsafe DOS cc1 flag")
+    with tempfile.TemporaryDirectory(prefix="cc1dos-", dir=OUT) as directory:
+        work = Path(directory)
+        shutil.copyfile(compiler, work / "CC1PSX.EXE")
+        shutil.copyfile(i_file, work / "IN.I")
+        command = "cc1psx " + " ".join(flags) + " IN.I -o OUT.S > CC.LOG"
+        run = subprocess.run([str(DOSBOX), "--noprimaryconf", "--nolocalconf", "--noautoexec",
+                              "--set", "output=texture", "--set", "texture_renderer=software",
+                              "--set", "mididevice=none", "--set", "cpu_cycles=max",
+                              "-c", "mount c " + str(work), "-c", "c:",
+                              "-c", "set TMP=C:" + chr(92), "-c", "set TEMP=C:" + chr(92),
+                              "-c", command, "-c", "exit"],
+                             capture_output=True, text=True, cwd=work,
+                             env=dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy"),
+                             timeout=300, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        log = (work / "CC.LOG").read_text(encoding="latin-1") if (work / "CC.LOG").is_file() else ""
+        if run.returncode or not (work / "OUT.S").is_file() or re.search(r"(?:^|\W)error", log, re.I):
+            return subprocess.CompletedProcess(run.args, run.returncode or 1, run.stdout, run.stderr + log)
+        s_file.write_text((work / "OUT.S").read_text(encoding="latin-1").replace("\r\n", "\n"))
+        return subprocess.CompletedProcess(run.args, 0, run.stdout, run.stderr + log)
 
 
 def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False):
@@ -105,11 +142,20 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     base = B.CC1PL_FLAGS if is_cpp else B.CC1_FLAGS
     cc1_flags = [f"-G{g}" if f == f"-G{B.G_VALUE}" else f for f in base] + flags.get("extra", []) + ["-g"]
     s_file = stem.with_suffix(".g.s")
-    compiler = compiler_for(src, is_cpp)
-    r = subprocess.run([str(compiler), *cc1_flags, str(i_file), "-o", str(s_file)],
-                       capture_output=True, text=True, cwd=ROOT, env=B._cc1_env())
+    compiler, compiler_dos = compiler_lane(src, is_cpp)
+    if compiler_dos:
+        r = compile_dos_cc1(compiler, cc1_flags, i_file, s_file)
+    else:
+        r = subprocess.run([str(compiler), *cc1_flags, str(i_file), "-o", str(s_file)],
+                           capture_output=True, text=True, cwd=ROOT, env=B._cc1_env())
     if r.returncode: sys.exit(f"[cc1] {rel}\n{r.stdout}{r.stderr}")
     txt = s_file.read_text().replace("_._", "___").replace("_GLOBAL_.I.", "_GLOBAL__I_").replace("_GLOBAL_.D.", "_GLOBAL__D_")
+    if compiler_dos:
+        # CC1PSX 2.7.2.SN.1 honours `__attribute__((section(".text.lib")))` only until its first inline
+        # jump table and then returns to `.text`, so ASPSX would split one TU's code over two sections.
+        # The retail EA objects are plain `.text`; route the attribute there (the attribute exists only
+        # to let the GNU lane place lib code in its own output section).
+        txt = re.sub(r"^\s*\.section\s+\.text\.\w+[^\n]*$", "\t.text", txt, flags=re.M)
     splits = flags.get("split_lcomm", {})
     if not isinstance(splits, dict):
         raise ValueError("invalid local-BSS split registry")

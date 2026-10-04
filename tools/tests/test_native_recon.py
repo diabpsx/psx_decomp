@@ -59,9 +59,18 @@ class NativeReconTests(unittest.TestCase):
         self.assertIn('.incbin "format.bin", 0, 6',wrapper)
         with self.assertRaises(ValueError):
             N.bounded_data_bridge(source, [(0x80110000,5,'format.bin')],0x8011000C)
+        # GAS escapes decode to their exact byte extent (sdk_link.gas_string_bytes): \n, \x5c and \134 are one byte each
         for escaped in ('\\n', '\\x5c', '\\134'):
-            with self.subTest(escaped=escaped), self.assertRaises(ValueError):
-                N.bounded_data_bridge(source.replace('\\'*2,escaped), [(0x80110000,6,'format.bin')],0x8011000C)
+            with self.subTest(escaped=escaped):
+                variant = source.replace('\\'*2, escaped)
+                self.assertIn('.incbin "format.bin", 0, 6',
+                              N.bounded_data_bridge(variant, [(0x80110000,6,'format.bin')],0x8011000C))
+                with self.assertRaises(ValueError):
+                    N.bounded_data_bridge(variant, [(0x80110000,5,'format.bin')],0x8011000C)
+        # malformed escapes and raw non-ASCII bytes stay fail-closed
+        for bad in ('\\q', '\\x', 'é'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                N.bounded_data_bridge(source.replace('\\'*2, bad), [(0x80110000,6,'format.bin')],0x8011000C)
     def test_gp_group_covers_contiguous_partitioned_small_data(self):
         rows = [(0, 'c', 'code'), (16, 'sdata', 'before'),
                 (32, 'sdata', 'owned'), (40, 'sdata', 'after'), (64, 'bin', 'checksum')]
@@ -132,9 +141,10 @@ class NativeReconTests(unittest.TestCase):
         self.assertEqual(wrapper.count('.word'), 2)
         with self.assertRaises(ValueError):
             N.bounded_data_bridge(source, [(0x80110004, 3, 'pool.bin')], 0x8011000C)
-        with self.assertRaises(ValueError):
-            N.bounded_data_bridge(source.replace('".tp"', '"\\x2etp"'),
-                                  [(0x80110004, 4, 'pool.bin')], 0x8011000C)
+        # an escaped spelling of the same bytes decodes to the same four-byte extent
+        self.assertIn('.incbin "pool.bin", 0, 4',
+                      N.bounded_data_bridge(source.replace('".tp"', '"\\x2etp"'),
+                                            [(0x80110004, 4, 'pool.bin')], 0x8011000C))
     def test_native_sym_rejects_wrong_or_missing_return_declaration(self):
         expected = '000001: $80010000 94 Def class EXT type FCN VOID size 0 name sample\n'
         function = {'start': 0x80010000}

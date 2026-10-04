@@ -37,8 +37,14 @@ def source_assembler(spec):
 
 
 def source_assembler_options(spec):
+    """(version, executable, runs under DOSBox, flags). `divide_guard` keeps ASPSX's default div/rem
+    zero-divide expansion (no -0): ASPSX 2.34's only mode, and the measured EA Canada EACLIB lane
+    on ASPSX 2.56 (bnez/nop/break 7 after every divide); PsyQ 4.0 game objects were assembled -0."""
     version, assembler = source_assembler(spec)
-    return version, assembler, version == '2.34', [] if version == '2.34' else ['-0']
+    guard = spec.get('divide_guard', version == '2.34')
+    if not isinstance(guard, bool) or (version == '2.34' and not guard):
+        raise ValueError('unreviewed native source divide-guard option')
+    return version, assembler, version == '2.34', [] if guard else ['-0']
 
 
 def is_zero_section(section):
@@ -223,14 +229,16 @@ def small_data_group(rows, end):
     return 0x80010000 + rows[first][0], 0x80010000 + stop
 
 
-def gp_carrier_plan(regions, retail, gp, small_end):
+def gp_carrier_plan(regions, retail, gp, small_end, anchor=False):
     combined = dict(regions)
     if '.sdata' in regions:
         va, size = regions['.sdata']
         prefix = prefix_bytes(retail, gp, va, small_end)
         combined['.sdata'] = (gp, len(prefix) + size)
         return prefix, combined, 'prefix'
-    if '.sbss' in regions:
+    if '.sbss' in regions or anchor:
+        # `anchor`: a -G8 TU whose only small data are externally bound commons still patches them
+        # gp-relative, so PSYLINK needs the GP base established by the same verified scaffold word.
         # PSYLINK bases internal GP patches on the .sdata group even when
         # the source only owns .sbss. A verified scaffold word anchors it.
         prefix = prefix_bytes(retail, gp, gp + 4, small_end)
@@ -276,8 +284,11 @@ def verify_untyped_export(map_text, symbols, retail_text, compiled_text, name, a
         r'^\s*([0-9A-Fa-f]{8})\s+' + re.escape(name) + r'\s*$', map_text, re.M)}
     compiled_addresses = {int(a, 16) for a in re.findall(
         r'^[0-9a-f]+: \$([0-9a-f]{8}) 2 ' + re.escape(name) + r'\s*$', compiled_text, re.M)}
+    # the native -g object records the export either as a plain `2` name record or (commons, -G8 small
+    # data) as a typed EXT declaration; either must sit at the retail address
     if (retail_addresses != {authority} or native_addresses != {authority}
-            or compiled_addresses != {authority} or (record and record[0] != authority)):
+            or (compiled_addresses and compiled_addresses != {authority})
+            or (not compiled_addresses and not record) or (record and record[0] != authority)):
         raise ValueError('untyped export addresses disagree')
     return {'address': f'0x{authority:08X}', 'alias': alias,
             'compiler_type': record[2] if record else None, 'retail_type_record': False}
@@ -331,8 +342,30 @@ def verify_stripped_library_members(obj, spec, regions, map_text, retail_text, p
             wanted.extend(placement.get('functions', []))
     if len(wanted) != len(set(wanted)) or set(wanted) != {path.stem for path in paths}:
         raise ValueError('stripped library member list differs from routed text')
+    # Oracle scaffolds are named by splat labels; a retail `2` name record may spell the exported
+    # symbol differently (func_80025254 = internalupdateasyncqueue), and one oracle span may hold a
+    # second exported function with no scaffold of its own (localasyncreader + PSXiasyncreader,
+    # setdirentrycallback + asyncdirentrycallback).  Those are declared explicitly and verified by
+    # their retail name-record address; their bytes are inside the whole-section retail compare.
+    aliases = spec.get('function_aliases', {})
+    covered = spec.get('covered_functions', [])
+    if (not isinstance(aliases, dict) or not isinstance(covered, list)
+            or any(not isinstance(k, str) or not isinstance(v, str) or k not in wanted for k, v in aliases.items())
+            or any(not isinstance(n, str) or not re.fullmatch(r'\w+', n) for n in covered)
+            or len(set(covered)) != len(covered)):
+        raise ValueError('invalid stripped library function aliases or covered functions')
+    # hand-assembly helpers that retail kept file-local and the assembler records under no symbol at all
+    # (CRUNCH.MIP func_8001xxxx): their scaffolds still tile the text and their bytes are inside the
+    # whole-section retail compare, so they are declared explicitly and need no symbol receipt.
+    statics = spec.get('static_functions', [])
+    if (not isinstance(statics, list) or len(set(statics)) != len(statics)
+            or any(s not in wanted or s in aliases for s in statics)):
+        raise ValueError('invalid stripped library static functions')
+    symbols = {aliases.get(name, name) for name in wanted if name not in statics}
+    if len(symbols) != len(wanted) - len(statics) or symbols & set(covered):
+        raise ValueError('stripped library exported names must be distinct')
     retail_functions = S.functions(retail_text, every=True)
-    if any(name in retail_functions for name in wanted):
+    if any(name in retail_functions for name in list(symbols) + covered):
         raise ValueError('available retail body SYM must use the full verifier')
     source_section = next(spec['sections'][section].get('source_section', section)
                           for section in spec['sections'] if section.startswith('.text.'))
@@ -342,20 +375,43 @@ def verify_stripped_library_members(obj, spec, regions, map_text, retail_text, p
     section_id = section_ids[0]
     definitions = {row['name']: row for row in obj['xdefs']
                    if 'bss' not in row and row['sect'] == section_id}
-    if set(definitions) != set(wanted):
+    # retail-static helpers carry a SYM `2` name record but no MAP entry; they are file-local here too
+    local_definitions = {row['name']: row for row in obj.get('locals', ())
+                         if 'bss' not in row and row['sect'] == section_id}
+    if set(definitions) != (symbols | set(covered)) - set(local_definitions):
         raise ValueError('stripped library exports differ from the complete object')
     logical = next(section for section in spec['sections'] if section.startswith('.text.'))
     base, size = regions[logical]
+
+    def check(symbol, address, length):
+        row = definitions.get(symbol) or local_definitions[symbol]
+        if row['off'] != address - base or row['off'] < 0 or row['off'] + length > size:
+            raise ValueError(symbol + ': stripped library object offset differs')
+        if symbol in local_definitions:
+            addresses = {int(a, 16) for a in re.findall(
+                r'^[0-9a-f]+: \$([0-9a-f]{8}) 2 ' + re.escape(symbol) + r'\s*$', retail_text, re.M)}
+            if addresses != {address}:
+                raise ValueError(symbol + ': retail name record address differs')
+            return
+        mapped = {int(value, 16) for value in re.findall(
+            r'^\s*([0-9A-Fa-f]{8})\s+' + re.escape(symbol) + r'\s*$', map_text, re.M)}
+        if mapped != {address}:
+            raise ValueError(symbol + ': stripped library map address differs')
+
     for path in paths:
         address, data = N.scaffold_bytes(path)
-        row = definitions[path.stem]
-        if row['off'] != address - base or row['off'] < 0 or row['off'] + len(data) > size:
-            raise ValueError(path.stem + ': stripped library object offset differs')
-        mapped = {int(value, 16) for value in re.findall(
-            r'^\s*([0-9A-Fa-f]{8})\s+' + re.escape(path.stem) + r'\s*$', map_text, re.M)}
-        if mapped != {address}:
-            raise ValueError(path.stem + ': stripped library map address differs')
-    return len(wanted)
+        if path.stem in statics:
+            if not base <= address < address + len(data) <= base + size:
+                raise ValueError(path.stem + ': static helper outside the member text')
+            continue
+        check(aliases.get(path.stem, path.stem), address, len(data))
+    for symbol in covered:
+        addresses = {int(a, 16) for a in re.findall(
+            r'^[0-9a-f]+: \$([0-9a-f]{8}) 2 ' + re.escape(symbol) + r'\s*$', retail_text, re.M)}
+        if len(addresses) != 1:
+            raise ValueError(symbol + ': covered function needs one retail name record')
+        check(symbol, addresses.pop(), 4)
+    return len(wanted) + len(covered)
 
 
 def text_bridge(segment, va, size):
@@ -381,7 +437,10 @@ def text_bridge(segment, va, size):
     return ''.join(output)
 
 
-def build():
+def build(only=None):
+    """Compile, link and verify every registered native source TU; write the link bridges + receipts.
+    `only` = iterable of segment names: verify just those (all cross-TU placement checks still run) and
+    return their receipts WITHOUT writing bridges or receipts.json (validation of new registry entries)."""
     registry = json.loads((B.ROOT / 'configs/native_recon_link.json').read_text())
     sdk_registry = json.loads((B.ROOT/'configs/sdk_link.json').read_text())
     sdk_scaffolds = {row['scaffold'] for spec in sdk_registry.values()
@@ -410,6 +469,8 @@ def build():
     receipts, bridges, bridge_limits, occupied = [], {}, {}, []
     extra_bridges, extra_limits = {}, {}
     for segment, spec in registry.items():
+        if only is not None and segment not in set(only):
+            continue
         source = (B.ROOT / spec['source']).resolve()
         source.relative_to(B.ROOT)
         if source.stem != segment:
@@ -447,7 +508,8 @@ def build():
                    for home, start, stop in occupied):
                 raise ValueError('overlapping native source payloads')
             occupied.append((homes[section], va, va + size))
-        prefix, combined, carrier_mode = gp_carrier_plan(regions, retail, gp, small_end)
+        prefix, combined, carrier_mode = gp_carrier_plan(regions, retail, gp, small_end,
+                                                         anchor=str(B.per_tu_flags(source).get('g_value', B.G_VALUE)) != '0')
         prefix_objects = []
         if prefix:
             prefix_source = OUT / f'{segment}_gp_prefix.s'
@@ -464,8 +526,11 @@ def build():
         if raw[:4] != b'LNK\x02':
             raise ValueError('compiler did not produce a native LNK object')
         obj = P.parse_obj_complete(raw)
+        # A common needs a receipt for its retail address: a typed SYM record (data_symbols) or, for
+        # stripped library members, the retail `2` name record + MAP address (untyped_data_symbols).
+        receipted = spec['data_symbols'] + list(spec.get('untyped_data_symbols', {}))
         commons = C.placements(obj, spec['common_symbols'], symbol_text,
-                               layouts, spec['data_symbols']) if 'common_symbols' in spec else {}
+                               layouts, receipted) if 'common_symbols' in spec else {}
         for row in commons.values():
             va, size = row['va'], row['size']
             if any(home == 'diabpsx' and va < stop and start < va+size for home,start,stop in occupied):
@@ -575,6 +640,8 @@ def build():
                          'bindings': {n: f'0x{v:08X}' for n, v in bindings.items()}})
         proof = 'stripped library members' if spec.get('stripped_library_sym') else 'SYM records'
         print(f'{segment}: native source bytes and {count} {proof} match retail; {len(prefix)} borrowed GP-prefix carrier bytes')
+    if only is not None:
+        return receipts
     for target, owned in extra_bridges.items():
         parts = []
         for path in (B.ROOT/'asm/nonmatchings'/target).glob('*.s'):

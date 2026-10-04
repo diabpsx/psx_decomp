@@ -1,3 +1,5 @@
+/* Repository file name eac_async.c: EA's member is ASYNC.C; the prefix only avoids a registry/segment
+ * key collision with the game TU recon/psxsrc/async.cpp (same stem). */
 /* EACPSXZ ASYNC.C (retail __FILE__ "cmn/async.c") -- PSX asynchronous file
  * loader: a pool of 180-byte request blocks queued by index and serviced by the
  * CD block-handle reader state machine (localasyncreader), which is re-entered

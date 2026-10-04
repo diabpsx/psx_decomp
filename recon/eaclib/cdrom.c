@@ -73,7 +73,7 @@ volatile int cdcallbacktime = 0;
 char cdb[0x2000];
 unsigned char cdrombuf[0x800];
 char *cdrombufadr[4] = { cdb, cdb + 0x800, cdb + 0x1000, cdb + 0x1800 };
-static int cdrombufsector[4];
+int cdrombufsector[4];                  /* retail common @80139BE0 (SYM name record, linker common pool), not a file static */
 
 volatile int datatracksector;
 volatile int asyncsector;

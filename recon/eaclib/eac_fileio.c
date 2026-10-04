@@ -1,3 +1,5 @@
+/* Repository file name eac_fileio.c: EA's member is FILEIO.C; the prefix only avoids a registry/segment
+ * key collision with the game TU recon/psxsrc/fileio.cpp (same stem). */
 /* EACPSXZ psx/fileio.c -- host (PC dev link) and CD-ROM file handles.
  * Retail abort strings name "psx/fileio.c".  Twin: the NFS2 PC beta
  * eaclib/fileio.c (Win32 variant of the same member: ufname/bigbufptr/

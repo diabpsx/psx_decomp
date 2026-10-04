@@ -20,8 +20,9 @@ functions, `DrawObjSelector` and `DrawSpellCel`, closed on 2026-10-03/04 (receip
 `scratch/padfuncs/r4` and `scratch/control/dsc5`; community decomp.me scratches
 `q8GOs`/`Cyqz5` supplied the final lever). The 837-entry library region is outside this count
 and is separately tracked below and in `docs/TOOLCHAIN.md`: 349 entries have original
-Sony archive-link receipts, all 146 Climax GLIB and fifteen EAC entries are reconstructed and
-source-linked, and 327 entries remain.
+Sony archive-link receipts, all 146 Climax GLIB entries are reconstructed and source-linked,
+and the remaining 342 entries (33 Climax hand-assembly functions and 309 EA Canada EACLIB
+functions) are reconstructed and native-linked as source members too (2026-10-04, below).
 
 ### Climax GLIB middleware (lib segment, 146 functions, separate count)
 
@@ -47,9 +48,44 @@ the 2.34 assembler reproduces all 138 functions' words, SYM records and source l
 GLIB objects were prebuilt with a PsyQ 3.x-era toolchain and linked into the game; that is the
 Climax GLIB lane listed below. Receipts live under `scratch/glib/`.
 
+### EA Canada EACLIB and Climax hand assembly (lib segment, 342 functions, separate count)
+
+The rest of the library region is EA Canada's PlayStation runtime (EA published the game) plus
+Climax's hand-written MIPS files. Their retail objects carry no function-body SYM records, so
+their bar is the native link: the whole source object, compiled and assembled with its measured
+toolchain, links byte-identical to the ROM at the retail addresses, owned data and zero storage
+included (`configs/native_recon_link.json`, receipts in `build/native_source/receipts.json`,
+listed in a third section of `MATCH_PROGRESS.md`).
+
+* **Climax `PSXSRC/*.MIP`** (33 functions, `recon/psxsrc/{boot,gte,replace,crunch,gp,ablock}.s`):
+  BOOT/GTE/REPLACE/CRUNCH/GP/ABLOCK transcribed as assembler-neutral `.s` with their data (the
+  4096-entry cosine table at 0x800B0D00, the GP save word). The retail SYM keeps per-file SLD runs
+  for these files, which fixed the file ownership: BOOT.MIP owns only the `.boot_text` entry word,
+  GTE.MIP owns `GTE_SetTransXYZ`, REPLACE.MIP owns `longjmp`.
+* **EA Canada EACLIB** (309 functions in 32 C members under `recon/eaclib/` plus the hand-written
+  PRINT.ASM, BLKMOV.ASM, BLKFILL.ASM, CRC.ASM, GETM.ASM): the memory manager (memman, cache,
+  compact, resize, validmem), async/CD/file I/O (async, blockio, cdrom, fileio, filename, filesize,
+  filexist, loadfat, loadcall, seekmsec, iocoord), the CD stream layer (cdstream), system tasks,
+  timers, locks and exits (systask, addtimer, inittmr, timer, getcycle, lock, exit, abortmsg), the
+  libddx host link (ddx) and the string members (stricmp, strnicmp, textcrnt). Source twins: EA's
+  EACLIB C recovered from the NFS2 PC beta (`nfs2b-pc/eaclib`, 136 of the names), the NFS2 and
+  NFS4 PSX reconstructions; 146 functions had no twin and were reconstructed from the oracle.
+  Measured toolchain identity: the EA objects were built by the **PsyQ 3.6 DOS `CC1PSX`
+  (2.7.2.SN.1) at `-O2 -G8 -fsigned-char`, assembled with ASPSX 2.56 keeping its default divide
+  guard** — 294/294 there, while the PsyQ 4.0 compiler differs only in load scheduling (sched1
+  places a load next to its use where 3.6 keeps a three-instruction gap) and the gcc 2.6.3 lane in
+  the small-constant form (ASPSX < 2.50). libddx alone is `-O1 -G0` with an ASPSX older than 2.50.
+  EA's build had plain `char` unsigned. `volatile` appears only where the oracle proves a
+  CD-callback or timer-interrupt path shares the object (the CDSTREAM structure, the blockio/cdrom
+  request globals, `curcancel`, `ticks`), and one `volatile` stack local in the MMIO routine
+  `SwapByte`, where retail keeps the mask after a stack re-read that the compiler folds for any
+  non-volatile load (ruled in 2026-10-04 as part of the MMIO exception). `loadfilecallback`
+  (a data-only EA member) is the one cell still supplied by the small-data scaffold.
+
 ## Toolchain (identified, see `docs/TOOLCHAIN.md`)
 * **PsyQ 4.0 game lane** — `CC1PSX.EXE` / `CC1PLPSX.EXE` = GNU C/C++ **2.7.2.SN32.3.7**, PsyQ 4.0 libraries.
 * **Climax GLIB lane** — gcc 2.6.3-compatible C generation at `-O2 -G0` and original DOS ASPSX 2.34.
+* **EA Canada EACLIB lane** — PsyQ 3.6 DOS `CC1PSX` (2.7.2.SN.1) at `-O2 -G8 -fsigned-char` under DOSBox, ASPSX 2.56 with its default divide guard (no `-0`); libddx `-O1 -G0` with ASPSX 2.34.
 * Assembler layer: [maspsx](https://github.com/mkst/maspsx) (ASPSX emulator) + `mipsel-none-elf-as`.
 * Splitter: [splat](https://github.com/ethteck/splat) 0.50 (`configs/diabpsx.yaml`).
 
@@ -736,6 +772,22 @@ is now 1,740 functions/117 TUs (1,721/116 native plus 19/1 conventional); 327
 library entries remain: 33 boot utilities and 294 EAC. The refreshed
 `build/eac_twin_screen.json` records 33 remaining same-name EAC candidates and
 no exact unintegrated body.
+
+Library remainder round (2026-10-04): six agents reconstructed the 327 entries that were
+pending (33 Climax `.MIP` functions as assembler-neutral `.s`, 294 EAC functions as 29 C members
+plus the hand-written PRINT.ASM and BLKMOV.ASM) against a relocation-masked word gate
+(`scratch/libgate/gate.py`, `dosgate.py`), and the orchestrator registered all of them as native
+members: `tools/symlane.py` gained the `psyq36-dos` compiler lane (PsyQ 3.6 `CC1PSX` under
+DOSBox, routing the compiler's split `.text.lib` back to `.text`), `tools/native_recon.py` the
+`divide_guard` assembler option, `function_aliases` / `covered_functions` / `static_functions`
+for oracle spans that hold a splat-named, file-static or second exported function, and
+untyped-receipt commons for stripped members; `gettick.c`, `resettick.c` and `timedwait.c`
+were retired in favour of the single TIMER object `timer.c` (its `tickcount`/`setticks`/
+`testticks` reach `tickset`/`tickval` gp-relative, which only the defining object does). The
+registry now holds 41 stripped-SYM members with 344 functions (342 lib entries plus the two
+retail statics `PSXiasyncreader` and `asyncdirentrycallback` inside other oracles); the five
+images link byte-identical. `loadfilecallback`'s four-byte cell (EA's data-only CALLBACK member)
+stays scaffold-supplied because a native member needs a text section.
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three

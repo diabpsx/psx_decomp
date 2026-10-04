@@ -332,6 +332,59 @@ conventional), the suite is231/231, and327 library entries remain:33 boot
 utilities plus294 EAC runtime.
 The machine-readable result is `build/eac_twin_screen.json`.
 
+## EA Canada EACLIB and Climax hand-assembly lanes (2026-10-04)
+
+The 342 library entries that are neither Sony archive members nor Climax GLIB are
+EA Canada's PlayStation runtime (EA published the title) and Climax's `PSXSRC/*.MIP`
+files. Their retail objects have no function-body SYM records, so the seal is the
+native link of each complete source member at its retail addresses.
+
+**EACLIB compiler identity (measured on 294 functions):** the PsyQ 3.6 DOS `CC1PSX`
+(version string `2.7.2.SN.1`) at `-O2 -G8 -fsigned-char`, assembled by ASPSX 2.56
+with its default divide guard (`bnez/nop/break 7`, no `-0`), reproduces every EAC
+function. The PsyQ 4.0 `CC1PSX` reproduces most and differs only in sched1 load
+placement (a load scheduled next to its use where 3.6 keeps a three-instruction gap);
+the gcc 2.6.3 / ASPSX 2.34 GLIB lane fails on every small constant (`addiu` in the
+EA objects means an assembler of 2.50 or later). libddx (`SwapByte`, `PutLong`,
+`GetLong`, `DDX*`) is `-O1 -G0` with an assembler older than 2.50 (small constants as
+`ori`); the compiler is undetermined between gcc 2.6.3 and PsyQ 4.0 at that level.
+EA's build had plain `char` unsigned. `tools/symlane.py` runs the DOS compiler under
+DOSBox (`compile_dos_cc1`) and routes its `.section .text.lib` back to `.text`: this
+compiler honours the section attribute only until its first inline jump table, so a TU
+would otherwise split over two sections while the retail objects are plain `.text`.
+Registry keys: `"compiler": "psyq36-dos"` in `tools/build.py` `PER_TU_FLAGS`,
+`"assembler": "2.56", "divide_guard": true` in `configs/native_recon_link.json`.
+
+**Member boundaries** come from the EAC abort strings (`cmn/async.c`, `psx/blockio.c`,
+`psx/cdrom.c`, `psx/fileio.c`, ...), from exact `.rodata`/`.sdata` extents and from the
+zero-length NULLFUNC.ASM SLD records PSYLINK left at object ends. TIMER is one object
+(`gettick` .. `timedwait`): `tickcount`, `setticks` and `testticks` address
+`tickset`/`tickval` gp-relative, which only the defining object does. Retail statics with
+a SYM name record but no MAP entry (`PSXiasyncreader`, `internalupdateasyncqueue`,
+`asyncdirentrycallback`) stay file-static and are verified by their name-record address
+inside the covering oracle span (`function_aliases`, `covered_functions`); CRUNCH.MIP's
+six unnamed helpers are declared `static_functions`. `cdrombufsector` sits in the
+linker's common pool (0x80139BE0, among the libpress/libcd commons), so it is a
+tentative definition, not a static. Commons of stripped members are receipted through
+their retail name record and MAP address (`untyped_data_symbols`); a `-G8` member whose
+only small data are commons gets the GP anchor word so PSYLINK can resolve gp-relative
+patches to externally bound symbols.
+
+**Hand assembly** (`recon/psxsrc/*.s`, `recon/eaclib/{blkfill,crc,getm,blkmov,print}.s`)
+is assembler-neutral: `.set noat`/`.set noreorder`, explicit delay slots, numeric
+registers, `la $r,sym` / `lw $r,sym` macros instead of GNU `%hi`/`%lo` pairs (ASPSX
+2.34 and 2.56 reject `%hi(`), GTE commands as `.word`. BOOT.MIP owns only the
+`.boot_text` entry word; the retail SLD "line 34 of BOOT.MIP" at 0x8001000C is the
+code-free section-switch record ASMPSX emits and PSYLINK places at a section end, so
+GTE.MIP owns `GTE_SetTransXYZ` and REPLACE.MIP owns `longjmp`.
+
+**Rulings in force for these members:** `volatile` only where the oracle proves a
+CD-callback / timer-interrupt path shares the object (reload after store, kept mask,
+store-before-load order), and one `volatile` stack local in the MMIO routine
+`SwapByte` (the kept `andi 0xFF` after the stack re-read is the compiler's refusal to
+fold a zero-extension into a volatile load), accepted 2026-10-04 as part of the MMIO
+exception and never elsewhere.
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record

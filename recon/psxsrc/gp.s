@@ -13,8 +13,7 @@
 # @80010DC0  GP.MIP lines 13-15
 	.globl	SaveGP
 SaveGP:
-	lui	$24,%hi(.L800B2D00)
-	addiu	$24,$24,%lo(.L800B2D00)
+	la	$24,.L800B2D00
 	jr	$31
 	 sw	$28,0($24)
 
@@ -22,8 +21,7 @@ SaveGP:
 	.globl	ReloadGP
 ReloadGP:
 	add	$2,$28,$0
-	lui	$24,%hi(.L800B2D00)
-	addiu	$24,$24,%lo(.L800B2D00)
+	la	$24,.L800B2D00
 	jr	$31
 	 lw	$28,0($24)
 

@@ -11,8 +11,7 @@ debugprint:
 	.set noreorder
 	.globl print
 print:
-	lui	$8,%hi(debugprint)
-	lw	$8,%lo(debugprint)($8)
+	lw	$8,debugprint
 	nop
 	slti	$1,$8,2
 	bnez	$1,.Lprint_off

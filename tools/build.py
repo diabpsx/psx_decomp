@@ -47,12 +47,23 @@ PER_TU_FLAGS = {
     "recon/eaclib/blkfill.s": {"g_value": "0"},
     "recon/eaclib/crc.s": {"g_value": "0"},
     "recon/eaclib/getm.s": {"g_value": "0"},
-    "recon/eaclib/gettick.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/eaclib/nasync_debug.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/eaclib/resettick.c": {"g_value": "8", "compiler": "gcc-2.6.3"},
     "recon/eaclib/savegp.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/eaclib/timedwait.c": {"g_value": "8", "compiler": "gcc-2.6.3"},
     "recon/eaclib/textcrnt.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    # EA Canada EACLIB C members (lib segment, 2026-10-04 round): measured identity = PsyQ 3.6 DOS
+    # CC1PSX "2.7.2.SN.1" at -O2 -G8 -fsigned-char with ASPSX 2.56 default divide guards (registry key
+    # "divide_guard"); the PsyQ 4.0 cc1 differs only in sched1 load placement, the gcc 2.6.3 lane
+    # in the small-li form (ASPSX < 2.50).  libddx (ddx.c) alone is -O1 -G0 with an ASPSX < 2.50.
+    **{f"recon/eaclib/{name}.c": {"g_value": "8", "compiler": "psyq36-dos"} for name in (
+        "lock", "systask", "getcycle", "addtimer", "inittmr", "timer", "filesize", "filexist", "iocoord",
+        "loadcall", "eac_async", "abortmsg", "cdstream", "exit", "filename", "stricmp", "strnicmp", "blockio",
+        "cdrom", "eac_fileio", "memman", "cache", "compact", "resize", "validmem", "loadfat", "seekmsec",
+        "callback")},
+    "recon/eaclib/ddx.c": {"g_value": "0", "compiler": "gcc-2.6.3", "extra": ["-O1"]},
+    "recon/eaclib/blkmov.s": {"g_value": "0"},
+    "recon/eaclib/print.s": {"g_value": "0"},
+    # Climax hand-assembly PSXSRC/*.MIP transcriptions (assembler-neutral .s)
+    **{f"recon/psxsrc/{name}.s": {"g_value": "0"} for name in ("boot", "gte", "replace", "crunch", "gp", "ablock")},
     # Climax GLIB C modules use absolute addressing even for four-byte owned
     # commons (TICK/GazTick), proving their original small-data threshold was 0.
     "recon/glibdev/gmain.c": {"g_value": "0"},

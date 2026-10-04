@@ -18,16 +18,13 @@ crunch:
 	addu	$10,$5,$0
 	sw	$5,-4($29)
 	addiu	$29,$29,-4
-	lui	$6,%hi(.L80010AC0)
-	addiu	$6,$6,%lo(.L80010AC0)
+	la	$6,.L80010AC0
 	nop
 	sw	$7,0($6)
-	lui	$6,%hi(.L80010AB8)
-	addiu	$6,$6,%lo(.L80010AB8)
+	la	$6,.L80010AB8
 	nop
 	sw	$8,0($6)
-	lui	$6,%hi(.L80010ABC)
-	addiu	$6,$6,%lo(.L80010ABC)
+	la	$6,.L80010ABC
 	nop
 	sw	$9,0($6)
 	addiu	$2,$0,1
@@ -54,12 +51,10 @@ crunch:
 	 nop
 	sw	$7,0($10)
 	addi	$10,$10,4
-	lui	$6,%hi(.L80010AB8)
-	addiu	$6,$6,%lo(.L80010AB8)
+	la	$6,.L80010AB8
 	nop
 	lw	$8,0($6)
-	lui	$6,%hi(.L80010ABC)
-	addiu	$6,$6,%lo(.L80010ABC)
+	la	$6,.L80010ABC
 	nop
 	lw	$9,0($6)
 	nop
@@ -82,8 +77,7 @@ func_800106D4:
 	sw	$31,-4($29)
 	addiu	$29,$29,-4
 	addu	$11,$8,$0
-	lui	$6,%hi(.L80010AC0)
-	addiu	$6,$6,%lo(.L80010AC0)
+	la	$6,.L80010AC0
 	nop
 	lw	$24,0($6)
 	nop
@@ -170,8 +164,7 @@ func_800106D4:
 	addi	$24,$24,-2
 	sll	$24,$24,1
 .L80010818:
-	lui	$14,%hi(.L80010ACA)
-	addiu	$14,$14,%lo(.L80010ACA)
+	la	$14,.L80010ACA
 	sw	$25,-4($29)
 	addiu	$29,$29,-4
 	addu	$25,$14,$24
@@ -185,12 +178,10 @@ func_800106D4:
 	beqz	$1,.L80010874
 	 nop
 	addu	$5,$3,$0
-	lui	$6,%hi(.L80010AC4)
-	addiu	$6,$6,%lo(.L80010AC4)
+	la	$6,.L80010AC4
 	nop
 	sw	$4,0($6)
-	lui	$6,%hi(.L80010AC8)
-	addiu	$6,$6,%lo(.L80010AC8)
+	la	$6,.L80010AC8
 	nop
 	sb	$24,0($6)
 .L80010874:
@@ -204,14 +195,12 @@ func_800106D4:
 	 nop
 	jal	func_8001097C
 	 nop
-	lui	$6,%hi(.L80010AC8)
-	addiu	$6,$6,%lo(.L80010AC8)
+	la	$6,.L80010AC8
 	nop
 	lb	$24,0($6)
 	nop
 	andi	$24,$24,0xff
-	lui	$6,%hi(.L80010AC4)
-	addiu	$6,$6,%lo(.L80010AC4)
+	la	$6,.L80010AC4
 	nop
 	lw	$3,0($6)
 	add	$14,$14,$24
@@ -276,8 +265,7 @@ func_8001097C:
 	slt	$1,$3,$6
 	beqz	$1,.L800109E4
 	 nop
-	lui	$6,%hi(.L80010AFA)
-	addiu	$6,$6,%lo(.L80010AFA)
+	la	$6,.L80010AFA
 	nop
 	lh	$24,0($6)
 	nop
@@ -294,8 +282,7 @@ func_8001097C:
 	jr	$31
 	 nop
 .L800109E4:
-	lui	$6,%hi(.L80010AFA+2)
-	addiu	$6,$6,%lo(.L80010AFA+2)
+	la	$6,.L80010AFA+2
 	nop
 	lh	$24,0($6)
 	nop

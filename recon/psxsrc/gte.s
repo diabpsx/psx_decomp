@@ -22,8 +22,7 @@ GTE_SetTransXYZ:
 # @80010020  GTE.MIP lines 85-205
 	.globl	GTE_RotateFT4
 GTE_RotateFT4:
-	lui	$8,%hi(costab)
-	addiu	$8,$8,%lo(costab)
+	la	$8,costab
 	andi	$7,$7,0xfff
 	sll	$7,$7,1
 	addu	$9,$7,$8
@@ -193,8 +192,7 @@ RES:
 # @8001023C  GTE.MIP lines 320-357
 	.globl	GTE_Test
 GTE_Test:
-	lui	$4,%hi(RGB)
-	addiu	$4,$4,%lo(RGB)
+	la	$4,RGB
 	nop
 	lw	$5,0($4)
 	lw	$6,4($4)
