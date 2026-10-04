@@ -520,12 +520,14 @@ void cdromdirectoryentry(char *name, int *sector, int *size)
     int namelen;
     int i;
     unsigned char *buf;
+    int extent;
+    int e1, e2;
 
     *sector = 0;
     *size = 0;
-    p = name;
     cursector = rootsector;
     remaining = rootlength;
+    p = name;
     buf = cdrombuf;
     if (directoryentrycached(p, sector, size))
         return;
@@ -544,7 +546,10 @@ void cdromdirectoryentry(char *name, int *sector, int *size)
                 rec = buf + off;
                 if (rec[0] == 0)
                     break;
-                if ((rec[0xa] | rec[0xb] << 8 | rec[0xc] << 16 | rec[0xd] << 24) == 0)
+                e1 = rec[0xb] << 8 | rec[0xa];
+                e2 = rec[0xc] << 16 | e1;
+                extent = rec[0xd] << 24 | e2;
+                if (extent == 0)
                     break;
                 if (rec[0x19] & 0x80)
                     break;
@@ -588,6 +593,8 @@ static void asyncdirentrycallback(int status)
     unsigned char *rec;
     int namelen;
     int i;
+    int extent;
+    int e1, e2;
 
     buf = cdrombuf;
     found = 0;
@@ -596,7 +603,10 @@ static void asyncdirentrycallback(int status)
         rec = buf + off;
         if (rec[0] == 0)
             break;
-        if ((rec[0xa] | rec[0xb] << 8 | rec[0xc] << 16 | rec[0xd] << 24) == 0)
+        e1 = rec[0xb] << 8 | rec[0xa];
+        e2 = rec[0xc] << 16 | e1;
+        extent = rec[0xd] << 24 | e2;
+        if (extent == 0)
             break;
         if (rec[0x19] & 0x80)
             break;
