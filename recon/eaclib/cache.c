@@ -2,7 +2,9 @@
  * Source twin: NFS2 PC beta eaclib cache.c (win\obja\cache.obj): same functions, same abort lines 90/92/98.
  * Diablo's checkcacheblock finds the default-class block through findnamedpurgeableblock() and
  * walks the reserved-class chain with a class pointer; cacheonei keeps the twin's copy of the
- * LAST scanned block's name (retail behaviour). */
+ * LAST scanned block's name (retail behaviour).  checkcacheinclassblock: an early `return 0` for an
+ * empty reserved class and a guarded found arm followed by `return 0` -- with these two separate
+ * return blocks gcc's jump pass swaps the found arm behind the not-found return, the retail layout. */
 #define LIBTEXT __attribute__((section(".text.lib")))
 
 typedef char *MEMBLOCK;
@@ -258,15 +260,15 @@ MEMBLOCK *checkcacheinclassblock(char *name, unsigned int type)
         return newblock;
     }
     reserved = memclass[(int)(type & 0xf00) >> 8].reserved;
-    if (reserved) {
-        blockhandle = findnamedpurgeableblockinclass(name, reserved);
-        if (blockhandle) {
-            ((EALIB_MEMBLOCK *)blockhandle)->type &= ~8;
-            newblock = reservememblockai(name, ((EALIB_MEMBLOCK *)blockhandle)->datasize,
-                                         ((EALIB_MEMBLOCK *)blockhandle)->type, 0);
-            blockmove(*blockhandle, *newblock, ((EALIB_MEMBLOCK *)blockhandle)->datasize);
-            return newblock;
-        }
+    if (!reserved)
+        return 0;
+    blockhandle = findnamedpurgeableblockinclass(name, reserved);
+    if (blockhandle) {
+        ((EALIB_MEMBLOCK *)blockhandle)->type &= ~8;
+        newblock = reservememblockai(name, ((EALIB_MEMBLOCK *)blockhandle)->datasize,
+                                     ((EALIB_MEMBLOCK *)blockhandle)->type, 0);
+        blockmove(*blockhandle, *newblock, ((EALIB_MEMBLOCK *)blockhandle)->datasize);
+        return newblock;
     }
     return 0;
 }
