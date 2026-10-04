@@ -161,10 +161,77 @@ def main():
         if grand_pass == total_all:
             lines.insert(3, "**COMPLETE (2026-10-04): every game-code entry matches retail bytes and function-body SYM records; "
                             "the five retail images link byte-identical to the ROM (`tools/link.py`). "
-                            "The separately tracked library region is not fully integrated: 349 entries have Sony archive receipts; "
-                            "the remaining entries include Climax GLIB source and unclassified code — see README.**\n")
+                            "The separately tracked library region is not fully integrated: 349 entries have Sony archive receipts, "
+                            "all 146 Climax GLIB and seven EAC entries are source-linked, and 335 entries remain — see README.**\n")
+        glib_lines, gpass, gtotal = glib_board()
+        lines += glib_lines
         (ROOT / "MATCH_PROGRESS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
         print(f"TOTAL {grand_pass}/{total_all}")
+        print(f"GLIB {gpass}/{gtotal}")
+
+
+def glib_files():
+    """{GLIB source basename: [fn, ...] in VA order} for the lib-segment oracles whose start address lies inside
+    that file's SLD run (0x88 file-set .. 0x8a end) in rom/DIABPSX-SYM.txt. Only GLIBDEV sources are returned;
+    the Sony objects and hand-written .ASM/.MIP files of the lib segment carry no C line runs."""
+    runs, cur = [], None
+    for ln in (ROOT / "rom" / "DIABPSX-SYM.txt").read_text(errors="replace").splitlines():
+        m = re.match(r"[0-9a-f]+: \$([0-9a-f]{8}) (8[0-9a-f]) (.*)$", ln)
+        if not m: continue
+        va, kind, rest = int(m.group(1), 16), m.group(2), m.group(3)
+        if kind == "88":
+            fm = re.match(r"Set SLD to line \d+ of file (.+?)\s*$", rest)
+            cur = [fm.group(1) if fm else "?", va, va]; runs.append(cur)
+        elif kind in ("80", "82", "84", "86") and cur:
+            cur[1] = min(cur[1], va); cur[2] = max(cur[2], va)
+        elif kind == "8a":
+            cur = None
+    out = collections.defaultdict(list)
+    for p in (ROOT / "asm" / "nonmatchings" / "lib").glob("*.s"):
+        txt = p.read_text(errors="replace")
+        m = re.search(r"/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\s", txt)
+        g = re.search(r"^glabel\s+(\S+)", txt, re.M)
+        if not (m and g): continue
+        va = int(m.group(1), 16)
+        hit = next((r[0] for r in runs if r[1] <= va <= r[2]), None)
+        if hit and "GLIBDEV" in hit.upper():
+            out[hit.replace("\\", "/").split("/")[-1].upper()].append((va, g.group(1)))
+    return {f: [n for _, n in sorted(v)] for f, v in out.items()}
+
+
+def glib_board():
+    """Separate board for the Climax GLIB C TUs reconstructed under recon/glibdev (not part of the game total).
+    PASS = bytes (tools/verify_asm.py) + exact SYM (tools/symlane.py) on the project lane; the real-ASPSX
+    alternate is not applied here (its segment is derived from the file name, which lib TUs do not share)."""
+    files = glib_files()
+    lines, gpass, gtotal = ["", "# Climax GLIB (lib segment) — separate count, not part of the game total", ""], 0, 0
+    per = []
+    for f in sorted(files, key=lambda k: -len(files[k])):
+        fns = files[f]; gtotal += len(fns)
+        tu = ROOT / "recon" / "glibdev" / (f[:-2].lower() + ".c")
+        res = {}
+        if tu.is_file():
+            res = gate(tu, fns)
+            sym = sym_ok(tu, [n for n, v in res.items() if v[0] == "PASS"]) if res else {}
+            for n, v in list(res.items()):
+                if v[0] == "PASS" and not sym.get(n, False): res[n] = ("SYMDIFF", v[1], 0)
+        npass = sum(1 for v in res.values() if v[0] == "PASS"); gpass += npass
+        per.append((f, tu, fns, res, npass))
+        print(f"glib {f}: {npass}/{len(fns)}")
+    lines.insert(2, f"**Climax GLIB: {gpass} / {gtotal} functions PASS (bytes + exact SYM) on the per-TU lane configured in "
+                    f"tools/build.py PER_TU_FLAGS; source = Climax's own GLib (SpongeBob SuperSponge Utils/Libs/GLib, "
+                    f"warcraft2 VRIP.C). The GLIB objects were built with a gcc 2.6.x / ASPSX 2.3x toolchain — see README**\n")
+    for f, tu, fns, res, npass in per:
+        where = tu.relative_to(ROOT).as_posix() if tu.is_file() else "(no recon TU yet)"
+        lines.append(f"## {f}  ({where}) — {npass}/{len(fns)} PASS")
+        for fn in fns:
+            st = res.get(fn, ("TODO", 0, 0))
+            if st[0] == "PASS": lines.append(f"- ✅ {fn} ({st[1]})")
+            elif st[0] == "FAIL": lines.append(f"- ❌ {fn} — {st[2]} diffs (ours {st[1]})")
+            elif st[0] == "SYMDIFF": lines.append(f"- 🟡 {fn} — bytes PASS, SYM differs")
+            else: lines.append(f"- ⬜ {fn}")
+        lines.append("")
+    return lines, gpass, gtotal
 
 if __name__ == "__main__":
     main()

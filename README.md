@@ -19,12 +19,37 @@ audits. The five retail images (`DIABPSX.BIN`, `FRONTEND.BIN`, `PREGAME.BIN`, `G
 functions, `DrawObjSelector` and `DrawSpellCel`, closed on 2026-10-03/04 (receipts under
 `scratch/padfuncs/r4` and `scratch/control/dsc5`; community decomp.me scratches
 `q8GOs`/`Cyqz5` supplied the final lever). The 837-entry library region is outside this count
-and is separately tracked below and in `docs/TOOLCHAIN.md`: 349 entries currently have
-original Sony archive-link receipts, eight are reconstructed from Climax GMAIN/TICK source,
-and the remaining 480 comprise 138 confirmed Climax GLIB functions plus 342 unclassified entries.
+and is separately tracked below and in `docs/TOOLCHAIN.md`: 349 entries have original
+Sony archive-link receipts, all 146 Climax GLIB and seven EAC entries are reconstructed and
+source-linked, and 335 entries remain.
+
+### Climax GLIB middleware (lib segment, 146 functions, separate count)
+
+146 of the library-region entries are Climax's own GLIB (Gary Liddon's GLib: the GAL memory
+allocator, the TASKER scheduler, the machine/debug/tick/timer/utility layers and VRIP's printf
+core), nine C translation units under `recon/glibdev/` tracked in a second section of
+`MATCH_PROGRESS.md` (its count is separate from the 2727 game entries). The text is Climax's:
+the GLib shipped inside the SpongeBob SuperSponge source
+(`ps1-decomp-refs/Spongebob_SuperSponge/Utils/Libs/GLib`) is Diablo's TASKER.C line for line
+(same SLD statement lines, same assert line numbers, same bugs), GAL.C is an older revision of
+its gal.c with blocks removed at fixed line offsets, GSYS/GDEBUG/GUTILS/TICK/GMAIN come from the
+same tree, VRIP.C from the Warcraft II Climax source; GTIMSYS's PSX body was written at the
+retail line positions. GLIB TUs need `-G0` (retail addresses their four-byte statics absolutely).
+
+Toolchain identity, measured on all nine TUs: on the PsyQ 4.0 game lane (CC1PSX 2.7.2.SN,
+ASPSX 2.56 behaviour) the reconstructed functions pass 115/138 (TASKER 34/41, GAL 62/70, GSYS
+6/7, GDEBUG 8/9, GUTILS 3/6, GTIMSYS 2/3, VRIP 0/2), and every miss is a compiler or assembler
+signature rather than a source difference: epilogue and jal delay-slot filling that gcc 2.6.x
+does not do, force-mem effects (`lw` vs `lhu` on u16 fields, operand order, reloads), the
+unsigned `/10` multiplier kept as a double constant, the `bnez/nop/break 7` divide guard that
+`ASPSX -0` suppresses, and small constants assembled as `ori` (ASPSX < 2.50). gcc 2.6.3 with
+the 2.34 assembler reproduces all 138 functions' words, SYM records and source lines, so the
+GLIB objects were prebuilt with a PsyQ 3.x-era toolchain and linked into the game; that is the
+Climax GLIB lane listed below. Receipts live under `scratch/glib/`.
 
 ## Toolchain (identified, see `docs/TOOLCHAIN.md`)
-* **PsyQ 4.0** — `CC1PSX.EXE` / `CC1PLPSX.EXE` = GNU C/C++ **2.7.2.SN32.3.7**, PsyQ 4.0 libraries.
+* **PsyQ 4.0 game lane** — `CC1PSX.EXE` / `CC1PLPSX.EXE` = GNU C/C++ **2.7.2.SN32.3.7**, PsyQ 4.0 libraries.
+* **Climax GLIB lane** — gcc 2.6.3-compatible C generation at `-O2 -G0` and original DOS ASPSX 2.34.
 * Assembler layer: [maspsx](https://github.com/mkst/maspsx) (ASPSX emulator) + `mipsel-none-elf-as`.
 * Splitter: [splat](https://github.com/ethteck/splat) 0.50 (`configs/diabpsx.yaml`).
 
@@ -233,8 +258,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1568 functions across one hundred TUs through real ASPSX/PSYLINK: 1587 source-linked
-functions across 101 TUs in total. They replace their text scaffolds at the original
+1,713 functions across 112 TUs through real ASPSX/PSYLINK: 1,732 source-linked
+functions across 113 TUs in total. They replace their text scaffolds at the original
 addresses. LIGHTING supplies all 28 functions and all six original sections,
 including the gold-source CrawlTable, 31 exact global records, restored RGB
 defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
@@ -434,11 +459,11 @@ exactly cover each member's XREFs and resolve to unique retail function addresse
 PSYLINK performs the relocations, and the complete result must match retail with
 no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
-The remaining 480 library-region entries are not native-linked: 476 use assembly
+The remaining 335 library-region entries are not native-linked: 331 use assembly
 scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
 game-function board, now **2727/2727 PASS**.
-That region also contains Climax GLIB routines (for example `GTE_SetTransXYZ`),
-so the 837 excluded entries are not all Sony SDK functions. Final integration
+The 837 excluded entries are not all Sony SDK functions: 146 are the now-integrated
+Climax GLIB routines. Final integration
 must replace the remaining scaffolds with verified reconstructed TUs and the appropriate
 retail library inputs, then verify all linked images and relocations. None of
 these integration requirements is waived by the per-function PASS count.
@@ -668,9 +693,43 @@ pool, and `GazTick` in runtime BSS at 0x8011CA60, with all function/global SYM
 records exact. Because the literals share `rodata.rodata` with original SDK
 payloads, native reconstruction composes its verified ranges on top of the
 fresh SDK bridge and emits one final wrapper; the final image remains exact.
-Coverage is now 1,587 functions/101 TUs (1,568/100 native plus 19/1
-conventional). The unlinked library region is 480 entries: 138 confirmed GLIB
-plus 342 unclassified.
+Coverage after TICK was 1,587 functions/101 TUs (1,568/100 native plus 19/1
+conventional).
+
+The remaining seven GLIB TUs are now integrated as well: GAL, TASKER, GDEBUG,
+GSYS, GUTILS, GTIMSYS and VRIP. Their verbatim Climax-family sources establish
+the historical C lane: gcc 2.6.3-compatible code generation at `-O2 -G0`, then
+the original DOS ASPSX 2.34. The native receipts hash both tools and verify all
+138 functions, every call binding, all function/global SYM records, 1,187 bytes
+of initialized/read-only data, and the exact runtime-zero placements. A
+fail-closed local-common split reproduces retail's separate 48-byte TASKER
+`SchEnv` and 5,600-byte GAL header banks without changing C function bodies.
+The corrected old-LNK parser also validates ASPSX's `0x36` SLD word-increment
+record against original DUMPOBJ. Coverage after GLIB was 1,725 functions/108 TUs
+(1,706/107 native plus 19/1 conventional). All 146 GLIB functions are linked.
+
+`tools/eac_twin_screen.py` makes the next producer split reproducible. In retail
+address order the original 342 pending entries formed only six uninterrupted runs: 33
+boot/GTE/compression/ABL utilities at 0x8001000C–0x80010EAC, plus 309 functions
+from one EAC runtime family (DDX, async/CD/file I/O, memory, streams, system
+tasks, semaphores and timers) spanning the GLIB-separated ranges through
+0x8003017C. Screening the local NFS4 EACLIB reconstruction finds 45 same-name
+candidates and ten relocation-masked exact bodies (`blockclear`, `crc16`,
+`geti`, `getm`, `gettick`, `initgp`, `puti`, `putm`, `resettick`, `restoregp`).
+This is source-twin evidence, not permission to import the rebuilt NFS archive.
+The first two complete EAC modules are now native-linked: natural TEXTCRNT.C
+source emits exact `putm`/`puti`, while the documented original hand-written
+GETM.ASM form emits exact `getm`/`geti`. Retail has no body-SYM records for these
+stripped library objects, so the explicit stripped-member seal instead requires
+the complete export set, exact object offsets/MAP addresses, and byte-identical
+linked payload. The original hand-written CRC.ASM module is also linked with its
+byte-identical 512-byte table. Separate natural source modules reproduce
+`gettick` and `resettick`; the latter owns the exact `tickset`/`tickval`
+small-data pair and uses the verified GP carrier. Coverage is now 1,732
+functions/113 TUs (1,713/112 native plus 19/1 conventional); 335 library entries
+remain: 33 boot utilities and 302 EAC. The refreshed
+`build/eac_twin_screen.json` records 38 remaining same-name EAC candidates and
+three exact bodies.
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three
