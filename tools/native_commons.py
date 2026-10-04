@@ -20,35 +20,49 @@ def placements(obj, declared, symbols, layouts, data_symbols):
     for row in rows:
         name = row['name']
         spec = declared[name]
-        if not isinstance(spec, dict) or set(spec) != {'va','size','scaffold'}:
+        if (not isinstance(spec, dict) or set(spec) not in
+                ({'va','size','scaffold'}, {'va','size','storage'})):
             raise ValueError('source common placement requires va/size/scaffold')
-        size, scaffold = spec['size'], spec['scaffold']
+        size, scaffold = spec['size'], spec.get('scaffold')
         if (type(size) is not int or size <= 0 or size != row['bss']
                 or obj['sections'].get(row['sect']) not in ('.sbss','.bss')
-                or not isinstance(scaffold,str) or not re.fullmatch(r'\w+\.(?:sdata|data)',scaffold)):
+                or (scaffold is not None and (not isinstance(scaffold,str)
+                                               or not re.fullmatch(r'\w+\.(?:sdata|data)',scaffold)))):
             raise ValueError('source common size/storage differs from compiler declaration')
         va = int(spec['va'],0)
         if N.data_address(symbols,name) != va:
             raise ValueError('source common differs from retail symbol address')
-        label,kind = scaffold.rsplit('.',1)
-        extent = layouts['diabpsx'].get((kind,label))
+        if scaffold is None:
+            if spec.get('storage') != 'bss':
+                raise ValueError('unknown source common storage')
+            extent = layouts['diabpsx'].get(('bss','__zero_fill'))
+        else:
+            label,kind = scaffold.rsplit('.',1)
+            extent = layouts['diabpsx'].get((kind,label))
         if extent is None or not extent[0] <= va < va+size <= sum(extent):
             raise ValueError('source common outside initialized scaffold')
-        result[name] = dict(va=va,size=size,scaffold=scaffold,limit=sum(extent),start=extent[0])
+        result[name] = dict(va=va,size=size,scaffold=scaffold,storage='bss' if scaffold is None else 'initialized',
+                            limit=sum(extent),start=extent[0])
     ordered = sorted((r['va'],r['size']) for r in result.values())
     if any(a+n>b for (a,n),(b,m) in zip(ordered,ordered[1:])):
         raise ValueError('source commons overlap')
     return result
 
 
-def allocate(segment, rows, retail, assembler, out):
+def allocate(segment, rows, retail, assembler, out, assemble=None):
     if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*',segment):
         raise ValueError('invalid common allocation owner')
     if not rows:
         return {}, {}
     banks = {}
     for name,row in rows.items():
+        if row['storage'] == 'bss':
+            continue
         banks.setdefault(row['scaffold'],[]).append((row['va'],row['size'],name))
+    runtime = {name: {'va':hex(row['va']),'size':row['size']}
+               for name,row in rows.items() if row['storage'] == 'bss'}
+    if not banks:
+        return {}, {'banks': {}, 'runtime_bss': runtime}
     lines, regions, owners, carriers = [], {}, {}, {}
     for index,(scaffold,items) in enumerate(sorted(banks.items())):
         items.sort()
@@ -73,7 +87,8 @@ def allocate(segment, rows, retail, assembler, out):
                                 scaffold_bytes=end-start-sum(n for _,n,_ in items))
     source, obj = out/(segment+'_commons.s'), out/(segment+'_commons.obj')
     source.write_bytes(('\r\n'.join(lines)+'\r\n').encode('ascii'))
-    run = B.run([assembler,'-q','-o',obj,source])
+    run = (assemble(assembler, ['-q'], source, obj) if assemble
+           else B.run([assembler,'-q','-o',obj,source]))
     if run.returncode:
         raise ValueError('source common allocation assembly failed: '+run.stdout+run.stderr)
     raw = obj.read_bytes()
@@ -90,4 +105,4 @@ def allocate(segment, rows, retail, assembler, out):
         payloads[name] = blocks[section][offset:offset+size]
         if len(payloads[name])!=size or any(payloads[name]):
             raise ValueError('source common allocation is not exact zero storage')
-    return payloads, dict(object_sha256=hashlib.sha256(raw).hexdigest(),banks=carriers)
+    return payloads, dict(object_sha256=hashlib.sha256(raw).hexdigest(),banks=carriers,runtime_bss=runtime)

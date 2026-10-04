@@ -34,6 +34,9 @@ _rb = ROOT / 'configs/recon_bss_link.json'
 RECON_BSS = json.loads(_rb.read_text()) if _rb.exists() else {}
 SECT = {"data": ".data", "rodata": ".rodata", "sdata": ".sdata", "bss": ".bss", "sbss": ".sbss"}
 
+def is_native_zero_section(section):
+    return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.bss\.\w+', section))
+
 def cross_image_provisions(name):
     registry = ROOT / "configs" / "cross_image_symbols.json"
     if not registry.exists():
@@ -117,11 +120,11 @@ def gen(name: str):
                   if section.startswith('.text.') and row.get('image', spec['image']) == name}
     native_data = {row["scaffold"] for spec in NATIVE_RECON.values()
                    for section, row in spec["sections"].items()
-                   if section not in (".text", ".sbss", ".bss") and not section.startswith('.text.')
+                   if section != ".text" and not is_native_zero_section(section) and not section.startswith('.text.')
                    and row.get("image", spec["image"]) == name}
     if name == 'diabpsx':
         native_data.update(row['scaffold'] for spec in NATIVE_RECON.values()
-                           for row in spec.get('common_symbols',{}).values())
+                           for row in spec.get('common_symbols',{}).values() if 'scaffold' in row)
     if set(NATIVE_RECON) & set(RECON_MAP):
         raise ValueError("source TU cannot use both GNU and native source inputs")
     if extra_text & (native_whole | set(RECON_MAP)):

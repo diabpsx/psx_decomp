@@ -1064,12 +1064,6 @@ INCLUDE_ASM("asm/nonmatchings/lib", DDXpollhost);
 
 INCLUDE_ASM("asm/nonmatchings/lib", DDXputchar);
 
-void dumpasync(void) {
-}
-
-void validateasyncblocks(void) {
-}
-
 INCLUDE_ASM("asm/nonmatchings/lib", asyncreadmsecs);
 
 INCLUDE_ASM("asm/nonmatchings/lib", asyncstructsize);

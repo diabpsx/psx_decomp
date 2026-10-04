@@ -186,9 +186,9 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
         elif op == 0x2E:                                   # processor
             p += 1
         elif sld_debug and op in (0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C):
-            # offset16; then increment8/increment32/line32/line32+file16.
+            # offset16; then increment8/increment16/line32/line32+file16.
             # 0x34's final byte is a number, NOT a length-prefixed string.
-            p += {0x32: 2, 0x34: 3, 0x36: 6, 0x38: 6, 0x3A: 8, 0x3C: 2}[op]
+            p += {0x32: 2, 0x34: 3, 0x36: 4, 0x38: 6, 0x3A: 8, 0x3C: 2}[op]
         elif sld_debug and op == 0x4A:                     # function start
             p += 28
             ln = d[p]; p += 1 + ln

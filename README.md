@@ -20,8 +20,8 @@ functions, `DrawObjSelector` and `DrawSpellCel`, closed on 2026-10-03/04 (receip
 `scratch/padfuncs/r4` and `scratch/control/dsc5`; community decomp.me scratches
 `q8GOs`/`Cyqz5` supplied the final lever). The 837-entry library region is outside this count
 and is separately tracked below and in `docs/TOOLCHAIN.md`: 349 entries have original
-Sony archive-link receipts, all 146 Climax GLIB and seven EAC entries are reconstructed and
-source-linked, and 335 entries remain.
+Sony archive-link receipts, all 146 Climax GLIB and eleven EAC entries are reconstructed and
+source-linked, and 331 entries remain.
 
 ### Climax GLIB middleware (lib segment, 146 functions, separate count)
 
@@ -258,8 +258,8 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1,713 functions across 112 TUs through real ASPSX/PSYLINK: 1,732 source-linked
-functions across 113 TUs in total. They replace their text scaffolds at the original
+1,717 functions across 114 TUs through real ASPSX/PSYLINK: 1,736 source-linked
+functions across 115 TUs in total. They replace their text scaffolds at the original
 addresses. LIGHTING supplies all 28 functions and all six original sections,
 including the gold-source CrawlTable, 31 exact global records, restored RGB
 defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
@@ -459,8 +459,7 @@ exactly cover each member's XREFs and resolve to unique retail function addresse
 PSYLINK performs the relocations, and the complete result must match retail with
 no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
-The remaining 335 library-region entries are not native-linked: 331 use assembly
-scaffolds and four already have C bodies in `src/lib.c`. This does not increase the
+The remaining 331 library-region entries all use assembly scaffolds. This does not increase the
 game-function board, now **2727/2727 PASS**.
 The 837 excluded entries are not all Sony SDK functions: 146 are the now-integrated
 Climax GLIB routines. Final integration
@@ -725,11 +724,14 @@ the complete export set, exact object offsets/MAP addresses, and byte-identical
 linked payload. The original hand-written CRC.ASM module is also linked with its
 byte-identical 512-byte table. Separate natural source modules reproduce
 `gettick` and `resettick`; the latter owns the exact `tickset`/`tickval`
-small-data pair and uses the verified GP carrier. Coverage is now 1,732
-functions/113 TUs (1,713/112 native plus 19/1 conventional); 335 library entries
-remain: 33 boot utilities and 302 EAC. The refreshed
-`build/eac_twin_screen.json` records 38 remaining same-name EAC candidates and
-three exact bodies.
+small-data pair and uses the verified GP carrier. The complete original
+BLKFILL.ASM member now supplies `blockclear` and `blockfill`, including Diablo's
+two-instruction byte-tail scheduling variant. The empty NASYNC debug hooks
+`dumpasync` and `validateasyncblocks` are promoted from the monolithic placeholder
+TU into their own exact source member. Coverage is now 1,736 functions/115 TUs
+(1,717/114 native plus 19/1 conventional); 331 library entries remain: 33 boot
+utilities and 298 EAC. The refreshed `build/eac_twin_screen.json`
+records 36 remaining same-name EAC candidates and two exact bodies.
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three

@@ -4399,3 +4399,4 @@ StRingBase = 0x80139BD4; //
 StRingAddr = 0x80139BD8; //
 cdrombufsector = 0x80139BE0; //
 StRingSize = 0x80139BF0; //
+FirstFreeByte = 0x80163E20; // retail MAP terminal .last symbol

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """build.py — Diablo PSX (SLPS-01416) matching-decomp build driver.
 
-Toolchain identity (settled 2026-09-26, see docs/TOOLCHAIN.md): the retail
-image was built with PsyQ 4.0 — CC1PSX/CC1PLPSX gcc 2.7.2.SN32.3.7 — and
-ASPSX.  Our lane: cpp -> real PsyQ cc1/cc1plus -> maspsx (aspsx emulator)
+Toolchain identity (see docs/TOOLCHAIN.md): game/PSX objects use PsyQ 4.0 —
+CC1PSX/CC1PLPSX gcc 2.7.2.SN32.3.7 — while Climax GLIB objects use the
+reviewed gcc 2.6.3-compatible/ASPSX 2.34 lane. The ordinary lane is cpp ->
+real PsyQ cc1/cc1plus -> maspsx (aspsx emulator)
 -> mipsel-none-elf-as.  Byte identity vs rom/DIABPSX.BIN is the criterion;
 tools/verify_asm.py is the sole gate.
 
@@ -43,17 +44,26 @@ CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline", "-fsigned-char"] 
 
 # per-TU flag overrides: {repo-relative posix path: {"g_value": "0", "lane": "c"...}}
 PER_TU_FLAGS = {
+    "recon/eaclib/blkfill.s": {"g_value": "0"},
+    "recon/eaclib/crc.s": {"g_value": "0"},
+    "recon/eaclib/getm.s": {"g_value": "0"},
+    "recon/eaclib/gettick.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/eaclib/nasync_debug.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/eaclib/resettick.c": {"g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/eaclib/textcrnt.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     # Climax GLIB C modules use absolute addressing even for four-byte owned
     # commons (TICK/GazTick), proving their original small-data threshold was 0.
     "recon/glibdev/gmain.c": {"g_value": "0"},
     "recon/glibdev/tick.c": {"g_value": "0"},
-    "recon/glibdev/tasker.c": {"g_value": "0"},   # 16 four-byte statics at 8011C98C.. reached absolutely (scratch/glib/tasker)
-    "recon/glibdev/gal.c": {"g_value": "0"},      # same: GAL statics addressed absolutely (scratch/glib/gal)
-    "recon/glibdev/gutils.c": {"g_value": "0"},
-    "recon/glibdev/gtimsys.c": {"g_value": "0"},
-    "recon/glibdev/vrip.c": {"g_value": "0"},
-    "recon/glibdev/gsys.c": {"g_value": "0"},
-    "recon/glibdev/gdebug.c": {"g_value": "0"},
+    "recon/glibdev/tasker.c": {"g_value": "0", "compiler": "gcc-2.6.3",
+        "split_lcomm": {"SchEnv": {"size": 48, "section": ".bss.sch"}}},
+    "recon/glibdev/gal.c": {"g_value": "0", "compiler": "gcc-2.6.3",
+        "split_lcomm": {"MemHdrBlocks": {"size": 5600, "section": ".bss.hdr"}}},
+    "recon/glibdev/gutils.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/gtimsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/vrip.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/gsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/gdebug.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     # Reproduce linker-placed zero commons. These unchanged GAME objects link
     # all text/pool bytes and their typed globals at the retail homes.
     "recon/source/missiles.cpp": {"extra": ["-fconserve-space"]},

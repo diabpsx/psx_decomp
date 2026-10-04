@@ -218,7 +218,7 @@ SECTIONS
         . = 0xA0CD4;   /* 0x800B0CD4 */
         build/native_source/dtors.data.s.o(.data);   /* verified native source data */
         . = 0xA0D00;   /* 0x800B0D00 */
-        build/sdk/native/data.data.s.o(.data);   /* original SDK data bridge */
+        build/native_source/data.data.s.o(.data);   /* verified native source data */
         . = 0xA7088;   /* 0x800B7088 */
         build/asm/data/data_monstlst.data.s.o(.data);
         . = 0xA75D8;   /* 0x800B75D8 */
@@ -732,10 +732,34 @@ SECTIONS
         __sdk_InitTAP_sbss_start = .;
         build/sdk/native/InitTAP.sbss.s.o(.sbss);
         ASSERT(. - __sdk_InitTAP_sbss_start == 0x80, "wrong BSS extent: InitTAP");
+        . = 0x10C98C;
+        __source_tasker_bss_start = .;
+        build/native_source/tasker.bss.s.o(.bss);
+        ASSERT(. - __source_tasker_bss_start == 0x40, "wrong BSS extent: tasker");
+        . = 0x10C9CC;
+        __source_gal_bss_start = .;
+        build/native_source/gal.bss.s.o(.bss);
+        ASSERT(. - __source_gal_bss_start == 0x2C, "wrong BSS extent: gal");
         . = 0x10CA60;
         __source_tick_bss_start = .;
         build/native_source/tick.bss.s.o(.bss);
         ASSERT(. - __source_tick_bss_start == 0x4, "wrong BSS extent: tick");
+        . = 0x10CA6C;
+        __source_gdebug.common_MsgFunc_bss_start = .;
+        build/native_source/gdebug.common_MsgFunc.bss.s.o(.bss);
+        ASSERT(. - __source_gdebug.common_MsgFunc_bss_start == 0x4, "wrong BSS extent: gdebug.common_MsgFunc");
+        . = 0x10CA74;
+        __source_gsys.common_LastPtr_bss_start = .;
+        build/native_source/gsys.common_LastPtr.bss.s.o(.bss);
+        ASSERT(. - __source_gsys.common_LastPtr_bss_start == 0x4, "wrong BSS extent: gsys.common_LastPtr");
+        . = 0x10CA88;
+        __source_gdebug.common_PollFunc_bss_start = .;
+        build/native_source/gdebug.common_PollFunc.bss.s.o(.bss);
+        ASSERT(. - __source_gdebug.common_PollFunc_bss_start == 0x4, "wrong BSS extent: gdebug.common_PollFunc");
+        . = 0x10CAB8;
+        __source_gdebug.common_ErrorFunc_bss_start = .;
+        build/native_source/gdebug.common_ErrorFunc.bss.s.o(.bss);
+        ASSERT(. - __source_gdebug.common_ErrorFunc_bss_start == 0x4, "wrong BSS extent: gdebug.common_ErrorFunc");
         . = 0x10CAE0;
         __source_vid_bss_start = .;
         build/native_source/vid.bss.s.o(.bss);
@@ -840,6 +864,18 @@ SECTIONS
         __sdk__patch_gte_bss_start = .;
         build/sdk/native/_patch_gte.bss.s.o(.bss);
         ASSERT(. - __sdk__patch_gte_bss_start == 0x10, "wrong BSS extent: _patch_gte");
+        . = 0x1225A0;
+        __source_tasker_bss.sch_start = .;
+        build/native_source/tasker.bss.sch.s.o(.bss.sch);
+        ASSERT(. - __source_tasker_bss.sch_start == 0x30, "wrong BSS extent: tasker");
+        . = 0x1225D0;
+        __source_gal_bss.hdr_start = .;
+        build/native_source/gal.bss.hdr.s.o(.bss.hdr);
+        ASSERT(. - __source_gal_bss.hdr_start == 0x15E0, "wrong BSS extent: gal");
+        . = 0x123BB0;
+        __source_vrip_bss_start = .;
+        build/native_source/vrip.bss.s.o(.bss);
+        ASSERT(. - __source_vrip_bss_start == 0x1380, "wrong BSS extent: vrip");
         . = 0x125040;
         __sdk_StSetRing_Stframe_no_bss_start = .;
         build/sdk/native/StSetRing_Stframe_no.bss.s.o(.bss);
@@ -868,6 +904,10 @@ SECTIONS
         __sdk_StSetRing_StCdIntrFlag_bss_start = .;
         build/sdk/native/StSetRing_StCdIntrFlag.bss.s.o(.bss);
         ASSERT(. - __sdk_StSetRing_StCdIntrFlag_bss_start == 0x4, "wrong BSS extent: StSetRing_StCdIntrFlag");
+        . = 0x1251E8;
+        __source_gutils.common_RndTabs_bss_start = .;
+        build/native_source/gutils.common_RndTabs.bss.s.o(.bss);
+        ASSERT(. - __source_gutils.common_RndTabs_bss_start == 0x18, "wrong BSS extent: gutils.common_RndTabs");
         . = 0x125200;
         __sdk__spu_init__spu_RQ_bss_start = .;
         build/sdk/native/_spu_init__spu_RQ.bss.s.o(.bss);

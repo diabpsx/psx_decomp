@@ -33,7 +33,7 @@ class PsyqSLDTests(unittest.TestCase):
     def test_line_records_are_numeric_not_strings(self):
         debug = (b'\x32' + struct.pack('<H', 0)
                  + b'\x34' + struct.pack('<HB', 0, 255)
-                 + b'\x36' + struct.pack('<HI', 4, 0x12345678)
+                 + b'\x36' + struct.pack('<HH', 4, 0x5678)
                  + b'\x38' + struct.pack('<HI', 4, 900)
                  + b'\x3a' + struct.pack('<HIH', 4, 901, 2)
                  + b'\x3c' + struct.pack('<H', 8))

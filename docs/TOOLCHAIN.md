@@ -7,12 +7,14 @@
    NextPrim, IsEndPrim, TermPrim, SetDrawLoad, SetDrawTPage, SetLineG3, SetLineG4` (LIBGPU) —
    matches the 4.0 bytes and NOT the 4.3 bytes. (Most lib functions carry relocations, so an exact
    search only ever finds the relocation-free ones; a reloc-masked comparison is the follow-up.)
-2. **Compiler = the PsyQ 4.0 cc1/cc1plus (gcc 2.7.2.SN32.3.7).** First compiled functions
+2. **Game compiler = the PsyQ 4.0 cc1/cc1plus (gcc 2.7.2.SN32.3.7).** First compiled functions
    (`GMAN.CPP`: `TextDat::TextDat`, `OnceOnlyInit`, `InitData`) byte-match through
    `CC1PLPSX.EXE -quiet -O2 -G8` + maspsx + GNU as.
 3. **Language lanes.** `SOURCE/*.CPP` and `PSXSRC/*.CPP` = C++ (gcc-2.x cfront-style mangling
    `Name__7TextDat`, dtors `_._7TextDat` → spelled `___7TextDat` by SN's assembler);
-   `GLIBDEV/SOURCE/*.C` (GAL/TASKER/GSYS/…) = C. `PSXSRC/*.MIP` = hand-written MIPS assembly.
+   `GLIBDEV/SOURCE/*.C` (GAL/TASKER/GSYS/…) = C and independently matches the
+   gcc 2.6.3-compatible `-O2 -G0` lane with original ASPSX 2.34.
+   `PSXSRC/*.MIP` = hand-written MIPS assembly.
 4. **Diablo does NOT use PsyQ libgte** — the `GTE_*` functions at the start of `.text` are Climax's
    own GLIB layer (`GTE_SetTransXYZ` @0x8001000C …). PsyQ libgpu/libspu/libcd/libcard/libpad/libc/
    libsn are linked from the 4.0 archives.
@@ -292,10 +294,39 @@ SDK imports, so native_recon composes its exact ranges on the freshly produced
 SDK bridge and gen_ld selects one combined wrapper. The main image remains
 byte-identical with 120,304 zero BSS bytes. Coverage is now 1,587 functions/
 101 TUs (1,568/100 native plus19/1 conventional), and the suite is224/224.
-The unlinked region is480 entries:138 confirmed GLIB and342 unclassified.
-The broader goal remains active pending authoritative GLIB
-inputs or reconstruction of those non-Sony entries and classification/import
-receipts for the342 unknown entries.
+The unlinked region at that checkpoint was480 entries:138 confirmed GLIB and342 unclassified.
+
+The other seven GLIB TUs now use the byte-proven historical lane: gcc 2.6.3-
+compatible C generation with `-O2 -G0`, followed by original DOS ASPSX 2.34.
+GAL, TASKER, GDEBUG, GSYS, GUTILS, GTIMSYS and VRIP contribute the remaining
+138 GLIB functions. Native linkage verifies their complete code, pools,
+initialized data, runtime BSS, call targets, and function/global SYM records.
+TASKER's 48-byte `SchEnv` and GAL's 5,600-byte header arena are fail-closed
+local-common splits that reproduce the retail BSS banks while leaving the C
+function bodies unchanged. VRIP additionally proved the old LNK `0x36` SLD
+record is offset16 plus increment16; the parser now checks that exact shape.
+Coverage after GLIB was 1,725 functions/108 TUs (1,706/107 native plus19/1 conventional),
+and all146 Climax GLIB entries are source-linked.
+
+The pending set has a reproducible producer partition from retail address order.
+`tools/eac_twin_screen.py` identified 33 boot/GTE/compression/ABL utilities and
+309 functions in one EAC runtime family across six uninterrupted pending runs.
+The local NFS4 EACLIB reconstruction supplies 45 same-name candidates; ten have
+exact relocation-masked bodies. Those are source-twin leads only, not original-
+archive receipts, so they remain pending until reconstructed/native-linked under
+the Diablo layout. TEXTCRNT.C (`putm`/`puti`) and the original hand-assembly
+GETM.ASM shape (`getm`/`geti`) are now the first two linked EAC modules. Because
+retail stripped their body-SYM records, their explicit seal proves complete
+exports, exact member offsets/MAP addresses and final bytes. The original
+CRC.ASM module and its exact 512-byte table are linked as well; separate source
+members supply `gettick` and `resettick`, including the latter's exact
+`tickset`/`tickval` small-data ownership. The complete original BLKFILL.ASM
+member supplies `blockclear`/`blockfill`, preserving Diablo's two-instruction
+tail-loop ordering variant. The two empty NASYNC debug hooks are also promoted
+from `src/lib.c` into an exact source member. Coverage is now 1,736 functions/
+115 TUs (1,717/114 native plus19/1 conventional), the suite is230/230, and331
+library entries remain:33 boot utilities plus298 EAC runtime.
+The machine-readable result is `build/eac_twin_screen.json`.
 
 ## Debug-object inspection (2026-10-03)
 

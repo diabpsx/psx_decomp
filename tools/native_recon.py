@@ -7,6 +7,7 @@ The final-image linker consumes generated wrappers only after all checks pass.
 """
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -25,10 +26,40 @@ IMAGES = {'diabpsx': 'DIABPSX.BIN', 'pregame': 'PREGAME.BIN',
 
 def source_assembler(spec):
     version = spec.get('assembler', '2.56')
-    choices = {'2.56': S.ASPSX, '2.67': Path('C:/Temp/PSYQ/psyq-410/PSSN/ASPSX.EXE')}
+    choices = {
+        '2.34': Path(os.environ.get('DIAB_ASPSX234', 'C:/Temp/nfs2-clean/psyq350/PSYQ/ASPSX.EXE')),
+        '2.56': S.ASPSX,
+        '2.67': Path('C:/Temp/PSYQ/psyq-410/PSSN/ASPSX.EXE'),
+    }
     if not isinstance(version, str) or version not in choices:
         raise ValueError('unreviewed native source assembler version')
     return version, choices[version]
+
+
+def source_assembler_options(spec):
+    version, assembler = source_assembler(spec)
+    return version, assembler, version == '2.34', [] if version == '2.34' else ['-0']
+
+
+def is_zero_section(section):
+    return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.bss\.\w+', section))
+
+
+def compile_source(source, assembler, assembler_dos, assembler_flags):
+    if source.suffix.lower() != '.s':
+        return S.compile_g(source, assembler=assembler, assembler_dos=assembler_dos,
+                           assembler_flags=assembler_flags)
+    flags = B.per_tu_flags(source)
+    g = str(flags.get('g_value', B.G_VALUE))
+    obj = S.OUT / (source.stem + '.g.obj')
+    assembly = S.OUT / (source.stem + '.g.s')
+    text = source.read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+    assembly.write_bytes(text)
+    run = S.assemble_native(assembler, ['-q', '-g', *assembler_flags, f'-G{g}'], assembly, obj,
+                            assembler_dos)
+    if run.returncode or not obj.is_file():
+        raise ValueError('native assembly source failed: ' + run.stdout + run.stderr)
+    return obj
 
 
 def image_layout(name):
@@ -56,13 +87,21 @@ def bss_placements(registry, start, end):
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', segment):
             raise ValueError('invalid native BSS owner')
         for section, row in spec['sections'].items():
-            if section not in ('.sbss', '.bss'):
+            if not is_zero_section(section):
                 continue
             va, size = int(row['va'], 0), row['size']
             if (row.get('image', spec['image']) != 'diabpsx' or type(size) is not int
                     or size <= 0 or va % 4 or va < start or va + size > end):
                 raise ValueError('native BSS outside main zero-fill region')
             result.append((va, size, segment, section))
+        for name, row in spec.get('common_symbols', {}).items():
+            if row.get('storage') != 'bss':
+                continue
+            va, size = int(row['va'], 0), row['size']
+            if (type(size) is not int or size <= 0 or va % 4 or va < start or va + size > end
+                    or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', name)):
+                raise ValueError('native common BSS outside main zero-fill region')
+            result.append((va, size, segment + '.common_' + name, '.bss'))
     result.sort()
     if any(a + n > b for (a, n, _, _), (b, _, _, _) in zip(result, result[1:])):
         raise ValueError('overlapping native BSS placements')
@@ -79,14 +118,14 @@ def validate_placements(segment, spec, layouts):
     sections = spec['sections']
     text_sections = [s for s in sections if s == '.text' or re.fullmatch(r'\.text\.\w+',s)]
     if not text_sections or any(s not in {'.text', '.rdata', '.sdata', '.data', '.sbss', '.bss', '.ctors', '.dtors'}
-                                and not re.fullmatch(r'\.text\.\w+', s) for s in sections):
+                                and not re.fullmatch(r'\.(?:text|bss)\.\w+', s) for s in sections):
         raise ValueError('unsupported native source section set')
     homes, regions, limits = {}, {}, {}
     for section, row in sections.items():
         home = row.get('image', spec['image'])
         if home not in layouts or (section == '.text' and home != spec['image']):
             raise ValueError('invalid native source section image')
-        if section in ('.sdata', '.sbss', '.bss') and home != 'diabpsx':
+        if (section == '.sdata' or is_zero_section(section)) and home != 'diabpsx':
             raise ValueError('native small data requires main-image placement')
         size, va = row['size'], int(row['va'], 0)
         if type(size) is not int or size <= 0:
@@ -98,7 +137,7 @@ def validate_placements(segment, spec, layouts):
             if not re.fullmatch(r'\w+', target) or target == segment or va % 4 or size % 4:
                 raise ValueError('extra source text requires a distinct aligned retail segment')
             key = ('c', target)
-        elif section in ('.sbss', '.bss'):
+        elif is_zero_section(section):
             if va % 4:
                 raise ValueError('native BSS must be word aligned')
             key = ('bss', '__zero_fill')
@@ -116,6 +155,12 @@ def validate_placements(segment, spec, layouts):
         if section == '.text' and (va, size) != extent:
             raise ValueError('native source text must fill the complete retail TU')
         homes[section], regions[section], limits[section] = home, (va, size), sum(extent)
+        source_section = row.get('source_section', section)
+        if not isinstance(source_section, str) or not re.fullmatch(r'\.[A-Za-z_][A-Za-z0-9_.]*', source_section):
+            raise ValueError('invalid native object-section alias')
+    aliases = [row.get('source_section', section) for section, row in sections.items()]
+    if len(aliases) != len(set(aliases)):
+        raise ValueError('native object-section aliases must be unique')
     return homes, regions, limits
 
 
@@ -276,6 +321,43 @@ def verify_sym(text, segment, data_symbols, retail_text, extra_paths=()):
     return count
 
 
+def verify_stripped_library_members(obj, spec, regions, map_text, retail_text, paths):
+    """Verify source members whose retail library objects have no body-SYM records."""
+    if spec.get('stripped_library_sym') is not True:
+        raise ValueError('stripped library verification must be explicit')
+    wanted = []
+    for section, placement in spec['sections'].items():
+        if section.startswith('.text.'):
+            wanted.extend(placement.get('functions', []))
+    if len(wanted) != len(set(wanted)) or set(wanted) != {path.stem for path in paths}:
+        raise ValueError('stripped library member list differs from routed text')
+    retail_functions = S.functions(retail_text, every=True)
+    if any(name in retail_functions for name in wanted):
+        raise ValueError('available retail body SYM must use the full verifier')
+    source_section = next(spec['sections'][section].get('source_section', section)
+                          for section in spec['sections'] if section.startswith('.text.'))
+    section_ids = [index for index, name in obj['sections'].items() if name == source_section]
+    if len(section_ids) != 1:
+        raise ValueError('stripped library object has ambiguous text section')
+    section_id = section_ids[0]
+    definitions = {row['name']: row for row in obj['xdefs']
+                   if 'bss' not in row and row['sect'] == section_id}
+    if set(definitions) != set(wanted):
+        raise ValueError('stripped library exports differ from the complete object')
+    logical = next(section for section in spec['sections'] if section.startswith('.text.'))
+    base, size = regions[logical]
+    for path in paths:
+        address, data = N.scaffold_bytes(path)
+        row = definitions[path.stem]
+        if row['off'] != address - base or row['off'] < 0 or row['off'] + len(data) > size:
+            raise ValueError(path.stem + ': stripped library object offset differs')
+        mapped = {int(value, 16) for value in re.findall(
+            r'^\s*([0-9A-Fa-f]{8})\s+' + re.escape(path.stem) + r'\s*$', map_text, re.M)}
+        if mapped != {address}:
+            raise ValueError(path.stem + ': stripped library map address differs')
+    return len(wanted)
+
+
 def text_bridge(segment, va, size):
     parts = []
     for path in (B.ROOT / 'asm/nonmatchings' / segment).glob('*.s'):
@@ -332,8 +414,11 @@ def build():
         source.relative_to(B.ROOT)
         if source.stem != segment:
             raise ValueError('native source requires a same-name whole TU')
-        assembler_version, assembler = source_assembler(spec)
+        assembler_version, assembler, assembler_dos, assembler_flags = source_assembler_options(spec)
         homes, regions, limits = validate_placements(segment, spec, layouts)
+        source_sections = {section: row.get('source_section', section)
+                           for section, row in spec['sections'].items()}
+        reverse_sections = {source: section for section, source in source_sections.items()}
         extra_paths = []
         from native_text import validate_members, render_mixed
         routed = {}
@@ -370,16 +455,16 @@ def build():
                                            for i in range(0, len(prefix), 16))
             prefix_source.write_bytes(assembly.replace('\n', '\r\n').encode('ascii'))
             prefix_obj = prefix_source.with_suffix('.obj')
-            run = subprocess.run([str(assembler), '-q', '-o', str(prefix_obj), str(prefix_source)],
-                                 cwd=B.ROOT, env=S.ENV, capture_output=True, text=True)
+            run = S.assemble_native(assembler, ['-q'], prefix_source, prefix_obj, assembler_dos)
             if run.returncode:
                 raise ValueError('GP scaffold assembly failed: ' + run.stdout + run.stderr)
             prefix_objects.append(prefix_obj)
-        original_obj = S.compile_g(source, assembler=assembler)
+        original_obj = compile_source(source, assembler, assembler_dos, assembler_flags)
         raw = original_obj.read_bytes()
         if raw[:4] != b'LNK\x02':
             raise ValueError('compiler did not produce a native LNK object')
-        commons = C.placements(P.parse_obj_complete(raw), spec['common_symbols'], symbol_text,
+        obj = P.parse_obj_complete(raw)
+        commons = C.placements(obj, spec['common_symbols'], symbol_text,
                                layouts, spec['data_symbols']) if 'common_symbols' in spec else {}
         for row in commons.values():
             va, size = row['va'], row['size']
@@ -397,14 +482,16 @@ def build():
         if compaction and (not S.overlay_group(source) or spec['image']=='diabpsx'
                            or any(home!='diabpsx' for section,home in homes.items() if section!='.text')):
             raise ValueError('native overlay compaction requires overlay text and resident pools')
-        blocks, map_text = N.native_link(segment, raw, combined, bindings,
+        link_regions = {source_sections.get(section, section): region for section, region in combined.items()}
+        blocks, map_text = N.native_link(segment, raw, link_regions, bindings,
                                          prefix_objects=prefix_objects, output_dir=OUT,
                                          overlay_text=bool(compaction))
+        blocks = {reverse_sections.get(section, section): data for section, data in blocks.items()}
         payloads = {}
         for section, data in blocks.items():
             home = homes.get(section, 'diabpsx')
             at = combined[section][0] - bases[home]
-            expected = bytes(len(data)) if section in ('.sbss', '.bss') else retail_images[home][at:at+len(data)]
+            expected = bytes(len(data)) if is_zero_section(section) else retail_images[home][at:at+len(data)]
             if at < 0 or data != expected:
                 raise ValueError(f'{segment} {section}: native bytes differ from retail')
             if section not in regions:
@@ -414,7 +501,12 @@ def build():
                              capture_output=True, text=True)
         if run.returncode:
             raise ValueError('native source SYM decoding failed')
-        count = verify_sym(run.stdout, segment, spec['data_symbols'], retail_sym, extra_paths)
+        if spec.get('stripped_library_sym'):
+            if spec['data_symbols']:
+                raise ValueError('stripped library data needs an explicit verification lane')
+            count = verify_stripped_library_members(obj, spec, regions, map_text, retail_sym, extra_paths)
+        else:
+            count = verify_sym(run.stdout, segment, spec['data_symbols'], retail_sym, extra_paths)
         aliases = spec.get('data_symbol_aliases', {})
         if not isinstance(aliases, dict) or set(aliases) - set(spec['data_symbols']):
             raise ValueError('native data aliases must name verified source globals')
@@ -427,7 +519,14 @@ def build():
             raise ValueError('typed and untyped source data declarations must be disjoint')
         untyped_receipts = {name: verify_untyped_export(map_text, symbol_text, retail_sym, run.stdout, name, alias)
                             for name, alias in untyped.items()}
-        common_payloads, common_allocation = C.allocate(segment,commons,retail,assembler,OUT)
+        common_payloads, common_allocation = C.allocate(
+            segment, commons, retail, assembler, OUT,
+            assemble=lambda tool, flags, src, obj: S.assemble_native(tool, flags, src, obj, assembler_dos))
+        for name, row in commons.items():
+            if row['storage'] != 'bss':
+                continue
+            wrapper = OUT / f'{segment}.common_{name}.bss.s'
+            wrapper.write_text(f'.section .bss, "aw", @nobits\n.global {name}\n{name}:\n.space {row["size"]}\n')
         for name,data in common_payloads.items():
             row = commons[name]
             filename = f'build/native_source/{segment}.common_{name}.bin'
@@ -436,7 +535,7 @@ def build():
             bridge_limits[row['scaffold']] = row['limit']
         for section, data in payloads.items():
             (OUT / f'{segment}{section}.bin').write_bytes(data)
-            if section in ('.sbss', '.bss'):
+            if is_zero_section(section):
                 (OUT / f'{segment}{section}.s').write_text(
                     f'.section {section}, "aw", @nobits\n' + f'.space {len(data)}\n')
             elif section != '.text' and not section.startswith('.text.'):
@@ -452,24 +551,30 @@ def build():
         (OUT / f'{segment}.sym.txt').write_text(run.stdout)
         receipts.append({'segment': segment, 'source': spec['source'], 'functions': count,
                          'assembler_version': assembler_version, 'assembler_sha256': sha(assembler.read_bytes()),
+                         'compiler_sha256': (None if source.suffix.lower() == '.s' else
+                                             sha(S.compiler_for(source, source.suffix.lower() != '.c').read_bytes())),
                          'compiler_overrides': B.per_tu_flags(source),
                          'symbol_compaction': compaction,
                          'symmunge_sha256': S.SYMMUNGE_SHA256 if compaction else None,
-                         'common_symbols': {name: {'va':hex(commons[name]['va']),'size':len(data),
-                                                    'sha256':sha(data)} for name,data in common_payloads.items()},
+                         'common_symbols': {
+                             name: {'va':hex(row['va']),'size':row['size'],'storage':row['storage'],
+                                    'sha256':sha(common_payloads[name]) if name in common_payloads else sha(bytes(row['size']))}
+                             for name,row in commons.items()},
                          'common_allocation': common_allocation,
                          'composed_sdk_scaffolds': sorted({row['scaffold'] for section,row in spec['sections'].items()
-                                                          if section not in ('.text','.sbss','.bss')
+                                                          if section != '.text' and not is_zero_section(section)
                                                           and not section.startswith('.text.')
                                                           and row['scaffold'] in sdk_scaffolds}),
                          'untyped_data_symbols': untyped_receipts,
                          'source_sha256': sha(source.read_bytes()), 'object_sha256': sha(raw),
-                         'preprocessed_sha256': sha((S.OUT / (source.stem + '.i')).read_bytes()),
+                         'preprocessed_sha256': (None if source.suffix.lower() == '.s' else
+                                                 sha((S.OUT / (source.stem + '.i')).read_bytes())),
                          'sections': {s: {'image': homes[s], 'va': f'0x{regions[s][0]:08X}', 'size': len(b), 'sha256': sha(b)}
                                       for s, b in payloads.items()},
                          'scaffold_gp_prefix': {'va': f'0x{gp:08X}', 'size': len(prefix), 'sha256': sha(prefix), 'mode': carrier_mode},
                          'bindings': {n: f'0x{v:08X}' for n, v in bindings.items()}})
-        print(f'{segment}: native source bytes and {count} SYM records match retail; {len(prefix)} borrowed GP-prefix carrier bytes')
+        proof = 'stripped library members' if spec.get('stripped_library_sym') else 'SYM records'
+        print(f'{segment}: native source bytes and {count} {proof} match retail; {len(prefix)} borrowed GP-prefix carrier bytes')
     for target, owned in extra_bridges.items():
         parts = []
         for path in (B.ROOT/'asm/nonmatchings'/target).glob('*.s'):

@@ -1,4 +1,220 @@
 {
+  "nasync_debug": {
+    "source": "recon/eaclib/nasync_debug.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80023730", "size": 16,
+        "functions": ["dumpasync", "validateasyncblocks"]}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "blkfill": {
+    "source": "recon/eaclib/blkfill.s",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8002C680", "size": 324,
+        "functions": ["blockclear", "blockfill"]}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "resettick": {
+    "source": "recon/eaclib/resettick.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80030090", "size": 36,
+        "functions": ["resettick"]},
+      ".sdata": {"va": "0x8011C5FC", "size": 8, "scaffold": "sdata_after_primpool.sdata"}
+    },
+    "data_symbols": [],
+    "untyped_data_symbols": {"tickset": "tickset", "tickval": "tickval"},
+    "externals": ["ticks"]
+  },
+  "gettick": {
+    "source": "recon/eaclib/gettick.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80030020", "size": 16,
+        "functions": ["gettick"]}
+    },
+    "data_symbols": [],
+    "externals": ["ticks"]
+  },
+  "crc": {
+    "source": "recon/eaclib/crc.s",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x800297B4", "size": 200,
+        "functions": ["crc16"]},
+      ".data": {"va": "0x800B69C4", "size": 512, "scaffold": "data.data"}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "getm": {
+    "source": "recon/eaclib/getm.s",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8002CAE4", "size": 136,
+        "functions": ["getm", "geti"]}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "textcrnt": {
+    "source": "recon/eaclib/textcrnt.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "stripped_library_sym": true,
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8002CB6C", "size": 80,
+        "functions": ["putm", "puti"]}
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "gal": {
+    "source": "recon/glibdev/gal.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x800212D4", "size": 8088,
+        "functions": [
+          "GAL_SetErrorChecking", "GAL_SplitBlock", "GAL_InitModule", "GAL_AddMemType", "GAL_Alloc", "GAL_Lock",
+          "GAL_Unlock", "GAL_Free", "GAL_GetFreeMem", "GAL_GetUsedMem", "GAL_LargestFreeBlock", "AttachHdrToList",
+          "DetachHdrFromList", "IsActiveValidHandle", "AlignPtr", "AlignSize", "FindClosestSizedBlock", "FindHighestMemBlock",
+          "FindLowestMemBlock", "GetMemInitInfoBlockFromType", "MergeToEmptyList", "GAL_AllocAt", "LoAlloc", "FindBlockInTheseBounds",
+          "GetFreeMemHdrBlock", "ReleaseMemHdrBlock", "GAL_IterateEmptyMem", "GAL_IterateUsedMem", "GAL_SetMemName", "GAL_TotalMem",
+          "GAL_MemBase", "GAL_DefragMem", "GSetError", "GAL_CheckMem", "CheckCollisions", "AreBlocksColliding",
+          "GAL_GetErrorText", "GAL_GetLastErrorCode", "GAL_GetLastErrorText", "GAL_HowManyEmptyRegions", "GAL_HowManyUsedRegions", "GAL_SetTimeStamp",
+          "GAL_IncTimeStamp", "GAL_GetTimeStamp", "GAL_AlignSizeToType", "GAL_AllocMultiStruct", "GAL_ProcessMultiStruct", "GAL_GetSize",
+          "GazDefragMem", "PutBlocksInRegionIntoList", "CollideRegions", "DeleteEmptyBlocks", "GetRegion", "FindNextBlock",
+          "ShuffleBlocks", "PutAllLockedBlocksOntoList", "SortMemHdrListByAddr", "GraftMemHdrList", "GAL_MemDump", "GAL_SetVerbosity",
+          "CountFreeBlocks", "SetBlockName", "GAL_GetNumFreeHeaders", "GAL_GetLastTypeAlloced", "GAL_SetAllocFilter", "GAL_SortUsedRegionsBySize",
+          "SortSize", "GAL_SortUsedRegionsByAddress", "SortAddr", "SortMemHdrList"]},
+      ".rdata": {"va": "0x8010E778", "size": 470, "scaffold": "rodata.rodata"},
+      ".data": {"va": "0x800B639C", "size": 80, "scaffold": "data.data"},
+      ".bss": {"va": "0x8011C9CC", "size": 44},
+      ".bss.hdr": {"va": "0x801325D0", "size": 5600}
+    },
+    "data_symbols": ["MemInitBlocks", "MemHdrBlocks", "FreeBlocks", "LastError", "TimeStamp", "FullErrorChecking",
+      "LastAttemptedAlloc", "LastDeallocedBlock", "VerbLev", "NumOfFreeHdrs", "LastTypeAlloced", "AllocFilter",
+      "GalErrors", "PhantomMem"],
+    "externals": ["DBG_SendMessage"]
+  },
+  "vrip": {
+    "source": "recon/glibdev/vrip.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80025538", "size": 2100,
+        "functions": ["vsprintf", "_doprnt"]},
+      ".rdata": {"va": "0x8010EB4C", "size": 524, "scaffold": "rodata.rodata"},
+      ".data": {"va": "0x800B63EC", "size": 7, "scaffold": "data.data"},
+      ".bss": {"va": "0x80133BB0", "size": 4992}
+    },
+    "data_symbols": ["buf", "NULL_REP"],
+    "externals": ["memchr", "memcpy", "strlen", "putc", "_ctype_"]
+  },
+  "gsys": {
+    "source": "recon/glibdev/gsys.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8002116C", "size": 344,
+        "functions": ["GSYS_GetWorkMemInfo", "GSYS_SetStackAndJump", "GSYS_MarkStack", "GSYS_IsStackCorrupted",
+          "GSYS_InitMachine", "GSYS_CheckPtr", "GSYS_IsStackOutOfBounds"]},
+      ".data": {"va": "0x800B6394", "size": 8, "scaffold": "data.data"}
+    },
+    "common_symbols": {
+      "LastPtr": {"va": "0x8011CA74", "size": 4, "storage": "bss"}
+    },
+    "data_symbols": ["LastPtr", "WorkMemInfo"],
+    "externals": ["ResetCallback", "FirstFreeByte", "_stacksize", "GSYS_MemStart", "GSYS_MemEnd", "GetSp", "SetSp"]
+  },
+  "gutils": {
+    "source": "recon/glibdev/gutils.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80020C98", "size": 364,
+        "functions": ["GU_InitModule", "GU_SetRndSeed", "GU_GetRnd", "GU_GetSRnd", "GU_GetRndRange", "GU_AlignVal"]},
+      ".data": {"va": "0x800B635C", "size": 24, "scaffold": "data.data"}
+    },
+    "common_symbols": {
+      "RndTabs": {"va": "0x801351E8", "size": 24, "storage": "bss"}
+    },
+    "data_symbols": ["RndTabs", "DefaultRnd"],
+    "externals": []
+  },
+  "gdebug": {
+    "source": "recon/glibdev/gdebug.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80020E54", "size": 156,
+        "functions": ["DBG_OpenModule", "DBG_PollHost", "DBG_Halt", "DBG_SendMessage", "DBG_SetMessageHandler",
+          "DBG_Error", "DBG_SetErrorFunc", "SendPsyqString", "DBG_SetPollRoutine"]}
+    },
+    "common_symbols": {
+      "PollFunc": {"va": "0x8011CA88", "size": 4, "storage": "bss"},
+      "MsgFunc": {"va": "0x8011CA6C", "size": 4, "storage": "bss"},
+      "ErrorFunc": {"va": "0x8011CAB8", "size": 4, "storage": "bss"}
+    },
+    "data_symbols": ["PollFunc", "MsgFunc", "ErrorFunc"],
+    "externals": []
+  },
+  "gtimsys": {
+    "source": "recon/glibdev/gtimsys.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x80020EF0", "size": 268,
+        "functions": ["GTIMSYS_GetTimer", "GTIMSYS_ResetTimer", "GTIMSYS_InitTimer"]},
+      ".rdata": {"va": "0x8010E770", "size": 8, "scaffold": "rodata.rodata"}
+    },
+    "data_symbols": [],
+    "externals": ["ResetRCnt", "DBG_SendMessage", "StartRCnt", "GetRCnt", "ExitCriticalSection", "SetRCnt",
+      "VSync", "EnterCriticalSection"]
+  },
+  "tasker": {
+    "source": "recon/glibdev/tasker.c",
+    "image": "diabpsx",
+    "assembler": "2.34",
+    "sections": {
+      ".text.lib": {"source_section": ".text", "segment": "lib", "va": "0x8001FEFC", "size": 3312,
+        "functions": ["DoEpi", "DoPro", "TSK_OpenModule", "TSK_AddTask", "TSK_DoTasks", "TSK_Sleep",
+          "ReturnToSchedulerIfCurrentTask", "TSK_Die", "TSK_Kill", "TSK_GetFirstActive", "TSK_IsStackCorrupted",
+          "TSK_JumpAndResetStack", "TSK_RepointProc", "TSK_GetCurrentTask", "TSK_IsCurrentTask", "TSK_Exist",
+          "TSK_SetExecFilter", "TSK_ClearExecFilter", "TSK_KillTasks", "TSK_IterateTasks", "TSK_MakeTaskInactive",
+          "TSK_MakeTaskActive", "TSK_MakeTaskImmortal", "TSK_MakeTaskMortal", "TSK_IsTaskActive", "TSK_IsTaskMortal",
+          "DetachFromList", "AddToList", "LoTskKill", "ExecuteTask", "TSK_SetDoTasksPrologue", "TSK_SetDoTasksEpilogue",
+          "TSK_SetTaskPrologue", "TSK_SetTaskEpilogue", "TSK_SetEpiProFilter", "TSK_ClearEpiProFilter",
+          "TSK_SetExtraStackProtection", "TSK_SetStackFloodCallback", "TSK_SetExtraStackSize", "ExtraMarkStack",
+          "CheckExtraStack"]},
+      ".rdata": {"va": "0x8010E728", "size": 45, "scaffold": "rodata.rodata"},
+      ".bss": {"va": "0x8011C98C", "size": 64},
+      ".bss.sch": {"va": "0x801325A0", "size": 48}
+    },
+    "data_symbols": ["ActiveTasks", "CurrentTask", "T", "MemTypeForTasker", "SchEnv", "ExecId", "ExecMask",
+      "TasksActive", "EpiFunc", "ProFunc", "EpiProId", "EpiProMask", "DoTasksPrologue", "DoTasksEpilogue",
+      "StackFloodCallback", "ExtraStackProtection", "ExtraStackSizeLongs"],
+    "externals": ["GSYS_IsStackCorrupted", "GSYS_MarkStack", "DBG_Error", "GSYS_SetStackAndJump", "setjmp",
+      "GAL_AllocMultiStruct", "GAL_Free", "GAL_Lock", "longjmp"]
+  },
   "tick": {
     "source": "recon/glibdev/tick.c",
     "image": "diabpsx",

@@ -3,7 +3,8 @@
 
     python tools/symlane.py recon/psxsrc/gman.cpp [FN,FN...]      # default: every function the TU defines
 
-Pipeline (PsyQ 4.0 compiler/assembler/linker, native vendor symbol compactor):
+Pipeline (PsyQ 4.0 by default; reviewed per-TU historical GLIB overrides,
+native vendor assembler/linker and symbol compactor):
     cc1plus <lane flags> -g  ->  .s (CRLF, cfront-name rewrites)  ->  ASPSX 2.56 -q -g  ->  .obj
     PSYLINK 2.52 /c /m (TU object + auto stub for its externals)  ->  .sym  ->  dumpsym  ->  text
 Overlay TUs use MAP-derived OVER groups, PSYLINK /v, then original SYMMUNGE /i.
@@ -15,7 +16,7 @@ then every function's debug records are compared with rom/DIABPSX-SYM.txt:
     blocks   nesting + address relative to the function start
 Line numbers (SLD, block `line =`, function line) are NOT compared (rule: fix later).
 Prints `SYM ok` / `SYM DIFF` per function with the first differing record."""
-import hashlib, json, os, re, subprocess, sys
+import hashlib, json, os, re, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -31,6 +32,8 @@ SYMMUNGE_SHA256 = "bd51481d903a5d8b55a2f30e7fede023772a5b6e656f50aa242a4663a4e60
 RETAIL = ROOT / "rom" / "DIABPSX-SYM.txt"
 OUT = ROOT / "build" / "sn"
 ENV = dict(os.environ, MSYS2_ARG_CONV_EXCL="*")
+GLIB_CC1 = Path(os.environ.get("DIAB_GLIB_CC1", "C:/Temp/windows-gcc-psx/gcc-2.6.3-psx/cc1.exe"))
+DOSBOX = Path(os.environ.get("DIAB_DOSBOX", "C:/Temp/diablo-psx-tool-probes/dosbox/dosbox-staging-v0.83.0/dosbox.exe"))
 
 def embedded_text_tables():
     out = {}
@@ -50,7 +53,45 @@ EMBEDDED_TEXT_TABLES = embedded_text_tables()
 def crlf(p: Path):
     b = p.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", b"\r\n"); p.write_bytes(b)
 
-def compile_g(src: Path, assembler=None) -> Path:
+def compiler_for(src: Path, is_cpp=False) -> Path:
+    lane = B.per_tu_flags(src).get("compiler")
+    if lane is None:
+        return B.CC1PL if is_cpp else B.CC1
+    if lane != "gcc-2.6.3" or is_cpp:
+        raise ValueError("unreviewed per-TU compiler lane")
+    return GLIB_CC1
+
+
+def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False):
+    """Run a reviewed native ASPSX, including DOS-only historical releases."""
+    assembler, source, obj = Path(assembler), Path(source), Path(obj)
+    if not dos:
+        return subprocess.run([str(assembler), *flags, "-o", str(obj), str(source)],
+                              capture_output=True, text=True, cwd=ROOT, env=ENV)
+    if any(not re.fullmatch(r"-[A-Za-z0-9]+", flag) for flag in flags):
+        raise ValueError("unsafe DOS ASPSX flag")
+    obj.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="aspsx-", dir=OUT) as directory:
+        work = Path(directory)
+        shutil.copyfile(assembler, work / "ASPSX.EXE")
+        shutil.copyfile(source, work / "IN.S")
+        command = "aspsx " + " ".join(flags) + " IN.S -o OUT.OBJ > AS.LOG"
+        run = subprocess.run([str(DOSBOX), "--noprimaryconf", "--nolocalconf", "--noautoexec",
+                              "--set", "output=texture", "--set", "texture_renderer=software",
+                              "--set", "mididevice=none", "--set", "cpu_cycles=max",
+                              "-c", "mount c " + str(work), "-c", "c:", "-c", command, "-c", "exit"],
+                             capture_output=True, text=True, cwd=work,
+                             env=dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy"),
+                             timeout=90, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        log = (work / "AS.LOG").read_text(encoding="latin-1") if (work / "AS.LOG").is_file() else ""
+        if (run.returncode or not (work / "OUT.OBJ").is_file()
+                or re.search(r"(?:^|\W)Errors?(?:\W|$)", log, re.I)):
+            return subprocess.CompletedProcess(run.args, run.returncode or 1, run.stdout, run.stderr + log)
+        shutil.copyfile(work / "OUT.OBJ", obj)
+        return subprocess.CompletedProcess(run.args, 0, run.stdout, run.stderr + log)
+
+
+def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=None) -> Path:
     """cc1/cc1plus with the lane flags + -g, SN-ready .s"""
     rel = src.resolve().relative_to(ROOT)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -64,14 +105,32 @@ def compile_g(src: Path, assembler=None) -> Path:
     base = B.CC1PL_FLAGS if is_cpp else B.CC1_FLAGS
     cc1_flags = [f"-G{g}" if f == f"-G{B.G_VALUE}" else f for f in base] + flags.get("extra", []) + ["-g"]
     s_file = stem.with_suffix(".g.s")
-    r = subprocess.run([str(B.CC1PL if is_cpp else B.CC1), *cc1_flags, str(i_file), "-o", str(s_file)],
+    compiler = compiler_for(src, is_cpp)
+    r = subprocess.run([str(compiler), *cc1_flags, str(i_file), "-o", str(s_file)],
                        capture_output=True, text=True, cwd=ROOT, env=B._cc1_env())
     if r.returncode: sys.exit(f"[cc1] {rel}\n{r.stdout}{r.stderr}")
     txt = s_file.read_text().replace("_._", "___").replace("_GLOBAL_.I.", "_GLOBAL__I_").replace("_GLOBAL_.D.", "_GLOBAL__D_")
+    splits = flags.get("split_lcomm", {})
+    if not isinstance(splits, dict):
+        raise ValueError("invalid local-BSS split registry")
+    for name, row in splits.items():
+        if (not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name) or not isinstance(row, dict)
+                or set(row) != {"size", "section"} or type(row["size"]) is not int or row["size"] <= 0
+                or not re.fullmatch(r"\.bss\.[A-Za-z_][A-Za-z0-9_]*", row["section"])):
+            raise ValueError("invalid local-BSS split declaration")
+        needle = f"\t.lcomm\t{name},{row['size']}"
+        if txt.count(needle) != 1:
+            raise ValueError(f"{name}: local-BSS split declaration differs from compiler output")
+        replacement = (f"\t.section {row['section']},\"aw\",@progbits\n{name}:\n"
+                       f"\t.space\t{row['size']}\n\t.section .bss,\"aw\",@progbits")
+        txt = txt.replace(needle, replacement)
     s_file.write_text(txt); crlf(s_file)
     obj = stem.with_suffix(".g.obj")
-    # -0: no div/rem zero-divide guard expansion (retail form; guard expansion is ASPSX's default)
-    r = subprocess.run([str(ASPSX if assembler is None else assembler), "-q", "-g", "-0", f"-G{g}", "-o", str(obj), str(s_file)], capture_output=True, text=True, cwd=ROOT, env=ENV)
+    # PsyQ 4.0 game objects use -0; the reviewed PsyQ 3.5 GLIB lane keeps
+    # ASPSX 2.34's default divide expansion and old li-as-ori behavior.
+    extra_as = ["-0"] if assembler_flags is None else list(assembler_flags)
+    r = assemble_native(ASPSX if assembler is None else assembler,
+                        ["-q", "-g", *extra_as, f"-G{g}"], s_file, obj, assembler_dos)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     return obj
 
