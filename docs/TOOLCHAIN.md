@@ -328,8 +328,8 @@ semantics are expressed in C with gcc 2.6.3 global register variables bound to
 `$gp` and `$zero`, retaining authentic relocations and the exact four-byte data
 word. Diablo's polling-only `timedwait` variant is separately reconstructed in
 natural C. Coverage is now 1,740 functions/117 TUs (1,721/116 native plus19/1
-conventional), the suite is231/231, and327 library entries remain:33 boot
-utilities plus294 EAC runtime.
+conventional), the suite was231/231, and327 library entries remained at that
+checkpoint:33 boot utilities plus294 EAC runtime.
 The machine-readable result is `build/eac_twin_screen.json`.
 
 ## EA Canada EACLIB and Climax hand-assembly lanes (2026-10-04)

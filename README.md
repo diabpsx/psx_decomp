@@ -182,7 +182,7 @@ When era assembly omits ELF symbol sizes, the tool requires the same source's
 real SDB array-size record; section padding is not treated as array data.
 Relocated pointer tables are rejected and need a relocation-aware gate.
 
-## Final-image integration is still pending
+## Final-image integration
 
 MISSILES follow-up (2026-10-03): restored retail function order, the original
 GMAN/CPLAYER header inlines and seven real CrawlNum local initializers. The
@@ -495,13 +495,11 @@ exactly cover each member's XREFs and resolve to unique retail function addresse
 PSYLINK performs the relocations, and the complete result must match retail with
 no masking. The receipt records those bindings. `PCread` and `PCwrite` call the
 already imported SN read/write members; `SpuInit` still calls scaffold `_SpuInit`.
-The remaining 327 library-region entries all use assembly scaffolds. This does not increase the
-game-function board, now **2727/2727 PASS**.
-The 837 excluded entries are not all Sony SDK functions: 146 are the now-integrated
-Climax GLIB routines. Final integration
-must replace the remaining scaffolds with verified reconstructed TUs and the appropriate
-retail library inputs, then verify all linked images and relocations. None of
-these integration requirements is waived by the per-function PASS count.
+The library region is now completely linked: 349 entries come from verified original Sony
+archives, 146 from reconstructed Climax GLIB TUs, and 342 from reconstructed EA Canada
+EACLIB / Climax hand-assembly members. The partition covers all 837 retail scaffolds exactly,
+with no gaps, extras or overlaps. This separate library seal does not change the game-function
+board, which remains **2727/2727 PASS**.
 
 Whole source-data placements must match the retail fragment kind and extent,
 belong to reconstructed text in that image, and cannot place a source section
@@ -768,8 +766,8 @@ TU into their own exact source member. SAVEGP is expressed without inline assemb
 gcc 2.6.3 global register variables bound to `$gp` and `$zero` emit the exact
 three-function hand-assembly sequence plus its saved-GP word. Diablo's polling-
 only `timedwait` variant is also exact as a separate natural C member. Coverage
-is now 1,740 functions/117 TUs (1,721/116 native plus 19/1 conventional); 327
-library entries remain: 33 boot utilities and 294 EAC. The refreshed
+was then 1,740 functions/117 TUs (1,721/116 native plus 19/1 conventional); 327
+library entries remained at that checkpoint: 33 boot utilities and 294 EAC. The refreshed
 `build/eac_twin_screen.json` records 33 remaining same-name EAC candidates and
 no exact unintegrated body.
 
