@@ -54,10 +54,15 @@ int handlesector(int h) LIBTEXT;
 int openblockhandlea(char *name, int *handle, int *offset, int *size, int *blocksize, int abort) LIBTEXT;
 int openblockhandle(char *name, int *handle, int *offset, int *size, int *blocksize) LIBTEXT;
 int openblockhandlez(char *name, int *handle, int *offset, int *size, int *blocksize) LIBTEXT;
-int asyncopenblockhandlea(char *name, int *handle, int *offset, int *size, int *blocksize, int abort) LIBTEXT;
-int asyncopenblockhandlebysector(char *name, int sector, int size, int *handle, int *blocksize) LIBTEXT;
-int asyncopenblockhandle(char *name, int *handle, int *offset, int *size, int *blocksize) LIBTEXT;
-int asyncopenblockhandlez(char *name, int *handle, int *offset, int *size, int *blocksize) LIBTEXT;
+/* asyncopenblockhandle* out-parameters are pointer-to-volatile: the only callers (cdstream.c
+ * localstreamreader) pass &cdms->handle/&cdms->fileoffset/&cdms->filesize of the CD-callback-
+ * shared CDSTREAM, and cdstream.c's prototype is asyncopenblockhandle(char *, volatile int *,
+ * volatile long *, volatile long *, int *).  The qualifier is type consistency with that shared
+ * object (orchestrator ruling, listed for user review). */
+int asyncopenblockhandlea(char *name, volatile int *handle, volatile long *offset, volatile long *size, int *blocksize, int abort) LIBTEXT;
+int asyncopenblockhandlebysector(char *name, int sector, int size, volatile int *handle, int *blocksize) LIBTEXT;
+int asyncopenblockhandle(char *name, volatile int *handle, volatile long *offset, volatile long *size, int *blocksize) LIBTEXT;
+int asyncopenblockhandlez(char *name, volatile int *handle, volatile long *offset, volatile long *size, int *blocksize) LIBTEXT;
 char *blockhandlefile(int h) LIBTEXT;
 void closeblockhandle(int h) LIBTEXT;
 int readblockhandle(int h, char *buf, int len) LIBTEXT;
@@ -142,7 +147,7 @@ int openblockhandlez(char *name, int *handle, int *offset, int *size, int *block
 
 static int asyncactivehandle = -1;
 
-int asyncopenblockhandlea(char *name, int *handle, int *offset, int *size, int *blocksize, int abort)
+int asyncopenblockhandlea(char *name, volatile int *handle, volatile long *offset, volatile long *size, int *blocksize, int abort)
 {
     int i;
     unsigned char *s;
@@ -166,7 +171,7 @@ int asyncopenblockhandlea(char *name, int *handle, int *offset, int *size, int *
     getdirectory((char *)filename);
     strcat((char *)filename, name);
     if (strncmp((char *)filename, "cdrom:", 6) == 0) {
-        cdromdirectoryentry((char *)filename + 6, (int *)&libblockhandle[i].sector, size);
+        cdromdirectoryentry((char *)filename + 6, (int *)&libblockhandle[i].sector, (int *)size);
         if (*size == 0) {
             if (abort) {
                 abortfile = "psx/blockio.c";
@@ -188,7 +193,7 @@ int asyncopenblockhandlea(char *name, int *handle, int *offset, int *size, int *
         strncpy((char *)libblockhandle[i].name, (char *)s, 12);
         asyncseekblockhandlea(i, libblockhandle[i].start, abort);
     } else {
-        openhandlea(name, (int *)&libblockhandle[i].handle, offset, size, abort);
+        openhandlea(name, (int *)&libblockhandle[i].handle, (int *)offset, (int *)size, abort);
         libblockhandle[i].start = *offset;
         libblockhandle[i].type = 2;
         *blocksize = 1;
@@ -197,7 +202,7 @@ int asyncopenblockhandlea(char *name, int *handle, int *offset, int *size, int *
     return *size;
 }
 
-int asyncopenblockhandlebysector(char *name, int sector, int size, int *handle, int *blocksize)
+int asyncopenblockhandlebysector(char *name, int sector, int size, volatile int *handle, int *blocksize)
 {
     int i;
     unsigned char *s;
@@ -226,12 +231,12 @@ int asyncopenblockhandlebysector(char *name, int sector, int size, int *handle, 
     return size;
 }
 
-int asyncopenblockhandle(char *name, int *handle, int *offset, int *size, int *blocksize)
+int asyncopenblockhandle(char *name, volatile int *handle, volatile long *offset, volatile long *size, int *blocksize)
 {
     return asyncopenblockhandlea(name, handle, offset, size, blocksize, 1);
 }
 
-int asyncopenblockhandlez(char *name, int *handle, int *offset, int *size, int *blocksize)
+int asyncopenblockhandlez(char *name, volatile int *handle, volatile long *offset, volatile long *size, int *blocksize)
 {
     return asyncopenblockhandlea(name, handle, offset, size, blocksize, 0);
 }
