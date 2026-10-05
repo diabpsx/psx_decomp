@@ -44,6 +44,92 @@ CC1PL_FLAGS = ["-quiet", "-O2", f"-G{G_VALUE}", "-fno-inline", "-fsigned-char"] 
 
 # per-TU flag overrides: {repo-relative posix path: {"g_value": "0", "lane": "c"...}}
 PER_TU_FLAGS = {
+    # VERSION.CPP was compiled on the timestamp embedded in the retail object.
+    # Preserve the original source's __DATE__/__TIME__ use while reproducing
+    # that preprocessing environment.
+    "recon/source/startup_1.cpp": {"cpp_extra": [
+        '-D__DATE__="May 29 1998"', '-D__TIME__="14:30:45"']},
+    # Retail CREDITS_text is one overlay group ordered as two header literals,
+    # initialized tables, the later PRIMPOOL.H literal, then code.  The vendor
+    # object therefore gives the post-.data literal its own section identity.
+    "recon/psxsrc/credits.cpp": {"split_section_after": {
+        "after": ".data", "section": ".rdata", "as": ".rdata.credits_tail"}},
+    # Retail DIALOG.CPP packs its four file-static byte arrays into one 16-byte
+    # small-BSS bank instead of ASPSX's default four-byte-per-.lcomm spacing.
+    "recon/psxsrc/dialog.cpp": {"pack_lcomm": {
+        "section": ".sbss", "size": 16,
+        "symbols": [["DialogGBack", 0, 1], ["GShadeX", 1, 1],
+                    ["GShadeY", 2, 1], ["RandBTab", 8, 8]]}},
+    # MEMCARD_text interleaves initialized strings, two zero-filled banks and
+    # code in one overlay group; its resident small-data order also starts with
+    # the invalid-character flag before the two filename literals.
+    "recon/psxsrc/memcard.cpp": {
+        "route_symbol_sections": {
+            "card_dir": ".data.memcard_zeros",
+            "card_header": ".data.memcard_zeros"},
+        "move_symbol_before": {
+            "symbol": "to_ascii_invalid_char", "size": 4, "before": "$LC0"},
+        "section_occurrence_renames": [
+            {"section": ".rdata", "occurrence": 2, "as": ".text"}]},
+    "recon/psxsrc/biglump.cpp": {"move_symbols_before": [
+        {"symbol": "BL_NoLumpFiles", "size": 4, "before": "FileLoaded"},
+        {"symbol": "BL_NoStreamFiles", "size": 4, "before": "FileLoaded"},
+        {"symbol": "LFileTab", "size": 4, "before": "FileLoaded"},
+        {"symbol": "SFileTab", "size": 4, "before": "FileLoaded"},
+        {"symbol": "NoQuedAsyncs", "size": 1, "before": "CurrAsync"}]},
+    "recon/psxsrc/stream.cpp": {"move_initialized_after": [
+        {"symbol": "Time", "directive": "word", "value": "0", "after": "$LC4"},
+        {"symbol": "CDWAIT", "directive": "word", "value": "0", "after": "$LC4"}]},
+    "recon/psxsrc/cplayer.cpp": {
+        "move_symbol_before": {
+            "symbol": "_7CPlayer.PActiveArray", "size": 8, "before": "$LC3"},
+        "move_literals_after": [
+            {"label": "$LC0", "literal": "psxsrc/primpool.h\\000", "after": "$LC2"}]},
+    "recon/psxsrc/cardcore.cpp": {"move_symbols_before": [
+        {"symbol": "MemCardActive", "size": 4, "before": "never_hooked_events"},
+        {"symbol": "MemcardOverlay", "size": 4, "before": "never_hooked_events"},
+        {"symbol": "NewCardFlag", "size": 4, "before": "never_hooked_events"},
+        {"symbol": "countdownloadcharblock", "size": 4, "before": "never_hooked_events"},
+        {"symbol": "mem_card_event_handler", "size": 4, "before": "card_side_empty"},
+        {"symbol": "saveflag", "size": 4, "before": "card_side_empty"},
+        {"symbol": "loadflag", "size": 4, "before": "card_side_empty"},
+        {"symbol": "formatflag", "size": 4, "before": "card_side_empty"},
+        {"symbol": "DoLoadedGame", "size": 4, "before": "card_side_empty"}]},
+    "recon/psxsrc/ctrl.cpp": {"pack_lcomm": {
+        "section": ".sbss", "size": 16,
+        "symbols": [["ctrl_select_line", 0, 1], ["ctrl_select_side", 1, 1],
+                    ["ckeyheld", 2, 1], ["CtrlRect", 8, 8]]}},
+    "recon/psxsrc/options.cpp": {"pack_lcomm": {
+        "section": ".sbss", "size": 40,
+        "symbols": [["Slider", 0, 4], ["sw", 4, 4], ["sx", 8, 4],
+                    ["sy", 12, 4], ["Adjust", 16, 1], ["qspin", 17, 1],
+                    ["lqspin", 18, 1], ["OrigLang", 20, 4],
+                        ["OldLang", 24, 4], ["NewLang", 28, 4],
+                        ["ORect", 32, 8]]}},
+    "recon/psxsrc/block.cpp": {"pack_lcomm": {
+        "section": ".bss.block_xy", "size": 28,
+        "symbols": [["dx", 0, 12], ["dy", 16, 12]]}},
+    "recon/source/diablo.cpp": {
+        "route_symbol_sections": {"D_8012EC28": ".bss.diablo_jmp"},
+        "pack_lcomm": {
+            "section": ".bss.diablo_seeds", "size": 308,
+            "symbols": [["glEndSeed", 0, 68], ["glMid1Seed", 80, 68],
+                        ["glMid2Seed", 160, 68], ["glMid3Seed", 240, 68]]}},
+    "recon/source/drlg_l2.cpp": {
+        "extra": ["-fwritable-strings"],
+        "section_occurrence_renames": [
+            {"section": ".rdata", "occurrence": 1, "as": ".text"}],
+        "pad_before_labels": {"$L429": 4}},
+    # Retail FMV keeps LoPlayFMVOverLay's six-entry language switch table in
+    # the overlay text stream; moving the final readonly occurrence before
+    # ASPSX preserves both its relocated words and the branch displacements.
+    "recon/psxsrc/fmv.cpp": {"section_occurrence_renames": [
+        {"section": ".rdata", "occurrence": 8, "as": ".text"}]},
+    "recon/psxsrc/dlg_2.cpp": {"section_occurrence_renames": [
+        {"section": ".rdata", "occurrence": 4, "as": ".rdata.dlg_formats"},
+        {"section": ".rdata", "occurrence": 4, "as": ".rdata.dlg_formats"}]},
+    "recon/source/misprint.cpp": {"section_occurrence_renames": [
+        {"section": ".rdata", "occurrence": 2, "as": ".rdata.misprint_prim"}]},
     "recon/eaclib/blkfill.s": {"g_value": "0"},
     "recon/eaclib/crc.s": {"g_value": "0"},
     "recon/eaclib/getm.s": {"g_value": "0"},
@@ -122,7 +208,7 @@ def compile_c(src: Path, skip_asm: bool = False) -> Path:
     g = str(flags.get("g_value", G_VALUE))
     obj = OUT / (str(rel) + ".o"); obj.parent.mkdir(parents=True, exist_ok=True)
     i_file, s_file = obj.with_suffix(".i"), obj.with_suffix(".s")
-    cpp = [CPP, *CPP_FLAGS] + (["-DSKIP_ASM"] if skip_asm else []) + [src, "-o", i_file]
+    cpp = [CPP, *CPP_FLAGS, *flags.get("cpp_extra", [])] + (["-DSKIP_ASM"] if skip_asm else []) + [src, "-o", i_file]
     r = run(cpp)
     if r.returncode:
         sys.exit(f"[cpp] {rel}\n{r.stderr}")
@@ -141,7 +227,7 @@ def compile_cpp(src: Path, skip_asm: bool = False) -> Path:
     g = str(flags.get("g_value", G_VALUE))
     obj = OUT / (str(rel) + ".o"); obj.parent.mkdir(parents=True, exist_ok=True)
     i_file, s_file = obj.with_suffix(".i"), obj.with_suffix(".s")
-    cpp = [CPP, "-x", "c", "-D__cplusplus=1", *CPP_FLAGS] + (["-DSKIP_ASM"] if skip_asm else []) + [src, "-o", i_file]
+    cpp = [CPP, "-x", "c", "-D__cplusplus=1", *CPP_FLAGS, *flags.get("cpp_extra", [])] + (["-DSKIP_ASM"] if skip_asm else []) + [src, "-o", i_file]
     r = run(cpp)
     if r.returncode:
         sys.exit(f"[cpp++] {rel}\n{r.stderr}")

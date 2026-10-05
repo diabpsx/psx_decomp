@@ -8,7 +8,7 @@ SECTIONS
         . = 0x0;   /* 0x80139BF8 */
         build/asm/data/pregame_hdr.data.s.o(.data);
         . = 0x4;   /* 0x80139BFC */
-        build/skel/PSXSRC/PREGAME.CPP.o(.text);
+        build/native_source/pregame.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2C;   /* 0x80139C24 */
         build/native_source/drlg_l1_pool.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x60;   /* 0x80139C58 */
@@ -16,193 +16,193 @@ SECTIONS
         . = 0x20B8;   /* 0x8013BCB0 */
         build/native_source/drlg_l1.text.s.o(.text);   /* verified native-assembled source */
         . = 0x72FC;   /* 0x80140EF4 */
-        build/asm/data/drlg_l2_rodata_80140ef4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80140ef4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7344;   /* 0x80140F3C */
-        build/asm/data/drlg_l2_rodata_80140f3c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80140f3c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x73E8;   /* 0x80140FE0 */
-        build/asm/data/drlg_l2_rodata_80140fe0.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80140fe0.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x748C;   /* 0x80141084 */
-        build/asm/data/drlg_l2_rodata_80141084.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141084.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x74A0;   /* 0x80141098 */
-        build/asm/data/drlg_l2_rodata_80141098.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141098.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x74B4;   /* 0x801410AC */
-        build/asm/data/drlg_l2_rodata_801410ac.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801410ac.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x74C8;   /* 0x801410C0 */
-        build/asm/data/drlg_l2_rodata_801410c0.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801410c0.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x74DC;   /* 0x801410D4 */
-        build/asm/data/drlg_l2_rodata_801410d4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801410d4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x74F0;   /* 0x801410E8 */
-        build/asm/data/drlg_l2_rodata_801410e8.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801410e8.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7504;   /* 0x801410FC */
-        build/asm/data/drlg_l2_rodata_801410fc.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801410fc.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7518;   /* 0x80141110 */
-        build/asm/data/drlg_l2_rodata_80141110.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141110.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x752C;   /* 0x80141124 */
-        build/asm/data/drlg_l2_rodata_80141124.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141124.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7540;   /* 0x80141138 */
-        build/asm/data/drlg_l2_rodata_80141138.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141138.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7554;   /* 0x8014114C */
-        build/asm/data/drlg_l2_rodata_8014114c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014114c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7568;   /* 0x80141160 */
-        build/asm/data/drlg_l2_rodata_80141160.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141160.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x757C;   /* 0x80141174 */
-        build/asm/data/drlg_l2_rodata_80141174.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141174.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7590;   /* 0x80141188 */
-        build/asm/data/drlg_l2_rodata_80141188.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141188.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x75A4;   /* 0x8014119C */
-        build/asm/data/drlg_l2_rodata_8014119c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014119c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x75B8;   /* 0x801411B0 */
-        build/asm/data/drlg_l2_rodata_801411b0.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801411b0.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x75CC;   /* 0x801411C4 */
-        build/asm/data/drlg_l2_rodata_801411c4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801411c4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x75DC;   /* 0x801411D4 */
-        build/asm/data/drlg_l2_rodata_801411d4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801411d4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x75EC;   /* 0x801411E4 */
-        build/asm/data/drlg_l2_rodata_801411e4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801411e4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x75FC;   /* 0x801411F4 */
-        build/asm/data/drlg_l2_rodata_801411f4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801411f4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x760C;   /* 0x80141204 */
-        build/asm/data/drlg_l2_rodata_80141204.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141204.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x761C;   /* 0x80141214 */
-        build/asm/data/drlg_l2_rodata_80141214.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141214.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x762C;   /* 0x80141224 */
-        build/asm/data/drlg_l2_rodata_80141224.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141224.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x763C;   /* 0x80141234 */
-        build/asm/data/drlg_l2_rodata_80141234.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141234.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x764C;   /* 0x80141244 */
-        build/asm/data/drlg_l2_rodata_80141244.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141244.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7660;   /* 0x80141258 */
-        build/asm/data/drlg_l2_rodata_80141258.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141258.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7674;   /* 0x8014126C */
-        build/asm/data/drlg_l2_rodata_8014126c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014126c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7688;   /* 0x80141280 */
-        build/asm/data/drlg_l2_rodata_80141280.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141280.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x769C;   /* 0x80141294 */
-        build/asm/data/drlg_l2_rodata_80141294.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141294.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x76B0;   /* 0x801412A8 */
-        build/asm/data/drlg_l2_rodata_801412a8.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801412a8.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x76C4;   /* 0x801412BC */
-        build/asm/data/drlg_l2_rodata_801412bc.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801412bc.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x76D8;   /* 0x801412D0 */
-        build/asm/data/drlg_l2_rodata_801412d0.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801412d0.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x76EC;   /* 0x801412E4 */
-        build/asm/data/drlg_l2_rodata_801412e4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801412e4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7700;   /* 0x801412F8 */
-        build/asm/data/drlg_l2_rodata_801412f8.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801412f8.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7714;   /* 0x8014130C */
-        build/asm/data/drlg_l2_rodata_8014130c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014130c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7728;   /* 0x80141320 */
-        build/asm/data/drlg_l2_rodata_80141320.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141320.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x773C;   /* 0x80141334 */
-        build/asm/data/drlg_l2_rodata_80141334.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141334.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7750;   /* 0x80141348 */
-        build/asm/data/drlg_l2_rodata_80141348.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141348.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7764;   /* 0x8014135C */
-        build/asm/data/drlg_l2_rodata_8014135c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014135c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7778;   /* 0x80141370 */
-        build/asm/data/drlg_l2_rodata_80141370.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141370.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x778C;   /* 0x80141384 */
-        build/asm/data/drlg_l2_rodata_80141384.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141384.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x779C;   /* 0x80141394 */
-        build/asm/data/drlg_l2_rodata_80141394.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141394.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x77AC;   /* 0x801413A4 */
-        build/asm/data/drlg_l2_rodata_801413a4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801413a4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x77BC;   /* 0x801413B4 */
-        build/asm/data/drlg_l2_rodata_801413b4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801413b4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x77CC;   /* 0x801413C4 */
-        build/asm/data/drlg_l2_rodata_801413c4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801413c4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x77DC;   /* 0x801413D4 */
-        build/asm/data/drlg_l2_rodata_801413d4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801413d4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x77EC;   /* 0x801413E4 */
-        build/asm/data/drlg_l2_rodata_801413e4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801413e4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x77FC;   /* 0x801413F4 */
-        build/asm/data/drlg_l2_rodata_801413f4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801413f4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x780C;   /* 0x80141404 */
-        build/asm/data/drlg_l2_rodata_80141404.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141404.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x781C;   /* 0x80141414 */
-        build/asm/data/drlg_l2_rodata_80141414.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141414.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x782C;   /* 0x80141424 */
-        build/asm/data/drlg_l2_rodata_80141424.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141424.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x783C;   /* 0x80141434 */
-        build/asm/data/drlg_l2_rodata_80141434.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141434.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x784C;   /* 0x80141444 */
-        build/asm/data/drlg_l2_rodata_80141444.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141444.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x785C;   /* 0x80141454 */
-        build/asm/data/drlg_l2_rodata_80141454.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141454.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x786C;   /* 0x80141464 */
-        build/asm/data/drlg_l2_rodata_80141464.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141464.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x787C;   /* 0x80141474 */
-        build/asm/data/drlg_l2_rodata_80141474.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141474.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x788C;   /* 0x80141484 */
-        build/asm/data/drlg_l2_rodata_80141484.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141484.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x789C;   /* 0x80141494 */
-        build/asm/data/drlg_l2_rodata_80141494.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141494.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x78AC;   /* 0x801414A4 */
-        build/asm/data/drlg_l2_rodata_801414a4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801414a4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x78BC;   /* 0x801414B4 */
-        build/asm/data/drlg_l2_rodata_801414b4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801414b4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x78CC;   /* 0x801414C4 */
-        build/asm/data/drlg_l2_rodata_801414c4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801414c4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x78DC;   /* 0x801414D4 */
-        build/asm/data/drlg_l2_rodata_801414d4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801414d4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x78EC;   /* 0x801414E4 */
-        build/asm/data/drlg_l2_rodata_801414e4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801414e4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x78FC;   /* 0x801414F4 */
-        build/asm/data/drlg_l2_rodata_801414f4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801414f4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x790C;   /* 0x80141504 */
-        build/asm/data/drlg_l2_rodata_80141504.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141504.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x791C;   /* 0x80141514 */
-        build/asm/data/drlg_l2_rodata_80141514.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141514.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x792C;   /* 0x80141524 */
-        build/asm/data/drlg_l2_rodata_80141524.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141524.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x793C;   /* 0x80141534 */
-        build/asm/data/drlg_l2_rodata_80141534.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141534.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x794C;   /* 0x80141544 */
-        build/asm/data/drlg_l2_rodata_80141544.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141544.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x795C;   /* 0x80141554 */
-        build/asm/data/drlg_l2_rodata_80141554.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141554.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x796C;   /* 0x80141564 */
-        build/asm/data/drlg_l2_rodata_80141564.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141564.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x797C;   /* 0x80141574 */
-        build/asm/data/drlg_l2_rodata_80141574.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141574.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x798C;   /* 0x80141584 */
-        build/asm/data/drlg_l2_rodata_80141584.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141584.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x799C;   /* 0x80141594 */
-        build/asm/data/drlg_l2_rodata_80141594.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141594.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x79AC;   /* 0x801415A4 */
-        build/asm/data/drlg_l2_rodata_801415a4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801415a4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x79BC;   /* 0x801415B4 */
-        build/asm/data/drlg_l2_rodata_801415b4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801415b4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x79CC;   /* 0x801415C4 */
-        build/asm/data/drlg_l2_rodata_801415c4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801415c4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x79DC;   /* 0x801415D4 */
-        build/asm/data/drlg_l2_rodata_801415d4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801415d4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x79EC;   /* 0x801415E4 */
-        build/asm/data/drlg_l2_rodata_801415e4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801415e4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x79FC;   /* 0x801415F4 */
-        build/asm/data/drlg_l2_rodata_801415f4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801415f4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7A0C;   /* 0x80141604 */
-        build/asm/data/drlg_l2_rodata_80141604.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141604.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7A30;   /* 0x80141628 */
-        build/asm/data/drlg_l2_rodata_80141628.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141628.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7A54;   /* 0x8014164C */
-        build/asm/data/drlg_l2_rodata_8014164c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014164c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7A78;   /* 0x80141670 */
-        build/asm/data/drlg_l2_rodata_80141670.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141670.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7A98;   /* 0x80141690 */
-        build/asm/data/drlg_l2_rodata_80141690.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_80141690.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7AA4;   /* 0x8014169C */
-        build/asm/data/drlg_l2_rodata_8014169c.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_8014169c.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7AB0;   /* 0x801416A8 */
-        build/asm/data/drlg_l2_rodata_801416a8.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801416a8.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7ABC;   /* 0x801416B4 */
-        build/asm/data/drlg_l2_rodata_801416b4.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801416b4.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7AC8;   /* 0x801416C0 */
-        build/asm/data/drlg_l2_rodata_801416c0.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801416c0.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x7AD4;   /* 0x801416CC */
-        build/asm/data/drlg_l2_rodata_801416cc.rodata.s.o(.rodata);
+        build/native_source/drlg_l2.raw_drlg_l2_rodata_801416cc.rodata.s.o(.rodata);   /* verified native raw span */
         . = 0x9810;   /* 0x80143408 */
-        build/skel/SOURCE/DRLG_L2.CPP.o(.text);
+        build/native_source/drlg_l2.text.s.o(.text);   /* verified native-assembled source */
         . = 0xEAAC;   /* 0x801486A4 */
         build/native_source/drlg_l3_pool.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xEAEC;   /* 0x801486E4 */
@@ -232,7 +232,7 @@ SECTIONS
         . = 0x25878;   /* 0x8015F470 */
         build/native_source/preinv.text.s.o(.text);   /* verified native-assembled source */
         . = 0x258CC;   /* 0x8015F4C4 */
-        build/skel/SOURCE/PREAUTO.CPP.o(.text);
+        build/native_source/preauto.text.s.o(.text);   /* verified native-assembled source */
         . = 0x25AF0;   /* 0x8015F6E8 */
         build/native_source/premon.text.s.o(.text);   /* verified native-assembled source */
         . = 0x283E4;   /* 0x80161FDC */

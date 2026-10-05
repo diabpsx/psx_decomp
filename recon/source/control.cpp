@@ -1,14 +1,40 @@
 /* SOURCE/CONTROL.CPP -- Diablo PSX (Climax 1998) reconstruction.  Twin: refs/diablo-hellfire/src/CONTROL.CPP.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h).
- * All 51 functions of the segment are written; 50 PASS. DrawSpellCel remains open
- * (frame reservation and register allocation; see its audit comment).
- * SetSpell / GetSBookTrans / DrawSpellBook / CheckSBook differ only in maspsx-vs-ASPSX assembly
- * (nop / `b` vs `bgez $0`) and pass on the ASPSX lane (tools/aspsx_gate.py). */
+ * All 51 functions and the complete initialized/zero-fill storage are source-owned;
+ * the native ASPSX/PSYLINK receipt matches retail bytes and every function/data SYM
+ * record. See configs/native_recon_link.json and tools/tests/test_control_native.py. */
 #include "diabpsx_types.h"
 #include "source/gen/structs_control.h"
 #include "source/gen/externs_control.h"
 #include "source/gen/protos_control.h"
 #include "source/diablo.h"
+
+extern "C" unsigned char GAL_Free(long Handle);
+extern "C" void DBG_Error(char *Text, char *File, int Line);
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd))
+            DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
+class CPlayer;
+extern CPlayer *_7CPlayer_PActiveArray[2];
+class CPlayer : public TextDat {
+public:
+    unsigned char player_data[144 - 112];
+
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if (1 < (unsigned int)PNum)
+            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
+        return _7CPlayer_PActiveArray[PNum];
+    }
+};
 
 #define infostr _infostr[sel_data]
 /* Gold CONTROL.CPP names both spell-strip edges. PSX keeps the right edge and
@@ -38,16 +64,72 @@
 /* DrawLevelUpFlag is the first explicitly-initialised public definition -> names the
  * static-init thunk _GLOBAL__I_DrawLevelUpFlag (lane fact 64). */
 unsigned char DrawLevelUpFlag = 0;
+
+/* Retail CONTROL owns this complete initialized bank.  The two alignment gaps after
+ * SpellColors and SpellITbl are emitted naturally by the following int arrays. */
+unsigned char SpellColors[18] = {
+    0xF0, 0xC0, 0x00, 0x00, 0x80, 0xF0,
+    0xF0, 0x40, 0x00, 0xF0, 0x80, 0x00,
+    0xF0, 0xF0, 0xF0, 0x80, 0xF0, 0x80
+};
+
+char SpellITbl[37] = {
+    1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 28, 13, 12, 18, 16, 14, 18, 19, 11,
+    20, 15, 21, 23, 24, 25, 22, 26, 29, 37, 38, 39, 42, 41, 40, 10, 36, 30
+};
+
+int SpellPages[5][5] = {
+    { 0, 1, 30, 31, 2 },
+    { 34, 20, 32, 6, 33 },
+    { 3, 7, 4, 8, 10 },
+    { 11, 29, 12, 15, 14 },
+    { 13, 18, 21, 23, 24 }
+};
+
+struct CSDATA CS_Tab[28] = {
+    { -348, 8, 114, 0, 0, 0, "A", 0 },
+    { -28, 8, 114, 0, 0, 0, "A", 0 },
+    { -228, 8, 114, 0, 0, 0, "A", 0 },
+    { 92, 8, 114, 0, 0, 0, "A", 0 },
+    { 46, 32, 27, 581, 0, 0, "A", 0 },
+    { 46, 53, 84, 310, 0, 0, "A", 0 },
+    { 46, 73, 84, 693, 0, 0, "A", 0 },
+    { 132, 32, 58, 401, 0, 0, "A", 0 },
+    { 46, 98, 38, 41, 0, 0, "A", 0 },
+    { 46, 124, 38, 1173, 0, 0, "A", 0 },
+    { 28, 150, 56, 225, 0, 0, "A", 0 },
+    { 92, 98, 38, 864, 624, 0, "A", 0 },
+    { 92, 124, 38, 864, 338, 0, "A", 0 },
+    { 92, 150, 38, 864, 594, 0, "A", 0 },
+    { -264, 44, 24, 1049, 0, 65, "A", 0 },
+    { -264, 62, 24, 623, 0, 0, "A", 0 },
+    { -264, 80, 24, 255, 0, 0, "A", 0 },
+    { -264, 98, 24, 1207, 0, 0, "A", 0 },
+    { -108, 54, 0, 795, 262, 0, "A", 0 },
+    { -164, 76, 27, 0, 0, 0, "A", 0 },
+    { -226, 44, 27, 0, 0, 706, "A", 0 },
+    { -226, 62, 27, 0, 0, 0, "A", 0 },
+    { -226, 80, 27, 0, 0, 0, "A", 0 },
+    { -226, 98, 27, 0, 0, 0, "A", 0 },
+    { -264, 128, 27, 589, 0, 0, "A", 0 },
+    { -226, 128, 27, 0, 0, 0, "A", 0 },
+    { -264, 146, 27, 634, 0, 0, "A", 0 },
+    { -226, 146, 27, 0, 0, 0, "A", 0 }
+};
+
+char _infostr[2][256] = { 0 };
+char tempstr[256] = { 0 };
+
 BOOL initchr = 0;
 int NoCSEntries = 28;
 
 /* TU-owned STAT globals (tentative definitions -> gp-rel like retail) */
 static int SPLICONNO = 6;
 static int SPLICONY = 110;
-int lus;
-char plusanim;
-int _pnumlines[2];
-int CS_XOFF;
+static int lus = 0;
+static char plusanim = 0;
+static int _pnumlines[2];
+static int CS_XOFF = 0;
 static int SPALOFF = 0x80;
 static int paloffset1 = -64;
 static int paloffset2 = -21;
@@ -57,23 +139,22 @@ static int pinc1 = 4;
 static int pinc2 = 4;
 static int pinc3 = 4;
 static int pinc4 = 4;
-int CsNo;
-unsigned char CrossCount[2];
+static int CsNo = 0;
+static unsigned char CrossCount[2] = { 0 };
 unsigned char chrbtnactive;
 unsigned char chrflag;
 unsigned char sbookflag;
-extern unsigned char chrbtn[][4];   /* unsized here, defined at the end of the TU: users see an incomplete
-                                       * array, so &chrbtn is materialised as its own register (CheckChrBtns) */
-int scx;
-int scy;
-int scx1;
-int scy1;
-int scx2;
-int scy2;
-long talkofs;
-char sgszTalkMsg[80];
-unsigned char sgbPlrTalkTbl[2];
-unsigned char talkbtndown[3];
+static unsigned char chrbtn[2][4];
+static int scx = 0;
+static int scy = 0;
+static int scx1 = 0;
+static int scy1 = 0;
+static int scx2 = 0;
+static int scy2 = 0;
+static long talkofs;
+static char sgszTalkMsg[80];
+static unsigned char sgbPlrTalkTbl[2];
+static unsigned char talkbtndown[3];
 unsigned char dropGoldFlag;
 unsigned char drawhpflag;
 unsigned char drawmanaflag;
@@ -84,16 +165,16 @@ unsigned char talkflag;
 int dropGoldValue;
 int initialDropGoldValue;
 int initialDropGoldIndex;
-int _pSpell[2];
-int _pSplType[2];
-int my_cur_spel[2];
+static int _pSpell[2];
+static int _pSplType[2];
+static int my_cur_spel[2];
 int sbooktab;
 int cur_spel[2];
 TASK *_spselflag[2];
-char _panelstr[2][10][64];
-int _pstrjust[2][10];
-unsigned char *pMultiBtns;
-unsigned char *pTalkBtns;
+static char _panelstr[2][10][64];
+static int _pstrjust[2][10];
+static unsigned char *pMultiBtns;
+static unsigned char *pTalkBtns;
 char SpellCol;
 struct RECT *InfoBoxRect;
 struct RECT CSRect;
@@ -115,22 +196,6 @@ static int SPLICONRIGHT = SPLICONNO * 9 + 128;
 static Dialog CSBack;
 
 extern "C" void func_80161F58(void);
-
-/* ---- CPad / Dialog / TextDat / CBlocks header-inline methods (out-of-line copies compiled
- * into this TU, -fno-inline; bodies identical to their declaring headers) ---- */
-inline Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
 
 unsigned char TrimCol(short col)
 {
@@ -323,142 +388,79 @@ void SetSpellTrans(char t)
     SpellCol = t;
 }
 
-void ClearPanel(void)
+void DrawSpellBookTSK(TASK *T)
 {
-    _pnumlines[sel_data] = 0;
-    _pinfoflag[sel_data] = 0;
-}
+    int CountDown;
+    int i;
 
-void InitPanelStr(void)
-{
-    ClearPanel();
-}
-
-void DrawCtrlPan(void)
-{
-    sel_data = 0;
-    DrawInfoBox(InfoBoxRect);
-}
-
-void DoAutoMap(void)
-{
-    if (currlevel == 0) {
-        InitDiabloMsg(1);
-    } else {
-        if (automapflag == 0)
-            func_80161F58();
-        else
-            automapflag = 0;
+    CountDown = 3;
+    if (!Qfromoptions) {
+        PostGamePad(2, 0, 0, 0);
+        stream_stop();
+        GLUE_SuspendGame();
     }
-}
-
-/* hellfire's local `int pSpell, c, s;` meets the PSX per-player macro
- * `#define pSpell _pSpell[sel_data]` and becomes a variable-length local array
- * `int _pSpell[sel_data]` (SYM: `int (*_pSpell)[1]` in $s1, alloca'd frame + $fp). */
-#define pSpell _pSpell[sel_data]
-void CheckPanelInfo(void)
-{
-    int pSpell, c, s;
-    int v;
-    int pnum = sel_data;
-
-    panelflag = 0;
-    ClearPanel();
-    if (!_spselflag[pnum]) {
-        if (MouseX >= 565 && MouseX < 621 && MouseY >= 416 && MouseY < 472) {
-            strcpy(infostr, GetStr(0x3B3));
-            infoclr = 0;
-            panelflag = 1;
-            pinfoflag = 1;
-            strcpy(tempstr, GetStr(0x4FA));
-            AddPanelString(tempstr, 1);
-            pSpell = plr[myplr]._pRSpell;
-            if (pSpell != -1) {
-                switch (plr[myplr]._pRSplType) {
-                case 0:
-                    sprintf(tempstr, GetStr(0x518), GetStr(spelldata[pSpell].sSkillText));
-                    AddPanelString(tempstr, 1);
-                    break;
-                case 1:
-                    sprintf(tempstr, GetStr(0x519), GetStr(spelldata[pSpell].sNameText));
-                    AddPanelString(tempstr, 1);
-                    v = plr[myplr]._pSplLvl[pSpell] + plr[myplr]._pISplLvlAdd;
-                    if (v < 0)
-                        v = 0;
-                    if (v == 0)
-                        sprintf(tempstr, GetStr(0x3F8));
-                    else
-                        sprintf(tempstr, GetStr(0x3F9), v);
-                    AddPanelString(tempstr, 1);
-                    break;
-                case 2:
-                    sprintf(tempstr, GetStr(0x3AF), GetStr(spelldata[pSpell].sNameText));
-                    AddPanelString(tempstr, 1);
-                    c = 0;
-                    for (s = 0; s < plr[myplr]._pNumInv; s++) {
-                        if (plr[myplr].InvList[s]._itype != -1
-                            && (plr[myplr].InvList[s]._iMiscId == 0x15 || plr[myplr].InvList[s]._iMiscId == 0x16)) {
-                            if (plr[myplr].InvList[s]._iSpell == pSpell)
-                                c++;
-                        }
-                    }
-                    for (s = 0; s < 8; s++) {
-                        if (plr[myplr].SpdList[s]._itype != -1
-                            && (plr[myplr].SpdList[s]._iMiscId == 0x15 || plr[myplr].SpdList[s]._iMiscId == 0x16)) {
-                            if (plr[myplr].SpdList[s]._iSpell == pSpell)
-                                c++;
-                        }
-                    }
-                    if (c == 1)
-                        strcpy(tempstr, GetStr(2));
-                    else
-                        sprintf(tempstr, GetStr(0x500), c);
-                    AddPanelString(tempstr, 1);
-                    break;
-                case 3:
-                    sprintf(tempstr, GetStr(0x405), GetStr(spelldata[pSpell].sNameText));
-                    AddPanelString(tempstr, 1);
-                    if (plr[myplr].InvBody[4]._iCharges == 1)
-                        strcpy(tempstr, GetStr(1));
-                    else
-                        sprintf(tempstr, GetStr(0x4FE), plr[myplr].InvBody[4]._iCharges);
-                    AddPanelString(tempstr, 1);
-                    break;
-                }
-            }
+    stream_pause();
+    if (!Qfromoptions) {
+        for (i = 1; i != -1; i--) {
+            ignore_buttons = 1;
+            TSK_Sleep(1);
         }
     }
-    if (invflag)
-        cursinvitem = CheckInvHLight();
-}
-#undef pSpell
+    while (1) {
+        if (!sbookflag)
+            break;
+        if (options_pad < 0)
+            break;
+        int omp = myplr;
 
-void FreeControlPan(void)
+        myplr = options_pad;
+        DrawSpellBook((unsigned)CountDown < 1);
+        if (CountDown != 0)
+            CountDown--;
+        myplr = omp;
+        TSK_Sleep(1);
+    }
+    PlaySFX(0x33);
+    if (!Qfromoptions) {
+        PostGamePad(5, 0, 0, 0);
+        stream_resume();
+        GLUE_ResumeGame();
+        GLUE_SetShowPanelFlag(1);
+        GLUE_SetShowGameScreenFlag(1);
+        GLUE_SetHomingScrollFlag(1);
+    } else {
+        GLUE_SetShowGameScreenFlag(1);
+        TSK_Sleep(1);
+        Qfromoptions = 4;
+        ToggleOptions();
+    }
+}
+
+void DrawSpeedSpellTSK(TASK *T)
 {
-    MemFreeDbg(pManaBuff);
-    MemFreeDbg(pLifeBuff);
-    MemFreeDbg(pPanelText);
-    MemFreeDbg(pChrPanel);
-    MemFreeDbg(pSpellCels);
-    MemFreeDbg(pPanelButtons);
-    MemFreeDbg(pMultiBtns);
-    MemFreeDbg(pTalkBtns);
-    MemFreeDbg(pChrButtons);
-    MemFreeDbg(pDurIcons);
-    MemFreeDbg(pQLogCel);
-    MemFreeDbg(pSpellBkCel);
-    MemFreeDbg(pSBkBtnCel);
-    MemFreeDbg(pSBkIconCels);
-    MemFreeDbg(pGBoxBuff);
-}
+    DEF_ARGS *args;
+    int pnum;
+    BOOL alive;
 
-char *get_pieces_str(int nGold)
-{
-    if (nGold == 1)
-        return GetStr(0x30A);
-    return GetStr(0x309);
-}
+    alive = 1;
+    args = (DEF_ARGS *)T->Data;
+    pnum = args->a0;
+    TSK_Sleep(1);
+    while (alive && !GLUE_Finished()) {
+        int old_opts = options_pad;
 
+        options_pad = pnum;
+        if ((invflag | chrflag | questlog | sbookflag | SelectorActive()) == 0) {
+            PostGamePad(pnum + 3, 0, 0, 0);
+            DrawSpellList();
+        }
+        options_pad = old_opts;
+        TSK_Sleep(1);
+        if (!plr[pnum].plractive)
+            alive = 0;
+    }
+    _spselflag[pnum] = 0;
+}
 
 void ToggleSpell(int pnum)
 {
@@ -475,41 +477,6 @@ void ToggleSpell(int pnum)
         args = (DEF_ARGS *)_spselflag[pnum]->Data;
         args->a0 = pnum;
     }
-}
-
-static int DrawDurIcon4Item(const ItemStruct *pItem, int x, int c)
-{
-    /* hellfire's DrawDurIcon4Item minus the DrawCel: the switch survives only as its
-     * (dead) jump-table load */
-    if (pItem->_itype == -1)
-        return x;
-    if (pItem->_iDurability > 5)
-        return x;
-    if (c == 0) {
-        if (pItem->_iClass == 1)
-            switch (pItem->_itype) {
-            case 1:
-                c = 2;
-                break;
-            case 2:
-                c = 6;
-                break;
-            case 3:
-                c = 7;
-                break;
-            case 4:
-                c = 5;
-                break;
-            case 10:
-                c = 8;
-                break;
-            }
-        else
-            c = 1;
-    }
-    if (pItem->_iDurability > 2)
-        c += 8;
-    return x - 40;
 }
 
 #define pSpell _pSpell[sel_data]
@@ -751,6 +718,7 @@ void DrawSpellList(void)
         scy1 = scy;
     }
 }
+
 #undef pSpell
 
 void SetSpell(int pnum)
@@ -777,260 +745,228 @@ void AddPanelString(const char *str, int just)
     }
 }
 
-char GetSBookTrans(int ii, unsigned char townok)
+void ClearPanel(void)
 {
-    char st;
-
-    st = 1;
-    if ((plr[myplr]._pISpells >> (ii - 1)) & 1)
-        st = 3;
-    if (plr[myplr]._pAblSpells & (1 << (ii - 1)))   /* missing (__int64) cast -- PSX predates the devilution bugfix */
-        st = 0;
-    if (st == 1) {
-        if (!CheckSpell(myplr, ii, 1, 1))
-            st = 4;
-        if ((char)(plr[myplr]._pSplLvl[ii] + plr[myplr]._pISplLvlAdd) <= 0)
-            st = 4;
-    }
-    if (currlevel == 0 && ii == 0x20 && plr[0].plractive && plr[1].plractive)
-        st = 4;
-    if (townok && currlevel == 0 && st != 4 && !spelldata[ii].sTownSpell)
-        st = 4;
-    return st;
+    _pnumlines[sel_data] = 0;
+    _pinfoflag[sel_data] = 0;
 }
 
-static void DrawSpellBook(BOOL DrawBg)
+void InitPanelStr(void)
 {
-    int i, ii, x, y;
-    int mind, maxd;
-    int sx, sy;
-    unsigned long long tspls;
-    char st;
-    char c;
-    int v;
-    unsigned char bright;
-    char Num[4];
-    int bw;
-    CPad *P;
-    int lsbooktab, lcur_spel;
+    ClearPanel();
+}
 
-    GLUE_SetShowGameScreenFlag(0);
-    GLUE_SetShowPanelFlag(0);
-    GLUE_SuspendGame();
-    if (!DrawBg)
-        return;
-    PrintSelectBack(0x4E6);
+void InitControlPan(void)
+{
+    int i;
+
+    scx1 = 0;
+    scy1 = 0;
+    scx2 = 0;
+    scy2 = 0;
+    pManaBuff = 0;
+    pLifeBuff = 0;
+    pPanelText = LoadFileInMem("CtrlPan\\SmalText.CEL", 0);
+    pChrPanel = LoadFileInMem("Data\\Char.CEL", 0);
+    pSpellCels = LoadFileInMem("CtrlPan\\SpelIcon.CEL", 0);
+    SetSpellTrans(0);
+    talkflag = 0;
+    if (gbMaxPlayers != 1) {
+        pMultiBtns = 0;
+        pTalkBtns = 0;
+        talkofs = 0;
+        sgszTalkMsg[0] = 0;
+        for (i = 0; i < 2; i++)
+            sgbPlrTalkTbl[i] = 1;
+        for (i = 0; i < 3; i++)
+            talkbtndown[i] = 0;
+    }
+    panelflag = 0;
+    lvlbtndown = 0;
+    pPanelButtons = LoadFileInMem("CtrlPan\\Panel8bu.CEL", 0);
+    panbtndown = 0;
+    pChrButtons = 0;
+    for (i = 0; i < 4; i++)
+        chrbtn[myplr][i] = 0;
+    pDurIcons = 0;
+    strcpy(infostr, GetStr(0x4FA));
+    InitPanelStr();
+    drawhpflag = 1;
+    drawmanaflag = 1;
+    chrflag = 0;
+    _spselflag[0] = 0;
+    _spselflag[1] = 0;
+    pSpellBkCel = 0;
+    pSBkBtnCel = 0;
+    pSBkIconCels = 0;
+    sbooktab = 0;
+    sbookflag = 0;
+    cur_spel[0] = 0;
+    cur_spel[1] = 0;
+    my_cur_spel[0] = 0;
+    my_cur_spel[1] = 0;
     if (plr[myplr]._pClass == 0)
         SpellPages[0][0] = 0x1A;
     else if (plr[myplr]._pClass == 1)
         SpellPages[0][0] = 0x1C;
     else if (plr[myplr]._pClass == 2)
         SpellPages[0][0] = 0x1B;
-    bw = 46;
-    x = 24;
-    y = 194;
-    CSBack.SetBack(0x94);
-    CSBack.SetBorder(0x12);
-    for (i = 0; i < 5; i++) {
-        CSBack.SetRGB(BACKR >> 1, BACKG >> 1, BACKB >> 1);
-        c = 64;
-        if (i == sbooktab) {
-            CSBack.SetRGB(255, 255, 255);
-            c = -1;
-        }
-        CSRect.x = x;
-        CSRect.y = y;
-        CSRect.w = bw;
-        CSRect.h = 9;
-        CSBack.Back(x, y, bw, 9);
-        sprintf(Num, "%d", i + 1);
-        MediumFont.Print(0, 8, Num, JustCentre, &CSRect, c, c, c);
-        x += 10 + bw;
-    }
-    CSBack.SetRGB(BACKR / 3 * 2, BACKG / 3 * 2, BACKB / 3 * 2);
-    CSBack.SetBack(0x94);
-    CSBack.SetBorder(0x12);
-    y = 38;
-    sx = 20;
-    sy = 46;
-    tspls = plr[myplr]._pISpells | plr[myplr]._pMemSpells | plr[myplr]._pAblSpells;
-    for (i = 1; i < 6; i++) {
-        CSBack.Back(47, y + 6, 252, 24);
-        CSRect.x = 47;
-        CSRect.y = y + 6;
-        CSRect.w = 252;
-        CSRect.h = 24;
-        ii = SpellPages[sbooktab][i - 1];
-        bright = 0x80;
-        if (ii != -1 && ((tspls >> (ii - 1)) & 1)) {
-            st = GetSBookTrans(ii, 1);
-            SetSpellTrans(st);
-            if (ii == my_cur_spel[options_pad]) {
-                if (i == cur_spel[options_pad] + 1) {
-                    bright = 0xFF;
-                    DrawSpellCel(sx, sy, 0, SpellITbl[ii], 1, 1);
-                } else
-                    DrawSpellCel(sx, sy, 1, SpellITbl[ii], 2, 1);
-            } else {
-                if (i == cur_spel[options_pad] + 1) {
-                    bright = 0xFF;
-                    DrawSpellCel(sx, sy, 0, SpellITbl[ii], 1, 0);
-                } else
-                    DrawSpellCel(sx, sy, 1, SpellITbl[ii], 2, 0);
-            }
-            st = GetSBookTrans(ii, 0);
-            PrintSBookStr(0, 9, ii, GetStr(spelldata[ii].sNameText), bright, st == 3);
-            switch (st) {
-            case 0:
-                strcpy(tempstr, GetStr(0x3D5));
-                break;
-            case 3:
-                sprintf(tempstr, GetStr(0x4FE), plr[myplr].InvBody[4]._iCharges);
-                break;
-            default:
-                v = GetManaAmount(myplr, ii) >> 6;
-                GetDamageAmt(ii, &mind, &maxd);
-                if (mind != -1)
-                    sprintf(tempstr, "%s:%i    %s:%i - %i", GetStr(0x27A), v, GetStr(0xE1), mind, maxd);
-                else
-                    sprintf(tempstr, "%s:%i    %s: -", GetStr(0x27A), v, GetStr(0xE1));
-                if (ii == 0x24)
-                    sprintf(tempstr, GetStr(0x27C), v);
-                PrintSBookStr(0, 20, ii, tempstr, bright, st == 3);
-                v = plr[myplr]._pSplLvl[ii] + plr[myplr]._pISplLvlAdd;
-                if (v < 0)
-                    v = 0;
-                if (v == 0)
-                    sprintf(tempstr, GetStr(0x3F8));
-                else
-                    sprintf(tempstr, GetStr(0x3F9), v);
-                break;
-            }
-            PrintSBookStr(0x88, 9, ii, tempstr, bright, st == 3);
-        }
-        y += 30;
-        sy += 30;
-    }
-    x = 22;
-    y = 48;
-    for (i = 0; i < 5; i++) {
-        if (i == cur_spel[options_pad])
-            CSBack.SetRGB(255, 255, 255);
+    pQLogCel = 0;
+    pGBoxBuff = 0;
+    dropGoldFlag = 0;
+    dropGoldValue = 0;
+    initialDropGoldValue = 0;
+    initialDropGoldIndex = 0;
+}
+
+void DrawCtrlPan(void)
+{
+    sel_data = 0;
+    DrawInfoBox(InfoBoxRect);
+}
+
+void DoAutoMap(void)
+{
+    if (currlevel == 0) {
+        InitDiabloMsg(1);
+    } else {
+        if (automapflag == 0)
+            func_80161F58();
         else
-            CSBack.SetRGB(BACKR >> 1, BACKG >> 1, BACKB >> 1);
-        CSBack.Back(x, y, 16, 15);
-        y += 30;
-    }
-    CSBack.SetBack(5);
-    CSBack.SetBorder(0x12);
-    CSBack.SetRGB(BORDERR, BORDERG, BORDERB);
-    CSRect.x = 14;
-    CSRect.y = 22;
-    CSRect.w = 292;
-    CSRect.h = 188;
-    CSBack.Back(14, 22, 292, 188);
-    MediumFont.Print(0, 14, GetStr(0x3F7), JustCentre, &CSRect, BLUER, BLUEG, BLUEB);
-    P = PAD_GetPad(options_pad, 0);
-    lsbooktab = sbooktab;
-    lcur_spel = cur_spel[options_pad];
-    P->SetPadTick(10);
-    P->SetPadTickMask(15);
-    if (P->GetTick() & 1)
-        cur_spel[options_pad]--;
-    if (P->GetTick() & 2)
-        cur_spel[options_pad]++;
-    if (cur_spel[options_pad] < 0)
-        cur_spel[options_pad] = 4;
-    if (cur_spel[options_pad] >= 5)
-        cur_spel[options_pad] = 0;
-    if (P->GetTick() & 4)
-        sbooktab--;
-    if (P->GetTick() & 8)
-        sbooktab++;
-    if (sbooktab < 0)
-        sbooktab = 4;
-    if (sbooktab >= 5)
-        sbooktab = 0;
-    if (lsbooktab != sbooktab)
-        PlaySFX(0x32);
-    if (lcur_spel != cur_spel[options_pad])
-        PlaySFX(0x32);
-    v = 0;
-    if (P->GetDown() & 0x100)
-        v = 1;
-    else if (P->GetDown() & 0x20)
-        v = 1;
-    if (v) {
-        PlaySFX(0x33);
-        sbookflag = 0;
-        if (optionsflag) {
-            cmenu = 1;
-            GLUE_SetShowGameScreenFlag(1);
-            GLUE_SetShowPanelFlag(0);
-        }
+            automapflag = 0;
     }
 }
 
-void CheckSBook(void)
+/* hellfire's local `int pSpell, c, s;` meets the PSX per-player macro
+ * `#define pSpell _pSpell[sel_data]` and becomes a variable-length local array
+ * `int _pSpell[sel_data]` (SYM: `int (*_pSpell)[1]` in $s1, alloca'd frame + $fp). */
+#define pSpell _pSpell[sel_data]
+void CheckPanelInfo(void)
 {
-    unsigned long long tspls;
-    char st;
-    int cspel;
+    int pSpell, c, s;
+    int v;
+    int pnum = sel_data;
 
-    RemoveTargetCursor(options_pad);
-    cspel = SpellPages[sbooktab][cur_spel[options_pad]];
-    tspls = plr[options_pad]._pISpells | plr[options_pad]._pMemSpells | plr[options_pad]._pAblSpells;
-    {
-    if (cspel != -1) {
-        BOOL splok;
-
-        if (cspel >= 0x1A && cspel <= 0x1C)
-            splok = 1;
-        else
-            splok = (unsigned long)(tspls >> (cspel - 1)) & 1;
-        if (splok) {
-            my_cur_spel[options_pad] = cspel;
-            st = 1;
-            if ((plr[options_pad]._pISpells >> (cspel - 1)) & 1)
-                st = 3;
-            if (plr[options_pad]._pAblSpells & (1 << (cspel - 1)))
-                st = 0;
-            plr[options_pad]._pRSpell = my_cur_spel[options_pad];
-            plr[options_pad]._pRSplType = st;
+    panelflag = 0;
+    ClearPanel();
+    if (!_spselflag[pnum]) {
+        if (MouseX >= 565 && MouseX < 621 && MouseY >= 416 && MouseY < 472) {
+            strcpy(infostr, GetStr(0x3B3));
+            infoclr = 0;
+            panelflag = 1;
+            pinfoflag = 1;
+            strcpy(tempstr, GetStr(0x4FA));
+            AddPanelString(tempstr, 1);
+            pSpell = plr[myplr]._pRSpell;
+            if (pSpell != -1) {
+                switch (plr[myplr]._pRSplType) {
+                case 0:
+                    sprintf(tempstr, GetStr(0x518), GetStr(spelldata[pSpell].sSkillText));
+                    AddPanelString(tempstr, 1);
+                    break;
+                case 1:
+                    sprintf(tempstr, GetStr(0x519), GetStr(spelldata[pSpell].sNameText));
+                    AddPanelString(tempstr, 1);
+                    v = plr[myplr]._pSplLvl[pSpell] + plr[myplr]._pISplLvlAdd;
+                    if (v < 0)
+                        v = 0;
+                    if (v == 0)
+                        sprintf(tempstr, GetStr(0x3F8));
+                    else
+                        sprintf(tempstr, GetStr(0x3F9), v);
+                    AddPanelString(tempstr, 1);
+                    break;
+                case 2:
+                    sprintf(tempstr, GetStr(0x3AF), GetStr(spelldata[pSpell].sNameText));
+                    AddPanelString(tempstr, 1);
+                    c = 0;
+                    for (s = 0; s < plr[myplr]._pNumInv; s++) {
+                        if (plr[myplr].InvList[s]._itype != -1
+                            && (plr[myplr].InvList[s]._iMiscId == 0x15 || plr[myplr].InvList[s]._iMiscId == 0x16)) {
+                            if (plr[myplr].InvList[s]._iSpell == pSpell)
+                                c++;
+                        }
+                    }
+                    for (s = 0; s < 8; s++) {
+                        if (plr[myplr].SpdList[s]._itype != -1
+                            && (plr[myplr].SpdList[s]._iMiscId == 0x15 || plr[myplr].SpdList[s]._iMiscId == 0x16)) {
+                            if (plr[myplr].SpdList[s]._iSpell == pSpell)
+                                c++;
+                        }
+                    }
+                    if (c == 1)
+                        strcpy(tempstr, GetStr(2));
+                    else
+                        sprintf(tempstr, GetStr(0x500), c);
+                    AddPanelString(tempstr, 1);
+                    break;
+                case 3:
+                    sprintf(tempstr, GetStr(0x405), GetStr(spelldata[pSpell].sNameText));
+                    AddPanelString(tempstr, 1);
+                    if (plr[myplr].InvBody[4]._iCharges == 1)
+                        strcpy(tempstr, GetStr(1));
+                    else
+                        sprintf(tempstr, GetStr(0x4FE), plr[myplr].InvBody[4]._iCharges);
+                    AddPanelString(tempstr, 1);
+                    break;
+                }
+            }
         }
-        PlaySFX(0x33);
     }
-    }
+    if (invflag)
+        cursinvitem = CheckInvHLight();
 }
 
-void DrawArrows(void)
+#undef pSpell
+
+void FreeControlPan(void)
 {
-    TextDat *ThisDat;
-    POLY_FT4 *Ft4;
-    unsigned char flip;
-    int x;
-    int otpos;
+    MemFreeDbg(pManaBuff);
+    MemFreeDbg(pLifeBuff);
+    MemFreeDbg(pPanelText);
+    MemFreeDbg(pChrPanel);
+    MemFreeDbg(pSpellCels);
+    MemFreeDbg(pPanelButtons);
+    MemFreeDbg(pMultiBtns);
+    MemFreeDbg(pTalkBtns);
+    MemFreeDbg(pChrButtons);
+    MemFreeDbg(pDurIcons);
+    MemFreeDbg(pQLogCel);
+    MemFreeDbg(pSpellBkCel);
+    MemFreeDbg(pSBkBtnCel);
+    MemFreeDbg(pSBkIconCels);
+    MemFreeDbg(pGBoxBuff);
+}
 
-    ThisDat = GM_UseTexData(0);
-    flip = 1;
-    otpos = CBlocks::GetMaxOtPos() - 4;
-    x = 0x11E;
-    if (CS_XOFF) {
-        flip = 0;
-        x = 0x1C;
+int CPrintString(int No, char *pszStr, int Just)
+{
+    TXT_JUST Justify;
+    unsigned char R, G, B;
+
+    Justify = (TXT_JUST)Just;
+    switch (_infoclr[sel_data]) {
+    case 0:
+        R = WHITER;
+        G = WHITEG;
+        B = WHITEB;
+        break;
+    case 1:
+        R = BLUER;
+        G = BLUEG;
+        B = BLUEB;
+        break;
+    case 2:
+        R = REDR;
+        G = REDG;
+        B = REDB;
+        break;
+    default:
+        R = GOLDR;
+        G = GOLDG;
+        B = GOLDB;
+        break;
     }
-    Ft4 = ThisDat->PrintFt4(0x7E, x, 0xCA, flip, otpos, 0);
-    Ft4->r0 = GOLDR;
-    Ft4->g0 = GOLDG;
-    Ft4->b0 = GOLDB;
-    setSemiTrans(Ft4, 0);
-    setShadeTex(Ft4, 0);
-
-    Ft4 = ThisDat->PrintFt4(0x7E, x | 1, 0xCB, flip, otpos, 0);
-    Ft4->r0 = 0;
-    Ft4->g0 = 0;
-    Ft4->b0 = 0;
-    Ft4->code = (Ft4->code | 2) & ~1;
+    return MediumFont.Print(0, No * 13 + 10, pszStr, Justify, InfoBoxRect, R, G, B);
 }
 
 static void PrintInfo(void)
@@ -1314,6 +1250,90 @@ void DrawPlus(int n, int pnum)
     }
 }
 
+void ChrCheckValidButton(int move)
+{
+    int pc;
+    int count;
+
+    lus = lus + move;
+    pc = plr[options_pad]._pClass;
+    for (int i = 0; i < 4; i++) {
+        switch (i) {
+        case 0:
+            if (plr[options_pad]._pBaseStr == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
+            else
+                chrbtn[options_pad][i] = 0;
+            break;
+        case 1:
+            if (plr[options_pad]._pBaseMag == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
+            else
+                chrbtn[options_pad][i] = 0;
+            break;
+        case 2:
+            if (plr[options_pad]._pBaseDex == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
+            else
+                chrbtn[options_pad][i] = 0;
+            break;
+        case 3:
+            if (plr[options_pad]._pBaseVit == MaxStats[pc][i])
+                chrbtn[options_pad][i] = 1;
+            else
+                chrbtn[options_pad][i] = 0;
+            break;
+        }
+    }
+    if (move == 0)
+        move = -1;
+    if (lus < 0)
+        lus = 3;
+    if (lus >= 4)
+        lus = 0;
+    count = 0;
+    while (chrbtn[myplr][lus]) {
+            lus = lus + move;
+            if (lus < 0)
+                lus = 3;
+            if (lus >= 4)
+                lus = 0;
+            count++;
+        if (count >= 4)
+            break;
+    }
+}
+
+void DrawArrows(void)
+{
+    TextDat *ThisDat;
+    POLY_FT4 *Ft4;
+    unsigned char flip;
+    int x;
+    int otpos;
+
+    ThisDat = GM_UseTexData(0);
+    flip = 1;
+    otpos = CBlocks::GetMaxOtPos() - 4;
+    x = 0x11E;
+    if (CS_XOFF) {
+        flip = 0;
+        x = 0x1C;
+    }
+    Ft4 = ThisDat->PrintFt4(0x7E, x, 0xCA, flip, otpos, 0);
+    Ft4->r0 = GOLDR;
+    Ft4->g0 = GOLDG;
+    Ft4->b0 = GOLDB;
+    setSemiTrans(Ft4, 0);
+    setShadeTex(Ft4, 0);
+
+    Ft4 = ThisDat->PrintFt4(0x7E, x | 1, 0xCB, flip, otpos, 0);
+    Ft4->r0 = 0;
+    Ft4->g0 = 0;
+    Ft4->b0 = 0;
+    Ft4->code = (Ft4->code | 2) & ~1;
+}
+
 #define P plr[options_pad]
 void BuildChr(void)
 {
@@ -1529,6 +1549,7 @@ void BuildChr(void)
     ChrCheckValidButton(0);
     CsNo = 0;
 }
+
 #undef P
 
 void DrawChr(void)
@@ -1634,77 +1655,123 @@ test:
     GLUE_SetHomingScrollFlag(1);
 }
 
-void DrawSpeedSpellTSK(TASK *T)
+void DrawLevelUpIcon(int pnum)
 {
-    DEF_ARGS *args;
-    int pnum;
-    BOOL alive;
-
-    alive = 1;
-    args = (DEF_ARGS *)T->Data;
-    pnum = args->a0;
-    TSK_Sleep(1);
-    while (alive && !GLUE_Finished()) {
-        int old_opts = options_pad;
-
-        options_pad = pnum;
-        if ((questlog | sbookflag | invflag | chrflag | SelectorActive()) == 0) {
-            PostGamePad(pnum + 3, 0, 0, 0);
-            DrawSpellList();
-        }
-        options_pad = old_opts;
-        TSK_Sleep(1);
-        if (!plr[pnum].plractive)
-            alive = 0;
+    if (!optionsflag && DoShowPanel && !stextflag && !qtextflag) {
+        lus = 4;
+        DrawPlus(4, pnum);
+        plusanim++;
+        if (plusanim == 24)
+            plusanim = 0;
     }
-    _spselflag[pnum] = 0;
 }
 
-void DrawSpellBookTSK(TASK *T)
+void CheckChrBtns(void)
 {
-    int CountDown;
-    int i;
+    int pc;
 
-    CountDown = 3;
-    if (!Qfromoptions) {
-        PostGamePad(2, 0, 0, 0);
-        stream_stop();
-        GLUE_SuspendGame();
-    }
-    stream_pause();
-    if (!Qfromoptions) {
-        for (i = 1; i != -1; i--) {
-            ignore_buttons = 1;
-            TSK_Sleep(1);
-        }
-    }
-    while (1) {
-        if (!sbookflag)
-            break;
-        if (options_pad < 0)
-            break;
-        int omp = myplr;
+    if (CS_XOFF != 0x140)
+        return;
+    if (!chrbtnactive)
+        return;
+    if (plr[options_pad]._pStatPts == 0)
+        return;
 
-        myplr = options_pad;
-        DrawSpellBook((unsigned)CountDown < 1);
-        if (CountDown != 0)
-            CountDown--;
-        myplr = omp;
-        TSK_Sleep(1);
+    ChrCheckValidButton(0);
+    if (chrbtn[myplr][lus] == 0) {
+        PlaySFX(0x33);
+        plr[options_pad]._pStatPts--;
     }
-    PlaySFX(0x33);
-    if (!Qfromoptions) {
-        PostGamePad(5, 0, 0, 0);
-        stream_resume();
-        GLUE_ResumeGame();
-        GLUE_SetShowPanelFlag(1);
-        GLUE_SetShowGameScreenFlag(1);
-        GLUE_SetHomingScrollFlag(1);
-    } else {
-        GLUE_SetShowGameScreenFlag(1);
-        TSK_Sleep(1);
-        Qfromoptions = 4;
-        ToggleOptions();
+    pc = plr[options_pad]._pClass;
+    switch (lus) {
+    case 0:
+        NetSendCmdParam1(1, 3, 1);
+        if (plr[options_pad]._pBaseStr == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    case 1:
+        NetSendCmdParam1(1, 4, 1);
+        if (plr[options_pad]._pBaseMag == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    case 2:
+        NetSendCmdParam1(1, 5, 1);
+        if (plr[options_pad]._pBaseDex == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    case 3:
+        NetSendCmdParam1(1, 6, 1);
+        if (plr[options_pad]._pBaseVit == MaxStats[pc][lus])
+            chrbtn[options_pad][lus] = 1;
+        else
+            chrbtn[options_pad][lus] = 0;
+        break;
+    }
+    ChrCheckValidButton(0);
+    BuildChr();
+}
+
+static int DrawDurIcon4Item(const ItemStruct *pItem, int x, int c)
+{
+    /* hellfire's DrawDurIcon4Item minus the DrawCel: the switch survives only as its
+     * (dead) jump-table load */
+    if (pItem->_itype == -1)
+        return x;
+    if (pItem->_iDurability > 5)
+        return x;
+    if (c == 0) {
+        if (pItem->_iClass == 1)
+            switch (pItem->_itype) {
+            case 1:
+                c = 2;
+                break;
+            case 2:
+                c = 6;
+                break;
+            case 3:
+                c = 7;
+                break;
+            case 4:
+                c = 5;
+                break;
+            case 10:
+                c = 8;
+                break;
+            }
+        else
+            c = 1;
+    }
+    if (pItem->_iDurability > 2)
+        c += 8;
+    return x - 40;
+}
+
+void RedBack(void)
+{
+    TextDat *ThisDat;
+    POLY_FT4 *FT4;
+
+    ThisDat = GM_UseTexData(0);
+    FT4 = ThisDat->PrintFt4(0xD8, 0, 0, 0, CBlocks::GetMaxOtPos() - 4, 0);
+    setXYWH(FT4, 0, 0, 0x160, 0xF0);
+    setRGB0(FT4, 0x18, 0x18, 0x18);
+    setSemiTrans(FT4, 1);
+    setShadeTex(FT4, 0);
+    FT4->u1--;
+    FT4->u3--;
+    FT4->v2--;
+    FT4->v3--;
+    FT4->tpage |= 0x40;
+    if (leveltype) {
+        FT4->r0 = 0;
+        FT4->g0 = 0xFF;
+        FT4->b0 = 0xFF;
     }
 }
 
@@ -1764,238 +1831,237 @@ void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char br
     MediumFont.Print(x, y, (char *)pszStr, TXT_LEFT, &CSRect, r, g, b);
 }
 
-void ChrCheckValidButton(int move)
+char GetSBookTrans(int ii, unsigned char townok)
 {
-    int pc;
-    int count;
+    char st;
 
-    lus = lus + move;
-    pc = plr[options_pad]._pClass;
-    for (int i = 0; i < 4; i++) {
-        switch (i) {
-        case 0:
-            if (plr[options_pad]._pBaseStr == MaxStats[pc][i])
-                chrbtn[options_pad][i] = 1;
-            else
-                chrbtn[options_pad][i] = 0;
-            break;
-        case 1:
-            if (plr[options_pad]._pBaseMag == MaxStats[pc][i])
-                chrbtn[options_pad][i] = 1;
-            else
-                chrbtn[options_pad][i] = 0;
-            break;
-        case 2:
-            if (plr[options_pad]._pBaseDex == MaxStats[pc][i])
-                chrbtn[options_pad][i] = 1;
-            else
-                chrbtn[options_pad][i] = 0;
-            break;
-        case 3:
-            if (plr[options_pad]._pBaseVit == MaxStats[pc][i])
-                chrbtn[options_pad][i] = 1;
-            else
-                chrbtn[options_pad][i] = 0;
-            break;
-        }
+    st = 1;
+    if ((plr[myplr]._pISpells >> (ii - 1)) & 1)
+        st = 3;
+    if (plr[myplr]._pAblSpells & (1 << (ii - 1)))   /* missing (__int64) cast -- PSX predates the devilution bugfix */
+        st = 0;
+    if (st == 1) {
+        if (!CheckSpell(myplr, ii, 1, 1))
+            st = 4;
+        if ((char)(plr[myplr]._pSplLvl[ii] + plr[myplr]._pISplLvlAdd) <= 0)
+            st = 4;
     }
-    if (move == 0)
-        move = -1;
-    if (lus < 0)
-        lus = 3;
-    if (lus >= 4)
-        lus = 0;
-    count = 0;
-    while (chrbtn[myplr][lus]) {
-            lus = lus + move;
-            if (lus < 0)
-                lus = 3;
-            if (lus >= 4)
-                lus = 0;
-            count++;
-        if (count >= 4)
-            break;
-    }
+    if (currlevel == 0 && ii == 0x20 && plr[0].plractive && plr[1].plractive)
+        st = 4;
+    if (townok && currlevel == 0 && st != 4 && !spelldata[ii].sTownSpell)
+        st = 4;
+    return st;
 }
 
-void CheckChrBtns(void)
+static void DrawSpellBook(BOOL DrawBg)
 {
-    int pc;
+    int i, ii, x, y;
+    int mind, maxd;
+    int sx, sy;
+    unsigned long long tspls;
+    char st;
+    char c;
+    int v;
+    unsigned char bright;
+    char Num[4];
+    int bw;
+    CPad *P;
+    int lsbooktab, lcur_spel;
 
-    if (CS_XOFF != 0x140)
+    GLUE_SetShowGameScreenFlag(0);
+    GLUE_SetShowPanelFlag(0);
+    GLUE_SuspendGame();
+    if (!DrawBg)
         return;
-    if (!chrbtnactive)
-        return;
-    if (plr[options_pad]._pStatPts == 0)
-        return;
-
-    ChrCheckValidButton(0);
-    if (chrbtn[myplr][lus] == 0) {
-        PlaySFX(0x33);
-        plr[options_pad]._pStatPts--;
-    }
-    pc = plr[options_pad]._pClass;
-    switch (lus) {
-    case 0:
-        NetSendCmdParam1(1, 3, 1);
-        if (plr[options_pad]._pBaseStr == MaxStats[pc][lus])
-            chrbtn[options_pad][lus] = 1;
-        else
-            chrbtn[options_pad][lus] = 0;
-        break;
-    case 1:
-        NetSendCmdParam1(1, 4, 1);
-        if (plr[options_pad]._pBaseMag == MaxStats[pc][lus])
-            chrbtn[options_pad][lus] = 1;
-        else
-            chrbtn[options_pad][lus] = 0;
-        break;
-    case 2:
-        NetSendCmdParam1(1, 5, 1);
-        if (plr[options_pad]._pBaseDex == MaxStats[pc][lus])
-            chrbtn[options_pad][lus] = 1;
-        else
-            chrbtn[options_pad][lus] = 0;
-        break;
-    case 3:
-        NetSendCmdParam1(1, 6, 1);
-        if (plr[options_pad]._pBaseVit == MaxStats[pc][lus])
-            chrbtn[options_pad][lus] = 1;
-        else
-            chrbtn[options_pad][lus] = 0;
-        break;
-    }
-    ChrCheckValidButton(0);
-    BuildChr();
-}
-
-int CPrintString(int No, char *pszStr, int Just)
-{
-    TXT_JUST Justify;
-    unsigned char R, G, B;
-
-    Justify = (TXT_JUST)Just;
-    switch (_infoclr[sel_data]) {
-    case 0:
-        R = WHITER;
-        G = WHITEG;
-        B = WHITEB;
-        break;
-    case 1:
-        R = BLUER;
-        G = BLUEG;
-        B = BLUEB;
-        break;
-    case 2:
-        R = REDR;
-        G = REDG;
-        B = REDB;
-        break;
-    default:
-        R = GOLDR;
-        G = GOLDG;
-        B = GOLDB;
-        break;
-    }
-    return MediumFont.Print(0, No * 13 + 10, pszStr, Justify, InfoBoxRect, R, G, B);
-}
-
-void InitControlPan(void)
-{
-    int i;
-
-    scx1 = 0;
-    scy1 = 0;
-    scx2 = 0;
-    scy2 = 0;
-    pManaBuff = 0;
-    pLifeBuff = 0;
-    pPanelText = LoadFileInMem("CtrlPan\\SmalText.CEL", 0);
-    pChrPanel = LoadFileInMem("Data\\Char.CEL", 0);
-    pSpellCels = LoadFileInMem("CtrlPan\\SpelIcon.CEL", 0);
-    SetSpellTrans(0);
-    talkflag = 0;
-    if (gbMaxPlayers != 1) {
-        pMultiBtns = 0;
-        pTalkBtns = 0;
-        talkofs = 0;
-        sgszTalkMsg[0] = 0;
-        for (i = 0; i < 2; i++)
-            sgbPlrTalkTbl[i] = 1;
-        for (i = 0; i < 3; i++)
-            talkbtndown[i] = 0;
-    }
-    panelflag = 0;
-    lvlbtndown = 0;
-    pPanelButtons = LoadFileInMem("CtrlPan\\Panel8bu.CEL", 0);
-    panbtndown = 0;
-    pChrButtons = 0;
-    for (i = 0; i < 4; i++)
-        chrbtn[myplr][i] = 0;
-    pDurIcons = 0;
-    strcpy(infostr, GetStr(0x4FA));
-    InitPanelStr();
-    drawhpflag = 1;
-    drawmanaflag = 1;
-    chrflag = 0;
-    _spselflag[0] = 0;
-    _spselflag[1] = 0;
-    pSpellBkCel = 0;
-    pSBkBtnCel = 0;
-    pSBkIconCels = 0;
-    sbooktab = 0;
-    sbookflag = 0;
-    cur_spel[0] = 0;
-    cur_spel[1] = 0;
-    my_cur_spel[0] = 0;
-    my_cur_spel[1] = 0;
+    PrintSelectBack(0x4E6);
     if (plr[myplr]._pClass == 0)
         SpellPages[0][0] = 0x1A;
     else if (plr[myplr]._pClass == 1)
         SpellPages[0][0] = 0x1C;
     else if (plr[myplr]._pClass == 2)
         SpellPages[0][0] = 0x1B;
-    pQLogCel = 0;
-    pGBoxBuff = 0;
-    dropGoldFlag = 0;
-    dropGoldValue = 0;
-    initialDropGoldValue = 0;
-    initialDropGoldIndex = 0;
-}
-
-void DrawLevelUpIcon(int pnum)
-{
-    if (!optionsflag && DoShowPanel && !stextflag && !qtextflag) {
-        lus = 4;
-        DrawPlus(4, pnum);
-        plusanim++;
-        if (plusanim == 24)
-            plusanim = 0;
+    bw = 46;
+    x = 24;
+    y = 194;
+    CSBack.SetBack(0x94);
+    CSBack.SetBorder(0x12);
+    for (i = 0; i < 5; i++) {
+        CSBack.SetRGB(BACKR >> 1, BACKG >> 1, BACKB >> 1);
+        c = 64;
+        if (i == sbooktab) {
+            CSBack.SetRGB(255, 255, 255);
+            c = -1;
+        }
+        CSRect.x = x;
+        CSRect.y = y;
+        CSRect.w = bw;
+        CSRect.h = 9;
+        CSBack.Back(x, y, bw, 9);
+        sprintf(Num, "%d", i + 1);
+        MediumFont.Print(0, 8, Num, JustCentre, &CSRect, c, c, c);
+        x += 10 + bw;
+    }
+    CSBack.SetRGB(BACKR / 3 * 2, BACKG / 3 * 2, BACKB / 3 * 2);
+    CSBack.SetBack(0x94);
+    CSBack.SetBorder(0x12);
+    y = 38;
+    sx = 20;
+    sy = 46;
+    tspls = plr[myplr]._pISpells | plr[myplr]._pMemSpells | plr[myplr]._pAblSpells;
+    for (i = 1; i < 6; i++) {
+        CSBack.Back(47, y + 6, 252, 24);
+        CSRect.x = 47;
+        CSRect.y = y + 6;
+        CSRect.w = 252;
+        CSRect.h = 24;
+        ii = SpellPages[sbooktab][i - 1];
+        bright = 0x80;
+        if (ii != -1 && ((tspls >> (ii - 1)) & 1)) {
+            st = GetSBookTrans(ii, 1);
+            SetSpellTrans(st);
+            if (ii == my_cur_spel[options_pad]) {
+                if (i == cur_spel[options_pad] + 1) {
+                    bright = 0xFF;
+                    DrawSpellCel(sx, sy, 0, SpellITbl[ii], 1, 1);
+                } else
+                    DrawSpellCel(sx, sy, 1, SpellITbl[ii], 2, 1);
+            } else {
+                if (i == cur_spel[options_pad] + 1) {
+                    bright = 0xFF;
+                    DrawSpellCel(sx, sy, 0, SpellITbl[ii], 1, 0);
+                } else
+                    DrawSpellCel(sx, sy, 1, SpellITbl[ii], 2, 0);
+            }
+            st = GetSBookTrans(ii, 0);
+            PrintSBookStr(0, 9, ii, GetStr(spelldata[ii].sNameText), bright, st == 3);
+            switch (st) {
+            case 0:
+                strcpy(tempstr, GetStr(0x3D5));
+                break;
+            case 3:
+                sprintf(tempstr, GetStr(0x4FE), plr[myplr].InvBody[4]._iCharges);
+                break;
+            default:
+                v = GetManaAmount(myplr, ii) >> 6;
+                GetDamageAmt(ii, &mind, &maxd);
+                if (mind != -1)
+                    sprintf(tempstr, "%s:%i    %s:%i - %i", GetStr(0x27A), v, GetStr(0xE1), mind, maxd);
+                else
+                    sprintf(tempstr, "%s:%i    %s: -", GetStr(0x27A), v, GetStr(0xE1));
+                if (ii == 0x24)
+                    sprintf(tempstr, GetStr(0x27C), v);
+                PrintSBookStr(0, 20, ii, tempstr, bright, st == 3);
+                v = plr[myplr]._pSplLvl[ii] + plr[myplr]._pISplLvlAdd;
+                if (v < 0)
+                    v = 0;
+                if (v == 0)
+                    sprintf(tempstr, GetStr(0x3F8));
+                else
+                    sprintf(tempstr, GetStr(0x3F9), v);
+                break;
+            }
+            PrintSBookStr(0x88, 9, ii, tempstr, bright, st == 3);
+        }
+        y += 30;
+        sy += 30;
+    }
+    x = 22;
+    y = 48;
+    for (i = 0; i < 5; i++) {
+        if (i == cur_spel[options_pad])
+            CSBack.SetRGB(255, 255, 255);
+        else
+            CSBack.SetRGB(BACKR >> 1, BACKG >> 1, BACKB >> 1);
+        CSBack.Back(x, y, 16, 15);
+        y += 30;
+    }
+    CSBack.SetBack(5);
+    CSBack.SetBorder(0x12);
+    CSBack.SetRGB(BORDERR, BORDERG, BORDERB);
+    CSRect.x = 14;
+    CSRect.y = 22;
+    CSRect.w = 292;
+    CSRect.h = 188;
+    CSBack.Back(14, 22, 292, 188);
+    MediumFont.Print(0, 14, GetStr(0x3F7), JustCentre, &CSRect, BLUER, BLUEG, BLUEB);
+    P = PAD_GetPad(options_pad, 0);
+    lsbooktab = sbooktab;
+    lcur_spel = cur_spel[options_pad];
+    P->SetPadTick(10);
+    P->SetPadTickMask(15);
+    if (P->GetTick() & 1)
+        cur_spel[options_pad]--;
+    if (P->GetTick() & 2)
+        cur_spel[options_pad]++;
+    if (cur_spel[options_pad] < 0)
+        cur_spel[options_pad] = 4;
+    if (cur_spel[options_pad] >= 5)
+        cur_spel[options_pad] = 0;
+    if (P->GetTick() & 4)
+        sbooktab--;
+    if (P->GetTick() & 8)
+        sbooktab++;
+    if (sbooktab < 0)
+        sbooktab = 4;
+    if (sbooktab >= 5)
+        sbooktab = 0;
+    if (lsbooktab != sbooktab)
+        PlaySFX(0x32);
+    if (lcur_spel != cur_spel[options_pad])
+        PlaySFX(0x32);
+    v = 0;
+    if (P->GetDown() & 0x100)
+        v = 1;
+    else if (P->GetDown() & 0x20)
+        v = 1;
+    if (v) {
+        PlaySFX(0x33);
+        sbookflag = 0;
+        if (optionsflag) {
+            cmenu = 1;
+            GLUE_SetShowGameScreenFlag(1);
+            GLUE_SetShowPanelFlag(0);
+        }
     }
 }
 
-void RedBack(void)
+void CheckSBook(void)
 {
-    TextDat *ThisDat;
-    POLY_FT4 *FT4;
+    unsigned long long tspls;
+    char st;
+    int cspel;
 
-    ThisDat = GM_UseTexData(0);
-    FT4 = ThisDat->PrintFt4(0xD8, 0, 0, 0, CBlocks::GetMaxOtPos() - 4, 0);
-    setXYWH(FT4, 0, 0, 0x160, 0xF0);
-    setRGB0(FT4, 0x18, 0x18, 0x18);
-    setSemiTrans(FT4, 1);
-    setShadeTex(FT4, 0);
-    FT4->u1--;
-    FT4->u3--;
-    FT4->v2--;
-    FT4->v3--;
-    FT4->tpage |= 0x40;
-    if (leveltype) {
-        FT4->r0 = 0;
-        FT4->g0 = 0xFF;
-        FT4->b0 = 0xFF;
+    RemoveTargetCursor(options_pad);
+    cspel = SpellPages[sbooktab][cur_spel[options_pad]];
+    tspls = plr[options_pad]._pISpells | plr[options_pad]._pMemSpells | plr[options_pad]._pAblSpells;
+    {
+    if (cspel != -1) {
+        BOOL splok;
+
+        if (cspel >= 0x1A && cspel <= 0x1C)
+            splok = 1;
+        else
+            splok = (unsigned long)(tspls >> (cspel - 1)) & 1;
+        if (splok) {
+            my_cur_spel[options_pad] = cspel;
+            st = 1;
+            if ((plr[options_pad]._pISpells >> (cspel - 1)) & 1)
+                st = 3;
+            if (plr[options_pad]._pAblSpells & (1 << (cspel - 1)))
+                st = 0;
+            plr[options_pad]._pRSpell = my_cur_spel[options_pad];
+            plr[options_pad]._pRSplType = st;
+        }
+        PlaySFX(0x33);
     }
+    }
+}
+
+char *get_pieces_str(int nGold)
+{
+    if (nGold == 1)
+        return GetStr(0x30A);
+    return GetStr(0x309);
 }
 
 /* definition after its users -- see the unsized declaration at the top */
-unsigned char chrbtn[2][4];

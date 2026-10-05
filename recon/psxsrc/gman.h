@@ -79,7 +79,11 @@ struct CBlock {                       /* sizeof 12 */
     unsigned long NumOfParts;
     CPart         Parts[1];
 
+#ifdef GMAN_OWNER_TU
+    int GetSize() const;
+#else
     int GetSize() const { return sizeof(NumOfParts) + NumOfParts * sizeof(CPart); }   /* GMAN.H:67 */
+#endif
     void GetBoundingBox(TextDat &TDat, RECT &R);
 };
 
@@ -115,10 +119,17 @@ struct CCreatureHdr {                 /* sizeof 20 */
 struct CTextFileInfo {                /* sizeof 4 */
     char *FileName;
 
+#ifdef GMAN_OWNER_TU
+    char *GetName() const;
+    BOOL  HasTp() const;
+    BOOL  HasDat() const;
+    long  LoadHdr() const;
+#else
     char *GetName() const { return FileName; }                          /* GMAN.H:173 */
     BOOL  HasTp() const   { return HasFile(".tp"); }                    /* GMAN.H:160 */
     BOOL  HasDat() const  { return HasFile(".dat"); }                   /* GMAN.H:161 */
     long  LoadHdr() const { return GetFile(".hdr", 0x8001); }           /* GMAN.H:167 */
+#endif
     BOOL  HasFile(char *Ext) const;
     long  GetFile(char *Ext, unsigned long RamId) const;
     long  LoadDat() const;
@@ -189,6 +200,18 @@ struct TextDat {                      /* sizeof 112 */
     void FindDecompArea(RECT &R);
 
     /* GMAN.H in-class methods (line numbers per SYM) */
+#ifdef GMAN_OWNER_TU
+    FRAME_HDR *GetFr(int FrNum);
+    PAL *GetPal(int PalNum);
+    int GetNumOfFrames();
+    void SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum);
+    int GetNumOfCreatures();
+    int GetTexNum() const;
+    BOOL IsLoaded() const;
+    BOOL CanXferPal() const;
+    BOOL CanXferFrame() const;
+    CCreatureHdr *GetCreature(int Creature);
+#else
     FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }                        /* 229 */
     PAL *GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }         /* 232 */
     int GetNumOfFrames() { return Hdr->NumOfFrames; }                                              /* 233 */
@@ -199,6 +222,7 @@ struct TextDat {                      /* sizeof 112 */
     BOOL CanXferPal() const { return PalX >= 0 && PalY >= 0; }                                     /* 258 */
     BOOL CanXferFrame() const { return DecX >= 0 && DecY >= 0; }                                   /* 259 */
     CCreatureHdr *GetCreature(int Creature) { return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]); }  /* 284 */
+#endif
 
     static CTextFileInfo *GetFileInfo(int Id);
 };
@@ -241,6 +265,7 @@ void GM_FinishedUsing(TextDat *tex);
 TextDat *GM_UseTexData(int Id);
 
 /* GMAN.H:290-296 — defined in the header (out-of-line copy per TU under -fno-inline) */
+#ifndef GMAN_OWNER_TU
 inline void TextDat::DumpDatFile()
 {
     if (hndDat != -1 && OwnDat) {
@@ -249,5 +274,6 @@ inline void TextDat::DumpDatFile()
         hndDat = -1;
     }
 }
+#endif
 
 #endif

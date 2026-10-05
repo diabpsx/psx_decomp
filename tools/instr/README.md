@@ -4464,6 +4464,15 @@ The function PASS board remains 2693/2727, with 34 entries still open.
 
 ### DRLG_L2 table reconstruction details
 
+Resolved 2026-10-04: the production native lane now links the exact 30,640-byte
+`DRLG_L2_text` group. The source keeps the two zero banks at their original
+trailing declaration position; `-fwritable-strings` supplies the exact 9,492-byte
+prefix, and the emitted nine-way switch table is routed back into `.text` with
+its retail four-byte pre-table pad. All 21,148 text bytes, 100 resident
+small-data bytes, 129 typed data records and 36 function SYM records match.
+The complete PREGAME and main images remain byte-identical. The investigation
+notes below are retained as the historical evidence that led to this route.
+
 2026-10-03 producer follow-up (diagnostic only; production remains unchanged):
 the live TU emits `.rdata=92`, `.data=9436`, `.text=21108` and `.sdata=100`.
 Retail code alone is 21,148 bytes: the difference is the nine-word switch table
@@ -5114,3 +5123,166 @@ additive checksum serialized separately. Coverage reaches 812 functions /
 Nothing under `C:/temp/dmt-cc1/` is committed (outside the repo entirely,
 per the task's rules); everything under `tools/instr/` is small text and
 safe to commit if the user wants the diagnostic lane kept.
+
+### Post-ASPSX small-data split lane
+
+OPTIONS confirms why scattered GP-owned objects cannot be routed in compiler
+assembly: naming each bank `.sdata.*` before ASPSX makes the assembler replace
+GP-relative patches with absolute address materialization, growing text from
+19,936 to 21,212 bytes.  `tools/psyq_rewrite.py` instead splits the completed
+LNK section after ASPSX, preserving each relocation operator while retargeting
+section-plus-offset expressions and data/debug symbol records.  Focused tests
+cover initialized bytes, XDEF/local records, debug definitions and a text-side
+section expression, and reject incomplete layouts and patch-bearing source
+sections.
+
+The audit also restored OPTIONS' retail initial values `Spacing=13` and
+`cs=lastcs=lastlastcs=1`; explicit zero initializers restore KeyPos/debounce's
+initialized-data provenance. `options_pad=-1` restores its retail startup state.
+Reordering the twenty-five OPTIONS.CPP bodies to retail source order places all
+38 functions exactly without section routing. The original unused GMAN/CPlayer
+header inlines restore the 32 missing filename bytes before the primpool literal,
+which in turn places both jump tables and their three text relocations exactly.
+
+Post-ASPSX splitting now places the 24 four-byte GP banks around four intervening
+globals owned by other TUs; the packed small-BSS is 40 bytes. Native verification
+proves 19,936 text bytes, 208 read-only bytes, all 96 initialized small-data bytes,
+all 40 small-BSS bytes, 38 function records and 35 named data records.
+
+BLOCK then follows the same source-order route: all 68 bodies now appear in retail
+order without per-function sections. Its unused GMAN inline restores the leading
+pool literal, and `TownConv` restores the complete 20-byte initialized table. The
+post-ASPSX split removes one verified zero alignment byte, uses a one-byte borrowed
+carrier for the unaligned selection bank, and preserves every GP patch. Separate
+packed BSS placement reproduces the four-byte gap between `dx` and `dy`. This audit
+also corrected DIALOG's small-BSS ownership from 20 to 16 bytes; BLOCK's `InfraFlag`
+owns the following four bytes. Native verification proves 19,000 text bytes, 76
+read-only bytes, 20 data bytes, 95 source small-data bytes, 4 small-BSS bytes, 44
+BSS bytes, 68 function records and 35 named data records. Native coverage reaches
+2,491 functions in 169 TUs.
+
+DIABLO native promotion restores the unused GMAN/CPlayer header literals, the
+original `LastFrCount=-1` and `ghMainWnd=0x29A` defaults, and all four source-owned
+global tables (`DebugMonsters`, `pMegaTiles`, `glSeedTbl`, `gnLevelTypeTbl`). Its
+small-data split places eleven resident banks and three runtime small-BSS words
+while dropping only verified compiler alignment zeros. Four 68-byte seed arrays
+use their retail 80-byte stride, and the setjmp buffer retains the following
+12-byte retail gap. Native verification proves 8,156 text bytes, 116 read-only
+bytes, 2,912 data bytes, 84 source small-data bytes, 368 zero-fill bytes, 33
+function records and 21 named data records. Coverage reaches 2,524 functions in
+170 native TUs.
+
+CONTROL native promotion restores the complete 2,048-byte initialized bank
+(`SpellColors`, `SpellITbl`, `SpellPages`, `CS_Tab`, `_infostr`, and `tempstr`),
+the unused GMAN/CPlayer header literals, and the retail file-static linkage of its
+private state. Its commutative panel-state test is written in the source order that
+keeps both ordinary and `-g` PsyQ compiler lanes semantically identical after
+scheduling. Post-ASPSX splitting places 25 resident small-data banks and seven
+zero-fill banks; the unaligned `sgbPlrTalkTbl` bank includes its verified two-byte
+retail zero prefix so the GNU final-image wrapper remains word aligned. Native
+verification proves 30,136 text bytes, 240 read-only bytes, 2,048 initialized-data
+bytes, 1,456 large-BSS bytes, all 51 function records, and every named data record.
+Coverage reaches 2,575 functions in 171 native TUs (2,594/172 including the one
+conventional TU); game final-image ownership is 2,104/2,727, leaving 623 scaffold
+entries. All 260 tests and all five exact-image comparisons pass.
+
+GMAN native promotion restores retail producer order for all 57 explicit bodies,
+the `CTextFileInfo::LoadHdr` header body, and the complete reverse-emitted inline
+tail. `MyGT4` is restored as the final 52 bytes of GMAN's 3,780-byte data bank.
+Post-ASPSX splitting places the `.tp`, `.dat`, `DECB`, `GMAN`, `Wanker!`, `.hdr`,
+and four mutable state words at their exact scattered GP addresses. A readonly
+split reverses the compiler pool order into the retail `gman.h`, `GMAN.CPP`, and
+`primpool.h` order; the final two assembler-alignment bytes remain scaffold-owned.
+Native verification proves all 13,732 text bytes, 76 function records, every named
+data record, 50 readonly bytes, 60 small-data bytes, 3,780 data bytes, eight static
+small-BSS bytes, and both constructor/destructor entries. Coverage reaches 2,651
+functions in 172 native TUs (2,670/173 including the conventional TU); game
+final-image ownership is 2,180/2,727, leaving 547 scaffold entries. All 262 tests
+and all five exact-image comparisons pass.
+
+FE native promotion restores the complete fourteen-menu `FeTable` bank, all eight
+typed menu-entry tables, the 40-byte English name grid, the 80-entry `FeBuffer`,
+and both player-name buffers using symbolic function/menu/font pointers. Unused
+GMAN/CPlayer header bodies restore the leading readonly filenames before FE's own
+filename, movie name, and switch table. Nine post-ASPSX banks place every resident
+frontend state object and the two short format literals at their retail GP
+addresses; the `FePadInFlag` bank retains its verified zero scalar-alignment byte.
+Native verification proves all 12,076 FRONTEND text bytes, 45 function records,
+all named data records, 92 readonly bytes, 3,214 meaningful data bytes, 135
+small-data bytes, and four static small-BSS bytes. The two final data-alignment
+bytes remain scaffold-owned. Coverage reaches 2,696 functions in 173 native TUs
+(2,715/174 including the conventional TU); game ownership is 2,225/2,727, leaving
+502 scaffold entries. All 263 tests and all five exact-image comparisons pass.
+
+STORES native promotion restores all 95 explicit bodies to retail order while
+preserving the eight compiler-emitted constructor/header methods. The source now
+owns the three exact Y-layout tables, initialized `talkname`, `SStringY`, and
+`gdwAllTextEntries`; the retail literal-address oracle corrects the PSX line
+separator strings to `"\n"` and `", "`. SBack's EXT linkage is restored. Five
+post-ASPSX data banks route these objects around the externally owned shop-item
+arrays, while ten resident GP banks and two packed small-BSS banks reproduce all
+unaligned state and scalar gaps. Native verification proves all 44,756 text bytes,
+103 function records, 40 named data records, 728 readonly bytes, 5,524 owned data
+bytes, 51 small-data bytes, 67 static small-BSS bytes, the 3,360-byte text buffer,
+and both constructor/destructor entries. Coverage reaches 2,799 functions in 174
+native TUs (2,818/175 including the conventional TU); game ownership is
+2,328/2,727, leaving 399 scaffold entries. All 265 tests and all five exact-image
+comparisons pass.
+
+ITEMS native promotion restores all 106 explicit bodies to retail order and the
+complete 14,708-byte initialized data bank: cursor/animation tables, inventory
+sounds, premium deltas, all 128 items, active/available lists, unique flags, and
+the output string. Explicit zero initializers reproduce retail producer order and
+preserve a legal one-past `itemavail` relocation; `psyq_rewrite.py` now accepts
+that boundary only when no following split chunk makes it ambiguous. The readonly
+split restores the retail filename/SinTab ordering while keeping the exact
+Item2Frm and switch/format pools. Five GP banks and three zero-fill banks place
+all remaining state. Native verification proves all 55,836 text bytes, 106
+function records, 18 named data records, 1,448 readonly bytes, 14,708 data bytes,
+67 small-data bytes, and 244 source BSS bytes. Coverage reaches 2,905 functions
+in 175 native TUs (2,924/176 including the conventional TU); game ownership is
+2,434/2,727, leaving 293 scaffold entries. All 267 tests and all five exact-image
+comparisons pass.
+
+MSG native promotion restores 98 explicit bodies plus the compression/header tail
+to retail order. Moving the strategy bodies back into their inline class definitions
+reproduces the original constructor/GetSize/virtual-method sequence. The complete
+4,768-byte `GameMaps`/`sgLocals` bank, compression vtables, three header filename
+literals, resident compressor objects, flags, function statics, and constructor/
+destructor entries now come from source. The linked relocation oracle corrects two
+protocol fields: `TCmd*Item::dwBuff` carries `_PlrCreate`, and spellbook commands
+copy `_pSBkSplType`. Native verification proves all 16,648 text bytes, 111 function
+records, nine named data records, 552 readonly bytes, 4,768 data bytes, 14 small-
+data bytes, three owned small-BSS bytes, and 32 BSS bytes. Coverage reaches 3,016
+functions in 176 native TUs (3,035/177 including the conventional TU); game
+ownership is 2,545/2,727, leaving 182 scaffold entries. All 268 tests and all five
+exact-image comparisons pass.
+
+PLAYER native promotion restores all 136 bodies to retail order and the complete
+13,760-byte player bank: direction offsets, animation lengths, class-stat tables,
+maximum stats, the 51-entry experience table, and both zero-initialized players.
+An unused GMAN header body plus an early CPlayer literal producer recover the exact
+404-byte readonly pool without section surgery. Adding the missing file-static
+`PRIM_GetPrim` declaration removes an implicit external binding and makes all four
+spell-animation calls resolve to PLAYER's retail-local copy. Two post-ASPSX GP
+banks place `myplr` and the adjacent death/light flags. Native verification proves
+all 30,628 text bytes, 136 function records, every named data record, 404 readonly
+bytes, 13,760 data bytes and six small-data bytes. Coverage reaches 3,152 functions
+in 177 native TUs (3,171/178 including the conventional TU); game ownership is
+2,681/2,727, leaving 46 scaffold entries. All 269 tests and all five exact-image
+comparisons pass.
+
+FMV native promotion restores retail EXT linkage for every stream/MDEC global while
+retaining only the two genuine file-static objects (`DiabEnd` and the movie-name
+buffer). Declaring those statics after the EXT state reproduces the retail compiler's
+allocation/codegen; all 44 functions remain exact. The final readonly occurrence is
+routed into `.text` before ASPSX, so LoPlayFMVOverLay's six-entry language switch
+table keeps its relocations and branch displacements. PSYLINK composes readonly,
+107,788 initialized-data bytes and text into the exact 118,924-byte FMV producer
+group; SYMMUNGE reproduces every overlay declaration record. Forty-six GP banks,
+the `DiabEnd` bank, two small-BSS banks and four BSS banks place all resident state,
+including the two function statics and movie/setjmp buffers. Native verification
+proves all 44 function records and 96 named data records. Coverage reaches 3,196
+functions in 178 native TUs (3,215/179 including the conventional TU). With
+DLG_2's two already-native raw-data exports, game final-image ownership is now
+2,727/2,727. All 270 tests and all five exact-image comparisons pass.

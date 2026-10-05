@@ -27,7 +27,7 @@ def cpe_bytes(data, va, size):
     return cpe_regions(data, {"text": (va, size)})["text"]
 
 
-def cpe_regions(data, regions):
+def cpe_regions(data, regions, allow_zero_holes=()):
     """Require exact coverage of every declared section, without unknown chunks."""
     if data[:4] != b"CPE\x01":
         raise ValueError("invalid CPE magic")
@@ -67,24 +67,53 @@ def cpe_regions(data, regions):
                 raise ValueError("truncated CPE metadata")
         else:
             raise ValueError(f"unsupported CPE tag {tag}")
-    if not ended or any(data[cursor:]) or any(len(seen[name]) != size for name, (va, size) in regions.items()):
+    allow_zero_holes = set(allow_zero_holes)
+    if allow_zero_holes - set(regions):
+        raise ValueError("unknown CPE zero-hole region")
+    if (not ended or any(data[cursor:])
+            or any(len(seen[name]) != size for name, (va, size) in regions.items()
+                   if name not in allow_zero_holes)):
         raise ValueError("CPE is unterminated, has trailing data, or leaves uncovered bytes")
     return {name: bytes(payload) for name, payload in result.items()}
 
 
-def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=None, overlay_text=False):
+def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=None,
+                overlay_text=False, composed_groups=None, allow_zero_holes=()):
     """Link an unchanged original object, with explicitly placed complete sections."""
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", entry):
         raise ValueError("invalid SDK output name")
     if type(overlay_text) is not bool:
         raise ValueError('native overlay selection must be Boolean')
+    composed_groups = {} if composed_groups is None else composed_groups
+    if not isinstance(composed_groups, dict):
+        raise ValueError('native composed groups must be a mapping')
+    composed_sections = []
+    for name, row in composed_groups.items():
+        if (not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', name)
+                or not isinstance(row, dict) or set(row) != {'sections', 'va', 'size'}
+                or not isinstance(row['sections'], list) or not row['sections']
+                or any(not re.fullmatch(r'\.[A-Za-z_][A-Za-z0-9_.]*', section)
+                       for section in row['sections'])
+                or type(row['va']) is not int or type(row['size']) is not int
+                or row['va'] % 4 or row['size'] <= 0):
+            raise ValueError('invalid native composed group')
+        composed_sections.extend(row['sections'])
+    if len(composed_sections) != len(set(composed_sections)) or set(composed_sections) & set(regions):
+        raise ValueError('native composed sections overlap ordinary placements')
     if overlay_text:
-        # This route has overlay code and resident initialized pools. Same-bank
-        # pools and zero-fill groups need their own explicit layout support.
-        if '.text' not in regions or any(s not in ('.text', '.rdata', '.data', '.sdata') for s in regions):
+        overlay_composed = list(composed_groups.items())
+        if len(overlay_composed) > 1:
+            raise ValueError('native overlay supports one composed text group')
+        if ((not overlay_composed and '.text' not in regions)
+                or (overlay_composed and not any(
+                    section == '.text' or re.fullmatch(r'\.text\.[A-Za-z_][A-Za-z0-9_.]*', section)
+                    for section in overlay_composed[0][1]['sections']))
+                or any(s not in ('.text', '.rdata', '.data', '.sdata', '.sbss', '.bss')
+                       and not re.fullmatch(r'\.(?:rdata|data|sdata|sbss|bss)\.[A-Za-z_][A-Za-z0-9_.]*', s)
+                       for s in regions)):
             raise ValueError('native overlay requires text and resident initialized pools')
         rows = sorted(regions.values())
-        start, length = regions['.text']
+        start, length = (overlay_composed[0][1]['va'], overlay_composed[0][1]['size']) if overlay_composed else regions['.text']
         if (start < 4 or start % 4 or length % 4
                 or any(type(a) is not int or type(n) is not int or n <= 0 for a,n in rows)
                 or any(a+n > b for (a,n),(b,m) in zip(rows,rows[1:]))
@@ -97,20 +126,28 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
     if any(prefix == (out / f"{entry}.obj").resolve() for prefix in prefix_objects):
         raise ValueError("native prefix object cannot alias the linked object's output path")
     (out / f"{entry}.obj").write_bytes(raw)
-    commands, files = [], {}
+    commands, files, composed_files = [], {}, {}
     if overlay_text:
-        commands.append(f'overlay_anchor group org(${regions[".text"][0]-4:08X}),file("{entry}_anchor.bin")')
+        commands.append(f'overlay_anchor group org(${start-4:08X}),file("{entry}_anchor.bin")')
     for index, (section, (va, size)) in enumerate(regions.items()):
         if not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", section):
             raise ValueError("invalid SDK section name")
         if overlay_text:
             filename = out / f'{entry}_group{index}.bin'
             files[section] = filename
-            placement = 'over(overlay_anchor)' if section == '.text' else f'org(${va:08X})'
+            placement = 'over(overlay_anchor)' if section == '.text' and not composed_groups else f'org(${va:08X})'
             commands.append(f'sdk_{index} group {placement},file("{filename.name}")')
             commands.append(f'\tsection {section},sdk_{index}')
         else:
             commands.extend([f"sdk_{index} group org(${va:08X})", f"\tsection {section},sdk_{index}"])
+    for index, (name, row) in enumerate(composed_groups.items()):
+        if overlay_text:
+            filename = out / f'{entry}_composed{index}.bin'
+            composed_files[name] = filename
+            commands.append(f'sdk_comp_{index} group over(overlay_anchor),file("{filename.name}")')
+        else:
+            commands.append(f'sdk_comp_{index} group org(${row["va"]:08X})')
+        commands.extend(f'\tsection {section},sdk_comp_{index}' for section in row['sections'])
     for name, address in bindings.items():
         if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
             raise ValueError("invalid SDK binding name")
@@ -130,7 +167,7 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         raise ValueError("native SDK link failed: " + run.stdout + run.stderr)
     if overlay_text:
         map_text = (out / f'{entry}.map').read_text()
-        payloads = list(files.values()) + [out / f'{entry}_anchor.bin']
+        payloads = list(files.values()) + list(composed_files.values()) + [out / f'{entry}_anchor.bin']
         raw_text = SL.compact_overlay_sym(out / sym_name, out / f'{entry}.sym', payloads)
         headers = [(int(a,16),int(n,16),int(i,16)) for a,n,i in re.findall(
             r'^\w+: \$([0-9a-f]{8}) overlay length \$([0-9a-f]{8}) id \$([0-9a-f]+)', raw_text,re.M|re.I)]
@@ -149,12 +186,23 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
             if len(data)!=size or [(int(a,16),int(n,16)) for a,n in actual]!=[(va,size)]:
                 raise ValueError('native overlay section extent/placement differs')
             blocks[section] = data
+        for name,path in composed_files.items():
+            row = composed_groups[name]
+            data = path.read_bytes()
+            ids = [i for a,n,i in headers if (a,n)==(row['va']-4,row['size']+4)]
+            if len(ids)!=1 or len(data)!=row['size']+4 or data[:4]!=struct.pack('<I',ids[0]):
+                raise ValueError('native composed overlay ID metadata does not match its payload')
+            blocks[name] = data[4:]
         anchor = (out/f'{entry}_anchor.bin').read_bytes()
-        ids = [i for a,n,i in headers if (a,n)==(regions['.text'][0]-4,4)]
+        ids = [i for a,n,i in headers if (a,n)==(start-4,4)]
         if len(ids)!=1 or anchor!=struct.pack('<I',ids[0]):
             raise ValueError('native overlay anchor metadata differs')
         return blocks, map_text
-    return (cpe_regions((out / f"{entry}.cpe").read_bytes(), regions),
+    output_regions = dict(regions)
+    output_regions.update({name: (row['va'], row['size']) for name, row in composed_groups.items()})
+    holes = set(composed_groups) | set(allow_zero_holes)
+    return (cpe_regions((out / f"{entry}.cpe").read_bytes(), output_regions,
+                        allow_zero_holes=holes),
             (out / f"{entry}.map").read_text())
 
 

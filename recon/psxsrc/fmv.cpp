@@ -11,6 +11,29 @@
  * drafts from skel/PSXSRC/FMV.CPP as shape hints. All %gp_rel names in the raw are literal retail names. */
 #include "psyq.h"
 
+extern "C" unsigned char GAL_Free(long Handle);
+extern "C" void DBG_Error(int code, const char *file, int line);
+struct TextDat {
+    BOOL OwnDat;
+    int TexNum;
+    int LastFrame;
+    BOOL DatLoaded;
+    long hndDat;
+    unsigned char rest[112 - 0x14];
+
+    void DumpDatFile();
+};
+/* Original unused GMAN.H inline: retains the first retail filename literal. */
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd))
+            DBG_Error(0, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
 /* ---------------------------------------------------------------- types (SYM / libcd.h) */
 typedef struct CdlLOC { u_char minute, second, sector, track; } CdlLOC;   /* sizeof 4 */
 typedef struct CdlFILE { CdlLOC pos; u_int size; char name[16]; } CdlFILE;  /* sizeof 24 */
@@ -21,6 +44,8 @@ typedef struct strheader {   /* StHEADER -- CD-ROM STR structure, sizeof 32 */
     u_int   dummy1, dummy2;
     CdlLOC  loc;
 } StHEADER;
+typedef int strdata[504];
+typedef void (*CdlCB)(unsigned char, unsigned char *);
 
 /* ---------------------------------------------------------------- SPU types (LIBSPU.H, PsyQ 4.0) --
  * confirmed against the raw oracle field-by-field (set_mdec_audio_volume's static `voice_attr` +
@@ -113,6 +138,7 @@ void SPU_Init(void);
 long ENG_random(long n);
 unsigned long VID_GetTick(void);
 void STR_AllocBuffer(void);
+extern unsigned char STR_Buffer[];
 void *Tmalloc(int size);
 void Tfree(void *p);
 void PAD_Handler(void);
@@ -175,97 +201,99 @@ void PA_SetPauseOk(int on);
 }
 
 /* ---------------------------------------------------------------- CD stream ring buffer state */
-static volatile int stream_chunksize;   /* ISR-shared (CdReadyCallback) */
-static unsigned char *volatile stream_bufh;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_bufsize;   /* ISR-shared (CdReadyCallback) */
-static unsigned char *volatile stream_buf;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_chunks_borrowed;
-static volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_out;
-static volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
-static volatile int _discard_count;   /* USER RULING (this session): volatile allowed for exactly this
+volatile int stream_chunksize;   /* ISR-shared (CdReadyCallback) */
+StHEADER *volatile stream_bufh;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_bufsize;   /* ISR-shared (CdReadyCallback) */
+strdata *volatile stream_buf;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_chunks_borrowed;
+volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_out;
+volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
+volatile int _discard_count;   /* USER RULING (this session): volatile allowed for exactly this
  * pair as part of the stream ring-buffer bookkeeping group, even though stream_cdready_handler itself
  * never touches them -- NOT a general policy widening, this pair only. */
-static volatile int _get_count;   /* see _discard_count ruling comment above */
-static volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
-static int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
-static void *volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
-static volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
-static volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
-static int time_in_frames;   /* written by the main loop (VID_GetTick), read by the handler */
-static volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
-static volatile int stream_last_sector;   /* ISR-shared (CdReadyCallback) */
-static char g_movie_filename[32];   /* @0x80121CE8: the one shared streamed-movie filename buffer;
-                                      * LoPlayFMVOverLay strcpy's "DIABEND*.MOV" into it before queuing
-                                      * a play_mdec_stream/dequeue_animation request. Gap to the next
-                                      * undefined_syms_auto_fmv.txt symbol (D_80121D08) is exactly 0x20. */
-static volatile int stream_opened;
-static volatile int stream_startsec;
-static volatile int stream_got_chunks;
-static volatile int stream_last_chunk;
-static int sector_dma_in;
-static int sector_dma;
+volatile int _get_count;   /* see _discard_count ruling comment above */
+volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
+int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
+CdlCB volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
+volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
+volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
+int time_in_frames;   /* written by the main loop (VID_GetTick), read by the handler */
+volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_last_sector;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_opened;
+volatile int stream_startsec;
+volatile int stream_got_chunks;
+volatile int stream_last_chunk;
+int sector_dma_in;
+int sector_dma;
 
 /* ---------------------------------------------------------------- MDEC bitstream decoder state */
-static int ordertab_length;
-static int mbuf;
-static void *vlctab;
-static void *vlcbuf[2];
-static RECT slice;
-static volatile int slices_to_do;
-static int slnum;
-static int slice_size;
-static int slice_inc;
-static int vbuf;
+int ordertab_length;
+int mbuf;
+unsigned short *vlctab;
+char *vlcbuf[2];
+RECT slice;
+volatile int slices_to_do;
+int slnum;
+int slice_size;
+int slice_inc;
+int vbuf;
 unsigned char map_buf[0x19000];   /* mdc bitstream work area (symbol_addrs_fmv.txt: size 0x19000); a
                                     * pointer jump table (void*[]) lives at byte offset 0x18FFC (see
                                     * start_mdec_decode/DCT_out_handler). */
 #define MAP_BUF_JTAB ((void **)&map_buf[0x18FFC])
-static int mdc_bufstart, mdc_buftop, mdc_buftotal, mdc_bufleft, num_mdcs;
-static int frame_decoded;
-static int last_fn, last_mdc;
-static int move_request, move_x, move_y, last_move_mbuf;
-static int mdec_cx, mdec_cy;
-static int do_brightness;
-static int area_pw, area_ph;
-static int num_pol[2];
-static int mdec_pw[2], mdec_ph[2];
-POLY_FT4 tmdc_pol[2][2][10];
+unsigned short *imgbuf[21];   /* set_mdec_img_buffer: 21 MDEC slice buffers */
+unsigned char *mdc_bufstart, *mdc_buftop;
+int mdc_buftotal, mdc_bufleft, num_mdcs;
+int frame_decoded;
+int last_fn = -1, last_mdc = -1;
+int move_request, move_x, move_y, last_move_mbuf = -1;
+int mdec_cx, mdec_cy;
+int do_brightness;
+int area_pw, area_ph;
+int num_pol[2];
+int mdec_pw[2], mdec_ph[2];
 POLY_FT4 br[2][2][10];
-static char tmdc_pol_dirty[2];
+POLY_FT4 tmdc_pol[2][2][10];
+char tmdc_pol_dirty[2];
 RECT mdc_buf[2];
-static int mdec_w, mdec_h;
+typedef struct { short vx, vy, vz, pad; } SVECTOR;   /* PsyQ libgte.h, sizeof 8 */
+SVECTOR tmdc_pol_offs[2][10][10];
+struct mdc_header;
+struct mdc_header *mdc_idx[10];
+struct _mdecanim mdec_queue[16];
+struct DR_ENV { unsigned char data[64]; };
+struct DR_ENV mdec_drenv[2];
+int mdec_w, mdec_h;
 
 /* ---------------------------------------------------------------- MDEC audio (SPU) state */
-static int mdec_audio_buffer[2];
-static int mdec_audio_playing;
-static int mdec_audio_offs;
-static int mdec_audio_rate_shift;
-static int mdec_audio_sec;
-static int sfx_volume;
-static unsigned char DiabEnd;   /* SYM: STAT UCHAR DiabEnd @0x8011b4e8; movie-end flag, read by
- * play_mdec_audio (previously undeclared -- that fn's SpuWrite address math used mdec_audio_sec
- * instead, a wrong-global bug). */
+int mdec_audio_buffer[2];
+int mdec_audio_playing;
+int mdec_audio_offs;
+int mdec_audio_rate_shift;
+int mdec_audio_sec;
+int sfx_volume = 0x3FFF;
 
 /* ---------------------------------------------------------------- movie-play queue */
-struct _mdecanim mdec_queue[16];
-static int mdec_head, mdec_tail, mdecs_queued, mdecs_waiting, mdec_waiting_tail;
-static int mdec_sectors_per_frame, mdec_framecount, mdec_last_frame, mdec_speed;
-static int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a placeholder
+int mdec_head, mdec_tail, mdecs_queued, mdecs_waiting, mdec_waiting_tail;
+int mdec_sectors_per_frame, mdec_framecount, mdec_last_frame, mdec_speed;
+int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a placeholder
  * "mdec_waiting_tail_unused" -- renamed: confirmed via SYM ($8011b5b4 EXT INT last_stream_frame) and
  * cross-refs in dequeue_animation.s + decode_mdec_stream.s (both use this exact bss slot). */
-static int streampos;
+int streampos;
 BOOL user_start;
-static void *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
-static void *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
-static void *vlc_tab;      /* Tmalloc'd MDEC VLC table buffer, ditto */
-unsigned short *imgbuf[21];   /* set_mdec_img_buffer: 21 MDEC slice buffers */
+unsigned char *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
+unsigned char *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
+unsigned char *vlc_tab = STR_Buffer; /* retail default VLC table; replaced by the playback allocation */
+static unsigned char DiabEnd;   /* SYM: STAT UCHAR DiabEnd @0x8011b4e8 */
+static char g_movie_filename[32]; /* @0x80121CE8; shared streamed-movie filename buffer */
 
 /* @0x80155E1C FMV.CPP:295 */
 extern "C" void _cd_seek(int sec)
@@ -282,9 +310,9 @@ extern "C" void _cd_seek(int sec)
 extern "C" void init_cdstream(int chunksize, unsigned char *buf, int bufsize)
 {
     stream_chunksize = chunksize;
-    stream_bufh = buf;
+    stream_bufh = (StHEADER *)buf;
     stream_bufsize = bufsize;
-    stream_buf = buf + ((bufsize * chunksize) << 5);
+    stream_buf = (strdata *)(buf + ((bufsize * chunksize) << 5));
 }
 
 /* @0x80155E7C FMV.CPP:328 */
@@ -347,8 +375,8 @@ extern "C" void stream_cdready_handler(unsigned char status, unsigned char *resu
                 cdstream_resetsec = stream_secnum;
                 return;
             }
-            CdGetSector(stream_bufh + (idx << 5), 8);
-            CdGetSector(stream_buf + (idx * 0x7E0), 0x1F8);
+            CdGetSector(&stream_bufh[idx], 8);
+            CdGetSector(&stream_buf[idx], 0x1F8);
             stream_secnum++;
             stream_subsec += 1;
             if (stream_subsec == stream_chunksize) {
@@ -416,8 +444,8 @@ extern "C" int cdstream_get_chunk(unsigned char **data, StHEADER **h)
     if (stream_chunks_in - stream_chunks_borrowed < 0)
         printf("underrun in get_chunk\n");
     if (stream_chunks_in != stream_chunks_borrowed) {
-        *data = stream_buf + stream_out * stream_chunksize * 0x7E0;
-        *h = (StHEADER *)(stream_bufh + stream_out * stream_chunksize * 32);
+        *data = (unsigned char *)&stream_buf[stream_out * stream_chunksize];
+        *h = &stream_bufh[stream_out * stream_chunksize];
         _get_count++;
         stream_out = (stream_out + 1) % stream_bufsize;
         stream_chunks_borrowed++;
@@ -591,19 +619,19 @@ extern "C" void init_mdec(unsigned char *vlc_buffer, unsigned char *vlc_table)
 {
     ordertab_length = 0x80;
     mbuf = 0;
-    vlctab = vlc_table;
+    vlctab = (unsigned short *)vlc_table;
     func_8013B6EC(vlc_table);
     func_8013AC3C(0);
     func_8013AED8(DCT_out_handler);
-    slice.h = 0x10;
-    vlcbuf[0] = vlc_buffer;
-    vlcbuf[1] = vlc_buffer + 0xEA60;
+    slice.w = 0x10;
+    vlcbuf[0] = (char *)vlc_buffer;
+    vlcbuf[1] = (char *)vlc_buffer + 0xEA60;
 }
 
 /* @0x801569D0 FMV.CPP:908 */
 extern "C" void init_mdec_buffer(char *buf, int size)
 {
-    mdc_bufstart = (int)buf;
+    mdc_bufstart = (unsigned char *)buf;
     mdc_buftop = mdc_bufstart;
     mdc_buftotal = size;
     mdc_bufleft = size;
@@ -623,8 +651,6 @@ extern "C" void init_mdec_buffer(char *buf, int size)
  * vx,vy,vz,pad), NOT a short[2][10][10][2] -- that's exactly why the confirmed byte coefficients
  * (800/80/8) were double a plain 2-short pair's stride: each grid point is a full SVECTOR (8 bytes),
  * x lives in .vx (+0), y in .vy (+2). */
-typedef struct { short vx, vy, vz, pad; } SVECTOR;   /* PsyQ libgte.h, sizeof 8 */
-static SVECTOR tmdc_pol_offs[2][10][10];
 #define TMDC_OFFS(mb, col, row) (tmdc_pol_offs[mb][col][row])
 
 /* Verbatim from Spongebob_SuperSponge/tools/psyq/include/LIBGPU.H (real PsyQ 4.0 header shipped with
@@ -756,6 +782,12 @@ extern "C" void rebuild_mdec_polys(int x, int y)
     }
 }
 
+/* @0x80156FA8 FMV.CPP:1034 */
+extern "C" void clear_mdec_frame(void)
+{
+    frame_decoded = 0;
+}
+
 extern unsigned long *ThisOt;   /* @0x8011AAB4 (gman.cpp's current ordering table) */
 
 /* @0x80156FB4 FMV.CPP:1044 -- SYM: FCN VOID; locals i (REG), cdbuf (REG UCHAR). */
@@ -794,6 +826,19 @@ extern "C" void draw_mdec_polys(int bright)
 
     if (do_brightness)
         do_brightness = 0;
+}
+
+/* @0x8015732C FMV.CPP:1087 */
+extern "C" void invalidate_mdec_frame(void)
+{
+    last_fn = -1;
+    last_mdc = -1;
+}
+
+/* @0x80157340 FMV.CPP:1097 */
+extern "C" int is_frame_decoded(void)
+{
+    return slices_to_do == 0;
 }
 
 /* @0x8015734C FMV.CPP:1111 -- SYM: w/h decremented in place, RECT r + int i, separate copy loops. */
@@ -848,25 +893,6 @@ extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, in
     last_fn = -1;
 }
 
-/* @0x80156FA8 FMV.CPP:1034 */
-extern "C" void clear_mdec_frame(void)
-{
-    frame_decoded = 0;
-}
-
-/* @0x8015732C FMV.CPP:1087 */
-extern "C" void invalidate_mdec_frame(void)
-{
-    last_fn = -1;
-    last_mdc = -1;
-}
-
-/* @0x80157340 FMV.CPP:1097 */
-extern "C" int is_frame_decoded(void)
-{
-    return slices_to_do == 0;
-}
-
 /* @0x801576DC FMV.CPP:1159 */
 extern "C" void set_mdec_poly_bright(int br)
 {
@@ -891,21 +917,8 @@ extern "C" int init_mdec_stream(unsigned char *buftop, int sectors_per_frame, in
 {
     mdec_sectors_per_frame = sectors_per_frame;
     init_cdstream(sectors_per_frame, buftop, mdec_frames_per_buffer);
-    mdec_framecount = 0;
+    mdec_streaming = 0;
     return (mdec_frames_per_buffer * mdec_sectors_per_frame) << 0xB;
-}
-
-/* @0x801578AC FMV.CPP:1283 */
-extern "C" void kill_mdec_audio(void)
-{
-    SpuFree(mdec_audio_buffer[0]);
-    SpuFree(mdec_audio_buffer[1]);
-}
-
-/* @0x801578DC FMV.CPP:1290 */
-extern "C" void stop_mdec_audio(void)
-{
-    SpuSetKey(0, 3);
 }
 
 /* Content-bug fix: struct was a fabricated shape (int sample_rate/short a,b/int loop/short c,d,e,f)
@@ -938,8 +951,8 @@ extern "C" void init_mdec_audio(int rate)
     mdec_audio_buffer[0] = SpuMalloc(20480);
     mdec_audio_buffer[1] = SpuMalloc(20480);
     mdec_audio_playing = 2;
-    mdec_audio_offs = 0;
     mdec_audio_sec = 0;
+    mdec_audio_offs = 0;
     mdec_audio_rate_shift = rate;
     if (mdec_audio_buffer[0] == -1 || mdec_audio_buffer[1] == -1)
         DBG_Error(0, "psxsrc/FMV.CPP", 1231);
@@ -951,6 +964,19 @@ extern "C" void init_mdec_audio(int rate)
     SpuSetTransferStartAddr(mdec_audio_buffer[1]);
     SpuWrite0(6144);
     SpuIsTransferCompleted(1);
+}
+
+/* @0x801578AC FMV.CPP:1283 */
+extern "C" void kill_mdec_audio(void)
+{
+    SpuFree(mdec_audio_buffer[0]);
+    SpuFree(mdec_audio_buffer[1]);
+}
+
+/* @0x801578DC FMV.CPP:1290 */
+extern "C" void stop_mdec_audio(void)
+{
+    SpuSetKey(0, 3);
 }
 
 /* Content-bug sweep vs the raw oracle (asm/nonmatchings/fmv/play_mdec_audio.s) -- confirmed
@@ -1061,12 +1087,6 @@ extern "C" void play_mdec_audio(unsigned char *data, asec *h)
         mdec_audio_playing--;
 }
 
-/* @0x80157D00 FMV.CPP:1437 */
-extern "C" void resync_audio(void)
-{
-    mdec_audio_playing = 2;
-}
-
 /* Content-bug fix: entirely fabricated struct/fields before (mask/l/r/pitch/adsr1..4 on a LOCAL,
  * non-static). The raw's SpuSetVoiceAttr arg is `&voice_attr` where `voice_attr` (SYM: STAT
  * SpuVoiceAttr @0x80121ca8) is a FUNCTION-LOCAL STATIC (declared inside the function below) --
@@ -1089,6 +1109,12 @@ extern "C" void set_mdec_audio_volume(short vol)
         SpuSetVoiceAttr(&voice_attr);
     }
     /* Retail SYM and the original Climax routine both declare a void result. */
+}
+
+/* @0x80157D00 FMV.CPP:1437 */
+extern "C" void resync_audio(void)
+{
+    mdec_audio_playing = 2;
 }
 
 /* @0x80157D10 FMV.CPP:1448 */

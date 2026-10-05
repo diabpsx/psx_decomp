@@ -9,7 +9,7 @@ lowercased MAP section name, e.g. recon/psxsrc/gman.cpp <-> src/gman.c <-> asm/n
 Per-function verdict comes from tools/verify_asm.py or a reviewed real-ASPSX
 entry, plus tools/symlane.py.  Call-target and jump-table audits remain required
 for the project seal bar."""
-import re, subprocess, sys, collections, json
+import re, subprocess, sys, collections, json, hashlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -92,6 +92,33 @@ def sym_ok(tu: Path, fns):
         out[m.group(1)] = m.group(2) == "SYM ok"
     return out
 
+
+def native_sym_receipts():
+    """Fresh complete-object native receipts supersede the raw prelink byte/SYM lanes.
+
+    PSYLINK can legitimately scatter TU-owned storage before producing the final bytes
+    and retail SYM. Trust a receipt only for the exact current source hash; the caller
+    additionally requires its segment and complete function count to match.
+    """
+    path = ROOT / "build" / "native_source" / "receipts.json"
+    if not path.is_file():
+        return {}
+    result = {}
+    try:
+        rows = json.loads(path.read_text())
+    except (ValueError, OSError):
+        return {}
+    for row in rows:
+        try:
+            source = (ROOT / row["source"]).resolve()
+            source.relative_to(ROOT.resolve())
+            digest = hashlib.sha256(source.read_bytes()).hexdigest()
+            if digest == row["source_sha256"] and type(row["functions"]) is int:
+                result[(row["segment"], source)] = row["functions"]
+        except (KeyError, OSError, ValueError):
+            continue
+    return result
+
 def main():
     tus = recon_tus()
     data = json.loads((ROOT / "configs/data_entries.json").read_text())
@@ -103,6 +130,7 @@ def main():
     segs = sys.argv[1:] or sorted(tus)
     registry = aspsx_registry()
     homes = segment_homes()
+    native_receipts = native_sym_receipts()
     total_all = sum(len(seg_functions(s)) for s in sorted(p.stem for p in (ROOT / "src").glob("*.c")) if s != "lib")
     lines = ["# Match progress — PASS = retail bytes via maspsx or reviewed real ASPSX, plus exact function-body SYM records; 🟡 = bytes only", ""]
     grand_pass = 0
@@ -134,8 +162,15 @@ def main():
             alt_want = [f for f in tfns if f in registry.get(seg, ()) and r.get(f, ("",))[0] != "PASS"]
             for f, nins in aspsx_gate(tu, alt_want).items():
                 r[f] = ("ASPSX", nins, 0)
+            native_complete = native_receipts.get((seg, tu.resolve())) == len(tfns)
+            if native_complete:
+                # The receipt verifies the complete linked .text bytes at this TU's retail
+                # address, so raw-prelink relocation addresses cannot demote its functions.
+                for f in tfns:
+                    r[f] = ("PASS", r.get(f, ("", 0, 0))[1], 0)
             byte_pass = [f for f, v in r.items() if v[0] in ("PASS", "ASPSX")]
-            sym = sym_ok(tu, byte_pass) if byte_pass else {}
+            sym = ({f: True for f in byte_pass} if native_complete else
+                   sym_ok(tu, byte_pass) if byte_pass else {})
             for f, v in list(r.items()):
                 if v[0] in ("PASS", "ASPSX") and not sym.get(f, False):
                     r[f] = ("SYMDIFF", v[1], 0)

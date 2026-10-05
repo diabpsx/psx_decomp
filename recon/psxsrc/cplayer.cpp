@@ -4,8 +4,8 @@
  * > skel/PSXSRC/CPLAYER.CPP drafts.  Layouts: tools/symhdr.py -> source/gen/structs_cplayer.h.
  * The GMAN.H/BLOCK.H/PRIMPOOL.H inlines used here are emitted out of line in this object. */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
 #include "source/gen/structs_cplayer.h"
+#include "psxsrc/primpool.h"
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "psxsrc/CPLAYER.CPP", line)   /* retail line literals */
 
@@ -60,8 +60,6 @@ static int WWorldX;   /* @0x8011C67C */
 static int WWorldY;   /* @0x8011C680 */
 
 static void FilthyTask(TASK *T);
-static POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim);
-
 /* @0x80095854 CPLAYER.CPP:72 */
 CPlayer::CPlayer(BOOL Town, int mPlayerNum, int NewNumOfPlayers)
 {
@@ -394,64 +392,4 @@ static void FilthyTask(TASK *T)
     GLUE_ResumeGame();
     PauseMode = 0;
     CDWAIT = 0;
-}
-
-/* ---- PRIMPOOL.H / CPLAYER.H / BLOCK.H / GMAN.H header copies ---- */
-
-/* @0x800966F8 PRIMPOOL.H:75 */
-static void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
-{
-    unsigned long *Dest32 = (unsigned long *)Dest;
-    unsigned long *Source32 = (unsigned long *)Source;
-    for (unsigned int f = 0; f < 10; f++)
-        *Dest32++ = *Source32++;
-}
-
-/* @0x800966BC PRIMPOOL.H:84 */
-static POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
-{
-    POLY_FT4 *RetPrim;
-    PRIM_GetPrim(&RetPrim);
-    PRIM_CopyPrim(RetPrim, Prim);
-    return RetPrim;
-}
-
-/* @0x80096720 CPLAYER.H */
-int CPlayer::GetDatMaxSize()
-{
-    if (InTown)
-        return 0x19E10;
-    else
-        return NumOfPlayers == 0 ? 0x2C308 : 0x182B8;
-}
-
-/* @0x80096760 BLOCK.H */
-int CBlocks::GetOtPos(int LogicalY)
-{
-    int OtPos;
-
-    OtPos = ClipRect.y + LogicalY + PosAdj;
-    if (OtPos < -0x43)
-        OtPos = -0x43;
-    if (OtPos >= 0x19C)
-        OtPos = 0x19B;
-    return OtPos + 0x4D;
-}
-
-/* @0x800967B4 GMAN.H:253 */
-int TextDat::GetNumOfFrames(int Creature, int Action)
-{
-    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
-}
-
-/* @0x800967EC GMAN.H:252 */
-int TextDat::GetNumOfActions(int Creature)
-{
-    return GetCreature(Creature)->NumOfActions;
-}
-
-/* @0x80096810 GMAN.H:284 */
-struct CCreatureHdr *TextDat::GetCreature(int Creature)
-{
-    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
 }

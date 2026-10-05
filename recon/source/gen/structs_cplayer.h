@@ -55,21 +55,11 @@ struct TextDat {   /* sizeof 112 */
     void PrepareFt4(struct POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
     static struct CTextFileInfo *GetFileInfo(int Id);
-    void SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY)
-    {
-        DecX = nDecX;
-        DecY = nDecY;
-        PalX = nPalX;
-        PalY = nPalY;
-    }
+    void SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY);
     struct CCreatureHdr *GetCreature(int Creature);
     int GetNumOfActions(int Creature);
     int GetNumOfFrames(int Creature, int Action);
-    void SetFileInfo(const struct CTextFileInfo *NewInfo, int NewTexNum)
-    {
-        FileInfo = (struct CTextFileInfo *)NewInfo;
-        TexNum = NewTexNum;
-    }
+    void SetFileInfo(const struct CTextFileInfo *NewInfo, int NewTexNum);
 };
 
 struct PlayerStruct;
@@ -427,5 +417,72 @@ struct PlayerParam {   /* sizeof 8 */
     CPlayer *ThePlayer;   /* +0x0 */
     int Id;   /* +0x4 */
 };
+
+/* Retail header copies. GCC 2.7.2 emits deferred inline bodies in reverse
+ * definition order, so this is the original header ordering read backwards
+ * from the CPLAYER.CPP tail. */
+inline void TextDat::SetFileInfo(const struct CTextFileInfo *NewInfo, int NewTexNum)
+{
+    FileInfo = (struct CTextFileInfo *)NewInfo;
+    TexNum = NewTexNum;
+}
+
+inline struct CCreatureHdr *TextDat::GetCreature(int Creature)
+{
+    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
+}
+
+inline int TextDat::GetNumOfActions(int Creature)
+{
+    return GetCreature(Creature)->NumOfActions;
+}
+
+inline int TextDat::GetNumOfFrames(int Creature, int Action)
+{
+    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
+}
+
+inline void TextDat::SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY)
+{
+    DecX = nDecX;
+    DecY = nDecY;
+    PalX = nPalX;
+    PalY = nPalY;
+}
+
+extern int PosAdj;
+inline int CBlocks::GetOtPos(int LogicalY)
+{
+    int OtPos = ClipRect.y + LogicalY + PosAdj;
+    if (OtPos < -0x43)
+        OtPos = -0x43;
+    if (OtPos >= 0x19C)
+        OtPos = 0x19B;
+    return OtPos + 0x4D;
+}
+
+inline int CPlayer::GetDatMaxSize()
+{
+    if (InTown)
+        return 0x19E10;
+    return NumOfPlayers == 0 ? 0x2C308 : 0x182B8;
+}
+
+void PRIM_GetPrim(POLY_FT4 **Prim);
+static inline void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
+{
+    unsigned long *Dest32 = (unsigned long *)Dest;
+    unsigned long *Source32 = (unsigned long *)Source;
+    for (unsigned int f = 0; f < 10; f++)
+        *Dest32++ = *Source32++;
+}
+
+static inline POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
+{
+    POLY_FT4 *RetPrim;
+    PRIM_GetPrim(&RetPrim);
+    PRIM_CopyPrim(RetPrim, Prim);
+    return RetPrim;
+}
 
 #endif

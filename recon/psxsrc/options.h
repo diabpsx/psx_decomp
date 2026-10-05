@@ -41,14 +41,40 @@ struct FRAME_HDR {   /* size 12; only .W accessed here */
     unsigned int W : 9, H : 9, PentaGram : 1, pad2 : 13;
 };
 struct TextDat {   /* sizeof 112 (SYM); only Frames is named */
-    unsigned char _pad0[0x24];
+    BOOL OwnDat;   /* +0x0 */
+    int TexNum;   /* +0x4 */
+    int LastFrame;   /* +0x8 */
+    BOOL DatLoaded;   /* +0xC */
+    long hndDat;   /* +0x10 */
+    long hndHdr;   /* +0x14 */
+    long hndPalOffset;   /* +0x18 */
+    long hndCreatureOffset;   /* +0x1C */
+    long hndBlockOffsets;   /* +0x20 */
     FRAME_HDR *Frames;   /* +0x24 */
     unsigned char _rest[112 - 0x28];
 
     POLY_FT4 * PrintFt4(int a, int b, int c, int d, int e, int f);
     POLY_GT4 * PrintGt4(int a, int b, int c, int d, int e, int f);
     /* GMAN.H in-class inline; -fno-inline emits the out-of-line copy (GetFr__7TextDati_800ab694) here */
-    FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
+    FRAME_HDR *GetFr(int FrNum);
+    void DumpDatFile();
+};
+
+class CPlayer;
+extern CPlayer *_7CPlayer_PActiveArray[2];
+class CPlayer : public TextDat {   /* sizeof 144 */
+public:
+    long hndDatMem;   /* +0x70 */
+    unsigned short NumOfPlayers;   /* +0x74 */
+    BOOL InTown;   /* +0x78 */
+    unsigned short PlayerNum;   /* +0x7C */
+    unsigned short Tpage;   /* +0x7E */
+    int TexId;   /* +0x80 */
+    int LastScrX;   /* +0x84 */
+    int LastScrY;   /* +0x88 */
+    int LastOtPos;   /* +0x8C */
+
+    static CPlayer *GetPlayer(int PNum);
 };
 TextDat * GM_UseTexData(int idx);   /* @0x80093C10 */
 void GM_FinishedUsing(TextDat *td);   /* @0x80093D80 */
@@ -96,8 +122,8 @@ struct CPad {   /* sizeof 236 */
     unsigned short GetDown() const;
     unsigned short GetUp() const;
     unsigned short GetTick() const;
-    void SetPadTick(unsigned short tick) { PADTICK = (unsigned char)tick; }
-    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
+    void SetPadTick(unsigned short tick);
+    void SetPadTickMask(unsigned short mask);
 };
 
 struct Dialog {   /* sizeof 16 */
@@ -108,15 +134,15 @@ struct Dialog {   /* sizeof 16 */
 
     Dialog();
     ~Dialog();
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetBack(int Type) { BackGfx = Type; }
+    void SetBorder(int Type);
+    void SetBack(int Type);
     void SetRGB(unsigned char R, unsigned char G, unsigned char B);
     void Back(int DX, int DY, int DW, int DH);   /* @0x8008BEE0 -- real fn, another TU (DIALOG.CPP) */
 };
 
 class CBlocks {
 public:
-    static int GetOverlayOtBase() { return 0x1E8; }
+    static int GetOverlayOtBase();
 };
 
 struct SFXHDR {   /* fields accessed here only */
@@ -361,5 +387,110 @@ void SoundPad(void);   /* @0x800A9260 OPTIONS.CPP:2043 */
 void DrawSpinner(int x, int y, unsigned char SpinR, unsigned char SpinG, unsigned char SpinB,
                   int spinradius, int spinbright, int angle, BOOL Sparkle, int OtPos, BOOL cross,
                   BOOL iso, unsigned char SinStep);   /* @0x800A6A44 OPTIONS.CPP:898 */
+
+/* Header definition order reconstructed from the reverse deferred-inline tail
+ * emitted by GCC 2.7.2 for OPTIONS.CPP. */
+extern "C" unsigned char GAL_Free(long Handle);
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd))
+            DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
+inline CPlayer *CPlayer::GetPlayer(int PNum)
+{
+    if (1 < (unsigned int)PNum)
+        DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
+    return _7CPlayer_PActiveArray[PNum];
+}
+
+inline FRAME_HDR *TextDat::GetFr(int FrNum)
+{
+    return Frames + (unsigned short)FrNum;
+}
+
+inline int CBlocks::GetOverlayOtBase()
+{
+    return 0x1E8;
+}
+
+inline Dialog::Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+
+inline Dialog::~Dialog()
+{
+}
+
+inline void Dialog::SetBorder(int Type)
+{
+    BorderGfx = Type;
+}
+
+inline void Dialog::SetBack(int Type)
+{
+    BackGfx = Type;
+}
+
+inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R;
+    DialogGreen = G;
+    DialogBlue = B;
+}
+
+inline void CPad::SetPadTick(unsigned short tick)
+{
+    PADTICK = (unsigned char)tick;
+}
+
+inline void CPad::SetPadTickMask(unsigned short mask)
+{
+    PADTICKMASK = mask;
+}
+
+inline unsigned short CPad::GetUp() const
+{
+    if (get_both != 0)
+        return both_Up;
+    return Up;
+}
+
+inline unsigned short CPad::GetDown() const
+{
+    if (get_both != 0)
+        return both_Down;
+    return Down;
+}
+
+inline unsigned short CPad::GetTick() const
+{
+    if (get_both != 0)
+        return both_Tick;
+    return Tick;
+}
+
+static inline void PRIM_GetPrim(POLY_G4 **Prim)
+{
+    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_G4) * 10) >= AddrToAvoid)
+        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
+    *Prim = (POLY_G4 *)ThisPrimAddr;
+    ThisPrimAddr = (POLY_FT4 *)((POLY_G4 *)ThisPrimAddr + 1);
+}
 
 #endif

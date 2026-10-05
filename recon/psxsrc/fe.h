@@ -61,6 +61,7 @@ struct TextDat {   /* sizeof 112 */
     int NumOfBuffers[2];   /* +0x64 */
     long hndDecompArrays;   /* +0x6C */
 
+    void DumpDatFile();
     POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 
@@ -555,6 +556,9 @@ extern struct FeTable FeBook2Menu;
 extern struct FeTable FeLoadCharMenu;
 extern struct FeTable FeLoadChar1Menu;
 extern struct FeTable FeLoadChar2Menu;
+extern struct FeTable McLoadGameMenu;
+void McCharCardMenuCtrl(void);
+void McMainCharKeyCtrl(void);
 extern struct FeMenuTable FeMainMenuTable[5];
 extern struct FeMenuTable FeNewGameMenuTable[3];
 extern struct FeMenuTable FePlayerClassMenuTable[5];

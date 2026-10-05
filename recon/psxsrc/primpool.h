@@ -8,6 +8,10 @@
 extern POLY_FT4 *ThisPrimAddr;   /* @0x8011AAB8 (.sdata) */
 extern POLY_FT4 *AddrToAvoid;    /* @0x8011AABC */
 
+#ifdef GMAN_OWNER_TU
+inline void PRIM_GetPrim(POLY_FT4 **Prim);
+inline void PRIM_GetPrim(POLY_GT4 **Prim);
+#else
 inline void PRIM_GetPrim(POLY_FT4 **Prim)
 {
     if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
@@ -22,4 +26,5 @@ inline void PRIM_GetPrim(POLY_GT4 **Prim)
     *Prim = (POLY_GT4 *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((POLY_GT4 *)ThisPrimAddr + 1);
 }
+#endif
 #endif

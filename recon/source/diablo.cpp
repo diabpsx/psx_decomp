@@ -29,6 +29,42 @@ static void plr_encrypt(unsigned char bEncrypt);   /* @0x80039EC0 DIABLO.CPP:351
 
 #define MAX_PLRS 2
 
+/* Original unused GMAN/CPLAYER header inlines retain their retail filename pool. */
+struct TextDat {
+    BOOL OwnDat;
+    int TexNum;
+    int LastFrame;
+    BOOL DatLoaded;
+    long hndDat;
+    unsigned char rest[112 - 0x14];
+
+    void DumpDatFile();
+};
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd))
+            DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
+class CPlayer;
+extern CPlayer *_7CPlayer_PActiveArray[2];
+class CPlayer : public TextDat {
+public:
+    unsigned char player_data[144 - 112];
+
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if (1 < (unsigned int)PNum)
+            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
+        return _7CPlayer_PActiveArray[PNum];
+    }
+};
+
 /* file statics (SYM class STAT, .bss @0x8012EAE8..) */
 static int glEndSeed[17];
 static int glMid1Seed[17];

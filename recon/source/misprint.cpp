@@ -5,10 +5,11 @@
  * Every Func<MIS> has the signature (MissileStruct *Ms, int ScrX, int ScrY, int OtPos).
  * TempPrintMissile(ScrX, ScrY, OtPos, spell, aframe, direction, anim, sfx, xflip, yflip, r, g, b, semi). */
 #include "diabpsx_types.h"
-#include "psxsrc/primpool.h"
 #include "source/gen/structs_misprint.h"
 #include "source/gen/externs_misprint.h"
 #include "source/gen/protos_misprint.h"
+
+extern "C" void DBG_Error(char *Text, char *File, int Line);
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "source/MISPRINT.cpp", line)   /* retail line literals */
 
@@ -21,6 +22,10 @@ inline CPlayer *CPlayer::GetPlayer(int PNum)
         DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
     return _7CPlayer_PActiveArray[PNum];
 }
+
+/* Keep PRIMPOOL.H last among the header-inline definitions: deferred inline
+ * emission is reversed, placing PRIM_GetPrim first in the retail tail. */
+#include "psxsrc/primpool.h"
 
 /* @0x8007B8C4 MISPRINT.CPP:85 */
 void DoPortalFX(POLY_FT4 *Ft4, int R, int G, int B, int OtPos)

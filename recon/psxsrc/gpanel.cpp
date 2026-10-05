@@ -43,8 +43,14 @@ struct TextDat {   /* sizeof 112 -- matches block.cpp's TextDat (its owner); onl
     int *PalOffset;             /* +0x30 */
     unsigned char pad2[112 - 0x34];
 
-    struct FRAME_HDR *GetFr(int FrNum);
-    PAL *GetPal(int PalNum);
+    struct FRAME_HDR *GetFr(int FrNum)
+    {
+        return (struct FRAME_HDR *)((char *)Frames + (FrNum & 0xFFFF) * 0xC);
+    }
+    PAL *GetPal(int PalNum)
+    {
+        return (PAL *)((char *)Pals + PalOffset[PalNum]);
+    }
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 
@@ -154,8 +160,14 @@ extern int InvGfxTable[];
 
 
 /* TU-owned small data: speed-bar needle physics state (persists between frames) */
-int D_8011AD94, D_8011AD98, D_8011AD9C, D_8011ADA0;
-int D_8011ADA4, D_8011ADA8, D_8011ADAC, D_8011ADB0;
+int D_8011AD94 = -64;
+int D_8011AD98 = -23;
+int D_8011AD9C = 19;
+int D_8011ADA0 = 48;
+int D_8011ADA4 = 4;
+int D_8011ADA8 = 4;
+int D_8011ADAC = 4;
+int D_8011ADB0 = 4;
 
 /* -------------------------------------------------------------------------------------------- */
 
@@ -176,13 +188,6 @@ GPanel::GPanel(int Ofs)
     ManaAnimCount = Ofs + 0x17;
     GlobeAnimCount = Ofs + 0xF;
     GPanelOt = CBlocks::GetMaxOtPos() - 2;
-}
-
-static unsigned char SpdTrimCol(short col)
-{
-    if (col < 0) col = 0;
-    if (col > 255) col = 255;
-    return col;
 }
 
 void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
@@ -283,14 +288,130 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     }
 }
 
-struct FRAME_HDR *TextDat::GetFr(int FrNum)
+static unsigned char SpdTrimCol(short col)
 {
-    return (struct FRAME_HDR *)((char *)Frames + (FrNum & 0xFFFF) * 0xC);
+    if (col < 0) col = 0;
+    if (col > 255) col = 255;
+    return col;
 }
 
-PAL *TextDat::GetPal(int PalNum)
+void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
 {
-    return (PAL *)((char *)Pals + PalOffset[PalNum]);
+    int X, Y, Loop;
+    struct POLY_FT4 *Ft4;
+    int Bx, By;
+
+    X = XY->MainX;
+    Y = XY->MainY;
+    X += XY->SpeedBarXOfs;
+    Y += XY->SpeedBarYOfs;
+    if (_pcurr_inv[sel_data] != -1) {
+        struct POLY_G4 *G4;
+        D_8011AD94 += D_8011ADA4;
+        D_8011AD98 += D_8011ADA8;
+        D_8011AD9C += D_8011ADAC;
+        D_8011ADA0 += D_8011ADB0;
+        if (D_8011AD94 >= 0x41) {
+            D_8011ADA4 = -4;
+        }
+        if (D_8011AD98 >= 0x41) {
+            D_8011ADA8 = -4;
+        }
+        if (D_8011AD9C >= 0x41) {
+            D_8011ADAC = -4;
+        }
+        if (D_8011ADA0 >= 0x41) {
+            D_8011ADB0 = -4;
+        }
+        if (D_8011AD94 < -0x40) {
+            D_8011ADA4 = 4;
+        }
+        if (D_8011AD98 < -0x40) {
+            D_8011ADA8 = 4;
+        }
+        if (D_8011AD9C < -0x40) {
+            D_8011ADAC = 4;
+        }
+        if (D_8011ADA0 < -0x40) {
+            D_8011ADB0 = 4;
+        }
+        G4 = PRIM_GetNextPolyG4__Fv();
+        setlen(G4, 8);
+        setcode(G4, 0x38);
+        /* Retail reads each vertex's selector before its coordinate stores. */
+        const int selected = _pcurr_inv[sel_data];
+        G4->y0 = Y;
+        G4->x0 = X + selected * 0x11;
+        const int selected1 = _pcurr_inv[sel_data];
+        G4->y1 = Y;
+        G4->x1 = X + selected1 * 0x11 + 0x11;
+        const int selected2 = _pcurr_inv[sel_data];
+        G4->y2 = Y + 0x14;
+        G4->x2 = X + selected2 * 0x11;
+        const int selected3 = _pcurr_inv[sel_data];
+        G4->y3 = Y + 0x14;
+        G4->x3 = X + selected3 * 0x11 + 0x11;
+        G4->r0 = (unsigned char)SpdTrimCol((short)(D_8011AD94 + 0xBF)) >> 1;
+        G4->g0 = SpdTrimCol(0);
+        G4->b0 = SpdTrimCol((short)(D_8011AD94 + 0x80));
+        G4->r1 = (unsigned char)SpdTrimCol((short)(D_8011AD98 + 0xBF)) >> 1;
+        G4->g1 = SpdTrimCol(0);
+        G4->b1 = SpdTrimCol((short)(D_8011AD98 + 0x80));
+        G4->r2 = (unsigned char)SpdTrimCol((short)(D_8011AD9C + 0xBF)) >> 1;
+        G4->g2 = SpdTrimCol(0);
+        G4->b2 = SpdTrimCol((short)(D_8011AD9C + 0x80));
+        G4->r3 = (unsigned char)SpdTrimCol((short)(D_8011ADA0 + 0xBF)) >> 1;
+        G4->g3 = SpdTrimCol(0);
+        G4->b3 = SpdTrimCol((short)(D_8011ADA0 + 0x80));
+        addPrim(&ThisOt[GPanelOt - 2], G4);
+        if (_SpdBeltSelFlag[sel_data] != 0) {
+            DrawSpinner__FiiUcUcUciiibiT8T8Uc(X + _pcurr_inv[sel_data] * 0x11 + 5, Y + 0xD, 0xA0, 0x40, 0xF0, 0x20, 0x60, 0, 0, GPanelOt - 1, 1, 0, 8);
+        }
+    }
+    Bx = X;
+    By = Y;
+    PanelTData->PrintFt4(0x99, Bx, By, 0, GPanelOt, 0);
+    X += 0x11;
+    Loop = 0;
+    PanelTData->PrintFt4(0x9A, Bx, By, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0x9B, Bx, By, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0x9C, Bx, By, 0, GPanelOt, 0);
+    for (; Loop < 6; Loop++) {
+        PanelTData->PrintFt4(0x9D, X, Y, 0, GPanelOt, 0);
+        PanelTData->PrintFt4(0x9E, X, Y, 0, GPanelOt, 0);
+        PanelTData->PrintFt4(0x9F, X, Y, 0, GPanelOt, 0);
+        PanelTData->PrintFt4(0xA0, X, Y, 0, GPanelOt, 0);
+        X += 0x11;
+    }
+    PanelTData->PrintFt4(0xA1, X, Y, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0xA2, X, Y, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0xA3, X, Y, 0, GPanelOt, 0);
+    PanelTData->PrintFt4(0xA4, X, Y, 0, GPanelOt, 0);
+    Loop = 0;
+    X = XY->MainX;
+    Y = XY->MainY;
+    const int InnerX = X + 2;
+    const int InnerY = Y + 2;
+    X = InnerX + XY->SpeedBarXOfs;
+    Y = InnerY + XY->SpeedBarYOfs;
+    do {
+        if (Plr->SpdList[Loop]._itype != -1) {
+            PanelTData->PrintFt4(InvGfxTable[Plr->SpdList[Loop]._iCurs], X, Y, 0, GPanelOt + 1, 0);
+        }
+        X += 0x11;
+        Loop++;
+    } while (Loop < 8);
+    Ft4 = PanelTData->PrintFt4(0x94, Bx, By, 0, GPanelOt - 1, 0);
+    setXYWH(Ft4, Bx + 1, By, 0x88, 0x14);
+    Ft4->r0 = 0x14;
+    Ft4->g0 = 0x14;
+    Ft4->b0 = 0x14;
+    Ft4->u1 = Ft4->u0 + 1;
+    Ft4->u3 = Ft4->u0 + 1;
+    Ft4->v2 = Ft4->v0 + 1;
+    Ft4->v3 = Ft4->v0 + 1;
+    Ft4->tpage |= 0x40;
+    Ft4->code = (Ft4->code | 2) & 0xFE;
 }
 
 void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)
@@ -435,125 +556,6 @@ void GPanel::Print(struct PanelXY *XY, struct PlayerStruct *Plr)
         HealthAnimCount = (HealthAnimCount + 1) & 0x1F;
         ManaAnimCount = (ManaAnimCount + 1) & 0x1F;
     }
-}
-
-void GPanel::DrawSpeedBar(struct PanelXY *XY, struct PlayerStruct *Plr)
-{
-    int X, Y, Loop;
-    struct POLY_FT4 *Ft4;
-    int Bx, By;
-
-    X = XY->MainX;
-    Y = XY->MainY;
-    X += XY->SpeedBarXOfs;
-    Y += XY->SpeedBarYOfs;
-    if (_pcurr_inv[sel_data] != -1) {
-        struct POLY_G4 *G4;
-        D_8011AD94 += D_8011ADA4;
-        D_8011AD98 += D_8011ADA8;
-        D_8011AD9C += D_8011ADAC;
-        D_8011ADA0 += D_8011ADB0;
-        if (D_8011AD94 >= 0x41) {
-            D_8011ADA4 = -4;
-        }
-        if (D_8011AD98 >= 0x41) {
-            D_8011ADA8 = -4;
-        }
-        if (D_8011AD9C >= 0x41) {
-            D_8011ADAC = -4;
-        }
-        if (D_8011ADA0 >= 0x41) {
-            D_8011ADB0 = -4;
-        }
-        if (D_8011AD94 < -0x40) {
-            D_8011ADA4 = 4;
-        }
-        if (D_8011AD98 < -0x40) {
-            D_8011ADA8 = 4;
-        }
-        if (D_8011AD9C < -0x40) {
-            D_8011ADAC = 4;
-        }
-        if (D_8011ADA0 < -0x40) {
-            D_8011ADB0 = 4;
-        }
-        G4 = PRIM_GetNextPolyG4__Fv();
-        setlen(G4, 8);
-        setcode(G4, 0x38);
-        /* Retail reads each vertex's selector before its coordinate stores. */
-        const int selected = _pcurr_inv[sel_data];
-        G4->y0 = Y;
-        G4->x0 = X + selected * 0x11;
-        const int selected1 = _pcurr_inv[sel_data];
-        G4->y1 = Y;
-        G4->x1 = X + selected1 * 0x11 + 0x11;
-        const int selected2 = _pcurr_inv[sel_data];
-        G4->y2 = Y + 0x14;
-        G4->x2 = X + selected2 * 0x11;
-        const int selected3 = _pcurr_inv[sel_data];
-        G4->y3 = Y + 0x14;
-        G4->x3 = X + selected3 * 0x11 + 0x11;
-        G4->r0 = (unsigned char)SpdTrimCol((short)(D_8011AD94 + 0xBF)) >> 1;
-        G4->g0 = SpdTrimCol(0);
-        G4->b0 = SpdTrimCol((short)(D_8011AD94 + 0x80));
-        G4->r1 = (unsigned char)SpdTrimCol((short)(D_8011AD98 + 0xBF)) >> 1;
-        G4->g1 = SpdTrimCol(0);
-        G4->b1 = SpdTrimCol((short)(D_8011AD98 + 0x80));
-        G4->r2 = (unsigned char)SpdTrimCol((short)(D_8011AD9C + 0xBF)) >> 1;
-        G4->g2 = SpdTrimCol(0);
-        G4->b2 = SpdTrimCol((short)(D_8011AD9C + 0x80));
-        G4->r3 = (unsigned char)SpdTrimCol((short)(D_8011ADA0 + 0xBF)) >> 1;
-        G4->g3 = SpdTrimCol(0);
-        G4->b3 = SpdTrimCol((short)(D_8011ADA0 + 0x80));
-        addPrim(&ThisOt[GPanelOt - 2], G4);
-        if (_SpdBeltSelFlag[sel_data] != 0) {
-            DrawSpinner__FiiUcUcUciiibiT8T8Uc(X + _pcurr_inv[sel_data] * 0x11 + 5, Y + 0xD, 0xA0, 0x40, 0xF0, 0x20, 0x60, 0, 0, GPanelOt - 1, 1, 0, 8);
-        }
-    }
-    Bx = X;
-    By = Y;
-    PanelTData->PrintFt4(0x99, Bx, By, 0, GPanelOt, 0);
-    X += 0x11;
-    Loop = 0;
-    PanelTData->PrintFt4(0x9A, Bx, By, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0x9B, Bx, By, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0x9C, Bx, By, 0, GPanelOt, 0);
-    for (; Loop < 6; Loop++) {
-        PanelTData->PrintFt4(0x9D, X, Y, 0, GPanelOt, 0);
-        PanelTData->PrintFt4(0x9E, X, Y, 0, GPanelOt, 0);
-        PanelTData->PrintFt4(0x9F, X, Y, 0, GPanelOt, 0);
-        PanelTData->PrintFt4(0xA0, X, Y, 0, GPanelOt, 0);
-        X += 0x11;
-    }
-    PanelTData->PrintFt4(0xA1, X, Y, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0xA2, X, Y, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0xA3, X, Y, 0, GPanelOt, 0);
-    PanelTData->PrintFt4(0xA4, X, Y, 0, GPanelOt, 0);
-    Loop = 0;
-    X = XY->MainX;
-    Y = XY->MainY;
-    const int InnerX = X + 2;
-    const int InnerY = Y + 2;
-    X = InnerX + XY->SpeedBarXOfs;
-    Y = InnerY + XY->SpeedBarYOfs;
-    do {
-        if (Plr->SpdList[Loop]._itype != -1) {
-            PanelTData->PrintFt4(InvGfxTable[Plr->SpdList[Loop]._iCurs], X, Y, 0, GPanelOt + 1, 0);
-        }
-        X += 0x11;
-        Loop++;
-    } while (Loop < 8);
-    Ft4 = PanelTData->PrintFt4(0x94, Bx, By, 0, GPanelOt - 1, 0);
-    setXYWH(Ft4, Bx + 1, By, 0x88, 0x14);
-    Ft4->r0 = 0x14;
-    Ft4->g0 = 0x14;
-    Ft4->b0 = 0x14;
-    Ft4->u1 = Ft4->u0 + 1;
-    Ft4->u3 = Ft4->u0 + 1;
-    Ft4->v2 = Ft4->v0 + 1;
-    Ft4->v3 = Ft4->v0 + 1;
-    Ft4->tpage |= 0x40;
-    Ft4->code = (Ft4->code | 2) & 0xFE;
 }
 
 /* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each

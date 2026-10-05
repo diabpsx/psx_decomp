@@ -75,8 +75,6 @@ int nSx1 = 0;
 int nSy1 = 0;
 int nSx2 = 0;
 int nSy2 = 0;
-struct ROOMNODE RoomList[81] = { { 0 } };
-unsigned char predungeon[40][40] = { { 0 } };
 
 /* ---------------------------------------------------------------------------------------------- */
 
@@ -1955,3 +1953,8 @@ void CreateL2Dungeon(unsigned int rseed, int entry)
         nSxy[idx + 3] = nSy2;
     }
 }
+
+/* Original trailing zero banks: their declaration position keeps the three
+ * PSX set-piece filenames ahead of them in the merged DRLG_L2 overlay group. */
+struct ROOMNODE RoomList[81] = { { 0 } };
+unsigned char predungeon[40][40] = { { 0 } };

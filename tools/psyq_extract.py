@@ -106,14 +106,15 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
     if d[:4] != b'LNK\x02':
         raise Desync("bad magic")
     p, cur = 4, None
-    sections, xdefs, xrefs, locs, patches = {}, [], [], [], []
+    sections, section_defs, xdefs, xrefs, locs, patches = {}, {}, [], [], [], []
     xref_symbols = {}
     groups = {}
-    code, bss, fname = {}, {}, None
+    code, bss, chunks, records, fname = {}, {}, [], [], None
     chunk_base = 0
     n = len(d)
     terminated = False
     while p < n:
+        record_start = p
         op = d[p]; p += 1
         if op == 0x00:
             terminated = True
@@ -123,6 +124,7 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
             if pad_even:
                 ln += ln & 1                                # 3.x (some objs): odd records even-padded
             chunk_base = len(code.get(cur, b''))            # patches below are CHUNK-relative
+            chunks.append(dict(sect=cur, off=chunk_base, size=ln, stream=len(chunks)))
             code[cur] = code.get(cur, b'') + d[p:p+ln]; p += ln
         elif op == 0x06:                                   # switch section
             cur = struct.unpack('<H', d[p:p+2])[0]; p += 2
@@ -159,6 +161,7 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
             ln = d[p]; p += 1
             nm = d[p:p+ln].decode('ascii', 'replace'); p += ln
             sections[sect] = nm
+            section_defs[sect] = {'group': grp, 'alignment': al, 'name': nm}
         elif op == 0x12:                                   # local symbol
             sect = struct.unpack('<H', d[p:p+2])[0]; p += 2
             val = struct.unpack('<I', d[p:p+4])[0]; p += 4
@@ -249,14 +252,17 @@ def parse_obj(d, alt_debug=False, pad_even=False, sld_debug=False):
             raise Desync("op 0x%02x @%d" % (op, p - 1))
         if sld_debug and p > n:
             raise Desync("truncated record 0x%02x" % op)
+        records.append({'op': op, 'start': record_start, 'end': p, 'section': cur})
     symbol_names = dict(xref_symbols)
     for row in xdefs:
         if row['sym'] in symbol_names and symbol_names[row['sym']] != row['name']:
             raise Desync('duplicate symbol number')
         symbol_names[row['sym']] = row['name']
-    return dict(sections=sections, xdefs=xdefs, xrefs=xrefs, xref_symbols=xref_symbols,
+    return dict(sections=sections, section_defs=section_defs,
+                xdefs=xdefs, xrefs=xrefs, xref_symbols=xref_symbols,
                 symbol_names=symbol_names, locals=locs, patches=patches,
-                code=code, bss=bss, filename=fname, consumed=p, total=n, terminated=terminated,
+                code=code, bss=bss, chunks=chunks, records=records, filename=fname,
+                consumed=p, total=n, terminated=terminated,
                 groups=groups)
 
 

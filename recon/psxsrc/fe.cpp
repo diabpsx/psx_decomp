@@ -5,6 +5,107 @@
  * line in this object (-fno-inline). */
 #include "psxsrc/fe.h"
 
+extern "C" unsigned char GAL_Free(long Handle);
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd))
+            DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
+class CPlayer;
+extern CPlayer *_7CPlayer_PActiveArray[2];
+class CPlayer : public TextDat {
+public:
+    unsigned char player_data[144 - 112];
+
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if (1 < (unsigned int)PNum)
+            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
+        return _7CPlayer_PActiveArray[PNum];
+    }
+};
+
+/* Complete retail FE data bank.  Function/menu pointers retain relocations, while
+ * FeBuffer and FePlayerName are the original zero-initialized trailing objects. */
+FeTable DummyMenu = { 0, 1, 64, 8, InitDummyMenu, NULL, NULL };
+FeTable FeMainMenu = { 0, 1, 64, 8, FeInitMainMenu, NULL, NULL };
+FeTable FeNewGameMenu = { 0, 1, 64, 8, FeInitNewGameMenu, FeNewGameMenuCtrl, NULL };
+FeTable FeNewP1ClassMenu = { 0, 1, 64, 8, FeInitPlayer1ClassMenu, FePlayerClassMenuCtrl, NULL };
+FeTable FeNewP1NameMenu = { 0, 1, 8, 8, FeInitNewP1NameMenu, FeNewNameMenuCtrl, NULL };
+FeTable FeNewP2ClassMenu = { 0, 1, 64, 8, FeInitPlayer2ClassMenu, FePlayerClassMenuCtrl, NULL };
+FeTable FeNewP2NameMenu = { 0, 1, 8, 8, FeInitNewP2NameMenu, FeNewNameMenuCtrl, NULL };
+FeTable FeDifficultyMenu = { 0, 1, 64, 8, FeInitDifficultyMenu, FeDifficultyMenuCtrl, NULL };
+FeTable FeBackgroundMenu = { 0, 1, 64, 8, FeInitBackgroundMenu, NULL, NULL };
+FeTable FeBook1Menu = { 0, 1, 64, 8, FeInitBook1Menu, FeBackBookMenuCtrl, NULL };
+FeTable FeBook2Menu = { 0, 1, 64, 8, FeInitBook2Menu, FeBackBookMenuCtrl, NULL };
+FeTable FeLoadCharMenu = { 0, 1, 64, 8, FeInitLoadMemcardSelect, McCharCardMenuCtrl, NULL };
+FeTable FeLoadChar1Menu = { 0, 1, 64, 8, FeInitLoadChar1Menu, McMainCharKeyCtrl, NULL };
+FeTable FeLoadChar2Menu = { 0, 1, 64, 8, FeInitLoadChar2Menu, McMainCharKeyCtrl, NULL };
+
+FeMenuTable FeMainMenuTable[5] = {
+    { 0, 0, JustCentre, 0x4FA, NULL, &LargeFont },
+    { 0, 22, JustCentre, 0x2B3, &FeNewGameMenu, &LargeFont },
+    { 0, 44, JustCentre, 0x25E, &McLoadGameMenu, &LargeFont },
+    { 0, 66, JustCentre, 0x2F5, &DummyMenu, &LargeFont },
+    { 0, 88, JustCentre, 0x03A, &FeBackgroundMenu, &LargeFont }
+};
+FeMenuTable FeNewGameMenuTable[3] = {
+    { 0, 0, JustCentre, 0x2DC, NULL, &LargeFont },
+    { 0, 65, JustCentre, 0x2F0, &FeNewP1ClassMenu, &MediumFont },
+    { 0, 78, JustCentre, 0x49C, &FeNewP1ClassMenu, &MediumFont }
+};
+FeMenuTable FePlayerClassMenuTable[5] = {
+    { 0, 0, JustCentre, 0x0B6, NULL, &LargeFont },
+    { 0, 65, JustCentre, 0x4BE, NULL, &MediumFont },
+    { 0, 78, JustCentre, 0x375, NULL, &MediumFont },
+    { 0, 91, JustCentre, 0x3E8, NULL, &MediumFont },
+    { 0, 104, JustCentre, 0x25B, &FeLoadCharMenu, &MediumFont }
+};
+unsigned char FeNameEngMenuTable[40] = {
+    'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T',
+    'U','V','W','X','Y','Z','^','.', '1','2','3','4','5','6','7','8','9','0','{','}'
+};
+FeMenuTable FeMemcardMenuTable[3] = {
+    { 0, 0, JustCentre, 0x3B7, NULL, &LargeFont },
+    { 0, 52, JustCentre, 0x288, &FeLoadChar1Menu, &MediumFont },
+    { 0, 78, JustCentre, 0x289, &FeLoadChar2Menu, &MediumFont }
+};
+FeMenuTable FeDifficultyMenuTable[4] = {
+    { 0, 0, JustCentre, 0x3B4, NULL, &LargeFont },
+    { 0, 65, JustCentre, 0x2BC, &FeDifficultyMenu, &MediumFont },
+    { 0, 78, JustCentre, 0x2B6, &FeDifficultyMenu, &MediumFont },
+    { 0, 91, JustCentre, 0x1BB, &FeDifficultyMenu, &MediumFont }
+};
+FeMenuTable FeBackgroundMenuTable[4] = {
+    { 0, 13, JustCentre, 0x03A, NULL, &LargeFont },
+    { 0, 31, JustCentre, 0x249, &FeBook1Menu, &MediumFont },
+    { 0, 61, JustCentre, 0x24A, &FeBook2Menu, &MediumFont },
+    { 0, 91, JustCentre, 0x466, &DummyMenu, &MediumFont }
+};
+FeMenuTable FeBook1MenuTable[5] = {
+    { 0, 13, JustCentre, 0x249, NULL, &LargeFont },
+    { 0, 46, JustCentre, 0x458, &DummyMenu, &MediumFont },
+    { 0, 61, JustCentre, 0x471, &DummyMenu, &MediumFont },
+    { 0, 76, JustCentre, 0x44A, &DummyMenu, &MediumFont },
+    { 0, 91, JustCentre, 0x43B, &DummyMenu, &MediumFont }
+};
+FeMenuTable FeBook2MenuTable[6] = {
+    { 0, 13, JustCentre, 0x24A, NULL, &LargeFont },
+    { 0, 39, JustCentre, 0x45E, &DummyMenu, &MediumFont },
+    { 0, 52, JustCentre, 0x438, &DummyMenu, &MediumFont },
+    { 0, 65, JustCentre, 0x448, &DummyMenu, &MediumFont },
+    { 0, 78, JustCentre, 0x452, &DummyMenu, &MediumFont },
+    { 0, 91, JustCentre, 0x46E, &DummyMenu, &MediumFont }
+};
+FeStruct FeBuffer[80];
+char FePlayerName[2][11];
+
 /* ---- TU-owned globals (SYM EXT/STAT; the oracle reaches them via %gp_rel -> defined here) ---- */
 int FeBackX = 0;
 int FeBackY = 0;

@@ -1,4 +1,2623 @@
 {
+  "diablo": {
+    "source": "recon/source/diablo.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x80037FAC",
+        "size": 8156
+      },
+      ".rdata": {
+        "va": "0x80111134",
+        "size": 116,
+        "scaffold": "rodata_diablo.rodata"
+      },
+      ".data": {
+        "va": "0x800CEC84",
+        "size": 2912,
+        "scaffold": "data_diablo.data",
+        "allow_zero_tail": 2912
+      },
+      ".sdata.diablo_last": {
+        "va": "0x8011B7D8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.diablo_mainwnd": {
+        "va": "0x8011B788",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.diablo_tiles": {
+        "va": "0x8011B7B0",
+        "size": 40,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.diablo_game": {
+        "va": "0x8011B7DC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.diablo_pause": {
+        "va": "0x8011B7A4",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 1
+      },
+      ".sdata.diablo_force": {
+        "va": "0x8011B790",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.diablo_gb": {
+        "va": "0x8011B800",
+        "size": 5,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 5
+      },
+      ".sdata.diablo_setseed": {
+        "va": "0x8011B79C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.diablo_mouse": {
+        "va": "0x8011B7AC",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 1
+      },
+      ".sdata.diablo_svga": {
+        "va": "0x8011B7E0",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 1
+      },
+      ".sdata.diablo_timeout": {
+        "va": "0x8011B7A8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sbss.diablo_lvldir": {
+        "va": "0x8011C7B0",
+        "size": 4,
+        "allow_zero_tail": 4
+      },
+      ".sbss.diablo_stack": {
+        "va": "0x8011C7B4",
+        "size": 4,
+        "allow_zero_tail": 4
+      },
+      ".sbss.diablo_pause": {
+        "va": "0x8011C7B8",
+        "size": 4,
+        "allow_zero_tail": 4
+      },
+      ".bss.diablo_seeds": {
+        "va": "0x8012EAE8",
+        "size": 308,
+        "allow_zero_tail": 308
+      },
+      ".bss.diablo_jmp": {
+        "va": "0x8012EC28",
+        "size": 48,
+        "allow_zero_tail": 48
+      }
+    },
+    "post_assemble_section_split": {
+      "section": ".sdata",
+      "pieces": [
+        {
+          "name": ".sdata.diablo_last",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": ".sdata.diablo_mainwnd",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": ".sdata.diablo_tiles",
+          "offset": 8,
+          "size": 40
+        },
+        {
+          "name": ".sdata.diablo_game",
+          "offset": 48,
+          "size": 4
+        },
+        {
+          "name": ".sdata.diablo_pause",
+          "offset": 52,
+          "size": 1
+        },
+        {
+          "name": ".sdata.diablo_force",
+          "offset": 56,
+          "size": 4
+        },
+        {
+          "name": ".sdata.diablo_gb",
+          "offset": 60,
+          "size": 5
+        },
+        {
+          "name": ".sdata.diablo_setseed",
+          "offset": 68,
+          "size": 4
+        },
+        {
+          "name": ".sdata.diablo_mouse",
+          "offset": 72,
+          "size": 1
+        },
+        {
+          "name": ".sdata.diablo_svga",
+          "offset": 73,
+          "size": 1
+        },
+        {
+          "name": ".sdata.diablo_timeout",
+          "offset": 76,
+          "size": 4
+        },
+        {
+          "name": ".sbss.diablo_lvldir",
+          "offset": 80,
+          "size": 4
+        },
+        {
+          "name": ".sbss.diablo_stack",
+          "offset": 84,
+          "size": 4
+        },
+        {
+          "name": ".sbss.diablo_pause",
+          "offset": 88,
+          "size": 4
+        }
+      ],
+      "allow_zero_gaps": true
+    },
+    "data_symbols": [
+      "DebugMonsters",
+      "pMegaTiles",
+      "glSeedTbl",
+      "gnLevelTypeTbl",
+      "LastFrCount",
+      "GameSpeed",
+      "PauseMode",
+      "force_redraw",
+      "gbProcessPlayers",
+      "gbDoEnding",
+      "gbRunGame",
+      "gbRunGameResult",
+      "gbGameLoopStartup",
+      "ghMainWnd",
+      "setseed",
+      "sgbMouseDown",
+      "svgamode",
+      "glEndSeed",
+      "glMid1Seed",
+      "glMid2Seed",
+      "glMid3Seed"
+    ],
+    "externals": [
+      "AddVision__FiiiUc",
+      "AllocdPiece__Fv",
+      "BuildLevTrigs__Fv",
+      "ChangeLightOff__Fiii",
+      "ChangeLightXY__Fiii",
+      "CheckCursMove__Fv",
+      "CheckIdentify__Fii",
+      "CheckQuests__Fv",
+      "CheckTriggers__Fi",
+      "ClearPanel__Fv",
+      "ClrDiabloMsg__Fv",
+      "ConvertdPiece__Fv",
+      "CreateL2Dungeon__FUii",
+      "CreateL3Dungeon__FUii",
+      "CreateL4Dungeon__FUii",
+      "CreateL5Dungeon__FUii",
+      "CreateThemeRooms__Fv",
+      "CreateTown__Fi",
+      "DBG_Error",
+      "DBG_Halt",
+      "DeltaLoadLevel__Fv",
+      "DiabloDieFlag",
+      "DoLoadedGame",
+      "DoRecharge__Fii",
+      "DoRepair__Fii",
+      "DoTelekinesis__Fv",
+      "FePlayerNo",
+      "FileLen__6FileIOPCc",
+      "FillSolidBlockTbls__Fv",
+      "FreeControlPan__Fv",
+      "FreeCursor__Fv",
+      "FreeInvGFX__Fv",
+      "FreeItemGFX__Fv",
+      "FreeLightTable__Fv",
+      "FreeMonsterSnd__Fv",
+      "FreeObjectGFX__Fv",
+      "FreePlayerGFX__Fi",
+      "FreeQuestText__Fv",
+      "FreeStoreMem__Fv",
+      "FreeTownerGFX__Fv",
+      "FreedPiece__Fv",
+      "Freeupstairs__Fv",
+      "GAL_Alloc",
+      "GAL_Free",
+      "GAL_Lock",
+      "GRL_PostMessage__FUlUilUl",
+      "GRL_SetWindowProc__FPFUlUilUl_Ul",
+      "GSYS_SetStackAndJump",
+      "GetFadeState__Fv",
+      "GetLevelMTypes__Fv",
+      "GetPortalLvlPos__Fv",
+      "GetReturnLvlPos__Fv",
+      "GetRndSeed__Fv",
+      "GetSpellLevel__Fii",
+      "HoldThemeRooms__Fv",
+      "InitAutomapOnce__Fv",
+      "InitAutomap__Fv",
+      "InitBird__Fv",
+      "InitControlPan__Fv",
+      "InitCursor__Fv",
+      "InitDead__Fv",
+      "InitDungMsgs__Fi",
+      "InitGamePadVars__Fv",
+      "InitInv__Fv",
+      "InitItemGFX__Fv",
+      "InitItems__Fb",
+      "InitL1Triggers__Fv",
+      "InitL2Triggers__Fv",
+      "InitL3Triggers__Fv",
+      "InitL4Triggers__Fv",
+      "InitLevelCursor__Fv",
+      "InitLevelMonsters__Fv",
+      "InitLevels__Fv",
+      "InitLightMax__Fv",
+      "InitLightTable__Fv",
+      "InitLighting__Fv",
+      "InitMissiles__Fv",
+      "InitMonsters__Fv",
+      "InitMultiView__Fv",
+      "InitObjectGFX__Fv",
+      "InitObjects__Fv",
+      "InitPlayerGFX__Fi",
+      "InitPlayer__FiUc",
+      "InitPortals__Fv",
+      "InitQuestText__Fv",
+      "InitQuests__Fv",
+      "InitStores__Fv",
+      "InitThemes__Fv",
+      "InitTownTriggers__Fv",
+      "InitTowners__Fv",
+      "InitVision__Fv",
+      "IsGameLoading__Fv",
+      "LoadRndLvlPal__Fi",
+      "LoadSetMap__Fv",
+      "LoadedChar",
+      "ML_Init__Fv",
+      "MakeLightTable__Fv",
+      "NetInit__FUcPUc",
+      "NetSendCmdLocParam1__FUcUcUcUcUs",
+      "NetSendCmdLocParam2__FUcUcUcUcUsUs",
+      "NetSendCmdParam1__FUcUcUs",
+      "NetSendCmdParam3__FUcUcUsUsUs",
+      "NewCursor__Fi",
+      "OVR_LoadFrontend__Fv",
+      "OVR_LoadGame__Fv",
+      "OVR_LoadMemcard__Fv",
+      "OVR_LoadPregame__Fv",
+      "PAD_Handler__Fv",
+      "PA_SetPauseOk__Fb",
+      "PaletteFadeOut__Fi",
+      "PlacePlayer__FiiiUc",
+      "PlayDungMsgs__Fv",
+      "ProcessBird__Fv",
+      "ProcessItems__Fv",
+      "ProcessLightList__Fv",
+      "ProcessMissiles__Fv",
+      "ProcessMonsters__Fv",
+      "ProcessObjects__Fv",
+      "ProcessPlayers__Fv",
+      "ProcessTowners__Fv",
+      "ProcessVisionList__Fv",
+      "QuestStatus__Fi",
+      "ReadAtAddr__6FileIOPCcPUci",
+      "ResyncQuests__Fv",
+      "SND_LoadBank__Fi",
+      "SYSI_GetFs__Fv",
+      "SavePreLighting__Fv",
+      "SetAmbientLight__Fv",
+      "SetCursor__Fi",
+      "SetDungeonMicros__Fv",
+      "SetMISSILE__Fii",
+      "SetQSpell__Fiii",
+      "SetRndSeed__Fl",
+      "SetSOLID__Fii",
+      "SetupTownStores__Fv",
+      "ShowProgress__FUi",
+      "SpawnQuestItem__Fiiiii",
+      "SpawnRock__Fv",
+      "TSK_Sleep",
+      "Tfree__FPv",
+      "Tmalloc__Fi",
+      "VID_GetTick__Fv",
+      "ViewX",
+      "ViewY",
+      "WorldToOffset__Fiii",
+      "_7CPlayer_PActiveArray",
+      "_pcurs",
+      "_pcursinvitem",
+      "_pcursobj",
+      "_pcursplr",
+      "currlevel",
+      "cursmx",
+      "cursmy",
+      "demo_pad_time",
+      "dung_map",
+      "dungeon",
+      "gbMaxPlayers",
+      "gbSelectProvider",
+      "gbValidSaveFile",
+      "last_type",
+      "level_record",
+      "leveltype",
+      "longjmp",
+      "music_fade__Fv",
+      "music_stop__Fv",
+      "mydflags",
+      "myplr",
+      "pad_func_Quick_Spell__Fi",
+      "pdungeon",
+      "plr",
+      "quests",
+      "sel_data",
+      "setjmp",
+      "setlevel",
+      "setlvlnum",
+      "setpc_x",
+      "setpc_y",
+      "sound_stop__Fv",
+      "sound_update__Fv",
+      "visible_level"
+    ]
+  },
+  "block": {
+    "source": "recon/psxsrc/block.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8008D41C",
+        "size": 19000
+      },
+      ".rdata": {
+        "va": "0x8011053C",
+        "size": 76,
+        "scaffold": "rodata_block.rodata"
+      },
+      ".data": {
+        "va": "0x800B8B80",
+        "size": 20,
+        "scaffold": "data_block.data"
+      },
+      ".sdata.block_pos": {
+        "va": "0x8011ACAC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_current": {
+        "va": "0x8011ACA8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_oldsp": {
+        "va": "0x8011ACE0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_select": {
+        "va": "0x8011AC8D",
+        "size": 27,
+        "scaffold": "sdata_after_primpool.sdata",
+        "borrowed_prefix": 1
+      },
+      ".sdata.block_rect": {
+        "va": "0x8011ACB4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_gt4": {
+        "va": "0x8011ACBC",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_render": {
+        "va": "0x8011ACC4",
+        "size": 20,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_xy": {
+        "va": "0x8011ACE4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_light": {
+        "va": "0x8011ACB0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.block_velocity": {
+        "va": "0x8011ACD8",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C65C",
+        "size": 4
+      },
+      ".bss": {
+        "va": "0x8011CBD0",
+        "size": 16
+      },
+      ".bss.block_xy": {
+        "va": "0x8011CBE0",
+        "size": 28
+      }
+    },
+    "post_assemble_section_split": {
+      "section": ".sdata",
+      "pieces": [
+        {
+          "name": ".sdata.block_pos",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": ".sdata.block_current",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": ".sdata.block_oldsp",
+          "offset": 8,
+          "size": 4
+        },
+        {
+          "name": ".sdata.block_select",
+          "offset": 12,
+          "size": 9,
+          "prefix_hex": "00"
+        },
+        {
+          "name": ".sdata.block_select",
+          "offset": 22,
+          "size": 18
+        },
+        {
+          "name": ".sdata.block_rect",
+          "offset": 40,
+          "size": 8
+        },
+        {
+          "name": ".sdata.block_gt4",
+          "offset": 48,
+          "size": 8
+        },
+        {
+          "name": ".sdata.block_render",
+          "offset": 56,
+          "size": 20
+        },
+        {
+          "name": ".sdata.block_xy",
+          "offset": 76,
+          "size": 8
+        },
+        {
+          "name": ".sdata.block_light",
+          "offset": 84,
+          "size": 4
+        },
+        {
+          "name": ".sdata.block_velocity",
+          "offset": 88,
+          "size": 8
+        }
+      ],
+      "allow_zero_gaps": true
+    },
+    "data_symbols": [
+      "TownConv",
+      "PosAdj",
+      "CurrentBlocks",
+      "OldSp",
+      "P1ObjSelCount",
+      "P2ObjSelCount",
+      "P12ObjSelCount",
+      "P1ItemSelCount",
+      "P2ItemSelCount",
+      "P12ItemSelCount",
+      "P1MonstSelCount",
+      "P2MonstSelCount",
+      "P12MonstSelCount",
+      "P1ObjSelCol",
+      "P2ObjSelCol",
+      "P12ObjSelCol",
+      "P1ItemSelCol",
+      "P2ItemSelCol",
+      "P12ItemSelCol",
+      "P1MonstSelCol",
+      "P2MonstSelCol",
+      "P12MonstSelCol",
+      "OtShift",
+      "OldLighting",
+      "GMXAdj2",
+      "GMYAdj2",
+      "Adjust",
+      "ax",
+      "ay",
+      "LightMethod",
+      "YPos",
+      "YVel",
+      "InfraFlag",
+      "dx",
+      "dy"
+    ],
+    "data_record_addresses": {
+      "Adjust": "0x8011ACD4"
+    },
+    "externals": [
+      "ABL_PrintPart",
+      "ABL_SetBlockRGBXY",
+      "AddrToAvoid",
+      "AllLevels",
+      "AllObjects",
+      "DBG_Error",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "FRIGFLAG",
+      "GAL_Alloc",
+      "GAL_Free",
+      "GAL_Lock",
+      "GAL_Unlock",
+      "GM_FinishedUsing__FP7TextDat",
+      "GM_UseTexData__Fi",
+      "GTE_RotateFT4",
+      "GU_GetRndRange",
+      "GetAction__C12CCreatureHdri",
+      "GetBoundingBox__6CBlockR7TextDatR4RECT",
+      "GetFrNum__7TextDatiiii",
+      "GetdDead__Fii",
+      "IsCompressed__7TextDatiiii",
+      "IsDirAliased__7TextDatiii",
+      "ItemAnimSnds",
+      "ItemCAnimTbl",
+      "MissDat",
+      "Monsters",
+      "NumOfMonsterListLevels",
+      "ObjMasterLoadList",
+      "ObjPrintFuncs",
+      "PRIM_Clip__FP4RECTi",
+      "PRIM_FullScreen__Fi",
+      "PauseMode",
+      "PlaySfxLoc__Fiii",
+      "PrepareFt4__7TextDatP8POLY_FT4iiiii",
+      "PrintFt4__7TextDatiiiiii",
+      "PrintMonster__7TextDatiiiiiii",
+      "SCR_GetBlackClut__Fv",
+      "SCR_NeedHighlightPal__FUsUsi",
+      "SYSI_GetFs__Fv",
+      "SetPal__7TextDatP9FRAME_HDRP8POLY_FT4",
+      "SetSp",
+      "SinTab",
+      "StartPartJump__Fiiiii",
+      "StonePals",
+      "TX_DatTab",
+      "ThisOt",
+      "ThisPrimAddr",
+      "TransPals",
+      "UPDATEPROGRESS__Fi",
+      "UniqTransPals",
+      "Use__7TextDatlbi",
+      "__7TextDat",
+      "___7TextDat",
+      "_pcursitem",
+      "_pcursmonst",
+      "_pcursobj",
+      "dMissArray",
+      "dead",
+      "dung_map",
+      "dung_map_b",
+      "dung_map_g",
+      "dung_map_r",
+      "dungeon",
+      "gr_scrxoff",
+      "gr_scryoff",
+      "item",
+      "leveltype",
+      "missile",
+      "monster",
+      "object",
+      "penta_clut",
+      "plr",
+      "qtextflag",
+      "restore_b",
+      "restore_g",
+      "restore_r",
+      "stextflag",
+      "towner",
+      "water_clut"
+    ]
+  },
+  "options": {
+    "source": "recon/psxsrc/options.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800A68D0",
+        "size": 19936
+      },
+      ".rdata": {
+        "va": "0x80110CF0",
+        "size": 208,
+        "scaffold": "rodata_options.rodata"
+      },
+      ".sdata.options_cs": {
+        "va": "0x8011B230",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_lastcs": {
+        "va": "0x8011B234",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_mono": {
+        "va": "0x8011B268",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_qfrom": {
+        "va": "0x8011B228",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_padfrig": {
+        "va": "0x8011B260",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_oldpad": {
+        "va": "0x8011B274",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_diablodie": {
+        "va": "0x8011B25C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_pressed": {
+        "va": "0x8011B290",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_lastlast": {
+        "va": "0x8011B238",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_spacing": {
+        "va": "0x8011B22C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_keypos": {
+        "va": "0x8011B270",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_debounce": {
+        "va": "0x8011B26C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_master": {
+        "va": "0x8011B278",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_music": {
+        "va": "0x8011B27C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_sound": {
+        "va": "0x8011B280",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_speech": {
+        "va": "0x8011B288",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_flag": {
+        "va": "0x8011B248",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_cmenu": {
+        "va": "0x8011B23C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_optionspad": {
+        "va": "0x8011B250",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.options_drawtask": {
+        "va": "0x8011B264",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_returnmenu": {
+        "va": "0x8011B28C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_character": {
+        "va": "0x8011B240",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_returncards": {
+        "va": "0x8011B24C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sdata.options_setseed": {
+        "va": "0x8011B258",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata",
+        "allow_zero_tail": 4
+      },
+      ".sbss": {
+        "va": "0x8011C6F0",
+        "size": 40
+      }
+    },
+    "post_assemble_section_split": {
+      "section": ".sdata",
+      "pieces": [
+        {
+          "name": ".sdata.options_cs",
+          "offset": 0,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_lastcs",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_optionspad",
+          "offset": 8,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_mono",
+          "offset": 12,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_qfrom",
+          "offset": 16,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_padfrig",
+          "offset": 20,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_oldpad",
+          "offset": 24,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_diablodie",
+          "offset": 28,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_pressed",
+          "offset": 32,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_lastlast",
+          "offset": 36,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_spacing",
+          "offset": 40,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_keypos",
+          "offset": 44,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_debounce",
+          "offset": 48,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_master",
+          "offset": 52,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_music",
+          "offset": 56,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_sound",
+          "offset": 60,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_speech",
+          "offset": 64,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_flag",
+          "offset": 68,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_cmenu",
+          "offset": 72,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_drawtask",
+          "offset": 76,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_returnmenu",
+          "offset": 80,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_character",
+          "offset": 84,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_returncards",
+          "offset": 88,
+          "size": 4
+        },
+        {
+          "name": ".sdata.options_setseed",
+          "offset": 92,
+          "size": 4
+        }
+      ]
+    },
+    "data_symbols": [
+      "MasterVol",
+      "MusicVol",
+      "SoundVol",
+      "SpeechVol",
+      "optionsflag",
+      "cmenu",
+      "options_pad",
+      "DrawOptionsTask",
+      "ReturnMenu",
+      "CharacterBlockLoaded",
+      "ReturnCards",
+      "MonoX",
+      "OptionsSetSeed",
+      "Qfromoptions",
+      "PadFrig",
+      "old_pad",
+      "DiabloDieFlag",
+      "they_pressed",
+      "lastlastcs",
+      "Spacing",
+      "KeyPos",
+      "debounce",
+      "OldLang",
+      "Slider",
+      "qspin",
+      "lqspin",
+      "NewLang",
+      "OrigLang",
+      "sw",
+      "ORect",
+      "cs",
+      "lastcs",
+      "sx",
+      "sy",
+      "Adjust"
+    ],
+    "data_record_addresses": {
+      "Adjust": "0x8011C700"
+    },
+    "absolute_bindings": {
+      "D_80157B68": "0x80157B68"
+    },
+    "scaffold_bindings": {
+      "D_8011B3D8": "sdata_after_primpool.sdata"
+    },
+    "retail_data_bindings": [
+      "KeyTab"
+    ],
+    "externals": [
+      "ActivateCharacterMemcard__Fii",
+      "ActivateMemcard__Fii",
+      "AddrToAvoid",
+      "AlertTxt",
+      "BLUEB",
+      "BLUEG",
+      "BLUER",
+      "BL_LoadStreamDir__Fv",
+      "BORDERB",
+      "BORDERG",
+      "BORDERR",
+      "Back__6Dialogiiii",
+      "CDWAIT",
+      "Circle",
+      "CountdownLoad__Fi",
+      "CountdownSave__Fi",
+      "DBG_Error",
+      "D_80157B68",
+      "DaveCentreStuff__Fv",
+      "DiabloCharacterFile",
+      "DiabloGameFile",
+      "DiabloOptionFile",
+      "DialogBlue",
+      "DialogGreen",
+      "DialogRed",
+      "DialogTBlue",
+      "DialogTGreen",
+      "DialogTRed",
+      "DoLoadedGame",
+      "DrawCtrlSetup__Fv",
+      "DrawHelp__Fv",
+      "FeFlag",
+      "FileSYS",
+      "GLUE_Finished__Fv",
+      "GLUE_ResumeGame__Fv",
+      "GLUE_SetHomingScrollFlag__Fb",
+      "GLUE_SetShowGameScreenFlag__Fb",
+      "GLUE_SetShowPanelFlag__Fb",
+      "GLUE_SuspendGame__Fv",
+      "GM_FinishedUsing__FP7TextDat",
+      "GM_UseTexData__Fi",
+      "GOLDB",
+      "GOLDG",
+      "GOLDR",
+      "GO_DoGameOver__Fv",
+      "GU_GetRnd",
+      "GetFadeState__Fv",
+      "GetFileNumber__FiPc",
+      "GetSaveStatusMessage__FiPc",
+      "GetSpeed__Fv",
+      "GetSpinnerWidth__Fi",
+      "GetStrWidth__5CFontPc",
+      "GetStr__Fi",
+      "IS_GameOver__Fv",
+      "InitCredits__Fv",
+      "IsGameLoading__Fv",
+      "LANG_GetLang__Fv",
+      "LANG_SetLang__F9LANG_TYPE",
+      "LargeFont",
+      "Loadfilename",
+      "MONO",
+      "MediumFont",
+      "MemCardActive",
+      "MemcardOFF__Fv",
+      "MemcardOverlay",
+      "MenuList",
+      "OVR_LoadGame__Fv",
+      "PAD_GetPad__FiUc",
+      "PSX_CH_SaveGame__Fii",
+      "PaletteFadeIn__Fi",
+      "PaletteFadeOut__Fi",
+      "PauseMode",
+      "PlaySFX__Fi",
+      "PostGamePad__Fiiii",
+      "PrintFt4__7TextDatiiiiii",
+      "PrintGt4__7TextDatiiiiii",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "REDB",
+      "REDG",
+      "REDR",
+      "RemoveCtrlScreen__Fv",
+      "STR_pauseall__Fv",
+      "STR_setvolume__FP6SFXHDR",
+      "Savefilename",
+      "SetSpeed__F9GM_SPEEDS",
+      "ShowAlertBox__Fv",
+      "ShowCardActionText__Fv",
+      "ShowCharacterFiles__FiiG4RECTi",
+      "ShowGameFiles__FPciiG4RECTi",
+      "ShowLoadingBox__Fi",
+      "SoundMenu",
+      "StartQuestlog__Fv",
+      "StatusTxt",
+      "TSK_AddTask",
+      "TSK_Exist",
+      "TSK_Sleep",
+      "ThisOt",
+      "ThisPrimAddr",
+      "VID_GetTick__Fv",
+      "VID_GetXOff__Fv",
+      "VID_GetYOff__Fv",
+      "VID_SetXYOff__Fii",
+      "WHITEB",
+      "WHITEG",
+      "WHITER",
+      "__builtin_delete",
+      "block_buf",
+      "card_active",
+      "card_side_empty",
+      "card_side_format",
+      "card_side_load",
+      "card_side_nogame",
+      "card_side_noopt",
+      "card_side_read",
+      "card_side_save",
+      "card_status",
+      "card_usable",
+      "cardondelay",
+      "countdownloadcharblock",
+      "ctrlflag",
+      "current_card",
+      "deathflag",
+      "format_card__Fi",
+      "formatflag",
+      "ignore_buttons",
+      "initchr",
+      "invflag",
+      "loadflag",
+      "msgflag",
+      "msgholdflag",
+      "music_fade__Fv",
+      "music_start__Fi",
+      "music_stop__Fv",
+      "pad_func_Chr__Fi",
+      "pad_func_SplBook__Fi",
+      "read_card_block__Fii",
+      "save_blocks",
+      "saveflag",
+      "sbookflag",
+      "sghMusic",
+      "sghStream",
+      "sglMasterVolume",
+      "sglMusicVolume",
+      "sglSoundVolume",
+      "sglSpeechVolume",
+      "sgnMusicTrack",
+      "sgpStreamSFX",
+      "snd_stop_snd__FP4TSnd",
+      "stream_pause__Fv",
+      "stream_resume__Fv",
+      "test_card_format__Fi"
+    ]
+  },
+  "padfuncs": {
+    "source": "recon/psxsrc/padfuncs.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800A09DC",
+        "size": 14760
+      },
+      ".sdata": {
+        "va": "0x8011B110",
+        "size": 22,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C6E0",
+        "size": 12
+      },
+      ".bss": {
+        "va": "0x8011D040",
+        "size": 16
+      },
+      ".ctors": {
+        "va": "0x800B0CB0",
+        "size": 4,
+        "scaffold": "ctors.data"
+      },
+      ".dtors": {
+        "va": "0x800B0CE0",
+        "size": 4,
+        "scaffold": "dtors.data"
+      }
+    },
+    "data_symbols": [
+      "gplayer",
+      "mana_order",
+      "health_order",
+      "select_flag",
+      "QSpell",
+      "_spltotype",
+      "SelectRect",
+      "item_select",
+      "SelectBack"
+    ],
+    "externals": [
+      "CheckNewPath__Fi",
+      "monster",
+      "ClrCursor__Fi",
+      "Qfromoptions",
+      "automapmoved",
+      "NewCursor__Fi",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "ForceTarget__11SpellTargetiii",
+      "GetGamePad__Fi",
+      "REDB",
+      "_spselflag",
+      "REDG",
+      "GLUE_SetShowPanelFlag__Fb",
+      "DialogTBlue",
+      "REDR",
+      "TargetActive__Fi",
+      "GLUE_Finished__Fv",
+      "myplr",
+      "abs",
+      "_pcurr_inv",
+      "PA_SetPauseOk__Fb",
+      "_pcursitem",
+      "sel_data",
+      "DialogGreen",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "DoShowPanel",
+      "TSK_Sleep",
+      "dung_map",
+      "_infoclr",
+      "plr",
+      "ClearPanel__Fv",
+      "BACKB",
+      "GetItemStr__Fi",
+      "BACKG",
+      "DrawChrTSK__FP4TASK",
+      "Back__6Dialogiiii",
+      "offset_x",
+      "TSK_Exist",
+      "offset_y",
+      "GLUE_SuspendGame__Fv",
+      "BACKR",
+      "_infostr",
+      "QuestlogDown__Fv",
+      "IsTrigger__Fii",
+      "GOLDB",
+      "GetDirection__Fiiii",
+      "BLUEB",
+      "DialogRed",
+      "GOLDG",
+      "BLUEG",
+      "WorldToOffset__Fiii",
+      "questlog",
+      "object",
+      "GOLDR",
+      "BLUER",
+      "PauseMode",
+      "Init__11SpellTargeti",
+      "CheckPlrSpell__Fv",
+      "__builtin_delete",
+      "_pcursinvitem",
+      "_pfind_list",
+      "_pcurs",
+      "PAD_GetPad__FiUc",
+      "automapflag",
+      "QuestlogUp__Fv",
+      "DialogTGreen",
+      "PosOkPlayer__Fiii",
+      "towner",
+      "SetItemMinStats__FPC12PlayerStructP10ItemStruct",
+      "options_pad",
+      "cursmx",
+      "cursmy",
+      "strcpy",
+      "optionsflag",
+      "DrawAndBlit__Fv",
+      "_SpdBeltSelFlag",
+      "item",
+      "NetSendCmdLocParam1__FUcUcUcUcUs",
+      "sbookflag",
+      "_pcursmonst",
+      "DialogTRed",
+      "UseInvItem__Fii",
+      "WHITEB",
+      "DrawSpellBookTSK__FP4TASK",
+      "_pcursobj",
+      "NetSendCmdLoc__FUcUcUcUc",
+      "WHITEG",
+      "ToggleOptions__Fv",
+      "BL_GetCurrentBlocks__Fv",
+      "ToggleSpell__Fi",
+      "qtextflag",
+      "stextflag",
+      "WHITER",
+      "FePlayerNo",
+      "chrflag",
+      "DialogBlue",
+      "GetStrWidth__5CFontPc",
+      "_pcursplr",
+      "leveltype",
+      "StartQuestlog__Fv",
+      "PostGamePad__Fiiii",
+      "StartStand__Fii",
+      "TryIconCurs__Fv",
+      "CanTalkToMonst__Fi",
+      "DoAutoMap__Fv",
+      "_pfind_index",
+      "invflag",
+      "GetWrap__5CFontPcP4RECT",
+      "GetWrapWidth__5CFontPcP4RECT",
+      "TSK_AddTask",
+      "CalcPlrScrolls__Fi",
+      "initchr",
+      "GLUE_ResumeGame__Fv",
+      "force_redraw",
+      "GetSpellTarget__Fi",
+      "PlaySFX__Fi",
+      "Remove__11SpellTarget",
+      "MediumFont"
+    ]
+  },
+  "misprint": {
+    "source": "recon/source/misprint.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8007B8C4",
+        "size": 7476
+      },
+      ".rdata": {
+        "va": "0x80118CA8",
+        "size": 172,
+        "scaffold": "rodata_misprint.rodata"
+      },
+      ".rdata.misprint_prim": {
+        "va": "0x80118D54",
+        "size": 20,
+        "scaffold": "rodata_misprint.rodata",
+        "allow_zero_tail": 2
+      },
+      ".data": {
+        "va": "0x800E38E4",
+        "size": 224,
+        "scaffold": "data_misprint.data"
+      },
+      ".sdata": {
+        "va": "0x8011BC28",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "MissDat"
+    ],
+    "externals": [
+      "ResurrectFX__Fiiii",
+      "ParticleExp__FP13MissileStructiiii",
+      "PrintFt4__7TextDatiiiiii",
+      "AddrToAvoid",
+      "DBG_Error",
+      "GM_UseTexData__Fi",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "plr",
+      "_7CPlayer_PActiveArray",
+      "ThisOt",
+      "GetFrNum__7TextDatiiii",
+      "DrawExpl__Fiiiiiccc",
+      "PrepareFt4__7TextDatP8POLY_FT4iiiii",
+      "PauseMode",
+      "ThisPrimAddr",
+      "ParticleMissile__FP13MissileStructiiii",
+      "currlevel"
+    ]
+  },
+  "dlg_2": {
+    "source": "recon/psxsrc/dlg_2.cpp",
+    "image": "frontend",
+    "sections": {
+      ".text": {
+        "va": "0x80159590",
+        "size": 9160
+      },
+      ".rdata.dlg_files": {
+        "source_section": ".rdata",
+        "va": "0x80143604",
+        "size": 72,
+        "raw_segment": "dlg",
+        "raw_kind": "c",
+        "allow_zero_tail": 3
+      },
+      ".rdata.dlg_formats": {
+        "va": "0x801436A0",
+        "size": 76,
+        "raw_segment": "dlg_1",
+        "raw_kind": "c"
+      },
+      ".sdata": {
+        "image": "diabpsx",
+        "va": "0x8011B410",
+        "size": 96,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "DiabloGameFile",
+      "DiabloOptionFile",
+      "DiabloCharacterFile",
+      "McState",
+      "fileinfoflag",
+      "AlertTxt",
+      "StatusTxt",
+      "current_card",
+      "LoadType",
+      "McMenuPos",
+      "McCurMenu"
+    ],
+    "data_record_addresses": {
+      "McState": "0x8011B420"
+    },
+    "externals": [
+      "FeSelUp__Fi",
+      "sprintf",
+      "DavesPad",
+      "card_files",
+      "MemcardOFF__Fv",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "GetDiabloStr__Fv",
+      "fileselect",
+      "card_dirty",
+      "FeFlag",
+      "InitPlayer__FiUc",
+      "countdownloadcharblock",
+      "card_side_empty",
+      "DialogTBlue",
+      "_witchitem",
+      "AlertStr",
+      "myplr",
+      "card_dir",
+      "loadflag",
+      "GetRndSeed__Fv",
+      "DialogGreen",
+      "ClrPlrPath__Fi",
+      "ActivateCharacterMemcard__Fii",
+      "plr",
+      "ClassStrTbl",
+      "FeDifficultyMenu",
+      "FePrevMenu__Fv",
+      "SetOTpos__5CFonti",
+      "Back__6Dialogiiii",
+      "card_header",
+      "FeBackH",
+      "GOLDB",
+      "DialogRed",
+      "GOLDG",
+      "McLoadCard1Menu",
+      "McLoadCard2Menu",
+      "FeBackW",
+      "card_side_nogame",
+      "FeBackX",
+      "FeBackY",
+      "card_usable",
+      "DoLoadedGame",
+      "GOLDR",
+      "DoLoadedChar",
+      "CharDataStruct",
+      "LargeFont",
+      "FeSelect__Fv",
+      "cardondelay",
+      "__builtin_delete",
+      "FeNewMenu__FP7FeTable",
+      "memset",
+      "PAD_GetPad__FiUc",
+      "strcat",
+      "RecreateItem__FiiUsiii",
+      "DialogTGreen",
+      "ShowCardActionText__Fv",
+      "card_side_read",
+      "strcmp",
+      "card_status",
+      "card_side_load",
+      "strcpy",
+      "PSX_CH_LoadGame__Fi",
+      "item",
+      "FeAddEntry__Fii8TXT_JUSTUsP7FeTableP5CFont",
+      "DialogTRed",
+      "ActivateMemcard__Fii",
+      "CharacterBlockLoaded",
+      "WHITEB",
+      "FeGetCursor__Fv",
+      "GetStr__Fi",
+      "LoadedChar",
+      "WHITEG",
+      "SetOTpos__6Dialogi",
+      "TempStr",
+      "WHITER",
+      "FeSelDown__Fi",
+      "FePlayerNo",
+      "PSX_OPT_SaveGame__FiPc",
+      "PSX_GM_LoadGame__FUcii",
+      "DialogBlue",
+      "GetStrWidth__5CFontPc",
+      "FeNewP2ClassMenu",
+      "DrawFeTwinkle__Fii",
+      "ExpLvlsTbl",
+      "CalcPlrInv__FiUc",
+      "PlaySFX__Fi",
+      "ShowLoadingBox__Fi",
+      "StorePlrNo",
+      "MediumFont",
+      "PSX_GM_SaveGame__FiPcT1",
+      "FeNoOfPlayers",
+      "strncat"
+    ]
+  },
+  "drlg_l2": {
+    "source": "recon/source/drlg_l2.cpp",
+    "image": "pregame",
+    "sections": {
+      ".text": {
+        "va": "0x80143408",
+        "size": 21148
+      },
+      ".sdata": {
+        "image": "diabpsx",
+        "va": "0x8011BE7C",
+        "size": 100,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "composed_group": {
+      "name": "drlg_l2_text",
+      "sections": [
+        ".data",
+        ".text"
+      ],
+      "image": "pregame",
+      "va": "0x80140EF4",
+      "size": 30640,
+      "exports": {
+        ".text": {
+          "offset": 9492,
+          "size": 21148
+        }
+      },
+      "raw_export_span": {
+        "offset": 0,
+        "size": 9492,
+        "kind": "rodata",
+        "target_prefix": "drlg_l2_rodata_"
+      }
+    },
+    "data_symbols": "all",
+    "externals": [
+      "QuestStatus__Fi",
+      "dminx",
+      "dminy",
+      "LvlViewX",
+      "dmaxx",
+      "LvlViewY",
+      "dmaxy",
+      "ENG_random__Fl",
+      "TransVal",
+      "DiabloAllocPtr__FUl",
+      "abs",
+      "SetRndSeed__Fl",
+      "GRL_LoadFileInMemSig__FPCcPUl",
+      "dung_map",
+      "DRLG_InitSetPC__Fv",
+      "mydflags",
+      "pdungeon",
+      "pSetPiece",
+      "SetMapMonsters__FPUcii",
+      "setloadflag",
+      "mem_free_dbg__FPv",
+      "DRLG_InitTrans__Fv",
+      "SetDPiece__Fiis",
+      "quests",
+      "UPDATEPROGRESS__Fi",
+      "nSxy",
+      "DRLG_Init_Globals__Fv",
+      "DRLG_CheckQuests__Fii",
+      "DRLG_SetPC__Fv",
+      "DRLG_PlaceThemeRooms__FiiiiUc",
+      "currlevel",
+      "setpc_h",
+      "pMegaTiles",
+      "dungeon",
+      "SetMapObjects__FPUcii",
+      "ViewX",
+      "ViewY",
+      "setpc_w",
+      "setpc_x",
+      "setpc_y"
+    ]
+  },
+  "ctrl": {
+    "source": "recon/psxsrc/ctrl.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8009C548",
+        "size": 5992
+      },
+      ".data": {
+        "va": "0x800CC364",
+        "size": 808,
+        "scaffold": "data_ctrl.data"
+      },
+      ".sdata": {
+        "va": "0x8011B01C",
+        "size": 111,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C6C8",
+        "size": 16
+      },
+      ".bss": {
+        "va": "0x8011CDF0",
+        "size": 16
+      },
+      ".ctors": {
+        "va": "0x800B0CAC",
+        "size": 4,
+        "scaffold": "ctors.data"
+      },
+      ".dtors": {
+        "va": "0x800B0CDC",
+        "size": 4,
+        "scaffold": "dtors.data"
+      }
+    },
+    "data_symbols": [
+      "pad_txt",
+      "txt_actions",
+      "AdvancedDefaults",
+      "BeginnerDefaults",
+      "toppos",
+      "ctrlflag",
+      "waitnomore",
+      "ctrl_select_line",
+      "ctrl_select_side",
+      "ckeyheld",
+      "CtrlRect",
+      "CtrlBack"
+    ],
+    "externals": [
+      "BORDERB",
+      "BORDERG",
+      "sprintf",
+      "tempstr",
+      "they_pressed",
+      "BORDERR",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "cmenu",
+      "REDB",
+      "_spselflag",
+      "REDG",
+      "FeFlag",
+      "pad_func_Use_Item__Fi",
+      "pad_func_Chr__Fi",
+      "DialogTBlue",
+      "REDR",
+      "pad_func_BeltList__Fi",
+      "pad_func_Inv__Fi",
+      "DialogGreen",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "pad_func_Quick_Use_Health__Fi",
+      "plr",
+      "SetOTpos__5CFonti",
+      "Back__6Dialogiiii",
+      "pad_func_Attack__Fi",
+      "pad_func_Quick_Spell__Fi",
+      "GOLDB",
+      "pad_func_Action__Fi",
+      "BLUEB",
+      "DialogRed",
+      "GOLDG",
+      "BLUEG",
+      "pad_func_Quick_Use_Mana__Fi",
+      "GOLDR",
+      "BLUER",
+      "pad_func_QLog__Fi",
+      "LargeFont",
+      "__builtin_delete",
+      "PAD_GetPad__FiUc",
+      "strcat",
+      "DialogTGreen",
+      "pad_func_SpellBook__Fi",
+      "options_pad",
+      "strcpy",
+      "PrintSelectBack__FUs",
+      "DialogTRed",
+      "pad_func_AutoMap__Fi",
+      "WHITEB",
+      "pad_func_SplBook__Fi",
+      "GetStr__Fi",
+      "WHITEG",
+      "SetOTpos__6Dialogi",
+      "WHITER",
+      "DialogBlue",
+      "GetStrWidth__5CFontPc",
+      "buttoncol",
+      "PostGamePad__Fiiii",
+      "PlaySFX__Fi",
+      "pad_func_Cast_Spell__Fi",
+      "MediumFont"
+    ]
+  },
+  "cardcore": {
+    "source": "recon/psxsrc/cardcore.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800A5004",
+        "size": 6348
+      },
+      ".rdata": {
+        "va": "0x80110CD0",
+        "size": 32,
+        "scaffold": "rodata_cardcore.rodata"
+      },
+      ".data": {
+        "va": "0x800CC7E8",
+        "size": 128,
+        "scaffold": "data_cardcore.data"
+      },
+      ".sdata": {
+        "va": "0x8011B160",
+        "size": 184,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "never_hooked_events",
+      "block_buf",
+      "MemCardActive",
+      "MemcardOverlay",
+      "NewCardFlag",
+      "countdownloadcharblock",
+      "mem_card_event_handler",
+      "saveflag",
+      "loadflag",
+      "formatflag",
+      "DoLoadedGame",
+      "card_side_empty",
+      "card_side_read",
+      "card_side_nogame",
+      "card_side_noopt",
+      "card_side_nocha",
+      "card_side_save",
+      "card_side_load",
+      "card_side_format",
+      "card_ev0",
+      "card_ev1",
+      "card_ev2",
+      "card_ev3",
+      "card_ev10",
+      "card_ev11",
+      "card_ev12",
+      "card_ev13",
+      "card_dirty",
+      "MemcardTask",
+      "save_blocks",
+      "card_event",
+      "cardondelay",
+      "card_active",
+      "Savefilename",
+      "Loadfilename",
+      "new_card_flag"
+    ],
+    "external_binding_aliases": {
+      "CharBlockBuf": "CharDataStruct"
+    },
+    "externals": [
+      "ChangeClearPAD",
+      "KeefDaFeef__Fi",
+      "_card_info",
+      "gbActivePlayers",
+      "GetFadeState__Fv",
+      "card_files",
+      "DrawOptionsTask",
+      "_card_wait",
+      "test_card_format__Fi",
+      "snd_stop_snd__FP4TSnd",
+      "ResetCallback",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "GetSaveStatusMessage__FiPc",
+      "FeFlag",
+      "StartCARD",
+      "STR_pauseall__Fv",
+      "GetFileNumber__FiPc",
+      "GLUE_SetShowPanelFlag__Fb",
+      "stream_stop__Fv",
+      "DialogTBlue",
+      "read_card_directory__Fi",
+      "DoSaveGame__Fv",
+      "AlertTxt",
+      "PA_SetPauseOk__Fb",
+      "DialogGreen",
+      "DiabloOptionFile",
+      "DiabloGameFile",
+      "_bu_init",
+      "EnableEvent",
+      "TSK_Sleep",
+      "plr",
+      "service_card__Fi",
+      "SetOTpos__5CFonti",
+      "DiabloCharacterFile",
+      "Back__6Dialogiiii",
+      "TSK_Exist",
+      "GRL_PostMessage__FUlUilUl",
+      "GLUE_SetHomingScrollFlag__Fb",
+      "DialogRed",
+      "card_usable",
+      "gbRunGame",
+      "ghMainWnd",
+      "PauseMode",
+      "PSX_CH_LoadBlock__Fii",
+      "GetVolumes__Fv",
+      "CharBlockBuf",
+      "__builtin_delete",
+      "memset",
+      "OVR_LoadFrontend__Fv",
+      "OpenEvent",
+      "DialogTGreen",
+      "ExitCriticalSection",
+      "STR_resumeall__Fv",
+      "card_status",
+      "options_pad",
+      "GetLoadStatusMessage__FPc",
+      "TestEvent",
+      "optionsflag",
+      "DoSaveOptions__Fv",
+      "InitCARD",
+      "last_card_status",
+      "new_card__Fi",
+      "DialogTRed",
+      "CharacterBlockLoaded",
+      "card_changed",
+      "StatusTxt",
+      "GetStr__Fi",
+      "LoadedChar",
+      "WHITEG",
+      "SetOTpos__6Dialogi",
+      "WHITER",
+      "FePlayerNo",
+      "PSX_GM_LoadGame__FUcii",
+      "DialogBlue",
+      "CalcVolumes__Fv",
+      "GetStrWidth__5CFontPc",
+      "TSK_Kill",
+      "PSX_OPT_LoadGame__Fiib",
+      "WinterSales__Fi",
+      "PaletteFadeOut__Fi",
+      "TSK_AddTask",
+      "drawsbarflag",
+      "GLUE_ResumeGame__Fv",
+      "VSync",
+      "_card_read",
+      "MediumFont",
+      "current_card",
+      "EnterCriticalSection"
+    ]
+  },
+  "cplayer": {
+    "source": "recon/psxsrc/cplayer.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x80095854",
+        "size": 4068
+      },
+      ".rdata": {
+        "va": "0x80110638",
+        "size": 156,
+        "borrowed_prefix": 4,
+        "scaffold": "rodata_cplayer.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AD50",
+        "size": 15,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C674",
+        "size": 16
+      }
+    },
+    "data_symbols": [
+      "OWorldX",
+      "OWorldY",
+      "WWorldX",
+      "WWorldY"
+    ],
+    "untyped_data_symbols": {
+      "_7CPlayer.PActiveArray": "_7CPlayer_PActiveArray"
+    },
+    "externals": [
+      "___7TextDat",
+      "Use__7TextDatlbi",
+      "GAL_Alloc",
+      "PrintFt4__7TextDatiiiiii",
+      "stream_stop__Fv",
+      "AddrToAvoid",
+      "DBG_Error",
+      "PosAdj",
+      "GetFileInfo__7TextDati",
+      "TSK_Sleep",
+      "plr",
+      "daylight",
+      "ThisOt",
+      "TSK_Exist",
+      "GetFrNum__7TextDatiiii",
+      "GLUE_SuspendGame__Fv",
+      "SetScrollTarget__7CBlocksii",
+      "PrepareFt4__7TextDatP8POLY_FT4iiiii",
+      "PauseMode",
+      "ShadScaleSkew__7CBlocksP8POLY_FT4",
+      "ThisPrimAddr",
+      "__7TextDat",
+      "ScrToWorldX__7CBlocksii",
+      "WorldToScrX__7CBlocksii",
+      "ScrToWorldY__7CBlocksii",
+      "WorldToScrY__7CBlocksii",
+      "GAL_Free",
+      "SpellFXDat",
+      "CDWAIT",
+      "DumpData__7TextDat",
+      "currlevel",
+      "leveltype",
+      "GetScrXY__7CBlocksR4RECTiiii",
+      "GetAction__C12CCreatureHdri",
+      "TSK_AddTask",
+      "GLUE_ResumeGame__Fv",
+      "DoReflection__FP8POLY_FT4iii"
+    ]
+  },
+  "stream": {
+    "source": "recon/psxsrc/stream.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x80098988",
+        "size": 6160
+      },
+      ".rdata": {
+        "va": "0x801108B4",
+        "size": 216,
+        "scaffold": "rodata_stream.rodata"
+      },
+      ".data": {
+        "va": "0x800B9BE0",
+        "size": 74188,
+        "scaffold": "data_stream.data"
+      },
+      ".sdata": {
+        "va": "0x8011ADBD",
+        "size": 51,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C6A4",
+        "size": 4
+      }
+    },
+    "data_symbols": [
+      "SFXTab",
+      "STR_Buffer",
+      "voice_attr",
+      "STRSave",
+      "NoActiveStreams",
+      "STRInit",
+      "frame_rate",
+      "CDAngle",
+      "my_spurate",
+      "Time",
+      "CDWAIT",
+      "SavePause"
+    ],
+    "data_record_addresses": {
+      "voice_attr": "0x800CBCE8"
+    },
+    "externals": [
+      "sprintf",
+      "AS_CloseStream__FP6STRHDRP6SFXHDR",
+      "sglSpeechVolume",
+      "PrintFt4__7TextDatiiiiii",
+      "FeFlag",
+      "sglMasterVolume",
+      "SpuSetTransferMode",
+      "sgszMusicTracks",
+      "BL_CloseStreamFile__FP6STRHDR",
+      "SpuSetTransferStartAddr",
+      "DBG_Error",
+      "GM_UseTexData__Fi",
+      "sgnMusicTrack",
+      "FRIGFLAG",
+      "sghMusic",
+      "SpuWrite",
+      "TSK_Sleep",
+      "plr",
+      "AS_GetBlock__FP6SFXHDR",
+      "systemtask",
+      "VID_GetTick__Fv",
+      "IsGameLoading__Fv",
+      "SpuWrite0",
+      "GLUE_HasGameStarted__Fv",
+      "FileSYS",
+      "SpuSetKeyOnWithAttr",
+      "BL_OpenStreamFile__FPcc",
+      "SpuSetKey",
+      "SpuMalloc",
+      "printf",
+      "strcmp",
+      "GetVideoMode",
+      "LANG_GetLang__Fv",
+      "strcpy",
+      "sgpStreamSFX",
+      "TSK_MakeTaskImmortal",
+      "AS_OpenStream__FP6STRHDRP6SFXHDR",
+      "sghStream",
+      "SpuFree",
+      "AS_WasLastBlock__FiP6STRHDRP6SFXHDR",
+      "sglMusicVolume",
+      "SpuSetReverbVoice",
+      "sglSoundVolume",
+      "qtextflag",
+      "SpuIsTransferCompleted",
+      "leveltype",
+      "TSK_AddTask",
+      "SpuSetVoiceAttr",
+      "PRIM_FullScreen__Fi"
+    ]
+  },
+  "biglump": {
+    "source": "recon/psxsrc/biglump.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8008725C",
+        "size": 3960
+      },
+      ".rdata": {
+        "va": "0x8011027C",
+        "size": 280,
+        "scaffold": "rodata_biglump.rodata"
+      },
+      ".data": {
+        "va": "0x800B79A4",
+        "size": 432,
+        "scaffold": "data_biglump.data"
+      },
+      ".sdata": {
+        "va": "0x8011AB60",
+        "size": 41,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "STREAM_DIR",
+      "STREAM_BIN",
+      "EAC_DirectoryCache",
+      "BL_NoLumpFiles",
+      "BL_NoStreamFiles",
+      "LFileTab",
+      "SFileTab",
+      "FileLoaded",
+      "NoQuedAsyncs",
+      "CurrAsync"
+    ],
+    "externals": [
+      "timerhz",
+      "sprintf",
+      "setasyncfile",
+      "ResetCallback",
+      "blockclear",
+      "setdirectorycache",
+      "cdromdirectoryentry",
+      "GAL_Alloc",
+      "setdirectory",
+      "initloadfilecallback",
+      "initpsxcdrom",
+      "cancelasyncload",
+      "FeFlag",
+      "DBG_Error",
+      "Tmalloc__Fi",
+      "fileexists",
+      "TSK_Sleep",
+      "ioreader",
+      "loadfileatadr",
+      "systemtask",
+      "filesize",
+      "strupr__FPc",
+      "initasyncstruct",
+      "asyncstructsize",
+      "addsystemtask",
+      "strlen",
+      "strcmp",
+      "disablecd",
+      "LANG_GetLang__Fv",
+      "getasyncreadstatus",
+      "GAL_Unlock",
+      "asyncloadsegment",
+      "GAL_Free",
+      "GAL_Lock",
+      "Tfree__FPv",
+      "SetGP",
+      "inittimer",
+      "FlushCache",
+      "asyncloadsegmentcallback",
+      "ReloadGP"
+    ]
+  },
+  "memcard": {
+    "source": "recon/psxsrc/memcard.cpp",
+    "image": "frontend",
+    "sections": {
+      ".text": {
+        "va": "0x801426F8",
+        "size": 3824
+      },
+      ".rdata": {
+        "va": "0x8013E158",
+        "size": 17824,
+        "scaffold": "memcard_rodata_8013e158.rodata"
+      },
+      ".sdata": {
+        "image": "diabpsx",
+        "va": "0x8011B3C8",
+        "size": 28,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "composed_group": {
+      "name": "memcard_text",
+      "sections": [
+        ".data",
+        ".rdata",
+        ".data.memcard_zeros",
+        ".text"
+      ],
+      "image": "frontend",
+      "va": "0x8013E158",
+      "size": 21648,
+      "exports": {
+        ".rdata": {
+          "offset": 0,
+          "size": 17824
+        },
+        ".text": {
+          "offset": 17824,
+          "size": 3824
+        }
+      }
+    },
+    "data_symbols": [
+      "sjis_table",
+      "card_dir",
+      "card_header",
+      "to_ascii_invalid_char",
+      "dirflag",
+      "card_status"
+    ],
+    "externals": [
+      "card_ev0",
+      "card_ev1",
+      "card_ev2",
+      "sprintf",
+      "card_ev3",
+      "card_files",
+      "_card_wait",
+      "erase",
+      "close",
+      "_get_errno",
+      "card_dirty",
+      "write",
+      "new_card_flag",
+      "_bu_init",
+      "card_removed__Fi",
+      "_card_clear",
+      "nextfile",
+      "PantsDelay__Fv",
+      "card_usable",
+      "format",
+      "memset",
+      "read",
+      "TestEvent",
+      "strcpy",
+      "block_buf",
+      "last_card_status",
+      "open",
+      "card_changed",
+      "firstfile",
+      "read_card_block__Fii",
+      "mem_card_event_handler",
+      "_card_load",
+      "test_hw_event__Fv"
+    ]
+  },
+  "gpanel": {
+    "source": "recon/psxsrc/gpanel.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800975CC",
+        "size": 5052
+      },
+      ".rdata": {
+        "va": "0x8011087C",
+        "size": 40,
+        "scaffold": "rodata_gpanel.rodata"
+      },
+      ".data": {
+        "va": "0x800B9BCC",
+        "size": 18,
+        "scaffold": "data_gpanel.data"
+      },
+      ".sdata": {
+        "va": "0x8011AD94",
+        "size": 32,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "DurColors"
+    ],
+    "scaffold_bindings": {
+      "D_80110868": "rodata_gpanel.rodata"
+    },
+    "externals": [
+      "PrintFt4__7TextDatiiiiii",
+      "GLUE_Finished__Fv",
+      "_pcurr_inv",
+      "GM_UseTexData__Fi",
+      "InvGfxTable",
+      "sel_data",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "ThisOt",
+      "VID_GetTick__Fv",
+      "SpellITbl",
+      "questlog",
+      "_SpdBeltSelFlag",
+      "spspelstate",
+      "sbookflag",
+      "gbMaxPlayers",
+      "qtextflag",
+      "stextflag",
+      "chrflag",
+      "invflag",
+      "PRIM_GetNextPolyG4__Fv",
+      "DrawInfoBox__FP4RECT"
+    ]
+  },
+  "dialog": {
+    "source": "recon/psxsrc/dialog.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8008AD90",
+        "size": 9444
+      },
+      ".rdata": {
+        "va": "0x801104DC",
+        "size": 50,
+        "scaffold": "rodata_dialog.rodata"
+      },
+      ".data": {
+        "va": "0x800B8AD0",
+        "size": 176,
+        "scaffold": "data_dialog.data"
+      },
+      ".sdata": {
+        "va": "0x8011ABF5",
+        "size": 131,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C64C",
+        "size": 16
+      }
+    },
+    "data_symbols": [
+      "BORDERB",
+      "BORDERG",
+      "DialogBackH",
+      "BORDERR",
+      "DialogBackW",
+      "DialogTData",
+      "DialogBevelUDH",
+      "DialogBevelLRH",
+      "DialogTBlue",
+      "DialogBevelUDW",
+      "DialogBevelLRW",
+      "Cxy",
+      "DialogBorderBH",
+      "DialogGreen",
+      "DialogBorderLH",
+      "DialogBorderBW",
+      "DialogBorderRH",
+      "DialogBorderTH",
+      "MY_DialogOTpos",
+      "DialogBorderLW",
+      "BACKB",
+      "DialogBorderRW",
+      "BACKG",
+      "DialogBorderTW",
+      "BACKR",
+      "DialogBevelGfx",
+      "DialogRed",
+      "DialogBorderBLH",
+      "DialogBorderBRH",
+      "DialogBorderBLW",
+      "DialogTGreen",
+      "DialogBorderTLH",
+      "DialogBorderBRW",
+      "DialogBorderTRH",
+      "DialogBorderTLW",
+      "DialogBorderTRW",
+      "DialogTRed",
+      "DialogBevelCH",
+      "DialogBorderGfx",
+      "DialogBlue",
+      "DialogBevelCW",
+      "DialogBackGfx",
+      "DialogGBack",
+      "GShadeTab",
+      "GShadeX",
+      "GShadeY",
+      "GShadePX",
+      "GShadePY",
+      "RandBTab"
+    ],
+    "externals": [
+      "PrintFt4__7TextDatiiiiii",
+      "DBG_Error",
+      "GM_UseTexData__Fi",
+      "PRIM_Clip__FP4RECTi",
+      "GU_GetRnd",
+      "ThisOt",
+      "PRIM_GetNextPolyFt4__Fv",
+      "PRIM_GetNextPolyGt4__Fv",
+      "qtextflag",
+      "PRIM_GetNextPolyG4__Fv",
+      "PRIM_FullScreen__Fi"
+    ]
+  },
+  "credits": {
+    "source": "recon/psxsrc/credits.cpp",
+    "image": "frontend",
+    "sections": {
+      ".text": {
+        "va": "0x8013D1B4",
+        "size": 4004
+      },
+      ".rdata": {
+        "va": "0x8013CB50",
+        "size": 1636,
+        "scaffold": "credits_rodata_8013cb50.rodata"
+      },
+      ".sdata": {
+        "image": "diabpsx",
+        "va": "0x8011B3BC",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "composed_group": {
+      "name": "credits_text",
+      "sections": [
+        ".rdata",
+        ".data",
+        ".rdata.credits_tail",
+        ".text"
+      ],
+      "image": "frontend",
+      "va": "0x8013CB50",
+      "size": 5640,
+      "exports": {
+        ".rdata": {
+          "offset": 0,
+          "size": 1636
+        },
+        ".text": {
+          "offset": 1636,
+          "size": 4004
+        }
+      }
+    },
+    "data_symbols": [
+      "CreditsText",
+      "CreditsTable",
+      "InCredits",
+      "CreditTitleNo",
+      "CreditSubTitleNo"
+    ],
+    "externals": [
+      "DavesPad",
+      "GetFadeState__Fv",
+      "Display__7CScreeniiii",
+      "___7TextDat",
+      "GetCharWidth__5CFontUc",
+      "AddrToAvoid",
+      "DBG_Error",
+      "GM_UseTexData__Fi",
+      "TSK_Sleep",
+      "_7CPlayer_PActiveArray",
+      "Load__7CScreeniii",
+      "ThisOt",
+      "PaletteFadeIn__Fi",
+      "VID_GetTick__Fv",
+      "CharFt4",
+      "GM_FinishedUsing__FP7TextDat",
+      "FeTData",
+      "LargeFont",
+      "__7CScreen",
+      "CharFrm",
+      "PrintSelectBack__FUs",
+      "ThisPrimAddr",
+      "CDWAIT",
+      "GetStr__Fi",
+      "PrintChar__5CFontUsUsUcUcUcUc",
+      "Set__7FontTab",
+      "LANG_ReloadMainTXT__Fv",
+      "LFont",
+      "PaletteFadeOut__Fi",
+      "PlaySFX__Fi",
+      "Unload__7CScreen",
+      "SetTextDat__5CFontP7TextDat",
+      "ReadPad__Fi"
+    ]
+  },
+  "startup": {
+    "source": "recon/psxsrc/startup.cpp",
+    "image": "diabpsx",
+    "routed_only": true,
+    "sections": {
+      ".text.startup_mem": {
+        "va": "0x800B04D0",
+        "size": 204,
+        "segment": "startup",
+        "functions": [
+          "MEM_SetupMem__Fv",
+          "SetupWorkRam__Fv"
+        ]
+      },
+      ".text.startup_pads": {
+        "va": "0x800B071C",
+        "size": 68,
+        "segment": "startup",
+        "functions": [
+          "PAD_Open__Fv"
+        ]
+      },
+      ".text.startup_gman": {
+        "va": "0x800B0760",
+        "size": 36,
+        "segment": "startup",
+        "functions": [
+          "GM_Open__Fv"
+        ]
+      },
+      ".sdata": {
+        "va": "0x8011AAD8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "Gaz"
+    ],
+    "retail_data_bindings": [
+      "PsxMem",
+      "PsxFastMem"
+    ],
+    "externals": [
+      "OPT_FreeMemStart",
+      "GAL_SetVerbosity",
+      "OPT_LinkerOpts",
+      "InitTAP",
+      "memset",
+      "OPT_FreeMemSize",
+      "AllDats",
+      "PadInit",
+      "RawPadData0",
+      "RawPadData1",
+      "StartTAP",
+      "GAL_AddMemType"
+    ]
+  },
+  "startup_1": {
+    "source": "recon/source/startup_1.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800B0A18",
+        "size": 640
+      },
+      ".rdata": {
+        "va": "0x80119464",
+        "size": 43,
+        "scaffold": "rodata_version_suffix.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BE14",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "Year",
+      "Day"
+    ],
+    "externals": [
+      "Words",
+      "CharPair2Num__FPc",
+      "DBG_Error",
+      "strupr__FPc",
+      "strcmp",
+      "strcpy",
+      "MonDays"
+    ]
+  },
+  "preauto": {
+    "source": "recon/source/preauto.cpp",
+    "image": "pregame",
+    "sections": {
+      ".text": {
+        "va": "0x8015F4C4",
+        "size": 548
+      },
+      ".rdata": {
+        "image": "diabpsx",
+        "va": "0x80119BEC",
+        "size": 19,
+        "scaffold": "rodata_preauto.rodata"
+      },
+      ".sdata": {
+        "image": "diabpsx",
+        "va": "0x8011C1E0",
+        "size": 36,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".bss": {
+        "image": "diabpsx",
+        "va": "0x8012FD80",
+        "size": 512
+      }
+    },
+    "data_symbols": [
+      "AutoMapTData",
+      "AmpBuffer"
+    ],
+    "externals": [
+      "ReadAtAddr__6FileIOPCcPUci",
+      "DBG_Error",
+      "AutoMapXOfs",
+      "AutoMapYOfs",
+      "GM_UseTexData__Fi",
+      "dung_map",
+      "automapflag",
+      "FileLen__6FileIOPCc",
+      "automapview",
+      "automaptype",
+      "leveltype",
+      "SYSI_GetFs__Fv"
+    ]
+  },
+  "titlescr": {
+    "source": "recon/psxsrc/titlescr.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8009E1F0",
+        "size": 516
+      },
+      ".data": {
+        "va": "0x800CC68C",
+        "size": 48,
+        "scaffold": "data_titlescr.data"
+      },
+      ".sdata": {
+        "va": "0x8011B0C0",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [
+      "TitleAnimCount",
+      "flametick",
+      "frmlist",
+      "xoff",
+      "flamecol"
+    ],
+    "externals": [
+      "Display__7CScreeniiii",
+      "PrintFt4__7TextDatiiiiii",
+      "Load__7CScreeniii",
+      "VID_GetTick__Fv",
+      "AttractNo",
+      "FlameTData"
+    ]
+  },
+  "pregame": {
+    "source": "recon/psxsrc/pregame.cpp",
+    "image": "pregame",
+    "sections": {
+      ".text": {
+        "va": "0x80139BFC",
+        "size": 40
+      },
+      ".rdata": {
+        "image": "diabpsx",
+        "va": "0x8011101C",
+        "size": 23,
+        "scaffold": "rodata_pregame.rodata"
+      }
+    },
+    "data_symbols": [],
+    "externals": [
+      "DBG_SendMessage"
+    ]
+  },
+  "presonly": {
+    "source": "recon/psxsrc/presonly.cpp",
+    "image": "frontend",
+    "sections": {
+      ".text": {
+        "va": "0x80139BFC",
+        "size": 40
+      },
+      ".rdata": {
+        "image": "diabpsx",
+        "va": "0x80110FA8",
+        "size": 23,
+        "scaffold": "rodata_presonly.rodata"
+      }
+    },
+    "data_symbols": [],
+    "externals": [
+      "DBG_SendMessage"
+    ]
+  },
   "savegp": {
     "source": "recon/eaclib/savegp.c",
     "image": "diabpsx",
@@ -8173,6 +10792,3466 @@
       "strlen",
       "strncmp",
       "write"
+    ]
+  },
+  "control": {
+    "source": "recon/source/control.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8003017C",
+        "size": 30136
+      },
+      ".rdata": {
+        "va": "0x80111034",
+        "size": 240,
+        "scaffold": "rodata_control.rodata"
+      },
+      ".data": {
+        "va": "0x800CE310",
+        "size": 2048,
+        "scaffold": "data_control.data"
+      },
+      ".bss.control_panel": {
+        "va": "0x8012E538",
+        "size": 1360
+      },
+      ".bss.control_back": {
+        "va": "0x8012EA88",
+        "size": 16
+      },
+      ".bss.control_talk": {
+        "va": "0x8012EA98",
+        "size": 80
+      },
+      ".ctors": {
+        "va": "0x800B0CBC",
+        "size": 4,
+        "scaffold": "ctors.data"
+      },
+      ".dtors": {
+        "va": "0x800B0CEC",
+        "size": 4,
+        "scaffold": "dtors.data"
+      },
+      ".sdata.control_00": {
+        "va": "0x8011B629",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_01": {
+        "va": "0x8011B62C",
+        "size": 32,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_02": {
+        "va": "0x8011B650",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_03": {
+        "va": "0x8011B65C",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_04": {
+        "va": "0x8011B664",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_05": {
+        "va": "0x8011B668",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_06": {
+        "va": "0x8011B66C",
+        "size": 52,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_07": {
+        "va": "0x8011B6A0",
+        "size": 2,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_08": {
+        "va": "0x8011B6A4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_09": {
+        "va": "0x8011B6B0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_10": {
+        "va": "0x8011B6B4",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_11": {
+        "va": "0x8011B6BE",
+        "size": 2,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_12": {
+        "va": "0x8011B6C0",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_13": {
+        "va": "0x8011B6C2",
+        "size": 2,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_14": {
+        "va": "0x8011B6C5",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_15": {
+        "va": "0x8011B6C6",
+        "size": 18,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_16": {
+        "va": "0x8011B6D8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_17": {
+        "va": "0x8011B6DC",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_18": {
+        "va": "0x8011B6EC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_19": {
+        "va": "0x8011B6F0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_20": {
+        "va": "0x8011B6F4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_21": {
+        "va": "0x8011B700",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_22": {
+        "va": "0x8011B705",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_23": {
+        "va": "0x8011B708",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.control_24": {
+        "va": "0x8011B714",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss.control_25": {
+        "va": "0x8011C764",
+        "size": 12
+      },
+      ".sbss.control_26": {
+        "va": "0x8011C774",
+        "size": 16
+      },
+      ".sbss.control_27": {
+        "va": "0x8011C784",
+        "size": 16
+      },
+      ".sbss.control_28": {
+        "va": "0x8011C794",
+        "size": 4
+      },
+      ".sbss.control_29": {
+        "va": "0x8011C798",
+        "size": 4
+      },
+      ".sbss.control_30": {
+        "va": "0x8011C7A0",
+        "size": 8
+      },
+      ".sbss.control_31": {
+        "va": "0x8011C7A8",
+        "size": 3
+      }
+    },
+    "post_assemble_section_split": [
+      {
+        "section": ".sdata",
+        "pieces": [
+          {
+            "name": ".sdata.control_00",
+            "offset": 0,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 12,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 16,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 76,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 80,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 84,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 88,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 92,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_01",
+            "offset": 96,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_02",
+            "offset": 160,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_02",
+            "offset": 168,
+            "size": 1
+          },
+          {
+            "name": ".sdata.control_03",
+            "offset": 20,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_03",
+            "offset": 68,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_04",
+            "offset": 24,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_05",
+            "offset": 28,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 4,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 8,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 32,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 36,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 40,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 44,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 48,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 52,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 56,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 60,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 64,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_06",
+            "offset": 100,
+            "size": 8
+          },
+          {
+            "name": ".sdata.control_07",
+            "offset": 72,
+            "size": 2,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_08",
+            "offset": 108,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_08",
+            "offset": 112,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_09",
+            "offset": 220,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_10",
+            "offset": 127,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_11",
+            "offset": 128,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_11",
+            "offset": 129,
+            "size": 1
+          },
+          {
+            "name": ".sdata.control_12",
+            "offset": 125,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_13",
+            "offset": 130,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_13",
+            "offset": 131,
+            "size": 1
+          },
+          {
+            "name": ".sdata.control_14",
+            "offset": 132,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_15",
+            "offset": 126,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_15",
+            "offset": 133,
+            "size": 1
+          },
+          {
+            "name": ".sdata.control_15",
+            "offset": 136,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_15",
+            "offset": 140,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_15",
+            "offset": 144,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_15",
+            "offset": 196,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_16",
+            "offset": 184,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_17",
+            "offset": 176,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_17",
+            "offset": 180,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_17",
+            "offset": 188,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_17",
+            "offset": 200,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_18",
+            "offset": 192,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_19",
+            "offset": 172,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_20",
+            "offset": 116,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_21",
+            "offset": 204,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_22",
+            "offset": 124,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_23",
+            "offset": 208,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_23",
+            "offset": 212,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_23",
+            "offset": 216,
+            "size": 4
+          },
+          {
+            "name": ".sdata.control_24",
+            "offset": 148,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.control_24",
+            "offset": 152,
+            "size": 8
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".sbss",
+        "pieces": [
+          {
+            "name": ".sbss.control_25",
+            "offset": 0,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.control_25",
+            "offset": 60,
+            "size": 4
+          },
+          {
+            "name": ".sbss.control_26",
+            "offset": 28,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.control_26",
+            "offset": 36,
+            "size": 8
+          },
+          {
+            "name": ".sbss.control_27",
+            "offset": 8,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.control_27",
+            "offset": 44,
+            "size": 8
+          },
+          {
+            "name": ".sbss.control_28",
+            "offset": 16,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.control_29",
+            "offset": 20,
+            "size": 2,
+            "alignment": 2,
+            "prefix_hex": "0000"
+          },
+          {
+            "name": ".sbss.control_30",
+            "offset": 52,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.control_30",
+            "offset": 56,
+            "size": 4
+          },
+          {
+            "name": ".sbss.control_31",
+            "offset": 24,
+            "size": 3,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".bss",
+        "pieces": [
+          {
+            "name": ".bss.control_talk",
+            "offset": 0,
+            "size": 80
+          },
+          {
+            "name": ".bss.control_panel",
+            "offset": 80,
+            "size": 1360
+          },
+          {
+            "name": ".bss.control_back",
+            "offset": 1440,
+            "size": 16
+          }
+        ]
+      }
+    ],
+    "data_symbols": "all",
+    "absolute_bindings": {
+      "func_80161F58": "0x80161F58"
+    },
+    "externals": [
+      "BACKB",
+      "BACKG",
+      "BACKR",
+      "BLUEB",
+      "BLUEG",
+      "BLUER",
+      "BORDERB",
+      "BORDERG",
+      "BORDERR",
+      "Back__6Dialogiiii",
+      "CalcStatDiff__Fi",
+      "CheckInvHLight__Fv",
+      "CheckSpell__FiicUc",
+      "DBG_Error",
+      "DialogBlue",
+      "DialogGreen",
+      "DialogRed",
+      "DialogTBlue",
+      "DialogTGreen",
+      "DialogTRed",
+      "DoShowPanel",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "FePlayerNo",
+      "GLUE_Finished__Fv",
+      "GLUE_ResumeGame__Fv",
+      "GLUE_SetHomingScrollFlag__Fb",
+      "GLUE_SetShowGameScreenFlag__Fb",
+      "GLUE_SetShowPanelFlag__Fb",
+      "GLUE_SuspendGame__Fv",
+      "GM_UseTexData__Fi",
+      "GOLDB",
+      "GOLDG",
+      "GOLDR",
+      "GetDamageAmt__FiPiT1",
+      "GetItemStr__Fi",
+      "GetManaAmount__Fii",
+      "GetObjectStr__Fi",
+      "GetStrWidth__5CFontPc",
+      "GetStr__Fi",
+      "GetWrap__5CFontPcP4RECT",
+      "InitDiabloMsg__Fc",
+      "InvPageFlag",
+      "InvPageNo",
+      "LANG_GetLang__Fv",
+      "LoadFileInMem__FPCcPUl",
+      "MakeItemStr__FP10ItemStructUsUs",
+      "MaxStats",
+      "MediumFont",
+      "MouseX",
+      "MouseY",
+      "NetSendCmdParam1__FUcUcUs",
+      "PAD_GetPad__FiUc",
+      "PRIM_GetNextPolyGt4__Fv",
+      "PauseMode",
+      "PlaySFX__Fi",
+      "PostGamePad__Fiiii",
+      "PrintFt4__7TextDatiiiiii",
+      "PrintMonstHistory__Fi",
+      "PrintSelectBack__FUs",
+      "PrintUniqueHistory__Fv",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "Qfromoptions",
+      "REDB",
+      "REDG",
+      "REDR",
+      "RemoveTargetCursor__Fi",
+      "SelectorActive__Fv",
+      "TSK_AddTask",
+      "TSK_Kill",
+      "TSK_Sleep",
+      "ThisOt",
+      "ToggleOptions__Fv",
+      "VID_GetTick__Fv",
+      "WHITEB",
+      "WHITEG",
+      "WHITER",
+      "_7CPlayer_PActiveArray",
+      "__builtin_delete",
+      "_infoclr",
+      "_pcurs",
+      "_pcursinvitem",
+      "_pcursitem",
+      "_pcursmonst",
+      "_pcursobj",
+      "_pcursplr",
+      "_pinfoflag",
+      "_trigflag",
+      "automapflag",
+      "cmenu",
+      "currlevel",
+      "force_redraw",
+      "func_80161F58",
+      "gbActivePlayers",
+      "gbMaxPlayers",
+      "ignore_buttons",
+      "invflag",
+      "leveltype",
+      "mem_free_dbg__FPv",
+      "monster",
+      "myplr",
+      "options_pad",
+      "optionsflag",
+      "pQLogCel",
+      "plr",
+      "qtextflag",
+      "questlog",
+      "sel_data",
+      "spelldata",
+      "sprintf",
+      "stextflag",
+      "strcpy",
+      "stream_pause__Fv",
+      "stream_resume__Fv",
+      "stream_stop__Fv",
+      "towner"
+    ]
+  },
+  "gman": {
+    "source": "recon/psxsrc/gman.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x80091E54",
+        "size": 13732
+      },
+      ".rdata.gman_file": {
+        "va": "0x80110588",
+        "size": 16,
+        "scaffold": "rodata_gman.rodata"
+      },
+      ".rdata.gman_cpp": {
+        "va": "0x80110598",
+        "size": 16,
+        "scaffold": "rodata_gman.rodata"
+      },
+      ".rdata.gman_prim": {
+        "va": "0x801105A8",
+        "size": 18,
+        "scaffold": "rodata_gman.rodata"
+      },
+      ".data": {
+        "va": "0x800B8B94",
+        "size": 3780,
+        "scaffold": "data_gman.data"
+      },
+      ".sbss": {
+        "va": "0x8011C66C",
+        "size": 8
+      },
+      ".ctors": {
+        "va": "0x800B0CA4",
+        "size": 4,
+        "scaffold": "ctors.data"
+      },
+      ".dtors": {
+        "va": "0x800B0CD8",
+        "size": 4,
+        "scaffold": "dtors.data"
+      },
+      ".sdata.gman_tp": {
+        "va": "0x8011ACEC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.gman_dat": {
+        "va": "0x8011ACF0",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.gman_decb": {
+        "va": "0x8011ACF8",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.gman_names": {
+        "va": "0x8011AD00",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.gman_hdr": {
+        "va": "0x8011AD14",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.gman_state": {
+        "va": "0x8011AD1C",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "post_assemble_section_split": [
+      {
+        "section": ".rdata",
+        "pieces": [
+          {
+            "name": ".rdata.gman_cpp",
+            "offset": 0,
+            "size": 16,
+            "alignment": 2
+          },
+          {
+            "name": ".rdata.gman_file",
+            "offset": 16,
+            "size": 16,
+            "alignment": 2
+          },
+          {
+            "name": ".rdata.gman_prim",
+            "offset": 32,
+            "size": 18,
+            "alignment": 8
+          }
+        ]
+      },
+      {
+        "section": ".sdata",
+        "pieces": [
+          {
+            "name": ".sdata.gman_decb",
+            "offset": 0,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.gman_tp",
+            "offset": 8,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.gman_names",
+            "offset": 12,
+            "size": 16,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.gman_dat",
+            "offset": 28,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.gman_hdr",
+            "offset": 36,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.gman_state",
+            "offset": 44,
+            "size": 16,
+            "alignment": 2
+          }
+        ]
+      }
+    ],
+    "data_symbols": [
+      "DatPool",
+      "AllDats",
+      "MyGT4",
+      "TpW",
+      "TpH",
+      "TpXDest",
+      "TpYDest"
+    ],
+    "retail_data_bindings": [
+      "MyFT4"
+    ],
+    "externals": [
+      "AddrToAvoid",
+      "BL_FileExists__FPcc",
+      "CDWAIT",
+      "DBG_Error",
+      "DEC_AddAsDecRequestor__FP7TextDat",
+      "DEC_RemoveAsDecRequestor__FP7TextDat",
+      "DrawSync",
+      "FeFlag",
+      "FileLen__6FileIOPCc",
+      "FileSYS",
+      "GAL_Alloc",
+      "GAL_Free",
+      "GAL_Lock",
+      "GAL_SetMemName",
+      "GAL_Unlock",
+      "GPUQ_DiscardHandle__Fl",
+      "GPUQ_FlushQ__Fv",
+      "GPUQ_LoadImage__FP4RECTli",
+      "GU_AlignVal",
+      "GetClut",
+      "GetTPage",
+      "LZNP_Decode__FPUcT0",
+      "LoadImage",
+      "ReadAtAddr__6FileIOPCcPUci",
+      "Read__6FileIOPCcUl",
+      "SYSI_GetFs__Fv",
+      "SetDrawLoad",
+      "StreamFile__6FileIOPCciPFPUciib_bii",
+      "TX_DatTab",
+      "ThisOt",
+      "ThisPrimAddr",
+      "__builtin_delete",
+      "strcat",
+      "strcpy",
+      "strlen"
+    ]
+  },
+  "fe": {
+    "source": "recon/psxsrc/fe.cpp",
+    "image": "frontend",
+    "sections": {
+      ".text": {
+        "va": "0x80139C24",
+        "size": 12076
+      },
+      ".rdata": {
+        "image": "diabpsx",
+        "va": "0x80110FC0",
+        "size": 92,
+        "scaffold": "rodata_fe.rodata"
+      },
+      ".data": {
+        "image": "diabpsx",
+        "va": "0x800CD680",
+        "size": 3214,
+        "scaffold": "data_fe.data"
+      },
+      ".sbss": {
+        "image": "diabpsx",
+        "va": "0x8011C748",
+        "size": 4
+      },
+      ".sdata.fe_00": {
+        "image": "diabpsx",
+        "va": "0x8011B320",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_01": {
+        "image": "diabpsx",
+        "va": "0x8011B328",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_02": {
+        "image": "diabpsx",
+        "va": "0x8011B334",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_03": {
+        "image": "diabpsx",
+        "va": "0x8011B338",
+        "size": 15,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_04": {
+        "image": "diabpsx",
+        "va": "0x8011B348",
+        "size": 28,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_05": {
+        "image": "diabpsx",
+        "va": "0x8011B364",
+        "size": 17,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_06": {
+        "image": "diabpsx",
+        "va": "0x8011B378",
+        "size": 20,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_07": {
+        "image": "diabpsx",
+        "va": "0x8011B38C",
+        "size": 18,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fe_08": {
+        "image": "diabpsx",
+        "va": "0x8011B3A0",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "post_assemble_section_split": {
+      "section": ".sdata",
+      "pieces": [
+        {
+          "name": ".sdata.fe_00",
+          "offset": 76,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_00",
+          "offset": 92,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_01",
+          "offset": 84,
+          "size": 8,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_01",
+          "offset": 96,
+          "size": 1
+        },
+        {
+          "name": ".sdata.fe_02",
+          "offset": 100,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_03",
+          "offset": 80,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_03",
+          "offset": 104,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_03",
+          "offset": 136,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_03",
+          "offset": 140,
+          "size": 3
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 108,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 112,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 116,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 120,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 124,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 128,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_04",
+          "offset": 132,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_05",
+          "offset": 0,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_05",
+          "offset": 4,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_05",
+          "offset": 8,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_05",
+          "offset": 12,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_05",
+          "offset": 16,
+          "size": 1
+        },
+        {
+          "name": ".sdata.fe_06",
+          "offset": 20,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_06",
+          "offset": 24,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_06",
+          "offset": 28,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_06",
+          "offset": 32,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_06",
+          "offset": 36,
+          "size": 2
+        },
+        {
+          "name": ".sdata.fe_06",
+          "offset": 38,
+          "size": 2
+        },
+        {
+          "name": ".sdata.fe_07",
+          "offset": 40,
+          "size": 8,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_07",
+          "offset": 48,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_07",
+          "offset": 52,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_07",
+          "offset": 56,
+          "size": 2
+        },
+        {
+          "name": ".sdata.fe_08",
+          "offset": 60,
+          "size": 4,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.fe_08",
+          "offset": 64,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_08",
+          "offset": 68,
+          "size": 4
+        },
+        {
+          "name": ".sdata.fe_08",
+          "offset": 72,
+          "size": 4
+        }
+      ],
+      "allow_zero_gaps": true
+    },
+    "data_symbols": "all",
+    "externals": [
+      "ADirtyFlagThatGaryWillLove",
+      "ActivateMemcard__Fii",
+      "AlertTxt",
+      "BLUEB",
+      "BLUEG",
+      "BLUER",
+      "BL_AsyncLoadDone__Fv",
+      "CDWAIT",
+      "CharacterBlockLoaded",
+      "CutScr",
+      "DBG_Error",
+      "DavesPad",
+      "DexterityTbl",
+      "DialogBlue",
+      "DialogGreen",
+      "DialogRed",
+      "DialogTBlue",
+      "DialogTGreen",
+      "DialogTRed",
+      "DirtyVidY",
+      "DirtyVidx",
+      "Display__7CScreeniiii",
+      "DrawFlameLogo__Fv",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "FinishBootProgress__Fv",
+      "FinishProgress__Fv",
+      "GM_FinishedUsing__FP7TextDat",
+      "GM_UseTexData__Fi",
+      "GOLDB",
+      "GOLDG",
+      "GOLDR",
+      "GetFadeState__Fv",
+      "GetStrWidth__5CFontPc",
+      "GetStr__Fi",
+      "InCredits",
+      "InitQTextMsg__Fi",
+      "IsGameLoading__Fv",
+      "LANG_GetLang__Fv",
+      "LargeFont",
+      "Load__7CScreeniii",
+      "MagicTbl",
+      "McCharCardMenuCtrl__Fv",
+      "McLoadGameMenu",
+      "McMainCharKeyCtrl__Fv",
+      "MediumFont",
+      "MemCardActive",
+      "MemcardOFF__Fv",
+      "PAD_GetPad__FiUc",
+      "PaletteFadeOut__Fi",
+      "PauseMode",
+      "PlayDemoFlag",
+      "PlaySFX__Fi",
+      "PrintFt4__7TextDatiiiiii",
+      "PrintSelectBack__FUs",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "PutUpCutScreen__Fi",
+      "ReadPad__Fi",
+      "SND_LoadBank__Fi",
+      "SPU_Init__Fv",
+      "StrengthTbl",
+      "TSK_AddTask",
+      "TSK_Sleep",
+      "TakeDownCutScreen__Fv",
+      "TextPtr",
+      "TitleFlag",
+      "ToggleOptions__Fv",
+      "UniqueItemFlag",
+      "Unload__7CScreen",
+      "VID_GetTick__Fv",
+      "VID_SetXYOff__Fii",
+      "VitalityTbl",
+      "WHITEB",
+      "WHITEG",
+      "WHITER",
+      "_7CPlayer_PActiveArray",
+      "__builtin_delete",
+      "card_active",
+      "cardondelay",
+      "current_card",
+      "currlevel",
+      "fileinfoflag",
+      "flamecol",
+      "gbActivePlayers",
+      "gbMaxPlayers",
+      "gbRunGame",
+      "gnDifficulty",
+      "memset",
+      "music_fade__Fv",
+      "music_start__Fi",
+      "music_stop__Fv",
+      "options_pad",
+      "optionsflag",
+      "play_movie",
+      "plr",
+      "qtextflag",
+      "snd_init__FUl",
+      "sprintf",
+      "strcat",
+      "strcpy",
+      "strlen",
+      "user_start",
+      "who_pressed__Fi"
+    ]
+  },
+  "stores": {
+    "source": "recon/source/stores.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800695A4",
+        "size": 44756
+      },
+      ".rdata": {
+        "va": "0x80117938",
+        "size": 728,
+        "scaffold": "rodata_stores.rodata"
+      },
+      ".data.stores_back": {
+        "va": "0x800DE304",
+        "size": 16,
+        "scaffold": "data_stores.data"
+      },
+      ".data.stores_strings": {
+        "va": "0x800DE314",
+        "size": 240,
+        "scaffold": "data_stores.data"
+      },
+      ".data.stores_talk": {
+        "va": "0x800DE404",
+        "size": 36,
+        "scaffold": "data_stores.data"
+      },
+      ".data.stores_hold": {
+        "va": "0x800E1D88",
+        "size": 5184,
+        "scaffold": "data_stores.data"
+      },
+      ".data.stores_hidx": {
+        "va": "0x800E31C8",
+        "size": 48,
+        "scaffold": "data_stores.data"
+      },
+      ".bss": {
+        "va": "0x8012EE48",
+        "size": 3360
+      },
+      ".sdata.stores_dave": {
+        "va": "0x8011BAA8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".ctors": {
+        "va": "0x800B0CCC",
+        "size": 4,
+        "scaffold": "ctors.data"
+      },
+      ".dtors": {
+        "va": "0x800B0CFC",
+        "size": 4,
+        "scaffold": "dtors.data"
+      },
+      ".sdata.stores_00": {
+        "va": "0x8011BA98",
+        "size": 10,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_01": {
+        "va": "0x8011BAA4",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_02": {
+        "va": "0x8011BAB3",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_03": {
+        "va": "0x8011BAB4",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_04": {
+        "va": "0x8011BAE0",
+        "size": 3,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_05": {
+        "va": "0x8011BAE4",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_06": {
+        "va": "0x8011BAFC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_07": {
+        "va": "0x8011BB0C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss.stores_state0": {
+        "va": "0x8011C884",
+        "size": 35
+      },
+      ".sbss.stores_state1": {
+        "va": "0x8011C8A8",
+        "size": 32
+      },
+      ".sdata.stores_newline": {
+        "va": "0x8011BAAC",
+        "size": 2,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.stores_comma": {
+        "va": "0x8011BAB0",
+        "size": 3,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "post_assemble_section_split": [
+      {
+        "section": ".data",
+        "pieces": [
+          {
+            "name": ".data.stores_strings",
+            "offset": 0,
+            "size": 240
+          },
+          {
+            "name": ".data.stores_talk",
+            "offset": 240,
+            "size": 36
+          },
+          {
+            "name": ".data.stores_back",
+            "offset": 276,
+            "size": 16
+          },
+          {
+            "name": ".data.stores_hold",
+            "offset": 292,
+            "size": 5184
+          },
+          {
+            "name": ".data.stores_hidx",
+            "offset": 5476,
+            "size": 48
+          }
+        ]
+      },
+      {
+        "section": ".sdata",
+        "pieces": [
+          {
+            "name": ".sdata.stores_00",
+            "offset": 0,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_00",
+            "offset": 24,
+            "size": 4
+          },
+          {
+            "name": ".sdata.stores_00",
+            "offset": 28,
+            "size": 1
+          },
+          {
+            "name": ".sdata.stores_00",
+            "offset": 29,
+            "size": 1
+          },
+          {
+            "name": ".sdata.stores_01",
+            "offset": 4,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_02",
+            "offset": 30,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_03",
+            "offset": 20,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_04",
+            "offset": 31,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_04",
+            "offset": 32,
+            "size": 1
+          },
+          {
+            "name": ".sdata.stores_04",
+            "offset": 33,
+            "size": 1
+          },
+          {
+            "name": ".sdata.stores_05",
+            "offset": 36,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_05",
+            "offset": 40,
+            "size": 4
+          },
+          {
+            "name": ".sdata.stores_05",
+            "offset": 44,
+            "size": 4
+          },
+          {
+            "name": ".sdata.stores_06",
+            "offset": 8,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_07",
+            "offset": 48,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_newline",
+            "offset": 12,
+            "size": 2,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.stores_comma",
+            "offset": 16,
+            "size": 3,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".sbss",
+        "pieces": [
+          {
+            "name": ".sdata.stores_dave",
+            "offset": 0,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.stores_state0",
+            "offset": 4,
+            "size": 32,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.stores_state0",
+            "offset": 36,
+            "size": 1
+          },
+          {
+            "name": ".sbss.stores_state0",
+            "offset": 40,
+            "size": 1
+          },
+          {
+            "name": ".sbss.stores_state0",
+            "offset": 44,
+            "size": 1
+          },
+          {
+            "name": ".sbss.stores_state1",
+            "offset": 48,
+            "size": 32,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      }
+    ],
+    "data_symbols": [
+      "InStoreFlag",
+      "SBack",
+      "SItemListFlag",
+      "SStringY",
+      "SStringYBuy0",
+      "SStringYBuy1",
+      "SStringYNorm",
+      "SWrapCount",
+      "SellIdx",
+      "SmithItemCount",
+      "StoreBackRect",
+      "StoreBackRectClipper",
+      "StorePlrNo",
+      "WFlag",
+      "WStaffFlag",
+      "gdwAllTextEntries",
+      "gossipend",
+      "gossipstart",
+      "pSTextBoxCels",
+      "pSTextSlidCels",
+      "stext",
+      "stextdown",
+      "stextflag",
+      "stextlhold",
+      "stextscrl",
+      "stextscrldbtn",
+      "stextscrlubtn",
+      "stextsel",
+      "stextshold",
+      "stextsize",
+      "stextsmax",
+      "stextsval",
+      "stextup",
+      "stextvhold",
+      "storehidx",
+      "storehold",
+      "storenumh",
+      "talker",
+      "talkname",
+      "tile"
+    ],
+    "externals": [
+      "AP2x2Tbl",
+      "AllItemsUseable",
+      "AutoPlace__FiiiiUc",
+      "BLUEB",
+      "BLUEG",
+      "BLUER",
+      "BORDERB",
+      "BORDERG",
+      "BORDERR",
+      "Back__6Dialogiiii",
+      "CDWAIT",
+      "CalcPlrInv__FiUc",
+      "CalculateGold__Fi",
+      "DBG_Error",
+      "DialogBlue",
+      "DialogGreen",
+      "DialogRed",
+      "DialogTBlue",
+      "DialogTGreen",
+      "DialogTRed",
+      "DrawQTextBack__Fv",
+      "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
+      "ENG_random__Fl",
+      "GLUE_Finished__Fv",
+      "GLUE_ResumeGame__Fv",
+      "GLUE_SetHomingScrollFlag__Fb",
+      "GLUE_SetShowPanelFlag__Fb",
+      "GLUE_SuspendGame__Fv",
+      "GM_UseTexData__Fi",
+      "GOLDB",
+      "GOLDG",
+      "GOLDR",
+      "GetGoldSeed__FiP10ItemStruct",
+      "GetRndSeed__Fv",
+      "GetStrWidth__5CFontPc",
+      "GetStr__Fi",
+      "GetWrap__5CFontPcP4RECT",
+      "InitQTextMsg__Fi",
+      "Line__6Dialogiii",
+      "MakeItemStr__FP10ItemStructUsUs",
+      "MediumFont",
+      "PAD_GetPad__FiUc",
+      "PL_Prefix",
+      "PL_Suffix",
+      "PauseMode",
+      "PlaySFX__Fi",
+      "PrintFt4__7TextDatiiiiii",
+      "PrintItemPower__FcPC10ItemStruct",
+      "Print__5CFontiiPc8TXT_JUSTP4RECTUcUcUc",
+      "Qtalklist",
+      "REDB",
+      "REDG",
+      "REDR",
+      "RemoveInvItem__Fii",
+      "RemoveSpdBarItem__Fii",
+      "SetCursor__Fi",
+      "SetICursor__Fi",
+      "SetItemMinStats__FPC12PlayerStructP10ItemStruct",
+      "SetRndSeed__Fl",
+      "SpawnPremium__Fi",
+      "SpecialAutoPlace__FiiiiUc",
+      "TSK_AddTask",
+      "TSK_Sleep",
+      "TextPtr",
+      "WHITEB",
+      "WHITEG",
+      "WHITER",
+      "_7CPlayer_PActiveArray",
+      "_NoWitchItems",
+      "_WitchIdxOfs",
+      "__builtin_delete",
+      "_boyitem",
+      "_golditem",
+      "_healitem",
+      "_numpremium",
+      "_premiumitem",
+      "_smithitem",
+      "_witchitem",
+      "chrflag",
+      "cursH",
+      "cursW",
+      "dropGoldFlag",
+      "gbMaxPlayers",
+      "icursH28",
+      "icursW28",
+      "invflag",
+      "myplr",
+      "options_pad",
+      "plr",
+      "qtextflag",
+      "questlist",
+      "questlog",
+      "quests",
+      "sbookflag",
+      "spelldata",
+      "sprintf",
+      "strcat",
+      "strcpy",
+      "stream_stop__Fv",
+      "tempstr",
+      "towner"
+    ]
+  },
+  "items": {
+    "source": "recon/source/items.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8003E24C",
+        "size": 55836
+      },
+      ".rdata.items_headers": {
+        "va": "0x80116140",
+        "size": 36,
+        "scaffold": "rodata_items.rodata"
+      },
+      ".rdata.items_file": {
+        "va": "0x80116164",
+        "size": 20,
+        "scaffold": "rodata_items.rodata"
+      },
+      ".rdata.items_sin": {
+        "va": "0x80116178",
+        "size": 64,
+        "scaffold": "rodata_items.rodata"
+      },
+      ".rdata.items_tail": {
+        "va": "0x801161B8",
+        "size": 1328,
+        "scaffold": "rodata_items.rodata"
+      },
+      ".data": {
+        "va": "0x800D1BE0",
+        "size": 14708,
+        "scaffold": "data_items.data"
+      },
+      ".sdata.items_num": {
+        "va": "0x8011B888",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.items_snds": {
+        "va": "0x8011B890",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.items_fmt0": {
+        "va": "0x8011B898",
+        "size": 32,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.items_fmt1": {
+        "va": "0x8011B8C0",
+        "size": 22,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.items_unique": {
+        "va": "0x8011B8DC",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".bss.items_curr": {
+        "va": "0x8012EC58",
+        "size": 108
+      },
+      ".bss.items_hold": {
+        "va": "0x8012ECC8",
+        "size": 9
+      },
+      ".bss.items_active": {
+        "va": "0x8012ECD8",
+        "size": 127
+      }
+    },
+    "post_assemble_section_split": [
+      {
+        "section": ".rdata",
+        "pieces": [
+          {
+            "name": ".rdata.items_headers",
+            "offset": 0,
+            "size": 36,
+            "alignment": 2
+          },
+          {
+            "name": ".rdata.items_sin",
+            "offset": 36,
+            "size": 64,
+            "alignment": 2
+          },
+          {
+            "name": ".rdata.items_file",
+            "offset": 100,
+            "size": 20,
+            "alignment": 2
+          },
+          {
+            "name": ".rdata.items_tail",
+            "offset": 120,
+            "size": 1328,
+            "alignment": 2
+          }
+        ]
+      },
+      {
+        "section": ".sdata",
+        "pieces": [
+          {
+            "name": ".sdata.items_num",
+            "offset": 0,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.items_snds",
+            "offset": 4,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.items_unique",
+            "offset": 12,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.items_fmt0",
+            "offset": 16,
+            "size": 32,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.items_fmt1",
+            "offset": 48,
+            "size": 22,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".bss",
+        "pieces": [
+          {
+            "name": ".bss.items_hold",
+            "offset": 0,
+            "size": 9,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.items_curr",
+            "offset": 12,
+            "size": 108,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.items_active",
+            "offset": 120,
+            "size": 127,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      }
+    ],
+    "data_symbols": [
+      "Item2Frm",
+      "ItemAnimLs",
+      "ItemAnimSnds",
+      "ItemCAnimTbl",
+      "ItemInvSnds",
+      "OutStr",
+      "SinTab",
+      "UniqueItemFlag",
+      "curruitem",
+      "idoppely",
+      "item",
+      "itemactive",
+      "itemactivelist",
+      "itemavail",
+      "itemhold",
+      "numitems",
+      "premiumlvladd",
+      "uitemflag"
+    ],
+    "externals": [
+      "AddPanelString__FPCci",
+      "AllItemsList",
+      "AllItemsUseable",
+      "AutoPlace__FiiiiUc",
+      "CDWAIT",
+      "ChangeLightRadius__Fii",
+      "ChangeVisionRadius__Fii",
+      "ClrPlrPath__Fi",
+      "DBG_Error",
+      "DeltaAddItem__Fi",
+      "ENG_random__Fl",
+      "FePlayerNo",
+      "GetRndSeed__Fv",
+      "GetSOLID__Fii",
+      "GetStrWidth__5CFontPc",
+      "GetStr__Fi",
+      "InitTargetCursor__Fi",
+      "IsDplayer__Fii",
+      "LANG_GetLang__Fv",
+      "MediumFont",
+      "ModifyPlrDex__Fii",
+      "ModifyPlrMag__Fii",
+      "ModifyPlrStr__Fii",
+      "ModifyPlrVit__Fii",
+      "NetSendCmdDItem__FUci",
+      "NewCursor__Fi",
+      "PL_Prefix",
+      "PL_Suffix",
+      "PauseMode",
+      "PlaySFX__Fi",
+      "PlaySfxLoc__Fiii",
+      "ScrollFlag",
+      "SetPlayerHitPoints__Fii",
+      "SetPlrAnims__Fi",
+      "SetRndSeed__Fl",
+      "StartSpell__FP12PlayerStructiii",
+      "StorePlrNo",
+      "TargetingSpell__Fi",
+      "UniqueItemList",
+      "_7CPlayer_PActiveArray",
+      "_boyitem",
+      "_boylevel",
+      "_golditem",
+      "_healitem",
+      "_infoclr",
+      "_infostr",
+      "_numpremium",
+      "_pcursplr",
+      "_pinfoflag",
+      "_premiumitem",
+      "_premiumlevel",
+      "_smithitem",
+      "_witchitem",
+      "currlevel",
+      "cursmx",
+      "cursmy",
+      "deltaload",
+      "drawhpflag",
+      "drawmanaflag",
+      "dung_map",
+      "force_redraw",
+      "gbMaxPlayers",
+      "get_pieces_str__Fi",
+      "gnDifficulty",
+      "invflag",
+      "leveltype",
+      "memset",
+      "missile",
+      "missileactive",
+      "monster",
+      "myplr",
+      "nummissiles",
+      "numobjects",
+      "object",
+      "objectactive",
+      "offset_x",
+      "offset_y",
+      "plr",
+      "quests",
+      "sel_data",
+      "setlevel",
+      "spelldata",
+      "sprintf",
+      "strcat",
+      "strcpy",
+      "strlen",
+      "tempstr"
+    ]
+  },
+  "msg": {
+    "source": "recon/source/msg.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8004EA9C",
+        "size": 16648
+      },
+      ".rdata": {
+        "va": "0x801167A8",
+        "size": 552,
+        "scaffold": "rodata_msg.rodata"
+      },
+      ".data": {
+        "va": "0x800D704C",
+        "size": 4768,
+        "scaffold": "data_msg.data"
+      },
+      ".sdata.msg_comp": {
+        "va": "0x8011B980",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss.msg_last": {
+        "va": "0x8011C82C",
+        "size": 1
+      },
+      ".sbss.msg_changed": {
+        "va": "0x8011C834",
+        "size": 2
+      },
+      ".bss": {
+        "va": "0x8012EDD8",
+        "size": 32
+      },
+      ".ctors": {
+        "va": "0x800B0CC4",
+        "size": 4,
+        "scaffold": "ctors.data"
+      },
+      ".dtors": {
+        "va": "0x800B0CF4",
+        "size": 4,
+        "scaffold": "dtors.data"
+      },
+      ".sdata.msg_flags": {
+        "va": "0x8011B97D",
+        "size": 2,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "post_assemble_section_split": [
+      {
+        "section": ".sbss",
+        "pieces": [
+          {
+            "name": ".sbss.msg_last",
+            "offset": 0,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.msg_changed",
+            "offset": 4,
+            "size": 1,
+            "alignment": 2,
+            "prefix_hex": "00"
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".sdata",
+        "pieces": [
+          {
+            "name": ".sdata.msg_flags",
+            "offset": 0,
+            "size": 2,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.msg_comp",
+            "offset": 4,
+            "size": 12,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      }
+    ],
+    "data_symbols": [
+      "GameMaps",
+      "sgLocals",
+      "deltaload",
+      "gbBufferMsgs",
+      "sgbDeltaChanged",
+      "CompNoComp",
+      "CompPakComp",
+      "CompCrunchComp",
+      "sgJunk"
+    ],
+    "externals": [
+      "ActivatePortal__FiiiiiUc",
+      "AddMissile__Fiiiiiiciii",
+      "AddVision__FiiiUc",
+      "AutoGetItem__Fii",
+      "ClearMissileSpot__Fi",
+      "ClrPlrPath__Fi",
+      "DBG_Error",
+      "DeactivatePortal__Fi",
+      "DeleteMissile__Fii",
+      "DoHealOther__Fii",
+      "DoResurrect__Fii",
+      "ExportData__13CompLevelMapsPUc",
+      "FadeGameOut__Fv",
+      "FindGetItem__FiUsi",
+      "GAL_AlignSizeToType",
+      "GetDirection__Fiiii",
+      "GetMap__13CompLevelMapsi",
+      "GetRndSeed__Fv",
+      "ImportData__13CompLevelMapsP14CompressedLevs",
+      "InitGamePadVars__Fv",
+      "Init__13CompLevelMaps",
+      "InvGetItem__Fii",
+      "InvPutItem__Fiii",
+      "M_GetKnockback__Fii",
+      "M_StartHit__Fiii",
+      "M_SyncStartKill__Fiiii",
+      "MakePlrPath__FiiiUc",
+      "ModifyPlrDex__Fii",
+      "ModifyPlrMag__Fii",
+      "ModifyPlrStr__Fii",
+      "ModifyPlrVit__Fii",
+      "NetSendLoPri__FPCUcUc",
+      "NewPlrAnim__Fiiii",
+      "PAK_DoPak__FPUcPCUci",
+      "PAK_DoUnpak__FPUcPCUc",
+      "PA_SetPauseOk__Fb",
+      "PlaySFX__Fi",
+      "PortalOnLevel__Fi",
+      "ReleaseMap__13CompLevelMapsP6DLevel",
+      "RemovePortalMissile__Fi",
+      "RestartTownLvl__Fi",
+      "SetMultiQuest__FiiUci",
+      "SetPlrDex__Fii",
+      "SetPlrMag__Fii",
+      "SetPlrStr__Fii",
+      "SetPlrVit__Fii",
+      "StartNewLvl__Fiii",
+      "StartPlrKill__FP12PlayerStructi",
+      "StartStand__Fii",
+      "StartWarpLvl__Fii",
+      "SyncBreakObj__Fii",
+      "SyncGetItem__FiiiUsi",
+      "SyncInitPlr__Fi",
+      "SyncOpObject__Fiii",
+      "SyncPlrKill__Fii",
+      "SyncPutItem__FiiiiUsiUciiiiiUl",
+      "TeleStop__Fi",
+      "_7CPlayer_PActiveArray",
+      "__13CompLevelMapsRC9CompClass",
+      "___13CompLevelMaps",
+      "__pure_virtual",
+      "_pcurs",
+      "abs",
+      "automapview",
+      "crunch",
+      "currlevel",
+      "deathflag",
+      "decrunch",
+      "encode_enemy__Fi",
+      "gbActivePlayers",
+      "glSeedTbl",
+      "item",
+      "memcpy",
+      "memset",
+      "missile",
+      "missileactive",
+      "monstactive",
+      "monster",
+      "myplr",
+      "numitems",
+      "nummissiles",
+      "nummonsters",
+      "object",
+      "plr",
+      "quests",
+      "setlevel",
+      "setlvlnum"
+    ]
+  },
+  "player": {
+    "source": "recon/source/player.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x8005FD10",
+        "size": 30628
+      },
+      ".rdata": {
+        "va": "0x8011774C",
+        "size": 404,
+        "scaffold": "rodata_player.rodata"
+      },
+      ".data": {
+        "va": "0x800DA348",
+        "size": 13760,
+        "scaffold": "data_player.data"
+      },
+      ".sdata.player_myplr": {
+        "va": "0x8011BA08",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.player_flags": {
+        "va": "0x8011BA0C",
+        "size": 2,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "post_assemble_section_split": {
+      "section": ".sdata",
+      "pieces": [
+        {
+          "name": ".sdata.player_flags",
+          "offset": 0,
+          "size": 2,
+          "alignment": 2
+        },
+        {
+          "name": ".sdata.player_myplr",
+          "offset": 4,
+          "size": 4,
+          "alignment": 2
+        }
+      ],
+      "allow_zero_gaps": true
+    },
+    "data_symbols": "all",
+    "absolute_bindings": {
+      "D_8011C878": "0x8011C878"
+    },
+    "externals": [
+      "AddDead__Fiici",
+      "AddLight__Fiii",
+      "AddMissile__Fiiiiiiciii",
+      "AddVision__FiiiUc",
+      "AddrToAvoid",
+      "ApocaStart__Fi",
+      "BreakObject__Fii",
+      "CalcPlrInv__FiUc",
+      "CalculateGold__Fi",
+      "CanTalkToMonst__Fi",
+      "CastSpell__Fiiiiiiii",
+      "ChangeLightColour__Fii",
+      "ChangeLightOff__Fiii",
+      "ChangeLightXY__Fiii",
+      "ChangeVisionXY__Fiii",
+      "CheckMonsterHit__FiRUc",
+      "CheckSpell__FiicUc",
+      "ClearMissileSpot__Fi",
+      "ClrCursor__Fi",
+      "CreatePlrItems__Fi",
+      "DBG_Error",
+      "D_8011C878",
+      "DeleteMissile__Fii",
+      "DeleteMonsterList__Fv",
+      "DoUnVision__Fiiii",
+      "ENG_random__Fl",
+      "FindGetItem__FiUsi",
+      "FriendlyMode",
+      "GLUE_SetHomingScrollFlag__Fb",
+      "GM_FinishedUsing__FP7TextDat",
+      "GM_UseTexData__Fi",
+      "GRL_PostMessage__FUlUilUl",
+      "GTIMSYS_GetTimer",
+      "GetDirection__Fiiii",
+      "GetFrNum__7TextDatiiii",
+      "GetGoldSeed__FiP10ItemStruct",
+      "GetSOLID__Fii",
+      "GetSpellLevel__Fii",
+      "GetSpellTarget__Fi",
+      "HealStart__Fi",
+      "HealotherStart__Fi",
+      "InitGamePadVars__Fv",
+      "IsGameLoading__Fv",
+      "ItemSpaceOk__Fii",
+      "LANG_ReloadMainTXT__Fv",
+      "M_GetKnockback__Fii",
+      "M_StartHit__Fiii",
+      "M_StartKill__Fii",
+      "ManashieldFlag",
+      "ManashieldFlag2",
+      "MissDat",
+      "NetSendCmdDamage__FUcUcUl",
+      "NetSendCmdDelItem__FUcUc",
+      "NetSendCmdGItem__FUcUcUcUcUc",
+      "NetSendCmdLocParam2__FUcUcUcUcUsUs",
+      "NetSendCmdLocParam3__FUcUcUcUcUsUsUs",
+      "NetSendCmdPItem__FUcUcUcUc",
+      "NetSendCmdParam1__FUcUcUs",
+      "NetSendCmdParam3__FUcUcUsUsUs",
+      "NewCursor__Fi",
+      "OperateObject__FiiUc",
+      "PA_SetPauseOk__Fb",
+      "PauseMode",
+      "PhaseEnd__Fi",
+      "PhaseStart__Fi",
+      "PlacePlayer__FiiiUc",
+      "PlaySFX__Fi",
+      "PlaySfxLoc__Fiii",
+      "PlayerDeathCount",
+      "PlayerEar",
+      "PostGamePad__Fiiii",
+      "PrepareFt4__7TextDatP8POLY_FT4iiiii",
+      "RemoveInvItem__Fii",
+      "RemoveSpdBarItem__Fii",
+      "RespawnItem__FiUc",
+      "ScrollInfo",
+      "SelectorActive__Fv",
+      "SetCurrentPortal__Fi",
+      "SetGoldCurs__Fii",
+      "SetPlrHandGoldCurs__FP10ItemStruct",
+      "SetPlrHandItem__FP10ItemStructi",
+      "SetRndSeed__Fl",
+      "SetSpdbarGoldCurs__Fii",
+      "SyncGetItem__FiiiUsi",
+      "TSK_Kill",
+      "TSK_Sleep",
+      "TalkToTowner__Fii",
+      "TalktoMonster__Fi",
+      "TeleStart__Fi",
+      "ThisOt",
+      "ThisPrimAddr",
+      "TransList",
+      "TryDisarm__Fii",
+      "UseScroll__Fv",
+      "UseStaff__Fv",
+      "ViewX",
+      "ViewY",
+      "VisionList",
+      "WorldToOffset__Fiii",
+      "_7CPlayer_PActiveArray",
+      "_pcurs",
+      "_pcursmonst",
+      "_pcursplr",
+      "_spselflag",
+      "abs",
+      "allspellsflag",
+      "automapflag",
+      "currlevel",
+      "cursmx",
+      "cursmy",
+      "dovision",
+      "drawhpflag",
+      "drawmanaflag",
+      "dung_map",
+      "gbActivePlayers",
+      "gbMaxPlayers",
+      "ghMainWnd",
+      "goldcheat",
+      "invflag",
+      "item",
+      "itemactive",
+      "itemavail",
+      "leveltype",
+      "light_fix__Fi",
+      "memset",
+      "missile",
+      "missileactive",
+      "monster",
+      "numitems",
+      "nummissiles",
+      "numvision",
+      "object",
+      "offset_x",
+      "offset_y",
+      "options_pad",
+      "portal",
+      "qtextflag",
+      "sel_data",
+      "setlevel",
+      "setlvlnum",
+      "sfxdelay",
+      "sfxdnum",
+      "sghStream",
+      "spelldata",
+      "stextflag",
+      "stream_stop__Fv",
+      "visible_level"
+    ]
+  },
+  "fmv": {
+    "source": "recon/psxsrc/fmv.cpp",
+    "image": "fmv",
+    "sections": {
+      ".text": {
+        "va": "0x80155E1C",
+        "size": 10828
+      },
+      ".rdata.fmv_all": {
+        "source_section": ".rdata.fmv_src",
+        "va": "0x8013B7DC",
+        "size": 108096,
+        "scaffold": "fmv_rodata_8013b7dc.rodata"
+      },
+      ".sbss.fmv_stream": {
+        "va": "0x8011C74C",
+        "size": 12,
+        "image": "diabpsx"
+      },
+      ".sdata.fmv_end": {
+        "va": "0x8011B4E8",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
+      },
+      ".sbss.fmv_jump": {
+        "va": "0x8011C758",
+        "size": 12,
+        "image": "diabpsx"
+      },
+      ".bss.fmv_subcode": {
+        "va": "0x80121C98",
+        "size": 12,
+        "image": "diabpsx"
+      },
+      ".bss.fmv_voice": {
+        "va": "0x80121CA8",
+        "size": 64,
+        "image": "diabpsx"
+      },
+      ".bss.fmv_movie": {
+        "va": "0x80121CE8",
+        "size": 32,
+        "image": "diabpsx"
+      },
+      ".bss.fmv_jmp": {
+        "va": "0x80121D08",
+        "size": 48,
+        "image": "diabpsx"
+      },
+      ".sdata.fmv_00": {
+        "image": "diabpsx",
+        "va": "0x8011B47C",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_01": {
+        "image": "diabpsx",
+        "va": "0x8011B484",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_02": {
+        "image": "diabpsx",
+        "va": "0x8011B488",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_03": {
+        "image": "diabpsx",
+        "va": "0x8011B48C",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_04": {
+        "image": "diabpsx",
+        "va": "0x8011B498",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_05": {
+        "image": "diabpsx",
+        "va": "0x8011B49C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_06": {
+        "image": "diabpsx",
+        "va": "0x8011B4A4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_07": {
+        "image": "diabpsx",
+        "va": "0x8011B4B0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_08": {
+        "image": "diabpsx",
+        "va": "0x8011B4B4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_09": {
+        "image": "diabpsx",
+        "va": "0x8011B4C8",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_10": {
+        "image": "diabpsx",
+        "va": "0x8011B4D8",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_11": {
+        "image": "diabpsx",
+        "va": "0x8011B4E0",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_12": {
+        "image": "diabpsx",
+        "va": "0x8011B4EC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_13": {
+        "image": "diabpsx",
+        "va": "0x8011B4F0",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_14": {
+        "image": "diabpsx",
+        "va": "0x8011B4F8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_15": {
+        "image": "diabpsx",
+        "va": "0x8011B4FC",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_16": {
+        "image": "diabpsx",
+        "va": "0x8011B508",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_17": {
+        "image": "diabpsx",
+        "va": "0x8011B510",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_18": {
+        "image": "diabpsx",
+        "va": "0x8011B514",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_19": {
+        "image": "diabpsx",
+        "va": "0x8011B51C",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_20": {
+        "image": "diabpsx",
+        "va": "0x8011B530",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_21": {
+        "image": "diabpsx",
+        "va": "0x8011B538",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_22": {
+        "image": "diabpsx",
+        "va": "0x8011B53C",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_23": {
+        "image": "diabpsx",
+        "va": "0x8011B54C",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_24": {
+        "image": "diabpsx",
+        "va": "0x8011B550",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_25": {
+        "image": "diabpsx",
+        "va": "0x8011B558",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_26": {
+        "image": "diabpsx",
+        "va": "0x8011B564",
+        "size": 22,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_27": {
+        "image": "diabpsx",
+        "va": "0x8011B57C",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_28": {
+        "image": "diabpsx",
+        "va": "0x8011B584",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_29": {
+        "image": "diabpsx",
+        "va": "0x8011B594",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_30": {
+        "image": "diabpsx",
+        "va": "0x8011B5A4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_31": {
+        "image": "diabpsx",
+        "va": "0x8011B5B4",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_32": {
+        "image": "diabpsx",
+        "va": "0x8011B5B8",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_33": {
+        "image": "diabpsx",
+        "va": "0x8011B5C4",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_34": {
+        "image": "diabpsx",
+        "va": "0x8011B5C8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_35": {
+        "image": "diabpsx",
+        "va": "0x8011B5CC",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_36": {
+        "image": "diabpsx",
+        "va": "0x8011B5D4",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_37": {
+        "image": "diabpsx",
+        "va": "0x8011B5DC",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_38": {
+        "image": "diabpsx",
+        "va": "0x8011B5E0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_39": {
+        "image": "diabpsx",
+        "va": "0x8011B5E4",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_40": {
+        "image": "diabpsx",
+        "va": "0x8011B5E8",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_41": {
+        "image": "diabpsx",
+        "va": "0x8011B5F4",
+        "size": 12,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_42": {
+        "image": "diabpsx",
+        "va": "0x8011B600",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_43": {
+        "image": "diabpsx",
+        "va": "0x8011B608",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_44": {
+        "image": "diabpsx",
+        "va": "0x8011B610",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sdata.fmv_45": {
+        "image": "diabpsx",
+        "va": "0x8011B618",
+        "size": 8,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "post_assemble_section_split": [
+      {
+        "section": ".sdata",
+        "pieces": [
+          {
+            "name": ".sdata.fmv_00",
+            "offset": 16,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_00",
+            "offset": 364,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_01",
+            "offset": 360,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_02",
+            "offset": 184,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_03",
+            "offset": 0,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_03",
+            "offset": 4,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_03",
+            "offset": 172,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_04",
+            "offset": 168,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_05",
+            "offset": 144,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_06",
+            "offset": 8,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_06",
+            "offset": 212,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_07",
+            "offset": 232,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_08",
+            "offset": 208,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_08",
+            "offset": 344,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_09",
+            "offset": 204,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_09",
+            "offset": 304,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_09",
+            "offset": 308,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_09",
+            "offset": 320,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_10",
+            "offset": 312,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_10",
+            "offset": 316,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_11",
+            "offset": 12,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_11",
+            "offset": 356,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_12",
+            "offset": 32,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_13",
+            "offset": 24,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_13",
+            "offset": 52,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_14",
+            "offset": 48,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_15",
+            "offset": 40,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_15",
+            "offset": 44,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_15",
+            "offset": 100,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_16",
+            "offset": 80,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_16",
+            "offset": 96,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_17",
+            "offset": 72,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_18",
+            "offset": 36,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_18",
+            "offset": 60,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_19",
+            "offset": 56,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_19",
+            "offset": 76,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_20",
+            "offset": 68,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_20",
+            "offset": 136,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_21",
+            "offset": 132,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_22",
+            "offset": 84,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_22",
+            "offset": 280,
+            "size": 8
+          },
+          {
+            "name": ".sdata.fmv_22",
+            "offset": 300,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_23",
+            "offset": 292,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_24",
+            "offset": 288,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_24",
+            "offset": 296,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_25",
+            "offset": 152,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_25",
+            "offset": 176,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_26",
+            "offset": 160,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_26",
+            "offset": 180,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_26",
+            "offset": 236,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_26",
+            "offset": 240,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_26",
+            "offset": 268,
+            "size": 2
+          },
+          {
+            "name": ".sdata.fmv_27",
+            "offset": 244,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_28",
+            "offset": 224,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_28",
+            "offset": 228,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_28",
+            "offset": 272,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_28",
+            "offset": 276,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_29",
+            "offset": 252,
+            "size": 8,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_29",
+            "offset": 260,
+            "size": 8
+          },
+          {
+            "name": ".sdata.fmv_30",
+            "offset": 216,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_30",
+            "offset": 220,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_31",
+            "offset": 348,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_32",
+            "offset": 328,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_32",
+            "offset": 336,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_32",
+            "offset": 340,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_33",
+            "offset": 332,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_34",
+            "offset": 324,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_35",
+            "offset": 148,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_35",
+            "offset": 192,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_36",
+            "offset": 188,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_36",
+            "offset": 200,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_37",
+            "offset": 196,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_38",
+            "offset": 140,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_39",
+            "offset": 92,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_40",
+            "offset": 20,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_40",
+            "offset": 28,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_40",
+            "offset": 108,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_41",
+            "offset": 104,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_41",
+            "offset": 112,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_41",
+            "offset": 120,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_42",
+            "offset": 116,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_42",
+            "offset": 128,
+            "size": 4
+          },
+          {
+            "name": ".sdata.fmv_43",
+            "offset": 124,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_44",
+            "offset": 352,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_45",
+            "offset": 64,
+            "size": 4,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_45",
+            "offset": 88,
+            "size": 4
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".sbss",
+        "pieces": [
+          {
+            "name": ".sbss.fmv_stream",
+            "offset": 0,
+            "size": 12,
+            "alignment": 2
+          },
+          {
+            "name": ".sdata.fmv_end",
+            "offset": 12,
+            "size": 1,
+            "alignment": 2
+          },
+          {
+            "name": ".sbss.fmv_jump",
+            "offset": 16,
+            "size": 12,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      },
+      {
+        "section": ".bss",
+        "pieces": [
+          {
+            "name": ".bss.fmv_subcode",
+            "offset": 0,
+            "size": 12,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.fmv_voice",
+            "offset": 12,
+            "size": 64,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.fmv_movie",
+            "offset": 76,
+            "size": 32,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.fmv_jmp",
+            "offset": 108,
+            "size": 48,
+            "alignment": 2
+          }
+        ]
+      }
+    ],
+    "composed_group": {
+      "name": "fmv_source",
+      "sections": [
+        ".rdata",
+        ".data",
+        ".text"
+      ],
+      "image": "fmv",
+      "va": "0x8013B7DC",
+      "size": 118924,
+      "exports": {
+        ".rdata.fmv_all": {
+          "offset": 0,
+          "size": 108096
+        },
+        ".text": {
+          "offset": 108096,
+          "size": 10828
+        }
+      }
+    },
+    "symbol_compaction": "overlay_text",
+    "data_symbols": [
+      "DiabEnd",
+      "_discard_count",
+      "_get_count",
+      "area_ph",
+      "area_pw",
+      "br",
+      "cdstream_resetsec",
+      "cdstream_resetting",
+      "do_brightness",
+      "first_handler_event",
+      "frame_decoded",
+      "img_buf",
+      "imgbuf",
+      "last_fn",
+      "last_handler_event",
+      "last_mdc",
+      "last_move_mbuf",
+      "last_stream_frame",
+      "map_buf",
+      "mbuf",
+      "mdc_buf",
+      "mdc_bufleft",
+      "mdc_bufstart",
+      "mdc_buftop",
+      "mdc_buftotal",
+      "mdc_idx",
+      "mdec_audio_buffer",
+      "mdec_audio_offs",
+      "mdec_audio_playing",
+      "mdec_audio_rate_shift",
+      "mdec_audio_sec",
+      "mdec_cx",
+      "mdec_cy",
+      "mdec_drenv",
+      "mdec_framecount",
+      "mdec_h",
+      "mdec_head",
+      "mdec_last_frame",
+      "mdec_ph",
+      "mdec_pw",
+      "mdec_queue",
+      "mdec_sectors_per_frame",
+      "mdec_speed",
+      "mdec_stream_starting",
+      "mdec_streaming",
+      "mdec_tail",
+      "mdec_w",
+      "mdec_waiting_tail",
+      "mdecs_queued",
+      "mdecs_waiting",
+      "move_request",
+      "move_x",
+      "move_y",
+      "num_mdcs",
+      "num_pol",
+      "old_cdready_handler",
+      "ordertab_length",
+      "sector_dma",
+      "sector_dma_in",
+      "sfx_volume",
+      "slice",
+      "slice_inc",
+      "slice_size",
+      "slices_to_do",
+      "slnum",
+      "stream_buf",
+      "stream_bufh",
+      "stream_bufsize",
+      "stream_chunks_borrowed",
+      "stream_chunks_in",
+      "stream_chunks_total",
+      "stream_chunksize",
+      "stream_ending",
+      "stream_got_chunks",
+      "stream_handler_installed",
+      "stream_in",
+      "stream_last_chunk",
+      "stream_last_sector",
+      "stream_open",
+      "stream_opened",
+      "stream_out",
+      "stream_secnum",
+      "stream_stalled",
+      "stream_startsec",
+      "stream_subsec",
+      "streampos",
+      "time_in_frames",
+      "tmdc_pol",
+      "tmdc_pol_dirty",
+      "tmdc_pol_offs",
+      "user_start",
+      "vbuf",
+      "vlc_buf",
+      "vlc_tab",
+      "vlcbuf",
+      "vlctab"
+    ],
+    "absolute_bindings": {
+      "D_8012E534": "0x8012E534",
+      "func_8013B3B0": "0x8013B3B0",
+      "func_8013AD94": "0x8013AD94",
+      "func_8013ADA0": "0x8013ADA0",
+      "func_8013AE1C": "0x8013AE1C",
+      "func_8013AC3C": "0x8013AC3C",
+      "func_8013B6EC": "0x8013B6EC",
+      "func_8013AED8": "0x8013AED8"
+    },
+    "externals": [
+      "CD_GetCdlFILE__FPCcP7CdlFILE",
+      "CdControlB",
+      "CdGetSector",
+      "CdIntToPos",
+      "CdPosToInt",
+      "CdRead2",
+      "CdReadyCallback",
+      "CdReset",
+      "ClearImage",
+      "DBG_Error",
+      "DBG_Halt",
+      "D_8012E534",
+      "ENG_random__Fl",
+      "EnterCriticalSection",
+      "ExitCriticalSection",
+      "GSYS_SetStackAndJump",
+      "GetTPage",
+      "GetVideoMode",
+      "LANG_GetLang__Fv",
+      "LoadImage",
+      "PAD_GetPad__FiUc",
+      "PAD_Handler__Fv",
+      "PRIM_GetCurrentScreen__Fv",
+      "ReloadGP",
+      "SPU_Init__Fv",
+      "STR_AllocBuffer__Fv",
+      "STR_Buffer",
+      "SetDispMask",
+      "SetGP",
+      "SetPolyFT4",
+      "SpuFree",
+      "SpuIsTransferCompleted",
+      "SpuMalloc",
+      "SpuSetCommonAttr",
+      "SpuSetKey",
+      "SpuSetKeyOnWithAttr",
+      "SpuSetTransferMode",
+      "SpuSetTransferStartAddr",
+      "SpuSetVoiceAttr",
+      "SpuWrite",
+      "SpuWrite0",
+      "TICK_Update",
+      "TSK_Sleep",
+      "Tfree__FPv",
+      "ThisOt",
+      "Tmalloc__Fi",
+      "VID_AfterDisplay__Fv",
+      "VID_GetTick__Fv",
+      "VID_SetDBuffer__Fb",
+      "VSync",
+      "fileexists",
+      "filesize",
+      "func_8013AC3C",
+      "func_8013AD94",
+      "func_8013ADA0",
+      "func_8013AE1C",
+      "func_8013AED8",
+      "func_8013B3B0",
+      "func_8013B6EC",
+      "longjmp",
+      "printf",
+      "setjmp",
+      "sglMasterVolume",
+      "sprintf",
+      "strcmp",
+      "strcpy",
+      "systemtask"
     ]
   }
 }

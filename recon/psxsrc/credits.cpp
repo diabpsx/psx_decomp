@@ -151,8 +151,8 @@ public:
     void SetTextDat(TextDat *NewDat);
     int GetCharWidth(unsigned char ch);
     int PrintChar(unsigned short Cx, unsigned short Cy, unsigned char C, unsigned char R, unsigned char G, unsigned char B);
-    void ClearFont() { GM_FinishedUsing(ThisDat); }
     int GetCharHeight(unsigned char ch) { return ThisDat->GetFr(FontTab[ch])->H; }
+    void ClearFont() { GM_FinishedUsing(ThisDat); }
 };
 
 struct FontItem;
@@ -172,13 +172,7 @@ struct Creds {   /* sizeof 12 */
 
 extern POLY_FT4 *ThisPrimAddr;
 extern POLY_FT4 *AddrToAvoid;
-inline void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
-}
+inline void PRIM_GetPrim(POLY_FT4 **Prim);
 
 /* ---------------------------------------------------------------- externals ---- */
 extern "C" void TSK_Sleep(int Frames);
@@ -238,6 +232,14 @@ int CreditsTable[224] = {   /* @0x8013CE20 */
     0, 4, 7, 10, 10, 10, 7, 4, 0, -4, -7, -10, -11, -10, -7, -4,
     0, 4, 7, 10, 10, 10, 7, 4, 0, -4, -7, -10, -11, -10, -7, -4,
 };
+
+inline void PRIM_GetPrim(POLY_FT4 **Prim)
+{
+    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
+        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
+    *Prim = (POLY_FT4 *)ThisPrimAddr;
+    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
+}
 
 extern int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag);
 extern void DoCredits(void);

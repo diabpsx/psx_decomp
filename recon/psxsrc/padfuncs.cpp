@@ -457,7 +457,7 @@ public:
     void Init(int plrn);
     void Remove();
     void ForceTarget(int monst, int x, int y);
-    BOOL Active() { return active; }
+    BOOL Active();
 };
 
 /* PADS.H */
@@ -551,6 +551,20 @@ public:
     long hndDecompArrays;   /* +0x6C */
 };
 
+/* CPLAYER.H */
+class CPlayer : public TextDat {   /* sizeof 144 */
+public:
+    long hndDatMem;   /* +0x70 */
+    unsigned short NumOfPlayers;   /* +0x74 */
+    BOOL InTown;   /* +0x78 */
+    unsigned short PlayerNum;   /* +0x7C */
+    unsigned short Tpage;   /* +0x7E */
+    int TexId;   /* +0x80 */
+    int LastScrX;   /* +0x84 */
+    int LastScrY;   /* +0x88 */
+    int LastOtPos;   /* +0x8C */
+};
+
 struct MonstList;
 struct LittleGt4;
 
@@ -599,6 +613,11 @@ public:
 
     static int GetOverlayOtBase() { return 0x1E8; }
 };
+
+inline BOOL SpellTarget::Active()
+{
+    return active;
+}
 
 /* DIALOG.H */
 extern unsigned char DialogRed, DialogGreen, DialogBlue;
@@ -760,7 +779,6 @@ void select_belt_item(int pnum);
 BOOL SelectorActive();
 
 /* ---------------------------------------------------------------- data (TU-owned, .sdata / .sbss) */
-struct CPlayer;
 CPlayer *gplayer = 0;                              /* @0x8011B110 */
 static char mana_order[4] = { 6, 7, 18, 19 };      /* @0x8011B114 */
 static char health_order[5] = { 3, 2, 21, 18, 19 };   /* @0x8011B118 */
@@ -1210,7 +1228,7 @@ void pad_func_SplBook(int pnum)
 /* @0x800A2390 */
 void pad_func_QLog(int pnum)
 {
-    if (!(invflag | chrflag | questlog | stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | sbookflag | optionsflag | SelectorActive() | _SpdBeltSelFlag[pnum])) {
+    if (!(chrflag | questlog | invflag | stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | sbookflag | optionsflag | SelectorActive() | _SpdBeltSelFlag[pnum])) {
         options_pad = pnum;
         StartQuestlog();
         if (questlog && !Qfromoptions)

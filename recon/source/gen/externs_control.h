@@ -12,12 +12,7 @@ extern unsigned char *pQLogCel;   /* @0x8011BA50 -- oracle uses lui/lw here (abs
 extern int myplr;   /* @0x8011BA08 */
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 extern struct SpellData spelldata[37];   /* @0x800DDB80 */
-/* TU-owned STAT globals (tentative defs live in control.cpp; forward decl here for consistency) */
-extern int _pnumlines[2];   /* @0x8011C764 */
-extern int lus;   /* @0x8011B65C */
-extern char plusanim;   /* @0x8011B664 */
-extern unsigned char *pMultiBtns;   /* @0x8011C7A0 */
-extern unsigned char *pTalkBtns;   /* @0x8011C7A4 */
+/* TU-owned STAT globals are declared and defined only in control.cpp. */
 extern unsigned char DialogRed;   /* @0x8011ABFD */
 extern unsigned char DialogGreen;   /* @0x8011ABFE */
 extern unsigned char DialogBlue;   /* @0x8011ABFF */

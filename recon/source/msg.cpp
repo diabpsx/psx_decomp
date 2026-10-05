@@ -21,15 +21,59 @@
  *    are this retail build's own ordering.
  */
 #include "diabpsx_types.h"
+extern "C" int crunch(const unsigned char *Src, unsigned char *Dest, int SrcLen, int WindowSize);
+extern "C" void decrunch(const unsigned char *Src, unsigned char *Dest, int SrcLen);
+int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize);
+int PAK_DoUnpak(unsigned char *Dest, const unsigned char *Src);
+extern "C" long GAL_AlignSizeToType(unsigned long Size, unsigned long MemType);
 #include "source/gen/structs_msg.h"
 #include "source/gen/externs_msg.h"
 #include "source/gen/protos_msg.h"
 #include "source/diablo.h"
 
-/* hand-asm lib routines (lib segment, a different TU) -- 4/3-arg forms confirmed from the raw
- * (asm/nonmatchings/lib/crunch.s, decrunch.s): crunch(src,dst,srclen,windowsize), decrunch(src,dst,srclen). */
-extern "C" int crunch(const unsigned char *Src, unsigned char *Dest, int SrcLen, int WindowSize);
-extern "C" void decrunch(const unsigned char *Src, unsigned char *Dest, int SrcLen);
+extern "C" unsigned char GAL_Free(long Handle);
+
+struct TextDat {
+    BOOL OwnDat;
+    int TexNum;
+    int LastFrame;
+    BOOL DatLoaded;
+    long hndDat;
+    unsigned char rest[112 - 20];
+    void DumpDatFile();
+};
+
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd))
+            DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+
+class CompMapHeaderProducer {
+public:
+    static void Check(int ok)
+    {
+        if (!ok)
+            DBG_Error(NULL, "source/compmap.h", 0);
+    }
+};
+
+class CPlayer;
+extern CPlayer *_7CPlayer_PActiveArray[2];
+class CPlayer : public TextDat {
+public:
+    unsigned char player_data[144 - 112];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if (1 < (unsigned int)PNum)
+            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
+        return _7CPlayer_PActiveArray[PNum];
+    }
+};
 
 /* explicit initializer (not a tentative def), declared as EARLY as possible in the TU -- gcc-2.7
  * names the _GLOBAL_.I/.D static-init thunk after the FIRST global with an explicit `=` initializer
@@ -128,55 +172,21 @@ static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-ow
 /* Compression strategy classes (real polymorphic inheritance -- see structs_msg.h for the class
  * declarations; the vtables match retail's D_80116808/D_80116820/D_80116838 exactly for this shape). */
 
-int NoComp::DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const
-{
-    memcpy(Dest, Src, SrcLen);
-    return SrcLen;
-}
-
-void NoComp::DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const
-{
-    memcpy(Dest, Src, SrcLen);
-}
-
-int PakComp::DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const
-{
-    return PAK_DoPak(Dest, Src, SrcLen);
-}
-
-void PakComp::DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const
-{
-    PAK_DoUnpak(Dest, Src);
-}
-
-int CrunchComp::DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const
-{
-    return crunch(Src, Dest, SrcLen, 0x800);
-}
-
-void CrunchComp::DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const
-{
-    decrunch(Src, Dest, SrcLen);
-}
-
-/* @0x80052A54 COMPMAP.H:60 -- inline header method, ends up compiled into this TU because it's
- * the only TU that calls it (DeltaExportData/DeltaImportData below).  Offset[21]+aligned(Size[21])
- * = the end of the last (21st) level's compressed data = the file's total compressed size. */
-int CompressedLevs::GetSize(void)
-{
-    return this->Offset[21] + GAL_AlignSizeToType(this->Size[21], 1);
-}
-
 /* the three compressor strategy objects + the level-map cache, default strategy = Pak (matches the
  * retail _GLOBAL_.I.deltaload ctor thunk: NoComp, PakComp, CrunchComp, then GameMaps(CompPakComp)). */
-static NoComp CompNoComp;
-static PakComp CompPakComp;
-static CrunchComp CompCrunchComp;
+NoComp CompNoComp;
+PakComp CompPakComp;
+CrunchComp CompCrunchComp;
 struct CompLevelMaps GameMaps(CompPakComp);
+struct LocalLevel sgLocals[22] = { 0 };
 
 /* ============================================================================================= */
 
 /* @0x8004EA9C MSG.CPP:266 */
+
+struct TCmdSpellXY { unsigned char bCmd, x, y, _pad; unsigned short wParam1, wParam2, wParam3; };
+struct TCmdSpellID { unsigned char bCmd, _pad; unsigned short wParam1, wParam2, wParam3; };
+
 void delta_init(void)
 {
     sgbDeltaChanged = 0;
@@ -580,9 +590,8 @@ void NetSendCmdGItem(unsigned char bHiPri, unsigned char bCmd, unsigned char mas
     cmd.bCh = item[ii]._iCharges;
     cmd.bMCh = item[ii]._iMaxCharges;
     cmd.wValue = (unsigned short)item[ii]._ivalue;
-    /* dwBuff is really (long)(signed char)_iMagical, NOT _iFlags -- confirmed via the raw's `lb`
-     * (signed byte load) + `sw` (sign-extended to a full word) sequence. */
-    cmd.dwBuff = (signed char)item[ii]._iMagical;
+    /* dwBuff carries the signed one-byte PSX player-creation marker. */
+    cmd.dwBuff = (signed char)item[ii]._PlrCreate;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -637,7 +646,7 @@ void NetSendCmdPItem(unsigned char bHiPri, unsigned char bCmd, unsigned char x, 
     cmd.bCh = plr[myplr].HoldItem._iCharges;
     cmd.bMCh = plr[myplr].HoldItem._iMaxCharges;
     cmd.wValue = plr[myplr].HoldItem._ivalue;
-    cmd.dwBuff = (signed char)plr[myplr].HoldItem._iMagical;
+    cmd.dwBuff = (signed char)plr[myplr].HoldItem._PlrCreate;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -679,7 +688,7 @@ void NetSendCmdDItem(unsigned char bHiPri, int ii)
     cmd.bCh = item[ii]._iCharges;
     cmd.bMCh = item[ii]._iMaxCharges;
     cmd.wValue = item[ii]._ivalue;
-    cmd.dwBuff = (signed char)item[ii]._iMagical;
+    cmd.dwBuff = (signed char)item[ii]._PlrCreate;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -755,14 +764,13 @@ static void On_ADDVIT(const TCmd *pCmd, int pnum)
         ModifyPlrVit(pnum, p->wParam1);
 }
 
-/* @0x800500B4 MSG.CPP:1454 -- sets a spellbook-cast destAction (0xC) using the spell id/type
- * (cmd->wParam1) and the PLAYER's own currently-set splType (plr[pnum]._pSplType), not the cmd's. */
+/* @0x800500B4 MSG.CPP:1454 -- spellbook casts use the player's spellbook type. */
 static void On_SBSPELL(const TCmd *pCmd, int pnum)
 {
     plr[pnum]._pSplFrom = 1;
     plr[pnum].destAction = 0xC;
     plr[pnum]._pSpell = (char)((const TCmdParam1 *)pCmd)->wParam1;
-    plr[pnum]._pSplType = plr[pnum]._pRSplType;
+    plr[pnum]._pSplType = plr[pnum]._pSBkSplType;
 }
 
 /* @0x80050128 MSG.CPP:1469 */
@@ -771,15 +779,6 @@ static void On_GOTOGETITEM(const TCmd *pCmd, int pnum)
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
     MakePlrPath(pnum, p->x, p->y, 0);
     plr[pnum].destAction = ACTION_WALK;
-    plr[pnum].destParam1 = (char)p->wParam1;
-}
-
-/* @0x800504C4 MSG.CPP:1589 */
-static void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
-{
-    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    MakePlrPath(pnum, p->x, p->y, 0);
-    plr[pnum].destAction = ACTION_PICKUPITEM;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
 
@@ -834,6 +833,15 @@ static void On_GETITEM(const TCmd *pCmd, int pnum)
     } else {
         NetSendCmdGItem2(1, 8, p->bMaster, p->bPnum, p);
     }
+}
+
+/* @0x800504C4 MSG.CPP:1589 */
+static void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
+{
+    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+    MakePlrPath(pnum, p->x, p->y, 0);
+    plr[pnum].destAction = ACTION_PICKUPITEM;
+    plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x8005054C MSG.CPP:1603 -- twin of On_REQUESTGITEM for the auto-pickup path (bCmd 9/0x27 reused). */
@@ -896,19 +904,52 @@ static void On_ITEMEXTRA(const TCmd *pCmd, int pnum)
     SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
 }
 
-/* @0x80051080 MSG.CPP:1971 */
-static void On_OPOBJT(const TCmd *pCmd, int pnum)
+/* @0x80050898 MSG.CPP:1741 */
+static void On_PUTITEM(const TCmd *pCmd, int pnum)
 {
-    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    plr[pnum].destAction = ACTION_OPERATE;
-    plr[pnum].destParam1 = (char)p->wParam1;
+    const TCmdPItem *p = (const TCmdPItem *)pCmd;
+    if (numitems >= 0x7A) {
+        PlaySFX(0x3D3);
+        return;
+    }
+    int ii = InvPutItem(pnum, p->x, p->y);
+    if (ii != -1) {
+        delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
+        check_update_plr(pnum);
+    }
+    check_update_plr(pnum);
+}
+
+/* @0x80050978 MSG.CPP:1795 -- re-derived from the raw: check_update_plr(pnum) is ALWAYS called after
+ * a successful SyncPutItem (was previously missing), same "delta_put_item echoes the placed item's
+ * own _ix/_iy" pattern as On_PUTITEM. */
+static void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
+{
+    const TCmdPItem *p = (const TCmdPItem *)pCmd;
+    int ii = SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
+    if (ii != -1) {
+        delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
+        check_update_plr(pnum);
+    }
+}
+
+/* @0x80050A7C MSG.CPP:1794 -- re-derived from the raw: a plrlevel==currlevel gate wraps the
+ * SyncPutItem echo (previously missing), and delta_put_item is ALWAYS called afterward regardless
+ * of that gate, with the target player's (unsigned char)plrlevel as the bLevel arg. */
+static void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
+{
+    const TCmdPItem *p = (const TCmdPItem *)pCmd;
+    if (currlevel == plr[pnum].plrlevel) {
+        if (pnum != myplr)
+            SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh,
+                        p->wValue, p->dwBuff);
+    }
+    delta_put_item(p, p->x, p->y, (unsigned char)plr[pnum].plrlevel);
 }
 
 /* local cmd shapes for the spell-cast family (not separately SYM-named; read straight off the byte
  * offsets in the raw -- XY-targeted casts carry x/y bytes + 3 u16 params, ID-targeted casts carry
  * only a target-id u16 + 2 more u16 params, both padded to 2-byte alignment after bCmd). */
-struct TCmdSpellXY { unsigned char bCmd, x, y, _pad; unsigned short wParam1, wParam2, wParam3; };
-struct TCmdSpellID { unsigned char bCmd, _pad; unsigned short wParam1, wParam2, wParam3; };
 
 /* @0x80050B98 MSG.CPP:1851 */
 static void On_SATTACKXY(const TCmd *pCmd, int pnum)
@@ -965,6 +1006,50 @@ static void On_TSPELLXY(const TCmd *pCmd, int pnum)
     plr[pnum]._pSplType = plr[pnum]._pTSplType;
 }
 
+/* @0x80050EC0 MSG.CPP:1934 */
+static void On_OPOBJXY(const TCmd *pCmd, int pnum)
+{
+    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+    if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
+        MakePlrPath(pnum, p->x, p->y, 1);
+    else
+        MakePlrPath(pnum, p->x, p->y, 0);
+    plr[pnum].destAction = 0xD;
+    plr[pnum].destParam1 = (char)p->wParam1;
+}
+
+/* @0x80050FA0 MSG.CPP:1952 */
+static void On_DISARMXY(const TCmd *pCmd, int pnum)
+{
+    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+    if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
+        MakePlrPath(pnum, p->x, p->y, 1);
+    else
+        MakePlrPath(pnum, p->x, p->y, 0);
+    plr[pnum].destAction = 0xE;
+    plr[pnum].destParam1 = (char)p->wParam1;
+}
+
+/* @0x80051080 MSG.CPP:1971 */
+static void On_OPOBJT(const TCmd *pCmd, int pnum)
+{
+    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+    plr[pnum].destAction = ACTION_OPERATE;
+    plr[pnum].destParam1 = (char)p->wParam1;
+}
+
+/* @0x800510CC MSG.CPP:1984 */
+static void On_ATTACKID(const TCmd *pCmd, int pnum)
+{
+    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+    int dx = abs(plr[pnum]._px - monster[p->wParam1]._mfutx);
+    int dy = abs(plr[pnum]._py - monster[p->wParam1]._mfuty);
+    if (dx >= 2 || dy >= 2)
+        MakePlrPath(pnum, monster[p->wParam1]._mfutx, monster[p->wParam1]._mfuty, 0);
+    plr[pnum].destAction = 0x14;
+    plr[pnum].destParam1 = (char)p->wParam1;
+}
+
 /* @0x80051208 MSG.CPP:2003 */
 static void On_SPELLID(const TCmd *pCmd, int pnum)
 {
@@ -1016,6 +1101,15 @@ static void On_TSPELLPID(const TCmd *pCmd, int pnum)
     plr[pnum].destParam2 = (char)p->wParam3;
     plr[pnum]._pSpell = (char)p->wParam2;
     plr[pnum]._pSplType = plr[pnum]._pTSplType;
+}
+
+/* @0x80051518 MSG.CPP:2078 */
+static void On_KNOCKBACK(const TCmd *pCmd, int pnum)
+{
+    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+    int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[p->wParam1]._mx, monster[p->wParam1]._my);
+    M_GetKnockback(p->wParam1, dir);
+    M_StartHit(p->wParam1, pnum, 0);
 }
 
 /* @0x800515D4 MSG.CPP:2091 */
@@ -1159,51 +1253,6 @@ static void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
     }
 }
 
-/* @0x80050EC0 MSG.CPP:1934 */
-static void On_OPOBJXY(const TCmd *pCmd, int pnum)
-{
-    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
-        MakePlrPath(pnum, p->x, p->y, 1);
-    else
-        MakePlrPath(pnum, p->x, p->y, 0);
-    plr[pnum].destAction = 0xD;
-    plr[pnum].destParam1 = (char)p->wParam1;
-}
-
-/* @0x80050FA0 MSG.CPP:1952 */
-static void On_DISARMXY(const TCmd *pCmd, int pnum)
-{
-    const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-    if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
-        MakePlrPath(pnum, p->x, p->y, 1);
-    else
-        MakePlrPath(pnum, p->x, p->y, 0);
-    plr[pnum].destAction = 0xE;
-    plr[pnum].destParam1 = (char)p->wParam1;
-}
-
-/* @0x800510CC MSG.CPP:1984 */
-static void On_ATTACKID(const TCmd *pCmd, int pnum)
-{
-    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    int dx = abs(plr[pnum]._px - monster[p->wParam1]._mfutx);
-    int dy = abs(plr[pnum]._py - monster[p->wParam1]._mfuty);
-    if (dx >= 2 || dy >= 2)
-        MakePlrPath(pnum, monster[p->wParam1]._mfutx, monster[p->wParam1]._mfuty, 0);
-    plr[pnum].destAction = 0x14;
-    plr[pnum].destParam1 = (char)p->wParam1;
-}
-
-/* @0x80051518 MSG.CPP:2078 */
-static void On_KNOCKBACK(const TCmd *pCmd, int pnum)
-{
-    const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[p->wParam1]._mx, monster[p->wParam1]._my);
-    M_GetKnockback(p->wParam1, dir);
-    M_StartHit(p->wParam1, pnum, 0);
-}
-
 /* @0x80051C8C MSG.CPP:2323 -- the literal 0x2B passed to SyncOpObject/delta_sync_object is NOT this
  * command's own ParseCmd dispatch id (41) -- it is a distinct object-action constant (OPENDOOR=0x2B,
  * CLOSEDOOR=0x2C, OPERATEOBJ=0x2D, PLROPOBJ=0x2E, BREAKOBJ=0x2F below), read straight off the raw
@@ -1246,47 +1295,26 @@ static void On_BREAKOBJ(const TCmd *pCmd, int pnum)
     delta_sync_object(p->wParam2, 0x2F, plr[pnum].plrlevel);
 }
 
-/* @0x80050898 MSG.CPP:1741 */
-static void On_PUTITEM(const TCmd *pCmd, int pnum)
+/* @0x80051EF4 MSG.CPP:2385 -- no-op: PSX has no cross-player inventory transfer command. */
+static void On_CHANGEPLRITEMS(const TCmd *pCmd, int pnum)
 {
-    const TCmdPItem *p = (const TCmdPItem *)pCmd;
-    if (numitems >= 0x7A) {
-        PlaySFX(0x3D3);
-        return;
-    }
-    int ii = InvPutItem(pnum, p->x, p->y);
-    if (ii != -1) {
-        delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
-        check_update_plr(pnum);
-    }
-    check_update_plr(pnum);
 }
 
-/* @0x80050978 MSG.CPP:1795 -- re-derived from the raw: check_update_plr(pnum) is ALWAYS called after
- * a successful SyncPutItem (was previously missing), same "delta_put_item echoes the placed item's
- * own _ix/_iy" pattern as On_PUTITEM. */
-static void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
+/* @0x80051EFC MSG.CPP:2398 -- no-op. */
+static void On_DELPLRITEMS(const TCmd *pCmd, int pnum)
 {
-    const TCmdPItem *p = (const TCmdPItem *)pCmd;
-    int ii = SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
-    if (ii != -1) {
-        delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
-        check_update_plr(pnum);
-    }
 }
 
-/* @0x80050A7C MSG.CPP:1794 -- re-derived from the raw: a plrlevel==currlevel gate wraps the
- * SyncPutItem echo (previously missing), and delta_put_item is ALWAYS called afterward regardless
- * of that gate, with the target player's (unsigned char)plrlevel as the bLevel arg. */
-static void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
+/* @0x80051F04 MSG.CPP:2406 -- no-op. */
+static void On_PLRLEVEL(const TCmd *pCmd, int pnum)
+{
+}
+
+/* @0x80051F0C MSG.CPP:2417 */
+static void On_DROPITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
-    if (currlevel == plr[pnum].plrlevel) {
-        if (pnum != myplr)
-            SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh,
-                        p->wValue, p->dwBuff);
-    }
-    delta_put_item(p, p->x, p->y, (unsigned char)plr[pnum].plrlevel);
+    delta_put_item(p, p->x, p->y, plr[pnum].plrlevel);
 }
 
 /* @0x80051F64 MSG.CPP:2428 -- UNVERIFIED (fsize 32, non-trivial fn not individually re-derived);
@@ -1349,42 +1377,6 @@ static void On_RETOWN(const TCmd *pCmd, int pnum)
     RestartTownLvl(pnum);
 }
 
-/* @0x80052390 MSG.CPP:2624 -- UNVERIFIED (fsize 40, not individually re-derived). */
-static void On_ENDSHIELD(const TCmd *pCmd, int pnum)
-{
-    if (pnum != myplr) {
-        for (int i = 0; i < nummissiles; i++) {
-            int mi = missileactive[i];
-            if (missile[mi]._mitype == 0xD && missile[mi]._misource == pnum) {
-                ClearMissileSpot(mi);
-                DeleteMissile(mi, i);
-            }
-        }
-    }
-}
-
-/* @0x80051EF4 MSG.CPP:2385 -- no-op: PSX has no cross-player inventory transfer command. */
-static void On_CHANGEPLRITEMS(const TCmd *pCmd, int pnum)
-{
-}
-
-/* @0x80051EFC MSG.CPP:2398 -- no-op. */
-static void On_DELPLRITEMS(const TCmd *pCmd, int pnum)
-{
-}
-
-/* @0x80051F04 MSG.CPP:2406 -- no-op. */
-static void On_PLRLEVEL(const TCmd *pCmd, int pnum)
-{
-}
-
-/* @0x80051F0C MSG.CPP:2417 */
-static void On_DROPITEM(const TCmd *pCmd, int pnum)
-{
-    const TCmdPItem *p = (const TCmdPItem *)pCmd;
-    delta_put_item(p, p->x, p->y, plr[pnum].plrlevel);
-}
-
 /* @0x80052248 MSG.CPP:2555 */
 static void On_SETSTR(const TCmd *pCmd, int pnum)
 {
@@ -1426,6 +1418,20 @@ static void On_SYNCQUEST(const TCmd *pCmd, int pnum)
         SetMultiQuest(p->q, p->qstate, p->qlog, p->qvar1);
     }
     sgbDeltaChanged = 1;
+}
+
+/* @0x80052390 MSG.CPP:2624 -- UNVERIFIED (fsize 40, not individually re-derived). */
+static void On_ENDSHIELD(const TCmd *pCmd, int pnum)
+{
+    if (pnum != myplr) {
+        for (int i = 0; i < nummissiles; i++) {
+            int mi = missileactive[i];
+            if (missile[mi]._mitype == 0xD && missile[mi]._misource == pnum) {
+                ClearMissileSpot(mi);
+                DeleteMissile(mi, i);
+            }
+        }
+    }
 }
 
 /* @0x80052468 MSG.CPP:2676 -- bare switch(pCmd->bCmd) dispatch; no bLen/plractive validation.

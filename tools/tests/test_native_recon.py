@@ -316,9 +316,9 @@ class NativeReconTests(unittest.TestCase):
     def test_gp_prefix_is_only_the_declared_data_range(self):
         data = bytes(range(32))
         self.assertEqual(N.prefix_bytes(data, 0x80010004, 0x80010010, 0x80010020), data[4:16])
+        self.assertEqual(N.prefix_bytes(data, 0x80010004, 0x80010011, 0x80010020), data[4:17])
         for gp, start, end in ((0x8000fffc, 0x80010010, 0x80010020),
                                (0x80010004, 0x80010002, 0x80010020),
-                               (0x80010004, 0x80010011, 0x80010020),
                                (0x80010004, 0x80010020, 0x80010020),
                                (0x80010004, 0x80010010, 0x80010024)):
             with self.subTest(start=start), self.assertRaises(ValueError):

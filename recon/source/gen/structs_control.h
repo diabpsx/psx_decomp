@@ -299,23 +299,14 @@ public:
     unsigned short BothTickCount[16];   /* +0xAC */
     unsigned short GazTickCount[16];   /* +0xCC */
 
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-    unsigned short GetTick() const
-    {
-        if (get_both)
-            return both_Tick;
-        return Tick;
-    }
-    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
-    void SetPadTick(unsigned short tick) { PADTICK = tick; }
+    unsigned short GetDown() const;
+    unsigned short GetTick() const;
+    void SetPadTickMask(unsigned short mask);
+    void SetPadTick(unsigned short tick);
 };
 
-extern unsigned char DialogRed, DialogGreen, DialogBlue;   /* declared early for the inline bodies */
+extern unsigned char DialogRed, DialogGreen, DialogBlue;
+extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 class Dialog {
 public:
     int BevelGfx;   /* +0x0 */
@@ -323,17 +314,12 @@ public:
     int BackGfx;   /* +0x8 */
     int DialogOTpos;   /* +0xC */
 
-    inline Dialog();
-    ~Dialog() {}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetBack(int Type) { BackGfx = Type; }
+    Dialog();
+    ~Dialog();
+    void SetBorder(int Type);
+    void SetBack(int Type);
     void Back(int DX, int DY, int DW, int DH);
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
+    void SetRGB(unsigned char R, unsigned char G, unsigned char B);
 };
 
 struct FRAME_HDR {   /* sizeof 12 */
@@ -388,8 +374,9 @@ public:
     int NumOfBuffers[2];   /* +0x64 */
     long hndDecompArrays;   /* +0x6C */
 
-    struct FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
-    struct PAL *GetPal(int PalNum) { return (struct PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }
+    struct FRAME_HDR *GetFr(int FrNum);
+    struct PAL *GetPal(int PalNum);
+    void DumpDatFile();
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 
@@ -465,9 +452,89 @@ public:
     int CursY;   /* +0xEC */
     struct RgbBlockInf GlBlockInf;   /* +0xF0 */
 
-    static int GetOverlayOtBase() { return 0x1E8; }
-    static int GetMaxOtPos() { return 0x1FF; }
+    static int GetOverlayOtBase();
+    static int GetMaxOtPos();
 };
+
+/* Retail deferred-copy order is the reverse of this definition order. */
+inline FRAME_HDR *TextDat::GetFr(int FrNum)
+{
+    return Frames + (unsigned short)FrNum;
+}
+
+inline PAL *TextDat::GetPal(int PalNum)
+{
+    return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]);
+}
+
+inline int CBlocks::GetMaxOtPos()
+{
+    return 0x1FF;
+}
+
+inline int CBlocks::GetOverlayOtBase()
+{
+    return 0x1E8;
+}
+
+inline Dialog::Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+
+inline Dialog::~Dialog()
+{
+}
+
+inline void Dialog::SetBorder(int Type)
+{
+    BorderGfx = Type;
+}
+
+inline void Dialog::SetBack(int Type)
+{
+    BackGfx = Type;
+}
+
+inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R;
+    DialogGreen = G;
+    DialogBlue = B;
+}
+
+inline void CPad::SetPadTick(unsigned short tick)
+{
+    PADTICK = tick;
+}
+
+inline void CPad::SetPadTickMask(unsigned short mask)
+{
+    PADTICKMASK = mask;
+}
+
+inline unsigned short CPad::GetDown() const
+{
+    if (get_both)
+        return both_Down;
+    return Down;
+}
+
+inline unsigned short CPad::GetTick() const
+{
+    if (get_both)
+        return both_Tick;
+    return Tick;
+}
 
 struct POLY_FT4 {   /* sizeof 40 */
     unsigned long tag;   /* +0x0 */

@@ -56,7 +56,10 @@ extern MEM_INIT_INFO PsxFastMem;             /* @0x800B7948 (MEM.CPP static) */
 extern unsigned char RawPadData0[34];        /* @0x800B7F0C */
 extern unsigned char RawPadData1[34];        /* @0x800B7F30 */
 
-static void SetupWorkRam();
+void GM_Open(void) __attribute__((section(".text.startup_gman")));
+void MEM_SetupMem(void) __attribute__((section(".text.startup_mem")));
+static void SetupWorkRam(void) __attribute__((section(".text.startup_mem")));
+void PAD_Open(void) __attribute__((section(".text.startup_pads")));
 
 /* @0x800B0754 GMAN.CPP:1398 */
 void GM_Open(void)

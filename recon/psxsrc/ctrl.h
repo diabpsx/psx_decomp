@@ -66,32 +66,12 @@ struct CPad {   /* sizeof 236 */
     unsigned short BothTickCount[16];   /* +0xAC */
     unsigned short GazTickCount[16];   /* +0xCC */
 
-    unsigned short GetTick() const
-    {
-        if (get_both)
-            return both_Tick;
-        return Tick;
-    }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-    unsigned short GetUp() const
-    {
-        if (get_both)
-            return both_Up;
-        return Up;
-    }
-    unsigned short GetCur() const
-    {
-        if (get_both)
-            return both_Cur;
-        return Cur;
-    }
-    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
-    void SetPadTick(unsigned short tick) { PADTICK = tick; }
+    unsigned short GetTick() const;
+    unsigned short GetDown() const;
+    unsigned short GetUp() const;
+    unsigned short GetCur() const;
+    void SetPadTickMask(unsigned short mask);
+    void SetPadTick(unsigned short tick);
 };
 
 extern unsigned char DialogRed, DialogGreen, DialogBlue;
@@ -99,7 +79,7 @@ extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
 class CBlocks {
 public:
-    static int GetOverlayOtBase() { return 0x1E8; }
+    static int GetOverlayOtBase();
 };
 
 struct Dialog {   /* sizeof 16 */
@@ -108,30 +88,88 @@ struct Dialog {   /* sizeof 16 */
     int BackGfx;   /* +0x8 */
     int DialogOTpos;   /* +0xC */
 
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    void SetBorder(int Type) { BorderGfx = Type; }
+    Dialog();
+    ~Dialog();
+    void SetRGB(unsigned char R, unsigned char G, unsigned char B);
+    void SetBorder(int Type);
     int SetOTpos(int OT);
     void Back(int DX, int DY, int DW, int DH);
 };
+
+/* Header order reconstructed from the reverse deferred-inline sequence emitted
+ * by GCC 2.7.2 at the end of CTRL.CPP. */
+inline int CBlocks::GetOverlayOtBase()
+{
+    return 0x1E8;
+}
+
+inline Dialog::Dialog()
+{
+    BackGfx = 0x94;
+    BevelGfx = 0x1A;
+    BorderGfx = 0x1A;
+    DialogRed = 0x80;
+    DialogGreen = 0x80;
+    DialogBlue = 0x80;
+    DialogTRed = 0x20;
+    DialogTGreen = 0x20;
+    DialogTBlue = 0x20;
+    DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+
+inline Dialog::~Dialog()
+{
+}
+
+inline void Dialog::SetBorder(int Type)
+{
+    BorderGfx = Type;
+}
+
+inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R;
+    DialogGreen = G;
+    DialogBlue = B;
+}
+
+inline void CPad::SetPadTick(unsigned short tick)
+{
+    PADTICK = tick;
+}
+
+inline void CPad::SetPadTickMask(unsigned short mask)
+{
+    PADTICKMASK = mask;
+}
+
+inline unsigned short CPad::GetCur() const
+{
+    if (get_both)
+        return both_Cur;
+    return Cur;
+}
+
+inline unsigned short CPad::GetUp() const
+{
+    if (get_both)
+        return both_Up;
+    return Up;
+}
+
+inline unsigned short CPad::GetDown() const
+{
+    if (get_both)
+        return both_Down;
+    return Down;
+}
+
+inline unsigned short CPad::GetTick() const
+{
+    if (get_both)
+        return both_Tick;
+    return Tick;
+}
 
 enum PLR_MODE {
     PM_QUIT = 11,

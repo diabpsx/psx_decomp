@@ -17,6 +17,7 @@ import sdk_link as N
 import symlane as S
 import return_type_audit as RTA
 import psyq_extract as P
+import psyq_rewrite as PR
 import native_commons as C
 
 OUT = B.BUILD / 'native_source'
@@ -48,13 +49,15 @@ def source_assembler_options(spec):
 
 
 def is_zero_section(section):
-    return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.bss\.\w+', section))
+    return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.(?:s?bss)\.\w+', section))
 
 
-def compile_source(source, assembler, assembler_dos, assembler_flags):
+def compile_source(source, assembler, assembler_dos, assembler_flags, section_prefixes=None):
     if source.suffix.lower() != '.s':
         return S.compile_g(source, assembler=assembler, assembler_dos=assembler_dos,
-                           assembler_flags=assembler_flags)
+                           assembler_flags=assembler_flags, section_prefixes=section_prefixes)
+    if section_prefixes:
+        raise ValueError('assembly source cannot consume a generated section prefix')
     flags = B.per_tu_flags(source)
     g = str(flags.get('g_value', B.G_VALUE))
     obj = S.OUT / (source.stem + '.g.obj')
@@ -124,23 +127,35 @@ def validate_placements(segment, spec, layouts):
     sections = spec['sections']
     text_sections = [s for s in sections if s == '.text' or re.fullmatch(r'\.text\.\w+',s)]
     if not text_sections or any(s not in {'.text', '.rdata', '.sdata', '.data', '.sbss', '.bss', '.ctors', '.dtors'}
-                                and not re.fullmatch(r'\.(?:text|bss)\.\w+', s) for s in sections):
+                                and not re.fullmatch(r'\.(?:text|rdata|data|sdata|sbss|bss)\.\w+', s) for s in sections):
         raise ValueError('unsupported native source section set')
     homes, regions, limits = {}, {}, {}
     for section, row in sections.items():
         home = row.get('image', spec['image'])
         if home not in layouts or (section == '.text' and home != spec['image']):
             raise ValueError('invalid native source section image')
-        if (section == '.sdata' or is_zero_section(section)) and home != 'diabpsx':
+        if (section.startswith('.sdata') or is_zero_section(section)) and home != 'diabpsx':
             raise ValueError('native small data requires main-image placement')
         size, va = row['size'], int(row['va'], 0)
         if type(size) is not int or size <= 0:
             raise ValueError('native source section needs a positive extent')
-        if section == '.text':
+        if 'raw_segment' in row:
+            if (set(row) - {'va', 'size', 'source_section', 'raw_segment', 'raw_kind',
+                            'allow_zero_tail', 'image'}
+                    or row.get('raw_kind') != 'c'
+                    or not re.fullmatch(r'\w+', row.get('raw_segment', ''))
+                    or type(row.get('allow_zero_tail', 0)) is not int
+                    or not 0 <= row.get('allow_zero_tail', 0) < size):
+                raise ValueError('invalid native raw-segment placement')
+            key = ('c', row['raw_segment'])
+        elif section == '.text':
             key = ('c', segment)
         elif section.startswith('.text.'):
             target = row.get('segment', '')
-            if not re.fullmatch(r'\w+', target) or target == segment or va % 4 or size % 4:
+            same_segment_route = (target == segment and spec.get('routed_only') is True
+                                  and '.text' not in sections)
+            if (not re.fullmatch(r'\w+', target) or (target == segment and not same_segment_route)
+                    or va % 4 or size % 4):
                 raise ValueError('extra source text requires a distinct aligned retail segment')
             key = ('c', target)
         elif is_zero_section(section):
@@ -148,7 +163,8 @@ def validate_placements(segment, spec, layouts):
                 raise ValueError('native BSS must be word aligned')
             key = ('bss', '__zero_fill')
         else:
-            kind = 'data' if section in ('.ctors', '.dtors') else 'rodata' if section == '.rdata' else section[1:]
+            kind = ('data' if section in ('.ctors', '.dtors') or section.startswith('.data.') else 'rodata' if section.startswith('.rdata')
+                    else 'sdata' if section.startswith('.sdata.') else section[1:])
             if section in ('.ctors', '.dtors') and (va % 4 or size % 4):
                 raise ValueError('native constructor/destructor tables must be word aligned')
             scaffold = row['scaffold']
@@ -210,11 +226,52 @@ def resolve_bindings(names, symbol_text):
     return result
 
 
+def resolve_retail_data_bindings(names, retail_sym):
+    """Resolve file-static cross-section references from the retail SYM oracle."""
+    result = {}
+    for name in names:
+        if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', name) or name in result:
+            raise ValueError('invalid or duplicate retail data binding')
+        records = list(data_records(retail_sym, name))
+        values = {row[0] for row in records}
+        if len(records) != 1 or len(values) != 1:
+            raise ValueError(f'{name}: expected one authoritative retail data record')
+        result[name] = values.pop()
+    return result
+
+
+def resolve_scaffold_bindings(rows):
+    """Resolve unnamed retail-pool labels from one explicitly named scaffold."""
+    if not isinstance(rows, dict):
+        raise ValueError('scaffold bindings must be a mapping')
+    result = {}
+    for name, scaffold in rows.items():
+        if (not re.fullmatch(r'D_[0-9A-Fa-f]{8}', name)
+                or not isinstance(scaffold, str) or not re.fullmatch(r'\w+\.\w+', scaffold)):
+            raise ValueError('invalid scaffold binding')
+        path = B.ROOT / 'asm/data' / (scaffold + '.s')
+        if not path.is_file():
+            raise ValueError('scaffold binding source is absent')
+        text = path.read_text()
+        match = re.search(r'^dlabel\s+' + re.escape(name) + r'\s*$(.*?)^enddlabel\s+' +
+                          re.escape(name) + r'\s*$', text, re.M | re.S)
+        if match is None:
+            raise ValueError('scaffold binding label is absent or ambiguous')
+        addresses = re.findall(r'/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\b', match[1])
+        if not addresses:
+            raise ValueError('scaffold binding has no retail address')
+        address = int(addresses[0], 16)
+        if address != int(name[2:], 16):
+            raise ValueError('scaffold binding name disagrees with its retail address')
+        result[name] = address
+    return result
+
+
 def prefix_bytes(retail, gp, start, small_end):
     if not (0x80010000 <= gp <= start < small_end <= 0x80010000 + len(retail)):
         raise ValueError('GP prefix must stay within the initialized small-data range')
-    if gp % 4 or start % 4:
-        raise ValueError('GP prefix must be word aligned')
+    if gp % 4:
+        raise ValueError('GP base must be word aligned')
     return retail[gp - 0x80010000:start - 0x80010000]
 
 
@@ -257,8 +314,10 @@ def data_records(text, name):
     return records
 
 
-def verify_data_map(map_text, symbols, retail_text, name, alias=None):
+def verify_data_map(map_text, symbols, retail_text, name, alias=None, expected_address=None):
     records = data_records(retail_text, name)
+    if expected_address is not None:
+        records = {row for row in records if row[0] == expected_address}
     if len(records) != 1:
         raise ValueError('native data needs one authoritative retail record')
     addresses = {int(v, 16) for v in re.findall(
@@ -294,14 +353,16 @@ def verify_untyped_export(map_text, symbols, retail_text, compiled_text, name, a
             'compiler_type': record[2] if record else None, 'retail_type_record': False}
 
 
-def verify_sym(text, segment, data_symbols, retail_text, extra_paths=()):
+def verify_sym(text, segment, data_symbols, retail_text, extra_paths=(), routed_only=False,
+               data_record_addresses=None):
     ours = S.functions(text)
     retail = S.functions(retail_text, every=True)
     our_declarations = RTA.declarations(text)
     retail_declarations = RTA.declarations(retail_text)
     expected = set()
     count = 0
-    for path in sorted((B.ROOT / 'asm/nonmatchings' / segment).glob('*.s')) + list(extra_paths):
+    base_paths = [] if routed_only else sorted((B.ROOT / 'asm/nonmatchings' / segment).glob('*.s'))
+    for path in base_paths + list(extra_paths):
         name = re.sub(r'_(?:[0-9a-f]{8}|ci)$', '', path.stem)
         va = S.oracle_va(path.parent.name, path.stem)
         retail_name = name
@@ -318,15 +379,21 @@ def verify_sym(text, segment, data_symbols, retail_text, extra_paths=()):
             same, reason = RTA.compare(actual, wanted)
             if not same:
                 raise ValueError(f'{name}: native return declaration differs: {reason}')
-        ok, reason = S.compare(ours[name], S.normalize_embedded_text_table(copies[0], name))
+        ok, reason = S.compare(S.normalize_embedded_text_table(ours[name], name),
+                               S.normalize_embedded_text_table(copies[0], name))
         if not ok:
             raise ValueError(f'{name}: native SYM differs: {reason}')
         expected.add(name)
         count += 1
     if not count or set(ours) != expected:
         raise ValueError('native source function set differs from the complete TU')
+    data_record_addresses = {} if data_record_addresses is None else data_record_addresses
     for name in data_symbols:
         actual, wanted = data_records(text, name), data_records(retail_text, name)
+        if name in data_record_addresses:
+            address = data_record_addresses[name]
+            actual = {row for row in actual if row[0] == address}
+            wanted = {row for row in wanted if row[0] == address}
         if len(actual) != 1 or len(wanted) != 1 or actual != wanted:
             raise ValueError(f'{name}: native global data SYM differs')
     return count
@@ -480,6 +547,68 @@ def build(only=None):
         source_sections = {section: row.get('source_section', section)
                            for section, row in spec['sections'].items()}
         reverse_sections = {source: section for section, source in source_sections.items()}
+        composition = spec.get('composed_group')
+        composed_exports = {}
+        composed_link = None
+        raw_exports = []
+        raw_payloads = {}
+        if composition is not None:
+            required_composition = {'name', 'sections', 'image', 'va', 'size', 'exports'}
+            if (not isinstance(composition, dict)
+                    or set(composition) - (required_composition | {'raw_export_span'})
+                    or not required_composition <= set(composition)
+                    or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', composition['name'])
+                    or not isinstance(composition['sections'], list) or not composition['sections']
+                    or len(composition['sections']) != len(set(composition['sections']))
+                    or any(not re.fullmatch(r'\.[A-Za-z_][A-Za-z0-9_.]*', value)
+                           for value in composition['sections'])
+                    or composition['image'] not in layouts
+                    or type(composition['size']) is not int or composition['size'] <= 0
+                    or not isinstance(composition['exports'], dict)):
+                raise ValueError('invalid native composed-group declaration')
+            composed_va = int(composition['va'], 0)
+            if composed_va % 4:
+                raise ValueError('native composed group must be word aligned')
+            for section, row in composition['exports'].items():
+                if (section not in regions or not isinstance(row, dict)
+                        or set(row) != {'offset', 'size'} or type(row['offset']) is not int
+                        or type(row['size']) is not int or row['offset'] < 0 or row['size'] <= 0
+                        or row['offset'] + row['size'] > composition['size']
+                        or regions[section] != (composed_va + row['offset'], row['size'])
+                        or homes[section] != composition['image']):
+                    raise ValueError('invalid native composed-group export')
+                composed_exports[section] = row
+            if '.text' not in composed_exports:
+                raise ValueError('native composed group must export the complete text section')
+            raw_span = composition.get('raw_export_span')
+            if raw_span is not None:
+                if (not isinstance(raw_span, dict)
+                        or set(raw_span) != {'offset', 'size', 'kind', 'target_prefix'}
+                        or type(raw_span['offset']) is not int or raw_span['offset'] < 0
+                        or type(raw_span['size']) is not int or raw_span['size'] <= 0
+                        or raw_span['offset'] + raw_span['size'] > composition['size']
+                        or raw_span['kind'] not in ('rodata', 'data')
+                        or not isinstance(raw_span['target_prefix'], str)
+                        or not re.fullmatch(r'\w+', raw_span['target_prefix'])):
+                    raise ValueError('invalid native raw-export span')
+                first = composed_va + raw_span['offset']
+                limit = first + raw_span['size']
+                candidates = sorted((extent[0], sum(extent), name) for (kind, name), extent
+                                    in layouts[composition['image']].items()
+                                    if kind == raw_span['kind'] and name.startswith(raw_span['target_prefix'])
+                                    and first <= extent[0] < sum(extent) <= limit)
+                cursor = first
+                for start, stop, target in candidates:
+                    if start != cursor:
+                        raise ValueError('native raw-export span has a retail-layout gap')
+                    raw_exports.append({'target': target, 'kind': raw_span['kind'],
+                                        'offset': start - composed_va, 'size': stop - start})
+                    cursor = stop
+                if cursor != limit:
+                    raise ValueError('native raw-export span is not completely declared')
+            composed_link = {composition['name']: {
+                'sections': composition['sections'], 'va': composed_va,
+                'size': composition['size']}}
         extra_paths = []
         from native_text import validate_members, render_mixed
         routed = {}
@@ -510,8 +639,50 @@ def build(only=None):
             occupied.append((homes[section], va, va + size))
         prefix, combined, carrier_mode = gp_carrier_plan(regions, retail, gp, small_end,
                                                          anchor=str(B.per_tu_flags(source).get('g_value', B.G_VALUE)) != '0')
+        post_split_spec = spec.get('post_assemble_section_split')
+        post_split_specs = ([] if post_split_spec is None else
+                            post_split_spec if isinstance(post_split_spec, list) else [post_split_spec])
+        post_split_pieces = {}
+        for split_spec in post_split_specs:
+            if isinstance(split_spec, dict):
+                for row in split_spec.get('pieces', []):
+                    post_split_pieces.setdefault(row.get('name'), row)
+        borrowed_prefixes = {}
+        object_prefixes = {}
+        for section, row in spec['sections'].items():
+            amount = row.get('borrowed_prefix', 0)
+            if type(amount) is not int or amount < 0 or (amount and section == '.sdata'):
+                raise ValueError('invalid borrowed native section prefix')
+            if not amount:
+                continue
+            va, size = regions[section]
+            home = homes[section]
+            kind = ('rodata' if section.startswith('.rdata') else
+                    'data' if section.startswith('.data') else
+                    'sdata' if section.startswith('.sdata') else section[1:])
+            extent = layouts[home][(kind, row['scaffold'].rsplit('.', 1)[0])]
+            if va - amount < extent[0]:
+                raise ValueError('borrowed native section prefix leaves its retail fragment')
+            at = va - amount - bases[home]
+            data = retail_images[home][at:at + amount]
+            source_section = row.get('source_section', section)
+            if source_section in object_prefixes:
+                raise ValueError('duplicate borrowed native object-section prefix')
+            borrowed_prefixes[section] = data
+            split_piece = post_split_pieces.get(source_section)
+            if split_piece is not None:
+                try:
+                    supplied = bytes.fromhex(split_piece.get('prefix_hex', ''))
+                except (TypeError, ValueError):
+                    raise ValueError('invalid post-assemble borrowed prefix')
+                if supplied != data:
+                    raise ValueError('post-assemble borrowed prefix differs from retail')
+            else:
+                object_prefixes[source_section] = data
+            combined[section] = (va - amount, size + amount)
         prefix_objects = []
-        if prefix:
+        embedded_prefix = bool(prefix and regions.get('.sdata', (0, 0))[0] % 4)
+        if prefix and not embedded_prefix:
             prefix_source = OUT / f'{segment}_gp_prefix.s'
             assembly = '.sdata\n' + ''.join('.byte ' + ','.join(f'0x{b:02x}' for b in prefix[i:i+16]) + '\n'
                                            for i in range(0, len(prefix), 16))
@@ -521,14 +692,43 @@ def build(only=None):
             if run.returncode:
                 raise ValueError('GP scaffold assembly failed: ' + run.stdout + run.stderr)
             prefix_objects.append(prefix_obj)
-        original_obj = compile_source(source, assembler, assembler_dos, assembler_flags)
+        if embedded_prefix:
+            if '.sdata' in object_prefixes:
+                raise ValueError('GP and explicit section prefixes overlap')
+            object_prefixes['.sdata'] = prefix
+        original_obj = compile_source(
+            source, assembler, assembler_dos, assembler_flags,
+            section_prefixes=object_prefixes or None)
         raw = original_obj.read_bytes()
         if raw[:4] != b'LNK\x02':
             raise ValueError('compiler did not produce a native LNK object')
+        post_split = post_split_spec
+        for split_spec in post_split_specs:
+            if (not isinstance(split_spec, dict)
+                    or set(split_spec) - {'section', 'pieces', 'allow_zero_gaps'}
+                    or not {'section', 'pieces'} <= set(split_spec)
+                    or not isinstance(split_spec['section'], str)
+                    or not isinstance(split_spec['pieces'], list)
+                    or type(split_spec.get('allow_zero_gaps', False)) is not bool):
+                raise ValueError('invalid post-assemble section split')
+            raw = PR.split_section(raw, split_spec['section'], split_spec['pieces'],
+                                   split_spec.get('allow_zero_gaps', False))
         obj = P.parse_obj_complete(raw)
+        declared_data_symbols = spec['data_symbols']
+        if declared_data_symbols == 'all':
+            data_symbols = sorted({row['name'] for row in obj['xdefs'] + obj['locals']
+                                   if not P.is_code_section(obj['sections'].get(row['sect']))})
+            if not data_symbols or any(len(data_records(retail_sym, name)) != 1
+                                       for name in data_symbols):
+                raise ValueError('automatic native data-symbol inventory lacks unique retail records')
+        elif (not isinstance(declared_data_symbols, list)
+              or any(not isinstance(name, str) for name in declared_data_symbols)):
+            raise ValueError('invalid native data-symbol inventory')
+        else:
+            data_symbols = declared_data_symbols
         # A common needs a receipt for its retail address: a typed SYM record (data_symbols) or, for
         # stripped library members, the retail `2` name record + MAP address (untyped_data_symbols).
-        receipted = spec['data_symbols'] + list(spec.get('untyped_data_symbols', {}))
+        receipted = data_symbols + list(spec.get('untyped_data_symbols', {}))
         commons = C.placements(obj, spec['common_symbols'], symbol_text,
                                layouts, receipted) if 'common_symbols' in spec else {}
         for row in commons.values():
@@ -536,7 +736,36 @@ def build(only=None):
             if any(home == 'diabpsx' and va < stop and start < va+size for home,start,stop in occupied):
                 raise ValueError('source common overlaps another native payload')
             occupied.append(('diabpsx',va,va+size))
-        bindings = resolve_bindings(spec['externals'], symbol_text)
+        external_aliases = spec.get('external_binding_aliases', {})
+        if (not isinstance(external_aliases, dict) or set(external_aliases) - set(spec['externals'])
+                or any(not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.]*', name)
+                       or not isinstance(alias, str)
+                       or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.]*', alias)
+                       for name, alias in external_aliases.items())):
+            raise ValueError('invalid native external binding alias')
+        absolute_bindings = spec.get('absolute_bindings', {})
+        if (not isinstance(absolute_bindings, dict)
+                or set(absolute_bindings) - set(spec['externals'])
+                or any(not re.fullmatch(r'(?:D|func)_[0-9A-Fa-f]{8}', name)
+                       or not isinstance(value, str)
+                       or not re.fullmatch(r'0x[0-9A-Fa-f]{8}', value)
+                       or int(name.rsplit('_', 1)[1], 16) != int(value, 0)
+                       for name, value in absolute_bindings.items())):
+            raise ValueError('invalid native absolute binding')
+        bindings = {}
+        for name in spec['externals']:
+            if name in absolute_bindings:
+                bindings[name] = int(absolute_bindings[name], 0)
+                continue
+            authority = external_aliases.get(name, name)
+            bindings[name] = resolve_bindings([authority], symbol_text)[authority]
+        static_bindings = resolve_retail_data_bindings(
+            spec.get('retail_data_bindings', []), retail_sym)
+        scaffold_bindings = resolve_scaffold_bindings(spec.get('scaffold_bindings', {}))
+        if set(bindings) & (set(static_bindings) | set(scaffold_bindings)) or set(static_bindings) & set(scaffold_bindings):
+            raise ValueError('native data binding declarations overlap')
+        bindings.update(static_bindings)
+        bindings.update(scaffold_bindings)
         if set(commons) & set(bindings):
             raise ValueError('source common cannot also be an external binding')
         bindings.update({name: row['va'] for name,row in commons.items()})
@@ -545,13 +774,32 @@ def build(only=None):
         if compaction not in (None,'overlay_text'):
             raise ValueError('unknown native symbol-compaction route')
         if compaction and (not S.overlay_group(source) or spec['image']=='diabpsx'
-                           or any(home!='diabpsx' for section,home in homes.items() if section!='.text')):
+                           or any(home not in ('diabpsx', spec['image'])
+                                  for section,home in homes.items() if section!='.text')):
             raise ValueError('native overlay compaction requires overlay text and resident pools')
-        link_regions = {source_sections.get(section, section): region for section, region in combined.items()}
+        link_regions = {source_sections.get(section, section): region
+                        for section, region in combined.items() if section not in composed_exports}
+        allowed_holes = {source_sections.get(section, section)
+                         for section, row in spec['sections'].items()
+                         if row.get('allow_zero_tail', 0)}
         blocks, map_text = N.native_link(segment, raw, link_regions, bindings,
                                          prefix_objects=prefix_objects, output_dir=OUT,
-                                         overlay_text=bool(compaction))
+                                         overlay_text=bool(compaction), composed_groups=composed_link,
+                                         allow_zero_holes=allowed_holes)
         blocks = {reverse_sections.get(section, section): data for section, data in blocks.items()}
+        if composition is not None:
+            group = blocks.pop(composition['name'], None)
+            if group is None:
+                raise ValueError('native composed group payload is absent')
+            home = composition['image']
+            at = int(composition['va'], 0) - bases[home]
+            if at < 0 or group != retail_images[home][at:at + composition['size']]:
+                raise ValueError(f'{segment} composed group differs from retail')
+            for section, row in composed_exports.items():
+                blocks[section] = group[row['offset']:row['offset'] + row['size']]
+            for row in raw_exports:
+                raw_payloads[(row['target'], row['kind'])] = group[
+                    row['offset']:row['offset'] + row['size']]
         payloads = {}
         for section, data in blocks.items():
             home = homes.get(section, 'diabpsx')
@@ -561,26 +809,36 @@ def build(only=None):
                 raise ValueError(f'{segment} {section}: native bytes differ from retail')
             if section not in regions:
                 continue  # Verified GP anchor is scaffold only, never exported.
-            payloads[section] = data[len(prefix):] if section == '.sdata' else data
+            strip = len(prefix) if section == '.sdata' else len(borrowed_prefixes.get(section, b''))
+            payloads[section] = data[strip:]
         run = subprocess.run([str(S.DUMPSYM), str(OUT / f'{segment}.sym')],
                              capture_output=True, text=True)
         if run.returncode:
             raise ValueError('native source SYM decoding failed')
+        record_addresses = spec.get('data_record_addresses', {})
+        if (not isinstance(record_addresses, dict) or set(record_addresses) - set(data_symbols)
+                or any(not isinstance(value, str) or not re.fullmatch(r'0x[0-9A-Fa-f]{8}', value)
+                       for value in record_addresses.values())):
+            raise ValueError('invalid native data-record address selection')
+        record_addresses = {name: int(value, 0) for name, value in record_addresses.items()}
         if spec.get('stripped_library_sym'):
-            if spec['data_symbols']:
+            if data_symbols:
                 raise ValueError('stripped library data needs an explicit verification lane')
             count = verify_stripped_library_members(obj, spec, regions, map_text, retail_sym, extra_paths)
         else:
-            count = verify_sym(run.stdout, segment, spec['data_symbols'], retail_sym, extra_paths)
+            count = verify_sym(run.stdout, segment, data_symbols, retail_sym, extra_paths,
+                               routed_only=spec.get('routed_only') is True,
+                               data_record_addresses=record_addresses)
         aliases = spec.get('data_symbol_aliases', {})
-        if not isinstance(aliases, dict) or set(aliases) - set(spec['data_symbols']):
+        if not isinstance(aliases, dict) or set(aliases) - set(data_symbols):
             raise ValueError('native data aliases must name verified source globals')
-        for name in spec['data_symbols']:
+        for name in data_symbols:
             if next(iter(data_records(run.stdout, name)))[1] == 'STAT':
                 continue  # Exact static type/address already proved by the native SYM record.
-            verify_data_map(map_text, symbol_text, retail_sym, name, aliases.get(name))
+            verify_data_map(map_text, symbol_text, retail_sym, name, aliases.get(name),
+                            record_addresses.get(name))
         untyped = spec.get('untyped_data_symbols', {})
-        if not isinstance(untyped, dict) or set(untyped) & set(spec['data_symbols']):
+        if not isinstance(untyped, dict) or set(untyped) & set(data_symbols):
             raise ValueError('typed and untyped source data declarations must be disjoint')
         untyped_receipts = {name: verify_untyped_export(map_text, symbol_text, retail_sym, run.stdout, name, alias)
                             for name, alias in untyped.items()}
@@ -604,13 +862,27 @@ def build(only=None):
                 (OUT / f'{segment}{section}.s').write_text(
                     f'.section {section}, "aw", @nobits\n' + f'.space {len(data)}\n')
             elif section != '.text' and not section.startswith('.text.'):
+                raw_target = spec['sections'][section].get('raw_segment')
+                if raw_target:
+                    kind = spec['sections'][section]['raw_kind']
+                    stem = f'{segment}.raw_{raw_target}.{kind}'
+                    (OUT / (stem + '.s')).write_text(
+                        f'.section .text\n.incbin "{(OUT / f"{segment}{section}.bin").as_posix()}"\n')
+                    continue
                 scaffold = spec['sections'][section]['scaffold']
-                kind = 'data' if section in ('.ctors', '.dtors') else 'rodata' if section == '.rdata' else section[1:]
+                kind = ('data' if section in ('.ctors', '.dtors') or section.startswith('.data.') else 'rodata' if section.startswith('.rdata')
+                        else 'sdata' if section.startswith('.sdata.') else section[1:])
                 if not re.fullmatch(r'\w+\.' + kind, scaffold):
                     raise ValueError('invalid native source data scaffold')
                 filename = f'build/native_source/{segment}{section}.bin'
                 bridges.setdefault(scaffold, []).append((*regions[section], filename))
                 bridge_limits[scaffold] = limits[section]
+        for (target, kind), data in raw_payloads.items():
+            stem = f'{segment}.raw_{target}.{kind}'
+            payload = OUT / (stem + '.bin')
+            payload.write_bytes(data)
+            (OUT / (stem + '.s')).write_text(
+                f'.section .{kind}\n.incbin "{payload.as_posix()}"\n')
         if '.text' in regions:
             (OUT / f'{segment}.text.s').write_text(text_bridge(segment, *regions['.text']))
         (OUT / f'{segment}.sym.txt').write_text(run.stdout)
@@ -619,6 +891,7 @@ def build(only=None):
                          'compiler_sha256': (None if source.suffix.lower() == '.s' else
                                              sha(S.compiler_for(source, source.suffix.lower() != '.c').read_bytes())),
                          'compiler_overrides': B.per_tu_flags(source),
+                         'post_assemble_section_split': post_split,
                          'symbol_compaction': compaction,
                          'symmunge_sha256': S.SYMMUNGE_SHA256 if compaction else None,
                          'common_symbols': {
@@ -629,14 +902,21 @@ def build(only=None):
                          'composed_sdk_scaffolds': sorted({row['scaffold'] for section,row in spec['sections'].items()
                                                           if section != '.text' and not is_zero_section(section)
                                                           and not section.startswith('.text.')
-                                                          and row['scaffold'] in sdk_scaffolds}),
+                                                          and row.get('scaffold') in sdk_scaffolds}),
                          'untyped_data_symbols': untyped_receipts,
                          'source_sha256': sha(source.read_bytes()), 'object_sha256': sha(raw),
                          'preprocessed_sha256': (None if source.suffix.lower() == '.s' else
                                                  sha((S.OUT / (source.stem + '.i')).read_bytes())),
                          'sections': {s: {'image': homes[s], 'va': f'0x{regions[s][0]:08X}', 'size': len(b), 'sha256': sha(b)}
                                       for s, b in payloads.items()},
-                         'scaffold_gp_prefix': {'va': f'0x{gp:08X}', 'size': len(prefix), 'sha256': sha(prefix), 'mode': carrier_mode},
+                         'scaffold_gp_prefix': {'va': f'0x{gp:08X}', 'size': len(prefix), 'sha256': sha(prefix),
+                                                'mode': 'embedded_prefix' if embedded_prefix else carrier_mode},
+                         'borrowed_section_prefixes': {
+                             section: {'size': len(data), 'sha256': sha(data)}
+                             for section, data in borrowed_prefixes.items()},
+                         'raw_exports': [
+                             {'target': target, 'kind': kind, 'size': len(data), 'sha256': sha(data)}
+                             for (target, kind), data in raw_payloads.items()],
                          'bindings': {n: f'0x{v:08X}' for n, v in bindings.items()}})
         proof = 'stripped library members' if spec.get('stripped_library_sym') else 'SYM records'
         print(f'{segment}: native source bytes and {count} {proof} match retail; {len(prefix)} borrowed GP-prefix carrier bytes')

@@ -8,29 +8,29 @@ SECTIONS
         . = 0x0;   /* 0x80139BF8 */
         build/asm/data/frontend_hdr.data.s.o(.data);
         . = 0x4;   /* 0x80139BFC */
-        build/skel/PSXSRC/PRESONLY.CPP.o(.text);
+        build/native_source/presonly.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2C;   /* 0x80139C24 */
-        build/skel/PSXSRC/FE.CPP.o(.text);
+        build/native_source/fe.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2F58;   /* 0x8013CB50 */
-        build/asm/data/credits_rodata_8013cb50.rodata.s.o(.rodata);
+        build/native_source/credits_rodata_8013cb50.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x35BC;   /* 0x8013D1B4 */
-        build/skel/PSXSRC/CREDITS.CPP.o(.text);
+        build/native_source/credits.text.s.o(.text);   /* verified native-assembled source */
         . = 0x4560;   /* 0x8013E158 */
-        build/asm/data/memcard_rodata_8013e158.rodata.s.o(.rodata);
+        build/native_source/memcard_rodata_8013e158.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x8B00;   /* 0x801426F8 */
-        build/skel/PSXSRC/MEMCARD.CPP.o(.text);
+        build/native_source/memcard.text.s.o(.text);   /* verified native-assembled source */
         . = 0x99F0;   /* 0x801435E8 */
         build/asm/data/dlg_rodata_801435e8.rodata.s.o(.rodata);
         . = 0x9A0C;   /* 0x80143604 */
-        build/src/dlg.c.o(.text);
+        build/native_source/dlg_2.raw_dlg.c.s.o(.text);   /* verified native raw segment */
         . = 0x9A54;   /* 0x8014364C */
         build/asm/data/dlg_rodata_8014364c.rodata.s.o(.rodata);
         . = 0x9AA8;   /* 0x801436A0 */
-        build/src/dlg_1.c.o(.text);
+        build/native_source/dlg_2.raw_dlg_1.c.s.o(.text);   /* verified native raw segment */
         . = 0x9AF4;   /* 0x801436EC */
         build/asm/data/dlg_rodata_801436ec.rodata.s.o(.rodata);
         . = 0x1F998;   /* 0x80159590 */
-        build/skel/PSXSRC/DLG.CPP.o(.text);
+        build/native_source/dlg_2.text.s.o(.text);   /* verified native-assembled source */
         . = 0x21D60;   /* 0x8015B958 */
         build/native_source/loadsave.text.s.o(.text);   /* verified native-assembled source */
         . = 0x23234;   /* image end 0x8015CE2C */

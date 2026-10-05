@@ -390,22 +390,30 @@ public:
     virtual void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const = 0;
 };
 
+struct CompressedLevs {   /* sizeof 180 */
+    unsigned long Version;   /* +0x0 */
+    unsigned long Offset[22];   /* +0x4 */
+    unsigned long Size[22];   /* +0x5C */
+
+    int GetSize(void) { return Offset[21] + GAL_AlignSizeToType(Size[21], 1); }
+};
+
 class NoComp : public CompClass {
 public:
-    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const;
-    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const;
+    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { memcpy(Dest, Src, SrcLen); return SrcLen; }
+    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { memcpy(Dest, Src, SrcLen); }
 };
 
 class PakComp : public CompClass {
 public:
-    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const;
-    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const;
+    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { return PAK_DoPak(Dest, Src, SrcLen); }
+    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { PAK_DoUnpak(Dest, Src); }
 };
 
 class CrunchComp : public CompClass {
 public:
-    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const;
-    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const;
+    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { return crunch(Src, Dest, SrcLen, 0x800); }
+    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { decrunch(Src, Dest, SrcLen); }
 };
 
 struct AMap {   /* sizeof 16 */
@@ -433,14 +441,6 @@ public:
     void Init(void);
     int ExportData(unsigned char *U8Dest);
     void ImportData(struct CompressedLevs *Levs);
-};
-
-struct CompressedLevs {   /* sizeof 180 */
-    unsigned long Version;   /* +0x0 */
-    unsigned long Offset[22];   /* +0x4 */
-    unsigned long Size[22];   /* +0x5C */
-
-    int GetSize(void);   /* @0x80052A54 COMPMAP.H:60 -- inline header method, compiled into THIS TU */
 };
 
 struct LocalLevel {   /* sizeof 200 */

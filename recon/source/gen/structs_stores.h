@@ -47,6 +47,7 @@ public:
     int NumOfBuffers[2];   /* +0x64 */
     long hndDecompArrays;   /* +0x6C */
 
+    void DumpDatFile();
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
 

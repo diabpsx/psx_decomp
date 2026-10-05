@@ -6865,13 +6865,18 @@ nonmatching Day
 
 dlabel Day
     /* 10BE18 8011BE18 00000000 */ .word 0x00000000
+enddlabel Day
+
+nonmatching D_8011BE1C
+
+dlabel D_8011BE1C
     /* 10BE1C 8011BE1C 2E747000 */ .word 0x0070742E
     /* 10BE20 8011BE20 2E646174 */ .word 0x7461642E
     /* 10BE24 8011BE24 002F0980 */ .word 0x80092F00
     /* 10BE28 8011BE28 2E747000 */ .word 0x0070742E
     /* 10BE2C 8011BE2C 2E646174 */ .word 0x7461642E
     /* 10BE30 8011BE30 00000000 */ .word 0x00000000
-enddlabel Day
+enddlabel D_8011BE1C
 
 nonmatching iscflag
 
@@ -7839,6 +7844,12 @@ dlabel D_8011C1B0
     /* 10C1D8 8011C1D8 */ .asciz ".dat"
     /* 2E64617400000000 */
 .align 2
+enddlabel D_8011C1B0
+
+.align 2
+nonmatching D_8011C1E0
+
+dlabel D_8011C1E0
 .align 2
     /* 10C1E0 8011C1E0 */ .asciz "L1.Amp"
     /* 4C312E416D700000 */
@@ -7855,12 +7866,17 @@ dlabel D_8011C1B0
     /* 10C1F8 8011C1F8 */ .asciz "L4.Amp"
     /* 4C342E416D700000 */
 .align 2
-enddlabel D_8011C1B0
+enddlabel D_8011C1E0
 
 nonmatching AutoMapTData
 
 dlabel AutoMapTData
     /* 10C200 8011C200 00000000 */ .word 0x00000000
+enddlabel AutoMapTData
+
+nonmatching D_8011C204
+
+dlabel D_8011C204
     /* 10C204 8011C204 2E747000 */ .word 0x0070742E
     /* 10C208 8011C208 2E646174 */ .word 0x7461642E
     /* 10C20C 8011C20C 00626181 */ .word 0x81616200
@@ -7882,7 +7898,7 @@ dlabel AutoMapTData
     /* 10C24C 8011C24C 2E747000 */ .word 0x0070742E
     /* 10C250 8011C250 2E646174 */ .word 0x7461642E
     /* 10C254 8011C254 */ .byte 0x00
-enddlabel AutoMapTData
+enddlabel D_8011C204
 
 nonmatching fadetor
 

@@ -36,6 +36,26 @@ int to_ascii_invalid_char;   /* @0x8011B3C8 */
 char dirflag;   /* @0x8011B3DB */
 int card_status[2];   /* @0x8011B3DC */
 
+/* MEMCARD.CPP-owned overlay storage.  The initialized conversion table is
+ * followed by the two zero-filled directory/header banks in retail. */
+struct sjis sjis_table[37] = {
+    { '0', 10, 0x824F }, { 'A', 26, 0x8260 }, { 'a', 26, 0x8281 },
+    { ' ', 1, 0x8140 }, { '!', 1, 0x8149 }, { '"', 1, 0x8168 },
+    { '#', 1, 0x8194 }, { '$', 1, 0x8190 }, { '%', 1, 0x8193 },
+    { '&', 1, 0x8195 }, { '\'', 1, 0x8166 }, { '(', 1, 0x8169 },
+    { ')', 1, 0x816A }, { '*', 1, 0x8196 }, { '+', 1, 0x817B },
+    { ',', 1, 0x8143 }, { '-', 1, 0x817C }, { '.', 1, 0x8144 },
+    { '/', 1, 0x815E }, { ':', 1, 0x8146 }, { ';', 1, 0x8147 },
+    { '<', 1, 0x8171 }, { '=', 1, 0x8181 }, { '>', 1, 0x8172 },
+    { '?', 1, 0x8148 }, { '@', 1, 0x8197 }, { '[', 1, 0x816D },
+    { '\\', 1, 0x818F }, { ']', 1, 0x816E }, { '^', 1, 0x814F },
+    { '_', 1, 0x8151 }, { '`', 1, 0x8165 }, { '{', 1, 0x816F },
+    { '|', 1, 0x8162 }, { '}', 1, 0x8170 }, { '~', 1, 0x8150 },
+    { 0, 0, 0 }
+};
+struct DIRENTRY card_dir[2][16];
+struct file_header card_header[2][16];
+
 /* @0x801426F8 MEMCARD.CPP:137 */
 void endian_swap(unsigned char *b, int byts)
 {
@@ -128,86 +148,6 @@ int sjis_to_ascii(unsigned short *sjis, char *asc)
     return to_ascii_invalid_char == 0;
 }
 
-/* @0x80142CE4 MEMCARD.CPP:503 */
-int checksum_data(char *buf, int size)
-{
-    int chk = 0xDEADBEEF;
-
-    while (size--) chk -= *buf++;
-    return chk;
-}
-
-/* @0x80142BF4 MEMCARD.CPP:418 — LIBCARD event poll after _card_load: ev0 = formatted, ev1/ev2 = card
- * gone, ev3 = new card (read block 0 and check the "MC" signature) */
-int test_card_format(int card_number)
-{
-    _card_load(card_number << 4);
-    _card_wait(card_number);
-    if (TestEvent(card_ev0) == 1) return 1;
-    if (TestEvent(card_ev1) == 1) {
-        card_removed(card_number);
-        return 0;
-    }
-    if (TestEvent(card_ev2) == 1) {
-        card_removed(card_number);
-        return 0;
-    }
-    if (TestEvent(card_ev3) == 1) {
-        if (read_card_block(card_number, 0) && block_buf[0] == 'M' && block_buf[1] == 'C') return 1;
-        return 0;
-    }
-    return 0;
-}
-
-/* @0x80142D20 MEMCARD.CPP:520 */
-int delete_card_file(int card_number, int file)
-{
-    char path[80];
-
-    if (card_usable[card_number]) {
-        if (file >= card_files[card_number]) return 0;
-        if (mem_card_event_handler) mem_card_event_handler(5, card_number);
-        sprintf(path, "bu%d0:%s", card_number, card_dir[card_number][file].name);
-        if (erase(path)) {
-            card_dirty[card_number] = 1;
-            card_changed[card_number] = 1;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-/* @0x80142FF4 MEMCARD.CPP:702 */
-int format_card(int card_number)
-{
-    char path[80];
-
-    if (card_status[card_number] == 0) {
-        card_dirty[card_number] = 1;
-        card_changed[card_number] = 1;
-        card_files[card_number] = 0;
-        if (mem_card_event_handler) mem_card_event_handler(4, card_number);
-        sprintf(path, "bu%d0:", card_number);
-        if (format(path)) return card_usable[card_number] = test_card_format(card_number);
-    }
-    return 0;
-}
-
-/* @0x8014340C MEMCARD.CPP:900 */
-void new_card(int card_number)
-{
-    if (mem_card_event_handler) mem_card_event_handler(1, card_number);
-    _bu_init();
-    _card_clear(card_number << 4);
-    _card_wait(card_number);
-    if (test_hw_event() == 0) {
-        card_usable[card_number] = test_card_format(card_number);
-        read_card_directory(card_number);
-    } else {
-        card_removed(card_number);
-    }
-}
-
 /* @0x80142998 MEMCARD.CPP:280 — scan bu<n>0:* into card_dir[n], then read each save's 512-byte header
  * (title byte-swapped and converted from Shift-JIS in place).  A card that is not usable while either
  * slot reports status 3 marks the OTHER slot dirty.  The short-circuit read/convert/close expression
@@ -251,37 +191,53 @@ void read_card_directory(int card_number)
     }
 }
 
-/* @0x801434A0 MEMCARD.CPP:945 — per-frame card state follow-up: status 0 after 1/2/4 or status 3 flags a
- * new card, status 2 after 0 drops usability; a dirty card is re-tested and its directory re-read */
-void service_card(int card_number)
+/* @0x80142BF4 MEMCARD.CPP:418 — LIBCARD event poll after _card_load: ev0 = formatted, ev1/ev2 = card
+ * gone, ev3 = new card (read block 0 and check the "MC" signature) */
+int test_card_format(int card_number)
 {
-    int last_status = last_card_status[card_number];
+    _card_load(card_number << 4);
+    _card_wait(card_number);
+    if (TestEvent(card_ev0) == 1) return 1;
+    if (TestEvent(card_ev1) == 1) {
+        card_removed(card_number);
+        return 0;
+    }
+    if (TestEvent(card_ev2) == 1) {
+        card_removed(card_number);
+        return 0;
+    }
+    if (TestEvent(card_ev3) == 1) {
+        if (read_card_block(card_number, 0) && block_buf[0] == 'M' && block_buf[1] == 'C') return 1;
+        return 0;
+    }
+    return 0;
+}
 
-    switch (card_status[card_number]) {
-    case 0:
-        if (last_status == 1 || last_status == 2 || last_status == 4) new_card_flag[card_number] = true;
-        break;
-    case 1:
-        break;
-    case 2:
-        if (last_status == 0) {
-            if (mem_card_event_handler) mem_card_event_handler(8, card_number);
-            card_usable[card_number] = 0;
+/* @0x80142CE4 MEMCARD.CPP:503 */
+int checksum_data(char *buf, int size)
+{
+    int chk = 0xDEADBEEF;
+
+    while (size--) chk -= *buf++;
+    return chk;
+}
+
+/* @0x80142D20 MEMCARD.CPP:520 */
+int delete_card_file(int card_number, int file)
+{
+    char path[80];
+
+    if (card_usable[card_number]) {
+        if (file >= card_files[card_number]) return 0;
+        if (mem_card_event_handler) mem_card_event_handler(5, card_number);
+        sprintf(path, "bu%d0:%s", card_number, card_dir[card_number][file].name);
+        if (erase(path)) {
+            card_dirty[card_number] = 1;
+            card_changed[card_number] = 1;
+            return 1;
         }
-        break;
-    case 3:
-        new_card_flag[card_number] = true;
-        break;
-    case 4:
-        break;
     }
-    if (card_dirty[card_number]) {
-        card_usable[card_number] = test_card_format(card_number);
-        dirflag = 1;
-        read_card_directory(card_number);
-        dirflag = 0;
-        card_dirty[card_number] = 0;
-    }
+    return 0;
 }
 
 /* @0x80142E18 MEMCARD.CPP:572 — read a save: 3 = card unusable, 2 = bad slot/id, 1 = open failed,
@@ -329,6 +285,22 @@ int read_card_file(int card_number, int file, int id, char *buf)
         return 2;
     }
     return 3;
+}
+
+/* @0x80142FF4 MEMCARD.CPP:702 */
+int format_card(int card_number)
+{
+    char path[80];
+
+    if (card_status[card_number] == 0) {
+        card_dirty[card_number] = 1;
+        card_changed[card_number] = 1;
+        card_files[card_number] = 0;
+        if (mem_card_event_handler) mem_card_event_handler(4, card_number);
+        sprintf(path, "bu%d0:", card_number);
+        if (format(path)) return card_usable[card_number] = test_card_format(card_number);
+    }
+    return 0;
 }
 
 /* @0x801430B8 MEMCARD.CPP:757 — build the 512-byte save header ("SC", type 0x11, block count, Shift-JIS
@@ -382,4 +354,52 @@ int write_card_file(int card_number, int id, char *name, char *title, unsigned c
         return 0;
     }
     return 3;
+}
+
+/* @0x8014340C MEMCARD.CPP:900 */
+void new_card(int card_number)
+{
+    if (mem_card_event_handler) mem_card_event_handler(1, card_number);
+    _bu_init();
+    _card_clear(card_number << 4);
+    _card_wait(card_number);
+    if (test_hw_event() == 0) {
+        card_usable[card_number] = test_card_format(card_number);
+        read_card_directory(card_number);
+    } else {
+        card_removed(card_number);
+    }
+}
+
+/* @0x801434A0 MEMCARD.CPP:945 — per-frame card state follow-up: status 0 after 1/2/4 or status 3 flags a
+ * new card, status 2 after 0 drops usability; a dirty card is re-tested and its directory re-read */
+void service_card(int card_number)
+{
+    int last_status = last_card_status[card_number];
+
+    switch (card_status[card_number]) {
+    case 0:
+        if (last_status == 1 || last_status == 2 || last_status == 4) new_card_flag[card_number] = true;
+        break;
+    case 1:
+        break;
+    case 2:
+        if (last_status == 0) {
+            if (mem_card_event_handler) mem_card_event_handler(8, card_number);
+            card_usable[card_number] = 0;
+        }
+        break;
+    case 3:
+        new_card_flag[card_number] = true;
+        break;
+    case 4:
+        break;
+    }
+    if (card_dirty[card_number]) {
+        card_usable[card_number] = test_card_format(card_number);
+        dirflag = 1;
+        read_card_directory(card_number);
+        dirflag = 0;
+        card_dirty[card_number] = 0;
+    }
 }

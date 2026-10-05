@@ -477,6 +477,7 @@ struct TextDat {   /* sizeof 112 */
     int NumOfBuffers[2];   /* +0x64 */
     long hndDecompArrays;   /* +0x6C */
 
+    void DumpDatFile();
     /* hand-added: only the two methods this TU actually calls (real member fns on GMAN.CPP's
      * TextDat, not free functions -- oracle mangling GetFrNum__7TextDatiiii / PrepareFt4__7TextDat...
      * has no leading P before the class tag, i.e. implicit `this`). */

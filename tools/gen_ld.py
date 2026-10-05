@@ -35,7 +35,7 @@ RECON_BSS = json.loads(_rb.read_text()) if _rb.exists() else {}
 SECT = {"data": ".data", "rodata": ".rodata", "sdata": ".sdata", "bss": ".bss", "sbss": ".sbss"}
 
 def is_native_zero_section(section):
-    return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.bss\.\w+', section))
+    return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.(?:s?bss)\.\w+', section))
 
 def cross_image_provisions(name):
     registry = ROOT / "configs" / "cross_image_symbols.json"
@@ -121,19 +121,50 @@ def gen(name: str):
     native_data = {row["scaffold"] for spec in NATIVE_RECON.values()
                    for section, row in spec["sections"].items()
                    if section != ".text" and not is_native_zero_section(section) and not section.startswith('.text.')
-                   and row.get("image", spec["image"]) == name}
+                   and row.get("image", spec["image"]) == name and row.get('scaffold')}
     if name == 'diabpsx':
         native_data.update(row['scaffold'] for spec in NATIVE_RECON.values()
                            for row in spec.get('common_symbols',{}).values() if 'scaffold' in row)
+    native_raw = {}
+    for owner, spec in NATIVE_RECON.items():
+        composition = spec.get('composed_group', {})
+        span = composition.get('raw_export_span') if isinstance(composition, dict) else None
+        if not span or composition.get('image') != name:
+            continue
+        first = int(composition['va'], 0) + span['offset'] - vram
+        limit = first + span['size']
+        cursor = first
+        for off, kind, target in subs:
+            if first <= off < limit and kind == span['kind'] and target.startswith(span['target_prefix']):
+                next_off = next((row[0] for row in subs if row[0] > off), end)
+                stop = min(next_off, limit)
+                if off != cursor:
+                    raise ValueError('native raw span has a linker-layout gap')
+                key = f'{target}.{kind}'
+                if key in native_raw:
+                    raise ValueError('duplicate native raw fragment')
+                native_raw[key] = (owner, target, kind)
+                cursor = stop
+        if cursor != limit:
+            raise ValueError('native raw span is incomplete in linker layout')
+    native_raw_c = {}
+    for owner, spec in NATIVE_RECON.items():
+        for section, row in spec['sections'].items():
+            target = row.get('raw_segment')
+            if not target or row.get('image', spec['image']) != name:
+                continue
+            if row.get('raw_kind') != 'c' or target in native_raw_c:
+                raise ValueError('invalid or duplicate native raw code segment')
+            native_raw_c[target] = (owner, target, row['raw_kind'])
     if set(NATIVE_RECON) & set(RECON_MAP):
         raise ValueError("source TU cannot use both GNU and native source inputs")
     if extra_text & (native_whole | set(RECON_MAP)):
         raise ValueError('mixed native text cannot overlap a whole-TU source selection')
-    if (native_whole | extra_text) - {n for off, kind, n in subs if kind == "c"}:
+    if (native_whole | extra_text | set(native_raw_c)) - {n for off, kind, n in subs if kind == "c"}:
         raise ValueError("native source owner has no retail text fragment")
     available = {f"{n}.{kind}" for off, kind, n in subs if kind in SECT}
     sdk_data = SDK_DATA if name == "diabpsx" else set()
-    if (sdk_data | native_data) - available:
+    if (sdk_data | native_data | set(native_raw)) - available:
         raise ValueError("native data placement names a missing retail fragment")
     # Native source may compose its exact ranges on top of the freshly generated
     # SDK bridge. gen_ld selects that one combined wrapper below; independent
@@ -151,7 +182,10 @@ def gen(name: str):
         out.append(f"        . = 0x{off:X};   /* 0x{va:08X} */")   # inside an output section `.` is the offset from its start
         if kind == "c":
             skel = SKEL_MAP.get(n)
-            if n in native_whole or n in extra_text:
+            if n in native_raw_c:
+                owner, target, raw_kind = native_raw_c[n]
+                out.append(f"        build/native_source/{owner}.raw_{target}.{raw_kind}.s.o(.text);   /* verified native raw segment */")
+            elif n in native_whole or n in extra_text:
                 out.append(f"        build/native_source/{n}.text.s.o(.text);   /* verified native-assembled source */")
             elif n in RECON_MAP:
                 out.append(f"        build/{RECON_MAP[n]}.o(.text);   /* reconstructed TU */")
@@ -174,6 +208,9 @@ def gen(name: str):
                     else:
                         out.extend(["        FILL(0);", f"        . = ALIGN({binding['alignment']});"])
                 out.append(f"        ASSERT(. - {marker} == 0x{binding['size']:X}, \"wrong source data extent: {n}\");")
+            elif f"{n}.{kind}" in native_raw:
+                owner, target, raw_kind = native_raw[f"{n}.{kind}"]
+                out.append(f"        build/native_source/{owner}.raw_{target}.{raw_kind}.s.o(.{raw_kind});   /* verified native raw span */")
             elif f"{n}.{kind}" in native_data:
                 out.append(f"        build/native_source/{n}.{kind}.s.o({SECT[kind]});   /* verified native source data */")
             elif name == "diabpsx" and f"{n}.{kind}" in SDK_DATA:
@@ -204,7 +241,7 @@ def gen(name: str):
                 out.extend([f"        . = 0x{address - vram:X};",
                             f"        {marker} = .;",
                             f"        {obj}({section});",
-                            f'        ASSERT(. - {marker} == 0x{size:X}, "wrong BSS extent: {entry}");'])
+                            f'        ASSERT(. - {marker} == 0x{size:X}, "wrong BSS extent: {entry}{section}");'])
         out.append(f"        . = 0x{limit:X};   /* remaining .sbss + .bss zero fill */")
     out += ["    }", "    /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }", "}", *provisions]
     (ROOT / "linkers" / f"{name}.ld").write_text("\n".join(out) + "\n")

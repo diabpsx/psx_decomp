@@ -332,6 +332,19 @@ conventional), the suite was231/231, and327 library entries remained at that
 checkpoint:33 boot utilities plus294 EAC runtime.
 The machine-readable result is `build/eac_twin_screen.json`.
 
+After the complete library integration and native promotion of PREGAME.CPP and
+PRESONLY.CPP, TITLESCR.CPP, PREAUTO.CPP, the VERSION.CPP startup suffix and the
+remaining GMAN/MEM/PADS startup blocks, CREDITS.CPP, DIALOG.CPP, GPANEL.CPP and
+MEMCARD.CPP, BIGLUMP.CPP, STREAM.CPP, CPLAYER.CPP, CARDCORE.CPP, CTRL.CPP,
+DRLG_L2.CPP, PADFUNCS.CPP, OPTIONS.CPP, BLOCK.CPP and DIABLO.CPP, the complete
+DLG_2.CPP overlay object, MISPRINT.CPP, CONTROL.CPP, GMAN.CPP, FE.CPP,
+STORES.CPP, ITEMS.CPP, MSG.CPP, PLAYER.CPP and FMV.CPP, native coverage is 3,196
+functions/178 TUs; including the one conventional TU gives 3,215/179. All
+2,727/2,727 game-board entries are final-image source-owned (including DLG_2's two
+native raw-data exports). All 270 tool tests and all five exact-image comparisons
+pass.
+This is a source-integration backlog, not a matching backlog.
+
 ## EA Canada EACLIB and Climax hand-assembly lanes (2026-10-04)
 
 The 342 library entries that are neither Sony archive members nor Climax GLIB are

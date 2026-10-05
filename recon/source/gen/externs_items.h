@@ -2,7 +2,7 @@ extern const struct ItemDataStruct AllItemsList[157];   /* @0x801113A4 */
 extern BOOL CDWAIT;   /* @0x8011ADEC */
 extern int FePlayerNo;   /* @0x8011B378 */
 extern unsigned char ItemAnimLs[35];   /* @0x800D1C8C */
-int *ItemAnimSnds;   /* @0x8011B890 */  /* TU-owned tentative def, %gp_rel-reached */
+extern int *ItemAnimSnds;   /* @0x8011B890 */
 extern unsigned char ItemCAnimTbl[169];   /* @0x800D1BE0 */
 extern struct CFont MediumFont;   /* @0x800B82D8 */
 extern char OutStr[128];   /* @0x800D54D4 */
@@ -10,7 +10,7 @@ extern const struct PLStruct PL_Prefix[84];   /* @0x80112744 */
 extern const struct PLStruct PL_Suffix[96];   /* @0x80113464 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
 extern int ScrollFlag[2];   /* @0x8011B8B8 */
-extern short SinTab[32];   /* @0x80116178 */
+extern const short SinTab[32];   /* @0x80116178 */
 extern int StorePlrNo;   /* @0x8011BAB4 */
 extern unsigned char UniqueItemFlag[128];   /* @0x800D5454 */
 extern const struct UItemStruct UniqueItemList[91];   /* @0x80114364 */
@@ -37,7 +37,7 @@ extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
 extern int force_redraw;   /* @0x8011B790 */
 extern unsigned char gbMaxPlayers;   /* @0x8011B9A2 */
 extern int gnDifficulty;   /* @0x8011C108 */
-int idoppely;   /* @0x8011B894 */  /* TU-owned tentative def, %gp_rel-reached */
+extern int idoppely;   /* @0x8011B894 */
 extern unsigned char invflag;   /* @0x8011C32C */
 extern struct ItemStruct item[128];   /* @0x800D1D54 */
 extern char itemactive[127];   /* @0x800D5354 */
@@ -45,7 +45,7 @@ extern char itemavail[127];   /* @0x800D53D4 */
 extern unsigned char leveltype;   /* @0x8011C10D */
 extern short missileactive[125];   /* @0x80102A60 */
 extern int myplr;   /* @0x8011BA08 */
-long numitems;   /* @0x8011B888 */  /* TU-owned tentative def, %gp_rel-reached */
+extern long numitems;   /* @0x8011B888 */
 extern int nummissiles;   /* @0x8011C288 */
 extern long numobjects;   /* @0x8011B9CC */
 extern char objectactive[127];   /* @0x800DA220 */
@@ -56,10 +56,9 @@ extern int premiumlvladd[6];   /* @0x800D1D3C */
 extern int sel_data;   /* @0x8011B72C */
 extern unsigned char setlevel;   /* @0x8011C10E */
 extern char tempstr[256];   /* @0x800CEA10 */
-unsigned char uitemflag;   /* @0x8011B8DC */  /* TU-owned tentative def, %gp_rel-reached */
+extern unsigned char uitemflag;   /* @0x8011B8DC */
 extern struct ObjectStruct object[127];   /* @0x800D8C4C */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
-static unsigned short Item2Frm[35];   /* @0x801161F4 SYM: STAT ARY SHORT[35] */
 extern struct SpellData spelldata[37];   /* @0x800DDB80 */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
 extern unsigned char AllItemsUseable[157];   /* @0x800D1B40 */

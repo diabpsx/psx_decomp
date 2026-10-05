@@ -10,7 +10,25 @@ static char ctrl_select_line;       /* .sbss */
 static char ctrl_select_side;       /* .sbss */
 static char ckeyheld;               /* .sbss */
 static RECT CtrlRect;               /* .sbss */
+static int toppos = 0;
 unsigned char ctrlflag = 0;         /* .sdata -- names the _GLOBAL_ ctor/dtor thunks */
+/* @0x800CC364: button name (sdata literals; "C" is shared by entries 0 and 3), pad bit, font glyph */
+pad_assigns pad_txt[14] = {
+    { "C", 0x40, 0x5F },
+    { "S", 0x80, 0x3C },
+    { "T", 0x200, 0x3E },
+    { "C", 0x100, 0x24 },
+    { "L1", 0x400, 0x7C },
+    { "L2", 0x800, 0x7E },
+    { "R1", 0x1000, 0x7F },
+    { "R2", 0x2000, 0x1F },
+    { "START", 0x10, 0 },
+    { "SELECT", 0x20, 0 },
+    { "UP", 0x1, 0 },
+    { "DOWN", 0x2, 0 },
+    { "LEFT", 0x4, 0 },
+    { "RIGHT", 0x8, 0 },
+};
 /* @0x800CC40C: text id, pad button mask, action handler, combo button mask (values from the retail image) */
 KEY_ASSIGNS txt_actions[20] = {
     { 0x3BD, 0, NULL, 0 },
@@ -34,24 +52,6 @@ KEY_ASSIGNS txt_actions[20] = {
     { 0x3F7, 0, (void (*)())pad_func_SplBook, 0 },
     { 0x33B, 0, (void (*)())pad_func_QLog, 0 },
 };
-/* @0x800CC364: button name (sdata literals; "C" is shared by entries 0 and 3), pad bit, font glyph */
-pad_assigns pad_txt[14] = {
-    { "C", 0x40, 0x5F },
-    { "S", 0x80, 0x3C },
-    { "T", 0x200, 0x3E },
-    { "C", 0x100, 0x24 },
-    { "L1", 0x400, 0x7C },
-    { "L2", 0x800, 0x7E },
-    { "R1", 0x1000, 0x7F },
-    { "R2", 0x2000, 0x1F },
-    { "START", 0x10, 0 },
-    { "SELECT", 0x20, 0 },
-    { "UP", 0x1, 0 },
-    { "DOWN", 0x2, 0 },
-    { "LEFT", 0x4, 0 },
-    { "RIGHT", 0x8, 0 },
-};
-static int toppos = 0;
 static Dialog CtrlBack;             /* bss; constructed by _GLOBAL__I_ctrlflag */
 static int AdvancedDefaults[20][2] = {
     { 0, 0 }, { 0, 0 }, { 1, 0 }, { 0, 0 }, { 0x2000, 0 }, { 0, 0 }, { 0x40, 0 }, { 0x100, 0 },

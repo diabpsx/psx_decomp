@@ -17,14 +17,15 @@ extern unsigned short dungeon[48][48];   /* @0x800E40C4 */
 extern unsigned char gbMaxPlayers;   /* @0x8011B9A2 */
 extern unsigned char gbSelectProvider;   /* @0x8011B9A6 */
 extern unsigned char gbValidSaveFile;   /* @0x8011B9F0 */
-extern unsigned long glSeedTbl[17];   /* @0x800CF75C */
-extern int gnLevelTypeTbl[17];   /* @0x800CF7A0 */
+int DebugMonsters[10];   /* @0x800CEC84 */
+unsigned char pMegaTiles[2736];   /* @0x800CECAC */
+unsigned long glSeedTbl[17];   /* @0x800CF75C */
+int gnLevelTypeTbl[17];   /* @0x800CF7A0 */
 extern char last_type;   /* @0x8011B095 */
 extern int level_record;   /* @0x8011AE44 */
 extern unsigned char leveltype;   /* @0x8011C10D */
 extern unsigned char *mydflags;   /* @0x8011C0D8 */
 extern int myplr;   /* @0x8011BA08 */
-extern unsigned char pMegaTiles[2736];   /* @0x800CECAC */
 extern unsigned char pdungeon[40][40];   /* @0x800E52C4 */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
 extern int sel_data;   /* @0x8011B72C */
@@ -40,16 +41,16 @@ extern struct PlayerStruct plr[2];   /* @0x800DA538 */
  * gp-relativizes them like retail). DIABLO.CPP is their natural home (main game-state file); other
  * TUs that only read them keep plain `extern` (and the oracle addresses them absolute there, which
  * is correct for a non-owner). */
+int LastFrCount = -1;   /* @0x8011B7D8 */
 enum GM_SPEEDS GameSpeed;   /* @0x8011B7DC */
-int LastFrCount;   /* @0x8011B7D8 */
 unsigned char PauseMode;   /* @0x8011B7A4 */
 int force_redraw;   /* @0x8011B790 */
-unsigned char gbDoEnding;   /* @0x8011B801 */
-unsigned char gbGameLoopStartup;   /* @0x8011B804 */
 unsigned char gbProcessPlayers;   /* @0x8011B800 */
+unsigned char gbDoEnding;   /* @0x8011B801 */
 unsigned char gbRunGame;   /* @0x8011B802 */
 unsigned char gbRunGameResult;   /* @0x8011B803 */
-unsigned long ghMainWnd;   /* @0x8011B788 */
+unsigned char gbGameLoopStartup;   /* @0x8011B804 */
+unsigned long ghMainWnd = 0x29A;   /* @0x8011B788 */
 int setseed;   /* @0x8011B79C */
 unsigned char sgbMouseDown;   /* @0x8011B7AC */
 unsigned char svgamode;   /* @0x8011B7E0 */

@@ -294,9 +294,12 @@ constructor/destructor pointers. All 22 named global types and placements
 match retail. This includes MtPrevText and the restored 120/200 timing defaults.
 Currently `configs/recon_link.json` selects one reconstructed TU covering
 19 verified function entries, while `configs/native_recon_link.json` supplies
-1,721 functions across 116 TUs through real ASPSX/PSYLINK: 1,740 source-linked
-functions across 117 TUs in total. They replace their text scaffolds at the original
-addresses. LIGHTING supplies all 28 functions and all six original sections,
+3,196 functions across 178 TUs through real ASPSX/PSYLINK: 3,215 source-linked
+functions across 179 TUs in total. All 2,727/2,727 game-board entries are now
+final-image source-owned, including DLG_2's two native raw-data exports. The
+source-owned TUs replace their text/data scaffolds at the original addresses.
+All 270 tool tests pass and all five linked images remain byte-identical.
+LIGHTING supplies all 28 functions and all six original sections,
 including the gold-source CrawlTable, 31 exact global records, restored RGB
 defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
 is byte-identical; DoLighting uses the reviewed real-ASPSX gate.
