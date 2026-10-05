@@ -61,6 +61,3 @@ int D_8011B7A8;             /* sgnTimeoutCurs-equivalent: saved cursor id while 
 int D_8011C7B0;             /* lvldir stashed across the CreateLevel setjmp/GSYS_SetStackAndJump handoff */
 unsigned char *D_8011C7B4;  /* CreateLevel's private stack pointer/top (GAL_Lock'd 0x14000-byte block) */
 int D_8011C7B8;             /* game_loop: "pause-ok already set" one-shot latch (SYM shows a WORD store) */
-
-/* TU-owned buffer, too big for gp-rel (used only via %hi/%lo in the oracle) -- CreateLevel's setjmp env. */
-int D_8012EC28[12];

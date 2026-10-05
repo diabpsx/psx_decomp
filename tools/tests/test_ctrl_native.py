@@ -18,10 +18,7 @@ import symlane as S
 class CtrlNativeTests(unittest.TestCase):
     def test_complete_object_and_inline_tail(self):
         source = B.ROOT / "recon/psxsrc/ctrl.cpp"
-        packed = B.per_tu_flags(source)["pack_lcomm"]
-        self.assertEqual(packed["symbols"],
-                         [["ctrl_select_line", 0, 1], ["ctrl_select_side", 1, 1],
-                          ["ckeyheld", 2, 1], ["CtrlRect", 8, 8]])
+        self.assertNotIn("pack_lcomm", B.per_tu_flags(source))
         with tempfile.TemporaryDirectory(prefix="ctrl-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -29,6 +26,7 @@ class CtrlNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("ctrl", 28))
+        self.assertEqual(receipt["assembler_version"], "2.67")
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2204)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 5992, ".data": 808, ".sdata": 111,

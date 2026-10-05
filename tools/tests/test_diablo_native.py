@@ -18,9 +18,8 @@ import symlane as S
 class DiabloNativeTests(unittest.TestCase):
     def test_complete_object_and_split_storage(self):
         flags = B.per_tu_flags(B.ROOT / "recon/source/diablo.cpp")
-        self.assertEqual(flags["pack_lcomm"]["size"], 308)
-        self.assertEqual(flags["route_symbol_sections"]["D_8012EC28"],
-                         ".bss.diablo_jmp")
+        self.assertNotIn("pack_lcomm", flags)
+        self.assertNotIn("route_symbol_sections", flags)
         with tempfile.TemporaryDirectory(prefix="diablo-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -28,12 +27,12 @@ class DiabloNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("diablo", 33))
+        self.assertEqual(receipt["assembler_version"], "2.67")
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".rdata", ".data", ".bss.diablo_seeds",
-                           ".bss.diablo_jmp")},
+                          (".text", ".rdata", ".data", ".bss")},
                          {".text": 8156, ".rdata": 116, ".data": 2912,
-                          ".bss.diablo_seeds": 308, ".bss.diablo_jmp": 48})
+                          ".bss": 368})
 
 
 if __name__ == "__main__":

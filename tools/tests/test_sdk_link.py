@@ -1,5 +1,7 @@
 """Reject incomplete or ambiguous native SDK payloads before scaffold import."""
 import copy
+import collections
+import json
 from pathlib import Path
 import struct
 import sys
@@ -13,6 +15,17 @@ import sdk_link as S
 
 
 class NativeSdkTests(unittest.TestCase):
+    def test_retail_archive_roots_are_canonical(self):
+        self.assertEqual(S.DEFAULT_SDK, "4.0")
+        self.assertEqual(S.ARCHIVES, Path("C:/Temp/PSYQ/psyq-400/PSX/LIB"))
+        self.assertEqual(S.SDK410, Path("C:/Temp/PSYQ/psyq-410/PSX/LIB"))
+        registry = json.loads((Path(__file__).resolve().parents[2]
+                               / "configs/sdk_link.json").read_text())
+        self.assertEqual(len(registry), 140)
+        self.assertEqual(collections.Counter(
+            spec.get("sdk", S.DEFAULT_SDK) for spec in registry.values()),
+            {"4.0": 66, "4.1": 74})
+
     def test_overlay_layout_rejects_unsupported_and_overlapping_regions(self):
         for regions in ({'.rdata': (0x1000,4)},
                         {'.text': (0x1000,4),'.sbss': (0x2000,4)},

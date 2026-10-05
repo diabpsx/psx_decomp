@@ -8,7 +8,7 @@ For each image: build/<name>.elf, build/<name>.bin, build/<name>.map and a byte 
 against rom/<IMAGE>.BIN. Main also emits a .runtime.bin with exact MAP-derived
 zero BSS; its .bin serializes only initialized payload plus computed checksum.
 Other images may have a zero-filled tail after the retail file extent."""
-import os, re, subprocess, sys
+import json, os, re, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,8 +45,12 @@ def link(name: str):
     if name == "diabpsx":
         import sdk_link
         sdk_link.build()
+    import native_archive
+    archive_registry = json.loads((ROOT / 'configs/native_archive_link.json').read_text())
+    archive_groups = [entry for entry, spec in archive_registry.items() if spec['image'] == name]
+    if archive_groups:
+        native_archive.build(archive_groups)
     import native_recon
-    import json
     native_registry = json.loads((ROOT / 'configs/native_recon_link.json').read_text())
     bss_path = ROOT / 'configs/recon_bss_link.json'
     conventional_bss = json.loads(bss_path.read_text()).get(name, {}) if bss_path.exists() else {}
@@ -63,7 +67,7 @@ def link(name: str):
         inputs.setdefault(obj, set()).add(section)
     for o in objs:
         op = ROOT / o
-        if o.startswith(("build/sdk/native/", "build/native_source/")):
+        if o.startswith(("build/sdk/native/", "build/native_source/", "build/native_archive/")):
             assemble_raw(ROOT / o[:-2], op)
         elif o.startswith("build/asm/"):
             src = ROOT / o[len("build/"):-2]
@@ -83,6 +87,9 @@ def link(name: str):
                 B.compile_any(src)
         elif o.startswith("build/recon/"):
             src = ROOT / o[len("build/"):-2]
+            if src.suffix.lower() == ".s":
+                assemble_raw(src, op)
+                continue
             hdrs = [f for f in (ROOT / "recon").rglob("*.h")]
             newest = max([src.stat().st_mtime] + [f.stat().st_mtime for f in hdrs])
             if not op.exists() or op.stat().st_mtime < newest:

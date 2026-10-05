@@ -1,0 +1,22 @@
+{
+  "ctype": {
+    "sdk": "4.1",
+    "library": "LIBC.LIB",
+    "member": "CTYPE0",
+    "archive_sha256": "d262a4c6fff8ae9d958e8e4a9fbf2356dc4d2ae82eca98d849573897dd0d7de7",
+    "section": ".data",
+    "va": "0x800B5DBC",
+    "size": 144,
+    "exports": ["_ctype_"]
+  },
+  "sndef": {
+    "sdk": "4.1",
+    "library": "LIBSN.LIB",
+    "member": "SNDEF",
+    "archive_sha256": "1ef99108b065166613a4bf6c5b46a74bd0f584e8a570926e8e0c66497e64f547",
+    "section": ".data",
+    "va": "0x800B42B4",
+    "size": 8,
+    "exports": ["_stacksize", "_ramsize"]
+  }
+}

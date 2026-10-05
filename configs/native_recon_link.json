@@ -2,6 +2,10 @@
   "diablo": {
     "source": "recon/source/diablo.cpp",
     "image": "diabpsx",
+    "assembler": "2.67",
+    "data_record_addresses": {
+      "CreateEnv": "0x8012EC28"
+    },
     "sections": {
       ".text": {
         "va": "0x80037FAC",
@@ -96,15 +100,9 @@
         "size": 4,
         "allow_zero_tail": 4
       },
-      ".bss.diablo_seeds": {
+      ".bss": {
         "va": "0x8012EAE8",
-        "size": 308,
-        "allow_zero_tail": 308
-      },
-      ".bss.diablo_jmp": {
-        "va": "0x8012EC28",
-        "size": 48,
-        "allow_zero_tail": 48
+        "size": 368
       }
     },
     "post_assemble_section_split": {
@@ -204,7 +202,8 @@
       "glEndSeed",
       "glMid1Seed",
       "glMid2Seed",
-      "glMid3Seed"
+      "glMid3Seed",
+      "CreateEnv"
     ],
     "externals": [
       "AddVision__FiiiUc",
@@ -392,6 +391,7 @@
   "block": {
     "source": "recon/psxsrc/block.cpp",
     "image": "diabpsx",
+    "assembler": "2.67",
     "sections": {
       ".text": {
         "va": "0x8008D41C",
@@ -464,11 +464,7 @@
       },
       ".bss": {
         "va": "0x8011CBD0",
-        "size": 16
-      },
-      ".bss.block_xy": {
-        "va": "0x8011CBE0",
-        "size": 28
+        "size": 44
       }
     },
     "post_assemble_section_split": {
@@ -658,6 +654,7 @@
   "options": {
     "source": "recon/psxsrc/options.cpp",
     "image": "diabpsx",
+    "assembler": "2.67",
     "sections": {
       ".text": {
         "va": "0x800A68D0",
@@ -668,266 +665,15 @@
         "size": 208,
         "scaffold": "rodata_options.rodata"
       },
-      ".sdata.options_cs": {
-        "va": "0x8011B230",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_lastcs": {
-        "va": "0x8011B234",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_mono": {
-        "va": "0x8011B268",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_qfrom": {
-        "va": "0x8011B228",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_padfrig": {
-        "va": "0x8011B260",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_oldpad": {
-        "va": "0x8011B274",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_diablodie": {
-        "va": "0x8011B25C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_pressed": {
-        "va": "0x8011B290",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_lastlast": {
-        "va": "0x8011B238",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_spacing": {
-        "va": "0x8011B22C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_keypos": {
-        "va": "0x8011B270",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_debounce": {
-        "va": "0x8011B26C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_master": {
-        "va": "0x8011B278",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_music": {
-        "va": "0x8011B27C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_sound": {
-        "va": "0x8011B280",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_speech": {
-        "va": "0x8011B288",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_flag": {
-        "va": "0x8011B248",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_cmenu": {
-        "va": "0x8011B23C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_optionspad": {
-        "va": "0x8011B250",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.options_drawtask": {
-        "va": "0x8011B264",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_returnmenu": {
-        "va": "0x8011B28C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_character": {
-        "va": "0x8011B240",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_returncards": {
-        "va": "0x8011B24C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.options_setseed": {
-        "va": "0x8011B258",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
       ".sbss": {
         "va": "0x8011C6F0",
         "size": 40
+      },
+      ".sdata": {
+        "va": "0x8011B228",
+        "size": 108,
+        "scaffold": "sdata_after_primpool.sdata"
       }
-    },
-    "post_assemble_section_split": {
-      "section": ".sdata",
-      "pieces": [
-        {
-          "name": ".sdata.options_cs",
-          "offset": 0,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_lastcs",
-          "offset": 4,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_optionspad",
-          "offset": 8,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_mono",
-          "offset": 12,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_qfrom",
-          "offset": 16,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_padfrig",
-          "offset": 20,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_oldpad",
-          "offset": 24,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_diablodie",
-          "offset": 28,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_pressed",
-          "offset": 32,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_lastlast",
-          "offset": 36,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_spacing",
-          "offset": 40,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_keypos",
-          "offset": 44,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_debounce",
-          "offset": 48,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_master",
-          "offset": 52,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_music",
-          "offset": 56,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_sound",
-          "offset": 60,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_speech",
-          "offset": 64,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_flag",
-          "offset": 68,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_cmenu",
-          "offset": 72,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_drawtask",
-          "offset": 76,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_returnmenu",
-          "offset": 80,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_character",
-          "offset": 84,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_returncards",
-          "offset": 88,
-          "size": 4
-        },
-        {
-          "name": ".sdata.options_setseed",
-          "offset": 92,
-          "size": 4
-        }
-      ]
     },
     "data_symbols": [
       "MasterVol",
@@ -964,7 +710,10 @@
       "lastcs",
       "sx",
       "sy",
-      "Adjust"
+      "Adjust",
+      "allspellsflag",
+      "OptionsSeed",
+      "VideoVol"
     ],
     "data_record_addresses": {
       "Adjust": "0x8011C700"
@@ -1573,6 +1322,7 @@
   "ctrl": {
     "source": "recon/psxsrc/ctrl.cpp",
     "image": "diabpsx",
+    "assembler": "2.67",
     "sections": {
       ".text": {
         "va": "0x8009C548",
@@ -2232,6 +1982,7 @@
   "dialog": {
     "source": "recon/psxsrc/dialog.cpp",
     "image": "diabpsx",
+    "assembler": "2.67",
     "sections": {
       ".text": {
         "va": "0x8008AD90",
@@ -3701,7 +3452,7 @@
       },
       ".data": {
         "va": "0x8010D6CC",
-        "size": 24,
+        "size": 1248,
         "image": "diabpsx",
         "scaffold": "data_automap.data"
       }
@@ -3718,7 +3469,9 @@
       "AMPlayerY",
       "AMPx",
       "AMPy",
-      "SetLevelName"
+      "SetLevelName",
+      "automapview",
+      "automaptype"
     ],
     "externals": [
       "AddrToAvoid",
@@ -3736,8 +3489,6 @@
       "SetLineF2",
       "ThisOt",
       "ThisPrimAddr",
-      "automaptype",
-      "automapview",
       "currlevel",
       "dungeon",
       "gbActivePlayers",
@@ -3768,6 +3519,13 @@
         "size": 104,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".data": {
+        "va": "0x8010D008",
+        "size": 1729,
+        "image": "diabpsx",
+        "scaffold": "data_inv.data",
+        "allow_zero_tail": 72
       }
     },
     "data_symbols": [
@@ -3793,10 +3551,15 @@
       "ItemW",
       "ItemH",
       "ItemNo",
-      "BRect"
+      "BRect",
+      "AP2x2Tbl",
+      "InvRect",
+      "InvGfxTable",
+      "InvItemWidth",
+      "InvItemHeight",
+      "InvSlotTable"
     ],
     "externals": [
-      "AP2x2Tbl",
       "AllItemsUseable",
       "BL_GetCurrentBlocks__Fv",
       "BORDERB",
@@ -3835,11 +3598,6 @@
       "GM_UseTexData__Fi",
       "GetDirection__Fiiii",
       "GetStr__Fi",
-      "InvGfxTable",
-      "InvItemHeight",
-      "InvItemWidth",
-      "InvRect",
-      "InvSlotTable",
       "ItemCAnimTbl",
       "ItemInvSnds",
       "LANG_GetLang__Fv",
@@ -4417,9 +4175,17 @@
         "va": "0x80118DE0",
         "size": 68,
         "scaffold": "rodata_coreauto_source.rodata"
+      },
+      ".data": {
+        "va": "0x800E3BAC",
+        "size": 32,
+        "scaffold": "data_coreauto.data"
       }
     },
-    "data_symbols": [],
+    "data_symbols": [
+      "AmLTab",
+      "AmRTab"
+    ],
     "externals": [
       "automaptype",
       "automapview",
@@ -4643,12 +4409,18 @@
       ".text": {
         "va": "0x8003E214",
         "size": 56
+      },
+      ".data": {
+        "va": "0x800D1B40",
+        "size": 157,
+        "scaffold": "data_itemdat.data"
       }
     },
-    "data_symbols": [],
-    "externals": [
-      "AllItemsList",
+    "data_symbols": [
       "AllItemsUseable"
+    ],
+    "externals": [
+      "AllItemsList"
     ]
   },
   "misdat": {
@@ -12821,14 +12593,6 @@
         "size": 12,
         "scaffold": "sdata_after_primpool.sdata"
       },
-      ".sbss.msg_last": {
-        "va": "0x8011C82C",
-        "size": 1
-      },
-      ".sbss.msg_changed": {
-        "va": "0x8011C834",
-        "size": 2
-      },
       ".bss": {
         "va": "0x8012EDD8",
         "size": 32
@@ -12847,28 +12611,13 @@
         "va": "0x8011B97D",
         "size": 2,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C82C",
+        "size": 10
       }
     },
     "post_assemble_section_split": [
-      {
-        "section": ".sbss",
-        "pieces": [
-          {
-            "name": ".sbss.msg_last",
-            "offset": 0,
-            "size": 1,
-            "alignment": 2
-          },
-          {
-            "name": ".sbss.msg_changed",
-            "offset": 4,
-            "size": 1,
-            "alignment": 2,
-            "prefix_hex": "00"
-          }
-        ],
-        "allow_zero_gaps": true
-      },
       {
         "section": ".sdata",
         "pieces": [
@@ -12897,7 +12646,10 @@
       "CompNoComp",
       "CompPakComp",
       "CompCrunchComp",
-      "sgJunk"
+      "sgJunk",
+      "sgbRecvCmd",
+      "sgdwRecvOffset",
+      "sgbDeltaChunks"
     ],
     "externals": [
       "ActivatePortal__FiiiiiUc",
@@ -12987,7 +12739,8 @@
       "quests",
       "setlevel",
       "setlvlnum"
-    ]
+    ],
+    "assembler": "2.67"
   },
   "player": {
     "source": "recon/source/player.cpp",
@@ -13007,34 +12760,11 @@
         "size": 13760,
         "scaffold": "data_player.data"
       },
-      ".sdata.player_myplr": {
+      ".sdata": {
         "va": "0x8011BA08",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.player_flags": {
-        "va": "0x8011BA0C",
-        "size": 2,
+        "size": 6,
         "scaffold": "sdata_after_primpool.sdata"
       }
-    },
-    "post_assemble_section_split": {
-      "section": ".sdata",
-      "pieces": [
-        {
-          "name": ".sdata.player_flags",
-          "offset": 0,
-          "size": 2,
-          "alignment": 2
-        },
-        {
-          "name": ".sdata.player_myplr",
-          "offset": 4,
-          "size": 4,
-          "alignment": 2
-        }
-      ],
-      "allow_zero_gaps": true
     },
     "data_symbols": "all",
     "absolute_bindings": {
@@ -14175,14 +13905,7 @@
       "vlctab"
     ],
     "absolute_bindings": {
-      "D_8012E534": "0x8012E534",
-      "func_8013B3B0": "0x8013B3B0",
-      "func_8013AD94": "0x8013AD94",
-      "func_8013ADA0": "0x8013ADA0",
-      "func_8013AE1C": "0x8013AE1C",
-      "func_8013AC3C": "0x8013AC3C",
-      "func_8013B6EC": "0x8013B6EC",
-      "func_8013AED8": "0x8013AED8"
+      "D_8012E534": "0x8012E534"
     },
     "externals": [
       "CD_GetCdlFILE__FPCcP7CdlFILE",
@@ -14237,13 +13960,13 @@
       "VSync",
       "fileexists",
       "filesize",
-      "func_8013AC3C",
-      "func_8013AD94",
-      "func_8013ADA0",
-      "func_8013AE1C",
-      "func_8013AED8",
-      "func_8013B3B0",
-      "func_8013B6EC",
+      "DecDCTReset",
+      "DecDCTBufSize",
+      "DecDCTin",
+      "DecDCTout",
+      "DecDCToutCallback",
+      "DecDCTvlc2",
+      "DecDCTvlcBuild",
       "longjmp",
       "printf",
       "setjmp",

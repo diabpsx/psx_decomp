@@ -82,6 +82,9 @@ public:
 unsigned char deltaload = 0;
 unsigned char gbBufferMsgs = 0;   /* @0x8011B97E -- .sdata right after deltaload; msg is the only %gp_rel user (TU-owned) */
 static DJunk sgJunk;
+static unsigned char sgbRecvCmd;
+static unsigned long sgdwRecvOffset;
+static unsigned char sgbDeltaChunks;
 static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-owned tentative def */
 
 /* --- delta item/object marker values (confirmed via delta_get_item's literal compares) --- */

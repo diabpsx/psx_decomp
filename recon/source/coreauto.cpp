@@ -17,6 +17,14 @@
 #define DMAXX 40
 #define DMAXY 40
 
+/* Original wall-bit lookup tables, indexed by the automap tile's low nibble. */
+unsigned char AmLTab[16] = {
+    0, 1, 2, 0, 2, 2, 0, 0, 6, 0, 4, 0, 4, 0, 0, 0
+};
+unsigned char AmRTab[16] = {
+    0, 0, 0, 8, 8, 0, 8, 0, 0, 24, 0, 16, 16, 0, 0, 0
+};
+
 #define SET_AUTOMAPVIEW(xc, yc) (automapview[(xc) >> 3][yc] |= (1 << ((xc) & 7)))
 
 /* @0x800809D4 COREAUTO.CPP:158 */

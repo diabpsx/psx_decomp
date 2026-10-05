@@ -1,4 +1,12 @@
 // overlay fmv (SYM id $e) symbols scoped by the SYM `set overlay` record; main-image symbols come from symbol_addrs.txt
+// Original LIBPRESS exports verified against the retail MAP and PsyQ 4.1 archive.
+DecDCTReset = 0x8013AC3C; // type:func
+DecDCTBufSize = 0x8013AD94; // type:func
+DecDCTin = 0x8013ADA0; // type:func
+DecDCTout = 0x8013AE1C; // type:func
+DecDCToutCallback = 0x8013AED8; // type:func
+DecDCTvlc2 = 0x8013B3B0; // type:func
+DecDCTvlcBuild = 0x8013B6EC; // type:func
 map_buf = 0x8013B910; // size:0x19000
 imgbuf = 0x80154910; // size:0x54
 br = 0x80154964; // size:0x640

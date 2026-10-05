@@ -18,8 +18,10 @@ import psyq_extract as P
 import symlane as SL
 from sdk_provenance import oracle as scaffold_bytes
 
-ARCHIVES = Path("C:/Temp/nfs3-clean/psyq400/PSX/LIB")
-ARCHIVE_ROOTS = {"4.0": ARCHIVES, "4.1": Path("C:/Temp/PSYQ/psyq-410/PSX/LIB")}
+ARCHIVES = Path("C:/Temp/PSYQ/psyq-400/PSX/LIB")
+SDK410 = Path("C:/Temp/PSYQ/psyq-410/PSX/LIB")
+ARCHIVE_ROOTS = {"4.0": ARCHIVES, "4.1": SDK410}
+DEFAULT_SDK = "4.0"
 OUT = B.BUILD / "sdk/native"
 
 
@@ -522,7 +524,7 @@ def build():
         library, member = spec["library"], spec["member"]
         if Path(library).name != library:
             raise ValueError("SDK archive must be a filename")
-        sdk = spec.get("sdk", "4.0")
+        sdk = spec.get("sdk", DEFAULT_SDK)
         archive = (ARCHIVE_ROOTS[sdk] / library).read_bytes()
         members, consumed = P.lib_members(archive)
         matches = [m for m in members if m["name"] == member]

@@ -123,6 +123,10 @@ long ExpLvlsTbl[51] = {
     1082908612,1310707109,1583495809
 };
 PlayerStruct plr[2] = { 0 };
+/* Retail initialized small-data order; zero values belong to this source TU. */
+int myplr = 0;
+unsigned char deathflag = 0;
+char light_rad = 0;
 
 unsigned char IsDplayer(int x, int y)
 {

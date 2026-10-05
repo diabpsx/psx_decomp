@@ -26,11 +26,20 @@ def render_mixed(parts, owned, start, size):
         if address != cursor or address + len(data) > start + size:
             raise ValueError('mixed text scaffold must cover its whole segment')
         if name in owned:
-            base, length, filename = owned[name]
+            row = owned[name]
+            if len(row) not in (3, 4):
+                raise ValueError('mixed text owner has an invalid payload declaration')
+            base, length, filename = row[:3]
             if not base <= address < address + len(data) <= base + length:
                 raise ValueError('mixed text function exceeds its source section')
-            output.append(f'glabel {label}\n.incbin "{filename}", {address-base}, {len(data)}\nendlabel {label}\n')
-            output.append(local_label_aliases(source, label, address, len(data)))
+            if len(row) == 4:
+                wrapper = row[3]
+                if filename is not None or not re.fullmatch(r'build/sdk/native/\w+\.s', wrapper):
+                    raise ValueError('mixed text archive wrapper is invalid')
+                output.append(f'.include "{wrapper}"\n')
+            else:
+                output.append(f'glabel {label}\n.incbin "{filename}", {address-base}, {len(data)}\nendlabel {label}\n')
+                output.append(local_label_aliases(source, label, address, len(data)))
             used.add(name)
         else:
             output.append(f'.include "{path}"\n')

@@ -6,7 +6,7 @@ SECTIONS
     .diabpsx 0x80010000 : AT(0) SUBALIGN(4)
     {
         . = 0x0;   /* 0x80010000 */
-        build/asm/header_code.s.o(.text);
+        build/recon/eaclib/nullfunc.s.o(.text);   /* genuine hand-authored source */
         . = 0x8;   /* 0x80010008 */
         build/asm/data/boot_text.data.s.o(.data);
         . = 0xC;   /* 0x8001000C */
@@ -286,7 +286,7 @@ SECTIONS
         . = 0xC1A40;   /* 0x800D1A40 */
         build/native_source/data_error.data.s.o(.data);   /* verified native source data */
         . = 0xC1B40;   /* 0x800D1B40 */
-        build/asm/data/data_itemdat.data.s.o(.data);
+        build/native_source/data_itemdat.data.s.o(.data);   /* verified native source data */
         . = 0xC1BE0;   /* 0x800D1BE0 */
         build/native_source/data_items.data.s.o(.data);   /* verified native source data */
         . = 0xC5554;   /* 0x800D5554 */
@@ -322,7 +322,7 @@ SECTIONS
         . = 0xD39E4;   /* 0x800E39E4 */
         build/native_source/data_objprint.data.s.o(.data);   /* verified native source data */
         . = 0xD3BAC;   /* 0x800E3BAC */
-        build/asm/data/data_coreauto.data.s.o(.data);
+        build/native_source/data_coreauto.data.s.o(.data);   /* verified native source data */
         . = 0xD3BCC;   /* 0x800E3BCC */
         build/native_source/data_portal.data.s.o(.data);   /* verified native source data */
         . = 0xD3C1C;   /* 0x800E3C1C */
@@ -773,13 +773,9 @@ SECTIONS
         build/native_source/minitext.sbss.s.o(.sbss);
         ASSERT(. - __source_minitext_sbss_start == 0x24, "wrong BSS extent: minitext.sbss");
         . = 0x10C82C;
-        __source_msg_sbss.msg_last_start = .;
-        build/native_source/msg.sbss.msg_last.s.o(.sbss.msg_last);
-        ASSERT(. - __source_msg_sbss.msg_last_start == 0x1, "wrong BSS extent: msg.sbss.msg_last");
-        . = 0x10C834;
-        __source_msg_sbss.msg_changed_start = .;
-        build/native_source/msg.sbss.msg_changed.s.o(.sbss.msg_changed);
-        ASSERT(. - __source_msg_sbss.msg_changed_start == 0x2, "wrong BSS extent: msg.sbss.msg_changed");
+        __source_msg_sbss_start = .;
+        build/native_source/msg.sbss.s.o(.sbss);
+        ASSERT(. - __source_msg_sbss_start == 0xA, "wrong BSS extent: msg.sbss");
         . = 0x10C840;
         __source_multi_sbss_start = .;
         build/native_source/multi.sbss.s.o(.sbss);
@@ -1003,11 +999,7 @@ SECTIONS
         . = 0x10CBD0;
         __source_block_bss_start = .;
         build/native_source/block.bss.s.o(.bss);
-        ASSERT(. - __source_block_bss_start == 0x10, "wrong BSS extent: block.bss");
-        . = 0x10CBE0;
-        __source_block_bss.block_xy_start = .;
-        build/native_source/block.bss.block_xy.s.o(.bss.block_xy);
-        ASSERT(. - __source_block_bss.block_xy_start == 0x1C, "wrong BSS extent: block.bss.block_xy");
+        ASSERT(. - __source_block_bss_start == 0x2C, "wrong BSS extent: block.bss");
         . = 0x10CC28;
         __source_overlay_bss_start = .;
         build/native_source/overlay.bss.s.o(.bss);
@@ -1073,13 +1065,9 @@ SECTIONS
         build/native_source/control.bss.control_talk.s.o(.bss.control_talk);
         ASSERT(. - __source_control_bss.control_talk_start == 0x50, "wrong BSS extent: control.bss.control_talk");
         . = 0x11EAE8;
-        __source_diablo_bss.diablo_seeds_start = .;
-        build/native_source/diablo.bss.diablo_seeds.s.o(.bss.diablo_seeds);
-        ASSERT(. - __source_diablo_bss.diablo_seeds_start == 0x134, "wrong BSS extent: diablo.bss.diablo_seeds");
-        . = 0x11EC28;
-        __source_diablo_bss.diablo_jmp_start = .;
-        build/native_source/diablo.bss.diablo_jmp.s.o(.bss.diablo_jmp);
-        ASSERT(. - __source_diablo_bss.diablo_jmp_start == 0x30, "wrong BSS extent: diablo.bss.diablo_jmp");
+        __source_diablo_bss_start = .;
+        build/native_source/diablo.bss.s.o(.bss);
+        ASSERT(. - __source_diablo_bss_start == 0x170, "wrong BSS extent: diablo.bss");
         . = 0x11EC58;
         __source_items_bss.items_curr_start = .;
         build/native_source/items.bss.items_curr.s.o(.bss.items_curr);

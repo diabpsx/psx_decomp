@@ -8,11 +8,11 @@ SECTIONS
         . = 0x0;   /* 0x80139BF8 */
         build/asm/data/fmv_hdr.data.s.o(.data);
         . = 0x4;   /* 0x80139BFC */
-        build/asm/data/libpress_rdata.rodata.s.o(.rodata);
+        build/native_archive/libpress_rdata.rodata.s.o(.rodata);   /* original native archive group */
         . = 0xB4;   /* 0x80139CAC */
-        build/asm/data/libpress_data.data.s.o(.data);
+        build/native_archive/libpress_data.data.s.o(.data);   /* original native archive group */
         . = 0x1044;   /* 0x8013AC3C */
-        build/asm/data/libpress_rodata_8013ac3c.rodata.s.o(.rodata);
+        build/native_archive/libpress_rodata_8013ac3c.rodata.s.o(.rodata);   /* original native archive group */
         . = 0x1BE4;   /* 0x8013B7DC */
         build/native_source/fmv_rodata_8013b7dc.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1C224;   /* 0x80155E1C */

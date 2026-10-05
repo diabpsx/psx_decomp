@@ -922,6 +922,30 @@ def build(only=None):
         print(f'{segment}: native source bytes and {count} {proof} match retail; {len(prefix)} borrowed GP-prefix carrier bytes')
     if only is not None:
         return receipts
+    # SDK members are proved and emitted by sdk_link before the final native-source
+    # bridge.  Consume those original-archive wrappers here instead of silently
+    # falling back to the byte-identical asm/nonmatchings/lib oracle.
+    sdk_names = re.findall(r'INCLUDE_ASM\("build/sdk/native",\s*(\w+)\s*\)',
+                           (B.ROOT/'src/lib.c').read_text())
+    if len(sdk_names) != len(set(sdk_names)):
+        raise ValueError('duplicate SDK final-link wrapper')
+    lib_owned = extra_bridges.setdefault('lib', {})
+    for name in sdk_names:
+        if name in lib_owned:
+            raise ValueError('SDK and reconstructed source both own a library entry')
+        oracle = B.ROOT/'asm/nonmatchings/lib'/(name+'.s')
+        wrapper = B.BUILD/'sdk/native'/(name+'.s')
+        if not oracle.is_file() or not wrapper.is_file():
+            raise ValueError('SDK final-link wrapper or retail oracle is absent')
+        address, data = N.scaffold_bytes(oracle)
+        lib_owned[name] = (address, len(data), None,
+                           wrapper.relative_to(B.ROOT).as_posix())
+    lib_oracles = {path.stem for path in (B.ROOT/'asm/nonmatchings/lib').glob('*.s')}
+    if set(lib_owned) != lib_oracles:
+        missing = sorted(lib_oracles - set(lib_owned))
+        extra = sorted(set(lib_owned) - lib_oracles)
+        raise ValueError(f'final library text is not fully native-owned: missing={missing}, extra={extra}')
+    extra_limits['lib'] = layouts['diabpsx'][('c', 'lib')]
     for target, owned in extra_bridges.items():
         parts = []
         for path in (B.ROOT/'asm/nonmatchings'/target).glob('*.s'):

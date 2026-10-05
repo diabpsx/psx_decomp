@@ -27,6 +27,8 @@ int AMPlayerY;
 int AMPx[2];   /* %gp_rel(AMPx) in DrawAutomap's oracle -> owned here */
 int AMPy[2];
 static int SetLevelName[6] = { 1274, 978, 114, 646, 796, 30 };   /* @0x8010D6CC STAT */
+unsigned char automapview[5][40] = { 0 };
+unsigned short automaptype[512] = { 0 };
 
 /* PsyQ PSXSRC/PRIMPOOL.H template, LINE_F2 instantiation (one out-of-line copy per TU that uses it --
  * this TU declares its own local copy, matching the source/*.cpp "self-contained" convention). */

@@ -20,7 +20,8 @@ functions, `DrawObjSelector` and `DrawSpellCel`, closed on 2026-10-03/04 (receip
 `scratch/padfuncs/r4` and `scratch/control/dsc5`; community decomp.me scratches
 `q8GOs`/`Cyqz5` supplied the final lever). The 837-entry library region is outside this count
 and is separately tracked below and in `docs/TOOLCHAIN.md`: 349 entries have original
-Sony archive-link receipts, all 146 Climax GLIB entries are reconstructed and source-linked,
+Sony PsyQ 4.0/4.1 archive-link receipts from `C:/Temp/PSYQ/psyq-{400,410}/PSX`, and the final mixed library text now consumes those archive
+wrappers instead of the oracle assembly, all 146 Climax GLIB entries are reconstructed and source-linked,
 and the remaining 342 entries (33 Climax hand-assembly functions and 309 EA Canada EACLIB
 functions) are reconstructed and native-linked as source members too (2026-10-04, below).
 
@@ -298,7 +299,7 @@ Currently `configs/recon_link.json` selects one reconstructed TU covering
 functions across 179 TUs in total. All 2,727/2,727 game-board entries are now
 final-image source-owned, including DLG_2's two native raw-data exports. The
 source-owned TUs replace their text/data scaffolds at the original addresses.
-All 270 tool tests pass and all five linked images remain byte-identical.
+All 272 tool tests pass; the five images retain their verified retail matches.
 LIGHTING supplies all 28 functions and all six original sections,
 including the gold-source CrawlTable, 31 exact global records, restored RGB
 defaults of 16, and the correctly sized 128-byte mult_tab. Its main-image link
@@ -903,3 +904,18 @@ as library code. Its three functions (`__SN_ENTRY_POINT`, `__main`, and
 `__do_global_dtors`), eight initialized-data exports, and private small-BSS
 cell pass native placement checks. This raises native SDK imports to 349.
 The main file remains exact with independently verified zero runtime BSS.
+
+The final mixed library bridge now has complete native ownership: all 349 Sony
+entries come from their verified original archive members and the other 488 entries
+come from reconstructed GLIB/EACLIB/Climax source. No `asm/nonmatchings/lib`
+function is selected by the final main-image link. This is still a transitional
+GNU wrapper around native-linked payloads; the whole-program PSYLINK lane remains
+the route for eliminating payload insertion and per-fragment placement entirely.
+
+FMV's complete 7,136-byte `libpress` prefix now comes from the original PsyQ 4.10
+`LIBPRESS`, `VLC_C`, and `BUILD` archive members. PSYLINK reproduces the 176-byte
+read-only section, 3,984-byte data section, 2,976-byte text section, all thirteen
+export addresses, and every relocated retail byte. `configs/native_archive_link.json`
+records the archive hash, member order, section order, extents, and three external
+bindings; the final FMV link no longer selects the three handwritten LIBPRESS
+scaffolds.

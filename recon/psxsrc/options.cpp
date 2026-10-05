@@ -5,51 +5,49 @@
  * refs/skeleton/JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H (prototypes only, no data layout). */
 #include "psxsrc/options.h"
 
-/* TU-owned statics (SYM STAT records, gp-rel in the oracle -> tentative definitions here) */
-static LANG_TYPE NewLang;
+/* File statics in retail storage order; ASPSX 2.67 packs the byte objects. */
+static TextDat *Slider;
+static int sw;
+static int sx;
+static int sy;
+static unsigned char Adjust;
+static unsigned char qspin;
+static unsigned char lqspin;
 static LANG_TYPE OrigLang;
-static int sw;             /* D_8011C6F4 -- volume-slider scale divisor */
-static RECT ORect;         /* D_8011C710 -- PrintMono's clip rect */
-static int cs = 1;          /* D_8011B230 -- confirmed by SYM: real name IS "cs", a single shared
-                              * "current highlighted menu item" static used by GameSpeedPad (as the
-                              * speed-submenu sub-selection counter) AND by CentrePad/LAMBO_MovePad
-                              * (as the active menu's cursor position) -- ONE static, not per-function. */
-static int lastcs = 1;      /* D_8011B234 -- SYM name "lastcs"; CentrePad's previous-frame cs snapshot */
-static int sx;               /* D_8011C6F8 -- SYM name "sx"; CentrePad's screen X offset accumulator */
-static int sy;               /* D_8011C6FC -- SYM name "sy"; CentrePad's screen Y offset accumulator */
-static unsigned char Adjust; /* D_8011C700 -- SYM name "Adjust"; CentrePad's one-shot "changed" latch */
+static LANG_TYPE OldLang;
+static LANG_TYPE NewLang;
+static RECT ORect;
 
-/* real (non-static) globals DEFINED in this TU (SYM class EXT, but THIS TU's oracle reaches every one
- * of these via %gp_rel across 13 OPTIONS.CPP function oracles -> OPTIONS.CPP owns them, per the
- * project's ownership rule: a module owns a global iff its own oracle addresses it %gp_rel, regardless
- * of the SYM "EXT" linkage label. Kept `extern` in options.h ONLY for globals this TU's oracle reaches
- * via an absolute lui/lw (owned elsewhere -- e.g. FeFlag, sghMusic, MediumFont, deathflag, etc). */
-unsigned long MasterVol;
-unsigned long MusicVol;
-unsigned long SoundVol;
-unsigned long SpeechVol;
-BOOL optionsflag;
-int cmenu;
-int options_pad = -1;
-TASK *DrawOptionsTask;
-int ReturnMenu;                 /* gp_rel in FormatPad's oracle -> owned here */
-BOOL CharacterBlockLoaded;      /* gp_rel in FormatPad's oracle -> owned here */
-int ReturnCards;                /* gp_rel in SaveOverwritePad's oracle -> owned here */
-int MonoX = 178;                 /* gp_rel only in PrintMono -> owned here */
-BOOL OptionsSetSeed;            /* gp_rel in DrawOptions's oracle -> owned here */
+/* Complete initialized small-data bank, in retail source emission order.
+ * The unused VideoVol, allspellsflag and OptionsSeed definitions are retained
+ * with the types and addresses recorded in retail OPTIONS.CPP's SYM records. */
 unsigned char Qfromoptions = 0;
-BOOL PadFrig = false;
-int old_pad = -1;
+static int Spacing = 13;
+static int cs = 1;
+static int lastcs = 1;
+static int lastlastcs = 1;
+int cmenu = 0;
+BOOL CharacterBlockLoaded = false;
+BOOL allspellsflag = false;
+BOOL optionsflag = false;
+int ReturnCards = 0;
+int options_pad = -1;
+int OptionsSeed = 0;
+BOOL OptionsSetSeed = false;
 BOOL DiabloDieFlag = false;
+BOOL PadFrig = false;
+TASK *DrawOptionsTask = 0;
+int MonoX = 178;
+static BOOL debounce = false;
+static unsigned char KeyPos = 0;
+int old_pad = -1;
+unsigned long MasterVol = 0;
+unsigned long MusicVol = 0;
+unsigned long SoundVol = 0;
+unsigned long VideoVol = 0;
+unsigned long SpeechVol = 0;
+int ReturnMenu = 0;
 int they_pressed = 0;
-static int lastlastcs = 1;      /* D_8011B238 -- SYM name "lastlastcs" */
-static int Spacing = 13;        /* D_8011B22C -- SYM name "Spacing" */
-static unsigned char KeyPos = 0; /* D_8011B270 -- SYM name "KeyPos" */
-static BOOL debounce = 0;       /* D_8011B26C -- SYM name "debounce" */
-static LANG_TYPE OldLang;       /* D_8011C708 -- SYM name "OldLang" */
-static TextDat *Slider;         /* D_8011C6F0 -- SYM name "Slider" */
-static unsigned char qspin;     /* D_8011C701 -- SYM name "qspin" */
-static unsigned char lqspin;    /* D_8011C702 -- SYM name "lqspin" */
 
 /* ---------------------------------------------------------------- large dialog/pad functions ---- */
 

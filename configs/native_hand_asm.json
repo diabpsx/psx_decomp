@@ -1,0 +1,18 @@
+{
+  "header_code": {
+    "source": "recon/eaclib/nullfunc.s",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "section": ".text",
+    "va": "0x80010000",
+    "size": 8,
+    "exports": [
+      "alertbox", "bitline", "detectcpu", "fclose", "findfirst", "findnext",
+      "fopen", "fprintf", "hideprint", "initinversetable", "interpretsub",
+      "nullfunction", "nullfunctionz", "nullwindow", "openmainwindow",
+      "printattribute", "printbyte", "printbytexy", "printchar", "printcharxy",
+      "printclear", "printscroll", "purgekey", "scancode", "scrollline",
+      "setbitline", "showprint", "transbitline"
+    ]
+  }
+}

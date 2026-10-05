@@ -1,0 +1,33 @@
+{
+  "libpress": {
+    "image": "fmv",
+    "sdk": "4.1",
+    "library": "LIBPRESS.LIB",
+    "archive_sha256": "f7f47aed252eee154bbec373b4692f0be39d46941ed9218bbce583f6b2b6511c",
+    "headers": {
+      "LIBPRESS.H": "078c277504fcca1a3c877e7a0781f125fd6051f0c6b62edce4f85b59ac35e503"
+    },
+    "members": ["LIBPRESS", "VLC_C", "BUILD"],
+    "externals": ["DMACallback", "ResetCallback", "printf"],
+    "sections": {
+      "libpress_rdata.rodata": {
+        "source_section": ".rdata",
+        "output_section": ".rodata",
+        "va": "0x80139BFC",
+        "size": 176
+      },
+      "libpress_data.data": {
+        "source_section": ".data",
+        "output_section": ".data",
+        "va": "0x80139CAC",
+        "size": 3984
+      },
+      "libpress_rodata_8013ac3c.rodata": {
+        "source_section": ".text",
+        "output_section": ".rodata",
+        "va": "0x8013AC3C",
+        "size": 2976
+      }
+    }
+  }
+}

@@ -70,6 +70,7 @@ static int glEndSeed[17];
 static int glMid1Seed[17];
 static int glMid2Seed[17];
 static int glMid3Seed[17];
+static int CreateEnv[12];
 
 void FreeGameMem(void)
 {
@@ -366,7 +367,7 @@ void CreateLevel(int lvldir)
     if (!D_8011C7B4)
         DBG_Error(0, "source/DIABLO.cpp", 0x9D2);
     D_8011C7B4 = D_8011C7B4 + 0x13FFC;
-    if (!setjmp(D_8012EC28)) {
+    if (!setjmp(CreateEnv)) {
         D_8011C7B0 = lvldir;
         GSYS_SetStackAndJump(D_8011C7B4, LoCreateLevel, 0);
     }
@@ -411,7 +412,7 @@ void LoCreateLevel(void *)
             break;
         }
     }
-    longjmp(D_8012EC28, 1);
+    longjmp(CreateEnv, 1);
 }
 
 void ClearOutDungeonMap(void)

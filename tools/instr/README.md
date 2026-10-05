@@ -5286,3 +5286,53 @@ proves all 44 function records and 96 named data records. Coverage reaches 3,196
 functions in 178 native TUs (3,215/179 including the conventional TU). With
 DLG_2's two already-native raw-data exports, game final-image ownership is now
 2,727/2,727. All 270 tests and all five exact-image comparisons pass.
+
+### Original archive ownership reaches the final SDK bridge and FMV LIBPRESS
+
+The 349 previously receipted Sony SDK functions now replace their final
+`asm/nonmatchings/lib` includes with the generated wrappers for the unchanged
+archive members. `native_recon.py` fails unless reconstructed GLIB/EACLIB/Climax
+owners plus those SDK owners cover the complete 837-entry retail library segment.
+The resulting 131,440-byte mixed text segment has zero oracle-function includes,
+and the 1,099,272-byte main image remains exact.
+
+The FMV prefix identifies a second exact SDK producer: PsyQ 4.10 patch 4.10
+`LIBPRESS.LIB` (SHA-256
+`f7f47aed252eee154bbec373b4692f0be39d46941ed9218bbce583f6b2b6511c`).
+Its `LIBPRESS`, `VLC_C`, and `BUILD` members naturally compose `.rdata`, `.data`,
+and `.text` at 0x80139BFC in the retail order. A real PSYLINK link resolves 141
+text relocations and reproduces all 7,136 bytes and thirteen exports exactly.
+The final FMV linker now selects that native archive group rather than the three
+handwritten `libpress_*` scaffolds; FMV remains byte-identical. This archive-group
+bridge is transitional until the full retail-style PSYLINK overlay link consumes
+the objects directly without extracted payload wrappers.
+All 272 tool tests pass. The affected main and FMV images were relinked and remain exact.
+
+### Canonical PsyQ archives, data-only SDK members, and EA NULLFUNC
+
+All 349 Sony entries use the canonical `C:/Temp/PSYQ/psyq-{400,410}/PSX`
+archives: 66 selections from 4.0 and 74 from 4.1. The complete member gate passes
+all 140 linked objects. Direct `inclib` probes additionally prove PsyQ 4.1
+`LIBC(CTYPE0)` at 0x800B5DBC (144 bytes, `_ctype_`) and `LIBSN(SNDEF)` at
+0x800B42B4 (eight bytes, `_stacksize`/`_ramsize`) without extracting members.
+
+NFS4's NULLFUNC owner resolves the main image's first codeword pair. The genuine
+hand-assembly transcription supplies all 28 coequal exports at 0x80010000 and
+replaces the generated oracle scaffold. Both ASPSX/PSYLINK and the final image
+assembler verify the unchanged two instructions.
+
+### PLAYER/OPTIONS native storage; real ASPSX packing replaces three rewrites
+
+PLAYER's `myplr`, `deathflag` and `light_rad` now have explicit zero initializers
+in retail emission order. Their entire six-byte small-data section comes from
+the compiler directly; the two post-ASPSX pieces are gone. All 136 function and
+named data records remain exact. OPTIONS likewise replaces its 24 small-data
+pieces with one naturally emitted 108-byte section and restores the unused
+`allspellsflag`, `OptionsSeed` and `VideoVol` definitions from the retail SYM.
+
+ASPSX 2.67 naturally reproduces the original byte-common packing. OPTIONS'
+eleven file statics in retail declaration order form the exact 40-byte small-BSS
+bank, while CTRL and DIALOG each form their exact sixteen-byte banks. The three
+`pack_lcomm` interventions are removed. Native tests prove every relocated
+source byte and all 38/28/11 function records respectively. Isolated GP carriers
+and whole-image integration wrappers still remain pending the whole native link.

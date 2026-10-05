@@ -10,7 +10,7 @@ struct ItemDataStruct {   /* sizeof 32; only iUsable is read here */
 };
 
 extern struct ItemDataStruct AllItemsList[157];
-extern unsigned char AllItemsUseable[157];
+unsigned char AllItemsUseable[157] = { 0 };
 
 void InitAllItemsUseable(void)
 {

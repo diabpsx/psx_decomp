@@ -1,4 +1,4 @@
-"""OPTIONS retail-order text, split GP banks, data, and SYM proof."""
+"""OPTIONS natural small-data and packed statics, text, and SYM proof."""
 from pathlib import Path
 import sys
 import tempfile
@@ -16,9 +16,9 @@ import symlane as S
                           B.ROOT / "rom/DIABPSX.BIN")),
                      "original toolchain/retail inputs unavailable")
 class OptionsNativeTests(unittest.TestCase):
-    def test_complete_object_and_post_aspsx_gp_banks(self):
+    def test_complete_object_and_native_storage(self):
         flags = B.per_tu_flags(B.ROOT / "recon/psxsrc/options.cpp")
-        self.assertEqual(flags["pack_lcomm"]["size"], 40)
+        self.assertNotIn("pack_lcomm", flags)
         with tempfile.TemporaryDirectory(prefix="options-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -26,14 +26,12 @@ class OptionsNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("options", 38))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
+        self.assertIsNone(receipt["post_assemble_section_split"])
+        self.assertEqual(receipt["assembler_version"], "2.67")
         self.assertEqual(receipt["sections"][".text"]["size"], 19936)
         self.assertEqual(receipt["sections"][".rdata"]["size"], 208)
         self.assertEqual(receipt["sections"][".sbss"]["size"], 40)
-        banks = [name for name in receipt["sections"] if name.startswith(".sdata.options_")]
-        self.assertEqual(len(banks), 24)
-        self.assertTrue(all(receipt["sections"][name]["size"] == 4 for name in banks))
-        self.assertEqual(len(receipt["post_assemble_section_split"]["pieces"]), 24)
+        self.assertEqual(receipt["sections"][".sdata"]["size"], 108)
 
 
 if __name__ == "__main__":

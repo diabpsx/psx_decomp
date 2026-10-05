@@ -18,8 +18,7 @@ import symlane as S
 class BlockNativeTests(unittest.TestCase):
     def test_complete_object_and_split_storage(self):
         flags = B.per_tu_flags(B.ROOT / "recon/psxsrc/block.cpp")
-        self.assertEqual(flags["pack_lcomm"]["symbols"],
-                         [["dx", 0, 12], ["dy", 16, 12]])
+        self.assertNotIn("pack_lcomm", flags)
         with tempfile.TemporaryDirectory(prefix="block-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -27,12 +26,13 @@ class BlockNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("block", 68))
+        self.assertEqual(receipt["assembler_version"], "2.67")
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
         self.assertEqual(receipt["borrowed_section_prefixes"][".sdata.block_select"]["size"], 1)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".rdata", ".data", ".sbss", ".bss", ".bss.block_xy")},
+                          (".text", ".rdata", ".data", ".sbss", ".bss")},
                          {".text": 19000, ".rdata": 76, ".data": 20,
-                          ".sbss": 4, ".bss": 16, ".bss.block_xy": 28})
+                          ".sbss": 4, ".bss": 44})
 
 
 if __name__ == "__main__":

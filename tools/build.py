@@ -54,12 +54,6 @@ PER_TU_FLAGS = {
     # object therefore gives the post-.data literal its own section identity.
     "recon/psxsrc/credits.cpp": {"split_section_after": {
         "after": ".data", "section": ".rdata", "as": ".rdata.credits_tail"}},
-    # Retail DIALOG.CPP packs its four file-static byte arrays into one 16-byte
-    # small-BSS bank instead of ASPSX's default four-byte-per-.lcomm spacing.
-    "recon/psxsrc/dialog.cpp": {"pack_lcomm": {
-        "section": ".sbss", "size": 16,
-        "symbols": [["DialogGBack", 0, 1], ["GShadeX", 1, 1],
-                    ["GShadeY", 2, 1], ["RandBTab", 8, 8]]}},
     # MEMCARD_text interleaves initialized strings, two zero-filled banks and
     # code in one overlay group; its resident small-data order also starts with
     # the invalid-character flag before the two filename literals.
@@ -95,26 +89,6 @@ PER_TU_FLAGS = {
         {"symbol": "loadflag", "size": 4, "before": "card_side_empty"},
         {"symbol": "formatflag", "size": 4, "before": "card_side_empty"},
         {"symbol": "DoLoadedGame", "size": 4, "before": "card_side_empty"}]},
-    "recon/psxsrc/ctrl.cpp": {"pack_lcomm": {
-        "section": ".sbss", "size": 16,
-        "symbols": [["ctrl_select_line", 0, 1], ["ctrl_select_side", 1, 1],
-                    ["ckeyheld", 2, 1], ["CtrlRect", 8, 8]]}},
-    "recon/psxsrc/options.cpp": {"pack_lcomm": {
-        "section": ".sbss", "size": 40,
-        "symbols": [["Slider", 0, 4], ["sw", 4, 4], ["sx", 8, 4],
-                    ["sy", 12, 4], ["Adjust", 16, 1], ["qspin", 17, 1],
-                    ["lqspin", 18, 1], ["OrigLang", 20, 4],
-                        ["OldLang", 24, 4], ["NewLang", 28, 4],
-                        ["ORect", 32, 8]]}},
-    "recon/psxsrc/block.cpp": {"pack_lcomm": {
-        "section": ".bss.block_xy", "size": 28,
-        "symbols": [["dx", 0, 12], ["dy", 16, 12]]}},
-    "recon/source/diablo.cpp": {
-        "route_symbol_sections": {"D_8012EC28": ".bss.diablo_jmp"},
-        "pack_lcomm": {
-            "section": ".bss.diablo_seeds", "size": 308,
-            "symbols": [["glEndSeed", 0, 68], ["glMid1Seed", 80, 68],
-                        ["glMid2Seed", 160, 68], ["glMid3Seed", 240, 68]]}},
     "recon/source/drlg_l2.cpp": {
         "extra": ["-fwritable-strings"],
         "section_occurrence_renames": [
@@ -123,7 +97,8 @@ PER_TU_FLAGS = {
     # Retail FMV keeps LoPlayFMVOverLay's six-entry language switch table in
     # the overlay text stream; moving the final readonly occurrence before
     # ASPSX preserves both its relocated words and the branch displacements.
-    "recon/psxsrc/fmv.cpp": {"section_occurrence_renames": [
+    "recon/psxsrc/fmv.cpp": {"cpp_extra": ["-IC:/Temp/PSYQ/psyq-410/PSX/INCLUDE"],
+        "section_occurrence_renames": [
         {"section": ".rdata", "occurrence": 8, "as": ".text"}]},
     "recon/psxsrc/dlg_2.cpp": {"section_occurrence_renames": [
         {"section": ".rdata", "occurrence": 4, "as": ".rdata.dlg_formats"},
@@ -144,7 +119,7 @@ PER_TU_FLAGS = {
         "lock", "systask", "getcycle", "addtimer", "inittmr", "timer", "filesize", "filexist", "iocoord",
         "loadcall", "eac_async", "abortmsg", "cdstream", "exit", "filename", "stricmp", "strnicmp", "blockio",
         "cdrom", "eac_fileio", "memman", "cache", "compact", "resize", "validmem", "loadfat", "seekmsec",
-        "callback")},
+        "callback", "vars")},
     "recon/eaclib/ddx.c": {"g_value": "0", "compiler": "gcc-2.6.3", "extra": ["-O1"]},
     "recon/eaclib/blkmov.s": {"g_value": "0"},
     "recon/eaclib/print.s": {"g_value": "0"},

@@ -10,6 +10,7 @@
  * Reconstructed from the raw oracle (asm/nonmatchings/fmv/*.s) + the SYM (DIABPSX.SYM); m2c/Hex-Rays
  * drafts from skel/PSXSRC/FMV.CPP as shape hints. All %gp_rel names in the raw are literal retail names. */
 #include "psyq.h"
+#include <LIBPRESS.H>
 
 extern "C" unsigned char GAL_Free(long Handle);
 extern "C" void DBG_Error(int code, const char *file, int line);
@@ -187,15 +188,6 @@ int GetVideoMode(void);
 int SetDispMask(int mask);
 void TICK_Update(void);
 int TSK_Sleep(int frames);
-/* MDEC/VLC decoder-core library helpers (linked from another TU/lib -- unlabeled in the raw, real
- * retail names unknown; kept as func_<VA> per the raw oracle). */
-void func_8013B6EC(void *vlc_table);
-void func_8013AC3C(int mode);
-void func_8013AED8(void (*handler)(void));
-void func_8013B3B0(void *data, void *vlcbuf_half, void *vlc_table);
-void func_8013AD94(void *data);
-void func_8013ADA0(void *vlcbuf_half, int mode);
-void func_8013AE1C(void *dst, int size);
 /* PAD / audio / misc engine helpers used by LoPlayFMVOverLay's main loop (other TUs). */
 void PA_SetPauseOk(int on);
 }
@@ -580,8 +572,8 @@ extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int 
     while (slices_to_do != 0) {
         /* spin */
     }
-    func_8013B3B0(data, vlcbuf[vbuf], vlctab);
-    func_8013AD94(data);
+    DecDCTvlc2((u_long *)data, (u_long *)vlcbuf[vbuf], vlctab);
+    DecDCTBufSize((u_long *)data);
     slnum = slices_to_do = w / slice.w + ((w % slice.w) > 0);
     slice.x = x;
     slice.y = y;
@@ -594,8 +586,8 @@ extern "C" void start_mdec_decode(unsigned char *data, int x, int y, int w, int 
         slice_inc = w & 0xF;
     else
         slice_inc = 0x10;
-    func_8013ADA0(vlcbuf[vbuf], 2);
-    func_8013AE1C(MAP_BUF_JTAB[slices_to_do], slice_size);
+    DecDCTin((u_long *)vlcbuf[vbuf], 2);
+    DecDCTout((u_long *)MAP_BUF_JTAB[slices_to_do], slice_size);
     vbuf ^= 1;
 }
 
@@ -609,7 +601,7 @@ extern "C" void DCT_out_handler(void)
     slices_to_do -= 1;
     if (slices_to_do != 0) {
         slice_inc = slice.w;
-        func_8013AE1C(MAP_BUF_JTAB[slices_to_do], slice_size);
+        DecDCTout((u_long *)MAP_BUF_JTAB[slices_to_do], slice_size);
     }
     SetGP(OldGp);
 }
@@ -620,9 +612,9 @@ extern "C" void init_mdec(unsigned char *vlc_buffer, unsigned char *vlc_table)
     ordertab_length = 0x80;
     mbuf = 0;
     vlctab = (unsigned short *)vlc_table;
-    func_8013B6EC(vlc_table);
-    func_8013AC3C(0);
-    func_8013AED8(DCT_out_handler);
+    DecDCTvlcBuild((u_short *)vlc_table);
+    DecDCTReset(0);
+    DecDCToutCallback(DCT_out_handler);
     slice.w = 0x10;
     vlcbuf[0] = (char *)vlc_buffer;
     vlcbuf[1] = (char *)vlc_buffer + 0xEA60;

@@ -28,10 +28,14 @@ _sd = ROOT / "configs/sdk_link.json"
 SDK_DATA = {placement["scaffold"]
             for member in (json.loads(_sd.read_text()).values() if _sd.exists() else [])
             for placement in member.get("data_sections", {}).values()}
+_na = ROOT / "configs/native_archive_link.json"
+NATIVE_ARCHIVES = json.loads(_na.read_text()) if _na.exists() else {}
 _nr = ROOT / "configs" / "native_recon_link.json"
 NATIVE_RECON = json.loads(_nr.read_text()) if _nr.exists() else {}
 _rb = ROOT / 'configs/recon_bss_link.json'
 RECON_BSS = json.loads(_rb.read_text()) if _rb.exists() else {}
+_ha = ROOT / 'configs/native_hand_asm.json'
+NATIVE_HAND_ASM = json.loads(_ha.read_text()) if _ha.exists() else {}
 SECT = {"data": ".data", "rodata": ".rodata", "sdata": ".sdata", "bss": ".bss", "sbss": ".sbss"}
 
 def is_native_zero_section(section):
@@ -122,6 +126,9 @@ def gen(name: str):
                    for section, row in spec["sections"].items()
                    if section != ".text" and not is_native_zero_section(section) and not section.startswith('.text.')
                    and row.get("image", spec["image"]) == name and row.get('scaffold')}
+    archive_data = {scaffold: row for spec in NATIVE_ARCHIVES.values()
+                    if spec.get("image") == name
+                    for scaffold, row in spec.get("sections", {}).items()}
     if name == 'diabpsx':
         native_data.update(row['scaffold'] for spec in NATIVE_RECON.values()
                            for row in spec.get('common_symbols',{}).values() if 'scaffold' in row)
@@ -164,7 +171,7 @@ def gen(name: str):
         raise ValueError("native source owner has no retail text fragment")
     available = {f"{n}.{kind}" for off, kind, n in subs if kind in SECT}
     sdk_data = SDK_DATA if name == "diabpsx" else set()
-    if (sdk_data | native_data | set(native_raw)) - available:
+    if (sdk_data | native_data | set(native_raw) | set(archive_data)) - available:
         raise ValueError("native data placement names a missing retail fragment")
     # Native source may compose its exact ranges on top of the freshly generated
     # SDK bridge. gen_ld selects that one combined wrapper below; independent
@@ -192,7 +199,13 @@ def gen(name: str):
             else:
                 out.append(f"        build/skel/{skel}.o(.text);" if skel else f"        build/src/{n}.c.o(.text);")
         elif kind == "asm":
-            out.append(f"        build/asm/{n}.s.o(.text);")
+            if n in NATIVE_HAND_ASM:
+                spec = NATIVE_HAND_ASM[n]
+                if spec['image'] != name or int(spec['va'], 0) != va or spec['size'] != (subs[i + 1][0] - off):
+                    raise ValueError(f'{n}: native hand-assembly placement differs')
+                out.append(f"        build/{spec['source']}.o({spec['section']});   /* genuine hand-authored source */")
+            else:
+                out.append(f"        build/asm/{n}.s.o(.text);")
         elif kind in SECT:
             binding = data_bindings.get(n)
             if binding:
@@ -213,6 +226,11 @@ def gen(name: str):
                 out.append(f"        build/native_source/{owner}.raw_{target}.{raw_kind}.s.o(.{raw_kind});   /* verified native raw span */")
             elif f"{n}.{kind}" in native_data:
                 out.append(f"        build/native_source/{n}.{kind}.s.o({SECT[kind]});   /* verified native source data */")
+            elif f"{n}.{kind}" in archive_data:
+                row = archive_data[f"{n}.{kind}"]
+                if row["output_section"] != SECT[kind]:
+                    raise ValueError(f"{n}: native archive output section differs")
+                out.append(f"        build/native_archive/{n}.{kind}.s.o({SECT[kind]});   /* original native archive group */")
             elif name == "diabpsx" and f"{n}.{kind}" in SDK_DATA:
                 out.append(f"        build/sdk/native/{n}.{kind}.s.o({SECT[kind]});   /* original SDK data bridge */")
             else:

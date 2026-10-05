@@ -1,0 +1,19 @@
+{
+  "vars": {
+    "source": "recon/eaclib/vars.c",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".data": {"va": "0x800B7044", "size": 64},
+      ".sdata": {"va": "0x8011C528", "size": 180}
+    }
+  },
+  "callback": {
+    "source": "recon/eaclib/callback.c",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".sdata": {"va": "0x8011C498", "size": 4}
+    }
+  }
+}

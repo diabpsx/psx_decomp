@@ -44,6 +44,15 @@ class NativeTextTests(unittest.TestCase):
         self.assertIn('.incbin "build/two.bin", 0, 4', text)
         self.assertIn('.include "asm/nonmatchings/startup/second.s"', text)
 
+    def test_original_archive_wrapper_replaces_the_oracle(self):
+        text = render_mixed(self.parts(), {
+            'first': (0x1000, 4, None, 'build/sdk/native/first.s')}, 0x1000, 12)
+        self.assertIn('.include "build/sdk/native/first.s"', text)
+        self.assertNotIn('asm/nonmatchings/startup/first.s', text)
+        with self.assertRaises(ValueError):
+            render_mixed(self.parts(), {
+                'first': (0x1000, 4, None, '../unverified.s')}, 0x1000, 12)
+
     def test_native_large_bss_is_bounded_and_counted(self):
         spec = {'image': 'diabpsx', 'sections': {'.bss': {'va': '0x8011CAE0', 'size': 224}}}
         rows = N.bss_placements({'vid': spec}, 0x8011C604, 0x80139BF4)

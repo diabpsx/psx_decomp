@@ -24,6 +24,7 @@ class MsgNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("msg", 111))
+        self.assertEqual(receipt["assembler_version"], "2.67")
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".rdata", ".data", ".bss", ".ctors", ".dtors")},
@@ -31,8 +32,9 @@ class MsgNativeTests(unittest.TestCase):
                           ".ctors": 4, ".dtors": 4})
         self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
                              if name.startswith(".sdata.msg_")), 14)
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".sbss.msg_")), 3)
+        self.assertEqual(receipt["sections"][".sbss"]["size"], 10)
+        self.assertEqual(len(receipt["post_assemble_section_split"]), 1)
+        self.assertEqual(receipt["post_assemble_section_split"][0]["section"], ".sdata")
 
 
 if __name__ == "__main__":
