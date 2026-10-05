@@ -1939,8 +1939,8 @@
         "scaffold": "rodata_gpanel.rodata"
       },
       ".data": {
-        "va": "0x800B9BCC",
-        "size": 18,
+        "va": "0x800B9A6C",
+        "size": 370,
         "scaffold": "data_gpanel.data"
       },
       ".sdata": {
@@ -1950,7 +1950,11 @@
       }
     },
     "data_symbols": [
-      "DurColors"
+      "DurColors",
+      "DefP1PanelXY",
+      "DefP1PanelXY2",
+      "DefP2PanelXY",
+      "DefP2PanelXY2"
     ],
     "scaffold_bindings": {
       "D_80110868": "rodata_gpanel.rodata"

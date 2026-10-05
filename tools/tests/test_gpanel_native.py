@@ -33,7 +33,7 @@ class GPanelNativeTests(unittest.TestCase):
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1556)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 5052, ".rdata": 40,
-                          ".data": 18, ".sdata": 32})
+                          ".data": 370, ".sdata": 32})
         self.assertEqual(receipt["bindings"]["D_80110868"], "0x80110868")
 
 

@@ -275,3 +275,34 @@ force rebuilding. Existing objects without receipts are not silently grandfather
 This strengthens build provenance only: neither compilation nor cache acceptance
 proves a whole-program retail byte/SYM match. The strict original-archive native
 whole-program link remains pending.
+
+## GPANEL structures and MAP ownership audit
+
+The retail MAP at lines 15732–15739 assigns four `DefP*PanelXY` globals to
+GPANEL.DATA. Retail typed SYM records prove each is a `PanelXY` of 88 bytes;
+the final 106-byte span consists of the fourth structure plus existing
+`DurColors[6][3]` (18 bytes). Source aggregate initializers in `gpanel.cpp`,
+in ordinary declaration order, now produce the complete 370-byte data section.
+Isolated native verification passes all 13 functions, all four new data records
+and the existing state records. The untouched raw-object lane exports all four
+names without assembly transformations. This does not remove the isolated
+verifier's existing GP-prefix carrier or prove a strict whole-program native link.
+The gate and raw-flow GPANEL objects are SHA-identical:
+`bdb9008ddb152a45cd22b9bb63be8a79700b56debf44765512a35c57b3720603`.
+Fresh `python tools/link.py diabpsx` verification passes the full source/archive
+receipt set and the current transitional final-image lane: all 1,099,272
+serialized bytes match retail, with 120,304 runtime zero BSS bytes verified.
+That final lane still uses native payload bridges and is not the strict native
+whole-program PSYLINK completion claim.
+
+`python tools/map_source_owners.py` audits all 143 checkpoint names against
+explicit retail object bounds and same-name typed SYM records. The generated
+`docs/REMAINING_SOURCE_OWNERS.md` lists 70 single enclosing candidates, 11
+ambiguous overlapping-overlay candidates and 62 without explicit object bounds.
+Enclosing addresses alone are not used to resolve overlay ownership. Clear next
+data-owner candidates include ITEMDAT's item tables, OBJDAT's object tables,
+MISDAT's missile tables, SPELLDAT's spell table and PREOBJ's `StoryText`.
+The `OVR_*`/`OPT_*` names instead occupy merged `.rdata` without typed SYM or
+per-object boundaries. Existing OVERLAY/STARTUP declarations identify their
+descriptor/options role; authentic link-time generation must be investigated
+before turning those names into hard-coded C definitions.

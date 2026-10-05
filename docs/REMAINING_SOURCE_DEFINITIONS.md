@@ -4,7 +4,7 @@ Captured from the last complete raw-object inventory (build/native_program/inven
 
 CharBlockBuf is the reconstruction alias for retail CharDataStruct at 0x801576F0, as recorded in CARDCORE external binding aliases.
 
-The six INV table definitions have since passed isolated native byte/SYM verification. They remain in this checkpoint until the complete raw-object inventory is refreshed.
+The six INV table definitions and four GPANEL `PanelXY` structures have since passed isolated native byte/SYM verification. They remain in this checkpoint until the complete raw-object inventory is refreshed. See `REMAINING_SOURCE_OWNERS.md` for the retail MAP/SYM ownership audit.
 
 | Name | Retail VA |
 | --- | --- |

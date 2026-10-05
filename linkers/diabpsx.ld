@@ -346,7 +346,7 @@ SECTIONS
         . = 0xFA57C;   /* 0x8010A57C */
         build/asm/data/data_monstdat.data.s.o(.data);
         . = 0xFD008;   /* 0x8010D008 */
-        build/asm/data/data_inv.data.s.o(.data);
+        build/native_source/data_inv.data.s.o(.data);   /* verified native source data */
         . = 0xFD6CC;   /* 0x8010D6CC */
         build/native_source/data_automap.data.s.o(.data);   /* verified native source data */
         . = 0xFDBAC;   /* 0x8010DBAC */

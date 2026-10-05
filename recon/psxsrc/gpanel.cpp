@@ -79,6 +79,25 @@ struct PanelXY {   /* sizeof 88, real field names from the retail SYM STRTAG rec
     unsigned char WhichPlayerDoesThisPanelReallyBelongToThen;   /* +0x54 */
 };
 
+/* Retail GPANEL.DATA: four PanelXY layouts followed by DurColors.
+ * The final byte member's three trailing bytes are ordinary struct padding. */
+PanelXY DefP1PanelXY = { /* @0x800B9A6C */
+    24, 200, 0, -12, -1, -9, -80, -8, -112,
+    162, 166, 144, 52, 44, 176, 70, 176, 96, 176, 122, 176, 1
+};
+PanelXY DefP1PanelXY2 = { /* @0x800B9AC4 */
+    24, 200, 0, -12, -1, -9, -80, -8, -112,
+    12, 24, 140, 104, 44, 176, 70, 176, 96, 176, 122, 176, 1
+};
+PanelXY DefP2PanelXY = { /* @0x800B9B1C */
+    294, 200, 1, -125, -1, -9, -80, -8, -112,
+    12, 166, 140, 52, 178, 176, 204, 176, 230, 176, 256, 176, 2
+};
+PanelXY DefP2PanelXY2 = { /* @0x800B9B74 */
+    294, 200, 1, -125, -1, -9, -80, -8, -112,
+    166, 24, 140, 104, 178, 176, 204, 176, 230, 176, 256, 176, 2
+};
+
 class CBlocks {
 public:
     static int GetMaxOtPos() { return 0x1FF; }
