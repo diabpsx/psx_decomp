@@ -34,3 +34,53 @@ static void SlowMemMove(void *Dest, void *Source, unsigned long size)
 {
     memmove(Dest, Source, size);
 }
+
+enum FILE_SYSTEM { FS_PC = 0, FS_CD = 1 };
+enum DEV_KIT { DK_SONY_ISA = 0, DK_SONY_PCI = 1, DK_CLIMAX = 2 };
+struct LNK_OPTS {   /* sizeof 32 */
+    unsigned long RamSize;
+    unsigned long StackSize;
+    void *OrgAddress;
+    void *FreeMemAddress;
+    unsigned long FreeMemSize;
+    FILE_SYSTEM FileSystem;
+    DEV_KIT DevKit;
+    unsigned long NoQuests;
+};
+
+enum GAL_VERB_LEV { GAL_SILENT = 0, GAL_NOISY = 1 };
+
+
+extern "C" {
+void *memset(void *s, int c, unsigned long n);
+unsigned char GAL_AddMemType(MEM_INIT_INFO *M);
+void GAL_SetVerbosity(GAL_VERB_LEV G);
+}
+extern LNK_OPTS OPT_LinkerOpts;
+extern void *OPT_FreeMemStart;
+extern unsigned long OPT_FreeMemSize;
+LNK_OPTS *Gaz;
+void MEM_SetupMem(void) __attribute__((section(".text.startup_mem")));
+static void SetupWorkRam(void) __attribute__((section(".text.startup_mem")));
+
+/* MEM.CPP:85 */
+void MEM_SetupMem(void)
+{
+    Gaz = &OPT_LinkerOpts;
+    SetupWorkRam();
+}
+
+/* MEM.CPP:123 */
+static void SetupWorkRam(void)
+{
+    PsxMem.Mem = OPT_FreeMemStart;
+    PsxMem.Size = OPT_FreeMemSize;
+    PsxMem.Type = 1;
+    PsxFastMem.Mem = (void *)0x1F800000;
+    PsxFastMem.Size = 0x400;
+    PsxFastMem.Type = 2;
+    memset(PsxMem.Mem, 0, PsxMem.Size);
+    GAL_AddMemType(&PsxFastMem);
+    GAL_AddMemType(&PsxMem);
+    GAL_SetVerbosity(GAL_NOISY);
+}

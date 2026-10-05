@@ -1,58 +1,32 @@
-# Remaining missing source definitions — 143-name checkpoint
+# Remaining missing source definitions - 73 entries
 
-Captured from the last complete raw-object inventory (build/native_program/inventory.json, 182 source objects), 2026-10-05. These names exclude the original Sony archive candidates. Retail VAs are resolved from the MAP, SYM name records and symbol-address configs; address-named oracle labels retain their encoded VA.
-
-CharBlockBuf is the reconstruction alias for retail CharDataStruct at 0x801576F0, as recorded in CARDCORE external binding aliases.
-
-The six INV table definitions and four GPANEL `PanelXY` structures have since passed isolated native byte/SYM verification. They remain in this checkpoint until the complete raw-object inventory is refreshed. See `REMAINING_SOURCE_OWNERS.md` for the retail MAP/SYM ownership audit.
+Fresh complete raw-object inventory, 2026-10-05: 186 source objects.
+The original 143-name checkpoint is preserved in SOURCE_DEFINITIONS_CHECKPOINT_143.md.
+The 60 single-MAP-candidate task has 59 entries resolved; D_80110B24 remains a TONY literal alias.
+This inventory does not prove a strict whole-program native link.
 
 | Name | Retail VA |
 | --- | --- |
-| `AP2x2Tbl` | `0x8010D008` |
-| `AiProc` | `0x80105314` |
 | `AlertStr` | `0x80159510` |
-| `AllItemsList` | `0x801113A4` |
-| `AllLevels` | `0x800B7558` |
-| `AllObjects` | `0x800D84B0` |
 | `CharBlockBuf` | `0x801576F0` |
 | `CharDataStruct` | `0x801576F0` |
-| `Circle` | `0x800CD2E0` |
 | `ClassStrTbl` | `0x801435F8` |
-| `D_80110868` | `0x80110868` |
 | `D_80110B24` | `0x80110B24` |
 | `D_8011B3D8` | `0x8011B3D8` |
 | `D_8011C878` | `0x8011C878` |
 | `D_8012E534` | `0x8012E534` |
 | `D_80157B68` | `0x80157B68` |
-| `DefP1PanelXY` | `0x800B9A6C` |
-| `DefP1PanelXY2` | `0x800B9AC4` |
-| `DefP2PanelXY` | `0x800B9B1C` |
-| `DefP2PanelXY2` | `0x800B9B74` |
 | `DoLoadedChar` | `0x8011B9EC` |
 | `FirstFreeByte` | `0x80163E20` |
 | `FriendlyMode` | `0x8011B7A5` |
 | `GSYS_MemEnd` | `0x8011AAD0` |
 | `GSYS_MemStart` | `0x8011AACC` |
-| `InvGfxTable` | `0x8010D278` |
-| `InvItemHeight` | `0x8010D5CC` |
-| `InvItemWidth` | `0x8010D518` |
-| `InvRect` | `0x8010D030` |
-| `InvSlotTable` | `0x8010D680` |
-| `KeyTab` | `0x800CD360` |
-| `MWVel` | `0x801051F4` |
 | `McLoadCard1Menu` | `0x80143668` |
 | `McLoadCard2Menu` | `0x80143684` |
 | `McLoadGameMenu` | `0x8014364C` |
-| `MenuList` | `0x800CD240` |
-| `MissPrintRoutines` | `0x800D6E50` |
-| `MonDays` | `0x800B09B8` |
-| `MonstAvailTbl` | `0x8010C698` |
-| `MonstConvTbl` | `0x8010C618` |
-| `Monsters` | `0x8010A3BC` |
 | `MouseX` | `0x8011B7E4` |
 | `MouseY` | `0x8011B7E8` |
 | `MyFT4` | `0x8011CC00` |
-| `NumOfMonsterListLevels` | `0x8011AA94` |
 | `OPT_DevKit` | `0x8010DBF0` |
 | `OPT_FileSystem` | `0x8010DBEC` |
 | `OPT_FreeMemSize` | `0x8010DBE8` |
@@ -67,54 +41,24 @@ The six INV table definitions and four GPANEL `PanelXY` structures have since pa
 | `OVR_GameSize` | `0x8010DBCC` |
 | `OVR_PregameAddress` | `0x8010DBB4` |
 | `OVR_PregameSize` | `0x8010DBC8` |
-| `ObjFileList` | `0x800DA320` |
-| `ObjMasterLoadList` | `0x801169F0` |
-| `ObjTypeConv` | `0x800D82EC` |
-| `PL_Prefix` | `0x80112744` |
-| `PL_Suffix` | `0x80113464` |
 | `PlayDemoFlag` | `0x8011AC81` |
 | `PlayerDeathCount` | `0x8011BA10` |
 | `PlayerEar` | `0x8011BA18` |
-| `PsxFastMem` | `0x800B7948` |
-| `PsxMem` | `0x800B7920` |
 | `ScrollFlag` | `0x8011B8B8` |
-| `SoundMenu` | `0x800CCB38` |
-| `StonePals` | `0x8010AA9C` |
-| `StoryBookName` | `0x800D8C38` |
-| `StoryText` | `0x800E40B0` |
-| `StringTable` | `0x80102A28` |
 | `TX_DatTab` | `0x800B2D04` |
 | `TempStr` | `0x801594D0` |
-| `TransPals` | `0x8010A57C` |
-| `UniqMonst` | `0x8010C708` |
-| `UniqTransPals` | `0x8010A794` |
-| `UniqueItemList` | `0x80114364` |
-| `ValueTable` | `0x80102A18` |
-| `Words` | `0x800B07E0` |
-| `XDirAdd` | `0x801029D8` |
-| `YDirAdd` | `0x801029F8` |
 | `_7CPlayer_PActiveArray` | `0x8011AD50` |
 | `_NoWitchItems` | `0x8011BAC8` |
 | `_WitchIdxOfs` | `0x8011BAD0` |
-| `_boyitem` | `0x800E0AF8` |
 | `_boylevel` | `0x8011BAD8` |
-| `_golditem` | `0x800E1CB0` |
-| `_healitem` | `0x800E0BD0` |
 | `_infoclr` | `0x8011B6BC` |
 | `_numpremium` | `0x8011BAB8` |
 | `_pinfoflag` | `0x8011B6B8` |
-| `_premiumitem` | `0x800DF508` |
 | `_premiumlevel` | `0x8011BAC0` |
-| `_smithitem` | `0x800DE428` |
-| `_witchitem` | `0x800DFA18` |
-| `alltext` | `0x80117C20` |
 | `animletter` | `0x8011C2A0` |
-| `bxadd` | `0x800D8BA8` |
-| `byadd` | `0x800D8BC8` |
 | `card_changed` | `0x8011B3F4` |
 | `card_files` | `0x8011B3EC` |
 | `card_usable` | `0x8011B3E4` |
-| `dMissArray` | `0x80105174` |
 | `debugmonsttypes` | `0x8011B7A0` |
 | `drawbtnflag` | `0x8011B6C1` |
 | `func_80161F58` | `0x80161F58` |
@@ -124,28 +68,13 @@ The six INV table definitions and four GPANEL `PanelXY` structures have since pa
 | `leveldebug` | `0x8011B798` |
 | `leverid` | `0x8011B9DC` |
 | `light4flag` | `0x8011B797` |
-| `misfiledata` | `0x800D6F60` |
-| `missile` | `0x80102C58` |
-| `missileactive` | `0x80102A60` |
-| `missileavail` | `0x80102B5C` |
-| `missiledata` | `0x800D67F0` |
-| `monstactive` | `0x8010A0C4` |
 | `monstdebug` | `0x8011B799` |
-| `monster` | `0x80105394` |
-| `monsterdata` | `0x8010AB9C` |
 | `monstimgtot` | `0x8011C2D0` |
-| `monstkills` | `0x8010A240` |
 | `mydflags` | `0x8011C0D8` |
-| `object` | `0x800D8C4C` |
-| `objectactive` | `0x800DA220` |
-| `objectavail` | `0x800DA2A0` |
 | `offset_x` | `0x8011C2A8` |
 | `offset_y` | `0x8011C2B0` |
 | `pSetPiece` | `0x8011C0DC` |
 | `save_buffer` | `0x801436EC` |
-| `shrineavail` | `0x800D8C1C` |
-| `shrinestrs` | `0x800D8BE8` |
-| `spelldata` | `0x800DDB80` |
 | `spspelstate` | `0x8011B64C` |
 | `totalmonsters` | `0x8011C2D4` |
 | `trapdir` | `0x8011B9D8` |

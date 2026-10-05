@@ -166,8 +166,10 @@ startup VID_OpenModule__Fv recon/psxsrc/vid.cpp
 startup OVR_Open__Fv recon/psxsrc/overlay.cpp
 startup PA_Open__Fv recon/psxsrc/pause.cpp
 startup SYSI_Init__Fv recon/psxsrc/sysinit.cpp
-startup MEM_SetupMem__Fv recon/psxsrc/startup.cpp
-startup SetupWorkRam__Fv recon/psxsrc/startup.cpp
+startup_1 GetVersionString__FPc recon/source/version.cpp
+startup_1 GetWord__FPc recon/source/version.cpp
+startup MEM_SetupMem__Fv recon/psxsrc/mem.cpp
+startup SetupWorkRam__Fv recon/psxsrc/mem.cpp
 startup PAD_Open__Fv recon/psxsrc/startup.cpp
 startup GM_Open__Fv recon/psxsrc/startup.cpp
 lib getlocksemaphore recon/eaclib/lock.c

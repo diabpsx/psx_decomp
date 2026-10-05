@@ -8,6 +8,8 @@
  * the existing psxsrc/block.cpp POLY_FT4 — not guessed. */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
 
 /* ---- shared game-engine layouts (kept minimal/local) ---- */
 
@@ -36,7 +38,10 @@ struct PAL {   /* retail SYM: sizeof 8 */
 
 struct TextDat {   /* sizeof 112 -- matches block.cpp's TextDat (its owner); only fields/methods
                        this TU's out-of-line accessor copies touch are declared. */
-    unsigned char pad0[0x24];
+    BOOL OwnDat;
+    int TexNum, LastFrame;
+    BOOL DatLoaded;
+    long hndDat, hndHdr, hndPalOffset, hndCreatureOffset, hndBlockOffsets;
     struct FRAME_HDR *Frames;   /* +0x24 */
     unsigned char pad1[0x2C - 0x28];
     void *Pals;                 /* +0x2C */
@@ -52,6 +57,32 @@ struct TextDat {   /* sizeof 112 -- matches block.cpp's TextDat (its owner); onl
         return (PAL *)((char *)Pals + PalOffset[PalNum]);
     }
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
+    void DumpDatFile();
+};
+
+/* Original GMAN.H / CPLAYER.H inlines: unused bodies naturally retain their
+ * filename literals before DrawSpell's initializer pool. */
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
+class CPlayer : public TextDat {
+public:
+    long hndDatMem;
+    unsigned short NumOfPlayers;
+    BOOL InTown;
+    unsigned short PlayerNum, Tpage;
+    int TexId, LastScrX, LastScrY, LastOtPos;
+    static CPlayer *PActiveArray[2];
+    static CPlayer *GetPlayer(int PNum)
+    {
+        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
+        return PActiveArray[PNum];
+    }
 };
 
 struct PanelXY {   /* sizeof 88, real field names from the retail SYM STRTAG record */
@@ -173,8 +204,6 @@ static unsigned char DurColors[6][3] = {
     {255, 255, 255}, {0, 0, 0}, {0, 0, 0}
 };
 extern signed char SpellITbl[];
-struct D_80110868_T { signed char b[16]; };   /* 16-byte table, block-copied (lwl/lwr) to a stack local in DrawSpell */
-extern struct D_80110868_T D_80110868;
 extern int InvGfxTable[];
 
 
@@ -438,9 +467,7 @@ void GPanel::DrawSpell(struct PanelXY *XY, struct PlayerStruct *Plr)
     int X, Y, Anim;
     struct POLY_FT4 *Ft4;
     int SpellNo;
-    char YT[16];
-
-    *(struct D_80110868_T *)YT = D_80110868;
+    char YT[16] = "\000\000\001\001\001\001\001\000\000\000\377\377\377\377\377\000";
 
     Y = XY->MainY;
     X = XY->MainX + 1;

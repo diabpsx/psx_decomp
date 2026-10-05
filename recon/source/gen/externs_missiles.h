@@ -7,15 +7,10 @@ extern void (*MissPrintRoutines[68])();   /* @0x800D6E50 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
 extern struct ScrollStruct ScrollInfo;   /* @0x800E7914 */
 extern int SetParticle;   /* @0x8011B0E4 */
-extern unsigned char StringTable[6][9];   /* @0x80102A28 */
 extern unsigned char TransList[256];   /* @0x800E7928 */
-extern unsigned char ValueTable[16];   /* @0x80102A18 */
 extern int ViewX;   /* @0x8011C114 */
 extern int ViewY;   /* @0x8011C118 */
-extern int XDirAdd[8];   /* @0x801029D8 */
-extern int YDirAdd[8];   /* @0x801029F8 */
 extern unsigned char currlevel;   /* @0x8011C10C */
-extern char dMissArray[32][4];   /* @0x80105174 */
 extern unsigned char drawhpflag;   /* @0x8011B6BE */
 extern unsigned char drawmanaflag;   /* @0x8011B6BF */
 extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
@@ -24,9 +19,6 @@ extern struct CPlayer *gplayer;   /* @0x8011B110 */
 extern unsigned char invflag;   /* @0x8011C32C */
 extern unsigned char leveltype;   /* @0x8011C10D */
 extern struct MisFileData misfiledata[47];   /* @0x800D6F60 */
-extern struct MissileStruct missile[125];   /* @0x80102C58 */
-extern short missileactive[125];   /* @0x80102A60 */
-extern short missileavail[125];   /* @0x80102B5C */
 extern struct MissileData missiledata[68];   /* @0x800D67F0 */
 extern struct MonsterStruct monster[190];   /* @0x80105394 */
 extern int myplr;   /* @0x8011BA08 */

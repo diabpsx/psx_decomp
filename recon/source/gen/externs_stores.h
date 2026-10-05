@@ -8,15 +8,9 @@ extern int Qtalklist[11][16];   /* @0x800CFBC0 */
 
 extern int _numpremium[2];   /* @0x8011BAB8 */
 extern int _premiumlevel[2];   /* @0x8011BAC0 */
-extern struct ItemStruct _premiumitem[2][6];   /* @0x800DF508 */
-extern struct ItemStruct _boyitem[2];   /* @0x800E0AF8 */
 extern int _boylevel[2];   /* @0x8011BAD8 */
 extern int _NoWitchItems[2];   /* @0x8011BAC8 */
 extern int _WitchIdxOfs[2];   /* @0x8011BAD0 */
-extern struct ItemStruct _smithitem[2][20];   /* @0x800DE428 */
-extern struct ItemStruct _witchitem[2][20];   /* @0x800DFA18 */
-extern struct ItemStruct _healitem[2][20];   /* @0x800E0BD0 */
-extern struct ItemStruct _golditem[2];   /* @0x800E1CB0 */
 extern int options_pad;   /* @0x8011B250 */
 extern unsigned char sbookflag;   /* @0x8011B6C6 */
 extern unsigned char invflag;   /* @0x8011C32C */

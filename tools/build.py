@@ -47,7 +47,7 @@ PER_TU_FLAGS = {
     # VERSION.CPP was compiled on the timestamp embedded in the retail object.
     # Preserve the original source's __DATE__/__TIME__ use while reproducing
     # that preprocessing environment.
-    "recon/source/startup_1.cpp": {"cpp_extra": [
+    "recon/source/version.cpp": {"cpp_extra": [
         '-D__DATE__="May 29 1998"', '-D__TIME__="14:30:45"']},
     # Retail CREDITS_text is one overlay group ordered as two header literals,
     # initialized tables, the later PRIMPOOL.H literal, then code.  The vendor

@@ -14,6 +14,24 @@
 #include "source/gen/protos_objects.h"
 #include "source/diablo.h"
 
+/* Retail OBJECTS.DATA, with PSX-sized state arrays and string IDs. */
+int bxadd[8] = { -1, 0, 1, -1, 1, -1, 0, 1 }; /* @0x800D8BA8 */
+int byadd[8] = { -1, -1, -1, 0, 0, 1, 1, 1 }; /* @0x800D8BC8 */
+unsigned short shrinestrs[26] = { /* @0x800D8BE8 */
+    685,493,392,1223,621,1039,857,302,1076,319,219,621,292,
+    291,263,506,895,1021,1024,3,214,833,944,761,391,1059
+};
+char shrineavail[26] = { /* @0x800D8C1C */
+    0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,2
+};
+unsigned short StoryBookName[9] = { /* @0x800D8C38 */
+    1112,1148,1141,1098,1148,1083,1133,1060,1085
+};
+ObjectStruct object[127] = { { 0 } }; /* @0x800D8C4C */
+char objectactive[127] = { 0 }; /* @0x800DA220 */
+char objectavail[127] = { 0 }; /* @0x800DA2A0 */
+char ObjFileList[40] = { 0 }; /* @0x800DA320 */
+
 #define THEME_NONE (-1)
 #define OBJ_CRUX1 0x14
 #define OBJ_CRUX2 0x15

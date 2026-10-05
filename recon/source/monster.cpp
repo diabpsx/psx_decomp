@@ -10,6 +10,28 @@
 #include "source/gen/externs_monster.h"
 #include "source/gen/protos_monster.h"
 
+/* Original walk velocities (also present in the PC twin), not rounded anew. */
+int MWVel[24][3] = { /* @0x801051F4 */
+    {256,512,1024}, {128,256,512}, {85,170,341}, {64,128,256},
+    {51,102,204}, {42,85,170}, {36,73,146}, {32,64,128},
+    {28,56,113}, {26,51,102}, {23,46,93}, {21,42,85},
+    {19,39,78}, {18,36,73}, {17,34,68}, {16,32,64},
+    {15,30,60}, {14,28,57}, {13,26,54}, {12,25,51},
+    {12,24,48}, {11,23,46}, {11,22,44}, {10,21,42}
+};
+void (*AiProc[32])(int) = { /* @0x80105314 */
+    MAI_Zombie, MAI_Fat, MAI_SkelSd, MAI_SkelBow, MAI_Scav, MAI_Rhino,
+    MAI_GoatMc, MAI_GoatBow, MAI_Fallen, MAI_Magma, MAI_SkelKing, MAI_Bat,
+    MAI_Garg, MAI_Cleaver, MAI_Succ, MAI_Sneak, MAI_Storm, MAI_Fireman,
+    MAI_Garbud, MAI_Acid, MAI_AcidUniq, MAI_Golum, MAI_Zhar, MAI_SnotSpil,
+    MAI_Snake, MAI_Counselor, MAI_Mega, MAI_Diablo, MAI_Lazurus,
+    MAI_Lazhelp, MAI_Lachdanan, MAI_Warlord
+};
+MonsterStruct monster[190] = { { 0 } }; /* @0x80105394 */
+short monstactive[190] = { 0 }; /* @0x8010A0C4 */
+short monstkills[190] = { 0 }; /* @0x8010A240 */
+CMonster Monsters[16] = { { 0 } }; /* @0x8010A3BC */
+
 /* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
 static BOOL gSameRoom(int m, int i);   /* @0x80156A68 MONSTER.CPP:5556 */
 #include "source/diablo.h"

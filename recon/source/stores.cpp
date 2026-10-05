@@ -8,7 +8,7 @@
  *  - The PC's static smithitem[]/witchitem[]/healitem[]/golditem/numpremium/premiumitem/boyitem arrays
  *    do NOT exist as such in the PSX SYM. Instead there are SmithItemCount/SellIdx/SWrapCount (ints) and
  *    per-player _numpremium/_premiumitem/_boylevel/_boyitem/_NoWitchItems/_WitchIdxOfs arrays already
- *    owned by another TU (see externs_stores.h) -- the shop-item generation/listing functions
+ *    source-owned by this TU in separate player banks -- the shop-item generation/listing functions
  *    (S_StartSmith, SmithBuyItem, S_StartWitch, WitchBuyItem, HealerBuyItem, S_StartBBoy/BoyBuyItem, ...)
  *    use a SUBSTANTIALLY different (likely disc-streamed, on-demand) design that has NOT been fully
  *    reverse-engineered yet -- see the final report.
@@ -101,6 +101,7 @@ extern struct QuestData questlist[16];   /* @0x800DD908 */
 /* file-owned globals (EXT in SYM, gp-rel tentative defs) */
 int StorePlrNo;
 unsigned char *pSTextBoxCels = 0;
+Dialog SBack;
 unsigned char *pSTextSlidCels;
 int *SStringY = SStringYNorm;
 char WStaffFlag;
@@ -126,9 +127,17 @@ int SStringYBuy1[20] = {
     -4, 9, 9, 22, 38, 51, 64, 77, 90, 103,
     116, 116, 134, 147, 160, 173, 186, 199, 212, 225
 };
-struct ItemStruct storehold[48];
-char storehidx[48];
 int talkname[9] = { 0x1A6, 0x305, 0x4FA, 0x2E3, 0x09B, 0x13D, 0x00D, 0x183, 0x4D7 };
+
+/* Retail per-player shop state, followed by the shared selection buffers. */
+ItemStruct _smithitem[2][20] = { { { 0 } } }; /* @0x800DE428 */
+ItemStruct _premiumitem[2][6] = { { { 0 } } }; /* @0x800DF508 */
+ItemStruct _witchitem[2][20] = { { { 0 } } }; /* @0x800DFA18 */
+ItemStruct _boyitem[2] = { { 0 } }; /* @0x800E0AF8 */
+ItemStruct _healitem[2][20] = { { { 0 } } }; /* @0x800E0BD0 */
+ItemStruct _golditem[2] = { { 0 } }; /* @0x800E1CB0 */
+struct ItemStruct storehold[48] = { { 0 } }; /* @0x800E1D88 */
+char storehidx[48] = { 0 }; /* @0x800E31C8 */
 
 /* file-static globals (STAT in SYM: internal linkage, not exported) */
 static struct STextStruct stext[NUMSTLINES];
@@ -153,7 +162,6 @@ static int talker;   /* @0x8011C8C4 */
 /* Static Dialog object: declaring it makes the compiler synthesize the ctor/dtor/_GLOBAL__ static-
  * init/destroy thunks automatically -- see __6Dialog_800743f0, ___6Dialog_800743c8,
  * _GLOBAL__I/D_pSTextBoxCels in the raw oracle (all boilerplate, not hand-written per-class code). */
-Dialog SBack;
 
 /* @0x800695A4 -- empty on PSX: the PC's 3 DiabloFreePtr calls are gone */
 

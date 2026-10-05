@@ -299,7 +299,7 @@ void DrawQTextTSK(TASK *T)
     GLUE_SuspendGame();
     GLUE_SetHomingScrollFlag(0);
     GLUE_SetShowPanelFlag(0);
-    qtextptr = GetStr(*(int *)&alltext[args->a1]);
+    qtextptr = GetStr(alltext[args->a1].txtstr);
     while (!IsKanjiLoaded())
         TSK_Sleep(1);
     sprintf(Name, "%04X", alltext[args->a1].sfxnr);

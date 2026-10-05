@@ -210,7 +210,7 @@ SECTIONS
         . = 0xA07C8;   /* 0x800B07C8 */
         build/asm/data/startup_rodata_800b07c8.rodata.s.o(.rodata);
         . = 0xA07E0;   /* 0x800B07E0 */
-        build/asm/data/startup_rodata_800b07e0.rodata.s.o(.rodata);
+        build/native_source/startup_rodata_800b07e0.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xA0A18;   /* 0x800B0A18 */
         build/native_source/startup_1.text.s.o(.text);   /* verified native-assembled source */
         . = 0xA0C98;   /* 0x800B0C98 */
@@ -262,7 +262,7 @@ SECTIONS
         . = 0xBC7E8;   /* 0x800CC7E8 */
         build/native_source/data_cardcore.data.s.o(.data);   /* verified native source data */
         . = 0xBC868;   /* 0x800CC868 */
-        build/asm/data/data_options.data.s.o(.data);
+        build/native_source/data_options.data.s.o(.data);   /* verified native source data */
         . = 0xBD374;   /* 0x800CD374 */
         build/native_source/data_bird.data.s.o(.data);   /* verified native source data */
         . = 0xBD4F4;   /* 0x800CD4F4 */
@@ -294,13 +294,13 @@ SECTIONS
         . = 0xC6790;   /* 0x800D6790 */
         build/native_source/data_minitext.data.s.o(.data);   /* verified native source data */
         . = 0xC67F0;   /* 0x800D67F0 */
-        build/asm/data/data_misdat.data.s.o(.data);
+        build/native_source/data_misdat.data.s.o(.data);   /* verified native source data */
         . = 0xC704C;   /* 0x800D704C */
         build/native_source/data_msg.data.s.o(.data);   /* verified native source data */
         . = 0xC82EC;   /* 0x800D82EC */
         build/asm/data/data_objdat.data.s.o(.data);
         . = 0xC8BA8;   /* 0x800D8BA8 */
-        build/asm/data/data_objects.data.s.o(.data);
+        build/native_source/data_objects.data.s.o(.data);   /* verified native source data */
         . = 0xCA348;   /* 0x800DA348 */
         build/native_source/data_player.data.s.o(.data);   /* verified native source data */
         . = 0xCD908;   /* 0x800DD908 */
@@ -334,15 +334,15 @@ SECTIONS
         . = 0xD4028;   /* 0x800E4028 */
         build/native_source/data_choosem.data.s.o(.data);   /* verified native source data */
         . = 0xD40B0;   /* 0x800E40B0 */
-        build/asm/data/data_preobj.data.s.o(.data);
+        build/native_source/data_preobj.data.s.o(.data);   /* verified native source data */
         . = 0xD40C4;   /* 0x800E40C4 */
         build/native_source/data_gendung.data.s.o(.data);   /* verified native source data */
         . = 0xF2728;   /* 0x80102728 */
         build/native_source/data_themes.data.s.o(.data);   /* verified native source data */
         . = 0xF29D8;   /* 0x801029D8 */
-        build/asm/data/data_missiles.data.s.o(.data);
+        build/native_source/data_missiles.data.s.o(.data);   /* verified native source data */
         . = 0xF51F4;   /* 0x801051F4 */
-        build/asm/data/data_monster.data.s.o(.data);
+        build/native_source/data_monster.data.s.o(.data);   /* verified native source data */
         . = 0xFA57C;   /* 0x8010A57C */
         build/asm/data/data_monstdat.data.s.o(.data);
         . = 0xFD008;   /* 0x8010D008 */
@@ -488,7 +488,7 @@ SECTIONS
         . = 0x10135C;   /* 0x8011135C */
         build/native_source/rodata_interfac_source.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1013A4;   /* 0x801113A4 */
-        build/asm/data/rodata_itemdat.rodata.s.o(.rodata);
+        build/native_source/rodata_itemdat.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x106140;   /* 0x80116140 */
         build/native_source/rodata_items.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1066E8;   /* 0x801166E8 */
@@ -496,7 +496,7 @@ SECTIONS
         . = 0x1066F8;   /* 0x801166F8 */
         build/native_source/rodata_minitext.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x106798;   /* 0x80116798 */
-        build/asm/data/rodata_misdat.rodata.s.o(.rodata);
+        build/native_source/rodata_misdat.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1067A8;   /* 0x801167A8 */
         build/native_source/rodata_msg.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1069D0;   /* 0x801169D0 */
@@ -556,7 +556,7 @@ SECTIONS
         . = 0x108E6C;   /* 0x80118E6C */
         build/asm/data/rodata_gameover.rodata.s.o(.rodata);
         . = 0x108E90;   /* 0x80118E90 */
-        build/asm/data/rodata_version_prefix.rodata.s.o(.rodata);
+        build/native_source/rodata_version_prefix.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10944C;   /* 0x8011944C */
         build/native_source/rodata_version_source.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109464;   /* 0x80119464 */

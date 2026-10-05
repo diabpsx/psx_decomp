@@ -49,6 +49,206 @@ unsigned long SpeechVol = 0;
 int ReturnMenu = 0;
 int they_pressed = 0;
 
+/* Complete retail OPTIONS.DATA; menu and volume links are symbolic. */
+OMENUITEM MainMenu[7] = { /* @0x800CC868 */
+    { 0, 759, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 1006, (TXT_JUST)1, 0, 0, 3 },
+    { 2, 204, (TXT_JUST)1, 0, 0, 21 },
+    { 3, 166, (TXT_JUST)1, 0, 0, 5 },
+    { 4, 213, (TXT_JUST)1, 0, 0, 23 },
+    { 5, 485, (TXT_JUST)1, 0, 0, 26 },
+    { 7, 1274, (TXT_JUST)1, 0, 0, -1 },
+};
+
+OMENUITEM GameMenu[12] = { /* @0x800CC910 */
+    { 0, 256, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 543, (TXT_JUST)1, 0, 0, 27 },
+    { 2, 174, (TXT_JUST)1, 0, 0, 28 },
+    { 3, 827, (TXT_JUST)1, 0, 0, 25 },
+    { 4, 1015, (TXT_JUST)1, 0, 0, 24 },
+    { 5, 904, (TXT_JUST)1, 0, 0, 8 },
+    { 6, 1006, (TXT_JUST)1, 0, 0, 3 },
+    { 7, 204, (TXT_JUST)1, 0, 0, 21 },
+    { 8, 166, (TXT_JUST)1, 0, 0, 5 },
+    { 9, 485, (TXT_JUST)1, 0, 0, 26 },
+    { 10, 376, (TXT_JUST)1, 0, 0, 11 },
+    { 11, 835, (TXT_JUST)1, 0, 0, 6 },
+};
+
+OMENUITEM GameSpeedMenu[4] = { /* @0x800CCA30 */
+    { 0, 376, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 378, (TXT_JUST)1, 0, 0, -2 },
+    { 2, 377, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENUITEM GameOverMenu[3] = { /* @0x800CCA90 */
+    { 0, 375, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 835, (TXT_JUST)1, 0, 0, 7 },
+    { 2, 606, (TXT_JUST)1, 0, 0, 10 },
+};
+
+OMENUITEM MemcardLoadGameOverMenu[4] = { /* @0x800CCAD8 */
+    { 0, 606, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 648, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 649, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 9 },
+};
+
+OMENUITEM SoundMenu[7] = { /* @0x800CCB38 */
+    { 0, 1006, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 1319, (TXT_JUST)0, 0, &MasterVol, -2 },
+    { 2, 1320, (TXT_JUST)0, 0, &MusicVol, -2 },
+    { 3, 1321, (TXT_JUST)0, 0, &SoundVol, -2 },
+    { 4, 1322, (TXT_JUST)0, 0, &SpeechVol, -2 },
+    { 5, 667, (TXT_JUST)0, 0, 0, -2 },
+    { 7, 1274, (TXT_JUST)1, 0, 0, 1 },
+};
+
+OMENUITEM CentreMenu[3] = { /* @0x800CCBE0 */
+    { 0, 261, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 12, (TXT_JUST)1, 0, 0, -2 },
+    { 6, 1274, (TXT_JUST)1, 0, 0, 1 },
+};
+
+OMENUITEM LangMenu[6] = { /* @0x800CCC28 */
+    { 0, 950, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 304, (TXT_JUST)1, 1, 0, -2 },
+    { 4, 364, (TXT_JUST)1, 1, 0, -2 },
+    { 5, 382, (TXT_JUST)1, 1, 0, -2 },
+    { 6, 1056, (TXT_JUST)1, 1, 0, -2 },
+    { 9, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENUITEM QuitMenu[4] = { /* @0x800CCCB8 */
+    { 0, 835, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 835, (TXT_JUST)1, 0, 0, 7 },
+    { 2, 309, (TXT_JUST)1, 0, 0, 2 },
+    { 4, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENUITEM AreYouSureMenu[4] = { /* @0x800CCD18 */
+    { 0, 38, (TXT_JUST)1, 0, 0, -2 },
+    { 1, 1255, (TXT_JUST)1, 0, 0, -1 },
+    { 2, 713, (TXT_JUST)1, 0, 0, 2 },
+    { 4, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENUITEM MemcardMenu[7] = { /* @0x800CCD78 */
+    { 0, 904, (TXT_JUST)1, 0, 0, -2 },
+    { 2, 902, (TXT_JUST)1, 0, 0, 13 },
+    { 3, 606, (TXT_JUST)1, 0, 0, 12 },
+    { 4, 901, (TXT_JUST)1, 0, 0, 14 },
+    { 5, 903, (TXT_JUST)1, 0, 0, 18 },
+    { 6, 607, (TXT_JUST)1, 0, 0, 19 },
+    { 7, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENUITEM MemcardLoadGameMenu[4] = { /* @0x800CCE20 */
+    { 0, 606, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 648, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 649, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 8 },
+};
+
+OMENUITEM MemcardSaveGameMenu[4] = { /* @0x800CCE80 */
+    { 0, 902, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 648, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 649, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 8 },
+};
+
+OMENUITEM MemcardSaveOptionsMenu[4] = { /* @0x800CCEE0 */
+    { 0, 903, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 648, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 649, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 8 },
+};
+
+OMENUITEM MemcardLoadOptionsMenu[4] = { /* @0x800CCF40 */
+    { 0, 607, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 648, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 649, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 8 },
+};
+
+OMENUITEM MemcardCharacterMenu[4] = { /* @0x800CCFA0 */
+    { 0, 901, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 648, (TXT_JUST)1, 0, 0, 15 },
+    { 5, 649, (TXT_JUST)1, 0, 0, 16 },
+    { 20, 1274, (TXT_JUST)1, 0, 0, 8 },
+};
+
+OMENUITEM MemcardSelectCard1[8] = { /* @0x800CD000 */
+    { 0, 952, (TXT_JUST)1, 0, 0, -2 },
+    { 2, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 4, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 6, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 7, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 14 },
+};
+
+OMENUITEM MemcardSelectCard2[8] = { /* @0x800CD0C0 */
+    { 0, 952, (TXT_JUST)1, 0, 0, -2 },
+    { 2, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 4, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 6, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 7, 87, (TXT_JUST)1, 0, 0, -2 },
+    { 8, 1274, (TXT_JUST)1, 0, 0, 14 },
+};
+
+OMENUITEM MemcardFormatMenu[4] = { /* @0x800CD180 */
+    { 1, 654, (TXT_JUST)1, 0, 0, -2 },
+    { 5, 1255, (TXT_JUST)1, 0, 0, -2 },
+    { 6, 713, (TXT_JUST)1, 0, 0, -2 },
+    { 7, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENUITEM SaveConfirmMenu[4] = { /* @0x800CD1E0 */
+    { 1, 765, (TXT_JUST)1, 0, 0, -2 },
+    { 3, 1255, (TXT_JUST)1, 0, 0, -2 },
+    { 4, 713, (TXT_JUST)1, 0, 0, 2 },
+    { 5, 1274, (TXT_JUST)1, 0, 0, 2 },
+};
+
+OMENULIST MenuList[20] = { /* @0x800CD240 */
+    { 320, 162, 7, MainMenu },
+    { 240, 168, 12, GameMenu },
+    { 220, 92, 7, SoundMenu },
+    { 160, 156, 6, LangMenu },
+    { 0, 0, 3, CentreMenu },
+    { 140, 50, 4, QuitMenu },
+    { 140, 50, 4, AreYouSureMenu },
+    { 240, 134, 7, MemcardMenu },
+    { 200, 48, 3, GameOverMenu },
+    { 256, 156, 4, MemcardLoadGameOverMenu },
+    { 140, 48, 4, GameSpeedMenu },
+    { 256, 156, 4, MemcardLoadGameMenu },
+    { 256, 156, 4, MemcardSaveGameMenu },
+    { 256, 150, 4, MemcardCharacterMenu },
+    { 256, 148, 8, MemcardSelectCard1 },
+    { 256, 148, 8, MemcardSelectCard2 },
+    { 160, 150, 4, MemcardFormatMenu },
+    { 256, 150, 4, MemcardSaveOptionsMenu },
+    { 256, 150, 4, MemcardLoadOptionsMenu },
+    { 150, 74, 4, SaveConfirmMenu },
+};
+
+short Circle[64] = { /* @0x800CD2E0 */
+    0, 25, 49, 74, 97, 120, 142, 162, 181, 197, 212, 225, 236, 244, 251, 254,
+    255, 254, 251, 244, 236, 225, 212, 197, 181, 162, 142, 120, 97, 74, 49, 25,
+    0, -25, -49, -74, -97, -120, -142, -162, -181, -197, -212, -225, -236, -244, -251, -254,
+    -255, -254, -251, -244, -236, -225, -212, -197, -181, -162, -142, -120, -97, -74, -49, -25,
+};
+
+static unsigned short KeyTab[10] = { /* @0x800CD360 */
+    1, 128, 1, 64, 128, 4, 1, 512, 128, 0
+};
+
 /* ---------------------------------------------------------------- large dialog/pad functions ---- */
 
 void PrintSelectBack(unsigned short Str)

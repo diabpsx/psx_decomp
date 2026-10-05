@@ -29,6 +29,25 @@
 #include "source/gen/protos_missiles.h"
 #include "source/diablo.h"
 
+/* Retail MISSILES.DATA, in source-owned declaration order. */
+int XDirAdd[8] = { 1, 0, -1, -1, -1, 0, 1, 1 }; /* @0x801029D8 */
+int YDirAdd[8] = { 1, 1, 1, 0, -1, -1, -1, 0 }; /* @0x801029F8 */
+unsigned char ValueTable[16] = { /* @0x80102A18 */
+    1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 14, 15, 16, 17, 19, 20
+};
+unsigned char StringTable[6][9] = { /* @0x80102A28 */
+    { 15, 14, 3, 0, 0, 0, 0, 0, 0 },
+    { 13, 11, 0, 0, 0, 0, 0, 0, 0 },
+    { 9, 4, 0, 0, 0, 0, 0, 0, 0 },
+    { 0, 1, 0, 0, 0, 0, 0, 0, 0 },
+    { 15, 8, 8, 8, 0, 0, 0, 0, 0 },
+    { 16, 16, 16, 16, 16, 16, 16, 16, 8 }
+};
+short missileactive[125] = { 0 }; /* @0x80102A60 */
+short missileavail[125] = { 0 }; /* @0x80102B5C */
+MissileStruct missile[125] = { { 0 } }; /* @0x80102C58 */
+char dMissArray[32][4] = { { 0 } }; /* @0x80105174 */
+
 #define MAXMISSILES 125
 #define MAXDUNX 96
 #define MAXDUNY 96

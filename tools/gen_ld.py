@@ -122,10 +122,11 @@ def gen(name: str):
     extra_text = {row['segment'] for spec in NATIVE_RECON.values()
                   for section, row in spec['sections'].items()
                   if section.startswith('.text.') and row.get('image', spec['image']) == name}
-    native_data = {row["scaffold"] for spec in NATIVE_RECON.values()
+    native_data = {scaffold for spec in NATIVE_RECON.values()
                    for section, row in spec["sections"].items()
                    if section != ".text" and not is_native_zero_section(section) and not section.startswith('.text.')
-                   and row.get("image", spec["image"]) == name and row.get('scaffold')}
+                   and row.get("image", spec["image"]) == name and row.get('scaffold')
+                   for scaffold in (row['scaffold'] if isinstance(row['scaffold'], list) else [row['scaffold']])}
     archive_data = {scaffold: row for spec in NATIVE_ARCHIVES.values()
                     if spec.get("image") == name
                     for scaffold, row in spec.get("sections", {}).items()}

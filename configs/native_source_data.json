@@ -4,8 +4,14 @@
     "image": "diabpsx",
     "assembler": "2.56",
     "sections": {
-      ".data": {"va": "0x800B7044", "size": 64},
-      ".sdata": {"va": "0x8011C528", "size": 180}
+      ".data": {
+        "va": "0x800B7044",
+        "size": 64
+      },
+      ".sdata": {
+        "va": "0x8011C528",
+        "size": 180
+      }
     }
   },
   "callback": {
@@ -13,7 +19,194 @@
     "image": "diabpsx",
     "assembler": "2.56",
     "sections": {
-      ".sdata": {"va": "0x8011C498", "size": 4}
+      ".sdata": {
+        "va": "0x8011C498",
+        "size": 4
+      }
     }
+  },
+  "monstdat": {
+    "source": "recon/source/monstdat.cpp",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".data": {
+        "va": "0x8010A57C",
+        "size": 10892
+      }
+    },
+    "data_symbols": [
+      "TransPals",
+      "UniqTransPals",
+      "StonePals",
+      "monsterdata",
+      "MonstConvTbl",
+      "MonstAvailTbl",
+      "UniqMonst"
+    ]
+  },
+  "objdat": {
+    "source": "recon/source/objdat.cpp",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".data": {
+        "va": "0x800D82EC",
+        "size": 2234
+      },
+      ".rdata": {
+        "va": "0x801169E0",
+        "size": 240
+      }
+    },
+    "data_symbols": [
+      "ObjTypeConv",
+      "AllObjects",
+      "ObjMasterLoadList"
+    ]
+  },
+  "spelldat": {
+    "source": "recon/source/spelldat.cpp",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".data": {
+        "va": "0x800DDB80",
+        "size": 1924
+      },
+      ".rdata": {
+        "va": "0x80117928",
+        "size": 14
+      }
+    },
+    "data_symbols": [
+      "spelldata"
+    ]
+  },
+  "textdat": {
+    "source": "recon/source/textdat.cpp",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".rdata": {
+        "va": "0x80117C10",
+        "size": 3244
+      }
+    },
+    "data_symbols": [
+      "alltext"
+    ]
+  },
+  "monstlst": {
+    "source": "recon/psxsrc/monstlst.cpp",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "sections": {
+      ".data": {
+        "va": "0x800B7088",
+        "size": 1360
+      },
+      ".sdata": {
+        "va": "0x8011A780",
+        "size": 792
+      }
+    },
+    "data_symbols": [
+      "AllLevels",
+      "NumOfMonsterListLevels",
+      "NumsLEV1M1A",
+      "NumsLEV1M1B",
+      "NumsLEV1M1C",
+      "NumsLEV2M2A",
+      "NumsLEV2M2B",
+      "NumsLEV2M2C",
+      "NumsLEV2M2D",
+      "NumsLEV2M2QA",
+      "NumsLEV2M2QB",
+      "NumsLEV3M3A",
+      "NumsLEV3M3B",
+      "NumsLEV3M3C",
+      "NumsLEV3M3QA",
+      "NumsLEV4M4A",
+      "NumsLEV4M4B",
+      "NumsLEV4M4C",
+      "NumsLEV4M4D",
+      "NumsLEV4M4QA",
+      "NumsLEV4M4QB",
+      "NumsLEV4M4QC",
+      "NumsLEV5M5A",
+      "NumsLEV5M5B",
+      "NumsLEV5M5C",
+      "NumsLEV5M5D",
+      "NumsLEV5M5E",
+      "NumsLEV5M5F",
+      "NumsLEV5M5QA",
+      "NumsLEV6M6A",
+      "NumsLEV6M6B",
+      "NumsLEV6M6C",
+      "NumsLEV6M6D",
+      "NumsLEV6M6E",
+      "NumsLEV6M6QA",
+      "NumsLEV7M7A",
+      "NumsLEV7M7B",
+      "NumsLEV7M7C",
+      "NumsLEV7M7D",
+      "NumsLEV7M7E",
+      "NumsLEV8M8A",
+      "NumsLEV8M8B",
+      "NumsLEV8M8C",
+      "NumsLEV8M8D",
+      "NumsLEV8M8QA",
+      "NumsLEV9M9A",
+      "NumsLEV9M9B",
+      "NumsLEV9M9C",
+      "NumsLEV9M9D",
+      "NumsLEV10M10A",
+      "NumsLEV10M10B",
+      "NumsLEV10M10C",
+      "NumsLEV10M10D",
+      "NumsLEV10M10QA",
+      "NumsLEV11M11A",
+      "NumsLEV11M11B",
+      "NumsLEV11M11C",
+      "NumsLEV11M11D",
+      "NumsLEV11M11E",
+      "NumsLEV12M12A",
+      "NumsLEV12M12B",
+      "NumsLEV12M12C",
+      "NumsLEV12M12D",
+      "NumsLEV13M13A",
+      "NumsLEV13M13B",
+      "NumsLEV13M13C",
+      "NumsLEV13M13D",
+      "NumsLEV13M13QB",
+      "NumsLEV14M14A",
+      "NumsLEV14M14B",
+      "NumsLEV14M14C",
+      "NumsLEV14M14D",
+      "NumsLEV14M14E",
+      "NumsLEV14M14QB",
+      "NumsLEV15M15A",
+      "NumsLEV15M15B",
+      "NumsLEV15M15C",
+      "NumsLEV15M15QA",
+      "NumsLEV16M16D",
+      "ChoiceListLEV1",
+      "ChoiceListLEV2",
+      "ChoiceListLEV3",
+      "ChoiceListLEV4",
+      "ChoiceListLEV5",
+      "ChoiceListLEV6",
+      "ChoiceListLEV7",
+      "ChoiceListLEV8",
+      "ChoiceListLEV9",
+      "ChoiceListLEV10",
+      "ChoiceListLEV11",
+      "ChoiceListLEV12",
+      "ChoiceListLEV13",
+      "ChoiceListLEV14",
+      "ChoiceListLEV15",
+      "ChoiceListLEV16"
+    ]
   }
 }

@@ -4,7 +4,6 @@ extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
 extern struct ObjDataStruct AllObjects[99];   /* @0x800D84B0 */
 extern int ObjTypeConv[113];   /* @0x800D82EC */
-extern unsigned short StoryText[3][3];   /* @0x800E40B0 */
 extern char ObjFileList[40];   /* @0x800DA320 */
 extern char shrineavail[26];   /* @0x800D8C1C */
 extern int bxadd[8];   /* @0x800D8BA8 */

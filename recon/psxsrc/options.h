@@ -78,7 +78,6 @@ public:
 };
 TextDat * GM_UseTexData(int idx);   /* @0x80093C10 */
 void GM_FinishedUsing(TextDat *td);   /* @0x80093D80 */
-extern short Circle[64];   /* @0x800CD2E0 -- sin/cos lookup table, another module */
 extern "C" unsigned long GU_GetRnd(void);   /* @0x80020CF4 */
 unsigned long VID_GetTick(void);   /* @0x800840F8 VID.CPP */
 
@@ -270,13 +269,11 @@ extern BOOL MemCardActive;
 extern BOOL MemcardOverlay;
 extern unsigned char ctrlflag;
 extern unsigned char sbookflag;
-extern OMENULIST MenuList[20];
 extern unsigned char GOLDR, GOLDG, GOLDB;
 extern unsigned char BLUER, BLUEG, BLUEB;
 extern unsigned char REDR, REDG, REDB;
 extern CFont LargeFont;
 extern unsigned long *ThisOt;
-extern OMENUITEM SoundMenu[7];
 int GetSpinnerWidth(int idx);   /* @0x8015B37C -- another module */
 BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag);   /* @0x8009BBA0 GLUE.CPP */
 BOOL GLUE_SetShowPanelFlag(BOOL NewFlag);   /* @0x8009BBB0 GLUE.CPP */
@@ -333,7 +330,6 @@ extern int card_side_nogame[2];
 extern int card_side_noopt[2];
 
 /* SoundPad additions */
-extern unsigned short KeyTab[10];   /* @0x800CD360 -- keyboard-remap mask table, another module */
 extern int they_pressed;
 extern unsigned char Qfromoptions;
 extern BOOL DiabloDieFlag;

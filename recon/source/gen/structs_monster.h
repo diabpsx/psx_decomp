@@ -2,10 +2,11 @@ struct CMonster;
 
 struct MonsterData;
 
-struct TextDataStruct {   /* PSX layout: 12 bytes (no txtspd field -- speed is computed by CalcTextSpeed) */
-    char *txtstr;
-    unsigned char scrlltxt;
-    int sfxnr;
+struct TextDataStruct {   /* retail SYM: sizeof 12 */
+    int txtstr;   /* +0x0 */
+    unsigned char scrlltxt;   /* +0x4 */
+    unsigned char txtspd;   /* +0x5 */
+    int sfxnr;   /* +0x8 */
 };
 
 struct MonsterStruct {   /* sizeof 104 */

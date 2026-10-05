@@ -673,6 +673,11 @@
         "va": "0x8011B228",
         "size": 108,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".data": {
+        "va": "0x800CC868",
+        "size": 2828,
+        "scaffold": "data_options.data"
       }
     },
     "data_symbols": [
@@ -713,7 +718,30 @@
       "Adjust",
       "allspellsflag",
       "OptionsSeed",
-      "VideoVol"
+      "VideoVol",
+      "MainMenu",
+      "GameMenu",
+      "GameSpeedMenu",
+      "GameOverMenu",
+      "MemcardLoadGameOverMenu",
+      "SoundMenu",
+      "CentreMenu",
+      "LangMenu",
+      "QuitMenu",
+      "AreYouSureMenu",
+      "MemcardMenu",
+      "MemcardLoadGameMenu",
+      "MemcardSaveGameMenu",
+      "MemcardSaveOptionsMenu",
+      "MemcardLoadOptionsMenu",
+      "MemcardCharacterMenu",
+      "MemcardSelectCard1",
+      "MemcardSelectCard2",
+      "MemcardFormatMenu",
+      "SaveConfirmMenu",
+      "MenuList",
+      "Circle",
+      "KeyTab"
     ],
     "data_record_addresses": {
       "Adjust": "0x8011C700"
@@ -724,9 +752,7 @@
     "scaffold_bindings": {
       "D_8011B3D8": "sdata_after_primpool.sdata"
     },
-    "retail_data_bindings": [
-      "KeyTab"
-    ],
+    "retail_data_bindings": [],
     "externals": [
       "ActivateCharacterMemcard__Fii",
       "ActivateMemcard__Fii",
@@ -741,7 +767,6 @@
       "BORDERR",
       "Back__6Dialogiiii",
       "CDWAIT",
-      "Circle",
       "CountdownLoad__Fi",
       "CountdownSave__Fi",
       "DBG_Error",
@@ -793,7 +818,6 @@
       "MemCardActive",
       "MemcardOFF__Fv",
       "MemcardOverlay",
-      "MenuList",
       "OVR_LoadGame__Fv",
       "PAD_GetPad__FiUc",
       "PSX_CH_SaveGame__Fii",
@@ -818,7 +842,6 @@
       "ShowCharacterFiles__FiiG4RECTi",
       "ShowGameFiles__FPciiG4RECTi",
       "ShowLoadingBox__Fi",
-      "SoundMenu",
       "StartQuestlog__Fv",
       "StatusTxt",
       "TSK_AddTask",
@@ -1934,8 +1957,8 @@
         "size": 5052
       },
       ".rdata": {
-        "va": "0x8011087C",
-        "size": 40,
+        "va": "0x80110844",
+        "size": 96,
         "scaffold": "rodata_gpanel.rodata"
       },
       ".data": {
@@ -1956,9 +1979,6 @@
       "DefP2PanelXY",
       "DefP2PanelXY2"
     ],
-    "scaffold_bindings": {
-      "D_80110868": "rodata_gpanel.rodata"
-    },
     "externals": [
       "PrintFt4__7TextDatiiiiii",
       "GLUE_Finished__Fv",
@@ -2167,15 +2187,6 @@
     "image": "diabpsx",
     "routed_only": true,
     "sections": {
-      ".text.startup_mem": {
-        "va": "0x800B04D0",
-        "size": 204,
-        "segment": "startup",
-        "functions": [
-          "MEM_SetupMem__Fv",
-          "SetupWorkRam__Fv"
-        ]
-      },
       ".text.startup_pads": {
         "va": "0x800B071C",
         "size": 68,
@@ -2191,66 +2202,17 @@
         "functions": [
           "GM_Open__Fv"
         ]
-      },
-      ".sdata": {
-        "va": "0x8011AAD8",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
       }
     },
-    "data_symbols": [
-      "Gaz"
-    ],
-    "retail_data_bindings": [
-      "PsxMem",
-      "PsxFastMem"
-    ],
+    "data_symbols": [],
+    "retail_data_bindings": [],
     "externals": [
-      "OPT_FreeMemStart",
-      "GAL_SetVerbosity",
-      "OPT_LinkerOpts",
       "InitTAP",
-      "memset",
-      "OPT_FreeMemSize",
       "AllDats",
       "PadInit",
       "RawPadData0",
       "RawPadData1",
-      "StartTAP",
-      "GAL_AddMemType"
-    ]
-  },
-  "startup_1": {
-    "source": "recon/source/startup_1.cpp",
-    "image": "diabpsx",
-    "sections": {
-      ".text": {
-        "va": "0x800B0A18",
-        "size": 640
-      },
-      ".rdata": {
-        "va": "0x80119464",
-        "size": 43,
-        "scaffold": "rodata_version_suffix.rodata"
-      },
-      ".sdata": {
-        "va": "0x8011BE14",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      }
-    },
-    "data_symbols": [
-      "Year",
-      "Day"
-    ],
-    "externals": [
-      "Words",
-      "CharPair2Num__FPc",
-      "DBG_Error",
-      "strupr__FPc",
-      "strcmp",
-      "strcpy",
-      "MonDays"
+      "StartTAP"
     ]
   },
   "preauto": {
@@ -3719,6 +3681,13 @@
         "size": 19,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".data": {
+        "va": "0x801051F4",
+        "size": 21384,
+        "scaffold": "data_monster.data",
+        "image": "diabpsx",
+        "allow_zero_tail": 448
       }
     },
     "common_symbols": {
@@ -3735,7 +3704,13 @@
     },
     "data_symbols": [
       "nummonsters",
-      "nummtypes"
+      "nummtypes",
+      "MWVel",
+      "AiProc",
+      "monster",
+      "monstactive",
+      "monstkills",
+      "Monsters"
     ],
     "externals": [
       "AddDead__Fiici",
@@ -3744,7 +3719,6 @@
       "AddMonster__FiiiiUc",
       "AddPanelString__FPCci",
       "AddPlrMonstExper__Filc",
-      "AiProc",
       "ChangeLightOff__Fiii",
       "ChangeLightXY__Fiii",
       "CheckArea__FiiiUci",
@@ -3767,7 +3741,6 @@
       "IsDplayer__Fii",
       "IsSkel__Fi",
       "LightList",
-      "MWVel",
       "M_CheckEFlag__Fi",
       "M_ClearSquares__Fi",
       "M_Enemy__Fi",
@@ -3776,7 +3749,6 @@
       "M_UpdateLeader__Fi",
       "MonstCheckDoors__Fi",
       "MonstPartJump__Fi",
-      "Monsters",
       "NetSendCmdGolem__FUcUcUcUclUc",
       "NetSendCmdLocParam1__FUcUcUcUcUs",
       "NetSendCmdParam2__FUcUcUsUs",
@@ -3830,10 +3802,7 @@
       "gnDifficulty",
       "missile",
       "missileactive",
-      "monstactive",
-      "monster",
       "monsterdata",
-      "monstkills",
       "music_stop__Fv",
       "myplr",
       "nummissiles",
@@ -3876,6 +3845,13 @@
         "size": 45,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".data": {
+        "va": "0x801029D8",
+        "size": 10268,
+        "scaffold": "data_missiles.data",
+        "image": "diabpsx",
+        "allow_zero_tail": 128
       }
     },
     "common_symbols": {
@@ -3922,7 +3898,15 @@
       "fadetob",
       "fadetog",
       "fadetor",
-      "nummissiles"
+      "nummissiles",
+      "XDirAdd",
+      "YDirAdd",
+      "ValueTable",
+      "StringTable",
+      "missileactive",
+      "missileavail",
+      "missile",
+      "dMissArray"
     ],
     "externals": [
       "AddDead__Fiici",
@@ -3975,19 +3959,14 @@
       "StartPlrBlock__Fii",
       "StartPlrHit__FiiUc",
       "StartPlrKill__Fii",
-      "StringTable",
       "TransList",
       "UseMana__Fii",
-      "ValueTable",
       "ViewX",
       "ViewY",
       "WorldToOffset__Fiii",
-      "XDirAdd",
-      "YDirAdd",
       "__divdi3",
       "abs",
       "currlevel",
-      "dMissArray",
       "drawhpflag",
       "drawmanaflag",
       "dung_map",
@@ -3997,9 +3976,6 @@
       "leveltype",
       "light_fix__Fi",
       "misfiledata",
-      "missile",
-      "missileactive",
-      "missileavail",
       "missiledata",
       "monster",
       "myplr",
@@ -4153,18 +4129,47 @@
         "scaffold": "data_version.data"
       },
       ".rdata": {
-        "va": "0x8011944C",
-        "size": 24,
-        "scaffold": "rodata_version_source.rodata"
+        "va": "0x80118E90",
+        "size": 1536,
+        "scaffold": [
+          "rodata_version_prefix.rodata",
+          "rodata_version_source.rodata",
+          "rodata_version_suffix.rodata"
+        ]
+      },
+      ".rdata.version_startup": {
+        "va": "0x800B07E0",
+        "size": 568,
+        "scaffold": "startup_rodata_800b07e0.rodata"
+      },
+      ".text.version_startup": {
+        "va": "0x800B0A18",
+        "size": 640,
+        "segment": "startup_1",
+        "functions": [
+          "GetVersionString__FPc",
+          "GetWord__FPc"
+        ]
+      },
+      ".sdata": {
+        "va": "0x8011BCD4",
+        "size": 328,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
-      "MyVerString"
+      "MyVerString",
+      "Words",
+      "MonDays",
+      "Year",
+      "Day"
     ],
     "externals": [
-      "GetVersionString__FPc",
-      "GetWord__FPc",
-      "sprintf"
+      "DBG_Error",
+      "sprintf",
+      "strcmp",
+      "strcpy",
+      "strupr__FPc"
     ]
   },
   "coreauto": {
@@ -4418,14 +4423,22 @@
         "va": "0x800D1B40",
         "size": 157,
         "scaffold": "data_itemdat.data"
+      },
+      ".rdata": {
+        "va": "0x801113A4",
+        "size": 19868,
+        "scaffold": "rodata_itemdat.rodata",
+        "allow_zero_tail": 4
       }
     },
     "data_symbols": [
-      "AllItemsUseable"
+      "AllItemsUseable",
+      "AllItemsList",
+      "PL_Prefix",
+      "PL_Suffix",
+      "UniqueItemList"
     ],
-    "externals": [
-      "AllItemsList"
-    ]
+    "externals": []
   },
   "misdat": {
     "source": "recon/source/misdat.cpp",
@@ -4434,10 +4447,141 @@
       ".text": {
         "va": "0x8004EA8C",
         "size": 16
+      },
+      ".rdata": {
+        "va": "0x80116798",
+        "size": 14,
+        "scaffold": "rodata_misdat.rodata"
+      },
+      ".data": {
+        "va": "0x800D67F0",
+        "size": 2139,
+        "scaffold": "data_misdat.data"
       }
     },
-    "data_symbols": [],
-    "externals": []
+    "data_symbols": [
+      "missiledata",
+      "MissPrintRoutines",
+      "misfiledata"
+    ],
+    "externals": [
+      "AddAcid__Fiiiiiicii",
+      "AddAcidpud__Fiiiiiicii",
+      "AddApoca__Fiiiiiicii",
+      "AddArrow__Fiiiiiicii",
+      "AddBoneSpirit__Fiiiiiicii",
+      "AddBoom__Fiiiiiicii",
+      "AddCbolt__Fiiiiiicii",
+      "AddChain__Fiiiiiicii",
+      "AddDiabApoca__Fiiiiiicii",
+      "AddDisarm__Fiiiiiicii",
+      "AddElement__Fiiiiiicii",
+      "AddFireball__Fiiiiiicii",
+      "AddFirebolt__Fiiiiiicii",
+      "AddFiremove__Fiiiiiicii",
+      "AddFirewallC__Fiiiiiicii",
+      "AddFirewall__Fiiiiiicii",
+      "AddFlame__Fiiiiiicii",
+      "AddFlamec__Fiiiiiicii",
+      "AddFlare__Fiiiiiicii",
+      "AddFlash2__Fiiiiiicii",
+      "AddFlash__Fiiiiiicii",
+      "AddGolem__Fiiiiiicii",
+      "AddGuardian__Fiiiiiicii",
+      "AddHbolt__Fiiiiiicii",
+      "AddHealOther__Fiiiiiicii",
+      "AddHeal__Fiiiiiicii",
+      "AddIdentify__Fiiiiiicii",
+      "AddInfra__Fiiiiiicii",
+      "AddLArrow__Fiiiiiicii",
+      "AddLightball__Fiiiiiicii",
+      "AddLightctrl__Fiiiiiicii",
+      "AddLightning__Fiiiiiicii",
+      "AddMagmaball__Fiiiiiicii",
+      "AddManashield__Fiiiiiicii",
+      "AddMisexp__Fiiiiiicii",
+      "AddNova__Fiiiiiicii",
+      "AddRecharge__Fiiiiiicii",
+      "AddRepair__Fiiiiiicii",
+      "AddResurrectBeam__Fiiiiiicii",
+      "AddResurrect__Fiiiiiicii",
+      "AddRhino__Fiiiiiicii",
+      "AddRndTeleport__Fiiiiiicii",
+      "AddRportal__Fiiiiiicii",
+      "AddStone__Fiiiiiicii",
+      "AddTelekinesis__Fiiiiiicii",
+      "AddTeleport__Fiiiiiicii",
+      "AddTown__Fiiiiiicii",
+      "AddWave__Fiiiiiicii",
+      "AddWeapexp__Fiiiiiicii",
+      "FuncACIDPUD__FP13MissileStructiii",
+      "FuncACIDSPLAT__FP13MissileStructiii",
+      "FuncACID__FP13MissileStructiii",
+      "FuncARROW__FP13MissileStructiii",
+      "FuncBONESPIRIT__FP13MissileStructiii",
+      "FuncBOOM__FP13MissileStructiii",
+      "FuncCBOLT__FP13MissileStructiii",
+      "FuncELEMENT__FP13MissileStructiii",
+      "FuncFARROW__FP13MissileStructiii",
+      "FuncFIREBOLT__FP13MissileStructiii",
+      "FuncFIREMOVE__FP13MissileStructiii",
+      "FuncFIREWALL__FP13MissileStructiii",
+      "FuncFLAME__FP13MissileStructiii",
+      "FuncFLAREXP__FP13MissileStructiii",
+      "FuncFLARE__FP13MissileStructiii",
+      "FuncFLASH2__FP13MissileStructiii",
+      "FuncFLASH__FP13MissileStructiii",
+      "FuncGUARDIAN__FP13MissileStructiii",
+      "FuncHBOLT__FP13MissileStructiii",
+      "FuncLARROW__FP13MissileStructiii",
+      "FuncLIGHTNING__FP13MissileStructiii",
+      "FuncMAGMABALL__FP13MissileStructiii",
+      "FuncMANASHIELD__FP13MissileStructiii",
+      "FuncMISEXP__FP13MissileStructiii",
+      "FuncRESURRECTBEAM__FP13MissileStructiii",
+      "FuncRHINO__FP13MissileStructiii",
+      "FuncRPORTAL__FP13MissileStructiii",
+      "FuncTOWN__FP13MissileStructiii",
+      "FuncWEAPEXP__FP13MissileStructiii",
+      "MI_Acidpud__Fi",
+      "MI_Acidsplat__Fi",
+      "MI_Apoca__Fi",
+      "MI_Arrow__Fi",
+      "MI_Bonespirit__Fi",
+      "MI_Boom__Fi",
+      "MI_Cbolt__Fi",
+      "MI_Chain__Fi",
+      "MI_Dummy__Fi",
+      "MI_Element__Fi",
+      "MI_Fireball__Fi",
+      "MI_Firebolt__Fi",
+      "MI_Firemove__Fi",
+      "MI_FirewallC__Fi",
+      "MI_Firewall__Fi",
+      "MI_Flame__Fi",
+      "MI_Flamec__Fi",
+      "MI_Flash2__Fi",
+      "MI_Flash__Fi",
+      "MI_Golem__Fi",
+      "MI_Guardian__Fi",
+      "MI_Hbolt__Fi",
+      "MI_Infra__Fi",
+      "MI_LArrow__Fi",
+      "MI_Lightball__Fi",
+      "MI_Lightctrl__Fi",
+      "MI_Lightning__Fi",
+      "MI_Misexp__Fi",
+      "MI_Nova__Fi",
+      "MI_ResurrectBeam__Fi",
+      "MI_Rhino__Fi",
+      "MI_Rportal__Fi",
+      "MI_SetManashield__Fi",
+      "MI_Stone__Fi",
+      "MI_Teleport__Fi",
+      "MI_Town__Fi",
+      "MI_Wave__Fi",
+      "MI_Weapexp__Fi"
+    ]
   },
   "premsg": {
     "source": "recon/source/premsg.cpp",
@@ -4765,14 +4909,35 @@
         "va": "0x8010FFF0",
         "size": 21,
         "scaffold": "rodata_mem.rodata"
+      },
+      ".text.startup_mem": {
+        "va": "0x800B04D0",
+        "size": 204,
+        "segment": "startup",
+        "functions": [
+          "MEM_SetupMem__Fv",
+          "SetupWorkRam__Fv"
+        ]
+      },
+      ".sdata": {
+        "va": "0x8011AAD8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
       "PsxMem",
-      "PsxFastMem"
+      "PsxFastMem",
+      "Gaz"
     ],
     "externals": [
-      "memmove"
+      "GAL_AddMemType",
+      "GAL_SetVerbosity",
+      "OPT_FreeMemSize",
+      "OPT_FreeMemStart",
+      "OPT_LinkerOpts",
+      "memmove",
+      "memset"
     ]
   },
   "lznp": {
@@ -8439,9 +8604,17 @@
         "va": "0x801197AC",
         "size": 484,
         "scaffold": "rodata_preobj.rodata"
+      },
+      ".data": {
+        "va": "0x800E40B0",
+        "size": 18,
+        "scaffold": "data_preobj.data",
+        "image": "diabpsx"
       }
     },
-    "data_symbols": [],
+    "data_symbols": [
+      "StoryText"
+    ],
     "externals": [
       "AddLight__Fiii",
       "AddObject__Fiii",
@@ -8466,7 +8639,6 @@
       "SetObjMapRange__Fiiiiii",
       "SetRndSeed__Fl",
       "SkipThemeRoom__Fii",
-      "StoryText",
       "ViewX",
       "ViewY",
       "armorFlag",
@@ -8573,13 +8745,28 @@
         "va": "0x8011B9C0",
         "size": 17,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".data": {
+        "va": "0x800D8BA8",
+        "size": 6048,
+        "scaffold": "data_objects.data",
+        "allow_zero_tail": 40
       }
     },
     "data_symbols": [
       "numobjfiles",
       "myscale",
       "numobjects",
-      "InitObjFlag"
+      "InitObjFlag",
+      "bxadd",
+      "byadd",
+      "shrinestrs",
+      "shrineavail",
+      "StoryBookName",
+      "object",
+      "objectactive",
+      "objectavail",
+      "ObjFileList"
     ],
     "externals": [
       "AddLight__Fiii",
@@ -8639,7 +8826,6 @@
       "NetSendCmdParam2__FUcUcUsUs",
       "NetSendCmdQuest__FUcUc",
       "NewCursor__Fi",
-      "ObjFileList",
       "ObjTypeConv",
       "PauseMode",
       "PlaySFX__Fi",
@@ -8665,7 +8851,6 @@
       "StartPlrKill__Fii",
       "StartStand__Fii",
       "StorePlrNo",
-      "StoryBookName",
       "TransVal",
       "UniqMonst",
       "_golditem",
@@ -8698,9 +8883,6 @@
       "numitems",
       "nummonsters",
       "numthemes",
-      "object",
-      "objectactive",
-      "objectavail",
       "pdungeon",
       "plr",
       "qtextflag",
@@ -8711,8 +8893,6 @@
       "setpc_w",
       "setpc_x",
       "setpc_y",
-      "shrineavail",
-      "shrinestrs",
       "sprintf",
       "strcpy",
       "tempstr",
@@ -11881,31 +12061,6 @@
         "size": 728,
         "scaffold": "rodata_stores.rodata"
       },
-      ".data.stores_back": {
-        "va": "0x800DE304",
-        "size": 16,
-        "scaffold": "data_stores.data"
-      },
-      ".data.stores_strings": {
-        "va": "0x800DE314",
-        "size": 240,
-        "scaffold": "data_stores.data"
-      },
-      ".data.stores_talk": {
-        "va": "0x800DE404",
-        "size": 36,
-        "scaffold": "data_stores.data"
-      },
-      ".data.stores_hold": {
-        "va": "0x800E1D88",
-        "size": 5184,
-        "scaffold": "data_stores.data"
-      },
-      ".data.stores_hidx": {
-        "va": "0x800E31C8",
-        "size": 48,
-        "scaffold": "data_stores.data"
-      },
       ".bss": {
         "va": "0x8012EE48",
         "size": 3360
@@ -11982,39 +12137,15 @@
         "va": "0x8011BAB0",
         "size": 3,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".data": {
+        "va": "0x800DE304",
+        "size": 20212,
+        "scaffold": "data_stores.data",
+        "allow_zero_tail": 48
       }
     },
     "post_assemble_section_split": [
-      {
-        "section": ".data",
-        "pieces": [
-          {
-            "name": ".data.stores_strings",
-            "offset": 0,
-            "size": 240
-          },
-          {
-            "name": ".data.stores_talk",
-            "offset": 240,
-            "size": 36
-          },
-          {
-            "name": ".data.stores_back",
-            "offset": 276,
-            "size": 16
-          },
-          {
-            "name": ".data.stores_hold",
-            "offset": 292,
-            "size": 5184
-          },
-          {
-            "name": ".data.stores_hidx",
-            "offset": 5476,
-            "size": 48
-          }
-        ]
-      },
       {
         "section": ".sdata",
         "pieces": [
@@ -12196,7 +12327,13 @@
       "storenumh",
       "talker",
       "talkname",
-      "tile"
+      "tile",
+      "_smithitem",
+      "_premiumitem",
+      "_witchitem",
+      "_boyitem",
+      "_healitem",
+      "_golditem"
     ],
     "externals": [
       "AP2x2Tbl",
@@ -12270,13 +12407,7 @@
       "_NoWitchItems",
       "_WitchIdxOfs",
       "__builtin_delete",
-      "_boyitem",
-      "_golditem",
-      "_healitem",
       "_numpremium",
-      "_premiumitem",
-      "_smithitem",
-      "_witchitem",
       "chrflag",
       "cursH",
       "cursW",

@@ -371,7 +371,13 @@ def data_bridge(source, regions):
         if address:
             labels.append((match, int(address[1], 16)))
     replacements, used = [], set()
-    for va, size, filename in regions:
+    for region in regions:
+        if len(region) not in (3, 4):
+            raise ValueError("invalid SDK data region shape")
+        va, size, filename = region[:3]
+        payload_offset = region[3] if len(region) == 4 else 0
+        if type(payload_offset) is not int or payload_offset < 0:
+            raise ValueError("invalid SDK data payload offset")
         if size <= 0:
             raise ValueError("SDK data region must have a positive extent")
         selected = [(i, match, address) for i, (match, address) in enumerate(labels)
@@ -400,7 +406,7 @@ def data_bridge(source, regions):
                 if end <= address:
                     raise ValueError("unordered SDK data labels")
                 replacements.append((match.start(2), match.end(2),
-                                     f'    .incbin "{filename}", {address - va}, {end - address}\n'))
+                                     f'    .incbin "{filename}", {payload_offset + address - va}, {end - address}\n'))
                 cursor = end
             if cursor < va + size:
                 partial.append((cursor, va + size))
@@ -434,7 +440,7 @@ def data_bridge(source, regions):
                         suffix = '\n    .byte '+','.join(f'0x{v:02X}' for v in original[used_width:])
                     position += used_width
                     replacements.append((match.start(), match.end(),
-                                         f'    .incbin "{filename}", {address - va}, {used_width}'+suffix))
+                                         f'    .incbin "{filename}", {payload_offset + address - va}, {used_width}'+suffix))
                 if position != limit:
                     raise ValueError("data boundaries need contiguous explicit scalar rows")
             continue
@@ -443,7 +449,7 @@ def data_bridge(source, regions):
             if match.start() in used or end <= address or end > va + size:
                 raise ValueError("overlapping or unordered SDK data placement")
             used.add(match.start())
-            body = f'    .incbin "{filename}", {address - va}, {end - address}\n'
+            body = f'    .incbin "{filename}", {payload_offset + address - va}, {end - address}\n'
             replacements.append((match.start(2), match.end(2), body))
     ordered = sorted(replacements)
     if any(end > next_start for (start, end, body), (next_start, next_end, next_body) in zip(ordered, ordered[1:])):

@@ -6,155 +6,157 @@ candidate ownership; they do not establish initializer values or individual exte
 Shared pools without object bounds remain unassigned. Multiple enclosing
 objects are shown, not silently disambiguated by address alone.
 
-Ten checkpoint names now have source definitions verified in isolated native
-TUs (six INV tables and four GPANEL structures); this is not a refreshed
-whole-program unresolved count.
+70 checkpoint names are resolved in the complete raw inventory;
+73 missing source references remain.
+59 of the 60 single-MAP-candidate task entries are resolved; the TONY
+literal alias D_80110B24 remains open. Native ownership receipts are
+isolated proofs, not a strict whole-program native link seal.
 
 | Name | Retail VA | MAP object/section candidates | Retail typed SYM | Status |
 | --- | --- | --- | --- | --- |
-| `AP2x2Tbl` | `0x8010D008` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY INT size 40 dims 1 10 tag  | Restored; native TU verified |
-| `AiProc` | `0x80105314` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY PTR FCN VOID size 128 dims 1 32 tag  | Checkpoint unresolved |
-| `AlertStr` | `0x80159510` | DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type ARY CHAR size 128 dims 1 128 tag  | Checkpoint unresolved |
-| `AllItemsList` | `0x801113A4` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 5024 dims 1 157 tag ItemDataStruct | Checkpoint unresolved |
-| `AllLevels` | `0x800B7558` | MONSTLST.data (`0x800B7088`–`0x800B75D8`, exclusive end) | Def2 class EXT type ARY STRUCT size 128 dims 1 16 tag MonstLevel | Checkpoint unresolved |
-| `AllObjects` | `0x800D84B0` | OBJDAT.data (`0x800D82EC`–`0x800D8BA6`, exclusive end) | Def2 class EXT type ARY STRUCT size 1782 dims 1 99 tag ObjDataStruct | Checkpoint unresolved |
-| `CharBlockBuf` | `0x801576F0` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | No same-name typed record | Checkpoint unresolved |
-| `CharDataStruct` | `0x801576F0` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type STRUCT size 7648 dims 0 tag CharDataStructDef | Checkpoint unresolved |
-| `Circle` | `0x800CD2E0` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY SHORT size 128 dims 1 64 tag  | Checkpoint unresolved |
-| `ClassStrTbl` | `0x801435F8` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY INT size 12 dims 1 3 tag  | Checkpoint unresolved |
-| `D_80110868` | `0x80110868` | GPANEL.rdata (`0x80110844`–`0x801108A4`, exclusive end) | No same-name typed record | Checkpoint unresolved |
-| `D_80110B24` | `0x80110B24` | TONY.rdata (`0x80110AC4`–`0x80110B31`, exclusive end) | No same-name typed record | Checkpoint unresolved |
-| `D_8011B3D8` | `0x8011B3D8` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `D_8011C878` | `0x8011C878` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `D_8012E534` | `0x8012E534` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `D_80157B68` | `0x80157B68` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | No same-name typed record | Checkpoint unresolved |
-| `DefP1PanelXY` | `0x800B9A6C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Restored; native TU verified |
-| `DefP1PanelXY2` | `0x800B9AC4` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Restored; native TU verified |
-| `DefP2PanelXY` | `0x800B9B1C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Restored; native TU verified |
-| `DefP2PanelXY2` | `0x800B9B74` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Restored; native TU verified |
-| `DoLoadedChar` | `0x8011B9EC` | No explicit object boundary | Def class EXT type BOOL size 0 | Checkpoint unresolved |
-| `FirstFreeByte` | `0x80163E20` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `FriendlyMode` | `0x8011B7A5` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `GSYS_MemEnd` | `0x8011AAD0` | No explicit object boundary | Def class EXT type UINT size 0 | Checkpoint unresolved |
-| `GSYS_MemStart` | `0x8011AACC` | No explicit object boundary | Def class EXT type UINT size 0 | Checkpoint unresolved |
-| `InvGfxTable` | `0x8010D278` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY INT size 672 dims 1 168 tag  | Restored; native TU verified |
-| `InvItemHeight` | `0x8010D5CC` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 180 dims 1 180 tag  | Restored; native TU verified |
-| `InvItemWidth` | `0x8010D518` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 180 dims 1 180 tag  | Restored; native TU verified |
-| `InvRect` | `0x8010D030` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY STRUCT size 584 dims 1 73 tag InvXY | Restored; native TU verified |
-| `InvSlotTable` | `0x8010D680` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 73 dims 1 73 tag  | Restored; native TU verified |
-| `KeyTab` | `0x800CD360` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class STAT type ARY USHORT size 20 dims 1 10 tag  | Checkpoint unresolved |
-| `MWVel` | `0x801051F4` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY ARY INT size 288 dims 2 24 3 tag  | Checkpoint unresolved |
-| `McLoadCard1Menu` | `0x80143668` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Checkpoint unresolved |
-| `McLoadCard2Menu` | `0x80143684` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Checkpoint unresolved |
-| `McLoadGameMenu` | `0x8014364C` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Checkpoint unresolved |
-| `MenuList` | `0x800CD240` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY STRUCT size 160 dims 1 20 tag OMENULIST | Checkpoint unresolved |
-| `MissPrintRoutines` | `0x800D6E50` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY PTR FCN VOID size 272 dims 1 68 tag  | Checkpoint unresolved |
-| `MonDays` | `0x800B09B8` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY STRUCT size 96 dims 1 12 tag MONTH_DAYS | Checkpoint unresolved |
-| `MonstAvailTbl` | `0x8010C698` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY CHAR size 112 dims 1 112 tag  | Checkpoint unresolved |
-| `MonstConvTbl` | `0x8010C618` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY CHAR size 128 dims 1 128 tag  | Checkpoint unresolved |
-| `Monsters` | `0x8010A3BC` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY STRUCT size 448 dims 1 16 tag CMonster | Checkpoint unresolved |
-| `MouseX` | `0x8011B7E4` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `MouseY` | `0x8011B7E8` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `MyFT4` | `0x8011CC00` | No explicit object boundary | Def2 class STAT type STRUCT size 40 dims 0 tag POLY_FT4 | Checkpoint unresolved |
-| `NumOfMonsterListLevels` | `0x8011AA94` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `OPT_DevKit` | `0x8010DBF0` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OPT_FileSystem` | `0x8010DBEC` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OPT_FreeMemSize` | `0x8010DBE8` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OPT_FreeMemStart` | `0x8010DBE4` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OPT_LinkerOpts` | `0x8010DBD8` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OPT_NoQuests` | `0x8010DBF4` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_FmvAddress` | `0x8010DBC0` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_FmvSize` | `0x8010DBD4` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_FrontEndAddress` | `0x8010DBB0` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_FrontEndSize` | `0x8010DBC4` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_GameAddress` | `0x8010DBB8` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_GameSize` | `0x8010DBCC` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_PregameAddress` | `0x8010DBB4` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `OVR_PregameSize` | `0x8010DBC8` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `ObjFileList` | `0x800DA320` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 40 dims 1 40 tag  | Checkpoint unresolved |
-| `ObjMasterLoadList` | `0x801169F0` | OBJDAT.rdata (`0x801169E0`–`0x80116AD0`, exclusive end) | Def2 class EXT type ARY STRUCT size 224 dims 1 56 tag OBJ_LOAD_INFO | Checkpoint unresolved |
-| `ObjTypeConv` | `0x800D82EC` | OBJDAT.data (`0x800D82EC`–`0x800D8BA6`, exclusive end) | Def2 class EXT type ARY INT size 452 dims 1 113 tag  | Checkpoint unresolved |
-| `PL_Prefix` | `0x80112744` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 3360 dims 1 84 tag PLStruct | Checkpoint unresolved |
-| `PL_Suffix` | `0x80113464` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 3840 dims 1 96 tag PLStruct | Checkpoint unresolved |
-| `PlayDemoFlag` | `0x8011AC81` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `PlayerDeathCount` | `0x8011BA10` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `PlayerEar` | `0x8011BA18` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `PsxFastMem` | `0x800B7948` | MEM.data (`0x800B7920`–`0x800B7970`, exclusive end) | Def2 class STAT type STRUCT size 40 dims 0 tag MEM_INIT_INFO | Checkpoint unresolved |
-| `PsxMem` | `0x800B7920` | MEM.data (`0x800B7920`–`0x800B7970`, exclusive end) | Def2 class STAT type STRUCT size 40 dims 0 tag MEM_INIT_INFO | Checkpoint unresolved |
-| `ScrollFlag` | `0x8011B8B8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `SoundMenu` | `0x800CCB38` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY STRUCT size 168 dims 1 7 tag OMENUITEM | Checkpoint unresolved |
-| `StonePals` | `0x8010AA9C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 256 dims 1 32 tag STONEPAL | Checkpoint unresolved |
-| `StoryBookName` | `0x800D8C38` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY USHORT size 18 dims 1 9 tag  | Checkpoint unresolved |
-| `StoryText` | `0x800E40B0` | PREOBJ.data (`0x800E40B0`–`0x800E40C2`, exclusive end) | Def2 class EXT type ARY ARY USHORT size 18 dims 2 3 3 tag  | Checkpoint unresolved |
-| `StringTable` | `0x80102A28` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY ARY UCHAR size 54 dims 2 6 9 tag  | Checkpoint unresolved |
-| `TX_DatTab` | `0x800B2D04` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `TempStr` | `0x801594D0` | DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type ARY CHAR size 64 dims 1 64 tag  | Checkpoint unresolved |
-| `TransPals` | `0x8010A57C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY INT size 536 dims 1 134 tag  | Checkpoint unresolved |
-| `UniqMonst` | `0x8010C708` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 2304 dims 1 96 tag UniqMonstStruct | Checkpoint unresolved |
-| `UniqTransPals` | `0x8010A794` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY INT size 776 dims 1 194 tag  | Checkpoint unresolved |
-| `UniqueItemList` | `0x80114364` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 7644 dims 1 91 tag UItemStruct | Checkpoint unresolved |
-| `ValueTable` | `0x80102A18` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY UCHAR size 16 dims 1 16 tag  | Checkpoint unresolved |
-| `Words` | `0x800B07E0` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY PTR CHAR size 472 dims 1 118 tag  | Checkpoint unresolved |
-| `XDirAdd` | `0x801029D8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Checkpoint unresolved |
-| `YDirAdd` | `0x801029F8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Checkpoint unresolved |
-| `_7CPlayer_PActiveArray` | `0x8011AD50` | No explicit object boundary | No same-name typed record | Checkpoint unresolved |
-| `_NoWitchItems` | `0x8011BAC8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `_WitchIdxOfs` | `0x8011BAD0` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `_boyitem` | `0x800E0AF8` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Checkpoint unresolved |
-| `_boylevel` | `0x8011BAD8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `_golditem` | `0x800E1CB0` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Checkpoint unresolved |
-| `_healitem` | `0x800E0BD0` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Checkpoint unresolved |
-| `_infoclr` | `0x8011B6BC` | No explicit object boundary | Def2 class EXT type ARY CHAR size 2 dims 1 2 tag  | Checkpoint unresolved |
-| `_numpremium` | `0x8011BAB8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `_pinfoflag` | `0x8011B6B8` | No explicit object boundary | Def2 class EXT type ARY UCHAR size 2 dims 1 2 tag  | Checkpoint unresolved |
-| `_premiumitem` | `0x800DF508` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 1296 dims 2 2 6 tag ItemStruct | Checkpoint unresolved |
-| `_premiumlevel` | `0x8011BAC0` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `_smithitem` | `0x800DE428` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Checkpoint unresolved |
-| `_witchitem` | `0x800DFA18` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Checkpoint unresolved |
-| `alltext` | `0x80117C20` | TEXTDAT.rdata (`0x80117C10`–`0x801188BC`, exclusive end) | Def2 class EXT type ARY STRUCT size 3228 dims 1 269 tag TextDataStruct | Checkpoint unresolved |
-| `animletter` | `0x8011C2A0` | No explicit object boundary | Def2 class EXT type ARY CHAR size 7 dims 1 7 tag  | Checkpoint unresolved |
-| `bxadd` | `0x800D8BA8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Checkpoint unresolved |
-| `byadd` | `0x800D8BC8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Checkpoint unresolved |
-| `card_changed` | `0x8011B3F4` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `card_files` | `0x8011B3EC` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `card_usable` | `0x8011B3E4` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `dMissArray` | `0x80105174` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY ARY CHAR size 128 dims 2 32 4 tag  | Checkpoint unresolved |
-| `debugmonsttypes` | `0x8011B7A0` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `drawbtnflag` | `0x8011B6C1` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `func_80161F58` | `0x80161F58` | PREMON.text (`0x8015F6E8`–`0x80161FDC`, exclusive end); AUTOMAP.text (`0x80161F58`–`0x80163E20`, exclusive end) | No same-name typed record | Checkpoint unresolved |
-| `goldcheat` | `0x8011B224` | No explicit object boundary | Def class EXT type BOOL size 0 | Checkpoint unresolved |
-| `iscflag` | `0x8011BE34` | No explicit object boundary | Def class EXT type BOOL size 0 | Checkpoint unresolved |
-| `last_card_status` | `0x8011B3FC` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Checkpoint unresolved |
-| `leveldebug` | `0x8011B798` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `leverid` | `0x8011B9DC` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `light4flag` | `0x8011B797` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `misfiledata` | `0x800D6F60` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY STRUCT size 235 dims 1 47 tag MisFileData | Checkpoint unresolved |
-| `missile` | `0x80102C58` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY STRUCT size 9500 dims 1 125 tag MissileStruct | Checkpoint unresolved |
-| `missileactive` | `0x80102A60` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY SHORT size 250 dims 1 125 tag  | Checkpoint unresolved |
-| `missileavail` | `0x80102B5C` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY SHORT size 250 dims 1 125 tag  | Checkpoint unresolved |
-| `missiledata` | `0x800D67F0` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY STRUCT size 1632 dims 1 68 tag MissileData | Checkpoint unresolved |
-| `monstactive` | `0x8010A0C4` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY SHORT size 380 dims 1 190 tag  | Checkpoint unresolved |
-| `monstdebug` | `0x8011B799` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `monster` | `0x80105394` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY STRUCT size 19760 dims 1 190 tag MonsterStruct | Checkpoint unresolved |
-| `monsterdata` | `0x8010AB9C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 6780 dims 1 113 tag MonsterData | Checkpoint unresolved |
-| `monstimgtot` | `0x8011C2D0` | No explicit object boundary | Def class EXT type LONG size 0 | Checkpoint unresolved |
-| `monstkills` | `0x8010A240` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY SHORT size 380 dims 1 190 tag  | Checkpoint unresolved |
-| `mydflags` | `0x8011C0D8` | No explicit object boundary | Def class EXT type PTR UCHAR size 0 | Checkpoint unresolved |
-| `object` | `0x800D8C4C` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY STRUCT size 5588 dims 1 127 tag ObjectStruct | Checkpoint unresolved |
-| `objectactive` | `0x800DA220` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 127 dims 1 127 tag  | Checkpoint unresolved |
-| `objectavail` | `0x800DA2A0` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 127 dims 1 127 tag  | Checkpoint unresolved |
-| `offset_x` | `0x8011C2A8` | No explicit object boundary | Def2 class EXT type ARY CHAR size 8 dims 1 8 tag  | Checkpoint unresolved |
-| `offset_y` | `0x8011C2B0` | No explicit object boundary | Def2 class EXT type ARY CHAR size 8 dims 1 8 tag  | Checkpoint unresolved |
-| `pSetPiece` | `0x8011C0DC` | No explicit object boundary | Def class EXT type PTR UCHAR size 0 | Checkpoint unresolved |
-| `save_buffer` | `0x801436EC` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY UCHAR size 81920 dims 1 81920 tag  | Checkpoint unresolved |
-| `shrineavail` | `0x800D8C1C` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 26 dims 1 26 tag  | Checkpoint unresolved |
-| `shrinestrs` | `0x800D8BE8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY USHORT size 52 dims 1 26 tag  | Checkpoint unresolved |
-| `spelldata` | `0x800DDB80` | SPELLDAT.data (`0x800DDB80`–`0x800DE304`, exclusive end) | Def2 class EXT type ARY STRUCT size 1924 dims 1 37 tag SpellData | Checkpoint unresolved |
-| `spspelstate` | `0x8011B64C` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `totalmonsters` | `0x8011C2D4` | No explicit object boundary | Def class EXT type UCHAR size 0 | Checkpoint unresolved |
-| `trapdir` | `0x8011B9D8` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `trapid` | `0x8011B9D4` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
-| `uniquetrans` | `0x8011C2D8` | No explicit object boundary | Def class EXT type INT size 0 | Checkpoint unresolved |
+| `AP2x2Tbl` | `0x8010D008` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY INT size 40 dims 1 10 tag  | Resolved; native owner verified |
+| `AiProc` | `0x80105314` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY PTR FCN VOID size 128 dims 1 32 tag  | Resolved; native owner verified |
+| `AlertStr` | `0x80159510` | DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type ARY CHAR size 128 dims 1 128 tag  | Current unresolved |
+| `AllItemsList` | `0x801113A4` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 5024 dims 1 157 tag ItemDataStruct | Resolved; native owner verified |
+| `AllLevels` | `0x800B7558` | MONSTLST.data (`0x800B7088`–`0x800B75D8`, exclusive end) | Def2 class EXT type ARY STRUCT size 128 dims 1 16 tag MonstLevel | Resolved; native owner verified |
+| `AllObjects` | `0x800D84B0` | OBJDAT.data (`0x800D82EC`–`0x800D8BA6`, exclusive end) | Def2 class EXT type ARY STRUCT size 1782 dims 1 99 tag ObjDataStruct | Resolved; native owner verified |
+| `CharBlockBuf` | `0x801576F0` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | No same-name typed record | Current unresolved |
+| `CharDataStruct` | `0x801576F0` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type STRUCT size 7648 dims 0 tag CharDataStructDef | Current unresolved |
+| `Circle` | `0x800CD2E0` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY SHORT size 128 dims 1 64 tag  | Resolved; native owner verified |
+| `ClassStrTbl` | `0x801435F8` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY INT size 12 dims 1 3 tag  | Current unresolved |
+| `D_80110868` | `0x80110868` | GPANEL.rdata (`0x80110844`–`0x801108A4`, exclusive end) | No same-name typed record | Resolved; native owner verified |
+| `D_80110B24` | `0x80110B24` | TONY.rdata (`0x80110AC4`–`0x80110B31`, exclusive end) | No same-name typed record | Current unresolved |
+| `D_8011B3D8` | `0x8011B3D8` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `D_8011C878` | `0x8011C878` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `D_8012E534` | `0x8012E534` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `D_80157B68` | `0x80157B68` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | No same-name typed record | Current unresolved |
+| `DefP1PanelXY` | `0x800B9A6C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
+| `DefP1PanelXY2` | `0x800B9AC4` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
+| `DefP2PanelXY` | `0x800B9B1C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
+| `DefP2PanelXY2` | `0x800B9B74` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
+| `DoLoadedChar` | `0x8011B9EC` | No explicit object boundary | Def class EXT type BOOL size 0 | Current unresolved |
+| `FirstFreeByte` | `0x80163E20` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `FriendlyMode` | `0x8011B7A5` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `GSYS_MemEnd` | `0x8011AAD0` | No explicit object boundary | Def class EXT type UINT size 0 | Current unresolved |
+| `GSYS_MemStart` | `0x8011AACC` | No explicit object boundary | Def class EXT type UINT size 0 | Current unresolved |
+| `InvGfxTable` | `0x8010D278` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY INT size 672 dims 1 168 tag  | Resolved; native owner verified |
+| `InvItemHeight` | `0x8010D5CC` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 180 dims 1 180 tag  | Resolved; native owner verified |
+| `InvItemWidth` | `0x8010D518` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 180 dims 1 180 tag  | Resolved; native owner verified |
+| `InvRect` | `0x8010D030` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY STRUCT size 584 dims 1 73 tag InvXY | Resolved; native owner verified |
+| `InvSlotTable` | `0x8010D680` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 73 dims 1 73 tag  | Resolved; native owner verified |
+| `KeyTab` | `0x800CD360` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class STAT type ARY USHORT size 20 dims 1 10 tag  | Resolved; native owner verified |
+| `MWVel` | `0x801051F4` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY ARY INT size 288 dims 2 24 3 tag  | Resolved; native owner verified |
+| `McLoadCard1Menu` | `0x80143668` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Current unresolved |
+| `McLoadCard2Menu` | `0x80143684` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Current unresolved |
+| `McLoadGameMenu` | `0x8014364C` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Current unresolved |
+| `MenuList` | `0x800CD240` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY STRUCT size 160 dims 1 20 tag OMENULIST | Resolved; native owner verified |
+| `MissPrintRoutines` | `0x800D6E50` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY PTR FCN VOID size 272 dims 1 68 tag  | Resolved; native owner verified |
+| `MonDays` | `0x800B09B8` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY STRUCT size 96 dims 1 12 tag MONTH_DAYS | Resolved; native owner verified |
+| `MonstAvailTbl` | `0x8010C698` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY CHAR size 112 dims 1 112 tag  | Resolved; native owner verified |
+| `MonstConvTbl` | `0x8010C618` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY CHAR size 128 dims 1 128 tag  | Resolved; native owner verified |
+| `Monsters` | `0x8010A3BC` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY STRUCT size 448 dims 1 16 tag CMonster | Resolved; native owner verified |
+| `MouseX` | `0x8011B7E4` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
+| `MouseY` | `0x8011B7E8` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
+| `MyFT4` | `0x8011CC00` | No explicit object boundary | Def2 class STAT type STRUCT size 40 dims 0 tag POLY_FT4 | Current unresolved |
+| `NumOfMonsterListLevels` | `0x8011AA94` | No explicit object boundary | Def class EXT type INT size 0 | Resolved; native owner verified |
+| `OPT_DevKit` | `0x8010DBF0` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OPT_FileSystem` | `0x8010DBEC` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OPT_FreeMemSize` | `0x8010DBE8` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OPT_FreeMemStart` | `0x8010DBE4` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OPT_LinkerOpts` | `0x8010DBD8` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OPT_NoQuests` | `0x8010DBF4` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_FmvAddress` | `0x8010DBC0` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_FmvSize` | `0x8010DBD4` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_FrontEndAddress` | `0x8010DBB0` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_FrontEndSize` | `0x8010DBC4` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_GameAddress` | `0x8010DBB8` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_GameSize` | `0x8010DBCC` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_PregameAddress` | `0x8010DBB4` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `OVR_PregameSize` | `0x8010DBC8` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `ObjFileList` | `0x800DA320` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 40 dims 1 40 tag  | Resolved; native owner verified |
+| `ObjMasterLoadList` | `0x801169F0` | OBJDAT.rdata (`0x801169E0`–`0x80116AD0`, exclusive end) | Def2 class EXT type ARY STRUCT size 224 dims 1 56 tag OBJ_LOAD_INFO | Resolved; native owner verified |
+| `ObjTypeConv` | `0x800D82EC` | OBJDAT.data (`0x800D82EC`–`0x800D8BA6`, exclusive end) | Def2 class EXT type ARY INT size 452 dims 1 113 tag  | Resolved; native owner verified |
+| `PL_Prefix` | `0x80112744` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 3360 dims 1 84 tag PLStruct | Resolved; native owner verified |
+| `PL_Suffix` | `0x80113464` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 3840 dims 1 96 tag PLStruct | Resolved; native owner verified |
+| `PlayDemoFlag` | `0x8011AC81` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `PlayerDeathCount` | `0x8011BA10` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `PlayerEar` | `0x8011BA18` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `PsxFastMem` | `0x800B7948` | MEM.data (`0x800B7920`–`0x800B7970`, exclusive end) | Def2 class STAT type STRUCT size 40 dims 0 tag MEM_INIT_INFO | Resolved; native owner verified |
+| `PsxMem` | `0x800B7920` | MEM.data (`0x800B7920`–`0x800B7970`, exclusive end) | Def2 class STAT type STRUCT size 40 dims 0 tag MEM_INIT_INFO | Resolved; native owner verified |
+| `ScrollFlag` | `0x8011B8B8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `SoundMenu` | `0x800CCB38` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY STRUCT size 168 dims 1 7 tag OMENUITEM | Resolved; native owner verified |
+| `StonePals` | `0x8010AA9C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 256 dims 1 32 tag STONEPAL | Resolved; native owner verified |
+| `StoryBookName` | `0x800D8C38` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY USHORT size 18 dims 1 9 tag  | Resolved; native owner verified |
+| `StoryText` | `0x800E40B0` | PREOBJ.data (`0x800E40B0`–`0x800E40C2`, exclusive end) | Def2 class EXT type ARY ARY USHORT size 18 dims 2 3 3 tag  | Resolved; native owner verified |
+| `StringTable` | `0x80102A28` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY ARY UCHAR size 54 dims 2 6 9 tag  | Resolved; native owner verified |
+| `TX_DatTab` | `0x800B2D04` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `TempStr` | `0x801594D0` | DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type ARY CHAR size 64 dims 1 64 tag  | Current unresolved |
+| `TransPals` | `0x8010A57C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY INT size 536 dims 1 134 tag  | Resolved; native owner verified |
+| `UniqMonst` | `0x8010C708` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 2304 dims 1 96 tag UniqMonstStruct | Resolved; native owner verified |
+| `UniqTransPals` | `0x8010A794` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY INT size 776 dims 1 194 tag  | Resolved; native owner verified |
+| `UniqueItemList` | `0x80114364` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 7644 dims 1 91 tag UItemStruct | Resolved; native owner verified |
+| `ValueTable` | `0x80102A18` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY UCHAR size 16 dims 1 16 tag  | Resolved; native owner verified |
+| `Words` | `0x800B07E0` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY PTR CHAR size 472 dims 1 118 tag  | Resolved; native owner verified |
+| `XDirAdd` | `0x801029D8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
+| `YDirAdd` | `0x801029F8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
+| `_7CPlayer_PActiveArray` | `0x8011AD50` | No explicit object boundary | No same-name typed record | Current unresolved |
+| `_NoWitchItems` | `0x8011BAC8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `_WitchIdxOfs` | `0x8011BAD0` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `_boyitem` | `0x800E0AF8` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Resolved; native owner verified |
+| `_boylevel` | `0x8011BAD8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `_golditem` | `0x800E1CB0` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Resolved; native owner verified |
+| `_healitem` | `0x800E0BD0` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Resolved; native owner verified |
+| `_infoclr` | `0x8011B6BC` | No explicit object boundary | Def2 class EXT type ARY CHAR size 2 dims 1 2 tag  | Current unresolved |
+| `_numpremium` | `0x8011BAB8` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `_pinfoflag` | `0x8011B6B8` | No explicit object boundary | Def2 class EXT type ARY UCHAR size 2 dims 1 2 tag  | Current unresolved |
+| `_premiumitem` | `0x800DF508` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 1296 dims 2 2 6 tag ItemStruct | Resolved; native owner verified |
+| `_premiumlevel` | `0x8011BAC0` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `_smithitem` | `0x800DE428` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Resolved; native owner verified |
+| `_witchitem` | `0x800DFA18` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Resolved; native owner verified |
+| `alltext` | `0x80117C20` | TEXTDAT.rdata (`0x80117C10`–`0x801188BC`, exclusive end) | Def2 class EXT type ARY STRUCT size 3228 dims 1 269 tag TextDataStruct | Resolved; native owner verified |
+| `animletter` | `0x8011C2A0` | No explicit object boundary | Def2 class EXT type ARY CHAR size 7 dims 1 7 tag  | Current unresolved |
+| `bxadd` | `0x800D8BA8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
+| `byadd` | `0x800D8BC8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
+| `card_changed` | `0x8011B3F4` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `card_files` | `0x8011B3EC` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `card_usable` | `0x8011B3E4` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `dMissArray` | `0x80105174` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY ARY CHAR size 128 dims 2 32 4 tag  | Resolved; native owner verified |
+| `debugmonsttypes` | `0x8011B7A0` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
+| `drawbtnflag` | `0x8011B6C1` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `func_80161F58` | `0x80161F58` | PREMON.text (`0x8015F6E8`–`0x80161FDC`, exclusive end); AUTOMAP.text (`0x80161F58`–`0x80163E20`, exclusive end) | No same-name typed record | Current unresolved |
+| `goldcheat` | `0x8011B224` | No explicit object boundary | Def class EXT type BOOL size 0 | Current unresolved |
+| `iscflag` | `0x8011BE34` | No explicit object boundary | Def class EXT type BOOL size 0 | Current unresolved |
+| `last_card_status` | `0x8011B3FC` | No explicit object boundary | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Current unresolved |
+| `leveldebug` | `0x8011B798` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `leverid` | `0x8011B9DC` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
+| `light4flag` | `0x8011B797` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `misfiledata` | `0x800D6F60` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY STRUCT size 235 dims 1 47 tag MisFileData | Resolved; native owner verified |
+| `missile` | `0x80102C58` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY STRUCT size 9500 dims 1 125 tag MissileStruct | Resolved; native owner verified |
+| `missileactive` | `0x80102A60` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY SHORT size 250 dims 1 125 tag  | Resolved; native owner verified |
+| `missileavail` | `0x80102B5C` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY SHORT size 250 dims 1 125 tag  | Resolved; native owner verified |
+| `missiledata` | `0x800D67F0` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY STRUCT size 1632 dims 1 68 tag MissileData | Resolved; native owner verified |
+| `monstactive` | `0x8010A0C4` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY SHORT size 380 dims 1 190 tag  | Resolved; native owner verified |
+| `monstdebug` | `0x8011B799` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `monster` | `0x80105394` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY STRUCT size 19760 dims 1 190 tag MonsterStruct | Resolved; native owner verified |
+| `monsterdata` | `0x8010AB9C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 6780 dims 1 113 tag MonsterData | Resolved; native owner verified |
+| `monstimgtot` | `0x8011C2D0` | No explicit object boundary | Def class EXT type LONG size 0 | Current unresolved |
+| `monstkills` | `0x8010A240` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY SHORT size 380 dims 1 190 tag  | Resolved; native owner verified |
+| `mydflags` | `0x8011C0D8` | No explicit object boundary | Def class EXT type PTR UCHAR size 0 | Current unresolved |
+| `object` | `0x800D8C4C` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY STRUCT size 5588 dims 1 127 tag ObjectStruct | Resolved; native owner verified |
+| `objectactive` | `0x800DA220` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 127 dims 1 127 tag  | Resolved; native owner verified |
+| `objectavail` | `0x800DA2A0` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 127 dims 1 127 tag  | Resolved; native owner verified |
+| `offset_x` | `0x8011C2A8` | No explicit object boundary | Def2 class EXT type ARY CHAR size 8 dims 1 8 tag  | Current unresolved |
+| `offset_y` | `0x8011C2B0` | No explicit object boundary | Def2 class EXT type ARY CHAR size 8 dims 1 8 tag  | Current unresolved |
+| `pSetPiece` | `0x8011C0DC` | No explicit object boundary | Def class EXT type PTR UCHAR size 0 | Current unresolved |
+| `save_buffer` | `0x801436EC` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY UCHAR size 81920 dims 1 81920 tag  | Current unresolved |
+| `shrineavail` | `0x800D8C1C` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 26 dims 1 26 tag  | Resolved; native owner verified |
+| `shrinestrs` | `0x800D8BE8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY USHORT size 52 dims 1 26 tag  | Resolved; native owner verified |
+| `spelldata` | `0x800DDB80` | SPELLDAT.data (`0x800DDB80`–`0x800DE304`, exclusive end) | Def2 class EXT type ARY STRUCT size 1924 dims 1 37 tag SpellData | Resolved; native owner verified |
+| `spspelstate` | `0x8011B64C` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `totalmonsters` | `0x8011C2D4` | No explicit object boundary | Def class EXT type UCHAR size 0 | Current unresolved |
+| `trapdir` | `0x8011B9D8` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
+| `trapid` | `0x8011B9D4` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
+| `uniquetrans` | `0x8011C2D8` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
 
 81/143 checkpoint names have explicit enclosing MAP object boundaries;
 70 have one candidate and 11 have ambiguous overlapping candidates.

@@ -123,6 +123,25 @@ def check_bss_overlap(native, sdk):
         raise ValueError('overlapping SDK/native BSS placements')
 
 
+def scaffold_parts(row, home, kind, layouts):
+    """Diagnostic fragments may share one untouched compiler section."""
+    names = row['scaffold']
+    names = names if isinstance(names, list) else [names]
+    if not names or any(not isinstance(name, str) for name in names) or len(names) != len(set(names)):
+        raise ValueError('invalid native source data scaffold span')
+    parts = []
+    for name in names:
+        if not isinstance(name, str) or not re.fullmatch(r'\w+\.' + kind, name):
+            raise ValueError('invalid native source data scaffold')
+        extent = layouts[home].get((kind, name.rsplit('.', 1)[0]))
+        if extent is None:
+            raise ValueError('native source data scaffold is absent')
+        parts.append((name, extent))
+    if any(sum(a) != b[0] for (_, a), (_, b) in zip(parts, parts[1:])):
+        raise ValueError('native source scaffold span is not contiguous and ordered')
+    return parts
+
+
 def validate_placements(segment, spec, layouts):
     sections = spec['sections']
     text_sections = [s for s in sections if s == '.text' or re.fullmatch(r'\.text\.\w+',s)]
@@ -131,6 +150,7 @@ def validate_placements(segment, spec, layouts):
         raise ValueError('unsupported native source section set')
     homes, regions, limits = {}, {}, {}
     for section, row in sections.items():
+        parts = None
         home = row.get('image', spec['image'])
         if home not in layouts or (section == '.text' and home != spec['image']):
             raise ValueError('invalid native source section image')
@@ -167,11 +187,9 @@ def validate_placements(segment, spec, layouts):
                     else 'sdata' if section.startswith('.sdata.') else section[1:])
             if section in ('.ctors', '.dtors') and (va % 4 or size % 4):
                 raise ValueError('native constructor/destructor tables must be word aligned')
-            scaffold = row['scaffold']
-            if not re.fullmatch(r'\w+\.' + kind, scaffold):
-                raise ValueError('invalid native source data scaffold')
-            key = (kind, scaffold.rsplit('.', 1)[0])
-        extent = layouts[home].get(key)
+            parts = scaffold_parts(row, home, kind, layouts)
+        extent = ((parts[0][1][0], sum(parts[-1][1]) - parts[0][1][0])
+                  if parts else layouts[home].get(key))
         if extent is None or not (extent[0] <= va < va + size <= sum(extent)):
             raise ValueError('native source section is outside its declared retail fragment')
         if section == '.text' and (va, size) != extent:
@@ -202,7 +220,7 @@ def bounded_data_bridge(source, regions, end):
     # Give the existing label-preserving parser the YAML-proven final boundary.
     # The sentinel is parser metadata only and never emitted into a wrapper.
     marker = '__native_source_end_boundary'
-    if marker in source or any(va + size > end for va, size, _ in regions):
+    if marker in source or any(row[0] + row[1] > end for row in regions):
         raise ValueError('invalid native data boundary')
     suffix = f'\ndlabel {marker}\n /* 0 {end:08X} 00000000 */ .word 0\nenddlabel {marker}\n'
     result = N.data_bridge(source + suffix, regions)
@@ -869,14 +887,20 @@ def build(only=None):
                     (OUT / (stem + '.s')).write_text(
                         f'.section .text\n.incbin "{(OUT / f"{segment}{section}.bin").as_posix()}"\n')
                     continue
-                scaffold = spec['sections'][section]['scaffold']
                 kind = ('data' if section in ('.ctors', '.dtors') or section.startswith('.data.') else 'rodata' if section.startswith('.rdata')
                         else 'sdata' if section.startswith('.sdata.') else section[1:])
-                if not re.fullmatch(r'\w+\.' + kind, scaffold):
-                    raise ValueError('invalid native source data scaffold')
+                parts = scaffold_parts(spec['sections'][section], homes[section], kind, layouts)
                 filename = f'build/native_source/{segment}{section}.bin'
-                bridges.setdefault(scaffold, []).append((*regions[section], filename))
-                bridge_limits[scaffold] = limits[section]
+                va, size = regions[section]
+                for scaffold, extent in parts:
+                    first, limit = max(va, extent[0]), min(va + size, sum(extent))
+                    if first >= limit:
+                        raise ValueError('native compiler section misses a scaffold-span member')
+                    region = (first, limit-first, filename)
+                    if len(parts) > 1:
+                        region += (first-va,)
+                    bridges.setdefault(scaffold, []).append(region)
+                    bridge_limits[scaffold] = sum(extent)
         for (target, kind), data in raw_payloads.items():
             stem = f'{segment}.raw_{target}.{kind}'
             payload = OUT / (stem + '.bin')
@@ -899,10 +923,12 @@ def build(only=None):
                                     'sha256':sha(common_payloads[name]) if name in common_payloads else sha(bytes(row['size']))}
                              for name,row in commons.items()},
                          'common_allocation': common_allocation,
-                         'composed_sdk_scaffolds': sorted({row['scaffold'] for section,row in spec['sections'].items()
+                         'composed_sdk_scaffolds': sorted({name for section,row in spec['sections'].items()
                                                           if section != '.text' and not is_zero_section(section)
                                                           and not section.startswith('.text.')
-                                                          and row.get('scaffold') in sdk_scaffolds}),
+                                                          and row.get('scaffold')
+                                                          for name in (row['scaffold'] if isinstance(row['scaffold'], list) else [row['scaffold']])
+                                                          if name in sdk_scaffolds}),
                          'untyped_data_symbols': untyped_receipts,
                          'source_sha256': sha(source.read_bytes()), 'object_sha256': sha(raw),
                          'preprocessed_sha256': (None if source.suffix.lower() == '.s' else

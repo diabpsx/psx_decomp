@@ -29,8 +29,9 @@ class StoresNativeTests(unittest.TestCase):
                           (".text", ".rdata", ".bss", ".ctors", ".dtors")},
                          {".text": 44756, ".rdata": 728, ".bss": 3360,
                           ".ctors": 4, ".dtors": 4})
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".data.stores_")), 5524)
+        self.assertEqual(receipt["sections"][".data"]["size"], 20212)
+        self.assertFalse(any(name.startswith('.data.stores_')
+                             for name in receipt['sections']))
         self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
                              if name.startswith(".sdata.stores_")), 51)
         self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()

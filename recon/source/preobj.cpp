@@ -45,6 +45,11 @@
 #include "source/gen/protos_preobj.h"
 #include "source/diablo.h"
 
+/* Retail PREOBJ.DATA; original story-book text IDs, three books per level. */
+unsigned short StoryText[3][3] = { /* @0x800E40B0 */
+    { 249, 250, 251 }, { 252, 253, 254 }, { 255, 256, 257 }
+};
+
 #define MAXOBJECTS   127
 #define MAXDUNX      96
 #define MAXDUNY      96

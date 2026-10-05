@@ -306,3 +306,66 @@ The `OVR_*`/`OPT_*` names instead occupy merged `.rdata` without typed SYM or
 per-object boundaries. Existing OVERLAY/STARTUP declarations identify their
 descriptor/options role; authentic link-time generation must be investigated
 before turning those names into hard-coded C definitions.
+
+## Single-MAP-candidate reconstruction round (2026-10-05)
+
+59 of the 60 selected checkpoint entries are resolved in a fresh complete
+raw-object inventory: 186 authentic compiler/assembler objects, 73 missing
+source references. MONSTLST also closes `NumOfMonsterListLevels` outside that
+selection. The historical list is retained as
+`docs/SOURCE_DEFINITIONS_CHECKPOINT_143.md`; the current 73-name/VA list is
+`docs/REMAINING_SOURCE_DEFINITIONS.md`.
+
+Restored ordinary aggregate definitions cover the full resident data of
+MISSILES, MONSTER, OBJECTS, STORES, OPTIONS, MISDAT and PREOBJ, and ITEMDAT's
+complete constant bank. Full native byte/function-body-SYM gates pass the
+changed function owners. STORES no longer needs its five-piece post-assembly
+data split: declaration order emits the entire 20,212-byte bank. GPANEL's
+anonymous template is now its real local `YT` initializer; original unused
+GMAN/CPLAYER inlines produce the preceding literals, giving all 96 `.rdata`
+bytes naturally, without its old external template alias.
+
+Five data-only owners join the raw compiler registry: MONSTDAT, OBJDAT,
+SPELLDAT, TEXTDAT and MONSTLST. `native_source_data.py` proves their complete
+initialized sections, relocations, export addresses and every declared retail
+typed data record without fake text or GP carriers. They are direct raw-native
+inputs; the transitional GNU final-image lane still contains their old data
+scaffolds until the strict whole-program PSYLINK integration replaces them.
+
+Typed materialization exposed an old TextDataStruct error: retail records INT
+txtstr at 0, UCHAR scrlltxt at 4, UCHAR txtspd at 5 and INT sfxnr at 8. Both
+consumer headers now use that layout, and minitext reads the named txtstr field.
+Fresh MINITEXT and MONSTER gates remain exact. The initializer helper rejects
+unsupported/mismatched SYM fields, overlapping extents and nonzero padding;
+it emits typed values, not binary byte blobs.
+
+VERSION now owns all five functions, Words/MonDays, their native 568-byte
+once-only bank, the complete 1536-byte literal pool and 328-byte small-data
+bank. Named compiler sections plus linker group ordering retain the original
+once-only home; no assembler rewrite is introduced. The obsolete split
+startup_1.cpp is removed. MEM likewise owns its two once-only routines beside
+the original private PsxMem/PsxFastMem and Gaz, closing false cross-TU static
+references without public aliases or duplicate storage.
+
+Native diagnostics can now validate one unchanged section spanning several
+ordered analysis fragments. The legacy label-preserving exporter reads offsets
+from that complete verified section; it does not split or rewrite the native
+object. This is regression-lane support, not a claim that payload bridges or
+per-fragment final placements have been eliminated.
+
+The sole selected entry still open is TONY's `D_80110B24`, an alias into its
+already-emitted DEMOPAD0.DAT literal. Direct literal spelling changes address
+reuse/scheduling in load_demo_pad_data/save_demo_pad_data (eight normalized
+diffs at 24 instructions). Duplicated branch stores reduce that to three diffs
+at 23 versus 24 instructions, by folding +7 and +48 into +55. Those trials
+were rejected; the passing baseline is retained. Real compiler cse/cse2/combine
+capture tooling from tools/instr was used; its artifacts are diagnostic only.
+Do not mark this entry resolved or add a synthetic global/pin to hide the alias.
+
+Fresh `python -u tools/link.py` exits successfully for all five current
+transitional images: DIABPSX 1,099,272 bytes (plus 120,304 checked runtime-zero
+BSS), FRONTEND 143,924, PREGAME 171,468, GAME 172,584 and FMV 126,064 bytes,
+all identical to retail. The complete source/archive receipt set is checked
+in this run. This is a regression seal, not strict native whole-program
+PSYLINK completion; the data-only owners and remaining scaffold removal still
+need integration in that final flow.

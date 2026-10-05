@@ -10,6 +10,23 @@ import native_recon as N
 class NativeTextTests(unittest.TestCase):
     entries = {'first': (0x1000, 4), 'second': (0x1004, 4), 'last': (0x1008, 4)}
 
+    def test_untouched_section_can_span_ordered_diagnostic_fragments(self):
+        layouts = {'diabpsx': {('rodata', 'a'): (0x1000, 4),
+                               ('rodata', 'b'): (0x1004, 8)}}
+        row = {'scaffold': ['a.rodata', 'b.rodata']}
+        self.assertEqual(N.scaffold_parts(row, 'diabpsx', 'rodata', layouts),
+                         [('a.rodata', (0x1000, 4)), ('b.rodata', (0x1004, 8))])
+        for names in (['b.rodata', 'a.rodata'], ['a.rodata', 'a.rodata'], [{}]):
+            with self.assertRaises(ValueError):
+                N.scaffold_parts({'scaffold': names}, 'diabpsx', 'rodata', layouts)
+
+    def test_bridge_offset_does_not_split_the_source_object(self):
+        source = 'dlabel x\n /* 0 00001000 00000000 */ .word 0\nenddlabel x\n'
+        result = N.bounded_data_bridge(source, [(0x1000, 4, 'whole-section.bin', 28)], 0x1004)
+        self.assertIn('.incbin "whole-section.bin", 28, 4', result)
+        with self.assertRaises(ValueError):
+            N.bounded_data_bridge(source, [(0x1000, 4, 'whole-section.bin', -1)], 0x1004)
+
     def test_only_whole_contiguous_explicit_functions(self):
         validate_members(0x1000, 8, ['second', 'first'], self.entries)
         for size, names in [(8, []), (8, ['first', 'first']), (8, ['first']),
