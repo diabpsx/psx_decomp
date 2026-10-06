@@ -14111,5 +14111,90 @@
       "strcpy",
       "systemtask"
     ]
+  },
+  "overinfo": {
+    "source": "recon/psxsrc/overinfo.s",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x8010DBAC",
+        "size": 44,
+        "scaffold": "rodata.rodata"
+      }
+    },
+    "data_symbols": [],
+    "untyped_data_symbols": {
+      "OVR_LoadAddress": "OVR_LoadAddress",
+      "OVR_FrontEndAddress": "OVR_FrontEndAddress",
+      "OVR_PregameAddress": "OVR_PregameAddress",
+      "OVR_GameAddress": "OVR_GameAddress",
+      "OVR_MemCardAddress": "OVR_MemCardAddress",
+      "OVR_FmvAddress": "OVR_FmvAddress",
+      "OVR_FrontEndSize": "OVR_FrontEndSize",
+      "OVR_PregameSize": "OVR_PregameSize",
+      "OVR_GameSize": "OVR_GameSize",
+      "OVR_MemCardSize": "OVR_MemCardSize",
+      "OVR_FmvSize": "OVR_FmvSize"
+    },
+    "externals": [
+      "_frontend_text_org",
+      "_pregame_text_org",
+      "_game_text_org",
+      "_fmv_text_org",
+      "__last_orgend"
+    ]
+  },
+  "lnkopt": {
+    "source": "recon/psxsrc/lnkopt.s",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x8010DBD8",
+        "size": 32,
+        "scaffold": "rodata.rodata"
+      }
+    },
+    "data_symbols": [],
+    "untyped_data_symbols": {
+      "OPT_LinkerOpts": "OPT_LinkerOpts",
+      "OPT_RamSize": "OPT_RamSize",
+      "OPT_StackSize": "OPT_StackSize",
+      "OPT_OrgAddress": "OPT_OrgAddress",
+      "OPT_FreeMemStart": "OPT_FreeMemStart",
+      "OPT_FreeMemSize": "OPT_FreeMemSize",
+      "OPT_FileSystem": "OPT_FileSystem",
+      "OPT_DevKit": "OPT_DevKit",
+      "OPT_NoQuests": "OPT_NoQuests"
+    },
+    "externals": [
+      "LNK_OrgAddress",
+      "FirstFreeByte"
+    ]
+  },
+  "callback": {
+    "source": "recon/eaclib/callback.c",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "divide_guard": true,
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".sdata": {
+        "va": "0x8011C498",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [],
+    "untyped_data_symbols": {
+      "loadfilecallback": "loadfilecallback"
+    },
+    "externals": []
   }
 }

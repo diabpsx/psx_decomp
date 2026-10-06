@@ -145,8 +145,14 @@ def scaffold_parts(row, home, kind, layouts):
 def validate_placements(segment, spec, layouts):
     sections = spec['sections']
     text_sections = [s for s in sections if s == '.text' or re.fullmatch(r'\.text\.\w+',s)]
-    if not text_sections or any(s not in {'.text', '.rdata', '.sdata', '.data', '.sbss', '.bss', '.ctors', '.dtors'}
-                                and not re.fullmatch(r'\.(?:text|rdata|data|sdata|sbss|bss)\.\w+', s) for s in sections):
+    # `data_only`: a member that owns no code (OVERINFO.MIP / LNKOPT.MIP option words, EA's CALLBACK cell):
+    # its data and zero-storage sections are still linked at the retail addresses and compared whole.
+    data_only = spec.get('data_only', False)
+    if not isinstance(data_only, bool) or (data_only and (text_sections or not spec.get('stripped_library_sym'))):
+        raise ValueError('data-only native members carry no text and use the stripped-member seal')
+    if (not text_sections and not data_only) or any(
+            s not in {'.text', '.rdata', '.sdata', '.data', '.sbss', '.bss', '.ctors', '.dtors'}
+            and not re.fullmatch(r'\.(?:text|rdata|data|sdata|sbss|bss)\.\w+', s) for s in sections):
         raise ValueError('unsupported native source section set')
     homes, regions, limits = {}, {}, {}
     for section, row in sections.items():
@@ -842,7 +848,13 @@ def build(only=None):
         if spec.get('stripped_library_sym'):
             if data_symbols:
                 raise ValueError('stripped library data needs an explicit verification lane')
-            count = verify_stripped_library_members(obj, spec, regions, map_text, retail_sym, extra_paths)
+            if spec.get('data_only') is True:
+                # no functions: the whole-section retail compare above and the untyped data receipts below are the seal
+                if any('bss' not in row and obj['sections'].get(row['sect']) == '.text' for row in obj['xdefs']):
+                    raise ValueError('data-only native member exports code')
+                count = 0
+            else:
+                count = verify_stripped_library_members(obj, spec, regions, map_text, retail_sym, extra_paths)
         else:
             count = verify_sym(run.stdout, segment, data_symbols, retail_sym, extra_paths,
                                routed_only=spec.get('routed_only') is True,
