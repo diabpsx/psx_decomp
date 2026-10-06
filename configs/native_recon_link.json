@@ -14122,7 +14122,7 @@
       ".rdata": {
         "va": "0x8010DBAC",
         "size": 44,
-        "scaffold": "rodata.rodata"
+        "link_object": true
       }
     },
     "data_symbols": [],
@@ -14144,7 +14144,12 @@
       "_pregame_text_org",
       "_game_text_org",
       "_fmv_text_org",
-      "__last_orgend"
+      "_memcard_text_org",
+      "_frontend_text_size",
+      "_pregame_text_size",
+      "_game_text_size",
+      "_memcard_text_size",
+      "_fmv_text_size"
     ]
   },
   "lnkopt": {
@@ -14157,7 +14162,7 @@
       ".rdata": {
         "va": "0x8010DBD8",
         "size": 32,
-        "scaffold": "rodata.rodata"
+        "link_object": true
       }
     },
     "data_symbols": [],
@@ -14173,8 +14178,11 @@
       "OPT_NoQuests": "OPT_NoQuests"
     },
     "externals": [
+      "__lnk_ram_size",
+      "LNK_StackSize",
       "LNK_OrgAddress",
-      "FirstFreeByte"
+      "FirstFreeByte",
+      "__lnk_free_mem_size"
     ]
   },
   "callback": {

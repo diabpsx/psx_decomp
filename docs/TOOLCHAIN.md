@@ -398,6 +398,28 @@ store-before-load order), and one `volatile` stack local in the MMIO routine
 fold a zero-extension into a volatile load), accepted 2026-10-04 as part of the MMIO
 exception and never elsewhere.
 
+### Data-only members and link-computed PSYLINK symbols (2026-10-06)
+
+Three retail objects carry no code: EA's CALLBACK (the `loadfilecallback` cell) and Climax's
+OVERINFO.MIP (overlay load addresses and sizes @8010DBAC) and LNKOPT.MIP (link option words
+@8010DBD8). The registry key `data_only` lets a stripped member own only data; the native lane
+checks the object exports no code and compares the data whole.
+
+OVERINFO/LNKOPT contain nothing but link results: PSYLINK's per-group `_<group>_org` /
+`_orgend` / `_size` records and the Climax link options `LNK_OrgAddress` / `LNK_StackSize`.
+So they are hand-authored `.s` files whose words are symbol references, and the registry row
+`link_object` makes the GNU link place the member's own object (`build/recon/psxsrc/<x>.s.o`)
+instead of a verified-bytes scaffold; `native_recon.carve_linked_objects` gives each one its
+own layout fragment (it must lead its retail fragment, the remainder keeps the fragment's
+name). `tools/link_symbols.py` derives every referenced value from the layouts: the overlay
+buffer is the main image's bss end rounded to the group alignment, each overlay's size is its
+image extent, `.last`/`FirstFreeByte` follows the largest overlay, the RAM size comes from
+`global_vram_end`, and the free-memory size is RAM top minus the declared stack option minus
+`FirstFreeByte`. `gen_ld` emits the same relations as linker-script expressions in
+`linkers/diabpsx.ld` (`ALIGN(ADDR+SIZEOF)`, `MAX(...)`), followed by `ASSERT`s against the
+genuine `rom/DIABPSX.MAP` records, and the native lane binds the members' externals to the
+identical numbers, so no address of theirs is written by hand anywhere.
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record

@@ -82,12 +82,88 @@ def image_layout(name):
     if name == 'diabpsx':
         from image_trailer import runtime_segments
         rows, end = runtime_segments(rows, end)
+    rows = carve_linked_objects(rows, end, base, name)
     layout = {(kind, label): (base + off, (rows[i + 1][0] if i + 1 < len(rows) else end) - off)
               for i, (off, kind, label) in enumerate(rows)}
     bss = re.search(r'bss_size:\s*(0x[0-9A-Fa-f]+)', text)
     if bss:
         layout[('bss', '__zero_fill')] = (base + end, int(bss[1], 16))
     return layout, base
+
+
+def linked_object_rows(registry=None):
+    """`link_object` data rows: the GNU link places the member's own object section (hand-authored
+    data such as OVERINFO.MIP / LNKOPT.MIP) instead of a verified-bytes scaffold.  Keyed by
+    (image, kind, segment) -> (va, size, source, section)."""
+    if registry is None:
+        registry = json.loads((B.ROOT / 'configs/native_recon_link.json').read_text())
+    rows = {}
+    for segment, spec in registry.items():
+        for section, row in spec['sections'].items():
+            if not row.get('link_object'):
+                continue
+            if (row['link_object'] is not True or 'scaffold' in row or 'raw_segment' in row
+                    or section not in ('.rdata', '.data', '.sdata')
+                    or not str(spec['source']).lower().endswith('.s')):
+                raise ValueError('linked object sections are hand-authored .rdata/.data/.sdata rows without a scaffold')
+            kind = 'rodata' if section == '.rdata' else section[1:]
+            rows[(row.get('image', spec['image']), kind, segment)] = (int(row['va'], 0), row['size'], spec['source'], section)
+    return rows
+
+
+def carve_linked_objects(rows, end, base, image, registry=None):
+    """Give every linked object its own layout fragment.  A linked object must lead its retail data
+    fragment (or follow another linked object), so the fragment's remainder keeps its name."""
+    linked = sorted((va, size, segment, kind) for (home, kind, segment), (va, size, _, _)
+                    in linked_object_rows(registry).items() if home == image)
+    rows = list(rows)
+    for va, size, segment, kind in linked:
+        off = va - base
+        index = next((i for i, (o, k, n) in enumerate(rows) if o == off), None)
+        if index is None:
+            raise ValueError(f'{segment}: linked object must lead its retail fragment')
+        o, k, n = rows[index]
+        stop = rows[index + 1][0] if index + 1 < len(rows) else end
+        if k != kind or off + size > stop:
+            raise ValueError(f'{segment}: linked object exceeds its retail fragment')
+        if n == segment:
+            raise ValueError(f'{segment}: duplicate linked object fragment')
+        rows[index] = (off, kind, segment)
+        if off + size < stop:
+            rows.insert(index + 1, (off + size, k, n))
+    return rows
+
+
+def trim_linked_objects(source, image, registry=None):
+    """Drop the splat data labels a linked object now owns from a scaffold's source (the carved
+    fragment keeps the splat file of its former whole extent)."""
+    linked = [(va, va + size) for (home, _, _), (va, size, _, _) in linked_object_rows(registry).items()
+              if home == image]
+    if not linked:
+        return source
+    block = re.compile(r"^(?:nonmatching (\w+)\r?\n(?:\r?\n)?)?dlabel (\w+)\r?\n(.*?)^enddlabel \2[ \t]*(?:\r?\n)?(?:\r?\n)?",
+                       re.M | re.S)
+
+    def drop(match):
+        address = re.search(r"/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\b", match[3])
+        if address and any(start <= int(address[1], 16) < stop for start, stop in linked):
+            if match[1] not in (None, match[2]):
+                raise ValueError('linked object label block is malformed')
+            return ''
+        return match[0]
+    trimmed = block.sub(drop, source)
+    if trimmed == source:
+        return source
+    # The carved remainder no longer starts where the splat file did, so an `.align N` ahead of a
+    # label is only right in address terms when the label's retail address is itself 2^N aligned;
+    # otherwise it would pad past the label.  Downgrade it to the label's own alignment.
+    align = re.compile(r"^\.align (\d+)(\r?\n(?:nonmatching \w+\r?\n(?:\r?\n)?)?dlabel \w+\r?\n[ \t]*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\b)",
+                       re.M)
+    def downgrade(match):
+        wanted, address = int(match[1]), int(match[3], 16)
+        natural = (address & -address).bit_length() - 1 if address else wanted
+        return f'.align {min(wanted, natural)}{match[2]}'
+    return align.sub(downgrade, trimmed)
 
 
 def bss_placements(registry, start, end):
@@ -193,7 +269,13 @@ def validate_placements(segment, spec, layouts):
                     else 'sdata' if section.startswith('.sdata.') else section[1:])
             if section in ('.ctors', '.dtors') and (va % 4 or size % 4):
                 raise ValueError('native constructor/destructor tables must be word aligned')
-            parts = scaffold_parts(row, home, kind, layouts)
+            if row.get('link_object'):
+                linked_object_rows({segment: spec})
+                key = (kind, segment)
+                if layouts[home].get(key) != (va, size):
+                    raise ValueError('linked object must own its whole carved retail fragment')
+            else:
+                parts = scaffold_parts(row, home, kind, layouts)
         extent = ((parts[0][1][0], sum(parts[-1][1]) - parts[0][1][0])
                   if parts else layouts[home].get(key))
         if extent is None or not (extent[0] <= va < va + size <= sum(extent)):
@@ -551,13 +633,16 @@ def build(only=None):
     layouts, bases = {}, {}
     for name in IMAGES:
         layouts[name], bases[name] = image_layout(name)
+    import link_symbols as LS
+    LS.check()
+    link_symbols = LS.compute()
     retail_images = {name: (B.ROOT / 'rom' / filename).read_bytes() for name, filename in IMAGES.items()}
     bss_start, bss_size = layouts['diabpsx'][('bss', '__zero_fill')]
     native_bss = bss_placements(registry, bss_start, bss_start + bss_size)
     sdk_bss = N.bss_placements(json.loads((B.ROOT / 'configs/sdk_link.json').read_text()),
                                bss_start, bss_start + bss_size)
     check_bss_overlap(native_bss, sdk_bss)
-    receipts, bridges, bridge_limits, occupied = [], {}, {}, []
+    receipts, bridges, bridge_limits, bridge_homes, occupied = [], {}, {}, {}, []
     extra_bridges, extra_limits = {}, {}
     for segment, spec in registry.items():
         if only is not None and segment not in set(only):
@@ -781,6 +866,9 @@ def build(only=None):
             if name in absolute_bindings:
                 bindings[name] = int(absolute_bindings[name], 0)
                 continue
+            if name in link_symbols:   # layout-derived PSYLINK group / link-option symbols
+                bindings[name] = link_symbols[name]
+                continue
             authority = external_aliases.get(name, name)
             bindings[name] = resolve_bindings([authority], symbol_text)[authority]
         static_bindings = resolve_retail_data_bindings(
@@ -886,6 +974,7 @@ def build(only=None):
             (B.ROOT/filename).write_bytes(data)
             bridges.setdefault(row['scaffold'],[]).append((row['va'],row['size'],filename))
             bridge_limits[row['scaffold']] = row['limit']
+            bridge_homes[row['scaffold']] = 'diabpsx'
         for section, data in payloads.items():
             (OUT / f'{segment}{section}.bin').write_bytes(data)
             if is_zero_section(section):
@@ -899,6 +988,8 @@ def build(only=None):
                     (OUT / (stem + '.s')).write_text(
                         f'.section .text\n.incbin "{(OUT / f"{segment}{section}.bin").as_posix()}"\n')
                     continue
+                if spec['sections'][section].get('link_object'):
+                    continue   # the GNU link places the hand-authored object section itself
                 kind = ('data' if section in ('.ctors', '.dtors') or section.startswith('.data.') else 'rodata' if section.startswith('.rdata')
                         else 'sdata' if section.startswith('.sdata.') else section[1:])
                 parts = scaffold_parts(spec['sections'][section], homes[section], kind, layouts)
@@ -913,6 +1004,7 @@ def build(only=None):
                         region += (first-va,)
                     bridges.setdefault(scaffold, []).append(region)
                     bridge_limits[scaffold] = sum(extent)
+                    bridge_homes[scaffold] = homes[section]
         for (target, kind), data in raw_payloads.items():
             stem = f'{segment}.raw_{target}.{kind}'
             payload = OUT / (stem + '.bin')
@@ -999,7 +1091,7 @@ def build(only=None):
                        else B.ROOT/'asm/data'/(scaffold+'.s'))
         if not source_path.is_file():
             raise ValueError('shared SDK/native data requires a fresh SDK bridge')
-        source = source_path.read_text()
+        source = trim_linked_objects(source_path.read_text(), bridge_homes[scaffold])
         (OUT / (scaffold + '.s')).write_text(bounded_data_bridge(source, regions, bridge_limits[scaffold]))
     (OUT / 'receipts.json').write_text(json.dumps(receipts, indent=2) + '\n')
     return receipts

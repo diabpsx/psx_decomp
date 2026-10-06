@@ -80,8 +80,12 @@ listed in a third section of `MATCH_PROGRESS.md`).
   CD-callback or timer-interrupt path shares the object (the CDSTREAM structure, the blockio/cdrom
   request globals, `curcancel`, `ticks`), and one `volatile` stack local in the MMIO routine
   `SwapByte`, where retail keeps the mask after a stack re-read that the compiler folds for any
-  non-volatile load (ruled in 2026-10-04 as part of the MMIO exception). `loadfilecallback`
-  (a data-only EA member) is the one cell still supplied by the small-data scaffold.
+  non-volatile load (ruled in 2026-10-04 as part of the MMIO exception). Data-only members
+  (`data_only` registry key, 2026-10-06) cover the three code-less retail objects: EA's CALLBACK
+  cell `loadfilecallback`, and Climax's OVERINFO.MIP / LNKOPT.MIP option words, which are
+  hand-authored `.s` sources the GNU link places as its own objects (`link_object`); every word
+  of theirs is a PSYLINK group or link-option symbol that `tools/link_symbols.py` derives from
+  the image layouts, the main linker script computes, and `rom/DIABPSX.MAP` cross-checks.
 
 ## Toolchain (identified, see `docs/TOOLCHAIN.md`)
 * **PsyQ 4.0 game lane** — `CC1PSX.EXE` / `CC1PLPSX.EXE` = GNU C/C++ **2.7.2.SN32.3.7**, PsyQ 4.0 libraries.
@@ -788,8 +792,9 @@ were retired in favour of the single TIMER object `timer.c` (its `tickcount`/`se
 `testticks` reach `tickset`/`tickval` gp-relative, which only the defining object does). The
 registry now holds 41 stripped-SYM members with 344 functions (342 lib entries plus the two
 retail statics `PSXiasyncreader` and `asyncdirentrycallback` inside other oracles); the five
-images link byte-identical. `loadfilecallback`'s four-byte cell (EA's data-only CALLBACK member)
-stays scaffold-supplied because a native member needs a text section.
+images link byte-identical. The code-less retail objects (EA's CALLBACK cell, Climax's
+OVERINFO.MIP and LNKOPT.MIP) are `data_only` members since 2026-10-06; the two Climax files are
+linked as their own GNU objects with link-computed PSYLINK symbols (see `docs/TOOLCHAIN.md`).
 
 The two previously skipped LIB2 archives in the SuperSponge toolchain have now
 been export-inventoried with original PsyLib2 2.07: `CMXboot.lib` has three

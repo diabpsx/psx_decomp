@@ -115,6 +115,9 @@ def gen(name: str):
     if name == 'diabpsx':
         from image_trailer import runtime_segments
         subs, end = runtime_segments(subs, end)
+    from native_recon import carve_linked_objects, linked_object_rows
+    subs = carve_linked_objects(subs, end, vram, name)
+    linked = {(kind, segment): row for (home, kind, segment), row in linked_object_rows().items() if home == name}
     data_bindings = DATA_MAP.get(name, {})
     validate_data_bindings(subs, end, data_bindings, vram)
     native = {segment: spec for segment, spec in NATIVE_RECON.items() if spec["image"] == name}
@@ -209,7 +212,15 @@ def gen(name: str):
                 out.append(f"        build/asm/{n}.s.o(.text);")
         elif kind in SECT:
             binding = data_bindings.get(n)
-            if binding:
+            if (kind, n) in linked:
+                lva, lsize, source, section = linked[(kind, n)]
+                if lva != va or lsize != (subs[i + 1][0] if i + 1 < len(subs) else end) - off:
+                    raise ValueError(f'{n}: linked object placement differs from its carved fragment')
+                marker = f"__linked_{name}_{n}_start"
+                out.extend([f"        {marker} = .;",
+                            f"        build/{source}.o({SECT[kind]});   /* hand-authored data source, link-resolved */",
+                            f'        ASSERT(. - {marker} == 0x{lsize:X}, "wrong linked object extent: {n}");'])
+            elif binding:
                 marker = f"__recon_{name}_{n}_start"
                 out.extend([f"        {marker} = .;",
                             f"        build/{RECON_MAP[binding['owner']]}.o({binding['section']});   /* source-owned data */"])
@@ -262,7 +273,13 @@ def gen(name: str):
                             f"        {obj}({section});",
                             f'        ASSERT(. - {marker} == 0x{size:X}, "wrong BSS extent: {entry}{section}");'])
         out.append(f"        . = 0x{limit:X};   /* remaining .sbss + .bss zero fill */")
-    out += ["    }", "    /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }", "}", *provisions]
+    out.append("    }")
+    if name == 'diabpsx':
+        import link_symbols
+        out += link_symbols.ld_lines(f'.{name}')
+    out += ["    /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }", "}", *provisions]
+    if name == 'diabpsx':
+        out += link_symbols.ld_asserts()
     (ROOT / "linkers" / f"{name}.ld").write_text("\n".join(out) + "\n")
     print(f"{name}: {len(subs)} subsegments -> linkers/{name}.ld")
 
