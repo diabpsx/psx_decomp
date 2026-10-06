@@ -6,6 +6,10 @@ candidate ownership; they do not establish initializer values or individual exte
 Shared pools without object bounds remain unassigned. Multiple enclosing
 objects are shown, not silently disambiguated by address alone.
 
+ClassStrTbl and the three McLoad*Menu structures are confirmed as
+DLG.CPP-owned FRONTEND data using that overlay's fragment bounds,
+retail DLG object markers and typed SYM records.
+
 70 checkpoint names are resolved in the complete raw inventory;
 73 missing source references remain.
 59 of the 60 single-MAP-candidate task entries are resolved; the TONY
@@ -23,7 +27,7 @@ isolated proofs, not a strict whole-program native link seal.
 | `CharBlockBuf` | `0x801576F0` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | No same-name typed record | Current unresolved |
 | `CharDataStruct` | `0x801576F0` | FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end); PREOBJ.text (`0x80155FD8`–`0x80159EDC`, exclusive end); INV.text (`0x80157274`–`0x80161F58`, exclusive end) | Def2 class EXT type STRUCT size 7648 dims 0 tag CharDataStructDef | Current unresolved |
 | `Circle` | `0x800CD2E0` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY SHORT size 128 dims 1 64 tag  | Resolved; native owner verified |
-| `ClassStrTbl` | `0x801435F8` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY INT size 12 dims 1 3 tag  | Current unresolved |
+| `ClassStrTbl` | `0x801435F8` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY INT size 12 dims 1 3 tag  | Owner confirmed; source definition unresolved |
 | `D_80110868` | `0x80110868` | GPANEL.rdata (`0x80110844`–`0x801108A4`, exclusive end) | No same-name typed record | Resolved; native owner verified |
 | `D_80110B24` | `0x80110B24` | TONY.rdata (`0x80110AC4`–`0x80110B31`, exclusive end) | No same-name typed record | Current unresolved |
 | `D_8011B3D8` | `0x8011B3D8` | No explicit object boundary | No same-name typed record | Current unresolved |
@@ -46,9 +50,9 @@ isolated proofs, not a strict whole-program native link seal.
 | `InvSlotTable` | `0x8010D680` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 73 dims 1 73 tag  | Resolved; native owner verified |
 | `KeyTab` | `0x800CD360` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class STAT type ARY USHORT size 20 dims 1 10 tag  | Resolved; native owner verified |
 | `MWVel` | `0x801051F4` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY ARY INT size 288 dims 2 24 3 tag  | Resolved; native owner verified |
-| `McLoadCard1Menu` | `0x80143668` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Current unresolved |
-| `McLoadCard2Menu` | `0x80143684` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Current unresolved |
-| `McLoadGameMenu` | `0x8014364C` | MISSILES.text (`0x80139C04`–`0x8014AB74`, exclusive end); FMV.text (`0x8013B7DC`–`0x80158868`, exclusive end); DRLG_L2.text (`0x80140EF4`–`0x801486A4`, exclusive end); DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Current unresolved |
+| `McLoadCard1Menu` | `0x80143668` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Owner confirmed; source definition unresolved |
+| `McLoadCard2Menu` | `0x80143684` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Owner confirmed; source definition unresolved |
+| `McLoadGameMenu` | `0x8014364C` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Owner confirmed; source definition unresolved |
 | `MenuList` | `0x800CD240` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY STRUCT size 160 dims 1 20 tag OMENULIST | Resolved; native owner verified |
 | `MissPrintRoutines` | `0x800D6E50` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY PTR FCN VOID size 272 dims 1 68 tag  | Resolved; native owner verified |
 | `MonDays` | `0x800B09B8` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY STRUCT size 96 dims 1 12 tag MONTH_DAYS | Resolved; native owner verified |
@@ -159,4 +163,4 @@ isolated proofs, not a strict whole-program native link seal.
 | `uniquetrans` | `0x8011C2D8` | No explicit object boundary | Def class EXT type INT size 0 | Current unresolved |
 
 81/143 checkpoint names have explicit enclosing MAP object boundaries;
-70 have one candidate and 11 have ambiguous overlapping candidates.
+74 have one candidate and 7 have ambiguous overlapping candidates.

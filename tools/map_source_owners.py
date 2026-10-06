@@ -9,6 +9,35 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+DLG_FRONTEND_FRAGMENTS = {
+    'ClassStrTbl': 'dlg_rodata_801435e8',
+    'McLoadGameMenu': 'dlg_rodata_8014364c',
+    'McLoadCard1Menu': 'dlg_rodata_8014364c',
+    'McLoadCard2Menu': 'dlg_rodata_8014364c',
+}
+
+
+def contextual_candidates(name, va, candidates, declarations, frontend):
+    """Use verified overlay context instead of overlapping VA ranges alone."""
+    fragment = DLG_FRONTEND_FRAGMENTS.get(name)
+    if fragment is None:
+        return candidates, False
+    base = re.search(r'^\s+vram:\s*(0x[0-9A-Fa-f]+)\s*$', frontend, re.M)
+    segments = [(int(offset, 16), kind, label.strip()) for offset, kind, label in
+                re.findall(r'^\s+- \[(0x[0-9A-Fa-f]+),\s*(\w+),\s*([^\]]+)\]', frontend, re.M)]
+    locations = [i for i, row in enumerate(segments) if row[1:] == ('rodata', fragment)]
+    if base is None or len(locations) != 1 or not declarations:
+        raise ValueError(f'{name}: missing FRONTEND/SYM ownership evidence')
+    index = locations[0]
+    if index + 1 >= len(segments):
+        raise ValueError(f'{name}: FRONTEND fragment has no end boundary')
+    origin = int(base[1], 16)
+    if not origin + segments[index][0] <= va < origin + segments[index+1][0]:
+        raise ValueError(f'{name}: VA is outside its verified FRONTEND fragment')
+    selected = [row for row in candidates if row[2:] == ('DLG', 'text')]
+    if len(selected) != 1:
+        raise ValueError(f'{name}: missing or ambiguous retail DLG object bounds')
+    return selected, True
 
 
 def build():
@@ -33,6 +62,7 @@ def build():
             if end > start:
                 regions.append((start, end, match[1], match[2]))
     sym_text = (ROOT / 'rom/DIABPSX-SYM.txt').read_text(encoding='latin-1')
+    frontend = (ROOT / 'configs/frontend.yaml').read_text(encoding='utf-8')
     records = {}
     for address, declaration, name in re.findall(
             r'^\w+: \$([0-9a-fA-F]+) 9[46] (Def2? class .*?) name (\S+)\s*$',
@@ -48,6 +78,9 @@ def build():
              'candidate ownership; they do not establish initializer values or individual extents.',
              'Shared pools without object bounds remain unassigned. Multiple enclosing',
              'objects are shown, not silently disambiguated by address alone.', '',
+             'ClassStrTbl and the three McLoad*Menu structures are confirmed as',
+             'DLG.CPP-owned FRONTEND data using that overlay\'s fragment bounds,',
+             'retail DLG object markers and typed SYM records.', '',
              f'{len(restored)} checkpoint names are resolved in the complete raw inventory;',
              f'{len(inventory["missing_source_definitions"])} missing source references remain.',
              '59 of the 60 single-MAP-candidate task entries are resolved; the TONY',
@@ -61,17 +94,23 @@ def build():
         va = int(address, 16)
         if name in symbols and va not in symbols[name]:
             raise ValueError(f'{name}: checkpoint address differs from retail MAP')
-        owners = [f'{owner}.{section} (`0x{start:08X}`–`0x{end:08X}`, exclusive end)'
-                  for start, end, owner, section in sorted(regions) if start <= va < end]
+        candidates = [row for row in sorted(regions) if row[0] <= va < row[1]]
+        candidates, confirmed = contextual_candidates(
+            name, va, candidates, records.get((name, va), set()), frontend)
+        owners = [('DLG.CPP / FRONTEND: ' if confirmed else '')
+                  + f'{owner}.{section} (`0x{start:08X}`–`0x{end:08X}`, exclusive end)'
+                  for start, end, owner, section in candidates]
         assigned += bool(owners)
         unique += len(owners) == 1
         declaration = '; '.join(sorted(records.get((name, va), set()))) or 'No same-name typed record'
         status = 'Resolved; native owner verified' if name in restored else 'Current unresolved'
+        if confirmed and name not in restored:
+            status = 'Owner confirmed; source definition unresolved'
         lines.append(f'| `{name}` | `{address}` | {"; ".join(owners) or "No explicit object boundary"} | {declaration} | {status} |')
     lines += ['', f'{assigned}/{len(names)} checkpoint names have explicit enclosing MAP object boundaries;',
               f'{unique} have one candidate and {assigned - unique} have ambiguous overlapping candidates.', '']
     output = ROOT / 'docs/REMAINING_SOURCE_OWNERS.md'
-    output.write_text('\n'.join(lines), encoding='utf-8')
+    output.write_text('\n'.join(lines), encoding='utf-8', newline='\n')
     print(f'{assigned}/{len(names)} names attributed; report: {output}')
 
 
