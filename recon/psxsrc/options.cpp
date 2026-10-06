@@ -1898,7 +1898,7 @@ void CharCardSelectMemcardPad(void)
     ShowCardActionText();
     LAMBO_MovePad(P);
     if ((P->GetDown() & 0x40) || (P->GetDown() & 0x10)) {
-        if (D_8011B3D8[cs] != 2) {
+        if (card_status[cs - 1] != 2) {
             countdownloadcharblock = 1;
             cardondelay = 5;
             PlaySFX(0x33);

@@ -1,7 +1,6 @@
 extern struct map_info dung_map[112][112];   /* @0x800E7A28 */
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 extern struct ObjectStruct object[127];   /* @0x800D8C4C */
-extern long nummonsters;   /* @0x8011C2CC */
 extern struct MissileStruct missile[125];   /* @0x80102C58 */
 extern int gnDifficulty;   /* @0x8011C108 */
 extern unsigned char currlevel;   /* @0x8011C10C */
@@ -19,8 +18,6 @@ extern unsigned char gbDoEnding;   /* @0x8011B801 */
 extern unsigned char gbRunGame;   /* @0x8011B802 */
 extern unsigned char deathflag;   /* @0x8011BA0C */
 extern int FePlayerNo;   /* @0x8011B378 */
-extern char offset_x[8];   /* @0x8011C2A8 */
-extern char offset_y[8];   /* @0x8011C2B0 */
 extern int _pcursmonst[2];   /* @0x8011B758 */
 extern unsigned char _pinfoflag[2];   /* @0x8011B6B8 */
 extern int sel_data;   /* @0x8011B72C */
@@ -36,3 +33,10 @@ extern struct MonsterData monsterdata[];   /* @0x8010AB9C */
 extern struct UniqMonstStruct UniqMonst[96];   /* @0x8010C708 */
 extern char TransVal;   /* @0x8011C148 */
 extern struct TextDataStruct alltext[269];   /* @0x80117C20 */
+
+/* MONSTER.CPP-owned small data in retail order (MAP 0x8011C2A0..0x8011C2DB).  The three
+ * initialised tables are emitted at the top of the TU; nummonsters, monstimgtot, totalmonsters
+ * and uniquetrans carry no initialiser, so cc1plus emits them at the end, after the ", " literal. */
+char animletter[7] = "nwahds";                        /* @0x8011C2A0 */
+char offset_x[8] = { 1, 0, -1, -1, -1, 0, 1, 1 };     /* @0x8011C2A8 */
+char offset_y[8] = { 1, 1, 1, 0, -1, -1, -1, 0 };     /* @0x8011C2B0 */

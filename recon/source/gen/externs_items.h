@@ -9,7 +9,7 @@ extern char OutStr[128];   /* @0x800D54D4 */
 extern const struct PLStruct PL_Prefix[84];   /* @0x80112744 */
 extern const struct PLStruct PL_Suffix[96];   /* @0x80113464 */
 extern unsigned char PauseMode;   /* @0x8011B7A4 */
-extern int ScrollFlag[2];   /* @0x8011B8B8 */
+extern int ScrollFlag[2];   /* @0x8011B8B8, defined before CastScroll in items.cpp */
 extern const short SinTab[32];   /* @0x80116178 */
 extern int StorePlrNo;   /* @0x8011BAB4 */
 extern unsigned char UniqueItemFlag[128];   /* @0x800D5454 */

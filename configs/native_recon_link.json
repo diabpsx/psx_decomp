@@ -744,7 +744,6 @@
       "card_side_noopt",
       "card_side_read",
       "card_side_save",
-      "card_status",
       "card_usable",
       "cardondelay",
       "countdownloadcharblock",
@@ -779,7 +778,8 @@
       "snd_stop_snd__FP4TSnd",
       "stream_pause__Fv",
       "stream_resume__Fv",
-      "test_card_format__Fi"
+      "test_card_format__Fi",
+      "card_status"
     ]
   },
   "padfuncs": {
@@ -1756,7 +1756,7 @@
       ".sdata": {
         "image": "diabpsx",
         "va": "0x8011B3C8",
-        "size": 28,
+        "size": 60,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -1788,7 +1788,11 @@
       "card_header",
       "to_ascii_invalid_char",
       "dirflag",
-      "card_status"
+      "card_status",
+      "card_usable",
+      "card_files",
+      "card_changed",
+      "last_card_status"
     ],
     "externals": [
       "card_ev0",
@@ -1796,7 +1800,6 @@
       "card_ev2",
       "sprintf",
       "card_ev3",
-      "card_files",
       "_card_wait",
       "erase",
       "close",
@@ -1809,16 +1812,13 @@
       "_card_clear",
       "nextfile",
       "PantsDelay__Fv",
-      "card_usable",
       "format",
       "memset",
       "read",
       "TestEvent",
       "strcpy",
       "block_buf",
-      "last_card_status",
       "open",
-      "card_changed",
       "firstfile",
       "read_card_block__Fii",
       "mem_card_event_handler",
@@ -3555,8 +3555,8 @@
         "scaffold": "rodata_monster.rodata"
       },
       ".sdata": {
-        "va": "0x8011C2B8",
-        "size": 19,
+        "va": "0x8011C2A0",
+        "size": 43,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
       },
@@ -3578,6 +3578,21 @@
         "va": "0x8011c29c",
         "size": 4,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      "monstimgtot": {
+        "va": "0x8011c2d0",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      "totalmonsters": {
+        "va": "0x8011c2d4",
+        "size": 1,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      "uniquetrans": {
+        "va": "0x8011c2d8",
+        "size": 4,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -3588,7 +3603,13 @@
       "monster",
       "monstactive",
       "monstkills",
-      "Monsters"
+      "Monsters",
+      "animletter",
+      "offset_x",
+      "offset_y",
+      "monstimgtot",
+      "totalmonsters",
+      "uniquetrans"
     ],
     "externals": [
       "AddDead__Fiici",
@@ -3685,8 +3706,6 @@
       "myplr",
       "nummissiles",
       "object",
-      "offset_x",
-      "offset_y",
       "play_movie",
       "plr",
       "plrind__FP12PlayerStruct",
@@ -12344,31 +12363,6 @@
         "size": 14708,
         "scaffold": "data_items.data"
       },
-      ".sdata.items_num": {
-        "va": "0x8011B888",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.items_snds": {
-        "va": "0x8011B890",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.items_fmt0": {
-        "va": "0x8011B898",
-        "size": 32,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.items_fmt1": {
-        "va": "0x8011B8C0",
-        "size": 22,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.items_unique": {
-        "va": "0x8011B8DC",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".bss.items_curr": {
         "va": "0x8012EC58",
         "size": 108
@@ -12380,6 +12374,11 @@
       ".bss.items_active": {
         "va": "0x8012ECD8",
         "size": 127
+      },
+      ".sdata": {
+        "va": "0x8011B888",
+        "size": 85,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "post_assemble_section_split": [
@@ -12411,42 +12410,6 @@
             "alignment": 2
           }
         ]
-      },
-      {
-        "section": ".sdata",
-        "pieces": [
-          {
-            "name": ".sdata.items_num",
-            "offset": 0,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.items_snds",
-            "offset": 4,
-            "size": 8,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.items_unique",
-            "offset": 12,
-            "size": 1,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.items_fmt0",
-            "offset": 16,
-            "size": 32,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.items_fmt1",
-            "offset": 48,
-            "size": 22,
-            "alignment": 2
-          }
-        ],
-        "allow_zero_gaps": true
       },
       {
         "section": ".bss",
@@ -12491,7 +12454,10 @@
       "itemhold",
       "numitems",
       "premiumlvladd",
-      "uitemflag"
+      "uitemflag",
+      "gnNumGetRecords",
+      "ScrollFlag",
+      "FIRSTTIME"
     ],
     "externals": [
       "AddPanelString__FPCci",
@@ -12525,7 +12491,6 @@
       "PauseMode",
       "PlaySFX__Fi",
       "PlaySfxLoc__Fiii",
-      "ScrollFlag",
       "SetPlayerHitPoints__Fii",
       "SetPlrAnims__Fi",
       "SetRndSeed__Fl",

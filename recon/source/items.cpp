@@ -260,10 +260,10 @@ static const short Item2Frm[35] = {
     300,254,233,252,237,241,241,239,238,240,242,237,244,235,251,261,222,232,250
 };
 
-long numitems = 0;
-int *ItemAnimSnds = ItemInvSnds;
-int idoppely = 16;
-unsigned char uitemflag = 0;
+long numitems = 0;                 /* @0x8011B888 */
+int gnNumGetRecords = 0;           /* @0x8011B88C */
+int *ItemAnimSnds = ItemInvSnds;   /* @0x8011B890 */
+int idoppely = 16;                 /* @0x8011B894 */
 
 void InitItemGFX(void)
 {
@@ -2906,6 +2906,10 @@ void PrintItemDur(const ItemStruct *x)
 /* @0x80047464 ITEMS.CPP:4234 — PSX-only (hellfire has no CastScroll): pad-driven scroll casting.
  * 1-player: heal other / resurrect refused; 2-player: teleport/phasing refused, heal other / resurrect
  * need the other player (pnum ^ 1) and aim at him */
+/* Retail ITEMS.CPP defines ScrollFlag here: its .sdata cell (0x8011B8B8) sits between the
+ * PrintItem* format literals and UseItem's "No Ta" literal. */
+int ScrollFlag[2] = { 0, 0 };      /* @0x8011B8B8 */
+
 void CastScroll(int pnum, int Spell)
 {
     PlayerStruct *ptrplr;
@@ -3450,6 +3454,10 @@ char *MakeItemStr(ItemStruct *ItemPtr, unsigned short ItemNo, unsigned short Max
 
 /* @0x80049608 ITEMS.CPP:4752 — PSX drops the "&& iSpell!=0" qualifier on the IT_STAFF check (the whole
  * oil-selling comment block is compiled out on both platforms) */
+/* Defined after MakeItemStr in retail: both cells follow its "%s %s" literal (0x8011B8D8/0x8011B8DC). */
+BOOL FIRSTTIME = TRUE;             /* @0x8011B8D8 */
+unsigned char uitemflag = 0;       /* @0x8011B8DC */
+
 unsigned char SmithItemOk(int i)
 {
     unsigned char rv;

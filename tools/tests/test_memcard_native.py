@@ -33,7 +33,7 @@ class MemcardNativeTests(unittest.TestCase):
         self.assertEqual((receipt["segment"], receipt["functions"]), ("memcard", 16))
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3144)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 3824, ".rdata": 17824, ".sdata": 28})
+                         {".text": 3824, ".rdata": 17824, ".sdata": 60})   # .. last_card_status
 
 
 if __name__ == "__main__":

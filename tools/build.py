@@ -61,8 +61,6 @@ PER_TU_FLAGS = {
         "route_symbol_sections": {
             "card_dir": ".data.memcard_zeros",
             "card_header": ".data.memcard_zeros"},
-        "move_symbol_before": {
-            "symbol": "to_ascii_invalid_char", "size": 4, "before": "$LC0"},
         "section_occurrence_renames": [
             {"section": ".rdata", "occurrence": 2, "as": ".text"}]},
     "recon/psxsrc/biglump.cpp": {"move_symbols_before": [

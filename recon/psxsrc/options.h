@@ -290,9 +290,6 @@ void ActivateMemcard(int a, int b);   /* @0x800A5790 CARDCORE.CPP */
 void ActivateCharacterMemcard(int a, int b);   /* @0x800A57CC CARDCORE.CPP */
 void ShowCardActionText(void);   /* @0x800A5888 CARDCORE.CPP */
 void ShowAlertBox(void);   /* @0x8015A3BC -- real fn, another module */
-extern int D_8011B3D8[];   /* SYM has no name for this address (gap between CreditSubTitleNo and
-                             * dirflag/card_status); absolute lui/lw in this TU's oracle -> extern, owned
-                             * elsewhere. Indexed [cs]. */
 extern BOOL DoLoadedGame[];
 extern int countdownloadcharblock;
 extern int card_side_read[2];

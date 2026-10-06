@@ -192,7 +192,10 @@ static BOOL gSameRoom(int m, int i);   /* @0x80156A68 MONSTER.CPP:5556 */
 #define MAXMONSTERS 190
 
 /* TU-owned small data (.sdata, gp-relative in retail) */
-long nummonsters;
+long nummonsters;                 /* @0x8011C2CC (uninitialised: emitted at the end of .sdata) */
+long monstimgtot;                 /* @0x8011C2D0 */
+unsigned char totalmonsters;      /* @0x8011C2D4 */
+int uniquetrans;                  /* @0x8011C2D8 */
 int nummtypes;
 
 #define MIT_ARROW        0

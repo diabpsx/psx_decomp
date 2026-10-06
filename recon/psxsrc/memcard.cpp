@@ -31,10 +31,16 @@ long format(char *fs);
 
 extern void (*mem_card_event_handler)(int event, int card_number);   /* @0x8011B174 */
 
-/* TU-owned small globals (%gp_rel in the oracle) */
-int to_ascii_invalid_char;   /* @0x8011B3C8 */
+/* TU-owned small globals (%gp_rel in the oracle), retail order.  to_ascii_invalid_char carries an
+ * explicit initialiser, so cc1plus emits it ahead of the "bu%d0:*" / "bu%d0:" literals; the rest
+ * have none and are emitted at the end of the TU in this order (0x8011B3DB..0x8011B403). */
+int to_ascii_invalid_char = 0;   /* @0x8011B3C8 */
 char dirflag;   /* @0x8011B3DB */
 int card_status[2];   /* @0x8011B3DC */
+int card_usable[2];   /* @0x8011B3E4 */
+int card_files[2];   /* @0x8011B3EC */
+int card_changed[2];   /* @0x8011B3F4 */
+int last_card_status[2];   /* @0x8011B3FC */
 
 /* MEMCARD.CPP-owned overlay storage.  The initialized conversion table is
  * followed by the two zero-filled directory/header banks in retail. */
