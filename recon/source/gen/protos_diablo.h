@@ -14,7 +14,7 @@ void LoadLvlGFX(void);   /* @0x80038930 DIABLO.CPP:2413 */
 void LoadMegaTiles(const char *LoadFile);   /* @0x800389E8 DIABLO.CPP:2452 */
 void LoadAllGFX(void);   /* @0x80038A78 DIABLO.CPP:2472 */
 void CreateLevel(int lvldir);   /* @0x80038A98 DIABLO.CPP:2505 */
-void LoCreateLevel(void *Param);   /* @0x80038B90 DIABLO.CPP:2534 -- SYM mangling LoCreateLevel__FPv needs a void* param even though the body ignores it (re-derives lvldir from D_8011C7B0) */
+void LoCreateLevel(void *Param);   /* @0x80038B90 DIABLO.CPP:2534 -- SYM mangling LoCreateLevel__FPv needs a void* param even though the body ignores it (re-derives lvldir from the static Passedlvldir) */
 void ClearOutDungeonMap(void);   /* @0x80038CF4 DIABLO.CPP:2592 */
 void AddQuestItems(void);   /* @0x80038EF4 DIABLO.CPP:2690 */
 void FreeInvGFX(void);   /* @0x80157274 INV.CPP:443 */

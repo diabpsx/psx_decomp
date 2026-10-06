@@ -36,28 +36,45 @@ extern int setpc_y;   /* @0x8011C0E8 */
 extern char visible_level;   /* @0x8011B0A8 */
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 
-/* TU-OWNED small globals (oracle reaches every one of these via %gp_rel in THIS TU; per methodology
- * 3.12#6 an owning module tentative-defines, not externs, its own small globals so the assembler
- * gp-relativizes them like retail). DIABLO.CPP is their natural home (main game-state file); other
- * TUs that only read them keep plain `extern` (and the oracle addresses them absolute there, which
- * is correct for a non-owner). */
-int LastFrCount = -1;   /* @0x8011B7D8 */
-enum GM_SPEEDS GameSpeed;   /* @0x8011B7DC */
-unsigned char PauseMode;   /* @0x8011B7A4 */
-int force_redraw;   /* @0x8011B790 */
-unsigned char gbProcessPlayers;   /* @0x8011B800 */
-unsigned char gbDoEnding;   /* @0x8011B801 */
-unsigned char gbRunGame;   /* @0x8011B802 */
-unsigned char gbRunGameResult;   /* @0x8011B803 */
-unsigned char gbGameLoopStartup;   /* @0x8011B804 */
-unsigned long ghMainWnd = 0x29A;   /* @0x8011B788 */
-int setseed;   /* @0x8011B79C */
-unsigned char sgbMouseDown;   /* @0x8011B7AC */
-unsigned char svgamode;   /* @0x8011B7E0 */
+/* TU-OWNED globals of DIABLO.CPP in retail small-data order (MAP 0x8011B788..0x8011B805, SYM
+ * STAT records for the statics).  cc1plus emits an initialised global at its definition, in source
+ * order and interleaved with the .sdata string literals of the functions compiled so far, and
+ * defers every uninitialised global to the end of the TU; the retail bytes therefore say which
+ * ones carried an explicit initialiser and where in the file they stood: this block (before
+ * LoadLvlGFX's "L1.TIL".."L4.TIL" and CreateLevel's "STACK" literals), then LastFrCount /
+ * GameSpeed right after CreateLevel (recon/source/diablo.cpp), then the uninitialised tail
+ * (svgamode, MouseX, MouseY, gv1..gv5, gb*) also kept there.  Statics without an initialiser
+ * go to .sbss (.lcomm) at 0x8011C7AC..0x8011C7BB in this order. */
+unsigned long ghMainWnd = 0x29A;      /* @0x8011B788 */
+unsigned char fullscreen = 1;         /* @0x8011B78C */
+int force_redraw = 0;                 /* @0x8011B790 */
+static unsigned char cineflag = 1;    /* @0x8011B794 (STAT) */
+unsigned char visiondebug = 0;        /* @0x8011B795 */
+unsigned char scrollflag = 0;         /* @0x8011B796 */
+unsigned char light4flag = 0;         /* @0x8011B797 */
+unsigned char leveldebug = 0;         /* @0x8011B798 */
+unsigned char monstdebug = 0;         /* @0x8011B799 */
+unsigned char trigdebug = 0;          /* @0x8011B79A */
+int setseed = 0;                      /* @0x8011B79C */
+int debugmonsttypes = 0;              /* @0x8011B7A0 */
+unsigned char PauseMode = 0;          /* @0x8011B7A4 */
+unsigned char FriendlyMode = 0;       /* @0x8011B7A5 */
+static int sgnTimeoutCurs = 0;        /* @0x8011B7A8 (STAT): saved cursor id while in a timeout-cursor state */
+unsigned char sgbMouseDown = 0;       /* @0x8011B7AC */
+static long *sg_previousFilter;       /* @0x8011C7AC (STAT, .sbss) */
+static int Passedlvldir;              /* @0x8011C7B0 (STAT, .sbss): lvldir stashed across the CreateLevel setjmp/GSYS_SetStackAndJump handoff */
+static unsigned char *TempStack;      /* @0x8011C7B4 (STAT, .sbss): CreateLevel's private stack (GAL_Lock'd 0x14000-byte block) */
+static BOOL pauseo;                   /* @0x8011C7B8 (STAT, .sbss): game_loop "pause-ok already set" one-shot latch */
 
-/* TU-owned small globals -- no SYM EXT record (unnamed splat D_ gaps), reached %gp_rel in the oracle;
- * tentative defs so they land in .sbss and gp-relative-address like retail (methodology 3.12#6). */
-int D_8011B7A8;             /* sgnTimeoutCurs-equivalent: saved cursor id while in a timeout-cursor state */
-int D_8011C7B0;             /* lvldir stashed across the CreateLevel setjmp/GSYS_SetStackAndJump handoff */
-unsigned char *D_8011C7B4;  /* CreateLevel's private stack pointer/top (GAL_Lock'd 0x14000-byte block) */
-int D_8011C7B8;             /* game_loop: "pause-ok already set" one-shot latch (SYM shows a WORD store) */
+/* Declared ahead (DIABLO.H), defined after CreateLevel in recon/source/diablo.cpp. */
+extern int LastFrCount;               /* @0x8011B7D8 */
+extern enum GM_SPEEDS GameSpeed;      /* @0x8011B7DC */
+extern unsigned char svgamode;        /* @0x8011B7E0 */
+extern int MouseX;                    /* @0x8011B7E4 */
+extern int MouseY;                    /* @0x8011B7E8 */
+extern long gv1, gv2, gv3, gv4, gv5;  /* @0x8011B7EC..0x8011B7FC */
+extern unsigned char gbProcessPlayers;   /* @0x8011B800 */
+extern unsigned char gbDoEnding;         /* @0x8011B801 */
+extern unsigned char gbRunGame;          /* @0x8011B802 */
+extern unsigned char gbRunGameResult;    /* @0x8011B803 */
+extern unsigned char gbGameLoopStartup;  /* @0x8011B804 */

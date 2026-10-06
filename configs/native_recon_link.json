@@ -4,7 +4,8 @@
     "image": "diabpsx",
     "assembler": "2.67",
     "data_record_addresses": {
-      "CreateEnv": "0x8012EC28"
+      "CreateEnv": "0x8012EC28",
+      "TempStack": "0x8011C7B4"
     },
     "sections": {
       ".text": {
@@ -22,164 +23,19 @@
         "scaffold": "data_diablo.data",
         "allow_zero_tail": 2912
       },
-      ".sdata.diablo_last": {
-        "va": "0x8011B7D8",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.diablo_mainwnd": {
-        "va": "0x8011B788",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.diablo_tiles": {
-        "va": "0x8011B7B0",
-        "size": 40,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.diablo_game": {
-        "va": "0x8011B7DC",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.diablo_pause": {
-        "va": "0x8011B7A4",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 1
-      },
-      ".sdata.diablo_force": {
-        "va": "0x8011B790",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.diablo_gb": {
-        "va": "0x8011B800",
-        "size": 5,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 5
-      },
-      ".sdata.diablo_setseed": {
-        "va": "0x8011B79C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sdata.diablo_mouse": {
-        "va": "0x8011B7AC",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 1
-      },
-      ".sdata.diablo_svga": {
-        "va": "0x8011B7E0",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 1
-      },
-      ".sdata.diablo_timeout": {
-        "va": "0x8011B7A8",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata",
-        "allow_zero_tail": 4
-      },
-      ".sbss.diablo_lvldir": {
-        "va": "0x8011C7B0",
-        "size": 4,
-        "allow_zero_tail": 4
-      },
-      ".sbss.diablo_stack": {
-        "va": "0x8011C7B4",
-        "size": 4,
-        "allow_zero_tail": 4
-      },
-      ".sbss.diablo_pause": {
-        "va": "0x8011C7B8",
-        "size": 4,
-        "allow_zero_tail": 4
-      },
       ".bss": {
         "va": "0x8012EAE8",
         "size": 368
+      },
+      ".sdata": {
+        "va": "0x8011B788",
+        "size": 125,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C7AC",
+        "size": 16
       }
-    },
-    "post_assemble_section_split": {
-      "section": ".sdata",
-      "pieces": [
-        {
-          "name": ".sdata.diablo_last",
-          "offset": 0,
-          "size": 4
-        },
-        {
-          "name": ".sdata.diablo_mainwnd",
-          "offset": 4,
-          "size": 4
-        },
-        {
-          "name": ".sdata.diablo_tiles",
-          "offset": 8,
-          "size": 40
-        },
-        {
-          "name": ".sdata.diablo_game",
-          "offset": 48,
-          "size": 4
-        },
-        {
-          "name": ".sdata.diablo_pause",
-          "offset": 52,
-          "size": 1
-        },
-        {
-          "name": ".sdata.diablo_force",
-          "offset": 56,
-          "size": 4
-        },
-        {
-          "name": ".sdata.diablo_gb",
-          "offset": 60,
-          "size": 5
-        },
-        {
-          "name": ".sdata.diablo_setseed",
-          "offset": 68,
-          "size": 4
-        },
-        {
-          "name": ".sdata.diablo_mouse",
-          "offset": 72,
-          "size": 1
-        },
-        {
-          "name": ".sdata.diablo_svga",
-          "offset": 73,
-          "size": 1
-        },
-        {
-          "name": ".sdata.diablo_timeout",
-          "offset": 76,
-          "size": 4
-        },
-        {
-          "name": ".sbss.diablo_lvldir",
-          "offset": 80,
-          "size": 4
-        },
-        {
-          "name": ".sbss.diablo_stack",
-          "offset": 84,
-          "size": 4
-        },
-        {
-          "name": ".sbss.diablo_pause",
-          "offset": 88,
-          "size": 4
-        }
-      ],
-      "allow_zero_gaps": true
     },
     "data_symbols": [
       "DebugMonsters",
@@ -203,7 +59,29 @@
       "glMid1Seed",
       "glMid2Seed",
       "glMid3Seed",
-      "CreateEnv"
+      "CreateEnv",
+      "fullscreen",
+      "cineflag",
+      "visiondebug",
+      "scrollflag",
+      "light4flag",
+      "leveldebug",
+      "monstdebug",
+      "trigdebug",
+      "debugmonsttypes",
+      "FriendlyMode",
+      "sgnTimeoutCurs",
+      "MouseX",
+      "MouseY",
+      "gv1",
+      "gv2",
+      "gv3",
+      "gv4",
+      "gv5",
+      "sg_previousFilter",
+      "Passedlvldir",
+      "TempStack",
+      "pauseo"
     ],
     "externals": [
       "AddVision__FiiiUc",

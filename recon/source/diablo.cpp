@@ -107,7 +107,7 @@ static void start_game(unsigned int uMsg)
     LoadedChar[1] = 0;
     LoadedChar[0] = 0;
     InitLevelCursor();
-    D_8011B7A8 = 0;
+    sgnTimeoutCurs = 0;
     sgbMouseDown = 0;
 }
 
@@ -363,21 +363,40 @@ void CreateLevel(int lvldir)
     hnd = GAL_Alloc(0x14000, 1, "STACK");
     if (hnd == -1)
         DBG_Error(0, "source/DIABLO.cpp", 0x9CF);
-    D_8011C7B4 = (unsigned char *)GAL_Lock(hnd);
-    if (!D_8011C7B4)
+    TempStack = (unsigned char *)GAL_Lock(hnd);
+    if (!TempStack)
         DBG_Error(0, "source/DIABLO.cpp", 0x9D2);
-    D_8011C7B4 = D_8011C7B4 + 0x13FFC;
+    TempStack = TempStack + 0x13FFC;
     if (!setjmp(CreateEnv)) {
-        D_8011C7B0 = lvldir;
-        GSYS_SetStackAndJump(D_8011C7B4, LoCreateLevel, 0);
+        Passedlvldir = lvldir;
+        GSYS_SetStackAndJump(TempStack, LoCreateLevel, 0);
     }
     if (!GAL_Free(hnd))
         DBG_Error(0, "source/DIABLO.cpp", 0x9DD);
 }
 
+/* Retail DIABLO.CPP defines these after CreateLevel: LastFrCount and GameSpeed follow the "STACK"
+ * literal in .sdata (0x8011B7D8 / 0x8011B7DC); the rest carry no initialiser, so cc1plus emits them
+ * at the end of the TU in this order (0x8011B7E0..0x8011B804). */
+int LastFrCount = -1;                 /* @0x8011B7D8 */
+enum GM_SPEEDS GameSpeed = GM_SPEED_NORMAL;   /* @0x8011B7DC */
+unsigned char svgamode;               /* @0x8011B7E0 */
+int MouseX;                           /* @0x8011B7E4 */
+int MouseY;                           /* @0x8011B7E8 */
+long gv1;                             /* @0x8011B7EC */
+long gv2;                             /* @0x8011B7F0 */
+long gv3;                             /* @0x8011B7F4 */
+long gv4;                             /* @0x8011B7F8 */
+long gv5;                             /* @0x8011B7FC */
+unsigned char gbProcessPlayers;       /* @0x8011B800 */
+unsigned char gbDoEnding;             /* @0x8011B801 */
+unsigned char gbRunGame;              /* @0x8011B802 */
+unsigned char gbRunGameResult;        /* @0x8011B803 */
+unsigned char gbGameLoopStartup;      /* @0x8011B804 */
+
 void LoCreateLevel(void *)
 {
-    int lvldir = D_8011C7B0;
+    int lvldir = Passedlvldir;
 
     if (leveltype < 5) {
         switch (leveltype) {
@@ -752,7 +771,7 @@ static void game_logic(void)
         break;
     }
 
-    if (!D_8011B7A8)
+    if (!sgnTimeoutCurs)
         CheckCursMove();
 
     ThisTick = VID_GetTick();
@@ -803,17 +822,17 @@ static void game_logic(void)
 static void timeout_cursor(unsigned char bTimeout)
 {
     if (bTimeout) {
-        if (D_8011B7A8 || sgbMouseDown)
+        if (sgnTimeoutCurs || sgbMouseDown)
             return;
-        D_8011B7A8 = _pcurs[myplr];
+        sgnTimeoutCurs = _pcurs[myplr];
         ClearPanel();
         NewCursor(0xB);
         force_redraw = 0xFF;
     } else {
-        if (!D_8011B7A8)
+        if (!sgnTimeoutCurs)
             return;
-        SetCursor(D_8011B7A8);
-        D_8011B7A8 = 0;
+        SetCursor(sgnTimeoutCurs);
+        sgnTimeoutCurs = 0;
         ClearPanel();
         force_redraw = 0xFF;
     }
@@ -822,11 +841,11 @@ static void timeout_cursor(unsigned char bTimeout)
 static void game_loop(unsigned char bStartup)
 {
     if (IsGameLoading()) {
-        D_8011C7B8 = 0;
+        pauseo = 0;
         return;
     }
-    if (!D_8011C7B8) {
-        D_8011C7B8 = 1;
+    if (!pauseo) {
+        pauseo = 1;
         PA_SetPauseOk(1);
     }
     timeout_cursor(0);
