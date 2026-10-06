@@ -213,12 +213,17 @@ def build(owners=None, reuse=False):
     definitions = {name for row in objects for name in row['exports']}
     unresolved = sorted({name for row in objects for name in row['references']} - definitions)
     archive_definitions = archive_exports()
-    source_missing = [name for name in unresolved if name not in archive_definitions]
+    import link_symbols as LS
+    link_computed = LS.compute()   # PSYLINK group / link-option symbols the link script defines
+    source_missing = [name for name in unresolved
+                      if name not in archive_definitions and name not in link_computed]
     report = {'scope': 'complete' if owners is None else 'selected owners only',
               'objects': objects,
               'unresolved_source_references': unresolved,
               'verified_archive_candidates': {name: archive_definitions[name]
                                               for name in unresolved if name in archive_definitions},
+              'link_computed_definitions': {
+                  name: f'0x{link_computed[name]:08X}' for name in unresolved if name in link_computed},
               'missing_source_definitions': {
                   name: [row['owner'] for row in objects if name in row['references']]
                   for name in source_missing},

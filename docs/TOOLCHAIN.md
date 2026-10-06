@@ -402,8 +402,9 @@ exception and never elsewhere.
 
 Three retail objects carry no code: EA's CALLBACK (the `loadfilecallback` cell) and Climax's
 OVERINFO.MIP (overlay load addresses and sizes @8010DBAC) and LNKOPT.MIP (link option words
-@8010DBD8). The registry key `data_only` lets a stripped member own only data; the native lane
-checks the object exports no code and compares the data whole.
+@8010DBD8). The CALLBACK cell is registered in `configs/native_source_data.json`; the registry key
+`data_only` lets a stripped member of `configs/native_recon_link.json` own only data, and the
+native lane checks the object exports no code and compares the data whole.
 
 OVERINFO/LNKOPT contain nothing but link results: PSYLINK's per-group `_<group>_org` /
 `_orgend` / `_size` records and the Climax link options `LNK_OrgAddress` / `LNK_StackSize`.

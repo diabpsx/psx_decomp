@@ -14184,25 +14184,5 @@
       "FirstFreeByte",
       "__lnk_free_mem_size"
     ]
-  },
-  "callback": {
-    "source": "recon/eaclib/callback.c",
-    "image": "diabpsx",
-    "assembler": "2.56",
-    "divide_guard": true,
-    "stripped_library_sym": true,
-    "data_only": true,
-    "sections": {
-      ".sdata": {
-        "va": "0x8011C498",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      }
-    },
-    "data_symbols": [],
-    "untyped_data_symbols": {
-      "loadfilecallback": "loadfilecallback"
-    },
-    "externals": []
   }
 }
