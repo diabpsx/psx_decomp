@@ -4,6 +4,7 @@
  * the native ASPSX/PSYLINK receipt matches retail bytes and every function/data SYM
  * record. See configs/native_recon_link.json and tools/tests/test_control_native.py. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads CONTROL's .sdata (0x8011B620) */
 #include "source/gen/structs_control.h"
 #include "source/gen/externs_control.h"
 #include "source/gen/protos_control.h"
@@ -62,9 +63,11 @@ public:
 #define setXYWH(p, _x0, _y0, _w, _h) (p)->x0 = (_x0), (p)->y0 = (_y0), (p)->x1 = (_x0)+(_w), (p)->y1 = (_y0), (p)->x2 = (_x0), (p)->y2 = (_y0)+(_h), (p)->x3 = (_x0)+(_w), (p)->y3 = (_y0)+(_h)
 
 /* DrawLevelUpFlag is the first explicitly-initialised public definition -> names the
- * static-init thunk _GLOBAL__I_DrawLevelUpFlag (lane fact 64). */
-unsigned char DrawLevelUpFlag = 0;
-
+ * static-init thunk _GLOBAL__I_DrawLevelUpFlag (lane fact 64).  Retail .sdata order
+ * (0x8011B629..0x8011B6A1): cc1plus emits each initialised global at its definition, so these
+ * stand in that order; the uninitialised globals (declared first in externs_control.h) and the
+ * uninitialised statics (.lcomm, 0x8011C764..) are emitted at the end of the TU. */
+unsigned char DrawLevelUpFlag = 0;   /* @0x8011B629 */
 /* Retail CONTROL owns this complete initialized bank.  The two alignment gaps after
  * SpellColors and SpellITbl are emitted naturally by the following int arrays. */
 unsigned char SpellColors[18] = {
@@ -120,17 +123,24 @@ struct CSDATA CS_Tab[28] = {
 char _infostr[2][256] = { 0 };
 char tempstr[256] = { 0 };
 
-BOOL initchr = 0;
-int NoCSEntries = 28;
-
-/* TU-owned STAT globals (tentative definitions -> gp-rel like retail) */
-static int SPLICONNO = 6;
-static int SPLICONY = 110;
-static int lus = 0;
-static char plusanim = 0;
-static int _pnumlines[2];
-static int CS_XOFF = 0;
-static int SPALOFF = 0x80;
+static int SPLICONNO = 6;   /* @0x8011B62C */
+static int SPLICONY = 110;   /* @0x8011B630 */
+static int scx = 0;   /* @0x8011B634 */
+static int scy = 0;
+static int scx1 = 0;
+static int scy1 = 0;
+static int scx2 = 0;
+static int scy2 = 0;   /* @0x8011B648 */
+unsigned char spspelstate = 0;   /* @0x8011B64C */
+TASK *_spselflag[2] = { 0, 0 };   /* @0x8011B650 */
+char SpellCol = 0;   /* @0x8011B658 */
+static int lus = 0;   /* @0x8011B65C */
+static int CsNo = 0;   /* @0x8011B660 */
+static char plusanim = 0;   /* @0x8011B664 */
+static int CS_XOFF = 0;   /* @0x8011B668 */
+BOOL initchr = 0;   /* @0x8011B66C */
+int NoCSEntries = 28;   /* @0x8011B670 */
+static int SPALOFF = 0x80;   /* @0x8011B674 */
 static int paloffset1 = -64;
 static int paloffset2 = -21;
 static int paloffset3 = 64;
@@ -138,62 +148,65 @@ static int paloffset4 = 21;
 static int pinc1 = 4;
 static int pinc2 = 4;
 static int pinc3 = 4;
-static int pinc4 = 4;
-static int CsNo = 0;
-static unsigned char CrossCount[2] = { 0 };
-unsigned char chrbtnactive;
-unsigned char chrflag;
-unsigned char sbookflag;
-static unsigned char chrbtn[2][4];
-static int scx = 0;
-static int scy = 0;
-static int scx1 = 0;
-static int scy1 = 0;
-static int scx2 = 0;
-static int scy2 = 0;
-static long talkofs;
-static char sgszTalkMsg[80];
-static unsigned char sgbPlrTalkTbl[2];
-static unsigned char talkbtndown[3];
+static int pinc4 = 4;   /* @0x8011B694 */
+/* Uninitialised EXT globals (first declared, in retail order, in externs_control.h). */
+unsigned char *pStatusPanel;
+unsigned char *pGBoxBuff;
 unsigned char dropGoldFlag;
+unsigned char _pinfoflag[2];
+char _infoclr[2];
 unsigned char drawhpflag;
 unsigned char drawmanaflag;
+unsigned char chrflag;
+unsigned char drawbtnflag;
 unsigned char panbtndown;
 unsigned char panelflag;
+unsigned char chrbtndown;
 unsigned char lvlbtndown;
+unsigned char sbookflag;
 unsigned char talkflag;
 int dropGoldValue;
 int initialDropGoldValue;
 int initialDropGoldIndex;
-static int _pSpell[2];
-static int _pSplType[2];
-static int my_cur_spel[2];
-int sbooktab;
-int cur_spel[2];
-TASK *_spselflag[2];
-static char _panelstr[2][10][64];
-static int _pstrjust[2][10];
-static unsigned char *pMultiBtns;
-static unsigned char *pTalkBtns;
-char SpellCol;
-struct RECT *InfoBoxRect;
-struct RECT CSRect;
+unsigned char *pPanelButtons;
+unsigned char *pPanelText;
 unsigned char *pManaBuff;
 unsigned char *pLifeBuff;
-unsigned char *pPanelText;
 unsigned char *pChrPanel;
-unsigned char *pSpellCels;
-unsigned char *pPanelButtons;
 unsigned char *pChrButtons;
+unsigned char *pSpellCels;
+struct RECT *InfoBoxRect;
+struct RECT CSRect;
+int numpanbtns;
 unsigned char *pDurIcons;
+unsigned char drawdurflag;
+unsigned char chrbtnactive;
 unsigned char *pSpellBkCel;
 unsigned char *pSBkBtnCel;
 unsigned char *pSBkIconCels;
-unsigned char *pGBoxBuff;
-/* static no-initialiser defs emit .lcomm; kept LAST so maspsx's sdata scan (which stops at
- * an .lcomm) still sees every tentative sdata def above */
-static int SPLICONRIGHT = SPLICONNO * 9 + 128;
-static Dialog CSBack;
+int sbooktab;
+int cur_spel[2];
+/* Uninitialised statics: .lcomm in definition order = retail .sbss order (0x8011C764..0x8011C7AA);
+ * SPLICONRIGHT has a dynamic initialiser, so it is .sbss storage plus constructor code. */
+static int _pnumlines[2];   /* @0x8011C764 */
+static int SPLICONRIGHT = SPLICONNO * 9 + 128;   /* @0x8011C76C */
+static int _pSpell[2];   /* @0x8011C774 */
+static int _pSplType[2];   /* @0x8011C77C */
+static unsigned char chrbtn[2][4];   /* @0x8011C784 */
+static int my_cur_spel[2];   /* @0x8011C78C */
+static long talkofs;   /* @0x8011C794 */
+static unsigned char sgbTalkSavePos;   /* @0x8011C798 */
+static unsigned char sgbNextTalkSave;   /* @0x8011C799 */
+static unsigned char sgbPlrTalkTbl[2];   /* @0x8011C79A */
+static unsigned char *pTalkPanel;   /* @0x8011C79C */
+static unsigned char *pMultiBtns;   /* @0x8011C7A0 */
+static unsigned char *pTalkBtns;   /* @0x8011C7A4 */
+static unsigned char talkbtndown[3];   /* @0x8011C7A8 */
+/* .bss statics (.lcomm larger than -G8), in retail .bss order 0x8012E538..0x8012EAE7 */
+static char _panelstr[2][10][64];   /* @0x8012E538 */
+static int _pstrjust[2][10];   /* @0x8012EA38 */
+static Dialog CSBack;   /* @0x8012EA88 */
+static char sgszTalkMsg[80];   /* @0x8012EA98 */
 
 extern "C" void func_80161F58(void);
 
@@ -720,6 +733,10 @@ void DrawSpellList(void)
 }
 
 #undef pSpell
+
+/* Retail defines CrossCount after DrawSpellList: its two bytes (0x8011B6A0) follow that function's
+ * "%s%s%s" literal and precede BuildChr's "%i". */
+static unsigned char CrossCount[2] = { 0 };   /* @0x8011B6A0 */
 
 void SetSpell(int pnum)
 {

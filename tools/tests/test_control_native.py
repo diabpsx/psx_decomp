@@ -1,4 +1,4 @@
-"""CONTROL complete text, initialized tables, split GP banks, BSS, and SYM proof."""
+"""CONTROL complete text, initialized tables, retail-order small data, BSS, and SYM proof."""
 from pathlib import Path
 import sys
 import tempfile
@@ -24,13 +24,15 @@ class ControlNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("control", 51))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3744)   # .sdata starts at 0x8011B620
+        self.assertEqual(receipt["assembler_version"], "2.67")
+        self.assertIsNone(receipt["post_assemble_section_split"])
+        # retail-order storage: the literal pool + globals in one .sdata row, the statics in one
+        # .sbss row (0x8011C764..0x8011C7AA) and one .bss row (0x8012E538..0x8012EAE7)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".rdata", ".data", ".bss.control_panel",
-                           ".bss.control_back", ".bss.control_talk")},
+                          (".text", ".rdata", ".data", ".sdata", ".sbss", ".bss")},
                          {".text": 30136, ".rdata": 240, ".data": 2048,
-                          ".bss.control_panel": 1360, ".bss.control_back": 16,
-                          ".bss.control_talk": 80})
+                          ".sdata": 256, ".sbss": 71, ".bss": 1456})
 
 
 if __name__ == "__main__":

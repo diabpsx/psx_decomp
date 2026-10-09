@@ -1,8 +1,46 @@
+/* CONTROL.CPP's uninitialised globals: cc1plus emits them at the end of the TU in first-declaration
+ * order, and the retail .sdata tail (0x8011B6AC..0x8011B71F) shows that order, so they are declared
+ * here before anything else can mention them (definitions in control.cpp). */
+extern unsigned char *pStatusPanel;   /* @0x8011B6AC */
+extern unsigned char *pGBoxBuff;   /* @0x8011B6B0 */
+extern unsigned char dropGoldFlag;   /* @0x8011B6B4 */
+extern unsigned char _pinfoflag[2];   /* @0x8011B6B8 */
+extern char _infoclr[2];   /* @0x8011B6BC */
+extern unsigned char drawhpflag;   /* @0x8011B6BE */
+extern unsigned char drawmanaflag;   /* @0x8011B6BF */
+extern unsigned char chrflag;   /* @0x8011B6C0 */
+extern unsigned char drawbtnflag;   /* @0x8011B6C1 */
+extern unsigned char panbtndown;   /* @0x8011B6C2 */
+extern unsigned char panelflag;   /* @0x8011B6C3 */
+extern unsigned char chrbtndown;   /* @0x8011B6C4 */
+extern unsigned char lvlbtndown;   /* @0x8011B6C5 */
+extern unsigned char sbookflag;   /* @0x8011B6C6 */
+extern unsigned char talkflag;   /* @0x8011B6C7 */
+extern int dropGoldValue;   /* @0x8011B6C8 */
+extern int initialDropGoldValue;   /* @0x8011B6CC */
+extern int initialDropGoldIndex;   /* @0x8011B6D0 */
+extern unsigned char *pPanelButtons;   /* @0x8011B6D4 */
+extern unsigned char *pPanelText;   /* @0x8011B6D8 */
+extern unsigned char *pManaBuff;   /* @0x8011B6DC */
+extern unsigned char *pLifeBuff;   /* @0x8011B6E0 */
+extern unsigned char *pChrPanel;   /* @0x8011B6E4 */
+extern unsigned char *pChrButtons;   /* @0x8011B6E8 */
+extern unsigned char *pSpellCels;   /* @0x8011B6EC */
+extern struct RECT *InfoBoxRect;   /* @0x8011B6F0 */
+extern struct RECT CSRect;   /* @0x8011B6F4 */
+extern int numpanbtns;   /* @0x8011B6FC */
+extern unsigned char *pDurIcons;   /* @0x8011B700 */
+extern unsigned char drawdurflag;   /* @0x8011B704 */
+extern unsigned char chrbtnactive;   /* @0x8011B705 */
+extern unsigned char *pSpellBkCel;   /* @0x8011B708 */
+extern unsigned char *pSBkBtnCel;   /* @0x8011B70C */
+extern unsigned char *pSBkIconCels;   /* @0x8011B710 */
+extern int sbooktab;   /* @0x8011B714 */
+extern int cur_spel[2];   /* @0x8011B718 */
 extern BOOL optionsflag;   /* @0x8011B248 */
 extern BOOL DoShowPanel;   /* @0x8011B000 */
 extern char stextflag;   /* @0x8011BAE0 */
 extern unsigned char qtextflag;   /* @0x8011B960 */
-extern unsigned char _pinfoflag[2];   /* @0x8011B6B8 */
 extern int sel_data;   /* @0x8011B72C */
 extern unsigned char currlevel;   /* @0x8011C10C */
 extern unsigned char automapflag;   /* @0x8011C37B */
@@ -38,10 +76,8 @@ extern const unsigned char WHITEB;   /* @0x8011ABD3 */
 extern const unsigned char REDR;   /* @0x8011ABD7 */
 extern const unsigned char REDG;   /* @0x8011ABD8 */
 extern const unsigned char REDB;   /* @0x8011ABD9 */
-extern struct RECT CSRect;   /* @0x8011B6F4 */
 extern class CFont MediumFont;   /* @0x800B82D8 */
 extern int MaxStats[3][4];   /* @0x800DA438 */
-extern char _infoclr[2];   /* @0x8011B6BC */
 extern const unsigned char BLUER;   /* @0x8011ABD4 */
 extern const unsigned char BLUEG;   /* @0x8011ABD5 */
 extern const unsigned char BLUEB;   /* @0x8011ABD6 */
