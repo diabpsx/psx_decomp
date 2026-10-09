@@ -91,10 +91,15 @@
       ".rdata": {
         "va": "0x80117C10",
         "size": 3244
+      },
+      ".sdata": {
+        "va": "0x8011BAF0",
+        "size": 16
       }
     },
     "data_symbols": [
-      "alltext"
+      "alltext",
+      "gdwAllTextEntries"
     ]
   },
   "monstlst": {

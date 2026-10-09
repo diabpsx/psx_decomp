@@ -1,6 +1,9 @@
 /* TEXTDAT.CPP � locale text IDs, scroll flags, speeds and sound IDs.
  * PC twin: refs/diablo-hellfire/src/TEXTDAT.CPP. */
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads TEXTDAT's .sdata (0x8011BAF0) */
 #include "psxsrc/textdat_header.h"
+
+unsigned long gdwAllTextEntries = 1;   /* @0x8011BAFC: TEXTDAT.CPP's one small-data global (retail link order: after STORES, before TOWN) */
 
 struct TextDataStruct {   /* retail SYM: sizeof 12 */
     int txtstr;   /* +0x0 */

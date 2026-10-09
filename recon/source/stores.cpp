@@ -98,23 +98,27 @@ struct QuestData {   /* sizeof 16 */
 };
 extern struct QuestData questlist[16];   /* @0x800DD908 */
 
-/* file-owned globals (EXT in SYM, gp-rel tentative defs) */
-int StorePlrNo;
-unsigned char *pSTextBoxCels = 0;
-Dialog SBack;
-unsigned char *pSTextSlidCels;
-int *SStringY = SStringYNorm;
-char WStaffFlag;
-char WFlag;
-unsigned char InStoreFlag;
-char stextflag;
-char stextsize;
-unsigned char stextscrl;
-int SmithItemCount;
-int SellIdx;
-int SWrapCount;
-unsigned long gdwAllTextEntries = 1;
-int tile;
+/* File-owned globals in retail .sdata order (0x8011BA98..0x8011BAEF).  The initialised ones are
+ * emitted here, in this order; the uninitialised ones (declared first in externs_stores.h) are
+ * emitted by cc1plus at the end of the TU, after SWrapCount's predecessors, in that order. */
+unsigned char *pSTextBoxCels = 0;   /* @0x8011BA98 */
+unsigned char *pSTextSlidCels = 0;   /* @0x8011BA9C */
+char WStaffFlag = 0;   /* @0x8011BAA0 */
+char WFlag = 0;   /* @0x8011BAA1 */
+int *SStringY = SStringYNorm;   /* @0x8011BAA4 */
+Dialog SBack;   /* @0x800DE304 (.data) */
+int StorePlrNo;   /* @0x8011BAB4 */
+int _numpremium[2];   /* @0x8011BAB8 */
+int _premiumlevel[2];   /* @0x8011BAC0 */
+int _NoWitchItems[2];   /* @0x8011BAC8 */
+int _WitchIdxOfs[2];   /* @0x8011BAD0 */
+int _boylevel[2];   /* @0x8011BAD8 */
+char stextflag;   /* @0x8011BAE0 */
+char stextsize;   /* @0x8011BAE1 */
+unsigned char stextscrl;   /* @0x8011BAE2 */
+int SmithItemCount;   /* @0x8011BAE4 */
+int SellIdx;   /* @0x8011BAE8 */
+int SWrapCount;   /* @0x8011BAEC */
 int SStringYNorm[20] = {
     0, 13, 26, 39, 53, 66, 79, 92, 105, 118,
     131, 144, 157, 170, 183, 196, 209, 222, 235, 248
@@ -232,7 +236,7 @@ void PrintSString(int x, int y, unsigned char cjustflag, char *str, char col, in
     unsigned char R;
     unsigned char G;
     unsigned char B;
-    static unsigned char DaveFix;
+    static unsigned char DaveFix = 0;   /* @0x8011BAA8: an initialised local static is emitted at its function */
 
     SWrapCount = 0;
     StoreBackRectClipper.x += x;
@@ -462,6 +466,9 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
             AddSText(0xC, l, 0, GetStr(0x4A3), iclr, 0);
     }
 }
+
+/* Retail defines InStoreFlag here: its byte (0x8011BAB3) follows PrintStoreItem's "\n" and ", " literals. */
+unsigned char InStoreFlag = 0;   /* @0x8011BAB3 */
 
 /* @0x8006A408 */
 unsigned char StoreAutoPlace(void)

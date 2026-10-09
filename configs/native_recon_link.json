@@ -7330,10 +7330,16 @@
       ".sbss": {
         "va": "0x8011C8C8",
         "size": 4
+      },
+      ".sdata": {
+        "va": "0x8011BB00",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
-      "P3Tiles"
+      "P3Tiles",
+      "tile"
     ],
     "externals": [
       "CowPlaying",
@@ -11962,11 +11968,6 @@
         "va": "0x8012EE48",
         "size": 3360
       },
-      ".sdata.stores_dave": {
-        "va": "0x8011BAA8",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".ctors": {
         "va": "0x800B0CCC",
         "size": 4,
@@ -11977,213 +11978,22 @@
         "size": 4,
         "scaffold": "dtors.data"
       },
-      ".sdata.stores_00": {
-        "va": "0x8011BA98",
-        "size": 10,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_01": {
-        "va": "0x8011BAA4",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_02": {
-        "va": "0x8011BAB3",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_03": {
-        "va": "0x8011BAB4",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_04": {
-        "va": "0x8011BAE0",
-        "size": 3,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_05": {
-        "va": "0x8011BAE4",
-        "size": 12,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_06": {
-        "va": "0x8011BAFC",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_07": {
-        "va": "0x8011BB0C",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sbss.stores_state0": {
-        "va": "0x8011C884",
-        "size": 35
-      },
-      ".sbss.stores_state1": {
-        "va": "0x8011C8A8",
-        "size": 32
-      },
-      ".sdata.stores_newline": {
-        "va": "0x8011BAAC",
-        "size": 2,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.stores_comma": {
-        "va": "0x8011BAB0",
-        "size": 3,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".data": {
         "va": "0x800DE304",
         "size": 20212,
         "scaffold": "data_stores.data",
         "allow_zero_tail": 48
+      },
+      ".sdata": {
+        "va": "0x8011BA98",
+        "size": 88,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C884",
+        "size": 68
       }
     },
-    "post_assemble_section_split": [
-      {
-        "section": ".sdata",
-        "pieces": [
-          {
-            "name": ".sdata.stores_00",
-            "offset": 0,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_00",
-            "offset": 24,
-            "size": 4
-          },
-          {
-            "name": ".sdata.stores_00",
-            "offset": 28,
-            "size": 1
-          },
-          {
-            "name": ".sdata.stores_00",
-            "offset": 29,
-            "size": 1
-          },
-          {
-            "name": ".sdata.stores_01",
-            "offset": 4,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_02",
-            "offset": 30,
-            "size": 1,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_03",
-            "offset": 20,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_04",
-            "offset": 31,
-            "size": 1,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_04",
-            "offset": 32,
-            "size": 1
-          },
-          {
-            "name": ".sdata.stores_04",
-            "offset": 33,
-            "size": 1
-          },
-          {
-            "name": ".sdata.stores_05",
-            "offset": 36,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_05",
-            "offset": 40,
-            "size": 4
-          },
-          {
-            "name": ".sdata.stores_05",
-            "offset": 44,
-            "size": 4
-          },
-          {
-            "name": ".sdata.stores_06",
-            "offset": 8,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_07",
-            "offset": 48,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_newline",
-            "offset": 12,
-            "size": 2,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.stores_comma",
-            "offset": 16,
-            "size": 3,
-            "alignment": 2
-          }
-        ],
-        "allow_zero_gaps": true
-      },
-      {
-        "section": ".sbss",
-        "pieces": [
-          {
-            "name": ".sdata.stores_dave",
-            "offset": 0,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sbss.stores_state0",
-            "offset": 4,
-            "size": 32,
-            "alignment": 2
-          },
-          {
-            "name": ".sbss.stores_state0",
-            "offset": 36,
-            "size": 1
-          },
-          {
-            "name": ".sbss.stores_state0",
-            "offset": 40,
-            "size": 1
-          },
-          {
-            "name": ".sbss.stores_state0",
-            "offset": 44,
-            "size": 1
-          },
-          {
-            "name": ".sbss.stores_state1",
-            "offset": 48,
-            "size": 32,
-            "alignment": 2
-          }
-        ],
-        "allow_zero_gaps": true
-      }
-    ],
     "data_symbols": [
       "InStoreFlag",
       "SBack",
@@ -12200,7 +12010,6 @@
       "StorePlrNo",
       "WFlag",
       "WStaffFlag",
-      "gdwAllTextEntries",
       "gossipend",
       "gossipstart",
       "pSTextBoxCels",
@@ -12224,13 +12033,17 @@
       "storenumh",
       "talker",
       "talkname",
-      "tile",
       "_smithitem",
       "_premiumitem",
       "_witchitem",
       "_boyitem",
       "_healitem",
-      "_golditem"
+      "_golditem",
+      "_numpremium",
+      "_premiumlevel",
+      "_NoWitchItems",
+      "_WitchIdxOfs",
+      "_boylevel"
     ],
     "externals": [
       "AP2x2Tbl",
@@ -12301,10 +12114,7 @@
       "WHITEG",
       "WHITER",
       "_7CPlayer_PActiveArray",
-      "_NoWitchItems",
-      "_WitchIdxOfs",
       "__builtin_delete",
-      "_numpremium",
       "chrflag",
       "cursH",
       "cursW",
@@ -12328,7 +12138,8 @@
       "stream_stop__Fv",
       "tempstr",
       "towner"
-    ]
+    ],
+    "assembler": "2.67"
   },
   "items": {
     "source": "recon/source/items.cpp",

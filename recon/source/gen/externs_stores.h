@@ -1,3 +1,18 @@
+/* STORES.CPP's uninitialised globals: cc1plus emits them at the end of the TU in first-declaration
+ * order, and retail .sdata (0x8011BAB4..0x8011BAEF) shows that order, so they are declared here
+ * before anything else can mention them. */
+extern int StorePlrNo;   /* @0x8011BAB4 */
+extern int _numpremium[2];   /* @0x8011BAB8 */
+extern int _premiumlevel[2];   /* @0x8011BAC0 */
+extern int _NoWitchItems[2];   /* @0x8011BAC8 */
+extern int _WitchIdxOfs[2];   /* @0x8011BAD0 */
+extern int _boylevel[2];   /* @0x8011BAD8 */
+extern char stextflag;   /* @0x8011BAE0 */
+extern char stextsize;   /* @0x8011BAE1 */
+extern unsigned char stextscrl;   /* @0x8011BAE2 */
+extern int SmithItemCount;   /* @0x8011BAE4 */
+extern int SellIdx;   /* @0x8011BAE8 */
+extern int SWrapCount;   /* @0x8011BAEC */
 /* STORES.CPP -- externs (globals owned by other TUs). */
 extern unsigned char gbMaxPlayers;   /* @0x8011B9A2 */
 extern int myplr;   /* @0x8011BA08 */
@@ -6,11 +21,6 @@ extern unsigned char currlevel;   /* @0x8011C10C */
 extern struct QuestStruct quests[16];   /* @0x800DDA40 */
 extern int Qtalklist[11][16];   /* @0x800CFBC0 */
 
-extern int _numpremium[2];   /* @0x8011BAB8 */
-extern int _premiumlevel[2];   /* @0x8011BAC0 */
-extern int _boylevel[2];   /* @0x8011BAD8 */
-extern int _NoWitchItems[2];   /* @0x8011BAC8 */
-extern int _WitchIdxOfs[2];   /* @0x8011BAD0 */
 extern int options_pad;   /* @0x8011B250 */
 extern unsigned char sbookflag;   /* @0x8011B6C6 */
 extern unsigned char invflag;   /* @0x8011C32C */

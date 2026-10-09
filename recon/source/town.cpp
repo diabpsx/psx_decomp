@@ -7,6 +7,7 @@
  * warps are closed from plr[myplr].pTownWarps; GRL_LoadFileInMemSig loads through the
  * FileIO system (directory stripped) into Tmalloc'd memory. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads TOWN's .sdata (0x8011BB00) */
 #include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_town.h"
 #include "source/gen/externs_town.h"
@@ -41,6 +42,7 @@ char *strrchr(const char *s, int c);
 #define LVL_TWARPUP 7
 
 static unsigned char *P3Tiles;
+int tile;   /* @0x8011BB0C: TOWN.CPP's uninitialised global, emitted after the literal pool */
 
 /* @0x80074478 TOWN.CPP:129 */
 void T_DrawView(int StartX, int StartY)
