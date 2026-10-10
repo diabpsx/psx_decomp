@@ -22,8 +22,8 @@ for them the nearest retail MAP symbols with a known native owner
 bound the owner by link order (one owner when both neighbours agree,
 otherwise the objects linked between the two).
 
-103 checkpoint names are resolved in the complete raw inventory;
-39 missing source references remain.
+130 checkpoint names are resolved in the complete raw inventory;
+12 missing source references remain.
 59 of the 60 single-MAP-candidate task entries are resolved; the TONY
 literal alias D_80110B24 remains open. Native ownership receipts are
 isolated proofs, not a strict whole-program native link seal.
@@ -43,18 +43,18 @@ isolated proofs, not a strict whole-program native link seal.
 | `D_80110868` | `0x80110868` | GPANEL.rdata (`0x80110844`–`0x801108A4`, exclusive end) | No same-name typed record | Resolved; native owner verified |
 | `D_80110B24` | `0x80110B24` | TONY.rdata (`0x80110AC4`–`0x80110B31`, exclusive end) | No same-name typed record | Current unresolved |
 | `D_8011B3D8` | `0x8011B3D8` | link order: after `to_ascii_invalid_char` (`0x8011B3C8`, memcard) before `dirflag` (`0x8011B3DB`, memcard) | No same-name typed record | Resolved; native owner verified |
-| `D_8011C878` | `0x8011C878` | link order: after `tickval` (`0x8011C600`, timer) before `requestedasyncmsecs` (`0x8011CA1C`, iocoord) | No same-name typed record | Owner bounded by link order (timer..iocoord); source definition unresolved |
-| `D_8012E534` | `0x8012E534` | link order: after `asyncblockmove` (`0x8011CAD8`, blockio) before `async` (`0x80135048`, eac_async) | No same-name typed record | Owner bounded by link order (blockio..eac_async); source definition unresolved |
+| `D_8011C878` | `0x8011C878` | link order: after `tickval` (`0x8011C600`, timer) before `requestedasyncmsecs` (`0x8011CA1C`, iocoord) | No same-name typed record | Resolved; native owner verified |
+| `D_8012E534` | `0x8012E534` | link order: after `asyncblockmove` (`0x8011CAD8`, blockio) before `async` (`0x80135048`, eac_async) | No same-name typed record | Resolved; native owner verified |
 | `D_80157B68` | `0x80157B68` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | No same-name typed record (alias of `CharDataStruct`) | Owner confirmed; source definition unresolved |
 | `DefP1PanelXY` | `0x800B9A6C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
 | `DefP1PanelXY2` | `0x800B9AC4` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
 | `DefP2PanelXY` | `0x800B9B1C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
 | `DefP2PanelXY2` | `0x800B9B74` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
-| `DoLoadedChar` | `0x8011B9EC` | link order: after `InitObjFlag` (`0x8011B9D0`, objects) before `gbValidSaveFile` (`0x8011B9F0`, pfile) | Def class EXT type BOOL size 0 | Owner bounded by link order (objects..pfile); source definition unresolved |
+| `DoLoadedChar` | `0x8011B9EC` | link order: after `leverid` (`0x8011B9DC`, objects) before `gbValidSaveFile` (`0x8011B9F0`, pfile) | Def class EXT type BOOL size 0 | Resolved; native owner verified |
 | `FirstFreeByte` | `0x80163E20` | defined by the link script (tools/link_symbols.py) | No same-name typed record | Resolved; link-computed symbol |
 | `FriendlyMode` | `0x8011B7A5` | link order: after `PauseMode` (`0x8011B7A4`, diablo) before `sgbMouseDown` (`0x8011B7AC`, diablo) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
-| `GSYS_MemEnd` | `0x8011AAD0` | link order: after `AddrToAvoid` (`0x8011AABC`, primpool) before `Gaz` (`0x8011AAD8`, mem) | Def class EXT type UINT size 0 | Owner bounded by link order (primpool..mem); source definition unresolved |
-| `GSYS_MemStart` | `0x8011AACC` | link order: after `AddrToAvoid` (`0x8011AABC`, primpool) before `Gaz` (`0x8011AAD8`, mem) | Def class EXT type UINT size 0 | Owner bounded by link order (primpool..mem); source definition unresolved |
+| `GSYS_MemEnd` | `0x8011AAD0` | link order: after `GSYS_MemStart` (`0x8011AACC`, mem) before `LowestFmem` (`0x8011AAD4`, mem) | Def class EXT type UINT size 0 | Resolved; native owner verified |
+| `GSYS_MemStart` | `0x8011AACC` | link order: after `AddrToAvoid` (`0x8011AABC`, primpool) before `GSYS_MemEnd` (`0x8011AAD0`, mem) | Def class EXT type UINT size 0 | Resolved; native owner verified |
 | `InvGfxTable` | `0x8010D278` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY INT size 672 dims 1 168 tag  | Resolved; native owner verified |
 | `InvItemHeight` | `0x8010D5CC` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 180 dims 1 180 tag  | Resolved; native owner verified |
 | `InvItemWidth` | `0x8010D518` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 180 dims 1 180 tag  | Resolved; native owner verified |
@@ -73,7 +73,7 @@ isolated proofs, not a strict whole-program native link seal.
 | `Monsters` | `0x8010A3BC` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY STRUCT size 448 dims 1 16 tag CMonster | Resolved; native owner verified |
 | `MouseX` | `0x8011B7E4` | link order: after `svgamode` (`0x8011B7E0`, diablo) before `MouseY` (`0x8011B7E8`, diablo) | Def class EXT type INT size 0 | Resolved; native owner verified |
 | `MouseY` | `0x8011B7E8` | link order: after `MouseX` (`0x8011B7E4`, diablo) before `gv1` (`0x8011B7EC`, diablo) | Def class EXT type INT size 0 | Resolved; native owner verified |
-| `MyFT4` | `0x8011CC00` | link order: after `asyncblockmove` (`0x8011CAD8`, blockio) before `async` (`0x80135048`, eac_async) | Def2 class STAT type STRUCT size 40 dims 0 tag POLY_FT4 | Owner bounded by link order (blockio..eac_async); source definition unresolved |
+| `MyFT4` | `0x8011CC00` | link order: after `asyncblockmove` (`0x8011CAD8`, blockio) before `async` (`0x80135048`, eac_async) | Def2 class STAT type STRUCT size 40 dims 0 tag POLY_FT4 | Resolved; native owner verified |
 | `NumOfMonsterListLevels` | `0x8011AA94` | link order: after `alltext` (`0x80117C20`, textdat) before `ArgsSoFar` (`0x8011AAA4`, gpuq) | Def class EXT type INT size 0 | Resolved; native owner verified |
 | `OPT_DevKit` | `0x8010DBF0` | link order: after `OPT_FileSystem` (`0x8010DBEC`, lnkopt) before `OPT_NoQuests` (`0x8010DBF4`, lnkopt) | No same-name typed record | Resolved; native owner verified |
 | `OPT_FileSystem` | `0x8010DBEC` | link order: after `OPT_FreeMemSize` (`0x8010DBE8`, lnkopt) before `OPT_DevKit` (`0x8010DBF0`, lnkopt) | No same-name typed record | Resolved; native owner verified |
@@ -94,9 +94,9 @@ isolated proofs, not a strict whole-program native link seal.
 | `ObjTypeConv` | `0x800D82EC` | OBJDAT.data (`0x800D82EC`–`0x800D8BA6`, exclusive end) | Def2 class EXT type ARY INT size 452 dims 1 113 tag  | Resolved; native owner verified |
 | `PL_Prefix` | `0x80112744` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 3360 dims 1 84 tag PLStruct | Resolved; native owner verified |
 | `PL_Suffix` | `0x80113464` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 3840 dims 1 96 tag PLStruct | Resolved; native owner verified |
-| `PlayDemoFlag` | `0x8011AC81` | link order: after `MY_DialogOTpos` (`0x8011AC74`, dialog) before `P1ObjSelCount` (`0x8011AC8D`, block) | Def class EXT type UCHAR size 0 | Owner bounded by link order (dialog..block); source definition unresolved |
-| `PlayerDeathCount` | `0x8011BA10` | link order: after `light_rad` (`0x8011BA0D`, player) before `questlog` (`0x8011BA29`, quests) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (player..quests); source definition unresolved |
-| `PlayerEar` | `0x8011BA18` | link order: after `light_rad` (`0x8011BA0D`, player) before `questlog` (`0x8011BA29`, quests) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (player..quests); source definition unresolved |
+| `PlayDemoFlag` | `0x8011AC81` | link order: after `MY_DialogOTpos` (`0x8011AC74`, dialog) before `P1ObjSelCount` (`0x8011AC8D`, block) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
+| `PlayerDeathCount` | `0x8011BA10` | link order: after `light_rad` (`0x8011BA0D`, player) before `PlayerEar` (`0x8011BA18`, player) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
+| `PlayerEar` | `0x8011BA18` | link order: after `PlayerDeathCount` (`0x8011BA10`, player) before `questlog` (`0x8011BA29`, quests) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `PsxFastMem` | `0x800B7948` | MEM.data (`0x800B7920`–`0x800B7970`, exclusive end) | Def2 class STAT type STRUCT size 40 dims 0 tag MEM_INIT_INFO | Resolved; native owner verified |
 | `PsxMem` | `0x800B7920` | MEM.data (`0x800B7920`–`0x800B7970`, exclusive end) | Def2 class STAT type STRUCT size 40 dims 0 tag MEM_INIT_INFO | Resolved; native owner verified |
 | `ScrollFlag` | `0x8011B8B8` | link order: after `idoppely` (`0x8011B894`, items) before `FIRSTTIME` (`0x8011B8D8`, items) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
@@ -105,7 +105,7 @@ isolated proofs, not a strict whole-program native link seal.
 | `StoryBookName` | `0x800D8C38` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY USHORT size 18 dims 1 9 tag  | Resolved; native owner verified |
 | `StoryText` | `0x800E40B0` | PREOBJ.data (`0x800E40B0`–`0x800E40C2`, exclusive end) | Def2 class EXT type ARY ARY USHORT size 18 dims 2 3 3 tag  | Resolved; native owner verified |
 | `StringTable` | `0x80102A28` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY ARY UCHAR size 54 dims 2 6 9 tag  | Resolved; native owner verified |
-| `TX_DatTab` | `0x800B2D04` | link order: after `costab` (`0x800B0D00`, gte) before `DefaultRnd` (`0x800B635C`, gutils) | No same-name typed record | Owner bounded by link order (gte..gutils); source definition unresolved |
+| `TX_DatTab` | `0x800B2D04` | link order: after `costab` (`0x800B0D00`, gte) before `DatTab_PANEL` (`0x800B32D4`, textab) | No same-name typed record | Resolved; native owner verified |
 | `TempStr` | `0x801594D0` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY CHAR size 64 dims 1 64 tag  | Owner confirmed; source definition unresolved |
 | `TransPals` | `0x8010A57C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY INT size 536 dims 1 134 tag  | Resolved; native owner verified |
 | `UniqMonst` | `0x8010C708` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 2304 dims 1 96 tag UniqMonstStruct | Resolved; native owner verified |
@@ -116,17 +116,17 @@ isolated proofs, not a strict whole-program native link seal.
 | `XDirAdd` | `0x801029D8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
 | `YDirAdd` | `0x801029F8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
 | `_7CPlayer_PActiveArray` | `0x8011AD50` | link order: after `CurrentOverlay` (`0x8011AD34`, overlay) before `ProfOn` (`0x8011AD60`, prof) | No same-name typed record | Owner bounded by link order (overlay..prof); source definition unresolved |
-| `_NoWitchItems` | `0x8011BAC8` | link order: after `StorePlrNo` (`0x8011BAB4`, stores) before `stextflag` (`0x8011BAE0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (stores); source definition unresolved |
-| `_WitchIdxOfs` | `0x8011BAD0` | link order: after `StorePlrNo` (`0x8011BAB4`, stores) before `stextflag` (`0x8011BAE0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (stores); source definition unresolved |
+| `_NoWitchItems` | `0x8011BAC8` | link order: after `_premiumlevel` (`0x8011BAC0`, stores) before `_WitchIdxOfs` (`0x8011BAD0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
+| `_WitchIdxOfs` | `0x8011BAD0` | link order: after `_NoWitchItems` (`0x8011BAC8`, stores) before `_boylevel` (`0x8011BAD8`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `_boyitem` | `0x800E0AF8` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Resolved; native owner verified |
-| `_boylevel` | `0x8011BAD8` | link order: after `StorePlrNo` (`0x8011BAB4`, stores) before `stextflag` (`0x8011BAE0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (stores); source definition unresolved |
+| `_boylevel` | `0x8011BAD8` | link order: after `_WitchIdxOfs` (`0x8011BAD0`, stores) before `stextflag` (`0x8011BAE0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `_golditem` | `0x800E1CB0` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Resolved; native owner verified |
 | `_healitem` | `0x800E0BD0` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Resolved; native owner verified |
-| `_infoclr` | `0x8011B6BC` | link order: after `dropGoldFlag` (`0x8011B6B4`, control) before `drawhpflag` (`0x8011B6BE`, control) | Def2 class EXT type ARY CHAR size 2 dims 1 2 tag  | Owner bounded by link order (control); source definition unresolved |
-| `_numpremium` | `0x8011BAB8` | link order: after `StorePlrNo` (`0x8011BAB4`, stores) before `stextflag` (`0x8011BAE0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (stores); source definition unresolved |
-| `_pinfoflag` | `0x8011B6B8` | link order: after `dropGoldFlag` (`0x8011B6B4`, control) before `drawhpflag` (`0x8011B6BE`, control) | Def2 class EXT type ARY UCHAR size 2 dims 1 2 tag  | Owner bounded by link order (control); source definition unresolved |
+| `_infoclr` | `0x8011B6BC` | link order: after `_pinfoflag` (`0x8011B6B8`, control) before `drawhpflag` (`0x8011B6BE`, control) | Def2 class EXT type ARY CHAR size 2 dims 1 2 tag  | Resolved; native owner verified |
+| `_numpremium` | `0x8011BAB8` | link order: after `StorePlrNo` (`0x8011BAB4`, stores) before `_premiumlevel` (`0x8011BAC0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
+| `_pinfoflag` | `0x8011B6B8` | link order: after `dropGoldFlag` (`0x8011B6B4`, control) before `_infoclr` (`0x8011B6BC`, control) | Def2 class EXT type ARY UCHAR size 2 dims 1 2 tag  | Resolved; native owner verified |
 | `_premiumitem` | `0x800DF508` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 1296 dims 2 2 6 tag ItemStruct | Resolved; native owner verified |
-| `_premiumlevel` | `0x8011BAC0` | link order: after `StorePlrNo` (`0x8011BAB4`, stores) before `stextflag` (`0x8011BAE0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Owner bounded by link order (stores); source definition unresolved |
+| `_premiumlevel` | `0x8011BAC0` | link order: after `_numpremium` (`0x8011BAB8`, stores) before `_NoWitchItems` (`0x8011BAC8`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `_smithitem` | `0x800DE428` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Resolved; native owner verified |
 | `_witchitem` | `0x800DFA18` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY ARY STRUCT size 4320 dims 2 2 20 tag ItemStruct | Resolved; native owner verified |
 | `alltext` | `0x80117C20` | TEXTDAT.rdata (`0x80117C10`–`0x801188BC`, exclusive end) | Def2 class EXT type ARY STRUCT size 3228 dims 1 269 tag TextDataStruct | Resolved; native owner verified |
@@ -138,13 +138,13 @@ isolated proofs, not a strict whole-program native link seal.
 | `card_usable` | `0x8011B3E4` | link order: after `card_status` (`0x8011B3DC`, memcard) before `card_files` (`0x8011B3EC`, memcard) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `dMissArray` | `0x80105174` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY ARY CHAR size 128 dims 2 32 4 tag  | Resolved; native owner verified |
 | `debugmonsttypes` | `0x8011B7A0` | link order: after `setseed` (`0x8011B79C`, diablo) before `PauseMode` (`0x8011B7A4`, diablo) | Def class EXT type INT size 0 | Resolved; native owner verified |
-| `drawbtnflag` | `0x8011B6C1` | link order: after `chrflag` (`0x8011B6C0`, control) before `panbtndown` (`0x8011B6C2`, control) | Def class EXT type UCHAR size 0 | Owner bounded by link order (control); source definition unresolved |
-| `func_80161F58` | `0x80161F58` | AUTOMAP.CPP / GAME: AUTOMAP.text (`0x80161F58`–`0x80163E20`, exclusive end) | No same-name typed record (alias of `StartAutomap__Fv`) | Owner confirmed; source definition unresolved |
-| `goldcheat` | `0x8011B224` | link order: after `new_card_flag` (`0x8011B210`, cardcore) before `Qfromoptions` (`0x8011B228`, options) | Def class EXT type BOOL size 0 | Owner bounded by link order (cardcore..options); source definition unresolved |
-| `iscflag` | `0x8011BE34` | link order: after `Day` (`0x8011BE18`, version) before `dPiece` (`0x8011BE44`, dpiece) | Def class EXT type BOOL size 0 | Owner bounded by link order (version..dpiece); source definition unresolved |
+| `drawbtnflag` | `0x8011B6C1` | link order: after `chrflag` (`0x8011B6C0`, control) before `panbtndown` (`0x8011B6C2`, control) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
+| `func_80161F58` | `0x80161F58` | AUTOMAP.CPP / GAME: AUTOMAP.text (`0x80161F58`–`0x80163E20`, exclusive end) | No same-name typed record (alias of `StartAutomap__Fv`) | Resolved; native owner verified |
+| `goldcheat` | `0x8011B224` | link order: after `new_card_flag` (`0x8011B210`, cardcore) before `Qfromoptions` (`0x8011B228`, options) | Def class EXT type BOOL size 0 | Resolved; native owner verified |
+| `iscflag` | `0x8011BE34` | link order: after `Day` (`0x8011BE18`, version) before `dPiece` (`0x8011BE44`, dpiece) | Def class EXT type BOOL size 0 | Resolved; native owner verified |
 | `last_card_status` | `0x8011B3FC` | link order: after `card_changed` (`0x8011B3F4`, memcard) before `DiabloGameFile` (`0x8011B410`, dlg_2) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `leveldebug` | `0x8011B798` | link order: after `light4flag` (`0x8011B797`, diablo) before `monstdebug` (`0x8011B799`, diablo) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
-| `leverid` | `0x8011B9DC` | link order: after `InitObjFlag` (`0x8011B9D0`, objects) before `gbValidSaveFile` (`0x8011B9F0`, pfile) | Def class EXT type INT size 0 | Owner bounded by link order (objects..pfile); source definition unresolved |
+| `leverid` | `0x8011B9DC` | link order: after `trapdir` (`0x8011B9D8`, objects) before `DoLoadedChar` (`0x8011B9EC`, pfile) | Def class EXT type INT size 0 | Resolved; native owner verified |
 | `light4flag` | `0x8011B797` | link order: after `scrollflag` (`0x8011B796`, diablo) before `leveldebug` (`0x8011B798`, diablo) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
 | `misfiledata` | `0x800D6F60` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY STRUCT size 235 dims 1 47 tag MisFileData | Resolved; native owner verified |
 | `missile` | `0x80102C58` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY STRUCT size 9500 dims 1 125 tag MissileStruct | Resolved; native owner verified |
@@ -157,21 +157,21 @@ isolated proofs, not a strict whole-program native link seal.
 | `monsterdata` | `0x8010AB9C` | MONSTDAT.data (`0x8010A57C`–`0x8010D008`, exclusive end) | Def2 class EXT type ARY STRUCT size 6780 dims 1 113 tag MonsterData | Resolved; native owner verified |
 | `monstimgtot` | `0x8011C2D0` | link order: after `nummonsters` (`0x8011C2CC`, monster) before `totalmonsters` (`0x8011C2D4`, monster) | Def class EXT type LONG size 0 | Resolved; native owner verified |
 | `monstkills` | `0x8010A240` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY SHORT size 380 dims 1 190 tag  | Resolved; native owner verified |
-| `mydflags` | `0x8011C0D8` | link order: after `l4holdy` (`0x8011BFB0`, drlg_l4) before `setpc_x` (`0x8011C0E4`, gendung) | Def class EXT type PTR UCHAR size 0 | Owner bounded by link order (drlg_l4..gendung); source definition unresolved |
+| `mydflags` | `0x8011C0D8` | link order: after `l4holdy` (`0x8011BFB0`, drlg_l4) before `pSetPiece` (`0x8011C0DC`, gendung) | Def class EXT type PTR UCHAR size 0 | Resolved; native owner verified |
 | `object` | `0x800D8C4C` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY STRUCT size 5588 dims 1 127 tag ObjectStruct | Resolved; native owner verified |
 | `objectactive` | `0x800DA220` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 127 dims 1 127 tag  | Resolved; native owner verified |
 | `objectavail` | `0x800DA2A0` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 127 dims 1 127 tag  | Resolved; native owner verified |
 | `offset_x` | `0x8011C2A8` | link order: after `animletter` (`0x8011C2A0`, monster) before `offset_y` (`0x8011C2B0`, monster) | Def2 class EXT type ARY CHAR size 8 dims 1 8 tag  | Resolved; native owner verified |
 | `offset_y` | `0x8011C2B0` | link order: after `offset_x` (`0x8011C2A8`, monster) before `nummonsters` (`0x8011C2CC`, monster) | Def2 class EXT type ARY CHAR size 8 dims 1 8 tag  | Resolved; native owner verified |
-| `pSetPiece` | `0x8011C0DC` | link order: after `l4holdy` (`0x8011BFB0`, drlg_l4) before `setpc_x` (`0x8011C0E4`, gendung) | Def class EXT type PTR UCHAR size 0 | Owner bounded by link order (drlg_l4..gendung); source definition unresolved |
+| `pSetPiece` | `0x8011C0DC` | link order: after `mydflags` (`0x8011C0D8`, gendung) before `DungSize` (`0x8011C0E0`, gendung) | Def class EXT type PTR UCHAR size 0 | Resolved; native owner verified |
 | `save_buffer` | `0x801436EC` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY UCHAR size 81920 dims 1 81920 tag  | Owner confirmed; source definition unresolved |
 | `shrineavail` | `0x800D8C1C` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY CHAR size 26 dims 1 26 tag  | Resolved; native owner verified |
 | `shrinestrs` | `0x800D8BE8` | OBJECTS.data (`0x800D8BA8`–`0x800DA348`, exclusive end) | Def2 class EXT type ARY USHORT size 52 dims 1 26 tag  | Resolved; native owner verified |
 | `spelldata` | `0x800DDB80` | SPELLDAT.data (`0x800DDB80`–`0x800DE304`, exclusive end) | Def2 class EXT type ARY STRUCT size 1924 dims 1 37 tag SpellData | Resolved; native owner verified |
-| `spspelstate` | `0x8011B64C` | link order: after `DrawLevelUpFlag` (`0x8011B629`, control) before `_spselflag` (`0x8011B650`, control) | Def class EXT type UCHAR size 0 | Owner bounded by link order (control); source definition unresolved |
+| `spspelstate` | `0x8011B64C` | link order: after `DrawLevelUpFlag` (`0x8011B629`, control) before `_spselflag` (`0x8011B650`, control) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
 | `totalmonsters` | `0x8011C2D4` | link order: after `monstimgtot` (`0x8011C2D0`, monster) before `uniquetrans` (`0x8011C2D8`, monster) | Def class EXT type UCHAR size 0 | Resolved; native owner verified |
-| `trapdir` | `0x8011B9D8` | link order: after `InitObjFlag` (`0x8011B9D0`, objects) before `gbValidSaveFile` (`0x8011B9F0`, pfile) | Def class EXT type INT size 0 | Owner bounded by link order (objects..pfile); source definition unresolved |
-| `trapid` | `0x8011B9D4` | link order: after `InitObjFlag` (`0x8011B9D0`, objects) before `gbValidSaveFile` (`0x8011B9F0`, pfile) | Def class EXT type INT size 0 | Owner bounded by link order (objects..pfile); source definition unresolved |
+| `trapdir` | `0x8011B9D8` | link order: after `trapid` (`0x8011B9D4`, objects) before `leverid` (`0x8011B9DC`, objects) | Def class EXT type INT size 0 | Resolved; native owner verified |
+| `trapid` | `0x8011B9D4` | link order: after `InitObjFlag` (`0x8011B9D0`, objects) before `trapdir` (`0x8011B9D8`, objects) | Def class EXT type INT size 0 | Resolved; native owner verified |
 | `uniquetrans` | `0x8011C2D8` | link order: after `totalmonsters` (`0x8011C2D4`, monster) before `InvPanelTData` (`0x8011C308`, inv) | Def class EXT type INT size 0 | Resolved; native owner verified |
 
 142/143 checkpoint names have an enclosing MAP object or link-order bound;
