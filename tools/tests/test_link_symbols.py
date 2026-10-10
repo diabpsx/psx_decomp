@@ -119,5 +119,33 @@ class LinkedObjectCarveTests(unittest.TestCase):
             N.validate_placements('overinfo', spec, {'diabpsx': {('rodata', 'overinfo'): (0x8010DBAC, 48)}})
 
 
+class MixedScaffoldSpanTests(unittest.TestCase):
+    layouts = {'frontend': {('rodata', 'dlg_rodata_801435e8'): (0x801435E8, 0x1C), ('c', 'dlg'): (0x80143604, 0x48),
+                            ('rodata', 'dlg_rodata_8014364c'): (0x8014364C, 0x54), ('c', 'dlg_1'): (0x801436A0, 0x4C),
+                            ('rodata', 'dlg_rodata_801436ec'): (0x801436EC, 0x15EA4)}}
+
+    def test_rodata_row_may_span_code_labelled_fragments_it_covers(self):
+        row = {'va': '0x801435E8', 'size': 0x104,
+               'scaffold': ['dlg_rodata_801435e8.rodata', 'dlg.c', 'dlg_rodata_8014364c.rodata', 'dlg_1.c']}
+        parts = N.scaffold_parts(row, 'frontend', 'rodata', self.layouts)
+        self.assertEqual([name for name, _ in parts], row['scaffold'])
+        spec = {'source': 'recon/psxsrc/dlg_2.cpp', 'image': 'frontend',
+                'sections': {'.text': {'va': '0x80159590', 'size': 9160}, '.rdata': row}}
+        layouts = {'frontend': {**self.layouts['frontend'], ('c', 'dlg_2'): (0x80159590, 9160)}}
+        homes, regions, limits = N.validate_placements('dlg_2', spec, layouts)
+        self.assertEqual(regions['.rdata'], (0x801435E8, 0x104))
+        short = dict(spec, sections={**spec['sections'], '.rdata': dict(row, size=0x100)})
+        with self.assertRaises(ValueError):   # dlg_1.c would not be covered completely
+            N.validate_placements('dlg_2', short, layouts)
+
+    def test_data_row_may_use_a_rodata_labelled_fragment_but_not_text(self):
+        parts = N.scaffold_parts({'scaffold': ['dlg_rodata_801436ec.rodata']}, 'frontend', 'data', self.layouts)
+        self.assertEqual(parts[0][1], (0x801436EC, 0x15EA4))
+        with self.assertRaises(ValueError):
+            N.scaffold_parts({'scaffold': ['dlg_rodata_801436ec.rodata']}, 'frontend', 'sdata', self.layouts)
+        with self.assertRaises(ValueError):
+            N.scaffold_parts({'scaffold': ['dlg.text']}, 'frontend', 'rodata', self.layouts)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -296,12 +296,19 @@ extern int card_side_read[2];
 extern int card_side_save[2];
 extern int card_usable[2];
 extern char *DiabloCharacterFile;
-struct CharacterSaveSlot {
-    signed char first;
-    unsigned char data[1271];
+/* DLG.H layouts, reduced to what OPTIONS.CPP touches: the memory-card character block (FRONTEND
+ * overlay data owned by DLG.CPP) holds six packed player saves; pName sits at +0x478 of each. */
+struct PkPlayerStruct {   /* sizeof 1272 */
+    unsigned char pkHead[0x478];   /* +0x0 .. the packed player fields up to pRSpell (see psxsrc/dlg.h) */
+    char pName[32];   /* +0x478 */
+    unsigned char pkTail[1272 - 0x478 - 32];   /* +0x498 InvGrid .. */
 };
-extern CharacterSaveSlot D_80157B68[];   /* SYM has no name; big per-slot table, indexed by slot
-                                           * and read at byte zero -- owned elsewhere. */
+struct CharDataStructDef {   /* sizeof 7648 */
+    struct PkPlayerStruct CharSlots[6];   /* +0x0 */
+    char ToggleSave[6];   /* +0x1DD0 */
+    char spltypesave[6];   /* +0x1DD6 */
+};
+extern struct CharDataStructDef CharDataStruct;   /* @0x801576F0 */
 BOOL GetSaveStatusMessage(int a, char *Name);   /* @0x8015A67C -- another module */
 void ShowCharacterFiles(int idx, int Spacing, RECT R, int Height);   /* @0x8015A90C -- another module,
                                                                         * RECT passed BY VALUE (packed

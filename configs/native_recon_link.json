@@ -625,9 +625,7 @@
     "data_record_addresses": {
       "Adjust": "0x8011C700"
     },
-    "absolute_bindings": {
-      "D_80157B68": "0x80157B68"
-    },
+    "absolute_bindings": {},
     "scaffold_bindings": {
       "D_8011B3D8": "sdata_after_primpool.sdata"
     },
@@ -649,7 +647,6 @@
       "CountdownLoad__Fi",
       "CountdownSave__Fi",
       "DBG_Error",
-      "D_80157B68",
       "DaveCentreStuff__Fv",
       "DiabloCharacterFile",
       "DiabloGameFile",
@@ -780,7 +777,8 @@
       "stream_pause__Fv",
       "stream_resume__Fv",
       "test_card_format__Fi",
-      "card_status"
+      "card_status",
+      "CharDataStruct"
     ]
   },
   "padfuncs": {
@@ -1011,25 +1009,21 @@
         "va": "0x80159590",
         "size": 9160
       },
-      ".rdata.dlg_files": {
-        "source_section": ".rdata",
-        "va": "0x80143604",
-        "size": 72,
-        "raw_segment": "dlg",
-        "raw_kind": "c",
-        "allow_zero_tail": 3
-      },
-      ".rdata.dlg_formats": {
-        "va": "0x801436A0",
-        "size": 76,
-        "raw_segment": "dlg_1",
-        "raw_kind": "c"
-      },
       ".sdata": {
         "image": "diabpsx",
         "va": "0x8011B410",
         "size": 96,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".rdata": {
+        "va": "0x801435E8",
+        "size": 260,
+        "scaffold": [
+          "dlg_rodata_801435e8.rodata",
+          "dlg.c",
+          "dlg_rodata_8014364c.rodata",
+          "dlg_1.c"
+        ]
       }
     },
     "data_symbols": [
@@ -1043,7 +1037,11 @@
       "current_card",
       "LoadType",
       "McMenuPos",
-      "McCurMenu"
+      "McCurMenu",
+      "ClassStrTbl",
+      "McLoadGameMenu",
+      "McLoadCard1Menu",
+      "McLoadCard2Menu"
     ],
     "data_record_addresses": {
       "McState": "0x8011B420"
@@ -1064,7 +1062,6 @@
       "card_side_empty",
       "DialogTBlue",
       "_witchitem",
-      "AlertStr",
       "myplr",
       "card_dir",
       "loadflag",
@@ -1073,7 +1070,6 @@
       "ClrPlrPath__Fi",
       "ActivateCharacterMemcard__Fii",
       "plr",
-      "ClassStrTbl",
       "FeDifficultyMenu",
       "FePrevMenu__Fv",
       "SetOTpos__5CFonti",
@@ -1083,8 +1079,6 @@
       "GOLDB",
       "DialogRed",
       "GOLDG",
-      "McLoadCard1Menu",
-      "McLoadCard2Menu",
       "FeBackW",
       "card_side_nogame",
       "FeBackX",
@@ -1093,7 +1087,6 @@
       "DoLoadedGame",
       "GOLDR",
       "DoLoadedChar",
-      "CharDataStruct",
       "LargeFont",
       "FeSelect__Fv",
       "cardondelay",
@@ -1122,7 +1115,6 @@
       "LoadedChar",
       "WHITEG",
       "SetOTpos__6Dialogi",
-      "TempStr",
       "WHITER",
       "FeSelDown__Fi",
       "FePlayerNo",
@@ -1140,7 +1132,11 @@
       "MediumFont",
       "PSX_GM_SaveGame__FiPcT1",
       "FeNoOfPlayers",
-      "strncat"
+      "strncat",
+      "save_buffer",
+      "CharDataStruct",
+      "TempStr",
+      "AlertStr"
     ]
   },
   "drlg_l2": {
@@ -1401,9 +1397,7 @@
       "Loadfilename",
       "new_card_flag"
     ],
-    "external_binding_aliases": {
-      "CharBlockBuf": "CharDataStruct"
-    },
+    "external_binding_aliases": {},
     "externals": [
       "ChangeClearPAD",
       "KeefDaFeef__Fi",
@@ -1450,7 +1444,6 @@
       "PauseMode",
       "PSX_CH_LoadBlock__Fii",
       "GetVolumes__Fv",
-      "CharBlockBuf",
       "__builtin_delete",
       "memset",
       "OVR_LoadFrontend__Fv",
@@ -1492,7 +1485,8 @@
       "_card_read",
       "MediumFont",
       "current_card",
-      "EnterCriticalSection"
+      "EnterCriticalSection",
+      "CharDataStruct"
     ]
   },
   "cplayer": {

@@ -129,7 +129,13 @@ def gen(name: str):
                    for section, row in spec["sections"].items()
                    if section != ".text" and not is_native_zero_section(section) and not section.startswith('.text.')
                    and row.get("image", spec["image"]) == name and row.get('scaffold')
-                   for scaffold in (row['scaffold'] if isinstance(row['scaffold'], list) else [row['scaffold']])}
+                   for scaffold in (row['scaffold'] if isinstance(row['scaffold'], list) else [row['scaffold']])
+                   if not scaffold.endswith('.c')}
+    # code-labelled fragments a native data row covers completely (see native_recon.scaffold_parts)
+    covered_code = {scaffold[:-2]: (owner, scaffold[:-2], 'c') for owner, spec in NATIVE_RECON.items()
+                    for section, row in spec["sections"].items()
+                    if row.get("image", spec["image"]) == name and isinstance(row.get('scaffold'), list)
+                    for scaffold in row['scaffold'] if scaffold.endswith('.c')}
     archive_data = {scaffold: row for spec in NATIVE_ARCHIVES.values()
                     if spec.get("image") == name
                     for scaffold, row in spec.get("sections", {}).items()}
@@ -158,7 +164,7 @@ def gen(name: str):
                 cursor = stop
         if cursor != limit:
             raise ValueError('native raw span is incomplete in linker layout')
-    native_raw_c = {}
+    native_raw_c = dict(covered_code)
     for owner, spec in NATIVE_RECON.items():
         for section, row in spec['sections'].items():
             target = row.get('raw_segment')

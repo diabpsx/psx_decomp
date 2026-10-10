@@ -98,9 +98,6 @@ PER_TU_FLAGS = {
     "recon/psxsrc/fmv.cpp": {"cpp_extra": ["-IC:/Temp/PSYQ/psyq-410/PSX/INCLUDE"],
         "section_occurrence_renames": [
         {"section": ".rdata", "occurrence": 8, "as": ".text"}]},
-    "recon/psxsrc/dlg_2.cpp": {"section_occurrence_renames": [
-        {"section": ".rdata", "occurrence": 4, "as": ".rdata.dlg_formats"},
-        {"section": ".rdata", "occurrence": 4, "as": ".rdata.dlg_formats"}]},
     "recon/source/misprint.cpp": {"section_occurrence_renames": [
         {"section": ".rdata", "occurrence": 2, "as": ".rdata.misprint_prim"}]},
     "recon/eaclib/blkfill.s": {"g_value": "0"},

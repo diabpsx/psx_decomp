@@ -459,6 +459,25 @@ cc1plus and then by the members' native gates:
   (retail stores through the literal's symbol; gcc materialises a literal's address in a
   register), so `D_80110B24` stays a documented bound alias.
 
+### FRONTEND DLG.CPP data (2026-10-10)
+
+DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's
+"psxsrc/gman.h" literal (textdat_header.h), `extern const int ClassStrTbl[3]`, the three BISLPS
+file-name literals, the three `extern const FeTable McLoad*Menu` tables and the sprintf formats.
+splat labelled the two literal runs as code (`dlg`, `dlg_1`), so a data row's `scaffold` list may
+now name a `<fragment>.c` part it covers completely; native_recon emits the member's bytes for
+such a part as a raw span and gen_ld places it like a raw code segment (no section renames, no
+split).  A `.data` row may likewise name a `.rodata`-labelled fragment.
+
+DLG's zero `.data` (save_buffer, CharDataStruct, TempStr, AlertStr; 0x801436EC..0x8015958F) is
+not reproduced yet: retail keeps a four-byte zero gap between save_buffer and CharDataStruct.
+cc1plus emits `.align 3` before the struct, but ASPSX 2.56/2.67 and PSYLINK 2.52 apply that
+alignment to the section-relative offset (verified with a probe object and with the member linked
+as a composed rdata/data/text group), where 0x14000 is already aligned, so our object has no gap
+and everything after it lands four bytes early.  No SYM record names a four-byte object there.
+The range stays scaffold-supplied; cardcore and options now reach the block as CharDataStruct
+(cardcore clears it whole, options reads CharSlots[cs - 1].pName[0]).
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record

@@ -560,13 +560,16 @@ extern struct FeTable FeNewP2ClassMenu;
 extern struct FeTable FeDifficultyMenu;
 
 /* DLG-owned initialised data in the overlay (%hi-addressed) */
+/* DLG.CPP's uninitialised data, declared in retail order: cc1plus emits them at the end of the TU in
+ * first-declaration order (0x801436EC save_buffer, 0x801576F0 CharDataStruct, 0x801594D0 TempStr,
+ * 0x80159510 AlertStr). */
+extern unsigned char save_buffer[81920];
 extern struct CharDataStructDef CharDataStruct;
 extern char TempStr[64];
 extern char AlertStr[128];
-extern unsigned char save_buffer[81920];
-extern struct FeTable McLoadGameMenu;
-extern struct FeTable McLoadCard1Menu;
-extern struct FeTable McLoadCard2Menu;
-extern int ClassStrTbl[3];
+extern const struct FeTable McLoadGameMenu;   /* .rdata table */
+extern const struct FeTable McLoadCard1Menu;   /* .rdata table */
+extern const struct FeTable McLoadCard2Menu;   /* .rdata table */
+extern const int ClassStrTbl[3];
 
 #endif

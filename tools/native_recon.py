@@ -207,9 +207,14 @@ def scaffold_parts(row, home, kind, layouts):
         raise ValueError('invalid native source data scaffold span')
     parts = []
     for name in names:
-        if not isinstance(name, str) or not re.fullmatch(r'\w+\.' + kind, name):
+        # Besides its own kind a span may name a `.c` fragment (splat labelled data inside an overlay
+        # object as code) that the row covers completely, and a `.data` row may name a `.rodata`
+        # fragment (zero-filled overlay data that splat labelled rodata).
+        allowed = {kind, 'c'} | ({'rodata'} if kind == 'data' else set())
+        if (not isinstance(name, str) or not re.fullmatch(r'\w+\.(?:' + '|'.join(sorted(allowed)) + ')', name)):
             raise ValueError('invalid native source data scaffold')
-        extent = layouts[home].get((kind, name.rsplit('.', 1)[0]))
+        base, part_kind = name.rsplit('.', 1)
+        extent = layouts[home].get((part_kind, base))
         if extent is None:
             raise ValueError('native source data scaffold is absent')
         parts.append((name, extent))
@@ -280,6 +285,9 @@ def validate_placements(segment, spec, layouts):
                   if parts else layouts[home].get(key))
         if extent is None or not (extent[0] <= va < va + size <= sum(extent)):
             raise ValueError('native source section is outside its declared retail fragment')
+        if parts and any(name.endswith('.c') and not (va <= part[0] and sum(part) <= va + size)
+                         for name, part in parts):
+            raise ValueError('a code-labelled scaffold part must be covered completely by the native section')
         if section == '.text' and (va, size) != extent:
             raise ValueError('native source text must fill the complete retail TU')
         homes[section], regions[section], limits[section] = home, (va, size), sum(extent)
@@ -999,6 +1007,15 @@ def build(only=None):
                     first, limit = max(va, extent[0]), min(va + size, sum(extent))
                     if first >= limit:
                         raise ValueError('native compiler section misses a scaffold-span member')
+                    if scaffold.endswith('.c'):
+                        # a code-labelled fragment the row covers completely: emit the member's bytes as a
+                        # raw span for gen_ld (placed like a raw code segment), no splat scaffold needed
+                        base = scaffold[:-2]
+                        stem = f'{segment}.raw_{base}.c'
+                        (OUT / (stem + '.bin')).write_bytes(data[first - va:limit - va])
+                        (OUT / (stem + '.s')).write_text(
+                            f'.section .text\n.incbin "{(OUT / (stem + ".bin")).as_posix()}"\n')
+                        continue
                     region = (first, limit-first, filename)
                     if len(parts) > 1:
                         region += (first-va,)

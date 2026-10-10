@@ -33,7 +33,7 @@ class CardCoreNativeTests(unittest.TestCase):
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 6348, ".rdata": 32,
                           ".data": 128, ".sdata": 184})
-        self.assertEqual(receipt["bindings"]["CharBlockBuf"], "0x801576F0")
+        self.assertEqual(receipt["bindings"]["CharDataStruct"], "0x801576F0")   # the character block, cleared whole
 
 
 if __name__ == "__main__":

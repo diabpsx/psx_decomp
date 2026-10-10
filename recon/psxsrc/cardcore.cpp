@@ -339,7 +339,8 @@ extern BOOL LoadedChar[2];   /* @0x8011B328 */
 extern PlayerStruct plr[2];   /* @0x800DA538 */
 extern CFont MediumFont;   /* @0x800B82D8 */
 extern const unsigned char WHITER, WHITEG;   /* @0x8011ABD1 */
-extern char CharBlockBuf[];   /* @0x801576F0 (overlay buffer, 0x1DE0 bytes, cleared around a character-block load) */
+struct CharDataStructDef;
+extern struct CharDataStructDef CharDataStruct;   /* @0x801576F0 (FRONTEND overlay, DLG.CPP), 0x1DE0 bytes, cleared around a character-block load */
 
 /* ---------------------------------------------------------------- prototypes */
 extern "C" {
@@ -660,12 +661,12 @@ void ActivateCharacterMemcard(int card1, int card2)
     ActivateMemcard(card1, card2);
     if (!CharacterBlockLoaded) {
         int fileno;
-        memset(CharBlockBuf, 0, 0x1DE0);
+        memset(&CharDataStruct, 0, 0x1DE0);
         fileno = GetFileNumber(current_card, DiabloCharacterFile);
         if (fileno != -1) {
             int ok = PSX_CH_LoadBlock(current_card, fileno);
             if (ok)
-                memset(CharBlockBuf, 0, 0x1DE0);
+                memset(&CharDataStruct, 0, 0x1DE0);
         } else
             PantsDelay();
     }

@@ -5,16 +5,28 @@
  * out of line in this object (-fno-inline).
  * The oracle's two splat "functions" dlg/func_80143604 and dlg_1/func_801436A0 are this TU's rodata
  * (the three BISLPS file-name literals; the Classes[] initialiser template + sprintf formats), not code. */
+#include "psxsrc/textdat_header.h"   /* GMAN.H: the DumpDatFile inline's "psxsrc/gman.h" literal heads DLG's .rdata (0x801435E8) */
 #include "psxsrc/dlg.h"
 
 /* ---- TU-owned globals (SYM EXT; %gp_rel in this oracle -> defined here) ---- */
 extern int AlertTxt, StatusTxt, current_card, LoadType, McMenuPos;
 extern FeTable *McCurMenu;
+/* Retail .rdata order: the class-name text ids, the three file-name literals, the three memory-card
+ * menu tables, then the sprintf formats of the functions below. */
+extern const int ClassStrTbl[3] = { 0x4BE, 0x375, 0x3E8 };   /* @0x801435F8 */
 char *DiabloGameFile = "BISLPS-01416-DIAB-01";
 char *DiabloOptionFile = "BISLPS-01416-DIAB-69";
 char *DiabloCharacterFile = "BISLPS-01416-DIAB-88";
 char *McState[2] = { "", "" };
 BOOL fileinfoflag = 0;
+extern const struct FeTable McLoadGameMenu = { 0, 1, 100, 8, McInitLoadGameMenu, McMainKeyCtrl, 0 };   /* @0x8014364C */
+extern const struct FeTable McLoadCard1Menu = { 0, 1, 100, 8, McInitLoadCard1Menu, McMainKeyCtrl, 0 };   /* @0x80143668 */
+extern const struct FeTable McLoadCard2Menu = { 0, 1, 100, 8, McInitLoadCard2Menu, McMainKeyCtrl, 0 };   /* @0x80143684 */
+/* The uninitialised data save_buffer, CharDataStruct, TempStr and AlertStr (0x801436EC..0x8015958F,
+ * zero .data between the tables and the code) are DLG.CPP's by the SYM block but are not defined
+ * here yet: retail keeps a four-byte zero gap between save_buffer and CharDataStruct that neither
+ * cc1plus's `.align 3` (section-relative under ASPSX 2.56/2.67 and PSYLINK 2.52) nor any recorded
+ * object explains, so the scaffold still supplies that range (see docs/TOOLCHAIN.md). */
 
 /* @0x80159590 DLG.CPP:188 */
 int GetFileNumber(int side, char *file_name)
