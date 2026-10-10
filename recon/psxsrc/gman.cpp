@@ -1,8 +1,9 @@
 /* GMAN.CPP — Climax PSX layer, texture/graphics manager (C:\diabpsx\PSXSRC\GMAN.CPP).
  * MAP: .GMAN_text 0x80091E54-0x800953F7, .GMAN_data 0x800B8B94.  Lane: CC1PLPSX 2.7.2 (C++). */
-#define GMAN_OWNER_TU
+#define PRIMPOOL_DECLARE_ONLY
+#include "psxsrc/primpool.h"
+#undef PRIMPOOL_DECLARE_ONLY
 #include "psxsrc/gman.h"
-#undef GMAN_OWNER_TU
 static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);   /* retail SYM: STAT (file-local) */
 static POLY_FT4 MyFT4;   /* @0x8011CC00 (SYM STAT): GMAN.CPP's one .bss static, the fallback primitive */
 
@@ -757,6 +758,8 @@ void TextDat::DecompFrame(FRAME_HDR *Fr)
 }
 
 /* line 1105 @0x80093818 */
+int wank = 8;   /* @0x8011AD10: retail defines it after DecompFrame ("Wanker!") and before LoadHdr (".hdr") */
+
 void TextDat::MakeCreatureOffsetTab()
 {
     int NumOfCreatures;
@@ -1321,28 +1324,8 @@ void CBlock::GetBoundingBox(TextDat &TDat, RECT &R)
     R.h = bottom - top;
 }
 
-inline int CBlock::GetSize() const { return sizeof(NumOfParts) + NumOfParts * sizeof(CPart); }
-inline BOOL CTextFileInfo::HasTp() const { return HasFile(".tp"); }
-inline BOOL CTextFileInfo::HasDat() const { return HasFile(".dat"); }
-inline char *CTextFileInfo::GetName() const { return FileName; }
-inline FRAME_HDR *TextDat::GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
-inline PAL *TextDat::GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }
-inline int TextDat::GetNumOfFrames() { return Hdr->NumOfFrames; }
-inline void TextDat::SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum) { FileInfo = (CTextFileInfo *)NewInfo; TexNum = NewTexNum; }
-inline int TextDat::GetNumOfCreatures() { return Hdr->NumOfCreatures; }
-inline CCreatureHdr *TextDat::GetCreature(int Creature) { return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]); }
-inline int TextDat::GetTexNum() const { return TexNum; }
-inline BOOL TextDat::IsLoaded() const { return LoadCount != 0; }
-inline BOOL TextDat::CanXferPal() const { return PalX >= 0 && PalY >= 0; }
-inline BOOL TextDat::CanXferFrame() const { return DecX >= 0 && DecY >= 0; }
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
+/* PRIMPOOL.H bodies (header copies, lines 65-71), parsed last: their literal is the last in retail .rdata and
+ * their copies lead the reverse-definition-order tail. */
 inline void PRIM_GetPrim(POLY_FT4 **Prim)
 {
     if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid) DBG_Error(NULL, "psxsrc/primpool.h", 68);

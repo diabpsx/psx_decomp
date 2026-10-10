@@ -10726,21 +10726,6 @@
         "va": "0x80091E54",
         "size": 13732
       },
-      ".rdata.gman_file": {
-        "va": "0x80110588",
-        "size": 16,
-        "scaffold": "rodata_gman.rodata"
-      },
-      ".rdata.gman_cpp": {
-        "va": "0x80110598",
-        "size": 16,
-        "scaffold": "rodata_gman.rodata"
-      },
-      ".rdata.gman_prim": {
-        "va": "0x801105A8",
-        "size": 18,
-        "scaffold": "rodata_gman.rodata"
-      },
       ".data": {
         "va": "0x800B8B94",
         "size": 3780,
@@ -10760,107 +10745,21 @@
         "size": 4,
         "scaffold": "dtors.data"
       },
-      ".sdata.gman_tp": {
-        "va": "0x8011ACEC",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.gman_dat": {
-        "va": "0x8011ACF0",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.gman_decb": {
-        "va": "0x8011ACF8",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.gman_names": {
-        "va": "0x8011AD00",
-        "size": 16,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.gman_hdr": {
-        "va": "0x8011AD14",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.gman_state": {
-        "va": "0x8011AD1C",
-        "size": 16,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".bss": {
         "va": "0x8011CC00",
         "size": 40
+      },
+      ".rdata": {
+        "va": "0x80110588",
+        "size": 50,
+        "scaffold": "rodata_gman.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011ACEC",
+        "size": 64,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
-    "post_assemble_section_split": [
-      {
-        "section": ".rdata",
-        "pieces": [
-          {
-            "name": ".rdata.gman_cpp",
-            "offset": 0,
-            "size": 16,
-            "alignment": 2
-          },
-          {
-            "name": ".rdata.gman_file",
-            "offset": 16,
-            "size": 16,
-            "alignment": 2
-          },
-          {
-            "name": ".rdata.gman_prim",
-            "offset": 32,
-            "size": 18,
-            "alignment": 8
-          }
-        ]
-      },
-      {
-        "section": ".sdata",
-        "pieces": [
-          {
-            "name": ".sdata.gman_decb",
-            "offset": 0,
-            "size": 8,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.gman_tp",
-            "offset": 8,
-            "size": 4,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.gman_names",
-            "offset": 12,
-            "size": 16,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.gman_dat",
-            "offset": 28,
-            "size": 8,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.gman_hdr",
-            "offset": 36,
-            "size": 8,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.gman_state",
-            "offset": 44,
-            "size": 16,
-            "alignment": 2
-          }
-        ]
-      }
-    ],
     "data_symbols": [
       "DatPool",
       "AllDats",
@@ -10869,7 +10768,8 @@
       "TpH",
       "TpXDest",
       "TpYDest",
-      "MyFT4"
+      "MyFT4",
+      "wank"
     ],
     "retail_data_bindings": [],
     "externals": [

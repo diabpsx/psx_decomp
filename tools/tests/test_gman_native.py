@@ -16,7 +16,7 @@ import symlane as S
                           B.ROOT / "rom/DIABPSX.BIN")),
                      "original toolchain/retail inputs unavailable")
 class GmanNativeTests(unittest.TestCase):
-    def test_complete_object_and_split_storage(self):
+    def test_complete_object_and_retail_order_storage(self):
         with tempfile.TemporaryDirectory(prefix="gman-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -24,16 +24,14 @@ class GmanNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("gman", 76))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
-        self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".data", ".sbss", ".bss", ".ctors", ".dtors")},
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1388)   # .sdata starts at 0x8011ACEC (its literal pool)
+        self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 13732, ".data": 3780, ".sbss": 8, ".bss": 40,   # .bss: the static MyFT4
-                          ".ctors": 4, ".dtors": 4})
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".rdata.gman_")), 50)
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".sdata.gman_")), 60)
-
+                          ".ctors": 4, ".dtors": 4,
+                          ".rdata": 50,    # "psxsrc/gman.h" (DumpDatFile, parsed at the include), "psxsrc/GMAN.CPP", "psxsrc/primpool.h" (parsed last)
+                          ".sdata": 64})   # pool, "DECB", "GMAN", "Wanker!", wank, ".hdr", TpW .. TpYDest
+        self.assertIsNone(receipt["post_assemble_section_split"])
+        self.assertEqual(B.per_tu_flags(B.ROOT / "recon/psxsrc/gman.cpp"), {})
 
 if __name__ == "__main__":
     unittest.main()

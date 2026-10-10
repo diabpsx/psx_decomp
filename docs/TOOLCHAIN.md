@@ -536,6 +536,28 @@ default small-data threshold, under which ASPSX homes every `.lcomm` of 8 bytes 
 the larger statics (SchEnv, MemHdrBlocks) in .bss, exactly the retail rows; the lane's new
 `assembler_g_value` keeps the compiler at -G0 and passes -G8 to the assembler only.
 
+### Round 4: GMAN natural; the ITEMS/FMV local-BSS alignment (2026-10-10)
+
+GMAN's `.rdata`/`.sdata` splits are gone.  GMAN.H now carries its in-class inline bodies for every TU
+(no owner mode): the ".tp"/".dat" pool and the DumpDatFile literal are parsed at the include and head
+GMAN's sections as in retail, LoadHdr is declared in the header and defined in GMAN.CPP (its ".hdr"
+literal follows `int wank = 8`, defined between DecompFrame and MakeCreatureOffsetTab), and
+GMAN.CPP parses PRIMPOOL.H's bodies last (declarations first via `PRIMPOOL_DECLARE_ONLY`), so the
+primpool literal is the last read-only item and the two copies lead the tail.  In-class inline
+bodies are compiled at the end of their class in member order, and the out-of-line copies are
+emitted in reverse definition order, so the header's member order is retail's copy order
+(HasTp, HasDat, GetName; ... GetNumOfCreatures, GetCreature, GetTexNum, ...).
+
+The ITEMS and FMV `.bss` rows remain split, and the evidence is now complete: retail places those
+statics at gcc's 8-byte-rounded sizes (curruitem 108 -> itemhold at 112, itemhold 9 -> itemactivelist
+at 128, itemactivelist 127 -> mult_tab at 256; FMV subcode 12 -> voice_attr at 16).  Every cc1plus
+2.7.2 build on disk (SN32.3.7 Build 0001, .0002, the SN16 DOS builds) emits `.lcomm name,size` with
+the exact size under every flag tried (-fno-common, -fconserve-space, -G0, ...), and every ASPSX
+build (2.34 .. 2.56, 2.67, 2.79, DOS and Win32, every single-letter switch, -G0/-G8) packs `.lcomm`
+objects at 4-byte alignment (2.67+ adds odd 4-byte pads that match retail no better); ASMPSX does not
+read gcc syntax.  No reachable tool reproduces the rounding, so the two rows per TU stay (probe
+receipts: scratch `la.s` layouts in build/tmp/pref).
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

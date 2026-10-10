@@ -8,7 +8,7 @@
 extern POLY_FT4 *ThisPrimAddr;   /* @0x8011AAB8 (.sdata) */
 extern POLY_FT4 *AddrToAvoid;    /* @0x8011AABC */
 
-#ifdef GMAN_OWNER_TU
+#ifdef PRIMPOOL_DECLARE_ONLY   /* GMAN.CPP defines the bodies at its end: retail parses them last (literal last in .rdata, copies first in the tail) */
 inline void PRIM_GetPrim(POLY_FT4 **Prim);
 inline void PRIM_GetPrim(POLY_GT4 **Prim);
 #else
