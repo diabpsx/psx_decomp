@@ -421,6 +421,44 @@ image extent, `.last`/`FirstFreeByte` follows the largest overlay, the RAM size 
 genuine `rom/DIABPSX.MAP` records, and the native lane binds the members' externals to the
 identical numbers, so no address of theirs is written by hand anywhere.
 
+## Retail small-data order from source order (2026-10-07 .. 2026-10-10)
+
+The game TUs' `.sdata`/`.sbss`/`.bss` rows and their post-assemble splits were replaced by single
+retail-order rows for DIABLO, MONSTER, ITEMS, MEMCARD, STORES, CONTROL, TOWN, TEXTDAT, PFILE,
+OBJECTS, PLAYER, ATTRACT, OPTIONS, GAMEMENU, DPIECE, GENDUNG, MEM, FMV and GMAN by reconstructing
+the source order the compiler needs.  The rules, each verified with a probe TU on the retail
+cc1plus and then by the members' native gates:
+
+- An initialised global (including `= 0`, and a `static ... = 0`) is emitted at its definition,
+  in source order, interleaved with the `.sdata` string literals of the functions compiled so
+  far.  The retail bytes therefore fix where in the file a definition stood (for example
+  LastFrCount after CreateLevel's "STACK" literal, CrossCount after DrawSpellList).
+- Every uninitialised global is deferred to the end of the TU, in first-declaration order; the
+  first declaration is usually an `extern` in a header, so the generated externs headers now
+  declare those names first and in retail order.
+- An uninitialised `static` is `.lcomm` (in definition order) and goes to `.sbss`/`.bss` by
+  size; with `-fconserve-space` (MONSTER) uninitialised globals are commons (`common_symbols`).
+  Statics are named from the SYM STAT records (cineflag, sgnTimeoutCurs, Passedlvldir, TempStack,
+  pauseo, deathdelay2, sg_previousFilter, ...).
+- ASPSX 2.56 pads an 8-byte `.lcomm` object to 8-byte alignment; ASPSX 2.67 keeps it 4-aligned,
+  which is what retail's RECT statics show (STORES, CONTROL use 2.67).  FMV's 64-byte static is
+  8-aligned under both.
+- A TU that includes the GMAN.H inlines starts its `.sdata` with the 12-byte ".tp"/".dat" literal
+  pool (psxsrc/textfileinfo_header.h); some TUs contribute only that pool.  Bytes between
+  objects (alignment padding) can be non-zero retail garbage and stay scaffold-supplied.
+- SN's cc1plus mangles the class static CPlayer::PActiveArray as `_7CPlayer.PActiveArray`; every
+  TU reaches it as the member, and the native link accepts dotted PSYLINK symbol names
+  (external_binding_aliases map the dotted name to the C-identifier address entry).
+- TEXTAB.MIP (TX_DatTab and 372 CTextFileInfo entries) is a hand-authored data object linked
+  directly (`link_object`); the gte/gp data rows are linked objects too so the carve chain leads
+  its fragment, and link.py strips the GNU-assembled text of such sources with objcopy because ld
+  resolves symbols before `/DISCARD/` would drop them.
+- Same-named statics in different TUs (TempStack in DIABLO and FMV) need `data_record_addresses`
+  to pick the member's own SYM record.
+- Not reproducible from natural source: TONY's in-place patch of its "DEMOPAD0.DAT" literal
+  (retail stores through the literal's symbol; gcc materialises a literal's address in a
+  register), so `D_80110B24` stays a documented bound alias.
+
 ## Debug-object inspection (2026-10-03)
 
 `tools/psyq_extract.py` now supports the standard source-line-debug record
