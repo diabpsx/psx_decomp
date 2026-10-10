@@ -36,8 +36,10 @@ class LightingNativeTests(unittest.TestCase):
             with patch.object(S,'OUT',folder):
                 raw = S.compile_g(source).read_bytes()
             obj = P.parse_obj_complete(raw)
+            names = S.retail_section_names(source)   # retail's per-object section spelling on the object
+            back = {v: k for k, v in names.items()}
             self.assertEqual({obj['sections'][s]:len(data) for s,data in obj['code'].items()},
-                             {section:size for section,(va,size) in regions.items()})
+                             {names.get(section, section):size for section,(va,size) in regions.items()})
             self.assertFalse(any('bss' in row for row in obj['xdefs']))
             self.assertEqual(set(obj['xrefs']),set(spec['externals']))
             prefix,combined,mode = R.gp_carrier_plan(regions,image,0x8011A780,0x8011C604)
@@ -48,7 +50,9 @@ class LightingNativeTests(unittest.TestCase):
             run = B.run([S.ASPSX,'-q','-o',prefix_obj,prefix_src])
             self.assertEqual(run.returncode,0,run.stdout+run.stderr)
             bindings = R.resolve_bindings(obj['xrefs'],symbols); bindings['_gp']=0x8011A780
-            blocks,map_text = N.native_link('lighting',raw,combined,bindings,output_dir=folder,prefix_objects=[prefix_obj])
+            blocks,map_text = N.native_link('lighting',raw,{names.get(k, k): v for k, v in combined.items()},bindings,
+                                            output_dir=folder,prefix_objects=[prefix_obj])
+            blocks = {back.get(k, k): v for k, v in blocks.items()}
             for section,actual in blocks.items():
                 va,size = combined[section]
                 expected = bytes(size) if section in ('.bss','.sbss') else image[va-0x80010000:va-0x80010000+size]

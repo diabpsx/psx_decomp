@@ -41,6 +41,8 @@ class MissilesNativeProbeTests(unittest.TestCase):
 
     def check_source(self,segment,text_va,text_size,pool_va,pool_size,small,small_size,count,expected_commons,data_section=None):
         source = B.ROOT/f'recon/source/{segment}.cpp'
+        names = S.retail_section_names(source)   # retail's per-object section spelling on the object
+        back = {v: k for k, v in names.items()}
         symbols = '\n'.join(p.read_text() for p in (B.ROOT/'configs').glob('symbol_addrs*.txt'))
         main = (B.ROOT/'rom/DIABPSX.BIN').read_bytes()
         game = (B.ROOT/'rom/GAME.BIN').read_bytes()
@@ -56,7 +58,7 @@ class MissilesNativeProbeTests(unittest.TestCase):
             sizes = {obj['sections'][s]: len(data) for s,data in obj['code'].items()}
             expected_sizes={'.text': text_size, '.rdata': pool_size, '.sdata': small_size}
             if data_section:expected_sizes['.data']=data_section[1]
-            self.assertEqual(sizes,expected_sizes)
+            self.assertEqual(sizes,{names.get(k, k): v for k, v in expected_sizes.items()})
             commons = {r['name']: r['bss'] for r in obj['xdefs'] if 'bss' in r}
             self.assertEqual(commons, expected_commons)
             bindings = R.resolve_bindings([n for n in obj['xrefs'] if n != '_7CPlayer.PActiveArray'], symbols)
@@ -71,9 +73,10 @@ class MissilesNativeProbeTests(unittest.TestCase):
             regions = {'.text': (text_va,text_size), '.rdata': (pool_va,pool_size),
                        '.sdata': (gp, len(prefix)+small_size)}
             if data_section:regions['.data']=data_section
-            blocks, _ = N.native_link(segment+'_probe',raw,regions,bindings,
+            blocks, _ = N.native_link(segment+'_probe',raw,{names.get(k, k): v for k, v in regions.items()},bindings,
                                       prefix_objects=[prefix_obj],output_dir=folder,overlay_text=True,
                                       overlay_group='game_text')   # retail overlay id $d
+            blocks = {back.get(k, k): v for k, v in blocks.items()}
             # Exact relocated bytes: no register/immediate/target normalization.
             self.assertEqual(blocks['.text'], game[text_va-0x80139BF8:text_va-0x80139BF8+text_size])
             self.assertEqual(blocks['.rdata'], main[pool_va-0x80010000:pool_va-0x80010000+pool_size])

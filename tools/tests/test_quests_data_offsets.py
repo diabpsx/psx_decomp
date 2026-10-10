@@ -31,16 +31,19 @@ class QuestsDataOffsetsTests(unittest.TestCase):
                 raw=S.compile_g(B.ROOT/'recon/source/quests.cpp').read_bytes()
             obj=P.parse_obj_complete(raw)
             sizes={obj['sections'][s]:len(data) for s,data in obj['code'].items()}
-            self.assertEqual(sizes['.data'],632)
+            names=S.retail_section_names(B.ROOT/'recon/source/quests.cpp')   # retail's per-object spelling on the object
+            back={v:k for k,v in names.items()}
+            data=names['.data']   # .QUESTS_data
+            self.assertEqual(sizes[data],632)
             # These two owned arrays already have their retail offsets in the
             # current data section; other global records are not sealed here.
             for name,offset in (('questlist',0),('quests',312)):
                 rows=[r for r in obj['xdefs'] if r['name']==name]
                 self.assertEqual(len(rows),1)
-                self.assertEqual((obj['sections'][rows[0]['sect']],rows[0]['off']),('.data',offset))
+                self.assertEqual((obj['sections'][rows[0]['sect']],rows[0]['off']),(data,offset))
             bases={'.text':0x800674B4,'.rdata':0x801178E0,'.data':0x800DD908,'.sdata':0x8011BA20,
                    '.sbss':0x8011C87C,'.bss':0x8012EDF8,'.ctors':0x800B0CC8,'.dtors':0x800B0CF8}
-            regions={name:(bases[name],size) for name,size in sizes.items() if size}
+            regions={name:(bases[back.get(name,name)],size) for name,size in sizes.items() if size}
             prefix,combined,mode=R.gp_carrier_plan(regions,image,0x8011A780,0x8011C604)
             src=folder/'prefix.s'; po=folder/'prefix.obj'
             src.write_bytes(('.sdata\r\n'+''.join('.byte '+','.join(map(str,prefix[i:i+16]))+'\r\n'
@@ -51,7 +54,7 @@ class QuestsDataOffsetsTests(unittest.TestCase):
             bindings['_gp']=0x8011A780
             blocks,_=N.native_link('quests_operands',raw,combined,bindings,output_dir=folder,prefix_objects=[po])
             functions={r['name']:r['off'] for r in obj['xdefs']+obj['locals']
-                       if obj['sections'].get(r['sect'])=='.text'}
+                       if obj['sections'].get(r['sect'])==names['.text']}
             targets={
                 'SetReturnLvlPos__Fv':(0x800681CC,[0x80068270,0x80068280,0x8006828C]),
                 'ResyncQuests__Fv':(0x80068330,[0x800685BC,0x800685D0,0x80068600,0x80068618,
@@ -63,7 +66,7 @@ class QuestsDataOffsetsTests(unittest.TestCase):
                     with self.subTest(function=name,address=hex(va)):
                         offset=functions[name]+va-retail_start
                         expected=image[va-0x80010000:va-0x80010000+4]
-                        self.assertEqual(blocks['.text'][offset:offset+4],expected)
+                        self.assertEqual(blocks[names['.text']][offset:offset+4],expected)
 
 
 if __name__=='__main__':unittest.main()

@@ -157,7 +157,9 @@ class MixedScaffoldSpanTests(unittest.TestCase):
         parts = N.scaffold_parts(row, 'frontend', 'rodata', self.layouts)
         self.assertEqual([name for name, _ in parts], row['scaffold'])
         spec = {'source': 'recon/psxsrc/dlg_2.cpp', 'image': 'frontend',
-                'sections': {'.text': {'va': '0x80159590', 'size': 9160}, '.rdata': row}}
+                'sections': {'.text': {'va': '0x80159590', 'size': 9160}, '.rdata': row},
+                # DLG is one merged `.DLG_text` stream: its rows are that composed group's exports
+                'composed_group': {'exports': {'.rdata': {}, '.text': {}}}}
         layouts = {'frontend': {**self.layouts['frontend'], ('c', 'dlg_2'): (0x80159590, 9160)}}
         homes, regions, limits = N.validate_placements('dlg_2', spec, layouts)
         self.assertEqual(regions['.rdata'], (0x801435E8, 0x104))

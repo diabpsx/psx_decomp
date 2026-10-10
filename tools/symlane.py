@@ -164,8 +164,15 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
             or len(merged_sections) != len(set(merged_sections))
             or any(section not in (".rdata", ".data") for section in merged_sections)):
         raise ValueError("invalid merged-section registry")
-    for section in merged_sections:
-        txt = re.sub(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", "\t.text", txt, flags=re.M)
+    # Retail renamed every compiled object's `.text`/`.rdata`/`.data` to `.NAME_text`/`.NAME_rdata`/`.NAME_data`
+    # (one `.NAME_text` for a merged overlay module); the rename is applied to the compiler's section directives.
+    names = retail_section_names(src, bool(merged_sections))
+    if not names and merged_sections:
+        names = {section: '.text' for section in merged_sections}
+    for section, target in names.items():
+        replacement = ('\t.text' if target == '.text' else
+                       f'\t.section {target},{SECTION_FLAGS[target.rsplit("_", 1)[1]]},@progbits')
+        txt = re.sub(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", replacement, txt, flags=re.M)
     if compiler_dos:
         # CC1PSX 2.7.2.SN.1 honours `__attribute__((section(".text.lib")))` only until its first inline
         # jump table and then returns to `.text`, so ASPSX would split one TU's code over two sections.
@@ -174,7 +181,8 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
         txt = re.sub(r"^\s*\.section\s+\.text\.\w+[^\n]*$", "\t.text", txt, flags=re.M)
     # Insert borrowed carriers after the section merge, so the prefix lands in the member's real section.
     for section, payload in section_prefixes.items():
-        match = re.search(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", txt, re.M)
+        match = re.search(r"^[ \t]*(?:" + re.escape(section) + r"[ \t]*|\.section[ \t]+" + re.escape(section) + r"\b.*)$",
+                          txt, re.M)
         if match is None:
             raise ValueError("native section-prefix target is absent")
         assembly = "\n".join("\t.byte\t" + ",".join(str(value) for value in payload[offset:offset + 16])
@@ -192,6 +200,30 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
                         ["-q", "-g", *extra_as, f"-G{assembler_g}"], s_file, obj, assembler_dos)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     return obj
+
+# Retail object names are the TU stems except where the reconstruction keeps several TUs for one object.
+RETAIL_OBJECT_NAMES = {'dlg_2': 'DLG'}
+SECTION_FLAGS = {'text': '"ax"', 'rdata': '"a"', 'data': '"aw"'}
+
+
+def retail_object_name(source):
+    stem = Path(source).stem.lower()
+    return RETAIL_OBJECT_NAMES.get(stem, stem.upper())
+
+
+def retail_section_names(source, merged=False):
+    """Retail's per-object spelling of a compiled TU's `.text`/`.rdata`/`.data` (`.VERSION_text`, ...), taken from
+    the MAP inventory; a merged overlay module (one emission-order stream) names all three `.NAME_text`.
+    Library members and hand-assembled objects keep plain names (the MAP has none for them).  No SN tool
+    produces this spelling (docs/TOOLCHAIN.md, round 9), so the lane rewrites the compiler's section directives."""
+    name = retail_object_name(source)
+    inventory = {row['name'] for row in json.loads((ROOT / 'configs/sections.json').read_text())}
+    if not any(f'.{name}_{kind}' in inventory for kind in ('text', 'rdata', 'data')):
+        return {}
+    if merged:
+        return {'.text': f'.{name}_text', '.rdata': f'.{name}_text', '.data': f'.{name}_text'}
+    return {f'.{kind}': f'.{name}_{kind}' for kind in ('text', 'rdata', 'data')}
+
 
 def overlay_group(source):
     """Identify overlay text from the retail MAP inventory, including diagnostic TUs."""
@@ -263,20 +295,32 @@ def link(obj: Path, source=None) -> Path:
     in_overlay = overlay_sections(source, overlay)
     if overlay:
         require_symmunge()
+    # the object's compiled sections carry retail's per-object names (compile_g); a merged module's three share one
+    merged = bool(B.per_tu_flags(Path(source)).get('merge_sections_into_text')) if source else False
+    names = retail_section_names(source, merged) if source else {}
+    placed = set()   # a merged module's `.rdata`/`.data`/`.text` are one object section: place it once
+    def spelled(sections):
+        out = []
+        for section in sections:
+            if names.get(section, section) not in placed:
+                placed.add(names.get(section, section)); out.append(names.get(section, section))
+        return out
     def write_lnk(with_stub):
+        placed.clear()
         lines = ["\torg\t$80010000", "text\tgroup"]
         if not overlay:
-            lines += ["\tsection\t.text,text"]
+            lines += [f"\tsection\t{names.get('.text', '.text')},text"]
+            placed.add(names.get('.text', '.text'))
         sections = ('.rdata', '.data', '.sdata', '.sbss', '.bss', '.ctors', '.dtors')
-        lines += [f'\tsection {section},text' for section in sections if section not in in_overlay]
+        lines += [f'\tsection {section},text' for section in spelled(s for s in sections if s not in in_overlay)]
         if overlay:
             # OVER plus /v is essential: ORG/OBJ alone never emits overlay
             # switches. The empty anchor reserves PsyQ's four-byte overlay ID.
             # Keep the diagnostic image in one CPE so the bytes gate reads the
             # very same link; retail splits these groups into separate files.
             lines += ['overlay_anchor group org($80139BF8)', f'{overlay} group over(overlay_anchor)']
-            lines += [f'\tsection {section},{overlay}' for section in ('.rdata', '.data', '.text')
-                      if section in in_overlay]
+            lines += [f'\tsection {section},{overlay}'
+                      for section in spelled(s for s in ('.rdata', '.data', '.text') if s in in_overlay)]
         lines += [f"\tinclude\t{obj.name}"] + ([f"\tinclude\t{name}_stub.obj"] if with_stub else [])
         lnk.write_bytes(("\r\n".join(lines) + "\r\n").encode())
     def run():

@@ -33,16 +33,19 @@ class OverlayProbeNativeTests(unittest.TestCase):
                 for segment, (image, pool, group) in cases.items():
                     spec = registry[segment]
                     source = B.ROOT / spec["source"]
+                    names = S.retail_section_names(source)   # retail's per-object section spelling
+                    back = {v: k for k, v in names.items()}
                     raw = S.compile_g(source).read_bytes()
                     obj = P.parse_obj_complete(raw)
                     self.assertEqual({obj["sections"][section]: len(data)
                                       for section, data in obj["code"].items()},
-                                     {".rdata": 23, ".text": 40})
+                                     {names.get(".rdata", ".rdata"): 23, names.get(".text", ".text"): 40})
                     regions = {".text": (0x80139BFC, 40), ".rdata": (pool, 23)}
                     bindings = R.resolve_bindings(spec["externals"], symbols)
                     bindings["_gp"] = 0x8011A780
-                    blocks, _ = N.native_link(segment, raw, regions, bindings, output_dir=folder,
-                                              overlay_text=True, overlay_group=group)   # retail overlay ids $c / $b
+                    blocks, _ = N.native_link(segment, raw, {names.get(k, k): v for k, v in regions.items()}, bindings,
+                                              output_dir=folder, overlay_text=True, overlay_group=group)   # ids $c / $b
+                    blocks = {back.get(k, k): v for k, v in blocks.items()}
                     overlay = (B.ROOT / "rom" / image).read_bytes()
                     self.assertEqual(blocks[".text"], overlay[4:44])
                     self.assertEqual(blocks[".rdata"], main[pool - 0x80010000:pool - 0x80010000 + 23])

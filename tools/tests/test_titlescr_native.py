@@ -35,9 +35,11 @@ class TitleScreenNativeTests(unittest.TestCase):
             with patch.object(S, "OUT", folder):
                 raw = S.compile_g(source).read_bytes()
             obj = P.parse_obj_complete(raw)
+            names = S.retail_section_names(source)   # retail's per-object section spelling on the object
+            back = {v: k for k, v in names.items()}
             self.assertEqual({obj["sections"][section]: len(data)
                               for section, data in obj["code"].items()},
-                             {section: size for section, (_, size) in regions.items()})
+                             {names.get(section, section): size for section, (_, size) in regions.items()})
             self.assertEqual(set(obj["xrefs"]), set(spec["externals"]))
 
             prefix, combined, mode = R.gp_carrier_plan(
@@ -54,8 +56,9 @@ class TitleScreenNativeTests(unittest.TestCase):
             bindings = R.resolve_bindings(obj["xrefs"], symbols)
             bindings["_gp"] = 0x8011A780
             blocks, map_text = N.native_link(
-                "titlescr", raw, combined, bindings, output_dir=folder,
+                "titlescr", raw, {names.get(k, k): v for k, v in combined.items()}, bindings, output_dir=folder,
                 prefix_objects=[prefix_object])
+            blocks = {back.get(k, k): v for k, v in blocks.items()}
             for section, actual in blocks.items():
                 va, size = combined[section]
                 self.assertEqual(actual, image[va - 0x80010000:va - 0x80010000 + size],

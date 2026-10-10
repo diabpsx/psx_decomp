@@ -298,7 +298,8 @@ def safe(s):
     return re.sub(r'[^A-Za-z0-9_.+@$-]', '_', s)[:120]
 
 def is_code_section(nm):
-    return nm is not None and (nm.startswith('.text') or nm.endswith('.text'))
+    # `.text`, `.text.lib`, `prefix.text`, and retail's per-object `.NAME_text` / `.STARTUP_text`
+    return nm is not None and (nm.startswith('.text') or nm.endswith('.text') or nm.endswith('_text'))
 
 # ---------------- driver ----------------
 def main():

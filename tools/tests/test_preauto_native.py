@@ -36,9 +36,11 @@ class PreAutoNativeTests(unittest.TestCase):
             with patch.object(S, "OUT", folder):
                 raw = S.compile_g(B.ROOT / spec["source"]).read_bytes()
             obj = P.parse_obj_complete(raw)
+            names = S.retail_section_names(B.ROOT / spec["source"])   # retail's per-object section spelling
+            back = {v: k for k, v in names.items()}
             self.assertEqual({obj["sections"][section]: len(data)
                               for section, data in obj["code"].items()},
-                             {section: size for section, (_, size) in regions.items()})
+                             {names.get(section, section): size for section, (_, size) in regions.items()})
             self.assertEqual(set(obj["xrefs"]), set(spec["externals"]))
 
             prefix, combined, mode = R.gp_carrier_plan(
@@ -55,8 +57,9 @@ class PreAutoNativeTests(unittest.TestCase):
             bindings = R.resolve_bindings(obj["xrefs"], symbols)
             bindings["_gp"] = 0x8011A780
             blocks, map_text = N.native_link(
-                "preauto", raw, combined, bindings, output_dir=folder,
+                "preauto", raw, {names.get(k, k): v for k, v in combined.items()}, bindings, output_dir=folder,
                 prefix_objects=[prefix_object], overlay_text=True, overlay_group="pregame_text")
+            blocks = {back.get(k, k): v for k, v in blocks.items()}
             for section in (".rdata", ".sdata"):
                 va, size = combined[section]
                 self.assertEqual(blocks[section],

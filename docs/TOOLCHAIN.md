@@ -615,7 +615,7 @@ and the next label (alignment pads), so the DLG scaffold is back to its original
 The retail per-object section names (`.CONTROL_text`, `.MAP_data`) are produced by none of the
 tools here: the CCPSX driver passes ASPSX nothing beyond `-q`, ASPSX `-s<name>` gives `name.text`
 in a group of that name, PREFSECT gives `prefix.text`, and PSYLIB members keep plain names.  The
-link no longer depends on them.
+link no longer depends on them.  (Round 9 below reproduces the spelling on our objects.)
 
 ### Round 7: ITEMS/FMV local BSS closed; no post-assemble split remains (2026-10-10)
 
@@ -656,6 +656,40 @@ The one-section name also retired the invented startup.cpp TU: with PAD_Open and
 `.STARTUP_text` their definition order fixed their addresses, and retail's SLD records put them in
 PADS.CPP (line 103) and GMAN.CPP (line 1398).  Each now lives in its retail owner as that TU's
 once-only piece; every STARTUP contributor is a real retail source.
+
+### Round 9: retail's per-object section names (2026-10-11)
+
+What produced `.VERSION_text` / `.VERSION_rdata` / `.VERSION_data` in the retail MAP?  Measured:
+
+- ASPSX `-s<name>` (2.56, 2.67, 2.81 from Climax's SpongeBob tree, the PsyQ 4.4 build, two 4.0/4.1
+  DTL builds) renames *every* section `name.text`, `name.sdata`, ... and puts them in a group `name`
+  (the PsyQ PREFSMPL sample's `-Wa,s<name>` overlay recipe).  PREFSECT (PsyQ 4.0/4.1, run under
+  DOSBox) prefixes every section with the given string verbatim (`VERSION.text`, `.VERSION_.text`).
+  CCPSX 3.02 and cc1plus 2.7.2.SN have no section-naming option (`.section %s` appears only for
+  `__attribute__((section))`); PSYLINK 2.52 renames nothing; Climax's own `objbodge.exe` (SpongeBob,
+  2001: `ccpsx -c`, `dmpsx -b`, `objbodge a.o $@`) leaves every section of our objects unchanged.
+- Retail renamed only `.text`, `.rdata` and `.data`, and only in *compiled* objects: `.sdata`, `.sbss`,
+  `.bss`, `.ctors`, `.dtors` and the attribute section `.STARTUP_text` keep their names, and the
+  hand-assembled `.MIP` objects (CRUNCH, TEXTAB, OVERINFO, LNKOPT, GP, ABLOCK, GTE, REPLACE) and every
+  library member link under plain names.  Nothing on the SN side has that selectivity; it is a step of
+  Climax's own build applied to the compiler's output of each game module, before ASPSX.
+
+The lane now does the same: `symlane.retail_section_names` reads the object's names from the MAP
+inventory (configs/sections.json; `dlg_2.cpp` is retail's DLG) and `compile_g` rewrites the three
+section directives of cc1plus's output to them (`.section .VERSION_text,"ax",@progbits`, ...).  For a
+merged overlay module (`merge_sections_into_text`) all three become its one `.NAME_text`, which is
+the same emission-order stream as before under retail's name.  Registry rows keep their logical
+keys; `source_section` now defaults to the retail name, so the member links place
+`section .VERSION_text,...` like retail's link script, and ASPSX, PSYLINK and SYMMUNGE accept the
+names (VERSION, and every other member, link byte- and SYM-identical).
+
+Two overlay shapes remain, both byte-exact but under different models: CREDITS, MEMCARD, DLG,
+DRLG_L2 and FMV are emission-order streams (DLG's `.align 3` pad is stream-relative), while
+DRLG_L1/L3/L4's single retail section is their `.rdata`, `.data` and `.text` in that order (a merged
+DRLG_L1 stream puts the tables where retail has the three `.DUN` literals, which cc1plus emits with
+DRLG_LoadL1SP after the tables).  The lane links the latter three as composed `.DRLG_L1_rdata` /
+`.DRLG_L1_data` / `.DRLG_L1_text` sections at retail's addresses; what folded them into one section
+in Climax's build is still unexplained.
 
 ### FRONTEND DLG.CPP data (2026-10-10)
 

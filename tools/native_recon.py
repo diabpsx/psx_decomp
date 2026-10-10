@@ -222,8 +222,18 @@ def scaffold_parts(row, home, kind, layouts):
     return parts
 
 
+def object_section_names(spec):
+    """The object section names a member's `.text`/`.rdata`/`.data` rows get by default: retail's per-object
+    spelling (symlane.retail_section_names), or plain for library members and hand-assembled objects."""
+    if not spec.get('source'):
+        return {}
+    source = B.ROOT / spec['source']
+    return S.retail_section_names(source, bool(B.per_tu_flags(source).get('merge_sections_into_text')))
+
+
 def validate_placements(segment, spec, layouts):
     sections = spec['sections']
+    names = object_section_names(spec)
     text_sections = [s for s in sections if s == '.text' or re.fullmatch(r'\.text\.\w+',s)]
     # `data_only`: a member that owns no code (OVERINFO.MIP / LNKOPT.MIP option words, EA's CALLBACK cell):
     # its data and zero-storage sections are still linked at the retail addresses and compared whole.
@@ -290,15 +300,18 @@ def validate_placements(segment, spec, layouts):
         if section == '.text' and (va, size) != extent:
             raise ValueError('native source text must fill the complete retail TU')
         homes[section], regions[section], limits[section] = home, (va, size), sum(extent)
-        source_section = row.get('source_section', section)
+        source_section = row.get('source_section', names.get(section, section))
         if not isinstance(source_section, str) or not re.fullmatch(r'\.[A-Za-z_][A-Za-z0-9_.]*', source_section):
             raise ValueError('invalid native object-section alias')
     # Several rows may name one object section (retail's `.STARTUP_text` holds VERSION's StrDate, StrTime,
     # Words and MonDays and its two once-only functions, one emission-order section); the rows then tile
     # that section contiguously in one image and the lane links it once, as PSYLINK did.
+    # (a merged module's rows are its composed group's exports: one stream, verified whole, not linked as rows)
+    exports = set(spec.get('composed_group', {}).get('exports', {}))
     shared = {}
     for section, row in sections.items():
-        shared.setdefault(row.get('source_section', section), []).append(section)
+        if section not in exports:
+            shared.setdefault(row.get('source_section', names.get(section, section)), []).append(section)
     for members in shared.values():
         ordered = sorted(members, key=lambda s: regions[s][0])
         if (len({homes[s] for s in members}) != 1
@@ -669,7 +682,8 @@ def build(only=None):
             raise ValueError('native source requires a same-name whole TU')
         assembler_version, assembler, assembler_dos, assembler_flags = source_assembler_options(spec)
         homes, regions, limits = validate_placements(segment, spec, layouts)
-        source_sections = {section: row.get('source_section', section)
+        names = object_section_names(spec)
+        source_sections = {section: row.get('source_section', names.get(section, section))
                            for section, row in spec['sections'].items()}
         composition = spec.get('composed_group')
         composed_exports = {}
@@ -731,8 +745,8 @@ def build(only=None):
                 if cursor != limit:
                     raise ValueError('native raw-export span is not completely declared')
             composed_link = {composition['name']: {
-                'sections': composition['sections'], 'va': composed_va,
-                'size': composition['size']}}
+                'sections': [names.get(section, section) for section in composition['sections']],
+                'va': composed_va, 'size': composition['size']}}
         extra_paths = []
         from native_text import validate_members, render_mixed
         routed = {}
@@ -784,7 +798,7 @@ def build(only=None):
                 raise ValueError('borrowed native section prefix leaves its retail fragment')
             at = va - amount - bases[home]
             data = retail_images[home][at:at + amount]
-            source_section = row.get('source_section', section)
+            source_section = row.get('source_section', names.get(section, section))
             if source_section in object_prefixes:
                 raise ValueError('duplicate borrowed native object-section prefix')
             borrowed_prefixes[section] = data
@@ -948,7 +962,7 @@ def build(only=None):
                 raise ValueError('stripped library data needs an explicit verification lane')
             if spec.get('data_only') is True:
                 # no functions: the whole-section retail compare above and the untyped data receipts below are the seal
-                if any('bss' not in row and obj['sections'].get(row['sect']) == '.text' for row in obj['xdefs']):
+                if any('bss' not in row and P.is_code_section(obj['sections'].get(row['sect'])) for row in obj['xdefs']):
                     raise ValueError('data-only native member exports code')
                 count = 0
             else:

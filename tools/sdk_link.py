@@ -79,6 +79,13 @@ def cpe_regions(data, regions, allow_zero_holes=()):
     return {name: bytes(payload) for name, payload in result.items()}
 
 
+def object_kind(name):
+    """`text`/`rdata`/`data`/`sdata`/`sbss`/`bss` for an object section name: plain, retail's per-object
+    `.NAME_text`, `.STARTUP_text`, or a lane alias like `.text.lib`; None for anything else."""
+    match = re.fullmatch(r'\.(?:[A-Za-z0-9_]+_)?(text|rdata|data|sdata|sbss|bss)(?:\.[A-Za-z_][A-Za-z0-9_.]*)?', name)
+    return match.group(1) if match else None
+
+
 def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=None,
                 overlay_text=False, composed_groups=None, allow_zero_holes=(), overlay_group=None):
     """Link an unchanged original object, with explicitly placed complete sections."""
@@ -106,16 +113,15 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         overlay_composed = list(composed_groups.items())
         if len(overlay_composed) > 1:
             raise ValueError('native overlay supports one composed text group')
-        if ((not overlay_composed and '.text' not in regions)
-                or (overlay_composed and not any(
-                    section == '.text' or re.fullmatch(r'\.text\.[A-Za-z_][A-Za-z0-9_.]*', section)
-                    for section in overlay_composed[0][1]['sections']))
-                or any(s not in ('.text', '.rdata', '.data', '.sdata', '.sbss', '.bss')
-                       and not re.fullmatch(r'\.(?:rdata|data|sdata|sbss|bss)\.[A-Za-z_][A-Za-z0-9_.]*', s)
-                       for s in regions)):
+        text_regions = [s for s in regions if object_kind(s) == 'text']
+        if ((not overlay_composed and len(text_regions) != 1)
+                or (overlay_composed and not any(object_kind(section) == 'text'
+                                                 for section in overlay_composed[0][1]['sections']))
+                or any(object_kind(s) is None for s in regions)):
             raise ValueError('native overlay requires text and resident initialized pools')
+        text_name = text_regions[0] if text_regions and not overlay_composed else None
         rows = sorted(regions.values())
-        start, length = (overlay_composed[0][1]['va'], overlay_composed[0][1]['size']) if overlay_composed else regions['.text']
+        start, length = (overlay_composed[0][1]['va'], overlay_composed[0][1]['size']) if overlay_composed else regions[text_name]
         if (start < 4 or start % 4 or length % 4
                 or any(type(a) is not int or type(n) is not int or n <= 0 for a,n in rows)
                 or any(a+n > b for (a,n),(b,m) in zip(rows,rows[1:]))
@@ -170,7 +176,7 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
             commands.append(f'{group} group org(${row["va"]:08X})')
         commands.extend(f'\tsection {section},{group}' for section in row['sections'])
     # in overlay mode the `over` text group is declared right after the anchor, so it takes retail's id
-    ordered = sorted(regions.items(), key=lambda kv: 0 if (overlay_text and kv[0] == '.text' and not composed_groups) else 1)
+    ordered = sorted(regions.items(), key=lambda kv: 0 if (overlay_text and kv[0] == text_name) else 1)
     for index, (section, (va, size)) in enumerate(ordered):
         if not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", section):
             raise ValueError("invalid SDK section name")
@@ -179,7 +185,7 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         if use_files:
             filename = out / f'{entry}_group{index}.bin'
             files[section] = filename
-            over = overlay_text and section == '.text' and not composed_groups
+            over = overlay_text and section == text_name
             group = overlay_group if over else f'sdk_{index}'
             commands.append(f'{group} group {"over(overlay_anchor)" if over else f"org(${va:08X})"},file("{filename.name}")')
             commands.append(f'\tsection {section},{group}')
@@ -215,7 +221,7 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         for section,path in files.items():
             va,size = regions[section]
             data = path.read_bytes()
-            if overlay_text and section == '.text':
+            if overlay_text and section == text_name:
                 ids = [i for a,n,i in headers if (a,n)==(va-4,size+4)]
                 if len(ids)!=1 or len(data)!=size+4 or data[:4]!=struct.pack('<I',ids[0]):
                     raise ValueError('native overlay ID metadata does not match its payload')
