@@ -555,8 +555,11 @@ at 128, itemactivelist 127 -> mult_tab at 256; FMV subcode 12 -> voice_attr at 1
 the exact size under every flag tried (-fno-common, -fconserve-space, -G0, ...), and every ASPSX
 build (2.34 .. 2.56, 2.67, 2.79, DOS and Win32, every single-letter switch, -G0/-G8) packs `.lcomm`
 objects at 4-byte alignment (2.67+ adds odd 4-byte pads that match retail no better); ASMPSX does not
-read gcc syntax.  No reachable tool reproduces the rounding, so the two rows per TU stay (probe
-receipts: scratch `la.s` layouts in build/tmp/pref).
+read gcc syntax.  The linker cannot help either: the `.lcomm` offsets are baked into the object
+(ASPSX 2.56 object locals: 108-byte at 0, 9-byte at 108, 127-byte at 120, 12-byte at 248, 64-byte at
+260), and PSYLINK 2.52 and SLINK Beta 3.0 (`/psx`) both place that section whole with the same extent.
+No reachable tool reproduces the rounding, so the two rows per TU stay (probe receipts: scratch
+`la.s` layouts in build/tmp/pref).
 
 ### FRONTEND DLG.CPP data (2026-10-10)
 
