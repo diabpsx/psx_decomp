@@ -12,7 +12,7 @@ static int FindEmptyIndex(void);
 static TextDat *DecRequestors[10];
 
 /* @0x800B07A4 DECOMP.CPP:61 (linked into the startup segment) */
-void DEC_Open(void) __attribute__((section(".text.decomp_startup")));
+void DEC_Open(void) __attribute__((section(".STARTUP_text")));
 void DEC_Open(void)
 {
     for (int f = 0; f < 10; f++)

@@ -3,10 +3,16 @@ SECTIONS
 {
     _gp = 0x8011A780;
     __romPos = 0;
+    _startup_text_id = 4;   /* PSYLINK group #4 of the retail link order */
+    _map_data_id = 5;   /* PSYLINK group #5 of the retail link order */
+    _frontend_text_id = 11;   /* PSYLINK group #11 of the retail link order */
+    _pregame_text_id = 12;   /* PSYLINK group #12 of the retail link order */
+    _game_text_id = 13;   /* PSYLINK group #13 of the retail link order */
+    _fmv_text_id = 14;   /* PSYLINK group #14 of the retail link order */
     .fmv 0x80139BF8 : AT(0) SUBALIGN(4)
     {
         . = 0x0;   /* 0x80139BF8 */
-        build/asm/data/fmv_hdr.data.s.o(.data);
+        LONG(_fmv_text_id);   /* PSYLINK $fmv_text overlay-id word */
         . = 0x4;   /* 0x80139BFC */
         build/native_archive/libpress_rdata.rodata.s.o(.rodata);   /* original native archive group */
         . = 0xB4;   /* 0x80139CAC */

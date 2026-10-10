@@ -74,7 +74,7 @@ static FileIO *FileSystem;
 static FileIO *OverlayFileSystem;
 
 /* @0x800B059C SYSINIT.CPP:97 (linked into the startup segment) */
-void SYSI_Init(void) __attribute__((section(".text.sysinit_startup")));
+void SYSI_Init(void) __attribute__((section(".STARTUP_text")));
 
 /* TUTILS.H helpers precede SYSINIT's ordinary code in retail. */
 static int GetTpY(unsigned short tpage)

@@ -170,8 +170,8 @@ startup_1 GetVersionString__FPc recon/source/version.cpp
 startup_1 GetWord__FPc recon/source/version.cpp
 startup MEM_SetupMem__Fv recon/psxsrc/mem.cpp
 startup SetupWorkRam__Fv recon/psxsrc/mem.cpp
-startup PAD_Open__Fv recon/psxsrc/startup.cpp
-startup GM_Open__Fv recon/psxsrc/startup.cpp
+startup PAD_Open__Fv recon/psxsrc/pads.cpp
+startup GM_Open__Fv recon/psxsrc/gman.cpp
 lib getlocksemaphore recon/eaclib/lock.c
 lib locksemaphore recon/eaclib/lock.c
 lib locksemaphorereturn recon/eaclib/lock.c

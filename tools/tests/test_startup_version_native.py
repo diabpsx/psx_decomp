@@ -19,7 +19,10 @@ class StartupVersionNativeTests(unittest.TestCase):
                 rows = R.build(["version"])
         self.assertEqual(rows[0]["functions"], 5)
         self.assertEqual(rows[0]["sections"][".rdata"]["size"], 1536)
-        self.assertEqual(rows[0]["sections"][".rdata.version_startup"]["size"], 568)
+        # StrDate (12), StrTime (9, padded), Words (472), MonDays (96): one .STARTUP_text section with the code
+        self.assertEqual(rows[0]["sections"][".rdata.version_startup"]["size"], 592)
         self.assertEqual(rows[0]["sections"][".text.version_startup"]["size"], 640)
         self.assertNotIn("Words", rows[0]["bindings"])
         self.assertNotIn("MonDays", rows[0]["bindings"])
+        self.assertNotIn("StrDate", rows[0]["bindings"])
+        self.assertNotIn("StrTime", rows[0]["bindings"])

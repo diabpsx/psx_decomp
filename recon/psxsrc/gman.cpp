@@ -903,6 +903,14 @@ void TextDat::SetPal(FRAME_HDR *Fr, POLY_FT4 *FT4)
     }
 }
 
+/* line 1398 @0x800B0760 (.STARTUP_text, once-only) */
+void GM_Open(void) __attribute__((section(".STARTUP_text")));
+void GM_Open(void)
+{
+    for (int f = 0; f < 372; f++)
+        AllDats[f] = NULL;
+}
+
 /* line 1413 @0x80093E98 */
 int TextDat::GetFrNum(int Creature, int Action, int Direction, int Frame)
 {

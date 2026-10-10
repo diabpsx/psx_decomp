@@ -66,8 +66,8 @@ unsigned int GSYS_MemEnd = 0;   /* @0x8011AAD0 */
 int LowestFmem = 0xA00000;   /* @0x8011AAD4 */
 LNK_OPTS *Gaz;   /* @0x8011AAD8 */
 int LastFmem;   /* @0x8011AADC */
-void MEM_SetupMem(void) __attribute__((section(".text.startup_mem")));
-static void SetupWorkRam(void) __attribute__((section(".text.startup_mem")));
+void MEM_SetupMem(void) __attribute__((section(".STARTUP_text")));
+static void SetupWorkRam(void) __attribute__((section(".STARTUP_text")));
 
 /* MEM.CPP:85 */
 void MEM_SetupMem(void)

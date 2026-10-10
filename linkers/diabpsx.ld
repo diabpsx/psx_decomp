@@ -3,6 +3,12 @@ SECTIONS
 {
     _gp = 0x8011A780;
     __romPos = 0;
+    _startup_text_id = 4;   /* PSYLINK group #4 of the retail link order */
+    _map_data_id = 5;   /* PSYLINK group #5 of the retail link order */
+    _frontend_text_id = 11;   /* PSYLINK group #11 of the retail link order */
+    _pregame_text_id = 12;   /* PSYLINK group #12 of the retail link order */
+    _game_text_id = 13;   /* PSYLINK group #13 of the retail link order */
+    _fmv_text_id = 14;   /* PSYLINK group #14 of the retail link order */
     .diabpsx 0x80010000 : AT(0) SUBALIGN(4)
     {
         . = 0x0;   /* 0x80010000 */
@@ -204,11 +210,17 @@ SECTIONS
         . = 0x9F0F0;   /* 0x800AF0F0 */
         build/native_source/spltargt.text.s.o(.text);   /* verified native-assembled source */
         . = 0xA031C;   /* 0x800B031C */
-        build/asm/data/startup_text_hdr.data.s.o(.data);
+        _startup_text_org = .;
+        _map_data_org = .;
+        LONG(_map_data_id);   /* PSYLINK $map_data overlay-id word; map_data is linked over startup_text at the same org, so its word is the one the image keeps */
+        _map_data_orgend = .;
+        __MAP_data_org = .;
+        build/recon/psxsrc/map.s.o(.data);   /* MAP: the reserved map_data member, an empty .data section */
+        __MAP_data_orgend = .;
         . = 0xA0320;   /* 0x800B0320 */
         build/native_source/startup.text.s.o(.text);   /* verified native-assembled source */
         . = 0xA07C8;   /* 0x800B07C8 */
-        build/asm/data/startup_rodata_800b07c8.rodata.s.o(.rodata);
+        build/native_source/startup_rodata_800b07c8.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xA07E0;   /* 0x800B07E0 */
         build/native_source/startup_rodata_800b07e0.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xA0A18;   /* 0x800B0A18 */
@@ -217,7 +229,20 @@ SECTIONS
         build/native_source/ctors.data.s.o(.data);   /* verified native source data */
         . = 0xA0CD4;   /* 0x800B0CD4 */
         build/native_source/dtors.data.s.o(.data);   /* verified native source data */
+        _startup_text_orgend = .;
         . = 0xA0D00;   /* 0x800B0D00 */
+        __linked_diabpsx_gte_start = .;
+        build/recon/psxsrc/gte.s.o(.data);   /* hand-authored data source, link-resolved */
+        ASSERT(. - __linked_diabpsx_gte_start == 0x2000, "wrong linked object extent: gte");
+        . = 0xA2D00;   /* 0x800B2D00 */
+        __linked_diabpsx_gp_start = .;
+        build/recon/psxsrc/gp.s.o(.data);   /* hand-authored data source, link-resolved */
+        ASSERT(. - __linked_diabpsx_gp_start == 0x4, "wrong linked object extent: gp");
+        . = 0xA2D04;   /* 0x800B2D04 */
+        __linked_diabpsx_textab_start = .;
+        build/recon/psxsrc/textab.s.o(.data);   /* hand-authored data source, link-resolved */
+        ASSERT(. - __linked_diabpsx_textab_start == 0x158C, "wrong linked object extent: textab");
+        . = 0xA4290;   /* 0x800B4290 */
         build/native_source/data.data.s.o(.data);   /* verified native source data */
         . = 0xA7088;   /* 0x800B7088 */
         build/asm/data/data_monstlst.data.s.o(.data);
@@ -350,6 +375,14 @@ SECTIONS
         . = 0xFD6CC;   /* 0x8010D6CC */
         build/native_source/data_automap.data.s.o(.data);   /* verified native source data */
         . = 0xFDBAC;   /* 0x8010DBAC */
+        __linked_diabpsx_overinfo_start = .;
+        build/recon/psxsrc/overinfo.s.o(.rodata);   /* hand-authored data source, link-resolved */
+        ASSERT(. - __linked_diabpsx_overinfo_start == 0x2C, "wrong linked object extent: overinfo");
+        . = 0xFDBD8;   /* 0x8010DBD8 */
+        __linked_diabpsx_lnkopt_start = .;
+        build/recon/psxsrc/lnkopt.s.o(.rodata);   /* hand-authored data source, link-resolved */
+        ASSERT(. - __linked_diabpsx_lnkopt_start == 0x20, "wrong linked object extent: lnkopt");
+        . = 0xFDBF8;   /* 0x8010DBF8 */
         build/native_source/rodata.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFF90;   /* 0x8010FF90 */
         build/asm/data/rodata_main.rodata.s.o(.rodata);
@@ -412,7 +445,7 @@ SECTIONS
         . = 0x100614;   /* 0x80110614 */
         build/native_source/rodata_cplayer.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1006D4;   /* 0x801106D4 */
-        build/asm/data/rodata_framehdr.rodata.s.o(.rodata);
+        build/native_source/rodata_framehdr.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1006E4;   /* 0x801106E4 */
         build/native_source/rodata_psxmsg.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100844;   /* 0x80110844 */
@@ -709,53 +742,17 @@ SECTIONS
         build/native_source/fe.sbss.s.o(.sbss);
         ASSERT(. - __source_fe_sbss_start == 0x4, "wrong BSS extent: fe.sbss");
         . = 0x10C74C;
-        __source_fmv_sbss.fmv_stream_start = .;
-        build/native_source/fmv.sbss.fmv_stream.s.o(.sbss.fmv_stream);
-        ASSERT(. - __source_fmv_sbss.fmv_stream_start == 0xC, "wrong BSS extent: fmv.sbss.fmv_stream");
-        . = 0x10C758;
-        __source_fmv_sbss.fmv_jump_start = .;
-        build/native_source/fmv.sbss.fmv_jump.s.o(.sbss.fmv_jump);
-        ASSERT(. - __source_fmv_sbss.fmv_jump_start == 0xC, "wrong BSS extent: fmv.sbss.fmv_jump");
+        __source_fmv_sbss_start = .;
+        build/native_source/fmv.sbss.s.o(.sbss);
+        ASSERT(. - __source_fmv_sbss_start == 0x18, "wrong BSS extent: fmv.sbss");
         . = 0x10C764;
-        __source_control_sbss.control_25_start = .;
-        build/native_source/control.sbss.control_25.s.o(.sbss.control_25);
-        ASSERT(. - __source_control_sbss.control_25_start == 0xC, "wrong BSS extent: control.sbss.control_25");
-        . = 0x10C774;
-        __source_control_sbss.control_26_start = .;
-        build/native_source/control.sbss.control_26.s.o(.sbss.control_26);
-        ASSERT(. - __source_control_sbss.control_26_start == 0x10, "wrong BSS extent: control.sbss.control_26");
-        . = 0x10C784;
-        __source_control_sbss.control_27_start = .;
-        build/native_source/control.sbss.control_27.s.o(.sbss.control_27);
-        ASSERT(. - __source_control_sbss.control_27_start == 0x10, "wrong BSS extent: control.sbss.control_27");
-        . = 0x10C794;
-        __source_control_sbss.control_28_start = .;
-        build/native_source/control.sbss.control_28.s.o(.sbss.control_28);
-        ASSERT(. - __source_control_sbss.control_28_start == 0x4, "wrong BSS extent: control.sbss.control_28");
-        . = 0x10C798;
-        __source_control_sbss.control_29_start = .;
-        build/native_source/control.sbss.control_29.s.o(.sbss.control_29);
-        ASSERT(. - __source_control_sbss.control_29_start == 0x4, "wrong BSS extent: control.sbss.control_29");
-        . = 0x10C7A0;
-        __source_control_sbss.control_30_start = .;
-        build/native_source/control.sbss.control_30.s.o(.sbss.control_30);
-        ASSERT(. - __source_control_sbss.control_30_start == 0x8, "wrong BSS extent: control.sbss.control_30");
-        . = 0x10C7A8;
-        __source_control_sbss.control_31_start = .;
-        build/native_source/control.sbss.control_31.s.o(.sbss.control_31);
-        ASSERT(. - __source_control_sbss.control_31_start == 0x3, "wrong BSS extent: control.sbss.control_31");
-        . = 0x10C7B0;
-        __source_diablo_sbss.diablo_lvldir_start = .;
-        build/native_source/diablo.sbss.diablo_lvldir.s.o(.sbss.diablo_lvldir);
-        ASSERT(. - __source_diablo_sbss.diablo_lvldir_start == 0x4, "wrong BSS extent: diablo.sbss.diablo_lvldir");
-        . = 0x10C7B4;
-        __source_diablo_sbss.diablo_stack_start = .;
-        build/native_source/diablo.sbss.diablo_stack.s.o(.sbss.diablo_stack);
-        ASSERT(. - __source_diablo_sbss.diablo_stack_start == 0x4, "wrong BSS extent: diablo.sbss.diablo_stack");
-        . = 0x10C7B8;
-        __source_diablo_sbss.diablo_pause_start = .;
-        build/native_source/diablo.sbss.diablo_pause.s.o(.sbss.diablo_pause);
-        ASSERT(. - __source_diablo_sbss.diablo_pause_start == 0x4, "wrong BSS extent: diablo.sbss.diablo_pause");
+        __source_control_sbss_start = .;
+        build/native_source/control.sbss.s.o(.sbss);
+        ASSERT(. - __source_control_sbss_start == 0x47, "wrong BSS extent: control.sbss");
+        . = 0x10C7AC;
+        __source_diablo_sbss_start = .;
+        build/native_source/diablo.sbss.s.o(.sbss);
+        ASSERT(. - __source_diablo_sbss_start == 0x10, "wrong BSS extent: diablo.sbss");
         . = 0x10C7BC;
         __source_towners_sbss_start = .;
         build/native_source/towners.sbss.s.o(.sbss);
@@ -780,18 +777,18 @@ SECTIONS
         __source_multi_sbss_start = .;
         build/native_source/multi.sbss.s.o(.sbss);
         ASSERT(. - __source_multi_sbss_start == 0x38, "wrong BSS extent: multi.sbss");
+        . = 0x10C878;
+        __source_player_sbss_start = .;
+        build/native_source/player.sbss.s.o(.sbss);
+        ASSERT(. - __source_player_sbss_start == 0x4, "wrong BSS extent: player.sbss");
         . = 0x10C87C;
         __source_quests_sbss_start = .;
         build/native_source/quests.sbss.s.o(.sbss);
         ASSERT(. - __source_quests_sbss_start == 0x8, "wrong BSS extent: quests.sbss");
         . = 0x10C884;
-        __source_stores_sbss.stores_state0_start = .;
-        build/native_source/stores.sbss.stores_state0.s.o(.sbss.stores_state0);
-        ASSERT(. - __source_stores_sbss.stores_state0_start == 0x23, "wrong BSS extent: stores.sbss.stores_state0");
-        . = 0x10C8A8;
-        __source_stores_sbss.stores_state1_start = .;
-        build/native_source/stores.sbss.stores_state1.s.o(.sbss.stores_state1);
-        ASSERT(. - __source_stores_sbss.stores_state1_start == 0x20, "wrong BSS extent: stores.sbss.stores_state1");
+        __source_stores_sbss_start = .;
+        build/native_source/stores.sbss.s.o(.sbss);
+        ASSERT(. - __source_stores_sbss_start == 0x44, "wrong BSS extent: stores.sbss");
         . = 0x10C8C8;
         __source_town_sbss_start = .;
         build/native_source/town.sbss.s.o(.sbss);
@@ -829,13 +826,13 @@ SECTIONS
         build/sdk/native/InitTAP.sbss.s.o(.sbss);
         ASSERT(. - __sdk_InitTAP_sbss_start == 0x80, "wrong BSS extent: InitTAP.sbss");
         . = 0x10C98C;
-        __source_tasker_bss_start = .;
-        build/native_source/tasker.bss.s.o(.bss);
-        ASSERT(. - __source_tasker_bss_start == 0x40, "wrong BSS extent: tasker.bss");
+        __source_tasker_sbss_start = .;
+        build/native_source/tasker.sbss.s.o(.sbss);
+        ASSERT(. - __source_tasker_sbss_start == 0x40, "wrong BSS extent: tasker.sbss");
         . = 0x10C9CC;
-        __source_gal_bss_start = .;
-        build/native_source/gal.bss.s.o(.bss);
-        ASSERT(. - __source_gal_bss_start == 0x2C, "wrong BSS extent: gal.bss");
+        __source_gal_sbss_start = .;
+        build/native_source/gal.sbss.s.o(.sbss);
+        ASSERT(. - __source_gal_sbss_start == 0x2C, "wrong BSS extent: gal.sbss");
         . = 0x10C9F8;
         __source_cdrom_sbss_start = .;
         build/native_source/cdrom.sbss.s.o(.sbss);
@@ -1000,6 +997,10 @@ SECTIONS
         __source_block_bss_start = .;
         build/native_source/block.bss.s.o(.bss);
         ASSERT(. - __source_block_bss_start == 0x2C, "wrong BSS extent: block.bss");
+        . = 0x10CC00;
+        __source_gman_bss_start = .;
+        build/native_source/gman.bss.s.o(.bss);
+        ASSERT(. - __source_gman_bss_start == 0x28, "wrong BSS extent: gman.bss");
         . = 0x10CC28;
         __source_overlay_bss_start = .;
         build/native_source/overlay.bss.s.o(.bss);
@@ -1037,49 +1038,21 @@ SECTIONS
         build/native_source/psxhelp.bss.s.o(.bss);
         ASSERT(. - __source_psxhelp_bss_start == 0x20, "wrong BSS extent: psxhelp.bss");
         . = 0x111C98;
-        __source_fmv_bss.fmv_subcode_start = .;
-        build/native_source/fmv.bss.fmv_subcode.s.o(.bss.fmv_subcode);
-        ASSERT(. - __source_fmv_bss.fmv_subcode_start == 0xC, "wrong BSS extent: fmv.bss.fmv_subcode");
-        . = 0x111CA8;
-        __source_fmv_bss.fmv_voice_start = .;
-        build/native_source/fmv.bss.fmv_voice.s.o(.bss.fmv_voice);
-        ASSERT(. - __source_fmv_bss.fmv_voice_start == 0x40, "wrong BSS extent: fmv.bss.fmv_voice");
-        . = 0x111CE8;
-        __source_fmv_bss.fmv_movie_start = .;
-        build/native_source/fmv.bss.fmv_movie.s.o(.bss.fmv_movie);
-        ASSERT(. - __source_fmv_bss.fmv_movie_start == 0x20, "wrong BSS extent: fmv.bss.fmv_movie");
-        . = 0x111D08;
-        __source_fmv_bss.fmv_jmp_start = .;
-        build/native_source/fmv.bss.fmv_jmp.s.o(.bss.fmv_jmp);
-        ASSERT(. - __source_fmv_bss.fmv_jmp_start == 0x30, "wrong BSS extent: fmv.bss.fmv_jmp");
+        __source_fmv_bss_start = .;
+        build/native_source/fmv.bss.s.o(.bss);
+        ASSERT(. - __source_fmv_bss_start == 0xC8A0, "wrong BSS extent: fmv.bss");
         . = 0x11E538;
-        __source_control_bss.control_panel_start = .;
-        build/native_source/control.bss.control_panel.s.o(.bss.control_panel);
-        ASSERT(. - __source_control_bss.control_panel_start == 0x550, "wrong BSS extent: control.bss.control_panel");
-        . = 0x11EA88;
-        __source_control_bss.control_back_start = .;
-        build/native_source/control.bss.control_back.s.o(.bss.control_back);
-        ASSERT(. - __source_control_bss.control_back_start == 0x10, "wrong BSS extent: control.bss.control_back");
-        . = 0x11EA98;
-        __source_control_bss.control_talk_start = .;
-        build/native_source/control.bss.control_talk.s.o(.bss.control_talk);
-        ASSERT(. - __source_control_bss.control_talk_start == 0x50, "wrong BSS extent: control.bss.control_talk");
+        __source_control_bss_start = .;
+        build/native_source/control.bss.s.o(.bss);
+        ASSERT(. - __source_control_bss_start == 0x5B0, "wrong BSS extent: control.bss");
         . = 0x11EAE8;
         __source_diablo_bss_start = .;
         build/native_source/diablo.bss.s.o(.bss);
         ASSERT(. - __source_diablo_bss_start == 0x170, "wrong BSS extent: diablo.bss");
         . = 0x11EC58;
-        __source_items_bss.items_curr_start = .;
-        build/native_source/items.bss.items_curr.s.o(.bss.items_curr);
-        ASSERT(. - __source_items_bss.items_curr_start == 0x6C, "wrong BSS extent: items.bss.items_curr");
-        . = 0x11ECC8;
-        __source_items_bss.items_hold_start = .;
-        build/native_source/items.bss.items_hold.s.o(.bss.items_hold);
-        ASSERT(. - __source_items_bss.items_hold_start == 0x9, "wrong BSS extent: items.bss.items_hold");
-        . = 0x11ECD8;
-        __source_items_bss.items_active_start = .;
-        build/native_source/items.bss.items_active.s.o(.bss.items_active);
-        ASSERT(. - __source_items_bss.items_active_start == 0x7F, "wrong BSS extent: items.bss.items_active");
+        __source_items_bss_start = .;
+        build/native_source/items.bss.s.o(.bss);
+        ASSERT(. - __source_items_bss_start == 0xFF, "wrong BSS extent: items.bss");
         . = 0x11ED58;
         __source_lighting_bss_start = .;
         build/native_source/lighting.bss.s.o(.bss);
@@ -1161,13 +1134,13 @@ SECTIONS
         build/sdk/native/_patch_gte.bss.s.o(.bss);
         ASSERT(. - __sdk__patch_gte_bss_start == 0x10, "wrong BSS extent: _patch_gte.bss");
         . = 0x1225A0;
-        __source_tasker_bss.sch_start = .;
-        build/native_source/tasker.bss.sch.s.o(.bss.sch);
-        ASSERT(. - __source_tasker_bss.sch_start == 0x30, "wrong BSS extent: tasker.bss.sch");
+        __source_tasker_bss_start = .;
+        build/native_source/tasker.bss.s.o(.bss);
+        ASSERT(. - __source_tasker_bss_start == 0x30, "wrong BSS extent: tasker.bss");
         . = 0x1225D0;
-        __source_gal_bss.hdr_start = .;
-        build/native_source/gal.bss.hdr.s.o(.bss.hdr);
-        ASSERT(. - __source_gal_bss.hdr_start == 0x15E0, "wrong BSS extent: gal.bss.hdr");
+        __source_gal_bss_start = .;
+        build/native_source/gal.bss.s.o(.bss);
+        ASSERT(. - __source_gal_bss_start == 0x15E0, "wrong BSS extent: gal.bss");
         . = 0x123BB0;
         __source_vrip_bss_start = .;
         build/native_source/vrip.bss.s.o(.bss);
@@ -1310,6 +1283,40 @@ SECTIONS
         ASSERT(. - __sdk_StSetRing_StRingSize_bss_start == 0x4, "wrong BSS extent: StSetRing_StRingSize.bss");
         . = 0x129BF4;   /* remaining .sbss + .bss zero fill */
     }
+    /* link-computed layout symbols (tools/link_symbols.py); OVERINFO.MIP and LNKOPT.MIP read them */
+    LNK_OrgAddress = ADDR(.diabpsx);
+    _bss_objend = ALIGN(ADDR(.diabpsx) + SIZEOF(.diabpsx), 8);
+    LNK_StackSize = 0x1800;   /* PSYLINK link option */
+    _frontend_text_org = _bss_objend;
+    _frontend_text_size = 0x23234;   /* configs/frontend.yaml image extent */
+    _frontend_text_orgend = _frontend_text_org + _frontend_text_size;
+    _pregame_text_org = _bss_objend;
+    _pregame_text_size = 0x29DCC;   /* configs/pregame.yaml image extent */
+    _pregame_text_orgend = _pregame_text_org + _pregame_text_size;
+    _game_text_org = _bss_objend;
+    _game_text_size = 0x2A228;   /* configs/game.yaml image extent */
+    _game_text_orgend = _game_text_org + _game_text_size;
+    _fmv_text_org = _bss_objend;
+    _fmv_text_size = 0x1EC70;   /* configs/fmv.yaml image extent */
+    _fmv_text_orgend = _fmv_text_org + _fmv_text_size;
+    __last_org = MAX(MAX(MAX(_frontend_text_orgend, _pregame_text_orgend), _game_text_orgend), _fmv_text_orgend);
+    FirstFreeByte = __last_org;
+    __last_size = 4;
+    __last_orgend = __last_org + __last_size;
+    _memcard_text_org = __last_orgend;
+    _memcard_text_size = 0;
+    __lnk_ram_size = 0x80200000 - 0x80000000;
+    __lnk_free_mem_size = 0x80200000 - LNK_StackSize - FirstFreeByte;
+    /* startup_text / map_data overlay groups at one org; their org/orgend marks come from the subsegments */
+    _startup_text_obj = _startup_text_org;
+    _startup_text_objend = _startup_text_orgend;
+    _startup_text_size = _startup_text_orgend - _startup_text_org;
+    _map_data_obj = _map_data_org;
+    _map_data_objend = _map_data_orgend;
+    _map_data_size = _map_data_orgend - _map_data_org;
+    __MAP_data_obj = __MAP_data_org;
+    __MAP_data_objend = __MAP_data_orgend;
+    __MAP_data_size = __MAP_data_orgend - __MAP_data_org;
     /DISCARD/ : { *(.reginfo) *(.mdebug*) *(.comment) *(.pdr) *(.gnu.attributes) *(.MIPS.abiflags) }
 }
 PROVIDE(CM_ChooseMonsterList__FiUl = 0x80155AE4); /* pregame retail export */
@@ -1323,3 +1330,40 @@ PROVIDE(UseStaffCharge__FP12PlayerStruct = 0x80160248); /* game retail export */
 PROVIDE(GetSpellLevel__Fii = 0x8013A43C); /* game retail export */
 PROVIDE(AddMissile__Fiiiiiiciii = 0x80142A04); /* game retail export */
 PROVIDE(CanTalkToMonst__Fi = 0x8015694C); /* game retail export */
+PROVIDE(StartAutomap__Fv = 0x80161F58); /* game retail export */
+ASSERT(LNK_OrgAddress == 0x80010000, "link-computed LNK_OrgAddress differs from rom/DIABPSX.MAP");
+ASSERT(_bss_objend == 0x80139BF8, "link-computed _bss_objend differs from rom/DIABPSX.MAP");
+ASSERT(LNK_StackSize == 0x1800, "link-computed LNK_StackSize differs from rom/DIABPSX.MAP");
+ASSERT(_startup_text_org == 0x800B031C, "link-computed _startup_text_org differs from rom/DIABPSX.MAP");
+ASSERT(_startup_text_obj == 0x800B031C, "link-computed _startup_text_obj differs from rom/DIABPSX.MAP");
+ASSERT(_startup_text_orgend == 0x800B0D00, "link-computed _startup_text_orgend differs from rom/DIABPSX.MAP");
+ASSERT(_startup_text_objend == 0x800B0D00, "link-computed _startup_text_objend differs from rom/DIABPSX.MAP");
+ASSERT(_startup_text_size == 0x9E4, "link-computed _startup_text_size differs from rom/DIABPSX.MAP");
+ASSERT(_map_data_org == 0x800B031C, "link-computed _map_data_org differs from rom/DIABPSX.MAP");
+ASSERT(_map_data_obj == 0x800B031C, "link-computed _map_data_obj differs from rom/DIABPSX.MAP");
+ASSERT(_map_data_orgend == 0x800B0320, "link-computed _map_data_orgend differs from rom/DIABPSX.MAP");
+ASSERT(_map_data_objend == 0x800B0320, "link-computed _map_data_objend differs from rom/DIABPSX.MAP");
+ASSERT(_map_data_size == 0x4, "link-computed _map_data_size differs from rom/DIABPSX.MAP");
+ASSERT(__MAP_data_org == 0x800B0320, "link-computed __MAP_data_org differs from rom/DIABPSX.MAP");
+ASSERT(__MAP_data_obj == 0x800B0320, "link-computed __MAP_data_obj differs from rom/DIABPSX.MAP");
+ASSERT(__MAP_data_orgend == 0x800B0320, "link-computed __MAP_data_orgend differs from rom/DIABPSX.MAP");
+ASSERT(__MAP_data_objend == 0x800B0320, "link-computed __MAP_data_objend differs from rom/DIABPSX.MAP");
+ASSERT(__MAP_data_size == 0x0, "link-computed __MAP_data_size differs from rom/DIABPSX.MAP");
+ASSERT(_frontend_text_org == 0x80139BF8, "link-computed _frontend_text_org differs from rom/DIABPSX.MAP");
+ASSERT(_frontend_text_size == 0x23234, "link-computed _frontend_text_size differs from rom/DIABPSX.MAP");
+ASSERT(_frontend_text_orgend == 0x8015CE2C, "link-computed _frontend_text_orgend differs from rom/DIABPSX.MAP");
+ASSERT(_pregame_text_org == 0x80139BF8, "link-computed _pregame_text_org differs from rom/DIABPSX.MAP");
+ASSERT(_pregame_text_size == 0x29DCC, "link-computed _pregame_text_size differs from rom/DIABPSX.MAP");
+ASSERT(_pregame_text_orgend == 0x801639C4, "link-computed _pregame_text_orgend differs from rom/DIABPSX.MAP");
+ASSERT(_game_text_org == 0x80139BF8, "link-computed _game_text_org differs from rom/DIABPSX.MAP");
+ASSERT(_game_text_size == 0x2A228, "link-computed _game_text_size differs from rom/DIABPSX.MAP");
+ASSERT(_game_text_orgend == 0x80163E20, "link-computed _game_text_orgend differs from rom/DIABPSX.MAP");
+ASSERT(_fmv_text_org == 0x80139BF8, "link-computed _fmv_text_org differs from rom/DIABPSX.MAP");
+ASSERT(_fmv_text_size == 0x1EC70, "link-computed _fmv_text_size differs from rom/DIABPSX.MAP");
+ASSERT(_fmv_text_orgend == 0x80158868, "link-computed _fmv_text_orgend differs from rom/DIABPSX.MAP");
+ASSERT(__last_org == 0x80163E20, "link-computed __last_org differs from rom/DIABPSX.MAP");
+ASSERT(FirstFreeByte == 0x80163E20, "link-computed FirstFreeByte differs from rom/DIABPSX.MAP");
+ASSERT(__last_size == 0x4, "link-computed __last_size differs from rom/DIABPSX.MAP");
+ASSERT(__last_orgend == 0x80163E24, "link-computed __last_orgend differs from rom/DIABPSX.MAP");
+ASSERT(_memcard_text_org == 0x80163E24, "link-computed _memcard_text_org differs from rom/DIABPSX.MAP");
+ASSERT(_memcard_text_size == 0x0, "link-computed _memcard_text_size differs from rom/DIABPSX.MAP");

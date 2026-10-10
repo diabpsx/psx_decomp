@@ -1956,39 +1956,6 @@
       "ReadPad__Fi"
     ]
   },
-  "startup": {
-    "source": "recon/psxsrc/startup.cpp",
-    "image": "diabpsx",
-    "routed_only": true,
-    "sections": {
-      ".text.startup_pads": {
-        "va": "0x800B071C",
-        "size": 68,
-        "segment": "startup",
-        "functions": [
-          "PAD_Open__Fv"
-        ]
-      },
-      ".text.startup_gman": {
-        "va": "0x800B0760",
-        "size": 36,
-        "segment": "startup",
-        "functions": [
-          "GM_Open__Fv"
-        ]
-      }
-    },
-    "data_symbols": [],
-    "retail_data_bindings": [],
-    "externals": [
-      "InitTAP",
-      "AllDats",
-      "PadInit",
-      "RawPadData0",
-      "RawPadData1",
-      "StartTAP"
-    ]
-  },
   "preauto": {
     "source": "recon/source/preauto.cpp",
     "image": "pregame",
@@ -3977,9 +3944,13 @@
         ]
       },
       ".rdata.version_startup": {
-        "va": "0x800B07E0",
-        "size": 568,
-        "scaffold": "startup_rodata_800b07e0.rodata"
+        "va": "0x800B07C8",
+        "size": 592,
+        "scaffold": [
+          "startup_rodata_800b07c8.rodata",
+          "startup_rodata_800b07e0.rodata"
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".text.version_startup": {
         "va": "0x800B0A18",
@@ -3988,7 +3959,8 @@
         "functions": [
           "GetVersionString__FPc",
           "GetWord__FPc"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".sdata": {
         "va": "0x8011BCD4",
@@ -3998,6 +3970,8 @@
     },
     "data_symbols": [
       "MyVerString",
+      "StrDate",
+      "StrTime",
       "Words",
       "MonDays",
       "Year",
@@ -4763,7 +4737,8 @@
         "functions": [
           "MEM_SetupMem__Fv",
           "SetupWorkRam__Fv"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".sdata": {
         "va": "0x8011AACC",
@@ -5277,6 +5252,15 @@
         "va": "0x800B0C9C",
         "size": 4,
         "scaffold": "ctors.data"
+      },
+      ".text.pads_startup": {
+        "va": "0x800B071C",
+        "size": 68,
+        "segment": "startup",
+        "functions": [
+          "PAD_Open__Fv"
+        ],
+        "source_section": ".STARTUP_text"
       }
     },
     "data_symbols": [
@@ -5294,8 +5278,11 @@
     "externals": [
       "DBG_Error",
       "GLUE_Finished__Fv",
+      "InitTAP",
       "IsGameLoading__Fv",
       "PA_SetPauseOk__Fb",
+      "PadInit",
+      "StartTAP",
       "deathflag",
       "demo_level",
       "demo_record_load",
@@ -6754,7 +6741,8 @@
         "segment": "startup",
         "functions": [
           "PA_Open__Fv"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".rdata": {
         "va": "0x801103C0",
@@ -6872,7 +6860,8 @@
         "segment": "startup",
         "functions": [
           "OVR_Open__Fv"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".rdata": {
         "va": "0x801105BC",
@@ -6935,7 +6924,8 @@
         "segment": "startup",
         "functions": [
           "SYSI_Init__Fv"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".rdata": {
         "va": "0x80110008",
@@ -7005,7 +6995,8 @@
         "segment": "startup",
         "functions": [
           "DEC_Open__Fv"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".rdata": {
         "va": "0x80110C38",
@@ -7040,7 +7031,8 @@
         "functions": [
           "VID_OpenModule__Fv",
           "InitScreens__Fv"
-        ]
+        ],
+        "source_section": ".STARTUP_text"
       },
       ".rdata": {
         "va": "0x8010FFE0",
@@ -10848,6 +10840,15 @@
         "va": "0x8011ACEC",
         "size": 64,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".text.gman_startup": {
+        "va": "0x800B0760",
+        "size": 36,
+        "segment": "startup",
+        "functions": [
+          "GM_Open__Fv"
+        ],
+        "source_section": ".STARTUP_text"
       }
     },
     "data_symbols": [

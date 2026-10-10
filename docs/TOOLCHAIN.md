@@ -634,6 +634,29 @@ no member moves bytes after assembly any more.
 Warcraft II (Climax, 1997) in the same reference tree builds with plain `ccpsx -c -O2`,
 `psylink /m /n400` and `symmunge /i`, with a link script of plain `text`/`bss` groups.
 
+### Round 8: STARTUP pieces under retail's `.STARTUP_text` name (2026-10-11)
+
+Retail's MAP has one `.STARTUP_text` section (0x800B0320..0x800B0C98) in the startup_text group,
+fed by VID, MEM, SYSINIT, PAUSE, PADS, GMAN, OVERLAY, DECOMP and VERSION in object order.  Each of
+those sources now routes its once-only pieces with `__attribute__((section(".STARTUP_text")))`, the
+retail name, instead of a per-TU `.text.<tu>_startup` name; cc1plus 2.7.2.SN emits
+`.section .STARTUP_text` and ASPSX/PSYLINK accept it, so each object carries the section retail's
+objects carried and the member link places it with `section .STARTUP_text,startup_text`.
+
+VERSION showed why the retail name matters: its section holds, in definition order, `StrDate`
+(`char[12] = __DATE__`, 0x800B07C8), `StrTime` (`char[9] = __TIME__`, 0x800B07D4), `Words`,
+`MonDays`, then GetVersionString and GetWord, 1232 bytes.  StrDate and StrTime were retail
+globals (SYM Def2 EXT, MAP names) that the splat scaffold still owned; they are now defined in
+version.cpp and verified by their SYM records.  The registry keeps its logical rows (a data row
+for the tables, a code row for the functions) and lets several rows name one object section
+(`source_section`) provided they tile it contiguously; the lane links that section once and
+slices the verified bytes back per row.
+
+The one-section name also retired the invented startup.cpp TU: with PAD_Open and GM_Open in one
+`.STARTUP_text` their definition order fixed their addresses, and retail's SLD records put them in
+PADS.CPP (line 103) and GMAN.CPP (line 1398).  Each now lives in its retail owner as that TU's
+once-only piece; every STARTUP contributor is a real retail source.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

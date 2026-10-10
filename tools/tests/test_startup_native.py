@@ -1,4 +1,4 @@
-"""Native once-only code stays with its authentic module's static storage."""
+"""Native once-only code stays with its authentic module (retail's SLD owner) and its static storage."""
 from pathlib import Path
 import sys
 import tempfile
@@ -16,11 +16,11 @@ class StartupNativeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
-                rows = R.build(["mem", "startup"])
+                rows = R.build(["mem", "pads"])
         records = {row["segment"]: row for row in rows}
-        self.assertEqual(records["startup"]["functions"], 2)
+        self.assertEqual(records["pads"]["sections"][".text.pads_startup"]["size"], 68)   # PAD_Open, PADS.CPP:103
         self.assertEqual(records["mem"]["functions"], 4)
         self.assertEqual(records["mem"]["sections"][".data"]["size"], 80)
         self.assertEqual(records["mem"]["sections"][".text.startup_mem"]["size"], 204)
-        self.assertNotIn("PsxMem", records["startup"]["bindings"])
-        self.assertNotIn("PsxFastMem", records["startup"]["bindings"])
+        self.assertNotIn("PsxMem", records["pads"]["bindings"])
+        self.assertNotIn("PsxFastMem", records["pads"]["bindings"])

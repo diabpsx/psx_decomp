@@ -1,21 +1,25 @@
 /* VERSION.CPP — Diablo PSX (Climax 1998) reconstruction.  No PC twin (the PC build's version comes
  * from the resource file): builds the "VERSION / CODEWORD" string shown by the front end from the
- * compile date. The original VERSION owner supplies all five functions, the
- * word/calendar bank and its string pools. Once-only sections are grouped in
- * STARTUP; the three ordinary routines remain in VERSION_text. */
+ * compile date. The original VERSION owner supplies all five functions, the build stamp, the
+ * word/calendar bank and its string pools. The once-only pieces sit in retail's .STARTUP_text
+ * section (every STARTUP-resident object contributes one, merged by PSYLINK's startup_text group);
+ * the three ordinary routines remain in VERSION_text. */
 #include "diabpsx_types.h"
 
 extern "C" int sprintf(char *buf, const char *fmt, ...);
-char *GetVersionString(char *VersionString2) __attribute__((section(".text.version_startup")));
-char *GetWord(char *VStr) __attribute__((section(".text.version_startup")));
+char *GetVersionString(char *VersionString2) __attribute__((section(".STARTUP_text")));
+char *GetWord(char *VStr) __attribute__((section(".STARTUP_text")));
 
 struct MONTH_DAYS {
     char *Month;
     int Days;
 };
 
-/* Once-only VERSION data is grouped before its once-only functions by PSYLINK. */
-char *Words[118] __attribute__((section(".rdata.version_startup"))) = { /* @0x800B07E0 */
+/* Once-only VERSION data precedes its once-only functions inside the one .STARTUP_text section, in
+ * definition order: the build stamp, the word bank, the calendar, then the two functions. */
+char StrDate[] __attribute__((section(".STARTUP_text"))) = __DATE__;   /* @0x800B07C8 "May 29 1998" */
+char StrTime[] __attribute__((section(".STARTUP_text"))) = __TIME__;   /* @0x800B07D4 "14:30:45" */
+char *Words[118] __attribute__((section(".STARTUP_text"))) = { /* @0x800B07E0 */
     "CHUNKY",
     "TINKER",
     "GINGER",
@@ -135,7 +139,7 @@ char *Words[118] __attribute__((section(".rdata.version_startup"))) = { /* @0x80
     "ARSE TRUMPET",
     "HIGH RES?",
 };
-MONTH_DAYS MonDays[12] __attribute__((section(".rdata.version_startup"))) = { /* @0x800B09B8 */
+MONTH_DAYS MonDays[12] __attribute__((section(".STARTUP_text"))) = { /* @0x800B09B8 */
     { "JAN", 31 },
     { "FEB", 28 },
     { "MAR", 31 },

@@ -293,9 +293,18 @@ def validate_placements(segment, spec, layouts):
         source_section = row.get('source_section', section)
         if not isinstance(source_section, str) or not re.fullmatch(r'\.[A-Za-z_][A-Za-z0-9_.]*', source_section):
             raise ValueError('invalid native object-section alias')
-    aliases = [row.get('source_section', section) for section, row in sections.items()]
-    if len(aliases) != len(set(aliases)):
-        raise ValueError('native object-section aliases must be unique')
+    # Several rows may name one object section (retail's `.STARTUP_text` holds VERSION's StrDate, StrTime,
+    # Words and MonDays and its two once-only functions, one emission-order section); the rows then tile
+    # that section contiguously in one image and the lane links it once, as PSYLINK did.
+    shared = {}
+    for section, row in sections.items():
+        shared.setdefault(row.get('source_section', section), []).append(section)
+    for members in shared.values():
+        ordered = sorted(members, key=lambda s: regions[s][0])
+        if (len({homes[s] for s in members}) != 1
+                or any(sum(regions[a]) != regions[b][0] for a, b in zip(ordered, ordered[1:]))
+                or (len(members) > 1 and any(sections[s].get('borrowed_prefix') for s in members))):
+            raise ValueError('rows sharing one object section must tile it contiguously')
     return homes, regions, limits
 
 
@@ -662,7 +671,6 @@ def build(only=None):
         homes, regions, limits = validate_placements(segment, spec, layouts)
         source_sections = {section: row.get('source_section', section)
                            for section, row in spec['sections'].items()}
-        reverse_sections = {source: section for section, source in source_sections.items()}
         composition = spec.get('composed_group')
         composed_exports = {}
         composed_link = None
@@ -873,8 +881,16 @@ def build(only=None):
         if compaction and any(home not in ('diabpsx', spec['image'])
                               for section,home in homes.items() if section!='.text'):
             raise ValueError('native overlay members keep their resident pools in the main image')
-        link_regions = {source_sections.get(section, section): region
-                        for section, region in combined.items() if section not in composed_exports}
+        section_rows = {}
+        for section, region in combined.items():
+            if section not in composed_exports:
+                section_rows.setdefault(source_sections.get(section, section), []).append((region, section))
+        link_regions = {}
+        for name, rows in section_rows.items():
+            rows.sort()
+            if any(sum(a) != b[0] for (a, _), (b, _) in zip(rows, rows[1:])):
+                raise ValueError('rows sharing one object section must tile it contiguously')
+            link_regions[name] = (rows[0][0][0], sum(size for (_, size), _ in rows))
         allowed_holes = {source_sections.get(section, section)
                          for section, row in spec['sections'].items()
                          if row.get('allow_zero_tail', 0)}
@@ -883,7 +899,16 @@ def build(only=None):
                                          overlay_text=bool(compaction), composed_groups=composed_link,
                                          allow_zero_holes=allowed_holes,
                                          overlay_group=(spec['image'] + '_text') if compaction else None)
-        blocks = {reverse_sections.get(section, section): data for section, data in blocks.items()}
+        linked = blocks
+        blocks = {}
+        for name, data in linked.items():
+            rows = section_rows.get(name)
+            if rows is None:
+                blocks[name] = data   # a composed group's whole payload
+                continue
+            first = rows[0][0][0]
+            for (va, size), section in rows:
+                blocks[section] = data[va - first:va - first + size]
         if composition is not None:
             group = blocks.pop(composition['name'], None)
             if group is None:

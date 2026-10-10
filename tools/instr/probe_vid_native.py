@@ -24,8 +24,8 @@ def main():
     source = live.read_text()
     marker = 'void InitScreens(void);'
     declarations = (
-        'void InitScreens(void) __attribute__((section(".text.vid_startup")));\n'
-        'void VID_OpenModule(void) __attribute__((section(".text.vid_startup")));')
+        'void InitScreens(void) __attribute__((section(".STARTUP_text")));\n'
+        'void VID_OpenModule(void) __attribute__((section(".STARTUP_text")));')
     if source.count(marker) == 1:
         source = source.replace(marker, declarations)
     elif source.count(declarations) != 1:

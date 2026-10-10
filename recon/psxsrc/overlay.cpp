@@ -44,7 +44,7 @@ static void ClearOutOverlays(void);
 static void LoadOver(Overlay &Ovr);
 
 /* @0x800B0784 OVERLAY.CPP:110 (.STARTUP_text) */
-void OVR_Open(void) __attribute__((section(".text.overlay_startup")));
+void OVR_Open(void) __attribute__((section(".STARTUP_text")));
 void OVR_Open(void)
 {
     ClearOutOverlays();

@@ -5,7 +5,7 @@
  * Reconstructed from the raw oracle (asm/nonmatchings/pads/*.s) + the SYM (DIABPSX.SYM); the TDR
  * skeleton (refs/skeleton/.../PADS.H) as shape hints.  PADS.H inlines used here are emitted out of line
  * in this object (-fno-inline), in reverse header order (SetPadType, CheckActive, SetActive,
- * SetBothFlag, ctor).  PAD_Open (PADS.CPP:103) lives in the startup segment, not here. */
+ * SetBothFlag, ctor).  PAD_Open (PADS.CPP:103) is once-only code in retail's .STARTUP_text section. */
 #include "psxsrc/textdat_header.h"
 #include "psxsrc/textfileinfo_header.h"
 
@@ -79,6 +79,21 @@ int demo_pad_count = 0;               /* @0x8011ABB8 */
 unsigned long demo_finish = 0;        /* @0x8011ABBC */
 int demo_start = 0;                   /* @0x8011ABC0 */
 int cac_pad = 0;                      /* @0x8011ABC4 */
+
+extern "C" {
+void InitTAP(unsigned char *bufA, long lenA, unsigned char *bufB, long lenB);   /* libtap */
+void StartTAP(void);
+void PadInit(int mode);                                                         /* libetc */
+}
+
+/* ---------------------------------------------------------------- @0x800B071C PADS.CPP:103 (.STARTUP_text) */
+void PAD_Open(void) __attribute__((section(".STARTUP_text")));
+void PAD_Open(void)
+{
+    InitTAP(RawPadData0, 34, RawPadData1, 34);
+    StartTAP();
+    PadInit(1);
+}
 
 /* ---------------------------------------------------------------- @0x800894E0 PADS.CPP:116 */
 unsigned long ReadPadStream(void)

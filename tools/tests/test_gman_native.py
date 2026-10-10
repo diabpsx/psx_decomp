@@ -23,11 +23,11 @@ class GmanNativeTests(unittest.TestCase):
                 receipts = R.build(["gman"])
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
-        self.assertEqual((receipt["segment"], receipt["functions"]), ("gman", 76))
+        self.assertEqual((receipt["segment"], receipt["functions"]), ("gman", 77))   # + GM_Open (GMAN.CPP:1398, .STARTUP_text)
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1388)   # .sdata starts at 0x8011ACEC (its literal pool)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 13732, ".data": 3780, ".sbss": 8, ".bss": 40,   # .bss: the static MyFT4
-                          ".ctors": 4, ".dtors": 4,
+                          ".ctors": 4, ".dtors": 4, ".text.gman_startup": 36,   # GM_Open, retail .STARTUP_text
                           ".rdata": 50,    # "psxsrc/gman.h" (DumpDatFile, parsed at the include), "psxsrc/GMAN.CPP", "psxsrc/primpool.h" (parsed last)
                           ".sdata": 64})   # pool, "DECB", "GMAN", "Wanker!", wank, ".hdr", TpW .. TpYDest
         self.assertIsNone(receipt["post_assemble_section_split"])

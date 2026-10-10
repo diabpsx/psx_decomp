@@ -411,7 +411,7 @@ BOOL CPauseMessages::AreYouSureMessage()
 
 /* @0x800B06E4 PAUSE.CPP:560 -- retail links this one into .STARTUP_text (startup segment); kept at its
  * source position here (it is also what keeps the static PauseTask referenced). */
-void PA_Open(void) __attribute__((section(".text.pause_startup")));
+void PA_Open(void) __attribute__((section(".STARTUP_text")));
 void PA_Open(void)
 {
     CanPause = false;
