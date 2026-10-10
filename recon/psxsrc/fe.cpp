@@ -4,6 +4,7 @@
  * Header inlines (Dialog ctor/dtor, CBlocks::GetOverlayOtBase, CPad::CheckActive) are emitted out of
  * line in this object (-fno-inline). */
 #include "psxsrc/fe.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 
 extern "C" unsigned char GAL_Free(long Handle);
 
@@ -106,41 +107,24 @@ FeMenuTable FeBook2MenuTable[6] = {
 FeStruct FeBuffer[80];
 char FePlayerName[2][11];
 
-/* ---- TU-owned globals (SYM EXT/STAT; the oracle reaches them via %gp_rel -> defined here) ---- */
-int FeBackX = 0;
-int FeBackY = 0;
-int FeBackW = 0;
-int FeBackH = 0;
-unsigned char FeFlag = 0;
-int FePlayerNo = 0;
-static FE_CREATE *CStruct;          /* .sbss */
-int FeBufferCount = 0;
-int FeMaxBufferCount = 0;
-int FeNoOfPlayers = 0;
-unsigned char FePadInTab[2] = { 0, 0 };
-unsigned char FePadInFlag = 0;
-int FeChrClass[2] = { 0, 0 };
-FeTable *FeCurMenu = 0;
-int FeEnterLang = 0;
-unsigned char FePlayerNameFlag[2] = { 0, 0 };
-unsigned long FeCount = 0;
-int fileselect = 0;
-int BookMenu = 0;
-int FMVPress = 0;
+/* ---- TU-owned globals (SYM EXT/STAT; the oracle reaches them via %gp_rel -> defined here) ----
+ * Retail .sdata order (0x8011B320..): these seven first, then FeDrawChrClass's " " and "%i" literals,
+ * then the rest (defined after FeDrawChrClass below); every one explicitly initialised. */
 TextDat *FeTData = 0;
-BOOL JustQuitQText = 0;
-BOOL LoadedChar[2] = { 0, 0 };
 TextDat *FlameTData = 0;
+BOOL LoadedChar[2] = { 0, 0 };
 unsigned char FeIsAVirgin = 1;
 int FeMenuDelay = 0;
+BOOL JustQuitQText = 0;
 static int fadeval = 0;
-static BOOL DrawBackOn = 0;
-int FeAttractMode = 1;
-int AttractNo = 1;
-unsigned long AttractTitleDelay = 0x708;
-unsigned long AttractMainDelay = 0x708;
-int FMVEndPad = 0x40;
-static int JustInCredits = 0;
+static FE_CREATE *CStruct;          /* .sbss */
+extern int FeAttractMode, AttractNo, FMVEndPad;
+extern unsigned long AttractTitleDelay, AttractMainDelay;
+extern int FeBackX, FeBackY, FeBackW, FeBackH, FePlayerNo, FeBufferCount, FeMaxBufferCount, FeNoOfPlayers;
+extern unsigned char FeFlag, FePadInTab[2], FePadInFlag, FePlayerNameFlag[2];
+extern int FeChrClass[2], FeEnterLang, fileselect, BookMenu, FMVPress;
+extern FeTable *FeCurMenu;
+extern unsigned long FeCount;
 
 /* @0x80139C24 FE.CPP:167 */
 void FeInitBuffer(void)
@@ -603,6 +587,34 @@ void FeDrawChrClass(void)
     }
 }
 
+
+/* Retail defines the rest of the small data after FeDrawChrClass (its " " / "%i" literals at 0x8011B340). */
+static BOOL DrawBackOn = 0;
+int FeAttractMode = 1;
+int AttractNo = 1;
+unsigned long AttractTitleDelay = 0x708;
+unsigned long AttractMainDelay = 0x708;
+int FMVEndPad = 0x40;
+static int JustInCredits = 0;
+int FeBackX = 0;
+int FeBackY = 0;
+int FeBackW = 0;
+int FeBackH = 0;
+unsigned char FeFlag = 0;
+int FePlayerNo = 0;
+int FeBufferCount = 0;
+int FeMaxBufferCount = 0;
+int FeNoOfPlayers = 0;
+unsigned char FePadInTab[2] = { 0, 0 };
+unsigned char FePadInFlag = 0;
+int FeChrClass[2] = { 0, 0 };
+FeTable *FeCurMenu = 0;
+int FeEnterLang = 0;
+unsigned char FePlayerNameFlag[2] = { 0, 0 };
+unsigned long FeCount = 0;
+int fileselect = 0;
+int BookMenu = 0;
+int FMVPress = 0;
 /* @0x8013B43C FE.CPP:918 */
 void FeInitNewP1NameMenu(void)
 {

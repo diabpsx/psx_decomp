@@ -3266,13 +3266,11 @@ nonmatching D_8011B3B0
 
 /* Automatically generated and unreferenced pad */
 dlabel D_8011B3B0
-    /* 10B3B0 8011B3B0 */ .asciz ".tp"
-    /* 2E747000 */
-.align 2
-.align 2
-    /* 10B3B4 8011B3B4 */ .asciz ".dat"
-    /* 2E64617400000000 */
-.align 2
+    /* 10B3B0 8011B3B0 2E747000 */ .word 0x0070742E
+    /* 10B3B4 8011B3B4 2E646174 */ .word 0x7461642E
+    /* 10B3B8 8011B3B8 */ .byte 0x00
+    /* 10B3B9 8011B3B9 */ .byte 0x00
+    /* 10B3BA 8011B3BA */ .short 0x0000
 enddlabel D_8011B3B0
 
 nonmatching InCredits

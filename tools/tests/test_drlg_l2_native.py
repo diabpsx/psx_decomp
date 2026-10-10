@@ -20,7 +20,8 @@ class DrlgL2NativeTests(unittest.TestCase):
         source = B.ROOT / "recon/source/drlg_l2.cpp"
         flags = B.per_tu_flags(source)
         self.assertIn("-fwritable-strings", flags["extra"])
-        self.assertEqual(flags["pad_before_labels"], {"$L429": 4})
+        self.assertEqual(flags["merge_sections_into_text"], [".rdata", ".data"])   # one emission-order stream
+        self.assertNotIn("pad_before_labels", flags)
         with tempfile.TemporaryDirectory(prefix="drlg-l2-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

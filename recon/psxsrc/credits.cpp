@@ -2,6 +2,7 @@
  * credits screen -- CreditsText[] title/subtitle/text string ids shown over the CScreen backdrop, each
  * character drawn by PrintCredits as a "melting" strip of POLY_FT4 copies offset by CreditsTable. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 
 /* ---------------------------------------------------------------- types ---- */
 struct RECT;

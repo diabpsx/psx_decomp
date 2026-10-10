@@ -24,12 +24,11 @@ class FeNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("fe", 45))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
-        self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".rdata", ".data", ".sbss")},
-                         {".text": 12076, ".rdata": 92, ".data": 3214, ".sbss": 4})
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".sdata.fe_")), 135)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2964)   # .sdata starts at 0x8011B314 (its literal pool)
+        self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
+                         {".text": 12076, ".rdata": 92, ".data": 3214, ".sbss": 4,
+                          ".sdata": 156})   # one retail-order row: pool, FeTData .. fadeval, " " "%i", DrawBackOn .. FMVPress
+        self.assertIsNone(receipt["post_assemble_section_split"])
 
 
 if __name__ == "__main__":

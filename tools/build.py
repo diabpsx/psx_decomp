@@ -52,22 +52,16 @@ PER_TU_FLAGS = {
     # Retail CREDITS_text is one overlay group ordered as two header literals,
     # initialized tables, the later PRIMPOOL.H literal, then code.  The vendor
     # object therefore gives the post-.data literal its own section identity.
-    "recon/psxsrc/credits.cpp": {"split_section_after": {
-        "after": ".data", "section": ".rdata", "as": ".rdata.credits_tail"}},
+    # Retail assembled these overlay modules' read-only and initialised data into their text section,
+    # one emission-order stream (docs/TOOLCHAIN.md, "Overlay modules as one emission-order stream").
+    "recon/psxsrc/credits.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
     # MEMCARD_text interleaves initialized strings, two zero-filled banks and
     # code in one overlay group; its resident small-data order also starts with
     # the invalid-character flag before the two filename literals.
-    "recon/psxsrc/memcard.cpp": {
-        "route_symbol_sections": {
-            "card_dir": ".data.memcard_zeros",
-            "card_header": ".data.memcard_zeros"},
-        "section_occurrence_renames": [
-            {"section": ".rdata", "occurrence": 2, "as": ".text"}]},
+    "recon/psxsrc/memcard.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
     "recon/source/drlg_l2.cpp": {
         "extra": ["-fwritable-strings"],
-        "section_occurrence_renames": [
-            {"section": ".rdata", "occurrence": 1, "as": ".text"}],
-        "pad_before_labels": {"$L429": 4}},
+        "merge_sections_into_text": [".rdata", ".data"]},
     # Retail FMV keeps LoPlayFMVOverLay's six-entry language switch table in
     # the overlay text stream; moving the final readonly occurrence before
     # ASPSX preserves both its relocated words and the branch displacements.
@@ -98,10 +92,11 @@ PER_TU_FLAGS = {
     # commons (TICK/GazTick), proving their original small-data threshold was 0.
     "recon/glibdev/gmain.c": {"g_value": "0"},
     "recon/glibdev/tick.c": {"g_value": "0"},
-    "recon/glibdev/tasker.c": {"g_value": "0", "compiler": "gcc-2.6.3",
-        "split_lcomm": {"SchEnv": {"size": 48, "section": ".bss.sch"}}},
-    "recon/glibdev/gal.c": {"g_value": "0", "compiler": "gcc-2.6.3",
-        "split_lcomm": {"MemHdrBlocks": {"size": 5600, "section": ".bss.hdr"}}},
+    # GLIB code is -G0 (absolute data references), but the objects were assembled with the assembler's
+    # default small-data threshold: ASPSX puts each `.lcomm` of 8 bytes or less in .sbss and the larger
+    # statics (SchEnv, MemHdrBlocks) in .bss, which is the retail placement.
+    "recon/glibdev/tasker.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/gal.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
     "recon/glibdev/gutils.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/glibdev/gtimsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/glibdev/vrip.c": {"g_value": "0", "compiler": "gcc-2.6.3"},

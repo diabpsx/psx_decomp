@@ -395,8 +395,11 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     # PsyQ 4.0 game objects use -0; the reviewed PsyQ 3.5 GLIB lane keeps
     # ASPSX 2.34's default divide expansion and old li-as-ori behavior.
     extra_as = ["-0"] if assembler_flags is None else list(assembler_flags)
+    assembler_g = str(flags.get("assembler_g_value", g))   # the assembler's small-data threshold (.lcomm/.comm homes)
+    if not re.fullmatch(r"[0-9]+", assembler_g):
+        raise ValueError("invalid assembler -G value")
     r = assemble_native(ASPSX if assembler is None else assembler,
-                        ["-q", "-g", *extra_as, f"-G{g}"], s_file, obj, assembler_dos)
+                        ["-q", "-g", *extra_as, f"-G{assembler_g}"], s_file, obj, assembler_dos)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     return obj
 

@@ -506,6 +506,36 @@ the end of the file reproduce retail text; defining them in the class changes th
 the text) and ITEMS' `.bss` (retail 8-aligns its 9- and 127-byte statics, which neither ASPSX
 2.56 nor 2.67 does).
 
+### Round 3: overlay modules as one emission-order stream; GLIB BSS by assembler threshold (2026-10-10)
+
+CREDITS, MEMCARD and DRLG_L2 were linked with per-occurrence section renames, a symbol route and a
+label pad so that a composed PSYLINK group could interleave their read-only data, initialised data
+and code the way the retail overlay streams do.  Probe (scratch `probe_merge.py`): assembling each
+TU's unchanged cc1plus output with every `.rdata`/`.data` directive turned into `.text` reproduces the
+retail `.CREDITS_text` / `.MEMCARD_text` / `.DRLG_L2_text` streams byte for byte at the retail
+offsets (only the gp-relative immediates differ in the unbound probe link).  Those three members now
+use the uniform `merge_sections_into_text` property and a composed group of just `.text`.  FMV is
+not such a stream (its data and code drift apart at the first function), so it keeps the composed
+`.rdata`/`.data`/`.text` order; LoPlayFMVOverLay's six-entry switch table sits inside retail's text,
+which no cc1plus option gives without changing code (`-membedded-pic` alters the code,
+`-fpic`/`-mabicalls` make `.gpword` tables), so that one occurrence rename stays.
+
+FE's and FMV's resident small data were 35 and 86 post-assemble pieces; both are now single retail-
+order rows: FE moves DrawBackOn .. FMVPress after FeDrawChrClass (its " " and "%i" literals sit
+between fadeval and DrawBackOn) and starts with the literal pool; FMV defines its 106 small globals in
+one explicitly initialised block in retail order, including the twelve unreferenced EA cdstream/mdec
+globals retail kept (mfn, mdec_scale = 0x1000, ...), and names its statics as the SYM does
+(FMVName, CreateEnv, Passedfilename, Passedw).  FMV's local statics then fall into .sbss and .bss in
+retail order by the assembler's small-data threshold, except that retail 8-aligns the 64-byte
+voice_attr after the 12-byte subcode and ASPSX 2.34, 2.56 and 2.67 all pack it at +12 (probe: a
+12/64/32/48/9/127-byte `.lcomm` sequence gives .bss 296 under 2.34/2.56 and 303 under 2.67, which
+8-aligns only the 127-byte object), so FMV's .bss stays two rows split at that pad.
+
+GLIB's gal/tasker `split_lcomm` is gone: the code is -G0, but the objects were assembled with the
+default small-data threshold, under which ASPSX homes every `.lcomm` of 8 bytes or less in .sbss and
+the larger statics (SchEnv, MemHdrBlocks) in .bss, exactly the retail rows; the lane's new
+`assembler_g_value` keeps the compiler at -G0 and passes -G8 to the assembler only.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

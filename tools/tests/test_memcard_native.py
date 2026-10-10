@@ -21,9 +21,10 @@ class MemcardNativeTests(unittest.TestCase):
         self.assertIn("struct sjis sjis_table[37] =", source)
         self.assertIn("struct DIRENTRY card_dir[2][16];", source)
         self.assertIn("struct file_header card_header[2][16];", source)
-        flags = B.per_tu_flags(B.ROOT / "recon/psxsrc/memcard.cpp")
-        self.assertEqual(flags["route_symbol_sections"]["card_dir"],
-                         ".data.memcard_zeros")
+        # one emission-order stream: strings, tables, the two zero-filled card banks (uninitialised
+        # globals deferred to the end of the data), then code
+        self.assertEqual(B.per_tu_flags(B.ROOT / "recon/psxsrc/memcard.cpp"),
+                         {"merge_sections_into_text": [".rdata", ".data"]})
         with tempfile.TemporaryDirectory(prefix="memcard-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

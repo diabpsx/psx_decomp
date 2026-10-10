@@ -24,12 +24,13 @@ class GlibNativeTests(unittest.TestCase):
         self.assertEqual((version, path, dos, flags), ("2.34", ASPSX234, True, []))
 
     def test_historical_local_bss_banks(self):
+        # the assembler's own small-data threshold (-G8) homes each `.lcomm` of 8 bytes or less in .sbss
+        # and the large statics (SchEnv, MemHdrBlocks) in .bss; the code stays -G0
         expected = {
-            "tasker": ({".text": 3312, ".rdata": 45, ".bss.sch": 48, ".bss": 64},
-                       {".bss.sch": 48, ".bss": 64}),
-            "gal": ({".data": 80, ".rdata": 470, ".text": 8088,
-                     ".bss.hdr": 5600, ".bss": 44},
-                    {".data": 28, ".bss.hdr": 5600, ".bss": 44}),
+            "tasker": ({".text": 3312, ".rdata": 45, ".sbss": 64, ".bss": 48},
+                       {".sbss": 64, ".bss": 48}),
+            "gal": ({".data": 80, ".rdata": 470, ".text": 8088, ".sbss": 44, ".bss": 5600},
+                    {".data": 28, ".sbss": 44, ".bss": 5600}),
         }
         with tempfile.TemporaryDirectory(prefix="glib-native-", dir=B.BUILD) as directory:
             with patch.object(S, "OUT", Path(directory)):
@@ -48,8 +49,8 @@ class GlibNativeTests(unittest.TestCase):
         rows = R.bss_placements({name: registry[name] for name in
                                  ("tasker", "gal", "vrip", "gdebug", "gutils", "gsys")},
                                 0x8011C604, 0x80139BF4)
-        self.assertIn((0x801325A0, 48, "tasker", ".bss.sch"), rows)
-        self.assertIn((0x801325D0, 5600, "gal", ".bss.hdr"), rows)
+        self.assertIn((0x801325A0, 48, "tasker", ".bss"), rows)
+        self.assertIn((0x801325D0, 5600, "gal", ".bss"), rows)
         self.assertIn((0x8011CA88, 4, "gdebug.common_PollFunc", ".bss"), rows)
         self.assertIn((0x801351E8, 24, "gutils.common_RndTabs", ".bss"), rows)
 

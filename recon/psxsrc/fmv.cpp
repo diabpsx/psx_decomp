@@ -192,69 +192,115 @@ int TSK_Sleep(int frames);
 void PA_SetPauseOk(int on);
 }
 
-/* ---------------------------------------------------------------- CD stream ring buffer state */
-volatile int stream_chunksize;   /* ISR-shared (CdReadyCallback) */
-StHEADER *volatile stream_bufh;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_bufsize;   /* ISR-shared (CdReadyCallback) */
-strdata *volatile stream_buf;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_chunks_borrowed;
-volatile int stream_in;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_out;
-volatile int stream_chunks_total;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_chunks_in;   /* ISR-shared (CdReadyCallback) */
-volatile int _discard_count;   /* USER RULING (this session): volatile allowed for exactly this
+/* ---------------------------------------------------------------- small data, retail .sdata order
+ * (0x8011B47C .. 0x8011B61C, one contiguous block; every object explicitly initialised).  The names retail
+ * keeps but nothing references (mfn, mdec_scale, mdec_stream_size, first_stream_frame,
+ * stream_frames_played, cdready_*, move_scale, stream_frames, stream_subcode, last_sector) are EA's
+ * cdstream/mdec state and are defined here as in the retail object (SYM EXT INT). */
+unsigned char *vlc_tab = STR_Buffer;   /* retail default VLC table; replaced by the playback allocation */
+unsigned char *vlc_buf = 0;            /* Tmalloc'd MDEC VLC bitstream buffer */
+unsigned char *img_buf = 0;            /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
+int vbuf = 0;
+int last_fn = -1;
+int last_mdc = -1;
+int slnum = 0;
+volatile int slices_to_do = 0;
+int mbuf = 0;
+int mfn = 0;
+int last_move_mbuf = -1;
+int move_request = 0;
+int mdec_scale = 0x1000;
+int do_brightness = 0;
+int frame_decoded = 0;
+int mdec_streaming = 0;
+int mdec_stream_size = 0;
+int first_stream_frame = 0;
+int stream_frames_played = 0;
+int num_mdcs = 0;
+int mdec_head = 0, mdec_tail = 0, mdec_waiting_tail = 0, mdecs_queued = 0, mdecs_waiting = 0;
+int sfx_volume = 0x3FFF;
+BOOL user_start = 0;
+static unsigned char DiabEnd = 0;      /* SYM: STAT UCHAR DiabEnd @0x8011B4E8 */
+/* CD stream ring buffer state */
+strdata *volatile stream_buf = 0;   /* ISR-shared (CdReadyCallback) */
+StHEADER *volatile stream_bufh = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_chunks_in = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_chunks_total = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_in = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_out = 0;
+volatile int stream_stalled = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_ending = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_open = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_handler_installed = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_chunks_borrowed = 0;
+volatile int _get_count = 0;   /* USER RULING (this session): volatile allowed for exactly this
  * pair as part of the stream ring-buffer bookkeeping group, even though stream_cdready_handler itself
  * never touches them -- NOT a general policy widening, this pair only. */
-volatile int _get_count;   /* see _discard_count ruling comment above */
-volatile int cdstream_resetsec;   /* ISR-shared (CdReadyCallback) */
-int cdstream_resetting;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_handler_installed;   /* ISR-shared (CdReadyCallback) */
-CdlCB volatile old_cdready_handler;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_ending;   /* ISR-shared (CdReadyCallback) */
-volatile int first_handler_event;   /* ISR-shared (CdReadyCallback) */
-volatile int last_handler_event;   /* ISR-shared (CdReadyCallback) */
-int time_in_frames;   /* written by the main loop (VID_GetTick), read by the handler */
-volatile int stream_open;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_stalled;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_secnum;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_subsec;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_last_sector;   /* ISR-shared (CdReadyCallback) */
-volatile int stream_opened;
-volatile int stream_startsec;
-volatile int stream_got_chunks;
-volatile int stream_last_chunk;
-int sector_dma_in;
-int sector_dma;
+volatile int _discard_count = 0;   /* see _get_count ruling comment above */
+CdlCB volatile old_cdready_handler = 0;   /* ISR-shared (CdReadyCallback) */
+int cdready_calls = 0, cdready_errors = 0, cdready_out_of_sync = 0;
+int cdstream_resetting = 0;   /* ISR-shared (CdReadyCallback) */
+int sector_dma = 0;
+int sector_dma_in = 0;
+volatile int first_handler_event = 0;   /* ISR-shared (CdReadyCallback) */
+/* MDEC audio (SPU) state */
+int mdec_audio_buffer[2] = { 0, 0 };
+int mdec_audio_sec = 0;
+int mdec_audio_offs = 0;
+int mdec_audio_playing = 0;
+int mdec_audio_rate_shift = 0;
+/* MDEC bitstream decoder state */
+char *vlcbuf[2] = { 0, 0 };
+int slice_size = 0;
+RECT slice = { 0, 0, 0, 0 };
+int slice_inc = 0;
+int area_pw = 0, area_ph = 0;
+char tmdc_pol_dirty[2] = { 0, 0 };
+int num_pol[2] = { 0, 0 };
+int mdec_cx = 0, mdec_cy = 0;
+int mdec_w = 0, mdec_h = 0;
+int mdec_pw[2] = { 0, 0 };
+int mdec_ph[2] = { 0, 0 };
+int move_x = 0, move_y = 0;
+int move_scale = 0;
+int stream_frames = 0;
+int last_stream_frame = 0;   /* confirmed via SYM ($8011b5b4 EXT INT last_stream_frame) and cross-refs in
+ * dequeue_animation.s + decode_mdec_stream.s (both use this exact slot). */
+int mdec_framecount = 0;
+int mdec_speed = 0;
+int mdec_stream_starting = 0;
+int mdec_last_frame = 0;
+int mdec_sectors_per_frame = 0;
+unsigned short *vlctab = 0;
+unsigned char *mdc_buftop = 0;
+unsigned char *mdc_bufstart = 0;
+int mdc_bufleft = 0;
+int mdc_buftotal = 0;
+int ordertab_length = 0;
+int time_in_frames = 0;   /* written by the main loop (VID_GetTick), read by the handler */
+volatile int stream_chunksize = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_bufsize = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_subsec = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_secnum = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_last_sector = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int stream_startsec = 0;
+volatile int stream_opened = 0;
+volatile int stream_last_chunk = 0;
+volatile int stream_got_chunks = 0;
+int stream_subcode = 0;
+int streampos = 0;
+int last_sector = 0;
+volatile int cdstream_resetsec = 0;   /* ISR-shared (CdReadyCallback) */
+volatile int last_handler_event = 0;   /* ISR-shared (CdReadyCallback) */
 
-/* ---------------------------------------------------------------- MDEC bitstream decoder state */
-int ordertab_length;
-int mbuf;
-unsigned short *vlctab;
-char *vlcbuf[2];
-RECT slice;
-volatile int slices_to_do;
-int slnum;
-int slice_size;
-int slice_inc;
-int vbuf;
+/* ---------------------------------------------------------------- MDEC work buffers (.bss / .data) */
 unsigned char map_buf[0x19000];   /* mdc bitstream work area (symbol_addrs_fmv.txt: size 0x19000); a
                                     * pointer jump table (void*[]) lives at byte offset 0x18FFC (see
                                     * start_mdec_decode/DCT_out_handler). */
 #define MAP_BUF_JTAB ((void **)&map_buf[0x18FFC])
 unsigned short *imgbuf[21];   /* set_mdec_img_buffer: 21 MDEC slice buffers */
-unsigned char *mdc_bufstart, *mdc_buftop;
-int mdc_buftotal, mdc_bufleft, num_mdcs;
-int frame_decoded;
-int last_fn = -1, last_mdc = -1;
-int move_request, move_x, move_y, last_move_mbuf = -1;
-int mdec_cx, mdec_cy;
-int do_brightness;
-int area_pw, area_ph;
-int num_pol[2];
-int mdec_pw[2], mdec_ph[2];
 POLY_FT4 br[2][2][10];
 POLY_FT4 tmdc_pol[2][2][10];
-char tmdc_pol_dirty[2];
 RECT mdc_buf[2];
 typedef struct { short vx, vy, vz, pad; } SVECTOR;   /* PsyQ libgte.h, sizeof 8 */
 SVECTOR tmdc_pol_offs[2][10][10];
@@ -263,29 +309,7 @@ struct mdc_header *mdc_idx[10];
 struct _mdecanim mdec_queue[16];
 struct DR_ENV { unsigned char data[64]; };
 struct DR_ENV mdec_drenv[2];
-int mdec_w, mdec_h;
-
-/* ---------------------------------------------------------------- MDEC audio (SPU) state */
-int mdec_audio_buffer[2];
-int mdec_audio_playing;
-int mdec_audio_offs;
-int mdec_audio_rate_shift;
-int mdec_audio_sec;
-int sfx_volume = 0x3FFF;
-
-/* ---------------------------------------------------------------- movie-play queue */
-int mdec_head, mdec_tail, mdecs_queued, mdecs_waiting, mdec_waiting_tail;
-int mdec_sectors_per_frame, mdec_framecount, mdec_last_frame, mdec_speed;
-int mdec_stream_starting, mdec_streaming, last_stream_frame;   /* was a placeholder
- * "mdec_waiting_tail_unused" -- renamed: confirmed via SYM ($8011b5b4 EXT INT last_stream_frame) and
- * cross-refs in dequeue_animation.s + decode_mdec_stream.s (both use this exact bss slot). */
-int streampos;
-BOOL user_start;
-unsigned char *img_buf;      /* Tmalloc'd MDEC image buffer, filled by LoPlayFMVOverLay */
-unsigned char *vlc_buf;      /* Tmalloc'd MDEC VLC bitstream buffer, ditto */
-unsigned char *vlc_tab = STR_Buffer; /* retail default VLC table; replaced by the playback allocation */
-static unsigned char DiabEnd;   /* SYM: STAT UCHAR DiabEnd @0x8011b4e8 */
-static char g_movie_filename[32]; /* @0x80121CE8; shared streamed-movie filename buffer */
+static char FMVName[32];   /* SYM STAT ARY CHAR @0x80121CE8: the streamed-movie filename buffer */
 
 /* @0x80155E1C FMV.CPP:295 */
 extern "C" void _cd_seek(int sec)
@@ -522,12 +546,12 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
     stream_ending = 0;
     stream_chunks_total = 0;
     stream_secnum = 0;
-    /* NOT `fname` -- the raw hardcodes &g_movie_filename (@0x80121CE8), the ONE shared movie-name
+    /* NOT `fname` -- the raw hardcodes &FMVName (@0x80121CE8), the ONE shared movie-name
      * buffer LoPlayFMVOverLay fills (its own "DIABEND*.MOV" strcpy destination, %hi/%lo(D_80121CE8)
      * matches ida's `-2146296600` calls there too). Every existing caller passes that same buffer's
      * address as `fname`, so this is semantically a no-op vs the parameter -- but retail's C literally
      * re-derives the global instead of forwarding the argument, and the bytes need the literal form. */
-    CD_GetCdlFILE(g_movie_filename, &RetFile);
+    CD_GetCdlFILE(FMVName, &RetFile);
     stream_secnum = CdPosToInt(&RetFile.pos);
     stream_secnum += secoffs;
     stream_startsec = stream_secnum;
@@ -1328,11 +1352,10 @@ extern "C" void GSYS_SetStackAndJump(void *Stack, void (*Func)(void *), void *Pa
 extern "C" void LoPlayFMVOverLay(void *);
 extern int sglMasterVolume;
 
-static jmp_buf D_80121D08;     /* PlayFMVOverLay's own setjmp env (right after g_movie_filename[32],
-                                 * @0x80121CE8 + 0x20 = 0x80121D08). */
-static char *D_8011C758;       /* filename stashed across the GSYS_SetStackAndJump handoff */
-static int D_8011C75C;         /* w  ditto */
-static int Passedh;            /* h  ditto (SYM STAT @0x8011C760) */
+static jmp_buf CreateEnv;      /* PlayFMVOverLay's own setjmp env (SYM STAT ARY INT 48 @0x80121D08) */
+static char *Passedfilename;   /* filename stashed across the GSYS_SetStackAndJump handoff (SYM STAT @0x8011C758) */
+static int Passedw;            /* w  ditto (@0x8011C75C) */
+static int Passedh;            /* h  ditto (@0x8011C760) */
 /* LoPlayFMVOverLay's task stack: FMV.CPP's own static (SYM STAT ARY UCHAR 51200 @0x80121D38, the last
  * .bss object before CONTROL's); the jump takes its last word, 0x8012E534. */
 static unsigned char TempStack[51200];
@@ -1340,9 +1363,9 @@ static unsigned char TempStack[51200];
 extern "C" short PlayFMVOverLay(char *filename, int w, int h)
 {
     sfx_volume = (sglMasterVolume * 0x3FFF) >> 8;
-    if (!setjmp(D_80121D08)) {
-        D_8011C758 = filename;
-        D_8011C75C = w;
+    if (!setjmp(CreateEnv)) {
+        Passedfilename = filename;
+        Passedw = w;
         Passedh = h;
         GSYS_SetStackAndJump(TempStack + sizeof(TempStack) - 4, LoPlayFMVOverLay, 0);
     }
@@ -1363,8 +1386,8 @@ extern "C" void LoPlayFMVOverLay(void *)
                * wait_cdstream's start_wait (catalog 13A). */
     CPad *P1;
     CPad *P2;
-    char *filename = D_8011C758;
-    int w = D_8011C75C;
+    char *filename = Passedfilename;
+    int w = Passedw;
     int h = Passedh;
     long vm;
 
@@ -1380,30 +1403,30 @@ extern "C" void LoPlayFMVOverLay(void *)
         switch (LANG_GetLang()) {
         case LANG_ENGLISH:
             DiabEnd = 1;
-            sprintf(g_movie_filename, "DIABEND1.MOV");
+            sprintf(FMVName, "DIABEND1.MOV");
             break;
         case LANG_FRENCH:
             DiabEnd = 2;
-            sprintf(g_movie_filename, "DIABEND1.MOV");
+            sprintf(FMVName, "DIABEND1.MOV");
             break;
         case LANG_GERMAN:
             DiabEnd = 1;
-            sprintf(g_movie_filename, "DIABEND2.MOV");
+            sprintf(FMVName, "DIABEND2.MOV");
             break;
         case LANG_SPANISH:
             DiabEnd = 2;
-            sprintf(g_movie_filename, "DIABEND2.MOV");
+            sprintf(FMVName, "DIABEND2.MOV");
             break;
         case LANG_ITALIAN:
             DiabEnd = 1;
-            sprintf(g_movie_filename, "DIABEND3.MOV");
+            sprintf(FMVName, "DIABEND3.MOV");
             break;
         case LANG_JAPANESE:
             DBG_Error(0, "psxsrc/FMV.CPP", 1790);
             break;
         }
     } else {
-        strcpy(g_movie_filename, filename);
+        strcpy(FMVName, filename);
     }
     user_start = 0;
     streampos = 0;
@@ -1426,10 +1449,10 @@ extern "C" void LoPlayFMVOverLay(void *)
     vm = GetVideoMode();
     switch (vm) {
     case 0:
-        play_mdec_stream(g_movie_filename, 0x1000, start, end);
+        play_mdec_stream(FMVName, 0x1000, start, end);
         break;
     case 1:
-        play_mdec_stream(g_movie_filename, 0x1333, start, end);
+        play_mdec_stream(FMVName, 0x1333, start, end);
         break;
     default:
         break;
@@ -1479,7 +1502,7 @@ extern "C" void LoPlayFMVOverLay(void *)
     TSK_Sleep(1);
     StrClearVRAM();
     TSK_Sleep(3);
-    longjmp(D_80121D08, 1);
+    longjmp(CreateEnv, 1);
 }
 
 /* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each

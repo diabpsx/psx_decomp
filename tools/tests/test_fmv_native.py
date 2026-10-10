@@ -24,15 +24,15 @@ class FmvNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("fmv", 44))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
-        self.assertEqual(receipt["sections"][".text"]["size"], 10828)
-        self.assertEqual(receipt["sections"][".rdata.fmv_all"]["size"], 108096)
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".sdata.fmv_")), 367)
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".sbss.fmv_")), 24)
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".bss.fmv_")), 156 + 51200)   # + the static TempStack
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3324)   # .sdata starts at 0x8011B47C (vlc_tab)
+        self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
+                         {".text": 10828, ".rdata.fmv_all": 108096,
+                          ".sdata": 420,    # one retail-order block, vlc_tab .. last_handler_event
+                          ".sbss": 24,      # idx, i, sec, Passedfilename, Passedw, Passedh (<= 8 bytes each)
+                          ".bss.fmv_subcode": 12, ".bss.fmv_rest": 51344})
+        # retail 8-aligns voice_attr (64 bytes) after the 12-byte subcode; no available ASPSX does, so the
+        # object's .bss is split at that pad (documented exception, like ITEMS' .bss)
+        self.assertEqual([piece["offset"] for piece in receipt["post_assemble_section_split"][0]["pieces"]], [0, 12])
 
 
 if __name__ == "__main__":
