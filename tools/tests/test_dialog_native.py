@@ -18,7 +18,7 @@ import symlane as S
 class DialogNativeTests(unittest.TestCase):
     def test_complete_object_and_packed_storage(self):
         source = B.ROOT / "recon/psxsrc/dialog.cpp"
-        self.assertNotIn("pack_lcomm", B.per_tu_flags(source))
+        self.assertEqual(B.per_tu_flags(source), {})
         with tempfile.TemporaryDirectory(prefix="dialog-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

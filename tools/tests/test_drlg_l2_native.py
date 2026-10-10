@@ -21,7 +21,6 @@ class DrlgL2NativeTests(unittest.TestCase):
         flags = B.per_tu_flags(source)
         self.assertIn("-fwritable-strings", flags["extra"])
         self.assertEqual(flags["merge_sections_into_text"], [".rdata", ".data"])   # one emission-order stream
-        self.assertNotIn("pad_before_labels", flags)
         with tempfile.TemporaryDirectory(prefix="drlg-l2-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

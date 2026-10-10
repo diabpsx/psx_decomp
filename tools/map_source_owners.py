@@ -139,8 +139,8 @@ def build():
              'otherwise the objects linked between the two).', '',
              f'{len(restored)} checkpoint names are resolved in the complete raw inventory;',
              f'{len(inventory["missing_source_definitions"])} missing source references remain.',
-             '59 of the 60 single-MAP-candidate task entries are resolved; the TONY',
-             'literal alias D_80110B24 remains open. Native ownership receipts are',
+             'All 60 single-MAP-candidate task entries are resolved (the TONY literal is',
+             'patched in place through a local pointer). Native ownership receipts are',
              'isolated proofs, not a strict whole-program native link seal.', '',
              '| Name | Retail VA | MAP object/section candidates | Retail typed SYM | Status |',
              '| --- | --- | --- | --- | --- |']

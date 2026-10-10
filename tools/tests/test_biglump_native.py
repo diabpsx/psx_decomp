@@ -18,7 +18,7 @@ import symlane as S
 class BigLumpNativeTests(unittest.TestCase):
     def test_complete_object_and_small_data_order(self):
         source = B.ROOT / "recon/psxsrc/biglump.cpp"
-        self.assertNotIn("move_symbols_before", B.per_tu_flags(source))   # explicit initialisers give the retail order
+        self.assertEqual(B.per_tu_flags(source), {})   # explicit initialisers give the retail order
         with tempfile.TemporaryDirectory(prefix="biglump-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

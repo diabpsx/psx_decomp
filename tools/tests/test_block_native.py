@@ -18,7 +18,7 @@ import symlane as S
 class BlockNativeTests(unittest.TestCase):
     def test_complete_object_and_split_storage(self):
         flags = B.per_tu_flags(B.ROOT / "recon/psxsrc/block.cpp")
-        self.assertNotIn("pack_lcomm", flags)
+        self.assertEqual(flags, {})   # retail-order small data from the source alone
         with tempfile.TemporaryDirectory(prefix="block-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

@@ -18,7 +18,7 @@ import symlane as S
 class OptionsNativeTests(unittest.TestCase):
     def test_complete_object_and_native_storage(self):
         flags = B.per_tu_flags(B.ROOT / "recon/psxsrc/options.cpp")
-        self.assertNotIn("pack_lcomm", flags)
+        self.assertEqual(flags, {})
         with tempfile.TemporaryDirectory(prefix="options-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

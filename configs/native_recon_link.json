@@ -11705,11 +11705,6 @@
         "va": "0x80155E1C",
         "size": 10828
       },
-      ".rdata.fmv_all": {
-        "va": "0x8013B7DC",
-        "size": 108096,
-        "scaffold": "fmv_rodata_8013b7dc.rodata"
-      },
       ".sdata": {
         "image": "diabpsx",
         "va": "0x8011B47C",
@@ -11725,6 +11720,11 @@
         "image": "diabpsx",
         "va": "0x80121C98",
         "size": 51360
+      },
+      ".rdata": {
+        "va": "0x8013B7DC",
+        "size": 108096,
+        "scaffold": "fmv_rodata_8013b7dc.rodata"
       }
     },
     "composed_group": {
@@ -11736,13 +11736,13 @@
       "va": "0x8013B7DC",
       "size": 118924,
       "exports": {
-        ".rdata.fmv_all": {
-          "offset": 0,
-          "size": 108096
-        },
         ".text": {
           "offset": 108096,
           "size": 10828
+        },
+        ".rdata": {
+          "offset": 0,
+          "size": 108096
         }
       }
     },

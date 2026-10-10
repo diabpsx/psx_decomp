@@ -18,7 +18,7 @@ import symlane as S
 class StreamNativeTests(unittest.TestCase):
     def test_complete_object_and_state_order(self):
         source = B.ROOT / "recon/psxsrc/stream.cpp"
-        self.assertNotIn("move_initialized_after", B.per_tu_flags(source))   # Time/CDWAIT follow STR_SoundCommand in the source
+        self.assertEqual(B.per_tu_flags(source), {})   # Time/CDWAIT follow STR_SoundCommand in the source
         with tempfile.TemporaryDirectory(prefix="stream-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
