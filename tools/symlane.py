@@ -187,8 +187,7 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
         # The retail EA objects are plain `.text`; route the attribute there (the attribute exists only
         # to let the GNU lane place lib code in its own output section).
         txt = re.sub(r"^\s*\.section\s+\.text\.\w+[^\n]*$", "\t.text", txt, flags=re.M)
-    # Insert borrowed carriers after all source-section routing. Otherwise a
-    # moved literal block could accidentally carry the prefix with it.
+    # Insert borrowed carriers after the section merge, so the prefix lands in the member's real section.
     for section, payload in section_prefixes.items():
         match = re.search(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", txt, re.M)
         if match is None:
@@ -326,10 +325,12 @@ def functions(txt: str, every=False):
     """{name: {hdr:{}, start, recs:[...], blocks:[(rel_addr, kind)]}} from a dumpsym text
     (every=True: {name: [copy, ...]} -- header inlines are emitted out of line once per TU, so the
     retail SYM holds several same-named functions at different VAs)"""
-    out, cur = {}, None
+    out, cur, overlay = {}, None, 0
     for ln in txt.splitlines():
+        m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) set overlay", ln)
+        if m: overlay = int(m[1], 16); continue   # PSYLINK overlay id in force for the records that follow
         m = re.match(r"^[0-9a-f]+: \$([0-9a-f]{8}) 8c Function start", ln)
-        if m: cur = dict(start=int(m[1], 16), hdr={}, recs=[], blocks=[]); continue
+        if m: cur = dict(start=int(m[1], 16), hdr={}, recs=[], blocks=[], ovl=overlay); continue
         if cur is None: continue
         m = re.match(r"\s+(\w+) = (.*)", ln)
         if m: cur["hdr"][m[1]] = m[2].strip(); continue
@@ -390,6 +391,8 @@ def compare(ours, retail):
             return False, f"header {k}: ours {ours['hdr'].get(k)} retail {retail['hdr'].get(k)}"
     if ours.get("end") != retail.get("end"):
         return False, f"length: ours 0x{ours.get('end', 0):x} retail 0x{retail.get('end', 0):x}"
+    if ours.get("ovl", 0) != retail.get("ovl", 0):
+        return False, f"overlay context: ours ${ours.get('ovl', 0):x} retail ${retail.get('ovl', 0):x}"
     a, b = ours["recs"], retail["recs"]
     for i in range(max(len(a), len(b))):
         x = a[i] if i < len(a) else None; y = b[i] if i < len(b) else None

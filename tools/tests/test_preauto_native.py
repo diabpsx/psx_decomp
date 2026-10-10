@@ -56,7 +56,7 @@ class PreAutoNativeTests(unittest.TestCase):
             bindings["_gp"] = 0x8011A780
             blocks, map_text = N.native_link(
                 "preauto", raw, combined, bindings, output_dir=folder,
-                prefix_objects=[prefix_object])
+                prefix_objects=[prefix_object], overlay_text=True, overlay_group="pregame_text")
             for section in (".rdata", ".sdata"):
                 va, size = combined[section]
                 self.assertEqual(blocks[section],

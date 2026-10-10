@@ -3076,7 +3076,32 @@
       "setpc_w",
       "setpc_x",
       "setpc_y"
-    ]
+    ],
+    "composed_group": {
+      "name": "drlg_l4_text",
+      "sections": [
+        ".rdata",
+        ".data",
+        ".text"
+      ],
+      "image": "pregame",
+      "va": "0x8014D7F8",
+      "size": 31456,
+      "exports": {
+        ".rdata": {
+          "offset": 0,
+          "size": 123
+        },
+        ".data": {
+          "offset": 124,
+          "size": 7220
+        },
+        ".text": {
+          "offset": 7344,
+          "size": 24112
+        }
+      }
+    }
   },
   "drlg_l1": {
     "source": "recon/source/drlg_l1.cpp",
@@ -3167,12 +3192,36 @@
       "setpc_w",
       "setpc_x",
       "setpc_y"
-    ]
+    ],
+    "composed_group": {
+      "name": "drlg_l1_text",
+      "sections": [
+        ".rdata",
+        ".data",
+        ".text"
+      ],
+      "image": "pregame",
+      "va": "0x80139C24",
+      "size": 29392,
+      "exports": {
+        ".rdata": {
+          "offset": 0,
+          "size": 52
+        },
+        ".data": {
+          "offset": 52,
+          "size": 8280
+        },
+        ".text": {
+          "offset": 8332,
+          "size": 21060
+        }
+      }
+    }
   },
   "automap": {
     "source": "recon/source/automap.cpp",
     "image": "game",
-    "symbol_compaction": "overlay_text",
     "sections": {
       ".text": {
         "va": "0x80161F58",
@@ -3242,7 +3291,6 @@
   "inv": {
     "source": "recon/source/inv.cpp",
     "image": "game",
-    "symbol_compaction": "overlay_text",
     "sections": {
       ".text": {
         "va": "0x80157274",
@@ -3438,7 +3486,6 @@
   "monster": {
     "source": "recon/source/monster.cpp",
     "image": "game",
-    "symbol_compaction": "overlay_text",
     "sections": {
       ".text": {
         "va": "0x8014AB74",
@@ -3621,7 +3668,6 @@
   "missiles": {
     "source": "recon/source/missiles.cpp",
     "image": "game",
-    "symbol_compaction": "overlay_text",
     "sections": {
       ".text": {
         "va": "0x80139C04",
@@ -8049,7 +8095,32 @@
       "setpc_w",
       "setpc_x",
       "setpc_y"
-    ]
+    ],
+    "composed_group": {
+      "name": "drlg_l3_text",
+      "sections": [
+        ".rdata",
+        ".data",
+        ".text"
+      ],
+      "image": "pregame",
+      "va": "0x801486A4",
+      "size": 20820,
+      "exports": {
+        ".rdata": {
+          "offset": 0,
+          "size": 63
+        },
+        ".data": {
+          "offset": 64,
+          "size": 2228
+        },
+        ".text": {
+          "offset": 2292,
+          "size": 18528
+        }
+      }
+    }
   },
   "cursor": {
     "source": "recon/source/cursor.cpp",
@@ -11716,7 +11787,6 @@
         }
       }
     },
-    "symbol_compaction": "overlay_text",
     "data_symbols": [
       "DiabEnd",
       "_discard_count",

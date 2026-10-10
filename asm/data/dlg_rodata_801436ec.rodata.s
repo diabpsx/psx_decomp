@@ -20487,8 +20487,8 @@ dlabel save_buffer
     /* 1DAE8 801576E0 00000000 */ .word 0x00000000
     /* 1DAEC 801576E4 00000000 */ .word 0x00000000
     /* 1DAF0 801576E8 00000000 */ .word 0x00000000
-    /* 1DAF4 801576EC 00000000 */ .word 0x00000000   /* the .align 3 pad before CharDataStruct, kept inside the label span */
 enddlabel save_buffer
+    /* 1DAF4 801576EC 00000000 */ .word 0x00000000
 
 nonmatching CharDataStruct
 

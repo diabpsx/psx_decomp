@@ -890,13 +890,15 @@ def build(only=None):
             raise ValueError('source common cannot also be an external binding')
         bindings.update({name: row['va'] for name,row in commons.items()})
         bindings['_gp'] = gp
-        compaction = spec.get('symbol_compaction')
-        if compaction not in (None,'overlay_text'):
-            raise ValueError('unknown native symbol-compaction route')
-        if compaction and (not S.overlay_group(source) or spec['image']=='diabpsx'
-                           or any(home not in ('diabpsx', spec['image'])
-                                  for section,home in homes.items() if section!='.text')):
-            raise ValueError('native overlay compaction requires overlay text and resident pools')
+        # Every member of a LUMP overlay links the retail way: its text in the overlay group (PSYLINK /v
+        # writes the id word, the overlay record and the `set overlay` switch) and the original SYMMUNGE
+        # compaction, so its SYM records carry retail's overlay context and layout.
+        if 'symbol_compaction' in spec:
+            raise ValueError('symbol compaction follows the member image; drop the explicit key')
+        compaction = 'overlay_text' if spec['image'] != 'diabpsx' else None
+        if compaction and any(home not in ('diabpsx', spec['image'])
+                              for section,home in homes.items() if section!='.text'):
+            raise ValueError('native overlay members keep their resident pools in the main image')
         link_regions = {source_sections.get(section, section): region
                         for section, region in combined.items() if section not in composed_exports}
         allowed_holes = {source_sections.get(section, section)
@@ -905,7 +907,8 @@ def build(only=None):
         blocks, map_text = N.native_link(segment, raw, link_regions, bindings,
                                          prefix_objects=prefix_objects, output_dir=OUT,
                                          overlay_text=bool(compaction), composed_groups=composed_link,
-                                         allow_zero_holes=allowed_holes)
+                                         allow_zero_holes=allowed_holes,
+                                         overlay_group=(spec['image'] + '_text') if compaction else None)
         blocks = {reverse_sections.get(section, section): data for section, data in blocks.items()}
         if composition is not None:
             group = blocks.pop(composition['name'], None)

@@ -584,6 +584,32 @@ retail's GMAN.H did not carry PRIMPOOL.H's bodies (no primpool literal), so gman
 primpool.h; the TUs that use PRIM_GetPrim include it themselves.  PSXMSG's pool (0x8011AD70) is
 owned by psxmsg.cpp.
 
+### Round 6: overlay scoping in the SYM lane (2026-10-10)
+
+PSYLINK numbers groups in declaration order and emits an overlay record, the `$<group>` id word and
+a `set overlay` switch for groups that overlap at one org (probe: an org group holding sections gets
+none; retail's `startup_text`/`map_data` pair at 0x800B031C and the four LUMP groups at 0x80139BF8
+get them).  The native lane (tools/sdk_link.native_link) now declares the retail groups
+(tools/link_symbols.GROUPS) ahead of a member's own placements, so a LUMP overlay member's `over`
+group takes its retail id (b-e) and the STARTUP-resident pieces of VID, MEM, SYSINIT, PAUSE,
+STARTUP, OVERLAY, DECOMP and VERSION are linked as the overlapping `startup_text` (org, id 4) /
+`map_data` (over, id 5) pair, which is what puts `set overlay $4` before their records as in retail.
+Every overlay-image member now links in overlay mode (PSYLINK /v plus the original SYMMUNGE /i),
+not only the five that needed the compaction before, and the per-function compare checks the
+overlay context (symlane.functions records the id in force).  Because PSYLINK writes nothing to
+the CPE once any group goes to a file(), every group of such a link is read from its file.
+DRLG_L1/L3/L4 are composed `.rdata`/`.data`/`.text` groups (their literals precede their tables, so
+they are not merged streams); the id word then precedes the whole group instead of colliding with the
+member's own data.
+
+The data bridge consumes loose annotated rows that a splat scaffold keeps between one label's end
+and the next label (alignment pads), so the DLG scaffold is back to its original spelling.
+
+The retail per-object section names (`.CONTROL_text`, `.MAP_data`) are produced by none of the
+tools here: the CCPSX driver passes ASPSX nothing beyond `-q`, ASPSX `-s<name>` gives `name.text`
+in a group of that name, PREFSECT gives `prefix.text`, and PSYLIB members keep plain names.  The
+link no longer depends on them.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

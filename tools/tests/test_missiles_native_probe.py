@@ -72,7 +72,8 @@ class MissilesNativeProbeTests(unittest.TestCase):
                        '.sdata': (gp, len(prefix)+small_size)}
             if data_section:regions['.data']=data_section
             blocks, _ = N.native_link(segment+'_probe',raw,regions,bindings,
-                                      prefix_objects=[prefix_obj],output_dir=folder,overlay_text=True)
+                                      prefix_objects=[prefix_obj],output_dir=folder,overlay_text=True,
+                                      overlay_group='game_text')   # retail overlay id $d
             # Exact relocated bytes: no register/immediate/target normalization.
             self.assertEqual(blocks['.text'], game[text_va-0x80139BF8:text_va-0x80139BF8+text_size])
             self.assertEqual(blocks['.rdata'], main[pool_va-0x80010000:pool_va-0x80010000+pool_size])

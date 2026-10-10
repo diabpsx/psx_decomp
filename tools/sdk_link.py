@@ -80,7 +80,7 @@ def cpe_regions(data, regions, allow_zero_holes=()):
 
 
 def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=None,
-                overlay_text=False, composed_groups=None, allow_zero_holes=()):
+                overlay_text=False, composed_groups=None, allow_zero_holes=(), overlay_group=None):
     """Link an unchanged original object, with explicitly placed complete sections."""
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", entry):
         raise ValueError("invalid SDK output name")
@@ -122,6 +122,22 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
                 or any(a < start and a+n > start-4 for a,n in rows)):
             raise ValueError('native overlay has invalid/overlapping regions or ID header')
         SL.require_symmunge()
+    # PSYLINK numbers groups in declaration order and the SYM's overlay records carry those ids, so the
+    # lane declares the retail groups (tools/link_symbols.GROUPS) ahead of the member's own placements:
+    # a LUMP overlay's `over` group then takes retail's id, and STARTUP-resident pieces are linked as
+    # retail's overlapping startup_text/map_data pair (ids 4 and 5), which is what makes PSYLINK write
+    # the `$startup_text` id word, the overlay records and the `set overlay $4` switch.
+    import link_symbols as LS
+    layout = LS.compute()
+    startup_lo, startup_hi = layout['_startup_text_org'], layout['_startup_text_orgend']
+    # (.ctors/.dtors words sit in the group too but carry no SYM records; they stay plain placements)
+    startup = sorted(((va, size, section) for section, (va, size) in regions.items()
+                      if startup_lo <= va < startup_hi and section not in ('.ctors', '.dtors')))
+    if startup and overlay_text:
+        raise ValueError('STARTUP-resident pieces belong to main-image members')
+    for (va, size, _), (next_va, _, _) in zip(startup, startup[1:]):
+        if va + size != next_va:
+            raise ValueError('STARTUP-resident pieces of one member must be contiguous')
     out = OUT if output_dir is None else Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
     prefix_objects = [Path(prefix).resolve() for prefix in prefix_objects]
@@ -129,27 +145,46 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         raise ValueError("native prefix object cannot alias the linked object's output path")
     (out / f"{entry}.obj").write_bytes(raw)
     commands, files, composed_files = [], {}, {}
+    # once any group is written to a file(), PSYLINK writes nothing to the CPE, so every group gets a file
+    use_files = overlay_text or bool(startup)
     if overlay_text:
+        # the member's retail overlay group takes its retail id; the anchor takes the slot before it
+        if overlay_group not in LS.OVERLAY_GROUPS[2:]:
+            raise ValueError('native overlay members name their retail overlay group')
+        commands.extend(f'{name} group' for name in LS.GROUPS[1:LS.group_id(overlay_group) - 2])
         commands.append(f'overlay_anchor group org(${start-4:08X}),file("{entry}_anchor.bin")')
-    for index, (section, (va, size)) in enumerate(regions.items()):
-        if not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", section):
-            raise ValueError("invalid SDK section name")
-        if overlay_text:
-            filename = out / f'{entry}_group{index}.bin'
-            files[section] = filename
-            placement = 'over(overlay_anchor)' if section == '.text' and not composed_groups else f'org(${va:08X})'
-            commands.append(f'sdk_{index} group {placement},file("{filename.name}")')
-            commands.append(f'\tsection {section},sdk_{index}')
-        else:
-            commands.extend([f"sdk_{index} group org(${va:08X})", f"\tsection {section},sdk_{index}"])
+    elif startup:
+        commands.extend(f'{name} group' for name in LS.GROUPS[1:LS.group_id('startup_text') - 1])
+        commands.append(f'startup_text group org(${startup[0][0]-4:08X}),file("{entry}_startup.bin")')
+        commands.extend(f'\tsection {section},startup_text' for _, _, section in startup)
+        commands.append(f'map_data group over(startup_text),file("{entry}_map_data.bin")')
+    # a composed overlay group is declared right after the anchor, so it takes retail's id
     for index, (name, row) in enumerate(composed_groups.items()):
         if overlay_text:
             filename = out / f'{entry}_composed{index}.bin'
             composed_files[name] = filename
-            commands.append(f'sdk_comp_{index} group over(overlay_anchor),file("{filename.name}")')
+            group = overlay_group if index == 0 else f'sdk_comp_{index}'
+            commands.append(f'{group} group over(overlay_anchor),file("{filename.name}")')
         else:
-            commands.append(f'sdk_comp_{index} group org(${row["va"]:08X})')
-        commands.extend(f'\tsection {section},sdk_comp_{index}' for section in row['sections'])
+            group = f'sdk_comp_{index}'
+            commands.append(f'{group} group org(${row["va"]:08X})')
+        commands.extend(f'\tsection {section},{group}' for section in row['sections'])
+    # in overlay mode the `over` text group is declared right after the anchor, so it takes retail's id
+    ordered = sorted(regions.items(), key=lambda kv: 0 if (overlay_text and kv[0] == '.text' and not composed_groups) else 1)
+    for index, (section, (va, size)) in enumerate(ordered):
+        if not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", section):
+            raise ValueError("invalid SDK section name")
+        if any(section == s for _, _, s in startup):
+            continue
+        if use_files:
+            filename = out / f'{entry}_group{index}.bin'
+            files[section] = filename
+            over = overlay_text and section == '.text' and not composed_groups
+            group = overlay_group if over else f'sdk_{index}'
+            commands.append(f'{group} group {"over(overlay_anchor)" if over else f"org(${va:08X})"},file("{filename.name}")')
+            commands.append(f'\tsection {section},{group}')
+        else:
+            commands.extend([f"sdk_{index} group org(${va:08X})", f"\tsection {section},sdk_{index}"])
     for name, address in bindings.items():
         # PSYLINK symbol names may carry '.', as SN's cc1plus mangles class statics (CPlayer::PActiveArray
         # is `_7CPlayer.PActiveArray` in the retail MAP).
@@ -163,15 +198,16 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         commands.append(f'\tinclude "{prefix}"')
     commands.append(f"\tinclude {entry}.obj")
     (out / f"{entry}.lnk").write_bytes(("\r\n".join(commands) + "\r\n").encode("ascii"))
-    sym_name = f'{entry}.raw.sym' if overlay_text else f'{entry}.sym'
-    run = subprocess.run([str(SL.PSYLINK), "/c", "/m", *(['/v'] if overlay_text else []),
+    sym_name = f'{entry}.raw.sym' if (overlay_text or startup) else f'{entry}.sym'
+    run = subprocess.run([str(SL.PSYLINK), "/c", "/m", *(['/v'] if (overlay_text or startup) else []),
                           f"@{entry}.lnk,{entry}.cpe,{sym_name},{entry}.map"],
                          cwd=out, env=SL.ENV, capture_output=True, text=True)
     if run.returncode or "0 error(s)" not in run.stdout:
         raise ValueError("native SDK link failed: " + run.stdout + run.stderr)
-    if overlay_text:
+    if use_files:
         map_text = (out / f'{entry}.map').read_text()
-        payloads = list(files.values()) + list(composed_files.values()) + [out / f'{entry}_anchor.bin']
+        payloads = list(files.values()) + list(composed_files.values()) + (
+            [out / f'{entry}_anchor.bin'] if overlay_text else [out / f'{entry}_startup.bin', out / f'{entry}_map_data.bin'])
         raw_text = SL.compact_overlay_sym(out / sym_name, out / f'{entry}.sym', payloads)
         headers = [(int(a,16),int(n,16),int(i,16)) for a,n,i in re.findall(
             r'^\w+: \$([0-9a-f]{8}) overlay length \$([0-9a-f]{8}) id \$([0-9a-f]+)', raw_text,re.M|re.I)]
@@ -179,7 +215,7 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
         for section,path in files.items():
             va,size = regions[section]
             data = path.read_bytes()
-            if section == '.text':
+            if overlay_text and section == '.text':
                 ids = [i for a,n,i in headers if (a,n)==(va-4,size+4)]
                 if len(ids)!=1 or len(data)!=size+4 or data[:4]!=struct.pack('<I',ids[0]):
                     raise ValueError('native overlay ID metadata does not match its payload')
@@ -197,16 +233,34 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
             if len(ids)!=1 or len(data)!=row['size']+4 or data[:4]!=struct.pack('<I',ids[0]):
                 raise ValueError('native composed overlay ID metadata does not match its payload')
             blocks[name] = data[4:]
-        anchor = (out/f'{entry}_anchor.bin').read_bytes()
-        ids = [i for a,n,i in headers if (a,n)==(start-4,4)]
-        if len(ids)!=1 or anchor!=struct.pack('<I',ids[0]):
-            raise ValueError('native overlay anchor metadata differs')
+        if overlay_text:
+            anchor = (out/f'{entry}_anchor.bin').read_bytes()
+            ids = [i for a,n,i in headers if (a,n)==(start-4,4)]
+            if len(ids)!=1 or anchor!=struct.pack('<I',ids[0]):
+                raise ValueError('native overlay anchor metadata differs')
+        if startup:
+            # retail's overlapping startup_text / map_data pair: ids 4 and 5, the id word, one overlay record each
+            records = {(a, n): i for a, n, i in headers}
+            first = startup[0][0]; total = sum(size for _, size, _ in startup)
+            data = (out / f'{entry}_startup.bin').read_bytes()
+            map_word = (out / f'{entry}_map_data.bin').read_bytes()
+            if (records.get((first - 4, total + 4)) != LS.group_id('startup_text')
+                    or records.get((first - 4, 4)) != LS.group_id('map_data')
+                    or len(data) != total + 4 or data[:4] != struct.pack('<I', LS.group_id('startup_text'))
+                    or map_word != struct.pack('<I', LS.group_id('map_data'))):
+                raise ValueError('STARTUP overlay metadata does not match its payload')
+            cursor = 4
+            for va, size, section in startup:
+                actual = re.findall(r'^\s*([0-9a-f]{8})\s+[0-9a-f]{8}\s+([0-9a-f]{8})\s+[0-9a-f]{8}\s+\w+\s+'
+                                    + re.escape(section) + r'\s*$', map_text, re.M | re.I)
+                if [(int(a, 16), int(n, 16)) for a, n in actual] != [(va, size)]:
+                    raise ValueError('STARTUP piece extent/placement differs')
+                blocks[section] = data[cursor:cursor + size]; cursor += size
         return blocks, map_text
     output_regions = dict(regions)
     output_regions.update({name: (row['va'], row['size']) for name, row in composed_groups.items()})
     holes = set(composed_groups) | set(allow_zero_holes)
-    return (cpe_regions((out / f"{entry}.cpe").read_bytes(), output_regions,
-                        allow_zero_holes=holes),
+    return (cpe_regions((out / f"{entry}.cpe").read_bytes(), output_regions, allow_zero_holes=holes),
             (out / f"{entry}.map").read_text())
 
 
@@ -409,6 +463,13 @@ def data_bridge(source, regions):
                     raise ValueError("unordered SDK data labels")
                 replacements.append((match.start(2), match.end(2),
                                      f'    .incbin "{filename}", {payload_offset + address - va}, {end - address}\n'))
+                # loose annotated rows between this label and the next (unlabelled alignment pads) are
+                # inside the incbin already
+                between = source[match.end():labels[i + 1][0].start()]
+                for loose in re.finditer(r"^[ \t]*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\b[^\n]*\n", between, re.M):
+                    if not address <= int(loose[1], 16) < end:
+                        raise ValueError("loose scaffold row outside its label span")
+                    replacements.append((match.end() + loose.start(), match.end() + loose.end(), ""))
                 cursor = end
             if cursor < va + size:
                 partial.append((cursor, va + size))
@@ -453,6 +514,14 @@ def data_bridge(source, regions):
             used.add(match.start())
             body = f'    .incbin "{filename}", {payload_offset + address - va}, {end - address}\n'
             replacements.append((match.start(2), match.end(2), body))
+            # The payload spans up to the next label, so loose annotated rows the scaffold keeps between
+            # this label's end and the next label (alignment pads splat left unlabelled) are already inside
+            # the incbin and must not be emitted a second time.
+            between = source[match.end():labels[i + 1][0].start()]
+            for loose in re.finditer(r"^[ \t]*/\*\s*[0-9A-Fa-f]+\s+([0-9A-Fa-f]{8})\b[^\n]*\n", between, re.M):
+                if not address <= int(loose[1], 16) < end:
+                    raise ValueError("loose scaffold row outside its label span")
+                replacements.append((match.end() + loose.start(), match.end() + loose.end(), ""))
     ordered = sorted(replacements)
     if any(end > next_start for (start, end, body), (next_start, next_end, next_body) in zip(ordered, ordered[1:])):
         raise ValueError("overlapping SDK data replacements")
