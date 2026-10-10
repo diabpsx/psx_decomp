@@ -13,9 +13,7 @@ struct FRAME_HDR;
 
 struct SPR_HDR;
 
-struct CTextFileInfo {   /* sizeof 4 */
-    char *FileName;   /* +0x0 */
-};
+#include "psxsrc/textfileinfo_header.h"   /* CTextFileInfo + the GMAN.H HasTp/HasDat inlines (".tp"/".dat" literal pool) */
 
 struct TextDat {   /* sizeof 112 */
     BOOL OwnDat;   /* +0x0 */
@@ -77,7 +75,8 @@ public:
     int LastScrY;   /* +0x88 */
     int LastOtPos;   /* +0x8C */
 
-    static CPlayer *PActiveArray[2];   /* _7CPlayer$PActiveArray (bss, owned by CPLAYER.CPP) */
+    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50 (.sdata, defined by CPLAYER.CPP) */
+    static CPlayer *GetPlayer(int PNum);   /* CPLAYER.H:65 inline */
 
     CPlayer(BOOL Town, int mPlayerNum, int NewNumOfPlayers);
     ~CPlayer();
@@ -468,7 +467,7 @@ inline int CPlayer::GetDatMaxSize()
     return NumOfPlayers == 0 ? 0x2C308 : 0x182B8;
 }
 
-void PRIM_GetPrim(POLY_FT4 **Prim);
+inline void PRIM_GetPrim(POLY_FT4 **Prim);   /* PRIMPOOL.H; its body is parsed in cplayer.cpp before Print */
 static inline void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
 {
     unsigned long *Dest32 = (unsigned long *)Dest;

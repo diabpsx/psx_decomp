@@ -6,6 +6,7 @@
  * Sources: retail asm oracle > SYM (scratch/tuinfo.py STREAM.CPP; SYM text gives STAT/EXT per function)
  * > skel/PSXSRC/STREAM.CPP drafts.  Layouts from tools/symhdr.py. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/psyq.h"
 #include "glibdev/gdebug.h"
 
@@ -203,8 +204,8 @@ static BOOL STRInit = false;             /* @0x8011ADC0 */
 static int frame_rate = 60;              /* @0x8011ADC4 */
 static unsigned char CDAngle = 0;        /* @0x8011ADC8 */
 int my_spurate = 0x7E;                   /* @0x8011ADCC */
-unsigned long Time = 0;                  /* @0x8011ADE8 */
-BOOL CDWAIT = false;                     /* @0x8011ADEC */
+extern unsigned long Time;               /* defined after STR_SoundCommand (retail .sdata order) */
+extern BOOL CDWAIT;
 
 /* @0x80098988 STREAM.CPP:166 */
 static void PrintCDWaitTask(TASK *T)
@@ -526,6 +527,10 @@ void STR_SoundCommand(SFXHDR *sfh, int Command)
         sfh->state = Command;
     }
 }
+
+/* Retail defines these after STR_SoundCommand ("BATTER" literal, 0x8011ADE0). */
+unsigned long Time = 0;                  /* @0x8011ADE8 */
+BOOL CDWAIT = false;                     /* @0x8011ADEC */
 
 /* @0x80099474 STREAM.CPP:927 */
 char STR_Command(SFXHDR *sfh)

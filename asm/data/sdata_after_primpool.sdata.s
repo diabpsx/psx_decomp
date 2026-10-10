@@ -161,13 +161,11 @@ dlabel D_8011AB4C
     /* 5C25733B31000000 */
 .align 2
 .align 2
-    /* 10AB54 8011AB54 */ .asciz ".tp"
-    /* 2E747000 */
-.align 2
-.align 2
-    /* 10AB58 8011AB58 */ .asciz ".dat"
-    /* 2E64617400000000 */
-.align 2
+    /* 10AB54 8011AB54 2E747000 */ .word 0x0070742E
+    /* 10AB58 8011AB58 2E646174 */ .word 0x7461642E
+    /* 10AB5C 8011AB5C */ .byte 0x00
+    /* 10AB5D 8011AB5D */ .byte 0x00
+    /* 10AB5E 8011AB5E */ .short 0x0000
 enddlabel D_8011AB4C
 
 nonmatching BL_NoLumpFiles
@@ -982,13 +980,11 @@ dlabel D_8011AD38
     /* 2E64617400000000 */
 .align 2
 .align 2
-    /* 10AD44 8011AD44 */ .asciz ".tp"
-    /* 2E747000 */
-.align 2
-.align 2
-    /* 10AD48 8011AD48 */ .asciz ".dat"
-    /* 2E64617400000000 */
-.align 2
+    /* 10AD44 8011AD44 2E747000 */ .word 0x0070742E
+    /* 10AD48 8011AD48 2E646174 */ .word 0x7461642E
+    /* 10AD4C 8011AD4C */ .byte 0x00
+    /* 10AD4D 8011AD4D */ .byte 0x00
+    /* 10AD4E 8011AD4E */ .short 0x0000
 enddlabel D_8011AD38
 
 nonmatching _7CPlayer_PActiveArray

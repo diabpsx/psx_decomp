@@ -18,10 +18,7 @@ import symlane as S
 class CardCoreNativeTests(unittest.TestCase):
     def test_complete_object_and_event_state_order(self):
         source = B.ROOT / "recon/psxsrc/cardcore.cpp"
-        moves = B.per_tu_flags(source)["move_symbols_before"]
-        self.assertEqual(len(moves), 9)
-        self.assertEqual(moves[0]["symbol"], "MemCardActive")
-        self.assertEqual(moves[-1]["symbol"], "DoLoadedGame")
+        self.assertEqual(B.per_tu_flags(source), {})   # explicit initialisers give the retail .sdata order
         with tempfile.TemporaryDirectory(prefix="cardcore-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -29,10 +26,10 @@ class CardCoreNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("cardcore", 27))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2528)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2516)   # .sdata starts at 0x8011B154 (its literal pool)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 6348, ".rdata": 32,
-                          ".data": 128, ".sdata": 184})
+                         {".text": 6348, ".rdata": 48,   # "psxsrc/gman.h" + the jump table
+                          ".data": 128, ".sdata": 196})
         self.assertEqual(receipt["bindings"]["CharDataStruct"], "0x801576F0")   # the character block, cleared whole
 
 

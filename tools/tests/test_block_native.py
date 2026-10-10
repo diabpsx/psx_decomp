@@ -27,11 +27,11 @@ class BlockNativeTests(unittest.TestCase):
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("block", 68))
         self.assertEqual(receipt["assembler_version"], "2.67")
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
-        self.assertEqual(receipt["borrowed_section_prefixes"][".sdata.block_select"]["size"], 1)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1284)   # .sdata starts at 0x8011AC84 (its literal pool)
+        self.assertIsNone(receipt["post_assemble_section_split"])
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".rdata", ".data", ".sbss", ".bss")},
-                         {".text": 19000, ".rdata": 76, ".data": 20,
+                          (".text", ".rdata", ".data", ".sdata", ".sbss", ".bss")},
+                         {".text": 19000, ".rdata": 76, ".data": 20, ".sdata": 104,
                           ".sbss": 4, ".bss": 44})
 
 

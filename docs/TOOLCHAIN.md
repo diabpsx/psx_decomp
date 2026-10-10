@@ -31,6 +31,26 @@
 | 8011C604–80139BF3 | Runtime `.sbss` + `.bss`; the raw file instead has a four-byte additive checksum at its 8011C604 boundary (see `tools/image_trailer.py`) |
 | 80139BF8+ | overlays b–e: pregame / frontend / game / fmv (+libpress) — separate binaries in LUMP.BIN |
 
+## Overlay-id words and the reserved MAP member (2026-10-10)
+
+The retail SYM opens with six overlay records: id 4 `startup_text` (0x800B031C, 0x9E4),
+id 5 `map_data` (0x800B031C, 4) and ids b-e for the LUMP overlays. PSYLINK 2.52 numbers
+groups in declaration order (`(default)`=1, `boot_text`, `text`, `startup_text`=4,
+`map_data`=5, data/rdata/sdata/sbss/bss, then the four LUMP overlays = b-e) and writes
+each OVER group's id as the four-byte `$<group>` word at the group's org; when two groups
+share an org the later group's word is what the image keeps, which is why the main image
+reads 5 at 0x800B031C. `map_data` has exactly one member: the object MAP, whose only
+section is an empty `.data` (`__MAP_data_obj = __MAP_data_objend = 0x800B0320`,
+`__MAP_data_size = 0`, no text, no SLD records). It is a reserved placeholder, kept as
+`recon/psxsrc/map.s` (one `.data` directive).
+
+`tools/link_symbols.py` derives the six ids from that group order, checks them against
+the SYM overlay records, and derives `_startup_text_*`, `_map_data_*` and `__MAP_data_*`
+from the layout; `tools/gen_ld.py` emits every id word as the link's own `LONG(_<group>_id)`
+and places the MAP object between its `__MAP_data_org/_orgend` marks. The former
+`asm/data/*_hdr.data.s` scaffold words are gone. The per-TU SYM lane still models only the
+four LUMP overlays, so STARTUP's `set overlay $4` switch is not reproduced there.
+
 ## Overlay debug producer (verified 2026-10-03)
 
 The exact SYM lane requires real overlay metadata, not just separate origins.
@@ -458,6 +478,33 @@ cc1plus and then by the members' native gates:
 - Not reproducible from natural source: TONY's in-place patch of its "DEMOPAD0.DAT" literal
   (retail stores through the literal's symbol; gcc materialises a literal's address in a
   register), so `D_80110B24` stays a documented bound alias.
+
+### Round 2: literal positions of header inlines (2026-10-10)
+
+MSG, ITEMS (.rdata), BLOCK, STREAM, BIGLUMP, CPLAYER, MISPRINT and CARDCORE lost their remaining
+post-assemble splits, section renames and source-move flags.  Two more compiler rules, probed on
+the retail cc1plus (scratch `probe_lit`/`probe_tail` cases):
+
+- An inline function's string literal is emitted where its *body is parsed*, never at its first
+  use; an inline that is never used still emits the literal (so a TU that merely includes the
+  GMAN.H inlines starts its `.rdata` with "psxsrc/gman.h" and its `.sdata` with the ".tp"/".dat"
+  pool).  The out-of-line copies of the inlines a TU uses are emitted at the end of the TU in
+  reverse *definition* order; declaration order does not matter.
+- Retail therefore fixes where PRIMPOOL.H's PRIM_GetPrim body was parsed: after the constructor
+  in CPLAYER (its literal follows the CPLAYER.CPP literals and precedes FindAction's table),
+  after FuncFLASH in MISPRINT, at the end in GMAN.  Those TUs declare the inline first and carry
+  the body (the "header copy") at that point, as BLOCK, LOADING, PLAYER and DAVEL already did.
+- The rows now start at each TU's literal pool.  Where a row starts or ends inside a splat label
+  of the shared scaffold, the scaffold's bytes up to that boundary must be explicit annotated
+  rows (`.word`/`.byte`/`.short`, or `.asciz` ending exactly there); an `.asciz` plus `.align`
+  pad is not carveable (BIGLUMP's and CPLAYER's pools, CPLAYER's "psxsrc/cplayer.h" pad).
+- A row ends at the object's extent, not at the next aligned object: MISPRINT's `.rdata` ends two
+  bytes after its final "psxsrc/primpool.h" literal and the alignment pad stays scaffold.
+
+Exceptions kept with splits: GMAN's `.rdata`/`.sdata` (its header inlines defined out of line at
+the end of the file reproduce retail text; defining them in the class changes the copy order and
+the text) and ITEMS' `.bss` (retail 8-aligns its 9- and 127-byte statics, which neither ASPSX
+2.56 nor 2.67 does).
 
 ### FRONTEND DLG.CPP data (2026-10-10)
 

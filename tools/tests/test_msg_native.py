@@ -25,16 +25,15 @@ class MsgNativeTests(unittest.TestCase):
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("msg", 111))
         self.assertEqual(receipt["assembler_version"], "2.67")
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4596)   # .sdata starts at 0x8011B974 (its literal pool)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".rdata", ".data", ".bss", ".ctors", ".dtors")},
                          {".text": 16648, ".rdata": 552, ".data": 4768, ".bss": 32,
                           ".ctors": 4, ".dtors": 4})
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".sdata.msg_")), 14)
+        # retail-order small data: pool, deltaload, gbBufferMsgs, the three compressors, dwRecCount
+        self.assertEqual(receipt["sections"][".sdata"]["size"], 28)
         self.assertEqual(receipt["sections"][".sbss"]["size"], 10)
-        self.assertEqual(len(receipt["post_assemble_section_split"]), 1)
-        self.assertEqual(receipt["post_assemble_section_split"][0]["section"], ".sdata")
+        self.assertIsNone(receipt["post_assemble_section_split"])
 
 
 if __name__ == "__main__":

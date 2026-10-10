@@ -251,10 +251,6 @@ char itemavail[127] = { 0 };
 unsigned char UniqueItemFlag[128] = { 0 };
 char OutStr[128] = { 0 };
 
-const short SinTab[32] = {
-    0,49,97,142,181,212,236,251,255,251,236,212,181,142,97,49,
-    0,-49,-97,-142,-181,-212,-236,-251,-255,-251,-236,-212,-181,-142,-97,-49
-};
 static const short Item2Frm[35] = {
     219,220,236,224,259,260,266,304,308,298,225,307,283,226,263,311,
     300,254,233,252,237,241,241,239,238,240,242,237,244,235,251,261,222,232,250
@@ -1205,6 +1201,13 @@ void GetStaffSpell(int i, int lvl, unsigned char onlygood)
 
 /* @0x8004129C ITEMS.CPP:1750 — PSX: text-id names, no _iFlags2/oil, no trailing _iFlags reset, gold from
  * currlevel with three independent difficulty tests (rndv = 0 up front), _PlrCreate = FePlayerNo */
+/* Retail defines SinTab here: its .rdata (0x80116178) follows GetStaffSpell's "source/ITEMS.cpp" literal
+ * and precedes the PrintItem* formats. */
+const short SinTab[32] = {
+    0,49,97,142,181,212,236,251,255,251,236,212,181,142,97,49,
+    0,-49,-97,-142,-181,-212,-236,-251,-255,-251,-236,-212,-181,-142,-97,-49
+};
+
 void GetItemAttrs(int i, int idata, int lvl)
 {
     int rndv = 0;

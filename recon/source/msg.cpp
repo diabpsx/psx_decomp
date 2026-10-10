@@ -21,6 +21,7 @@
  *    are this retail build's own ordering.
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 extern "C" int crunch(const unsigned char *Src, unsigned char *Dest, int SrcLen, int WindowSize);
 extern "C" void decrunch(const unsigned char *Src, unsigned char *Dest, int SrcLen);
 int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize);
@@ -180,6 +181,7 @@ static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-ow
 NoComp CompNoComp;
 PakComp CompPakComp;
 CrunchComp CompCrunchComp;
+unsigned long dwRecCount;   /* @0x8011B98C: uninitialised, declared after the compressor objects */
 struct CompLevelMaps GameMaps(CompPakComp);
 struct LocalLevel sgLocals[22] = { 0 };
 

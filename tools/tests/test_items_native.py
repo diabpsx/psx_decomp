@@ -28,8 +28,7 @@ class ItemsNativeTests(unittest.TestCase):
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".data")},
                          {".text": 55836, ".data": 14708})
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".rdata.items_")), 1448)
+        self.assertEqual(receipt["sections"][".rdata"]["size"], 1448)   # one retail-order .rdata row
         # retail-order small data: one .sdata row 0x8011B888..0x8011B8DC (numitems .. uitemflag)
         self.assertEqual(receipt["sections"][".sdata"]["size"], 85)
         self.assertFalse(any(name.startswith(".sdata.items_") for name in receipt["sections"]))

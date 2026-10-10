@@ -119,6 +119,7 @@ struct TextDat {   /* sizeof 112 */
     struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);   /* @0x80093418 GMAN.CPP:989 */
     struct FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }   /* GMAN.H:229 */
     int GetNumOfFrames() { return Hdr->NumOfFrames; }   /* GMAN.H:233 */
+    void DumpDatFile();   /* GMAN.H:290 inline, defined (unused) in misprint.cpp */
 };
 
 struct CPlayer {   /* sizeof 144 */

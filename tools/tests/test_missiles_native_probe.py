@@ -23,18 +23,21 @@ class MissilesNativeProbeTests(unittest.TestCase):
     def test_full_relocated_text_pool_and_constant_small_data(self):
         self.check_source('missiles',0x80139C04,69488,0x80119DC0,1272,0x8011C258,45,115,
                           {'nummissiles':4,'MissilePreFlag':1,'ManashieldFlag':1,'ManashieldFlag2':1,
-                           'fadetor':1,'fadetog':1,'fadetob':1})
+                           'fadetor':1,'fadetog':1,'fadetob':1},
+                          data_section=(0x801029D8,10268))
 
     def test_monster_relocated_text_pool_statics_and_common_storage(self):
-        self.check_source('monster',0x8014AB74,50944,0x8011A2B8,240,0x8011C2B8,19,105,
-                          {'nummonsters':4,'nummtypes':4})
+        self.check_source('monster',0x8014AB74,50944,0x8011A2B8,240,0x8011C2A0,43,105,
+                          {'nummonsters':4,'nummtypes':4,'monstimgtot':4,'totalmonsters':1,'uniquetrans':4},
+                          data_section=(0x801051F4,21384))
 
     def test_inv_relocated_text_initialized_globals_and_header_order(self):
-        self.check_source('inv',0x80157274,44260,0x8011A3B8,896,0x8011C2F4,104,57,{})
+        self.check_source('inv',0x80157274,44260,0x8011A3B8,896,0x8011C2F4,104,57,{},
+                          data_section=(0x8010D008,1729))
 
     def test_automap_relocated_code_and_original_global_initializers(self):
         self.check_source('automap',0x80161F58,7880,0x8011A738,72,0x8011C368,60,19,{},
-                          data_section=(0x8010D6CC,24))
+                          data_section=(0x8010D6CC,1248))
 
     def check_source(self,segment,text_va,text_size,pool_va,pool_size,small,small_size,count,expected_commons,data_section=None):
         source = B.ROOT/f'recon/source/{segment}.cpp'

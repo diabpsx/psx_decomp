@@ -4,6 +4,8 @@
  * Reconstructed from the raw oracle (asm/nonmatchings/cardcore/*.s) + the SYM; drafts from refs/skeleton.
  * Header inlines (Dialog, CBlocks) are emitted out of line in this object (-fno-inline). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
+#include "psxsrc/textdat_header.h"   /* GMAN.H TextDat + its unused DumpDatFile inline: "psxsrc/gman.h" heads this TU's .rdata */
 
 struct RECT {   /* sizeof 8 */
     short x, y, w, h;
@@ -404,16 +406,18 @@ void ActivateMemcard(int card1, int card2);
 void PantsDelay();
 
 /* ---------------------------------------------------------------- data (TU-owned, .sdata/.data, address order) */
-BOOL MemCardActive;                    /* @0x8011B160 */
-BOOL MemcardOverlay;                   /* @0x8011B164 */
-int NewCardFlag;                       /* @0x8011B168 */
-int countdownloadcharblock;            /* @0x8011B16C */
+/* Retail .sdata order (after the literal pool): these are explicitly initialised, so they are emitted at their
+ * definitions around never_hooked_events and ahead of the initialised card_side_* tables. */
+BOOL MemCardActive = false;            /* @0x8011B160 */
+BOOL MemcardOverlay = false;           /* @0x8011B164 */
+int NewCardFlag = 0;                   /* @0x8011B168 */
+int countdownloadcharblock = 0;        /* @0x8011B16C */
 static int never_hooked_events = 1;    /* @0x8011B170 */
-void (*mem_card_event_handler)();      /* @0x8011B174 */
-int saveflag;                          /* @0x8011B178 */
-int loadflag;                          /* @0x8011B17C */
-int formatflag;                        /* @0x8011B180 */
-BOOL DoLoadedGame;                     /* @0x8011B184 */
+void (*mem_card_event_handler)() = 0;  /* @0x8011B174 */
+int saveflag = 0;                      /* @0x8011B178 */
+int loadflag = 0;                      /* @0x8011B17C */
+int formatflag = 0;                    /* @0x8011B180 */
+BOOL DoLoadedGame = false;             /* @0x8011B184 */
 int card_side_empty[2] = { 655, 665 };    /* @0x8011B188 */
 int card_side_read[2] = { 841, 842 };     /* @0x8011B190 */
 int card_side_nogame[2] = { 726, 727 };   /* @0x8011B198 */

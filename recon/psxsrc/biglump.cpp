@@ -3,6 +3,7 @@
  * Sources: retail asm oracle (asm/nonmatchings/biglump) > SYM (scratch/tuinfo.py BIGLUMP.CPP)
  * > refs/skeleton drafts.  Retail assert strings/line literals kept verbatim. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/biglump.h"
 
 #define TRUE  1
@@ -79,12 +80,13 @@ extern unsigned char FeFlag;
 char STREAM_DIR[16];   /* @0x800B79A4 */
 char STREAM_BIN[16];   /* @0x800B79B4 */
 unsigned char EAC_DirectoryCache[400];   /* @0x800B79C4 */
-unsigned long BL_NoLumpFiles;   /* @0x8011AB60 */
-unsigned long BL_NoStreamFiles;   /* @0x8011AB64 */
-STRHDR *LFileTab;   /* @0x8011AB68 */
-STRHDR *SFileTab;   /* @0x8011AB6C */
+/* BIGLUMP.CPP small data in retail .sdata order (after the literal pool): all explicitly initialised. */
+unsigned long BL_NoLumpFiles = 0;   /* @0x8011AB60 */
+unsigned long BL_NoStreamFiles = 0;   /* @0x8011AB64 */
+STRHDR *LFileTab = 0;   /* @0x8011AB68 */
+STRHDR *SFileTab = 0;   /* @0x8011AB6C */
 volatile unsigned char FileLoaded = 1;   /* @0x8011AB70 */ /* callback-shared (AsyncLoadCallBack) */
-unsigned char NoQuedAsyncs;   /* @0x8011AB71 */
+unsigned char NoQuedAsyncs = 0;   /* @0x8011AB71 */
 unsigned char CurrAsync = 1;   /* @0x8011AB72 */
 
 extern STRHDR *BL_MakeFilePosTab(unsigned char *BL_DirPtr, unsigned long NoStreamFiles);

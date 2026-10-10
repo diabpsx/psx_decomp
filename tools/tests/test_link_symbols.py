@@ -22,6 +22,33 @@ class LinkSymbolTests(unittest.TestCase):
         self.assertEqual(values['__lnk_free_mem_size'],
                          0x80000000 + values['__lnk_ram_size'] - values['LNK_StackSize'] - values['FirstFreeByte'])
 
+    def test_overlay_ids_follow_the_group_order_and_the_retail_sym(self):
+        values = LS.compute()
+        # PSYLINK numbers groups in declaration order; the retail SYM carries the six overlay records
+        self.assertEqual([values[f'_{g}_id'] for g in LS.OVERLAY_GROUPS], [4, 5, 0xB, 0xC, 0xD, 0xE])
+        self.assertEqual(LS.retail_overlay_ids(), {g: values[f'_{g}_id'] for g in LS.OVERLAY_GROUPS})
+        # startup_text and map_data share one org; map_data holds only its id word and MAP's empty .data
+        self.assertEqual(values['_map_data_org'], values['_startup_text_org'])
+        self.assertEqual((values['_map_data_size'], values['__MAP_data_size']), (4, 0))
+        self.assertEqual(values['__MAP_data_org'], values['_map_data_orgend'])
+        self.assertEqual(values['_startup_text_size'], 0x9E4)
+        retail = LS.check()
+        for name in ('_startup_text_org', '_startup_text_objend', '_map_data_size', '__MAP_data_obj', '__MAP_data_size'):
+            self.assertEqual(retail[name], values[name])
+        with self.assertRaises(ValueError):
+            LS.check(sym_text='000008: $800b031c overlay length $00000004 id $7\n')
+
+    def test_id_words_are_emitted_by_the_link_not_by_scaffold_data(self):
+        self.assertIn('_map_data_id = 5;', '\n'.join(LS.id_lines()))
+        main = LS.subsegment_lines('diabpsx', 'startup_text_hdr')
+        self.assertIn('LONG(_map_data_id);', main[2])
+        self.assertTrue(any(line.startswith(f'build/{LS.MAP_MEMBER}.o(.data);') for line in main))
+        self.assertEqual(LS.subsegment_lines('frontend', 'frontend_hdr')[0].split('   ')[0], 'LONG(_frontend_text_id);')
+        self.assertEqual(LS.subsegment_lines('frontend', 'fe'), [])
+        self.assertEqual(LS.after_subsegment_lines('diabpsx', 'dtors'), ['_startup_text_orgend = .;'])
+        self.assertFalse(list((LS.ROOT / 'asm/data').glob('*_hdr.data.s')))
+        self.assertEqual((LS.ROOT / LS.MAP_MEMBER).read_text().strip().splitlines()[-1].strip(), '.data')
+
     def test_check_reports_a_disagreeing_map_record(self):
         with self.assertRaises(ValueError):
             LS.check(' 80139BFC  _frontend_text_org\n')

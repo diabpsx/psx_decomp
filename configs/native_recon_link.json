@@ -285,57 +285,6 @@
         "size": 20,
         "scaffold": "data_block.data"
       },
-      ".sdata.block_pos": {
-        "va": "0x8011ACAC",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_current": {
-        "va": "0x8011ACA8",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_oldsp": {
-        "va": "0x8011ACE0",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_select": {
-        "va": "0x8011AC8D",
-        "size": 27,
-        "scaffold": "sdata_after_primpool.sdata",
-        "borrowed_prefix": 1
-      },
-      ".sdata.block_rect": {
-        "va": "0x8011ACB4",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_gt4": {
-        "va": "0x8011ACBC",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_render": {
-        "va": "0x8011ACC4",
-        "size": 20,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_xy": {
-        "va": "0x8011ACE4",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_light": {
-        "va": "0x8011ACB0",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      ".sdata.block_velocity": {
-        "va": "0x8011ACD8",
-        "size": 8,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".sbss": {
         "va": "0x8011C65C",
         "size": 4
@@ -343,69 +292,12 @@
       ".bss": {
         "va": "0x8011CBD0",
         "size": 44
+      },
+      ".sdata": {
+        "va": "0x8011AC84",
+        "size": 104,
+        "scaffold": "sdata_after_primpool.sdata"
       }
-    },
-    "post_assemble_section_split": {
-      "section": ".sdata",
-      "pieces": [
-        {
-          "name": ".sdata.block_pos",
-          "offset": 0,
-          "size": 4
-        },
-        {
-          "name": ".sdata.block_current",
-          "offset": 4,
-          "size": 4
-        },
-        {
-          "name": ".sdata.block_oldsp",
-          "offset": 8,
-          "size": 4
-        },
-        {
-          "name": ".sdata.block_select",
-          "offset": 12,
-          "size": 9,
-          "prefix_hex": "00"
-        },
-        {
-          "name": ".sdata.block_select",
-          "offset": 22,
-          "size": 18
-        },
-        {
-          "name": ".sdata.block_rect",
-          "offset": 40,
-          "size": 8
-        },
-        {
-          "name": ".sdata.block_gt4",
-          "offset": 48,
-          "size": 8
-        },
-        {
-          "name": ".sdata.block_render",
-          "offset": 56,
-          "size": 20
-        },
-        {
-          "name": ".sdata.block_xy",
-          "offset": 76,
-          "size": 8
-        },
-        {
-          "name": ".sdata.block_light",
-          "offset": 84,
-          "size": 4
-        },
-        {
-          "name": ".sdata.block_velocity",
-          "offset": 88,
-          "size": 8
-        }
-      ],
-      "allow_zero_gaps": true
     },
     "data_symbols": [
       "TownConv",
@@ -953,25 +845,19 @@
         "va": "0x8007B8C4",
         "size": 7476
       },
-      ".rdata": {
-        "va": "0x80118CA8",
-        "size": 172,
-        "scaffold": "rodata_misprint.rodata"
-      },
-      ".rdata.misprint_prim": {
-        "va": "0x80118D54",
-        "size": 20,
-        "scaffold": "rodata_misprint.rodata",
-        "allow_zero_tail": 2
-      },
       ".data": {
         "va": "0x800E38E4",
         "size": 224,
         "scaffold": "data_misprint.data"
       },
+      ".rdata": {
+        "va": "0x80118C98",
+        "size": 206,
+        "scaffold": "rodata_misprint.rodata"
+      },
       ".sdata": {
-        "va": "0x8011BC28",
-        "size": 4,
+        "va": "0x8011BC1C",
+        "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -1343,19 +1229,19 @@
         "va": "0x800A5004",
         "size": 6348
       },
-      ".rdata": {
-        "va": "0x80110CD0",
-        "size": 32,
-        "scaffold": "rodata_cardcore.rodata"
-      },
       ".data": {
         "va": "0x800CC7E8",
         "size": 128,
         "scaffold": "data_cardcore.data"
       },
+      ".rdata": {
+        "va": "0x80110CC0",
+        "size": 48,
+        "scaffold": "rodata_cardcore.rodata"
+      },
       ".sdata": {
-        "va": "0x8011B160",
-        "size": 184,
+        "va": "0x8011B154",
+        "size": 196,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -1497,20 +1383,19 @@
         "va": "0x80095854",
         "size": 4068
       },
-      ".rdata": {
-        "va": "0x80110638",
-        "size": 156,
-        "borrowed_prefix": 4,
-        "scaffold": "rodata_cplayer.rodata"
-      },
-      ".sdata": {
-        "va": "0x8011AD50",
-        "size": 15,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".sbss": {
         "va": "0x8011C674",
         "size": 16
+      },
+      ".rdata": {
+        "va": "0x80110624",
+        "size": 176,
+        "scaffold": "rodata_cplayer.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AD44",
+        "size": 27,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -1580,14 +1465,14 @@
         "size": 74188,
         "scaffold": "data_stream.data"
       },
-      ".sdata": {
-        "va": "0x8011ADBD",
-        "size": 51,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".sbss": {
         "va": "0x8011C6A4",
         "size": 4
+      },
+      ".sdata": {
+        "va": "0x8011ADB4",
+        "size": 60,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -1678,8 +1563,8 @@
         "scaffold": "data_biglump.data"
       },
       ".sdata": {
-        "va": "0x8011AB60",
-        "size": 41,
+        "va": "0x8011AB54",
+        "size": 53,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -11606,30 +11491,20 @@
         "va": "0x8003E24C",
         "size": 55836
       },
-      ".rdata.items_headers": {
-        "va": "0x80116140",
-        "size": 36,
-        "scaffold": "rodata_items.rodata"
-      },
-      ".rdata.items_file": {
-        "va": "0x80116164",
-        "size": 20,
-        "scaffold": "rodata_items.rodata"
-      },
-      ".rdata.items_sin": {
-        "va": "0x80116178",
-        "size": 64,
-        "scaffold": "rodata_items.rodata"
-      },
-      ".rdata.items_tail": {
-        "va": "0x801161B8",
-        "size": 1328,
-        "scaffold": "rodata_items.rodata"
-      },
       ".data": {
         "va": "0x800D1BE0",
         "size": 14708,
         "scaffold": "data_items.data"
+      },
+      ".sdata": {
+        "va": "0x8011B888",
+        "size": 85,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".rdata": {
+        "va": "0x80116140",
+        "size": 1448,
+        "scaffold": "rodata_items.rodata"
       },
       ".bss.items_curr": {
         "va": "0x8012EC58",
@@ -11642,68 +11517,8 @@
       ".bss.items_active": {
         "va": "0x8012ECD8",
         "size": 127
-      },
-      ".sdata": {
-        "va": "0x8011B888",
-        "size": 85,
-        "scaffold": "sdata_after_primpool.sdata"
       }
     },
-    "post_assemble_section_split": [
-      {
-        "section": ".rdata",
-        "pieces": [
-          {
-            "name": ".rdata.items_headers",
-            "offset": 0,
-            "size": 36,
-            "alignment": 2
-          },
-          {
-            "name": ".rdata.items_sin",
-            "offset": 36,
-            "size": 64,
-            "alignment": 2
-          },
-          {
-            "name": ".rdata.items_file",
-            "offset": 100,
-            "size": 20,
-            "alignment": 2
-          },
-          {
-            "name": ".rdata.items_tail",
-            "offset": 120,
-            "size": 1328,
-            "alignment": 2
-          }
-        ]
-      },
-      {
-        "section": ".bss",
-        "pieces": [
-          {
-            "name": ".bss.items_hold",
-            "offset": 0,
-            "size": 9,
-            "alignment": 2
-          },
-          {
-            "name": ".bss.items_curr",
-            "offset": 12,
-            "size": 108,
-            "alignment": 2
-          },
-          {
-            "name": ".bss.items_active",
-            "offset": 120,
-            "size": 127,
-            "alignment": 2
-          }
-        ],
-        "allow_zero_gaps": true
-      }
-    ],
     "data_symbols": [
       "Item2Frm",
       "ItemAnimLs",
@@ -11814,6 +11629,32 @@
       "strcpy",
       "strlen",
       "tempstr"
+    ],
+    "post_assemble_section_split": [
+      {
+        "section": ".bss",
+        "pieces": [
+          {
+            "name": ".bss.items_hold",
+            "offset": 0,
+            "size": 9,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.items_curr",
+            "offset": 12,
+            "size": 108,
+            "alignment": 2
+          },
+          {
+            "name": ".bss.items_active",
+            "offset": 120,
+            "size": 127,
+            "alignment": 2
+          }
+        ],
+        "allow_zero_gaps": true
+      }
     ]
   },
   "msg": {
@@ -11834,11 +11675,6 @@
         "size": 4768,
         "scaffold": "data_msg.data"
       },
-      ".sdata.msg_comp": {
-        "va": "0x8011B980",
-        "size": 12,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".bss": {
         "va": "0x8012EDD8",
         "size": 32
@@ -11853,36 +11689,16 @@
         "size": 4,
         "scaffold": "dtors.data"
       },
-      ".sdata.msg_flags": {
-        "va": "0x8011B97D",
-        "size": 2,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
       ".sbss": {
         "va": "0x8011C82C",
         "size": 10
+      },
+      ".sdata": {
+        "va": "0x8011B974",
+        "size": 28,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
-    "post_assemble_section_split": [
-      {
-        "section": ".sdata",
-        "pieces": [
-          {
-            "name": ".sdata.msg_flags",
-            "offset": 0,
-            "size": 2,
-            "alignment": 2
-          },
-          {
-            "name": ".sdata.msg_comp",
-            "offset": 4,
-            "size": 12,
-            "alignment": 2
-          }
-        ],
-        "allow_zero_gaps": true
-      }
-    ],
     "data_symbols": [
       "GameMaps",
       "sgLocals",
@@ -11895,7 +11711,8 @@
       "sgJunk",
       "sgbRecvCmd",
       "sgdwRecvOffset",
-      "sgbDeltaChunks"
+      "sgbDeltaChunks",
+      "dwRecCount"
     ],
     "externals": [
       "ActivatePortal__FiiiiiUc",

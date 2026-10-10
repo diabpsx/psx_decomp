@@ -63,30 +63,6 @@ PER_TU_FLAGS = {
             "card_header": ".data.memcard_zeros"},
         "section_occurrence_renames": [
             {"section": ".rdata", "occurrence": 2, "as": ".text"}]},
-    "recon/psxsrc/biglump.cpp": {"move_symbols_before": [
-        {"symbol": "BL_NoLumpFiles", "size": 4, "before": "FileLoaded"},
-        {"symbol": "BL_NoStreamFiles", "size": 4, "before": "FileLoaded"},
-        {"symbol": "LFileTab", "size": 4, "before": "FileLoaded"},
-        {"symbol": "SFileTab", "size": 4, "before": "FileLoaded"},
-        {"symbol": "NoQuedAsyncs", "size": 1, "before": "CurrAsync"}]},
-    "recon/psxsrc/stream.cpp": {"move_initialized_after": [
-        {"symbol": "Time", "directive": "word", "value": "0", "after": "$LC4"},
-        {"symbol": "CDWAIT", "directive": "word", "value": "0", "after": "$LC4"}]},
-    "recon/psxsrc/cplayer.cpp": {
-        "move_symbol_before": {
-            "symbol": "_7CPlayer.PActiveArray", "size": 8, "before": "$LC3"},
-        "move_literals_after": [
-            {"label": "$LC0", "literal": "psxsrc/primpool.h\\000", "after": "$LC2"}]},
-    "recon/psxsrc/cardcore.cpp": {"move_symbols_before": [
-        {"symbol": "MemCardActive", "size": 4, "before": "never_hooked_events"},
-        {"symbol": "MemcardOverlay", "size": 4, "before": "never_hooked_events"},
-        {"symbol": "NewCardFlag", "size": 4, "before": "never_hooked_events"},
-        {"symbol": "countdownloadcharblock", "size": 4, "before": "never_hooked_events"},
-        {"symbol": "mem_card_event_handler", "size": 4, "before": "card_side_empty"},
-        {"symbol": "saveflag", "size": 4, "before": "card_side_empty"},
-        {"symbol": "loadflag", "size": 4, "before": "card_side_empty"},
-        {"symbol": "formatflag", "size": 4, "before": "card_side_empty"},
-        {"symbol": "DoLoadedGame", "size": 4, "before": "card_side_empty"}]},
     "recon/source/drlg_l2.cpp": {
         "extra": ["-fwritable-strings"],
         "section_occurrence_renames": [
@@ -98,8 +74,6 @@ PER_TU_FLAGS = {
     "recon/psxsrc/fmv.cpp": {"cpp_extra": ["-IC:/Temp/PSYQ/psyq-410/PSX/INCLUDE"],
         "section_occurrence_renames": [
         {"section": ".rdata", "occurrence": 8, "as": ".text"}]},
-    "recon/source/misprint.cpp": {"section_occurrence_renames": [
-        {"section": ".rdata", "occurrence": 2, "as": ".rdata.misprint_prim"}]},
     "recon/eaclib/blkfill.s": {"g_value": "0"},
     "recon/eaclib/crc.s": {"g_value": "0"},
     "recon/eaclib/getm.s": {"g_value": "0"},

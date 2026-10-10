@@ -18,10 +18,7 @@ import symlane as S
 class BigLumpNativeTests(unittest.TestCase):
     def test_complete_object_and_small_data_order(self):
         source = B.ROOT / "recon/psxsrc/biglump.cpp"
-        moves = B.per_tu_flags(source)["move_symbols_before"]
-        self.assertEqual([row["symbol"] for row in moves],
-                         ["BL_NoLumpFiles", "BL_NoStreamFiles", "LFileTab",
-                          "SFileTab", "NoQuedAsyncs"])
+        self.assertNotIn("move_symbols_before", B.per_tu_flags(source))   # explicit initialisers give the retail order
         with tempfile.TemporaryDirectory(prefix="biglump-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -29,10 +26,10 @@ class BigLumpNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("biglump", 17))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 992)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 980)   # .sdata starts at 0x8011AB54 (its literal pool)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 3960, ".rdata": 280,
-                          ".data": 432, ".sdata": 41})
+                          ".data": 432, ".sdata": 53})
 
 
 if __name__ == "__main__":

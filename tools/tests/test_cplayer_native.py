@@ -1,4 +1,4 @@
-"""CPLAYER header-inline order, borrowed pool prefix, bytes, and SYM proof."""
+"""CPLAYER header-inline order, retail-order pool and literals, bytes, and SYM proof."""
 from pathlib import Path
 import sys
 import tempfile
@@ -18,9 +18,7 @@ import symlane as S
 class CPlayerNativeTests(unittest.TestCase):
     def test_complete_object_and_header_copies(self):
         source = B.ROOT / "recon/psxsrc/cplayer.cpp"
-        flags = B.per_tu_flags(source)
-        self.assertEqual(flags["move_symbol_before"]["symbol"],
-                         "_7CPlayer.PActiveArray")
+        self.assertEqual(B.per_tu_flags(source), {})   # PActiveArray initialised, PRIM_GetPrim body parsed before Print
         with tempfile.TemporaryDirectory(prefix="cplayer-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -28,11 +26,11 @@ class CPlayerNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("cplayer", 22))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1488)
-        self.assertEqual(receipt["borrowed_section_prefixes"][".rdata"]["size"], 4)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1476)   # .sdata starts at 0x8011AD44 (its literal pool)
+        self.assertEqual(receipt["borrowed_section_prefixes"], {})
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 4068, ".rdata": 156,
-                          ".sdata": 15, ".sbss": 16})
+                         {".text": 4068, ".rdata": 176,   # "psxsrc/cplayer.h" .. FindActionEnum's table
+                          ".sdata": 27, ".sbss": 16})     # pool, PActiveArray, "PLRDAT"
 
 
 if __name__ == "__main__":

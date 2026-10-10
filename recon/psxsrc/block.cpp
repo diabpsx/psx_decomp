@@ -6,6 +6,7 @@
  * from psxsrc/psyq.h and psxsrc/gen/structs_block.h (tools/symhdr.py struct; regenerate with
  * scratch/block/genhdr.py).  All 68 functions PASS bytes + SYM (2026-10-03). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/psyq.h"
 #include "psxsrc/gen/structs_block.h"
 /* verbatim PsyQ 4.0 LIBGPU.H primitive macros (psyq.h's shared copies drift: casts, setcode-based ?:) */
@@ -59,9 +60,7 @@ struct SPR_HDR {   /* sizeof 40 */
     unsigned int IsTiles : 8;
     unsigned int Spare : 8;
 };
-struct CTextFileInfo {   /* sizeof 4 */
-    char *FileName;
-};
+/* CTextFileInfo comes from psxsrc/textfileinfo_header.h (GMAN.H), with its HasTp/HasDat inlines. */
 struct LittleGt4;
 
 struct MonstList {   /* sizeof 16 */
@@ -286,12 +285,20 @@ struct TownToCreature TownConv[10] = {   /* @0x800B8B80 */
     { 0, 7 }, { 1, 6 }, { 2, 4 }, { 3, 11 }, { 4, 8 },
     { 5, 5 }, { 6, 12 }, { 7, 10 }, { 8, 9 }, { 9, 3 }
 };
-/* SYM EXT INT @0x8011ACAC (.sdata, initialised -15) */
-int PosAdj = -15;
-
-/* BLOCK.CPP-owned globals (SYM EXT, .sdata). */
-CBlocks *CurrentBlocks = 0;
-int OldSp = 0;
+/* BLOCK.CPP-owned small data in retail .sdata order (0x8011AC8D..): the selection counters (SYM EXT
+ * UCHAR) and colours (SYM file STAT USHORT), CurrentBlocks, PosAdj and the static LightMethod, all
+ * initialised here; OtShift .. Adjust follow MakeRectTable/MakeGt4Table's literals, and OldSp, ax, ay
+ * follow PrintTowners' local statics. */
+unsigned char P1ObjSelCount = 0, P2ObjSelCount = 0, P12ObjSelCount = 0;
+unsigned char P1ItemSelCount = 0, P2ItemSelCount = 0, P12ItemSelCount = 0;
+unsigned char P1MonstSelCount = 0, P2MonstSelCount = 0, P12MonstSelCount = 0;
+static unsigned short P1ObjSelCol = 0x3C00, P2ObjSelCol = 0x000F, P12ObjSelCol = 0x3C0F;
+static unsigned short P1ItemSelCol = 0x3C00, P2ItemSelCol = 0x000F, P12ItemSelCol = 0x3C0F;
+static unsigned short P1MonstSelCol = 0x3C00, P2MonstSelCol = 0x000F, P12MonstSelCol = 0x3C0F;
+CBlocks *CurrentBlocks = 0;   /* @0x8011ACA8 */
+int PosAdj = -15;   /* @0x8011ACAC */
+static int LightMethod = 0;   /* @0x8011ACB0 */
+extern int OldSp, ax, ay;   /* defined after PrintTowners (retail .sdata order) */
 
 extern unsigned char PauseMode;
 extern char stextflag;
@@ -361,14 +368,6 @@ void PRIM_GetPrim(POLY_FT4 **Prim);
 void PRIM_GetPrim(POLY_GT4 **Prim);
 void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source);
 POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim);
-/* BLOCK.CPP-owned selection counters (SYM EXT UCHAR @0x8011AC8D..95, .sdata) and colours (SYM file STAT
-   USHORT @0x8011AC96..A6, .sdata initialised -- values read from DIABPSX.BIN). */
-unsigned char P1ObjSelCount = 0, P2ObjSelCount = 0, P12ObjSelCount = 0;
-unsigned char P1ItemSelCount = 0, P2ItemSelCount = 0, P12ItemSelCount = 0;
-unsigned char P1MonstSelCount = 0, P2MonstSelCount = 0, P12MonstSelCount = 0;
-static unsigned short P1ObjSelCol = 0x3C00, P2ObjSelCol = 0x000F, P12ObjSelCol = 0x3C0F;
-static unsigned short P1ItemSelCol = 0x3C00, P2ItemSelCol = 0x000F, P12ItemSelCol = 0x3C0F;
-static unsigned short P1MonstSelCol = 0x3C00, P2MonstSelCol = 0x000F, P12MonstSelCol = 0x3C0F;
 
 /* @0x8008D41C BLOCK.CPP:310 */
 void UpdateSel(unsigned short *Col, unsigned short Add, unsigned char *Count)
@@ -797,9 +796,6 @@ int OldLighting = 1;
 int GMXAdj2 = -40;
 int GMYAdj2 = 40;
 int Adjust = 0;
-int ax = 0;
-int ay = 0;
-static int LightMethod = 0;
 void PRIM_Clip(RECT *R, int Depth);
 void PRIM_FullScreen(int Depth);
 extern "C" void ABL_SetBlockRGBXY(RgbBlockInf *Inf, int x, int y, BOOL DoTrans);
@@ -1515,6 +1511,11 @@ void CBlocks::PrintTowners(int x, int y)
         }
     }
 }
+
+/* Retail defines these after PrintTowners (whose local statics YPos/YVel sit at 0x8011ACD8/DC). */
+int OldSp = 0;   /* @0x8011ACE0 */
+int ax = 0;   /* @0x8011ACE4 */
+int ay = 0;   /* @0x8011ACE8 */
 
 /* @0x800904B0 BLOCK.CPP:2051 */
 int AddObject(CacheInfo *Info, map_info *p0, int bx, int by)
