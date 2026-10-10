@@ -13,7 +13,8 @@
 #include "psxsrc/biglump.h"
 #include "psxsrc/decomp.h"
 #include "cstring.h"
-#include "psxsrc/primpool.h"
+/* PRIMPOOL.H is not part of GMAN.H: the empty FRAMEHDR.CPP (GMAN.H only) carries no primpool literal in retail;
+ * each TU that uses PRIM_GetPrim includes PRIMPOOL.H where retail parsed its bodies. */
 #include "psxsrc/gpuq.h"
 
 struct FRAME_HDR {                    /* sizeof 12 (bitfields) */

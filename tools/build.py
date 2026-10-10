@@ -59,6 +59,7 @@ PER_TU_FLAGS = {
     # code in one overlay group; its resident small-data order also starts with
     # the invalid-character flag before the two filename literals.
     "recon/psxsrc/memcard.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
+    "recon/psxsrc/dlg_2.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
     "recon/source/drlg_l2.cpp": {
         "extra": ["-fwritable-strings"],
         "merge_sections_into_text": [".rdata", ".data"]},

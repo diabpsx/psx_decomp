@@ -22,11 +22,14 @@ BOOL fileinfoflag = 0;
 extern const struct FeTable McLoadGameMenu = { 0, 1, 100, 8, McInitLoadGameMenu, McMainKeyCtrl, 0 };   /* @0x8014364C */
 extern const struct FeTable McLoadCard1Menu = { 0, 1, 100, 8, McInitLoadCard1Menu, McMainKeyCtrl, 0 };   /* @0x80143668 */
 extern const struct FeTable McLoadCard2Menu = { 0, 1, 100, 8, McInitLoadCard2Menu, McMainKeyCtrl, 0 };   /* @0x80143684 */
-/* The uninitialised data save_buffer, CharDataStruct, TempStr and AlertStr (0x801436EC..0x8015958F,
- * zero .data between the tables and the code) are DLG.CPP's by the SYM block but are not defined
- * here yet: retail keeps a four-byte zero gap between save_buffer and CharDataStruct that neither
- * cc1plus's `.align 3` (section-relative under ASPSX 2.56/2.67 and PSYLINK 2.52) nor any recorded
- * object explains, so the scaffold still supplies that range (see docs/TOOLCHAIN.md). */
+/* DLG is one emission-order stream (read-only data, initialised data and code assembled into one section): the
+ * literals and tables above, then these uninitialised globals (deferred to the end of the data, in dlg.h's
+ * declaration order), then the code.  Inside that one section cc1plus's `.align 3` before CharDataStruct lands
+ * at stream offset 0x104 + 0x14000 and pads four bytes: retail's zero gap at 0x801576EC. */
+unsigned char save_buffer[81920];        /* @0x801436EC */
+struct CharDataStructDef CharDataStruct;   /* @0x801576F0 */
+char TempStr[64];                          /* @0x801594D0 */
+char AlertStr[128];                        /* @0x80159510 */
 
 /* @0x80159590 DLG.CPP:188 */
 int GetFileNumber(int side, char *file_name)

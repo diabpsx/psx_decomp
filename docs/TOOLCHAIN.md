@@ -561,6 +561,29 @@ read gcc syntax.  The linker cannot help either: the `.lcomm` offsets are baked 
 No reachable tool reproduces the rounding, so the two rows per TU stay (probe receipts: scratch
 `la.s` layouts in build/tmp/pref).
 
+### Round 5: the last unowned data (2026-10-10)
+
+DLG is one emission-order stream like CREDITS and MEMCARD (`merge_sections_into_text`): the literals
+and tables, then the four uninitialised globals (save_buffer, CharDataStruct, TempStr, AlertStr, now
+defined in dlg_2.cpp in dlg.h's declaration order), then the code.  Inside that one section cc1plus's
+`.align 3` before CharDataStruct is applied at stream offset 0x104 + 0x14000 and pads four bytes,
+which is retail's zero gap at 0x801576EC; the earlier composed `.rdata`/`.data`/`.text` order could
+not produce it because the pad is section-relative.  The DLG `.data` exception below is closed.
+
+TONY's "DEMOPAD0.DAT" literal is patched in place through a local pointer
+(`char *Name = "DEMOPAD0.DAT"; Name[7] = ...;`): cc1plus constant-propagates the pointer and stores
+through the literal's own label (`sb reg,$LC+7`), which is retail's `sb %lo(sym+7)($at)` with no symbol;
+writing through the literal expression itself or through a named array gives `la`+`sb 0(reg)` instead.
+The bound alias D_80110B24 is gone.
+
+The bytes between CPLAYER and PSXMSG belong to FRAMEHDR, an empty retail TU (rom/DIABPSX.MAP:
+`__FRAMEHDR_text_size` = `__FRAMEHDR_data_size` = 0, `__FRAMEHDR_rdata_size` = 14) whose only content
+is what including GMAN.H leaves: the DumpDatFile literal (0x801106D4) and the ".tp"/".dat" pool
+(0x8011AD64).  It is recon/psxsrc/framehdr.cpp, a data-only member.  Its object also proves that
+retail's GMAN.H did not carry PRIMPOOL.H's bodies (no primpool literal), so gman.h no longer includes
+primpool.h; the TUs that use PRIM_GetPrim include it themselves.  PSXMSG's pool (0x8011AD70) is
+owned by psxmsg.cpp.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

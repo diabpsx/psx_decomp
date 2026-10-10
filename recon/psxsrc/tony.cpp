@@ -154,7 +154,6 @@ extern unsigned char demo_buffer[900];
 extern unsigned char PauseMode;
 extern CFont MediumFont;
 extern const unsigned char WHITER, WHITEG;
-extern char D_80110B24[];                                  /* "DEMOPAD0.DAT" */
 
 /* ---------------------------------------------------------------- TU data (.sdata) ---- */
 int tony_poll = 0;                                          /* @0x8011AE34 */
@@ -337,8 +336,9 @@ void load_demo_pad_data(unsigned long demo_num)
 
     if (demo_num >= 10)
         demo_num += 7;
-    D_80110B24[7] = demo_num + '0';
-    Fs->ReadAtAddr("DEMOPAD0.DAT", demo_buffer, -1);
+    char *Name = "DEMOPAD0.DAT";   /* the literal itself is patched in place (retail: sb into the pool) */
+    Name[7] = demo_num + '0';
+    Fs->ReadAtAddr(Name, demo_buffer, -1);
 }
 
 /* @0x8009B8D0 TONY.CPP:289 */
@@ -348,8 +348,9 @@ void save_demo_pad_data(unsigned long demo_num)
 
     if (demo_num >= 10)
         demo_num += 7;
-    D_80110B24[7] = demo_num + '0';
-    Fs->Save("DEMOPAD0.DAT", demo_buffer, 900);
+    char *Name = "DEMOPAD0.DAT";
+    Name[7] = demo_num + '0';
+    Fs->Save(Name, demo_buffer, 900);
 }
 
 /* @0x8009B930 TONY.CPP:308 */

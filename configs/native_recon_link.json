@@ -903,12 +903,13 @@
       },
       ".rdata": {
         "va": "0x801435E8",
-        "size": 260,
+        "size": 90024,
         "scaffold": [
           "dlg_rodata_801435e8.rodata",
           "dlg.c",
           "dlg_rodata_8014364c.rodata",
-          "dlg_1.c"
+          "dlg_1.c",
+          "dlg_rodata_801436ec.rodata"
         ]
       }
     },
@@ -927,7 +928,11 @@
       "ClassStrTbl",
       "McLoadGameMenu",
       "McLoadCard1Menu",
-      "McLoadCard2Menu"
+      "McLoadCard2Menu",
+      "save_buffer",
+      "CharDataStruct",
+      "TempStr",
+      "AlertStr"
     ],
     "data_record_addresses": {
       "McState": "0x8011B420"
@@ -1018,12 +1023,27 @@
       "MediumFont",
       "PSX_GM_SaveGame__FiPcT1",
       "FeNoOfPlayers",
-      "strncat",
-      "save_buffer",
-      "CharDataStruct",
-      "TempStr",
-      "AlertStr"
-    ]
+      "strncat"
+    ],
+    "composed_group": {
+      "name": "dlg_text",
+      "sections": [
+        ".text"
+      ],
+      "image": "frontend",
+      "va": "0x801435E8",
+      "size": 99184,
+      "exports": {
+        ".rdata": {
+          "offset": 0,
+          "size": 90024
+        },
+        ".text": {
+          "offset": 90024,
+          "size": 9160
+        }
+      }
+    }
   },
   "drlg_l2": {
     "source": "recon/source/drlg_l2.cpp",
@@ -6207,8 +6227,7 @@
       "printf",
       "restore_b",
       "restore_g",
-      "restore_r",
-      "D_80110B24"
+      "restore_r"
     ]
   },
   "psxmsg": {
@@ -6230,8 +6249,8 @@
         "scaffold": "rodata_psxmsg.rodata"
       },
       ".sdata": {
-        "va": "0x8011AD7C",
-        "size": 4,
+        "va": "0x8011AD70",
+        "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -12370,6 +12389,26 @@
       "DatTab_M15QA": "DatTab_M15QA",
       "DatTab_M16D": "DatTab_M16D"
     },
+    "externals": []
+  },
+  "framehdr": {
+    "source": "recon/psxsrc/framehdr.cpp",
+    "image": "diabpsx",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x801106D4",
+        "size": 14,
+        "scaffold": "rodata_framehdr.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AD64",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [],
     "externals": []
   }
 }

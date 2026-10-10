@@ -17,8 +17,9 @@ import symlane as S
                      "original toolchain/retail inputs unavailable")
 class Dlg2NativeTests(unittest.TestCase):
     def test_complete_object_and_raw_segments(self):
-        # no section renames: DLG's .rdata is one compiled section spanning the overlay's fragments
-        self.assertNotIn("section_occurrence_renames", B.per_tu_flags(B.ROOT / "recon/psxsrc/dlg_2.cpp"))
+        # DLG is one emission-order stream: literals and tables, the zero data (save_buffer .. AlertStr, with
+        # retail's four-byte .align 3 pad before CharDataStruct arising at stream offset 0x14104), then the code
+        self.assertEqual(B.per_tu_flags(B.ROOT / "recon/psxsrc/dlg_2.cpp"), {"merge_sections_into_text": [".rdata", ".data"]})
         with tempfile.TemporaryDirectory(prefix="dlg2-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):
@@ -27,10 +28,10 @@ class Dlg2NativeTests(unittest.TestCase):
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("dlg_2", 35))
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3216)
-        # one .rdata row (0x801435E8..0x801436EB): the gman.h literal, ClassStrTbl, the BISLPS file
-        # names, the three McLoad*Menu tables and the sprintf formats
+        # the data stream (0x801435E8..0x8015958F) exported as one row: the gman.h literal, ClassStrTbl, the
+        # BISLPS file names, the McLoad*Menu tables, the sprintf formats, then the four zero arrays
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 9160, ".rdata": 260, ".sdata": 96})
+                         {".text": 9160, ".rdata": 90024, ".sdata": 96})
 
 
 if __name__ == "__main__":

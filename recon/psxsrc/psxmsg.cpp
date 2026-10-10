@@ -4,6 +4,7 @@
  * PSX_PostWndProc runs the Post* half after the new level is in.
  * Reconstructed from the raw oracle (asm/nonmatchings/psxmsg/*.s) + the SYM + refs/diablo-hellfire/src/INTERFAC.CPP. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/cplayer_header.h"
 
 struct TASK;
