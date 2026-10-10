@@ -17,7 +17,6 @@ import sdk_link as N
 import symlane as S
 import return_type_audit as RTA
 import psyq_extract as P
-import psyq_rewrite as PR
 import native_commons as C
 
 OUT = B.BUILD / 'native_source'
@@ -756,14 +755,9 @@ def build(only=None):
             occupied.append((homes[section], va, va + size))
         prefix, combined, carrier_mode = gp_carrier_plan(regions, retail, gp, small_end,
                                                          anchor=str(B.per_tu_flags(source).get('g_value', B.G_VALUE)) != '0')
-        post_split_spec = spec.get('post_assemble_section_split')
-        post_split_specs = ([] if post_split_spec is None else
-                            post_split_spec if isinstance(post_split_spec, list) else [post_split_spec])
-        post_split_pieces = {}
-        for split_spec in post_split_specs:
-            if isinstance(split_spec, dict):
-                for row in split_spec.get('pieces', []):
-                    post_split_pieces.setdefault(row.get('name'), row)
+        if 'post_assemble_section_split' in spec:
+            raise ValueError('post-assemble section splits are retired: the retail layout comes from the source order '
+                             'and the assembler (ASPSX 2.67+ rounds .lcomm to 8 bytes)')
         borrowed_prefixes = {}
         object_prefixes = {}
         for section, row in spec['sections'].items():
@@ -786,16 +780,7 @@ def build(only=None):
             if source_section in object_prefixes:
                 raise ValueError('duplicate borrowed native object-section prefix')
             borrowed_prefixes[section] = data
-            split_piece = post_split_pieces.get(source_section)
-            if split_piece is not None:
-                try:
-                    supplied = bytes.fromhex(split_piece.get('prefix_hex', ''))
-                except (TypeError, ValueError):
-                    raise ValueError('invalid post-assemble borrowed prefix')
-                if supplied != data:
-                    raise ValueError('post-assemble borrowed prefix differs from retail')
-            else:
-                object_prefixes[source_section] = data
+            object_prefixes[source_section] = data
             combined[section] = (va - amount, size + amount)
         prefix_objects = []
         embedded_prefix = bool(prefix and regions.get('.sdata', (0, 0))[0] % 4)
@@ -819,17 +804,6 @@ def build(only=None):
         raw = original_obj.read_bytes()
         if raw[:4] != b'LNK\x02':
             raise ValueError('compiler did not produce a native LNK object')
-        post_split = post_split_spec
-        for split_spec in post_split_specs:
-            if (not isinstance(split_spec, dict)
-                    or set(split_spec) - {'section', 'pieces', 'allow_zero_gaps'}
-                    or not {'section', 'pieces'} <= set(split_spec)
-                    or not isinstance(split_spec['section'], str)
-                    or not isinstance(split_spec['pieces'], list)
-                    or type(split_spec.get('allow_zero_gaps', False)) is not bool):
-                raise ValueError('invalid post-assemble section split')
-            raw = PR.split_section(raw, split_spec['section'], split_spec['pieces'],
-                                   split_spec.get('allow_zero_gaps', False))
         obj = P.parse_obj_complete(raw)
         declared_data_symbols = spec['data_symbols']
         if declared_data_symbols == 'all':
@@ -1039,7 +1013,7 @@ def build(only=None):
                          'compiler_sha256': (None if source.suffix.lower() == '.s' else
                                              sha(S.compiler_for(source, source.suffix.lower() != '.c').read_bytes())),
                          'compiler_overrides': B.per_tu_flags(source),
-                         'post_assemble_section_split': post_split,
+                         'post_assemble_section_split': None,   # retired: layout from source order + assembler
                          'symbol_compaction': compaction,
                          'symmunge_sha256': S.SYMMUNGE_SHA256 if compaction else None,
                          'common_symbols': {

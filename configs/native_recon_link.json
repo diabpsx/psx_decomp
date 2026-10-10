@@ -11251,17 +11251,9 @@
         "size": 1448,
         "scaffold": "rodata_items.rodata"
       },
-      ".bss.items_curr": {
+      ".bss": {
         "va": "0x8012EC58",
-        "size": 108
-      },
-      ".bss.items_hold": {
-        "va": "0x8012ECC8",
-        "size": 9
-      },
-      ".bss.items_active": {
-        "va": "0x8012ECD8",
-        "size": 127
+        "size": 255
       }
     },
     "data_symbols": [
@@ -11375,32 +11367,7 @@
       "strlen",
       "tempstr"
     ],
-    "post_assemble_section_split": [
-      {
-        "section": ".bss",
-        "pieces": [
-          {
-            "name": ".bss.items_hold",
-            "offset": 0,
-            "size": 9,
-            "alignment": 2
-          },
-          {
-            "name": ".bss.items_curr",
-            "offset": 12,
-            "size": 108,
-            "alignment": 2
-          },
-          {
-            "name": ".bss.items_active",
-            "offset": 120,
-            "size": 127,
-            "alignment": 2
-          }
-        ],
-        "allow_zero_gaps": true
-      }
-    ]
+    "assembler": "2.67"
   },
   "msg": {
     "source": "recon/source/msg.cpp",
@@ -11739,7 +11706,6 @@
         "size": 10828
       },
       ".rdata.fmv_all": {
-        "source_section": ".rdata.fmv_src",
         "va": "0x8013B7DC",
         "size": 108096,
         "scaffold": "fmv_rodata_8013b7dc.rodata"
@@ -11755,15 +11721,10 @@
         "va": "0x8011C74C",
         "size": 24
       },
-      ".bss.fmv_subcode": {
+      ".bss": {
         "image": "diabpsx",
         "va": "0x80121C98",
-        "size": 12
-      },
-      ".bss.fmv_rest": {
-        "image": "diabpsx",
-        "va": "0x80121CA8",
-        "size": 51344
+        "size": 51360
       }
     },
     "composed_group": {
@@ -11970,30 +11931,11 @@
       "strcpy",
       "systemtask"
     ],
-    "assembler": "2.56",
+    "assembler": "2.67",
     "data_record_addresses": {
       "TempStack": "0x80121D38",
       "CreateEnv": "0x80121D08"
-    },
-    "post_assemble_section_split": [
-      {
-        "section": ".bss",
-        "pieces": [
-          {
-            "name": ".bss.fmv_subcode",
-            "offset": 0,
-            "size": 12,
-            "alignment": 2
-          },
-          {
-            "name": ".bss.fmv_rest",
-            "offset": 12,
-            "size": 51344,
-            "alignment": 8
-          }
-        ]
-      }
-    ]
+    }
   },
   "overinfo": {
     "source": "recon/psxsrc/overinfo.s",

@@ -29,10 +29,8 @@ class FmvNativeTests(unittest.TestCase):
                          {".text": 10828, ".rdata.fmv_all": 108096,
                           ".sdata": 420,    # one retail-order block, vlc_tab .. last_handler_event
                           ".sbss": 24,      # idx, i, sec, Passedfilename, Passedw, Passedh (<= 8 bytes each)
-                          ".bss.fmv_subcode": 12, ".bss.fmv_rest": 51344})
-        # retail 8-aligns voice_attr (64 bytes) after the 12-byte subcode; no available ASPSX does, so the
-        # object's .bss is split at that pad (documented exception, like ITEMS' .bss)
-        self.assertEqual([piece["offset"] for piece in receipt["post_assemble_section_split"][0]["pieces"]], [0, 12])
+                          ".bss": 51360})   # subcode, voice_attr, FMVName, CreateEnv, TempStack: .lcomm rounded to 8 (ASPSX 2.67)
+        self.assertIsNone(receipt["post_assemble_section_split"])
 
 
 if __name__ == "__main__":

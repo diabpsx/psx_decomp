@@ -617,6 +617,23 @@ tools here: the CCPSX driver passes ASPSX nothing beyond `-q`, ASPSX `-s<name>` 
 in a group of that name, PREFSECT gives `prefix.text`, and PSYLIB members keep plain names.  The
 link no longer depends on them.
 
+### Round 7: ITEMS/FMV local BSS closed; no post-assemble split remains (2026-10-10)
+
+The rounds 2-4 notes above say that no available assembler reproduces retail's 8-byte-rounded
+`.lcomm` placement.  That was a misreading of the census: ASPSX 2.67, 2.79 and 2.81 all place
+each `.lcomm` object at its size rounded up to 8 (a 4-byte sbss object in the probe had shifted
+every `.bss` offset by 4, hiding it), and 2.81 was skipped for rejecting `-g`.  The Climax trees in
+C:/Temp/ps1-decomp-refs settled it: SpongeBob SuperSponge (Climax, 2001) bundles ASPSX 2.81, and
+assembling our ITEMS and FMV output with 2.67/2.79/2.81 gives retail's layout exactly (FMV: subcode
+0, voice_attr 16, FMVName 80, CreateEnv 112, TempStack 160, .bss 51360; ITEMS: 112/128/255 once
+curruitem is declared before itemhold, the `.lcomm` order being declaration order).  ASPSX 2.34
+and 2.56 pack at 4.  ITEMS and FMV therefore assemble with ASPSX 2.67 like STORES, CONTROL and DLG,
+each with one `.bss` row, and the post-assemble section-split mechanism (psyq_rewrite.py) is gone:
+no member moves bytes after assembly any more.
+
+Warcraft II (Climax, 1997) in the same reference tree builds with plain `ccpsx -c -O2`,
+`psylink /m /n400` and `symmunge /i`, with a link script of plain `text`/`bss` groups.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

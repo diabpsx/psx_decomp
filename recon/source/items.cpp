@@ -137,6 +137,9 @@ static void RepairItem(ItemStruct *i, int lvl);   /* @0x80045E1C ITEMS.CPP:3328 
 
 /* @0x8003E24C ITEMS.CPP:556 — empty on PSX (PC CEL-loading loop removed) */
 
+/* Retail .bss order (ASPSX rounds each `.lcomm` to 8 bytes): curruitem @0x8012EC58, itemhold @0x8012ECC8,
+ * itemactivelist @0x8012ECD8; the statics are emitted in declaration order. */
+static ItemStruct curruitem;
 static unsigned char itemhold[3][3];   /* @D_8012ECC8 — hellfire file-scope `BOOL itemhold[3][3]`; this
  * project's BOOL is 1-byte (bool), matching the oracle's byte stores */
 #define ISEL_NONE 0
@@ -157,7 +160,6 @@ static unsigned char itemhold[3][3];   /* @D_8012ECC8 — hellfire file-scope `B
 #define PLF_ARMOR 0x100000
 #define PLF_RING 0x1
 #define IMAGIC_NONE 0
-static ItemStruct curruitem;
 #define ISEL_TOP 2
 #define infostr _infostr[sel_data]
 #define infoclr _infoclr[sel_data]

@@ -32,8 +32,10 @@ class ItemsNativeTests(unittest.TestCase):
         # retail-order small data: one .sdata row 0x8011B888..0x8011B8DC (numitems .. uitemflag)
         self.assertEqual(receipt["sections"][".sdata"]["size"], 85)
         self.assertFalse(any(name.startswith(".sdata.items_") for name in receipt["sections"]))
-        self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".bss.items_")), 244)
+        # one .bss row: curruitem, itemhold, itemactivelist in declaration order, each .lcomm rounded to 8
+        # bytes by ASPSX 2.67 (0x8012EC58 .. 0x8012ED57)
+        self.assertEqual(receipt["sections"][".bss"]["size"], 255)
+        self.assertIsNone(receipt["post_assemble_section_split"])
 
 
 if __name__ == "__main__":
