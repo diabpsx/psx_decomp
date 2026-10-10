@@ -50,8 +50,11 @@ extern "C" int sprintf(char *buf, const char *fmt, ...);
 /* TU-owned small data (.sdata/.sbss, gp-relative in retail) */
 int numobjfiles = 0;
 int myscale = 512;
-long numobjects;
-unsigned char InitObjFlag;
+long numobjects;   /* @0x8011B9CC */
+unsigned char InitObjFlag;   /* @0x8011B9D0 */
+int trapid;   /* @0x8011B9D4 */
+int trapdir;   /* @0x8011B9D8 */
+int leverid;   /* @0x8011B9DC */
 
 void PostAddL1Door(int i, int x, int y, int ot)
 {

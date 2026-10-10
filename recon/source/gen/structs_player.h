@@ -486,6 +486,7 @@ struct TextDat {   /* sizeof 112 */
 };
 
 struct CPlayer {   /* sizeof 144 */
+    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50, defined by cplayer.cpp */
     struct TextDat TextDat;   /* +0x0 */
     long hndDatMem;   /* +0x70 */
     unsigned short NumOfPlayers;   /* +0x74 */

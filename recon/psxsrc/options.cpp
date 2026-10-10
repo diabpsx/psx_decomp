@@ -4,6 +4,7 @@
  * menu layer).  Reconstructed from the retail asm oracle + skel/PSXSRC/OPTIONS.CPP (Ghidra/IDA draft) +
  * refs/skeleton/JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H (prototypes only, no data layout). */
 #include "psxsrc/options.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 
 /* File statics in retail storage order; ASPSX 2.67 packs the byte objects. */
 static TextDat *Slider;
@@ -21,7 +22,8 @@ static RECT ORect;
 /* Complete initialized small-data bank, in retail source emission order.
  * The unused VideoVol, allspellsflag and OptionsSeed definitions are retained
  * with the types and addresses recorded in retail OPTIONS.CPP's SYM records. */
-unsigned char Qfromoptions = 0;
+BOOL goldcheat = 0;   /* @0x8011B224 */
+unsigned char Qfromoptions = 0;   /* @0x8011B228 */
 static int Spacing = 13;
 static int cs = 1;
 static int lastcs = 1;

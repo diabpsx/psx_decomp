@@ -59,7 +59,13 @@ void GAL_SetVerbosity(GAL_VERB_LEV G);
 extern LNK_OPTS OPT_LinkerOpts;
 extern void *OPT_FreeMemStart;
 extern unsigned long OPT_FreeMemSize;
-LNK_OPTS *Gaz;
+/* Retail MEM.CPP small data in order: the three initialised words, then the uninitialised Gaz and
+ * LastFmem that cc1plus emits at the end of the TU. */
+unsigned int GSYS_MemStart = 0;   /* @0x8011AACC */
+unsigned int GSYS_MemEnd = 0;   /* @0x8011AAD0 */
+int LowestFmem = 0xA00000;   /* @0x8011AAD4 */
+LNK_OPTS *Gaz;   /* @0x8011AAD8 */
+int LastFmem;   /* @0x8011AADC */
 void MEM_SetupMem(void) __attribute__((section(".text.startup_mem")));
 static void SetupWorkRam(void) __attribute__((section(".text.startup_mem")));
 

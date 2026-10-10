@@ -3,6 +3,7 @@
  * PSX deltas: dTransVal/dFlags live in dung_map[x][y] (scans over 96x96), dungeon is unsigned short [48][48],
  * the .SOL tables load through GRL_LoadFileInMemSig and are followed by ConvertdPiece (no nTransTable / block_lvid). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_gendung.h"
 #include "source/gen/externs_gendung.h"
@@ -23,7 +24,10 @@
 
 /* Complete initialized small-data group, in retail declaration order.
  * Types and ownership follow GENDUNG's global SYM records. */
-int setpc_x = 0;
+unsigned char *mydflags = 0;   /* @0x8011C0D8 */
+unsigned char *pSetPiece = 0;   /* @0x8011C0DC */
+int DungSize = 112 * 112 * 8;   /* @0x8011C0E0: sizeof dung_map */
+int setpc_x = 0;   /* @0x8011C0E4 */
 int setpc_y = 0;
 int setpc_w = 0;
 int setpc_h = 0;

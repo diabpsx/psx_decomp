@@ -3,8 +3,11 @@
  * drops FeFlag, then -- unless a saved game is being loaded -- loads the game overlay and creates
  * the players the front end set up (keeping characters loaded from a memory card). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
+
+unsigned char PlayDemoFlag;   /* @0x8011AC81: ATTRACT.CPP's one small-data global, after the literal pool */
 
 /* Original unused GMAN.H inline retains its diagnostic filename literal. */
 struct TextDat {

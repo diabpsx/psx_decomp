@@ -13,6 +13,7 @@
  * (gamemenu_on, gamemenu_handle_previous, gamemenu_previous, ...) was dropped entirely; whatever
  * still calls gamemenu_off() elsewhere in this port only needs the empty stub. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 
@@ -44,6 +45,8 @@ public:
 #include "source/gen/externs_gamemenu.h"
 #include "source/gen/protos_gamemenu.h"
 #include "source/diablo.h"
+
+BOOL iscflag;   /* @0x8011BE34: GAMEMENU.CPP's one surviving small-data global, after the literal pool */
 
 void gamemenu_off(void)
 {

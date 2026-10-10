@@ -61,9 +61,9 @@ struct TextDat {   /* sizeof 112 (SYM); only Frames is named */
 };
 
 class CPlayer;
-extern CPlayer *_7CPlayer_PActiveArray[2];
 class CPlayer : public TextDat {   /* sizeof 144 */
 public:
+    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50, defined by cplayer.cpp */
     long hndDatMem;   /* +0x70 */
     unsigned short NumOfPlayers;   /* +0x74 */
     BOOL InTown;   /* +0x78 */
@@ -399,7 +399,7 @@ inline CPlayer *CPlayer::GetPlayer(int PNum)
 {
     if (1 < (unsigned int)PNum)
         DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-    return _7CPlayer_PActiveArray[PNum];
+    return PActiveArray[PNum];
 }
 
 inline FRAME_HDR *TextDat::GetFr(int FrNum)

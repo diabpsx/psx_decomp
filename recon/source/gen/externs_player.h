@@ -70,5 +70,4 @@ extern struct SFXHDR *sghStream;   /* @0x8011B834 */
 extern struct SpellData spelldata[37];   /* @0x800DDB80 */
 extern char stextflag;   /* @0x8011BAE0 */
 extern char visible_level;   /* @0x8011B0A8 */
-extern struct CPlayer *_7CPlayer_PActiveArray[2];   /* @0x8011AD50 (class-static, no EXT record; sized from GetPlayer's assert PNum<2) */
 extern char D_8011C878[2];   /* per-player post-death countdown timer, no SYM/EXT record; owned by this TU (only player/*.s reaches it) */

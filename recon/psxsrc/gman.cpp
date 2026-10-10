@@ -4,6 +4,7 @@
 #include "psxsrc/gman.h"
 #undef GMAN_OWNER_TU
 static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);   /* retail SYM: STAT (file-local) */
+static POLY_FT4 MyFT4;   /* @0x8011CC00 (SYM STAT): GMAN.CPP's one .bss static, the fallback primitive */
 
 /* GMAN.CPP-owned globals (.sdata @0x8011AD1C..; SYM class EXT INT).  Tentative definitions in the
  * OWNER TU make them gp-relative (`lw $v,%gp_rel(TpW)($gp)`) exactly like retail; `extern` would

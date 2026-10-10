@@ -151,7 +151,9 @@ def native_link(entry, raw, regions, bindings, prefix_objects=(), output_dir=Non
             commands.append(f'sdk_comp_{index} group org(${row["va"]:08X})')
         commands.extend(f'\tsection {section},sdk_comp_{index}' for section in row['sections'])
     for name, address in bindings.items():
-        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+        # PSYLINK symbol names may carry '.', as SN's cc1plus mangles class statics (CPlayer::PActiveArray
+        # is `_7CPlayer.PActiveArray` in the retail MAP).
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", name):
             raise ValueError("invalid SDK binding name")
         commands.append(f"{name} equ ${address:08X}")
     for prefix in prefix_objects:

@@ -26,8 +26,8 @@ class GmanNativeTests(unittest.TestCase):
         self.assertEqual((receipt["segment"], receipt["functions"]), ("gman", 76))
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
-                          (".text", ".data", ".sbss", ".ctors", ".dtors")},
-                         {".text": 13732, ".data": 3780, ".sbss": 8,
+                          (".text", ".data", ".sbss", ".bss", ".ctors", ".dtors")},
+                         {".text": 13732, ".data": 3780, ".sbss": 8, ".bss": 40,   # .bss: the static MyFT4
                           ".ctors": 4, ".dtors": 4})
         self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
                              if name.startswith(".rdata.gman_")), 50)

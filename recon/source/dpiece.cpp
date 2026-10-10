@@ -3,6 +3,7 @@
  * Bodies from the retail oracle (asm/nonmatchings/dpiece) + SYM (scratch/tuinfo.py DPIECE.CPP).
  * dBits: bit0 SOLID, bit1 MISSILE, bit2 BLOCK, bit3 TRAP, high nibble dDead. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/textdat_header.h"
 #include "glibdev/gdebug.h"
 #include "source/gen/structs_dpiece.h"

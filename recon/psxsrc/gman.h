@@ -243,7 +243,6 @@ extern TextDat *AllDats[372];        /* @0x800B9454 (.GMAN_data) */
 extern TextDat  DatPool[20];         /* @0x800B8B94 */
 extern int TpW, TpH, TpXDest, TpYDest;   /* .sdata */
 extern CTextFileInfo *TX_DatTab[];
-extern POLY_FT4 MyFT4;               /* @0x8011CC00 (bss, unnamed in SYM) */
 extern POLY_GT4 MyGT4;               /* @0x800B9A24 */
 extern "C" { extern u_long *ThisOt; }   /* .sdata @0x8011AAB4 */
 void LZNP_Decode(unsigned char *Src, unsigned char *Dst);   /* LZNP.CPP */

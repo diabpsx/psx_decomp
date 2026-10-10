@@ -2,6 +2,7 @@
  * PSX deltas: only the UI-hero helpers survive (no save archives); two classes map to UI ids,
  * everything else is the sorcerer; SetupLocalPlayer just marks the save file valid. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_pfile.h"
 #include "source/gen/protos_pfile.h"
@@ -16,7 +17,8 @@ extern "C" char *strncpy(char *dst, const char *src, unsigned int n);
 #define UI_SORCERER 2
 #define MAX_NAME_LEN 16
 
-unsigned char gbValidSaveFile;
+BOOL DoLoadedChar;   /* @0x8011B9EC: uninitialised, declared before gbValidSaveFile */
+unsigned char gbValidSaveFile;   /* @0x8011B9F0 */
 
 /* @0x8005FC20 PFILE.CPP:380 */
 static unsigned char game_2_ui_class(const PlayerStruct *p)

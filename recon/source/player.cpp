@@ -35,6 +35,7 @@ static void ArmorDur(PlayerStruct *ptrplr);   /* @0x80064320 PLAYER.CPP:3326 */
 static void CheckCheatStats(PlayerStruct *ptrplr);   /* @0x800650CC PLAYER.CPP:3877 */
 static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy);   /* @0x800615DC PLAYER.CPP:1987 */
 static void PRIM_GetPrim(POLY_FT4 **Prim);
+static char deathdelay2[2];   /* @0x8011C878 (SYM STAT): per-player post-death countdown, PLAYER.CPP's one .sbss static */
 #include "source/diablo.h"
 
 /* ---- local constants (values confirmed from the oracle / hellfire source) ---- */
@@ -127,6 +128,8 @@ PlayerStruct plr[2] = { 0 };
 int myplr = 0;
 unsigned char deathflag = 0;
 char light_rad = 0;
+int PlayerDeathCount[2];   /* @0x8011BA10: uninitialised, first declared in externs_player.h */
+int PlayerEar[2];   /* @0x8011BA18 */
 
 unsigned char IsDplayer(int x, int y)
 {
@@ -557,7 +560,7 @@ void InitPlayer(PlayerStruct *ptrplr, unsigned char FirstTime)
     ptrplr->_pInvincible = FALSE;
 
     if (ismyplr(ptrplr)) {
-        D_8011C878[plrind(ptrplr)] = 0;
+        deathdelay2[plrind(ptrplr)] = 0;
         deathflag = FALSE;
         ScrollInfo._sxoff = 0;
         ScrollInfo._syoff = 0;
@@ -944,7 +947,7 @@ void StartPlayerKill(PlayerStruct *ptrplr, int earflag)
     p->DeadLevel = currlevel;
     SetPlayerOld(ptrplr);
     drawhpflag = TRUE;
-    D_8011C878[plrind(ptrplr)] = 30;
+    deathdelay2[plrind(ptrplr)] = 30;
     StartPlayerDropItems(ptrplr, earflag);
 }
 
@@ -1891,7 +1894,7 @@ int PM_DoGotHit(PlayerStruct *ptrplr)
     return rv;
 }
 
-/* PSX-only death sequencing: D_8011C878[plrind(ptrplr)] is a small per-player post-death countdown
+/* PSX-only death sequencing: deathdelay2[plrind(ptrplr)] is a small per-player post-death countdown
  * (unnamed in the SYM, TU-owned) that must count down to exactly 1 before this player's vision/
  * cursor/active-count cleanup actually runs; not present in devilution's PM_DoDeath at all. */
 int PM_DoDeath(PlayerStruct *ptrplr)
@@ -1900,8 +1903,8 @@ int PM_DoDeath(PlayerStruct *ptrplr)
 
     TryDropPlayerItems(ptrplr);
     if (ptrplr->_pVar8 >= ptrplr->_pDFrames * 2) {
-        if (D_8011C878[pnum] >= 2 && ismyplr(ptrplr)) {
-            if (--D_8011C878[pnum] == 1) {
+        if (deathdelay2[pnum] >= 2 && ismyplr(ptrplr)) {
+            if (--deathdelay2[pnum] == 1) {
                 RemovePlrFromMap(ptrplr);
                 ptrplr->plractive = FALSE;
                 if (--gbActivePlayers == 0) {
@@ -2884,7 +2887,7 @@ CPlayer *CPlayer::GetPlayer(int PNum)
     if (1 < (unsigned int)PNum) {
         DBG_Error((char *)0x0, "psxsrc/cplayer.h", 0x41);
     }
-    return _7CPlayer_PActiveArray[PNum];
+    return PActiveArray[PNum];
 }
 
 int CPlayer::GetLastOtPos() const

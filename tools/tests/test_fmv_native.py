@@ -32,7 +32,7 @@ class FmvNativeTests(unittest.TestCase):
         self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
                              if name.startswith(".sbss.fmv_")), 24)
         self.assertEqual(sum(row["size"] for name, row in receipt["sections"].items()
-                             if name.startswith(".bss.fmv_")), 156)
+                             if name.startswith(".bss.fmv_")), 156 + 51200)   # + the static TempStack
 
 
 if __name__ == "__main__":

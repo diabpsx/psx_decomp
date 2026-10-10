@@ -39,16 +39,16 @@ inline void TextDat::DumpDatFile()
 }
 
 class CPlayer;
-extern CPlayer *_7CPlayer_PActiveArray[2];
 class CPlayer : public TextDat {
 public:
+    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50, defined by cplayer.cpp */
     unsigned char player_data[144 - 112];
 
     static CPlayer *GetPlayer(int PNum)
     {
         if (1 < (unsigned int)PNum)
             DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-        return _7CPlayer_PActiveArray[PNum];
+        return PActiveArray[PNum];
     }
 };
 

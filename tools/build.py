@@ -122,7 +122,7 @@ PER_TU_FLAGS = {
     "recon/eaclib/blkmov.s": {"g_value": "0"},
     "recon/eaclib/print.s": {"g_value": "0"},
     # Climax hand-assembly PSXSRC/*.MIP transcriptions (assembler-neutral .s)
-    **{f"recon/psxsrc/{name}.s": {"g_value": "0"} for name in ("boot", "gte", "replace", "crunch", "gp", "ablock", "overinfo", "lnkopt")},
+    **{f"recon/psxsrc/{name}.s": {"g_value": "0"} for name in ("boot", "gte", "replace", "crunch", "gp", "ablock", "overinfo", "lnkopt", "textab")},
     # Climax GLIB C modules use absolute addressing even for four-byte owned
     # commons (TICK/GazTick), proving their original small-data threshold was 0.
     "recon/glibdev/gmain.c": {"g_value": "0"},

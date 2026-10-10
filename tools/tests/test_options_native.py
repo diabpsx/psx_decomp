@@ -31,7 +31,7 @@ class OptionsNativeTests(unittest.TestCase):
         self.assertEqual(receipt["sections"][".text"]["size"], 19936)
         self.assertEqual(receipt["sections"][".rdata"]["size"], 208)
         self.assertEqual(receipt["sections"][".sbss"]["size"], 40)
-        self.assertEqual(receipt["sections"][".sdata"]["size"], 108)
+        self.assertEqual(receipt["sections"][".sdata"]["size"], 124)   # literal pool + goldcheat ahead of Qfromoptions
 
 
 if __name__ == "__main__":

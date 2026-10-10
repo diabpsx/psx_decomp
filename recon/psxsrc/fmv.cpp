@@ -1332,11 +1332,10 @@ static jmp_buf D_80121D08;     /* PlayFMVOverLay's own setjmp env (right after g
                                  * @0x80121CE8 + 0x20 = 0x80121D08). */
 static char *D_8011C758;       /* filename stashed across the GSYS_SetStackAndJump handoff */
 static int D_8011C75C;         /* w  ditto */
-static int D_8011C760;         /* h  ditto */
-/* Not gp-rel in the oracle (0x8012E534 is >32KB from $gp=0x8011A780, out of gp-relative range) --
- * an unsized extern array forces the 2-insn lui/addiu absolute form instead of a tentative-def gp_rel
- * access. Pre-allocated task stack top for LoPlayFMVOverLay; owning TU unknown/not yet reconstructed. */
-extern unsigned char D_8012E534[];
+static int Passedh;            /* h  ditto (SYM STAT @0x8011C760) */
+/* LoPlayFMVOverLay's task stack: FMV.CPP's own static (SYM STAT ARY UCHAR 51200 @0x80121D38, the last
+ * .bss object before CONTROL's); the jump takes its last word, 0x8012E534. */
+static unsigned char TempStack[51200];
 
 extern "C" short PlayFMVOverLay(char *filename, int w, int h)
 {
@@ -1344,8 +1343,8 @@ extern "C" short PlayFMVOverLay(char *filename, int w, int h)
     if (!setjmp(D_80121D08)) {
         D_8011C758 = filename;
         D_8011C75C = w;
-        D_8011C760 = h;
-        GSYS_SetStackAndJump(D_8012E534, LoPlayFMVOverLay, 0);
+        Passedh = h;
+        GSYS_SetStackAndJump(TempStack + sizeof(TempStack) - 4, LoPlayFMVOverLay, 0);
     }
     return 0;
 }
@@ -1366,7 +1365,7 @@ extern "C" void LoPlayFMVOverLay(void *)
     CPad *P2;
     char *filename = D_8011C758;
     int w = D_8011C75C;
-    int h = D_8011C760;
+    int h = Passedh;
     long vm;
 
     {

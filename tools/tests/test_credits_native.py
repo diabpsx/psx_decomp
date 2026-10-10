@@ -57,7 +57,11 @@ class CreditsNativeTests(unittest.TestCase):
             run = B.run([S.ASPSX, "-q", "-o", prefix_object, prefix_source])
             self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
 
-            bindings = R.resolve_bindings(obj["xrefs"], symbols)
+            # the class static CPlayer::PActiveArray is `_7CPlayer.PActiveArray` to the SN tools; its
+            # retail address is listed under the C-identifier spelling
+            aliases = {"_7CPlayer.PActiveArray": "_7CPlayer_PActiveArray"}
+            resolved = R.resolve_bindings(sorted({aliases.get(n, n) for n in obj["xrefs"]}), symbols)
+            bindings = {n: resolved[aliases.get(n, n)] for n in obj["xrefs"]}
             bindings["_gp"] = 0x8011A780
             blocks, map_text = N.native_link(
                 "credits", raw, combined, bindings, output_dir=folder,

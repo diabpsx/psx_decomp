@@ -28,7 +28,9 @@ class PlayerNativeTests(unittest.TestCase):
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".rdata", ".data")},
                          {".text": 30628, ".rdata": 404, ".data": 13760})
-        self.assertEqual(receipt["sections"][".sdata"]["size"], 6)
+        # myplr, deathflag, light_rad, then the uninitialised PlayerDeathCount[2] and PlayerEar[2]
+        self.assertEqual(receipt["sections"][".sdata"]["size"], 24)
+        self.assertEqual(receipt["sections"][".sbss"]["size"], 4)   # the static deathdelay2[2], word-padded
 
 
 if __name__ == "__main__":

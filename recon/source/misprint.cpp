@@ -20,7 +20,7 @@ inline CPlayer *CPlayer::GetPlayer(int PNum)
 {
     if (1 < (unsigned int)PNum)
         DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-    return _7CPlayer_PActiveArray[PNum];
+    return PActiveArray[PNum];
 }
 
 /* Keep PRIMPOOL.H last among the header-inline definitions: deferred inline

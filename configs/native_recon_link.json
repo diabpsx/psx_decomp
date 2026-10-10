@@ -548,8 +548,8 @@
         "size": 40
       },
       ".sdata": {
-        "va": "0x8011B228",
-        "size": 108,
+        "va": "0x8011B218",
+        "size": 124,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".data": {
@@ -619,7 +619,8 @@
       "SaveConfirmMenu",
       "MenuList",
       "Circle",
-      "KeyTab"
+      "KeyTab",
+      "goldcheat"
     ],
     "data_record_addresses": {
       "Adjust": "0x8011C700"
@@ -988,7 +989,6 @@
       "GM_UseTexData__Fi",
       "DrawSpinner__FiiUcUcUciiibiT8T8Uc",
       "plr",
-      "_7CPlayer_PActiveArray",
       "ThisOt",
       "GetFrNum__7TextDatiiii",
       "DrawExpl__Fiiiiiccc",
@@ -996,8 +996,12 @@
       "PauseMode",
       "ThisPrimAddr",
       "ParticleMissile__FP13MissileStructiiii",
-      "currlevel"
-    ]
+      "currlevel",
+      "_7CPlayer.PActiveArray"
+    ],
+    "external_binding_aliases": {
+      "_7CPlayer.PActiveArray": "_7CPlayer_PActiveArray"
+    }
   },
   "dlg_2": {
     "source": "recon/psxsrc/dlg_2.cpp",
@@ -4752,9 +4756,16 @@
         "va": "0x801194B4",
         "size": 33,
         "scaffold": "rodata_gamemenu.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BE28",
+        "size": 16,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
-    "data_symbols": [],
+    "data_symbols": [
+      "iscflag"
+    ],
     "externals": []
   },
   "testcode": {
@@ -4817,15 +4828,19 @@
         ]
       },
       ".sdata": {
-        "va": "0x8011AAD8",
-        "size": 4,
+        "va": "0x8011AACC",
+        "size": 20,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
       "PsxMem",
       "PsxFastMem",
-      "Gaz"
+      "Gaz",
+      "GSYS_MemStart",
+      "GSYS_MemEnd",
+      "LowestFmem",
+      "LastFmem"
     ],
     "externals": [
       "GAL_AddMemType",
@@ -4916,9 +4931,16 @@
         "va": "0x80110510",
         "size": 44,
         "scaffold": "rodata_attract_native.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AC78",
+        "size": 10,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
-    "data_symbols": [],
+    "data_symbols": [
+      "PlayDemoFlag"
+    ],
     "externals": [
       "CalcPlrInv__FiUc",
       "ClearLoadCharItems__Fv",
@@ -6275,7 +6297,6 @@
       "DBG_SendMessage",
       "DBG_SetErrorFunc",
       "DBG_SetPollRoutine",
-      "D_80110B24",
       "DrawSync",
       "GLUE_Finished__Fv",
       "GLUE_StartGameExit__Fv",
@@ -6314,7 +6335,8 @@
       "printf",
       "restore_b",
       "restore_g",
-      "restore_r"
+      "restore_r",
+      "D_80110B24"
     ]
   },
   "psxmsg": {
@@ -6527,14 +6549,17 @@
       "VID_GetTick__Fv",
       "WorldToScrX__7CBlocksii",
       "WorldToScrY__7CBlocksii",
-      "_7CPlayer_PActiveArray",
       "chrflag",
       "invflag",
       "monster",
       "plr",
       "questlog",
-      "sbookflag"
-    ]
+      "sbookflag",
+      "_7CPlayer.PActiveArray"
+    ],
+    "external_binding_aliases": {
+      "_7CPlayer.PActiveArray": "_7CPlayer_PActiveArray"
+    }
   },
   "prof": {
     "source": "recon/psxsrc/prof.cpp",
@@ -7844,8 +7869,8 @@
         "scaffold": "rodata_dpiece_native.rodata"
       },
       ".sdata": {
-        "va": "0x8011BE44",
-        "size": 4,
+        "va": "0x8011BE38",
+        "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -7923,13 +7948,14 @@
         "scaffold": "rodata_pfile_native.rodata"
       },
       ".sdata": {
-        "va": "0x8011B9F0",
-        "size": 1,
+        "va": "0x8011B9E0",
+        "size": 17,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
-      "gbValidSaveFile"
+      "gbValidSaveFile",
+      "DoLoadedChar"
     ],
     "externals": [
       "memset",
@@ -8316,10 +8342,10 @@
         "scaffold": "rodata_gendung.rodata"
       },
       ".sdata": {
-        "image": "diabpsx",
-        "va": "0x8011C0E4",
-        "size": 108,
-        "scaffold": "sdata_after_primpool.sdata"
+        "va": "0x8011C0CC",
+        "size": 132,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [
@@ -8365,7 +8391,10 @@
       "setpc_w",
       "setpc_x",
       "setpc_y",
-      "themeCount"
+      "themeCount",
+      "mydflags",
+      "pSetPiece",
+      "DungSize"
     ],
     "externals": [
       "ConvertdPiece__Fv",
@@ -8646,7 +8675,7 @@
       },
       ".sdata": {
         "va": "0x8011B9C0",
-        "size": 17,
+        "size": 32,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".data": {
@@ -8669,7 +8698,10 @@
       "object",
       "objectactive",
       "objectavail",
-      "ObjFileList"
+      "ObjFileList",
+      "trapid",
+      "trapdir",
+      "leverid"
     ],
     "externals": [
       "AddLight__Fiii",
@@ -10356,7 +10388,7 @@
       ".data": {
         "va": "0x800B0D00",
         "size": 8192,
-        "scaffold": "data.data"
+        "link_object": true
       }
     },
     "data_symbols": [],
@@ -10446,7 +10478,7 @@
       ".data": {
         "va": "0x800B2D00",
         "size": 4,
-        "scaffold": "data.data"
+        "link_object": true
       }
     },
     "data_symbols": [],
@@ -10696,9 +10728,7 @@
       }
     },
     "data_symbols": "all",
-    "absolute_bindings": {
-      "func_80161F58": "0x80161F58"
-    },
+    "absolute_bindings": {},
     "externals": [
       "BACKB",
       "BACKG",
@@ -10789,7 +10819,6 @@
       "cmenu",
       "currlevel",
       "force_redraw",
-      "func_80161F58",
       "gbActivePlayers",
       "gbMaxPlayers",
       "ignore_buttons",
@@ -10812,7 +10841,8 @@
       "stream_pause__Fv",
       "stream_resume__Fv",
       "stream_stop__Fv",
-      "towner"
+      "towner",
+      "StartAutomap__Fv"
     ],
     "assembler": "2.67"
   },
@@ -10887,6 +10917,10 @@
         "va": "0x8011AD1C",
         "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".bss": {
+        "va": "0x8011CC00",
+        "size": 40
       }
     },
     "post_assemble_section_split": [
@@ -10962,11 +10996,10 @@
       "TpW",
       "TpH",
       "TpXDest",
-      "TpYDest"
-    ],
-    "retail_data_bindings": [
+      "TpYDest",
       "MyFT4"
     ],
+    "retail_data_bindings": [],
     "externals": [
       "AddrToAvoid",
       "BL_FileExists__FPcc",
@@ -11981,14 +12014,16 @@
       },
       ".sdata": {
         "va": "0x8011BA08",
-        "size": 6,
+        "size": 24,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C878",
+        "size": 4
       }
     },
     "data_symbols": "all",
-    "absolute_bindings": {
-      "D_8011C878": "0x8011C878"
-    },
+    "absolute_bindings": {},
     "externals": [
       "AddDead__Fiici",
       "AddLight__Fiii",
@@ -12011,7 +12046,6 @@
       "ClrCursor__Fi",
       "CreatePlrItems__Fi",
       "DBG_Error",
-      "D_8011C878",
       "DeleteMissile__Fii",
       "DeleteMonsterList__Fv",
       "DoUnVision__Fiiii",
@@ -12058,8 +12092,6 @@
       "PlacePlayer__FiiiUc",
       "PlaySFX__Fi",
       "PlaySfxLoc__Fiii",
-      "PlayerDeathCount",
-      "PlayerEar",
       "PostGamePad__Fiiii",
       "PrepareFt4__7TextDatP8POLY_FT4iiiii",
       "RemoveInvItem__Fii",
@@ -12089,7 +12121,6 @@
       "ViewY",
       "VisionList",
       "WorldToOffset__Fiii",
-      "_7CPlayer_PActiveArray",
       "_pcurs",
       "_pcursmonst",
       "_pcursplr",
@@ -12136,8 +12167,12 @@
       "spelldata",
       "stextflag",
       "stream_stop__Fv",
-      "visible_level"
-    ]
+      "visible_level",
+      "_7CPlayer.PActiveArray"
+    ],
+    "external_binding_aliases": {
+      "_7CPlayer.PActiveArray": "_7CPlayer_PActiveArray"
+    }
   },
   "fmv": {
     "source": "recon/psxsrc/fmv.cpp",
@@ -12464,6 +12499,11 @@
         "va": "0x8011B618",
         "size": 8,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".bss.fmv_stack": {
+        "va": "0x80121D38",
+        "size": 51200,
+        "image": "diabpsx"
       }
     },
     "post_assemble_section_split": [
@@ -12999,6 +13039,11 @@
             "offset": 108,
             "size": 48,
             "alignment": 2
+          },
+          {
+            "name": ".bss.fmv_stack",
+            "offset": 156,
+            "size": 51200
           }
         ]
       }
@@ -13121,11 +13166,11 @@
       "vlc_buf",
       "vlc_tab",
       "vlcbuf",
-      "vlctab"
+      "vlctab",
+      "TempStack",
+      "Passedh"
     ],
-    "absolute_bindings": {
-      "D_8012E534": "0x8012E534"
-    },
+    "absolute_bindings": {},
     "externals": [
       "CD_GetCdlFILE__FPCcP7CdlFILE",
       "CdControlB",
@@ -13138,7 +13183,6 @@
       "ClearImage",
       "DBG_Error",
       "DBG_Halt",
-      "D_8012E534",
       "ENG_random__Fl",
       "EnterCriticalSection",
       "ExitCriticalSection",
@@ -13194,7 +13238,11 @@
       "strcmp",
       "strcpy",
       "systemtask"
-    ]
+    ],
+    "assembler": "2.56",
+    "data_record_addresses": {
+      "TempStack": "0x80121D38"
+    }
   },
   "overinfo": {
     "source": "recon/psxsrc/overinfo.s",
@@ -13268,5 +13316,396 @@
       "FirstFreeByte",
       "__lnk_free_mem_size"
     ]
+  },
+  "textab": {
+    "source": "recon/psxsrc/textab.s",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".data": {
+        "va": "0x800B2D04",
+        "size": 5516,
+        "link_object": true
+      }
+    },
+    "data_symbols": [],
+    "untyped_data_symbols": {
+      "TX_DatTab": "TX_DatTab",
+      "DatTab_PANEL": "DatTab_PANEL",
+      "DatTab_CUT2": "DatTab_CUT2",
+      "DatTab_CUT3": "DatTab_CUT3",
+      "DatTab_CUT4": "DatTab_CUT4",
+      "DatTab_CUTGATE": "DatTab_CUTGATE",
+      "DatTab_CUTL1D": "DatTab_CUTL1D",
+      "DatTab_CUTPORTL": "DatTab_CUTPORTL",
+      "DatTab_CUTPORTR": "DatTab_CUTPORTR",
+      "DatTab_CUTSTART": "DatTab_CUTSTART",
+      "DatTab_CUTTT": "DatTab_CUTTT",
+      "DatTab_LEGAL": "DatTab_LEGAL",
+      "DatTab_MENU": "DatTab_MENU",
+      "DatTab_MAINBACK": "DatTab_MAINBACK",
+      "DatTab_BLCKSMTH": "DatTab_BLCKSMTH",
+      "DatTab_CHURCH": "DatTab_CHURCH",
+      "DatTab_TAVERN": "DatTab_TAVERN",
+      "DatTab_BOOTLOGO": "DatTab_BOOTLOGO",
+      "DatTab_JLOGO": "DatTab_JLOGO",
+      "DatTab_TITLE": "DatTab_TITLE",
+      "DatTab_L1ADATA": "DatTab_L1ADATA",
+      "DatTab_L1BDATA": "DatTab_L1BDATA",
+      "DatTab_L1CDATA": "DatTab_L1CDATA",
+      "DatTab_L1DDATA": "DatTab_L1DDATA",
+      "DatTab_L1EDATA": "DatTab_L1EDATA",
+      "DatTab_L2ADATA": "DatTab_L2ADATA",
+      "DatTab_L2BDATA": "DatTab_L2BDATA",
+      "DatTab_L2CDATA": "DatTab_L2CDATA",
+      "DatTab_L2DDATA": "DatTab_L2DDATA",
+      "DatTab_L2EDATA": "DatTab_L2EDATA",
+      "DatTab_L3ADATA": "DatTab_L3ADATA",
+      "DatTab_L3BDATA": "DatTab_L3BDATA",
+      "DatTab_L3CDATA": "DatTab_L3CDATA",
+      "DatTab_L3DDATA": "DatTab_L3DDATA",
+      "DatTab_L3EDATA": "DatTab_L3EDATA",
+      "DatTab_L4ADATA": "DatTab_L4ADATA",
+      "DatTab_L4BDATA": "DatTab_L4BDATA",
+      "DatTab_L4CDATA": "DatTab_L4CDATA",
+      "DatTab_L4DDATA": "DatTab_L4DDATA",
+      "DatTab_L4EDATA": "DatTab_L4EDATA",
+      "DatTab_TOWNDATA": "DatTab_TOWNDATA",
+      "DatTab_TOWNDARK": "DatTab_TOWNDARK",
+      "DatTab_WLN": "DatTab_WLN",
+      "DatTab_WLU": "DatTab_WLU",
+      "DatTab_WLS": "DatTab_WLS",
+      "DatTab_WLD": "DatTab_WLD",
+      "DatTab_WLB": "DatTab_WLB",
+      "DatTab_WLA": "DatTab_WLA",
+      "DatTab_WLM": "DatTab_WLM",
+      "DatTab_WLH": "DatTab_WLH",
+      "DatTab_WLT": "DatTab_WLT",
+      "DatTab_WMN": "DatTab_WMN",
+      "DatTab_WMU": "DatTab_WMU",
+      "DatTab_WMS": "DatTab_WMS",
+      "DatTab_WMD": "DatTab_WMD",
+      "DatTab_WMB": "DatTab_WMB",
+      "DatTab_WMA": "DatTab_WMA",
+      "DatTab_WMM": "DatTab_WMM",
+      "DatTab_WMH": "DatTab_WMH",
+      "DatTab_WMT": "DatTab_WMT",
+      "DatTab_WHN": "DatTab_WHN",
+      "DatTab_WHU": "DatTab_WHU",
+      "DatTab_WHS": "DatTab_WHS",
+      "DatTab_WHD": "DatTab_WHD",
+      "DatTab_WHB": "DatTab_WHB",
+      "DatTab_WHA": "DatTab_WHA",
+      "DatTab_WHM": "DatTab_WHM",
+      "DatTab_WHH": "DatTab_WHH",
+      "DatTab_WHT": "DatTab_WHT",
+      "DatTab_SLN": "DatTab_SLN",
+      "DatTab_SLU": "DatTab_SLU",
+      "DatTab_SLS": "DatTab_SLS",
+      "DatTab_SLD": "DatTab_SLD",
+      "DatTab_SLB": "DatTab_SLB",
+      "DatTab_SLA": "DatTab_SLA",
+      "DatTab_SLM": "DatTab_SLM",
+      "DatTab_SLH": "DatTab_SLH",
+      "DatTab_SLT": "DatTab_SLT",
+      "DatTab_SMN": "DatTab_SMN",
+      "DatTab_SMU": "DatTab_SMU",
+      "DatTab_SMS": "DatTab_SMS",
+      "DatTab_SMD": "DatTab_SMD",
+      "DatTab_SMB": "DatTab_SMB",
+      "DatTab_SMA": "DatTab_SMA",
+      "DatTab_SMM": "DatTab_SMM",
+      "DatTab_SMH": "DatTab_SMH",
+      "DatTab_SMT": "DatTab_SMT",
+      "DatTab_SHN": "DatTab_SHN",
+      "DatTab_SHU": "DatTab_SHU",
+      "DatTab_SHS": "DatTab_SHS",
+      "DatTab_SHD": "DatTab_SHD",
+      "DatTab_SHB": "DatTab_SHB",
+      "DatTab_SHA": "DatTab_SHA",
+      "DatTab_SHM": "DatTab_SHM",
+      "DatTab_SHH": "DatTab_SHH",
+      "DatTab_SHT": "DatTab_SHT",
+      "DatTab_RLN": "DatTab_RLN",
+      "DatTab_RLU": "DatTab_RLU",
+      "DatTab_RLS": "DatTab_RLS",
+      "DatTab_RLD": "DatTab_RLD",
+      "DatTab_RLB": "DatTab_RLB",
+      "DatTab_RLA": "DatTab_RLA",
+      "DatTab_RLM": "DatTab_RLM",
+      "DatTab_RLH": "DatTab_RLH",
+      "DatTab_RLT": "DatTab_RLT",
+      "DatTab_RMN": "DatTab_RMN",
+      "DatTab_RMU": "DatTab_RMU",
+      "DatTab_RMS": "DatTab_RMS",
+      "DatTab_RMD": "DatTab_RMD",
+      "DatTab_RMB": "DatTab_RMB",
+      "DatTab_RMA": "DatTab_RMA",
+      "DatTab_RMM": "DatTab_RMM",
+      "DatTab_RMH": "DatTab_RMH",
+      "DatTab_RMT": "DatTab_RMT",
+      "DatTab_RHN": "DatTab_RHN",
+      "DatTab_RHU": "DatTab_RHU",
+      "DatTab_RHS": "DatTab_RHS",
+      "DatTab_RHD": "DatTab_RHD",
+      "DatTab_RHB": "DatTab_RHB",
+      "DatTab_RHA": "DatTab_RHA",
+      "DatTab_RHM": "DatTab_RHM",
+      "DatTab_RHH": "DatTab_RHH",
+      "DatTab_RHT": "DatTab_RHT",
+      "DatTab_WLNT": "DatTab_WLNT",
+      "DatTab_WLUT": "DatTab_WLUT",
+      "DatTab_WLST": "DatTab_WLST",
+      "DatTab_WLDT": "DatTab_WLDT",
+      "DatTab_WLBT": "DatTab_WLBT",
+      "DatTab_WLAT": "DatTab_WLAT",
+      "DatTab_WLMT": "DatTab_WLMT",
+      "DatTab_WLHT": "DatTab_WLHT",
+      "DatTab_WLTT": "DatTab_WLTT",
+      "DatTab_WMNT": "DatTab_WMNT",
+      "DatTab_WMUT": "DatTab_WMUT",
+      "DatTab_WMST": "DatTab_WMST",
+      "DatTab_WMDT": "DatTab_WMDT",
+      "DatTab_WMBT": "DatTab_WMBT",
+      "DatTab_WMAT": "DatTab_WMAT",
+      "DatTab_WMMT": "DatTab_WMMT",
+      "DatTab_WMHT": "DatTab_WMHT",
+      "DatTab_WMTT": "DatTab_WMTT",
+      "DatTab_WHNT": "DatTab_WHNT",
+      "DatTab_WHUT": "DatTab_WHUT",
+      "DatTab_WHST": "DatTab_WHST",
+      "DatTab_WHDT": "DatTab_WHDT",
+      "DatTab_WHBT": "DatTab_WHBT",
+      "DatTab_WHAT": "DatTab_WHAT",
+      "DatTab_WHMT": "DatTab_WHMT",
+      "DatTab_WHHT": "DatTab_WHHT",
+      "DatTab_WHTT": "DatTab_WHTT",
+      "DatTab_SLNT": "DatTab_SLNT",
+      "DatTab_SLUT": "DatTab_SLUT",
+      "DatTab_SLST": "DatTab_SLST",
+      "DatTab_SLDT": "DatTab_SLDT",
+      "DatTab_SLBT": "DatTab_SLBT",
+      "DatTab_SLAT": "DatTab_SLAT",
+      "DatTab_SLMT": "DatTab_SLMT",
+      "DatTab_SLHT": "DatTab_SLHT",
+      "DatTab_SLTT": "DatTab_SLTT",
+      "DatTab_SMNT": "DatTab_SMNT",
+      "DatTab_SMUT": "DatTab_SMUT",
+      "DatTab_SMST": "DatTab_SMST",
+      "DatTab_SMDT": "DatTab_SMDT",
+      "DatTab_SMBT": "DatTab_SMBT",
+      "DatTab_SMAT": "DatTab_SMAT",
+      "DatTab_SMMT": "DatTab_SMMT",
+      "DatTab_SMHT": "DatTab_SMHT",
+      "DatTab_SMTT": "DatTab_SMTT",
+      "DatTab_SHNT": "DatTab_SHNT",
+      "DatTab_SHUT": "DatTab_SHUT",
+      "DatTab_SHST": "DatTab_SHST",
+      "DatTab_SHDT": "DatTab_SHDT",
+      "DatTab_SHBT": "DatTab_SHBT",
+      "DatTab_SHAT": "DatTab_SHAT",
+      "DatTab_SHMT": "DatTab_SHMT",
+      "DatTab_SHHT": "DatTab_SHHT",
+      "DatTab_SHTT": "DatTab_SHTT",
+      "DatTab_RLNT": "DatTab_RLNT",
+      "DatTab_RLUT": "DatTab_RLUT",
+      "DatTab_RLST": "DatTab_RLST",
+      "DatTab_RLDT": "DatTab_RLDT",
+      "DatTab_RLBT": "DatTab_RLBT",
+      "DatTab_RLAT": "DatTab_RLAT",
+      "DatTab_RLMT": "DatTab_RLMT",
+      "DatTab_RLHT": "DatTab_RLHT",
+      "DatTab_RLTT": "DatTab_RLTT",
+      "DatTab_RMNT": "DatTab_RMNT",
+      "DatTab_RMUT": "DatTab_RMUT",
+      "DatTab_RMST": "DatTab_RMST",
+      "DatTab_RMDT": "DatTab_RMDT",
+      "DatTab_RMBT": "DatTab_RMBT",
+      "DatTab_RMAT": "DatTab_RMAT",
+      "DatTab_RMMT": "DatTab_RMMT",
+      "DatTab_RMHT": "DatTab_RMHT",
+      "DatTab_RMTT": "DatTab_RMTT",
+      "DatTab_RHNT": "DatTab_RHNT",
+      "DatTab_RHUT": "DatTab_RHUT",
+      "DatTab_RHST": "DatTab_RHST",
+      "DatTab_RHDT": "DatTab_RHDT",
+      "DatTab_RHBT": "DatTab_RHBT",
+      "DatTab_RHAT": "DatTab_RHAT",
+      "DatTab_RHMT": "DatTab_RHMT",
+      "DatTab_RHHT": "DatTab_RHHT",
+      "DatTab_RHTT": "DatTab_RHTT",
+      "DatTab_FRONTEND": "DatTab_FRONTEND",
+      "DatTab_TITLEGFX": "DatTab_TITLEGFX",
+      "DatTab_TOWNGFX": "DatTab_TOWNGFX",
+      "DatTab_GENOBJ": "DatTab_GENOBJ",
+      "DatTab_INVGFX": "DatTab_INVGFX",
+      "DatTab_MISS": "DatTab_MISS",
+      "DatTab_WLN2": "DatTab_WLN2",
+      "DatTab_WLU2": "DatTab_WLU2",
+      "DatTab_WLS2": "DatTab_WLS2",
+      "DatTab_WLD2": "DatTab_WLD2",
+      "DatTab_WLB2": "DatTab_WLB2",
+      "DatTab_WLA2": "DatTab_WLA2",
+      "DatTab_WLM2": "DatTab_WLM2",
+      "DatTab_WLH2": "DatTab_WLH2",
+      "DatTab_WLT2": "DatTab_WLT2",
+      "DatTab_WMN2": "DatTab_WMN2",
+      "DatTab_WMU2": "DatTab_WMU2",
+      "DatTab_WMS2": "DatTab_WMS2",
+      "DatTab_WMD2": "DatTab_WMD2",
+      "DatTab_WMB2": "DatTab_WMB2",
+      "DatTab_WMA2": "DatTab_WMA2",
+      "DatTab_WMM2": "DatTab_WMM2",
+      "DatTab_WMH2": "DatTab_WMH2",
+      "DatTab_WMT2": "DatTab_WMT2",
+      "DatTab_WHN2": "DatTab_WHN2",
+      "DatTab_WHU2": "DatTab_WHU2",
+      "DatTab_WHS2": "DatTab_WHS2",
+      "DatTab_WHD2": "DatTab_WHD2",
+      "DatTab_WHB2": "DatTab_WHB2",
+      "DatTab_WHA2": "DatTab_WHA2",
+      "DatTab_WHM2": "DatTab_WHM2",
+      "DatTab_WHH2": "DatTab_WHH2",
+      "DatTab_WHT2": "DatTab_WHT2",
+      "DatTab_SLN2": "DatTab_SLN2",
+      "DatTab_SLU2": "DatTab_SLU2",
+      "DatTab_SLS2": "DatTab_SLS2",
+      "DatTab_SLD2": "DatTab_SLD2",
+      "DatTab_SLB2": "DatTab_SLB2",
+      "DatTab_SLA2": "DatTab_SLA2",
+      "DatTab_SLM2": "DatTab_SLM2",
+      "DatTab_SLH2": "DatTab_SLH2",
+      "DatTab_SLT2": "DatTab_SLT2",
+      "DatTab_SMN2": "DatTab_SMN2",
+      "DatTab_SMU2": "DatTab_SMU2",
+      "DatTab_SMS2": "DatTab_SMS2",
+      "DatTab_SMD2": "DatTab_SMD2",
+      "DatTab_SMB2": "DatTab_SMB2",
+      "DatTab_SMA2": "DatTab_SMA2",
+      "DatTab_SMM2": "DatTab_SMM2",
+      "DatTab_SMH2": "DatTab_SMH2",
+      "DatTab_SMT2": "DatTab_SMT2",
+      "DatTab_SHN2": "DatTab_SHN2",
+      "DatTab_SHU2": "DatTab_SHU2",
+      "DatTab_SHS2": "DatTab_SHS2",
+      "DatTab_SHD2": "DatTab_SHD2",
+      "DatTab_SHB2": "DatTab_SHB2",
+      "DatTab_SHA2": "DatTab_SHA2",
+      "DatTab_SHM2": "DatTab_SHM2",
+      "DatTab_SHH2": "DatTab_SHH2",
+      "DatTab_SHT2": "DatTab_SHT2",
+      "DatTab_RLN2": "DatTab_RLN2",
+      "DatTab_RLU2": "DatTab_RLU2",
+      "DatTab_RLS2": "DatTab_RLS2",
+      "DatTab_RLD2": "DatTab_RLD2",
+      "DatTab_RLB2": "DatTab_RLB2",
+      "DatTab_RLA2": "DatTab_RLA2",
+      "DatTab_RLM2": "DatTab_RLM2",
+      "DatTab_RLH2": "DatTab_RLH2",
+      "DatTab_RLT2": "DatTab_RLT2",
+      "DatTab_RMN2": "DatTab_RMN2",
+      "DatTab_RMU2": "DatTab_RMU2",
+      "DatTab_RMS2": "DatTab_RMS2",
+      "DatTab_RMD2": "DatTab_RMD2",
+      "DatTab_RMB2": "DatTab_RMB2",
+      "DatTab_RMA2": "DatTab_RMA2",
+      "DatTab_RMM2": "DatTab_RMM2",
+      "DatTab_RMH2": "DatTab_RMH2",
+      "DatTab_RMT2": "DatTab_RMT2",
+      "DatTab_RHN2": "DatTab_RHN2",
+      "DatTab_RHU2": "DatTab_RHU2",
+      "DatTab_RHS2": "DatTab_RHS2",
+      "DatTab_RHD2": "DatTab_RHD2",
+      "DatTab_RHB2": "DatTab_RHB2",
+      "DatTab_RHA2": "DatTab_RHA2",
+      "DatTab_RHM2": "DatTab_RHM2",
+      "DatTab_RHH2": "DatTab_RHH2",
+      "DatTab_RHT2": "DatTab_RHT2",
+      "DatTab_QKANJI": "DatTab_QKANJI",
+      "DatTab_BKANJI": "DatTab_BKANJI",
+      "DatTab_WLND": "DatTab_WLND",
+      "DatTab_SLND": "DatTab_SLND",
+      "DatTab_RLND": "DatTab_RLND",
+      "DatTab_M1A": "DatTab_M1A",
+      "DatTab_M1B": "DatTab_M1B",
+      "DatTab_M1C": "DatTab_M1C",
+      "DatTab_M2A": "DatTab_M2A",
+      "DatTab_M2B": "DatTab_M2B",
+      "DatTab_M2C": "DatTab_M2C",
+      "DatTab_M2D": "DatTab_M2D",
+      "DatTab_M2QA": "DatTab_M2QA",
+      "DatTab_M2QB": "DatTab_M2QB",
+      "DatTab_M3A": "DatTab_M3A",
+      "DatTab_M3B": "DatTab_M3B",
+      "DatTab_M3C": "DatTab_M3C",
+      "DatTab_M3QA": "DatTab_M3QA",
+      "DatTab_M4A": "DatTab_M4A",
+      "DatTab_M4B": "DatTab_M4B",
+      "DatTab_M4C": "DatTab_M4C",
+      "DatTab_M4D": "DatTab_M4D",
+      "DatTab_M4QA": "DatTab_M4QA",
+      "DatTab_M4QB": "DatTab_M4QB",
+      "DatTab_M4QC": "DatTab_M4QC",
+      "DatTab_M5A": "DatTab_M5A",
+      "DatTab_M5B": "DatTab_M5B",
+      "DatTab_M5C": "DatTab_M5C",
+      "DatTab_M5D": "DatTab_M5D",
+      "DatTab_M5E": "DatTab_M5E",
+      "DatTab_M5F": "DatTab_M5F",
+      "DatTab_M5QA": "DatTab_M5QA",
+      "DatTab_M6A": "DatTab_M6A",
+      "DatTab_M6B": "DatTab_M6B",
+      "DatTab_M6C": "DatTab_M6C",
+      "DatTab_M6D": "DatTab_M6D",
+      "DatTab_M6E": "DatTab_M6E",
+      "DatTab_M6QA": "DatTab_M6QA",
+      "DatTab_M7A": "DatTab_M7A",
+      "DatTab_M7B": "DatTab_M7B",
+      "DatTab_M7C": "DatTab_M7C",
+      "DatTab_M7D": "DatTab_M7D",
+      "DatTab_M7E": "DatTab_M7E",
+      "DatTab_M8A": "DatTab_M8A",
+      "DatTab_M8B": "DatTab_M8B",
+      "DatTab_M8C": "DatTab_M8C",
+      "DatTab_M8D": "DatTab_M8D",
+      "DatTab_M8QA": "DatTab_M8QA",
+      "DatTab_M9A": "DatTab_M9A",
+      "DatTab_M9B": "DatTab_M9B",
+      "DatTab_M9C": "DatTab_M9C",
+      "DatTab_M9D": "DatTab_M9D",
+      "DatTab_M10A": "DatTab_M10A",
+      "DatTab_M10B": "DatTab_M10B",
+      "DatTab_M10C": "DatTab_M10C",
+      "DatTab_M10D": "DatTab_M10D",
+      "DatTab_M10QA": "DatTab_M10QA",
+      "DatTab_M11A": "DatTab_M11A",
+      "DatTab_M11B": "DatTab_M11B",
+      "DatTab_M11C": "DatTab_M11C",
+      "DatTab_M11D": "DatTab_M11D",
+      "DatTab_M11E": "DatTab_M11E",
+      "DatTab_M12A": "DatTab_M12A",
+      "DatTab_M12B": "DatTab_M12B",
+      "DatTab_M12C": "DatTab_M12C",
+      "DatTab_M12D": "DatTab_M12D",
+      "DatTab_M13A": "DatTab_M13A",
+      "DatTab_M13B": "DatTab_M13B",
+      "DatTab_M13C": "DatTab_M13C",
+      "DatTab_M13D": "DatTab_M13D",
+      "DatTab_M13QB": "DatTab_M13QB",
+      "DatTab_M14A": "DatTab_M14A",
+      "DatTab_M14B": "DatTab_M14B",
+      "DatTab_M14C": "DatTab_M14C",
+      "DatTab_M14D": "DatTab_M14D",
+      "DatTab_M14E": "DatTab_M14E",
+      "DatTab_M14QB": "DatTab_M14QB",
+      "DatTab_M15A": "DatTab_M15A",
+      "DatTab_M15B": "DatTab_M15B",
+      "DatTab_M15C": "DatTab_M15C",
+      "DatTab_M15QA": "DatTab_M15QA",
+      "DatTab_M16D": "DatTab_M16D"
+    },
+    "externals": []
   }
 }

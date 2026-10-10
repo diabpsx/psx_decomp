@@ -52,6 +52,9 @@ def link(name: str):
         native_archive.build(archive_groups)
     import native_recon
     native_registry = json.loads((ROOT / 'configs/native_recon_link.json').read_text())
+    native_text_sources = {spec['source'] for spec in native_registry.values()
+                           if any(row.get('link_object') for row in spec['sections'].values())
+                           and any(s == '.text' or s.startswith('.text.') for s in spec['sections'])}
     bss_path = ROOT / 'configs/recon_bss_link.json'
     conventional_bss = json.loads(bss_path.read_text()).get(name, {}) if bss_path.exists() else {}
     conventional_sources = json.loads((ROOT / 'configs/recon_link.json').read_text())
@@ -89,6 +92,13 @@ def link(name: str):
             src = ROOT / o[len("build/"):-2]
             if src.suffix.lower() == ".s":
                 assemble_raw(src, op)
+                if o[len("build/"):-2] in native_text_sources:
+                    # A hand-authored source whose data section is linked directly (`link_object`) may also
+                    # carry code; that code is placed from the native lane's verified text bridge, so the
+                    # GNU-assembled text (and its symbols) is removed from the object before the link.
+                    r = subprocess.run([str(OBJCOPY), "-w", "-R", ".text*", str(op)], capture_output=True, text=True)
+                    if r.returncode:
+                        sys.exit("[objcopy] " + o + "\n" + r.stderr)
                 continue
             hdrs = [f for f in (ROOT / "recon").rglob("*.h")]
             newest = max([src.stat().st_mtime] + [f.stat().st_mtime for f in hdrs])
