@@ -63,12 +63,10 @@ PER_TU_FLAGS = {
     "recon/source/drlg_l2.cpp": {
         "extra": ["-fwritable-strings"],
         "merge_sections_into_text": [".rdata", ".data"]},
-    # Retail FMV keeps LoPlayFMVOverLay's six-entry language switch table in
-    # the overlay text stream; moving the final readonly occurrence before
-    # ASPSX preserves both its relocated words and the branch displacements.
+    # FMV is one emission-order stream too (its tables, literals and data, then the code with
+    # LoPlayFMVOverLay's switch table inline where cc1plus emits it); libpress headers from PsyQ 4.1.
     "recon/psxsrc/fmv.cpp": {"cpp_extra": ["-IC:/Temp/PSYQ/psyq-410/PSX/INCLUDE"],
-        "section_occurrence_renames": [
-        {"section": ".rdata", "occurrence": 8, "as": ".text"}]},
+        "merge_sections_into_text": [".rdata", ".data"]},
     "recon/eaclib/blkfill.s": {"g_value": "0"},
     "recon/eaclib/crc.s": {"g_value": "0"},
     "recon/eaclib/getm.s": {"g_value": "0"},

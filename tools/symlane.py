@@ -166,21 +166,6 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
         raise ValueError("invalid merged-section registry")
     for section in merged_sections:
         txt = re.sub(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", "\t.text", txt, flags=re.M)
-    occurrence_renames = flags.get("section_occurrence_renames", [])
-    if not isinstance(occurrence_renames, list):
-        raise ValueError("invalid section-occurrence rename registry")
-    for row in occurrence_renames:
-        if (not isinstance(row, dict) or set(row) != {"section", "occurrence", "as"}
-                or type(row["occurrence"]) is not int or row["occurrence"] <= 0
-                or any(not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", row[key])
-                       for key in ("section", "as"))):
-            raise ValueError("invalid section-occurrence rename")
-        matches = list(re.finditer(r"^[ \t]*" + re.escape(row["section"]) + r"[ \t]*$", txt, re.M))
-        if len(matches) < row["occurrence"]:
-            raise ValueError("section-occurrence rename target is absent")
-        match = matches[row["occurrence"] - 1]
-        indent = re.match(r"[ \t]*", match[0])[0]
-        txt = txt[:match.start()] + indent + ".section " + row["as"] + txt[match.end():]
     if compiler_dos:
         # CC1PSX 2.7.2.SN.1 honours `__attribute__((section(".text.lib")))` only until its first inline
         # jump table and then returns to `.text`, so ASPSX would split one TU's code over two sections.

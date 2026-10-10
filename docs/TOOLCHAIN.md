@@ -594,6 +594,13 @@ get them).  The native lane (tools/sdk_link.native_link) now declares the retail
 group takes its retail id (b-e) and the STARTUP-resident pieces of VID, MEM, SYSINIT, PAUSE,
 STARTUP, OVERLAY, DECOMP and VERSION are linked as the overlapping `startup_text` (org, id 4) /
 `map_data` (over, id 5) pair, which is what puts `set overlay $4` before their records as in retail.
+FMV is a merged emission-order stream as well: its tables, literals and data, then the code with
+LoPlayFMVOverLay's switch table inline where cc1plus emits it (the earlier "table in text" rename
+was this; the merged probe had been misread against a FRONTEND symbol sharing the overlay address
+range).  With it gone the lane keeps no per-occurrence mechanism at all: the remaining per-TU keys
+are compile options (`extra` -fwritable-strings, `g_value` -G0 for library code, `cpp_extra` for
+FMV's PsyQ 4.1 LIBPRESS.H beside its 4.1 libpress members), the assembler threshold
+(`assembler_g_value`) and the stream property (`merge_sections_into_text`).
 Every overlay-image member now links in overlay mode (PSYLINK /v plus the original SYMMUNGE /i),
 not only the five that needed the compaction before, and the per-function compare checks the
 overlay context (symlane.functions records the id in force).  Because PSYLINK writes nothing to
