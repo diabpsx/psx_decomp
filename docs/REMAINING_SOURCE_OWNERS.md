@@ -22,8 +22,8 @@ for them the nearest retail MAP symbols with a known native owner
 bound the owner by link order (one owner when both neighbours agree,
 otherwise the objects linked between the two).
 
-130 checkpoint names are resolved in the complete raw inventory;
-12 missing source references remain.
+137 checkpoint names are resolved in the complete raw inventory;
+5 missing source references remain.
 59 of the 60 single-MAP-candidate task entries are resolved; the TONY
 literal alias D_80110B24 remains open. Native ownership receipts are
 isolated proofs, not a strict whole-program native link seal.
@@ -36,16 +36,16 @@ isolated proofs, not a strict whole-program native link seal.
 | `AllItemsList` | `0x801113A4` | ITEMDAT.rdata (`0x801113A4`–`0x80116140`, exclusive end) | Def2 class EXT type ARY STRUCT size 5024 dims 1 157 tag ItemDataStruct | Resolved; native owner verified |
 | `AllLevels` | `0x800B7558` | MONSTLST.data (`0x800B7088`–`0x800B75D8`, exclusive end) | Def2 class EXT type ARY STRUCT size 128 dims 1 16 tag MonstLevel | Resolved; native owner verified |
 | `AllObjects` | `0x800D84B0` | OBJDAT.data (`0x800D82EC`–`0x800D8BA6`, exclusive end) | Def2 class EXT type ARY STRUCT size 1782 dims 1 99 tag ObjDataStruct | Resolved; native owner verified |
-| `CharBlockBuf` | `0x801576F0` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | No same-name typed record (alias of `CharDataStruct`) | Owner confirmed; source definition unresolved |
+| `CharBlockBuf` | `0x801576F0` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | No same-name typed record (alias of `CharDataStruct`) | Resolved; native owner verified |
 | `CharDataStruct` | `0x801576F0` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 7648 dims 0 tag CharDataStructDef | Owner confirmed; source definition unresolved |
 | `Circle` | `0x800CD2E0` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY SHORT size 128 dims 1 64 tag  | Resolved; native owner verified |
-| `ClassStrTbl` | `0x801435F8` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY INT size 12 dims 1 3 tag  | Owner confirmed; source definition unresolved |
+| `ClassStrTbl` | `0x801435F8` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type ARY INT size 12 dims 1 3 tag  | Resolved; native owner verified |
 | `D_80110868` | `0x80110868` | GPANEL.rdata (`0x80110844`–`0x801108A4`, exclusive end) | No same-name typed record | Resolved; native owner verified |
 | `D_80110B24` | `0x80110B24` | TONY.rdata (`0x80110AC4`–`0x80110B31`, exclusive end) | No same-name typed record | Current unresolved |
 | `D_8011B3D8` | `0x8011B3D8` | link order: after `to_ascii_invalid_char` (`0x8011B3C8`, memcard) before `dirflag` (`0x8011B3DB`, memcard) | No same-name typed record | Resolved; native owner verified |
 | `D_8011C878` | `0x8011C878` | link order: after `tickval` (`0x8011C600`, timer) before `requestedasyncmsecs` (`0x8011CA1C`, iocoord) | No same-name typed record | Resolved; native owner verified |
 | `D_8012E534` | `0x8012E534` | link order: after `asyncblockmove` (`0x8011CAD8`, blockio) before `async` (`0x80135048`, eac_async) | No same-name typed record | Resolved; native owner verified |
-| `D_80157B68` | `0x80157B68` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | No same-name typed record (alias of `CharDataStruct`) | Owner confirmed; source definition unresolved |
+| `D_80157B68` | `0x80157B68` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | No same-name typed record (alias of `CharDataStruct`) | Resolved; native owner verified |
 | `DefP1PanelXY` | `0x800B9A6C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
 | `DefP1PanelXY2` | `0x800B9AC4` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
 | `DefP2PanelXY` | `0x800B9B1C` | GPANEL.data (`0x800B9A6C`–`0x800B9BDE`, exclusive end) | Def2 class EXT type STRUCT size 88 dims 0 tag PanelXY | Resolved; native owner verified |
@@ -62,9 +62,9 @@ isolated proofs, not a strict whole-program native link seal.
 | `InvSlotTable` | `0x8010D680` | INV.data (`0x8010D008`–`0x8010D6C9`, exclusive end) | Def2 class EXT type ARY UCHAR size 73 dims 1 73 tag  | Resolved; native owner verified |
 | `KeyTab` | `0x800CD360` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class STAT type ARY USHORT size 20 dims 1 10 tag  | Resolved; native owner verified |
 | `MWVel` | `0x801051F4` | MONSTER.data (`0x801051F4`–`0x8010A57C`, exclusive end) | Def2 class EXT type ARY ARY INT size 288 dims 2 24 3 tag  | Resolved; native owner verified |
-| `McLoadCard1Menu` | `0x80143668` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Owner confirmed; source definition unresolved |
-| `McLoadCard2Menu` | `0x80143684` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Owner confirmed; source definition unresolved |
-| `McLoadGameMenu` | `0x8014364C` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Owner confirmed; source definition unresolved |
+| `McLoadCard1Menu` | `0x80143668` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Resolved; native owner verified |
+| `McLoadCard2Menu` | `0x80143684` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Resolved; native owner verified |
+| `McLoadGameMenu` | `0x8014364C` | DLG.CPP / FRONTEND: DLG.text (`0x801435E8`–`0x8015B958`, exclusive end) | Def2 class EXT type STRUCT size 28 dims 0 tag FeTable | Resolved; native owner verified |
 | `MenuList` | `0x800CD240` | OPTIONS.data (`0x800CC868`–`0x800CD374`, exclusive end) | Def2 class EXT type ARY STRUCT size 160 dims 1 20 tag OMENULIST | Resolved; native owner verified |
 | `MissPrintRoutines` | `0x800D6E50` | MISDAT.data (`0x800D67F0`–`0x800D704B`, exclusive end) | Def2 class EXT type ARY PTR FCN VOID size 272 dims 1 68 tag  | Resolved; native owner verified |
 | `MonDays` | `0x800B09B8` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY STRUCT size 96 dims 1 12 tag MONTH_DAYS | Resolved; native owner verified |
@@ -115,7 +115,7 @@ isolated proofs, not a strict whole-program native link seal.
 | `Words` | `0x800B07E0` | STARTUP.text (`0x800B0320`–`0x800B0C98`, exclusive end) | Def2 class EXT type ARY PTR CHAR size 472 dims 1 118 tag  | Resolved; native owner verified |
 | `XDirAdd` | `0x801029D8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
 | `YDirAdd` | `0x801029F8` | MISSILES.data (`0x801029D8`–`0x801051F4`, exclusive end) | Def2 class EXT type ARY INT size 32 dims 1 8 tag  | Resolved; native owner verified |
-| `_7CPlayer_PActiveArray` | `0x8011AD50` | link order: after `CurrentOverlay` (`0x8011AD34`, overlay) before `ProfOn` (`0x8011AD60`, prof) | No same-name typed record | Owner bounded by link order (overlay..prof); source definition unresolved |
+| `_7CPlayer_PActiveArray` | `0x8011AD50` | link order: after `CurrentOverlay` (`0x8011AD34`, overlay) before `ProfOn` (`0x8011AD60`, prof) | No same-name typed record | Resolved; native owner verified |
 | `_NoWitchItems` | `0x8011BAC8` | link order: after `_premiumlevel` (`0x8011BAC0`, stores) before `_WitchIdxOfs` (`0x8011BAD0`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `_WitchIdxOfs` | `0x8011BAD0` | link order: after `_NoWitchItems` (`0x8011BAC8`, stores) before `_boylevel` (`0x8011BAD8`, stores) | Def2 class EXT type ARY INT size 8 dims 1 2 tag  | Resolved; native owner verified |
 | `_boyitem` | `0x800E0AF8` | STORES.data (`0x800DE304`–`0x800E31F8`, exclusive end) | Def2 class EXT type ARY STRUCT size 216 dims 1 2 tag ItemStruct | Resolved; native owner verified |
