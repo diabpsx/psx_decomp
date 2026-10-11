@@ -23,8 +23,8 @@ class DrlgL4NativeTests(unittest.TestCase):
     def test_full_sections_named_caches_and_both_data_wrappers(self):
         spec=json.loads((B.ROOT/'configs/native_recon_link.json').read_text())['drlg_l4']
         self.assertEqual(R.source_assembler(spec),('2.56',S.ASPSX))
-        self.assertEqual(B.per_tu_flags(B.ROOT/spec['source']),{})
-        self.assertEqual(spec['composed_group']['sections'],['.rdata','.data','.text'])
+        self.assertEqual(B.per_tu_flags(B.ROOT/spec['source']),{'merge_sections_into_text':['.rdata','.data']})
+        self.assertEqual(spec['composed_group']['sections'],['.text'])   # one .DRLG_L4_text stream
         pregame=(B.ROOT/'rom/PREGAME.BIN').read_bytes()
         with tempfile.TemporaryDirectory(prefix='l4-native-',dir=B.BUILD) as directory:
             folder=Path(directory)

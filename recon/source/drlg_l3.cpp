@@ -41,7 +41,10 @@ static void DRLG_L3SetWalls(void);   /* @0x8014CA68 DRLG_L3.CPP:1884 */
 static void DRLG_L3(int entry);   /* @0x8014CB1C DRLG_L3.CPP:1919 */
 static void DRLG_L3Pass3(void);   /* @0x8014D238 DRLG_L3.CPP:2081 */
 #include "source/diablo.h"
-#include "source/gen/tables_drlg_l3.h"
+/* The cave tables (source/gen/tables_drlg_l3.h) are included after DRLG_L3Pool, where retail's DRLG_L3.CPP
+ * defined them: cc1plus emits a function's static const tables where the function is defined, and retail's
+ * .DRLG_L3_text stream has the spawntable/poolsub constants before L3ConvTbl.  The one early user sees this. */
+extern unsigned char L3ConvTbl[16];
 
 extern "C" void *memcpy(void *dst, const void *src, unsigned long n);
 
@@ -843,6 +846,8 @@ static void DRLG_L3Pool(void)
         }
     }
 }
+
+#include "source/gen/tables_drlg_l3.h"
 
 static void DRLG_L3PoolFix(void)
 {

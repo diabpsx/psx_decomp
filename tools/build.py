@@ -63,6 +63,10 @@ PER_TU_FLAGS = {
     "recon/source/drlg_l2.cpp": {
         "extra": ["-fwritable-strings"],
         "merge_sections_into_text": [".rdata", ".data"]},
+    # DRLG_L1/L3/L4 are the same one-stream shape (their tables are defined after the set-piece loaders).
+    "recon/source/drlg_l1.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
+    "recon/source/drlg_l3.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
+    "recon/source/drlg_l4.cpp": {"merge_sections_into_text": [".rdata", ".data"]},
     # FMV is one emission-order stream too (its tables, literals and data, then the code with
     # LoPlayFMVOverLay's switch table inline where cc1plus emits it); libpress headers from PsyQ 4.1.
     "recon/psxsrc/fmv.cpp": {"cpp_extra": ["-IC:/Temp/PSYQ/psyq-410/PSX/INCLUDE"],

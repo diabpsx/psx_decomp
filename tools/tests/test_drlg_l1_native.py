@@ -25,7 +25,7 @@ class DrlgL1NativeTests(unittest.TestCase):
     def test_all_code_data_globals_and_six_packed_flags(self):
         spec=json.loads((B.ROOT/'configs/native_recon_link.json').read_text())['drlg_l1']
         self.assertEqual(R.source_assembler(spec),('2.67',AS267))
-        self.assertEqual(spec['composed_group']['sections'],['.rdata','.data','.text'])   # literals, tables, code in the pregame stream
+        self.assertEqual(spec['composed_group']['sections'],['.text'])   # one .DRLG_L1_text stream: literals, tables, code
         with tempfile.TemporaryDirectory(prefix='l1-native-',dir=B.BUILD) as directory:
             folder=Path(directory)
             with patch.object(R,'OUT',folder),patch.object(S,'OUT',folder):

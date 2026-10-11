@@ -683,13 +683,24 @@ keys; `source_section` now defaults to the retail name, so the member links plac
 `section .VERSION_text,...` like retail's link script, and ASPSX, PSYLINK and SYMMUNGE accept the
 names (VERSION, and every other member, link byte- and SYM-identical).
 
-Two overlay shapes remain, both byte-exact but under different models: CREDITS, MEMCARD, DLG,
-DRLG_L2 and FMV are emission-order streams (DLG's `.align 3` pad is stream-relative), while
-DRLG_L1/L3/L4's single retail section is their `.rdata`, `.data` and `.text` in that order (a merged
-DRLG_L1 stream puts the tables where retail has the three `.DUN` literals, which cc1plus emits with
-DRLG_LoadL1SP after the tables).  The lane links the latter three as composed `.DRLG_L1_rdata` /
-`.DRLG_L1_data` / `.DRLG_L1_text` sections at retail's addresses; what folded them into one section
-in Climax's build is still unexplained.
+(Round 10 below closes the one residual this left: DRLG_L1/L3/L4 looked like `.rdata`, `.data`, `.text`
+concatenations rather than emission-order streams.)
+
+### Round 10: DRLG_L1/L3/L4 are emission-order streams too (2026-10-11)
+
+A merged DRLG_L1 stream had put the tables where retail has DRLG_LoadL1SP's three `.DUN` literals.
+A synthetic TU settled cc1plus 2.7.2.SN's emission rule: a function's string literals (and its
+function-scope `static const` tables) are emitted where the function is *defined*, initialised data
+at its definition, and all code at end of file.  So retail's `.DRLG_L1_text` (gman.h literal, the
+three `.DUN` names, the tables, L5dungeon, code) means DRLG_L1.CPP defined its tables after
+DRLG_LoadL1SP; DRLG_L4's nine `.DUN` names (DRLG_LoadL4SP and DRLG_LoadDiabQuads) and DRLG_L3's
+spawntable/poolsub constants (DRLG_L3Pool) precede their tables the same way.  cc1plus accepts a
+forward declaration of a file-static array (`static unsigned char SPATS[];`) and emits the table at
+its later initialised definition, so the three sources now define their tables after those loader
+functions with declarations for the early users, and all three link as merged `.DRLG_Lx_text`
+streams (`merge_sections_into_text`, composed `['.text']`) byte- and SYM-identical.  Every overlay
+module is now the same shape: one emission-order section under retail's name.  The retail SLD line
+numbers are not gated, so the tables' exact original line position is not claimed.
 
 ### FRONTEND DLG.CPP data (2026-10-10)
 

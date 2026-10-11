@@ -3047,8 +3047,6 @@
     "composed_group": {
       "name": "drlg_l4_text",
       "sections": [
-        ".rdata",
-        ".data",
         ".text"
       ],
       "image": "pregame",
@@ -3163,8 +3161,6 @@
     "composed_group": {
       "name": "drlg_l1_text",
       "sections": [
-        ".rdata",
-        ".data",
         ".text"
       ],
       "image": "pregame",
@@ -8091,8 +8087,6 @@
     "composed_group": {
       "name": "drlg_l3_text",
       "sections": [
-        ".rdata",
-        ".data",
         ".text"
       ],
       "image": "pregame",
