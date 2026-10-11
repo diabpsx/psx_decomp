@@ -73,14 +73,20 @@ int SP4y2;
 int l4holdx;
 int l4holdy;
 
-/* The zero arrays and miniset tables are defined after DRLG_LoadDiabQuads, where retail's DRLG_L4.CPP kept them:
+/* The zero arrays and miniset tables are defined at the end of the file, where retail's DRLG_L4.CPP kept them:
  * cc1plus emits a function's string literals where the function is defined and initialised data at its
- * definition, and retail's .DRLG_L4_text stream has the nine .DUN names of DRLG_LoadL4SP and DRLG_LoadDiabQuads
- * before the tables.  The early users see these declarations. */
+ * definition, retail's .DRLG_L4_text stream has the nine .DUN names of DRLG_LoadL4SP and DRLG_LoadDiabQuads
+ * before the tables, and the SLD line stream has no gap between functions that could hold them
+ * (docs/TOOLCHAIN.md, round 11).  The functions see these declarations. */
 extern unsigned char dung[20][20];
 extern unsigned char hallok[20];
 extern unsigned char L4dungeon[80][80];
 static unsigned char L4ConvTbl[];
+static unsigned char L4USTAIRS[];
+static unsigned char L4TWARP[];
+static unsigned char L4DSTAIRS[];
+static unsigned char L4PENTA[];
+static unsigned char L4PENTA2[];
 #define L4BTYPES_SIZE 140   /* DRLG_L4Subs needs the count before the table is complete */
 static unsigned char L4BTYPES[];
 
@@ -1376,113 +1382,6 @@ void DRLG_LoadDiabQuads(unsigned char preflag)
     DRLG_L4SetRoom(ptrSetPiece, diabquad4x, diabquad4y);
 }
 
-/* Original overlay-owned zero arrays, before the initialized miniset tables. */
-unsigned char dung[20][20] = {{0}};
-unsigned char hallok[20] = {0};
-unsigned char L4dungeon[80][80] = {{0}};
-
-/** A lookup table for the 16 possible patterns of a 2x2 area,
- *  where each cell either contains a SW wall or it doesn't. */
-static unsigned char L4ConvTbl[16] = { 30, 6, 1, 6, 2, 6, 6, 6, 9, 6, 1, 6, 2, 6, 3, 6 };   /* @0x8014F318 */
-
-/** Miniset: Stairs up. */
-static unsigned char L4USTAIRS[] = {   /* @0x8014F328 */
-    4, 5,
-
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-
-     0,  0,  0,  0,
-    36, 38, 35,  0,
-    37, 34, 33, 32,
-     0,  0, 31,  0,
-     0,  0,  0,  0,
-};
-/** Miniset: Stairs up to town. */
-static unsigned char L4TWARP[] = {   /* @0x8014F354 */
-    4, 5,
-
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-    6, 6, 6, 6,
-
-      0,   0,   0,   0,
-    134, 136, 133,   0,
-    135, 132, 131, 130,
-      0,   0, 129,   0,
-      0,   0,   0,   0,
-};
-/** Miniset: Stairs down. */
-static unsigned char L4DSTAIRS[] = {   /* @0x8014F380 */
-    5, 5,
-
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-
-    0,  0,  0,  0, 0,
-    0,  0, 45, 41, 0,
-    0, 44, 43, 40, 0,
-    0, 46, 42, 39, 0,
-    0,  0,  0,  0, 0,
-};
-/** Miniset: Pentagram. */
-static unsigned char L4PENTA[] = {   /* @0x8014F3B4 */
-    5, 5,
-
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-
-    0,   0,   0,   0, 0,
-    0,  98, 100, 103, 0,
-    0,  99, 102, 105, 0,
-    0, 101, 104, 106, 0,
-    0,   0,   0,   0, 0,
-};
-/** Miniset: Pentagram portal. */
-static unsigned char L4PENTA2[] = {   /* @0x8014F3E8 */
-    5, 5,
-
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6,
-
-    0,   0,   0,   0, 0,
-    0, 107, 109, 112, 0,
-    0, 108, 111, 114, 0,
-    0, 110, 113, 115, 0,
-    0,   0,   0,   0, 0,
-};
-
-/** Maps tile IDs to their corresponding undecorated tile ID. */
-static unsigned char L4BTYPES[L4BTYPES_SIZE] = {   /* @0x8014F41C */
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16, 17, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 6,
-    6, 6, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 1, 2, 1, 2, 1, 2, 1, 1, 2,
-    2, 0, 0, 0, 0, 0, 0, 15, 16, 9,
-    12, 4, 5, 7, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
 
 /* @0x80153614 */
 static unsigned char DRLG_L4PlaceMiniSet(const unsigned char *miniset, int tmin, int tmax, int cx, int cy, int setview, int ldir)
@@ -2049,3 +1948,112 @@ void CreateL4Dungeon(unsigned int rseed, int entry)
     MemFreeDbg(lpSetPiece3);
     MemFreeDbg(lpSetPiece4);
 }
+
+/* ---------------------------------------------------------------- tables (retail: end of file) */
+/* Original overlay-owned zero arrays, before the initialized miniset tables. */
+unsigned char dung[20][20] = {{0}};
+unsigned char hallok[20] = {0};
+unsigned char L4dungeon[80][80] = {{0}};
+
+/** A lookup table for the 16 possible patterns of a 2x2 area,
+ *  where each cell either contains a SW wall or it doesn't. */
+static unsigned char L4ConvTbl[16] = { 30, 6, 1, 6, 2, 6, 6, 6, 9, 6, 1, 6, 2, 6, 3, 6 };   /* @0x8014F318 */
+
+/** Miniset: Stairs up. */
+static unsigned char L4USTAIRS[] = {   /* @0x8014F328 */
+    4, 5,
+
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+
+     0,  0,  0,  0,
+    36, 38, 35,  0,
+    37, 34, 33, 32,
+     0,  0, 31,  0,
+     0,  0,  0,  0,
+};
+/** Miniset: Stairs up to town. */
+static unsigned char L4TWARP[] = {   /* @0x8014F354 */
+    4, 5,
+
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+    6, 6, 6, 6,
+
+      0,   0,   0,   0,
+    134, 136, 133,   0,
+    135, 132, 131, 130,
+      0,   0, 129,   0,
+      0,   0,   0,   0,
+};
+/** Miniset: Stairs down. */
+static unsigned char L4DSTAIRS[] = {   /* @0x8014F380 */
+    5, 5,
+
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+
+    0,  0,  0,  0, 0,
+    0,  0, 45, 41, 0,
+    0, 44, 43, 40, 0,
+    0, 46, 42, 39, 0,
+    0,  0,  0,  0, 0,
+};
+/** Miniset: Pentagram. */
+static unsigned char L4PENTA[] = {   /* @0x8014F3B4 */
+    5, 5,
+
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+
+    0,   0,   0,   0, 0,
+    0,  98, 100, 103, 0,
+    0,  99, 102, 105, 0,
+    0, 101, 104, 106, 0,
+    0,   0,   0,   0, 0,
+};
+/** Miniset: Pentagram portal. */
+static unsigned char L4PENTA2[] = {   /* @0x8014F3E8 */
+    5, 5,
+
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6,
+
+    0,   0,   0,   0, 0,
+    0, 107, 109, 112, 0,
+    0, 108, 111, 114, 0,
+    0, 110, 113, 115, 0,
+    0,   0,   0,   0, 0,
+};
+
+/** Maps tile IDs to their corresponding undecorated tile ID. */
+static unsigned char L4BTYPES[L4BTYPES_SIZE] = {   /* @0x8014F41C */
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10, 11, 12, 13, 14, 15, 16, 17, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 6,
+    6, 6, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 1, 2, 1, 2, 1, 2, 1, 1, 2,
+    2, 0, 0, 0, 0, 0, 0, 15, 16, 9,
+    12, 4, 5, 7, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+};

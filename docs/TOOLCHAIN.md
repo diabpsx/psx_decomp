@@ -699,8 +699,24 @@ forward declaration of a file-static array (`static unsigned char SPATS[];`) and
 its later initialised definition, so the three sources now define their tables after those loader
 functions with declarations for the early users, and all three link as merged `.DRLG_Lx_text`
 streams (`merge_sections_into_text`, composed `['.text']`) byte- and SYM-identical.  Every overlay
-module is now the same shape: one emission-order section under retail's name.  The retail SLD line
-numbers are not gated, so the tables' exact original line position is not claimed.
+module is now the same shape: one emission-order section under retail's name.  (Round 11 below
+places the tables where the SLD stream says they were.)
+
+### Round 11: where the DRLG tables were in the source (2026-10-11)
+
+The SLD stream annotates code only, but the line span of each function (its records between its
+start and the next function's start) bounds where non-code lines can sit.  Measured on the retail
+SYM with the scaffold function bounds: DRLG_L1's functions run from line 274 (DRLG_PlaceDoor) to
+2193 (CreateL5Dungeon) and the largest gaps after DRLG_LoadL1SP are 35 lines (865..900) and 51
+lines (1015..1066); DRLG_L3 has one 49-line gap (1342..1391) after its constants' function and
+DRLG_L4 has no gap over 25 lines at all (functions 148..1841).  The tables (8280, 2228 and 7220
+bytes of initialisers) fit none of those, so in all three files they followed the last function.
+The byte streams cannot tell (no later function contributes read-only or initialised data), so the
+sources now define the tables at the end of the file with forward declarations at the top; L4's 147
+lines before its first function hold that preamble.  cc1plus accepts `static T A[];` ahead of the
+initialised definition and emits the table there; `sizeof` cannot apply to the incomplete type, so
+DRLG_L5Subs and DRLG_L4Subs compare against L5BTYPES_SIZE / L4BTYPES_SIZE.  The members are
+unchanged byte- and SYM-wise.  The lines inside each function (the SLD proper) are still not gated.
 
 ### FRONTEND DLG.CPP data (2026-10-10)
 
