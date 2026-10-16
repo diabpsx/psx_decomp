@@ -2,6 +2,8 @@
  * file.  Spanker dumps the used-memory blocks of GAL heap 1 (MemCb halts on each block, leaving
  * its address in LastAddr); GaryLiddon is empty (its body is compiled out). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer_header.h"
 
 extern "C" {
 void DBG_Halt(void);

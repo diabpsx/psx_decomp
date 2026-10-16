@@ -34,7 +34,7 @@ segments:
     bss_size: 0x1D5F0   # .sbss+.bss 0x8011C604..0x80139BF4 (runtime zero-fill)
     subsegments:
       - [0x000000, asm, header_code]
-      - [0x000008, data, boot_text]
+      - [0x000008, asm, boot_text]
       - [0x00000C, c, lib]
       - [0x02017C, c, control]
       - [0x027734, c, cursor]

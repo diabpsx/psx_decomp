@@ -27,8 +27,8 @@ class PreAutoNativeTests(unittest.TestCase):
         symbols = "\n".join(path.read_text() for path in
                             (B.ROOT / "configs").glob("symbol_addrs*.txt"))
         regions = {".text": (0x8015F4C4, 548),
-                   ".rdata": (0x80119BEC, 19),
-                   ".sdata": (0x8011C1E0, 36),
+                   ".rdata": (0x80119BC8, 55),
+                   ".sdata": (0x8011C1D4, 48),
                    ".bss": (0x8012FD80, 512)}
 
         with tempfile.TemporaryDirectory(prefix="preauto-native-", dir=B.BUILD) as directory:
@@ -45,7 +45,7 @@ class PreAutoNativeTests(unittest.TestCase):
 
             prefix, combined, mode = R.gp_carrier_plan(
                 regions, main, 0x8011A780, 0x8011C604)
-            self.assertEqual((mode, len(prefix)), ("prefix", 6752))
+            self.assertEqual((mode, len(prefix)), ("prefix", 6740))
             prefix_source = folder / "prefix.s"
             prefix_object = folder / "prefix.obj"
             prefix_source.write_bytes((".sdata\r\n" + "".join(
@@ -54,7 +54,8 @@ class PreAutoNativeTests(unittest.TestCase):
             run = B.run([S.ASPSX, "-q", "-o", prefix_object, prefix_source])
             self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
 
-            bindings = R.resolve_bindings(obj["xrefs"], symbols)
+            bindings = R.resolve_bindings([n for n in obj["xrefs"] if n != "_7CPlayer.PActiveArray"], symbols)
+            bindings["_7CPlayer.PActiveArray"] = N.data_address(symbols, "_7CPlayer_PActiveArray")   # SN spelling of the class static
             bindings["_gp"] = 0x8011A780
             blocks, map_text = N.native_link(
                 "preauto", raw, {names.get(k, k): v for k, v in combined.items()}, bindings, output_dir=folder,

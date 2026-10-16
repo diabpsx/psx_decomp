@@ -9,6 +9,7 @@
  * entry points (PlayFMVOverLay / LoPlayFMVOverLay) plus a per-TU inlined copy of CPad::GetDown (PADS.H).
  * Reconstructed from the raw oracle (asm/nonmatchings/fmv/*.s) + the SYM (DIABPSX.SYM); m2c/Hex-Rays
  * drafts from skel/PSXSRC/FMV.CPP as shape hints. All %gp_rel names in the raw are literal retail names. */
+#include "psxsrc/textfileinfo_header.h"
 #include "psyq.h"
 #include <LIBPRESS.H>
 

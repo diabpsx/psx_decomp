@@ -6,6 +6,7 @@
  * skel/PSXSRC/GLUE.CPP (generated from the retail SYM before this file existed).
  * TU-owned data and globals use the retail SYM names and layouts. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 /* ---- externs from other TUs (types kept minimal/opaque; only the fields this TU touches) ---- */
@@ -530,18 +531,20 @@ void GLUE_Init(void)
 {
 }
 
-int CPlayer::GetTexId(void)
+/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
+ * code in REVERSE definition order, so retail's tail (CPlayer::GetTexId, CBlocks::SetTown, CBlocks::MoveToScrollTarget) fixes this definition order. */
+inline void CBlocks::MoveToScrollTarget(void)
 {
-    return TexId;
+    ScrollX = ScrollTargetX;
+    ScrollY = ScrollTargetY;
 }
 
-void CBlocks::SetTown(BOOL Val)
+inline void CBlocks::SetTown(BOOL Val)
 {
     Town = Val;
 }
 
-void CBlocks::MoveToScrollTarget(void)
+inline int CPlayer::GetTexId(void)
 {
-    ScrollX = ScrollTargetX;
-    ScrollY = ScrollTargetY;
+    return TexId;
 }

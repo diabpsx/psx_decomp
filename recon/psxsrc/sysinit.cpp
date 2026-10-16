@@ -2,6 +2,7 @@
  * SYSI_Init brings up memory, video, the file system, the tasker and every module; the file
  * system is the PC link (PCIO) or packed data file (DatIO) on a dev kit, else the CD (CdIO). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 struct RECT {   /* sizeof 8 */

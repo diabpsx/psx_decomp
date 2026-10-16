@@ -129,7 +129,7 @@ def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False):
 
 
 def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=None,
-              section_prefixes=None) -> Path:
+              section_prefixes=None, plain_library_text=False, sn_spellings=False) -> Path:
     """cc1/cc1plus with the lane flags + -g, SN-ready .s"""
     rel = src.resolve().relative_to(ROOT)
     OUT.mkdir(parents=True, exist_ok=True)
@@ -152,7 +152,10 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
         r = subprocess.run([str(compiler), *cc1_flags, str(i_file), "-o", str(s_file)],
                            capture_output=True, text=True, cwd=ROOT, env=B._cc1_env())
     if r.returncode: sys.exit(f"[cc1] {rel}\n{r.stdout}{r.stderr}")
-    txt = s_file.read_text().replace("_._", "___").replace("_GLOBAL_.I.", "_GLOBAL__I_").replace("_GLOBAL_.D.", "_GLOBAL__D_")
+    txt = s_file.read_text()
+    if not sn_spellings:
+        # GNU as cannot spell SN's dotted destructor / static-initialiser names; the PSYLINK lane keeps them
+        txt = txt.replace("_._", "___").replace("_GLOBAL_.I.", "_GLOBAL__I_").replace("_GLOBAL_.D.", "_GLOBAL__D_")
     section_prefixes = {} if section_prefixes is None else section_prefixes
     if not isinstance(section_prefixes, dict) or any(
             not re.fullmatch(r"\.[A-Za-z_][A-Za-z0-9_.]*", section)
@@ -173,11 +176,12 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
         replacement = ('\t.text' if target == '.text' else
                        f'\t.section {target},{SECTION_FLAGS[target.rsplit("_", 1)[1]]},@progbits')
         txt = re.sub(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", replacement, txt, flags=re.M)
-    if compiler_dos:
+    if compiler_dos or plain_library_text:
         # CC1PSX 2.7.2.SN.1 honours `__attribute__((section(".text.lib")))` only until its first inline
         # jump table and then returns to `.text`, so ASPSX would split one TU's code over two sections.
         # The retail EA objects are plain `.text`; route the attribute there (the attribute exists only
-        # to let the GNU lane place lib code in its own output section).
+        # to let the GNU lane place lib code in its own output section).  The whole-program PSYLINK lane
+        # asks for the plain spelling on every library object (plain_library_text).
         txt = re.sub(r"^\s*\.section\s+\.text\.\w+[^\n]*$", "\t.text", txt, flags=re.M)
     # Insert borrowed carriers after the section merge, so the prefix lands in the member's real section.
     for section, payload in section_prefixes.items():

@@ -27,9 +27,9 @@ class CtrlNativeTests(unittest.TestCase):
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("ctrl", 28))
         self.assertEqual(receipt["assembler_version"], "2.67")
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2204)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2192)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 5992, ".data": 808, ".sdata": 111,
+                         {".text": 5992, ".rdata": 33, ".data": 808, ".sdata": 123,
                           ".sbss": 16, ".bss": 16, ".ctors": 4, ".dtors": 4})
 
 

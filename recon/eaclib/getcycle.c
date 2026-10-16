@@ -3,7 +3,7 @@
  * accessors; getcycle merges the low halfword of getcycleticks above the 16-bit count with lwl. */
 #define LIBTEXT __attribute__((section(".text.lib")))
 
-extern void savegp_ci(unsigned int *out);
+extern void savegp(unsigned int *out);
 extern void restoregp(unsigned int value);
 extern void *InterruptCallback(int irq, void (*func)());
 extern void addexit(void (*func)());
@@ -24,7 +24,7 @@ void getcycleint(void)
 {
     unsigned int gpbuf[2];
 
-    savegp_ci(gpbuf);
+    savegp(gpbuf);
     ++getcycleticks;
     restoregp(gpbuf[0]);
 }

@@ -4,6 +4,7 @@
  * player-specific unique items back as gold (PlaceStoreGold2 = STORES.CPP PlaceStoreGold for any
  * player).  The CPAD.H inlines GetCur/CheckActive are emitted out of line here (-fno-inline). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 
 /* ---- SYM layouts (copied from recon/source/gen/structs_player.h) ---- */
 enum PLR_MODE {

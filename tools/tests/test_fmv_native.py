@@ -24,10 +24,10 @@ class FmvNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("fmv", 44))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3324)   # .sdata starts at 0x8011B47C (vlc_tab)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3312)   # .sdata starts at 0x8011B470 (its literal pool)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 10828, ".rdata": 108096,   # the composed stream's data export: tables, literals and data before the code
-                          ".sdata": 420,    # one retail-order block, vlc_tab .. last_handler_event
+                          ".sdata": 432,    # one retail-order block, vlc_tab .. last_handler_event
                           ".sbss": 24,      # idx, i, sec, Passedfilename, Passedw, Passedh (<= 8 bytes each)
                           ".bss": 51360})   # subcode, voice_attr, FMVName, CreateEnv, TempStack: .lcomm rounded to 8 (ASPSX 2.67)
         self.assertIsNone(receipt["post_assemble_section_split"])

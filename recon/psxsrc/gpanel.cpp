@@ -7,6 +7,10 @@
  * off the retail SYM (STRTAG/MOS records) or matched to recon/source/gen/structs_player.h and
  * the existing psxsrc/block.cpp POLY_FT4 — not guessed. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+/* retail GPANEL.CPP small data: the two zero-initialised offsets follow the pool (0x8011AD8C, 0x8011AD90) */
+int hof = 0;
+int mof = 0;
 #include "psxsrc/psyq.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
@@ -208,14 +212,14 @@ extern int InvGfxTable[];
 
 
 /* TU-owned small data: speed-bar needle physics state (persists between frames) */
-int D_8011AD94 = -64;
-int D_8011AD98 = -23;
-int D_8011AD9C = 19;
-int D_8011ADA0 = 48;
-int D_8011ADA4 = 4;
-int D_8011ADA8 = 4;
-int D_8011ADAC = 4;
-int D_8011ADB0 = 4;
+static int D_8011AD94 = -64;
+static int D_8011AD98 = -23;
+static int D_8011AD9C = 19;
+static int D_8011ADA0 = 48;
+static int D_8011ADA4 = 4;
+static int D_8011ADA8 = 4;
+static int D_8011ADAC = 4;
+static int D_8011ADB0 = 4;
 
 /* -------------------------------------------------------------------------------------------- */
 

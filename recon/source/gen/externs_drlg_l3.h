@@ -1,47 +1,47 @@
 /* pregame-overlay data tables (carved into asm/data/drlg_l3_rodata_*.rodata.s, symbol_addrs_pregame.txt) */
 extern unsigned char spawntable[15];   /* @0x801486B4 */
 extern unsigned char poolsub[15];   /* @0x801486D4 */
-extern unsigned char L3ConvTbl[16];   /* @0x801486E4 */
-extern unsigned char L3UP[20];   /* @0x801486F4 */
-extern unsigned char L3DOWN[20];   /* @0x80148708 */
-extern unsigned char L3HOLDWARP[20];   /* @0x8014871C */
-extern unsigned char L3TITE1[34];   /* @0x80148730 */
-extern unsigned char L3TITE2[34];   /* @0x80148754 */
-extern unsigned char L3TITE3[34];   /* @0x80148778 */
-extern unsigned char L3TITE7[42];   /* @0x8014879C */
-extern unsigned char L3TITE8[20];   /* @0x801487C8 */
-extern unsigned char L3TITE9[20];   /* @0x801487DC */
-extern unsigned char L3TITE10[20];   /* @0x801487F0 */
-extern unsigned char L3TITE11[20];   /* @0x80148804 */
-extern unsigned char L3ISLE1[14];   /* @0x80148818 */
-extern unsigned char L3ISLE2[14];   /* @0x80148828 */
-extern unsigned char L3ISLE3[14];   /* @0x80148838 */
-extern unsigned char L3ISLE4[14];   /* @0x80148848 */
-extern unsigned char L3ISLE5[10];   /* @0x80148858 */
-extern unsigned char L3ANVIL[244];   /* @0x80148864 */
+static unsigned char L3ConvTbl[];   /* retail STAT: file-local table */   /* @0x801486E4 */
+static unsigned char L3UP[];   /* retail STAT: file-local table */   /* @0x801486F4 */
+static unsigned char L3DOWN[];   /* retail STAT: file-local table */   /* @0x80148708 */
+static unsigned char L3HOLDWARP[];   /* retail STAT: file-local table */   /* @0x8014871C */
+static unsigned char L3TITE1[];   /* retail STAT: file-local table */   /* @0x80148730 */
+static unsigned char L3TITE2[];   /* retail STAT: file-local table */   /* @0x80148754 */
+static unsigned char L3TITE3[];   /* retail STAT: file-local table */   /* @0x80148778 */
+static unsigned char L3TITE7[];   /* retail STAT: file-local table */   /* @0x8014879C */
+static unsigned char L3TITE8[];   /* retail STAT: file-local table */   /* @0x801487C8 */
+static unsigned char L3TITE9[];   /* retail STAT: file-local table */   /* @0x801487DC */
+static unsigned char L3TITE10[];   /* retail STAT: file-local table */   /* @0x801487F0 */
+static unsigned char L3TITE11[];   /* retail STAT: file-local table */   /* @0x80148804 */
+static unsigned char L3ISLE1[];   /* retail STAT: file-local table */   /* @0x80148818 */
+static unsigned char L3ISLE2[];   /* retail STAT: file-local table */   /* @0x80148828 */
+static unsigned char L3ISLE3[];   /* retail STAT: file-local table */   /* @0x80148838 */
+static unsigned char L3ISLE4[];   /* retail STAT: file-local table */   /* @0x80148848 */
+static unsigned char L3ISLE5[];   /* retail STAT: file-local table */   /* @0x80148858 */
+static unsigned char L3ANVIL[];   /* retail STAT: file-local table */   /* @0x80148864 */
 
 /* main-image small tables reached from DRLG_L3__Fi (content confirmed byte-for-byte against
  * refs/devilution/Source/drlg_l3.cpp's L3TITE12/L3TITE13/L3CREV1-11/L3XTRA1-5; VAs are the real
  * addresses splat carved (D_8011BEEC etc) -- named here for readability, byte-identical either way
  * since verify_asm normalizes %hi/%lo/reloc names). */
-extern unsigned char L3TITE12[6];   /* @0x8011BEEC */
-extern unsigned char L3TITE13[6];   /* @0x8011BEF4 */
-extern unsigned char L3CREV1[6];   /* @0x8011BEFC */
-extern unsigned char L3CREV2[6];   /* @0x8011BF04 */
-extern unsigned char L3CREV3[6];   /* @0x8011BF0C */
-extern unsigned char L3CREV4[6];   /* @0x8011BF14 */
-extern unsigned char L3CREV5[6];   /* @0x8011BF1C */
-extern unsigned char L3CREV6[6];   /* @0x8011BF24 */
-extern unsigned char L3CREV7[6];   /* @0x8011BF2C */
-extern unsigned char L3CREV8[6];   /* @0x8011BF34 */
-extern unsigned char L3CREV9[6];   /* @0x8011BF3C */
-extern unsigned char L3CREV10[6];   /* @0x8011BF44 */
-extern unsigned char L3CREV11[6];   /* @0x8011BF4C */
-extern unsigned char L3XTRA1[4];   /* @0x8011BF54 */
-extern unsigned char L3XTRA2[4];   /* @0x8011BF58 */
-extern unsigned char L3XTRA3[4];   /* @0x8011BF5C */
-extern unsigned char L3XTRA4[4];   /* @0x8011BF60 */
-extern unsigned char L3XTRA5[4];   /* @0x8011BF64 */
+static unsigned char L3TITE12[];   /* retail STAT: file-local table */   /* @0x8011BEEC */
+static unsigned char L3TITE13[];   /* retail STAT: file-local table */   /* @0x8011BEF4 */
+static unsigned char L3CREV1[];   /* retail STAT: file-local table */   /* @0x8011BEFC */
+static unsigned char L3CREV2[];   /* retail STAT: file-local table */   /* @0x8011BF04 */
+static unsigned char L3CREV3[];   /* retail STAT: file-local table */   /* @0x8011BF0C */
+static unsigned char L3CREV4[];   /* retail STAT: file-local table */   /* @0x8011BF14 */
+static unsigned char L3CREV5[];   /* retail STAT: file-local table */   /* @0x8011BF1C */
+static unsigned char L3CREV6[];   /* retail STAT: file-local table */   /* @0x8011BF24 */
+static unsigned char L3CREV7[];   /* retail STAT: file-local table */   /* @0x8011BF2C */
+static unsigned char L3CREV8[];   /* retail STAT: file-local table */   /* @0x8011BF34 */
+static unsigned char L3CREV9[];   /* retail STAT: file-local table */   /* @0x8011BF3C */
+static unsigned char L3CREV10[];   /* retail STAT: file-local table */   /* @0x8011BF44 */
+static unsigned char L3CREV11[];   /* retail STAT: file-local table */   /* @0x8011BF4C */
+static unsigned char L3XTRA1[];   /* retail STAT: file-local table */   /* @0x8011BF54 */
+static unsigned char L3XTRA2[];   /* retail STAT: file-local table */   /* @0x8011BF58 */
+static unsigned char L3XTRA3[];   /* retail STAT: file-local table */   /* @0x8011BF5C */
+static unsigned char L3XTRA4[];   /* retail STAT: file-local table */   /* @0x8011BF60 */
+static unsigned char L3XTRA5[];   /* retail STAT: file-local table */   /* @0x8011BF64 */
 
 /* game-core state (owned by GENDUNG.CPP / ENGINE.CPP, tentative-defined there) */
 extern unsigned short dungeon[48][48];   /* @0x800E40C4 */

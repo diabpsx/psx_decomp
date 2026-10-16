@@ -87,6 +87,8 @@ extern int asyncsector;
 ASYNC async;
 volatile int curcancel = 0;            /* shared with the CD-callback reader path */
 
+void dumpasync(void) LIBTEXT;
+void validateasyncblocks(void) LIBTEXT;
 int asyncreadmsecs(int bytes) LIBTEXT;
 int asyncstructsize(int numblocks) LIBTEXT;
 void initasyncstruct(ASYNCBLOCK *blocks, int numblocks, int memclass) LIBTEXT;
@@ -118,6 +120,15 @@ void initasyncblocks(ASYNCBLOCK *blocks, int numblocks) LIBTEXT;
 void putasyncblock(int handle) LIBTEXT;
 int getasyncblock(void) LIBTEXT;
 static void internalupdateasyncqueue(void) LIBTEXT;
+
+/* debug hooks: empty in the retail release build (same member, ahead of the loader) */
+void dumpasync(void)
+{
+}
+
+void validateasyncblocks(void)
+{
+}
 
 int asyncreadmsecs(int bytes)
 {

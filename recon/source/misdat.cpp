@@ -1,6 +1,7 @@
 /* MISDAT.CPP — Diablo PSX (Climax 1998) reconstruction.  Twin: refs/diablo-hellfire/src/MISDAT.CPP.
  * The two empty handlers of the missile tables: nullmissile (add function) and FuncNULL (the PSX
  * per-missile draw hook). */
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 struct MissileStruct {   /* sizeof 76 */

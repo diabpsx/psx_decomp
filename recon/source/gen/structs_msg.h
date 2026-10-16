@@ -625,3 +625,9 @@ struct PlayerStruct {   /* sizeof 6632 */
     unsigned char pLvlLoad;   /* +0x19E2 */
     unsigned long pDiabloKillLevel;   /* +0x19E4 */
 };
+
+struct TMegaPkt {   /* retail sizeof 32008 (MULTI.CPP layout; MSG keeps a static pointer to it) */
+    struct TMegaPkt *pNext;
+    unsigned long dwSpaceLeft;
+    unsigned char data[32000];
+};

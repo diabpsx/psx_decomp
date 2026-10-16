@@ -32,7 +32,7 @@ class DrlgL1NativeTests(unittest.TestCase):
                 receipt=R.build(['drlg_l1'])[0]
             self.assertEqual((receipt['segment'],receipt['functions']),('drlg_l1',40))
             self.assertEqual({name:row['size'] for name,row in receipt['sections'].items()},
-                             {'.text':21060,'.rdata':52,'.data':8280,'.sbss':6})
+                             {'.text':21060,'.rdata':52,'.data':8280,'.sdata':9,'.sbss':6})
             self.assertEqual(len(spec['data_symbols']),17)
             # Verify the format bridge too: inter-label alignment bytes must
             # not survive outside an incbin that already contains those bytes.

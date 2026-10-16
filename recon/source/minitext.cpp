@@ -6,6 +6,7 @@
  * VAG voice-file length instead of the PC's fixed qtextDelaySpd[] table.  Reconstructed from the retail
  * asm oracle + skel/SOURCE/MINITEXT.CPP (Ghidra/IDA draft). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_minitext.h"
 #include "source/gen/externs_minitext.h"

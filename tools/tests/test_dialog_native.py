@@ -27,11 +27,11 @@ class DialogNativeTests(unittest.TestCase):
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("dialog", 11))
         self.assertEqual(receipt["assembler_version"], "2.67")
-        self.assertEqual(receipt["scaffold_gp_prefix"]["mode"], "embedded_prefix")
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1141)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["mode"], "prefix")
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1132)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 9444, ".rdata": 50, ".data": 176,
-                          ".sdata": 131, ".sbss": 16})
+                          ".sdata": 140, ".sbss": 16})
 
 
 if __name__ == "__main__":

@@ -16,7 +16,8 @@ OVERLAYS = ('frontend', 'pregame', 'game', 'fmv')
 KSEG0 = 0x80000000
 GROUP_ALIGN = 8            # PSYLINK group alignment: the overlay groups start at the main image's bss end rounded up
 LAST_SIZE = 4              # `.last` group (GSYSASM.ASM's FirstFreeByte word)
-LINK_OPTIONS = {'LNK_StackSize': 0x1800}   # PSYLINK /stack option of the retail link (rom/DIABPSX.MAP)
+LINK_OPTIONS = {'LNK_OrgAddress': 0x80010000, 'LNK_StackSize': 0x1800, 'LNK_RamSize': 2, 'LNK_DevKit': 1,
+                'LNK_FileSys': 1, 'LNK_NoQuests': 0}   # the retail link's `equ` symbols (rom/DIABPSX.MAP)
 # PSYLINK group declaration order of the retail link (rom/DIABPSX.MAP group column): an overlay group's id is its
 # 1-based position, and PSYLINK writes that id as the 4-byte `$<group>` word at the group's org (probe 2026-10-10:
 # two OVER groups at one org each get a word there, the later group's value is what the image keeps).
@@ -67,8 +68,10 @@ def compute():
     vram, end, bss, ram_end = layout('diabpsx')
     main_end = vram + end + bss
     org = (main_end + GROUP_ALIGN - 1) // GROUP_ALIGN * GROUP_ALIGN
-    out = {'LNK_OrgAddress': vram, '_bss_objend': org}
+    out = {'_bss_objend': org}
     out.update(LINK_OPTIONS)
+    if LINK_OPTIONS['LNK_OrgAddress'] != vram:
+        raise ValueError('LNK_OrgAddress differs from the main image origin')
     out.update({f'_{group}_id': group_id(group) for group in OVERLAY_GROUPS})
     first, stop = startup_span()
     start_org = vram + first

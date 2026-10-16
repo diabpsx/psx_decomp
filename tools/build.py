@@ -74,7 +74,6 @@ PER_TU_FLAGS = {
     "recon/eaclib/blkfill.s": {"g_value": "0"},
     "recon/eaclib/crc.s": {"g_value": "0"},
     "recon/eaclib/getm.s": {"g_value": "0"},
-    "recon/eaclib/nasync_debug.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/eaclib/savegp.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/eaclib/textcrnt.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     # EA Canada EACLIB C members (lib segment, 2026-10-04 round): measured identity = PsyQ 3.6 DOS
@@ -83,7 +82,7 @@ PER_TU_FLAGS = {
     # in the small-li form (ASPSX < 2.50).  libddx (ddx.c) alone is -O1 -G0 with an ASPSX < 2.50.
     **{f"recon/eaclib/{name}.c": {"g_value": "8", "compiler": "psyq36-dos"} for name in (
         "lock", "systask", "getcycle", "addtimer", "inittmr", "timer", "filesize", "filexist", "iocoord",
-        "loadcall", "eac_async", "abortmsg", "cdstream", "exit", "filename", "stricmp", "strnicmp", "blockio",
+        "loadcall", "eac_async", "abortmsg", "cdstream", "exit", "filename", "stricmp", "blockio",
         "cdrom", "eac_fileio", "memman", "cache", "compact", "resize", "validmem", "loadfat", "seekmsec",
         "callback", "vars")},
     "recon/eaclib/ddx.c": {"g_value": "0", "compiler": "gcc-2.6.3", "extra": ["-O1"]},
@@ -94,7 +93,7 @@ PER_TU_FLAGS = {
     # Climax GLIB C modules use absolute addressing even for four-byte owned
     # commons (TICK/GazTick), proving their original small-data threshold was 0.
     "recon/glibdev/gmain.c": {"g_value": "0"},
-    "recon/glibdev/tick.c": {"g_value": "0"},
+    "recon/glibdev/tick.c": {"g_value": "0", "assembler_g_value": "8"},
     # GLIB code is -G0 (absolute data references), but the objects were assembled with the assembler's
     # default small-data threshold: ASPSX puts each `.lcomm` of 8 bytes or less in .sbss and the larger
     # statics (SchEnv, MemHdrBlocks) in .bss, which is the retail placement.
@@ -103,8 +102,8 @@ PER_TU_FLAGS = {
     "recon/glibdev/gutils.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/glibdev/gtimsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
     "recon/glibdev/vrip.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gdebug.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/gsys.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/gdebug.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
     # Reproduce linker-placed zero commons. These unchanged GAME objects link
     # all text/pool bytes and their typed globals at the retail homes.
     "recon/source/missiles.cpp": {"extra": ["-fconserve-space"]},

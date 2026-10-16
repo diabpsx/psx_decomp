@@ -29,7 +29,7 @@ class LightingNativeTests(unittest.TestCase):
         symbols = '\n'.join(p.read_text() for p in (B.ROOT/'configs').glob('symbol_addrs*.txt'))
         retail = S.RETAIL.read_text(encoding='latin-1')
         regions = {'.text':(0x8004BC68,7412), '.rdata':(0x801166E8,14),
-                   '.data':(0x800D5554,4668), '.sdata':(0x8011B8F4,52),
+                   '.data':(0x800D5554,4668), '.sdata':(0x8011B8E8,64),
                    '.sbss':(0x8011C7DC,44), '.bss':(0x8012ED58,128)}
         with tempfile.TemporaryDirectory(prefix='lighting-native-',dir=B.BUILD) as directory:
             folder = Path(directory)
@@ -43,7 +43,7 @@ class LightingNativeTests(unittest.TestCase):
             self.assertFalse(any('bss' in row for row in obj['xdefs']))
             self.assertEqual(set(obj['xrefs']),set(spec['externals']))
             prefix,combined,mode = R.gp_carrier_plan(regions,image,0x8011A780,0x8011C604)
-            self.assertEqual((mode,len(prefix)),('prefix',4468))
+            self.assertEqual((mode,len(prefix)),('prefix',4456))
             prefix_src=folder/'prefix.s'; prefix_obj=folder/'prefix.obj'
             prefix_src.write_bytes(('.sdata\r\n'+''.join('.byte '+','.join(map(str,prefix[i:i+16]))+'\r\n'
                                   for i in range(0,len(prefix),16))).encode())

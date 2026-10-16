@@ -4,6 +4,8 @@
  * for scaffolding only, cross-checked function-by-function against this retail target's own raw).
  * Layouts / externs / prototypes from DIABPSX.SYM (tools/symhdr.py -> psxsrc/gen/*_main.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" pool heads this TU's .sdata */
+#include "psxsrc/cplayer_header.h"        /* GMAN.H / CPLAYER.H inline literals head its .rdata */
 #include "psxsrc/gen/structs_main.h"
 #include "psxsrc/gen/externs_main.h"
 #include "psxsrc/gen/protos_main.h"

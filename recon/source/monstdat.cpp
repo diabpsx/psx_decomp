@@ -1,6 +1,8 @@
 /* MONSTDAT.CPP � typed PSX monster tables, from retail SYM and data.
  * PC twin: refs/diablo-hellfire/src/MONSTDAT.CPP; PSX IDs/layouts are retained. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 
 
 struct MonsterData {   /* sizeof 60 */

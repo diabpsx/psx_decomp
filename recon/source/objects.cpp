@@ -9,6 +9,7 @@
  * GetSOLID-style wrapper) except where the oracle itself calls GetSOLID/GetTRAP/SetSOLID/etc (DPIECE.CPP
  * accessors); MemFreeDbg macro (from source/diablo.h) is used for mem_free_dbg. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_objects.h"
 #include "source/gen/externs_objects.h"
 #include "source/gen/protos_objects.h"
@@ -3416,8 +3417,19 @@ void RestoreObjectLight(void)
     }
 }
 
-/* out-of-line header-copy methods (GMAN.H/BLOCK.H inline members compiled into this TU because it uses them) */
-int CBlocks::GetOtPos(int LogicalY)
+/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
+ * code in REVERSE definition order, so retail's tail (CBlocks::GetOtPos, TextDat::GetNumOfFrames, TextDat::GetCreature) fixes this definition order. */
+inline struct CCreatureHdr *TextDat::GetCreature(int Creature)
+{
+    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
+}
+
+inline int TextDat::GetNumOfFrames(int Creature, int Action)
+{
+    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
+}
+
+inline int CBlocks::GetOtPos(int LogicalY)
 {
     int OtPos;
 
@@ -3428,20 +3440,9 @@ int CBlocks::GetOtPos(int LogicalY)
         OtPos = 0x19B;
     return OtPos + 0x4D;
 }
-
-int TextDat::GetNumOfFrames(int Creature, int Action)
-{
-    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
-}
-
 struct MiniTileDef {
     short v1, v2, v3, v4;
 };
-
-struct CCreatureHdr *TextDat::GetCreature(int Creature)
-{
-    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
-}
 
 /* ---- merge alternates (claude/cool-knuth-frvuxm into master, 2026-09-28): the losing side of each
  * conflict hunk, kept for reference. Winner = PASS (bytes+SYM) first, then SLD line agreement. ---- */

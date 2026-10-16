@@ -1,6 +1,3 @@
 {
-  "diabpsx": {
-    "sdata_primpool": {"owner": "primpool", "section": ".sdata", "size": 20},
-    "rodata_primpool_native": {"owner": "primpool", "section": ".rodata", "size": 28, "payload_size": 25, "alignment": 4, "padding_hex": "494142"}
-  }
+  "diabpsx": {}
 }

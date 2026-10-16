@@ -5,8 +5,8 @@
 lib initgp recon/eaclib/savegp.c
 lib savegp_ci recon/eaclib/savegp.c
 lib restoregp recon/eaclib/savegp.c
-lib dumpasync recon/eaclib/nasync_debug.c
-lib validateasyncblocks recon/eaclib/nasync_debug.c
+lib dumpasync recon/eaclib/eac_async.c
+lib validateasyncblocks recon/eaclib/eac_async.c
 lib blockclear recon/eaclib/blkfill.s
 lib blockfill recon/eaclib/blkfill.s
 lib crc16 recon/eaclib/crc.s
@@ -275,7 +275,7 @@ lib addexit recon/eaclib/exit.c
 lib removeexit recon/eaclib/exit.c
 lib filename recon/eaclib/filename.c
 lib stricmp recon/eaclib/stricmp.c
-lib strnicmp recon/eaclib/strnicmp.c
+lib strnicmp recon/eaclib/stricmp.c
 lib cachememadr recon/eaclib/cache.c
 lib cachememblock recon/eaclib/cache.c
 lib prioritycachememadr recon/eaclib/cache.c

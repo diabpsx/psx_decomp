@@ -2,6 +2,7 @@
  * Bodies from the retail oracle (asm/nonmatchings/primpool) + SYM (scratch/tuinfo.py PRIMPOOL.CPP).
  * File statics per SYM class STAT; ThisOt / ThisPrimAddr / AddrToAvoid are this module's EXT .sdata. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" pool heads this TU's .sdata */
 #include "psxsrc/psyq.h"
 #include "psxsrc/textdat_header.h"
 #include "glibdev/gal.h"

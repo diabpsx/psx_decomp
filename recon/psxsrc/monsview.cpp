@@ -1,6 +1,7 @@
 /* MONSVIEW.CPP — Diablo PSX (Climax 1998) reconstruction (PSXSRC).  Debug monster viewer: compiled
  * out in the retail build (empty body). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

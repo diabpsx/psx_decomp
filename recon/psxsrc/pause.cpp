@@ -5,6 +5,7 @@
  * (Dialog, CBlocks, CPad) are emitted out of line in this object (-fno-inline).
  * Sources: retail asm oracle > SYM (scratch/tuinfo.py PAUSE.CPP) > refs/skeleton PAUSE.H (prototypes). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 struct RECT {   /* sizeof 8 */

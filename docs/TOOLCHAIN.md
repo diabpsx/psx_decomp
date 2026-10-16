@@ -718,6 +718,104 @@ initialised definition and emits the table there; `sizeof` cannot apply to the i
 DRLG_L5Subs and DRLG_L4Subs compare against L5BTYPES_SIZE / L4BTYPES_SIZE.  The members are
 unchanged byte- and SYM-wise.  The lines inside each function (the SLD proper) are still not gated.
 
+### Round 12: every scaffold-supplied byte of the game objects owned by source (2026-10-11)
+
+A census of the main image against the receipts, the SDK member receipts and the data lanes listed
+what the GNU image still took from splat scaffolds: 71 `.sdata` ".tp"/".dat" literal pools and 27
+`.rdata` literal heads of units that include GMAN.H / CPLAYER.H without using the inlines, the
+first pool (MAIN, the first object after MONSTLST's tables), four units whose retail object carries
+nothing but those literals (LEIGH, CMONST, CREATURE, PREITEM), PRIMPOOL (still in the old
+conventional lane), DRLG_L1's pool, the data-lane pools (MONSTDAT, OBJDAT, SPELLDAT), VARS's seven
+mouse hooks (`nullfunction`), LOADSAVE's trailing "DIABLO-OPTIONS" literal, LIBSPU's `spu_malloc`
+/ `spu_reverb_params` data members and the boot word.  Every one is now source-owned:
+
+- A pool is claimed by including the split literal headers (`psxsrc/textfileinfo_header.h`,
+  `psxsrc/textdat_header.h` or `psxsrc/cplayer_header.h`) right after `diabpsx_types.h`, and the
+  member's `.sdata` / `.rdata` rows extend back over it.  Pool attribution follows the include
+  order (same-named sections concatenate in include order; the named `text` group does not).
+  Five units kept local TextDat/CPlayer copies that clashed; they use the split headers now.
+- Zero-initialised definitions put four groups of globals back in their sections (GPANEL hof/mof,
+  PLAYER PlrStructSize/ItemStructSize = sizeof, MONSTER nummtypes, MISSILES fadetor/g/b); their
+  `common_symbols` rows are gone.
+- LEIGH/CMONST/CREATURE/PREITEM are empty TUs: the includes alone emit retail's bytes.
+- PRIMPOOL is a native member (ASPSX 2.67 packs its byte statics into the 32-byte `.sbss`);
+  `configs/recon_link.json`, `recon_data_link.json` and `recon_bss_link.json` are empty.
+- VARS defines `clobbermouse`..`resetdialmouse` = `nullfunction` (NFS4's VARS.C twin); the boot
+  word is `recon/psxsrc/boot.s` (`Wankpot: .word __SN_ENTRY_POINT`, hand-asm lane); LIBSPU's two
+  data members join `configs/native_archive_data.json`.
+- `sdk_link.data_bridge` now consumes splat's bare `.align n` between/after literal rows from the
+  verified payload (the 2 bytes after "psxsrc/gman.h"); the three hand-written `_prefix` scaffolds
+  carry annotated rows; `asm/data/sdata_primpool.sdata.s` names PRIMPOOL's statics.
+
+Still scaffold-supplied in the GNU image: PSYLINK's 1..3-byte section padding (uninitialised link
+garbage at 85 sites, not source-derivable) and the archive-data members (`_ctype_`, SNDEF, the
+LIBSPU pair) that `gen_ld` does not consume.  The whole-program PSYLINK link below takes both from
+the original tools.
+
+### Phase 2: the whole-program PSYLINK link (2026-10-11)
+
+`python tools/native_program_link.py [--reuse]` links all five images in one PSYLINK run from the
+native objects and the original archives, the way retail was built, and compares them with
+`rom/*.BIN`: FRONTEND, PREGAME, GAME and FMV come out byte-identical; DIABPSX differs in 160 bytes
+(below); the MAP group table is identical in all 334 rows and the symbol table has no extra and no
+missing symbol except the section symbols of ~370 empty retail objects (below).
+
+- Objects: every registry member is compiled by the gate's own lane (`symlane.compile_g`, retail
+  section names, no GP carriers, no payload extraction) and written under its retail object name;
+  the cache is keyed on the preprocessed text.  Hand-assembled members are assembled with their own
+  `-G`; the GNU lane's `.text.lib` placement attribute is spelled `.text` (`plain_library_text`) and
+  SN's own `_._7TextDat` / `_GLOBAL_.I.x` names are kept (`sn_spellings`).  NULLFUNC's section is
+  `code`, MAP's is `.MAP_data` (retail MAP).
+- Libraries: the Sony archives are the PsyQ 4.1 `.LIB`s through `inclib` in the retail search order
+  (LIBSN, LIBAPI, LIBETC, LIBGPU, LIBSPU, LIBC, LIBCARD, LIBCD, LIBTAP, LIBGTE), then
+  `inclib LIBPRESS.LIB,libpress`, then `GLIB.LIB`: the Climax GLIB and EA EACLIB objects as one
+  PSYLIB archive whose member order is the retail pull order (the plain `.text`/`.data`/`.sdata`
+  sequence of the MAP).  PSYLINK's search (probed): libraries in order, archive order within a
+  library, the library rescanned from its first member after every pull, passes repeated while
+  anything is pulled; that reproduces all 693 plain-text symbols in retail order.  NULLFUNC is the
+  archive's last member and LIBPRESS is searched before it: retail's undeclared empty sections
+  (libpress.sdata, .MONSTLST_text) read 0x80010000, i.e. were evaluated before `code` reached the
+  default group.  GSYSASM.ASM (`FirstFreeByte` / `hahha` in `.last`) is reconstructed as
+  `recon/glibdev/gsysasm.s`.
+- Script: groups in MAP order (`boot_text`, `text`, `startup_text`, `map_data over(startup_text)`,
+  `data`, `rdata`, `sdata`, `sbss bss`, `bss bss`, the four LUMP groups `over(frontend_text)` with
+  `file("X.BIN")`, `memend`, `last`, `memcard_text`); every section the retail link declared, read
+  from the MAP's `__<section>_org` symbols so that empty sections take their positions (OBJDAT's
+  `.OBJDAT_text` ahead of `.OBJECTS_text`, MONSTDAT's at INV's start, PREITEM's at PREMSG's end);
+  the six `LNK_*` equates; the game objects included in the retail include order
+  (`build/include_order.json`: a topological merge of the concatenation orders of `.sdata`, `.sbss`,
+  `.bss`, `.ctors`, `.dtors` and the plain sections; the named `text`/`rdata`/`data` sections follow
+  the script's declaration order instead).  LNKOPT's RAM-size and free-memory words are link
+  expressions over `LNK_RamSize`, `LNK_StackSize` and `FirstFreeByte` (PSYLINK evaluates them; the
+  GNU lane assembles the same values as `--defsym`s).
+- Run: `psylink /c /m /v /p /n600`: `/v` writes the `$<group>` id words, `/p` writes the main image
+  as a pure binary (Climax appended the additive checksum, `image_trailer`), the LUMP groups go to
+  their files.  PSYLINK 2.60 (PsyQ 4.1) writes each overlay file at the group's own extent; 2.52
+  pads the last OVER group's file to the overlay set's end plus the following group, which retail's
+  126064-byte FMV.BIN is not, so the link uses 2.60.
+
+What the link taught about the sources (all gates still PASS): cc1plus emits a non-inlined
+`inline` member's out-of-line copy at the end of the TU, after all other code, in reverse
+definition order, as a local symbol; 43 such functions were global in the reconstruction and are
+`inline` (definitions reversed) or `static` now, which is what the retail STAT records say.
+Uninitialised globals of a C++ TU are emitted at the end of its `.sdata`/`.data` (MISSILES',
+MONSTER's, ITEMS' tails, DEAD's `pSquareCel`); only `-fconserve-space` makes them commons.  Retail
+STAT data the reconstruction had dropped is back (BLOCK blockr/g/b, PROF LastCpuTime/LastDrawTime/
+DrawArea, OPTIONS McState, INTERFAC sgdwProgress/sgdwXY, ITEMS tem, MSG sgdwOwnerWait/sgpMegaPkt,
+MONSTER sgbSaveSoundOn, the DRLG_L3 tables static); the EA commons retail allocated in `.sbss`
+(asyncseekstart, timerevent, ...) are declared in cdrom.c/cdstream.c/inittmr.c; GLIB's TICK/GSYS/
+GDEBUG commons are small commons (assembler `-G8`); STRNICMP is in STRICMP.C and the NASYNC debug
+hooks in ASYNC.C (retail pulled them without a caller); `savegp` carries its retail name (the
+oracle file keeps the `savegp_ci` stem because Windows cannot hold it beside GLIB's `SaveGP.s`).
+
+Residuals: (1) 85 sites of 1..3 bytes between sections are the retail linker's stale buffer bytes
+(address fragments); PSYLINK 2.60 writes zeros there, and no source spells them, so DIABPSX.BIN
+differs in those 157 bytes plus the checksum.  (2) Retail linked ~370 objects whose sections are
+all empty (BKANJI, L1ADATA.., M1A.., RH*/RL*/..., CUT*, DEBUG, DOBJ, HELP...): the asset pipeline's
+stubs, which contribute only their 4340 section symbols; they are not reconstructed.  (3) The plain
+`__data`/`__sbss`/`__bss` `_size`/`_orgend`/`_objend` symbols differ (PSYLINK's unpadded sums of
+contributions; the group extents and every address agree).
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

@@ -9,6 +9,7 @@
  * CheckTrigForce() also gained an 8-neighbour offset_x/offset_y probe (the PSX pad cursor isn't
  * pixel-precise) trying each Force*Trig() around the cursor tile until one hits. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_trigs.h"
 #include "source/gen/externs_trigs.h"

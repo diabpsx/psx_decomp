@@ -21,25 +21,24 @@ import json
                      'original compiler/linker and retail images unavailable')
 class MissilesNativeProbeTests(unittest.TestCase):
     def test_full_relocated_text_pool_and_constant_small_data(self):
-        self.check_source('missiles',0x80139C04,69488,0x80119DC0,1272,0x8011C258,45,115,
-                          {'nummissiles':4,'MissilePreFlag':1,'ManashieldFlag':1,'ManashieldFlag2':1,
-                           'fadetor':1,'fadetog':1,'fadetob':1},
+        self.check_source('missiles',0x80139C04,69488,0x80119DC0,1272,0x8011C24C,67,115,
+                          {},   # in-section zero-initialised definitions now (retail .sdata tail)
                           data_section=(0x801029D8,10268))
 
     def test_monster_relocated_text_pool_statics_and_common_storage(self):
-        self.check_source('monster',0x8014AB74,50944,0x8011A2B8,240,0x8011C2A0,43,105,
-                          {'nummonsters':4,'nummtypes':4,'monstimgtot':4,'totalmonsters':1,'uniquetrans':4},
-                          data_section=(0x801051F4,21384))
+        self.check_source('monster',0x8014AB74,50944,0x8011A2B8,240,0x8011C290,76,105,
+                          {},   # in-section zero-initialised definitions now (retail .sdata tail)
+                          data_section=(0x801051F4,21384),extra={'.sbss':(0x8011C904,4)})
 
     def test_inv_relocated_text_initialized_globals_and_header_order(self):
-        self.check_source('inv',0x80157274,44260,0x8011A3B8,896,0x8011C2F4,104,57,{},
+        self.check_source('inv',0x80157274,44260,0x8011A3B8,896,0x8011C2E8,116,57,{},
                           data_section=(0x8010D008,1729))
 
     def test_automap_relocated_code_and_original_global_initializers(self):
-        self.check_source('automap',0x80161F58,7880,0x8011A738,72,0x8011C368,60,19,{},
+        self.check_source('automap',0x80161F58,7880,0x8011A738,72,0x8011C35C,72,19,{},
                           data_section=(0x8010D6CC,1248))
 
-    def check_source(self,segment,text_va,text_size,pool_va,pool_size,small,small_size,count,expected_commons,data_section=None):
+    def check_source(self,segment,text_va,text_size,pool_va,pool_size,small,small_size,count,expected_commons,data_section=None,extra=None):
         source = B.ROOT/f'recon/source/{segment}.cpp'
         names = S.retail_section_names(source)   # retail's per-object section spelling on the object
         back = {v: k for k, v in names.items()}
@@ -58,6 +57,7 @@ class MissilesNativeProbeTests(unittest.TestCase):
             sizes = {obj['sections'][s]: len(data) for s,data in obj['code'].items()}
             expected_sizes={'.text': text_size, '.rdata': pool_size, '.sdata': small_size}
             if data_section:expected_sizes['.data']=data_section[1]
+            if extra:expected_sizes.update({k:v[1] for k,v in extra.items()})   # resident zero storage rows (MONSTER's sgbSaveSoundOn)
             self.assertEqual(sizes,{names.get(k, k): v for k, v in expected_sizes.items()})
             commons = {r['name']: r['bss'] for r in obj['xdefs'] if 'bss' in r}
             self.assertEqual(commons, expected_commons)
@@ -73,6 +73,7 @@ class MissilesNativeProbeTests(unittest.TestCase):
             regions = {'.text': (text_va,text_size), '.rdata': (pool_va,pool_size),
                        '.sdata': (gp, len(prefix)+small_size)}
             if data_section:regions['.data']=data_section
+            if extra:regions.update(extra)
             blocks, _ = N.native_link(segment+'_probe',raw,{names.get(k, k): v for k, v in regions.items()},bindings,
                                       prefix_objects=[prefix_obj],output_dir=folder,overlay_text=True,
                                       overlay_group='game_text')   # retail overlay id $d

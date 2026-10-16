@@ -7,12 +7,45 @@
     "va": "0x80010000",
     "size": 8,
     "exports": [
-      "alertbox", "bitline", "detectcpu", "fclose", "findfirst", "findnext",
-      "fopen", "fprintf", "hideprint", "initinversetable", "interpretsub",
-      "nullfunction", "nullfunctionz", "nullwindow", "openmainwindow",
-      "printattribute", "printbyte", "printbytexy", "printchar", "printcharxy",
-      "printclear", "printscroll", "purgekey", "scancode", "scrollline",
-      "setbitline", "showprint", "transbitline"
+      "alertbox",
+      "bitline",
+      "detectcpu",
+      "fclose",
+      "findfirst",
+      "findnext",
+      "fopen",
+      "fprintf",
+      "hideprint",
+      "initinversetable",
+      "interpretsub",
+      "nullfunction",
+      "nullfunctionz",
+      "nullwindow",
+      "openmainwindow",
+      "printattribute",
+      "printbyte",
+      "printbytexy",
+      "printchar",
+      "printcharxy",
+      "printclear",
+      "printscroll",
+      "purgekey",
+      "scancode",
+      "scrollline",
+      "setbitline",
+      "showprint",
+      "transbitline"
+    ]
+  },
+  "boot_text": {
+    "source": "recon/psxsrc/boot.s",
+    "image": "diabpsx",
+    "assembler": "2.56",
+    "section": ".boot_text",
+    "va": "0x80010008",
+    "size": 4,
+    "exports": [
+      "Wankpot"
     ]
   }
 }

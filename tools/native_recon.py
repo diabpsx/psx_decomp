@@ -51,10 +51,12 @@ def is_zero_section(section):
     return section in ('.sbss', '.bss') or bool(re.fullmatch(r'\.(?:s?bss)\.\w+', section))
 
 
-def compile_source(source, assembler, assembler_dos, assembler_flags, section_prefixes=None):
+def compile_source(source, assembler, assembler_dos, assembler_flags, section_prefixes=None,
+                   plain_library_text=False, sn_spellings=False):
     if source.suffix.lower() != '.s':
         return S.compile_g(source, assembler=assembler, assembler_dos=assembler_dos,
-                           assembler_flags=assembler_flags, section_prefixes=section_prefixes)
+                           assembler_flags=assembler_flags, section_prefixes=section_prefixes,
+                           plain_library_text=plain_library_text, sn_spellings=sn_spellings)
     if section_prefixes:
         raise ValueError('assembly source cannot consume a generated section prefix')
     flags = B.per_tu_flags(source)

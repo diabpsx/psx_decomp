@@ -6,6 +6,8 @@
  * Dialog's field layout is read directly off the retail SYM STRTAG record (BevelGfx/BorderGfx/
  * BackGfx/DialogOTpos), not guessed. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer_header.h"
 
 struct TASK { unsigned char pad[92]; };   /* sizeof 92 per retail SYM; only used as an untyped handle here */
 
@@ -199,36 +201,9 @@ static void PrintGameOver(void)
     PBack.SetOTpos(oldDotpos);
 }
 
-unsigned short CPad::GetDown(void) const
-{
-    if (AnalogMode != 0) {
-        return DownA;
-    }
-    return Down;
-}
-
-void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R;
-    DialogGreen = G;
-    DialogBlue = B;
-}
-
-void Dialog::SetBack(int Type)
-{
-    BackGfx = Type;
-}
-
-void Dialog::SetBorder(int Type)
-{
-    BorderGfx = Type;
-}
-
-Dialog::~Dialog()
-{
-}
-
-Dialog::Dialog()
+/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
+ * code in REVERSE definition order, so retail's tail (CPad::GetDown, Dialog::SetRGB, Dialog::SetBack, Dialog::SetBorder, Dialog::~Dialog, Dialog::Dialog) fixes this definition order. */
+inline Dialog::Dialog()
 {
     BackGfx = 0x94;
     BevelGfx = 0x1A;
@@ -240,4 +215,33 @@ Dialog::Dialog()
     DialogTGreen = 0x20;
     DialogTBlue = 0x20;
     DialogOTpos = CBlocks::GetOverlayOtBase();
+}
+
+inline Dialog::~Dialog()
+{
+}
+
+inline void Dialog::SetBorder(int Type)
+{
+    BorderGfx = Type;
+}
+
+inline void Dialog::SetBack(int Type)
+{
+    BackGfx = Type;
+}
+
+inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
+{
+    DialogRed = R;
+    DialogGreen = G;
+    DialogBlue = B;
+}
+
+inline unsigned short CPad::GetDown(void) const
+{
+    if (AnalogMode != 0) {
+        return DownA;
+    }
+    return Down;
 }

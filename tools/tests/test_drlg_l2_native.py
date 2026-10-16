@@ -28,9 +28,9 @@ class DrlgL2NativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("drlg_l2", 36))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 5884)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 5872)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 21148, ".sdata": 100})
+                         {".text": 21148, ".sdata": 112})
         self.assertEqual(sum(row["size"] for row in receipt["raw_exports"]), 9492)
 
 

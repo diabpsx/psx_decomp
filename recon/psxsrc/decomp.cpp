@@ -2,6 +2,7 @@
  * sets (TextDat) that want their compressed frames decompressed; DEC_DoDecompRequests services
  * every registered requestor once per call. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 
 #include "psxsrc/textdat_header.h"
 

@@ -29,7 +29,7 @@ class CPlayerNativeTests(unittest.TestCase):
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1476)   # .sdata starts at 0x8011AD44 (its literal pool)
         self.assertEqual(receipt["borrowed_section_prefixes"], {})
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 4068, ".rdata": 176,   # "psxsrc/cplayer.h" .. FindActionEnum's table
+                         {".text": 4068, ".rdata": 192,   # "psxsrc/cplayer.h" .. FindActionEnum's table
                           ".sdata": 27, ".sbss": 16})     # pool, PActiveArray, "PLRDAT"
 
 

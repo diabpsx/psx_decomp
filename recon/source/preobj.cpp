@@ -39,6 +39,7 @@
  *    keeps as `dPiece[x][y]`; AddL1Door additionally zeroes `_oAnimFlag` (devilution does not).
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_preobj.h"
 #include "source/gen/externs_preobj.h"

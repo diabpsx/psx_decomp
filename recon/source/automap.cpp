@@ -9,6 +9,7 @@
  * AMPlayerX/Y, AMPx/AMPy for the 2-player split-screen case).  Layouts, prototypes, externs
  * generated from DIABPSX.SYM (tools/symhdr.py -> gen headers). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_automap.h"
 #include "source/gen/externs_automap.h"

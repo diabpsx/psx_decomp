@@ -7,6 +7,7 @@
  * `andi $a1,-0x41` proves the PSX build clears bit 0x40 here, so the local #define below follows the
  * oracle's VALUE, kept under the devilution FUNCTION name). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

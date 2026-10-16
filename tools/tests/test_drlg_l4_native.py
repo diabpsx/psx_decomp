@@ -32,8 +32,8 @@ class DrlgL4NativeTests(unittest.TestCase):
                 receipt=R.build(['drlg_l4'])[0]
             self.assertEqual((receipt['segment'],receipt['functions']),('drlg_l4',36))
             self.assertEqual({name:row['size'] for name,row in receipt['sections'].items()},
-                             {'.text':24112,'.rdata':123,'.data':7220,'.sdata':60,'.sbss':28})
-            self.assertEqual(receipt['scaffold_gp_prefix']['size'],6136)
+                             {'.text':24112,'.rdata':123,'.data':7220,'.sdata':72,'.sbss':28})
+            self.assertEqual(receipt['scaffold_gp_prefix']['size'],6124)
             for section,kind,name,va,size,limit in (
                 ('.data','data','tables',0x8014D874,7220,0x8014F4A8),
                 ('.rdata','rodata','pool',0x8014D7F8,123,0x8014D874)):

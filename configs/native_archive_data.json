@@ -7,7 +7,9 @@
     "section": ".data",
     "va": "0x800B5DBC",
     "size": 144,
-    "exports": ["_ctype_"]
+    "exports": [
+      "_ctype_"
+    ]
   },
   "sndef": {
     "sdk": "4.1",
@@ -17,6 +19,37 @@
     "section": ".data",
     "va": "0x800B42B4",
     "size": 8,
-    "exports": ["_stacksize", "_ramsize"]
+    "exports": [
+      "_stacksize",
+      "_ramsize"
+    ]
+  },
+  "spu_malloc": {
+    "sdk": "4.1",
+    "library": "LIBSPU.LIB",
+    "member": "S_M",
+    "archive_sha256": "342788b08c0a251dc4f17685278fde8a7f2b6f24edc23d7ee7c12d5c0ade9695",
+    "section": ".data",
+    "va": "0x800B5AAC",
+    "size": 16,
+    "exports": [
+      "_spu_AllocBlockNum",
+      "_spu_AllocLastNum",
+      "_spu_memList"
+    ]
+  },
+  "spu_reverb_params": {
+    "sdk": "4.1",
+    "library": "LIBSPU.LIB",
+    "member": "S_RMP",
+    "archive_sha256": "342788b08c0a251dc4f17685278fde8a7f2b6f24edc23d7ee7c12d5c0ade9695",
+    "section": ".data",
+    "va": "0x800B5ABC",
+    "size": 768,
+    "exports": [
+      "_spu_rev_startaddr",
+      "_spu_rev_workareasize",
+      "_spu_rev_param"
+    ]
   }
 }

@@ -3,6 +3,7 @@
  * PSX delta: retail's InitInv doesn't do the PC CEL-load-by-class dance; instead it clears the
  * inventory/status-bar flags and sets up the PSX panel/graphics TextDat handles + initial cursor slot. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

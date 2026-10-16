@@ -3,6 +3,7 @@
  * (Back, GShadeTab/RandBTab), border lines (Line), the textured tile primitive (DialogPrint) and
  * the drop shadows.  The GMAN.H TextDat::GetFr/GetPal inlines are emitted out of line here. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 
 /* ---------------------------------------------------------------- PsyQ libgpu ---- */
 struct RECT {   /* sizeof 8 */

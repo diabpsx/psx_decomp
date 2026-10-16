@@ -10,6 +10,7 @@
  * pick/swap loop (matching GetMonsterTypes's body) because CC1PL_FLAGS carries -fno-inline (no
  * inlining occurs; this is genuine PSX-side source duplication, not a compiler artifact). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_premon.h"
 #include "source/gen/externs_premon.h"

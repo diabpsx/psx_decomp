@@ -7,6 +7,7 @@
  * main-image data in this build (D_8011BEEC..D_8011BF64) -- content confirmed byte-identical to devilution's
  * named arrays via direct ROM read, so the devilution names are used here for readability. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l3.h"
 #include "source/gen/externs_drlg_l3.h"
@@ -45,42 +46,6 @@ static void DRLG_L3Pass3(void);   /* @0x8014D238 DRLG_L3.CPP:2081 */
  * defined them: cc1plus emits a function's static const tables where the function is defined, retail's
  * .DRLG_L3_text stream has DRLG_L3Pool's spawntable/poolsub constants before L3ConvTbl, and the SLD line stream
  * leaves no gap between functions large enough to hold them (docs/TOOLCHAIN.md, round 11). */
-extern unsigned char L3ConvTbl[16];
-extern unsigned char L3UP[20];
-extern unsigned char L3DOWN[20];
-extern unsigned char L3HOLDWARP[20];
-extern unsigned char L3TITE1[34];
-extern unsigned char L3TITE2[34];
-extern unsigned char L3TITE3[34];
-extern unsigned char L3TITE7[42];
-extern unsigned char L3TITE8[20];
-extern unsigned char L3TITE9[20];
-extern unsigned char L3TITE10[20];
-extern unsigned char L3TITE11[20];
-extern unsigned char L3ISLE1[14];
-extern unsigned char L3ISLE2[14];
-extern unsigned char L3ISLE3[14];
-extern unsigned char L3ISLE4[14];
-extern unsigned char L3ISLE5[10];
-extern unsigned char L3ANVIL[244];
-extern unsigned char L3TITE12[6];
-extern unsigned char L3TITE13[6];
-extern unsigned char L3CREV1[6];
-extern unsigned char L3CREV2[6];
-extern unsigned char L3CREV3[6];
-extern unsigned char L3CREV4[6];
-extern unsigned char L3CREV5[6];
-extern unsigned char L3CREV6[6];
-extern unsigned char L3CREV7[6];
-extern unsigned char L3CREV8[6];
-extern unsigned char L3CREV9[6];
-extern unsigned char L3CREV10[6];
-extern unsigned char L3CREV11[6];
-extern unsigned char L3XTRA1[4];
-extern unsigned char L3XTRA2[4];
-extern unsigned char L3XTRA3[4];
-extern unsigned char L3XTRA4[4];
-extern unsigned char L3XTRA5[4];
 
 extern "C" void *memcpy(void *dst, const void *src, unsigned long n);
 

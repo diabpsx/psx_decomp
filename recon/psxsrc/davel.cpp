@@ -5,6 +5,7 @@
  * (PRIMPOOL.H PRIM_GetPrim<POLY_G4/F4/FT4>, CPLAYER.H GetPlayer/GetLastOtPos, BLOCK.H GetOtPos,
  * GMAN.H GetFr) are emitted out of line in this object (-fno-inline). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 
 /* ---------------------------------------------------------------- PsyQ libgpu ---- */
 struct RECT {   /* sizeof 8 */

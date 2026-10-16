@@ -14,7 +14,7 @@ SECTIONS
         . = 0x0;   /* 0x80010000 */
         build/recon/eaclib/nullfunc.s.o(.text);   /* genuine hand-authored source */
         . = 0x8;   /* 0x80010008 */
-        build/asm/data/boot_text.data.s.o(.data);
+        build/recon/psxsrc/boot.s.o(.boot_text);   /* genuine hand-authored source */
         . = 0xC;   /* 0x8001000C */
         build/native_source/lib.text.s.o(.text);   /* verified native-assembled source */
         . = 0x2017C;   /* 0x8003017C */
@@ -110,7 +110,7 @@ SECTIONS
         . = 0x733B0;   /* 0x800833B0 */
         build/native_source/gpuq.text.s.o(.text);   /* verified native-assembled source */
         . = 0x737F4;   /* 0x800837F4 */
-        build/recon/psxsrc/primpool.cpp.o(.text);   /* reconstructed TU */
+        build/native_source/primpool.text.s.o(.text);   /* verified native-assembled source */
         . = 0x74030;   /* 0x80084030 */
         build/native_source/vid.text.s.o(.text);   /* verified native-assembled source */
         . = 0x74424;   /* 0x80084424 */
@@ -385,17 +385,11 @@ SECTIONS
         . = 0xFDBF8;   /* 0x8010DBF8 */
         build/native_source/rodata.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFF90;   /* 0x8010FF90 */
-        build/asm/data/rodata_main.rodata.s.o(.rodata);
+        build/native_source/rodata_main.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFB4;   /* 0x8010FFB4 */
         build/native_source/rodata_gpuq.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFC4;   /* 0x8010FFC4 */
-        __recon_diabpsx_rodata_primpool_native_start = .;
-        build/recon/psxsrc/primpool.cpp.o(.rodata);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_rodata_primpool_native_start == 0x19, "wrong source payload extent: rodata_primpool_native");
-        BYTE(0x49); /* preserved retail alignment byte */
-        BYTE(0x41); /* preserved retail alignment byte */
-        BYTE(0x42); /* preserved retail alignment byte */
-        ASSERT(. - __recon_diabpsx_rodata_primpool_native_start == 0x1C, "wrong source data extent: rodata_primpool_native");
+        build/native_source/rodata_primpool_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFE0;   /* 0x8010FFE0 */
         build/native_source/rodata_vid.rodata.s.o(.rodata);   /* verified native source data */
         . = 0xFFFF0;   /* 0x8010FFF0 */
@@ -403,13 +397,13 @@ SECTIONS
         . = 0x100008;   /* 0x80110008 */
         build/native_source/rodata_sysinit.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100078;   /* 0x80110078 */
-        build/asm/data/rodata_garyl.rodata.s.o(.rodata);
+        build/native_source/rodata_garyl.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10009C;   /* 0x8011009C */
         build/native_source/rodata_daveo_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1000AC;   /* 0x801100AC */
-        build/asm/data/rodata_tims.rodata.s.o(.rodata);
+        build/native_source/rodata_tims.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1000BC;   /* 0x801100BC */
-        build/asm/data/rodata_leigh.rodata.s.o(.rodata);
+        build/native_source/rodata_leigh.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1000E0;   /* 0x801100E0 */
         build/native_source/rodata_fileio.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100130;   /* 0x80110130 */
@@ -455,9 +449,9 @@ SECTIONS
         . = 0x10098C;   /* 0x8011098C */
         build/native_source/rodata_sndbank.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100A40;   /* 0x80110A40 */
-        build/asm/data/rodata_async.rodata.s.o(.rodata);
+        build/native_source/rodata_async.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100A50;   /* 0x80110A50 */
-        build/asm/data/rodata_cmonst.rodata.s.o(.rodata);
+        build/native_source/rodata_cmonst.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100A60;   /* 0x80110A60 */
         build/native_source/rodata_scratch.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100AC4;   /* 0x80110AC4 */
@@ -465,17 +459,17 @@ SECTIONS
         . = 0x100B34;   /* 0x80110B34 */
         build/native_source/rodata_glue_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100B74;   /* 0x80110B74 */
-        build/asm/data/rodata_ctrl.rodata.s.o(.rodata);
+        build/native_source/rodata_ctrl.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100B98;   /* 0x80110B98 */
         build/native_source/rodata_graham_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100BBC;   /* 0x80110BBC */
-        build/asm/data/rodata_titlescr.rodata.s.o(.rodata);
+        build/native_source/rodata_titlescr.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100BCC;   /* 0x80110BCC */
-        build/asm/data/rodata_creature.rodata.s.o(.rodata);
+        build/native_source/rodata_creature.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100BDC;   /* 0x80110BDC */
         build/native_source/rodata_davel_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100C14;   /* 0x80110C14 */
-        build/asm/data/rodata_padfuncs.rodata.s.o(.rodata);
+        build/native_source/rodata_padfuncs.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100C38;   /* 0x80110C38 */
         build/native_source/rodata_decomp_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100C5C;   /* 0x80110C5C */
@@ -495,7 +489,7 @@ SECTIONS
         . = 0x100F74;   /* 0x80110F74 */
         build/native_source/rodata_monsview.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100F84;   /* 0x80110F84 */
-        build/asm/data/rodata_spltargt.rodata.s.o(.rodata);
+        build/native_source/rodata_spltargt.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100FA8;   /* 0x80110FA8 */
         build/native_source/rodata_presonly.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x100FC0;   /* 0x80110FC0 */
@@ -505,7 +499,7 @@ SECTIONS
         . = 0x101034;   /* 0x80111034 */
         build/native_source/rodata_control.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x101124;   /* 0x80111124 */
-        build/asm/data/rodata_cursor.rodata.s.o(.rodata);
+        build/native_source/rodata_cursor.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x101134;   /* 0x80111134 */
         build/native_source/rodata_diablo.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1011A8;   /* 0x801111A8 */
@@ -517,7 +511,7 @@ SECTIONS
         . = 0x10133C;   /* 0x8011133C */
         build/native_source/rodata_error_native.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10134C;   /* 0x8011134C */
-        build/asm/data/rodata_interfac_prefix.rodata.s.o(.rodata);
+        build/native_source/rodata_interfac_prefix.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10135C;   /* 0x8011135C */
         build/native_source/rodata_interfac_source.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1013A4;   /* 0x801113A4 */
@@ -545,7 +539,7 @@ SECTIONS
         . = 0x1078E0;   /* 0x801178E0 */
         build/native_source/rodata_quests.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x107904;   /* 0x80117904 */
-        build/asm/data/rodata_scrollrt.rodata.s.o(.rodata);
+        build/native_source/rodata_scrollrt.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x107928;   /* 0x80117928 */
         build/asm/data/rodata_spelldat.rodata.s.o(.rodata);
         . = 0x107938;   /* 0x80117938 */
@@ -557,7 +551,7 @@ SECTIONS
         . = 0x10893C;   /* 0x8011893C */
         build/native_source/rodata_trigs.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1089C0;   /* 0x801189C0 */
-        build/asm/data/rodata_spells_prefix.rodata.s.o(.rodata);
+        build/native_source/rodata_spells_prefix.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1089E8;   /* 0x801189E8 */
         build/native_source/rodata_spells_table.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x1089FC;   /* 0x801189FC */
@@ -577,9 +571,9 @@ SECTIONS
         . = 0x108DB0;   /* 0x80118DB0 */
         build/native_source/rodata_palette.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108DC0;   /* 0x80118DC0 */
-        build/asm/data/rodata_coremon.rodata.s.o(.rodata);
+        build/native_source/rodata_coremon.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108DD0;   /* 0x80118DD0 */
-        build/asm/data/rodata_coreauto_prefix.rodata.s.o(.rodata);
+        build/native_source/rodata_coreauto_prefix.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108DE0;   /* 0x80118DE0 */
         build/native_source/rodata_coreauto_source.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108E24;   /* 0x80118E24 */
@@ -587,7 +581,7 @@ SECTIONS
         . = 0x108E34;   /* 0x80118E34 */
         build/native_source/rodata_compmap.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108E6C;   /* 0x80118E6C */
-        build/asm/data/rodata_gameover.rodata.s.o(.rodata);
+        build/native_source/rodata_gameover.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x108E90;   /* 0x80118E90 */
         build/native_source/rodata_version_prefix.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10944C;   /* 0x8011944C */
@@ -631,7 +625,7 @@ SECTIONS
         . = 0x109D8C;   /* 0x80119D8C */
         build/native_source/rodata_premsg.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109D9C;   /* 0x80119D9C */
-        build/asm/data/rodata_preitem.rodata.s.o(.rodata);
+        build/native_source/rodata_preitem.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x109DC0;   /* 0x80119DC0 */
         build/native_source/rodata_missiles.rodata.s.o(.rodata);   /* verified native source data */
         . = 0x10A2B8;   /* 0x8011A2B8 */
@@ -645,9 +639,7 @@ SECTIONS
         . = 0x10A780;   /* 0x8011A780 */
         build/native_source/sdata_before_primpool.sdata.s.o(.sdata);   /* verified native source data */
         . = 0x10AAB4;   /* 0x8011AAB4 */
-        __recon_diabpsx_sdata_primpool_start = .;
-        build/recon/psxsrc/primpool.cpp.o(.sdata);   /* source-owned data */
-        ASSERT(. - __recon_diabpsx_sdata_primpool_start == 0x14, "wrong source data extent: sdata_primpool");
+        build/native_source/sdata_primpool.sdata.s.o(.sdata);   /* verified native source data */
         . = 0x10AAC8;   /* 0x8011AAC8 */
         build/native_source/sdata_after_primpool.sdata.s.o(.sdata);   /* verified native source data */
         . = 0x10C604;   /* image end 0x8011C604 */
@@ -658,9 +650,9 @@ SECTIONS
         build/native_source/main.sbss.s.o(.sbss);
         ASSERT(. - __source_main_sbss_start == 0x4, "wrong BSS extent: main.sbss");
         . = 0x10C608;
-        __recon_primpool_sbss_start = .;
-        build/recon/psxsrc/primpool.cpp.o(.sbss);
-        ASSERT(. - __recon_primpool_sbss_start == 0x20, "wrong BSS extent: primpool.sbss");
+        __source_primpool_sbss_start = .;
+        build/native_source/primpool.sbss.s.o(.sbss);
+        ASSERT(. - __source_primpool_sbss_start == 0x20, "wrong BSS extent: primpool.sbss");
         . = 0x10C628;
         __source_vid_sbss_start = .;
         build/native_source/vid.sbss.s.o(.sbss);
@@ -680,7 +672,7 @@ SECTIONS
         . = 0x10C65C;
         __source_block_sbss_start = .;
         build/native_source/block.sbss.s.o(.sbss);
-        ASSERT(. - __source_block_sbss_start == 0x4, "wrong BSS extent: block.sbss");
+        ASSERT(. - __source_block_sbss_start == 0x10, "wrong BSS extent: block.sbss");
         . = 0x10C66C;
         __source_gman_sbss_start = .;
         build/native_source/gman.sbss.s.o(.sbss);
@@ -692,7 +684,7 @@ SECTIONS
         . = 0x10C684;
         __source_prof_sbss_start = .;
         build/native_source/prof.sbss.s.o(.sbss);
-        ASSERT(. - __source_prof_sbss_start == 0x14, "wrong BSS extent: prof.sbss");
+        ASSERT(. - __source_prof_sbss_start == 0x20, "wrong BSS extent: prof.sbss");
         . = 0x10C6A4;
         __source_stream_sbss_start = .;
         build/native_source/stream.sbss.s.o(.sbss);
@@ -724,7 +716,7 @@ SECTIONS
         . = 0x10C6F0;
         __source_options_sbss_start = .;
         build/native_source/options.sbss.s.o(.sbss);
-        ASSERT(. - __source_options_sbss_start == 0x28, "wrong BSS extent: options.sbss");
+        ASSERT(. - __source_options_sbss_start == 0x30, "wrong BSS extent: options.sbss");
         . = 0x10C720;
         __source_bird_sbss_start = .;
         build/native_source/bird.sbss.s.o(.sbss);
@@ -761,6 +753,14 @@ SECTIONS
         __source_engine_sbss_start = .;
         build/native_source/engine.sbss.s.o(.sbss);
         ASSERT(. - __source_engine_sbss_start == 0xC, "wrong BSS extent: engine.sbss");
+        . = 0x10C7D0;
+        __source_interfac_sbss_start = .;
+        build/native_source/interfac.sbss.s.o(.sbss);
+        ASSERT(. - __source_interfac_sbss_start == 0x8, "wrong BSS extent: interfac.sbss");
+        . = 0x10C7D8;
+        __source_items_sbss_start = .;
+        build/native_source/items.sbss.s.o(.sbss);
+        ASSERT(. - __source_items_sbss_start == 0x4, "wrong BSS extent: items.sbss");
         . = 0x10C7DC;
         __source_lighting_sbss_start = .;
         build/native_source/lighting.sbss.s.o(.sbss);
@@ -772,7 +772,7 @@ SECTIONS
         . = 0x10C82C;
         __source_msg_sbss_start = .;
         build/native_source/msg.sbss.s.o(.sbss);
-        ASSERT(. - __source_msg_sbss_start == 0xA, "wrong BSS extent: msg.sbss");
+        ASSERT(. - __source_msg_sbss_start == 0x14, "wrong BSS extent: msg.sbss");
         . = 0x10C840;
         __source_multi_sbss_start = .;
         build/native_source/multi.sbss.s.o(.sbss);
@@ -817,6 +817,10 @@ SECTIONS
         __source_drlg_l4_sbss_start = .;
         build/native_source/drlg_l4.sbss.s.o(.sbss);
         ASSERT(. - __source_drlg_l4_sbss_start == 0x1C, "wrong BSS extent: drlg_l4.sbss");
+        . = 0x10C904;
+        __source_monster_sbss_start = .;
+        build/native_source/monster.sbss.s.o(.sbss);
+        ASSERT(. - __source_monster_sbss_start == 0x4, "wrong BSS extent: monster.sbss");
         . = 0x10C908;
         __sdk___SN_ENTRY_POINT_sbss_start = .;
         build/sdk/native/__SN_ENTRY_POINT.sbss.s.o(.sbss);
@@ -845,6 +849,10 @@ SECTIONS
         __source_lock_sbss_start = .;
         build/native_source/lock.sbss.s.o(.sbss);
         ASSERT(. - __source_lock_sbss_start == 0x4, "wrong BSS extent: lock.sbss");
+        . = 0x10CA18;
+        __source_cdrom.common_asyncseekstart_bss_start = .;
+        build/native_source/cdrom.common_asyncseekstart.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncseekstart_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncseekstart.bss");
         . = 0x10CA1C;
         __source_iocoord.common_requestedasyncmsecs_bss_start = .;
         build/native_source/iocoord.common_requestedasyncmsecs.bss.s.o(.bss);
@@ -853,14 +861,26 @@ SECTIONS
         __source_memman.common_emptyblock_bss_start = .;
         build/native_source/memman.common_emptyblock.bss.s.o(.bss);
         ASSERT(. - __source_memman.common_emptyblock_bss_start == 0x4, "wrong BSS extent: memman.common_emptyblock.bss");
+        . = 0x10CA24;
+        __source_inittmr.common_timerevent_bss_start = .;
+        build/native_source/inittmr.common_timerevent.bss.s.o(.bss);
+        ASSERT(. - __source_inittmr.common_timerevent_bss_start == 0x4, "wrong BSS extent: inittmr.common_timerevent.bss");
         . = 0x10CA28;
         __source_cdrom.common_datatracksector_bss_start = .;
         build/native_source/cdrom.common_datatracksector.bss.s.o(.bss);
         ASSERT(. - __source_cdrom.common_datatracksector_bss_start == 0x4, "wrong BSS extent: cdrom.common_datatracksector.bss");
+        . = 0x10CA2C;
+        __source_cdrom.common_asyncbytes_bss_start = .;
+        build/native_source/cdrom.common_asyncbytes.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncbytes_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncbytes.bss");
         . = 0x10CA30;
         __source_cdrom.common_rootlength_bss_start = .;
         build/native_source/cdrom.common_rootlength.bss.s.o(.bss);
         ASSERT(. - __source_cdrom.common_rootlength_bss_start == 0x4, "wrong BSS extent: cdrom.common_rootlength.bss");
+        . = 0x10CA34;
+        __source_cdstream.common_streamleftafter_bss_start = .;
+        build/native_source/cdstream.common_streamleftafter.bss.s.o(.bss);
+        ASSERT(. - __source_cdstream.common_streamleftafter_bss_start == 0x4, "wrong BSS extent: cdstream.common_streamleftafter.bss");
         . = 0x10CA38;
         __source_cdrom.common_rootsector_bss_start = .;
         build/native_source/cdrom.common_rootsector.bss.s.o(.bss);
@@ -869,6 +889,10 @@ SECTIONS
         __source_blockio.common_asyncblockbytes_bss_start = .;
         build/native_source/blockio.common_asyncblockbytes.bss.s.o(.bss);
         ASSERT(. - __source_blockio.common_asyncblockbytes_bss_start == 0x4, "wrong BSS extent: blockio.common_asyncblockbytes.bss");
+        . = 0x10CA40;
+        __source_cdrom.common_cdrate_bss_start = .;
+        build/native_source/cdrom.common_cdrate.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_cdrate_bss_start == 0x4, "wrong BSS extent: cdrom.common_cdrate.bss");
         . = 0x10CA44;
         __source_iocoord.common_streamtopupfunc_bss_start = .;
         build/native_source/iocoord.common_streamtopupfunc.bss.s.o(.bss);
@@ -898,13 +922,17 @@ SECTIONS
         build/native_source/blockio.common_asyncblockmemadr.bss.s.o(.bss);
         ASSERT(. - __source_blockio.common_asyncblockmemadr_bss_start == 0x4, "wrong BSS extent: blockio.common_asyncblockmemadr.bss");
         . = 0x10CA60;
-        __source_tick_bss_start = .;
-        build/native_source/tick.bss.s.o(.bss);
-        ASSERT(. - __source_tick_bss_start == 0x4, "wrong BSS extent: tick.bss");
+        __source_tick_sbss_start = .;
+        build/native_source/tick.sbss.s.o(.sbss);
+        ASSERT(. - __source_tick_sbss_start == 0x4, "wrong BSS extent: tick.sbss");
         . = 0x10CA64;
         __source_cdrom.common_asyncsector_bss_start = .;
         build/native_source/cdrom.common_asyncsector.bss.s.o(.bss);
         ASSERT(. - __source_cdrom.common_asyncsector_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncsector.bss");
+        . = 0x10CA68;
+        __source_cdstream.common_streamleftbefore_bss_start = .;
+        build/native_source/cdstream.common_streamleftbefore.bss.s.o(.bss);
+        ASSERT(. - __source_cdstream.common_streamleftbefore_bss_start == 0x4, "wrong BSS extent: cdstream.common_streamleftbefore.bss");
         . = 0x10CA6C;
         __source_gdebug.common_MsgFunc_bss_start = .;
         build/native_source/gdebug.common_MsgFunc.bss.s.o(.bss);
@@ -917,10 +945,18 @@ SECTIONS
         __source_gsys.common_LastPtr_bss_start = .;
         build/native_source/gsys.common_LastPtr.bss.s.o(.bss);
         ASSERT(. - __source_gsys.common_LastPtr_bss_start == 0x4, "wrong BSS extent: gsys.common_LastPtr.bss");
+        . = 0x10CA78;
+        __source_cdstream.common_doshighwater_bss_start = .;
+        build/native_source/cdstream.common_doshighwater.bss.s.o(.bss);
+        ASSERT(. - __source_cdstream.common_doshighwater_bss_start == 0x4, "wrong BSS extent: cdstream.common_doshighwater.bss");
         . = 0x10CA7C;
         __source_blockio.common_asyncblockcallbackfunc_bss_start = .;
         build/native_source/blockio.common_asyncblockcallbackfunc.bss.s.o(.bss);
         ASSERT(. - __source_blockio.common_asyncblockcallbackfunc_bss_start == 0x4, "wrong BSS extent: blockio.common_asyncblockcallbackfunc.bss");
+        . = 0x10CA80;
+        __source_cdrom.common_asyncsetseek_bss_start = .;
+        build/native_source/cdrom.common_asyncsetseek.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncsetseek_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncsetseek.bss");
         . = 0x10CA84;
         __source_iocoord.common_elapsedasyncmsecs_bss_start = .;
         build/native_source/iocoord.common_elapsedasyncmsecs.bss.s.o(.bss);
@@ -933,6 +969,10 @@ SECTIONS
         __source_cdrom.common_asyncsectors_bss_start = .;
         build/native_source/cdrom.common_asyncsectors.bss.s.o(.bss);
         ASSERT(. - __source_cdrom.common_asyncsectors_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncsectors.bss");
+        . = 0x10CA90;
+        __source_cdrom.common_acdspeed_bss_start = .;
+        build/native_source/cdrom.common_acdspeed.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_acdspeed_bss_start == 0x4, "wrong BSS extent: cdrom.common_acdspeed.bss");
         . = 0x10CA94;
         __source_memman.common__lv_bss_start = .;
         build/native_source/memman.common__lv.bss.s.o(.bss);
@@ -953,6 +993,10 @@ SECTIONS
         __source_blockio.common_blockiosector_bss_start = .;
         build/native_source/blockio.common_blockiosector.bss.s.o(.bss);
         ASSERT(. - __source_blockio.common_blockiosector_bss_start == 0x4, "wrong BSS extent: blockio.common_blockiosector.bss");
+        . = 0x10CAA8;
+        __source_cdrom.common_asyncsetspeed_bss_start = .;
+        build/native_source/cdrom.common_asyncsetspeed.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncsetspeed_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncsetspeed.bss");
         . = 0x10CAAC;
         __source_blockio.common_asyncendbytes_bss_start = .;
         build/native_source/blockio.common_asyncendbytes.bss.s.o(.bss);
@@ -973,18 +1017,38 @@ SECTIONS
         __source_cdrom.common_currentsector_bss_start = .;
         build/native_source/cdrom.common_currentsector.bss.s.o(.bss);
         ASSERT(. - __source_cdrom.common_currentsector_bss_start == 0x4, "wrong BSS extent: cdrom.common_currentsector.bss");
+        . = 0x10CAC0;
+        __source_cdrom.common_readtimer_bss_start = .;
+        build/native_source/cdrom.common_readtimer.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_readtimer_bss_start == 0x4, "wrong BSS extent: cdrom.common_readtimer.bss");
         . = 0x10CAC4;
         __source_memman.common_highwater_bss_start = .;
         build/native_source/memman.common_highwater.bss.s.o(.bss);
         ASSERT(. - __source_memman.common_highwater_bss_start == 0x4, "wrong BSS extent: memman.common_highwater.bss");
+        . = 0x10CAC8;
+        __source_cdrom.common_asyncseek_bss_start = .;
+        build/native_source/cdrom.common_asyncseek.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncseek_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncseek.bss");
         . = 0x10CACC;
         __source_iocoord.common_asynctick_bss_start = .;
         build/native_source/iocoord.common_asynctick.bss.s.o(.bss);
         ASSERT(. - __source_iocoord.common_asynctick_bss_start == 0x4, "wrong BSS extent: iocoord.common_asynctick.bss");
+        . = 0x10CAD0;
+        __source_cdrom.common_asynctime_bss_start = .;
+        build/native_source/cdrom.common_asynctime.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asynctime_bss_start == 0x4, "wrong BSS extent: cdrom.common_asynctime.bss");
+        . = 0x10CAD4;
+        __source_cdrom.common_asyncreadseeks_bss_start = .;
+        build/native_source/cdrom.common_asyncreadseeks.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncreadseeks_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncreadseeks.bss");
         . = 0x10CAD8;
         __source_blockio.common_asyncblockmove_bss_start = .;
         build/native_source/blockio.common_asyncblockmove.bss.s.o(.bss);
         ASSERT(. - __source_blockio.common_asyncblockmove_bss_start == 0x4, "wrong BSS extent: blockio.common_asyncblockmove.bss");
+        . = 0x10CADC;
+        __source_cdrom.common_asyncblocksize_bss_start = .;
+        build/native_source/cdrom.common_asyncblocksize.bss.s.o(.bss);
+        ASSERT(. - __source_cdrom.common_asyncblocksize_bss_start == 0x4, "wrong BSS extent: cdrom.common_asyncblocksize.bss");
         . = 0x10CAE0;
         __source_vid_bss_start = .;
         build/native_source/vid.bss.s.o(.bss);
@@ -1286,7 +1350,12 @@ SECTIONS
     /* link-computed layout symbols (tools/link_symbols.py); OVERINFO.MIP and LNKOPT.MIP read them */
     LNK_OrgAddress = ADDR(.diabpsx);
     _bss_objend = ALIGN(ADDR(.diabpsx) + SIZEOF(.diabpsx), 8);
+    LNK_OrgAddress = 0x80010000;   /* PSYLINK link option */
     LNK_StackSize = 0x1800;   /* PSYLINK link option */
+    LNK_RamSize = 0x2;   /* PSYLINK link option */
+    LNK_DevKit = 0x1;   /* PSYLINK link option */
+    LNK_FileSys = 0x1;   /* PSYLINK link option */
+    LNK_NoQuests = 0x0;   /* PSYLINK link option */
     _frontend_text_org = _bss_objend;
     _frontend_text_size = 0x23234;   /* configs/frontend.yaml image extent */
     _frontend_text_orgend = _frontend_text_org + _frontend_text_size;
@@ -1331,9 +1400,13 @@ PROVIDE(GetSpellLevel__Fii = 0x8013A43C); /* game retail export */
 PROVIDE(AddMissile__Fiiiiiiciii = 0x80142A04); /* game retail export */
 PROVIDE(CanTalkToMonst__Fi = 0x8015694C); /* game retail export */
 PROVIDE(StartAutomap__Fv = 0x80161F58); /* game retail export */
-ASSERT(LNK_OrgAddress == 0x80010000, "link-computed LNK_OrgAddress differs from rom/DIABPSX.MAP");
 ASSERT(_bss_objend == 0x80139BF8, "link-computed _bss_objend differs from rom/DIABPSX.MAP");
+ASSERT(LNK_OrgAddress == 0x80010000, "link-computed LNK_OrgAddress differs from rom/DIABPSX.MAP");
 ASSERT(LNK_StackSize == 0x1800, "link-computed LNK_StackSize differs from rom/DIABPSX.MAP");
+ASSERT(LNK_RamSize == 0x2, "link-computed LNK_RamSize differs from rom/DIABPSX.MAP");
+ASSERT(LNK_DevKit == 0x1, "link-computed LNK_DevKit differs from rom/DIABPSX.MAP");
+ASSERT(LNK_FileSys == 0x1, "link-computed LNK_FileSys differs from rom/DIABPSX.MAP");
+ASSERT(LNK_NoQuests == 0x0, "link-computed LNK_NoQuests differs from rom/DIABPSX.MAP");
 ASSERT(_startup_text_org == 0x800B031C, "link-computed _startup_text_org differs from rom/DIABPSX.MAP");
 ASSERT(_startup_text_obj == 0x800B031C, "link-computed _startup_text_obj differs from rom/DIABPSX.MAP");
 ASSERT(_startup_text_orgend == 0x800B0D00, "link-computed _startup_text_orgend differs from rom/DIABPSX.MAP");

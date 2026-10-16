@@ -2,6 +2,8 @@
  * screen.  DrawFlameLogo animates the six flame sprites over the logo (frame advanced by the
  * elapsed ticks, wrapping after 57) and, on attract screen 5, adds two fixed sprites. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 
 struct POLY_FT4 {   /* sizeof 40 */
     unsigned long tag;
@@ -20,10 +22,6 @@ struct POLY_FT4 {   /* sizeof 40 */
     unsigned short pad2;
 };
 
-class TextDat {
-public:
-    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-};
 
 class CScreen {   /* sizeof 124: TextDat (112), LoadedId, TpX, TpY */
 public:

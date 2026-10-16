@@ -3,6 +3,8 @@
  * 3D pipeline; DrawView/DrawAndBlit here are the frame-level HUD/overlay-draw + load-gate wrapper).
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_scrollrt.h"
 #include "source/gen/externs_scrollrt.h"
 #include "source/gen/protos_scrollrt.h"

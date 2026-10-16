@@ -3,6 +3,7 @@
  * PSX deltas: nSolidTable/nTrapTable -> GetSOLID/GetTRAP, random_(idx, n) -> ENG_random(n), the dungeon
  * scan loops run over 96x96, dMonster/dFlags/dObject/dItem/dTransVal live in dung_map[x][y]. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_themes.h"
 #include "source/gen/externs_themes.h"

@@ -680,6 +680,9 @@ void CBlocks::SetRandOffset(int QuakeAmount)
 
 extern struct PlayerStruct plr[2];   /* @0x800DA538 */
 static BOOL InfraFlag;               /* @0x8011C65C file STAT */
+static int blockr;   /* retail STAT record, unreferenced here: keeps the .sbss layout */
+static int blockg;
+static int blockb;
 
 /* @0x8008E140 BLOCK.CPP:816 */
 void CBlocks::Print()
@@ -2026,123 +2029,54 @@ CBlocks *BL_GetCurrentBlocks(void)
     return CurrentBlocks;
 }
 
-/* @0x800919F8 BLOCK.CPP:115 */
-int GetHighlightCol(int Index, char *SelList, unsigned short P1Col, unsigned short P2Col, unsigned short P12Col)
+/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
+ * code in REVERSE definition order, so retail's tail (GetHighlightCol, PRIM_GetPrim, GetHighlightCol, PRIM_GetCopy, PRIM_GetPrim, PRIM_CopyPrim, TownToCreature::GetCreature, CBlocks::SetItemGraphics, CBlocks::SetObjGraphics, CBlocks::DumpItems, CBlocks::DumpObjs, CBlocks::DumpMonsters, CBlocks::GetOtPos, LittleGt4::InitFromGt4, TextDat::GetNumOfFrames, TextDat::GetNumOfActions, TextDat::GetCreature, TextDat::SetFileInfo, TextDat::GetNumOfFrames, TextDat::GetPal, TextDat::GetFr) fixes this definition order. */
+/* @0x80091E38 GMAN.H (header copy):229 */
+inline FRAME_HDR *TextDat::GetFr(int FrNum)
 {
-    if (SelList[0] == SelList[1]) {
-        if (SelList[0] == Index)
-            return P12Col;
-    }
-    if (Index == SelList[0])
-        return P1Col & 0xFFFF;
-    if (Index == SelList[1])
-        return P2Col & 0xFFFF;
-    return -1;
+    return Frames + (unsigned short)FrNum;
 }
 
-extern unsigned long ThisPrimAddr;
-extern unsigned long AddrToAvoid;
-
-/* @0x80091A40 PRIMPOOL.H (header copy):65 */
-void PRIM_GetPrim(POLY_FT4 **Prim)
+/* @0x80091E1C GMAN.H (header copy):232 */
+inline PAL *TextDat::GetPal(int PalNum)
 {
-    if (!(ThisPrimAddr + 0x190 < AddrToAvoid))
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = ThisPrimAddr + 0x28;
+    return (PAL *)((char *)Pals + PalOffset[PalNum]);
 }
 
-/* @0x80091ABC BLOCK.CPP:115 */
-int GetHighlightCol(int Index, int *SelList, unsigned short P1Col, unsigned short P2Col, unsigned short P12Col)
+/* @0x80091E08 GMAN.H (header copy):233 */
+inline int TextDat::GetNumOfFrames()
 {
-    if (SelList[0] == SelList[1]) {
-        if (SelList[0] == Index)
-            return P12Col;
-    }
-    if (Index == SelList[0])
-        return P1Col & 0xFFFF;
-    if (Index == SelList[1])
-        return P2Col & 0xFFFF;
-    return -1;
+    return Hdr->NumOfFrames;
 }
 
-/* @0x80091B04 PRIMPOOL.H (header copy):84 */
-POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
+/* @0x80091DFC GMAN.H (header copy):240 */
+inline void TextDat::SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum)
 {
-    POLY_FT4 *RetPrim;
-    PRIM_GetPrim(&RetPrim);
-    PRIM_CopyPrim(RetPrim, Prim);
-    return RetPrim;
+    FileInfo = (CTextFileInfo *)NewInfo;
+    TexNum = NewTexNum;
 }
 
-/* @0x80091B40 PRIMPOOL.H (header copy):65 */
-void PRIM_GetPrim(POLY_GT4 **Prim)
+/* @0x80091DE0 GMAN.H (header copy):284 */
+inline CCreatureHdr *TextDat::GetCreature(int Creature)
 {
-    if (!(ThisPrimAddr + 0x208 < AddrToAvoid))
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_GT4 *)ThisPrimAddr;
-    ThisPrimAddr = ThisPrimAddr + 0x34;
+    return (CCreatureHdr *)((char *)CreatureAnims + CreatureOffset[Creature]);
 }
 
-/* @0x80091BBC PRIMPOOL.H (header copy):75 */
-void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
+/* @0x80091DBC GMAN.H (header copy):252 */
+inline int TextDat::GetNumOfActions(int Creature)
 {
-    unsigned long *Dest32 = (unsigned long *)Dest;
-    unsigned long *Source32 = (unsigned long *)Source;
-    for (unsigned int f = 0; f < 10; f++)
-        *Dest32++ = *Source32++;
+    return *(int *)GetCreature(Creature);
 }
 
-/* @0x80091BE4 BLOCK.CPP:239 */
-int TownToCreature::GetCreature(int GameCreature)
+/* @0x80091D84 BLOCK.CPP:1350 (GMAN.H header copy):253 */
+inline int TextDat::GetNumOfFrames(int Creature, int Action)
 {
-    if (GameCreature != GameEqu)
-        return -1;
-    return CreatureEquate;
-}
-
-/* @0x80091C00 BLOCK.H (header copy):261 */
-void CBlocks::SetItemGraphics(int Id)
-{
-    SetGraphics(&ItemTexDat, &ItemTexId, Id);
-}
-
-/* @0x80091C28 BLOCK.H (header copy):260 */
-void CBlocks::SetObjGraphics(int Id)
-{
-    SetGraphics(&ObjTexDat, &ObjTexId, Id);
-}
-
-/* @0x80091C50 BLOCK.H (header copy):230 */
-void CBlocks::DumpItems()
-{
-    DumpGraphics(&ItemTexDat, &ItemTexId);
-}
-
-/* @0x80091C74 BLOCK.H (header copy):229 */
-void CBlocks::DumpObjs()
-{
-    DumpGraphics(&ObjTexDat, &ObjTexId);
-}
-
-/* @0x80091C98 BLOCK.H (header copy):228 */
-void CBlocks::DumpMonsters()
-{
-    MonsterList = NULL;
-    DumpGraphics(&MonstTexDat, &MonstTexId);
-}
-
-/* @0x80091CC0 BLOCK.H (header copy):177 */
-int CBlocks::GetOtPos(int LogicalY)
-{
-    int OtPos = ClipRect.y + LogicalY + PosAdj;
-    if (OtPos < -0x43) OtPos = -0x43;
-    if (OtPos > 0x19B) OtPos = 0x19B;
-    return OtPos + 0x4D;
+    CCreatureHdr *hdr = (CCreatureHdr *)GetCreature(Creature);
+    return hdr->GetAction(Action)->NumOfFrames;
 }
 
 /* @0x80091CF8 BLOCK.H (header copy):56 */
-void LittleGt4::InitFromGt4(POLY_GT4 *Gt4, int nw, int nh)
+inline void LittleGt4::InitFromGt4(POLY_GT4 *Gt4, int nw, int nh)
 {
     clut = Gt4->clut;
     tpage = Gt4->tpage;
@@ -2159,46 +2093,116 @@ void LittleGt4::InitFromGt4(POLY_GT4 *Gt4, int nw, int nh)
     h = nh;
 }
 
-/* @0x80091D84 BLOCK.CPP:1350 (GMAN.H header copy):253 */
-int TextDat::GetNumOfFrames(int Creature, int Action)
+/* @0x80091CC0 BLOCK.H (header copy):177 */
+inline int CBlocks::GetOtPos(int LogicalY)
 {
-    CCreatureHdr *hdr = (CCreatureHdr *)GetCreature(Creature);
-    return hdr->GetAction(Action)->NumOfFrames;
+    int OtPos = ClipRect.y + LogicalY + PosAdj;
+    if (OtPos < -0x43) OtPos = -0x43;
+    if (OtPos > 0x19B) OtPos = 0x19B;
+    return OtPos + 0x4D;
 }
 
-/* @0x80091DBC GMAN.H (header copy):252 */
-int TextDat::GetNumOfActions(int Creature)
+/* @0x80091C98 BLOCK.H (header copy):228 */
+inline void CBlocks::DumpMonsters()
 {
-    return *(int *)GetCreature(Creature);
+    MonsterList = NULL;
+    DumpGraphics(&MonstTexDat, &MonstTexId);
 }
 
-/* @0x80091DE0 GMAN.H (header copy):284 */
-CCreatureHdr *TextDat::GetCreature(int Creature)
+/* @0x80091C74 BLOCK.H (header copy):229 */
+inline void CBlocks::DumpObjs()
 {
-    return (CCreatureHdr *)((char *)CreatureAnims + CreatureOffset[Creature]);
+    DumpGraphics(&ObjTexDat, &ObjTexId);
 }
 
-/* @0x80091DFC GMAN.H (header copy):240 */
-void TextDat::SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum)
+/* @0x80091C50 BLOCK.H (header copy):230 */
+inline void CBlocks::DumpItems()
 {
-    FileInfo = (CTextFileInfo *)NewInfo;
-    TexNum = NewTexNum;
+    DumpGraphics(&ItemTexDat, &ItemTexId);
 }
 
-/* @0x80091E08 GMAN.H (header copy):233 */
-int TextDat::GetNumOfFrames()
+/* @0x80091C28 BLOCK.H (header copy):260 */
+inline void CBlocks::SetObjGraphics(int Id)
 {
-    return Hdr->NumOfFrames;
+    SetGraphics(&ObjTexDat, &ObjTexId, Id);
 }
 
-/* @0x80091E1C GMAN.H (header copy):232 */
-PAL *TextDat::GetPal(int PalNum)
+/* @0x80091C00 BLOCK.H (header copy):261 */
+inline void CBlocks::SetItemGraphics(int Id)
 {
-    return (PAL *)((char *)Pals + PalOffset[PalNum]);
+    SetGraphics(&ItemTexDat, &ItemTexId, Id);
 }
 
-/* @0x80091E38 GMAN.H (header copy):229 */
-FRAME_HDR *TextDat::GetFr(int FrNum)
+/* @0x80091BE4 BLOCK.CPP:239 */
+inline int TownToCreature::GetCreature(int GameCreature)
 {
-    return Frames + (unsigned short)FrNum;
+    if (GameCreature != GameEqu)
+        return -1;
+    return CreatureEquate;
 }
+
+/* @0x80091BBC PRIMPOOL.H (header copy):75 */
+inline void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
+{
+    unsigned long *Dest32 = (unsigned long *)Dest;
+    unsigned long *Source32 = (unsigned long *)Source;
+    for (unsigned int f = 0; f < 10; f++)
+        *Dest32++ = *Source32++;
+}
+
+/* @0x80091B40 PRIMPOOL.H (header copy):65 */
+inline void PRIM_GetPrim(POLY_GT4 **Prim)
+{
+    if (!(ThisPrimAddr + 0x208 < AddrToAvoid))
+        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
+    *Prim = (POLY_GT4 *)ThisPrimAddr;
+    ThisPrimAddr = ThisPrimAddr + 0x34;
+}
+
+/* @0x80091B04 PRIMPOOL.H (header copy):84 */
+inline POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
+{
+    POLY_FT4 *RetPrim;
+    PRIM_GetPrim(&RetPrim);
+    PRIM_CopyPrim(RetPrim, Prim);
+    return RetPrim;
+}
+
+/* @0x80091ABC BLOCK.CPP:115 */
+inline int GetHighlightCol(int Index, int *SelList, unsigned short P1Col, unsigned short P2Col, unsigned short P12Col)
+{
+    if (SelList[0] == SelList[1]) {
+        if (SelList[0] == Index)
+            return P12Col;
+    }
+    if (Index == SelList[0])
+        return P1Col & 0xFFFF;
+    if (Index == SelList[1])
+        return P2Col & 0xFFFF;
+    return -1;
+}
+
+/* @0x80091A40 PRIMPOOL.H (header copy):65 */
+inline void PRIM_GetPrim(POLY_FT4 **Prim)
+{
+    if (!(ThisPrimAddr + 0x190 < AddrToAvoid))
+        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
+    *Prim = (POLY_FT4 *)ThisPrimAddr;
+    ThisPrimAddr = ThisPrimAddr + 0x28;
+}
+
+/* @0x800919F8 BLOCK.CPP:115 */
+inline int GetHighlightCol(int Index, char *SelList, unsigned short P1Col, unsigned short P2Col, unsigned short P12Col)
+{
+    if (SelList[0] == SelList[1]) {
+        if (SelList[0] == Index)
+            return P12Col;
+    }
+    if (Index == SelList[0])
+        return P1Col & 0xFFFF;
+    if (Index == SelList[1])
+        return P2Col & 0xFFFF;
+    return -1;
+}
+extern unsigned long ThisPrimAddr;
+extern unsigned long AddrToAvoid;

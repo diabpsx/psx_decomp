@@ -2,6 +2,8 @@
  * blocks read asynchronously from STREAM.BIN into an SFX header's buffer; the completion callbacks
  * (one per SFXTab slot) flag the chunk as got. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 
 struct STRHDR {   /* sizeof 20 */
     unsigned char Name[12];

@@ -87,6 +87,8 @@ static unsigned char sgbRecvCmd;
 static unsigned long sgdwRecvOffset;
 static unsigned char sgbDeltaChunks;
 static unsigned char sgbDeltaChanged;   /* D_8011C835 -- gp-rel small BSS, TU-owned tentative def */
+static unsigned long sgdwOwnerWait;   /* retail STAT record, unreferenced here: keeps the .sbss layout */
+static struct TMegaPkt *sgpMegaPkt;
 
 /* --- delta item/object marker values (confirmed via delta_get_item's literal compares) --- */
 #define MAXITEMS 127

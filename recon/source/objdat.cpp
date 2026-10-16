@@ -1,5 +1,6 @@
 /* OBJDAT.CPP � retail object descriptors and texture/creature load IDs.
  * PC twin: refs/diablo-hellfire/src/OBJDAT.CPP. */
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 struct ObjDataStruct {   /* sizeof 18 */

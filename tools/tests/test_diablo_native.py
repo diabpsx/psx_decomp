@@ -27,12 +27,12 @@ class DiabloNativeTests(unittest.TestCase):
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("diablo", 33))
         self.assertEqual(receipt["assembler_version"], "2.67")
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4104)   # .sdata starts at 0x8011B788
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4092)   # .sdata starts at 0x8011B77C (its literal pool)
         self.assertIsNone(receipt["post_assemble_section_split"])
         # retail-order small data: one .sdata row (0x8011B788..0x8011B804) and one .sbss row of statics
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".rdata", ".data", ".sdata", ".sbss", ".bss")},
-                         {".text": 8156, ".rdata": 116, ".data": 2912, ".sdata": 125,
+                         {".text": 8156, ".rdata": 116, ".data": 2912, ".sdata": 137,
                           ".sbss": 16, ".bss": 368})
 
 

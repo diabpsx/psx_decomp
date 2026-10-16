@@ -5,10 +5,15 @@
  * is unconditional), and the WM_DIABLOADGAME path is dead (app_fatal "OLD uMSG WM_DIABLOADGAME").
  * It additionally re-broadcasts player-1's join location for local 2-player hot-seat (plr[1].plractive). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_interfac.h"
 #include "source/gen/externs_interfac.h"
 #include "source/gen/protos_interfac.h"
 #include "source/diablo.h"
+
+static unsigned long sgdwProgress;   /* retail STAT record, unreferenced here: keeps the .sbss layout */
+static unsigned long sgdwXY;
 
 /* interface_mode (devilution enum); the raw dispatch value is uMsg-0x42 (0x42='B'=WM_DIABNEXTLVL) */
 #define WM_DIABNEXTLVL  0

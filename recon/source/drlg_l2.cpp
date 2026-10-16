@@ -8,6 +8,7 @@
  * random_(0,n) -> ENG_random(n); LoadFileInMem -> GRL_LoadFileInMemSig; MemFreeDbg macro (source/diablo.h)
  * matches DRLG_FreeL2SP's load/null/free-call oracle shape exactly. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l2.h"
 #include "source/gen/externs_drlg_l2.h"

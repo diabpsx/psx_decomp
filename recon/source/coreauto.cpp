@@ -9,6 +9,8 @@
  * switch only ever sets two local wall flags (AMLWallFlag/AMRWallFlag) that are never read back out
  * in this reconstruction (matches the retail asm: dead stores, kept faithfully per the oracle). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_coreauto.h"
 #include "source/gen/externs_coreauto.h"
 #include "source/gen/protos_coreauto.h"

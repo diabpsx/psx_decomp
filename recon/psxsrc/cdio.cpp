@@ -3,6 +3,7 @@
  * files are read in 32K slices into the stream buffer and handed to a callback; saves go to the
  * PC link (PCopen/PCwrite). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 struct CdlLOC {   /* sizeof 4 */

@@ -6,6 +6,7 @@
  * asset path — the PSX item-graphics system uses ItemCAnimTbl/ItemAnimLs instead); random(22,n) -> ENG_random(n).
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_items.h"
 #include "source/gen/externs_items.h"
 #include "source/gen/protos_items.h"
@@ -52,6 +53,8 @@ static unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x);  
 static void RechargeItem(ItemStruct *i, int r);   /* @0x80045FD0 ITEMS.CPP:3374 */
 static void RepairItem(ItemStruct *i, int lvl);   /* @0x80045E1C ITEMS.CPP:3328 */
 #include "source/diablo.h"
+
+static int tem;   /* retail STAT record, unreferenced here: keeps the .sbss layout */
 
 /* ITEMS.H (hellfire) cursor ids for the gold pile graphic */
 #define GOLD_VT1 1000
@@ -3960,3 +3963,7 @@ void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int iv
     item[ii]._PlrCreate = FePlayerNo;
     FePlayerNo = OldFePlayerNo;
 }
+
+/* Zero-initialised after the last function: retail's .sdata tail of ITEMS (0x8011B8E0 / 0x8011B8E4). */
+int ScrollType = 0;
+struct ItemDataStruct *itemsave = 0;

@@ -5,6 +5,7 @@
  * InvMoveCurs*) are PSX-native (no PC twin) and are reconstructed separately from the oracle+SYM.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_inv.h"
 #include "source/gen/externs_inv.h"

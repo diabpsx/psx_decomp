@@ -1,6 +1,8 @@
 /* TIMS.CPP — Diablo PSX (Climax 1998) reconstruction (PSXSRC).  A programmer's scratch file: TimSwann
  * is empty (its body is compiled out).  TUTILS.H's static tpage helpers are emitted in this object. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 
 /* TUTILS.H */
 static int GetTpY(unsigned short tpage)

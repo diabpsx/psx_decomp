@@ -28,8 +28,8 @@
         "size": 368
       },
       ".sdata": {
-        "va": "0x8011B788",
-        "size": 125,
+        "va": "0x8011B77C",
+        "size": 137,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -287,7 +287,7 @@
       },
       ".sbss": {
         "va": "0x8011C65C",
-        "size": 4
+        "size": 16
       },
       ".bss": {
         "va": "0x8011CBD0",
@@ -334,7 +334,10 @@
       "YVel",
       "InfraFlag",
       "dx",
-      "dy"
+      "dy",
+      "blockr",
+      "blockg",
+      "blockb"
     ],
     "data_record_addresses": {
       "Adjust": "0x8011ACD4"
@@ -437,7 +440,7 @@
       },
       ".sbss": {
         "va": "0x8011C6F0",
-        "size": 40
+        "size": 48
       },
       ".sdata": {
         "va": "0x8011B218",
@@ -512,10 +515,12 @@
       "MenuList",
       "Circle",
       "KeyTab",
-      "goldcheat"
+      "goldcheat",
+      "McState"
     ],
     "data_record_addresses": {
-      "Adjust": "0x8011C700"
+      "Adjust": "0x8011C700",
+      "McState": "0x8011C718"
     },
     "absolute_bindings": {},
     "scaffold_bindings": {
@@ -682,8 +687,8 @@
         "size": 14760
       },
       ".sdata": {
-        "va": "0x8011B110",
-        "size": 22,
+        "va": "0x8011B104",
+        "size": 34,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -703,6 +708,11 @@
         "va": "0x800B0CE0",
         "size": 4,
         "scaffold": "dtors.data"
+      },
+      ".rdata": {
+        "va": "0x80110C14",
+        "size": 33,
+        "scaffold": "rodata_padfuncs.rodata"
       }
     },
     "data_symbols": [
@@ -897,8 +907,8 @@
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011B410",
-        "size": 96,
+        "va": "0x8011B404",
+        "size": 108,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".rdata": {
@@ -1055,8 +1065,8 @@
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011BE7C",
-        "size": 100,
+        "va": "0x8011BE70",
+        "size": 112,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -1140,8 +1150,8 @@
         "scaffold": "data_ctrl.data"
       },
       ".sdata": {
-        "va": "0x8011B01C",
-        "size": 111,
+        "va": "0x8011B010",
+        "size": 123,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -1161,6 +1171,11 @@
         "va": "0x800B0CDC",
         "size": 4,
         "scaffold": "dtors.data"
+      },
+      ".rdata": {
+        "va": "0x80110B74",
+        "size": 33,
+        "scaffold": "rodata_ctrl.rodata"
       }
     },
     "data_symbols": [
@@ -1407,8 +1422,8 @@
         "size": 16
       },
       ".rdata": {
-        "va": "0x80110624",
-        "size": 176,
+        "va": "0x80110614",
+        "size": 192,
         "scaffold": "rodata_cplayer.rodata"
       },
       ".sdata": {
@@ -1475,8 +1490,8 @@
         "size": 6160
       },
       ".rdata": {
-        "va": "0x801108B4",
-        "size": 216,
+        "va": "0x801108A4",
+        "size": 232,
         "scaffold": "rodata_stream.rodata"
       },
       ".data": {
@@ -1572,8 +1587,8 @@
         "size": 3960
       },
       ".rdata": {
-        "va": "0x8011027C",
-        "size": 280,
+        "va": "0x8011026C",
+        "size": 296,
         "scaffold": "rodata_biglump.rodata"
       },
       ".data": {
@@ -1744,8 +1759,8 @@
         "scaffold": "data_gpanel.data"
       },
       ".sdata": {
-        "va": "0x8011AD94",
-        "size": 32,
+        "va": "0x8011AD80",
+        "size": 52,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -1754,7 +1769,9 @@
       "DefP1PanelXY",
       "DefP1PanelXY2",
       "DefP2PanelXY",
-      "DefP2PanelXY2"
+      "DefP2PanelXY2",
+      "hof",
+      "mof"
     ],
     "externals": [
       "PrintFt4__7TextDatiiiiii",
@@ -1800,8 +1817,8 @@
         "scaffold": "data_dialog.data"
       },
       ".sdata": {
-        "va": "0x8011ABF5",
-        "size": 131,
+        "va": "0x8011ABEC",
+        "size": 140,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -1966,14 +1983,14 @@
       },
       ".rdata": {
         "image": "diabpsx",
-        "va": "0x80119BEC",
-        "size": 19,
+        "va": "0x80119BC8",
+        "size": 55,
         "scaffold": "rodata_preauto.rodata"
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011C1E0",
-        "size": 36,
+        "va": "0x8011C1D4",
+        "size": 48,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".bss": {
@@ -1998,8 +2015,12 @@
       "automapview",
       "automaptype",
       "leveltype",
-      "SYSI_GetFs__Fv"
-    ]
+      "SYSI_GetFs__Fv",
+      "_7CPlayer.PActiveArray"
+    ],
+    "external_binding_aliases": {
+      "_7CPlayer.PActiveArray": "_7CPlayer_PActiveArray"
+    }
   },
   "titlescr": {
     "source": "recon/psxsrc/titlescr.cpp",
@@ -2015,9 +2036,14 @@
         "scaffold": "data_titlescr.data"
       },
       ".sdata": {
-        "va": "0x8011B0C0",
-        "size": 12,
+        "va": "0x8011B0B4",
+        "size": 24,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".rdata": {
+        "va": "0x80110BBC",
+        "size": 14,
+        "scaffold": "rodata_titlescr.rodata"
       }
     },
     "data_symbols": [
@@ -2100,27 +2126,10 @@
       }
     },
     "data_symbols": [],
-    "externals": []
-  },
-  "nasync_debug": {
-    "source": "recon/eaclib/nasync_debug.c",
-    "image": "diabpsx",
-    "assembler": "2.34",
-    "stripped_library_sym": true,
-    "sections": {
-      ".text.lib": {
-        "source_section": ".text",
-        "segment": "lib",
-        "va": "0x80023730",
-        "size": 16,
-        "functions": [
-          "dumpasync",
-          "validateasyncblocks"
-        ]
-      }
-    },
-    "data_symbols": [],
-    "externals": []
+    "externals": [],
+    "function_aliases": {
+      "savegp_ci": "savegp"
+    }
   },
   "blkfill": {
     "source": "recon/eaclib/blkfill.s",
@@ -2658,7 +2667,7 @@
         "size": 21,
         "scaffold": "rodata.rodata"
       },
-      ".bss": {
+      ".sbss": {
         "va": "0x8011CA60",
         "size": 4
       }
@@ -2877,8 +2886,8 @@
         "scaffold": "data_lighting.data"
       },
       ".sdata": {
-        "va": "0x8011B8F4",
-        "size": 52,
+        "va": "0x8011B8E8",
+        "size": 64,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -2960,8 +2969,8 @@
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011BF78",
-        "size": 60,
+        "va": "0x8011BF6C",
+        "size": 72,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -3091,6 +3100,12 @@
         "image": "diabpsx",
         "va": "0x8011C8D8",
         "size": 6
+      },
+      ".sdata": {
+        "image": "diabpsx",
+        "va": "0x8011BE64",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -3197,8 +3212,8 @@
         "scaffold": "rodata_automap.rodata"
       },
       ".sdata": {
-        "va": "0x8011C368",
-        "size": 60,
+        "va": "0x8011C35C",
+        "size": 72,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
       },
@@ -3266,8 +3281,8 @@
         "scaffold": "rodata_inv.rodata"
       },
       ".sdata": {
-        "va": "0x8011C2F4",
-        "size": 104,
+        "va": "0x8011C2E8",
+        "size": 116,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
       },
@@ -3461,8 +3476,8 @@
         "scaffold": "rodata_monster.rodata"
       },
       ".sdata": {
-        "va": "0x8011C2A0",
-        "size": 43,
+        "va": "0x8011C290",
+        "size": 76,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
       },
@@ -3472,33 +3487,11 @@
         "scaffold": "data_monster.data",
         "image": "diabpsx",
         "allow_zero_tail": 448
-      }
-    },
-    "common_symbols": {
-      "nummonsters": {
-        "va": "0x8011c2cc",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
       },
-      "nummtypes": {
-        "va": "0x8011c29c",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "monstimgtot": {
-        "va": "0x8011c2d0",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "totalmonsters": {
-        "va": "0x8011c2d4",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "uniquetrans": {
-        "va": "0x8011c2d8",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
+      ".sbss": {
+        "image": "diabpsx",
+        "va": "0x8011C904",
+        "size": 4
       }
     },
     "data_symbols": [
@@ -3515,7 +3508,8 @@
       "offset_y",
       "monstimgtot",
       "totalmonsters",
-      "uniquetrans"
+      "uniquetrans",
+      "sgbSaveSoundOn"
     ],
     "externals": [
       "AddDead__Fiici",
@@ -3643,8 +3637,8 @@
         "scaffold": "rodata_missiles.rodata"
       },
       ".sdata": {
-        "va": "0x8011C258",
-        "size": 45,
+        "va": "0x8011C24C",
+        "size": 67,
         "image": "diabpsx",
         "scaffold": "sdata_after_primpool.sdata"
       },
@@ -3654,43 +3648,6 @@
         "scaffold": "data_missiles.data",
         "image": "diabpsx",
         "allow_zero_tail": 128
-      }
-    },
-    "common_symbols": {
-      "ManashieldFlag": {
-        "va": "0x8011c28d",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "MissilePreFlag": {
-        "va": "0x8011c28c",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "ManashieldFlag2": {
-        "va": "0x8011c28e",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "nummissiles": {
-        "va": "0x8011c288",
-        "size": 4,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "fadetob": {
-        "va": "0x8011c257",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "fadetog": {
-        "va": "0x8011c256",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
-      },
-      "fadetor": {
-        "va": "0x8011c255",
-        "size": 1,
-        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -3811,6 +3768,16 @@
         "va": "0x800CD650",
         "size": 48,
         "scaffold": "data_spltargt.data"
+      },
+      ".rdata": {
+        "va": "0x80110F84",
+        "size": 33,
+        "scaffold": "rodata_spltargt.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011B308",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -3990,14 +3957,22 @@
         "size": 1316
       },
       ".rdata": {
-        "va": "0x80118DE0",
-        "size": 68,
-        "scaffold": "rodata_coreauto_source.rodata"
+        "va": "0x80118DD0",
+        "size": 84,
+        "scaffold": [
+          "rodata_coreauto_prefix.rodata",
+          "rodata_coreauto_source.rodata"
+        ]
       },
       ".data": {
         "va": "0x800E3BAC",
         "size": 32,
         "scaffold": "data_coreauto.data"
+      },
+      ".sdata": {
+        "va": "0x8011BC98",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -4019,12 +3994,27 @@
         "size": 988
       },
       ".rdata": {
-        "va": "0x8011135C",
-        "size": 72,
-        "scaffold": "rodata_interfac_source.rodata"
+        "va": "0x8011134C",
+        "size": 88,
+        "scaffold": [
+          "rodata_interfac_prefix.rodata",
+          "rodata_interfac_source.rodata"
+        ]
+      },
+      ".sdata": {
+        "va": "0x8011B870",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".sbss": {
+        "va": "0x8011C7D0",
+        "size": 8
       }
     },
-    "data_symbols": [],
+    "data_symbols": [
+      "sgdwProgress",
+      "sgdwXY"
+    ],
     "externals": [
       "DeltaSaveLevel__Fv",
       "DisableInputWndProc__FUlUilUl",
@@ -4060,9 +4050,17 @@
         "size": 3264
       },
       ".rdata": {
-        "va": "0x801189E8",
-        "size": 20,
-        "scaffold": "rodata_spells_table.rodata"
+        "va": "0x801189C0",
+        "size": 60,
+        "scaffold": [
+          "rodata_spells_prefix.rodata",
+          "rodata_spells_table.rodata"
+        ]
+      },
+      ".sdata": {
+        "va": "0x8011BB84",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4111,6 +4109,16 @@
       ".text": {
         "va": "0x8007F354",
         "size": 5760
+      },
+      ".rdata": {
+        "va": "0x80118DC0",
+        "size": 14,
+        "scaffold": "rodata_coremon.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BC8C",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4158,6 +4166,16 @@
       ".text": {
         "va": "0x8009A9B4",
         "size": 708
+      },
+      ".rdata": {
+        "va": "0x80110A40",
+        "size": 14,
+        "scaffold": "rodata_async.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AE0C",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4179,6 +4197,16 @@
       ".text": {
         "va": "0x8008584C",
         "size": 48
+      },
+      ".rdata": {
+        "va": "0x801100AC",
+        "size": 14,
+        "scaffold": "rodata_tims.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AB20",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4191,6 +4219,16 @@
       ".text": {
         "va": "0x8006931C",
         "size": 648
+      },
+      ".rdata": {
+        "va": "0x80117904",
+        "size": 33,
+        "scaffold": "rodata_scrollrt.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BA74",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4266,6 +4304,11 @@
         "va": "0x800D67F0",
         "size": 2139,
         "scaffold": "data_misdat.data"
+      },
+      ".sdata": {
+        "va": "0x8011B968",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -4405,6 +4448,12 @@
         "va": "0x80119D8C",
         "size": 14,
         "scaffold": "rodata_premsg.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C234",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -4463,6 +4512,12 @@
         "va": "0x80119D20",
         "size": 33,
         "scaffold": "rodata_premiss.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C210",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -4490,6 +4545,12 @@
         "va": "0x80119D68",
         "size": 33,
         "scaffold": "rodata_prestore.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C228",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -4530,6 +4591,12 @@
         "va": "0x80119B08",
         "size": 14,
         "scaffold": "rodata_preport.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C1B0",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -4551,6 +4618,12 @@
         "va": "0x80119BA4",
         "size": 33,
         "scaffold": "rodata_preinv.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C1C8",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -4581,6 +4654,11 @@
         "va": "0x80110E30",
         "size": 148,
         "scaffold": "rodata_corefmv.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011B2AC",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -4614,6 +4692,11 @@
         "va": "0x80119490",
         "size": 33,
         "scaffold": "rodata_coreinv.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BE1C",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4635,6 +4718,11 @@
         "va": "0x80110F74",
         "size": 14,
         "scaffold": "rodata_monsview.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011B2FC",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4785,6 +4873,11 @@
         "va": "0x80110604",
         "size": 14,
         "scaffold": "rodata_lambo.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AD38",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -4807,6 +4900,11 @@
         "va": "0x80118D68",
         "size": 33,
         "scaffold": "rodata_mlist_native.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BC2C",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -5091,7 +5189,7 @@
       ".rdata": {
         "image": "diabpsx",
         "va": "0x801194FC",
-        "size": 49,
+        "size": 67,
         "scaffold": "rodata_loadsave.rodata"
       },
       ".sdata": {
@@ -5202,8 +5300,8 @@
         "scaffold": "rodata_compmap.rodata"
       },
       ".sdata": {
-        "va": "0x8011BCBC",
-        "size": 9,
+        "va": "0x8011BCB0",
+        "size": 21,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -5402,8 +5500,8 @@
         "scaffold": "rodata_multi.rodata"
       },
       ".sdata": {
-        "va": "0x8011B99C",
-        "size": 12,
+        "va": "0x8011B990",
+        "size": 24,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -6072,8 +6170,8 @@
         "scaffold": "rodata_glue_native.rodata"
       },
       ".sdata": {
-        "va": "0x8011AEAC",
-        "size": 356,
+        "va": "0x8011AEA0",
+        "size": 368,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -6177,8 +6275,8 @@
         "scaffold": "rodata_tony_native.rodata"
       },
       ".sdata": {
-        "va": "0x8011AE34",
-        "size": 108,
+        "va": "0x8011AE28",
+        "size": 120,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".bss": {
@@ -6340,8 +6438,8 @@
         "scaffold": "rodata_sndbank.rodata"
       },
       ".sdata": {
-        "va": "0x8011ADFC",
-        "size": 14,
+        "va": "0x8011ADF0",
+        "size": 26,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -6417,8 +6515,8 @@
         "scaffold": "rodata_davel_native.rodata"
       },
       ".sdata": {
-        "va": "0x8011B0E4",
-        "size": 32,
+        "va": "0x8011B0D8",
+        "size": 44,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -6496,7 +6594,7 @@
       },
       ".sbss": {
         "va": "0x8011C684",
-        "size": 20
+        "size": 32
       }
     },
     "data_symbols": [
@@ -6505,7 +6603,10 @@
       "CpuStart",
       "CpuTime",
       "DrawTime",
-      "DrawStart"
+      "DrawStart",
+      "LastCpuTime",
+      "LastDrawTime",
+      "DrawArea"
     ],
     "externals": [
       "AddPrim",
@@ -6566,8 +6667,8 @@
         "scaffold": "rodata_cdio.rodata"
       },
       ".sdata": {
-        "va": "0x8011AB4C",
-        "size": 6,
+        "va": "0x8011AB40",
+        "size": 18,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -6746,8 +6847,8 @@
         "scaffold": "rodata_pause.rodata"
       },
       ".sdata": {
-        "va": "0x8011ABA4",
-        "size": 4,
+        "va": "0x8011AB98",
+        "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -6929,8 +7030,8 @@
         "scaffold": "rodata_sysinit.rodata"
       },
       ".sdata": {
-        "va": "0x8011AAEC",
-        "size": 4,
+        "va": "0x8011AAE0",
+        "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -7002,6 +7103,11 @@
       ".bss": {
         "va": "0x8011D050",
         "size": 40
+      },
+      ".sdata": {
+        "va": "0x8011B128",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -7130,6 +7236,12 @@
         "va": "0x80119D44",
         "size": 33,
         "scaffold": "rodata_pretrigs_native.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C21C",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -7165,8 +7277,8 @@
         "scaffold": "rodata_trigs.rodata"
       },
       ".sdata": {
-        "va": "0x8011BB1C",
-        "size": 104,
+        "va": "0x8011BB10",
+        "size": 116,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -7500,8 +7612,8 @@
         "scaffold": "rodata_minitext.rodata"
       },
       ".sdata": {
-        "va": "0x8011B934",
-        "size": 52,
+        "va": "0x8011B928",
+        "size": 64,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -7624,6 +7736,16 @@
       ".sbss": {
         "va": "0x8011C604",
         "size": 4
+      },
+      ".sdata": {
+        "va": "0x8011AA98",
+        "size": 9,
+        "scaffold": "sdata_before_primpool.sdata"
+      },
+      ".rdata": {
+        "va": "0x8010FF90",
+        "size": 33,
+        "scaffold": "rodata_main.rodata"
       }
     },
     "data_symbols": [
@@ -7680,6 +7802,16 @@
       ".text": {
         "va": "0x800821DC",
         "size": 1220
+      },
+      ".rdata": {
+        "va": "0x80118E6C",
+        "size": 33,
+        "scaffold": "rodata_gameover.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011BCC8",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [],
@@ -7741,8 +7873,8 @@
         "scaffold": "rodata_daveo_native.rodata"
       },
       ".sdata": {
-        "va": "0x8011AB0C",
-        "size": 20,
+        "va": "0x8011AB00",
+        "size": 32,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -7908,6 +8040,11 @@
       ".sbss": {
         "va": "0x8011C8D0",
         "size": 4
+      },
+      ".sdata": {
+        "va": "0x8011BCA4",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
@@ -8033,8 +8170,8 @@
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011BEEC",
-        "size": 128,
+        "va": "0x8011BEE0",
+        "size": 140,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -8117,9 +8254,14 @@
         "size": 1620
       },
       ".sdata": {
-        "va": "0x8011B72C",
-        "size": 66,
+        "va": "0x8011B720",
+        "size": 78,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".rdata": {
+        "va": "0x80111124",
+        "size": 14,
+        "scaffold": "rodata_cursor.rodata"
       }
     },
     "data_symbols": [
@@ -8171,9 +8313,14 @@
         "size": 128
       },
       ".sdata": {
-        "va": "0x8011AAFC",
-        "size": 4,
+        "va": "0x8011AAF0",
+        "size": 16,
         "scaffold": "sdata_after_primpool.sdata"
+      },
+      ".rdata": {
+        "va": "0x80110078",
+        "size": 33,
+        "scaffold": "rodata_garyl.rodata"
       }
     },
     "data_symbols": [
@@ -8210,8 +8357,8 @@
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011C15C",
-        "size": 84,
+        "va": "0x8011C150",
+        "size": 96,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
@@ -8370,14 +8517,15 @@
       },
       ".sdata": {
         "va": "0x8011B770",
-        "size": 8,
+        "size": 12,
         "scaffold": "sdata_after_primpool.sdata"
       }
     },
     "data_symbols": [
       "dead",
       "spurtndx",
-      "stonendx"
+      "stonendx",
+      "pSquareCel"
     ],
     "externals": [
       "Monsters",
@@ -8401,6 +8549,12 @@
         "va": "0x80119C00",
         "size": 286,
         "scaffold": "rodata_premon_native.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C204",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -8490,6 +8644,12 @@
         "size": 18,
         "scaffold": "data_preobj.data",
         "image": "diabpsx"
+      },
+      ".sdata": {
+        "va": "0x8011C0C0",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [
@@ -8574,6 +8734,12 @@
         "va": "0x80119B18",
         "size": 140,
         "scaffold": "rodata_prequest.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C1BC",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata",
+        "image": "diabpsx"
       }
     },
     "data_symbols": [],
@@ -8617,13 +8783,13 @@
         "size": 52128
       },
       ".rdata": {
-        "va": "0x80116AE0",
-        "size": 3164,
+        "va": "0x80116AD0",
+        "size": 3180,
         "scaffold": "rodata_objects.rodata"
       },
       ".sdata": {
-        "va": "0x8011B9C0",
-        "size": 32,
+        "va": "0x8011B9B4",
+        "size": 44,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".data": {
@@ -8893,7 +9059,7 @@
       "StartRCnt",
       "addexit",
       "restoregp",
-      "savegp_ci"
+      "savegp"
     ]
   },
   "addtimer": {
@@ -8973,6 +9139,11 @@
         "va": "0x8011CA58",
         "size": 4,
         "storage": "bss"
+      },
+      "timerevent": {
+        "va": "0x8011CA24",
+        "size": 4,
+        "storage": "bss"
       }
     },
     "data_symbols": [],
@@ -8980,7 +9151,8 @@
       "timerflag": "timerflag",
       "restoretimerstack": "restoretimerstack",
       "settimerstack": "settimerstack",
-      "reentryflag": "reentryflag"
+      "reentryflag": "reentryflag",
+      "timerevent": "timerevent"
     },
     "externals": [
       "EnterCriticalSection",
@@ -8998,7 +9170,7 @@
       "print",
       "resettick",
       "restoregp",
-      "savegp_ci",
+      "savegp",
       "ticks",
       "timerhz",
       "timerperiod",
@@ -9403,7 +9575,10 @@
       "streambytes": "streambytes",
       "seekticks": "seekticks",
       "pout": "pout",
-      "cdspeed": "cdspeed"
+      "cdspeed": "cdspeed",
+      "streamleftafter": "streamleftafter",
+      "streamleftbefore": "streamleftbefore",
+      "doshighwater": "doshighwater"
     },
     "externals": [
       "abortfile",
@@ -9433,7 +9608,24 @@
       "strchr",
       "strncmp",
       "strncpy"
-    ]
+    ],
+    "common_symbols": {
+      "streamleftafter": {
+        "va": "0x8011CA34",
+        "size": 4,
+        "storage": "bss"
+      },
+      "streamleftbefore": {
+        "va": "0x8011CA68",
+        "size": 4,
+        "storage": "bss"
+      },
+      "doshighwater": {
+        "va": "0x8011CA78",
+        "size": 4,
+        "storage": "bss"
+      }
+    }
   },
   "exit": {
     "source": "recon/eaclib/exit.c",
@@ -9501,28 +9693,9 @@
         "source_section": ".text",
         "segment": "lib",
         "va": "0x8002F574",
-        "size": 108,
+        "size": 240,
         "functions": [
-          "stricmp"
-        ]
-      }
-    },
-    "data_symbols": [],
-    "externals": []
-  },
-  "strnicmp": {
-    "source": "recon/eaclib/strnicmp.c",
-    "image": "diabpsx",
-    "assembler": "2.56",
-    "divide_guard": true,
-    "stripped_library_sym": true,
-    "sections": {
-      ".text.lib": {
-        "source_section": ".text",
-        "segment": "lib",
-        "va": "0x8002F5E0",
-        "size": 132,
-        "functions": [
+          "stricmp",
           "strnicmp"
         ]
       }
@@ -9802,6 +9975,61 @@
         "va": "0x80139BE0",
         "size": 16,
         "storage": "bss"
+      },
+      "asyncseekstart": {
+        "va": "0x8011CA18",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asyncbytes": {
+        "va": "0x8011CA2C",
+        "size": 4,
+        "storage": "bss"
+      },
+      "cdrate": {
+        "va": "0x8011CA40",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asyncsetseek": {
+        "va": "0x8011CA80",
+        "size": 4,
+        "storage": "bss"
+      },
+      "acdspeed": {
+        "va": "0x8011CA90",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asyncsetspeed": {
+        "va": "0x8011CAA8",
+        "size": 4,
+        "storage": "bss"
+      },
+      "readtimer": {
+        "va": "0x8011CAC0",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asyncseek": {
+        "va": "0x8011CAC8",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asynctime": {
+        "va": "0x8011CAD0",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asyncreadseeks": {
+        "va": "0x8011CAD4",
+        "size": 4,
+        "storage": "bss"
+      },
+      "asyncblocksize": {
+        "va": "0x8011CADC",
+        "size": 4,
+        "storage": "bss"
       }
     },
     "data_symbols": [],
@@ -9833,7 +10061,18 @@
       "asyncmemadr": "asyncmemadr",
       "cachefile": "cachefile",
       "asyncsector": "asyncsector",
-      "cdrombufsector": "cdrombufsector"
+      "cdrombufsector": "cdrombufsector",
+      "asyncseekstart": "asyncseekstart",
+      "asyncbytes": "asyncbytes",
+      "cdrate": "cdrate",
+      "asyncsetseek": "asyncsetseek",
+      "acdspeed": "acdspeed",
+      "asyncsetspeed": "asyncsetspeed",
+      "readtimer": "readtimer",
+      "asyncseek": "asyncseek",
+      "asynctime": "asynctime",
+      "asyncreadseeks": "asyncreadseeks",
+      "asyncblocksize": "asyncblocksize"
     },
     "externals": [
       "CdControl",
@@ -9863,7 +10102,7 @@
       "printf",
       "reservememadr",
       "restoregp",
-      "savegp_ci",
+      "savegp",
       "streamer_iotaskptr",
       "strlen",
       "strncmp",
@@ -10462,9 +10701,11 @@
       ".text.lib": {
         "source_section": ".text",
         "segment": "lib",
-        "va": "0x80023740",
-        "size": 7420,
+        "va": "0x80023730",
+        "size": 7436,
         "functions": [
+          "dumpasync",
+          "validateasyncblocks",
           "asyncreadmsecs",
           "asyncstructsize",
           "initasyncstruct",
@@ -10538,7 +10779,6 @@
       "blockclear",
       "blockhandlefile",
       "closeblockhandle",
-      "dumpasync",
       "handlesector",
       "psxcdromstopread",
       "purgememadr",
@@ -11067,8 +11307,8 @@
         "allow_zero_tail": 48
       },
       ".sdata": {
-        "va": "0x8011BA98",
-        "size": 88,
+        "va": "0x8011BA8C",
+        "size": 100,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -11237,8 +11477,8 @@
         "scaffold": "data_items.data"
       },
       ".sdata": {
-        "va": "0x8011B888",
-        "size": 85,
+        "va": "0x8011B87C",
+        "size": 108,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".rdata": {
@@ -11249,6 +11489,10 @@
       ".bss": {
         "va": "0x8012EC58",
         "size": 255
+      },
+      ".sbss": {
+        "va": "0x8011C7D8",
+        "size": 4
       }
     },
     "data_symbols": [
@@ -11272,7 +11516,10 @@
       "uitemflag",
       "gnNumGetRecords",
       "ScrollFlag",
-      "FIRSTTIME"
+      "FIRSTTIME",
+      "ScrollType",
+      "itemsave",
+      "tem"
     ],
     "externals": [
       "AddPanelString__FPCci",
@@ -11398,7 +11645,7 @@
       },
       ".sbss": {
         "va": "0x8011C82C",
-        "size": 10
+        "size": 20
       },
       ".sdata": {
         "va": "0x8011B974",
@@ -11419,7 +11666,9 @@
       "sgbRecvCmd",
       "sgdwRecvOffset",
       "sgbDeltaChunks",
-      "dwRecCount"
+      "dwRecCount",
+      "sgdwOwnerWait",
+      "sgpMegaPkt"
     ],
     "externals": [
       "ActivatePortal__FiiiiiUc",
@@ -11531,8 +11780,8 @@
         "scaffold": "data_player.data"
       },
       ".sdata": {
-        "va": "0x8011BA08",
-        "size": 24,
+        "va": "0x8011B9F4",
+        "size": 44,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -11702,8 +11951,8 @@
       },
       ".sdata": {
         "image": "diabpsx",
-        "va": "0x8011B47C",
-        "size": 420,
+        "va": "0x8011B470",
+        "size": 432,
         "scaffold": "sdata_after_primpool.sdata"
       },
       ".sbss": {
@@ -11998,11 +12247,13 @@
       "OPT_NoQuests": "OPT_NoQuests"
     },
     "externals": [
-      "__lnk_ram_size",
+      "LNK_RamSize",
       "LNK_StackSize",
       "LNK_OrgAddress",
       "FirstFreeByte",
-      "__lnk_free_mem_size"
+      "LNK_FileSys",
+      "LNK_DevKit",
+      "LNK_NoQuests"
     ]
   },
   "textab": {
@@ -12415,5 +12666,155 @@
     },
     "data_symbols": [],
     "externals": []
+  },
+  "leigh": {
+    "source": "recon/psxsrc/leigh.cpp",
+    "image": "diabpsx",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x801100BC",
+        "size": 33,
+        "scaffold": "rodata_leigh.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AB2C",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "cmonst": {
+    "source": "recon/psxsrc/cmonst.cpp",
+    "image": "diabpsx",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x80110A50",
+        "size": 14,
+        "scaffold": "rodata_cmonst.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AE18",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "creature": {
+    "source": "recon/psxsrc/creature.cpp",
+    "image": "diabpsx",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x80110BCC",
+        "size": 14,
+        "scaffold": "rodata_creature.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011B0CC",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "preitem": {
+    "source": "recon/source/preitem.cpp",
+    "image": "diabpsx",
+    "stripped_library_sym": true,
+    "data_only": true,
+    "sections": {
+      ".rdata": {
+        "va": "0x80119D9C",
+        "size": 33,
+        "scaffold": "rodata_preitem.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011C240",
+        "size": 9,
+        "scaffold": "sdata_after_primpool.sdata"
+      }
+    },
+    "data_symbols": [],
+    "externals": []
+  },
+  "primpool": {
+    "source": "recon/psxsrc/primpool.cpp",
+    "image": "diabpsx",
+    "sections": {
+      ".text": {
+        "va": "0x800837F4",
+        "size": 2108
+      },
+      ".rdata": {
+        "va": "0x8010FFC4",
+        "size": 25,
+        "scaffold": "rodata_primpool_native.rodata"
+      },
+      ".sdata": {
+        "va": "0x8011AAA8",
+        "size": 32,
+        "scaffold": [
+          "sdata_before_primpool.sdata",
+          "sdata_primpool.sdata"
+        ]
+      },
+      ".sbss": {
+        "va": "0x8011C608",
+        "size": 32
+      }
+    },
+    "data_symbols": [
+      "ThisOt",
+      "ThisPrimAddr",
+      "AddrToAvoid",
+      "ScrRect",
+      "hndPrimBuffers",
+      "PrimBuffers",
+      "BufferDepth",
+      "WorkRamId",
+      "ScrNum",
+      "Screens",
+      "PbToClear",
+      "BufferNum",
+      "LastBuffer",
+      "DispEnvToPut",
+      "ThisOtSize"
+    ],
+    "externals": [
+      "AddPrim",
+      "CDWAIT",
+      "ClearOTag",
+      "DrawOTag",
+      "DrawSyncCallback",
+      "GAL_Alloc",
+      "GAL_Lock",
+      "GPUQ_FlushQ__Fv",
+      "PROF_CpuEnd__Fv",
+      "PROF_CpuStart__Fv",
+      "PROF_Draw__FPUl",
+      "PROF_DrawEnd__Fv",
+      "PROF_DrawStart__Fv",
+      "PROF_Open__Fv",
+      "PROF_Restart__Fv",
+      "PutDispEnv",
+      "SetDrawArea",
+      "SetDrawEnv",
+      "VID_DoThisNextSync__FPFv_v",
+      "VID_GetXOff__Fv",
+      "VID_GetYOff__Fv",
+      "VID_IsDbuffer__Fv",
+      "VID_NextSyncRoutHasExecuted__Fv"
+    ],
+    "assembler": "2.67"
   }
 }

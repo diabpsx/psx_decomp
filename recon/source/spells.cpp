@@ -1,6 +1,8 @@
 /* SPELLS.CPP — Diablo PSX (Climax 1998) reconstruction.  Twin: refs/devilution/Source/spells.cpp.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_spells.h"
 #include "source/gen/externs_spells.h"
 #include "source/gen/protos_spells.h"

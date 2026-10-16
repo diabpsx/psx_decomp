@@ -118,6 +118,10 @@ int cdspeed = 218;
 int seekticks = 300;
 int streamtime = 0;
 int streambytes = 0;
+/* retail commons of this member (MAP names, no SYM records): unreferenced by the surviving code */
+int streamleftafter;
+int streamleftbefore;
+int doshighwater;
 CDSTREAM *cdms = 0;
 CDSTREAM *cdrs = 0;
 

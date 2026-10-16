@@ -24,9 +24,9 @@ class PadfuncsNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("padfuncs", 49))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2448)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 2436)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 14760, ".sdata": 22, ".sbss": 12, ".bss": 16,
+                         {".text": 14760, ".rdata": 33, ".sdata": 34, ".sbss": 12, ".bss": 16,
                           ".ctors": 4, ".dtors": 4})
 
 

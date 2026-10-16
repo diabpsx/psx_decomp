@@ -36,7 +36,14 @@ def assemble_raw(s: Path, obj: Path):
     obj.parent.mkdir(parents=True, exist_ok=True)
     tmp = obj.with_suffix(".pre.s")
     tmp.write_text('.include "macro.inc"\n.set noat\n.set noreorder\n' + s.read_text(encoding="utf-8", errors="replace"), encoding="utf-8")
-    r = subprocess.run([str(B.AS), *B.AS_ARCH_SCAFFOLD, f"-G{B.G_VALUE}", "-I", str(B.INCLUDE), "-I", str(ROOT), "-o", str(obj), str(tmp)],
+    defsyms = []
+    if s.name == 'lnkopt.s':
+        # LNKOPT.MIP's words are link-time expressions over the retail link options and FirstFreeByte;
+        # GNU as needs their values up front (PSYLINK evaluates them in the whole-program lane)
+        import link_symbols as LS
+        values = LS.compute()
+        defsyms = [f'--defsym={name}={values[name]}' for name in ('LNK_RamSize', 'LNK_StackSize', 'FirstFreeByte')]
+    r = subprocess.run([str(B.AS), *B.AS_ARCH_SCAFFOLD, f"-G{B.G_VALUE}", *defsyms, "-I", str(B.INCLUDE), "-I", str(ROOT), "-o", str(obj), str(tmp)],
                        capture_output=True, text=True, cwd=ROOT)
     if r.returncode:
         sys.exit(f"[as] {s}\n{r.stderr}")

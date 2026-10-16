@@ -11,6 +11,7 @@
  * colour_mask/shift_mask/weirdy/cont, and a screen-space "weird cheat" colour-cycle effect) --
  * there is no PC source for these; they are transcribed directly from the oracle disassembly. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_lighting.h"
 #include "source/gen/externs_lighting.h"

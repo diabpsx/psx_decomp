@@ -3,6 +3,7 @@
  * PlayFMVOverLay (FMV.BIN, C linkage), chains the intro and victory movies, then reloads the
  * overlay that was resident before.  play_movie maps a movie name to its FmvTab entry. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

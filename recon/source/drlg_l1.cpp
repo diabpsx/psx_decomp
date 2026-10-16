@@ -14,6 +14,7 @@
  *  - random_(0, n) -> ENG_random(n).
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" pool is this TU's whole .sdata */
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l1.h"
 #include "source/gen/externs_drlg_l1.h"

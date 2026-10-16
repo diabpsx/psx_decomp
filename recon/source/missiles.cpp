@@ -24,10 +24,15 @@
  * seven zero commons and 115 exact SYM records are integrated into the matching images.
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_missiles.h"
 #include "source/gen/externs_missiles.h"
 #include "source/gen/protos_missiles.h"
 #include "source/diablo.h"
+extern int nummissiles;
+extern unsigned char ManashieldFlag;
+extern unsigned char ManashieldFlag2;
+extern unsigned char MissilePreFlag;
 
 /* Retail MISSILES.DATA, in source-owned declaration order. */
 int XDirAdd[8] = { 1, 0, -1, -1, -1, 0, 1, 1 }; /* @0x801029D8 */
@@ -57,13 +62,9 @@ char dMissArray[32][4] = { { 0 } }; /* @0x80105174 */
 
 /* TU-owned small globals (oracle reaches these via %gp_rel -> tentative definitions, not extern;
  * methodology 3.12#6 / feedback_sym_module_canonical). */
-int nummissiles;
-unsigned char ManashieldFlag;
-unsigned char ManashieldFlag2;
-unsigned char MissilePreFlag;
-unsigned char fadetor;
-unsigned char fadetog;
-unsigned char fadetob;
+unsigned char fadetor = 0;   /* zero-initialised: packed after the pool inside .sdata */
+unsigned char fadetog = 0;   /* zero-initialised: packed after the pool inside .sdata */
+unsigned char fadetob = 0;   /* zero-initialised: packed after the pool inside .sdata */
 
 /* The seven six-entry CrawlNum local initializers below share the compiler's
  * original 24-byte pool template at retail 0x8011A030. No external ROM alias. */
@@ -4290,3 +4291,10 @@ void ClearMissileSpot(int mi)
 #if 0 /* MERGE ALT AddLightball: master side -- lost because: both PASS; branch SLD span 17 == retail 17, master 15 */
     /* PSX-only addition: missile slots with bit 1 set receive a light source here. */
 #endif
+
+/* Zero-initialised after the last function: retail keeps these four in .sdata behind the TU's last literal
+ * pool (0x8011C288..0x8011C28E), where an initialised definition at the end of the file lands. */
+int nummissiles = 0;
+unsigned char MissilePreFlag = 0;
+unsigned char ManashieldFlag = 0;
+unsigned char ManashieldFlag2 = 0;

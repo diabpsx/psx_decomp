@@ -27,8 +27,9 @@ class TitleScreenNativeTests(unittest.TestCase):
         symbols = "\n".join(path.read_text() for path in
                             (B.ROOT / "configs").glob("symbol_addrs*.txt"))
         regions = {".text": (0x8009E1F0, 516),
+                   ".rdata": (0x80110BBC, 14),
                    ".data": (0x800CC68C, 48),
-                   ".sdata": (0x8011B0C0, 12)}
+                   ".sdata": (0x8011B0B4, 24)}
 
         with tempfile.TemporaryDirectory(prefix="titlescr-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
@@ -44,7 +45,7 @@ class TitleScreenNativeTests(unittest.TestCase):
 
             prefix, combined, mode = R.gp_carrier_plan(
                 regions, image, 0x8011A780, 0x8011C604)
-            self.assertEqual((mode, len(prefix)), ("prefix", 2368))
+            self.assertEqual((mode, len(prefix)), ("prefix", 2356))   # .sdata starts at its literal pool (0x8011B0B4)
             prefix_source = folder / "prefix.s"
             prefix_object = folder / "prefix.obj"
             prefix_source.write_bytes((".sdata\r\n" + "".join(

@@ -3,6 +3,7 @@
  * MSG.CPP multiplayer-delta code; PSX splits them into their own overlay TU). Reconstructed from the
  * retail asm oracle + skel/SOURCE/PREMSG.CPP (Ghidra/IDA draft). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

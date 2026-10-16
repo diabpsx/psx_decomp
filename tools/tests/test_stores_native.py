@@ -24,7 +24,7 @@ class StoresNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("stores", 103))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4888)   # .sdata starts at 0x8011BA98
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4876)   # .sdata starts at 0x8011BA8C (its literal pool)
         self.assertEqual(receipt["assembler_version"], "2.67")   # 2.56 pads 8-byte .lcomm statics to 8
         self.assertIsNone(receipt["post_assemble_section_split"])
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
@@ -35,7 +35,7 @@ class StoresNativeTests(unittest.TestCase):
         self.assertFalse(any(name.startswith('.data.stores_')
                              for name in receipt['sections']))
         # retail-order small data: one .sdata row 0x8011BA98..0x8011BAEF and one .sbss row of statics
-        self.assertEqual((receipt["sections"][".sdata"]["size"], receipt["sections"][".sbss"]["size"]), (88, 68))
+        self.assertEqual((receipt["sections"][".sdata"]["size"], receipt["sections"][".sbss"]["size"]), (100, 68))
         self.assertFalse(any(name.startswith((".sdata.stores_", ".sbss.stores_")) for name in receipt["sections"]))
 
 

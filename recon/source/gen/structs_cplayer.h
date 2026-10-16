@@ -58,7 +58,19 @@ struct TextDat {   /* sizeof 112 */
     int GetNumOfActions(int Creature);
     int GetNumOfFrames(int Creature, int Action);
     void SetFileInfo(const struct CTextFileInfo *NewInfo, int NewTexNum);
+    void DumpDatFile();   /* GMAN.H:290-296, inline below: its "psxsrc/gman.h" literal heads this TU's .rdata */
 };
+
+#include "glibdev/gdebug.h"
+#include "glibdev/gal.h"
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
 
 struct PlayerStruct;
 class CBlocks;

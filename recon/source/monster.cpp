@@ -5,6 +5,8 @@
  * Definitions follow retail VA order. The native common-data/overlay lane verifies all
  * 50944 text bytes, the 240-byte pool, 19 small-data bytes and 105 exact function records. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+int nummtypes = 0;                /* @0x8011C29C: zero-initialised, so it follows the pool inside .sdata */
 #include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_monster.h"
 #include "source/gen/externs_monster.h"
@@ -34,7 +36,12 @@ CMonster Monsters[16] = { { 0 } }; /* @0x8010A3BC */
 
 /* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
 static BOOL gSameRoom(int m, int i);   /* @0x80156A68 MONSTER.CPP:5556 */
+static unsigned char sgbSaveSoundOn;   /* retail STAT record, unreferenced here: keeps the .sbss layout */
 #include "source/diablo.h"
+extern long nummonsters;
+extern long monstimgtot;
+extern unsigned char totalmonsters;
+extern int uniquetrans;
 
 /* monster types (_mMTidx / CMonster::mtype, retail values) */
 #define MT_GOLEM    109
@@ -192,11 +199,6 @@ static BOOL gSameRoom(int m, int i);   /* @0x80156A68 MONSTER.CPP:5556 */
 #define MAXMONSTERS 190
 
 /* TU-owned small data (.sdata, gp-relative in retail) */
-long nummonsters;                 /* @0x8011C2CC (uninitialised: emitted at the end of .sdata) */
-long monstimgtot;                 /* @0x8011C2D0 */
-unsigned char totalmonsters;      /* @0x8011C2D4 */
-int uniquetrans;                  /* @0x8011C2D8 */
-int nummtypes;
 
 #define MIT_ARROW        0
 #define MIT_FLARE        0x18
@@ -4489,3 +4491,10 @@ void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir)
             _mx = Monst->_mx - Monst->_menemyx;
             _my = Monst->_my - Monst->_menemyy;
 #endif
+
+/* Zero-initialised after the last function: retail keeps these four in .sdata behind the TU's last literal
+ * pool (0x8011C2CC..0x8011C2DB). */
+long nummonsters = 0;
+long monstimgtot = 0;
+unsigned char totalmonsters = 0;
+int uniquetrans = 0;

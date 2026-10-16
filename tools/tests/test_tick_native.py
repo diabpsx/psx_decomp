@@ -27,10 +27,10 @@ class TickNativeTests(unittest.TestCase):
     def test_complete_routed_object(self):
         spec=json.loads((B.ROOT/'configs/native_recon_link.json').read_text())['tick']
         source=B.ROOT/spec['source']
-        self.assertEqual(B.per_tu_flags(source),{'g_value':'0'})
+        self.assertEqual(B.per_tu_flags(source),{'g_value':'0','assembler_g_value':'8'})   # -G0 code, small commons
         layouts={name:R.image_layout(name)[0] for name in R.IMAGES}
         homes,regions,limits=R.validate_placements('tick',spec,layouts)
-        self.assertEqual(regions,{'.text.lib':(0x80020BEC,172),'.rdata':(0x8010E758,21),'.bss':(0x8011CA60,4)})
+        self.assertEqual(regions,{'.text.lib':(0x80020BEC,172),'.rdata':(0x8010E758,21),'.sbss':(0x8011CA60,4)})   # GazTick: a small common (assembler -G8)
         entries={p.stem:(N.scaffold_bytes(p)[0],len(N.scaffold_bytes(p)[1]))
                  for p in (B.ROOT/'asm/nonmatchings/lib').glob('*.s')}
         T.validate_members(0x80020BEC,172,NAMES,entries)
@@ -42,13 +42,13 @@ class TickNativeTests(unittest.TestCase):
                              {'.text.lib':172,'.rdata':21})
             common=[r for r in obj['xdefs'] if 'bss' in r]
             self.assertEqual([(obj['sections'][r['sect']],r['name'],r['bss']) for r in common],
-                             [('.bss','GazTick',4)])
+                             [('.sbss','GazTick',4)])
             self.assertEqual(obj['xrefs'],[])
             blocks,map_text=N.native_link('tick',raw,regions,{'_gp':0x8011A780},output_dir=folder)
             retail=(B.ROOT/'rom/DIABPSX.BIN').read_bytes()
             self.assertEqual(blocks['.text.lib'],retail[0x10BEC:0x10C98])
             self.assertEqual(blocks['.rdata'],retail[0xFE758:0xFE76D])
-            self.assertEqual(blocks['.bss'],bytes(4))
+            self.assertEqual(blocks['.sbss'],bytes(4))
             dump=subprocess.run([S.DUMPSYM,folder/'tick.sym'],capture_output=True,text=True)
             self.assertEqual(dump.returncode,0,dump.stderr)
             paths=[B.ROOT/'asm/nonmatchings/lib'/(name+'.s') for name in NAMES]

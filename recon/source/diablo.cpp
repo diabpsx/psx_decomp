@@ -4,6 +4,7 @@
  * LoadGameLevel, GSYS_SetStackAndJump-based CreateLevel with a private allocated stack).
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_diablo.h"
 #include "psxsrc/sysobj.h"
 #include "psxsrc/fileio.h"

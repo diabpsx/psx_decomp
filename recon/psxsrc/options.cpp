@@ -18,6 +18,7 @@ static LANG_TYPE OrigLang;
 static LANG_TYPE OldLang;
 static LANG_TYPE NewLang;
 static RECT ORect;
+static char *McState[2];   /* retail STAT record, unreferenced here: keeps the .sbss layout */
 
 /* Complete initialized small-data bank, in retail source emission order.
  * The unused VideoVol, allspellsflag and OptionsSeed definitions are retained
@@ -432,11 +433,11 @@ void ChangeLang(void)
     }
 }
 
-void DrawLeftRight(void)
+static void DrawLeftRight(void)
 {
 }
 
-void PrintMono(int ypos)
+static void PrintMono(int ypos)
 {
     char *String;
     int len;
@@ -1428,7 +1429,7 @@ void GetVolumes(void)
     }
 }
 
-void AlterSpeedMenu(GM_SPEEDS gs)
+static void AlterSpeedMenu(GM_SPEEDS gs)
 {
     OMENUITEM *it;
 
@@ -1448,7 +1449,7 @@ void AlterSpeedMenu(GM_SPEEDS gs)
     }
 }
 
-void GameSpeedPad(void)
+static void GameSpeedPad(void)
 {
     int cp;
     BOOL exit_flag;

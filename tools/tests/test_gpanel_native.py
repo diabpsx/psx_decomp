@@ -30,10 +30,10 @@ class GPanelNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("gpanel", 13))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1556)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1536)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
                          {".text": 5052, ".rdata": 96,
-                          ".data": 370, ".sdata": 32})
+                          ".data": 370, ".sdata": 52})
         self.assertNotIn("D_80110868", receipt["bindings"])
 
 

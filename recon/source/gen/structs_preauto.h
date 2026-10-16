@@ -2,9 +2,6 @@
  * pointed-to type as the complete 112-byte class rather than a forward
  * declaration.  Keep the unused payload opaque while preserving that type
  * identity and size. */
-struct TextDat {
-    unsigned char opaque[112];
-};
 
 struct SysObj {   /* sizeof 4 */
     long MemHnd;   /* +0x0 */

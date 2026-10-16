@@ -424,6 +424,15 @@ def gas_string_bytes(literal):
     return bytes(out)
 
 
+def alignment_pad(source, start, stop, position, address):
+    """The first `.align n` directive between two scaffold rows that explains the gap exactly."""
+    for match in re.finditer(r"^[ 	]*\.align[ 	]+(\d)[ 	]*$", source[start:stop], re.M):
+        width = 1 << int(match[1])
+        if address == (position + width - 1) // width * width:
+            return slice(start + match.start(), start + match.end())
+    return None
+
+
 def data_bridge(source, regions):
     """Import SDK data while preserving labels, including inside a scaffold object."""
     pattern = re.compile(r"^dlabel (\w+)\r?\n(.*?)^enddlabel \1\s*$", re.M | re.S)
@@ -488,9 +497,18 @@ def data_bridge(source, regions):
                          and gas_string_bytes(match[2]) is not None]
                 rows.sort(key=lambda row: row[1])
                 position = first
+                previous_end = 0
                 for match, address, width in rows:
                     if address != position:
-                        raise ValueError("data boundaries need contiguous explicit scalar rows")
+                        # splat spells the compiler's literal alignment as a bare `.align n` between two rows
+                        # (e.g. the 2 bytes after "psxsrc/gman.h"); the verified payload supplies those bytes.
+                        pad = alignment_pad(source, previous_end, match.start(), position, address)
+                        if pad is None:
+                            raise ValueError("data boundaries need contiguous explicit scalar rows")
+                        replacements.append((pad.start, pad.stop,
+                                             f'    .incbin "{filename}", {payload_offset + position - va}, {address - position}'))
+                        position = address
+                    previous_end = match.end()
                     used_width = min(width,limit-address)
                     suffix = ''
                     if used_width != width:
@@ -511,7 +529,12 @@ def data_bridge(source, regions):
                     replacements.append((match.start(), match.end(),
                                          f'    .incbin "{filename}", {payload_offset + address - va}, {used_width}'+suffix))
                 if position != limit:
-                    raise ValueError("data boundaries need contiguous explicit scalar rows")
+                    # the span may end on the compiler's alignment after its last literal (a bare `.align n`)
+                    pad = alignment_pad(source, previous_end, len(source), position, limit)
+                    if pad is None:
+                        raise ValueError("data boundaries need contiguous explicit scalar rows")
+                    replacements.append((pad.start, pad.stop,
+                                         f'    .incbin "{filename}", {payload_offset + position - va}, {limit - position}'))
             continue
         for i, match, address in selected:
             end = labels[i + 1][1]

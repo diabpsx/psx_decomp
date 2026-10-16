@@ -30,7 +30,7 @@ extern int strncmp(const char *, const char *, int);
 extern int strlen(const char *);
 extern int toupper(int);
 extern void initgp(void);
-extern void savegp_ci(unsigned int *out);
+extern void savegp(unsigned int *out);
 extern void restoregp(unsigned int value);
 extern void _96_remove(void);
 extern int CdInit(void);
@@ -82,6 +82,18 @@ int rootlength;
 volatile int currentsector;
 volatile int asyncsectors;
 char *asyncmemadr;
+/* retail commons of this member (MAP names, no SYM records): unreferenced by the surviving code */
+int asyncseekstart;
+int asyncbytes;
+int cdrate;
+int asyncsetseek;
+int acdspeed;
+int asyncsetspeed;
+int readtimer;
+int asyncseek;
+int asynctime;
+int asyncreadseeks;
+int asyncblocksize;
 void (*asyncreadcallbackfunc)(int);
 CdlLOC asyncloc;
 DIRCACHE *cachefile;
@@ -304,7 +316,7 @@ void Iasyncreadcallback(int intr, unsigned char *result)
     unsigned int savedgp;
     int i;
 
-    savegp_ci(&savedgp);
+    savegp(&savedgp);
     cdcallbacks++;
     if (asyncpausereq && asyncsectors == 0) {
         CdReadyCallback(0);

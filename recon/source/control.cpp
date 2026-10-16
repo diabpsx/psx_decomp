@@ -210,7 +210,7 @@ static char sgszTalkMsg[80];   /* @0x8012EA98 */
 
 void StartAutomap(void);   /* GAME overlay, AUTOMAP.CPP @0x80161F58 (cross-image call) */
 
-unsigned char TrimCol(short col)
+static unsigned char TrimCol(short col)
 {
     if (col < 0)
         col = 0;
@@ -1792,7 +1792,7 @@ void RedBack(void)
     }
 }
 
-void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff)
+static void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff)
 {
     unsigned char r, g, b;
 

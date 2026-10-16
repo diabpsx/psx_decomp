@@ -1,6 +1,8 @@
 /* COREMON.CPP — Diablo PSX (Climax 1998) reconstruction.  Twin: refs/devilution/Source/monster.cpp (+ inv.cpp CanPut).
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_coremon.h"
 #include "source/gen/externs_coremon.h"
 #include "source/gen/protos_coremon.h"

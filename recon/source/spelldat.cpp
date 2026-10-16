@@ -1,4 +1,5 @@
 /* SPELLDAT.CPP � retail PSX spell records; PC twin SPELLDAT.CPP. */
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 
 struct SpellData {   /* sizeof 52 */

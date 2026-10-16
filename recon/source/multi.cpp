@@ -5,6 +5,7 @@
  * fut/targ coords); NetInit is the local two-controller setup: player 1 exists when FePlayerNo is
  * set, the seed comes from the VID tick (or OptionsSeed / the demo seed). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_multi.h"
 #include "source/gen/externs_multi.h"

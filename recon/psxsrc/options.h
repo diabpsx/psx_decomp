@@ -364,15 +364,15 @@ void DrawOptions(TASK *T);   /* @0x800AA2D0 OPTIONS.CPP:2703 -- not yet reconstr
 
 void SetLoadedLang(LANG_TYPE LoadLang);   /* @0x800A70C0 OPTIONS.CPP:1059 */
 void ChangeLang(void);   /* @0x800A7170 OPTIONS.CPP:1091 */
-void DrawLeftRight(void);   /* @0x800A7234 OPTIONS.CPP:1121 */
-void PrintMono(int ypos);   /* @0x800A723C OPTIONS.CPP:1137 */
+static void DrawLeftRight(void);   /* @0x800A7234 OPTIONS.CPP:1121 */
+static void PrintMono(int ypos);   /* @0x800A723C OPTIONS.CPP:1137 */
 int who_pressed(int pval);   /* @0x800A8314 OPTIONS.CPP:1498 */
 void SwitchMONO(void);   /* @0x800A9214 OPTIONS.CPP:2023 */
 void CalcVolumes(void);   /* @0x800A9EAC OPTIONS.CPP:2463 */
 void SetLoadedVolumes(void);   /* @0x800AA008 OPTIONS.CPP:2498 */
 void GetVolumes(void);   /* @0x800AA0B8 OPTIONS.CPP:2514 */
-void AlterSpeedMenu(GM_SPEEDS speed);   /* @0x800AA154 OPTIONS.CPP:2621 */
-void GameSpeedPad(void);   /* @0x800AA1A8 OPTIONS.CPP:2644 */
+static void AlterSpeedMenu(GM_SPEEDS speed);   /* @0x800AA154 OPTIONS.CPP:2621 */
+static void GameSpeedPad(void);   /* @0x800AA1A8 OPTIONS.CPP:2644 */
 void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
 void PrintSelectBack(unsigned short Str);   /* @0x800A68D0 OPTIONS.CPP:817 */
 void DrawDialogBox(int e, int f, RECT *DRect, int X, int Y, int W, int H);   /* @0x800A6960 OPTIONS.CPP:862 */

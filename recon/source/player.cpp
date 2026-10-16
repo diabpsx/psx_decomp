@@ -5,7 +5,11 @@
  * multiplayer content makes it diverge from the shorter PSX body -- flagged per function below).
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_player.h"
+/* retail PLAYER.CPP small data: the two struct sizes follow the pool (0x8011BA00, 0x8011BA04) */
+static int PlrStructSize = sizeof(PlayerStruct);
+static int ItemStructSize = sizeof(ItemStruct);
 #include "source/gen/externs_player.h"
 #include "source/gen/protos_player.h"
 
@@ -2877,12 +2881,24 @@ static void PRIM_GetPrim(POLY_FT4 **Prim)
     ThisPrimAddr = ThisPrimAddr + 1;
 }
 
-BOOL SpellTarget::Active()
+/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
+ * code in REVERSE definition order, so retail's tail (SpellTarget::Active, CPlayer::GetPlayer, CPlayer::GetLastOtPos, CPlayer::GetLastScrY, CPlayer::GetLastScrX) fixes this definition order. */
+inline int CPlayer::GetLastScrX() const
 {
-    return active;
+    return LastScrX;
 }
 
-CPlayer *CPlayer::GetPlayer(int PNum)
+inline int CPlayer::GetLastScrY() const
+{
+    return LastScrY;
+}
+
+inline int CPlayer::GetLastOtPos() const
+{
+    return LastOtPos;
+}
+
+inline CPlayer *CPlayer::GetPlayer(int PNum)
 {
     if (1 < (unsigned int)PNum) {
         DBG_Error((char *)0x0, "psxsrc/cplayer.h", 0x41);
@@ -2890,17 +2906,7 @@ CPlayer *CPlayer::GetPlayer(int PNum)
     return PActiveArray[PNum];
 }
 
-int CPlayer::GetLastOtPos() const
+inline BOOL SpellTarget::Active()
 {
-    return LastOtPos;
-}
-
-int CPlayer::GetLastScrY() const
-{
-    return LastScrY;
-}
-
-int CPlayer::GetLastScrX() const
-{
-    return LastScrX;
+    return active;
 }

@@ -52,3 +52,12 @@ int yscale = 0;
 int xbangle = 0;
 int ybangle = 0;
 int aspectratio = 0x10000;
+/* the mouse hooks default to NULLFUNC.ASM's return-zero body (0x80010000); retail keeps them at 0x8011C5DC.. */
+extern void nullfunction(void);
+void (*clobbermouse)(void) = nullfunction;
+void (*hidemouse)(void) = nullfunction;
+void (*showmouse)(void) = nullfunction;
+void (*readmouse)(void) = nullfunction;
+void (*mouseclick)(void) = nullfunction;
+void (*setdialmouse)(void) = nullfunction;
+void (*resetdialmouse)(void) = nullfunction;

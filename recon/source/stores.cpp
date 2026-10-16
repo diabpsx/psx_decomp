@@ -20,6 +20,7 @@
  *    not EXT -- declared `static` here, not `extern`.
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_stores.h"
 #include "source/gen/externs_stores.h"
 #include "source/gen/protos_stores.h"

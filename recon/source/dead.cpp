@@ -18,6 +18,7 @@
  * %gp_rel(spurtndx)/%gp_rel(stonendx) stores (both are 4-byte ints defined in this TU, like devilution). */
 int spurtndx;
 int stonendx;
+unsigned char *pSquareCel;   /* @0x8011B778: uninitialised like spurtndx/stonendx, so cc1plus defers it behind them (SYM order); unused here */
 /* Retail owns this zero-initialized 372-byte array in .data at 0x800CEB10. */
 DeadStruct dead[31] = {0};
 

@@ -1,6 +1,7 @@
 /* COREINV.CPP — Diablo PSX (Climax 1998) reconstruction.  Twin: refs/devilution/Source/inv.cpp FindGetItem.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

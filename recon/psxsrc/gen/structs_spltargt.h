@@ -63,36 +63,7 @@ struct FRAME_HDR;
 struct SPR_HDR;
 
 struct CTextFileInfo;
-
-struct TextDat {   /* sizeof 112 */
-    BOOL OwnDat;   /* +0x0 */
-    int TexNum;   /* +0x4 */
-    int LastFrame;   /* +0x8 */
-    BOOL DatLoaded;   /* +0xC */
-    long hndDat;   /* +0x10 */
-    long hndHdr;   /* +0x14 */
-    long hndPalOffset;   /* +0x18 */
-    long hndCreatureOffset;   /* +0x1C */
-    long hndBlockOffsets;   /* +0x20 */
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    struct SPR_HDR *Hdr;   /* +0x28 */
-    void *Pals;   /* +0x2C */
-    int *PalOffset;   /* +0x30 */
-    int *CreatureOffset;   /* +0x34 */
-    unsigned char *CreatureAnims;   /* +0x38 */
-    unsigned char *Blocks;   /* +0x3C */
-    BOOL Loaded;   /* +0x40 */
-    int LoadCount;   /* +0x44 */
-    struct CTextFileInfo *FileInfo;   /* +0x48 */
-    long hndDecompBuffer;   /* +0x4C */
-    int DecX;   /* +0x50 */
-    int DecY;   /* +0x54 */
-    int PalX;   /* +0x58 */
-    int PalY;   /* +0x5C */
-    int Scr;   /* +0x60 */
-    int NumOfBuffers[2];   /* +0x64 */
-    long hndDecompArrays;   /* +0x6C */
-};
+/* TextDat: psxsrc/textdat_header.h (GMAN.H), included by the TU ahead of this header */
 
 struct MonstList;
 

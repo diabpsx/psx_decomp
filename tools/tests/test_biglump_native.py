@@ -28,7 +28,7 @@ class BigLumpNativeTests(unittest.TestCase):
         self.assertEqual((receipt["segment"], receipt["functions"]), ("biglump", 17))
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 980)   # .sdata starts at 0x8011AB54 (its literal pool)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 3960, ".rdata": 280,
+                         {".text": 3960, ".rdata": 296,
                           ".data": 432, ".sdata": 53})
 
 

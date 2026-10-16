@@ -6,6 +6,8 @@
  * CheckRportal probe the 8 neighbours (offset_x/offset_y) of the cursor square around each
  * portal and stop at the first hit; strings come from GetStr(). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_cursor.h"
 #include "source/gen/externs_cursor.h"
 #include "source/gen/protos_cursor.h"

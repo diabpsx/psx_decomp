@@ -26,6 +26,9 @@ static int CpuStart;        /* @0x8011C688 */
 static int CpuTime;         /* @0x8011C68C */
 static int DrawTime;        /* @0x8011C690 */
 static int DrawStart;       /* @0x8011C694 */
+static int LastCpuTime;   /* retail STAT record, unreferenced here: keeps the .sbss layout */
+static int LastDrawTime;
+static int DrawArea;
 
 /* @0x80096838 PROF.CPP:87 */
 void PROF_Open(void)

@@ -5,6 +5,7 @@
  * out of line in this object (-fno-inline).
  * The oracle's two splat "functions" dlg/func_80143604 and dlg_1/func_801436A0 are this TU's rodata
  * (the three BISLPS file-name literals; the Classes[] initialiser template + sprintf formats), not code. */
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"   /* GMAN.H: the DumpDatFile inline's "psxsrc/gman.h" literal heads DLG's .rdata (0x801435E8) */
 #include "psxsrc/dlg.h"
 

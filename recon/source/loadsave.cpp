@@ -495,3 +495,8 @@ int RestoreLoadedData(BOOL firstflag)
 unsigned char ADirtyFlagThatGaryWillLove = 0;
 int DirtyVidx = 0;
 int DirtyVidY = 0;
+
+/* The last item of retail .LOADSAVE_rdata is an unreferenced "DIABLO-OPTIONS" literal (no code, data or SYM record
+ * refers to it): the literal of an inline body that cc1plus parsed after the last function and never instantiated.
+ * Nothing records the original inline; this stand-in carries only that literal.  [INFERRED] */
+inline const char *OptionsFileName(void) { return "DIABLO-OPTIONS"; }

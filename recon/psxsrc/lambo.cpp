@@ -1,6 +1,7 @@
 /* LAMBO.CPP — Diablo PSX (Climax 1998) reconstruction (PSXSRC).  A programmer's scratch file: both
  * functions are empty in the retail build. */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
 

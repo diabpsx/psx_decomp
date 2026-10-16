@@ -24,6 +24,7 @@
  *  - pMegaTiles entries are read as SIGNED 16-bit (`lh`), not unsigned (devilution's WORD/lhu).
  */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 #include "psxsrc/textdat_header.h"
 #include "source/gen/structs_drlg_l4.h"
 #include "source/gen/externs_drlg_l4.h"

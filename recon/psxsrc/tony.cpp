@@ -3,6 +3,7 @@
  * demo player (set_pad_record_play starts print_demo_task, which forces the demo character's stats
  * every frame and tears the demo down when demo_finish is raised). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
 
 /* ---------------------------------------------------------------- types ---- */
 struct TASK {   /* sizeof 92 */

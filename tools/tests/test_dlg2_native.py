@@ -27,11 +27,11 @@ class Dlg2NativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("dlg_2", 35))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3216)
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 3204)
         # the data stream (0x801435E8..0x8015958F) exported as one row: the gman.h literal, ClassStrTbl, the
         # BISLPS file names, the McLoad*Menu tables, the sprintf formats, then the four zero arrays
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 9160, ".rdata": 90024, ".sdata": 96})
+                         {".text": 9160, ".rdata": 90024, ".sdata": 108})
 
 
 if __name__ == "__main__":

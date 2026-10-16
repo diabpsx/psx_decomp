@@ -7,7 +7,7 @@ extern char *abortfile;
 extern int abortline;
 extern void abortmessage(char *message, ...);
 extern void print(char *format, ...);
-extern void savegp_ci(unsigned int *out);
+extern void savegp(unsigned int *out);
 extern void restoregp(unsigned int value);
 extern void *InterruptCallback(int irq, void (*func)());
 extern void addexit(void (*func)());
@@ -29,6 +29,8 @@ int timerflag = 0;
 volatile int reentryflag;
 void (*settimerstack)(void);
 void (*restoretimerstack)(void);
+/* retail commons of this member (MAP names, no SYM records): unreferenced by the surviving code */
+int timerevent;
 
 void inittimer(int hz) LIBTEXT;
 void restoretimer(void) LIBTEXT;
@@ -74,7 +76,7 @@ void tmrint(void)
     unsigned int gpbuf[2];
     int i;
 
-    savegp_ci(gpbuf);
+    savegp(gpbuf);
     ++finebios;
     if (finebios >= 19) {
         finebios = 0;

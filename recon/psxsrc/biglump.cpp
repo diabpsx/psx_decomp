@@ -4,6 +4,7 @@
  * > refs/skeleton drafts.  Retail assert strings/line literals kept verbatim. */
 #include "diabpsx_types.h"
 #include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
+#include "psxsrc/textdat_header.h"        /* GMAN.H TextDat + DumpDatFile inline: "psxsrc/gman.h" literal heads this TU's .rdata */
 #include "psxsrc/biglump.h"
 
 #define TRUE  1

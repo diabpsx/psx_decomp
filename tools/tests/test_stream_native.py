@@ -28,7 +28,7 @@ class StreamNativeTests(unittest.TestCase):
         self.assertEqual((receipt["segment"], receipt["functions"]), ("stream", 21))
         self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 1588)   # .sdata starts at 0x8011ADB4 (its literal pool)
         self.assertEqual({name: row["size"] for name, row in receipt["sections"].items()},
-                         {".text": 6160, ".rdata": 216, ".data": 74188,
+                         {".text": 6160, ".rdata": 232, ".data": 74188,
                           ".sdata": 60, ".sbss": 4})
 
 

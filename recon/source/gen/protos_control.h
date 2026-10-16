@@ -1,4 +1,4 @@
-unsigned char TrimCol(short col);   /* @0x8003017C CONTROL.CPP:542; retail UCHAR result */
+static unsigned char TrimCol(short col);   /* @0x8003017C CONTROL.CPP:542; retail UCHAR result */
 void SetSpellTrans(char t);   /* @0x80030D38 CONTROL.CPP:742 */
 void ClearPanel(void);   /* @0x80031F20 CONTROL.CPP:1291 */
 void InitPanelStr(void);   /* @0x80031F50 CONTROL.CPP:1346 */
@@ -49,7 +49,7 @@ static void DrawSpellBook(BOOL DrawBg);   /* @0x800366D8 CONTROL.CPP:3253 */
 void ToggleOptions(void);   /* @0x800AA9CC OPTIONS.CPP:3174 */
 void DrawSpellBookTSK(TASK *T);   /* @0x80030D44 CONTROL.CPP:754 */
 int LANG_GetLang(void);   /* @0x8007B348 LANG.CPP:84 (real return is enum LANG_TYPE; int avoids a forward-decl dependency) */
-void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff);   /* @0x800361F0 CONTROL.CPP:3133 */
+static void PrintSBookStr(int x, int y, int cspel, const char *pszStr, unsigned char bright, unsigned char Staff);   /* @0x800361F0 CONTROL.CPP:3133 */
 void ChrCheckValidButton(int move);   /* @0x80034028 CONTROL.CPP:2500 */
 void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1);   /* @0x8004F834 MSG.CPP:964 */
 void BuildChr(void);   /* @0x80034434 CONTROL.CPP:2596 */

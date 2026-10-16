@@ -475,11 +475,22 @@ struct TextDat {   /* sizeof 112 */
     int NumOfBuffers[2];   /* +0x64 */
     long hndDecompArrays;   /* +0x6C */
 
+    void DumpDatFile();   /* GMAN.H:290-296, inline below: its "psxsrc/gman.h" literal heads this TU's .rdata */
     struct CCreatureHdr * GetCreature(int Creature);
     int GetNumOfFrames(int Creature, int Action);
     int GetFrNum(int Creature, int Action, int Direction, int Frame);
     struct POLY_FT4 * PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
 };
+
+#include "glibdev/gal.h"
+inline void TextDat::DumpDatFile()
+{
+    if (hndDat != -1 && OwnDat) {
+        long Hnd = hndDat;
+        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        hndDat = -1;
+    }
+}
 
 struct MonstList;
 struct LittleGt4;

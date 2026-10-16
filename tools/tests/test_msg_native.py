@@ -32,7 +32,7 @@ class MsgNativeTests(unittest.TestCase):
                           ".ctors": 4, ".dtors": 4})
         # retail-order small data: pool, deltaload, gbBufferMsgs, the three compressors, dwRecCount
         self.assertEqual(receipt["sections"][".sdata"]["size"], 28)
-        self.assertEqual(receipt["sections"][".sbss"]["size"], 10)
+        self.assertEqual(receipt["sections"][".sbss"]["size"], 20)
         self.assertIsNone(receipt["post_assemble_section_split"])
 
 

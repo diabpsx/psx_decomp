@@ -24,13 +24,13 @@ class ItemsNativeTests(unittest.TestCase):
         self.assertEqual(len(receipts), 1)
         receipt = receipts[0]
         self.assertEqual((receipt["segment"], receipt["functions"]), ("items", 106))
-        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4360)   # .sdata starts at 0x8011B888
+        self.assertEqual(receipt["scaffold_gp_prefix"]["size"], 4348)   # .sdata starts at 0x8011B87C (its literal pool)
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".data")},
                          {".text": 55836, ".data": 14708})
         self.assertEqual(receipt["sections"][".rdata"]["size"], 1448)   # one retail-order .rdata row
         # retail-order small data: one .sdata row 0x8011B888..0x8011B8DC (numitems .. uitemflag)
-        self.assertEqual(receipt["sections"][".sdata"]["size"], 85)
+        self.assertEqual(receipt["sections"][".sdata"]["size"], 108)
         self.assertFalse(any(name.startswith(".sdata.items_") for name in receipt["sections"]))
         # one .bss row: curruitem, itemhold, itemactivelist in declaration order, each .lcomm rounded to 8
         # bytes by ASPSX 2.67 (0x8012EC58 .. 0x8012ED57)

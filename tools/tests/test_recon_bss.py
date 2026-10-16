@@ -26,7 +26,8 @@ class ReconBSSTests(unittest.TestCase):
             sources = dict(gen_ld.RECON_MAP, primpool='recon/psxsrc/primpool.cpp')
             binding = {'diabpsx': {'primpool': {'.sbss': {'va': '0x8011C608', 'size': 32}}}}
             with patch.object(gen_ld, 'ROOT', root), patch.object(gen_ld, 'RECON_MAP', sources), \
-                 patch.object(gen_ld, 'RECON_BSS', binding), contextlib.redirect_stdout(io.StringIO()):
+                 patch.object(gen_ld, 'RECON_BSS', binding), contextlib.redirect_stdout(io.StringIO()), \
+                 patch.object(gen_ld, 'NATIVE_RECON', {k: v for k, v in gen_ld.NATIVE_RECON.items() if k != 'primpool'}):
                 gen_ld.gen('diabpsx')
             script = (root / 'linkers/diabpsx.ld').read_text()
             self.assertIn('build/recon/psxsrc/primpool.cpp.o(.sbss);', script)

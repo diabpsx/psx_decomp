@@ -32,7 +32,7 @@ class BlockNativeTests(unittest.TestCase):
         self.assertEqual({name: receipt["sections"][name]["size"] for name in
                           (".text", ".rdata", ".data", ".sdata", ".sbss", ".bss")},
                          {".text": 19000, ".rdata": 76, ".data": 20, ".sdata": 104,
-                          ".sbss": 4, ".bss": 44})
+                          ".sbss": 16, ".bss": 44})
 
 
 if __name__ == "__main__":

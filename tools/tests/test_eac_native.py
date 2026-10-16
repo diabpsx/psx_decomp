@@ -38,7 +38,7 @@ class EacNativeTests(unittest.TestCase):
                 self.assertEqual(blocks[section],
                                  retail[address - 0x80010000:address - 0x80010000 + size])
             paths = [B.ROOT / "asm/nonmatchings/lib" / (name + ".s")
-                     for name in ("initgp", "savegp_ci", "restoregp")]
+                     for name in ("initgp", "savegp_ci", "restoregp")]   # oracle stems (savegp_ci: Windows cannot hold savegp.s beside SaveGP.s)
             self.assertEqual(R.verify_stripped_library_members(
                 obj, spec, {".text.lib": regions[".text"], ".data": regions[".data"]},
                 mapping, S.RETAIL.read_text(encoding="latin-1"), paths), 3)
@@ -100,7 +100,6 @@ class EacNativeTests(unittest.TestCase):
         retail_sym = S.RETAIL.read_text(encoding="latin-1")
         cases = {"blkfill": (["blockclear", "blockfill"], {}),
                  "getm": (["getm", "geti"], {}),
-                 "nasync_debug": (["dumpasync", "validateasyncblocks"], {}),
                  "textcrnt": (["putm", "puti"], {})}
         with tempfile.TemporaryDirectory(prefix="eac-native-", dir=B.BUILD) as directory:
             folder = Path(directory)

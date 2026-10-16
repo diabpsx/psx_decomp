@@ -6,6 +6,8 @@
  * owned by other TUs (coreauto.cpp / gendung.cpp) -- reached here absolute, not gp-rel.  AutoMapTData IS
  * gp-rel in the oracle, so it is a TU-owned tentative definition here (InitAutomapOnce). */
 #include "diabpsx_types.h"
+#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer_header.h"
 #include "source/gen/structs_preauto.h"
 #include "source/gen/externs_preauto.h"
 #include "source/gen/protos_preauto.h"
