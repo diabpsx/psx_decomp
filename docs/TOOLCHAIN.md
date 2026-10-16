@@ -808,9 +808,17 @@ GDEBUG commons are small commons (assembler `-G8`); STRNICMP is in STRICMP.C and
 hooks in ASYNC.C (retail pulled them without a caller); `savegp` carries its retail name (the
 oracle file keeps the `savegp_ci` stem because Windows cannot hold it beside GLIB's `SaveGP.s`).
 
-Residuals: (1) 85 sites of 1..3 bytes between sections are the retail linker's stale buffer bytes
-(address fragments); PSYLINK 2.60 writes zeros there, and no source spells them, so DIABPSX.BIN
-differs in those 157 bytes plus the checksum.  (2) Retail linked ~370 objects whose sections are
+Residuals: (1) 85 sites of 1..3 bytes between sections are the retail linker's stale buffer bytes;
+PSYLINK 2.60 writes zeros there, and no source spells them, so DIABPSX.BIN differs in those 157
+bytes plus the checksum.  Linker-version experiment (2026-10-17): the DOS builds PSYLINK 2.52D and
+2.60D (msdos-player, same script with 8.3 paths) reproduce their Win32 twins bit for bit (2.60D: the
+same 160 bytes, four overlays identical; 2.52D: FMV.BIN padded to 172588 like 2.52), and the Win32
+2.73 / 2.82 builds differ more (2420 bytes).  Pre-filling the output with 0xCC proves every pad is
+written by the linker, so the retail bytes are heap leftovers of the retail linker binary itself:
+"SX." / "IAB" (the DIABPSX file name), "O_t" / "at" (section-name strings), `xx 09 80` /
+`xx 01 80` (0x8009xxxx / 0x8001xxxx patch addresses).  That binary is a PSYLINK build other than
+2.52 / 2.60 / 2.73 / 2.82 (an intermediate 2.5x/2.6x release), which is also the likely origin of
+the six plain-section size symbols below; without it those bytes are not reproducible.  (2) Retail linked ~370 objects whose sections are
 all empty (BKANJI, L1ADATA.., M1A.., RH*/RL*/..., CUT*, DEBUG, DOBJ, HELP...): the asset pipeline's
 stubs, which contribute only their 4340 section symbols; they are not reconstructed.  (3) The plain
 `__data`/`__sbss`/`__bss` `_size`/`_orgend`/`_objend` symbols differ (PSYLINK's unpadded sums of
