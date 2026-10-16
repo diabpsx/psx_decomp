@@ -824,6 +824,84 @@ stubs, which contribute only their 4340 section symbols; they are not reconstruc
 `__data`/`__sbss`/`__bss` `_size`/`_orgend`/`_objend` symbols differ (PSYLINK's unpadded sums of
 contributions; the group extents and every address agree).
 
+### Phase 2b: the whole-program SYM against DIABPSX.SYM (2026-10-17)
+
+The link's SYM, `SYMMUNGE /i`-compacted as retail's was, against rom/DIABPSX.SYM (dumpsym records).
+Three things in our flow were not retail's, each visible only in the whole-program SYM:
+
+- **SYMMUNGE drops function records that arrive high -> low -> high.**  Every SYMMUNGE build (the
+  1.56 Win32 of PsyQ 4.5/4.6 and the one DOS-extender program shipped as PsyQ 4.0, 4.1, 4.3, 4.4
+  and Glover's, run under DOSBox) silently discards function records whose addresses go down and
+  then up again within an overlay (`PAK, PCIO, PSXHELP` loses PCIO's; `ITEMDAT, PAK, PCIO, PSXHELP`
+  all of PCIO's), and PSYLINK 2.52/2.60 write an object's records at its include position.  Our
+  include order put the objects that feed no shared section (DATIO, GAMEONLY, ITEMDAT, LZNP, PAK,
+  PCIO, PREGAME, PRESONLY, STORM, TESTCODE) first, alphabetically: 803 of 3174 function records
+  vanished.  `include_order` now derives the order from the retail facts instead of a generated
+  list: `shared_section_chains` reads each shared object section's contributor order from the
+  registry's retail addresses (`.sdata` orders 126 objects, `.sbss` 44, `.bss` 24, `.ctors`/`.dtors`,
+  `.STARTUP_text`, the hand-assembled objects' plain `.text`/`.data`/`.rdata`), the lanes follow
+  those chains (PSXSRC before SOURCE), and within a lane the objects sit in the retail
+  section-declaration order (the makefile's object list), which places the unconstrained ten at
+  their text-section positions (PCIO after FILEIO, DATIO after SYSOBJ, LZNP after BIGLUMP, PAK
+  after KANJI, ITEMDAT after INTERFAC, TESTCODE and STORM after GAMEPAD, the overlay markers
+  before their overlays).  Same five images and MAP; SYMMUNGE keeps 2871/2871.  (Retail's own
+  linker, the lost 2.5x/2.6x build, may have emitted the SYM in address order instead; its SLD runs
+  below say it did not emit per-object records the way 2.52/2.60 do.)
+- **The retail section rename was applied to the assembled object, not to the assembly.**  ASPSX
+  2.56 and 2.67 write the SLD end record (object record 0x3C) into their `.text` section whatever
+  section the code is in, so renaming the compiler's directives left an empty `.text` whose address
+  became every object's End-SLD address ($8001000C / $80010EAC...) and SYMMUNGE could not merge
+  one object's SLD with the next.  The retail SYM's End-SLD addresses are code ends, so the retail
+  objects' `.text` *was* the renamed section: `compile_g` now assembles plain `.text`/`.rdata`/
+  `.data` (a merged overlay module still folds its `.rdata`/`.data` into `.text` first) and
+  `psyq_extract.rename_sections` rewrites the object's section-definition records.  Bytes are
+  unchanged; the empty `.NAME_rdata`/`.NAME_data` sections retail's MAP declares for the merged
+  modules now exist (section symbols missing: 4340 -> 3909, all of them the asset stubs').
+- **EACLIB's C objects carried no debug records.**  Retail has no function, SLD or type record
+  from any EACLIB C file (its .ASM members have SLD); ours were built with -g: 303 extra functions,
+  EAC SLD blocks between the GLIB members, EA's types.  `stripped_library_object` builds them
+  without -g (bytes identical).  Function records: retail 2866 = ours 2866, none missing, none
+  extra; plain symbols 5971 = 5971; block records 4388 = 4388.
+
+The remaining differences, in the order a reader of the SYM meets them:
+
+- **End-SLD records: retail 6, ours 23** (with PsyQ 4.0's SYMMUNGE; 1.56 keeps 122).  Seven are the
+  hand-assembled objects (BOOT, GTE, REPLACE, CRUNCH, GP, ABLOCK, EA's PRINT/CRC/BLKMOV/GETM): their
+  retail .MIP/.ASM sources were assembled with SLD line records and our GNU-syntax `.s` produce
+  none, so each is an End record without a run.  Seven are overlay gaps (MEMCARD->DLG, LOADSAVE,
+  PREGAME->DRLG_L1, DRLG_L1->L2->L3->L4, PREMSG): PSYLINK 2.52/2.60 write each overlay object's
+  SLD under its own `set overlay` switch and SYMMUNGE only merges a run that is contiguous and
+  unswitched; retail's linker wrote the overlays' SLD as one run (DLG.CPP's records start at
+  0x80159590 in both SYMs, after its data, and retail has no End record before them).  Not
+  reproducible without that linker.
+- **278 functions are attributed to a different file.**  Retail compiled non-inlined `inline`
+  members in its headers: BLOCK.H (29 TUs' SLD switch into it), PADS.H (17), DIALOG.H (15),
+  GMAN.H (14), PRIMPOOL.H (11), TUTILS.H (7), CPLAYER.H (5), SPLTARGT.H (4), COMPMAP.H (2),
+  STORM.H, PRINTY.H; ours defines them in the .cpp or in a `structs_*.h`.  DLG.CPP's 25 functions
+  are our DLG_2.CPP; MSG.CPP's 9 inline members sit in our structs_msg.h.  This is the retail
+  header layout, source-level work.
+- **Type definitions.**  24 tags are defined differently from retail (FileIO's vtable pointer is
+  `.vf`, a `PTR ARY STRUCT __vtbl_ptr_type`, where ours is `_vf`; TextDat, CPad, CFont, CBlocks (32
+  members, 264 bytes), SFXHDR (36 members), MonsterStruct (132 members), TSFX, CMonster, PLR_MODE
+  and LANG_TYPE enumerator order, GAL_ERROR_CODE/GAL_VERB_LEV, CTRL_SET, TARGET, PkPlayerStruct,
+  CharDataStructDef, LOAD_IMAGE_ARGS, CCritSect, _mdecanim, cdstreamstruct, strheader), and
+  SYMMUNGE warns 535 times that our TUs disagree with each other (one retail header, several of
+  ours).  Seven tags are ours alone (CPlayerHeaderProducer, CompMapHeaderProducer, FRAME_TP,
+  MiniTileDef, Quests, TCmdSpellID, TCmdSpellXY); ~150 retail tags are absent from ours, mostly
+  libgte/libgs types the retail headers dragged in (Gs*, DIVPOLYGON*, CRVECTOR*) plus game types
+  we never declared (ItemGetRecordStruct, OrigPkItemStruct, PcPkItemStruct, PcPkPlayerStruct,
+  QuestTalkData, MINIXY, SNDLIMITS, SNDPLAYOPTS, ...).  Anonymous-aggregate numbering (`.Nfake`)
+  differs with the TUs' contents.
+- **22 symbol names.**  Retail SpdCol0..3 / SpdColInc0..3 (GPANEL) are our D_8011AD94..B0;
+  AutoSpellList is our AutoTargetSpells; gfsize/gholdstate our filelength/savedstate; retail's
+  function-static suffixes (`TpX.94`, `DestAddr.66`, `AddVal.184`, `txtBack.160`...) are cc1's
+  per-TU counters, which track the TU's text; `exitfuncs` and `saved_gp` are plain symbols here
+  (retail EXIT.C/SAVEGP.ASM kept them private).
+- **Line numbers.**  2734 function records differ in `line`/`end_line`, 2105 in their block
+  lines, and the SLD line records throughout: our sources' line layout is not retail's (the PASS
+  bar excludes SLD).  Paths: retail `C:\diabpsx\SOURCE\x.cpp` / `C:\diabpsx\PSXSRC`, ours the
+  repository's.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

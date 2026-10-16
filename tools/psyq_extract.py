@@ -294,6 +294,74 @@ def parse_obj_complete(data):
             errors.append(label + ': ' + str(exc))
     raise Desync(' | '.join(errors))
 
+def rename_sections(data, mapping):
+    """Copy of an ASPSX (SLD-dialect) object with its section-definition names (0x10 records) renamed by
+    `mapping` (old name -> new name); every other record is copied verbatim.  Retail's `.NAME_text` /
+    `.NAME_rdata` / `.NAME_data` spelling was applied to the assembled object (docs/TOOLCHAIN.md, SYM diff):
+    ASPSX writes the SLD end record into its `.text` section whatever section the code is in, and the retail
+    SYM's End-SLD addresses are the objects' code ends, so the code section itself carried the retail name."""
+    if data[:4] != b'LNK\x02':
+        raise Desync('not a LNK object')
+    out = bytearray(data[:4])
+    p = 4
+    renamed = 0
+
+    def counted():
+        nonlocal p
+        ln = data[p]; p += 1 + ln
+
+    while p < len(data):
+        start = p
+        op = data[p]; p += 1
+        if op == 0x00:
+            out += data[start:p]
+            break
+        elif op == 0x02:
+            p += 2 + struct.unpack_from('<H', data, p)[0]
+        elif op == 0x06:
+            p += 2
+        elif op == 0x08:
+            p += 4
+        elif op == 0x0A:
+            p = _expr(data, p + 3, False)
+        elif op in (0x0C, 0x14, 0x30):
+            p += 8; counted()
+        elif op in (0x0E, 0x1C):
+            p += 2; counted()
+        elif op == 0x10:
+            header = data[start:p + 5]; p += 5
+            ln = data[p]; name = data[p + 1:p + 1 + ln]; p += 1 + ln
+            new = mapping.get(name.decode('latin-1'))
+            if new is not None:
+                name = new.encode('latin-1'); renamed += 1
+            out += header + bytes([len(name)]) + name
+            continue
+        elif op == 0x12:
+            p += 6; counted()
+        elif op == 0x2E:
+            p += 1
+        elif op in (0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C):
+            p += {0x32: 2, 0x34: 3, 0x36: 4, 0x38: 6, 0x3A: 8, 0x3C: 2}[op]
+        elif op == 0x4A:
+            p += 28; counted()
+        elif op in (0x4C, 0x4E, 0x50):
+            p += 10
+        elif op == 0x52:
+            p += 14; counted()
+        elif op == 0x54:
+            p += 14; p += 2 + 4 * struct.unpack_from('<H', data, p)[0]; counted(); counted()
+        else:
+            raise Desync('unsupported record 0x%02x at %d' % (op, start))
+        out += data[start:p]
+    else:
+        raise Desync('missing END')
+    if any(data[p:]):
+        raise Desync('unparsed nonzero suffix')
+    if renamed != len(mapping):
+        raise Desync('section rename: %d of %d names found' % (renamed, len(mapping)))
+    return bytes(out)
+
+
 def safe(s):
     return re.sub(r'[^A-Za-z0-9_.+@$-]', '_', s)[:120]
 

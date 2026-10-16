@@ -52,11 +52,11 @@ def is_zero_section(section):
 
 
 def compile_source(source, assembler, assembler_dos, assembler_flags, section_prefixes=None,
-                   plain_library_text=False, sn_spellings=False):
+                   plain_library_text=False, sn_spellings=False, debug=True):
     if source.suffix.lower() != '.s':
         return S.compile_g(source, assembler=assembler, assembler_dos=assembler_dos,
                            assembler_flags=assembler_flags, section_prefixes=section_prefixes,
-                           plain_library_text=plain_library_text, sn_spellings=sn_spellings)
+                           plain_library_text=plain_library_text, sn_spellings=sn_spellings, debug=debug)
     if section_prefixes:
         raise ValueError('assembly source cannot consume a generated section prefix')
     flags = B.per_tu_flags(source)

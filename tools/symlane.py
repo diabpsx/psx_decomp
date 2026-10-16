@@ -22,6 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import build as B
+import psyq_extract as P
 
 PSYQ = Path("C:/Temp/nfs3-clean/psyq400/PSYQ")
 ASPSX = Path(os.environ.get("DIAB_ASPSX", PSYQ / "ASPSX.EXE"))
@@ -129,8 +130,9 @@ def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False):
 
 
 def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=None,
-              section_prefixes=None, plain_library_text=False, sn_spellings=False) -> Path:
-    """cc1/cc1plus with the lane flags + -g, SN-ready .s"""
+              section_prefixes=None, plain_library_text=False, sn_spellings=False, debug=True) -> Path:
+    """cc1/cc1plus with the lane flags + -g, SN-ready .s (debug=False: no -g on either tool, the shape of
+    retail's EACLIB objects, which carry no debug records)"""
     rel = src.resolve().relative_to(ROOT)
     OUT.mkdir(parents=True, exist_ok=True)
     stem = OUT / rel.name
@@ -143,7 +145,7 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     if r.returncode: sys.exit(f"[cpp] {rel}\n{r.stderr}")
     g = str(flags.get("g_value", B.G_VALUE))
     base = B.CC1PL_FLAGS if is_cpp else B.CC1_FLAGS
-    cc1_flags = [f"-G{g}" if f == f"-G{B.G_VALUE}" else f for f in base] + flags.get("extra", []) + ["-g"]
+    cc1_flags = [f"-G{g}" if f == f"-G{B.G_VALUE}" else f for f in base] + flags.get("extra", []) + (["-g"] if debug else [])
     s_file = stem.with_suffix(".g.s")
     compiler, compiler_dos = compiler_lane(src, is_cpp)
     if compiler_dos:
@@ -167,15 +169,16 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
             or len(merged_sections) != len(set(merged_sections))
             or any(section not in (".rdata", ".data") for section in merged_sections)):
         raise ValueError("invalid merged-section registry")
+    # A merged overlay module folds `.rdata`/`.data` into `.text` before assembly (one emission-order stream).
     # Retail renamed every compiled object's `.text`/`.rdata`/`.data` to `.NAME_text`/`.NAME_rdata`/`.NAME_data`
-    # (one `.NAME_text` for a merged overlay module); the rename is applied to the compiler's section directives.
-    names = retail_section_names(src, bool(merged_sections))
-    if not names and merged_sections:
-        names = {section: '.text' for section in merged_sections}
-    for section, target in names.items():
-        replacement = ('\t.text' if target == '.text' else
-                       f'\t.section {target},{SECTION_FLAGS[target.rsplit("_", 1)[1]]},@progbits')
-        txt = re.sub(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", replacement, txt, flags=re.M)
+    # on the assembled object (psyq_extract.rename_sections below): ASPSX writes the SLD end record into its
+    # `.text` section, and the retail SYM's End-SLD addresses are the code ends, so the code section itself
+    # carried the retail name.
+    for section in merged_sections:
+        txt = re.sub(r"^[ \t]*" + re.escape(section) + r"[ \t]*$", "\t.text", txt, flags=re.M)
+    names = retail_section_names(src)
+    directive_of = {retail: plain for plain, retail in names.items()}
+    directive_of.update({retail_section_names(src, True).get(section, section): '.text' for section in merged_sections})
     if compiler_dos or plain_library_text:
         # CC1PSX 2.7.2.SN.1 honours `__attribute__((section(".text.lib")))` only until its first inline
         # jump table and then returns to `.text`, so ASPSX would split one TU's code over two sections.
@@ -185,6 +188,7 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
         txt = re.sub(r"^\s*\.section\s+\.text\.\w+[^\n]*$", "\t.text", txt, flags=re.M)
     # Insert borrowed carriers after the section merge, so the prefix lands in the member's real section.
     for section, payload in section_prefixes.items():
+        section = directive_of.get(section, section)   # retail object-section names are applied after assembly
         match = re.search(r"^[ \t]*(?:" + re.escape(section) + r"[ \t]*|\.section[ \t]+" + re.escape(section) + r"\b.*)$",
                           txt, re.M)
         if match is None:
@@ -201,13 +205,14 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     if not re.fullmatch(r"[0-9]+", assembler_g):
         raise ValueError("invalid assembler -G value")
     r = assemble_native(ASPSX if assembler is None else assembler,
-                        ["-q", "-g", *extra_as, f"-G{assembler_g}"], s_file, obj, assembler_dos)
+                        ["-q", *(["-g"] if debug else []), *extra_as, f"-G{assembler_g}"], s_file, obj, assembler_dos)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
+    if names:
+        obj.write_bytes(P.rename_sections(obj.read_bytes(), names))
     return obj
 
 # Retail object names are the TU stems except where the reconstruction keeps several TUs for one object.
 RETAIL_OBJECT_NAMES = {'dlg_2': 'DLG'}
-SECTION_FLAGS = {'text': '"ax"', 'rdata': '"a"', 'data': '"aw"'}
 
 
 def retail_object_name(source):
@@ -219,7 +224,8 @@ def retail_section_names(source, merged=False):
     """Retail's per-object spelling of a compiled TU's `.text`/`.rdata`/`.data` (`.VERSION_text`, ...), taken from
     the MAP inventory; a merged overlay module (one emission-order stream) names all three `.NAME_text`.
     Library members and hand-assembled objects keep plain names (the MAP has none for them).  No SN tool
-    produces this spelling (docs/TOOLCHAIN.md, round 9), so the lane rewrites the compiler's section directives."""
+    produces this spelling (docs/TOOLCHAIN.md, round 9); the lane applies it to the assembled object's section
+    records (compile_g), where the retail SYM's End-SLD addresses place it."""
     name = retail_object_name(source)
     inventory = {row['name'] for row in json.loads((ROOT / 'configs/sections.json').read_text())}
     if not any(f'.{name}_{kind}' in inventory for kind in ('text', 'rdata', 'data')):

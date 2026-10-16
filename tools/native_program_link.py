@@ -31,6 +31,8 @@ SDK_ROOT = SDK.ARCHIVE_ROOTS['4.1']
 # PsyQ 4.1's PSYLINK 2.60: every overlay group file is written at the group's own extent (2.52 pads the last
 # declared OVER group's file to the overlay set's end plus the following group, which retail's FMV.BIN is not)
 PSYLINK = Path('C:/Temp/PSYQ/psyq-410/PSSN/PSYLINK.EXE')
+# PsyQ 4.0's SYMMUNGE (DOS extender build, run under DOSBox): merges contiguous SLD blocks like the retail SYM
+SYMMUNGE_DOS = Path('C:/Temp/PSYQ/psyq-400-DTL-S2002/PSSN/BIN/SYMMUNGE.EXE')
 # retail library search order (the pull sequence of rom/DIABPSX.MAP's plain .text: LIBSN first, LIBGTE last)
 SDK_LIBRARIES = ['LIBSN.LIB', 'LIBAPI.LIB', 'LIBETC.LIB', 'LIBGPU.LIB', 'LIBSPU.LIB', 'LIBC.LIB', 'LIBCARD.LIB',
                  'LIBCD.LIB', 'LIBTAP.LIB', 'LIBGTE.LIB']
@@ -78,6 +80,14 @@ def object_name(owner, spec):
     return S.retail_object_name(B.ROOT / spec['source'])
 
 
+def stripped_library_object(source):
+    """EA's EACLIB came as prebuilt objects without debug records: the retail SYM has no function, SLD or type
+    records for any of its C members (its hand-assembled members carry SLD lines), so the whole-program lane
+    builds those C objects without -g."""
+    relative = Path(source).resolve().relative_to(B.ROOT.resolve())
+    return relative.parts[:2] == ('recon', 'eaclib') and relative.suffix.lower() == '.c'
+
+
 def compile_owner(owner, spec, reuse):
     """The member's native object under its retail object name (the gate's compiler/assembler lane, no carriers)."""
     source = B.ROOT / spec['source']
@@ -88,9 +98,10 @@ def compile_owner(owner, spec, reuse):
     version, assembler, dos, assembler_flags = R.source_assembler_options(spec)
     work = OUT / 'work'
     work.mkdir(parents=True, exist_ok=True)
+    debug = not stripped_library_object(source)
     inputs = {'source': spec['source'], 'source_sha256': digest(source), 'flags': flags,
-              'assembler': version, 'assembler_sha256': digest(assembler),
-              'spellings': SECTION_SPELLINGS.get(spec['source'], {}), 'assembly_rules': 5}
+              'assembler': version, 'assembler_sha256': digest(assembler), 'debug': debug,
+              'spellings': SECTION_SPELLINGS.get(spec['source'], {}), 'assembly_rules': 6}
     if source.suffix.lower() != '.s':
         # headers are inputs too: key the cache on the preprocessed text
         is_cpp = source.suffix.lower() != '.c'
@@ -131,7 +142,7 @@ def compile_owner(owner, spec, reuse):
         else:
             # retail's library objects are plain `.text`; `.text.lib` only exists for the GNU image lane
             obj = R.compile_source(source, assembler, dos, assembler_flags, plain_library_text=True,
-                                   sn_spellings=True)
+                                   sn_spellings=True, debug=debug)
     raw = obj.read_bytes()
     if raw[:4] != b'LNK\x02':
         raise ValueError(f'{owner}: not a native LNK object')
@@ -141,18 +152,92 @@ def compile_owner(owner, spec, reuse):
     return target, False
 
 
-def include_order(specs):
-    """Retail include order: NULLFUNC, BOOT, then the derived order (build/include_order.json) of the rest."""
-    derived = json.loads((B.BUILD / 'include_order.json').read_text())
+def shared_section_chains(specs):
+    """For every object section that several included objects feed (`.sdata`, `.sbss`, `.bss`, `.ctors`,
+    `.STARTUP_text`, the hand-assembled objects' plain `.text`/`.data`/`.rdata`, ...): its contributors in
+    retail address order (the registry rows' retail addresses), i.e. the order PSYLINK concatenated them in."""
     library = set(GLIB_MEMBERS)
-    order = ['hand_boot_text']
-    for owner in derived:
-        if owner.startswith('?') or owner in order or owner in library or owner not in specs:
+    homes = {}
+    for owner, spec in specs.items():
+        if owner in library:
             continue
+        names = R.object_section_names(spec) if spec.get('sections') else {}
+        rows = spec.get('sections') or ({spec['section']: spec} if spec.get('section') else {})
+        for section, row in rows.items():
+            if not isinstance(row, dict) or 'va' not in row:
+                continue
+            name = row.get('source_section') or names.get(section)
+            if name is None:
+                name = '.text' if re.fullmatch(r'\.text\.\w+', section) else section
+            name = SECTION_SPELLINGS.get(spec['source'], {}).get(name, name)
+            homes.setdefault(name, []).append((int(row['va'], 16), owner))
+    chains = {}
+    for name, rows in homes.items():
+        owners = []
+        for va, owner in sorted(rows):
+            if owner not in owners:
+                owners.append(owner)
+        if len(owners) > 1:
+            chains[name] = owners
+    return chains
+
+
+def lane(spec):
+    """The retail source tree an object came from (its include lane): PSXSRC, SOURCE, or the EA library tree."""
+    return Path(spec['source']).parts[1]
+
+
+def include_order(specs):
+    """The retail include order, from two retail facts.  (1) The concatenation order of every shared object
+    section (shared_section_chains): PSXSRC's objects precede SOURCE's in all of them, and within a lane the
+    order is the lane's retail section-declaration order (rom/DIABPSX.MAP), the makefile's object list.
+    (2) Objects that feed no shared section (PCIO, DATIO, LZNP, PAK, ITEMDAT, TESTCODE, STORM, the overlay
+    markers) take their place in that same per-lane section order: that is where the retail SYM needs them,
+    because SYMMUNGE drops function records that arrive in a high->low->high address sequence, and PSYLINK
+    writes an object's SYM records at its include position (library members after every include).
+    BOOT (the entry object) comes first; hand-assembled objects and data-only objects without a declared text
+    section lead their lane, ordered only by their chains."""
+    import heapq
+    library = set(GLIB_MEMBERS)
+    declared = [section for _, section in section_declarations()]
+    position = {section: index for index, section in enumerate(declared)}
+    lanes = []
+    for owner, spec in specs.items():
+        if owner not in library and lane(spec) not in lanes:
+            lanes.append(lane(spec))
+    chains = shared_section_chains(specs)
+    # the lane order is the shared sections' verdict: the lane of the first contributor comes first
+    first = {}
+    for owners in chains.values():
+        for index, owner in enumerate(owners):
+            first.setdefault(lane(specs[owner]), index)
+    lanes.sort(key=lambda name: first.get(name, len(specs)))
+
+    def key(owner):
+        spec = specs[owner]
+        if owner == 'hand_boot_text':
+            return (-1, 0, 0)
+        text = f'.{object_name(owner, spec)}_text'
+        return (lanes.index(lane(spec)), 0 if text in position else -1, position.get(text, 0))
+
+    successors = {owner: [] for owner in specs if owner not in library}
+    pending = {owner: 0 for owner in successors}
+    for owners in chains.values():
+        for before, after in zip(owners, owners[1:]):
+            successors[before].append(after)
+            pending[after] += 1
+    ready = [(key(owner), owner) for owner, count in pending.items() if count == 0]
+    heapq.heapify(ready)
+    order = []
+    while ready:
+        _, owner = heapq.heappop(ready)
         order.append(owner)
-    for owner in specs:
-        if owner not in order and owner not in library:
-            order.append(owner)
+        for after in successors[owner]:
+            pending[after] -= 1
+            if pending[after] == 0:
+                heapq.heappush(ready, (key(after), after))
+    if len(order) != len(successors):
+        raise ValueError('shared-section chains contradict each other: ' + ', '.join(sorted(set(successors) - set(order))))
     return order
 
 
@@ -321,6 +406,52 @@ def compare():
     return report
 
 
+def munge_dos(raw, munged):
+    """SYMMUNGE /i with the PsyQ 4.0 DOS build under DOSBox (symlane.compile_dos_cc1's harness).  The DOS
+    builds of PsyQ 4.0-4.4 are one program; the 1.56 Win32 build (PsyQ 4.5+) keeps every object's End-SLD
+    record, the 4.0 one merges contiguous SLD blocks as the retail SYM shows."""
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix='symmunge-', dir=OUT) as directory:
+        work = Path(directory)
+        shutil.copyfile(SYMMUNGE_DOS, work / 'SYMMUNGE.EXE')
+        shutil.copyfile(raw, work / 'RAW.SYM')
+        run = subprocess.run([str(S.DOSBOX), '--noprimaryconf', '--nolocalconf', '--noautoexec',
+                              '--set', 'output=texture', '--set', 'texture_renderer=software',
+                              '--set', 'mididevice=none', '--set', 'cpu_cycles=max',
+                              '-c', 'mount c ' + str(work), '-c', 'c:',
+                              '-c', 'symmunge /i RAW.SYM OUT.SYM > SM.LOG', '-c', 'exit'],
+                             capture_output=True, text=True, cwd=work,
+                             env=dict(S.ENV, SDL_VIDEODRIVER='dummy', SDL_AUDIODRIVER='dummy'),
+                             timeout=900, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        log = (work / 'SM.LOG').read_text(encoding='latin-1', errors='replace') if (work / 'SM.LOG').is_file() else ''
+        if run.returncode or not (work / 'OUT.SYM').is_file() or 'compacted OK' not in log:
+            raise ValueError('SYMMUNGE failed: ' + run.stdout + run.stderr + log[-2000:])
+        shutil.copyfile(work / 'OUT.SYM', munged)
+    return log
+
+
+def check_sym():
+    """SYMMUNGE /i the link's SYM as retail did and count what survives: every function record must (SYMMUNGE
+    silently drops records that arrive out of address order, see include_order), and the End-SLD count tells
+    how many SLD runs stayed separate (retail: 6)."""
+    raw, munged = OUT / 'diabpsx.sym', OUT / 'diabpsx.munged.sym'
+    log = munge_dos(raw, munged)
+    (OUT / 'symmunge.log').write_text(log)
+    run = subprocess.CompletedProcess([], 0, log, '')
+    counts = {}
+    for name, path in (('raw', raw), ('munged', munged)):
+        dump = subprocess.run([str(S.DUMPSYM), str(path)], capture_output=True, text=True, env=S.ENV,
+                              encoding='latin-1')
+        path.with_suffix('.sym.txt').write_text(dump.stdout, encoding='latin-1')
+        counts[name] = {kind: sum(1 for line in dump.stdout.splitlines() if re.match(r'^[0-9a-f]+: \$[0-9a-f]{8} ' + kind + ' ', line))
+                        for kind in ('8c', '8a', '88', '2')}
+    counts['struct_warnings'] = run.stdout.count('non-matching definitions')
+    counts['compacted'] = 'compacted OK' in run.stdout
+    print('SYM: raw functions', counts['raw']['8c'], 'munged', counts['munged']['8c'],
+          'End-SLD records', counts['munged']['8a'], 'struct warnings', counts['struct_warnings'])
+    return counts
+
+
 def compare_map(map_text):
     """Group table rows that differ from the retail MAP, and symbol address disagreements."""
     retail = (B.ROOT / 'rom/DIABPSX.MAP').read_text(encoding='latin-1')
@@ -373,7 +504,7 @@ def build(reuse=False, link=True):
         print(run.stdout[-3000:] + run.stderr[-1000:])
         raise ValueError('PSYLINK failed')
     map_text = (OUT / 'diabpsx.map').read_text(encoding='latin-1')
-    report = {'images': compare(), 'map': compare_map(map_text)}
+    report = {'images': compare(), 'map': compare_map(map_text), 'sym': check_sym()}
     (OUT / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report
 
