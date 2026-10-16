@@ -6,8 +6,7 @@
  * skel/PSXSRC/GLUE.CPP (generated from the retail SYM before this file existed).
  * TU-owned data and globals use the retail SYM names and layouts. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/textdat_header.h"
+#include "psxsrc/gman.h"
 
 /* ---- externs from other TUs (types kept minimal/opaque; only the fields this TU touches) ---- */
 struct TASK { unsigned char pad[92]; };   /* sizeof 92 per retail SYM; only used as an untyped handle here */
@@ -70,7 +69,6 @@ extern "C" int sprintf(char *, const char *, ...);
 extern int FePlayerNo;
 extern "C" void StartStand__FP12PlayerStructi(struct PlayerStruct *P, int Dir);
 
-struct RECT { short x, y, w, h; };   /* sizeof 8 */
 struct TextDat;
 struct PanelXY;
 struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record) */
@@ -104,8 +102,7 @@ extern struct Quests quests;
 extern void *gplayer;
 static unsigned char JustLoadedPlayer = 0;   /* @0x8011AFF0; retail SYM STAT UCHAR, .sdata */
 
-extern "C" int GM_UseTexData__Fi(int Id);
-extern int MissDat;
+extern TextDat *MissDat;
 extern "C" void music_start__Fi(int LevelType);
 extern "C" void PaletteFadeIn__Fi(int Ticks);
 extern "C" void PlaySFX__Fi(int Id);
@@ -118,49 +115,8 @@ extern "C" void FinishProgress__Fv(void);
 extern "C" void TakeDownCutScreen__Fv(void);
 
 /* Original CPlayer header layout and GetPlayer inline retain the header pool. */
-class CPlayer : public TextDat {
-public:
-    long hndDatMem;
-    unsigned short NumOfPlayers;
-    BOOL InTown;
-    unsigned short PlayerNum, Tpage;
-    int TexId, LastScrX, LastScrY, LastOtPos;
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-
-    CPlayer(BOOL InTown, int Which, int PlayerNum);
-    ~CPlayer();
-    int GetTexId(void);
-    void Load(int Id);
-    void NonBlockingLoadNewGFX(int Id);
-    void SetScrollTarget(struct PlayerStruct &Plr, class CBlocks &Blocks);
-    void Print(struct PlayerStruct &Plr, class CBlocks &Blocks);
-};
-
-class CBlocks {
-public:
-    unsigned char pad0[0xA8];
-    int Town;              /* +0xA8 */
-    unsigned char pad1[0xC8 - 0xAC];
-    int ScrollTargetX;     /* +0xC8 */
-    int ScrollTargetY;     /* +0xCC */
-    int ScrollX;           /* +0xD0 */
-    int ScrollY;           /* +0xD4 */
-    unsigned char pad2[264 - 0xD8];   /* sizeof CBlocks = 264 per retail SYM */
-
-    CBlocks(int TextId, int MLev, int c, int Level, int List);
-    ~CBlocks();
-    void SetTown(BOOL Val);
-    void MoveToScrollTarget(void);
-    void SetTownersGraphics(void);
-    void SetRandOffset(int Amount);
-    void DoScroll(void);
-    void Print(void);
-};
+#include "psxsrc/block.h"
+#include "psxsrc/cplayer.h"
 
 /* TU-owned small data */
 static BOOL GlueFinished;
@@ -358,10 +314,10 @@ static void BgTask(struct TASK *T)
     FinishProgress__Fv();
     TakeDownCutScreen__Fv();
     if (leveltype != 0) {
-        MissDat = GM_UseTexData__Fi(0xD0);
+        MissDat = GM_UseTexData(0xD0);
     } else {
         MyBlocks.SetTownersGraphics();
-        MissDat = GM_UseTexData__Fi(0xCD);
+        MissDat = GM_UseTexData(0xCD);
     }
     music_start__Fi(leveltype);
     PaletteFadeIn__Fi(8);
@@ -532,19 +488,4 @@ void GLUE_Init(void)
 }
 
 /* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
- * code in REVERSE definition order, so retail's tail (CPlayer::GetTexId, CBlocks::SetTown, CBlocks::MoveToScrollTarget) fixes this definition order. */
-inline void CBlocks::MoveToScrollTarget(void)
-{
-    ScrollX = ScrollTargetX;
-    ScrollY = ScrollTargetY;
-}
-
-inline void CBlocks::SetTown(BOOL Val)
-{
-    Town = Val;
-}
-
-inline int CPlayer::GetTexId(void)
-{
-    return TexId;
-}
+ * code in REVERSE definition order, so retail's tail (CPlayer::GetTexId, CBlocks::SetTown, CBlocks::MoveToScrollTarget) fixes this definition order. */

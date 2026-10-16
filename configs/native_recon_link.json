@@ -898,7 +898,8 @@
     }
   },
   "dlg_2": {
-    "source": "recon/psxsrc/dlg_2.cpp",
+    "tu": "dlg",
+    "source": "recon/psxsrc/dlg.cpp",
     "image": "frontend",
     "sections": {
       ".text": {

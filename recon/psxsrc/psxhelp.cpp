@@ -3,111 +3,12 @@
  * button assigned to it).  The header inlines (Dialog, CPad, CBlocks) are emitted out of line in
  * this object (-fno-inline). */
 #include "diabpsx_types.h"
-#include "psxsrc/textdat_header.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/pads.h"
+#include "psxsrc/dialog.h"
 
-class CPlayer : public TextDat {
-public:
-    long hndDatMem;
-    unsigned short NumOfPlayers;
-    BOOL InTown;
-    unsigned short PlayerNum, Tpage;
-    int TexId, LastScrX, LastScrY, LastOtPos;
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-};
-
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
-
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
-
-class CPad {
-public:
-    unsigned char get_both;       /* +0x0 */
-    unsigned char active;         /* +0x1 */
-    unsigned char PadType;        /* +0x2 */
-    unsigned char PADTICK;        /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;        /* +0x6 */
-    unsigned short Cur;           /* +0x8 */
-    unsigned short Up;            /* +0xA */
-    unsigned short Down;          /* +0xC */
-    unsigned short Tick;          /* +0xE */
-    unsigned short Old;           /* +0x10 */
-    unsigned short both_Cur;      /* +0x12 */
-    unsigned short both_Up;       /* +0x14 */
-    unsigned short both_Down;     /* +0x16 */
-    unsigned short both_Tick;     /* +0x18 */
-    unsigned short both_Old;      /* +0x1A */
-    unsigned char rest[236 - 0x1C];
-
-    void SetPadTick(unsigned short tick) { PADTICK = tick; }
-    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-    unsigned short GetTick() const
-    {
-        if (get_both)
-            return both_Tick;
-        return Tick;
-    }
-
-};
-
-
-class CBlocks {
-public:
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
-
-
-class Dialog {
-public:
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    void Bevels(int Type);
-    void Display(int x, int y, int W, int H);
-    void Back(int x, int y, int w, int h);
-    int SetOTpos(int OT);
-};
-
 
 struct HelpStruct {   /* sizeof 12 */
     char DisplayType;

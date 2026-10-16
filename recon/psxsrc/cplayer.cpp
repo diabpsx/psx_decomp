@@ -4,7 +4,6 @@
  * > skel/PSXSRC/CPLAYER.CPP drafts.  Layouts: tools/symhdr.py -> source/gen/structs_cplayer.h.
  * The GMAN.H/BLOCK.H/PRIMPOOL.H inlines used here are emitted out of line in this object. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 #include "source/gen/structs_cplayer.h"
 #include "psxsrc/psyq.h"
 #include "glibdev/gdebug.h"
@@ -56,13 +55,6 @@ extern unsigned char PauseMode;
 extern POLY_FT4 *ThisPrimAddr;   /* PRIMPOOL.H @0x8011AAB8 */
 extern POLY_FT4 *AddrToAvoid;    /* @0x8011AABC */
 
-/* CPLAYER.H inline (line 65), unused here: its "psxsrc/cplayer.h" literal heads this TU's .rdata. */
-inline CPlayer *CPlayer::GetPlayer(int PNum)
-{
-    if (1 < (unsigned int)PNum)
-        DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-    return PActiveArray[PNum];
-}
 
 /* ---- TU data ---- */
 CPlayer *CPlayer::PActiveArray[2] = { 0, 0 };   /* @0x8011AD50: explicitly initialised, so it precedes the "PLRDAT" literal in .sdata */
@@ -207,16 +199,7 @@ void CPlayer::SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg)
         Bg.SetScrollTarget(NWorldX, NWorldY);
 }
 
-/* PRIMPOOL.H inline (header copy, lines 65-71), parsed here: cc1plus emits an inline's literal where its body
- * is parsed, and retail .rdata has "psxsrc/primpool.h" after the constructor's literals and before FindAction's
- * table; defined last among this TU's inlines, it leads the reverse-order out-of-line tail. */
-inline void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 68);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
-}
+#include "psxsrc/primpool.h"
 
 /* @0x80095E8C CPLAYER.CPP:316 */
 void CPlayer::Print(PlayerStruct &Plr, CBlocks &Bg)

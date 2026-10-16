@@ -3,8 +3,10 @@
  * Sources: retail asm oracle (asm/nonmatchings/spltargt) > SYM (scratch/tuinfo.py SPLTARGT.CPP)
  * > refs/skeleton drafts.  Layouts: tools/symhdr.py -> psxsrc/gen/structs_spltargt.h. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/cplayer_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/pads.h"
+#include "psxsrc/block.h"
+#include "psxsrc/spltargt.h"
 #include "psxsrc/gen/structs_spltargt.h"
 
 #define TRUE  1

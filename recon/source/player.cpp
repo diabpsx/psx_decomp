@@ -5,40 +5,21 @@
  * multiplayer content makes it diverge from the shorter PSX body -- flagged per function below).
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_player.h"
 /* retail PLAYER.CPP small data: the two struct sizes follow the pool (0x8011BA00, 0x8011BA04) */
 static int PlrStructSize = sizeof(PlayerStruct);
 static int ItemStructSize = sizeof(ItemStruct);
 #include "source/gen/externs_player.h"
 #include "source/gen/protos_player.h"
+#include "psxsrc/primpool.h"
 
 extern "C" unsigned char GAL_Free(long Handle);
 
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd))
-            DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-
-class CPlayerHeaderProducer {
-public:
-    static void Check(int PNum)
-    {
-        if (1 < (unsigned int)PNum)
-            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-    }
-};
 
 /* File-local functions: retail SYM gives these class STAT (static); no other TU calls them. */
 static void ArmorDur(PlayerStruct *ptrplr);   /* @0x80064320 PLAYER.CPP:3326 */
 static void CheckCheatStats(PlayerStruct *ptrplr);   /* @0x800650CC PLAYER.CPP:3877 */
 static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy);   /* @0x800615DC PLAYER.CPP:1987 */
-static void PRIM_GetPrim(POLY_FT4 **Prim);
 static char deathdelay2[2];   /* @0x8011C878 (SYM STAT): per-player post-death countdown, PLAYER.CPP's one .sbss static */
 #include "source/diablo.h"
 
@@ -91,7 +72,6 @@ static char deathdelay2[2];   /* @0x8011C878 (SYM STAT): per-player post-death c
 #define MIS_FARROW 0x1B
 #define MIS_LARROW 0x38
 #define ICLASS_WEAPON 1
-struct P_TAG { unsigned addr : 24; unsigned len : 8; unsigned char r0, g0, b0, code; };
 #define setaddr(p, _addr)	(((P_TAG *)(p))->addr = (unsigned long)(_addr))
 #define setcode(p, _code)	(((P_TAG *)(p))->code = (unsigned char)(_code))
 #define getcode(p)   		(unsigned char)(((P_TAG *)(p))->code)
@@ -2872,41 +2852,4 @@ void GetGoldSeed(PlayerStruct *ptrplr, ItemStruct *h)
 
 /* PsyQ addPrim-style primitive-pool cursor advance (identical body wherever it's instantiated --
  * confirmed byte-identical across every PRIM_GetPrim__FPP8POLY_FT4 VA in refs/skeleton). */
-static void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if (AddrToAvoid <= ThisPrimAddr + 10) {
-        DBG_Error((char *)0x0, "psxsrc/primpool.h", 0x44);
-    }
-    *Prim = ThisPrimAddr;
-    ThisPrimAddr = ThisPrimAddr + 1;
-}
-
-/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
- * code in REVERSE definition order, so retail's tail (SpellTarget::Active, CPlayer::GetPlayer, CPlayer::GetLastOtPos, CPlayer::GetLastScrY, CPlayer::GetLastScrX) fixes this definition order. */
-inline int CPlayer::GetLastScrX() const
-{
-    return LastScrX;
-}
-
-inline int CPlayer::GetLastScrY() const
-{
-    return LastScrY;
-}
-
-inline int CPlayer::GetLastOtPos() const
-{
-    return LastOtPos;
-}
-
-inline CPlayer *CPlayer::GetPlayer(int PNum)
-{
-    if (1 < (unsigned int)PNum) {
-        DBG_Error((char *)0x0, "psxsrc/cplayer.h", 0x41);
-    }
-    return PActiveArray[PNum];
-}
-
-inline BOOL SpellTarget::Active()
-{
-    return active;
-}
+#include "psxsrc/primpool.h"

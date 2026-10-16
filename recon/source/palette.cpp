@@ -8,24 +8,11 @@
 #include "diabpsx_types.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/block.h"
 #include "source/gen/structs_palette.h"
-
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 #define MAXOTPOS 0x1FF
 
-class CBlocks {
-public:
-    static int GetMaxOtPos() { return MAXOTPOS; }
-};
 
 #include "source/gen/externs_palette.h"
 #include "source/gen/protos_palette.h"

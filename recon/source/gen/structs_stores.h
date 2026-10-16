@@ -1,55 +1,6 @@
-struct POLY_FT4 {   /* sizeof 40 -- copied from recon/psxsrc/davel.cpp */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char u0, v0;
-    unsigned short clut;
-    short x1, y1;
-    unsigned char u1, v1;
-    unsigned short tpage;
-    short x2, y2;
-    unsigned char u2, v2;
-    unsigned short pad0;
-    short x3, y3;
-    unsigned char u3, v3;
-    unsigned short pad1;
-};
 
 /* TextDat -- copied from recon/source/gen/structs_control.h's (already-proven) layout. Only
  * PrintFt4 is exercised in this TU. */
-class TextDat {
-public:
-    BOOL OwnDat;   /* +0x0 */
-    int TexNum;   /* +0x4 */
-    int LastFrame;   /* +0x8 */
-    BOOL DatLoaded;   /* +0xC */
-    long hndDat;   /* +0x10 */
-    long hndHdr;   /* +0x14 */
-    long hndPalOffset;   /* +0x18 */
-    long hndCreatureOffset;   /* +0x1C */
-    long hndBlockOffsets;   /* +0x20 */
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    struct SPR_HDR *Hdr;   /* +0x28 */
-    void *Pals;   /* +0x2C */
-    int *PalOffset;   /* +0x30 */
-    int *CreatureOffset;   /* +0x34 */
-    unsigned char *CreatureAnims;   /* +0x38 */
-    unsigned char *Blocks;   /* +0x3C */
-    BOOL Loaded;   /* +0x40 */
-    int LoadCount;   /* +0x44 */
-    struct CTextFileInfo *FileInfo;   /* +0x48 */
-    long hndDecompBuffer;   /* +0x4C */
-    int DecX;   /* +0x50 */
-    int DecY;   /* +0x54 */
-    int PalX;   /* +0x58 */
-    int PalY;   /* +0x5C */
-    int Scr;   /* +0x60 */
-    int NumOfBuffers[2];   /* +0x64 */
-    long hndDecompArrays;   /* +0x6C */
-
-    void DumpDatFile();
-    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-};
 
 enum TXT_JUST { JustRight = 2, JustCentre = 1, JustLeft = 0 };
 
@@ -72,85 +23,8 @@ struct CFont {   /* sizeof 540 */
 /* CBlocks/Dialog -- copied verbatim from recon/psxsrc/psxhelp.cpp (canonical layout used across the
  * whole TU family). Declaring a `static Dialog SBack;` object below makes the compiler synthesize
  * the ctor/dtor/_GLOBAL__ static-init thunks automatically -- they are NOT hand-written functions. */
-class CBlocks {
-public:
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
-
-extern unsigned char DialogRed, DialogGreen, DialogBlue;     /* @0x8011ABFD.. */
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;  /* @0x8011AC00.. */
-
-class Dialog {
-public:
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    void Bevels(int Type);
-    void Display(int x, int y, int W, int H);
-    void Back(int x, int y, int w, int h);
-    void Line(int x, int y, int w);
-    int SetOTpos(int OT);
-};
 
 /* CPad -- copied from recon/psxsrc/psxhelp.cpp (canonical layout used across the whole TU family). */
-class CPad {
-public:
-    unsigned char get_both;       /* +0x0 */
-    unsigned char active;         /* +0x1 */
-    unsigned char PadType;        /* +0x2 */
-    unsigned char PADTICK;        /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;        /* +0x6 */
-    unsigned short Cur;           /* +0x8 */
-    unsigned short Up;            /* +0xA */
-    unsigned short Down;          /* +0xC */
-    unsigned short Tick;          /* +0xE */
-    unsigned short Old;           /* +0x10 */
-    unsigned short both_Cur;      /* +0x12 */
-    unsigned short both_Up;       /* +0x14 */
-    unsigned short both_Down;     /* +0x16 */
-    unsigned short both_Tick;     /* +0x18 */
-    unsigned short both_Old;      /* +0x1A */
-    unsigned char rest[236 - 0x1C];
-
-    unsigned short GetTick() const
-    {
-        if (get_both)
-            return both_Tick;
-        return Tick;
-    }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-    void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }
-    void SetPadTick(unsigned short tick) { PADTICK = tick; }
-};
 
 struct ItemStruct {   /* sizeof 108 */
     int _iVAdd1;   /* +0x0 */
@@ -452,12 +326,6 @@ struct PLStruct {   /* sizeof 40 */
     int PLMultVal;   /* +0x24 */
 };
 
-struct RECT {   /* sizeof 8 */
-    short x;   /* +0x0 */
-    short y;   /* +0x2 */
-    short w;   /* +0x4 */
-    short h;   /* +0x6 */
-};
 
 struct STextStruct {   /* sizeof 140 */
     char _sx;   /* +0x0 */

@@ -6,13 +6,13 @@
  * refs/skeleton (TDR Ghidra) as shape hints.  Header inlines (Dialog, SpellTarget::Active, CBlocks,
  * CPad) are emitted out of line in this object (-fno-inline). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/cplayer_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/pads.h"
+#include "psxsrc/block.h"
+#include "psxsrc/spltargt.h"
+#include "psxsrc/dialog.h"
 
 /* ---------------------------------------------------------------- types (SYM) */
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
 
@@ -435,71 +435,9 @@ struct DEF_ARGS {   /* sizeof 16 */
     unsigned long a3;   /* +0xC */
 };
 
-struct TextDat;
 
 /* SPLTARGT.H */
-class SpellTarget {   /* sizeof 72 */
-public:
-    unsigned char forcespell;   /* +0x0 */
-    BOOL active;   /* +0x4 */
-    short _sx;   /* +0x8 */
-    short _sy;   /* +0xA */
-    short _nsx;   /* +0xC */
-    short _nsy;   /* +0xE */
-    unsigned char _stx;   /* +0x10 */
-    unsigned char _sty;   /* +0x11 */
-    BOOL changed;   /* +0x14 */
-    struct PlayerStruct *player;   /* +0x18 */
-    int pnum;   /* +0x1C */
-    int angle;   /* +0x20 */
-    int spotid;   /* +0x24 */
-    short lastx[8];   /* +0x28 */
-    short lasty[8];   /* +0x38 */
 
-    void Init(int plrn);
-    void Remove();
-    void ForceTarget(int monst, int x, int y);
-    BOOL Active();
-};
-
-/* PADS.H */
-class CPad {   /* sizeof 236 */
-public:
-    unsigned char get_both;   /* +0x0 */
-    unsigned char active;   /* +0x1 */
-    unsigned char PadType;   /* +0x2 */
-    unsigned char PADTICK;   /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;   /* +0x6 */
-    unsigned short Cur;   /* +0x8 */
-    unsigned short Up;   /* +0xA */
-    unsigned short Down;   /* +0xC */
-    unsigned short Tick;   /* +0xE */
-    unsigned short Old;   /* +0x10 */
-    unsigned short both_Cur;   /* +0x12 */
-    unsigned short both_Up;   /* +0x14 */
-    unsigned short both_Down;   /* +0x16 */
-    unsigned short both_Tick;   /* +0x18 */
-    unsigned short both_Old;   /* +0x1A */
-    BOOL TickDown[16];   /* +0x1C */
-    BOOL TickBoth[16];   /* +0x5C */
-    unsigned char TickCount[16];   /* +0x9C */
-    unsigned short BothTickCount[16];   /* +0xAC */
-    unsigned short GazTickCount[16];   /* +0xCC */
-
-    unsigned short GetCur() const
-    {
-        if (get_both)
-            return both_Cur;
-        return Cur;
-    }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-};
 
 struct GamePad {   /* sizeof 212 */
     struct PlayerStruct *player;   /* +0x0 */
@@ -517,101 +455,10 @@ struct GamePad {   /* sizeof 212 */
     unsigned char combo_menu_active;   /* +0xD1 */
 };
 
-struct FRAME_HDR;
-struct SPR_HDR;
-struct CTextFileInfo;
 
 
 
-struct MonstList;
-struct LittleGt4;
 
-struct RgbBlockInf {   /* sizeof 24 */
-    int FromValR;   /* +0x0 */
-    int ToValR;   /* +0x4 */
-    int FromValG;   /* +0x8 */
-    int ToValG;   /* +0xC */
-    int FromValB;   /* +0x10 */
-    int ToValB;   /* +0x14 */
-};
-
-/* BLOCK.H */
-class CBlocks {   /* sizeof 264 */
-public:
-    class TextDat TextDat;   /* +0x0 */
-    class TextDat *MonstTexDat;   /* +0x70 */
-    class TextDat *ObjTexDat;   /* +0x74 */
-    struct MonstList *MonsterList;   /* +0x78 */
-    int RndX;   /* +0x7C */
-    int RndY;   /* +0x80 */
-    int MonstTexId;   /* +0x84 */
-    long hndBlocks;   /* +0x88 */
-    int ObjTexId;   /* +0x8C */
-    int ItemTexId;   /* +0x90 */
-    class TextDat *ItemTexDat;   /* +0x94 */
-    int BgTexId;   /* +0x98 */
-    class TextDat *BgTexDat;   /* +0x9C */
-    int pOtPos[2];   /* +0xA0 */
-    BOOL IsTown;   /* +0xA8 */
-    int NumOfBlocks;   /* +0xAC */
-    struct LittleGt4 *Gt4s;   /* +0xB0 */
-    long hndGt4s;   /* +0xB4 */
-    struct RECT *Rects;   /* +0xB8 */
-    long hndRects;   /* +0xBC */
-    struct RECT ClipRect;   /* +0xC0 */
-    int StX;   /* +0xC8 */
-    int StY;   /* +0xCC */
-    int Mx;   /* +0xD0 */
-    int My;   /* +0xD4 */
-    int pBlockX[2];   /* +0xD8 */
-    int pBlockY[2];   /* +0xE0 */
-    int CursX;   /* +0xE8 */
-    int CursY;   /* +0xEC */
-    struct RgbBlockInf GlBlockInf;   /* +0xF0 */
-
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
-
-inline BOOL SpellTarget::Active()
-{
-    return active;
-}
-
-/* DIALOG.H */
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
-
-class Dialog {   /* sizeof 16 */
-public:
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetBack(int Type) { BackGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    void Back(int DX, int DY, int DW, int DH);
-};
 
 /* PRINTY.H */
 class CFont {   /* sizeof 540 */

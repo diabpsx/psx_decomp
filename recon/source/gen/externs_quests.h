@@ -35,7 +35,7 @@ extern int cursmy;                       /* @0x8011B754 */
 extern int Qtalklist[11][16];            /* @0x800CFBC0 */
 extern unsigned char Qfromoptions;                 /* @0x8011B228 */
 extern char **TextPtr;                      /* @0x8011BBF4 */
-extern int CDWAIT;                       /* @0x8011ADEC */
+extern BOOL CDWAIT;                       /* @0x8011ADEC */
 extern unsigned char qtextflag;          /* @0x8011B960 */
 extern int options_pad;                  /* @0x8011B250 */
 extern struct CFont MediumFont;          /* @0x800B82D8 */

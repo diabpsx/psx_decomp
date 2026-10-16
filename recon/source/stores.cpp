@@ -20,7 +20,8 @@
  *    not EXT -- declared `static` here, not `extern`.
  */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/dialog.h"
+#include "psxsrc/pads.h"
 #include "source/gen/structs_stores.h"
 #include "source/gen/externs_stores.h"
 #include "source/gen/protos_stores.h"
@@ -29,15 +30,6 @@
 extern "C" unsigned char GAL_Free(long Handle);
 extern "C" void DBG_Error(char *Text, char *File, int Line);
 
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd))
-            DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 class CPlayer;
 class CPlayer : public TextDat {

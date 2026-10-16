@@ -52,33 +52,7 @@ struct MonstLevel {   /* sizeof 8 */
     struct MonstList *TheLists;
 };
 
-class CPad {   /* sizeof 236 */
-public:
-    unsigned char get_both;
-    unsigned char active;
-    unsigned char PadType;
-    unsigned char PADTICK;
-    unsigned short PADTICKMASK;
-    unsigned short PadNum;
-    unsigned short Cur;
-    unsigned short Up;
-    unsigned short Down;
-    unsigned short Tick;
-    unsigned short Old;
-    unsigned short both_Cur;
-    unsigned short both_Up;
-    unsigned short both_Down;
-    unsigned short both_Tick;
-    unsigned short both_Old;
-    unsigned char rest[236 - 0x1C];
-
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-};
+#include "psxsrc/pads.h"
 
 class CFont {
 public:

@@ -1,4 +1,3 @@
-struct TextDat;
 
 enum LANG_TYPE {
     LANG_NONE = 5,
@@ -15,12 +14,6 @@ enum TXT_JUST {
     JustLeft = 0
 };
 
-struct RECT {   /* sizeof 8 */
-    short x;   /* +0x0 */
-    short y;   /* +0x2 */
-    short w;   /* +0x4 */
-    short h;   /* +0x6 */
-};
 
 struct CFont {   /* sizeof 540 */
     int TextureId;   /* +0x0 */
@@ -39,50 +32,6 @@ struct CFont {   /* sizeof 540 */
     int GetCharWidth(unsigned char ch);
 };
 
-struct CPad {   /* sizeof 236 */
-    unsigned char get_both;   /* +0x0 */
-    unsigned char active;   /* +0x1 */
-    unsigned char PadType;   /* +0x2 */
-    unsigned char PADTICK;   /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;   /* +0x6 */
-    unsigned short Cur;   /* +0x8 */
-    unsigned short Up;   /* +0xA */
-    unsigned short Down;   /* +0xC */
-    unsigned short Tick;   /* +0xE */
-    unsigned short Old;   /* +0x10 */
-    unsigned short both_Cur;   /* +0x12 */
-    unsigned short both_Up;   /* +0x14 */
-    unsigned short both_Down;   /* +0x16 */
-    unsigned short both_Tick;   /* +0x18 */
-    unsigned short both_Old;   /* +0x1A */
-    BOOL TickDown[16];   /* +0x1C */
-    BOOL TickBoth[16];   /* +0x5C */
-    unsigned char TickCount[16];   /* +0x9C */
-    unsigned short BothTickCount[16];   /* +0xAC */
-    unsigned short GazTickCount[16];   /* +0xCC */
-
-    unsigned short GetDown() const;
-};
-
-struct Dialog {   /* sizeof 16 */
-    int BevelGfx;   /* +0x0 */
-    int BorderGfx;   /* +0x4 */
-    int BackGfx;   /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog();
-    ~Dialog();
-    void SetBorder(int Type);
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B);
-    void Back(int DX, int DY, int DW, int DH);
-    int SetOTpos(int OT);
-};
-
-class CBlocks {
-public:
-    static int GetOverlayOtBase();
-};
 
 struct TASK {   /* sizeof 92 */
     struct TASK *Next;   /* +0x0 */

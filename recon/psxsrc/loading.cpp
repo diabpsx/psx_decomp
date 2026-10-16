@@ -3,23 +3,11 @@
  * Class shapes (TextDat/CScreen/CFont/Dialog/CBlocks) as in psxsrc/fe.h, redeclared locally. */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
-#include "psxsrc/textdat_header.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 
-class CPlayer : public TextDat {
-public:
-    long hndDatMem;
-    unsigned short NumOfPlayers;
-    BOOL InTown;
-    unsigned short PlayerNum, Tpage;
-    int TexId, LastScrX, LastScrY, LastOtPos;
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-};
+#include "psxsrc/cplayer.h"
+#define PRIMPOOL_NONINLINE   /* this object predates the `inline` on PRIMPOOL.H:65 (copy ahead of the static-init thunks, literal last) */
+#include "psxsrc/primpool.h"
 
 enum TXT_JUST { JustRight = 2, JustCentre = 1, JustLeft = 0 };
 
@@ -60,22 +48,7 @@ struct DEF_ARGS {   /* sizeof 16 */
      (p)->x2 = (_x2), (p)->y2 = (_y2), (p)->x3 = (_x3), (p)->y3 = (_y3))
 
 /* PRIMPOOL.H PRIM_GetPrim, POLY_G4 copy (line 68) */
-static void PRIM_GetPrim(POLY_G4 **Prim);
 
-struct FRAME_HDR;
-struct SPR_HDR;
-struct CTextFileInfo;
-
-struct CScreen : TextDat {   /* sizeof 124 */
-    int LoadedId;   /* +0x70 */
-    int TpX;        /* +0x74 */
-    int TpY;        /* +0x78 */
-
-    CScreen();
-    void Load(int Id, int tpx, int tpy);
-    void Unload(void);
-    void Display(int Id, int tpx, int tpy, int fadeval);
-};
 
 struct CFont {   /* sizeof 540 */
     unsigned char _pad[0x21C];
@@ -85,28 +58,7 @@ struct CFont {   /* sizeof 540 */
     int SetOTpos(int OT);
 };
 
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
-
-class CBlocks {
-public:
-    static inline int GetOverlayOtBase();   /* BLOCK.H */
-};
-
-struct Dialog {   /* sizeof 16 */
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    inline Dialog();
-    inline ~Dialog();
-    inline void SetRGB(unsigned char R, unsigned char G, unsigned char B);
-    inline void SetBack(int Type);
-    inline void SetBorder(int Type);
-    int SetOTpos(int OT);
-    void Back(int DX, int DY, int DW, int DH);
-};
+#include "psxsrc/dialog.h"
 
 extern CFont MediumFont;                  /* @0x800B82D8 */
 extern unsigned long *ThisOt;             /* @0x8011AAB4 */
@@ -336,33 +288,5 @@ void FinishProgress(void)
     }
 }
 
-#include "psxsrc/primpool.h"
-static void PRIM_GetPrim(POLY_G4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_G4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 68);
-    *Prim = (POLY_G4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_G4 *)ThisPrimAddr + 1);
-}
-inline int CBlocks::GetOverlayOtBase() { return 0x1E8; }
-inline Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
-inline Dialog::~Dialog() {}
-inline void Dialog::SetBorder(int Type) { BorderGfx = Type; }
-inline void Dialog::SetBack(int Type) { BackGfx = Type; }
-inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R; DialogGreen = G; DialogBlue = B;
-}
-
+/* PRIMPOOL.H: the retail object has this copy ahead of the static-initialiser thunks and its literal last in .rdata,
+ * i.e. instantiated here at the end of the file, not at its first use. */

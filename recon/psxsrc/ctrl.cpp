@@ -3,8 +3,7 @@
  * Advanced/Beginner default tables, pad-driven line selection and button assignment, and its draw.
  * Header inlines (CPad getters/setters, Dialog ctor/dtor/SetRGB/SetBorder, CBlocks::GetOverlayOtBase)
  * are emitted out of line in this object (-fno-inline). */
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/cplayer_header.h"
+#include "psxsrc/cplayer.h"
 #include "psxsrc/ctrl.h"
 
 /* ---- TU-owned data (SYM STAT/EXT; %gp_rel in the oracle -> defined here) ---- */

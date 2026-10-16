@@ -19,7 +19,7 @@ class Dlg2NativeTests(unittest.TestCase):
     def test_complete_object_and_raw_segments(self):
         # DLG is one emission-order stream: literals and tables, the zero data (save_buffer .. AlertStr, with
         # retail's four-byte .align 3 pad before CharDataStruct arising at stream offset 0x14104), then the code
-        self.assertEqual(B.per_tu_flags(B.ROOT / "recon/psxsrc/dlg_2.cpp"), {"merge_sections_into_text": [".rdata", ".data"]})
+        self.assertEqual(B.per_tu_flags(B.ROOT / "recon/psxsrc/dlg.cpp"), {"merge_sections_into_text": [".rdata", ".data"]})
         with tempfile.TemporaryDirectory(prefix="dlg2-native-", dir=B.BUILD) as directory:
             folder = Path(directory)
             with patch.object(R, "OUT", folder), patch.object(S, "OUT", folder):

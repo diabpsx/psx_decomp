@@ -6,8 +6,9 @@
  * VAG voice-file length instead of the PC's fixed qtextDelaySpd[] table.  Reconstructed from the retail
  * asm oracle + skel/SOURCE/MINITEXT.CPP (Ghidra/IDA draft). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/cplayer_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/pads.h"
+#include "psxsrc/dialog.h"
 #include "source/gen/structs_minitext.h"
 #include "source/gen/externs_minitext.h"
 #include "source/gen/protos_minitext.h"
@@ -249,42 +250,6 @@ void DrawQTextBack(void)
             LargeFont.SetOTpos(oldot);
         }
     }
-}
-
-inline unsigned short CPad::GetDown() const
-{
-    if (get_both != 0)
-        return both_Down;
-    return Down;
-}
-
-inline int CBlocks::GetOverlayOtBase() { return 0x1E8; }
-
-inline Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
-
-inline Dialog::~Dialog()
-{
-}
-
-inline void Dialog::SetBorder(int Type) { BorderGfx = Type; }
-
-inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R;
-    DialogGreen = G;
-    DialogBlue = B;
 }
 
 void DrawQTextTSK(TASK *T)

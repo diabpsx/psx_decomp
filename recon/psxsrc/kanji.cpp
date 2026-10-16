@@ -8,7 +8,7 @@
 #include "psxsrc/psyq.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 #include "psxsrc/fileio.h"
 
 #define ASSERT(e, line) if (!(e)) DBG_Error(NULL, "psxsrc/KANJI.CPP", line)   /* retail line literals */
@@ -58,118 +58,11 @@ struct ALL_DECOMP_BUFFERS {   /* sizeof 12 */
     struct DECOMP_BUFFER TheBuffers[1];   /* +0x4 */
 };
 
-struct FRAME_HDR {   /* sizeof 12 */
-    unsigned int FrOffset : 32;
-    int X : 8;
-    int Y : 8;
-    unsigned int PalNum : 8;
-    unsigned int NotTrans : 1;
-    unsigned int Rotated : 1;
-    unsigned int InVRAM : 1;
-    unsigned int CompType : 2;
-    unsigned int Floor : 1;
-    unsigned int Cycle : 1;
-    unsigned int pad : 1;
-    unsigned int W : 9;
-    unsigned int H : 9;
-    unsigned int PentaGram : 1;
-    unsigned int pad2 : 13;
-};
-
-struct SPR_HDR {   /* sizeof 40 */
-    unsigned int DecompOffset : 32;
-    unsigned int CreatureOffset : 32;
-    unsigned int PalOffset : 32;
-    unsigned int FrameOffset : 32;
-    unsigned int BaseFrame : 32;
-    unsigned int DestTPage : 32;
-    unsigned int ComponentOffset : 32;
-    unsigned int NumOfCreatures : 32;
-    unsigned int NumOfFrames : 16;
-    unsigned int NumOfPals : 16;
-    unsigned int TWidth : 8;
-    unsigned int THeight : 8;
-    unsigned int IsTiles : 8;
-    unsigned int Spare : 8;
-};
-
-struct CTextFileInfo;
-
-struct TextDat {   /* sizeof 112 */
-    BOOL OwnDat;   /* +0x0 */
-    int TexNum;   /* +0x4 */
-    int LastFrame;   /* +0x8 */
-    BOOL DatLoaded;   /* +0xC */
-    long hndDat;   /* +0x10 */
-    long hndHdr;   /* +0x14 */
-    long hndPalOffset;   /* +0x18 */
-    long hndCreatureOffset;   /* +0x1C */
-    long hndBlockOffsets;   /* +0x20 */
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    struct SPR_HDR *Hdr;   /* +0x28 */
-    void *Pals;   /* +0x2C */
-    int *PalOffset;   /* +0x30 */
-    int *CreatureOffset;   /* +0x34 */
-    unsigned char *CreatureAnims;   /* +0x38 */
-    unsigned char *Blocks;   /* +0x3C */
-    BOOL Loaded;   /* +0x40 */
-    int LoadCount;   /* +0x44 */
-    struct CTextFileInfo *FileInfo;   /* +0x48 */
-    long hndDecompBuffer;   /* +0x4C */
-    int DecX;   /* +0x50 */
-    int DecY;   /* +0x54 */
-    int PalX;   /* +0x58 */
-    int PalY;   /* +0x5C */
-    int Scr;   /* +0x60 */
-    int NumOfBuffers[2];   /* +0x64 */
-    long hndDecompArrays;   /* +0x6C */
-
-    void SetPal(struct FRAME_HDR *Fr, POLY_FT4 *FT4);   /* @0x80093DD4 GMAN.CPP:1358 */
-    /* GMAN.H in-class inlines (out-of-line copies land in this TU) */
-    inline struct ALL_DECOMP_BUFFERS *GetDecompBuffers();
-    inline struct FRAME_HDR *GetFr(int FrNum);
-    void DumpDatFile();
-};
-
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 /* Original CPLAYER.H layout and unused inline retain its diagnostic filename. */
-class CPlayer : public TextDat {
-public:
-    long hndDatMem;
-    unsigned short NumOfPlayers;
-    BOOL InTown;
-    unsigned short PlayerNum, Tpage;
-    int TexId, LastScrX, LastScrY, LastOtPos;
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-};
+#include "psxsrc/cplayer.h"
 
-class CBlocks : public TextDat {   /* sizeof 264; only the fields touched here are named */
-public:
-    struct TextDat *MonstTexDat;    /* +0x70 */
-    struct TextDat *ObjTexDat;      /* +0x74 */
-    struct MonstList *MonsterList;  /* +0x78 */
-    int RndX, RndY;                 /* +0x7C, +0x80 */
-    int MonstTexId;                 /* +0x84 */
-    unsigned char _rest[264 - 0x88];   /* +0x88 .. sizeof 264 (SYM) */
-
-    void SetTownersGraphics();                              /* @BLOCK.CPP */
-    void DumpGraphics(struct TextDat **TDat, int *Id);     /* @BLOCK.CPP */
-    /* BLOCK.H:228 */
-    inline void DumpMonsters();
-};
+#include "psxsrc/block.h"
 
 /* ---- externals ---- */
 extern "C" {
@@ -203,15 +96,7 @@ extern unsigned char PauseMode;
 extern TextDat *AllDats[372];
 
 /* ---- TUTILS.H ---- */
-static int GetTpY(unsigned short tpage)
-{
-    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
-}
-
-static int GetTpX(unsigned short tpage)
-{
-    return (tpage << 6) & 0x3C0;
-}
+#include "psxsrc/tutils.h"
 
 /* ---- TU data (SYM STAT) ---- */
 static KANJI_FRMS KanjiCacheType;                 /* @0x8011C730 sbss */
@@ -553,21 +438,6 @@ KANJI_FRMS GetKanjiCacheFrm(void)
 }
 
 /* @0x800ADC2C KANJI.CPP:535 */
-inline FRAME_HDR *TextDat::GetFr(int FrNum)
-{
-    return Frames + (unsigned short)FrNum;
-}
-inline ALL_DECOMP_BUFFERS *TextDat::GetDecompBuffers()
-{
-    if (Hdr->DecompOffset)
-        return (ALL_DECOMP_BUFFERS *)((unsigned char *)Hdr + Hdr->DecompOffset);
-    return NULL;
-}
-inline void CBlocks::DumpMonsters()
-{
-    MonsterList = NULL;
-    DumpGraphics(&MonstTexDat, &MonstTexId);
-}
 #include "psxsrc/primpool.h"
 
 POLY_FT4 *GetKanjiFrm(unsigned short kan)

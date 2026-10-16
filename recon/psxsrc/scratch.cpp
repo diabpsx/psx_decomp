@@ -9,67 +9,8 @@ void GPUQ_MoveImage(RECT *R, int x, int y);                 /* @GPUQ.CPP */
 void GPUQ_LoadClutAddr(int x, int y, int Cols, void *Addr);  /* @GPUQ.CPP */
 
 /* ---- TUTILS.H ---------------------------------------------------------------------------- */
-template <class T> class TLinkedList {
-public:
-    T *Next;   /* +0x0 */
-    T *Prev;   /* +0x4 */
-
-    void DetachFromList(T **Head)   /* TUTILS.H:46 */
-    {
-        if (Prev)
-            Prev->Next = Next;
-        else
-            *Head = Next;
-        if (Next)
-            Next->Prev = Prev;
-    }
-    void AddToList(T **Head)        /* TUTILS.H:57 */
-    {
-        Prev = NULL;
-        Next = *Head;
-        if (Next)
-            Next->Prev = (T *)this;
-        *Head = (T *)this;
-    }
-    T *GetNext() const { return Next; }   /* TUTILS.H:67 */
-};
-
-template <class T, int N> class Collection {
-public:
-    int ObjsUsed;    /* +0x0 */
-    T Objects[N];    /* +0x4 */
-    T *Used;
-    T *Unused;
-
-    void MoveFromUnusedToUsed(T *RetObj)   /* TUTILS.H:83 */
-    {
-        RetObj->DetachFromList(&Unused);
-        RetObj->AddToList(&Used);
-        ObjsUsed++;
-    }
-    void MoveFromUsedToUnused(T *RetObj)   /* TUTILS.H:90 */
-    {
-        RetObj->DetachFromList(&Used);
-        RetObj->AddToList(&Unused);
-        ObjsUsed--;
-    }
-    void Init()                            /* TUTILS.H:98 */
-    {
-        Used = NULL;
-        Unused = NULL;
-        ObjsUsed = 0;
-        for (int f = 0; f < N; f++)
-            Objects[f].AddToList(&Unused);
-    }
-    T *GetObj()                            /* TUTILS.H:110 */
-    {
-        T *RetObj = Unused;
-        if (RetObj)
-            MoveFromUnusedToUsed(RetObj);
-        return RetObj;
-    }
-    int GetNumOfObjs() { return N; }       /* TUTILS.H:132 */
-};
+#define TUTILS_TEMPLATES_ONLY   /* no GetTpY/GetTpX copies in retail SCRATCH */
+#include "psxsrc/tutils.h"
 
 /* ---- SCRATCH.CPP --------------------------------------------------------------------------- */
 struct InitPos {

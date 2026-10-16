@@ -2,42 +2,39 @@
  * SYSI_Init brings up memory, video, the file system, the tasker and every module; the file
  * system is the PC link (PCIO) or packed data file (DatIO) on a dev kit, else the CD (CdIO). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/textdat_header.h"
-
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
-
-class SysObj {   /* sizeof 4 */
-public:
-    long MemHnd;
-    void *operator new(int Amount, unsigned long RamID);
-};
-
-class FileIO : public SysObj {   /* sizeof 20 */
-public:
-    unsigned long MemId;
-    long hndPath;
-    char *SearchPath;
-    void *_vf;
-    void SetSearchPath(const char *Path);
-};
+#include "psxsrc/gman.h"
 
 class PCIO : public FileIO {
 public:
     PCIO(unsigned long OurMemId);
+    BOOL FileExists(const char *Name);
+    BOOL LoReadFileAtAddr(const char *Name, unsigned char *Dest, int Len);
+    int  GetFileLength(const char *Name);
+    BOOL LoSave(const char *Name, unsigned char *Addr, int Len);
+    BOOL LoStreamFile(const char *Name, int Slice, StreamCallback Func, int Offset, int Size);
 };
 
 class DatIO : public FileIO {
 public:
     DatIO(unsigned long OurMemId);
+    BOOL FileExists(const char *Name);
+    BOOL LoReadFileAtAddr(const char *Name, unsigned char *Dest, int Len);
+    int  GetFileLength(const char *Name);
+    BOOL LoSave(const char *Name, unsigned char *Addr, int Len);
+    BOOL LoStreamFile(const char *Name, int Slice, StreamCallback Func, int Offset, int Size);
 };
 
 class CdIO : public FileIO {
 public:
     CdIO(unsigned long OurMemId);
+    BOOL FileExists(const char *Name);
+    BOOL LoReadFileAtAddr(const char *Name, unsigned char *Dest, int Len);
+    int  GetFileLength(const char *Name);
+    BOOL LoSave(const char *Name, unsigned char *Addr, int Len);
+    BOOL LoStreamFile(const char *Name, int Slice, StreamCallback Func, int Offset, int Size);
 };
+
+
 
 extern "C" {
 void DBG_Error(char *Text, char *File, int Line);
@@ -78,16 +75,7 @@ static FileIO *OverlayFileSystem;
 void SYSI_Init(void) __attribute__((section(".STARTUP_text")));
 
 /* TUTILS.H helpers precede SYSINIT's ordinary code in retail. */
-static int GetTpY(unsigned short tpage)
-{
-    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
-}
-
-static int GetTpX(unsigned short tpage)
-{
-    return (tpage << 6) & 0x3C0;
-}
-
+#include "psxsrc/tutils.h"
 void SYSI_Init(void)
 {
     struct RECT clrRect;

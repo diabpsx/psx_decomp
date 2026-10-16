@@ -902,6 +902,58 @@ The remaining differences, in the order a reader of the SYM meets them:
   bar excludes SLD).  Paths: retail `C:\diabpsx\SOURCE\x.cpp` / `C:\diabpsx\PSXSRC`, ours the
   repository's.
 
+### Round 13: the header-defined inline members live in the retail headers (2026-10-17)
+
+Phase 2b counted 278 function records whose retail file is a header: the non-inlined copies of
+`inline` members that retail defined in PADS.H, DIALOG.H, BLOCK.H, GMAN.H, PRIMPOOL.H, TUTILS.H,
+CPLAYER.H, SPLTARGT.H, PRINTY.H, COMPMAP.H and STORM.H (and DLG.CPP / MSG.CPP for two spellings of
+ours).  The tree had those members as per-TU copies, in each TU's own partial class declaration,
+in the generated `gen/structs_*.h`, in the hand headers ctrl.h/dlg.h/fe.h/options.h and in the three
+split headers textdat_header.h / textfileinfo_header.h / cplayer_header.h.  They now live once, in
+the retail headers (recon/psxsrc/pads.h, dialog.h, block.h, gman.h, primpool.h, tutils.h, cplayer.h,
+spltargt.h, printy.h; recon/source/compmap.h, storm.h), each class with its full retail layout from
+the SYM (CPad 236 bytes with its tick tables, CBlocks 264 over its TextDat base, SpellTarget 72,
+CFont 540, ...), and every converted TU includes them in the order its retail tail dictates (the
+SLD file switches of each object give that order directly: e.g. PSXHELP parses PADS.H, BLOCK.H,
+DIALOG.H; CPLAYER parses GMAN.H, BLOCK.H, CPLAYER.H, PRIMPOOL.H).  Every member gate and the
+five images are unchanged.  What the retail objects taught on the way:
+
+- **Deferred inlines are emitted in reverse order of their queue key; the key of a plain inline is
+  its definition (an in-class body: its position in the class), the key of a template
+  instantiation is its first reference.**  BLOCK's tail (`GetHighlightCol<char*>`, `PRIM_GetPrim<
+  POLY_FT4>`, `GetHighlightCol<int*>`, `PRIM_GetCopy`, `PRIM_GetPrim<POLY_GT4>`, `PRIM_CopyPrim`,
+  `TownToCreature::GetCreature`, ...) is exactly the reverse of: TownToCreature's in-class body,
+  PRIMPOOL.H's CopyPrim (parsed between BLOCK.CPP's lines 375 and 392), then the code's first calls
+  in order (GT4, GetCopy, HL<int*>, FT4 direct, HL<char*>).  So PRIM_GetPrim (every instance is
+  PRIMPOOL.H:65) and PRIM_GetCopy (84) are templates, and BLOCK.CPP's own GetHighlightCol (115) is
+  one too; a template referenced inside another template's body is instantiated lazily, at the end
+  of the file.  (Synthetic probes with the game's cc1plus confirmed each rule.)
+- **PRIMPOOL.H:65 exists in two states in the retail objects.**  LOADING and MISPRINT have their
+  `PRIM_GetPrim` copy flushed at the end of the file *ahead of* the `_GLOBAL_.D/.I` thunks, with the
+  "psxsrc/primpool.h" literal last in .rdata and the parameter recorded in $16: the emission of a
+  non-`inline` template.  BLOCK, GMAN, CPLAYER and the rest have the copies in the deferred queue
+  after the thunks: an `inline` one.  The same compiler produces both only from the two spellings,
+  so those two objects were compiled against the earlier spelling of the line; primpool.h carries
+  both under `PRIMPOOL_NONINLINE`, which loading.cpp and misprint.cpp define.
+- **OBJPRINT** has its three PRIMPOOL copies in the order GetCopy, CopyPrim, FT4 *before* its GMAN.H
+  copies, i.e. FT4 keyed between the GMAN.H class and CopyPrim's definition.  No inclusion of
+  PRIMPOOL.H reproduces that with the rules above (a lazily nested FT4 lands last), so objprint.cpp
+  keeps those three copies defined locally; they are the only three of the 278 still attributed to
+  a .cpp.
+- **TUTILS.H's GetTpY/GetTpX (177/182) are file-static functions**: cc1plus 2.7.2 emits an unused
+  static function, which is why MAIN, SYSINIT, TIMS and KANJI carry copies they never call; SCRATCH,
+  which uses only the templates, carries none, so the helpers sit under a guard
+  (`TUTILS_TEMPLATES_ONLY`) that scratch.cpp defines.  CompClass's constructor in MSG (COMPMAP.H:51)
+  is the compiler-synthesised one (the class line), not a user one.
+- The split headers remain for the TUs that only needed GMAN.H's layouts; they are now plain
+  subsets of gman.h / cplayer.h and can be replaced TU by TU.
+- **DLG.CPP is now spelled dlg.cpp** (it was dlg_2.cpp because splat had labelled two of the
+  object's rodata fragments `dlg` and `dlg_1`, and the native lane names a segment after its TU).
+  The lane key stays `dlg_2` (build artifacts, GNU-lane labels, the splat rows); the registry row
+  declares `"tu": "dlg"` and native_recon accepts a declared TU name in place of the segment name,
+  which retired symlane's `RETAIL_OBJECT_NAMES` table.  The whole-program SYM now attributes 2863
+  of the 2866 functions to the retail basename; the three OBJPRINT copies above are the remainder.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

@@ -5,6 +5,16 @@
  * line in this object (-fno-inline).  `CFont LargeFont = MediumFont;` is the dynamic initialiser behind
  * _GLOBAL__I_WHITER (WHITER = first explicitly-initialised public global). */
 #include "psxsrc/printy.h"
+#include "psxsrc/block.h"
+
+/* TU-local declarations */
+enum LANG_TYPE { LANG_NONE = 5, LANG_JAP = 4, LANG_SWEDISH = 3, LANG_GERMAN = 2, LANG_FRENCH = 1, LANG_ENGLISH = 0 };
+extern "C" void TSK_Sleep(int Frames);   /* TASKER.C:287 */
+enum LANG_TYPE LANG_GetLang(void);   /* LANG.CPP:84 */
+POLY_FT4 *GetKanjiFrm(unsigned short kan);   /* KANJI.CPP:535 */
+BOOL IsKanjiLoaded(void);   /* KANJI.CPP:294 */
+void PRIM_Clip(RECT *R, int Depth);   /* PRIMPOOL.CPP:216 */
+void PRIM_FullScreen(int Depth);   /* PRIMPOOL.CPP:257 */
 
 /* ---- TU-owned data (SYM EXT; values from the retail image) ---- */
 const unsigned char WHITER = 0x80;

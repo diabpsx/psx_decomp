@@ -4,19 +4,9 @@
  * Header inlines (Dialog ctor/dtor, CBlocks::GetOverlayOtBase, CPad::CheckActive) are emitted out of
  * line in this object (-fno-inline). */
 #include "psxsrc/fe.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 
 extern "C" unsigned char GAL_Free(long Handle);
 
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd))
-            DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 class CPlayer;
 class CPlayer : public TextDat {

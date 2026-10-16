@@ -31,60 +31,7 @@ struct DLevel {   /* sizeof 4696 */
     DMonsterStr monster[190];
 };
 
-class CompClass {
-public:
-    virtual int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const = 0;
-    virtual void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const = 0;
-};
-
-struct CompressedLevs {   /* sizeof 180 */
-    unsigned long Version;
-    unsigned long Offset[NUM_OF_MAPS];
-    unsigned long Size[NUM_OF_MAPS];
-};
-
-class AMap {
-public:
-    BOOL Compressed;     /* +0x0 */
-    long hnd;            /* +0x4 */
-    int Size;            /* +0x8 */
-    DLevel *CurrLevel;   /* +0xC */
-
-    AMap() { hnd = -1; Init(); }            /* COMPMAP.H:75 */
-    ~AMap() { Init(); }                     /* COMPMAP.H:80 */
-    BOOL IsCompressed() { return Compressed; }   /* COMPMAP.H:86 */
-    void Init();
-    int WriteCompressed(unsigned char *Dest, const CompClass &CompObj);
-    void SetCompData(const unsigned char *Data, int NewSize);
-    DLevel *GetMap();
-    void ReleaseMap(DLevel *Dl);
-    void CompressMap(const CompClass &CompObj);
-    void DecompressMap(const CompClass &CompObj);
-};
-
-class CompLevelMaps {
-public:
-    CompClass *CompObj;              /* +0x0 */
-    AMap TheMaps[NUM_OF_MAPS];       /* +0x4 */
-    int LastNumOut;                  /* +0x164 */
-    DLevel *LastMapOut;              /* +0x168 */
-    BOOL MapOut;                     /* +0x16C */
-
-    CompLevelMaps(const CompClass &NewCompObj);
-    ~CompLevelMaps();
-    void Init();
-    void InitAllMaps();
-    DLevel *GetMap(int MapNum);
-    void ReleaseMap(DLevel *Dl);
-    void ImportData(CompressedLevs *Levs);
-    int ExportData(unsigned char *U8Dest);
-    void MakeSureMapXDecomped(int MapNum);
-    void CheckMapNum(int MapNum)     /* COMPMAP.H:129 */
-    {
-        if (!((unsigned)MapNum < NUM_OF_MAPS))
-            DBG_Error(NULL, "source/compmap.h", 129);
-    }
-};
+#include "source/compmap.h"
 
 /* @0x80081608 COMPMAP.CPP:60 */
 CompLevelMaps::CompLevelMaps(const CompClass &NewCompObj) : CompObj((CompClass *)&NewCompObj)

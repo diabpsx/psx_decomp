@@ -20,6 +20,7 @@ struct FileIO : public SysObj {   /* SYM lists the base subobject as a member na
     virtual BOOL LoSave(const char *Name, unsigned char *Addr, int Len) = 0;
     virtual BOOL LoStreamFile(const char *Name, int Slice, StreamCallback Func, int Offset, int Size) = 0;
 
+    void SetSearchPath(const char *Path);
     long Read(const char *Name, unsigned long RamId);                                       /* @0x80085920 */
     int  FileLen(const char *Name);                                                          /* @0x80085A90 */
     BOOL ReadAtAddr(const char *Name, unsigned char *Dest, int Len);                         /* @0x80085BF4 */

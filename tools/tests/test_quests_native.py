@@ -41,7 +41,9 @@ class QuestsNativeTests(unittest.TestCase):
             self.assertEqual({obj['sections'][s]:len(data) for s,data in obj['code'].items()},
                              {names.get(section, section):size for section,(va,size) in regions.items()})
             self.assertFalse(any('bss' in row for row in obj['xdefs']))
-            self.assertEqual(set(obj['xrefs']),set(spec['externals'])|{'_7CPlayer.PActiveArray'})
+            # the -g object also carries the debug records of the headers' declarations: CPlayer's
+            # static member (cplayer.h) and BLOCK.H's `extern int PosAdj`, neither used by QUESTS' code
+            self.assertEqual(set(obj['xrefs']),set(spec['externals'])|{'_7CPlayer.PActiveArray','PosAdj'})
             prefix,combined,mode=R.gp_carrier_plan(regions,image,0x8011A780,0x8011C604)
             self.assertEqual((mode,len(prefix)),('prefix',4768))
             prefix_src=folder/'prefix.s';prefix_obj=folder/'prefix.obj'

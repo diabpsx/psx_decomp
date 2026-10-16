@@ -4,7 +4,8 @@
  * the native ASPSX/PSYLINK receipt matches retail bytes and every function/data SYM
  * record. See configs/native_recon_link.json and tools/tests/test_control_native.py. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads CONTROL's .sdata (0x8011B620) */
+#include "psxsrc/dialog.h"
+#include "psxsrc/pads.h"
 #include "source/gen/structs_control.h"
 #include "source/gen/externs_control.h"
 #include "source/gen/protos_control.h"
@@ -13,15 +14,6 @@
 extern "C" unsigned char GAL_Free(long Handle);
 extern "C" void DBG_Error(char *Text, char *File, int Line);
 
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd))
-            DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 class CPlayer;
 class CPlayer : public TextDat {

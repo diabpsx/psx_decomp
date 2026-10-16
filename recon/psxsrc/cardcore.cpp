@@ -4,12 +4,8 @@
  * Reconstructed from the raw oracle (asm/nonmatchings/cardcore/*.s) + the SYM; drafts from refs/skeleton.
  * Header inlines (Dialog, CBlocks) are emitted out of line in this object (-fno-inline). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
-#include "psxsrc/textdat_header.h"   /* GMAN.H TextDat + its unused DumpDatFile inline: "psxsrc/gman.h" heads this TU's .rdata */
+#include "psxsrc/dialog.h"
 
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
 
@@ -252,50 +248,7 @@ struct TASK {   /* sizeof 92 */
 };
 
 struct TSnd;
-struct TextDat;
 
-/* BLOCK.H */
-class CBlocks {
-public:
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
-
-/* DIALOG.H */
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
-
-class Dialog {   /* sizeof 16 */
-public:
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetBack(int Type) { BackGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    void Back(int DX, int DY, int DW, int DH);
-    int SetOTpos(int OT);
-};
 
 /* PRINTY.H */
 class CFont {   /* sizeof 540 */

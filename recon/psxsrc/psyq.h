@@ -12,6 +12,8 @@ typedef struct POLY_FT4 {                          /* sizeof 40 */
     short x2, y2; u_char u2, v2; u_short pad1;
     short x3, y3; u_char u3, v3; u_short pad2;
 } POLY_FT4;
+typedef struct POLY_F4 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1, x2, y2, x3, y3; } POLY_F4;   /* sizeof 24 */
+typedef struct LINE_F2 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1; } LINE_F2;                     /* sizeof 16 */
 typedef struct POLY_G4 {                          /* sizeof 36; PsyQ 4.0 LIBGPU.H */
     u_long tag; u_char r0, g0, b0, code;
     short x0, y0; u_char r1, g1, b1, pad1;

@@ -21,7 +21,7 @@
  *    are this retail build's own ordering.
  */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
+#include "psxsrc/gman.h"
 extern "C" int crunch(const unsigned char *Src, unsigned char *Dest, int SrcLen, int WindowSize);
 extern "C" void decrunch(const unsigned char *Src, unsigned char *Dest, int SrcLen);
 int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize);
@@ -34,47 +34,27 @@ extern "C" long GAL_AlignSizeToType(unsigned long Size, unsigned long MemType);
 
 extern "C" unsigned char GAL_Free(long Handle);
 
-struct TextDat {
-    BOOL OwnDat;
-    int TexNum;
-    int LastFrame;
-    BOOL DatLoaded;
-    long hndDat;
-    unsigned char rest[112 - 20];
-    void DumpDatFile();
-};
 
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd))
-            DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-
-class CompMapHeaderProducer {
+/* MSG.CPP:111-158 -- the three compressors behind CompClass (COMPMAP.H); their inline members are emitted out of line here */
+class NoComp : public CompClass {
 public:
-    static void Check(int ok)
-    {
-        if (!ok)
-            DBG_Error(NULL, "source/compmap.h", 0);
-    }
+    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { memcpy(Dest, Src, SrcLen); return SrcLen; }
+    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { memcpy(Dest, Src, SrcLen); }
 };
 
-class CPlayer;
-class CPlayer : public TextDat {
+class PakComp : public CompClass {
 public:
-    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50, defined by cplayer.cpp */
-    unsigned char player_data[144 - 112];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if (1 < (unsigned int)PNum)
-            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-        return PActiveArray[PNum];
-    }
+    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { return PAK_DoPak(Dest, Src, SrcLen); }
+    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { PAK_DoUnpak(Dest, Src); }
 };
+
+class CrunchComp : public CompClass {
+public:
+    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { return crunch(Src, Dest, SrcLen, 0x800); }
+    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { decrunch(Src, Dest, SrcLen); }
+};
+
+#include "psxsrc/cplayer.h"
 
 /* explicit initializer (not a tentative def), declared as EARLY as possible in the TU -- gcc-2.7
  * names the _GLOBAL_.I/.D static-init thunk after the FIRST global with an explicit `=` initializer

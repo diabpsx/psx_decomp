@@ -8,7 +8,6 @@
 #include "glibdev/gal.h"
 
 typedef struct POLY_F3 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1, x2, y2; } POLY_F3;   /* 20 */
-typedef struct POLY_F4 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1, x2, y2, x3, y3; } POLY_F4;   /* 24 */
 typedef struct DR_MODE { u_long tag; u_long code[2]; } DR_MODE;   /* 12 */
 typedef struct DR_ENV { u_long tag; u_long code[15]; } DR_ENV;   /* 64 */
 typedef struct DRAWENV {                                          /* 92 */

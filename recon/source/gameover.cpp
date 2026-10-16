@@ -6,44 +6,13 @@
  * Dialog's field layout is read directly off the retail SYM STRTAG record (BevelGfx/BorderGfx/
  * BackGfx/DialogOTpos), not guessed. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/cplayer_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/dialog.h"
+#include "psxsrc/pads.h"
 
 struct TASK { unsigned char pad[92]; };   /* sizeof 92 per retail SYM; only used as an untyped handle here */
 
-class CBlocks {
-public:
-    static int GetMaxOtPos() { return 0x1FF; }
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
 
-struct Dialog {   /* sizeof 16, real field names from the retail SYM STRTAG record */
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog();
-    ~Dialog();
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B);
-    void SetBack(int Type);
-    void SetBorder(int Type);
-    int SetOTpos(int NewOt);
-    void Back(int X, int Y, int W, int H);
-};
-
-struct CPad {
-    unsigned char AnalogMode;   /* +0x0 -- nonzero when the pad is in analog mode */
-    unsigned char pad0[0xC - 1];
-    unsigned short Down;        /* +0xC -- digital button-down bits */
-    unsigned char pad1[0x16 - 0xE];
-    unsigned short DownA;        /* +0x16 -- analog-mode button-down bits */
-    unsigned char pad2[236 - 0x18];   /* sizeof CPad = 236 per retail SYM */
-
-    unsigned short GetDown(void) const;
-};
-
-struct RECT { short x, y, w, h; };
 enum TXT_JUST { JustLeft, JustCentre, JustRight };
 
 struct TextDat;
@@ -86,8 +55,6 @@ extern int options_pad;
 extern int optionsflag;
 extern int cmenu;
 extern int FePlayerNo;
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 extern unsigned char BORDERR, BORDERG, BORDERB;
 
 static void GameOverTask(struct TASK *T);
@@ -203,45 +170,3 @@ static void PrintGameOver(void)
 
 /* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
  * code in REVERSE definition order, so retail's tail (CPad::GetDown, Dialog::SetRGB, Dialog::SetBack, Dialog::SetBorder, Dialog::~Dialog, Dialog::Dialog) fixes this definition order. */
-inline Dialog::Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
-
-inline Dialog::~Dialog()
-{
-}
-
-inline void Dialog::SetBorder(int Type)
-{
-    BorderGfx = Type;
-}
-
-inline void Dialog::SetBack(int Type)
-{
-    BackGfx = Type;
-}
-
-inline void Dialog::SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R;
-    DialogGreen = G;
-    DialogBlue = B;
-}
-
-inline unsigned short CPad::GetDown(void) const
-{
-    if (AnalogMode != 0) {
-        return DownA;
-    }
-    return Down;
-}

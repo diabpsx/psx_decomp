@@ -5,8 +5,9 @@
  * InvMoveCurs*) are PSX-native (no PC twin) and are reconstructed separately from the oracle+SYM.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/cplayer_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/dialog.h"
+#include "psxsrc/pads.h"
 #include "source/gen/structs_inv.h"
 #include "source/gen/externs_inv.h"
 #include "source/gen/protos_inv.h"
@@ -168,12 +169,6 @@ unsigned char InvSlotTable[73] = { 0 };
 #define ICURS_GOLD_MEDIUM 5
 #define ICURS_GOLD_LARGE 6
 
-/* verbatim PsyQ 4.0 LIBGPU.H primitive macros */
-struct P_TAG {
-    unsigned addr : 24;
-    unsigned len : 8;
-    unsigned char r0, g0, b0, code;
-};
 typedef unsigned char u_char;
 typedef unsigned long u_long;
 #define setlen(p, _len)   (((P_TAG *)(p))->len  = (u_char)(_len))

@@ -7,30 +7,21 @@
 #include "psxsrc/psyq.h"
 #include "glibdev/gdebug.h"
 #include "glibdev/gal.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 #include "source/gen/structs_objprint.h"
 
-inline void TextDat::DumpDatFile()
+/* PRIMPOOL.H in OBJPRINT: the retail tail has PRIM_GetPrim<FT4> emitted between PRIM_CopyPrim and the GMAN.H copies, a
+ * queue position (after GMAN.H, before CopyPrim) that no inclusion of PRIMPOOL.H reproduces with the 2.7.2 template
+ * rules (see docs/TOOLCHAIN.md); the three copies stay defined in this TU in that order. */
+extern POLY_FT4 *ThisPrimAddr;   /* PRIMPOOL.H */
+extern POLY_FT4 *AddrToAvoid;
+inline void PRIM_GetPrim(POLY_FT4 **Prim)   /* PRIMPOOL.H:65 */
 {
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
+    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
+        DBG_Error(NULL, "psxsrc/primpool.h", 68);
+    *Prim = (POLY_FT4 *)ThisPrimAddr;
+    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
 }
-inline FRAME_HDR *TextDat::GetFr(int FrNum)
-{
-    return Frames + (unsigned short)FrNum;
-}
-inline CCreatureHdr *TextDat::GetCreature(int Creature)
-{
-    return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
-}
-inline int TextDat::GetNumOfFrames(int Creature, int Action)
-{
-    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
-}
-#include "psxsrc/primpool.h"
 
 /* ---- externals ---- */
 extern "C" {

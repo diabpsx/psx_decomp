@@ -1,9 +1,8 @@
 /* GMAN.CPP — Climax PSX layer, texture/graphics manager (C:\diabpsx\PSXSRC\GMAN.CPP).
  * MAP: .GMAN_text 0x80091E54-0x800953F7, .GMAN_data 0x800B8B94.  Lane: CC1PLPSX 2.7.2 (C++). */
-#define PRIMPOOL_DECLARE_ONLY
-#include "psxsrc/primpool.h"
 #undef PRIMPOOL_DECLARE_ONLY
 #include "psxsrc/gman.h"
+#include "psxsrc/primpool.h"
 static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes);   /* retail SYM: STAT (file-local) */
 static POLY_FT4 MyFT4;   /* @0x8011CC00 (SYM STAT): GMAN.CPP's one .bss static, the fallback primitive */
 
@@ -1332,17 +1331,3 @@ void CBlock::GetBoundingBox(TextDat &TDat, RECT &R)
     R.h = bottom - top;
 }
 
-/* PRIMPOOL.H bodies (header copies, lines 65-71), parsed last: their literal is the last in retail .rdata and
- * their copies lead the reverse-definition-order tail. */
-inline void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid) DBG_Error(NULL, "psxsrc/primpool.h", 68);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
-}
-inline void PRIM_GetPrim(POLY_GT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_GT4) * 10) >= AddrToAvoid) DBG_Error(NULL, "psxsrc/primpool.h", 68);
-    *Prim = (POLY_GT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_GT4 *)ThisPrimAddr + 1);
-}

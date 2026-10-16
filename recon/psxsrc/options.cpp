@@ -4,7 +4,6 @@
  * menu layer).  Reconstructed from the retail asm oracle + skel/PSXSRC/OPTIONS.CPP (Ghidra/IDA draft) +
  * refs/skeleton/JAP_1998_05_29/DIABPSX/PSXSRC/OPTIONS.H (prototypes only, no data layout). */
 #include "psxsrc/options.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
 
 /* File statics in retail storage order; ASPSX 2.67 packs the byte objects. */
 static TextDat *Slider;

@@ -7,7 +7,7 @@
  * off the retail SYM (STRTAG/MOS records) or matched to recon/source/gen/structs_player.h and
  * the existing psxsrc/block.cpp POLY_FT4 — not guessed. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 /* retail GPANEL.CPP small data: the two zero-initialised offsets follow the pool (0x8011AD8C, 0x8011AD90) */
 int hof = 0;
 int mof = 0;
@@ -17,77 +17,8 @@ int mof = 0;
 
 /* ---- shared game-engine layouts (kept minimal/local) ---- */
 
-struct FRAME_HDR {   /* retail SYM: sizeof 12 */
-    unsigned int FrOffset : 32;
-    int X : 8;
-    int Y : 8;
-    unsigned int PalNum : 8;
-    unsigned int NotTrans : 1;
-    unsigned int Rotated : 1;
-    unsigned int InVRAM : 1;
-    unsigned int CompType : 2;
-    unsigned int Floor : 1;
-    unsigned int Cycle : 1;
-    unsigned int pad : 1;
-    unsigned int W : 9;
-    unsigned int H : 9;
-    unsigned int PentaGram : 1;
-    unsigned int pad2 : 13;
-};
-struct PAL {   /* retail SYM: sizeof 8 */
-    unsigned int InVram : 1;
-    unsigned int NumOfCols : 31;
-    unsigned short Cols[1];
-};
 
-struct TextDat {   /* sizeof 112 -- matches block.cpp's TextDat (its owner); only fields/methods
-                       this TU's out-of-line accessor copies touch are declared. */
-    BOOL OwnDat;
-    int TexNum, LastFrame;
-    BOOL DatLoaded;
-    long hndDat, hndHdr, hndPalOffset, hndCreatureOffset, hndBlockOffsets;
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    unsigned char pad1[0x2C - 0x28];
-    void *Pals;                 /* +0x2C */
-    int *PalOffset;             /* +0x30 */
-    unsigned char pad2[112 - 0x34];
-
-    struct FRAME_HDR *GetFr(int FrNum)
-    {
-        return (struct FRAME_HDR *)((char *)Frames + (FrNum & 0xFFFF) * 0xC);
-    }
-    PAL *GetPal(int PalNum)
-    {
-        return (PAL *)((char *)Pals + PalOffset[PalNum]);
-    }
-    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-    void DumpDatFile();
-};
-
-/* Original GMAN.H / CPLAYER.H inlines: unused bodies naturally retain their
- * filename literals before DrawSpell's initializer pool. */
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-class CPlayer : public TextDat {
-public:
-    long hndDatMem;
-    unsigned short NumOfPlayers;
-    BOOL InTown;
-    unsigned short PlayerNum, Tpage;
-    int TexId, LastScrX, LastScrY, LastOtPos;
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-};
+#include "psxsrc/cplayer.h"
 
 struct PanelXY {   /* sizeof 88, real field names from the retail SYM STRTAG record */
     int MainX;                  /* +0x0 */
@@ -133,10 +64,7 @@ PanelXY DefP2PanelXY2 = { /* @0x800B9B74 */
     166, 24, 140, 104, 178, 176, 204, 176, 230, 176, 256, 176, 2
 };
 
-class CBlocks {
-public:
-    static int GetMaxOtPos() { return 0x1FF; }
-};
+#include "psxsrc/block.h"
 
 struct GPanel {   /* sizeof 28 per retail SYM (fields from the SYM STRTAG record) */
     int HealthAnimCount;    /* +0x0 */
@@ -188,7 +116,6 @@ struct PlayerStruct {
     unsigned char pad6[6632 - (0x15B0 + 8 * 108)];   /* sizeof PlayerStruct = 6632 */
 };
 
-extern "C" int GM_UseTexData__Fi(int Id);
 extern "C" BOOL GLUE_Finished__Fv(void);
 extern "C" int VID_GetTick__Fv(void);
 extern "C" void DrawInfoBox__FP4RECT(struct RECT *R);
@@ -202,7 +129,6 @@ extern int spspelstate[4];
 extern int _pcurr_inv[4];
 extern int sel_data;
 extern unsigned char _SpdBeltSelFlag[4];
-extern int *ThisOt;
 static unsigned char DurColors[6][3] = {
     {255, 0, 0}, {240, 64, 0}, {255, 255, 0},
     {255, 255, 255}, {0, 0, 0}, {0, 0, 0}
@@ -235,7 +161,7 @@ unsigned int GPanel::GetPal(int Frm)
 
 GPanel::GPanel(int Ofs)
 {
-    PanelTData = (struct TextDat *)GM_UseTexData__Fi(0);
+    PanelTData = GM_UseTexData(0);
     HealthAnimCount = Ofs + 1;
     ManaAnimCount = Ofs + 0x17;
     GlobeAnimCount = Ofs + 0xF;

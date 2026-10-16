@@ -4,105 +4,16 @@
  * base subobjects turned into inheritance; RECT from psxsrc/psyq.h) */
 #include "psxsrc/psyq.h"
 
-enum PACTION {
-    PL_NOACTION = 0, PL_WALK = 1, PL_STAND = 2, PL_ATTACK = 3, PL_HIT = 4, PL_BLOCK = 5,
-    PL_DEATH = 6, PL_TWALK = 7, PL_TSTAND = 8, PL_LMAGIC = 9, PL_QMAGIC = 10, PL_FMAGIC = 11
-};
 
-struct FRAME_HDR;
 
-struct SPR_HDR;
+#include "psxsrc/block.h"
+#include "psxsrc/cplayer.h"   /* retail CPLAYER.CPP parses GMAN.H, BLOCK.H, CPLAYER.H in that order (its tail) */
 
-#include "psxsrc/textfileinfo_header.h"   /* CTextFileInfo + the GMAN.H HasTp/HasDat inlines (".tp"/".dat" literal pool) */
 
-struct TextDat {   /* sizeof 112 */
-    BOOL OwnDat;   /* +0x0 */
-    int TexNum;   /* +0x4 */
-    int LastFrame;   /* +0x8 */
-    BOOL DatLoaded;   /* +0xC */
-    long hndDat;   /* +0x10 */
-    long hndHdr;   /* +0x14 */
-    long hndPalOffset;   /* +0x18 */
-    long hndCreatureOffset;   /* +0x1C */
-    long hndBlockOffsets;   /* +0x20 */
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    struct SPR_HDR *Hdr;   /* +0x28 */
-    void *Pals;   /* +0x2C */
-    int *PalOffset;   /* +0x30 */
-    int *CreatureOffset;   /* +0x34 */
-    unsigned char *CreatureAnims;   /* +0x38 */
-    unsigned char *Blocks;   /* +0x3C */
-    BOOL Loaded;   /* +0x40 */
-    int LoadCount;   /* +0x44 */
-    struct CTextFileInfo *FileInfo;   /* +0x48 */
-    long hndDecompBuffer;   /* +0x4C */
-    int DecX;   /* +0x50 */
-    int DecY;   /* +0x54 */
-    int PalX;   /* +0x58 */
-    int PalY;   /* +0x5C */
-    int Scr;   /* +0x60 */
-    int NumOfBuffers[2];   /* +0x64 */
-    long hndDecompArrays;   /* +0x6C */
-
-    /* hand-added: GMAN.CPP members called here + GMAN.H in-class inlines whose out-of-line copies land here */
-    TextDat();
-    ~TextDat();
-    void DumpData();
-    void Use(long NewHndDat, BOOL DatLoaded, int size);
-    int GetFrNum(int Creature, int Action, int Direction, int Frame);
-    void PrepareFt4(struct POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);
-    struct POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-    static struct CTextFileInfo *GetFileInfo(int Id);
-    void SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY);
-    struct CCreatureHdr *GetCreature(int Creature);
-    int GetNumOfActions(int Creature);
-    int GetNumOfFrames(int Creature, int Action);
-    void SetFileInfo(const struct CTextFileInfo *NewInfo, int NewTexNum);
-    void DumpDatFile();   /* GMAN.H:290-296, inline below: its "psxsrc/gman.h" literal heads this TU's .rdata */
-};
-
-#include "glibdev/gdebug.h"
-#include "glibdev/gal.h"
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 struct PlayerStruct;
 class CBlocks;
 
-class CPlayer : public TextDat {   /* sizeof 144; SYM shows the base as member `TextDat TextDat @+0` */
-public:
-    long hndDatMem;   /* +0x70 */
-    unsigned short NumOfPlayers;   /* +0x74 */
-    BOOL InTown;   /* +0x78 */
-    unsigned short PlayerNum;   /* +0x7C */
-    unsigned short Tpage;   /* +0x7E */
-    int TexId;   /* +0x80 */
-    int LastScrX;   /* +0x84 */
-    int LastScrY;   /* +0x88 */
-    int LastOtPos;   /* +0x8C */
-
-    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50 (.sdata, defined by CPLAYER.CPP) */
-    static CPlayer *GetPlayer(int PNum);   /* CPLAYER.H:65 inline */
-
-    CPlayer(BOOL Town, int mPlayerNum, int NewNumOfPlayers);
-    ~CPlayer();
-    void Load(int Id);
-    void SetScrollTarget(struct PlayerStruct &Plr, CBlocks &Bg);
-    void Print(struct PlayerStruct &Plr, CBlocks &Bg);
-    int FindAction(struct PlayerStruct &Plr);
-    enum PACTION FindActionEnum(struct PlayerStruct &Plr);
-    void Init();
-    void Dump();
-    void LoadThis(int Id);
-    void NonBlockingLoadNewGFX(int Id);
-    int GetDatMaxSize();
-};
 
 enum PLR_MODE {
     PM_QUIT = 11,
@@ -353,147 +264,14 @@ struct SPELLFX_DAT {   /* sizeof 72 */
     int healtime;   /* +0x44 */
 };
 
-struct MonstList;
-
-struct LittleGt4;
 
 
-struct RgbBlockInf {   /* sizeof 24 */
-    int FromValR;   /* +0x0 */
-    int ToValR;   /* +0x4 */
-    int FromValG;   /* +0x8 */
-    int ToValG;   /* +0xC */
-    int FromValB;   /* +0x10 */
-    int ToValB;   /* +0x14 */
-};
 
-class CBlocks : public TextDat {   /* sizeof 264 */
-public:
-    struct TextDat *MonstTexDat;   /* +0x70 */
-    struct TextDat *ObjTexDat;   /* +0x74 */
-    struct MonstList *MonsterList;   /* +0x78 */
-    int RndX;   /* +0x7C */
-    int RndY;   /* +0x80 */
-    int MonstTexId;   /* +0x84 */
-    long hndBlocks;   /* +0x88 */
-    int ObjTexId;   /* +0x8C */
-    int ItemTexId;   /* +0x90 */
-    struct TextDat *ItemTexDat;   /* +0x94 */
-    int BgTexId;   /* +0x98 */
-    struct TextDat *BgTexDat;   /* +0x9C */
-    int pOtPos[2];   /* +0xA0 */
-    BOOL IsTown;   /* +0xA8 */
-    int NumOfBlocks;   /* +0xAC */
-    struct LittleGt4 *Gt4s;   /* +0xB0 */
-    long hndGt4s;   /* +0xB4 */
-    struct RECT *Rects;   /* +0xB8 */
-    long hndRects;   /* +0xBC */
-    struct RECT ClipRect;   /* +0xC0 */
-    int StX;   /* +0xC8 */
-    int StY;   /* +0xCC */
-    int Mx;   /* +0xD0 */
-    int My;   /* +0xD4 */
-    int pBlockX[2];   /* +0xD8 */
-    int pBlockY[2];   /* +0xE0 */
-    int CursX;   /* +0xE8 */
-    int CursY;   /* +0xEC */
-    struct RgbBlockInf GlBlockInf;   /* +0xF0 */
-
-    int ScrToWorldX(int sx, int sy);   /* @0x800915E4 BLOCK.CPP:2597 */
-    int ScrToWorldY(int sx, int sy);
-    int WorldToScrX(int x, int y);     /* @0x800919D0 BLOCK.CPP:2789 */
-    int WorldToScrY(int x, int y);
-    void SetScrollTarget(int x, int y);   /* @0x8009160C BLOCK.CPP:2619 */
-    void GetScrXY(RECT &R, int x, int y, int sxoff, int syoff);   /* @0x8009185C BLOCK.CPP:2723 */
-    static void ShadScaleSkew(struct POLY_FT4 *Ft4);   /* @0x80091930 BLOCK.CPP:2745 */
-    int GetOtPos(int LogicalY);   /* BLOCK.H inline (out-of-line copy here) */
-};
-
-struct CCreatureAction {   /* sizeof 14 */
-    unsigned short BaseFrame;   /* +0x0 */
-    unsigned char NumOfFrames;   /* +0x2 */
-    unsigned char NumOfPhysFrames;   /* +0x3 */
-    unsigned char DirRemap[8];   /* +0x4 */
-    unsigned char AnimRemap[1];   /* +0xC */
-};
-
-struct CCreatureHdr {   /* sizeof 20 */
-    long NumOfActions;   /* +0x0 */
-    struct CCreatureAction Cr;   /* +0x4 */
-
-    struct CCreatureAction *GetAction(int ActNum) const;   /* @0x800942EC GMAN.CPP:1591 */
-};
 
 struct PlayerParam {   /* sizeof 8 */
     CPlayer *ThePlayer;   /* +0x0 */
     int Id;   /* +0x4 */
 };
 
-/* Retail header copies. GCC 2.7.2 emits deferred inline bodies in reverse
- * definition order, so this is the original header ordering read backwards
- * from the CPLAYER.CPP tail. */
-inline void TextDat::SetFileInfo(const struct CTextFileInfo *NewInfo, int NewTexNum)
-{
-    FileInfo = (struct CTextFileInfo *)NewInfo;
-    TexNum = NewTexNum;
-}
-
-inline struct CCreatureHdr *TextDat::GetCreature(int Creature)
-{
-    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
-}
-
-inline int TextDat::GetNumOfActions(int Creature)
-{
-    return GetCreature(Creature)->NumOfActions;
-}
-
-inline int TextDat::GetNumOfFrames(int Creature, int Action)
-{
-    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
-}
-
-inline void TextDat::SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY)
-{
-    DecX = nDecX;
-    DecY = nDecY;
-    PalX = nPalX;
-    PalY = nPalY;
-}
-
-extern int PosAdj;
-inline int CBlocks::GetOtPos(int LogicalY)
-{
-    int OtPos = ClipRect.y + LogicalY + PosAdj;
-    if (OtPos < -0x43)
-        OtPos = -0x43;
-    if (OtPos >= 0x19C)
-        OtPos = 0x19B;
-    return OtPos + 0x4D;
-}
-
-inline int CPlayer::GetDatMaxSize()
-{
-    if (InTown)
-        return 0x19E10;
-    return NumOfPlayers == 0 ? 0x2C308 : 0x182B8;
-}
-
-inline void PRIM_GetPrim(POLY_FT4 **Prim);   /* PRIMPOOL.H; its body is parsed in cplayer.cpp before Print */
-static inline void PRIM_CopyPrim(POLY_FT4 *Dest, POLY_FT4 *Source)
-{
-    unsigned long *Dest32 = (unsigned long *)Dest;
-    unsigned long *Source32 = (unsigned long *)Source;
-    for (unsigned int f = 0; f < 10; f++)
-        *Dest32++ = *Source32++;
-}
-
-static inline POLY_FT4 *PRIM_GetCopy(POLY_FT4 *Prim)
-{
-    POLY_FT4 *RetPrim;
-    PRIM_GetPrim(&RetPrim);
-    PRIM_CopyPrim(RetPrim, Prim);
-    return RetPrim;
-}
 
 #endif

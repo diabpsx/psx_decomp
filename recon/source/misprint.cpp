@@ -5,7 +5,9 @@
  * Every Func<MIS> has the signature (MissileStruct *Ms, int ScrX, int ScrY, int OtPos).
  * TempPrintMissile(ScrX, ScrY, OtPos, spell, aframe, direction, anim, sfx, xflip, yflip, r, g, b, semi). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
+#include "psxsrc/gman.h"
+#define PRIMPOOL_NONINLINE   /* this object predates the `inline` on PRIMPOOL.H:65 (copy ahead of the static-init thunks, literal last) */
+#include "psxsrc/primpool.h"
 #include "source/gen/structs_misprint.h"
 #include "source/gen/externs_misprint.h"
 #include "source/gen/protos_misprint.h"
@@ -20,28 +22,9 @@ TextDat *MissDat;
 extern "C" unsigned char GAL_Free(long Handle);
 
 /* Original unused GMAN.H inline (line 290): its "psxsrc/gman.h" literal heads this TU's .rdata. */
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd))
-            DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-
-inline CPlayer *CPlayer::GetPlayer(int PNum)
-{
-    if (1 < (unsigned int)PNum)
-        DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-    return PActiveArray[PNum];
-}
-
-/* PRIMPOOL.H: declared here, its body is parsed after FuncFLASH (see there). */
 #include "psxsrc/psyq.h"
 extern POLY_FT4 *ThisPrimAddr;   /* @0x8011AAB8 */
 extern POLY_FT4 *AddrToAvoid;    /* @0x8011AABC */
-inline void PRIM_GetPrim(POLY_FT4 **Prim);
 
 /* @0x8007B8C4 MISPRINT.CPP:85 */
 void DoPortalFX(POLY_FT4 *Ft4, int R, int G, int B, int OtPos)
@@ -607,13 +590,6 @@ void FuncFLASH(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 /* PRIMPOOL.H inline (header copy, lines 65-71), parsed here: cc1plus emits an inline's literal where its body
  * is parsed, and retail .rdata has "psxsrc/primpool.h" after FuncFLASH's xoffset table; defined last among the
  * inlines, it leads the reverse-order out-of-line tail. */
-inline void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 68);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
-}
 
 /* @0x8007D3AC MISPRINT.CPP:610 */
 void FuncMANASHIELD(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
@@ -642,3 +618,6 @@ void FuncWEAPEXP(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
     else
         TempPrintMissile(ScrX, ScrY, OtPos + 2, 8, Ms->_miAnimFrame, Ms->_mimfnum, 0, 0x12, 0, 0, 0x80, 0x80, 0x80, 0);
 }
+
+/* PRIMPOOL.H: the retail object has this copy ahead of the static-initialiser thunks and its literal last in .rdata,
+ * i.e. instantiated here at the end of the file, not at its first use. */

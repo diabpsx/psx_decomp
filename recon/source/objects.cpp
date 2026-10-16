@@ -9,7 +9,6 @@
  * GetSOLID-style wrapper) except where the oracle itself calls GetSOLID/GetTRAP/SetSOLID/etc (DPIECE.CPP
  * accessors); MemFreeDbg macro (from source/diablo.h) is used for mem_free_dbg. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_objects.h"
 #include "source/gen/externs_objects.h"
 #include "source/gen/protos_objects.h"
@@ -3417,29 +3416,6 @@ void RestoreObjectLight(void)
     }
 }
 
-/* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other
- * code in REVERSE definition order, so retail's tail (CBlocks::GetOtPos, TextDat::GetNumOfFrames, TextDat::GetCreature) fixes this definition order. */
-inline struct CCreatureHdr *TextDat::GetCreature(int Creature)
-{
-    return (struct CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]);
-}
-
-inline int TextDat::GetNumOfFrames(int Creature, int Action)
-{
-    return GetCreature(Creature)->GetAction(Action)->NumOfFrames;
-}
-
-inline int CBlocks::GetOtPos(int LogicalY)
-{
-    int OtPos;
-
-    OtPos = ClipRect.y + LogicalY + PosAdj;
-    if (OtPos < -0x43)
-        OtPos = -0x43;
-    if (OtPos >= 0x19C)
-        OtPos = 0x19B;
-    return OtPos + 0x4D;
-}
 struct MiniTileDef {
     short v1, v2, v3, v4;
 };

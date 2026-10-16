@@ -5,8 +5,10 @@
  * drafts as secondary shape hints only.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/textdat_header.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/pads.h"
+#include "psxsrc/block.h"
+#include "psxsrc/spltargt.h"
 #include "source/gen/structs_gamepad.h"
 #include "source/gen/externs_gamepad.h"
 #include "source/gen/protos_gamepad.h"

@@ -212,7 +212,7 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     return obj
 
 # Retail object names are the TU stems except where the reconstruction keeps several TUs for one object.
-RETAIL_OBJECT_NAMES = {'dlg_2': 'DLG'}
+RETAIL_OBJECT_NAMES = {}
 
 
 def retail_object_name(source):

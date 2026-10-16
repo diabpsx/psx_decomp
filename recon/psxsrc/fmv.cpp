@@ -85,43 +85,7 @@ typedef struct SpuVoiceAttr {   /* sizeof 64 (SYM: STRUCT size 64 tag SpuVoiceAt
 
 /* @0x80158840 PADS.H (header copy):120 -- CPad::GetDown() const, inlined afresh per TU (-fno-inline
  * would emit it once; PsyQ 4.0 without that flag re-emits the inline body at every call site's TU). */
-class CPad {   /* sizeof 236, PADS.H */
-public:
-    unsigned char get_both;
-    unsigned char active;
-    unsigned char PadType;
-    unsigned char PADTICK;
-    unsigned short PADTICKMASK;
-    unsigned short PadNum;
-    unsigned short Cur;
-    unsigned short Up;
-    unsigned short Down;
-    unsigned short Tick;
-    unsigned short Old;
-    unsigned short both_Cur;
-    unsigned short both_Up;
-    unsigned short both_Down;
-    unsigned short both_Tick;
-    unsigned short both_Old;
-    BOOL TickDown[16];
-    BOOL TickBoth[16];
-    unsigned char TickCount[16];
-    unsigned short BothTickCount[16];
-    unsigned short GazTickCount[16];
-
-    unsigned short GetCur() const
-    {
-        if (get_both)
-            return both_Cur;
-        return Cur;
-    }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-};
+#include "psxsrc/pads.h"
 
 struct _mdecanim {   /* sizeof 20 -- one queued PlayFMVOverLay-less streamed movie request */
     char *name;

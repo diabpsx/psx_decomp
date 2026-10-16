@@ -3,63 +3,9 @@
  * (Back, GShadeTab/RandBTab), border lines (Line), the textured tile primitive (DialogPrint) and
  * the drop shadows.  The GMAN.H TextDat::GetFr/GetPal inlines are emitted out of line here. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 
 /* ---------------------------------------------------------------- PsyQ libgpu ---- */
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
-struct POLY_FT4 {   /* sizeof 40 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char u0, v0;
-    unsigned short clut;
-    short x1, y1;
-    unsigned char u1, v1;
-    unsigned short tpage;
-    short x2, y2;
-    unsigned char u2, v2;
-    unsigned short pad1;
-    short x3, y3;
-    unsigned char u3, v3;
-    unsigned short pad2;
-};
-struct POLY_G4 {   /* sizeof 36 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char r1, g1, b1, pad1;
-    short x1, y1;
-    unsigned char r2, g2, b2, pad2;
-    short x2, y2;
-    unsigned char r3, g3, b3, pad3;
-    short x3, y3;
-};
-struct POLY_GT4 {   /* sizeof 52 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char u0, v0;
-    unsigned short clut;
-    unsigned char r1, g1, b1, p1;
-    short x1, y1;
-    unsigned char u1, v1;
-    unsigned short tpage;
-    unsigned char r2, g2, b2, p2;
-    short x2, y2;
-    unsigned char u2, v2;
-    unsigned short pad2;
-    unsigned char r3, g3, b3, p3;
-    short x3, y3;
-    unsigned char u3, v3;
-    unsigned short pad3;
-};
-struct P_TAG {
-    unsigned addr : 24;
-    unsigned len : 8;
-    unsigned char r0, g0, b0, code;
-};
 /* verbatim PsyQ 4.0 LIBGPU.H primitive macros */
 typedef unsigned char u_char;
 typedef unsigned long u_long;
@@ -83,99 +29,15 @@ typedef unsigned long u_long;
 #define setPolyG4(p)	setlen(p, 8),  setcode(p, 0x38)
 
 /* ---------------------------------------------------------------- engine types ---- */
-struct FRAME_HDR {   /* sizeof 12 */
-    unsigned int FrOffset : 32;
-    int X : 8;
-    int Y : 8;
-    unsigned int PalNum : 8;
-    unsigned int NotTrans : 1;
-    unsigned int Rotated : 1;
-    unsigned int InVRAM : 1;
-    unsigned int CompType : 2;
-    unsigned int Floor : 1;
-    unsigned int Cycle : 1;
-    unsigned int pad : 1;
-    unsigned int W : 9;
-    unsigned int H : 9;
-    unsigned int PentaGram : 1;
-    unsigned int pad2 : 13;
-};
-struct FRAME_TP {   /* word 0 of a FRAME_HDR as U/V/Tpage (GMAN.H view) */
-    unsigned U : 8, V : 8, Tpage : 16;
-};
-struct PAL {   /* sizeof 8 */
-    unsigned int InVram : 1;
-    unsigned int NumOfCols : 31;
-    unsigned short Cols[1];
-};
 struct TP_LOAD_HDR {   /* sizeof 4 */
     unsigned int U : 8;
     unsigned int V : 8;
     unsigned int tpage : 16;
 };
 
-extern "C" BOOL GAL_Free(long Hnd);
 extern "C" void DBG_Error(char *Text, char *File, int Line);
 
-struct SPR_HDR;
-struct CTextFileInfo;
-class TextDat {   /* sizeof 112 */
-public:
-    BOOL OwnDat;                        /* +0x0 */
-    int TexNum;                         /* +0x4 */
-    int LastFrame;                      /* +0x8 */
-    BOOL DatLoaded;                     /* +0xC */
-    long hndDat;                        /* +0x10 */
-    long hndHdr;                        /* +0x14 */
-    long hndPalOffset;                  /* +0x18 */
-    long hndCreatureOffset;             /* +0x1C */
-    long hndBlockOffsets;               /* +0x20 */
-    FRAME_HDR *Frames;                  /* +0x24 */
-    SPR_HDR *Hdr;                       /* +0x28 */
-    void *Pals;                         /* +0x2C */
-    int *PalOffset;                     /* +0x30 */
-    int *CreatureOffset;                /* +0x34 */
-    unsigned char *CreatureAnims;       /* +0x38 */
-    unsigned char *Blocks;              /* +0x3C */
-    BOOL Loaded;                        /* +0x40 */
-    int LoadCount;                      /* +0x44 */
-    CTextFileInfo *FileInfo;            /* +0x48 */
-    long hndDecompBuffer;               /* +0x4C */
-    int DecX;                           /* +0x50 */
-    int DecY;                           /* +0x54 */
-    int PalX;                           /* +0x58 */
-    int PalY;                           /* +0x5C */
-    int Scr;                            /* +0x60 */
-    int NumOfBuffers[2];                /* +0x64 */
-    long hndDecompArrays;               /* +0x6C */
-
-    FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
-    PAL *GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }
-    POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-    inline void DumpDatFile();
-};
-/* GMAN.H:290-296 -- never called here; compiling it emits "psxsrc/gman.h" into .DIALOG_rdata */
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-
-class Dialog {   /* sizeof 16 */
-public:
-    int BevelGfx;       /* +0x0 */
-    int BorderGfx;      /* +0x4 */
-    int BackGfx;        /* +0x8 */
-    int DialogOTpos;    /* +0xC */
-
-    void GetSizes();
-    void Back(int DX, int DY, int DW, int DH);
-    void Line(int DX, int DY, int DW);
-    int SetOTpos(int OT);
-};
+#include "psxsrc/dialog.h"
 
 /* ---------------------------------------------------------------- externals ---- */
 extern "C" unsigned long GU_GetRnd(void);

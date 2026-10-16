@@ -11,11 +11,7 @@
 extern "C" int abs(int);
 
 /* STORM.H (PSX): the Win32 critical section is compiled out. */
-class CCritSect {
-    int m_critsect;
-public:
-    void inline Enter() {}
-};
+#include "source/storm.h"
 
 long orgseed = 0;
 int SeedCount = 0;

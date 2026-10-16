@@ -17,7 +17,7 @@ class RetailSectionNameTests(unittest.TestCase):
     def test_merged_overlay_module_one_stream(self):
         self.assertEqual(S.retail_section_names(B.ROOT / "recon/psxsrc/credits.cpp", merged=True),
                          {".text": ".CREDITS_text", ".rdata": ".CREDITS_text", ".data": ".CREDITS_text"})
-        self.assertEqual(S.retail_object_name(B.ROOT / "recon/psxsrc/dlg_2.cpp"), "DLG")   # one retail object, two TUs here
+        self.assertEqual(S.retail_object_name(B.ROOT / "recon/psxsrc/dlg.cpp"), "DLG")   # one retail object, two TUs here
 
     def test_library_and_assembly_objects_keep_plain_names(self):
         self.assertEqual(S.retail_section_names(B.ROOT / "recon/eaclib/timer.c"), {})

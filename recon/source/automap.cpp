@@ -9,8 +9,6 @@
  * AMPlayerX/Y, AMPx/AMPy for the 2-player split-screen case).  Layouts, prototypes, externs
  * generated from DIABPSX.SYM (tools/symhdr.py -> gen headers). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/textdat_header.h"
 #include "source/gen/structs_automap.h"
 #include "source/gen/externs_automap.h"
 #include "source/gen/protos_automap.h"
@@ -31,15 +29,7 @@ static int SetLevelName[6] = { 1274, 978, 114, 646, 796, 30 };   /* @0x8010D6CC 
 unsigned char automapview[5][40] = { 0 };
 unsigned short automaptype[512] = { 0 };
 
-/* PsyQ PSXSRC/PRIMPOOL.H template, LINE_F2 instantiation (one out-of-line copy per TU that uses it --
- * this TU declares its own local copy, matching the source/*.cpp "self-contained" convention). */
-static inline void PRIM_GetPrim(LINE_F2 **Prim)
-{
-    if ((unsigned char *)ThisPrimAddr + sizeof(LINE_F2) * 10 >= (unsigned char *)AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (LINE_F2 *)ThisPrimAddr;
-    ThisPrimAddr = (struct POLY_FT4 *)((LINE_F2 *)ThisPrimAddr + 1);
-}
+#include "psxsrc/primpool.h"
 
 /* PsyQ libgpu.h OT-link macros (P_TAG's addr:24 bitfield) */
 #define getaddr(p) (((P_TAG *)(p))->addr)

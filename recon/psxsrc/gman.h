@@ -67,6 +67,7 @@ struct PAL {                          /* sizeof 8 */
 };
 
 struct TextDat;
+struct ALL_DECOMP_BUFFERS;            /* DECOMP.H (KANJI.CPP): { NumOfBuffers; DECOMP_BUFFER TheBuffers[1]; } */
 
 struct CPart {                        /* sizeof 8 */
     unsigned long Piece;
@@ -189,18 +190,35 @@ struct TextDat {                      /* sizeof 112 */
     void MakeCreatureOffsetTab();
     void FindDecompArea(RECT &R);
 
-    /* GMAN.H in-class methods (line numbers per SYM); the member order here is the order their out-of-line
-     * copies are defined in (the retail tail is their reverse) */
+    /* GMAN.H in-class methods (line numbers per SYM).  The compiler queues a deferred inline the first time it
+     * is referenced, so GetCreature (284) is queued from GetNumOfActions' body and precedes the members after
+     * 251 in every TU's tail; the member order here reproduces every retail tail (GMAN, BLOCK, CPLAYER,
+     * OBJECTS, OBJPRINT, KANJI, MISPRINT). */
     FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }                        /* 229 */
     PAL *GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }         /* 232 */
     int GetNumOfFrames() { return Hdr->NumOfFrames; }                                              /* 233 */
     void SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum) { FileInfo = (CTextFileInfo *)NewInfo; TexNum = NewTexNum; }  /* 240 */
+    ALL_DECOMP_BUFFERS *GetDecompBuffers()                                                         /* 243 */
+    {
+        if (Hdr->DecompOffset)
+            return (ALL_DECOMP_BUFFERS *)((unsigned char *)Hdr + Hdr->DecompOffset);
+        return NULL;
+    }
     int GetNumOfCreatures() { return Hdr->NumOfCreatures; }                                        /* 251 */
     CCreatureHdr *GetCreature(int Creature) { return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]); }  /* 284 */
+    int GetNumOfActions(int Creature) { return GetCreature(Creature)->NumOfActions; }              /* 252 */
+    int GetNumOfFrames(int Creature, int Action) { return GetCreature(Creature)->GetAction(Action)->NumOfFrames; }  /* 253 */
     int GetTexNum() const { return TexNum; }                                                       /* 256 */
     BOOL IsLoaded() const { return LoadCount != 0; }                                               /* 257 */
     BOOL CanXferPal() const { return PalX >= 0 && PalY >= 0; }                                     /* 258 */
     BOOL CanXferFrame() const { return DecX >= 0 && DecY >= 0; }                                   /* 259 */
+    void SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY)                                 /* 265 */
+    {
+        DecX = nDecX;
+        DecY = nDecY;
+        PalX = nPalX;
+        PalY = nPalY;
+    }
 
     static CTextFileInfo *GetFileInfo(int Id);
 };
@@ -227,7 +245,7 @@ void LZNP_Decode(unsigned char *Src, unsigned char *Dst);   /* LZNP.CPP */
 void DEC_AddAsDecRequestor(TextDat *Dat);                  /* DECOMP.CPP @0x800A4384 */
 void GPUQ_FlushQ();                                        /* GPUQ.CPP @0x800833F0 */
 extern unsigned char FeFlag;                               /* @0x8011B374 */
-extern int CDWAIT;                                         /* @0x8011ADEC */
+extern BOOL CDWAIT;                                        /* @0x8011ADEC (SYM: BOOL) */
 struct DR_LOAD2 {                     /* sizeof 68 (SYM) */
     unsigned int  addr : 24;
     unsigned int  len  : 8;

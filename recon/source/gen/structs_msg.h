@@ -384,64 +384,7 @@ struct TCmdPlrInfoHdr {   /* sizeof 6 */
  * retail data: D_80116850 is CompClass's OWN vtable with 2 pure-virtual slots -> DoComp/DoDecomp;
  * NoComp/PakComp/CrunchComp each carry a 2-entry vtable of their own DoComp/DoDecomp overrides).
  * DoComp/DoDecomp are declared const to match the mangled "C" (const-method) qualifier. */
-class CompClass {
-public:
-    virtual int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const = 0;
-    virtual void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const = 0;
-};
-
-struct CompressedLevs {   /* sizeof 180 */
-    unsigned long Version;   /* +0x0 */
-    unsigned long Offset[22];   /* +0x4 */
-    unsigned long Size[22];   /* +0x5C */
-
-    int GetSize(void) { return Offset[21] + GAL_AlignSizeToType(Size[21], 1); }
-};
-
-class NoComp : public CompClass {
-public:
-    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { memcpy(Dest, Src, SrcLen); return SrcLen; }
-    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { memcpy(Dest, Src, SrcLen); }
-};
-
-class PakComp : public CompClass {
-public:
-    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { return PAK_DoPak(Dest, Src, SrcLen); }
-    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { PAK_DoUnpak(Dest, Src); }
-};
-
-class CrunchComp : public CompClass {
-public:
-    int DoComp(unsigned char *Dest, const unsigned char *Src, int SrcLen) const { return crunch(Src, Dest, SrcLen, 0x800); }
-    void DoDecomp(unsigned char *Dest, const unsigned char *Src, int DstLen, int SrcLen) const { decrunch(Src, Dest, SrcLen); }
-};
-
-struct AMap {   /* sizeof 16 */
-    BOOL Compressed;   /* +0x0 */
-    long hnd;   /* +0x4 */
-    int Size;   /* +0x8 */
-    struct DLevel *CurrLevel;   /* +0xC */
-};
-
-/* CompLevelMaps itself + GetMap/ReleaseMap/Init/ExportData/ImportData are reconstructed elsewhere
- * (COMPMAP.CPP, a different splat segment) -- only declared here (extern) for the calls this TU
- * makes into it (GetDLevel/ReleaseDLevel) and the GameMaps object THIS TU owns/constructs. */
-class CompLevelMaps {
-public:
-    CompClass *CompObj;         /* +0x0 */
-    struct AMap TheMaps[22];    /* +0x4 */
-    int LastNumOut;             /* +0x164 */
-    struct DLevel *LastMapOut;  /* +0x168 */
-    BOOL MapOut;                /* +0x16C */
-
-    CompLevelMaps(const CompClass &NewCompObj);
-    ~CompLevelMaps();
-    struct DLevel *GetMap(int MapNum);
-    void ReleaseMap(struct DLevel *Dl);
-    void Init(void);
-    int ExportData(unsigned char *U8Dest);
-    void ImportData(struct CompressedLevs *Levs);
-};
+#include "source/compmap.h"
 
 struct LocalLevel {   /* sizeof 200 */
     unsigned char automapsv[5][40];   /* +0x0 */

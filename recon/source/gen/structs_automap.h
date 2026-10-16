@@ -1,9 +1,3 @@
-struct RECT {   /* sizeof 8 */
-    short x;   /* +0x0 */
-    short y;   /* +0x2 */
-    short w;   /* +0x4 */
-    short h;   /* +0x6 */
-};
 
 enum TXT_JUST {
     JustLeft = 0,
@@ -29,33 +23,14 @@ struct CFont {   /* sizeof 540 */
 
 /* CBlocks::GetOverlayOtBase is an inline (PSXSRC header) method -- one out-of-line copy per TU that
  * uses it (same idiom as PRIM_GetPrim below); this TU's own local declaration, self-contained. */
-class CBlocks {
-public:
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
+#include "psxsrc/block.h"
 
 /* PsyQ GPU tag word (libgpu.h P_TAG) -- the OT-link addr:24/len:8 bitfield view used by getaddr/
  * setaddr/addPrim.  Declared locally (matches source/*.cpp's convention of NOT including psxsrc/*.h). */
-struct P_TAG {
-    unsigned addr : 24;
-    unsigned len : 8;
-    unsigned char r0, g0, b0, code;
-};
 
 /* PsyQ GPU LINE_F2 primitive + the PRIM_GetPrim<T> pool-allocator template (PSXSRC/PRIMPOOL.H),
  * declared locally so this "source" TU stays self-contained (matches the source/*.cpp convention of
  * NOT including psxsrc/*.h -- see palette.cpp's local POLY_FT4). */
-struct LINE_F2 {   /* sizeof 16 */
-    unsigned long tag;   /* +0x0 */
-    unsigned char r0;   /* +0x4 */
-    unsigned char g0;   /* +0x5 */
-    unsigned char b0;   /* +0x6 */
-    unsigned char code;   /* +0x7 */
-    short x0;   /* +0x8 */
-    short y0;   /* +0xA */
-    short x1;   /* +0xC */
-    short y1;   /* +0xE */
-};
 enum PLR_MODE {
     PM_QUIT = 11,
     PM_NEWLVL = 10,

@@ -33,12 +33,6 @@ struct TriggerStruct {   /* sizeof 16 */
     int _tlvl;  /* +0xC */
 };
 
-struct RECT {   /* sizeof 8 */
-    short x;   /* +0x0 */
-    short y;   /* +0x2 */
-    short w;   /* +0x4 */
-    short h;   /* +0x6 */
-};
 
 /* opaque-sized carriers: only used as typed pointers/arrays, field access via raw offsets */
 struct PlayerStruct { unsigned char _pad[0x19E8]; };
@@ -63,9 +57,6 @@ struct MonsterStruct {   /* sizeof 104 */
     void *MData;            /* +0x64 */
 };
 
-struct CBlocks {
-    static int GetOverlayOtBase(void) { return 0x1E8; }
-};
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
 
@@ -76,37 +67,5 @@ struct CFont {   /* sizeof 540 (printy.h); layout opaque here, size load-bearing
     int GetStrWidth(char *Str);
 };
 
-extern unsigned char DialogRed, DialogGreen, DialogBlue, DialogTRed, DialogTGreen, DialogTBlue;
-struct Dialog {   /* sizeof 16 */
-    int BevelGfx;    /* +0x0 */
-    int BorderGfx;   /* +0x4  (SetBorder) */
-    int BackGfx;     /* +0x8  (SetBack) */
-    int DialogOTpos; /* +0xC */
-    Dialog()
-{
-    BackGfx = 0x94;
-    BevelGfx = 0x1A;
-    BorderGfx = 0x1A;
-    DialogRed = 0x80;
-    DialogGreen = 0x80;
-    DialogBlue = 0x80;
-    DialogTRed = 0x20;
-    DialogTGreen = 0x20;
-    DialogTBlue = 0x20;
-    DialogOTpos = CBlocks::GetOverlayOtBase();
-}
-    ~Dialog()
-{
-}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetBack(int Type) { BackGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-{
-    DialogRed = R;
-    DialogGreen = G;
-    DialogBlue = B;
-}
-    void Back(int x, int y, int w, int h);
-};
 
 struct TASK { char _pad[92]; };

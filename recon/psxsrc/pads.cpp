@@ -6,53 +6,9 @@
  * skeleton (refs/skeleton/.../PADS.H) as shape hints.  PADS.H inlines used here are emitted out of line
  * in this object (-fno-inline), in reverse header order (SetPadType, CheckActive, SetActive,
  * SetBothFlag, ctor).  PAD_Open (PADS.CPP:103) is once-only code in retail's .STARTUP_text section. */
-#include "psxsrc/textdat_header.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 
-/* ---------------------------------------------------------------- PADS.H (SYM layout, sizeof 236) */
-class CPad {
-public:
-    unsigned char get_both;   /* +0x0 */
-    unsigned char active;   /* +0x1 */
-    unsigned char PadType;   /* +0x2 */
-    unsigned char PADTICK;   /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;   /* +0x6 */
-    unsigned short Cur;   /* +0x8 */
-    unsigned short Up;   /* +0xA */
-    unsigned short Down;   /* +0xC */
-    unsigned short Tick;   /* +0xE */
-    unsigned short Old;   /* +0x10 */
-    unsigned short both_Cur;   /* +0x12 */
-    unsigned short both_Up;   /* +0x14 */
-    unsigned short both_Down;   /* +0x16 */
-    unsigned short both_Tick;   /* +0x18 */
-    unsigned short both_Old;   /* +0x1A */
-    BOOL TickDown[16];   /* +0x1C */
-    BOOL TickBoth[16];   /* +0x5C */
-    unsigned char TickCount[16];   /* +0x9C */
-    unsigned short BothTickCount[16];   /* +0xAC */
-    unsigned short GazTickCount[16];   /* +0xCC */
-
-    CPad(int PhysStick)   /* PADS.H:85 */
-    {
-        PadNum = PhysStick;
-        get_both = 0;
-        Flush();
-    }
-    void SetBothFlag(unsigned char fl) { get_both = fl; }   /* PADS.H:87 */
-    void SetActive(unsigned char a) { active = a; }   /* PADS.H:94 */
-    unsigned char CheckActive()   /* PADS.H:97 */
-    {
-        return active;
-    }
-    void SetPadType(unsigned char val) { PadType = val; }   /* PADS.H:102 */
-
-    void NewVal(unsigned short New);
-    void BothNewVal(unsigned short New, unsigned short New2);
-    unsigned short Trans(unsigned short PadVal);
-    void Flush();
-};
+#include "psxsrc/pads.h"
 
 /* ---------------------------------------------------------------- externs */
 extern BOOL IsGameLoading(void);   /* @0x800A4648 LOADING.CPP:212 */

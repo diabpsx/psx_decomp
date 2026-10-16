@@ -5,12 +5,9 @@
  * (Dialog, CBlocks, CPad) are emitted out of line in this object (-fno-inline).
  * Sources: retail asm oracle > SYM (scratch/tuinfo.py PAUSE.CPP) > refs/skeleton PAUSE.H (prototypes). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/textdat_header.h"
+#include "psxsrc/pads.h"
+#include "psxsrc/dialog.h"
 
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
 
@@ -34,78 +31,8 @@ struct TASK {   /* sizeof 92 */
     unsigned short MaxStackSizeBytes;   /* +0x5A */
 };
 struct TSnd;
-struct TextDat;
 
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
-class CPad {
-public:
-    unsigned char get_both;       /* +0x0 */
-    unsigned char active;         /* +0x1 */
-    unsigned char PadType;        /* +0x2 */
-    unsigned char PADTICK;        /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;        /* +0x6 */
-    unsigned short Cur;           /* +0x8 */
-    unsigned short Up;            /* +0xA */
-    unsigned short Down;          /* +0xC */
-    unsigned short Tick;          /* +0xE */
-    unsigned short Old;           /* +0x10 */
-    unsigned short both_Cur;      /* +0x12 */
-    unsigned short both_Up;       /* +0x14 */
-    unsigned short both_Down;     /* +0x16 */
-    unsigned short both_Tick;     /* +0x18 */
-    unsigned short both_Old;      /* +0x1A */
-    unsigned char rest[236 - 0x1C];
-
-    unsigned char CheckActive() { return active; }
-    unsigned short GetDown() const
-    {
-        if (get_both)
-            return both_Down;
-        return Down;
-    }
-};
-
-class CBlocks {
-public:
-    static int GetMaxOtPos() { return 0x1FF; }
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
-
-class Dialog {
-public:
-    int BevelGfx;      /* +0x0 */
-    int BorderGfx;     /* +0x4 */
-    int BackGfx;       /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetBorder(int Type) { BorderGfx = Type; }
-    void SetBack(int Type) { BackGfx = Type; }
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    void Back(int DX, int DY, int DW, int DH);
-    int SetOTpos(int OT);
-};
 
 class CFont {
 public:

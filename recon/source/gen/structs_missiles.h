@@ -3,71 +3,12 @@ struct AnimStruct {   /* sizeof 2 */
     char Rate;   /* +0x1 */
 };
 
-struct FRAME_HDR;
 
-struct SPR_HDR;
+#include "psxsrc/block.h"
 
-struct CTextFileInfo;
 
-#include "psxsrc/textdat_header.h"
 
-struct MonstList;
 
-struct LittleGt4;
-
-struct RECT;
-
-struct RECT {   /* sizeof 8 */
-    short x;   /* +0x0 */
-    short y;   /* +0x2 */
-    short w;   /* +0x4 */
-    short h;   /* +0x6 */
-};
-
-struct RgbBlockInf {   /* sizeof 24 */
-    int FromValR;   /* +0x0 */
-    int ToValR;   /* +0x4 */
-    int FromValG;   /* +0x8 */
-    int ToValG;   /* +0xC */
-    int FromValB;   /* +0x10 */
-    int ToValB;   /* +0x14 */
-};
-
-struct CBlocks {   /* sizeof 264 */
-    struct TextDat TextDat;   /* +0x0 */
-    struct TextDat *MonstTexDat;   /* +0x70 */
-    struct TextDat *ObjTexDat;   /* +0x74 */
-    struct MonstList *MonsterList;   /* +0x78 */
-    int RndX;   /* +0x7C */
-    int RndY;   /* +0x80 */
-    int MonstTexId;   /* +0x84 */
-    long hndBlocks;   /* +0x88 */
-    int ObjTexId;   /* +0x8C */
-    int ItemTexId;   /* +0x90 */
-    struct TextDat *ItemTexDat;   /* +0x94 */
-    int BgTexId;   /* +0x98 */
-    struct TextDat *BgTexDat;   /* +0x9C */
-    int pOtPos[2];   /* +0xA0 */
-    BOOL IsTown;   /* +0xA8 */
-    int NumOfBlocks;   /* +0xAC */
-    struct LittleGt4 *Gt4s;   /* +0xB0 */
-    long hndGt4s;   /* +0xB4 */
-    struct RECT *Rects;   /* +0xB8 */
-    long hndRects;   /* +0xBC */
-    struct RECT ClipRect;   /* +0xC0 */
-    int StX;   /* +0xC8 */
-    int StY;   /* +0xCC */
-    int Mx;   /* +0xD0 */
-    int My;   /* +0xD4 */
-    int pBlockX[2];   /* +0xD8 */
-    int pBlockY[2];   /* +0xE0 */
-    int CursX;   /* +0xE8 */
-    int CursY;   /* +0xEC */
-    struct RgbBlockInf GlBlockInf;   /* +0xF0 */
-
-    /* BLOCK.H:205 -- in-class inline; -fno-inline emits the out-of-line copy here */
-    void MoveToScrollTarget() { Mx = StX; My = StY; }
-};
 
 struct MissileStruct {   /* sizeof 76 */
     long _mixvel;   /* +0x0 */
@@ -361,24 +302,7 @@ struct ScrollStruct {   /* sizeof 20 */
     int _sdir;   /* +0x10 */
 };
 
-struct CPlayer : public TextDat {   /* sizeof 144; original CPLAYER.H base */
-    long hndDatMem;   /* +0x70 */
-    unsigned short NumOfPlayers;   /* +0x74 */
-    BOOL InTown;   /* +0x78 */
-    unsigned short PlayerNum;   /* +0x7C */
-    unsigned short Tpage;   /* +0x7E */
-    int TexId;   /* +0x80 */
-    int LastScrX;   /* +0x84 */
-    int LastScrY;   /* +0x88 */
-    int LastOtPos;   /* +0x8C */
-    void SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg);
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-};
+#include "psxsrc/cplayer.h"
 
 struct MisFileData {   /* sizeof 5 */
     unsigned char mAnimName;   /* +0x0 */

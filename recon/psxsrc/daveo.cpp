@@ -4,7 +4,7 @@
  * player-specific unique items back as gold (PlaceStoreGold2 = STORES.CPP PlaceStoreGold for any
  * player).  The CPAD.H inlines GetCur/CheckActive are emitted out of line here (-fno-inline). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 
 /* ---- SYM layouts (copied from recon/source/gen/structs_player.h) ---- */
 enum PLR_MODE {
@@ -246,58 +246,9 @@ public:
     void SetChar(int ch, unsigned short Frm);
 };
 
-class CPad {   /* sizeof 236 */
-public:
-    unsigned char get_both;       /* +0x0 */
-    unsigned char active;         /* +0x1 */
-    unsigned char PadType;        /* +0x2 */
-    unsigned char PADTICK;        /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;        /* +0x6 */
-    unsigned short Cur;           /* +0x8 */
-    unsigned short Up;            /* +0xA */
-    unsigned short Down;          /* +0xC */
-    unsigned short Tick;          /* +0xE */
-    unsigned short Old;           /* +0x10 */
-    unsigned short both_Cur;      /* +0x12 */
-    unsigned short both_Up;       /* +0x14 */
-    unsigned short both_Down;     /* +0x16 */
-    unsigned short both_Tick;     /* +0x18 */
-    unsigned short both_Old;      /* +0x1A */
-    unsigned char rest[236 - 0x1C];
-
-    unsigned char CheckActive() { return active; }
-    unsigned short GetCur() const
-    {
-        if (get_both)
-            return both_Cur;
-        return Cur;
-    }
-    void Flush();
-};
+#include "psxsrc/pads.h"
 
 struct FeTable;
-
-/* GMAN.H (included by the original): its header-defined TextDat::DumpDatFile is never called here,
- * but compiling it emits "psxsrc/gman.h" -- the only string in retail .DAVEO_rdata (0xE bytes). */
-extern "C" BOOL GAL_Free(long Hnd);
-extern "C" void DBG_Error(char *Text, char *File, int Line);
-class TextDat {   /* sizeof 112 -- only the fields DumpDatFile touches */
-public:
-    BOOL OwnDat;                   /* +0x0 */
-    int pad0[3];
-    long hndDat;                   /* +0x10 */
-    unsigned char rest[112 - 0x14];
-    inline void DumpDatFile();
-};
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
 
 /* ---- externals ---- */
 CPad *PAD_GetPad(int PadNum, unsigned char both);

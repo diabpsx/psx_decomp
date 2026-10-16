@@ -680,7 +680,9 @@ def build(only=None):
             continue
         source = (B.ROOT / spec['source']).resolve()
         source.relative_to(B.ROOT)
-        if source.stem != segment:
+        # The TU is named after the segment unless the row says otherwise: DLG.CPP's lane key is
+        # `dlg_2` because splat labelled two of the object's rodata fragments `dlg` and `dlg_1`.
+        if source.stem != spec.get('tu', segment):
             raise ValueError('native source requires a same-name whole TU')
         assembler_version, assembler, assembler_dos, assembler_flags = source_assembler_options(spec)
         homes, regions, limits = validate_placements(segment, spec, layouts)
@@ -944,7 +946,11 @@ def build(only=None):
             at = combined[section][0] - bases[home]
             expected = bytes(len(data)) if is_zero_section(section) else retail_images[home][at:at+len(data)]
             if at < 0 or data != expected:
-                raise ValueError(f'{segment} {section}: native bytes differ from retail')
+                first = next((i for i in range(min(len(data), len(expected))) if data[i] != expected[i]), min(len(data), len(expected)))
+                count = sum(1 for i in range(min(len(data), len(expected))) if data[i] != expected[i]) + abs(len(data) - len(expected))
+                raise ValueError(f'{segment} {section}: native bytes differ from retail ({count} bytes; first at '
+                                 f'+0x{first:X} = 0x{combined[section][0] + first:08X}: ours {data[first:first + 8].hex()} '
+                                 f'retail {expected[first:first + 8].hex()})')
             if section not in regions:
                 continue  # Verified GP anchor is scaffold only, never exported.
             strip = len(prefix) if section == '.sdata' else len(borrowed_prefixes.get(section, b''))

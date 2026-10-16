@@ -18,12 +18,6 @@ struct TASK {   /* sizeof 92 */
     unsigned short MaxStackSizeBytes;   /* +0x5A */
 };
 
-struct RECT {   /* sizeof 8 */
-    short x;   /* +0x0 */
-    short y;   /* +0x2 */
-    short w;   /* +0x4 */
-    short h;   /* +0x6 */
-};
 
 enum TXT_JUST { JustLeft = 0, JustCentre = 1, JustRight = 2 };
 
@@ -38,97 +32,12 @@ public:
     void SetChar(int Char, unsigned short Frame);
 };
 
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
 
 struct MonstList;
-class CBlocks {   /* sizeof 264 (SYM); only the fields BLOCK.H's inline DumpMonsters touches are named */
-public:
-    unsigned char _pad0[0x70];
-    struct TextDat *MonstTexDat;    /* +0x70 */
-    struct TextDat *ObjTexDat;      /* +0x74 */
-    struct MonstList *MonsterList;  /* +0x78 */
-    int RndX, RndY;                 /* +0x7C, +0x80 */
-    int MonstTexId;                 /* +0x84 */
-    unsigned char _rest[264 - 0x88];
-
-    static int GetOverlayOtBase() { return 0x1E8; }
-    void DumpGraphics(struct TextDat **TDat, int *Id);   /* BLOCK.CPP */
-    /* BLOCK.H:228 -- in-class inline; -fno-inline emits the out-of-line copy (DumpMonsters__7CBlocks_80161f28) here */
-    void DumpMonsters()
-    {
-        MonsterList = NULL;
-        DumpGraphics(&MonstTexDat, &MonstTexId);
-    }
-    void SetTownersGraphics();
-};
-
-class CPad {
-public:
-    void Flush(void);
-};
-
-class Dialog {
-public:
-    int BevelGfx;   /* +0x0 */
-    int BorderGfx;   /* +0x4 */
-    int BackGfx;   /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-    void SetBorder(int v) { BorderGfx = v; }
-    void SetBack(int Type) { BackGfx = Type; }
-    void Back(int DX, int DY, int DW, int DH);
-    void SetRGB(unsigned char R, unsigned char G, unsigned char B)
-    {
-        DialogRed = R;
-        DialogGreen = G;
-        DialogBlue = B;
-    }
-    int SetOTpos(int OT);
-};
 
 
-struct POLY_FT4 {   /* sizeof 40 */
-    unsigned long tag;   /* +0x0 */
-    unsigned char r0;   /* +0x4 */
-    unsigned char g0;   /* +0x5 */
-    unsigned char b0;   /* +0x6 */
-    unsigned char code;   /* +0x7 */
-    short x0;   /* +0x8 */
-    short y0;   /* +0xA */
-    unsigned char u0;   /* +0xC */
-    unsigned char v0;   /* +0xD */
-    unsigned short clut;   /* +0xE */
-    short x1;   /* +0x10 */
-    short y1;   /* +0x12 */
-    unsigned char u1;   /* +0x14 */
-    unsigned char v1;   /* +0x15 */
-    unsigned short tpage;   /* +0x16 */
-    short x2;   /* +0x18 */
-    short y2;   /* +0x1A */
-    unsigned char u2;   /* +0x1C */
-    unsigned char v2;   /* +0x1D */
-    unsigned short pad1;   /* +0x1E */
-    short x3;   /* +0x20 */
-    short y3;   /* +0x22 */
-    unsigned char u3;   /* +0x24 */
-    unsigned char v3;   /* +0x25 */
-    unsigned short pad2;   /* +0x26 */
-};
+
+
 
 
 enum PLR_MODE {

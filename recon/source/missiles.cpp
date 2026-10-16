@@ -24,7 +24,6 @@
  * seven zero commons and 115 exact SYM records are integrated into the matching images.
  */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
 #include "source/gen/structs_missiles.h"
 #include "source/gen/externs_missiles.h"
 #include "source/gen/protos_missiles.h"

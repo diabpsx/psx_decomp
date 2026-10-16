@@ -3,8 +3,7 @@
  * Layouts / externs / prototypes from DIABPSX.SYM (tools/symhdr.py -> psxsrc/gen/*_bird.h). */
 #include "diabpsx_types.h"
 #include "psxsrc/psyq.h"
-#include "psxsrc/textfileinfo_header.h"
-#include "psxsrc/textdat_header.h"
+#include "psxsrc/gman.h"
 #include "psxsrc/gen/structs_bird.h"
 #include "psxsrc/gen/externs_bird.h"
 #include "psxsrc/gen/protos_bird.h"
@@ -12,37 +11,10 @@
 #define TSFX_BIRDCHR1 0xDC
 
 /* Original CPLAYER.H layout and unused diagnostic inline. */
-class CPlayer : public TextDat {
-public:
-    long hndDatMem;
-    unsigned short NumOfPlayers;
-    BOOL InTown;
-    unsigned short PlayerNum, Tpage;
-    int TexId, LastScrX, LastScrY, LastOtPos;
-    static CPlayer *PActiveArray[2];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
-        return PActiveArray[PNum];
-    }
-};
+#include "psxsrc/cplayer.h"
 
 /* BLOCK.H CBlocks (sizeof 264): ClipRect @+0xC0 is the only field this TU reads */
-struct CBlocks {
-    unsigned char _pad0[0xC0];
-    RECT ClipRect;                                  /* +0xC0 */
-    unsigned char _pad1[0x108 - 0xC8];
-
-    void GetScrXY(RECT &R, int x, int y, int sxoff, int syoff);   /* @0x8009185C BLOCK.CPP:2723 */
-    static void ShadScaleSkew(POLY_FT4 *Ft4);                           /* @0x80091930 BLOCK.CPP:2745 */
-    int GetOtPos(int LogicalY)                                      /* BLOCK.H:177 */
-    {
-        int OtPos = ClipRect.y + LogicalY + PosAdj;
-        if (OtPos < -0x43) OtPos = -0x43;
-        if (OtPos > 0x19B) OtPos = 0x19B;
-        return OtPos + 0x4D;
-    }
-};
+#include "psxsrc/block.h"
 
 #include "psxsrc/primpool.h"
 

@@ -2,31 +2,9 @@
  * credits screen -- CreditsText[] title/subtitle/text string ids shown over the CScreen backdrop, each
  * character drawn by PrintCredits as a "melting" strip of POLY_FT4 copies offset by CreditsTable. */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" literal pool heads this TU's .sdata */
+#include "psxsrc/gman.h"
 
 /* ---------------------------------------------------------------- types ---- */
-struct RECT;
-struct POLY_FT4 {   /* sizeof 40 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char u0, v0;
-    unsigned short clut;
-    short x1, y1;
-    unsigned char u1, v1;
-    unsigned short tpage;
-    short x2, y2;
-    unsigned char u2, v2;
-    unsigned short pad1;
-    short x3, y3;
-    unsigned char u3, v3;
-    unsigned short pad2;
-};
-struct P_TAG {
-    unsigned addr : 24;
-    unsigned len : 8;
-    unsigned char r0, g0, b0, code;
-};
 /* verbatim PsyQ 4.0 LIBGPU.H primitive macros */
 typedef unsigned char u_char;
 typedef unsigned long u_long;
@@ -44,126 +22,17 @@ typedef unsigned long u_long;
 #define setShadeTex(p, tge) \
 	((tge)?setcode(p, getcode(p)|0x01):setcode(p, getcode(p)&~0x01))
 
-struct FRAME_HDR {   /* sizeof 12 */
-    unsigned int FrOffset : 32;
-    int X : 8;
-    int Y : 8;
-    unsigned int PalNum : 8;
-    unsigned int NotTrans : 1;
-    unsigned int Rotated : 1;
-    unsigned int InVRAM : 1;
-    unsigned int CompType : 2;
-    unsigned int Floor : 1;
-    unsigned int Cycle : 1;
-    unsigned int pad : 1;
-    unsigned int W : 9;
-    unsigned int H : 9;
-    unsigned int PentaGram : 1;
-    unsigned int pad2 : 13;
-};
 
-extern "C" BOOL GAL_Free(long Hnd);
 extern "C" void DBG_Error(char *Text, char *File, int Line);
 
-struct SPR_HDR;
-struct CTextFileInfo;
-class TextDat {   /* sizeof 112 */
-public:
-    BOOL OwnDat;                        /* +0x0 */
-    int TexNum;                         /* +0x4 */
-    int LastFrame;                      /* +0x8 */
-    BOOL DatLoaded;                     /* +0xC */
-    long hndDat;                        /* +0x10 */
-    long hndHdr;                        /* +0x14 */
-    long hndPalOffset;                  /* +0x18 */
-    long hndCreatureOffset;             /* +0x1C */
-    long hndBlockOffsets;               /* +0x20 */
-    FRAME_HDR *Frames;                  /* +0x24 */
-    SPR_HDR *Hdr;                       /* +0x28 */
-    void *Pals;                         /* +0x2C */
-    int *PalOffset;                     /* +0x30 */
-    int *CreatureOffset;                /* +0x34 */
-    unsigned char *CreatureAnims;       /* +0x38 */
-    unsigned char *Blocks;              /* +0x3C */
-    BOOL Loaded;                        /* +0x40 */
-    int LoadCount;                      /* +0x44 */
-    CTextFileInfo *FileInfo;            /* +0x48 */
-    long hndDecompBuffer;               /* +0x4C */
-    int DecX;                           /* +0x50 */
-    int DecY;                           /* +0x54 */
-    int PalX;                           /* +0x58 */
-    int PalY;                           /* +0x5C */
-    int Scr;                            /* +0x60 */
-    int NumOfBuffers[2];                /* +0x64 */
-    long hndDecompArrays;               /* +0x6C */
+#include "psxsrc/cplayer.h"
 
-    ~TextDat();
-    FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
-    inline void DumpDatFile();
-};
-/* GMAN.H:290-296 -- never called here; compiling it emits "psxsrc/gman.h" into .CREDITS_rdata */
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-
-class CPlayer;
-class CPlayer {   /* CPLAYER.H inline: never called here; emits "psxsrc/cplayer.h" */
-public:
-    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50, defined by cplayer.cpp */
-    unsigned char data[144];
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if (1 < (unsigned int)PNum)
-            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-        return PActiveArray[PNum];
-    }
-};
-
-struct CScreen : public TextDat {   /* sizeof 124 */
-    int LoadedId;                       /* +0x70 */
-    int TpX;                            /* +0x74 */
-    int TpY;                            /* +0x78 */
-
-    CScreen();
-    void Load(int Id, int tpx, int tpy);
-    void Display(int Id, int tpx, int tpy, int fadeval);
-    void Unload(void);
-};
 
 void GM_FinishedUsing(TextDat *Fin);
 TextDat *GM_UseTexData(int Id);
 
-class CFont {   /* sizeof 540 */
-public:
-    int TextureId;                      /* +0x0 */
-    unsigned short FontTab[256];        /* +0x4 */
-    int PrintyOTpos;                    /* +0x204 */
-    int MinX;                           /* +0x208 */
-    int MaxX;                           /* +0x20C */
-    int Width;                          /* +0x210 */
-    TextDat *ThisDat;                   /* +0x214 */
-    unsigned char FontHeight;           /* +0x218 */
+#include "psxsrc/printy.h"
 
-    void SetTextDat(TextDat *NewDat);
-    int GetCharWidth(unsigned char ch);
-    int PrintChar(unsigned short Cx, unsigned short Cy, unsigned char C, unsigned char R, unsigned char G, unsigned char B);
-    int GetCharHeight(unsigned char ch) { return ThisDat->GetFr(FontTab[ch])->H; }
-    void ClearFont() { GM_FinishedUsing(ThisDat); }
-};
-
-struct FontItem;
-struct FontTab {   /* sizeof 16 */
-    CFont *Fnt;
-    FontItem *Items;
-    int NumOfItems;
-    int FrameBase;
-    void Set(void);
-};
 
 struct Creds {   /* sizeof 12 */
     int Title;
@@ -171,9 +40,6 @@ struct Creds {   /* sizeof 12 */
     int Text;
 };
 
-extern POLY_FT4 *ThisPrimAddr;
-extern POLY_FT4 *AddrToAvoid;
-inline void PRIM_GetPrim(POLY_FT4 **Prim);
 
 /* ---------------------------------------------------------------- externals ---- */
 extern "C" void TSK_Sleep(int Frames);
@@ -234,13 +100,7 @@ int CreditsTable[224] = {   /* @0x8013CE20 */
     0, 4, 7, 10, 10, 10, 7, 4, 0, -4, -7, -10, -11, -10, -7, -4,
 };
 
-inline void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
-}
+#include "psxsrc/primpool.h"
 
 extern int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag);
 extern void DoCredits(void);

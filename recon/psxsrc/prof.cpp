@@ -5,7 +5,6 @@
 #include "psxsrc/psyq.h"
 
 typedef struct POLY_F3 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1, x2, y2; } POLY_F3;                   /* 20 */
-typedef struct POLY_F4 { u_long tag; u_char r0, g0, b0, code; short x0, y0, x1, y1, x2, y2, x3, y3; } POLY_F4;   /* 24 */
 #define setPolyF3(p) setlen(p, 4), setcode(p, 0x20)
 #define setPolyF4(p) setlen(p, 5), setcode(p, 0x28)
 #define setRGB0(p, _r0, _g0, _b0) (p)->r0 = (_r0), (p)->g0 = (_g0), (p)->b0 = (_b0)

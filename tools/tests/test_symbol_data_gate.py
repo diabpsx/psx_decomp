@@ -45,7 +45,7 @@ class SymbolDataGateTests(unittest.TestCase):
                       symbol="DrawDurThingy__6GPaneliiP10ItemStructi")
 
     def test_pointer_relocation_requires_layout(self):
-        self.rejected("has a relocation", source="recon/psxsrc/dlg_2.cpp",
+        self.rejected("has a relocation", source="recon/psxsrc/dlg.cpp",
                       symbol="McState", va="0x8011B420", size="8")
 
 

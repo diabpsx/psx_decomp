@@ -4,8 +4,7 @@
  * for scaffolding only, cross-checked function-by-function against this retail target's own raw).
  * Layouts / externs / prototypes from DIABPSX.SYM (tools/symhdr.py -> psxsrc/gen/*_main.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"   /* GMAN.H inlines: the ".tp"/".dat" pool heads this TU's .sdata */
-#include "psxsrc/cplayer_header.h"        /* GMAN.H / CPLAYER.H inline literals head its .rdata */
+#include "psxsrc/cplayer.h"
 #include "psxsrc/gen/structs_main.h"
 #include "psxsrc/gen/externs_main.h"
 #include "psxsrc/gen/protos_main.h"
@@ -27,16 +26,7 @@ static void GameTask(TASK *T);
 void MAIN_MainLoop(void);
 
 /* Texture-page helpers precede MAIN's entry points in the retail TU. */
-static int GetTpY(unsigned short tpage)
-{
-    return ((tpage << 4) & 0x100) | ((tpage >> 2) & 0x200);
-}
-
-static int GetTpX(unsigned short tpage)
-{
-    return (tpage << 6) & 0x3C0;
-}
-
+#include "psxsrc/tutils.h"
 /* @0x80083128 MAIN.CPP:116 */
 void Remove96(void)
 {

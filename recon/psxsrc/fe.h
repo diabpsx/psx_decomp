@@ -28,52 +28,7 @@ struct TASK {   /* sizeof 92 */
     unsigned short XtraLongs;   /* +0x58 */
     unsigned short MaxStackSizeBytes;   /* +0x5A */
 };
-struct FRAME_HDR;
-struct SPR_HDR;
-struct CTextFileInfo;
-
-struct TextDat {   /* sizeof 112 */
-    BOOL OwnDat;   /* +0x0 */
-    int TexNum;   /* +0x4 */
-    int LastFrame;   /* +0x8 */
-    BOOL DatLoaded;   /* +0xC */
-    long hndDat;   /* +0x10 */
-    long hndHdr;   /* +0x14 */
-    long hndPalOffset;   /* +0x18 */
-    long hndCreatureOffset;   /* +0x1C */
-    long hndBlockOffsets;   /* +0x20 */
-    struct FRAME_HDR *Frames;   /* +0x24 */
-    struct SPR_HDR *Hdr;   /* +0x28 */
-    void *Pals;   /* +0x2C */
-    int *PalOffset;   /* +0x30 */
-    int *CreatureOffset;   /* +0x34 */
-    unsigned char *CreatureAnims;   /* +0x38 */
-    unsigned char *Blocks;   /* +0x3C */
-    BOOL Loaded;   /* +0x40 */
-    int LoadCount;   /* +0x44 */
-    struct CTextFileInfo *FileInfo;   /* +0x48 */
-    long hndDecompBuffer;   /* +0x4C */
-    int DecX;   /* +0x50 */
-    int DecY;   /* +0x54 */
-    int PalX;   /* +0x58 */
-    int PalY;   /* +0x5C */
-    int Scr;   /* +0x60 */
-    int NumOfBuffers[2];   /* +0x64 */
-    long hndDecompArrays;   /* +0x6C */
-
-    void DumpDatFile();
-    POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-};
-
-struct CScreen : TextDat {   /* sizeof 124 */
-    int LoadedId;   /* +0x70 */
-    int TpX;   /* +0x74 */
-    int TpY;   /* +0x78 */
-
-    void Load(int Id, int tpx, int tpy);
-    void Unload(void);
-    void Display(int Id, int tpx, int tpy, int fadeval);
-};
+#include "psxsrc/gman.h"
 
 struct CFont {   /* sizeof 540 */
     int TextureId;   /* +0x0 */
@@ -89,61 +44,8 @@ struct CFont {   /* sizeof 540 */
     int Print(int X, int Y, char *Str, TXT_JUST Justify, RECT *TextWindow, unsigned char R, unsigned char G, unsigned char B);
 };
 
-struct CPad {   /* sizeof 236 */
-    unsigned char get_both;   /* +0x0 */
-    unsigned char active;   /* +0x1 */
-    unsigned char PadType;   /* +0x2 */
-    unsigned char PADTICK;   /* +0x3 */
-    unsigned short PADTICKMASK;   /* +0x4 */
-    unsigned short PadNum;   /* +0x6 */
-    unsigned short Cur;   /* +0x8 */
-    unsigned short Up;   /* +0xA */
-    unsigned short Down;   /* +0xC */
-    unsigned short Tick;   /* +0xE */
-    unsigned short Old;   /* +0x10 */
-    unsigned short both_Cur;   /* +0x12 */
-    unsigned short both_Up;   /* +0x14 */
-    unsigned short both_Down;   /* +0x16 */
-    unsigned short both_Tick;   /* +0x18 */
-    unsigned short both_Old;   /* +0x1A */
-    BOOL TickDown[16];   /* +0x1C */
-    BOOL TickBoth[16];   /* +0x5C */
-    unsigned char TickCount[16];   /* +0x9C */
-    unsigned short BothTickCount[16];   /* +0xAC */
-    unsigned short GazTickCount[16];   /* +0xCC */
-
-    unsigned char CheckActive() { return active; }
-};
-
-extern unsigned char DialogRed, DialogGreen, DialogBlue;
-extern unsigned char DialogTRed, DialogTGreen, DialogTBlue;
-
-class CBlocks {
-public:
-    static int GetOverlayOtBase() { return 0x1E8; }
-};
-
-struct Dialog {   /* sizeof 16 */
-    int BevelGfx;   /* +0x0 */
-    int BorderGfx;   /* +0x4 */
-    int BackGfx;   /* +0x8 */
-    int DialogOTpos;   /* +0xC */
-
-    Dialog()
-    {
-        BackGfx = 0x94;
-        BevelGfx = 0x1A;
-        BorderGfx = 0x1A;
-        DialogRed = 0x80;
-        DialogGreen = 0x80;
-        DialogBlue = 0x80;
-        DialogTRed = 0x20;
-        DialogTGreen = 0x20;
-        DialogTBlue = 0x20;
-        DialogOTpos = CBlocks::GetOverlayOtBase();
-    }
-    ~Dialog() {}
-};
+#include "psxsrc/pads.h"
+#include "psxsrc/dialog.h"
 
 struct FeTable {   /* sizeof 28 */
     int Title;   /* +0x0 */
@@ -416,7 +318,6 @@ void *memset(void *s, int c, unsigned long n);
 int sprintf(char *buf, const char *fmt, ...);
 char *strcpy(char *dst, const char *src);
 char *strcat(char *dst, const char *src);
-unsigned long strlen(const char *s);
 TASK *TSK_AddTask(unsigned long Id, void (*Main)(), int StackSize, int DataSize);   /* TASKER.C:141 */
 void TSK_Sleep(int Frames);   /* TASKER.C:287 */
 void DBG_Error(char *Text, char *File, int Line);   /* GDEBUG.C:146 */

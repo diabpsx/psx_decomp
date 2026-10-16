@@ -5,56 +5,9 @@
  * (PRIMPOOL.H PRIM_GetPrim<POLY_G4/F4/FT4>, CPLAYER.H GetPlayer/GetLastOtPos, BLOCK.H GetOtPos,
  * GMAN.H GetFr) are emitted out of line in this object (-fno-inline). */
 #include "diabpsx_types.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/gman.h"
 
 /* ---------------------------------------------------------------- PsyQ libgpu ---- */
-struct RECT {   /* sizeof 8 */
-    short x, y, w, h;
-};
-
-struct P_TAG {
-    unsigned addr : 24;
-    unsigned len : 8;
-    unsigned char r0, g0, b0, code;
-};
-
-struct POLY_F4 {   /* sizeof 24 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    short x1, y1;
-    short x2, y2;
-    short x3, y3;
-};
-
-struct POLY_G4 {   /* sizeof 36 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char r1, g1, b1, pad1;
-    short x1, y1;
-    unsigned char r2, g2, b2, pad2;
-    short x2, y2;
-    unsigned char r3, g3, b3, pad3;
-    short x3, y3;
-};
-
-struct POLY_FT4 {   /* sizeof 40 */
-    unsigned long tag;
-    unsigned char r0, g0, b0, code;
-    short x0, y0;
-    unsigned char u0, v0;
-    unsigned short clut;
-    short x1, y1;
-    unsigned char u1, v1;
-    unsigned short tpage;
-    short x2, y2;
-    unsigned char u2, v2;
-    unsigned short pad1;
-    short x3, y3;
-    unsigned char u3, v3;
-    unsigned short pad2;
-};
 
 #define setlen(p, _len)   (((P_TAG *)(p))->len = (unsigned char)(_len))
 #define setcode(p, _code) (((P_TAG *)(p))->code = (unsigned char)(_code))
@@ -93,157 +46,11 @@ struct TASK {   /* sizeof 92 */
     unsigned short MaxStackSizeBytes;
 };
 
-struct FRAME_HDR {   /* sizeof 12 */
-    unsigned int FrOffset : 32;
-    int X : 8;
-    int Y : 8;
-    unsigned int PalNum : 8;
-    unsigned int NotTrans : 1;
-    unsigned int Rotated : 1;
-    unsigned int InVRAM : 1;
-    unsigned int CompType : 2;
-    unsigned int Floor : 1;
-    unsigned int Cycle : 1;
-    unsigned int pad : 1;
-    unsigned int W : 9;
-    unsigned int H : 9;
-    unsigned int PentaGram : 1;
-    unsigned int pad2 : 13;
-};
 
-/* word 0 of a FRAME_HDR read as its U/V/Tpage bytes (GMAN.H view) */
-struct FRAME_TP {
-    unsigned U : 8, V : 8, Tpage : 16;
-};
 
-struct SPR_HDR;
-struct CTextFileInfo;
+#include "psxsrc/block.h"
 
-class TextDat {   /* sizeof 112 */
-public:
-    BOOL OwnDat;                        /* +0x0 */
-    int TexNum;                         /* +0x4 */
-    int LastFrame;                      /* +0x8 */
-    BOOL DatLoaded;                     /* +0xC */
-    long hndDat;                        /* +0x10 */
-    long hndHdr;                        /* +0x14 */
-    long hndPalOffset;                  /* +0x18 */
-    long hndCreatureOffset;             /* +0x1C */
-    long hndBlockOffsets;               /* +0x20 */
-    FRAME_HDR *Frames;                  /* +0x24 */
-    SPR_HDR *Hdr;                       /* +0x28 */
-    void *Pals;                         /* +0x2C */
-    int *PalOffset;                     /* +0x30 */
-    int *CreatureOffset;                /* +0x34 */
-    unsigned char *CreatureAnims;       /* +0x38 */
-    unsigned char *Blocks;              /* +0x3C */
-    BOOL Loaded;                        /* +0x40 */
-    int LoadCount;                      /* +0x44 */
-    CTextFileInfo *FileInfo;            /* +0x48 */
-    long hndDecompBuffer;               /* +0x4C */
-    int DecX;                           /* +0x50 */
-    int DecY;                           /* +0x54 */
-    int PalX;                           /* +0x58 */
-    int PalY;                           /* +0x5C */
-    int Scr;                            /* +0x60 */
-    int NumOfBuffers[2];                /* +0x64 */
-    long hndDecompArrays;               /* +0x6C */
-
-    FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }
-    inline void DumpDatFile();
-    void PrepareFt4(POLY_FT4 *FT4, int Frm, int X, int Y, int XFlip, int YFlip);
-    POLY_FT4 *PrintFt4(int Frm, int X, int Y, int XFlip, int OtPos, int YFlip);
-};
-
-/* GMAN.H:290-296 -- defined in the header; never called here, but compiling it is what puts
- * "psxsrc/gman.h" first in this object's .rdata (retail .DAVEL_rdata order: gman.h, cplayer.h, primpool.h) */
-extern "C" BOOL GAL_Free(long Hnd);
-inline void TextDat::DumpDatFile()
-{
-    if (hndDat != -1 && OwnDat) {
-        long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
-        hndDat = -1;
-    }
-}
-
-extern int PosAdj;
-
-struct MonstList;
-struct LittleGt4;
-
-struct RgbBlockInf {   /* sizeof 24 */
-    int FromValR, ToValR, FromValG, ToValG, FromValB, ToValB;
-};
-
-class CBlocks : public TextDat {   /* sizeof 264; TextDat base @+0x0 */
-public:
-    struct TextDat *MonstTexDat;        /* +0x70 */
-    struct TextDat *ObjTexDat;          /* +0x74 */
-    MonstList *MonsterList;             /* +0x78 */
-    int RndX;                           /* +0x7C */
-    int RndY;                           /* +0x80 */
-    int MonstTexId;                     /* +0x84 */
-    long hndBlocks;                     /* +0x88 */
-    int ObjTexId;                       /* +0x8C */
-    int ItemTexId;                      /* +0x90 */
-    struct TextDat *ItemTexDat;         /* +0x94 */
-    int BgTexId;                        /* +0x98 */
-    struct TextDat *BgTexDat;           /* +0x9C */
-    int pOtPos[2];                      /* +0xA0 */
-    BOOL IsTown;                        /* +0xA8 */
-    int NumOfBlocks;                    /* +0xAC */
-    LittleGt4 *Gt4s;                    /* +0xB0 */
-    long hndGt4s;                       /* +0xB4 */
-    RECT *Rects;                        /* +0xB8 */
-    long hndRects;                      /* +0xBC */
-    RECT ClipRect;                      /* +0xC0 */
-    int StX;                            /* +0xC8 */
-    int StY;                            /* +0xCC */
-    int Mx;                             /* +0xD0 */
-    int My;                             /* +0xD4 */
-    int pBlockX[2];                     /* +0xD8 */
-    int pBlockY[2];                     /* +0xE0 */
-    int CursX;                          /* +0xE8 */
-    int CursY;                          /* +0xEC */
-    RgbBlockInf GlBlockInf;             /* +0xF0 */
-
-    void GetXY(int *nx, int *ny);
-    int WorldToScrX(int x, int y);
-    int WorldToScrY(int x, int y);
-    void GetScrXY(RECT &R, int x, int y, int sxoff, int syoff);
-    int GetOtPos(int LogicalY)
-    {
-        int OtPos = ClipRect.y + LogicalY + PosAdj;
-        if (OtPos < -0x43) OtPos = -0x43;
-        if (OtPos > 0x19B) OtPos = 0x19B;
-        return OtPos + 0x4D;
-    }
-};
-
-class CPlayer;
-
-class CPlayer : public TextDat {   /* sizeof 144; TextDat base @+0x0 */
-public:
-    static CPlayer *PActiveArray[2];   /* _7CPlayer.PActiveArray @0x8011AD50, defined by cplayer.cpp */
-    long hndDatMem;                     /* +0x70 */
-    unsigned short NumOfPlayers;        /* +0x74 */
-    BOOL InTown;                        /* +0x78 */
-    unsigned short PlayerNum;           /* +0x7C */
-    unsigned short Tpage;               /* +0x7E */
-    int TexId;                          /* +0x80 */
-    int LastScrX;                       /* +0x84 */
-    int LastScrY;                       /* +0x88 */
-    int LastOtPos;                      /* +0x8C */
-
-    int GetLastOtPos() const { return LastOtPos; }
-    static CPlayer *GetPlayer(int PNum)
-    {
-        if (1 < (unsigned int)PNum)
-            DBG_Error(NULL, "psxsrc/cplayer.h", 0x41);
-        return PActiveArray[PNum];
-    }
-};
+#include "psxsrc/cplayer.h"
 
 struct PlayerStruct {   /* sizeof 6632 -- only the fields read here */
     int _pmode;                         /* +0x0 */
@@ -340,28 +147,7 @@ extern unsigned char chrflag;
 extern unsigned char PauseMode;
 extern unsigned char invflag;
 
-/* ---------------------------------------------------------------- PRIMPOOL.H ---- */
-inline void PRIM_GetPrim(POLY_FT4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_FT4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_FT4 *)ThisPrimAddr + 1);
-}
-inline void PRIM_GetPrim(POLY_F4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_F4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_F4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_F4 *)ThisPrimAddr + 1);
-}
-inline void PRIM_GetPrim(POLY_G4 **Prim)
-{
-    if ((POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_G4) * 10) >= AddrToAvoid)
-        DBG_Error(NULL, "psxsrc/primpool.h", 0x44);
-    *Prim = (POLY_G4 *)ThisPrimAddr;
-    ThisPrimAddr = (POLY_FT4 *)((POLY_G4 *)ThisPrimAddr + 1);
-}
+#include "psxsrc/primpool.h"
 
 /* ---------------------------------------------------------------- TU data ---- */
 struct SPELLFX_DAT SpellFXDat[2];               /* @0x800CC6DC: an uninitialized C++ global lands in .data, after the statics */

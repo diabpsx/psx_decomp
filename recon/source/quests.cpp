@@ -7,8 +7,8 @@
  * not present in the PC source) with per-TU out-of-line copies of its small inline methods.
  * Layouts / prototypes / externs generated from DIABPSX.SYM (tools/symhdr.py -> gen/*.h). */
 #include "diabpsx_types.h"
-#include "psxsrc/cplayer_header.h"
-#include "psxsrc/textfileinfo_header.h"
+#include "psxsrc/cplayer.h"
+#include "psxsrc/dialog.h"
 #include "source/gen/structs_quests.h"
 #include "source/gen/externs_quests.h"
 #include "source/gen/protos_quests.h"
