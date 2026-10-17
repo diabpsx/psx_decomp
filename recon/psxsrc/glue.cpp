@@ -150,25 +150,23 @@ int GLUE_GetMonsterList(void)
     return CurrentMonsterList;
 }
 
+#line 265
 void GLUE_SuspendGame(void)
 {
     struct TASK *T;
 
     T = TSK_Exist(0, 0x4000, -1);
-    if (T == 0) {
-        DBG_Error(0, "psxsrc/GLUE.CPP", 0x10E);
-    }
+    if (T == 0) DBG_Error(0, "psxsrc/GLUE.CPP", 0x10E);
     TSK_MakeTaskInactive(T);
 }
 
+#line 280
 void GLUE_ResumeGame(void)
 {
     struct TASK *T;
 
     T = TSK_Exist(0, 0x4000, -1);
-    if (T == 0) {
-        DBG_Error(0, "psxsrc/GLUE.CPP", 0x11D);
-    }
+    if (T == 0) DBG_Error(0, "psxsrc/GLUE.CPP", 0x11D);
     TSK_MakeTaskActive(T);
 }
 

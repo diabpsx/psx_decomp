@@ -1413,6 +1413,7 @@ static void L5tileFix(void)
     }
 }
 
+#line 1647
 static void DRLG_L5Subs(void)
 {
     int x, y, i, rv;
@@ -1429,26 +1430,20 @@ static void DRLG_L5Subs(void)
                     i = -1;
                     while (rv >= 0) {
                         i++;
-                        if (i == L5BTYPES_SIZE)
-                            i = 0;
-                        if (c == L5BTYPES[i])
-                            rv--;
+                        if (i == L5BTYPES_SIZE) i = 0;
+                        if (c == L5BTYPES[i]) rv--;
                     }
                     if (i == 89) {
                         c = dungeon[x][y - 1];
                         if (L5BTYPES[c] == 79 && mydflags[x + (y - 1) * DMAXX] == 0) {
                             dungeon[x][y - 1] = 90;
-                        } else {
-                            i = 79;
-                        }
+                        } else i = 79;
                     }
                     if (i == 91) {
                         c = dungeon[x + 1][y];
                         if (L5BTYPES[c] == 80 && mydflags[(x + 1) + y * DMAXX] == 0) {
                             dungeon[x + 1][y] = 92;
-                        } else {
-                            i = 80;
-                        }
+                        } else i = 80;
                     }
                     dungeon[x][y] = i;
                 }

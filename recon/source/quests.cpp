@@ -196,6 +196,7 @@ unsigned char ForceQuests(void)
 
 
     if (gbMaxPlayers != 1) return 0;
+
     for (int i = 0; i < MAXQUESTS; i++) {
         if (i == Q_BETRAYER) continue;
         if (currlevel != quests[i]._qlevel) continue;
@@ -378,11 +379,10 @@ void SetReturnLvlPos(void)
     }
 }
 
+#line 490
 void GetReturnLvlPos(void)
 {
-    if (quests[Q_BETRAYER]._qactive == QUEST_DONE) {
-        quests[Q_BETRAYER]._qvar2 = QS_VBRP2;
-    }
+    if (quests[Q_BETRAYER]._qactive == QUEST_DONE) quests[Q_BETRAYER]._qvar2 = QS_VBRP2;
     ViewX = ReturnLvlX;
     ViewY = ReturnLvlY;
     currlevel = (unsigned char)ReturnLvl;
@@ -571,7 +571,9 @@ void StartQuestlog(void)
     }
     if (numqlines < 7) qtopline = ((7 - numqlines) >> 1) * 2 + 6;
     else qtopline = 6;
+
     if (numqlines != 0) qline = qtopline;
+
     questlog = 1;
     qtoffset = 0;
 

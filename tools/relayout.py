@@ -429,7 +429,7 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             out[k][0] = joined
             if kj is not None and kj in rewrites: rewrites[kj] = joined   # the line was itself a rewritten `} else {`
             continue
-        lead = list(group[:-1])
+        lead = [j for j in group[:-1] if not (j in rewrites and rewrites[j] is None)]   # dropped `}` lines cost nothing
         need = target - (cur + len(lead) + 1)
         merged_decls = []   # (index in lead, text) replacements from declaration merges
         while need < 0:
@@ -447,6 +447,20 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             if pair is None: break
             a, text = pair
             merged_decls.append((lead[a], text)); lead.pop(a + 1); need += 1
+        if need < 0 and lead and re.match(r'^\s*\}\s*else\b', code[last_i]):
+            # `if (c) {` (emitted) / stmt (footprint-less, in lead) / `} else ...` (this line): retail wrote the
+            # block brace-less, `if (c) stmt;` with `else ...` on this line
+            j = lead[-1]; k = len(out) - 1
+            while k >= 0 and not out[k][1]: k -= 1
+            if (k >= 0 and out[k][2] is not None and (STMT.match(code[j].strip()) or SIMPLE_STMT.match(code[j].strip()))
+                    and all(blank(x) or comment_only(x) for x in lead[:-1])):
+                head_i = out[k][2]; head_text = rewrites.get(head_i, out[k][0]) or ''
+                if HEAD_BRACE.match(strip_comments(head_text)) and all(code[x].strip() == '' for x in range(head_i + 1, j)):
+                    joined = strip_comments(head_text).rstrip()[:-1].rstrip() + ' ' + lines[j].strip()
+                    out[k][0] = joined
+                    if head_i in rewrites: rewrites[head_i] = joined
+                    rewrites[last_i] = closing_rewrite(lines[last_i])
+                    lead.pop(); need += 1
         brace_join = None
         if need < 0 and lead and (STMT.match(code[last_i].strip()) or SIMPLE_STMT.match(code[last_i].strip())):
             close_k = single_statement_block(code, lead[-1], last_i, close_i)

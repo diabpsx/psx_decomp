@@ -56,6 +56,7 @@ static unsigned char BirdDistanceOK(int WorldXa, int WorldYa, int WorldXb, int W
 static void BirdWorld(BIRDSTRUCT *b, int wx, int wy);
 
 /* @0x800AB73C BIRD.CPP:100 */
+#line 99
 static void AlterBirdPos(BIRDSTRUCT *b, unsigned char rnd)
 {
     int offsx = offset_x[b->dir];
@@ -67,30 +68,42 @@ static void AlterBirdPos(BIRDSTRUCT *b, unsigned char rnd)
         b->flyvar--;
     }
     if (b->flyvar <= 0) {
+
         if (BirdFrig) {
             b->flyvar = ENG_random(5) + 5;
         } else {
             b->flyvar = ENG_random(10) + 5;
         }
         if (b->newdir != b->dir) {
+
             if (rnd) {
                 b->dir += b->rnddir;
+
             } else {
-                if (b->dir < b->newdir) {
-                    b->dir++;
-                } else if (b->dir > b->newdir) {
-                    b->dir--;
-                }
+                if (b->dir < b->newdir) b->dir++;
+                else if (b->dir > b->newdir) b->dir--;
+
             }
-            if (b->dir < 0) {
-                b->dir += 8;
-            } else if (b->dir > 7) {
-                b->dir -= 8;
-            }
+            if (b->dir < 0) b->dir += 8;
+            else if (b->dir > 7) b->dir -= 8;
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
     b->WorldX += offsx;
     b->WorldY += offsy;
+
     BirdWorld(b, b->WorldX, b->WorldY);
 }
 

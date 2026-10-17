@@ -162,6 +162,7 @@ static int DRLG_L3FillRoom(int x1, int y1, int x2, int y2)
     return rv;
 }
 
+#line 482
 static void DRLG_L3CreateBlock(int x, int y, int obs, int dir)
 {
     int blksizex, blksizey, cbd;
@@ -172,77 +173,49 @@ static void DRLG_L3CreateBlock(int x, int y, int obs, int dir)
     blksizey = ENG_random(2) + 3;
 
     if (dir == 0) {
+
         y2 = y - 1;
         y1 = y2 - blksizey;
-        if (blksizex < obs) {
-            x1 = ENG_random(blksizex) + x;
-        }
-        if (blksizex == obs) {
-            x1 = x;
-        }
-        if (blksizex > obs) {
-            x1 = x - ENG_random(blksizex);
-        }
+        if (blksizex < obs) x1 = ENG_random(blksizex) + x;
+        if (blksizex == obs) x1 = x;
+        if (blksizex > obs) x1 = x - ENG_random(blksizex);
         x2 = x1 + blksizex;
     }
     if (dir == 3) {
+
         x2 = x - 1;
         x1 = x2 - blksizex;
-        if (blksizey < obs) {
-            y1 = ENG_random(blksizey) + y;
-        }
-        if (blksizey == obs) {
-            y1 = y;
-        }
-        if (blksizey > obs) {
-            y1 = y - ENG_random(blksizey);
-        }
+        if (blksizey < obs) y1 = ENG_random(blksizey) + y;
+        if (blksizey == obs) y1 = y;
+        if (blksizey > obs) y1 = y - ENG_random(blksizey);
         y2 = y1 + blksizey;
     }
     if (dir == 2) {
+
         y1 = y + 1;
         y2 = y1 + blksizey;
-        if (blksizex < obs) {
-            x1 = ENG_random(blksizex) + x;
-        }
-        if (blksizex == obs) {
-            x1 = x;
-        }
-        if (blksizex > obs) {
-            x1 = x - ENG_random(blksizex);
-        }
+        if (blksizex < obs) x1 = ENG_random(blksizex) + x;
+        if (blksizex == obs) x1 = x;
+        if (blksizex > obs) x1 = x - ENG_random(blksizex);
         x2 = x1 + blksizex;
     }
     if (dir == 1) {
+
         x1 = x + 1;
         x2 = x1 + blksizex;
-        if (blksizey < obs) {
-            y1 = ENG_random(blksizey) + y;
-        }
-        if (blksizey == obs) {
-            y1 = y;
-        }
-        if (blksizey > obs) {
-            y1 = y - ENG_random(blksizey);
-        }
+        if (blksizey < obs) y1 = ENG_random(blksizey) + y;
+        if (blksizey == obs) y1 = y;
+        if (blksizey > obs) y1 = y - ENG_random(blksizey);
         y2 = y1 + blksizey;
     }
-
     contflag = DRLG_L3FillRoom(x1, y1, x2, y2);
     if (contflag == true) {
+
         cbd = ENG_random(4);
-        if (cbd != 0 && dir != 2) {
-            DRLG_L3CreateBlock(x1, y1, blksizey, 0);
-        }
-        if (cbd != 0 && dir != 3) {
-            DRLG_L3CreateBlock(x2, y1, blksizex, 1);
-        }
-        if (cbd != 0 && dir != 0) {
-            DRLG_L3CreateBlock(x1, y2, blksizey, 2);
-        }
-        if (cbd != 0 && dir != 1) {
-            DRLG_L3CreateBlock(x1, y1, blksizex, 3);
-        }
+        if (cbd != 0 && dir != 2) DRLG_L3CreateBlock(x1, y1, blksizey, 0);
+        if (cbd != 0 && dir != 3) DRLG_L3CreateBlock(x2, y1, blksizex, 1);
+        if (cbd != 0 && dir != 0) DRLG_L3CreateBlock(x1, y2, blksizey, 2);
+        if (cbd != 0 && dir != 1) DRLG_L3CreateBlock(x1, y1, blksizex, 3);
     }
 }
 
@@ -287,21 +260,25 @@ static void DRLG_L3FillDiags(void)
     }
 }
 
+#line 582
 static void DRLG_L3FillSingles(void)
 {
     int i, j, v;
 
     for (j = 1; j < DMAXY - 1; j++) {
+
         for (i = 1; i < DMAXX - 1; i++) {
+
             if (dungeon[i][j] == 0) {
+
                 v = dungeon[i - 1][j - 1] + dungeon[i][j - 1] + dungeon[i + 1][j - 1];
                 if (v == 3) {
+
                     v = dungeon[i - 1][j] + dungeon[i + 1][j];
                     if (v == 2) {
+
                         v = dungeon[i - 1][j + 1] + dungeon[i][j + 1] + dungeon[i + 1][j + 1];
-                        if (v == 3) {
-                            dungeon[i][j] = 1;
-                        }
+                        if (v == 3) dungeon[i][j] = 1;
                     }
                 }
             }
@@ -309,6 +286,7 @@ static void DRLG_L3FillSingles(void)
     }
 }
 
+#line 609
 static void DRLG_L3FillStraights(void)
 {
     int i, j;
@@ -317,16 +295,21 @@ static void DRLG_L3FillStraights(void)
     int k, rv;
 
     for (j = 0; j < DMAXY - 1; j++) {
+
         xc = 0;
         for (i = 0; i < 37; i++) {
+
             if (dungeon[i][j] == 0 && dungeon[i][j + 1] == 1) {
-                if (xc == 0) {
-                    xs = i;
-                }
+
+                if (xc == 0) xs = i;
                 xc++;
+
+
             } else {
                 if (xc > 3 && ENG_random(2)) {
+
                     for (k = xs; k < i; k++) {
+
                         rv = ENG_random(2);
                         dungeon[k][j] = rv;
                     }
@@ -336,16 +319,21 @@ static void DRLG_L3FillStraights(void)
         }
     }
     for (j = 0; j < DMAXY - 1; j++) {
+
         xc = 0;
         for (i = 0; i < 37; i++) {
+
             if (dungeon[i][j] == 1 && dungeon[i][j + 1] == 0) {
-                if (xc == 0) {
-                    xs = i;
-                }
+
+                if (xc == 0) xs = i;
                 xc++;
+
+
             } else {
                 if (xc > 3 && ENG_random(2)) {
+
                     for (k = xs; k < i; k++) {
+
                         rv = ENG_random(2);
                         dungeon[k][j + 1] = rv;
                     }
@@ -355,16 +343,21 @@ static void DRLG_L3FillStraights(void)
         }
     }
     for (i = 0; i < DMAXX - 1; i++) {
+
         yc = 0;
         for (j = 0; j < 37; j++) {
+
             if (dungeon[i][j] == 0 && dungeon[i + 1][j] == 1) {
-                if (yc == 0) {
-                    ys = j;
-                }
+
+                if (yc == 0) ys = j;
                 yc++;
+
+
             } else {
                 if (yc > 3 && ENG_random(2)) {
+
                     for (k = ys; k < j; k++) {
+
                         rv = ENG_random(2);
                         dungeon[i][k] = rv;
                     }
@@ -374,16 +367,21 @@ static void DRLG_L3FillStraights(void)
         }
     }
     for (i = 0; i < DMAXX - 1; i++) {
+
         yc = 0;
         for (j = 0; j < 37; j++) {
+
             if (dungeon[i][j] == 1 && dungeon[i + 1][j] == 0) {
-                if (yc == 0) {
-                    ys = j;
-                }
+
+                if (yc == 0) ys = j;
                 yc++;
+
+
             } else {
                 if (yc > 3 && ENG_random(2)) {
+
                     for (k = ys; k < j; k++) {
+
                         rv = ENG_random(2);
                         dungeon[i + 1][k] = rv;
                     }

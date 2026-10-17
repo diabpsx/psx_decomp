@@ -1671,6 +1671,7 @@ static void DRLG_L4TransFix()
 }
 
 /* @0x801544BC */
+#line 1453
 static void DRLG_L4Corners()
 {
     int i, j;
@@ -1679,10 +1680,9 @@ static void DRLG_L4Corners()
         for (i = 1; i < DMAXX - 1; i++) {
             if (dungeon[i][j] >= 18 && dungeon[i][j] <= 30) {
                 if (dungeon[i + 1][j] < 18) {
+
                     dungeon[i][j] += 98;
-                } else if (dungeon[i][j + 1] < 18) {
-                    dungeon[i][j] += 98;
-                }
+                } else if (dungeon[i][j + 1] < 18) dungeon[i][j] += 98;
             }
         }
     }

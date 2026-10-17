@@ -1572,34 +1572,27 @@ static void DRLG_L2TransFix(void)
     }
 }
 
+#line 2709
 static void L2DirtFix(void)
 {
     int i, j;
 
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
-            if (dungeon[i][j] == 13 && dungeon[i + 1][j] != 11) {
-                dungeon[i][j] = 146;
-            }
-            if (dungeon[i][j] == 11 && dungeon[i + 1][j] != 11) {
-                dungeon[i][j] = 144;
-            }
-            if (dungeon[i][j] == 15 && dungeon[i + 1][j] != 11) {
-                dungeon[i][j] = 148;
-            }
-            if (dungeon[i][j] == 10 && dungeon[i][j + 1] != 10) {
-                dungeon[i][j] = 143;
-            }
-            if (dungeon[i][j] == 13 && dungeon[i][j + 1] != 10) {
-                dungeon[i][j] = 146;
-            }
-            if (dungeon[i][j] == 14 && dungeon[i][j + 1] != 15) {
-                dungeon[i][j] = 147;
-            }
+            if (dungeon[i][j] == 13 && dungeon[i + 1][j] != 11) dungeon[i][j] = 146;
+            if (dungeon[i][j] == 11 && dungeon[i + 1][j] != 11) dungeon[i][j] = 144;
+            if (dungeon[i][j] == 15 && dungeon[i + 1][j] != 11) dungeon[i][j] = 148;
+
+            if (dungeon[i][j] == 10 && dungeon[i][j + 1] != 10) dungeon[i][j] = 143;
+            if (dungeon[i][j] == 13 && dungeon[i][j + 1] != 10) dungeon[i][j] = 146;
+            if (dungeon[i][j] == 14 && dungeon[i][j + 1] != 15) dungeon[i][j] = 147;
+
+
         }
     }
 }
 
+#line 2732
 void L2LockoutFix(void)
 {
     int i, j;
@@ -1607,23 +1600,18 @@ void L2LockoutFix(void)
 
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
-            if (dungeon[i][j] == 4 && dungeon[i - 1][j] != 3) {
-                dungeon[i][j] = 1;
-            }
-            if (dungeon[i][j] == 5 && dungeon[i][j - 1] != 3) {
-                dungeon[i][j] = 2;
-            }
+            if (dungeon[i][j] == 4 && dungeon[i - 1][j] != 3) dungeon[i][j] = 1;
+            if (dungeon[i][j] == 5 && dungeon[i][j - 1] != 3) dungeon[i][j] = 2;
         }
     }
+
     for (j = 1; j < DMAXY - 1; j++) {
         for (i = 1; i < DMAXX - 1; i++) {
             if (!(mydflags[i + j * DMAXX] & DLRG_PROTECTED)) {
                 if ((dungeon[i][j] == 2 || dungeon[i][j] == 5) && dungeon[i][j - 1] == 3 && dungeon[i][j + 1] == 3) {
                     doorok = false;
                     while ((dungeon[i][j] == 2 || dungeon[i][j] == 5) && dungeon[i][j - 1] == 3 && dungeon[i][j + 1] == 3) {
-                        if (dungeon[i][j] == 5) {
-                            doorok = true;
-                        }
+                        if (dungeon[i][j] == 5) doorok = true;
                         i++;
                     }
                     if (!doorok && !(mydflags[(i - 1) + j * DMAXX] & DLRG_PROTECTED)) {
@@ -1639,9 +1627,7 @@ void L2LockoutFix(void)
                 if ((dungeon[i][j] == 1 || dungeon[i][j] == 4) && dungeon[i - 1][j] == 3 && dungeon[i + 1][j] == 3) {
                     doorok = false;
                     while ((dungeon[i][j] == 1 || dungeon[i][j] == 4) && dungeon[i - 1][j] == 3 && dungeon[i + 1][j] == 3) {
-                        if (dungeon[i][j] == 4) {
-                            doorok = true;
-                        }
+                        if (dungeon[i][j] == 4) doorok = true;
                         j++;
                     }
                     if (!doorok && !(mydflags[i + (j - 1) * DMAXX] & DLRG_PROTECTED)) {

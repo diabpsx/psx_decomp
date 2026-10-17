@@ -1156,6 +1156,7 @@ void AddObjTraps()
     }
 }
 
+#line 1363
 void AddChestTraps()
 {
     int i, j;
@@ -1165,14 +1166,14 @@ void AddChestTraps()
         for (i = 0; i < MAXDUNX; i++) {
             if (dung_map[i][j].dObject > 0) {
                 oi = dung_map[i][j].dObject - 1;
+
+
+
                 if (object[oi]._otype >= OBJ_CHEST1 && object[oi]._otype <= OBJ_CHEST3 && !object[oi]._oTrapFlag && ENG_random(100) < 10) {
                     object[oi]._otype += OBJ_TCHEST1 - OBJ_CHEST1;
                     object[oi]._oTrapFlag = 1;
-                    if (leveltype == DTYPE_CATACOMBS) {
-                        object[oi]._oVar4 = ENG_random(2);
-                    } else {
-                        object[oi]._oVar4 = ENG_random(3);
-                    }
+                    if (leveltype == DTYPE_CATACOMBS) object[oi]._oVar4 = ENG_random(2);
+                    else object[oi]._oVar4 = ENG_random(3);
                 }
             }
         }
@@ -1389,36 +1390,41 @@ static void restoreplrpos()
     PlacePlayer(1, plr[0]._pVar5, plr[0]._pVar6, 0);
 }
 
+#line 1624
 void InitObjects()
 {
     int textdef = 0;
     unsigned char *setp;
 
     ClrAllObjects();
+
     if (currlevel == 16) {
         AddDiabObjs();
         return;
+
     }
     saveplrpos();
     InitObjFlag = 1;
+
     GetRndSeed();
+
     if (currlevel == 9 && gbMaxPlayers == 1)
         AddSlainHero();
-    if (QuestStatus(Q_MUSHROOM) && currlevel == quests[Q_MUSHROOM]._qlevel && gbMaxPlayers != 2)
-        AddMushPatch();
-    if (currlevel == 4)
-        AddStoryBooks();
-    if (currlevel == 8)
-        AddStoryBooks();
-    if (currlevel == 12)
-        AddStoryBooks();
+
+
+
+
+    if (QuestStatus(Q_MUSHROOM) && currlevel == quests[Q_MUSHROOM]._qlevel && gbMaxPlayers != 2) AddMushPatch();
+
+    if (currlevel == 4) AddStoryBooks();
+    if (currlevel == 8) AddStoryBooks();
+    if (currlevel == 12) AddStoryBooks();
+
     if (leveltype == DTYPE_CATHEDRAL) {
-        if (QuestStatus(Q_BUTCHER))
-            AddTortures();
-        if (QuestStatus(Q_PWATER))
-            AddCandles();
-        if (QuestStatus(Q_LTBANNER))
-            AddObject(OBJ_SIGNCHEST, 2 * setpc_x + 26, 2 * setpc_y + 19);
+        if (QuestStatus(Q_BUTCHER)) AddTortures();
+        if (QuestStatus(Q_PWATER)) AddCandles();
+        if (QuestStatus(Q_LTBANNER)) AddObject(OBJ_SIGNCHEST, 2 * setpc_x + 26, 2 * setpc_y + 19);
+
         InitRndLocBigObj(10, 15, OBJ_SARC);
         AddL1Objs(0, 0, MAXDUNX, MAXDUNY);
         InitRndBarrels();
@@ -1428,16 +1434,13 @@ void InitObjects()
             InitRndLocObj5x5(1, 1, 0x17 /* OBJ_STAND */);
         if (QuestStatus(Q_SCHAMB))
             InitRndLocObj5x5(1, 1, OBJ_BOOK2R);
+
         AddL2Objs(0, 0, MAXDUNX, MAXDUNY);
         AddL2Torches();
         if (QuestStatus(Q_BLIND)) {
-            if (plr[myplr]._pClass == PC_WARRIOR) {
-                textdef = TEXT_BLINDING;
-            } else if (plr[myplr]._pClass == PC_ROGUE) {
-                textdef = TEXT_RBLINDING;
-            } else if (plr[myplr]._pClass == PC_SORCERER) {
-                textdef = TEXT_MBLINDING;
-            }
+            if (plr[myplr]._pClass == PC_WARRIOR) textdef = TEXT_BLINDING;
+            else if (plr[myplr]._pClass == PC_ROGUE) textdef = TEXT_RBLINDING;
+            else if (plr[myplr]._pClass == PC_SORCERER) textdef = TEXT_MBLINDING;
             quests[Q_BLIND]._qmsg = textdef;
             AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w + 1, setpc_y + setpc_h + 1, textdef);
             setp = GRL_LoadFileInMemSig("Levels\\L2Data\\Blind2.DUN", NULL);
@@ -1445,32 +1448,26 @@ void InitObjects()
             MemFreeDbg(setp);
         }
         if (QuestStatus(Q_BLOOD)) {
-            if (plr[myplr]._pClass == PC_WARRIOR) {
-                textdef = TEXT_BLOODY;
-            } else if (plr[myplr]._pClass == PC_ROGUE) {
-                textdef = TEXT_RBLOODY;
-            } else if (plr[myplr]._pClass == PC_SORCERER) {
-                textdef = TEXT_MBLOODY;
-            }
+            if (plr[myplr]._pClass == PC_WARRIOR) textdef = TEXT_BLOODY;
+            else if (plr[myplr]._pClass == PC_ROGUE) textdef = TEXT_RBLOODY;
+            else if (plr[myplr]._pClass == PC_SORCERER) textdef = TEXT_MBLOODY;
             quests[Q_BLOOD]._qmsg = textdef;
             AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y + 3, setpc_x + 2, setpc_y + 7, textdef);
             AddObject(OBJ_PEDISTAL, 2 * setpc_x + 25, 2 * setpc_y + 32);
         }
         InitRndBarrels();
+
     }
     if (leveltype == DTYPE_CAVES) {
         AddL3Objs(0, 0, MAXDUNX, MAXDUNY);
         InitRndBarrels();
+
     }
     if (leveltype == DTYPE_HELL) {
         if (QuestStatus(Q_WARLORD)) {
-            if (plr[myplr]._pClass == PC_WARRIOR) {
-                textdef = TEXT_BLOODWAR;
-            } else if (plr[myplr]._pClass == PC_ROGUE) {
-                textdef = TEXT_RBLOODWAR;
-            } else if (plr[myplr]._pClass == PC_SORCERER) {
-                textdef = TEXT_MBLOODWAR;
-            }
+            if (plr[myplr]._pClass == PC_WARRIOR) textdef = TEXT_BLOODWAR;
+            else if (plr[myplr]._pClass == PC_ROGUE) textdef = TEXT_RBLOODWAR;
+            else if (plr[myplr]._pClass == PC_SORCERER) textdef = TEXT_MBLOODWAR;
             quests[Q_WARLORD]._qmsg = textdef;
             AddBookLever(0, 0, MAXDUNX, MAXDUNY, setpc_x, setpc_y, setpc_x + setpc_w, setpc_y + setpc_h, textdef);
             setp = GRL_LoadFileInMemSig("Levels\\L4Data\\Warlord.DUN", NULL);
@@ -1479,16 +1476,17 @@ void InitObjects()
         }
         if (QuestStatus(Q_BETRAYER) && gbMaxPlayers == 1)
             AddLazStand();
+
         InitRndBarrels();
         AddL4Goodies();
+
     }
     InitRndLocObj(5, 10, OBJ_CHEST1);
     InitRndLocObj(3, 6, OBJ_CHEST2);
     InitRndLocObj(1, 5, OBJ_CHEST3);
-    if (leveltype != DTYPE_HELL)
-        AddObjTraps();
-    if (leveltype > DTYPE_CATHEDRAL)
-        AddChestTraps();
+    if (leveltype != DTYPE_HELL) AddObjTraps();
+    if (leveltype > DTYPE_CATHEDRAL) AddChestTraps();
+
     restoreplrpos();
     InitObjFlag = 0;
 }

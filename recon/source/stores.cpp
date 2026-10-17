@@ -1228,14 +1228,14 @@ void S_StartWSell(void)
 }
 
 /* @0x8006D22C */
+#line 1389
 unsigned char WitchRechargeOk(int i)
 {
+
     unsigned char rv;
 
     rv = 0;
-    if (plr[myplr].InvList[i]._itype == 10) {
-        rv = plr[myplr].InvList[i]._iCharges != plr[myplr].InvList[i]._iMaxCharges;
-    }
+    if (plr[myplr].InvList[i]._itype == 10) rv = plr[myplr].InvList[i]._iCharges != plr[myplr].InvList[i]._iMaxCharges;
     return rv;
 }
 
@@ -2365,22 +2365,30 @@ void TakePlrsMoney(long cost)
 }
 
 /* @0x80070B94 */
+#line 2575
 void SmithBuyItem(void)
 {
+
     int idx;
 
     TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
-    if (plr[myplr].HoldItem._iMagical == 0) {
-        plr[myplr].HoldItem._iIdentified = 0;
-    }
+
+
+    if (plr[myplr].HoldItem._iMagical == 0) plr[myplr].HoldItem._iIdentified = 0;
     StoreAutoPlace();
+
+
+
     idx = (stextlhold - stextup) / 4 + stextvhold;
     if (idx == 0x13) {
         _smithitem[StorePlrNo][19]._itype = -1;
+
     } else {
         for (; _smithitem[StorePlrNo][idx + 1]._itype != -1; idx++) {
+
             _smithitem[StorePlrNo][idx] = _smithitem[StorePlrNo][idx + 1];
         }
+
         _smithitem[StorePlrNo][idx]._itype = -1;
     }
     CalcPlrInv(myplr, 1);

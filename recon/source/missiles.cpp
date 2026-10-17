@@ -705,8 +705,15 @@ void MoveMissilePos(int i)
     }
 }
 
+    /* PSX monster.mMagicRes bit layout confirmed via raw oracle: IMMUNE bits are
+     * 0x8=LIGHTNING(mir==3), 0x10=MAGIC(mir==1), 0x20=FIRE(mir==2); RESIST bits are
+     * 0x1=LIGHTNING(mir==3), 0x2=MAGIC(mir==1), 0x4=FIRE(mir==2) -- NOT this TU's
+     * IMMUNE_MAGIC/RESIST_MAGIC #defines (those are for a different bit layout). */
+#line 825
 unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, unsigned char shift)
 {
+
+
     int hit, hper;
     long dam;
     int mor, mir;
@@ -716,19 +723,20 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
     if (monster[m].mtalkmsg)
         return 0;
     if ((monster[m]._mhitpoints >> 6) <= 0)
+
         return 0;
     if (monster[m].MType->mtype == 0x20 /* MT_ILLWEAV */ && monster[m]._mgoal == 2 /* MGOAL_RETREAT */)
+
         return 0;
-    if (monster[m]._mmode == 14 /* MM_CHARGE (raw oracle literal) */)
-        return 0;
+    if (monster[m]._mmode == 14 ) return 0;
 
     mir = missiledata[t].mResist;
     mor = monster[m].mMagicRes;
-    /* PSX monster.mMagicRes bit layout confirmed via raw oracle: IMMUNE bits are
-     * 0x8=LIGHTNING(mir==3), 0x10=MAGIC(mir==1), 0x20=FIRE(mir==2); RESIST bits are
-     * 0x1=LIGHTNING(mir==3), 0x2=MAGIC(mir==1), 0x4=FIRE(mir==2) -- NOT this TU's
-     * IMMUNE_MAGIC/RESIST_MAGIC #defines (those are for a different bit layout). */
+
+
     if ((mor & 0x8 && mir == MISR_LIGHTNING) || (mor & 0x10 && mir == MISR_MAGIC) || (mor & 0x20 && mir == MISR_FIRE))
+
+
         return 1;
 
     if ((mor & 0x1 && mir == MISR_LIGHTNING) || (mor & 0x2 && mir == MISR_MAGIC) || (mor & 0x4 && mir == MISR_FIRE))
@@ -736,38 +744,43 @@ unsigned char MonsterTrapHit(int m, int mindam, int maxdam, int dist, int t, uns
 
     hit = ENG_random(100);
     hper = 90 - monster[m].mArmorClass - dist;
-    if (hper < 5)
-        hper = 5;
-    if (hper > 95)
-        hper = 95;
+    if (hper < 5) hper = 5;
+    if (hper > 95) hper = 95;
     if (CheckMonsterHit(m, ret))
         return ret;
 
+
+
     if (hit < hper || monster[m]._mmode == MM_STONE) {
+
         dam = ENG_random(maxdam - mindam + 1) + mindam;
-        if (!shift)
-            dam <<= 6;
+        if (!shift) dam <<= 6;
         if (resist)
             monster[m]._mhitpoints -= dam >> 2;
         else
             monster[m]._mhitpoints -= dam;
+
+
+
+
+
         if ((monster[m]._mhitpoints >> 6) <= 0) {
             if (monster[m]._mmode == MM_STONE) {
                 M_StartKill(m, -1);
                 monster[m]._mmode = MM_STONE;
-            } else {
-                M_StartKill(m, -1);
-            }
+            } else M_StartKill(m, -1);
         } else {
             if (resist) {
+
                 PlayEffect(m, 1);
+
+
+
             } else if (monster[m]._mmode == MM_STONE) {
-                if (m >= 4)
-                    M_StartHit(m, -1, dam);
+                if (m >= 4) M_StartHit(m, -1, dam);
                 monster[m]._mmode = MM_STONE;
             } else {
-                if (m >= 4)
-                    M_StartHit(m, -1, dam);
+                if (m >= 4) M_StartHit(m, -1, dam);
             }
         }
     }
@@ -1323,6 +1336,7 @@ void AddArrow(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
         if (plr[id]._pClass == PC_WARRIOR) av += (plr[id]._pLevel - 1) >> 3;
         GetMissileVel(mi, sx, sy, dx, dy, av);
     } else GetMissileVel(mi, sx, sy, dx, dy, 32);
+
 
     missile[mi]._miAnimFrame = GetDirection16(sx, sy, dx, dy) + 1;
 
@@ -4029,6 +4043,7 @@ void MI_FirewallC(int i)
 
 
 
+
         tx = miss->_miVar5 + XDirAdd[miss->_miVar4];
         ty = miss->_miVar6 + YDirAdd[miss->_miVar4];
 
@@ -4086,16 +4101,19 @@ void MI_Apoca(int i)
     } else missile[i]._miDelFlag = 1;
 }
 
-void MI_Wave(int i)
-{
     /* Structurally reconstructed from the raw oracle -- NOT yet byte-verified. PSX bound is 112
      * (confirmed via raw sltiu 0x6F), not MAXDUNX/MAXDUNY(96); uses GetMISSILE(x,y) in place of
      * nMissileTable[dPiece[x][y]] per this TU's established idiom. */
+#line 5264
+void MI_Wave(int i)
+{
+
+
     int dira, dirb, nxa, nya, nxb, nyb;
     int sd, j, f1, f2, id, sx, sy, dx, dy;
-
     f1 = 0;
     f2 = 0;
+
     id = missile[i]._misource;
     sx = missile[i]._mix;
     sy = missile[i]._miy;
@@ -4108,6 +4126,11 @@ void MI_Wave(int i)
     nxa = sx + XDirAdd[sd];
     nya = sy + YDirAdd[sd];
 
+
+
+
+
+
     if (GetMISSILE(nxa, nya) == 0) {
         AddMissile(nxa, nya, nxa + XDirAdd[sd], nya + YDirAdd[sd], plr[id]._pdir, MIS_FIREMOVE, TARGET_MONSTERS, id, 0, missile[i]._mispllvl);
 
@@ -4116,27 +4139,30 @@ void MI_Wave(int i)
         nxb = sx + XDirAdd[sd] + XDirAdd[dirb];
         nyb = sy + YDirAdd[sd] + YDirAdd[dirb];
         for (j = 0; j < 2 + (missile[i]._mispllvl >> 1); j++) {
+
+
+
+
             if (GetMISSILE(nxa, nya) == 0 && f1 == 0 && nxa > 0 && nxa < 112 && nya > 0 && nya < 112) {
                 AddMissile(nxa, nya, nxa + XDirAdd[sd], nya + YDirAdd[sd], plr[id]._pdir, MIS_FIREMOVE, TARGET_MONSTERS, id, 0, missile[i]._mispllvl);
                 nxa += XDirAdd[dira];
                 nya += YDirAdd[dira];
-            } else {
-                f1 = 1;
-            }
+            } else f1 = 1;
+
+
+
+
 
             if (GetMISSILE(nxb, nyb) == 0 && f2 == 0 && nxb > 0 && nxb < 112 && nyb > 0 && nyb < 112) {
                 AddMissile(nxb, nyb, nxb + XDirAdd[sd], nyb + YDirAdd[sd], plr[id]._pdir, MIS_FIREMOVE, TARGET_MONSTERS, id, 0, missile[i]._mispllvl);
                 nxb += XDirAdd[dirb];
                 nyb += YDirAdd[dirb];
-            } else {
-                f2 = 1;
-            }
+            } else f2 = 1;
         }
     }
 
     missile[i]._mirange--;
-    if (missile[i]._mirange == 0)
-        missile[i]._miDelFlag = 1;
+    if (missile[i]._mirange == 0) missile[i]._miDelFlag = 1;
 }
 
 #line 5327

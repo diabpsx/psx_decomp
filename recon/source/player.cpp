@@ -1113,6 +1113,7 @@ void StartPlrHit(PlayerStruct *ptrplr, int dam, unsigned char forcehit)
 
 
 
+
     drawhpflag = TRUE;
 
 
@@ -2085,6 +2086,7 @@ int PM_DoRangeAttack(PlayerStruct *ptrplr)
 
 
 
+
         AddMissile(ptrplr->_px, ptrplr->_py, ptrplr->_pVar1, ptrplr->_pVar2, ptrplr->_pdir, mistype, 0, ptrplr != plr, 4, 0);
 
         PlaySfxLoc(4, ptrplr->_px, ptrplr->_py);
@@ -2371,21 +2373,25 @@ static void ArmorDur(PlayerStruct *ptrplr)
     CalcPlrInv(ptrplr, TRUE);
 }
 
+#line 3355
 int PM_DoGotHit(PlayerStruct *ptrplr)
 {
+
+
+
+
     int rv;
     if (ptrplr->_pVar8 == ptrplr->_pHFrames) {
         StartStand(ptrplr, ptrplr->_pdir);
         ClearPlrPVars(ptrplr);
-        if (ENG_random(4) != 0) {
-            ArmorDur(ptrplr);
-        }
+        if (ENG_random(4) != 0) ArmorDur(ptrplr);
         rv = 1;
     } else {
         ptrplr->_pVar8++;
         rv = 0;
     }
     ChangeLightColour(ptrplr->_plid, 0x23F0);
+
     return rv;
 }
 
@@ -2525,16 +2531,16 @@ void CheckNewPath(PlayerStruct *ptrplr)
     ptrplr->destAction = -1;
 }
 
+#line 3772
 unsigned char PlrDeathModeOK(int p)
 {
     if (p != myplr) {
+
         return TRUE;
     }
-    if (plr[p]._pmode == PM_DEATH) {
-        return TRUE;
-    } else if (plr[p]._pmode == PM_QUIT) {
-        return TRUE;
-    } else if (plr[p]._pmode == PM_NEWLVL) {
+    if (plr[p]._pmode == PM_DEATH) return TRUE;
+    else if (plr[p]._pmode == PM_QUIT) return TRUE;
+    else if (plr[p]._pmode == PM_NEWLVL) {
         return TRUE;
     }
     return FALSE;
@@ -2974,83 +2980,77 @@ void CheckStats(int p)
  * function has in devilution (no netcode on this build). */
 /* SYM confirms retail caches a named `PlayerStruct *player = &plr[p];` local (REG $a2) and an `int
  * ms` -- not a repeated `plr[p]` re-index. */
+#line 4416
 void ModifyPlrStr(int p, int l)
 {
+
+
     PlayerStruct *player = &plr[p];
     int ms = MaxStats[player->_pClass][0];
-    if (player->_pBaseStr + l > ms) {
-        l = ms - player->_pBaseStr;
-    }
+    if (player->_pBaseStr + l > ms) l = ms - player->_pBaseStr;
     player->_pStrength += l;
     player->_pBaseStr += l;
-
     if (player->_pClass == CLASS_ROGUE)
         player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     else
         player->_pDamageMod = player->_pStrength * player->_pLevel / 100;
-
     CalcPlrInv(p, TRUE);
 }
 
+#line 4436
 void ModifyPlrMag(int p, int l)
 {
+
+
     PlayerStruct *player = &plr[p];
     int ms = MaxStats[player->_pClass][1];
-    if (player->_pBaseMag + l > ms) {
-        l = ms - player->_pBaseMag;
-    }
+    if (player->_pBaseMag + l > ms) l = ms - player->_pBaseMag;
     player->_pMagic += l;
     player->_pBaseMag += l;
-
     l <<= 6;
-    if (player->_pClass == CLASS_SORCERER) {
-        l <<= 1;
-    }
+    if (player->_pClass == CLASS_SORCERER) l <<= 1;
     player->_pMaxManaBase += l;
     player->_pMaxMana += l;
+
     if (!(player->_pIFlags & ISPL_NOMANA)) {
         player->_pManaBase += l;
         player->_pMana += l;
     }
-
     CalcPlrInv(p, TRUE);
 }
 
+#line 4461
 void ModifyPlrDex(int p, int l)
 {
+
+
     PlayerStruct *player = &plr[p];
     int ms = MaxStats[player->_pClass][2];
-    if (player->_pBaseDex + l > ms) {
-        l = ms - player->_pBaseDex;
-    }
+    if (player->_pBaseDex + l > ms) l = ms - player->_pBaseDex;
     player->_pDexterity += l;
     player->_pBaseDex += l;
     CalcPlrInv(p, TRUE);
-
     if (player->_pClass == CLASS_ROGUE) {
         player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     }
 }
 
+#line 4479
 void ModifyPlrVit(int p, int l)
 {
+
+
     PlayerStruct *player = &plr[p];
     int ms = MaxStats[player->_pClass][3];
-    if (player->_pBaseVit + l > ms) {
-        l = ms - player->_pBaseVit;
-    }
+    if (player->_pBaseVit + l > ms) l = ms - player->_pBaseVit;
     player->_pVitality += l;
     player->_pBaseVit += l;
-
     l <<= 6;
-    if (player->_pClass == CLASS_WARRIOR) {
-        l <<= 1;
-    }
+    if (player->_pClass == CLASS_WARRIOR) l <<= 1;
     player->_pHPBase += l;
     player->_pMaxHPBase += l;
     player->_pHitPoints += l;
     player->_pMaxHP += l;
-
     CalcPlrInv(p, TRUE);
 }
 
@@ -3079,15 +3079,15 @@ void SetPlrStr(int p, int v)
     }
 }
 
+#line 4529
 void SetPlrMag(int p, int v)
 {
+
+
     PlayerStruct *player = &plr[p];
     player->_pBaseMag = v;
-
     v <<= 6;
-    if (player->_pClass == CLASS_SORCERER) {
-        v <<= 1;
-    }
+    if (player->_pClass == CLASS_SORCERER) v <<= 1;
     player->_pMaxManaBase = v;
     player->_pMaxMana = v;
     CalcPlrInv(p, TRUE);
@@ -3108,15 +3108,15 @@ void SetPlrDex(int p, int v)
     }
 }
 
+#line 4561
 void SetPlrVit(int p, int v)
 {
+
+
     PlayerStruct *player = &plr[p];
     player->_pBaseVit = v;
-
     v <<= 6;
-    if (player->_pClass == CLASS_WARRIOR) {
-        v <<= 1;
-    }
+    if (player->_pClass == CLASS_WARRIOR) v <<= 1;
     player->_pHPBase = v;
     player->_pMaxHPBase = v;
     CalcPlrInv(p, TRUE);
@@ -3130,60 +3130,74 @@ void InitDungMsgs(PlayerStruct *ptrplr)
     ptrplr->pDungMsgs = 0;
 }
 
+#line 4587
 void PlayDungMsgs(void)
 {
-    PlayerStruct *player = &plr[myplr];
 
+
+    PlayerStruct *player = &plr[myplr];
     if (currlevel == 1 && !player->_pLvlVisited[1] && gbMaxPlayers == 1 && !(player->pDungMsgs & 1)) {
+
         sfxdelay = 40;
-        if (player->_pClass == CLASS_WARRIOR) {
-            sfxdnum = 0x338;
-        } else if (player->_pClass == CLASS_ROGUE) {
-            sfxdnum = 0x2C5;
-        } else if (player->_pClass == CLASS_SORCERER) {
-            sfxdnum = 0x25D;
-        }
+
+        if (player->_pClass == CLASS_WARRIOR) sfxdnum = 0x338;
+        else if (player->_pClass == CLASS_ROGUE) sfxdnum = 0x2C5;
+        else if (player->_pClass == CLASS_SORCERER) sfxdnum = 0x25D;
+
+
+
         player->pDungMsgs |= 1;
+
+
     } else if (currlevel == 5 && !player->_pLvlVisited[5] && gbMaxPlayers == 1 && !(player->pDungMsgs & 2)) {
+
         sfxdelay = 40;
-        if (player->_pClass == CLASS_WARRIOR) {
-            sfxdnum = 0x337;
-        } else if (player->_pClass == CLASS_ROGUE) {
-            sfxdnum = 0x2C4;
-        } else if (player->_pClass == CLASS_SORCERER) {
-            sfxdnum = 0x25C;
-        }
+
+        if (player->_pClass == CLASS_WARRIOR) sfxdnum = 0x337;
+        else if (player->_pClass == CLASS_ROGUE) sfxdnum = 0x2C4;
+        else if (player->_pClass == CLASS_SORCERER) sfxdnum = 0x25C;
+
+
+
         player->pDungMsgs |= 2;
+
+
     } else if (currlevel == 9 && !player->_pLvlVisited[9] && gbMaxPlayers == 1 && !(player->pDungMsgs & 4)) {
+
         sfxdelay = 40;
-        if (player->_pClass == CLASS_WARRIOR) {
-            sfxdnum = 0x339;
-        } else if (player->_pClass == CLASS_ROGUE) {
-            sfxdnum = 0x2C6;
-        } else if (player->_pClass == CLASS_SORCERER) {
-            sfxdnum = 0x25E;
-        }
+
+        if (player->_pClass == CLASS_WARRIOR) sfxdnum = 0x339;
+        else if (player->_pClass == CLASS_ROGUE) sfxdnum = 0x2C6;
+        else if (player->_pClass == CLASS_SORCERER) sfxdnum = 0x25E;
+
+
+
         player->pDungMsgs |= 4;
+
+
     } else if (currlevel == 13 && !player->_pLvlVisited[13] && gbMaxPlayers == 1 && !(player->pDungMsgs & 8)) {
+
         sfxdelay = 40;
-        if (player->_pClass == CLASS_WARRIOR) {
-            sfxdnum = 0x33A;
-        } else if (player->_pClass == CLASS_ROGUE) {
-            sfxdnum = 0x2C7;
-        } else if (player->_pClass == CLASS_SORCERER) {
-            sfxdnum = 0x25F;
-        }
+
+        if (player->_pClass == CLASS_WARRIOR) sfxdnum = 0x33A;
+        else if (player->_pClass == CLASS_ROGUE) sfxdnum = 0x2C7;
+        else if (player->_pClass == CLASS_SORCERER) sfxdnum = 0x25F;
+
+
+
         player->pDungMsgs |= 8;
+
+
     } else if (currlevel == 16 && !player->_pLvlVisited[16] && gbMaxPlayers == 1 && !(player->pDungMsgs & 16)) {
+
         sfxdelay = 40;
-        if (player->_pClass == CLASS_WARRIOR) {
-            sfxdnum = 0x348;
-        } else if (player->_pClass == CLASS_ROGUE) {
-            sfxdnum = 0x348;
-        } else if (player->_pClass == CLASS_SORCERER) {
-            sfxdnum = 0x348;
-        }
+
+        if (player->_pClass == CLASS_WARRIOR) sfxdnum = 0x348;
+        else if (player->_pClass == CLASS_ROGUE) sfxdnum = 0x348;
+        else if (player->_pClass == CLASS_SORCERER) sfxdnum = 0x348;
+
         player->pDungMsgs |= 16;
+
     } else {
         sfxdelay = 0;
     }
