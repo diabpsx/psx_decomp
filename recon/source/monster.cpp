@@ -3786,50 +3786,58 @@ void MAI_SnotSpil(int i)
  * it is NOT); (2) the tail `Action=0` gate is `_mmode==MM_STAND ||
  * _mmode==MM_TALK` (not just MM_STAND) -- this function can set _mmode to
  * MM_TALK earlier in its own body, so retail re-checks for that value too. */
+#line 4083
 void MAI_Lazurus(int i)
 {
+
+
     int md;
     MonsterStruct *Monst = &monster[i];
     int _mx;
     int _my;
-
     _mx = ((const MonsterStruct *)Monst)->_mx;
     _my = ((const MonsterStruct *)Monst)->_my;
 
+
     if (Monst->_mmode == MM_STAND) {
         md = M_GetDir(i);
-
         if (dung_map[_mx][_my].dFlags & BFLAG_MONSTACTIVE) {
+
+
             if (gbMaxPlayers == 1) {
                 if (Monst->mtalkmsg == TXT_VB1 && Monst->_mgoal == MG_TALK
                     && plr[myplr]._px == 35 && plr[myplr]._py == 46) {
+
                     Monst->_mmode = MM_TALK;
                     quests[Q_BETRAYER]._qvar1 = 5;
-                    if (!deltaload)
-                        NetSendCmdQuest(1, Q_BETRAYER);
+                    if (!deltaload) NetSendCmdQuest(1, Q_BETRAYER);
                 }
 
                 if (Monst->mtalkmsg == TXT_VB1 && !effect_is_playing(USFX_LAZ1) && Monst->_mgoal == MG_WAITTOTALK) {
+
+
                     ObjChangeMapResync(1, 18, 20, 24);
                     RedoPlayerVision();
                     quests[Q_BETRAYER]._qvar1 = 6;
-                    if (!deltaload)
-                        NetSendCmdQuest(1, Q_BETRAYER);
+                    if (!deltaload) NetSendCmdQuest(1, Q_BETRAYER);
                     Monst->_mgoal = MG_ATTACK;
                     Monst->_msquelch = 255;
                     Monst->mtalkmsg = 0;
                 }
             }
 
-            if (gbMaxPlayers != 1 && Monst->mtalkmsg == TXT_VB1 && Monst->_mgoal == MG_TALK && quests[Q_BETRAYER]._qvar1 < 4) {
+            if (gbMaxPlayers != 1)
+
+                if (Monst->mtalkmsg == TXT_VB1 && Monst->_mgoal == MG_TALK && quests[Q_BETRAYER]._qvar1 < 4) {
                 Monst->_mmode = MM_TALK;
+
+
             }
         }
 
         if (Monst->_mgoal == MG_ATTACK || Monst->_mgoal == MG_RUN_AWAY || Monst->_mgoal == MG_WALK_AROUND1) {
             MAI_Counselor(i);
         }
-
         monster[i]._mdir = md;
         if (Monst->_mmode == MM_STAND || Monst->_mmode == MM_TALK)
             Monst->Action = 0;

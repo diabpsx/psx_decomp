@@ -1810,15 +1810,18 @@ static void DRLG_L5DirtFix(void)
     }
 }
 
+#line 2007
 static void DRLG_L5CornerFix(void)
 {
     int i, j;
 
     for (j = 1; j < DMAXY - 1; j++) {
         for (i = 1; i < DMAXX - 1; i++) {
-            if (!(mydflags[i + j * DMAXX] & DLRG_PROTECTED) && dungeon[i][j] == 17 && dungeon[i - 1][j] == 13 && dungeon[i][j - 1] == 1) {
+            if (!(mydflags[i + j * DMAXX] & DLRG_PROTECTED))
+                if (dungeon[i][j] == 17 && dungeon[i - 1][j] == 13 && dungeon[i][j - 1] == 1) {
                 dungeon[i][j] = 16;
                 mydflags[i + (j - 1) * DMAXX] &= DLRG_PROTECTED;
+
             }
             if (dungeon[i][j] == 202 && dungeon[i + 1][j] == 13 && dungeon[i][j + 1] == 1) {
                 dungeon[i][j] = 8;

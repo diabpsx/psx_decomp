@@ -44,19 +44,24 @@ for base in files:
     # candidates: functions the unsafe mode can lay out that the safe mode cannot
     safe_src = RL.Source(path); RL.MANUAL.clear()
     RL.relayout(safe_src, retail, ours, apply=False, safe=True)
-    deferred = {n for n, why in RL.MANUAL if 'deferred' in why or 'cannot reach' in why or 'would have to share' in why}
+    deferred = {n for n, why in RL.MANUAL if 'deferred' in why or 'cannot reach' in why or 'would have to share' in why
+               or 'statement boundary' in why or 'more statements' in why}
     RL.MANUAL.clear()
     cands = []
     for n in deferred:
-        s = RL.Source(path); RL.MANUAL.clear()
-        rep1, _ = RL.relayout(s, retail, ours, apply=False, safe=False, only=[n])
-        if rep1.get('manual', 0) == 0 and rep1.get('cannot locate', 0) == 0 and sum(rep1.values()):
-            cands.append(n)
+        for choice in ('first', 'last'):
+            RL.NESTED_SPLIT = choice
+            s = RL.Source(path); RL.MANUAL.clear()
+            rep1, _ = RL.relayout(s, retail, ours, apply=False, safe=False, only=[n])
+            if rep1.get('manual', 0) == 0 and rep1.get('cannot locate', 0) == 0 and sum(rep1.values()):
+                cands.append((n, choice)); break
     if not cands:
         print(base, 'no candidates', flush=True); continue
     kept = []
-    for n in cands:
+    tried = set()
+    for n, choice in cands:
         before = path.read_bytes()
+        RL.NESTED_SPLIT = choice
         s = RL.Source(path); RL.MANUAL.clear()
         RL.relayout(s, retail, ours, apply=True, safe=False, only=[n]); s.save()
         ok, why = gate(seg)
@@ -69,7 +74,11 @@ for base in files:
             kept.append(n); ours = fresh   # later functions locate against the fresh dump
         else:
             path.write_bytes(before)
-            print(f'  {base} {n}: reverted ({why.strip()[:120]})', flush=True)
+            ours = symlane(path) or ours   # the dump on disk reflected the reverted text
+            if choice == 'first' and (n, 'last') not in tried:
+                # a nested-if split at the other `&&`
+                tried.add((n, 'last')); cands.append((n, 'last'))
+            print(f'  {base} {n} ({choice}): reverted ({why.strip()[:120]})', flush=True)
     total['kept'] += len(kept); total['reverted'] += len(cands) - len(kept)
     print(base, 'kept', len(kept), 'of', len(cands), flush=True)
 print('TOTAL', dict(total))

@@ -60,10 +60,10 @@ unsigned char effect_is_playing(int nSFX)
 
 
 
-    if (sghStream && sghStream->SfxNo == nSFX)
+    if (sghStream)
 
+        if (sghStream->SfxNo == nSFX)
         return 1;
-
 
     return 0;
 }
@@ -87,21 +87,33 @@ void stream_stop(void)
 }
 
 /* line 127 @0x8003CFB8 */
+#line 126
 void stream_pause(void)
 {
     if (FileSYS == 2) {
+
         SFXTab[1].volume = 0;
         STR_setvolume(&SFXTab[1]);
-        if (sghStream && sghStream->used)
+        if (sghStream)
+
+            if (sghStream->used)
+
+
             STR_SoundCommand(sghStream, 3);
     }
 }
 
 /* line 148 @0x8003D01C */
+#line 147
 void stream_resume(void)
 {
     if (FileSYS == 2) {
-        if (sghStream && sghStream->used)
+
+        if (sghStream)
+
+            if (sghStream->used)
+
+
             STR_SoundCommand(sghStream, 4);
     }
 }
@@ -411,12 +423,15 @@ static int RndSFX(int psfx)
 }
 
 /* line 520 @0x8003D718 */
+#line 519
 void PlaySFX(int psfx)
 {
-    if (psfx == 0 && plr[0].plractive && plr[1].plractive)
-        return;
+    if (psfx == 0)
 
+        if (plr[0].plractive && plr[1].plractive)
+        return;
     psfx = RndSFX(psfx);
+
     PlaySFX_priv(&sgSFX[psfx], 0, 0, 0);
 }
 

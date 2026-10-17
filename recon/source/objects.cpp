@@ -3567,10 +3567,11 @@ void GetObjectStr(int i)
     }
 }
 
+#line 4477
 void AddLamp(int x, int y, int r)
 {
     if (level_lamp[leveltype])
-        AddLight(x, y, r);
+        AddLight(x, y, r); return;
 }
 
 void RestoreObjectLight(void)

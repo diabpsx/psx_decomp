@@ -785,16 +785,24 @@ void Theme_ArmorStand(int t)
     armorFlag = 0;
 }
 
+#line 888
 void Theme_GoatShrine(int t)
 {
+
     int xx, yy;
 
     TFit_GoatShrine(t);
     AddObject(OBJ_GOATSHRINE, themex, themey);
+
     for (yy = themey - 1; yy <= themey + 1; yy++) {
         for (xx = themex - 1; xx <= themex + 1; xx++) {
-            if (dung_map[xx][yy].dTransVal == theme[t].ttval && !GetSOLID(xx, yy) && (xx != themex || yy != themey))
+
+
+            if (dung_map[xx][yy].dTransVal == theme[t].ttval && !GetSOLID(xx, yy))
+
+                if ((xx != themex || yy != themey))
                 AddMonster(xx, yy, DIR_SW, themeVar1, 1);
+
         }
     }
 }

@@ -504,16 +504,23 @@ SFXHDR *STR_PlaySound(unsigned short Name, char flag, int volume, char loop)
 }
 
 /* @0x80099010 STREAM.CPP:736 */
+#line 735
 void STR_setvolume(SFXHDR *sfh)
 {
     voice_attr.mask = 3;
     voice_attr.voice = 1 << sfh->voice;
     voice_attr.volume.left = sfh->volume;
     voice_attr.volume.right = sfh->volume;
+
     LANG_TYPE lang = LANG_GetLang();
-    if ((lang == LANG_FRENCH || lang == LANG_SWEDISH) && sfh->voice == 1) {
+
+    if ((lang == LANG_FRENCH || lang == LANG_SWEDISH))
+
+        if (sfh->voice == 1) {
+
         voice_attr.volume.left <<= 1;
         voice_attr.volume.right <<= 1;
+
     }
     SpuSetVoiceAttr(&voice_attr);
 }

@@ -2172,20 +2172,26 @@ void GetUniqueItem(int i, int _uid)
 }
 
 /* @0x800442B4 ITEMS.CPP:2628 — PSX: UniqueItemFlag gate, currlevel instead of GetEffLevel, NetSendCmdDItem */
+#line 2627
 void SpawnUnique(int uid, int x, int y)
 {
     int ii, itype;
 
-    if (numitems < MAXITEMS && !UniqueItemFlag[uid]) {
+    if (numitems < MAXITEMS)
+
+        if (!UniqueItemFlag[uid]) {
+
         ii = itemavail[0];
         GetSuperItemSpace(x, y, ii);
         itemavail[0] = itemavail[MAXITEMS - numitems - 1];
         itemactive[numitems] = ii;
+
         itype = 0;
         while (AllItemsList[itype].iItemId != UniqueItemList[uid].UIItemId) itype++;
         GetItemAttrs(ii, itype, currlevel);
         GetUniqueItem(ii, uid);
         SetupItem(ii);
+
         if (!deltaload) NetSendCmdDItem(FALSE, ii);
         numitems++;
     }

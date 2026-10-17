@@ -260,6 +260,28 @@ def closing_rewrite(line):
     return m.group(1) + m.group(2)
 
 
+NESTED_SPLIT = 'first'   # which top-level `&&` of `if (A && B && C)` becomes the nesting point: 'first' or 'last'
+
+
+def nested_if_split(line):
+    """`if (A && B) {`-style line -> (indent, leading `} else ` text, A, B, trailing ` {`) at a top-level `&&`,
+    or None when the line is not such an if."""
+    m = re.match(r'^(\s*)((?:\}\s*)?(?:else\s+)?)if\s*\((.*)\)(\s*\{?)\s*$', line.rstrip())
+    if not m: return None
+    cond = m.group(3); depth = 0; cuts = []; j = 0
+    while j < len(cond) - 1:
+        c = cond[j]
+        if c == '(': depth += 1
+        elif c == ')': depth -= 1
+        elif depth == 0 and cond[j:j + 2] == '&&': cuts.append(j)
+        j += 1
+    if not cuts: return None
+    cut = cuts[0] if NESTED_SPLIT == 'first' else cuts[-1]
+    a, b = cond[:cut].strip(), cond[cut + 2:].strip()
+    if not a or not b: return None
+    return m.group(1), m.group(2), a, b, m.group(4).rstrip() and ' {' or ''
+
+
 def lis_keep(values):
     """indexes of a longest non-decreasing subsequence of `values` (the lines that need not move)."""
     n = len(values); best = [1] * n; prev = [-1] * n
@@ -299,10 +321,15 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             return 'same-line', lines[sig_i:open_i + 1], anchor_i, r['line'] - (open_i - sig_i)
         return manual(name, 'one-line function whose retail SLD spans several lines')
     rp = dict(r['points']); op = dict(o['points'])
-    tgt = {}; joins = set(); splits = {}
-    for off, ln in op.items():
+    tgt = {}; joins = set(); splits = {}; nested = {}
+    trailing_return = None
+    for off, ln in sorted(op.items()):
         if off in rp:
             if tgt.setdefault(ln, rp[off]) != rp[off]:
+                if (not safe and off == max(op) and ln == max(op.values()) and rp[off] > tgt[ln]):
+                    # the function's epilogue carries a later retail line than its last statement: retail ended
+                    # the void function with a `return;` on that line (the PC twins end with `return ...;`)
+                    trailing_return = rp[off]; continue
                 return manual(name, f'our line {ln} maps to retail {tgt[ln]} and {rp[off]} (retail has more statements)')
     roff = sorted(rp); ooff = sorted(op)
     # two of our code lines on one retail line: the later one is joined onto the earlier (`for (..) x;`)
@@ -332,6 +359,12 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
         if ln in splits: return manual(name, f'line {ln} would need two splits')
         phys = src.physical_of(ln, logical)
         if len(phys) != 1 or not (SPLIT.match(lines[phys[0]]) or SPLIT_ELSE.match(lines[phys[0]])):
+            if (len(phys) == 1 and not safe and ln not in nested and nested_if_split(code[phys[0]]) is not None
+                    and rp[off] > tgt.get(ln, 0)):
+                # `if (A && B)` where retail's line map has a second statement inside the condition: retail
+                # nested the ifs (a probe showed a split `&&` adds no note, a nested `if` does); the inner
+                # `if (B)` goes on the retail-only point's line.  Which `&&` to split at is tried under the gate.
+                nested[ln] = rp[off]; continue
             return manual(name, f'retail has a statement boundary inside our line {ln}')
         splits[ln] = rp[off]
     if len(r['blocks']) != len(o['blocks']): return manual(name, 'block record counts differ')
@@ -497,6 +530,16 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             out.append([brace_join[1], True, brace_join[0]]); cur = target
             slack_at = None; slack_n = 0
             continue
+        if lg_last in nested:
+            parts = nested_if_split(code[last_i])
+            indent, lead_txt, a, b, tail = parts
+            out.append([f'{indent}{lead_txt}if ({a})', True, last_i]); cur = target
+            gap = nested[lg_last] - cur - 1
+            if gap < 0: return manual(name, 'nested if would go backwards')
+            out.extend([['', False, None] for _ in range(gap)])
+            out.append([f'{indent}    if ({b}){tail}', True, None]); cur = nested[lg_last]
+            slack_at = None; slack_n = 0
+            continue
         if lg_last in splits:
             m = SPLIT.match(last) or SPLIT_ELSE.match(last)
             head, tail = m.group(1), m.group(2).strip()
@@ -508,6 +551,17 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             slack_at = None; slack_n = 0
             continue
         out.append([last, True, last_i]); cur = target
+    if trailing_return is not None:
+        # with an explicit `return;` cc1plus notes the `}` line too and the epilogue carries that note, while
+        # the block-end record keeps the last statement's line: retail's shape is `stmt; return;` on the last
+        # statement's line (probe r2) with the `}` on the epilogue's line
+        k = len(out) - 1
+        while k >= 0 and not out[k][1]: k -= 1
+        if k < 0 or not re.match(r'^\s*\}', code[close_i]): return manual(name, 'trailing return has no statement to follow')
+        out[k][0] = out[k][0].rstrip() + ' return;'
+        gap = trailing_return - cur - 1
+        if gap < 0: return manual(name, 'trailing return would go backwards')
+        out.extend([['', False, None] for _ in range(gap)])
     # the closing braces of blocks made brace-less: dropped, or `} else ...` -> `else ...`
     out_lines = []
     for text, _, j in out:

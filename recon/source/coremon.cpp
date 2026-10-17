@@ -88,17 +88,28 @@ void M_CheckEFlag(int i)
 
 }
 
+#line 138
 void M_ClearSquares(int i)
 {
+
     int mx = monster[i]._moldx;
     int my = monster[i]._moldy;
     int mt = -1 - i;
     int mt2 = i + 1;
 
+
+
     for (int y = my - 1; y <= my + 1; y++) {
+
         for (int x = mx - 1; x <= mx + 1; x++) {
-            if (x < 96 && y < 96 && (dung_map[x][y].dMonster == mt || dung_map[x][y].dMonster == mt2))
+
+            if (x < 96 && y < 96)
+
+                if ((dung_map[x][y].dMonster == mt || dung_map[x][y].dMonster == mt2))
+
                 dung_map[x][y].dMonster = 0;
+
+
         }
     }
 

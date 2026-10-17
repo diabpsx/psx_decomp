@@ -458,9 +458,25 @@ void DeltaAddItem(int ii)
 }
 
 /* @0x8004F560 MSG.CPP:731 */
+#line 730
 int DeltaExportData(char *Dst)
 {
+
+
+
+
+
+
     return GameMaps.ExportData((unsigned char *)Dst);
+
+
+
+
+
+
+
+
+    return;
 }
 
 /* @0x8004F58C MSG.CPP:754 -- single-arg (char *Src is reinterpreted straight as CompressedLevs*);
@@ -715,15 +731,24 @@ void NetSendCmdGItem(unsigned char bHiPri, unsigned char bCmd, unsigned char mas
 }
 
 /* @0x8004FA84 MSG.CPP:1069 */
+#line 1068
 void NetSendCmdGItem2(unsigned char usonly, unsigned char bCmd, unsigned char mast, unsigned char pnum, const TCmdGItem *p)
 {
+
+
+
+
     TCmdGItem cmd = *p;
     cmd.bCmd = bCmd;
     cmd.bPnum = pnum;
+
+
     cmd.bMaster = mast;
     if (!usonly) {
         cmd.dwTime = 0;
         NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
+
+    return;
     }
 }
 
@@ -981,35 +1006,72 @@ static void On_WALKXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8004FFF4 MSG.CPP:1384 */
+#line 1383
 static void On_ADDSTR(const TCmd *pCmd, int pnum)
 {
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
-        ModifyPlrStr(pnum, p->wParam1);
+
+
+
+
+
+
+
+
+
+        ModifyPlrStr(pnum, p->wParam1); return;
 }
 
 /* @0x80050024 MSG.CPP:1403 */
+#line 1402
 static void On_ADDMAG(const TCmd *pCmd, int pnum)
 {
+
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
-        ModifyPlrMag(pnum, p->wParam1);
+
+
+
+        ModifyPlrMag(pnum, p->wParam1); return;
 }
 
 /* @0x80050054 MSG.CPP:1416 */
+#line 1415
 static void On_ADDDEX(const TCmd *pCmd, int pnum)
 {
+
+
+
+
+
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
-        ModifyPlrDex(pnum, p->wParam1);
+
+
+
+        ModifyPlrDex(pnum, p->wParam1); return;
 }
 
 /* @0x80050084 MSG.CPP:1435 */
+#line 1434
 static void On_ADDVIT(const TCmd *pCmd, int pnum)
 {
+
+
+
+
+
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     if (p->wParam1 <= 256)
-        ModifyPlrVit(pnum, p->wParam1);
+
+
+
+        ModifyPlrVit(pnum, p->wParam1); return;
 }
 
 /* @0x800500B4 MSG.CPP:1454 -- spellbook casts use the player's spellbook type. */
@@ -1846,35 +1908,56 @@ static void On_RETOWN(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052248 MSG.CPP:2555 */
+#line 2554
 static void On_SETSTR(const TCmd *pCmd, int pnum)
 {
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    if (p->wParam1 < 0x2EF && pnum != myplr)
-        SetPlrStr(pnum, p->wParam1);
+    if (p->wParam1 < 0x2EF)
+
+
+        if (pnum != myplr)
+        SetPlrStr(pnum, p->wParam1); return;
 }
 
 /* @0x80052288 MSG.CPP:2568 */
+#line 2567
 static void On_SETDEX(const TCmd *pCmd, int pnum)
 {
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    if (p->wParam1 < 0x2EF && pnum != myplr)
-        SetPlrDex(pnum, p->wParam1);
+    if (p->wParam1 < 0x2EF)
+
+
+        if (pnum != myplr)
+        SetPlrDex(pnum, p->wParam1); return;
 }
 
 /* @0x800522C8 MSG.CPP:2582 */
+#line 2581
 static void On_SETMAG(const TCmd *pCmd, int pnum)
 {
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    if (p->wParam1 < 0x2EF && pnum != myplr)
-        SetPlrMag(pnum, p->wParam1);
+    if (p->wParam1 < 0x2EF)
+
+
+        if (pnum != myplr)
+        SetPlrMag(pnum, p->wParam1); return;
 }
 
 /* @0x80052308 MSG.CPP:2596 */
+#line 2595
 static void On_SETVIT(const TCmd *pCmd, int pnum)
 {
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
-    if (p->wParam1 < 0x2EF && pnum != myplr)
+    if (p->wParam1 < 0x2EF)
+
+
+        if (pnum != myplr)
         SetPlrVit(pnum, p->wParam1);
+    return;
 }
 
 /* @0x80052348 MSG.CPP:2610 */

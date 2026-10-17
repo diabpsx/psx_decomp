@@ -2546,42 +2546,47 @@ unsigned char PlrDeathModeOK(int p)
     return FALSE;
 }
 
+#line 3787
 void ValidatePlayer(void)
 {
+
+
     int i, gt, pc;
     unsigned long long msk = 0;
+
     unsigned long long b = 1;
 
-    if (plr[myplr]._pLevel > 50)
-        plr[myplr]._pLevel = 50;
+
+
+
+    if (plr[myplr]._pLevel > 50) plr[myplr]._pLevel = 50;
     if (plr[myplr]._pExperience > plr[myplr]._pNextExper)
         plr[myplr]._pExperience = plr[myplr]._pNextExper;
     gt = 0;
     for (i = 0; i < plr[myplr]._pNumInv; i++) {
         if (plr[myplr].InvList[i]._itype == 11) {
-            if (!goldcheat && plr[myplr].InvList[i]._ivalue > 5000)
+
+            if (!goldcheat)
+
+                if (plr[myplr].InvList[i]._ivalue > 5000)
                 plr[myplr].InvList[i]._ivalue = 5000;
+
             gt += plr[myplr].InvList[i]._ivalue;
         }
     }
-    if (gt != plr[myplr]._pGold)
-        plr[myplr]._pGold = gt;
+    if (gt != plr[myplr]._pGold) plr[myplr]._pGold = gt;
     pc = plr[myplr]._pClass;
-    if (plr[myplr]._pBaseStr > MaxStats[pc][0])
-        plr[myplr]._pBaseStr = MaxStats[pc][0];
-    if (plr[myplr]._pBaseMag > MaxStats[pc][1])
-        plr[myplr]._pBaseMag = MaxStats[pc][1];
-    if (plr[myplr]._pBaseDex > MaxStats[pc][2])
-        plr[myplr]._pBaseDex = MaxStats[pc][2];
-    if (plr[myplr]._pBaseVit > MaxStats[pc][3])
-        plr[myplr]._pBaseVit = MaxStats[pc][3];
+    if (plr[myplr]._pBaseStr > MaxStats[pc][0]) plr[myplr]._pBaseStr = MaxStats[pc][0];
+    if (plr[myplr]._pBaseMag > MaxStats[pc][1]) plr[myplr]._pBaseMag = MaxStats[pc][1];
+    if (plr[myplr]._pBaseDex > MaxStats[pc][2]) plr[myplr]._pBaseDex = MaxStats[pc][2];
+    if (plr[myplr]._pBaseVit > MaxStats[pc][3]) plr[myplr]._pBaseVit = MaxStats[pc][3];
 
     if (!allspellsflag) {
+
         for (i = 1; i < 37; i++) {
             if (spelldata[i].sBookLvl != -1) {
                 msk |= (b << (i - 1));
-                if (plr[myplr]._pSplLvl[i] > 15)
-                    plr[myplr]._pSplLvl[i] = 15;
+                if (plr[myplr]._pSplLvl[i] > 15) plr[myplr]._pSplLvl[i] = 15;
             }
         }
         plr[myplr]._pMemSpells &= msk;

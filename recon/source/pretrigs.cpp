@@ -113,6 +113,7 @@ void InitL1Triggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 189
 void InitL2Triggers(void)
 {
     int i, j;
@@ -120,11 +121,15 @@ void InitL2Triggers(void)
     numtrigs = 0;
     for (j = 0; j < MAXDUNY; j++) {
         for (i = 0; i < MAXDUNX; i++) {
-            if (GetDPiece(i, j) == 0x10B && (i != quests[Q_SCHAMB]._qtx || j != quests[Q_SCHAMB]._qty)) {
+
+            if (GetDPiece(i, j) == 0x10B)
+                if ((i != quests[Q_SCHAMB]._qtx || j != quests[Q_SCHAMB]._qty)) {
                 trigs[numtrigs]._tx = i;
                 trigs[numtrigs]._ty = j;
                 trigs[numtrigs]._tmsg = WM_DIABPREVLVL;
                 numtrigs++;
+
+
             }
             if (GetDPiece(i, j) == 0x22F) {
                 trigs[numtrigs]._tx = i;
@@ -132,6 +137,7 @@ void InitL2Triggers(void)
                 trigs[numtrigs]._tmsg = WM_DIABTWARPUP;
                 trigs[numtrigs]._tlvl = 0;
                 numtrigs++;
+
             }
             if (GetDPiece(i, j) == 0x10F) {
                 trigs[numtrigs]._tx = i;
@@ -178,6 +184,7 @@ void InitL3Triggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 264
 void InitL4Triggers(void)
 {
     int i, j;
@@ -185,11 +192,13 @@ void InitL4Triggers(void)
     numtrigs = 0;
     for (j = 0; j < MAXDUNY; j++) {
         for (i = 0; i < MAXDUNX; i++) {
+
             if (GetDPiece(i, j) == 0x53) {
                 trigs[numtrigs]._tx = i;
                 trigs[numtrigs]._ty = j;
                 trigs[numtrigs]._tmsg = WM_DIABPREVLVL;
                 numtrigs++;
+
             }
             if (GetDPiece(i, j) == 0x1A6) {
                 trigs[numtrigs]._tx = i;
@@ -197,6 +206,7 @@ void InitL4Triggers(void)
                 trigs[numtrigs]._tmsg = WM_DIABTWARPUP;
                 trigs[numtrigs]._tlvl = 0;
                 numtrigs++;
+
             }
             if (GetDPiece(i, j) == 0x78) {
                 trigs[numtrigs]._tx = i;
@@ -209,11 +219,14 @@ void InitL4Triggers(void)
 
     for (j = 0; j < MAXDUNY; j++) {
         for (i = 0; i < MAXDUNX; i++) {
-            if (GetDPiece(i, j) == 0x172 && quests[Q_BETRAYER]._qactive == QUEST_DONE) {
+
+            if (GetDPiece(i, j) == 0x172)
+                if (quests[Q_BETRAYER]._qactive == QUEST_DONE) {
                 trigs[numtrigs]._tx = i;
                 trigs[numtrigs]._ty = j;
                 trigs[numtrigs]._tmsg = WM_DIABNEXTLVL;
                 numtrigs++;
+
             }
         }
     }

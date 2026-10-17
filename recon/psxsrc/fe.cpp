@@ -275,33 +275,63 @@ void FeNewMenu(FeTable *Menu)
 }
 
 /* @0x8013A524 FE.CPP:357 */
+#line 356
 void FePrevMenu(void)
 {
+
+
+
+
     void (*FuncPtr)();
 
-    if (FeCurMenu == &FeNewP2ClassMenu && LoadedChar[0])
+    if (FeCurMenu == &FeNewP2ClassMenu)
+
+
+        if (LoadedChar[0])
+
+
         FeNewP2ClassMenu.PrevMenu = &FeNewP1ClassMenu;
+
+
+
     if (FeCurMenu == &FeDifficultyMenu) {
+
         if (FePlayerNo) {
+
+
             if (LoadedChar[1])
+
+
                 FeDifficultyMenu.PrevMenu = &FeNewP2ClassMenu;
+
+
+
+
         } else {
             if (LoadedChar[0])
+
+
                 FeDifficultyMenu.PrevMenu = &FeNewP1ClassMenu;
+
+
         }
     }
     if (FeCurMenu == &FeNewP2ClassMenu) {
+
         FePlayerNo--;
         FeNoOfPlayers++;
     }
-    if (FeCurMenu != &FeMainMenu && FeCurMenu->PrevMenu) {
+    if (FeCurMenu != &FeMainMenu)
+        if (FeCurMenu->PrevMenu) {
+
         FeCurMenu = (FeTable *)FeCurMenu->PrevMenu;
         FeInitBuffer();
-        if (FeCurMenu->Sel == -1)
-            FeCurMenu->Sel = 1;
+        if (FeCurMenu->Sel == -1) FeCurMenu->Sel = 1;
+
         FuncPtr = FeCurMenu->InitFuncPtr;
         FuncPtr();
         FeMenuDelay = 0;
+
         PlaySFX(0x33);
         JustQuitQText = 0;
     }

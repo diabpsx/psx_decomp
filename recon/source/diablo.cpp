@@ -613,11 +613,21 @@ void ClearOutDungeonMap(void)
             dungeon[x][y] = val;
 }
 
+#line 2689
 void AddQuestItems(void)
 {
-    if (QuestStatus(Q_ROCK) && !quests[Q_ROCK].pad_for_laz)
+    if (QuestStatus(Q_ROCK))
+
+        if (!quests[Q_ROCK].pad_for_laz)
+
         SpawnRock();
-    if (QuestStatus(Q_ANVIL) && !quests[Q_ANVIL].pad_for_laz)
+
+
+
+    if (QuestStatus(Q_ANVIL))
+
+        if (!quests[Q_ANVIL].pad_for_laz)
+
         SpawnQuestItem(IDI_ANVIL, 2 * setpc_x + 27, 2 * setpc_y + 27, 0, 1);
 }
 

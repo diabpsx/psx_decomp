@@ -112,45 +112,68 @@ unsigned long ReadPadStream(void)
 }
 
 /* ---------------------------------------------------------------- @0x800895F8 PADS.CPP:176 */
+#line 175
 void PAD_Handler(void)
 {
-    unsigned long JVal;
-    unsigned long v;
+    unsigned long JVal, v;
     unsigned char fin;
-
     fin = IsGameLoading() | GLUE_Finished();
+
     JVal = ReadPadStream();
+
     if (fin)
+
         cac_pad = 0;
     else
         cac_pad = JVal;
 
+
     if (demo_record_load == 1) {
-        if (!fin && demo_pad_time) {
+
+        if (!fin)
+
+            if (demo_pad_time) {
+
             demo_pad_time--;
             demo_buffer[demo_pad_count++] = ((JVal & 0xF0) >> 4) | ((JVal & 0xF000) >> 8);
             if (!demo_pad_time) {
+
                 save_demo_pad_data(demo_level);
                 printf("Finished Recording\a\n");
+
+
+
+
+
             }
         }
-    } else if (!fin && demo_pad_time) {
+    } else if (!fin)
+
+        if (demo_pad_time) {
+
         PA_SetPauseOk(0);
         demo_pad_time--;
         v = demo_buffer[demo_pad_count++];
         JVal = (JVal & 0xFFFF0F0F) | ((v & 0xF0) << 8) | ((v & 0xF) << 4);
+
         if (!demo_pad_time || cac_pad) {
             demo_finish = 1;
             if (cac_pad) {
+
                 demo_finish = 2;
                 if (cac_pad & 0x800)
+
                     user_start = 1;
+
+
+
             }
         }
     }
 
     Pad0.NewVal(JVal);
     Pad1.NewVal(JVal >> 16);
+
     Pad0.BothNewVal(JVal, JVal >> 16);
     Pad1.BothNewVal(JVal, JVal >> 16);
 }
