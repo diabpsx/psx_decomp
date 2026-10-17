@@ -33,7 +33,7 @@ def functions(recs):
         f[3] = [(a - f[0], ln, fl) for a, ln, fl in pts if f[0] <= a < f[1]]
     return out
 R = functions(load(ROOT + r'\rom\DIABPSX-SYM.txt'))
-O = functions(load(seg if seg.endswith('.txt') else ROOT + r'uild\sn' + seg + '_g.sym.txt'))
+O = functions(load(seg if seg.endswith('.txt') else ROOT + '/build/sn/' + seg + '_g.sym.txt'))
 quiet = '-q' in sys.argv
 ok = bad = 0
 for name in O:
