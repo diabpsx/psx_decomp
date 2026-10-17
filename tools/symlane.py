@@ -33,6 +33,44 @@ SYMMUNGE_SHA256 = "bd51481d903a5d8b55a2f30e7fede023772a5b6e656f50aa242a4663a4e60
 RETAIL = ROOT / "rom" / "DIABPSX-SYM.txt"
 OUT = ROOT / "build" / "sn"
 ENV = dict(os.environ, MSYS2_ARG_CONV_EXCL="*")
+
+# The original build compiled from C:\diabpsx with relative source paths (`source/X.CPP`, `psxsrc/X.CPP`): ASPSX
+# records the working directory as typed plus the upper-cased relative `.file` path, which is the retail SLD
+# file name.  tools/ensure_diabpsx.py makes C:\diabpsx a junction onto recon/; the GLIB C sources were
+# DOS-built, so their records are upper-case throughout (`C:\DIABPSX\GLIBDEV\SOURCE\[PSX\]X.C`).
+SLD_ROOT = Path('C:/diabpsx')
+
+
+def sld_cwd(src: Path) -> str:
+    """The typed working directory the retail SLD file names start with."""
+    if not _under_recon(src):   # diagnostic copies outside recon/: their own directory, bare name
+        return str(src.resolve().parent)
+    rel = src.resolve().relative_to(ROOT / 'recon')
+    try:
+        ok = SLD_ROOT.is_dir() and os.path.samefile(SLD_ROOT, ROOT / 'recon')
+    except OSError:
+        ok = False
+    if not ok:
+        sys.exit('[symlane] C:/diabpsx is not a junction onto recon/; run: python tools/ensure_diabpsx.py')
+    return 'C:' + chr(92) + ('DIABPSX' if rel.parts[0] == 'glibdev' else 'diabpsx')
+
+
+def sld_source(src: Path) -> str:
+    """The relative path the compiler is given (the `.file` directive, `__FILE__`)."""
+    return src.resolve().relative_to(ROOT / 'recon').as_posix() if _under_recon(src) else src.name
+
+
+def _under_recon(src: Path) -> bool:
+    try:
+        src.resolve().relative_to(ROOT / 'recon'); return True
+    except ValueError:
+        return False
+
+
+def sld_cpp_flags():
+    """B.CPP_FLAGS with the recon include root spelled relative, so included headers record as `psxsrc/x.h`."""
+    recon = str(ROOT / 'recon')
+    return ['-I.' if f in ('-I' + recon, '-I' + recon.replace(chr(92), '/')) else f for f in B.CPP_FLAGS]
 GLIB_CC1 = Path(os.environ.get("DIAB_GLIB_CC1", "C:/Temp/windows-gcc-psx/gcc-2.6.3-psx/cc1.exe"))
 DOSBOX = Path(os.environ.get("DIAB_DOSBOX", "C:/Temp/diablo-psx-tool-probes/dosbox/dosbox-staging-v0.83.0/dosbox.exe"))
 
@@ -100,12 +138,14 @@ def compile_dos_cc1(compiler: Path, flags, i_file: Path, s_file: Path):
         return subprocess.CompletedProcess(run.args, 0, run.stdout, run.stderr + log)
 
 
-def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False):
-    """Run a reviewed native ASPSX, including DOS-only historical releases."""
+def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False, cwd=None):
+    """Run a reviewed native ASPSX, including DOS-only historical releases.  `cwd` is the typed working
+    directory ASPSX prefixes to a relative `.file` name (the SLD file record); the DOS lane runs from
+    C:/DIABPSX of its mounted work directory for the same reason."""
     assembler, source, obj = Path(assembler), Path(source), Path(obj)
     if not dos:
         return subprocess.run([str(assembler), *flags, "-o", str(obj), str(source)],
-                              capture_output=True, text=True, cwd=ROOT, env=ENV)
+                              capture_output=True, text=True, cwd=cwd or ROOT, env=ENV)
     if any(not re.fullmatch(r"-[A-Za-z0-9]+", flag) for flag in flags):
         raise ValueError("unsafe DOS ASPSX flag")
     obj.parent.mkdir(parents=True, exist_ok=True)
@@ -113,11 +153,13 @@ def assemble_native(assembler: Path, flags, source: Path, obj: Path, dos=False):
         work = Path(directory)
         shutil.copyfile(assembler, work / "ASPSX.EXE")
         shutil.copyfile(source, work / "IN.S")
-        command = "aspsx " + " ".join(flags) + " IN.S -o OUT.OBJ > AS.LOG"
+        (work / "DIABPSX").mkdir()
+        up = ".." + chr(92)
+        command = up + "ASPSX " + " ".join(flags) + " " + up + "IN.S -o " + up + "OUT.OBJ > " + up + "AS.LOG"
         run = subprocess.run([str(DOSBOX), "--noprimaryconf", "--nolocalconf", "--noautoexec",
                               "--set", "output=texture", "--set", "texture_renderer=software",
                               "--set", "mididevice=none", "--set", "cpu_cycles=max",
-                              "-c", "mount c " + str(work), "-c", "c:", "-c", command, "-c", "exit"],
+                              "-c", "mount c " + str(work), "-c", "c:", "-c", "cd DIABPSX", "-c", command, "-c", "exit"],
                              capture_output=True, text=True, cwd=work,
                              env=dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy"),
                              timeout=90, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
@@ -139,9 +181,10 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     i_file = stem.with_suffix(".i")
     is_cpp = src.suffix.lower() != ".c"
     flags = B.per_tu_flags(src)
+    cwd = sld_cwd(src)   # the retail SLD file name = this directory as typed + the relative source path
     cpp = [B.CPP, "-x", "c", *(["-D__cplusplus=1"] if is_cpp else []),
-           *B.CPP_FLAGS, *flags.get("cpp_extra", []), src, "-o", i_file]
-    r = subprocess.run([str(c) for c in cpp], capture_output=True, text=True, cwd=ROOT)
+           *sld_cpp_flags(), *flags.get("cpp_extra", []), sld_source(src), "-o", i_file]
+    r = subprocess.run([str(c) for c in cpp], capture_output=True, text=True, cwd=cwd)
     if r.returncode: sys.exit(f"[cpp] {rel}\n{r.stderr}")
     g = str(flags.get("g_value", B.G_VALUE))
     base = B.CC1PL_FLAGS if is_cpp else B.CC1_FLAGS
@@ -205,7 +248,8 @@ def compile_g(src: Path, assembler=None, assembler_dos=False, assembler_flags=No
     if not re.fullmatch(r"[0-9]+", assembler_g):
         raise ValueError("invalid assembler -G value")
     r = assemble_native(ASPSX if assembler is None else assembler,
-                        ["-q", *(["-g"] if debug else []), *extra_as, f"-G{assembler_g}"], s_file, obj, assembler_dos)
+                        ["-q", *(["-g"] if debug else []), *extra_as, f"-G{assembler_g}"], s_file, obj, assembler_dos,
+                        cwd=cwd)
     if r.returncode or not obj.exists(): sys.exit(f"[aspsx] {rel}\n{r.stdout}{r.stderr}")
     if names:
         obj.write_bytes(P.rename_sections(obj.read_bytes(), names))

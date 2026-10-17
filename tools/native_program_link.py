@@ -72,7 +72,7 @@ def owners():
             raise ValueError('duplicate hand-assembly owner')
         specs[owner] = {'source': spec['source'], 'image': spec['image'], 'assembler': spec['assembler']}
     specs['map'] = {'source': LS.MAP_MEMBER, 'image': 'diabpsx', 'assembler': '2.56'}
-    specs['gsysasm'] = {'source': 'recon/glibdev/gsysasm.s', 'image': 'diabpsx', 'assembler': '2.56'}
+    specs['gsysasm'] = {'source': 'recon/glibdev/source/psx/gsysasm.s', 'image': 'diabpsx', 'assembler': '2.56'}
     return specs
 
 

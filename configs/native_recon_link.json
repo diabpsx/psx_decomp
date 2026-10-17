@@ -2217,7 +2217,7 @@
     "externals": []
   },
   "gal": {
-    "source": "recon/glibdev/gal.c",
+    "source": "recon/glibdev/source/gal.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2339,7 +2339,7 @@
     ]
   },
   "vrip": {
-    "source": "recon/glibdev/vrip.c",
+    "source": "recon/glibdev/source/psx/vrip.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2381,7 +2381,7 @@
     ]
   },
   "gsys": {
-    "source": "recon/glibdev/gsys.c",
+    "source": "recon/glibdev/source/psx/gsys.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2428,7 +2428,7 @@
     ]
   },
   "gutils": {
-    "source": "recon/glibdev/gutils.c",
+    "source": "recon/glibdev/source/gutils.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2466,7 +2466,7 @@
     "externals": []
   },
   "gdebug": {
-    "source": "recon/glibdev/gdebug.c",
+    "source": "recon/glibdev/source/psx/gdebug.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2513,7 +2513,7 @@
     "externals": []
   },
   "gtimsys": {
-    "source": "recon/glibdev/gtimsys.c",
+    "source": "recon/glibdev/source/psx/gtimsys.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2547,7 +2547,7 @@
     ]
   },
   "tasker": {
-    "source": "recon/glibdev/tasker.c",
+    "source": "recon/glibdev/source/tasker.c",
     "image": "diabpsx",
     "assembler": "2.34",
     "sections": {
@@ -2646,7 +2646,7 @@
     ]
   },
   "tick": {
-    "source": "recon/glibdev/tick.c",
+    "source": "recon/glibdev/source/tick.c",
     "image": "diabpsx",
     "sections": {
       ".text.lib": {
@@ -2679,7 +2679,7 @@
     "externals": []
   },
   "gmain": {
-    "source": "recon/glibdev/gmain.c",
+    "source": "recon/glibdev/source/gmain.c",
     "image": "diabpsx",
     "sections": {
       ".text.lib": {

@@ -85,7 +85,7 @@ class NativeProgramLinkTests(unittest.TestCase):
         self.assertTrue(L.stripped_library_object(L.B.ROOT / 'recon/eaclib/cdstream.c'))
         self.assertTrue(L.stripped_library_object(L.B.ROOT / 'recon/eaclib/ddx.c'))
         self.assertFalse(L.stripped_library_object(L.B.ROOT / 'recon/eaclib/nullfunc.s'))   # EA's .ASM members carried SLD
-        self.assertFalse(L.stripped_library_object(L.B.ROOT / 'recon/glibdev/tasker.c'))
+        self.assertFalse(L.stripped_library_object(L.B.ROOT / 'recon/glibdev/source/tasker.c'))
         self.assertFalse(L.stripped_library_object(L.B.ROOT / 'recon/psxsrc/main.cpp'))
 
     def test_rename_sections_renames_only_the_section_records(self):

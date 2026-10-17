@@ -35,7 +35,7 @@ class GlibNativeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="glib-native-", dir=B.BUILD) as directory:
             with patch.object(S, "OUT", Path(directory)):
                 for name, (code, bss) in expected.items():
-                    obj = S.compile_g(B.ROOT / "recon/glibdev" / (name + ".c"),
+                    obj = S.compile_g(B.ROOT / "recon/glibdev/source" / (name + ".c"),
                                       assembler=ASPSX234, assembler_dos=True,
                                       assembler_flags=[])
                     parsed = P.parse_obj_complete(obj.read_bytes())

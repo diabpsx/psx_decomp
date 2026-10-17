@@ -992,6 +992,21 @@ must run from a `C:\diabpsx\<DIR>` working directory (a junction onto recon/) wi
   `psxsrc/GMAN.CPP`, `source/MLIST.cpp` are those spellings), and the GLIB C files need retail's
   `glibdev/source/[psx/]` layout under recon/ to record `C:\DIABPSX\GLIBDEV\SOURCE\[PSX\]X.C`.
 
+### Round 14a: the SYM lane compiles from C:/diabpsx (2026-10-17)
+
+The SLD file names are exact for every compiled TU and header.  `tools/ensure_diabpsx.py` makes
+`C:/diabpsx` a directory junction onto recon/ (`mklink /J`; RE2's lane uses `subst D:`), and
+symlane.compile_g runs cpp and ASPSX from it: cpp on the relative source path (`source/version.cpp`,
+`-I.` for the recon include root) so the `.file` directive and every header switch are relative,
+ASPSX with the working directory typed as `C:\diabpsx` (game TUs) or `C:\DIABPSX` (GLIB, whose
+retail records are DOS upper-case throughout; the DOS ASPSX 2.34 lane runs from a `DIABPSX`
+subdirectory of its mounted work directory).  The GLIB C sources moved into retail's shape,
+recon/glibdev/source/ and recon/glibdev/source/psx/.  Whole-program SYM after the change: no
+file path differs from retail for any compiled function (the three OBJPRINT PRIMPOOL copies aside);
+the 389 retail-only `88` records are the hand-assembled `.MIP`/`.ASM` members, whose names would
+need the `.MIP` spelling and `C:\DIABPSX\PSXSRC` / `D:\LIB\PSX` working directories (open).
+Diagnostic copies compiled from outside recon/ (the tests' temporary TUs) record their own directory.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

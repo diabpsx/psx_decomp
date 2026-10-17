@@ -92,18 +92,18 @@ PER_TU_FLAGS = {
     **{f"recon/psxsrc/{name}.s": {"g_value": "0"} for name in ("boot", "gte", "replace", "crunch", "gp", "ablock", "overinfo", "lnkopt", "textab")},
     # Climax GLIB C modules use absolute addressing even for four-byte owned
     # commons (TICK/GazTick), proving their original small-data threshold was 0.
-    "recon/glibdev/gmain.c": {"g_value": "0"},
-    "recon/glibdev/tick.c": {"g_value": "0", "assembler_g_value": "8"},
+    "recon/glibdev/source/gmain.c": {"g_value": "0"},
+    "recon/glibdev/source/tick.c": {"g_value": "0", "assembler_g_value": "8"},
     # GLIB code is -G0 (absolute data references), but the objects were assembled with the assembler's
     # default small-data threshold: ASPSX puts each `.lcomm` of 8 bytes or less in .sbss and the larger
     # statics (SchEnv, MemHdrBlocks) in .bss, which is the retail placement.
-    "recon/glibdev/tasker.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gal.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gutils.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gtimsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/vrip.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gsys.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
-    "recon/glibdev/gdebug.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/tasker.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/gal.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/gutils.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/psx/gtimsys.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/psx/vrip.c": {"g_value": "0", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/psx/gsys.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
+    "recon/glibdev/source/psx/gdebug.c": {"g_value": "0", "assembler_g_value": "8", "compiler": "gcc-2.6.3"},
     # Reproduce linker-placed zero commons. These unchanged GAME objects link
     # all text/pool bytes and their typed globals at the retail homes.
     "recon/source/missiles.cpp": {"extra": ["-fconserve-space"]},
