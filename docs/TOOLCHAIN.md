@@ -984,6 +984,13 @@ file-name half of the SLD is a lane matter, not a source one: retail recorded `C
 `C:\diabpsx\PSXSRC\X.CPP` and `C:\DIABPSX\GLIBDEV\SOURCE\[PSX\]X.C`, which ASPSX builds from the
 working directory as typed plus the upper-cased bare `.file` name (RE2's finding), so each compile
 must run from a `C:\diabpsx\<DIR>` working directory (a junction onto recon/) with the bare file name.
+  Verified the same day with a junction `C:\diabpsx` -> recon/ (`mklink /J`, the RE2 lane uses `subst D:`):
+  cpp, cc1plus and ASPSX run from `C:\diabpsx` on `source/VERSION.cpp` produce `.file 1 "source/VERSION.cpp"`
+  and the OBJ records `C:\diabpsx\SOURCE\VERSION.CPP`; the same run from a typed `C:\DIABPSX` records
+  `C:\DIABPSX\SOURCE\VERSION.CPP`.  So ASPSX = working directory as typed + the relative `.file` path
+  upper-cased, `__FILE__` becomes the relative spelling the retail makefile typed (the DBG_Error literals
+  `psxsrc/GMAN.CPP`, `source/MLIST.cpp` are those spellings), and the GLIB C files need retail's
+  `glibdev/source/[psx/]` layout under recon/ to record `C:\DIABPSX\GLIBDEV\SOURCE\[PSX\]X.C`.
 
 ### FRONTEND DLG.CPP data (2026-10-10)
 
