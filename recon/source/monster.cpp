@@ -224,12 +224,14 @@ extern int uniquetrans;
 #define PM_GOTHIT   7
 #define PM_DEATH    8
 
+#line 431
 void DeleteMonster(int i)
 {
+
+
     int temp;
 
-    nummonsters--;
-    temp = monstactive[nummonsters];
+    nummonsters--; temp = monstactive[nummonsters];
     monstactive[nummonsters] = monstactive[i];
     monstactive[i] = temp;
 }
@@ -831,19 +833,22 @@ void M2MStartKill(int i, int mid)
 /* PASS+SYM. `pmonster` is a pointer-to-CONST: loads through it are RTX_UNCHANGING, so sched2
  * drops their memory dependence on the prologue's stack saves and hoists the `_mx` load (plus
  * its s-reg save) above `sw ra` -- the 4-diff prologue residual shared with the MAI_* talkers. */
+#line 1068
 void M_StartKill(int i, int pnum)
 {
+
     const MonsterStruct *pmonster;
     int _mx, _my;
 
     pmonster = monster;
-    pmonster += i;
-    _mx = pmonster->_mx;
+    pmonster += i; _mx = pmonster->_mx;
     _my = pmonster->_my;
 
     if (monster[i]._mmode == MM_STONE) {
+
         MonstPartJump(i);
         RemoveStoneMissiles(i, _mx, _my);
+
     }
 
     delta_kill_monster(i, _mx, _my, currlevel);
@@ -851,6 +856,7 @@ void M_StartKill(int i, int pnum)
         NetSendCmdLocParam1(0, CMD_MONSTDEATH, _mx, _my, i);
     else
         NetSendCmdLocParam1(0, CMD_KILLGOLEM, _mx, _my, currlevel);
+
 
     MonstStartKill(i, pnum, 1);
 }
@@ -5034,18 +5040,23 @@ void M_StartAttack(int i)
 /* PASS+SYM. Logic from hellfire's M_StartWalk (PSX drops the unused `pn` local). Locals per retail
  * SYM (long fx/fy, pmonster, _mx/_my); pmonster is a const view built as `monster; += i` (same
  * lever as M_StartKill -- its loads then don't wait for the `sw ra` save). */
+#line 5809
 void M_StartWalk(int i, int xvel, int yvel, int xadd, int yadd, int EndDir)
 {
     long fx, fy;
     const MonsterStruct *pmonster;
     int _mx, _my;
-
     pmonster = monster;
-    pmonster += i;
-    _mx = pmonster->_mx;
+    pmonster += i; _mx = pmonster->_mx;
     _my = pmonster->_my;
+
+
+
     fx = _mx + xadd;
     fy = _my + yadd;
+
+
+
     dung_map[fx][fy].dMonster = -1 - i;
     monster[i]._mmode = MM_WALK;
     monster[i]._moldx = _mx;

@@ -44,7 +44,7 @@ for base in files:
     # candidates: functions the unsafe mode can lay out that the safe mode cannot
     safe_src = RL.Source(path); RL.MANUAL.clear()
     RL.relayout(safe_src, retail, ours, apply=False, safe=True)
-    deferred = {n for n, why in RL.MANUAL if 'deferred' in why or 'cannot reach' in why}
+    deferred = {n for n, why in RL.MANUAL if 'deferred' in why or 'cannot reach' in why or 'would have to share' in why}
     RL.MANUAL.clear()
     cands = []
     for n in deferred:

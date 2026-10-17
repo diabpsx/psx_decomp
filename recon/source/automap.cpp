@@ -87,19 +87,16 @@ LINE_F2 *AMGetLine(unsigned char R, unsigned char G, unsigned char B)
 }
 
 /* line 202 @0x801620A0 */
+#line 201
 void AmDrawPlayer(int x0, int y0, int x1, int y1, int PNum)
 {
     LINE_F2 *L2;
-
     if (PNum == 0)
         L2 = AMGetLine(0x20, 0xFF, 0);
     else
         L2 = AMGetLine(0xFF, 0, 0xE0);
-
-    L2->x0 = x0;
-    L2->y0 = y0;
-    L2->x1 = x1;
-    L2->y1 = y1;
+    L2->x0 = x0; L2->y0 = y0;
+    L2->x1 = x1; L2->y1 = y1;
 }
 
 /* line 221 @0x80162124 -- twin: devilution DrawAutomapPlr's per-direction 3-segment marker, but each
@@ -300,8 +297,11 @@ void DrawAutoMapHorzGrate(int X, int Y)
 }
 
 /* line 467 @0x8016293C */
+#line 466
 void DrawAutoMapSquare(int X, int Y)
 {
+
+
     LINE_F2 *L2;
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
 
@@ -310,6 +310,7 @@ void DrawAutoMapSquare(int X, int Y)
     Y *= AutoMapScale;
     Lx = (X - Y) * 2;
     Ly = Y + X;
+
     Lx -= Frac * 2;
     Ly -= Frac;
     Lx += AMPlayerX; Ly += AMPlayerY;
@@ -319,28 +320,20 @@ void DrawAutoMapSquare(int X, int Y)
     x3 = Lx + AutoMapScale * 2 - Frac * 2;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = Lx;
-    L2->y0 = y0;
+    L2->x0 = Lx; L2->y0 = y0;
     L2->x1 = x1;
     L2->y1 = y1;
-
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = x1;
-    L2->y0 = y1;
+    L2->x0 = x1; L2->y0 = y1;
     L2->x1 = Lx;
     L2->y1 = y2;
-
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = Lx;
-    L2->y0 = y2;
+    L2->x0 = Lx; L2->y0 = y2;
     L2->x1 = x3;
     L2->y1 = y1;
-
     L2 = AMGetLine(0x5F, 0x58, 0x38);
-    L2->x0 = x3;
-    L2->y0 = y1;
-    L2->x1 = Lx;
-    L2->y1 = y0;
+    L2->x0 = x3; L2->y0 = y1;
+    L2->x1 = Lx; L2->y1 = y0;
 }
 
 /* line 507 @0x80162A70 -- Twin: hellfire

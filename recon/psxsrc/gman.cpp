@@ -1043,26 +1043,34 @@ void TextDat::DoDecompRequests()
 }
 
 /* line 1496 @0x80094068 */
+#line 1495
 void TextDat::FindDecompArea(RECT &R)
 {
-    int NumOfFrames;
-    int Widest;
+    int NumOfFrames, Widest;
     int Tallest;
-
     if (Loaded == 0) DBG_Error(NULL, "psxsrc/GMAN.CPP", 1499);
+
     NumOfFrames = GetNumOfFrames();
     Widest = 0;
     Tallest = 0;
+
     for (int f = 0; f < NumOfFrames; f++) {
+
+
+
         int w;
         int h;
         w = Frames[f].W;
         h = Frames[f].H;
-        if (w > Widest) Widest = w;
-        if (h > Tallest) Tallest = h;
+
+        if (w > Widest)
+            Widest = w;
+
+        if (h > Tallest)
+            Tallest = h;
     }
-    Widest = GU_AlignVal(Widest, 2);
-    R.w = Widest;
+
+    Widest = GU_AlignVal(Widest, 2); R.w = Widest;
     R.h = Tallest;
 }
 
@@ -1244,6 +1252,7 @@ BOOL CTextFileInfo::HasFile(char *Ext) const
 }
 
 /* line 1743 @0x80094788 -- run-length decoder */
+#line 1742
 static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes)
 {
     unsigned char *EndDest;
@@ -1251,32 +1260,41 @@ static void Un64(unsigned char *Src, unsigned char *Dest, long SizeBytes)
     unsigned long Code;
     unsigned long Run;
     unsigned long BigCode;
-
     EndDest = Dest + SizeBytes;
+
     while (Dest < EndDest) {
+
         Code = *Src;
         Run = Code >> 6;
         Src++;
         if (Run) {
             Code &= 0x3f;
         } else {
-            Run = *Src;
-            Src++;
+            Run = *Src; Src++;
         }
         if (Run > 7) {
+
             BigDest = (unsigned long *)(((unsigned long)Dest + 3) & ~3);
+
             while (Dest < (unsigned char *)BigDest) {
+
                 *Dest++ = Code;
                 Run--;
+
             }
             BigCode = Code | (Code << 8) | (Code << 16) | (Code << 24);
+
             while (Run > 3) {
+
                 *BigDest++ = BigCode;
                 Run -= 4;
+
             }
             Dest = (unsigned char *)BigDest;
+
         }
         while (Run != 0) {
+
             *Dest++ = Code;
             Run--;
         }

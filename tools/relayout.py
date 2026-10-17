@@ -410,6 +410,16 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
                 if close_k is not None:
                     joined = head_code[:-1].rstrip() + ' ' + stmt
                     rewrites[close_k] = closing_rewrite(lines[close_k])
+            if joined is None and simple and not safe and STMT.match(head_code.strip()) \
+                    and not any(not blank(j) and not comment_only(j) for j in group[:-1]):
+                # two statements on one retail line (user ruling 2026-10-17): same-value assignments chain
+                # (`sx1 = sy1 = 0;`), anything else sits as two statements on the line; the gate decides
+                a = re.match(r'^(\s*)([A-Za-z_][\w.>\[\]-]*)\s*=\s*([^;=]+);\s*$', head_code)
+                b = re.match(r'^([A-Za-z_][\w.>\[\]-]*)\s*=\s*([^;=]+);\s*$', stmt_code)
+                if a and b and a.group(3).strip() == b.group(2).strip():
+                    joined = f'{a.group(1)}{a.group(2)} = {b.group(1)} = {a.group(3).strip()};'
+                else:
+                    joined = head_code + ' ' + stmt
             if joined is None:
                 # only a complete simple statement joins, and only onto a control head (`for (..)`, `else`)
                 if (not simple or not (head_code.endswith(')') or head_code.endswith('else'))

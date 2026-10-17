@@ -253,16 +253,16 @@ static unsigned short KeyTab[10] = { /* @0x800CD360 */
 
 /* ---------------------------------------------------------------- large dialog/pad functions ---- */
 
+#line 816
 void PrintSelectBack(unsigned short Str)
 {
+
     char *S;
 
     if (Str == 0x49E) {
-        S = GetStr(0x49E);
-        MediumFont.Print(0, 0xDE, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
+        S = GetStr(0x49E); MediumFont.Print(0, 0xDE, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
     } else {
-        S = GetStr(Str);
-        MediumFont.Print(0, 0xE0, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
+        S = GetStr(Str); MediumFont.Print(0, 0xE0, S, JustCentre, NULL, WHITER, WHITEG, WHITEB);
     }
 }
 

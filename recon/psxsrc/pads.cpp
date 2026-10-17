@@ -57,32 +57,55 @@ void PAD_Open(void)
 }
 
 /* ---------------------------------------------------------------- @0x800894E0 PADS.CPP:116 */
+#line 115
 unsigned long ReadPadStream(void)
 {
     unsigned char *p0 = RawPadData0;
     unsigned char *p1 = RawPadData1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     unsigned long rval;
 
     Pad0.SetActive(*p0++ == 0);
     Pad1.SetActive(*p1++ == 0);
+
     Pad0.SetPadType(*p0++);
     Pad1.SetPadType(*p1++);
 
     if (Pad1.CheckActive()) {
-        rval = *p1++;
-        rval <<= 8;
-        rval |= *p1;
-        rval <<= 8;
+
+        rval = *p1++; rval <<= 8;
+        rval |= *p1; rval <<= 8;
+
     } else
         rval = 0xFFFF00;
 
     if (Pad0.CheckActive()) {
-        rval |= *p0++;
-        rval <<= 8;
+
+        rval |= *p0++; rval <<= 8;
         rval |= *p0;
+
     } else {
         rval <<= 8;
         rval |= 0xFFFF;
+
     }
 
     return ~rval;

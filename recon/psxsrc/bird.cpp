@@ -180,29 +180,40 @@ static int GetPerch(BIRDSTRUCT *b)
 }
 
 /* @0x800ABB78 BIRD.CPP:250 */
+#line 249
 static void BIRD_StartHop(BIRDSTRUCT *b)
 {
     int nd = ENG_random(8);
+
+
     int x = offset_x[nd] * hop_height;
     int y = offset_y[nd] * hop_height;
 
     if (!b->leadflag) {
+
         if (!BirdDistanceOK(b->leader->WorldX, b->leader->WorldY, b->WorldX + x, b->WorldY + y))
             nd = GetDirection(b->_bx, b->_by, b->leader->_bx, b->leader->_by);
+
+
     } else {
         Perch *p = &perches[GetPerch(b)];
+
         if (!BirdDistanceOK(p->x << 3, p->y << 3, b->WorldX + x, b->WorldY + y))
             nd = GetDirection(b->_bx, b->_by, p->x, p->y);
+
     }
     b->flyvar = ENG_random(3) + 1;
-    x = offset_x[nd];
-    y = offset_y[nd];
+
+    x = offset_x[nd]; y = offset_y[nd];
     x *= hop_height + b->flyvar;
     y *= hop_height + b->flyvar;
+
     if (!SolidLoc((b->WorldX + x) >> 3, (b->WorldY + y) >> 3)) {
+
         b->dir = nd;
         b->mode = BIRD_HOP;
         b->flytime = hop_height;
+
     } else {
         b->flytime = ENG_random(50) + 10;
     }

@@ -392,77 +392,147 @@ void AddSText(int x, int y, unsigned char j, char *str, char clr, unsigned char 
  * StoreBackRect.w). D_8011BAAC/D_8011BAB0 are un-named oracle string constants; transcribed as their
  * evident literal content (", " and "\n") since the oracle only exposes their addresses, not source
  * names. */
+#line 455
 void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
 {
     char sstr[128];
     int li;
-
     li = 0;
+
     sstr[0] = 0;
     if (x->_iIdentified) {
+
         if (x->_iMagical != 2 && x->_iPrePower != -1) {
+
             PrintItemPower(PL_Prefix[x->_iPrePower].PLPower, x);
             if (tempstr[0])
                 strcat(sstr, tempstr);
         }
         if (x->_iSufPower != -1) {
+
             PrintItemPower(PL_Suffix[x->_iSufPower].PLPower, x);
+
             if (sstr[0] && tempstr[0]) {
+
                 strcat(sstr, "\n");
                 li++;
             }
             if (tempstr[0])
                 strcat(sstr, tempstr);
+
+
+
+
+
+
         }
     }
     if (x->_iMiscId == 0x17 && x->_iMaxCharges) {
+
         sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
+
         if (sstr[0]) {
+
             strcat(sstr, "\n");
             li++;
         }
         strcat(sstr, tempstr);
+
     }
     if (sstr[0]) {
+
         AddSText(0xC, l, 0, sstr, iclr, 0);
-        l += li + 1;
-        li = 0;
+        l += li + 1; li = 0;
+
     }
     sstr[0] = 0;
     if (x->_iClass == 1)
+
+
         sprintf(sstr, "%s:%i-%i", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
-    if (x->_iClass == 2)
-        sprintf(sstr, GetStr(0x2F), x->_iAC);
+
+
+    if (x->_iClass == 2) sprintf(sstr, GetStr(0x2F), x->_iAC);
     const int first = sstr[0];   /* record-less (never named): cse substitutes it for the sstr[0] test below, so the load is hoisted above the durability branches as in retail */
+
+
+
+
+
     if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0) {
-        if (sstr[0])
-            strcat(sstr, "\n");
+
+        if (sstr[0]) strcat(sstr, "\n");
         strcat(sstr, GetStr(0x218));
+
+
+
     } else {
         sprintf(tempstr, GetStr(0x11F), x->_iDurability, x->_iMaxDur);
         if (MediumFont.GetStrWidth(tempstr) + MediumFont.GetStrWidth(sstr) <= StoreBackRect.w * 2 - 0x44)
+
+
+
+
+
+
             strcat(sstr, ", ");
+
+
+
+
+
+
+
+
         if (tempstr)
             strcat(sstr, tempstr);
+
     }
-    if (x->_itype == 0)
-        sstr[0] = 0;
+    if (x->_itype == 0) sstr[0] = 0;
+
+
+
+
+
+
+
+
+
+
     if (!(x->_iMiscId == 0x15 || x->_iMiscId == 0x16 || x->_iMiscId == 0x2 || x->_iMiscId == 0x3 || x->_iMiscId == 0x4 || x->_iMiscId == 0x5 || x->_iMiscId == 0x6 || x->_iMiscId == 0x7 || x->_iMiscId == 0xA || x->_iMiscId == 0xB || x->_iMiscId == 0xC || x->_iMiscId == 0xD || x->_iMiscId == 0xE || x->_iMiscId == 0xF || x->_iMiscId == 0x10 || x->_iMiscId == 0x11 || x->_iMiscId == 0x12 || x->_iMiscId == 0x13 || x->_iMiscId == 0x18))
         strcat(sstr, "\n");
+
     if (x->_iMinStr + x->_iMinMag + x->_iMinDex == 0) {
+
         strcat(sstr, GetStr(0x2D1));
+
+
     } else {
         strcpy(tempstr, GetStr(0x35D));
-        if (x->_iMinStr)
-            sprintf(tempstr, GetStr(0x51C), tempstr, x->_iMinStr);
-        if (x->_iMinMag)
-            sprintf(tempstr, GetStr(0x51B), tempstr, x->_iMinMag);
-        if (x->_iMinDex)
-            sprintf(tempstr, GetStr(0x51A), tempstr, x->_iMinDex);
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if (x->_iMinStr) sprintf(tempstr, GetStr(0x51C), tempstr, x->_iMinStr);
+        if (x->_iMinMag) sprintf(tempstr, GetStr(0x51B), tempstr, x->_iMinMag);
+        if (x->_iMinDex) sprintf(tempstr, GetStr(0x51A), tempstr, x->_iMinDex);
+
+
         strcat(sstr, tempstr);
     }
     AddSText(0xC, l, 0, sstr, iclr, 0);
     l += li + 2;
+
+
     if (x->_iMagical == 2 && x->_iIdentified) {
         if (x->_iMaxDur == 0xFF || x->_iMaxDur == 0)
             AddSText(0xC, l + 1, 0, GetStr(0x4A3), iclr, 0);
