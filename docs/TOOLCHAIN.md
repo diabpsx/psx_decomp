@@ -1050,6 +1050,23 @@ header inline members (PADS.H ... need anchors in the headers), 34 static-initia
   `sx1 = 0; sy1 = 0;`, unknowable from the SLD), reorders the safe rules refuse (71), and the 26
   static-initialiser thunks whose lines follow the globals' definitions.
 
+### Round 14d: layout passes 5-8 (2026-10-17)
+
+More retail idioms the SLD proves, each a relayout rule: two statements on one retail line
+(user ruling: same-value assignments chain, `sx1 = sy1 = 0;`, anything else sits as two
+statements), compact switch cases (`case 2: x = 1; break;`), brace-less `else` bodies and
+if/else chains (`if (c) x;` / `else if (d) y;`), nested ifs where retail's line map has a second
+statement inside one of our `if (A && B)` conditions (a probe showed a split `&&` adds no note, a
+nested `if` does; the inner `if` sits on the retail-only point's line; which `&&` nests is tried
+under the gate), and void functions that end `stmt; return;` on the last statement's line with
+the `}` carrying the epilogue note (probes r1-r10: without a `return;` the epilogue takes the last
+statement's line; with one, the function's `}`; a return inside a block takes its own line).
+`tools/relayout_pass2.py` applies the unsafe ones per function and keeps each only when the TU's
+gate and the function's SLD pass.  State: 1629 functions exact on points and start line (strict
+comparer 1292/2687); residue 1015 TU functions, most in OBJECTS (53), STORES (43), MONSTER (39),
+INV (36), PLAYER (35), MSG (33): structural recoveries per function, with `tools/sldwhy.py` and
+the PC twins as the guide.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's
