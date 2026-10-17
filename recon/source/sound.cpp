@@ -28,10 +28,9 @@ SFXHDR *sghMusic = 0;
 unsigned short sgszMusicTracks[6] = {0x3CD, 0x3CE, 0x3CF, 0x3D0, 0x3D1, 0x3D2};
 
 /* line 108 @0x80077D14 */
+#line 107
 void snd_update(unsigned char bStopAll)
 {
-    /* PC ALLOW_DUP_SOUNDS duplicate-voice sweep -- PSX has no software duplicate-buffer pool
-     * (the SPU has its own hardware voices), so this entry point is a no-op stub. */
 }
 
 /* line 132 @0x80077D1C */
@@ -124,8 +123,8 @@ void music_start(int nTrack)
 {
     if (FileSYS == 2) {
 
-        int MusicVolume;
 
+        int MusicVolume;
 
         if (sghMusic) music_stop();
 

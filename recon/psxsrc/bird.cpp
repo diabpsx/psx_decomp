@@ -348,8 +348,8 @@ static void BIRD_StartFly(BIRDSTRUCT *b)
 
 
     if (leader == NULL) {
-        b++;
 
+        b++;
         for (int i = 0; i < 3; i++)
             BIRD_StartScatter(b++);
     }

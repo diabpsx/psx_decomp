@@ -416,8 +416,8 @@ void GRL_StripDir(char *Dest, const char *Src)
 
     if (BSlash || FSlash) {
 
-        char *Last;
 
+        char *Last;
 
 
         if (!BSlash) BSlash = (char *)Src;

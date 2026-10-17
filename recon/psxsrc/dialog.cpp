@@ -395,8 +395,8 @@ void InitDialog()
     for (int i = 0; i < 6; i++) GU_GetRnd();
 
     for (int y = 0; y < 8; y++) {
-        unsigned char bits = 0;
 
+        unsigned char bits = 0;
         for (int x = 0; x < 8; x++) {
 
             if (GU_GetRnd() % 3 == 0) bits |= 1;

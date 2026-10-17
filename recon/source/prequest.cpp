@@ -154,6 +154,7 @@ void DrawWarLord(int x, int y)
     MemFreeDbg(setp);
 }
 
+#line 264
 void DrawSChamber(int q, int x, int y)
 {
     int i, j;
@@ -162,21 +163,29 @@ void DrawSChamber(int q, int x, int y)
     unsigned char *sp, *setp;
 
     setp = GRL_LoadFileInMemSig("Bonestr1.DUN", NULL);
+
     rw = setp[0];
+
     rh = setp[2];
     sp = setp + 4;
-    setpc_x = x;
-    setpc_y = y;
+
     setpc_w = rw;
     setpc_h = rh;
+    setpc_x = x;
+    setpc_y = y;
+
+
+
     for (j = y; j < rh + y; j++) {
         for (i = x; i < rw + x; i++) {
             dungeon[i][j] = (*sp != 0) ? *sp : 3;
             sp += 2;
         }
     }
+
     xx = 2 * x + 22;
     yy = 2 * y + 23;
+
     quests[q]._qtx = xx;
     quests[q]._qty = yy;
     MemFreeDbg(setp);

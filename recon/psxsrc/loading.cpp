@@ -127,8 +127,8 @@ void UPDATEPROGRESS(int inc)
 
 
 
-    } else {
 
+    } else {
 
 
         for (int i = 0; i < inc * 4; i++) {
@@ -160,30 +160,38 @@ BOOL IsGameLoading(void)
 }
 
 /* @0x800A4654 LOADING.CPP:224 */
+#line 223
 void DrawCutScreen(int lev)
 {
-    unsigned char barr;
-    unsigned char barg;
+    unsigned char barr, barg;
     unsigned short prog;
     Dialog LBack;
     int tx;
     POLY_G4 *G4;
-    int BarOt;
-    int oldDot;
-    int oldTot;
-
+    int BarOt, oldDot, oldTot;
     BarOt = CBlocks::GetOverlayOtBase() + 8;
+
+
     tx = (256 - MediumFont.GetStrWidth(GetStr(0x25A))) / 2 + 32;
+
+
+
+
+
+
     oldDot = LBack.SetOTpos(100);
     oldTot = MediumFont.SetOTpos(100);
     MediumFont.Print(tx, 188, GetStr(0x25A), JustLeft, NULL, WHITER, WHITEG, WHITEG);
+
+
     LBack.SetBack(0x94);
     LBack.SetBorder(0x12);
     LBack.SetRGB(BORDERR, BORDERG, BORDERB);
     LBack.Back(32, 200, 256, 8);
+
     prog = progress;
-    if (prog >= 256)
-        prog = 256;
+    if (prog >= 256) prog = 256;
+
     barg = prog >> 1;
     barr = 128 - barg;
 

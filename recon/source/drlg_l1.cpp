@@ -111,65 +111,45 @@ static unsigned char PWATERIN[];
 unsigned char L5dungeon[80][80];
 
 
+#line 270
 static void DRLG_PlaceDoor(int x, int y)
 {
     unsigned char c;
     unsigned char df;
-
     if ((mydflags[x + y * DMAXX] & DLRG_PROTECTED) == 0) {
-        c = dungeon[x][y];
-        df = mydflags[x + y * DMAXX] & 0x7F;
 
+
+
+        df = mydflags[x + y * DMAXX] & 0x7F;
+        c = dungeon[x][y];
         if (df == 1) {
-            if (y != 1 && c == 2)
-                dungeon[x][y] = 26;
-            if (y != 1 && c == 7)
-                dungeon[x][y] = 31;
-            if (y != 1 && c == 14)
-                dungeon[x][y] = 42;
-            if (y != 1 && c == 4)
-                dungeon[x][y] = 43;
-            if (x != 1 && c == 1)
-                dungeon[x][y] = 25;
-            if (x != 1 && c == 10)
-                dungeon[x][y] = 40;
-            if (x != 1 && c == 6)
-                dungeon[x][y] = 30;
+            if (y != 1 && c == 2) dungeon[x][y] = 26;
+            if (y != 1 && c == 7) dungeon[x][y] = 31;
+            if (y != 1 && c == 14) dungeon[x][y] = 42;
+            if (y != 1 && c == 4) dungeon[x][y] = 43;
+            if (x != 1 && c == 1) dungeon[x][y] = 25;
+            if (x != 1 && c == 10) dungeon[x][y] = 40;
+            if (x != 1 && c == 6) dungeon[x][y] = 30;
         }
         if (df == 2) {
-            if (x != 1 && c == 1)
-                dungeon[x][y] = 25;
-            if (x != 1 && c == 6)
-                dungeon[x][y] = 30;
-            if (x != 1 && c == 10)
-                dungeon[x][y] = 40;
-            if (x != 1 && c == 4)
-                dungeon[x][y] = 41;
-            if (y != 1 && c == 2)
-                dungeon[x][y] = 26;
-            if (y != 1 && c == 14)
-                dungeon[x][y] = 42;
-            if (y != 1 && c == 7)
-                dungeon[x][y] = 31;
+            if (x != 1 && c == 1) dungeon[x][y] = 25;
+            if (x != 1 && c == 6) dungeon[x][y] = 30;
+            if (x != 1 && c == 10) dungeon[x][y] = 40;
+            if (x != 1 && c == 4) dungeon[x][y] = 41;
+            if (y != 1 && c == 2) dungeon[x][y] = 26;
+            if (y != 1 && c == 14) dungeon[x][y] = 42;
+            if (y != 1 && c == 7) dungeon[x][y] = 31;
         }
         if (df == 3) {
-            if (x != 1 && y != 1 && c == 4)
-                dungeon[x][y] = 28;
-            if (x != 1 && c == 10)
-                dungeon[x][y] = 40;
-            if (y != 1 && c == 14)
-                dungeon[x][y] = 42;
-            if (y != 1 && c == 2)
-                dungeon[x][y] = 26;
-            if (x != 1 && c == 1)
-                dungeon[x][y] = 25;
-            if (y != 1 && c == 7)
-                dungeon[x][y] = 31;
-            if (x != 1 && c == 6)
-                dungeon[x][y] = 30;
+            if (x != 1 && y != 1 && c == 4) dungeon[x][y] = 28;
+            if (x != 1 && c == 10) dungeon[x][y] = 40;
+            if (y != 1 && c == 14) dungeon[x][y] = 42;
+            if (y != 1 && c == 2) dungeon[x][y] = 26;
+            if (x != 1 && c == 1) dungeon[x][y] = 25;
+            if (y != 1 && c == 7) dungeon[x][y] = 31;
+            if (x != 1 && c == 6) dungeon[x][y] = 30;
         }
     }
-
     mydflags[x + y * DMAXX] = DLRG_PROTECTED;
 }
 

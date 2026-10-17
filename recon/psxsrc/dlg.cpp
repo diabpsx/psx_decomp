@@ -195,14 +195,19 @@ void ChooseCardLoad(void)
 }
 
 /* @0x80159A08 DLG.CPP:344 */
+#line 343
 void McInitLoadGameMenu(void)
 {
+    fileinfoflag = 0;
+    loadflag = 0;
+
+
+
     FeBackX = 0x20;
     FeBackY = 0x40;
     FeBackW = 0x100;
     FeBackH = 0x70;
-    fileinfoflag = 0;
-    loadflag = 0;
+
     LoadType = 1;
     ChooseCardLoad();
 }

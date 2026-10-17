@@ -312,29 +312,42 @@ void invistimer()
 }
 
 /* @0x8009EB50 DAVEL.CPP:242 */
+#line 241
 void setUVparams(POLY_FT4 *Ft4, FRAME_HDR *Fr)
 {
+
+
     int zU = ((FRAME_TP *)Fr)->U;
     int zV = ((FRAME_TP *)Fr)->V;
     int zW = Fr->W;
     int zH = Fr->H;
 
+
     if (!(((unsigned long *)Fr)[1] & 0x2000000)) {
+
         Ft4->u0 = zU;
         Ft4->v0 = zV;
+
         Ft4->u1 = zU + zW - 1;
         Ft4->v1 = zV;
+
         Ft4->u2 = zU;
         Ft4->v2 = zV + zH - 1;
+
         Ft4->u3 = zU + zW - 1;
         Ft4->v3 = zV + zH - 1;
+
+
     } else {
         Ft4->u0 = zU;
         Ft4->v0 = zV + zW - 2;
+
         Ft4->u2 = zU + zH - 1;
-        Ft4->u1 = zU;
         Ft4->v2 = zV + zW - 2;
+
+        Ft4->u1 = zU;
         Ft4->v1 = zV - 1;
+
         Ft4->u3 = zU + zH - 1;
         Ft4->v3 = zV - 1;
     }

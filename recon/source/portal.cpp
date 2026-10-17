@@ -70,36 +70,53 @@ void AddWarpMissile(int i, int x, int y)
 }
 
 /* @0x80080FE8 PORTAL.CPP:189 */
+#line 188
 void SyncPortals(void)
 {
+
     for (int i = 0; i < MAXPORTAL; i++) {
         if (portal[i].open) {
             if (currlevel == 0) {
+
                 for (int x = 0; x < 112; x++) {
+
                     for (int y = 0; y < 112; y++) {
-                        dung_map[x][y].dMissile = 0;
+
                         dung_map[x][y].dFlags &= ~BFLAG_MISSILE;
+                        dung_map[x][y].dMissile = 0;
                     }
                 }
                 AddWarpMissile(i, WarpDropX[i], WarpDropY[i]);
             } else {
                 if (portal[i].setlvl == setlevel && portal[i].level == currlevel)
+
                     AddWarpMissile(i, portal[i].x, portal[i].y);
             }
+
+
+
+
+
+
+
+
+
         }
     }
 }
 
 /* @0x8008113C PORTAL.CPP:236 */
+#line 235
 void ActivatePortal(int i, int x, int y, int lvl, int lvltype, unsigned char sp)
 {
+
     portal[i].open = 1;
     if (lvl != 0) {
         portal[i].x = x;
         portal[i].y = y;
         portal[i].level = currlevel;
-        portal[i].setlvl = sp;
         portal[i].ltype = lvltype;
+        portal[i].setlvl = sp;
         portal[i].setlvlnum = setlvlnum;
     }
 }

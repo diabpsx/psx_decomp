@@ -36,8 +36,8 @@ static void writeblock(struct block *theblock)
         theblock->fputc(0x80);
         theblock->fputc(0);
 
-
     } else if (theblock->blockrep) {
+
         theblock->fputc(theblock->blockoffset);
         theblock->fputc(theblock->blocksize);
 

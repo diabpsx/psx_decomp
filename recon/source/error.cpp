@@ -46,11 +46,10 @@ void InitDiabloMsg(char e)
     msgdelay = 0x46;
 }
 
+#line 172
 void ClrDiabloMsg(void)
 {
-    for (int i = 0; i < 80; i++)
-        msgtable[i] = 0;
-
+    for (int i = 0; i < 80; i++) msgtable[i] = 0;
     msgflag = 0;
     msgcnt = 0;
 }

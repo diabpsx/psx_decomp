@@ -197,9 +197,9 @@ void LANG_SetLang(enum LANG_TYPE NewLanguageType)
 {
     if (NewLanguageType != LanguageType) {
 
+
         char FileNameBuffer[40];
         FileIO *FIO;
-
         FIO = SYSI_GetFs();
 
         DumpCurrentText();

@@ -163,17 +163,17 @@ static void DRLG_L4Shadows()
 }
 
 /* @0x8014F56C */
+#line 165
 static void InitL4Dungeon()
 {
-    memset(L4dungeon, 0, sizeof(L4dungeon));
 
+    memset(L4dungeon, 0, sizeof(L4dungeon));
     /* clears the whole physical 48x48 dungeon array, not just the DMAXX/DMAXY logical area */
     for (int j = 0; j < 48; j++) {
         for (int i = 0; i < 48; i++) {
             dungeon[i][j] = 30; // L4_DIRT;DIRT_PIC
         }
     }
-
     for (int j = 0; j < DMAXY; j++) {
         for (int i = 0; i < DMAXX; i++) {
             DFLAGS(i, j) = 0;
@@ -2014,29 +2014,43 @@ static void DRLG_L4Pass3()
 }
 
 /* @0x801551F8 */
+#line 1800
 void CreateL4Dungeon(unsigned int rseed, int entry)
 {
     SetRndSeed(rseed);
 
-    dmaxx = 96;
-    dmaxy = 96;
+
+
     dminx = 0;
     dminy = 0;
+    dmaxx = 96;
+    dmaxy = 96;
+
     ViewX = 40;
     ViewY = 40;
 
-    /* reset the 4 "non-b" quad-file caches (quad1, quad2a, quad3a, quad4a) so a fresh top-level
-     * generation reloads them; the "b" variants (2b/3b/4b) are left alone -- matches the oracle. */
     lpSetPiece1 = 0;
     lpSetPiece2 = 0;
     lpSetPiece3 = 0;
     lpSetPiece4 = 0;
+
 
     DRLG_InitSetPC();
     DRLG_LoadL4SP();
     DRLG_L4(entry);
     DRLG_L4Pass3();
     DRLG_FreeL4SP();
+
+
+
+
+
+
+
+
+
+
+
     DRLG_SetPC();
 
     MemFreeDbg(lpSetPiece1);

@@ -475,64 +475,67 @@ void PrintStoreItem(const struct ItemStruct *x, int l, char iclr)
 unsigned char InStoreFlag = 0;   /* @0x8011BAB3 */
 
 /* @0x8006A408 */
+#line 610
 unsigned char StoreAutoPlace(void)
 {
     int i;
-    int w;
-    int h;
+    int w, h;
     int idx;
     unsigned char done;
-
     SetICursor(plr[myplr].HoldItem._iCurs + 0xC);
+
+
     w = icursW28;
     h = icursH28;
     done = 0;
     if (w == 1 && h == 1) {
+
+
         idx = plr[myplr].HoldItem.IDidx;
+
         if (plr[myplr].HoldItem._iStatFlag && AllItemsUseable[idx] && plr[myplr].HoldItem._itype != 11) {
+
             for (i = 0; i < 8 && !done; i++) {
+
                 if (plr[myplr].SpdList[i]._itype == -1) {
+
                     plr[myplr].SpdList[i] = plr[myplr].HoldItem;
                     done = 1;
                 }
             }
+
         }
-        for (i = 30; i <= 39 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 20; i <= 29 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 10; i <= 19 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 0; i <= 9 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 30; i <= 39 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 20; i <= 29 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 10; i <= 19 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 0; i <= 9 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 1 && h == 2) {
-        for (i = 29; i >= 20 && !done; i--)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 9; i >= 0 && !done; i--)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 19; i >= 10 && !done; i--)
-            done = AutoPlace(myplr, i, w, h, 1);
+
+
+        for (i = 29; i >= 20 && !done; i--) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 9; i >= 0 && !done; i--) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 19; i >= 10 && !done; i--) done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 1 && h == 3) {
-        for (i = 0; i < 20 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
+
+
+        for (i = 0; i < 20 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 2 && h == 2) {
-        for (i = 0; i < 10 && !done; i++)
-            done = AutoPlace(myplr, AP2x2Tbl[i], w, h, 1);
-        for (i = 21; i < 29 && !done; i += 2)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 1; i < 9 && !done; i += 2)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 10; i < 19 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
+
+
+        for (i = 0; i < 10 && !done; i++) done = AutoPlace(myplr, AP2x2Tbl[i], w, h, 1);
+
+        for (i = 21; i < 29 && !done; i += 2) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 1; i < 9 && !done; i += 2) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 10; i < 19 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
     }
     if (w == 2 && h == 3) {
-        for (i = 0; i < 9 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
-        for (i = 10; i < 19 && !done; i++)
-            done = AutoPlace(myplr, i, w, h, 1);
+
+
+        for (i = 0; i < 9 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
+        for (i = 10; i < 19 && !done; i++) done = AutoPlace(myplr, i, w, h, 1);
     }
     return done;
 }
@@ -1620,14 +1623,10 @@ void S_StartIdShow(void)
 }
 
 /* @0x8006F49C */
+#line 1900
 void S_StartTalk(void)
 {
-    int i;
-    int tq;
-    int sn;
-    int la;
-    int gl;
-
+    int i, tq, sn, la, gl;
     SItemListFlag = 0;
     stextsize = 0;
     stextscrl = 0;
@@ -1637,20 +1636,29 @@ void S_StartTalk(void)
 
     tq = 0;
     for (i = 0; i < 16; i++) {
-        if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog)
-            tq++;
+
+        if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog) tq++;
     }
+
 
     sn = 10 - (tq >> 1);
     la = 1;
 
+
+
+
+
+
     gl = sn - 2;
     for (i = 0; i < 16; i++) {
+
         if (quests[i]._qactive == 2 && Qtalklist[talker][i] != -1 && quests[i]._qlog) {
+
             AddSText(0, sn, 1, GetStr(questlist[i]._qlstr), 0, 1);
             sn += la;
         }
     }
+
     AddSText(0, gl, 1, GetStr(0x199), 1, 1);
 }
 
@@ -2456,19 +2464,25 @@ unsigned char StoreGoldFit(int idx)
 
 
 /* @0x80071760 */
+#line 2771
 void PlaceStoreGold(long v)
 {
+
     int i, ii, xx, yy;
     unsigned char done;
 
     done = 0;
     for (ii = 0; ii < 40 && !done; ii++) {
+
         yy = 10 * (ii / 10);
         xx = ii % 10;
         if (plr[myplr].InvGrid[xx + yy] == 0) {
             int x;   /* dead local: retail SYM has a record-less level here (it also keeps the loop unrotated) */
             i = plr[myplr]._pNumInv;
+
+
             GetGoldSeed(myplr, &golditem);
+
             plr[myplr].InvList[i] = golditem;
             plr[myplr]._pNumInv++;
             plr[myplr].InvGrid[xx + yy] = plr[myplr]._pNumInv;
@@ -2801,12 +2815,19 @@ void S_BoyEnter(void)
 }
 
 /* @0x80072DD0 */
+#line 3213
 void BoyBuyItem(void)
 {
+
     TakePlrsMoney(plr[myplr].HoldItem._iIvalue);
+
+
     StoreAutoPlace();
-    stextshold = 0xC;
+
+
     _boyitem[StorePlrNo]._itype = -1;
+    stextshold = 0xC;
+
     CalcPlrInv(myplr, 1);
 }
 

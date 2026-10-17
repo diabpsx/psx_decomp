@@ -200,21 +200,19 @@ long CBlockHdr::MakeOffsetTab() const
 }
 
 /* line 408 @0x800924E0 */
+#line 407
 void TextDat::SetUVTp(FRAME_HDR *Fr, POLY_FT4 *FT4, int XFlip, int YFlip)
 {
     int Rotated;
-    int Tpage;
-    int U;
-    int V;
-    int W;
+    int Tpage, U, V, W;
     int H;
-
     Rotated = Fr->Rotated;
     Tpage = ((FRAME_TP *)Fr)->Tpage;
     U = ((FRAME_TP *)Fr)->U;
     V = ((FRAME_TP *)Fr)->V;
     W = Fr->W;
     H = Fr->H;
+
     if (!Rotated) {
         if (XFlip) {
             FT4->u0 = U + W - 1;
@@ -485,21 +483,19 @@ unsigned char *TextDat::GetDecompBufffer(int Size)
 }
 
 /* line 745 @0x80092E74 */
+#line 744
 void TextDat::SetUVTpGT4(FRAME_HDR *Fr, POLY_GT4 *FT4, int XFlip, int YFlip)
 {
     int Rotated;
-    int Tpage;
-    int U;
-    int V;
-    int W;
+    int Tpage, U, V, W;
     int H;
-
     Rotated = Fr->Rotated;
     Tpage = ((FRAME_TP *)Fr)->Tpage;
     U = ((FRAME_TP *)Fr)->U;
     V = ((FRAME_TP *)Fr)->V;
     W = Fr->W;
     H = Fr->H;
+
     if (!Rotated) {
         if (XFlip) {
             FT4->u0 = U + W - 1;
@@ -629,22 +625,21 @@ void TextDat::PrepareGt4(POLY_GT4 *GT4, int Frm, int X, int Y, int XFlip, int YF
 }
 
 /* line 885 @0x800931CC */
+#line 884
 void TextDat::SetUVTpGT3(FRAME_HDR *Fr, POLY_GT3 *GT3)
 {
     int Rotated;
-    int Tpage;
-    int U;
-    int V;
-    int W;
+    int Tpage, U, V, W;
     int H;
-
     Rotated = Fr->Rotated;
     Tpage = ((FRAME_TP *)Fr)->Tpage;
     U = ((FRAME_TP *)Fr)->U;
     V = ((FRAME_TP *)Fr)->V;
     W = Fr->W;
     H = Fr->H;
+
     if (!Rotated) {
+
         GT3->u0 = U;
         GT3->u1 = U + W;
         GT3->u2 = U;
@@ -1116,8 +1111,8 @@ void CCreatureAction::InitDirRemap()
     for (f = 0; f < 8; f++) {
 
         if (Dir2Remap[f]) {
-            int OrigNum = f;                 /* SYM: nested-block locals (block line 19/20) -- the block */
 
+            int OrigNum = f;                 /* SYM: nested-block locals (block line 19/20) -- the block */
 
             for (int g = 0; g < 8; g++) {    /* scoping is what keeps the outer loop UN-rotated */
 

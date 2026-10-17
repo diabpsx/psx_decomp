@@ -220,6 +220,7 @@ BOOL CD_GetCdlFILE(const char *Name, struct CdlFILE *RetFile)
 }
 
 /* @0x80086EE4 CDIO.CPP:292 */
+#line 291
 BOOL CdIO::LoStreamFile(const char *Name, int Slice, BOOL (*Func)(unsigned char *, int, int, BOOL), int Offset, int Size)
 {
     unsigned char *Dest;
@@ -229,54 +230,79 @@ BOOL CdIO::LoStreamFile(const char *Name, int Slice, BOOL (*Func)(unsigned char 
     int ah;
     unsigned char Count;
     int Lumpfile;
-
     Count = 0;
-    if (Size <= 0)
-        DBG_Error(0, "psxsrc/CDIO.CPP", 302);
-    if (Slice <= 0)
-        DBG_Error(0, "psxsrc/CDIO.CPP", 303);
+
+    if (Size <= 0) DBG_Error(0, "psxsrc/CDIO.CPP", 302);
+    if (Slice <= 0) DBG_Error(0, "psxsrc/CDIO.CPP", 303);
+
+
+
+
     Lumpfile = 1;
-    if (CDWAIT)
-        Lumpfile = IsGameLoading() == 1;
-    if (BL_FileExists((char *)Name, Lumpfile) == 0)
-        DBG_Error(0, "psxsrc/CDIO.CPP", 316);
+    if (CDWAIT) Lumpfile = IsGameLoading() == 1;
+
+
+
+
+
+
+    if (BL_FileExists((char *)Name, Lumpfile) == 0) DBG_Error(0, "psxsrc/CDIO.CPP", 316);
+
+
     Slice = 0x8000;
+
     sh = BL_OpenStreamFile((char *)Name, Lumpfile);
-    if (!sh)
-        DBG_Error(0, "psxsrc/CDIO.CPP", 322);
-    OrigSize = Size;
+    if (!sh) DBG_Error(0, "psxsrc/CDIO.CPP", 322);
     Pos = sh->Offset + Offset;
-    Pos += 4;
+
+
+
     Dest = SFXTab[1].mem;
+
+    OrigSize = Size;
+
+    Pos += 4;
+
     while (Size > 0) {
         int SizeToRead;
         unsigned char *ptr;
-
         ptr = Dest;
         SizeToRead = Size;
-        if (Size > Slice)
-            SizeToRead = Slice;
+        if (Size > Slice) SizeToRead = Slice;
+
+
         if (Lumpfile == 1)
             setasyncfile("LUMP.BIN");
         else
             setasyncfile(STREAM_BIN);
+
         ah = asyncloadsegment(Pos, ptr, SizeToRead);
+
+
         do
             systemtask(0);
         while (!getasyncreadstatus(ah));
+
         cancelasyncload(ah);
+
         Func(ptr, OrigSize - Size, SizeToRead, Size == 0);
         Size -= SizeToRead;
+
         Pos += SizeToRead;
         if (Size > 0) {
+
             if (!(Count & 3) && IsGameLoading())
                 UPDATEPROGRESS(4);
+
+
             else
                 TSK_Sleep(1);
+
             Count++;
         }
     }
     BL_CloseStreamFile(sh);
+
     return 1;
 }
 

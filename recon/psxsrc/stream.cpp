@@ -314,76 +314,116 @@ void STR_AllocBuffer(void)
 }
 
 /* @0x80098B74 STREAM.CPP:472 */
+#line 471
 void STR_Init(void)
 {
     if (!STRInit) {
+
         long vm = GetVideoMode();
         switch (vm) {
+
+
         case 0:
             frame_rate = 60;
             break;
+
+
         case 1:
             frame_rate = 50;
+
+
             break;
         }
         STR_AllocBuffer();
+
+
+
         unsigned char *ptr = (unsigned char *)STR_Buffer;
+
         Time = 0;
         for (int i = 0; i < 2; i++) {
-            SFXTab[i].mem = ptr;
-            ptr += 0x9000;
+
             SFXTab[i].used = 0;
             SFXTab[i].SPUstreamaddr = 0;
+            SFXTab[i].mem = ptr;
             SFXTab[i].voice = i;
+            ptr += 0x9000;
         }
+
+
+
+
+
         TASK *T = TSK_AddTask(0, (void (*)())STR_SystemTask, 0x800, 0);
         ASSERT(T, 0x1FF);
         TSK_MakeTaskImmortal(T);
         InitCDWaitIcon();
+
         sglMasterVolume = 0xE6;
         sglMusicVolume = 0x1FFF;
         sglSoundVolume = 0x1FFF;
         sglSpeechVolume = 0x1FFF;
+
         STRInit = true;
     }
 }
 
 /* @0x80098CA0 STREAM.CPP:531 */
+#line 530
 SFXHDR *STR_InitStream(char flag)
 {
     SFXHDR *sfh = &SFXTab[flag];
 
+
+
     if (sfh->used == 0) {
+
     sfh->used = 1;
+
     sfh->state = 1;
     sfh->framecount = VID_GetTick();
     sfh->lastcount = VID_GetTick();
-    sfh->stream_playing = 2;
-    sfh->pitch = 0x3FC;
+
     sfh->stream_sec = 0;
     sfh->stream_pos = 0;
     sfh->sec_num = 0;
+
     sfh->SPU_frame = 0;
     sfh->SPU_sec = 0;
     sfh->SPU_pos = 0;
     sfh->SPU_sec_num = 0;
+
     sfh->stream_offs = 0;
+    sfh->stream_playing = 2;
     sfh->playing = 0;
     sfh->stream_read = 0;
     sfh->stream_stall = 0;
     sfh->stream_ending = 0;
+
     sfh->voice = flag;
+    sfh->pitch = 0x3FC;
+
     sfh->DMA_size = 0;
     sfh->ChunkGot = 0;
     sfh->spu_rate = 0x69;
+
+
+
+
+
+
+
     sfh->SPUstreamaddr = SpuMalloc(0x8EA0);
     ASSERT(sfh->SPUstreamaddr != -1, 0x23E);
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(sfh->SPUstreamaddr);
     SpuWrite0(0x8E80);
     SpuIsTransferCompleted(1);
+
     NoActiveStreams++;
+
     return sfh;
+
     }
     return NULL;
 }
@@ -928,8 +968,8 @@ void STR_StreamMainTask(SFXHDR *sfh, char FileType)
     struct DEF_ARGS *A;
     if (sh) {
 
-        TASK *T2;
 
+        TASK *T2;
 
         sfh->SizeIn = sh->Size;
 

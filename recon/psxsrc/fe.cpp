@@ -428,12 +428,16 @@ void InitFrontEnd(FE_CREATE *CreateStruct)
 }
 
 /* @0x8013ABA4 FE.CPP:595 */
+#line 594
 void FeInitMainMenu(void)
 {
-    cardondelay = 5;
+
     AlertTxt = 0;
+    cardondelay = 5;
+
     if (MemCardActive == 1)
         MemcardOFF();
+
     FeAddTable(FeMainMenuTable, 5);
     FeBackX = 8;
     FeBackY = 0x20;
@@ -663,55 +667,75 @@ void FeInitNewP2NameMenu(void)
 }
 
 /* @0x8013B4EC FE.CPP:945 */
+#line 944
 void FeNewNameMenuCtrl(void)
 {
     if (qtextflag || CDWAIT || PauseMode)
+
+
         return;
     if (DavesPad & 4) {
+
         FeCurMenu->Sel--;
-        if (FeCurMenu->Sel % 10 == 0)
-            FeCurMenu->Sel += 10;
+
+
+
+        if (FeCurMenu->Sel % 10 == 0) FeCurMenu->Sel += 10;
         PlaySFX(0x32);
     }
     if (DavesPad & 8) {
+
         FeCurMenu->Sel++;
-        if (FeCurMenu->Sel % 10 == 1)
-            FeCurMenu->Sel -= 10;
+
+
+
+        if (FeCurMenu->Sel % 10 == 1) FeCurMenu->Sel -= 10;
         PlaySFX(0x32);
     }
     if (DavesPad & 1) {
+
         FeCurMenu->Sel -= 10;
-        if (FeCurMenu->Sel <= 0)
-            FeCurMenu->Sel += 40;
+        if (FeCurMenu->Sel <= 0) FeCurMenu->Sel += 40;
         PlaySFX(0x32);
     }
     if (DavesPad & 2) {
+
         FeCurMenu->Sel += 10;
-        if (FeCurMenu->Sel > 40)
-            FeCurMenu->Sel -= 40;
+        if (FeCurMenu->Sel > 40) FeCurMenu->Sel -= 40;
         PlaySFX(0x32);
     }
     if (DavesPad & 0x100) {
+
         FePrevMenu();
+
+
     } else {
         if (DavesPad & 0x10) {
+
             if (strlen(FePlayerName[FePlayerNo]) == 0) {
                 PlaySFX(0x3D3);
+
             } else {
                 PlaySFX(0x33);
                 if (FeNoOfPlayers > 0) {
-                    FeNoOfPlayers--;
+
                     FePlayerNo++;
+                    FeNoOfPlayers--;
                     FeNewMenu(&FeNewP2ClassMenu);
+
                 } else {
                     FeNewMenu(&FeDifficultyMenu);
                 }
             }
         }
         if (DavesPad & 0x40) {
+
             if (FeBuffer[FeCurMenu->Sel].Str == 0x107B || FeBuffer[FeCurMenu->Sel].Str == 0x107D) {
+
                 if (strlen(FePlayerName[FePlayerNo]) != 0)
                     PlaySFX(0x33);
+
+
                 else
                     PlaySFX(0x3D3);
             } else {
@@ -719,38 +743,54 @@ void FeNewNameMenuCtrl(void)
                     PlaySFX(0x33);
                 else
                     PlaySFX(0x3D3);
+
             }
             if (FeBuffer[FeCurMenu->Sel].Str == 0x107B) {
+
                 if (FePlayerNameFlag[FePlayerNo]) {
+
                     FePlayerName[FePlayerNo][0] = 0;
                     FePlayerNameFlag[FePlayerNo] = 0;
                 }
                 if (strlen(FePlayerName[FePlayerNo]) != 0)
+
                     FePlayerName[FePlayerNo][strlen(FePlayerName[FePlayerNo]) - 1] = 0;
+
+
+
             } else if (FeBuffer[FeCurMenu->Sel].Str == 0x107D) {
+
                 if (strlen(FePlayerName[FePlayerNo]) != 0) {
                     if (FeNoOfPlayers > 0) {
-                        FeNoOfPlayers--;
+
                         FePlayerNo++;
+                        FeNoOfPlayers--;
                         FeNewMenu(&FeNewP2ClassMenu);
+
                     } else {
                         FeNewMenu(&FeDifficultyMenu);
                     }
                 }
             } else {
                 if (FePlayerNameFlag[FePlayerNo]) {
+
                     FePlayerName[FePlayerNo][0] = 0;
                     FePlayerNameFlag[FePlayerNo] = 0;
                 }
                 if (strlen(FePlayerName[FePlayerNo]) < 10) {
+
                     if (FeBuffer[FeCurMenu->Sel].Str == 0x105E) {
                         strcat(FePlayerName[FePlayerNo], " ");
+
                     } else {
                         char asd[2];
                         asd[1] = 0;
                         asd[0] = FeBuffer[FeCurMenu->Sel].Str;
+
                         strcat(FePlayerName[FePlayerNo], asd);
                         PlaySFX(0x33);
+
+
                     }
                 } else {
                     PlaySFX(0x3D3);

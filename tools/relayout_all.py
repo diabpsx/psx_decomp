@@ -7,14 +7,15 @@ apply = '--apply' in sys.argv; whole = '--whole' in sys.argv; safe = '--safe' in
 pick = [a.upper() for a in sys.argv[1:] if not a.startswith('--')]
 retail = RL.functions(RL.load(RL.RETAIL))
 whole_dump = RL.functions(RL.load(RL.ROOT / 'build/native_program/link/diabpsx.munged.sym.txt'))
-files = sorted({f['file'] for f in whole_dump.values() if f['file'].endswith('.CPP')})
+headers = '--headers' in sys.argv   # the header inline members: laid out against the whole-program dump
+files = sorted({f['file'] for f in whole_dump.values() if f['file'].endswith('.H' if headers else '.CPP')})
 if pick: files = [f for f in files if f in pick]
 total = collections.Counter(); reasons = collections.Counter(); perfile = {}
 for base in files:
     cands = [p for d in ('recon/psxsrc', 'recon/source') for p in [pathlib.Path(d) / base.lower()] if p.is_file()]
     if not cands: print('no source for', base); continue
     path = cands[0]
-    if whole:
+    if whole or headers:
         ours = whole_dump
     else:
         r = subprocess.run([sys.executable, 'tools/symlane.py', str(path)], capture_output=True, text=True)

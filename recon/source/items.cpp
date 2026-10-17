@@ -1916,14 +1916,28 @@ void GetItemBonus(int i, int idata, int minlvl, int maxlvl, unsigned char onlygo
  * _iAnimWidth2 sets (PSX's item sprite system reaches ItemCAnimTbl directly, no itemanims[] pointer);
  * `item[i].ItemFrame = Item2Frm[it]` (PSX sprite frame base) replaces hellfire's _iAnimLen = ItemAnimLs[it];
  * adds `item[i]._PlrCreate = FePlayerNo` */
+#line 2313
 void SetupItem(int i)
 {
     int it;
 
+
+
     it = ItemCAnimTbl[item[i]._iCurs];
+
+    item[i].ItemFrame = Item2Frm[it];
+
+
+
+
+
+
+
     item[i]._iIdentified = FALSE;
     item[i]._iPostDraw = FALSE;
-    item[i].ItemFrame = Item2Frm[it];
+
+
+
     if (plr[myplr].pLvlLoad == 0) {
         item[i]._iAnimFrame = 1;
         item[i]._iAnimFlag = TRUE;
@@ -2704,8 +2718,8 @@ void GetItemStr(int i)
 
     switch (item[i]._itype) {
 
-    case IT_GOLD: {
 
+    case IT_GOLD: {
         int nGold = item[i]._ivalue;
         const char *get_pieces_str(int nGold);
         sprintf(infostr, GetStr(0x4FF), nGold, get_pieces_str(nGold));
@@ -4449,8 +4463,8 @@ void RecreateHealerItem(int ii, int idx, int lvl, int iseed)
 
     if ((idx == 0x18) || (idx == 0x1D) || (idx == 0x22)) {
         GetItemAttrs(ii, idx, lvl);
-
     } else {
+
         SetRndSeed(iseed);
 
 
@@ -4736,6 +4750,7 @@ void SortHealer(void)
  * ivalue/createinfo/seed (not hellfire's seed/createinfo/ivalue). */
 /* The early uavail normalization is overwritten in the dungeon-item arm, but it is part of the
  * original source shape: GCC removes the dead stores late while retaining retail's hoisted UNIQUE mask. */
+#line 6126
 void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue, int PlrCreate)
 {
     int OldFePlayerNo = FePlayerNo;
@@ -4743,32 +4758,73 @@ void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int iv
     unsigned char onlygood, uavail, pregen;
 
     FePlayerNo = OldFePlayerNo;
-    if (PlrCreate != -1) FePlayerNo = PlrCreate;
+
+    if (PlrCreate != -1)
+        FePlayerNo = PlrCreate;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if (icreateinfo & ICI_UNIQUE)
         uavail = TRUE;
     else
         uavail = FALSE;
 
     if (idx == IDI_GOLD) {
+
         SetPlrHandItem(&item[ii], idx);
-        item[ii]._ivalue = ivalue;
+
         item[ii]._iCreateInfo = icreateinfo;
+        item[ii]._ivalue = ivalue;
         item[ii]._iSeed = iseed;
+
         if (item[ii]._ivalue >= GOLD_VT2) {
+
             item[ii]._iCurs = ITEM_5GOLD;
+
+
         } else {
-            if (ivalue <= GOLD_VT1) item[ii]._iCurs = ITEM_1GOLD;
+            if (ivalue <= GOLD_VT1)
+                item[ii]._iCurs = ITEM_1GOLD;
+
             else item[ii]._iCurs = ITEM_3GOLD;
+
+
+
         }
     } else {
         if (icreateinfo == 0) {
+
             SetPlrHandItem(&item[ii], idx);
             SetPlrHandSeed(&item[ii], iseed);
+
+
+
         } else {
             if (icreateinfo & ICI_TOWNMASK) RecreateTownItem(ii, idx, icreateinfo, iseed, ivalue);
+
+
             else {
                 if ((icreateinfo & ICI_USEFUL) == ICI_USEFUL) {
+
                     SetupAllUseful(ii, iseed, icreateinfo & ICI_LVLMASK);
+
+
                 } else {
                     uper = 0;
                     onlygood = FALSE;
@@ -4779,12 +4835,16 @@ void RecreateItem(int ii, int idx, unsigned short icreateinfo, int iseed, int iv
                     if (icreateinfo & ICI_ONLYGOOD) onlygood = TRUE;
                     if (icreateinfo & ICI_UNIQUE) uavail = TRUE;
                     if (icreateinfo & ICI_PREGEN) pregen = TRUE;
+
+
+
+
+
                     SetupAllItems(ii, idx, iseed, icreateinfo & ICI_LVLMASK, uper, onlygood, uavail, pregen);
                 }
             }
         }
     }
-
     item[ii]._PlrCreate = FePlayerNo;
     FePlayerNo = OldFePlayerNo;
 }

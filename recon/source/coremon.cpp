@@ -116,12 +116,17 @@ unsigned char IsSkel(int mt)
         || mt >= MT_WSKELSD && mt <= MT_XSKELSD;
 }
 
+#line 177
 void NewMonsterAnim(int i, AnimStruct &anim, int md, int AnimType)
 {
+
+
     MonsterStruct *Monst = &monster[i];
+
+
     Monst->_mAnimLen = anim.Frames;
-    Monst->_mAnimCnt = 0;
     Monst->_mAnimFrame = 1;
+    Monst->_mAnimCnt = 0;
     Monst->_mAnimDelay = anim.Rate;
     Monst->_mdir = md;
     Monst->_mFlags &= ~(MFLAG_LOCK_ANIMATION | MFLAG_ALLOW_SPECIAL);

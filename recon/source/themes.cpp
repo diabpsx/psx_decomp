@@ -206,10 +206,13 @@ unsigned char TFit_GoatShrine(int t)
     return 0;
 }
 
+#line 237
 unsigned char CheckThemeObj3(int xp, int yp, int t, int f)
 {
+
     for (int i = 0; i < 9; i++) {
         if (xp + trm3x[i] < 0 || yp + trm3y[i] < 0)
+
             return 0;
         if (GetSOLID(xp + trm3x[i], yp + trm3y[i]))
             return 0;
@@ -220,7 +223,6 @@ unsigned char CheckThemeObj3(int xp, int yp, int t, int f)
         if (f != -1 && ENG_random(f) == 0)
             return 0;
     }
-
     return 1;
 }
 
@@ -620,17 +622,23 @@ void Theme_SkelRoom(int t)
     }
 }
 
+#line 702
 void Theme_Treasure(int t)
 {
-    int xp, yp;
-    int i;
+    int xp, yp, i;
     char treasrnd[4] = { 4, 9, 7, 10 };
     char monstrnd[4] = { 6, 8, 3, 7 };
 
+
     GetRndSeed();
     for (yp = 0; yp < MAXDUNY; yp++) {
+
         for (xp = 0; xp < MAXDUNX; xp++) {
+
+
+
             if (dung_map[xp][yp].dTransVal == theme[t].ttval && !GetSOLID(xp, yp)) {
+
                 int rv = ENG_random(treasrnd[leveltype - 1]);
                 if ((2 * ENG_random(treasrnd[leveltype - 1])) == 0) {
                     CreateTypeItem(xp, yp, 0, ITYPE_GOLD, IMISC_NONE, 0, 1);

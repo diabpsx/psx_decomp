@@ -432,23 +432,34 @@ void CPlayer::NonBlockingLoadNewGFX(int Id)
 }
 
 /* @0x800965B8 CPLAYER.CPP:641 */
+#line 640
 static void FilthyTask(TASK *T)
 {
     CPlayer *ThePlayer;
+
+
+
+
     char FName[15];
     int Id;
     PlayerParam *Pp;
 
     Pp = (PlayerParam *)T->Data;
-    CDWAIT = 1;
-    PauseMode = 1;
     ThePlayer = Pp->ThePlayer;
     Id = Pp->Id;
+
+    CDWAIT = 1;
+    PauseMode = 1;
     GLUE_SuspendGame();
+
     TSK_Sleep(3);
+
     stream_stop();
+
     ThePlayer->LoadThis(Id);
+
     GLUE_ResumeGame();
+
     PauseMode = 0;
     CDWAIT = 0;
 }

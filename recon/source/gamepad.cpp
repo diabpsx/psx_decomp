@@ -175,18 +175,30 @@ char pad_UpIsUpRight(int pval, char other)
 }
 
 /* --------------------------------------------------------------------- */
+#line 403
 GamePad::GamePad(int player_num)
 {
-    player = &plr[player_num];
+
     pad_up_button = 0;
     pad_up_action = 0;
+    player = &plr[player_num];
     pnum = player_num;
     allow_walking = 1;
     combo_key = 0;
+
+
+
     await_combo = 0;
     restore_controller_settings(CTRL_BEGINNER);
+
+
     SetAllButtons(txt_actions);
+
     ClrCursor(player_num);
+
+
+
+
     SetQSpell(pnum, -1, 4);
 }
 

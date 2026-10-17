@@ -221,6 +221,20 @@ def movable_statement(code, lines, j, out, slack_at):
     return prev.endswith((';', '{', '}')) and not re.match(r'(if|while|for|else|do|switch)\b', prev)
 
 
+PLAIN_DECL = re.compile(r'^(\s*)((?:(?:static|const|unsigned|signed|register)\s+)*[A-Za-z_]\w*(?:\s*\*+)?)\s+([A-Za-z_]\w*(?:\[[^;]*\])?(?:,\s*[A-Za-z_]\w*(?:\[[^;]*\])?)*);\s*$')
+
+
+def decl_pair(lines, lead, merged):
+    """Two consecutive lead lines declaring plain (uninitialised) variables of one spelled type:
+    returns (index of the first, merged text) or None.  Earlier merges are honoured."""
+    texts = dict(merged)
+    for a in range(len(lead) - 1):
+        m1 = PLAIN_DECL.match(texts.get(lead[a], lines[lead[a]])); m2 = PLAIN_DECL.match(lines[lead[a + 1]])
+        if m1 and m2 and m1.group(2) == m2.group(2) and lead[a + 1] not in texts:
+            return a, f'{m1.group(1)}{m1.group(2)} {m1.group(3)}, {m2.group(3)};'
+    return None
+
+
 def lis_keep(values):
     """indexes of a longest non-decreasing subsequence of `values` (the lines that need not move)."""
     n = len(values); best = [1] * n; prev = [-1] * n
@@ -254,6 +268,11 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
     anchor_i = sig_i
     if anchor_i - 1 >= 0 and re.match(r'\s*#\s*line\s+\d+\s*$', lines[anchor_i - 1]):
         anchor_i -= 1
+    if close_i == open_i:
+        # the whole function sits on one line (an in-class method): the anchor alone places it
+        if all(ln == r['line'] for _, ln in r['points']):
+            return 'same-line', lines[sig_i:open_i + 1], anchor_i, r['line'] - (open_i - sig_i)
+        return manual(name, 'one-line function whose retail SLD spans several lines')
     rp = dict(r['points']); op = dict(o['points'])
     tgt = {}; joins = set(); splits = {}
     for off, ln in op.items():
@@ -294,7 +313,9 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
     btgt = {}
     for (ro_, rl, rk), (oo_, ol, ok) in zip(r['blocks'], o['blocks']):
         if rk != ok: return manual(name, 'block record kinds differ')
-        btgt.setdefault(o['line'] + ol, r['line'] + rl)
+        # block record lines are 1-based relative to the function's `{` line: a block start is its `{`
+        # line, a block end the line of the block's last statement (not the `}`)
+        btgt.setdefault(o['line'] + ol - 1, r['line'] + rl - 1)
     body = list(range(open_i, close_i + 1))
     phys_target = {}
     for i in body:
@@ -304,6 +325,12 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
         ph = [i for i in src.physical_of(lg, logical) if open_i <= i <= close_i]
         if len(ph) == 1 and ph[0] not in phys_target: phys_target[ph[0]] = t
     phys_target[open_i] = r['line']
+    # a one-line function: retail put signature, `{`, the statement and `}` on one line
+    if (all(t == r['line'] for t in phys_target.values()) and close_i == open_i + 2
+            and STMT.match(code[open_i + 1].strip()) and code[open_i].strip() == '{' and code[close_i].strip() == '}'
+            and len(lines[sig_i:open_i]) == 1):
+        one = lines[sig_i].rstrip() + ' { ' + lines[open_i + 1].strip() + ' }'
+        return 'one-liner', [one], anchor_i, r['line']
     seq = [(i, phys_target[i]) for i in body if i in phys_target]
     moved = False
     if [t for _, t in seq] != sorted(t for _, t in seq):
@@ -358,15 +385,21 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             continue
         lead = list(group[:-1])
         need = target - (cur + len(lead) + 1)
+        merged_decls = []   # (index in lead, text) replacements from declaration merges
         while need < 0:
             idx = next((j for j in range(len(lead)) if blank(lead[j])), None)
             if idx is not None:
                 lead.pop(idx); need += 1; continue
             # a comment: drop a whole comment (a block comment spans lines; never leave a half)
             unit = comment_unit(lines, lead)
-            if unit is None: break
-            for j in reversed(unit): lead.pop(j)
-            need += len(unit)
+            if unit is not None:
+                for j in reversed(unit): lead.pop(j)
+                need += len(unit); continue
+            # two plain declarations of one type on consecutive lines: `int c;` `int i;` -> `int c, i;`
+            pair = decl_pair(lines, lead, merged_decls)
+            if pair is None: break
+            a, text = pair
+            merged_decls.append((lead[a], text)); lead.pop(a + 1); need += 1
         while need < 0 and lead and slack_n > 0 and not safe and movable_statement(code, lines, lead[0], out, slack_at):
             # a plain statement with no SLD footprint: it can only be placed where the budget allows; use
             # the blank slack before the previous statement (one statement per line; the bytes gate
@@ -377,7 +410,8 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             return manual(name, f'line {lg_last} cannot reach retail line {target} ({-need} too many lines before it)')
         slack_at = len(out); slack_n = need
         out.extend([['', False] for _ in range(need)])
-        out.extend([[lines[j], not blank(j) and not comment_only(j)] for j in lead])
+        merged = dict(merged_decls)
+        out.extend([[merged.get(j, lines[j]), not blank(j) and not comment_only(j)] for j in lead])
         last = lines[last_i]
         if lg_last in splits:
             m = SPLIT.match(last) or SPLIT_ELSE.match(last)

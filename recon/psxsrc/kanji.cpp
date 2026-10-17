@@ -457,6 +457,7 @@ static void Crunch(unsigned char *s, unsigned char *db)
 }
 
 /* @0x800ADAA8 KANJI.CPP:474 */
+#line 473
 static void _get_font(unsigned char *d, unsigned short num, unsigned char *abuff)
 {
     unsigned char *bp;
@@ -465,16 +466,24 @@ static void _get_font(unsigned char *d, unsigned short num, unsigned char *abuff
     char shift;
 
     bp = abuff + getb(num);
+
     ASSERT(bp, 0x1E2);
+
     bcy = *bp++;
+
     memset(d, 0, 144);
+
     shift = 1;
     for (i = 0; i < 132; i++) {
+
         if (bcy & shift)
             *d = 7;
-        shift <<= 1;
         d++;
+
+
+        shift <<= 1;
         if (!shift) {
+
             shift = 1;
             bcy = *bp++;
         }

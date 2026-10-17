@@ -142,26 +142,29 @@ int AddMonsterType(int type, int placeflag)
 }
 
 /* --------------------------------------------------------------------- */
+#line 317
 void GetMonsterTypes(unsigned long QuestMask)
 {
     int typelist[MAX_LVLMTYPES + 174];
-    int mt;
-    int nt;
-    int i;
-
+    int mt, nt, i;
     nt = ML_GetPresetMonsters(currlevel, typelist, QuestMask);
+
     while (nt > 0 && nummtypes < MAX_LVLMTYPES) {
+
         if (nt == 0)
             break;
         i = ENG_random(nt);
         mt = typelist[i];
+
         SwapMonsterType(&mt);
+
         AddMonsterType(mt, MPFLAG_SCATTER);
         typelist[i] = typelist[--nt];
     }
 }
 
 /* --------------------------------------------------------------------- */
+#line 338
 void ClrAllMonsters(void)
 {
     int i;
@@ -170,7 +173,12 @@ void ClrAllMonsters(void)
     for (i = 0; i < MAXMONSTERS; i++) {
         Monst = &monster[i];
         ClearMVars(i);
+
+
+
+
         Monst->mName = 0;
+
         Monst->_mgoal = 0;
         Monst->_mmode = 0;
         Monst->_mVar1 = 0;
@@ -182,15 +190,16 @@ void ClrAllMonsters(void)
         Monst->_moldx = 0;
         Monst->_moldy = 0;
         Monst->_mdir = ENG_random(8);
+        Monst->_mxvel = 0;
+        Monst->_myvel = 0;
+
         Monst->Action = 0;
         Monst->_mAnimDelay = 0;
         Monst->_mAnimCnt = 0;
         Monst->_mAnimLen = 0;
         Monst->_mAnimFrame = 0;
-        Monst->_mDelFlag = 0;
-        Monst->_mxvel = 0;
-        Monst->_myvel = 0;
         Monst->_mFlags = 0;
+        Monst->_mDelFlag = 0;
         Monst->_menemy = ENG_random(gbActivePlayers);
         Monst->_menemyx = plr[Monst->_menemy]._px;
         Monst->_menemyy = plr[Monst->_menemy]._py;

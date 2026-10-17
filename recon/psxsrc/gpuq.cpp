@@ -58,8 +58,8 @@ void GPUQ_FlushQ(void)
         } else if (Img->Flags & 1) {
             LoadImage(&Img->Rect, (unsigned long *)Img->Addr);
 
-
         } else {
+
             void *ImgMem = GAL_Lock(Img->Handle);
             if (ImgMem == 0) DBG_Error(0, "psxsrc/GPUQ.CPP", 0x7C);
             LoadImage(&Img->Rect, (unsigned long *)((long)ImgMem + Img->Offset));
@@ -140,15 +140,18 @@ void GPUQ_LoadClutAddr(int X, int Y, int Cols, void *Addr)
 }
 
 /* @0x80083754 GPUQ.CPP:276 */
+#line 275
 void GPUQ_MoveImage(RECT *R, int x, int y)
 {
     LOAD_IMAGE_ARGS *Args;
 
     CheckMaxArgs();
+
     Args = &AllArgs[ArgsSoFar];
+
     Args->Rect = *R;
+    Args->Flags |= 4;
     Args->MoveX = (unsigned short)x;
     Args->MoveY = (unsigned short)y;
-    Args->Flags |= 4;
     ArgsSoFar++;
 }

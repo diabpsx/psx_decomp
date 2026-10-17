@@ -894,43 +894,66 @@ enum GM_SPEEDS GetSpeed(void)
     return GameSpeed;
 }
 
+#line 3174
 static void game_logic(void)
 {
     int Frames, ThisTick, SinceLast;
-
     if (PauseMode)
+
+
+
+
+
+
         return;
 
     switch (GameSpeed) {
+
     case GM_SPEED_NORMAL:
         Frames = 3;
         break;
+
+
     case GM_SPEED_FAST:
         Frames = 2;
         break;
     default:
         DBG_Error(0, "source/DIABLO.cpp", 0xC7D);
         Frames = 1;
+
+
+
+
+
+
+
         break;
     }
 
     if (!sgnTimeoutCurs)
         CheckCursMove();
 
+
     ThisTick = VID_GetTick();
+
+
     SinceLast = Frames;
     if (LastFrCount != -1)
+
         SinceLast = ThisTick - LastFrCount;
+
+
+
+
     if (SinceLast > 5)
         SinceLast = 5;
+
     if (SinceLast < Frames)
         return;
+    if (demo_pad_time) PAD_Handler();
 
-    if (demo_pad_time)
-        PAD_Handler();
     if (gbProcessPlayers)
         ProcessPlayers();
-
     if (leveltype) {
         ProcessMonsters();
         ProcessObjects();
@@ -938,28 +961,39 @@ static void game_logic(void)
         ProcessItems();
         ProcessLightList();
         ProcessVisionList();
+
     } else {
         ProcessTowners();
         ProcessItems();
+
+
         ProcessLightList();
+
         ProcessBird();
         ProcessMissiles();
+
     }
     sound_update();
 
+
     if (plr[0].plractive) {
+
         myplr = 0;
         CheckTriggers(0);
+
     }
     if (plr[1].plractive) {
+
         myplr = 1;
         CheckTriggers(1);
+
     }
     myplr = 0;
     CheckQuests();
+    force_redraw |= 1;
 
     LastFrCount = ThisTick - (SinceLast - Frames);
-    force_redraw |= 1;
+
 }
 
 static void timeout_cursor(unsigned char bTimeout)

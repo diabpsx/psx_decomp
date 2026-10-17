@@ -533,15 +533,39 @@ void AddPlrMonstExper(int lvl, long exp, char pmask)
     }
 }
 
+#line 1002
 void InitPlayer(PlayerStruct *ptrplr, unsigned char FirstTime)
 {
+
+
+
+
+
+
     if (FirstTime) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         ptrplr->_pRSplType = 4;
         ptrplr->_pRSpell = -1;
+
         ptrplr->_pSBkSpell = -1;
-        ptrplr->DeadLevel = 100;
         ptrplr->_pSpell = ptrplr->_pRSpell;
         ptrplr->_pSplType = ptrplr->_pRSplType;
+        ptrplr->DeadLevel = 100;
         if ((ptrplr->_pgfxnum & 0xF) == 4)
             ptrplr->_pwtype = 1;
         else
@@ -570,39 +594,128 @@ void InitPlayer(PlayerStruct *ptrplr, unsigned char FirstTime)
 
         ptrplr->_pdir = 0;
 
+
         if (ismyplr(ptrplr)) {
+
             if (!FirstTime || currlevel != 0) {
                 if (plrind(ptrplr) == 1 && plr[0].plractive)
+
                     PlacePlayer(plrind(ptrplr), ViewX + 1, ViewY + 1, FALSE);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 else
                     PlacePlayer(plrind(ptrplr), ViewX, ViewY, FALSE);
             }
         } else {
             int i;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             PlacePlayer(plrind(ptrplr), ViewX, ViewY, FALSE);
         }
+
+
     }
 
     ptrplr->walkpath[0] = -1;
     ptrplr->destAction = -1;
     WorldToOffset(ptrplr, (ptrplr->_px << 3) + 4, (ptrplr->_py << 3) + 4);
+
+
+
+
     light_rad = ptrplr->_pLightRad;
+
+
+
     light_fix(ptrplr->_plid);
+
     ptrplr->_plid = AddLight(ptrplr->_px, ptrplr->_py, light_rad + 9200);
     ChangeLightOff(ptrplr->_plid, 0, 0);
+
+
+
+
+
+
     ManashieldFlag = 0;
     ManashieldFlag2 = 0;
+
+
+
+
+
+
+
+
     ptrplr->_pvid = AddVision(ptrplr->_px, ptrplr->_py, 10, plrind(ptrplr));
+
 
     if (ptrplr->_pClass == CLASS_WARRIOR)
         ptrplr->_pAblSpells = (unsigned long long)1 << (26 - 1);
+
     else if (ptrplr->_pClass == CLASS_ROGUE)
         ptrplr->_pAblSpells = (unsigned long long)1 << (28 - 1);
     else if (ptrplr->_pClass == CLASS_SORCERER)
         ptrplr->_pAblSpells = (unsigned long long)1 << (27 - 1);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     ptrplr->_pNextExper = ExpLvlsTbl[ptrplr->_pLevel];
+
+
+
+
+
+
     ptrplr->_pInvincible = FALSE;
+
+
 
     if (ismyplr(ptrplr)) {
         deathdelay2[plrind(ptrplr)] = 0;
@@ -1384,12 +1497,15 @@ void InitLevelChange(PlayerStruct *ptrplr)
     visible_level = -1;
 }
 
+#line 2354
 void CheckPlrDead(int pnum)
 {
     PlayerStruct *ptrplr = &plr[pnum];
+
     if (ptrplr->_pmode == PM_DEATH) {
-        ptrplr->_pAnimFrame = ptrplr->_pAnimLen;
+
         ptrplr->plractive = FALSE;
+        ptrplr->_pAnimFrame = ptrplr->_pAnimLen;
     }
 }
 
@@ -1430,18 +1546,31 @@ void StartNewLvl(PlayerStruct *ptrplr, int fom, int lvl)
     }
 }
 
+#line 2441
 void RestartTownLvl(PlayerStruct *ptrplr)
 {
+
+
     InitLevelChange(&plr[0]);
     InitLevelChange(&plr[1]);
+
+
+
+
+
+
+
+
+
     ptrplr->plrlevel = 0;
     SetPlayerHitPoints(ptrplr, 64);
     ptrplr->_pMana = 0;
     ptrplr->_pManaBase = ptrplr->_pMana - (ptrplr->_pMaxMana - ptrplr->_pMaxManaBase);
     CalcPlrInv(ptrplr, FALSE);
+
     if (ismyplr(ptrplr)) {
-        ptrplr->_pInvincible = TRUE;
         ptrplr->_pmode = PM_NEWLVL;
+        ptrplr->_pInvincible = TRUE;
         GRL_PostMessage(ghMainWnd, 0x49, 0, 0);
     }
 }
@@ -3023,105 +3152,69 @@ void PlayDungMsgs(void)
  * between the PlayerStruct* forms used inside this TU and the int-pnum forms other TUs export).
  * plrind(ptrplr) returns 0/1 for &plr[0]/&plr[1] (see plrind__FP12PlayerStruct below). ---- */
 
-void CreatePlrItems(PlayerStruct *ptrplr)
-{
-    CreatePlrItems(plrind(ptrplr));
-}
+#line 4658
+void CreatePlrItems(PlayerStruct *ptrplr) { CreatePlrItems(plrind(ptrplr)); }
 
-void WorldToOffset(PlayerStruct *ptrplr, int x, int y)
-{
-    WorldToOffset(plrind(ptrplr), x, y);
-}
+#line 4659
+void WorldToOffset(PlayerStruct *ptrplr, int x, int y) { WorldToOffset(plrind(ptrplr), x, y); }
 
-void SetSpdbarGoldCurs(PlayerStruct *ptrplr, int i)
-{
-    SetSpdbarGoldCurs(plrind(ptrplr), i);
-}
+#line 4660
+void SetSpdbarGoldCurs(PlayerStruct *ptrplr, int i) { SetSpdbarGoldCurs(plrind(ptrplr), i); }
 
 int GetSpellLevel(PlayerStruct *ptrplr, int val)
 {
     return GetSpellLevel(plrind(ptrplr), val);
 }
 
-void BreakObject(PlayerStruct *ptrplr, int val)
-{
-    BreakObject(plrind(ptrplr), val);
-}
+#line 4662
+void BreakObject(PlayerStruct *ptrplr, int val) { BreakObject(plrind(ptrplr), val); }
 
-void CalcPlrInv(PlayerStruct *ptrplr, unsigned char bl)
-{
-    CalcPlrInv(plrind(ptrplr), bl);
-}
+#line 4663
+void CalcPlrInv(PlayerStruct *ptrplr, unsigned char bl) { CalcPlrInv(plrind(ptrplr), bl); }
 
-void RemoveSpdBarItem(PlayerStruct *ptrplr, int val)
-{
-    RemoveSpdBarItem(plrind(ptrplr), val);
-}
+#line 4664
+void RemoveSpdBarItem(PlayerStruct *ptrplr, int val) { RemoveSpdBarItem(plrind(ptrplr), val); }
 
-void M_StartKill(int m, PlayerStruct *ptrplr)
-{
-    M_StartKill(m, plrind(ptrplr));
-}
+#line 4665
+void M_StartKill(int m, PlayerStruct *ptrplr) { M_StartKill(m, plrind(ptrplr)); }
 
-void SetGoldCurs(PlayerStruct *ptrplr, int i)
-{
-    SetGoldCurs(plrind(ptrplr), i);
-}
+#line 4666
+void SetGoldCurs(PlayerStruct *ptrplr, int i) { SetGoldCurs(plrind(ptrplr), i); }
 
-void HealStart(PlayerStruct *ptrplr)
-{
-    HealStart(plrind(ptrplr));
-}
+#line 4667
+void HealStart(PlayerStruct *ptrplr) { HealStart(plrind(ptrplr)); }
 
-void HealotherStart(PlayerStruct *ptrplr)
-{
-    HealotherStart(plrind(ptrplr));
-}
+#line 4668
+void HealotherStart(PlayerStruct *ptrplr) { HealotherStart(plrind(ptrplr)); }
 
 int CalculateGold(PlayerStruct *ptrplr)
 {
     return CalculateGold(plrind(ptrplr));
 }
 
-void M_StartHit(int m, PlayerStruct *ptrplr, int dam)
-{
-    M_StartHit(m, plrind(ptrplr), dam);
-}
+#line 4670
+void M_StartHit(int m, PlayerStruct *ptrplr, int dam) { M_StartHit(m, plrind(ptrplr), dam); }
 
-void TeleStart(PlayerStruct *ptrplr)
-{
-    TeleStart(plrind(ptrplr));
-}
+#line 4671
+void TeleStart(PlayerStruct *ptrplr) { TeleStart(plrind(ptrplr)); }
 
-void PhaseStart(PlayerStruct *ptrplr)
-{
-    PhaseStart(plrind(ptrplr));
-}
+#line 4672
+void PhaseStart(PlayerStruct *ptrplr) { PhaseStart(plrind(ptrplr)); }
 
-void RemoveInvItem(PlayerStruct *ptrplr, int i)
-{
-    RemoveInvItem(plrind(ptrplr), i);
-}
+#line 4673
+void RemoveInvItem(PlayerStruct *ptrplr, int i) { RemoveInvItem(plrind(ptrplr), i); }
 
-void PhaseEnd(PlayerStruct *ptrplr)
-{
-    PhaseEnd(plrind(ptrplr));
-}
+#line 4674
+void PhaseEnd(PlayerStruct *ptrplr) { PhaseEnd(plrind(ptrplr)); }
 
-void OperateObject(PlayerStruct *ptrplr, int oi, unsigned char bl)
-{
-    OperateObject(plrind(ptrplr), oi, bl);
-}
+#line 4675
+void OperateObject(PlayerStruct *ptrplr, int oi, unsigned char bl) { OperateObject(plrind(ptrplr), oi, bl); }
 
-void TryDisarm(PlayerStruct *ptrplr, int oi)
-{
-    TryDisarm(plrind(ptrplr), oi);
-}
+#line 4676
+void TryDisarm(PlayerStruct *ptrplr, int oi) { TryDisarm(plrind(ptrplr), oi); }
 
-void TalkToTowner(PlayerStruct *ptrplr, int val)
-{
-    TalkToTowner(plrind(ptrplr), val);
-}
+#line 4677
+void TalkToTowner(PlayerStruct *ptrplr, int val) { TalkToTowner(plrind(ptrplr), val); }
 
 unsigned char PosOkPlayer(int pnum, int x, int y)
 {
@@ -3133,130 +3226,80 @@ int CalcStatDiff(int pnum)
     return CalcStatDiff(&plr[pnum]);
 }
 
-void StartNewLvl(int pnum, int fom, int lvl)
-{
-    StartNewLvl(&plr[pnum], fom, lvl);
-}
+#line 4681
+void StartNewLvl(int pnum, int fom, int lvl) { StartNewLvl(&plr[pnum], fom, lvl); }
 
-void CreatePlayer(int pnum, char c)
-{
-    CreatePlayer(&plr[pnum], c);
-}
+#line 4682
+void CreatePlayer(int pnum, char c) { CreatePlayer(&plr[pnum], c); }
 
-void StartStand(int pnum, int dir)
-{
-    StartStand(&plr[pnum], dir);
-}
+#line 4683
+void StartStand(int pnum, int dir) { StartStand(&plr[pnum], dir); }
 
-void SetPlayerHitPoints(int pnum, int val)
-{
-    SetPlayerHitPoints(&plr[pnum], val);
-}
+#line 4684
+void SetPlayerHitPoints(int pnum, int val) { SetPlayerHitPoints(&plr[pnum], val); }
 
-void MakePlrPath(int pnum, int xx, int yy, unsigned char endspace)
-{
-    MakePlrPath(&plr[pnum], xx, yy, endspace);
-}
+#line 4685
+void MakePlrPath(int pnum, int xx, int yy, unsigned char endspace) { MakePlrPath(&plr[pnum], xx, yy, endspace); }
 
-void StartWarpLvl(int pnum, int pidx)
-{
-    StartWarpLvl(&plr[pnum], pidx);
-}
+#line 4686
+void StartWarpLvl(int pnum, int pidx) { StartWarpLvl(&plr[pnum], pidx); }
 
-void SyncPlrKill(int pnum, int earflag)
-{
-    SyncPlrKill(&plr[pnum], earflag);
-}
+#line 4687
+void SyncPlrKill(int pnum, int earflag) { SyncPlrKill(&plr[pnum], earflag); }
 
-void StartPlrKill(int pnum, int val)
-{
-    StartPlrKill(&plr[pnum], val);
-}
+#line 4688
+void StartPlrKill(int pnum, int val) { StartPlrKill(&plr[pnum], val); }
 
-void NewPlrAnim(int pnum, int Peq, int numFrames, int Delay)
-{
-    NewPlrAnim(&plr[pnum], Peq, numFrames, Delay);
-}
+#line 4689
+void NewPlrAnim(int pnum, int Peq, int numFrames, int Delay) { NewPlrAnim(&plr[pnum], Peq, numFrames, Delay); }
 
-void AddPlrExperience(int pnum, int lvl, long exp)
-{
-    AddPlrExperience(&plr[pnum], lvl, exp);
-}
+#line 4690
+void AddPlrExperience(int pnum, int lvl, long exp) { AddPlrExperience(&plr[pnum], lvl, exp); }
 
-void StartPlrBlock(int pnum, int dir)
-{
-    StartPlrBlock(&plr[pnum], dir);
-}
+#line 4691
+void StartPlrBlock(int pnum, int dir) { StartPlrBlock(&plr[pnum], dir); }
 
-void StartPlrHit(int pnum, int dam, unsigned char forcehit)
-{
-    StartPlrHit(&plr[pnum], dam, forcehit);
-}
+#line 4692
+void StartPlrHit(int pnum, int dam, unsigned char forcehit) { StartPlrHit(&plr[pnum], dam, forcehit); }
 
-void StartSpell(int pnum, int d, int cx, int cy)
-{
-    StartSpell(&plr[pnum], d, cx, cy);
-}
+#line 4693
+void StartSpell(int pnum, int d, int cx, int cy) { StartSpell(&plr[pnum], d, cx, cy); }
 
-void InitPlayer(int pnum, unsigned char FirstTime)
-{
-    InitPlayer(&plr[pnum], FirstTime);
-}
+#line 4695
+void InitPlayer(int pnum, unsigned char FirstTime) { InitPlayer(&plr[pnum], FirstTime); }
 
-void PM_ChangeLightOff(int pnum)
-{
-    PM_ChangeLightOff(&plr[pnum]);
-}
+#line 4697
+void PM_ChangeLightOff(int pnum) { PM_ChangeLightOff(&plr[pnum]); }
 
-void CheckNewPath(int pnum)
-{
-    CheckNewPath(&plr[pnum]);
-}
+#line 4698
+void CheckNewPath(int pnum) { CheckNewPath(&plr[pnum]); }
 
-void FreePlayerGFX(int pnum)
-{
-    FreePlayerGFX(&plr[pnum]);
-}
+#line 4699
+void FreePlayerGFX(int pnum) { FreePlayerGFX(&plr[pnum]); }
 
-void InitDungMsgs(int pnum)
-{
-    InitDungMsgs(&plr[pnum]);
-}
+#line 4700
+void InitDungMsgs(int pnum) { InitDungMsgs(&plr[pnum]); }
 
-void InitPlayerGFX(int pnum)
-{
-    InitPlayerGFX(&plr[pnum]);
-}
+#line 4701
+void InitPlayerGFX(int pnum) { InitPlayerGFX(&plr[pnum]); }
 
-void SyncInitPlrPos(int pnum)
-{
-    SyncInitPlrPos(&plr[pnum]);
-}
+#line 4702
+void SyncInitPlrPos(int pnum) { SyncInitPlrPos(&plr[pnum]); }
 
-void SetPlrAnims(int pnum)
-{
-    SetPlrAnims(&plr[pnum]);
-}
+#line 4703
+void SetPlrAnims(int pnum) { SetPlrAnims(&plr[pnum]); }
 
-void ClrPlrPath(int pnum)
-{
-    ClrPlrPath(&plr[pnum]);
-}
+#line 4704
+void ClrPlrPath(int pnum) { ClrPlrPath(&plr[pnum]); }
 
-void SyncInitPlr(int pnum)
-{
-    SyncInitPlr(&plr[pnum]);
-}
+#line 4705
+void SyncInitPlr(int pnum) { SyncInitPlr(&plr[pnum]); }
 
-void RestartTownLvl(int pnum)
-{
-    RestartTownLvl(&plr[pnum]);
-}
+#line 4706
+void RestartTownLvl(int pnum) { RestartTownLvl(&plr[pnum]); }
 
-void SetPlayerOld(int pnum)
-{
-    SetPlayerOld(&plr[pnum]);
-}
+#line 4707
+void SetPlayerOld(int pnum) { SetPlayerOld(&plr[pnum]); }
 
 #line 4714
 void GetGoldSeed(PlayerStruct *ptrplr, ItemStruct *h)

@@ -543,25 +543,18 @@ void DeleteMissile(int mi, int i)
         missileactive[i] = missileactive[nummissiles];
 }
 
+#line 636
 void GetMissileVel(int i, int sx, int sy, int dx, int dy, int v)
 {
-    /* PSX is ALL-INTEGER here, not the PC twin's float sqrt(dx*dx+dy*dy): raw oracle calls
-     * veclen2(dxp,dyp) (an integer distance approximation, NOT sqrt) and does the final divide
-     * via __divdi3 (64-bit signed division) on hand-built 64-bit products -- confirmed by reading
-     * the jal targets directly (no `sqrt` symbol exists anywhere in the retail SYM at all). Also
-     * clamps each of dxp/dyp/dr away from exact zero before dividing (avoids a div-by-zero /
-     * degenerate direction), which the PC twin does not do explicitly. */
-    long long dxp, dyp, dr;
 
+    long long dxp, dyp, dr;
     dxp = (((dx - sx) << 5) - ((dy - sy) << 5)) << 16;
     dyp = (((dx - sx) << 5) + ((dy - sy) << 5)) << 16;
     dr = veclen2(dxp, dyp);
-    if (dxp == 0)
-        dxp++;
-    if (dyp == 0)
-        dyp++;
-    if (dr == 0)
-        dr++;
+
+    if (dxp == 0) dxp++;
+    if (dyp == 0) dyp++;
+    if (dr == 0) dr++;
     missile[i]._mixvel = (v << 16) * dxp / dr;
     missile[i]._miyvel = (v << 15) * dyp / dr;
 }
@@ -1923,14 +1916,13 @@ void AddChain(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     UseMana(id, SPL_CHAIN);
 }
 
+#line 2429
 void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* PSX massively simplifies devilution's Cels/uniqtrans/mlid handling away -- just picks one of
-     * the CMonster::Anims[] slots (SPECIAL/ATTACK/WALK) by a hardcoded mtype range (the collapsed
-     * EquivMonst(mtype,MT_HORNED)=[0x40,0x43], EquivMonst(mtype,MT_NSNAKE)=[0x59,0x5C] ranges) and
-     * copies Frames/Rate; no Cels pointer, no _miAnimWidth/Width2, no uniqtype/mlid path exist here. */
-    struct AnimStruct *anim;
 
+
+
+    struct AnimStruct *anim;
     if ((unsigned char)(monster[id].MType->mtype - 0x40) < 4)
         anim = &monster[id].MType->Anims[5];
     else if ((unsigned char)(monster[id].MType->mtype - 0x59) < 4)
@@ -1940,18 +1932,28 @@ void AddRhino(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
 
     GetMissileVel(mi, sx, sy, dx, dy, 18);
 
+
     missile[mi]._mimfnum = midir;
     missile[mi]._miAnimFlags = 0;
+
     missile[mi]._miAnimDelay = anim->Rate;
     missile[mi]._miAnimLen = anim->Frames;
-    missile[mi]._miAnimAdd = 1;
 
+
+    missile[mi]._miAnimAdd = 1;
     if ((unsigned char)(monster[id].MType->mtype - 0x59) < 4)
         missile[mi]._miAnimFrame = 7;
 
     missile[mi]._miVar1 = 0;
     missile[mi]._miVar2 = 0;
+
     missile[mi]._miLightFlag = 1;
+
+
+
+
+
+
     missile[mi]._mirange = 256;
 
     PutMissile(mi);
@@ -2013,17 +2015,20 @@ void AddFlare(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, i
     }
 }
 
+#line 2558
 void AddAcid(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* PSX simplifies devilution's velocity-based mirange branch away entirely -- always uses the
-     * 15+5*(mint+1) form, and drives direction via GetDirection8/SetMissDir instead of leaving
-     * _mimfnum unset. */
     GetMissileVel(mi, sx, sy, dx, dy, 16);
+
     SetMissDir(mi, GetDirection8(sx, sy, dx, dy));
+
+
     missile[mi]._mirange = 5 * (monster[id]._mint + 1) + 15;
     missile[mi]._mlid = -1;
+
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
+
     PutMissile(mi);
 }
 
@@ -2571,16 +2576,19 @@ void AddResurrect(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._miDelFlag = 1;
 }
 
+#line 3333
 void AddResurrectBeam(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
     /* decoded directly from the oracle -- a fixed 16-tick range, no misfiledata lookup */
+
     missile[mi]._mix = dx;
     missile[mi]._miy = dy;
-    missile[mi]._mixvel = 0;
-    missile[mi]._miyvel = 0;
-    missile[mi]._mirange = 16;
     missile[mi]._misx = missile[mi]._mix;
     missile[mi]._misy = missile[mi]._miy;
+    missile[mi]._mixvel = 0;
+    missile[mi]._miyvel = 0;
+
+    missile[mi]._mirange = 16;
 }
 
 #line 3350
@@ -2594,11 +2602,17 @@ void AddTelekinesis(int mi, int sx, int sy, int dx, int dy, int midir, char mien
         NewCursor(CURSOR_TELEKINESIS);
 }
 
+#line 3364
 void AddBoneSpirit(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
+
+
+
     if (sx == dx && sy == dy) {
         dx += XDirAdd[midir];
         dy += YDirAdd[midir];
+
+
     }
     missile[mi]._midam = 0;
 
@@ -2606,6 +2620,7 @@ void AddBoneSpirit(int mi, int sx, int sy, int dx, int dy, int midir, char miene
     SetMissDir(mi, GetDirection8(sx, sy, dx, dy));
 
     missile[mi]._mirange = 256;
+
     missile[mi]._miVar1 = sx;
     missile[mi]._miVar2 = sy;
     missile[mi]._miVar3 = 0;
@@ -2616,34 +2631,41 @@ void AddBoneSpirit(int mi, int sx, int sy, int dx, int dy, int midir, char miene
 
     if (mienemy == TARGET_MONSTERS) {
         UseMana(id, SPL_BONESPIRIT);
+
+
+
+
         plr[id]._pHitPoints -= 6 << 6;
-        drawhpflag = 1;
         plr[id]._pHPBase -= 6 << 6;
+        drawhpflag = 1;
+
         if (plr[id]._pHitPoints <= 0)
+
             StartPlrKill(id, 0);
     }
 }
 
+#line 3411
 void AddRportal(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
-    /* PSX-only prologue: shrinks/re-places any pre-existing portal missile occupying this tile
-     * before placing the new one -- no PC twin has this. */
     int m2 = dung_map[sx][sy].dMissile;
 
     if (m2 > 0) {
+
         m2--;
         MissileStruct *miss = &missile[m2];
         miss->_miy--;
         PutMissile(m2);
     }
-
     missile[mi]._mix = sx;
     missile[mi]._miy = sy;
     missile[mi]._misx = sx;
     missile[mi]._misy = sy;
+
     missile[mi]._mirange = 100;
     missile[mi]._miVar1 = missile[mi]._mirange - missile[mi]._miAnimLen;
     missile[mi]._miVar2 = 0;
+
     PutMissile(mi);
 }
 
@@ -2663,6 +2685,7 @@ void AddDiabApoca(int mi, int sx, int sy, int dx, int dy, int midir, char mienem
     missile[mi]._miDelFlag = 1;
 }
 
+#line 3450
 int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micaster, int id, int v3, int spllvl)
 {
     int mi;
@@ -2670,21 +2693,27 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
      * position -- rodata template D_8011A080. */
     int xyoffs[16] = { 0, 0, 0, 6, 0, 6, 0, 0, 12, 0, 0, 4, 0, 12, 0, 12 };
 
+
     if (nummissiles >= MAXMISSILES)
         return -1;
+
 
     mi = missileavail[0];
     missileavail[0] = missileavail[MAXMISSILES - nummissiles - 1];
     missileactive[nummissiles] = mi;
     nummissiles++;
 
+
     missile[mi].PrintPtr = MissPrintRoutines[mitype];
+
     missile[mi]._mitype = mitype;
     missile[mi]._micaster = micaster;
     missile[mi]._misource = id;
     missile[mi]._miAnimType = missiledata[mitype].mFileNum;
     missile[mi]._miDrawFlag = missiledata[mitype].mDraw;
+
     missile[mi]._mispllvl = spllvl;
+
     missile[mi]._mimfnum = midir;
 
     if (missile[mi]._miAnimType != 0xFF && misfiledata[missile[mi]._miAnimType].mAnimFAmt >= 8)
@@ -2697,11 +2726,14 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
     missile[mi]._misx = sx;
     missile[mi]._misy = sy;
 
-    /* PSX-only: a player's missile starts half a direction-offset away from the caster's current
-     * sub-tile offset (apocalypse and flame-wave excepted). */
     if (micaster == TARGET_MONSTERS && mitype != 0x2C /* MIS_APOCA */ && mitype != 0x31 /* MIS_FLAMEC */) {
+
+
+
         missile[mi]._miVar6 = (plr[id]._pxoff + xyoffs[plr[id]._pdir * 2]) >> 1;
         missile[mi]._miVar7 = (plr[id]._pyoff + xyoffs[plr[id]._pdir * 2 + 1]) >> 1;
+
+
     } else {
         missile[mi]._miVar6 = 0;
         missile[mi]._miVar7 = 0;
@@ -2709,23 +2741,26 @@ int AddMissile(int sx, int sy, int v1, int v2, int midir, int mitype, char micas
 
     missile[mi]._mitxoff = 0;
     missile[mi]._mityoff = 0;
+
     missile[mi]._mixoff = 0;
     missile[mi]._miyoff = 0;
+
     missile[mi]._miDelFlag = 0;
     missile[mi]._miAnimAdd = 1;
+
     missile[mi]._miLightFlag = 0;
     missile[mi]._miPreFlag = 0;
+
     missile[mi]._midam = v3;
     missile[mi]._miHitFlag = 0;
     missile[mi]._midist = 0;
-    missile[mi]._mirnd = 0;
     missile[mi]._mlid = -1;
+    missile[mi]._mirnd = 0;
 
     if (missiledata[mitype].mlSFX != -1)
         PlaySfxLoc(missiledata[mitype].mlSFX, missile[mi]._mix, missile[mi]._miy);
 
     ((void (*)(int, int, int, int, int, int, char, int, int))missiledata[mitype].mAddProc)(mi, sx, sy, v1, v2, midir, micaster, id, v3);
-
     return mi;
 }
 
@@ -2754,9 +2789,9 @@ int Sentfire(int i, int sx, int sy)
     return ex;
 }
 
+#line 3586
 void MI_Dummy(int i)
 {
-    /* @0x80143078: `jr ra; nop` -- empty body, i unused. */
 }
 
 #line 3590

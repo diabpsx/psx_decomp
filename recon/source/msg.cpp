@@ -657,28 +657,60 @@ void NetSendCmdQuest(unsigned char bHiPri, unsigned char q)
 }
 
 /* @0x8004F93C MSG.CPP:1011 */
+#line 1010
 void NetSendCmdGItem(unsigned char bHiPri, unsigned char bCmd, unsigned char mast, unsigned char pnum, unsigned char ii)
 {
     TCmdGItem cmd;
+
+
+
     cmd.bCmd = bCmd;
     cmd.bPnum = pnum;
     cmd.bMaster = mast;
     cmd.dwTime = 0;
-    cmd.bCursitem = ii;
     cmd.bLevel = currlevel;
+    cmd.bCursitem = ii;
     cmd.x = item[ii]._ix;
     cmd.y = item[ii]._iy;
     cmd.wIndx = item[ii].IDidx;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     cmd.wCI = item[ii]._iCreateInfo;
+
+
     cmd.dwSeed = item[ii]._iSeed;
+
+
     cmd.bId = item[ii]._iIdentified;
     cmd.bDur = (unsigned char)item[ii]._iDurability;
     cmd.bMDur = (unsigned char)item[ii]._iMaxDur;
     cmd.bCh = item[ii]._iCharges;
     cmd.bMCh = item[ii]._iMaxCharges;
     cmd.wValue = (unsigned short)item[ii]._ivalue;
-    /* dwBuff carries the signed one-byte PSX player-creation marker. */
     cmd.dwBuff = (signed char)item[ii]._PlrCreate;
+
+
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -1551,8 +1583,8 @@ static void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
 
-        int dummy1;
 
+        int dummy1;
 
 
         monster[((const TCmdParam2 *)pCmd)->wParam1].mWhoHit |= (1 << pnum);
@@ -1714,32 +1746,62 @@ static void On_DROPITEM(const TCmd *pCmd, int pnum)
 /* @0x80051F64 MSG.CPP:2428 -- UNVERIFIED (fsize 32, non-trivial fn not individually re-derived);
  * best-effort from devilution's On_PLAYER_JOINLEVEL (a remote player's PlayerStruct sync marker --
  * marks them active on our copy of their slot and re-syncs their local-visibility state). */
+#line 2427
 static void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 {
     plr[pnum]._pLvlChanging = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if (plr[pnum].plractive && pnum) {
+
         const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
-        plr[pnum]._pGFXLoad = 0;
         plr[pnum]._px = p->x;
         plr[pnum]._py = p->y;
         plr[pnum].plrlevel = p->wParam1;
+        plr[pnum]._pGFXLoad = 0;
+
+
+
         SyncInitPlr(pnum);
         if ((plr[pnum]._pHitPoints >> 6) > 0) {
+
             StartStand(pnum, 0);
+
+
         } else {
             plr[pnum]._pgfxnum = 0;
+
             plr[pnum]._pmode = (enum PLR_MODE)8;
             NewPlrAnim(pnum, 1, plr[pnum]._pDFrames, 1);
             plr[pnum]._pAnimFrame = plr[pnum]._pAnimLen - 1;
             plr[pnum]._pVar8 = plr[pnum]._pAnimLen * 2;
+
+
+
         }
         if (plr[pnum]._pvid == -1)
+
             plr[pnum]._pvid = (char)AddVision(plr[pnum]._px, plr[pnum]._py, 10, pnum);
+
+
         gbActivePlayers = 0;
-        if (plr[0].plractive)
-            gbActivePlayers = 1;
-        if (plr[1].plractive)
-            gbActivePlayers = gbActivePlayers + 1;
+        if (plr[0].plractive) gbActivePlayers = 1;
+        if (plr[1].plractive) gbActivePlayers = gbActivePlayers + 1;
     }
 }
 
