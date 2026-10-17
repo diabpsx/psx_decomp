@@ -24,6 +24,7 @@ struct SpellTarget {   /* sizeof 72 */
     short lastx[8];             /* +0x28 */
     short lasty[8];             /* +0x38 */
 
+#line 17
     BOOL Active() { return active; }   /* SPLTARGT.H:17 */
     void ClearTrails(void);
     void Init(int plrn);

@@ -81,6 +81,7 @@ struct CBlock {                       /* sizeof 12 */
     unsigned long NumOfParts;
     CPart         Parts[1];
 
+#line 67
     int GetSize() const { return sizeof(NumOfParts) + NumOfParts * sizeof(CPart); }   /* GMAN.H:67 */
     void GetBoundingBox(TextDat &TDat, RECT &R);
 };
@@ -117,8 +118,11 @@ struct CCreatureHdr {                 /* sizeof 20 */
 struct CTextFileInfo {                /* sizeof 4 */
     char *FileName;
 
+#line 160
     BOOL  HasTp() const   { return HasFile(".tp"); }                    /* GMAN.H:160 */
+#line 161
     BOOL  HasDat() const  { return HasFile(".dat"); }                   /* GMAN.H:161 */
+#line 173
     char *GetName() const { return FileName; }                          /* GMAN.H:173 */
     long  LoadHdr() const;                                              /* GMAN.H:167; defined in GMAN.CPP: its ".hdr" literal follows wank in retail .sdata */
     BOOL  HasFile(char *Ext) const;
@@ -194,24 +198,38 @@ struct TextDat {                      /* sizeof 112 */
      * is referenced, so GetCreature (284) is queued from GetNumOfActions' body and precedes the members after
      * 251 in every TU's tail; the member order here reproduces every retail tail (GMAN, BLOCK, CPLAYER,
      * OBJECTS, OBJPRINT, KANJI, MISPRINT). */
+#line 229
     FRAME_HDR *GetFr(int FrNum) { return Frames + (unsigned short)FrNum; }                        /* 229 */
+#line 232
     PAL *GetPal(int PalNum) { return (PAL *)((unsigned char *)Pals + PalOffset[PalNum]); }         /* 232 */
+#line 233
     int GetNumOfFrames() { return Hdr->NumOfFrames; }                                              /* 233 */
+#line 240
     void SetFileInfo(const CTextFileInfo *NewInfo, int NewTexNum) { FileInfo = (CTextFileInfo *)NewInfo; TexNum = NewTexNum; }  /* 240 */
+#line 242
     ALL_DECOMP_BUFFERS *GetDecompBuffers()                                                         /* 243 */
     {
         if (Hdr->DecompOffset)
             return (ALL_DECOMP_BUFFERS *)((unsigned char *)Hdr + Hdr->DecompOffset);
+
         return NULL;
     }
+#line 251
     int GetNumOfCreatures() { return Hdr->NumOfCreatures; }                                        /* 251 */
     CCreatureHdr *GetCreature(int Creature) { return (CCreatureHdr *)(CreatureAnims + CreatureOffset[Creature]); }  /* 284 */
+#line 252
     int GetNumOfActions(int Creature) { return GetCreature(Creature)->NumOfActions; }              /* 252 */
+#line 253
     int GetNumOfFrames(int Creature, int Action) { return GetCreature(Creature)->GetAction(Action)->NumOfFrames; }  /* 253 */
+#line 256
     int GetTexNum() const { return TexNum; }                                                       /* 256 */
+#line 257
     BOOL IsLoaded() const { return LoadCount != 0; }                                               /* 257 */
+#line 258
     BOOL CanXferPal() const { return PalX >= 0 && PalY >= 0; }                                     /* 258 */
+#line 259
     BOOL CanXferFrame() const { return DecX >= 0 && DecY >= 0; }                                   /* 259 */
+#line 264
     void SetDecompArea(int nDecX, int nDecY, int nPalX, int nPalY)                                 /* 265 */
     {
         DecX = nDecX;
@@ -260,11 +278,14 @@ void GM_FinishedUsing(TextDat *tex);
 TextDat *GM_UseTexData(int Id);
 
 /* GMAN.H:290-296 — defined in the header (out-of-line copy per TU under -fno-inline) */
+#line 289
 inline void TextDat::DumpDatFile()
 {
     if (hndDat != -1 && OwnDat) {
+
         long Hnd = hndDat;
-        if (!GAL_Free(Hnd)) DBG_Error(NULL, "psxsrc/gman.h", 295);
+        if (!GAL_Free(Hnd))
+            DBG_Error(NULL, "psxsrc/gman.h", 295);
         hndDat = -1;
     }
 }

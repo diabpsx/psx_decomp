@@ -15,6 +15,7 @@ struct LittleGt4 {                    /* sizeof 16 */
     unsigned short tpage;
     unsigned char u2, v2, u3, v3, w, h, code, Flags;
 
+#line 55
     void InitFromGt4(POLY_GT4 *Gt4, int nw, int nh)                     /* BLOCK.H:56 */
     {
         clut = Gt4->clut;
@@ -108,25 +109,41 @@ public:
     int WorldToScrX(int x, int y);
     int WorldToScrY(int x, int y);
 
+#line 171
     static int GetMaxOtPos() { return 0x1FF; }                             /* BLOCK.H:171 */
+#line 174
     static int GetOverlayOtBase() { return 0x1E8; }                        /* BLOCK.H:174 */
+#line 176
     int GetOtPos(int LogicalY)                                             /* BLOCK.H:177 */
     {
         int OtPos = ClipRect.y + LogicalY + PosAdj;
-        if (OtPos < -0x43) OtPos = -0x43;
-        if (OtPos > 0x19B) OtPos = 0x19B;
+
+        if (OtPos < -0x43)
+            OtPos = -0x43;
+
+        if (OtPos > 0x19B)
+            OtPos = 0x19B;
+
+
+
         return OtPos + 0x4D;
     }
+#line 205
     void MoveToScrollTarget() { Mx = StX; My = StY; }                      /* BLOCK.H:205 */
+#line 212
     void SetTown(BOOL Val) { IsTown = Val; }                               /* BLOCK.H:212 */
     void DumpMonsters()                                                    /* BLOCK.H:228 */
     {
         MonsterList = NULL;
         DumpGraphics(&MonstTexDat, &MonstTexId);
     }
+#line 229
     void DumpObjs() { DumpGraphics(&ObjTexDat, &ObjTexId); }               /* BLOCK.H:229 */
+#line 230
     void DumpItems() { DumpGraphics(&ItemTexDat, &ItemTexId); }            /* BLOCK.H:230 */
+#line 260
     void SetObjGraphics(int Id) { SetGraphics(&ObjTexDat, &ObjTexId, Id); }       /* BLOCK.H:260 */
+#line 261
     void SetItemGraphics(int Id) { SetGraphics(&ItemTexDat, &ItemTexId, Id); }    /* BLOCK.H:261 */
 };
 

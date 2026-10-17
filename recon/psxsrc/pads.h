@@ -35,39 +35,54 @@ public:
         get_both = 0;
         Flush();
     }
+#line 87
     void SetBothFlag(unsigned char fl) { get_both = fl; }                   /* PADS.H:87 */
     void NewVal(unsigned short New);
     void BothNewVal(unsigned short New, unsigned short New2);
+#line 91
     void SetPadTick(unsigned short tick) { PADTICK = tick; }                /* PADS.H:91 */
+#line 92
     void SetPadTickMask(unsigned short mask) { PADTICKMASK = mask; }        /* PADS.H:92 */
+#line 94
     void SetActive(unsigned char a) { active = a; }                         /* PADS.H:94 */
+#line 96
     unsigned char CheckActive()                                             /* PADS.H:97 */
     {
+
         return active;
     }
+#line 102
     void SetPadType(unsigned char val) { PadType = val; }                   /* PADS.H:102 */
+#line 105
     unsigned short GetCur() const                                           /* PADS.H:106 */
     {
         if (get_both)
             return both_Cur;
+
         return Cur;
     }
+#line 112
     unsigned short GetUp() const                                            /* PADS.H:113 */
     {
         if (get_both)
             return both_Up;
+
         return Up;
     }
+#line 119
     unsigned short GetDown() const                                          /* PADS.H:120 */
     {
         if (get_both)
             return both_Down;
+
         return Down;
     }
+#line 126
     unsigned short GetTick() const                                          /* PADS.H:127 */
     {
         if (get_both)
             return both_Tick;
+
         return Tick;
     }
     unsigned short Trans(unsigned short PadVal);

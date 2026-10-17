@@ -7,6 +7,7 @@
 
 class CCritSect {
     unsigned long m_critsect;   /* +0x0 (SYM) */
+#line 1103
 public:
     void Enter() {}   /* STORM.H:1104 */
 };

@@ -20,6 +20,7 @@ struct CFont {   /* sizeof 540 */
     TextDat *ThisDat;   /* +0x214 */
     unsigned char FontHeight;   /* +0x218 */
 
+#line 59
     void Init() { ThisDat = GM_UseTexData(TextureId); }                    /* PRINTY.H:59 */
     void SetTextDat(TextDat *NewDat);
     int KanjiPrintChar(unsigned short Cx, unsigned short Cy, unsigned short kan, unsigned char R, unsigned char G, unsigned char B);
@@ -31,9 +32,13 @@ struct CFont {   /* sizeof 540 */
     void SetChar(int ch, unsigned short Frm);
     int SetOTpos(int OT);
     int GetCharWidth(unsigned char ch);
+#line 76
     int GetCharHeight(unsigned char ch) { return ThisDat->GetFr(FontTab[ch])->H; }   /* PRINTY.H:76 */
+#line 79
     int GetCharFrameNum(unsigned char ch) { return FontTab[ch]; }                    /* PRINTY.H:79 */
+#line 82
     BOOL IsDefined(unsigned char C) { return FontTab[C] != 0x3039; }                 /* PRINTY.H:82 */
+#line 85
     void ClearFont() { GM_FinishedUsing(ThisDat); }                                  /* PRINTY.H:85 */
 };
 

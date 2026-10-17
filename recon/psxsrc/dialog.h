@@ -17,6 +17,7 @@ public:
     int BackGfx;       /* +0x8 */
     int DialogOTpos;   /* +0xC */
 
+#line 61
     Dialog()                                                               /* DIALOG.H:62 */
     {
         BackGfx = 0x94;
@@ -28,8 +29,12 @@ public:
         DialogTRed = 0x20;
         DialogTGreen = 0x20;
         DialogTBlue = 0x20;
+
+
+
         DialogOTpos = CBlocks::GetOverlayOtBase();
     }
+#line 78
     ~Dialog()                                                              /* DIALOG.H:79 */
     {
     }
@@ -39,8 +44,11 @@ public:
     void Back(int DX, int DY, int DW, int DH);
     void Line(int DX, int DY, int DW);
     int SetOTpos(int OT);
+#line 91
     void SetBorder(int Type) { BorderGfx = Type; }                         /* DIALOG.H:91 */
+#line 94
     void SetBack(int Type) { BackGfx = Type; }                             /* DIALOG.H:94 */
+#line 98
     void SetRGB(unsigned char R, unsigned char G, unsigned char B)         /* DIALOG.H:99 */
     {
         DialogRed = R;

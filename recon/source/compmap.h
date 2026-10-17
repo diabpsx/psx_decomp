@@ -37,7 +37,9 @@ public:
     DLevel *CurrLevel;   /* +0xC */
 
     AMap() { hnd = -1; Init(); }                 /* COMPMAP.H:75 */
+#line 80
     ~AMap() { Init(); }                          /* COMPMAP.H:80 */
+#line 86
     BOOL IsCompressed() { return Compressed; }   /* COMPMAP.H:86 */
     void Init();
     int WriteCompressed(unsigned char *Dest, const CompClass &CompObj);

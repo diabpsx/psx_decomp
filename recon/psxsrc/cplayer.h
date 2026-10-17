@@ -31,10 +31,15 @@ public:
 
     CPlayer(BOOL InTown, int Which, int PlayerNum);
     ~CPlayer();
+#line 55
     int GetTexId() { return TexId; }                                       /* CPLAYER.H:55 */
+#line 58
     int GetLastScrX() const { return LastScrX; }                           /* CPLAYER.H:58 */
+#line 59
     int GetLastScrY() const { return LastScrY; }                           /* CPLAYER.H:59 */
+#line 60
     int GetLastOtPos() const { return LastOtPos; }                         /* CPLAYER.H:60 */
+#line 63
     static CPlayer *GetPlayer(int PNum)                                    /* CPLAYER.H:64 */
     {
         if ((unsigned)PNum >= 2) DBG_Error(NULL, "psxsrc/cplayer.h", 65);
@@ -49,10 +54,12 @@ public:
     void Dump();
     void LoadThis(int Id);
     void NonBlockingLoadNewGFX(int Id);
+#line 75
     int GetDatMaxSize()                                                    /* CPLAYER.H:76 */
     {
         if (InTown)
             return 0x19E10;
+
         return NumOfPlayers == 0 ? 0x2C308 : 0x182B8;
     }
 };
