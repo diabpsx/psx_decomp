@@ -954,6 +954,37 @@ five images are unchanged.  What the retail objects taught on the way:
   which retired symlane's `RETAIL_OBJECT_NAMES` table.  The whole-program SYM now attributes 2863
   of the 2866 functions to the retail basename; the three OBJPRINT copies above are the remainder.
 
+### Round 14 probe: SLD line maps from `#line` anchors and layout (2026-10-17)
+
+The whole-program SYM diff left one bucket: 2050 functions whose block records differ only in
+their line numbers, i.e. the source-line layout, which the PASS bar excludes.  RE2's rule (one
+`#line` anchor before each function, retail SLD reproduced by ordinary layout inside the body)
+transfers to this lane: VERSION.CPP is the proof, 5/5 functions SLD-exact with bytes and SYM
+records unchanged (`tools/sldcmp.py version`).  What cc1plus 2.7.2 does, from probes with the
+game compiler (C:/tmp_tpl/sld/probe*.py):
+
+- **One line note per statement, at the line where the statement ends** (its `;`), however the
+  statement is split across lines.  A function call nested in an argument list adds no note.
+- **Code-less statements still emit a note**: `((void)0);`, `return;`, an empty `{}` block,
+  `if (0) ...`.  A bare `;` does not.  So a disabled debug macro leaves its line in the SLD.
+- **Line notes are fixed points; the scheduler moves instructions across them.**  Retail's
+  interleaved lines inside one apparent statement (GetWord's `335, 338, 335, 338`) mean two
+  retail statements whose instructions were scheduled past each other, and the layout that
+  reproduces them recovers the original statement structure: `Minutes /= 360;` on 335 before
+  `return Words[Minutes % 118];` on 338, and `Word = GetWord(VerString);` on 235 before the
+  `sprintf` on 236 (the temporary gets no SYM record: its pseudo is folded into the call).
+- The SYM function record's line is the `{` line; the block records' lines are relative to it;
+  the Function-end line is the last note (the last statement), not the `}`.
+- cc1plus accepts a newline inside a string literal and the statement then ends on the later
+  line (a mis-edit found this; bytes stay identical, the note moves).
+
+Baseline before any layout work: `tools/sldcmp.py build/native_program/link/diabpsx.munged.sym.txt -q`
+reports 129/2687 functions SLD-exact (the GLIB C sources and a few already laid-out TUs).  The
+file-name half of the SLD is a lane matter, not a source one: retail recorded `C:\diabpsx\SOURCE\X.CPP`,
+`C:\diabpsx\PSXSRC\X.CPP` and `C:\DIABPSX\GLIBDEV\SOURCE\[PSX\]X.C`, which ASPSX builds from the
+working directory as typed plus the upper-cased bare `.file` name (RE2's finding), so each compile
+must run from a `C:\diabpsx\<DIR>` working directory (a junction onto recon/) with the bare file name.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

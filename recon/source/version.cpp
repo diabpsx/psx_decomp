@@ -158,27 +158,6 @@ int Day;
 
 char MyVerString[120] = {0};   /* Retail initialized buffer at 0x800E3C1C. */
 
-/* @0x800826A0 VERSION.CPP:230 */
-void VER_InitVersion(void)
-{
-    char VerString[120];
-
-    GetVersionString(VerString);
-    sprintf(MyVerString, "VERSION\n%s\n\nCODEWORD\n%s", VerString, GetWord(VerString));
-}
-
-/* @0x800826E4 VERSION.CPP:241 */
-char *VER_GetVerString(void)
-{
-    return MyVerString;
-}
-
-/* @0x800826F4 VERSION.CPP:285 */
-int CharPair2Num(char *Str)
-{
-    return (Str[0] - '0') * 10 + (Str[1] - '0');
-}
-
 extern "C" {
 void *memcpy(void *, const void *, unsigned int);
 char *strcpy(char *, const char *);
@@ -187,26 +166,62 @@ void DBG_Error(char *, char *, int);
 }
 void strupr(char *Buffa);
 
-/* @0x800B0A18 VERSION.CPP:252 */
+#line 229
+void VER_InitVersion(void)
+{
+    char VerString[120];
+    char *Word;
+
+    GetVersionString(VerString);
+    Word = GetWord(VerString);
+    sprintf(MyVerString, "VERSION\n%s\n\nCODEWORD\n%s", VerString, Word);
+}
+
+
+#line 240
+char *VER_GetVerString(void)
+{
+    return MyVerString;
+}
+
+
+#line 251
 char *GetVersionString(char *VersionString2)
 {
     char VersionString[40];
 
+
+
     memcpy(&VersionString[0], __DATE__, 3);       /* "May" */
     memcpy(&VersionString[3], __DATE__ + 9, 2);   /* year */
     memcpy(&VersionString[5], __DATE__ + 4, 2);   /* day */
+
     if (VersionString[5] == ' ')
         VersionString[5] = '0';
+
     VersionString[7] = '.';
+
     memcpy(&VersionString[8], __TIME__, 2);       /* hours */
     memcpy(&VersionString[10], __TIME__ + 3, 2);  /* minutes */
     VersionString[12] = 0;
+
+
     strupr(VersionString);
+
     strcpy(VersionString2, VersionString);
+
     return VersionString2;
 }
 
-/* @0x800B0AEC VERSION.CPP:299 */
+
+#line 284
+int CharPair2Num(char *Str)
+{
+    return (Str[0] - '0') * 10 + (Str[1] - '0');
+}
+
+
+#line 298
 char *GetWord(char *VStr)
 {
     BOOL Found;
@@ -216,22 +231,36 @@ char *GetWord(char *VStr)
 
     Year = CharPair2Num(&VStr[3]);
     Day = CharPair2Num(&VStr[5]);
+
+
     DayCount = 0;
+
     memcpy(MonStr, VStr, 3);
+
     MonStr[3] = 0;
+
     Found = 0;
+
     for (int i = 0; i < 12 && !Found; i++) {
+
         if (!strcmp(MonDays[i].Month, MonStr))
             Found = 1;
         else
             DayCount += MonDays[i].Days;
     }
-    if (!Found)
-        DBG_Error(NULL, "source/VERSION.cpp", 325);
+
+    if (!Found) DBG_Error(NULL, "source/VERSION.cpp", 325);
+
     DayCount += Day;
     DayCount += Year * 365;
+
     Minutes = DayCount * 24 * 60;
+
     Minutes += CharPair2Num(&VStr[8]) * 60;
     Minutes += CharPair2Num(&VStr[10]);
-    return Words[(Minutes / 360) % 118];
+
+    Minutes /= 360;
+
+
+    return Words[Minutes % 118];
 }
