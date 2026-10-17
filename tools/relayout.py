@@ -238,6 +238,7 @@ def decl_pair(lines, lead, merged):
 
 HEAD_BRACE = re.compile(r'^(\s*(?:\}\s*)?(?:(?:else\s+)?(?:if|while|for)\s*\(.*\)|else))\s*\{\s*$')
 SIMPLE_STMT = re.compile(r'^(?:return\b[^;]*|break|continue)\s*;$')
+LABEL_OR_HEAD = re.compile(r'^(?:(?:case\b[^:]*|default)\s*:|else|(?:\}\s*)?(?:else\s+)?(?:if|while|for)\s*\(.*\))$')
 
 
 def single_statement_block(code, open_i, stmt_i, close_i):
@@ -422,7 +423,9 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
                     joined = head_code + ' ' + stmt
             if joined is None:
                 # only a complete simple statement joins, and only onto a control head (`for (..)`, `else`)
-                if (not simple or not (head_code.endswith(')') or head_code.endswith('else'))
+                # (`stmt; break;` inside a switch case is the compact-case idiom: a break/continue may follow a statement)
+                if (not simple or not (head_code.endswith(')') or head_code.endswith('else') or re.match(r'^\s*(?:case\b|default\b)', head_code)
+                                       or (re.match(r'^(?:break|continue)\s*;$', stmt_code) and STMT.match(head_code.strip())))
                         or any(not blank(j) and not comment_only(j) for j in group[:-1])):
                     return manual(name, f'line {lg_last} would have to share retail line {target} with another statement')
                 joined = head_code + ' ' + stmt
@@ -464,13 +467,19 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
         brace_join = None
         if need < 0 and lead and (STMT.match(code[last_i].strip()) or SIMPLE_STMT.match(code[last_i].strip())):
             close_k = single_statement_block(code, lead[-1], last_i, close_i)
-            if close_k is not None and rewrites.get(lead[-1], lines[lead[-1]]) is not None:
+            head_text = rewrites.get(lead[-1], lines[lead[-1]])
+            if close_k is not None and head_text is not None:
                 # `} else {` / stmt / `}` where retail wrote `} else stmt;`: the block loses its braces
                 head_i = lead.pop()
-                head_text = rewrites.get(head_i, lines[head_i])   # it may itself be a rewritten `} else {`
                 brace_join = (head_i, strip_comments(head_text).rstrip()[:-1].rstrip() + ' ' + lines[last_i].strip())
                 rewrites[close_k] = closing_rewrite(lines[close_k]); need += 1
                 rewrites[head_i] = brace_join[1]
+            elif head_text is not None and LABEL_OR_HEAD.match(strip_comments(head_text).strip()):
+                # `case X:` / `default:` / `else` / a brace-less `if (..)` head on its own line, the statement
+                # on the next: retail wrote them on one line (`case 2: x = 1;`, `else x = 1;`)
+                head_i = lead.pop()
+                brace_join = (head_i, strip_comments(head_text).rstrip() + ' ' + lines[last_i].strip()); need += 1
+                if head_i in rewrites: rewrites[head_i] = brace_join[1]
         while need < 0 and lead and slack_n > 0 and not safe and movable_statement(code, lines, lead[0], out, slack_at):
             # a plain statement with no SLD footprint: it can only be placed where the budget allows; use
             # the blank slack before the previous statement (one statement per line; the bytes gate

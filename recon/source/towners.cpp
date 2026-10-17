@@ -65,20 +65,17 @@ void InitTownerInfo(int i, long w, unsigned char sel, int t, int x, int y, char 
     towner[i]._tSeed = GetRndSeed();
 }
 
+#line 165
 void InitQstSnds(int i)
 {
     int j;
-
     j = i;
-    if (boyloadflag)
-        j++;
+    if (boyloadflag) j++;
     for (int quest = 0; quest < MAXQUESTS; quest++) {
         towner[i].qsts[quest]._qsttype = quests[quest]._qtype;
         towner[i].qsts[quest]._qstmsg = Qtalklist[j][quest];
-        if (Qtalklist[j][quest] != -1)
-            towner[i].qsts[quest]._qstmsgact = 1;
-        else
-            towner[i].qsts[quest]._qstmsgact = 0;
+        if (Qtalklist[j][quest] != -1) towner[i].qsts[quest]._qstmsgact = 1;
+        else towner[i].qsts[quest]._qstmsgact = 0;
     }
 }
 

@@ -256,18 +256,24 @@ int PrintCredits(int StrNo, int Y, int CharFade, int RFlag, int GFlag, int BFlag
 }
 
 /* @0x8013DA78 CREDITS.CPP:580 */
+#line 579
 void DrawCreditsTitle(int TitleNo, int TitleFade, int TitleMode, int NextTitleNo, int Y)
 {
+
+
+
     if ((TitleMode == 0 && TitleNo == CreditTitleNo) || (TitleMode == 2 && NextTitleNo == CreditTitleNo)) {
+
         TitleMode = 1;
         TitleFade = 127;
+
     }
     switch (TitleMode) {
     case 0:
         PrintCredits(TitleNo, Y, TitleFade, 255, 255, 0);
         break;
-    case 1:
-        CreditTitleNo = TitleNo;
+    case 1: CreditTitleNo = TitleNo;
+
     case 2:
         PrintCredits(CreditTitleNo, Y, TitleFade, 255, 255, 0);
         break;

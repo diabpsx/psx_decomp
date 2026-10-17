@@ -797,12 +797,12 @@ void MakeLightTable(void)
 {
 }
 
+#line 1155
 void InitLightMax(void)
 {
     if (light4flag)
         lightmax = 3;
-    else
-        lightmax = -0x80;
+    else lightmax = -0x80;
 }
 
 #line 1165

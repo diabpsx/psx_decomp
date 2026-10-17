@@ -2164,20 +2164,32 @@ void STextUp(void)
 }
 
 /* @0x800703DC */
+#line 2363
 void STextDown(void)
 {
+
+
+
+
     if (stextsel != -1) {
+
         if (stextscrl) {
+
             if (stextsel == stextdown) {
-                if (stextsval < stextsmax)
-                    stextsval++;
+
+                if (stextsval < stextsmax) stextsval++;
+
+
             } else {
                 stextsel++;
                 while (!stext[stextsel]._ssel) {
+
                     if (stextsel == 23)
                         stextsel = 0;
                     else
                         stextsel++;
+
+
                 }
             }
         } else {
@@ -2186,10 +2198,10 @@ void STextDown(void)
             else
                 stextsel++;
             while (!stext[stextsel]._ssel) {
-                if (stextsel == 23)
-                    stextsel = 0;
-                else
-                    stextsel++;
+
+                if (stextsel == 23) stextsel = 0;
+                else stextsel++;
+
             }
         }
     }

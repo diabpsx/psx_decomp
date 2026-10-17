@@ -157,6 +157,7 @@ void CheckTown(void)
 }
 
 /* @0x80037B18 CURSOR.CPP:247 */
+#line 246
 void CheckRportal(void)
 {
     int ocursmx = cursmx;
@@ -166,8 +167,10 @@ void CheckRportal(void)
         int mx = missileactive[i];
         if (missile[mx]._mitype == MIT_RPORTAL) {
             for (int dir = 0; dir < 8; dir++) {
+
                 cursmx = ocursmx + offset_x[dir];
                 cursmy = ocursmy + offset_y[dir];
+
                 if (((cursmx == missile[mx]._mix - 1) && (cursmy == missile[mx]._miy)) ||
                     ((cursmx == missile[mx]._mix) && (cursmy == missile[mx]._miy - 1)) ||
                     ((cursmx == missile[mx]._mix - 1) && (cursmy == missile[mx]._miy - 1)) ||
@@ -178,10 +181,8 @@ void CheckRportal(void)
                     trigflag = 1;
                     ClearPanel();
                     strcpy(infostr, GetStr(0x31E));
-                    if (!setlevel)
-                        strcpy(tempstr, GetStr(0x479));
-                    else
-                        strcpy(tempstr, GetStr(0x244));
+                    if (!setlevel) strcpy(tempstr, GetStr(0x479));
+                    else strcpy(tempstr, GetStr(0x244));
                     AddPanelString(tempstr, TEXT_CENTER);
                     cursmx = missile[mx]._mix;
                     cursmy = missile[mx]._miy;

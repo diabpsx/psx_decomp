@@ -801,6 +801,7 @@ static int DRLG_L3Spawn(int x, int y, int *totarea)
     return false;
 }
 
+#line 1051
 static void DRLG_L3Pool(void)
 {
     int i, j, found;
@@ -810,36 +811,35 @@ static void DRLG_L3Pool(void)
     static const unsigned char poolsub[] = { 0, 35, 26, 36, 25, 29, 34, 7, 33, 28, 27, 37, 32, 31, 30 };
 
     for (duny = 0; duny < DMAXY; duny++) {
+
         for (dunx = 0; dunx < DMAXX; dunx++) {
+
             if (dungeon[dunx][duny] == 8) {
+
                 dungeon[dunx][duny] |= 0x80;
                 totarea = 1;
                 found = 0;
 
-                if (dunx + 1 < DMAXX && found == 0)
-                    found = DRLG_L3Spawn(dunx + 1, duny, &totarea);
-                else
-                    found = 1;
-                if (dunx - 1 > 0 && found == 0)
-                    found = DRLG_L3Spawn(dunx - 1, duny, &totarea);
-                else
-                    found = 1;
-                if (duny + 1 < DMAXY && found == 0)
-                    found = DRLG_L3Spawn(dunx, duny + 1, &totarea);
-                else
-                    found = 1;
-                if (duny - 1 > 0 && found == 0)
-                    found = DRLG_L3Spawn(dunx, duny - 1, &totarea);
-                else
-                    found = 1;
+                if (dunx + 1 < DMAXX && found == 0) found = DRLG_L3Spawn(dunx + 1, duny, &totarea);
+                else found = 1;
+                if (dunx - 1 > 0 && found == 0) found = DRLG_L3Spawn(dunx - 1, duny, &totarea);
+                else found = 1;
+                if (duny + 1 < DMAXY && found == 0) found = DRLG_L3Spawn(dunx, duny + 1, &totarea);
+                else found = 1;
+                if (duny - 1 > 0 && found == 0) found = DRLG_L3Spawn(dunx, duny - 1, &totarea);
+                else found = 1;
 
                 poolchance = ENG_random(100);
                 for (i = duny - totarea; i < duny + totarea; i++) {
+
                     for (j = dunx - totarea; j < dunx + totarea; j++) {
+
                         if ((dungeon[j][i] & 0x80) != 0 && i >= 0 && i < DMAXY && j >= 0 && j < DMAXX) {
+
                             dungeon[j][i] &= 0x7f;
 
                             if (totarea > 4 && poolchance < 25 && found == 0) {
+
                                 k = poolsub[dungeon[j][i]];
                                 if (k != 0 && k <= 37)
                                     dungeon[j][i] = k;

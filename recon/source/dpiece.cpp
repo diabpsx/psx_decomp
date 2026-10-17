@@ -58,32 +58,38 @@ void FreedPiece(void)
 }
 
 /* @0x8008287C DPIECE.CPP:113 */
+#line 112
 void ConvertdPiece(void)
 {
     ASSERT(dPiece, 114);
+
     for (int y = 0; y < 112; y++) {
+
         for (int x = 0; x < 112; x++) {
+
             short dp = GetDPiece(x, y);
+
             ASSERT((unsigned short)dp <= 2049, 122);
+
             dung_map[x][y].dBits &= 0xF0;
-            if (nSolidTable[dp])
-                SetSOLID(x, y);
-            else
-                ClearSOLID(x, y);
-            if (nMissileTable[dp])
-                SetMISSILE(x, y);
-            else
-                ClearMISSILE(x, y);
-            if (nBlockTable[dp])
-                SetBLOCK(x, y);
-            else
-                ClearBLOCK(x, y);
-            if (nTrapTable[dp])
-                SetTRAP(x, y);
-            else
-                ClearTRAP(x, y);
+
+            if (nSolidTable[dp]) SetSOLID(x, y);
+            else ClearSOLID(x, y);
+
+            if (nMissileTable[dp]) SetMISSILE(x, y);
+            else ClearMISSILE(x, y);
+
+            if (nBlockTable[dp]) SetBLOCK(x, y);
+            else ClearBLOCK(x, y);
+
+            if (nTrapTable[dp]) SetTRAP(x, y);
+            else ClearTRAP(x, y);
+
             if (!dp)
+
                 SetSOLID(x, y);
+
+
         }
     }
 }

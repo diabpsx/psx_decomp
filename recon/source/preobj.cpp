@@ -273,14 +273,17 @@ void AddL2Door(int i, int x, int y, int ot)
     object[i]._oVar4 = 0;
 }
 
+#line 223
 void AddL3Door(int i, int x, int y, int ot)
 {
+
     object[i]._oDoorFlag = 1;
+
     object[i]._oAnimFlag = 0;
-    if (ot == OBJ_L3LDOOR)
-        ObjSetMicro(x, y, 531);
-    else
-        ObjSetMicro(x, y, 534);
+
+
+    if (ot == OBJ_L3LDOOR) ObjSetMicro(x, y, 531);
+    else ObjSetMicro(x, y, 534);
     object[i]._oVar4 = 0;
 }
 
@@ -1495,9 +1498,21 @@ void InitObjects()
  * the main-image AddObject() across the overlay boundary. Case order below matches the retail
  * code-block layout (VA order in the oracle), not enum order — see the file banner for the
  * AddObjLight-literal deltas and the OBJ_L1LIGHT fallthrough. ---- */
+        /* fallthrough */
+#line 1725
 void PreObjObjAddSwitch(int ot, int ox, int oy, int oi)
 {
     switch (ot) {
+
+
+
+
+
+
+
+
+
+
     case OBJ_SKFIRE:
     case OBJ_CANDLE1:
     case OBJ_CANDLE2:
@@ -1541,6 +1556,7 @@ void PreObjObjAddSwitch(int ot, int ox, int oy, int oi)
     case OBJ_FLAMELVR:
         AddFlameLvr(oi);
         break;
+
     case OBJ_WATER:
         object[oi]._oAnimFrame = 1;
         break;
@@ -1602,9 +1618,7 @@ void PreObjObjAddSwitch(int ot, int ox, int oy, int oi)
     case OBJ_BCROSS:
     case OBJ_TBCROSS:
         AddBrnCross(oi);
-        /* fallthrough */
-    case OBJ_L1LIGHT:
-        AddObjLight(oi, 0x1B8);
+    case OBJ_L1LIGHT: AddObjLight(oi, 0x1B8);
         break;
     case OBJ_PEDISTAL:
         AddPedistal(oi);

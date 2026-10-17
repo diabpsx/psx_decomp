@@ -616,14 +616,13 @@ void FuncRESURRECTBEAM(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007D448 MISPRINT.CPP:625 */
+#line 624
 void FuncWEAPEXP(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     ScrX += Ms->_miVar6;
     ScrY += Ms->_miVar7;
-    if (Ms->_miVar2 == 1)
-        ParticleExp(Ms, ScrX, ScrY, 0xFF0000, OtPos + 2);
-    else
-        TempPrintMissile(ScrX, ScrY, OtPos + 2, 8, Ms->_miAnimFrame, Ms->_mimfnum, 0, 0x12, 0, 0, 0x80, 0x80, 0x80, 0);
+    if (Ms->_miVar2 == 1) ParticleExp(Ms, ScrX, ScrY, 0xFF0000, OtPos + 2);
+    else TempPrintMissile(ScrX, ScrY, OtPos + 2, 8, Ms->_miAnimFrame, Ms->_mimfnum, 0, 0x12, 0, 0, 0x80, 0x80, 0x80, 0);
 }
 
 /* PRIMPOOL.H: the retail object has this copy ahead of the static-initialiser thunks and its literal last in .rdata,

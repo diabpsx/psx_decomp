@@ -560,50 +560,58 @@ void FePlayerClassMenuCtrl(void)
 }
 
 /* @0x8013AFB4 FE.CPP:778 */
+#line 777
 void FeDrawChrClass(void)
 {
     Dialog FeBack;
     RECT FeRect;
     char TempStr[4];
-
     strcpy(TempStr, " ");   /* builtin strcpy of a constant = the retail 2-byte lhu/sh copy (an initializer would bzero the tail) */
 
     switch (FeChrClass[FePlayerNo]) {
     case 0:
         FeTData->PrintFt4(0x6E, 0x24, 0x32, 0, 0xFF, 0);
         break;
-    case 1:
-        FeTData->PrintFt4(0x6C, 0x24, 0x32, 0, 0xFF, 0);
+    case 1: FeTData->PrintFt4(0x6C, 0x24, 0x32, 0, 0xFF, 0);
         break;
-    case 2:
-        FeTData->PrintFt4(0x6D, 0x24, 0x32, 0, 0xFF, 0);
+    case 2: FeTData->PrintFt4(0x6D, 0x24, 0x32, 0, 0xFF, 0);
         break;
-    default:
-        FeTData->PrintFt4(0x6B, 0x24, 0x32, 0, 0xFF, 0);
+    default: FeTData->PrintFt4(0x6B, 0x24, 0x32, 0, 0xFF, 0);
         break;
+
     }
     if (FeChrClass[FePlayerNo] != -1 && FeChrClass[FePlayerNo] != 3) {
+
+
+
+
         setRECT(&FeRect, 0xAC, 0x2B, 0x80, 0x80);
+
+
         MediumFont.Print(0, 0x12, FePlayerName[FePlayerNo], JustCentre, &FeRect, GOLDR, GOLDG, GOLDB);
+
+
+
+
+
         MediumFont.Print(0, 0x27, GetStr(0x245), JustLeft, &FeRect, WHITER, WHITEG, WHITEG);
-        if (FeChrClass[FePlayerNo] != -1)
-            sprintf(TempStr, "%i", 1);
+        if (FeChrClass[FePlayerNo] != -1) sprintf(TempStr, "%i", 1);
         MediumFont.Print(0, 0x27, TempStr, JustRight, &FeRect, WHITER, WHITEG, WHITEG);
+
         MediumFont.Print(0, 0x34, GetStr(0x419), JustLeft, &FeRect, WHITER, WHITEG, WHITEG);
-        if (FeChrClass[FePlayerNo] != -1)
-            sprintf(TempStr, "%i", StrengthTbl[FeChrClass[FePlayerNo]]);
+        if (FeChrClass[FePlayerNo] != -1) sprintf(TempStr, "%i", StrengthTbl[FeChrClass[FePlayerNo]]);
         MediumFont.Print(0, 0x34, TempStr, JustRight, &FeRect, WHITER, WHITEG, WHITEG);
+
         MediumFont.Print(0, 0x41, GetStr(0x26F), JustLeft, &FeRect, WHITER, WHITEG, WHITEG);
-        if (FeChrClass[FePlayerNo] != -1)
-            sprintf(TempStr, "%i", MagicTbl[FeChrClass[FePlayerNo]]);
+        if (FeChrClass[FePlayerNo] != -1) sprintf(TempStr, "%i", MagicTbl[FeChrClass[FePlayerNo]]);
         MediumFont.Print(0, 0x41, TempStr, JustRight, &FeRect, WHITER, WHITEG, WHITEG);
+
         MediumFont.Print(0, 0x4E, GetStr(0xFF), JustLeft, &FeRect, WHITER, WHITEG, WHITEG);
-        if (FeChrClass[FePlayerNo] != -1)
-            sprintf(TempStr, "%i", DexterityTbl[FeChrClass[FePlayerNo]]);
+        if (FeChrClass[FePlayerNo] != -1) sprintf(TempStr, "%i", DexterityTbl[FeChrClass[FePlayerNo]]);
         MediumFont.Print(0, 0x4E, TempStr, JustRight, &FeRect, WHITER, WHITEG, WHITEG);
+
         MediumFont.Print(0, 0x5B, GetStr(0x4B7), JustLeft, &FeRect, WHITER, WHITEG, WHITEG);
-        if (FeChrClass[FePlayerNo] != -1)
-            sprintf(TempStr, "%i", VitalityTbl[FeChrClass[FePlayerNo]]);
+        if (FeChrClass[FePlayerNo] != -1) sprintf(TempStr, "%i", VitalityTbl[FeChrClass[FePlayerNo]]);
         MediumFont.Print(0, 0x5B, TempStr, JustRight, &FeRect, WHITER, WHITEG, WHITEG);
     }
 }

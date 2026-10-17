@@ -610,20 +610,26 @@ void doparticlechain(int sx, int sy, int dx, int dy, int count, int scale, int s
 }
 
 /* @0x8009FA04 DAVEL.CPP:570 */
+#line 569
 void ParticleMissile(MissileStruct *Ms, int ScrX, int ScrY, int colour, int OtPos)
 {
     ScrY -= 16;
+
     if (SetParticle) {
+
         SetParticle = 0;
         if (Ms->_misource == 0)
+
             p1partexecnum = 1;
+
         if (Ms->_misource == 1)
+
             p2partexecnum = Ms->_misource;
+
+
     }
-    if (Ms->_mitype == 1)
-        doparticlechain(ScrX, ScrY, Ms->_mixvel, Ms->_miyvel, 8, 0x8000, 0x1000, 1, 0, colour, OtPos, Ms->_misource);
-    else
-        doparticlechain(ScrX, ScrY, Ms->_mixvel, Ms->_miyvel, 8, 0xF000, 0x2000, 1, 0, colour, OtPos, Ms->_misource);
+    if (Ms->_mitype == 1) doparticlechain(ScrX, ScrY, Ms->_mixvel, Ms->_miyvel, 8, 0x8000, 0x1000, 1, 0, colour, OtPos, Ms->_misource);
+    else doparticlechain(ScrX, ScrY, Ms->_mixvel, Ms->_miyvel, 8, 0xF000, 0x2000, 1, 0, colour, OtPos, Ms->_misource);
 }
 
 /* @0x8009FAC0 DAVEL.CPP:591 */

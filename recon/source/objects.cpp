@@ -3315,23 +3315,31 @@ void SyncPedistal(int i)
 
 }
 
+#line 4213
 void SyncL2Doors(int i)
 {
+
     int dx, dy;
 
-    if (object[i]._oVar4 == 0)
-        object[i]._oMissFlag = 0;
-    else
-        object[i]._oMissFlag = 1;
+    if (object[i]._oVar4 == 0) object[i]._oMissFlag = 0;
+    else object[i]._oMissFlag = 1;
     dx = object[i]._ox;
     dy = object[i]._oy;
     object[i]._oSelFlag = 2;
+
+
+
     if (object[i]._otype == 0x2A && object[i]._oVar4 == 0) {
         ObjSetMicro(dx, dy, 0x21A);
+
+
     } else if (object[i]._otype == 0x2A && (object[i]._oVar4 == 1 || object[i]._oVar4 == 2)) {
         ObjSetMicro(dx, dy, 0xD);
+
     } else if (object[i]._otype == 0x2B && object[i]._oVar4 == 0) {
         ObjSetMicro(dx, dy, 0x21C);
+
+
     } else if (object[i]._otype == 0x2B && (object[i]._oVar4 == 1 || object[i]._oVar4 == 2)) {
         ObjSetMicro(dx, dy, 0x11);
     }

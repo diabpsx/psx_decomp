@@ -256,26 +256,26 @@ static int CalcNumOfStrings(char **TPtr)
 }
 
 /* @0x8007B764 LANG.CPP:306 */
+#line 305
 static void GetLangFileName(enum LANG_TYPE NewLanguageType, char *Dest)
 {
     char *Ext;
 
     Ext = GetLangFileNameExt(NewLanguageType);
-    if (!Ext)
-        DBG_Error(0, "source/LANG.cpp", 310);
+    if (!Ext) DBG_Error(0, "source/LANG.cpp", 310);
+
     *Dest = 0;
+
+
     switch (LangDbNo) {
     case LANG_DB_MAIN:
         strcat(Dest, "MAINTXT.");
         break;
-    case LANG_DB_QUEST:
-        strcat(Dest, "QUESTTXT.");
+    case LANG_DB_QUEST: strcat(Dest, "QUESTTXT.");
         break;
-    case LANG_DB_BACK:
-        strcat(Dest, "BACKTXT.");
+    case LANG_DB_BACK: strcat(Dest, "BACKTXT.");
         break;
-    case LANG_DB_CREDITS:
-        strcat(Dest, "CREDTXT.");
+    case LANG_DB_CREDITS: strcat(Dest, "CREDTXT.");
         break;
     }
     strcat(Dest, Ext);

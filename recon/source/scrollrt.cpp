@@ -34,19 +34,62 @@ void DrawView(int StartX, int StartY)
         DrawDiabloMsg();
 }
 
+#line 281
 void DrawAndBlit(void)
 {
+
+
+
+
     if (GLUE_Finished() || IsGameLoading())
+
         return;
 
     drawhpflag = 1;
     drawmanaflag = 1;
     drawbtnflag = 1;
     drawsbarflag = 1;
-    if (leveltype)
-        DrawView(ViewX, ViewY);
-    else
-        T_DrawView(ViewX, ViewY);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (leveltype) DrawView(ViewX, ViewY);
+    else T_DrawView(ViewX, ViewY);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     drawhpflag = 0;
     drawmanaflag = 0;
     drawbtnflag = 0;

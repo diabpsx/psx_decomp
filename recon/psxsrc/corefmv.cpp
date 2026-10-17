@@ -65,37 +65,99 @@ void SCR_DumpClut(void);
 short PlayFMV(char *str, int w, int h);
 
 /* @0x800ACF58 COREFMV.CPP:95 */
+#line 94
 short PlayFMV(char *str, int w, int h)
 {
+
+
     short RetVal;
     enum OVER_TYPE CurrentOver;
 
     PA_SetPauseOk(0);
+
     CurrentOver = OVR_GetCurrentOverlay();
+
     music_stop();
+
     OVR_LoadFmv();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     RetVal = PlayFMVOverLay(str, w, h);
 
     if (!strcmp(str, "EACLOGO.MOV") && !user_start) {
+
         RetVal = PlayFMVOverLay("BLIZZARD.MOV", w, h);
-        if (!user_start)
-            RetVal = PlayFMVOverLay("DIABLO1.MOV", w, h);
+        if (!user_start) RetVal = PlayFMVOverLay("DIABLO1.MOV", w, h);
     }
 
     if ((!strcmp(str, "DIABVIC1.MOV") || !strcmp(str, "DIABVIC2.MOV") || !strcmp(str, "DIABVIC3.MOV")) && !user_start)
+
         RetVal = PlayFMVOverLay("DIABEND.MOV", w, h);
+
+
+
+
+
 
     switch (CurrentOver) {
     case OVR_NONE:
         break;
-    case OVR_PREGAME:
-        OVR_LoadPregame();
+    case OVR_PREGAME: OVR_LoadPregame();
         break;
+
     case OVR_GAME:
         OVR_LoadGame();
         break;
+
     case OVR_FRONTEND:
         OVR_LoadFrontend();
+
         break;
     case OVR_FMV:
         break;

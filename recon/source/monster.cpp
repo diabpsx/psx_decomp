@@ -608,8 +608,10 @@ void M2MStartHit(int mid, int i, int dam)
  * substantially from what's written here (a1/a2 mapping, frame size) suggesting a real ordering or
  * missing-statement gap, not just coloring -- needs a full re-derivation pass, not attempted further
  * this session (time budget). */
+#line 867
 void MonstStartKill(int i, int pnum, unsigned char sendmsg)
 {
+
     int md;
     MonsterStruct *Monst;
     MonsterStruct *pmonster;
@@ -617,30 +619,43 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
 
     Monst = &monster[i];
 
-    if (pnum >= 0)
-        Monst->mWhoHit = 1 << pnum;
+
+    if (pnum >= 0) Monst->mWhoHit = 1 << pnum;
+
+
 
     if (pnum < 2 && i >= 3) {
+
         int omp = myplr;
         myplr = pnum;
         AddPlrMonstExper(Monst->mLevel, Monst->mExp, Monst->mWhoHit);
         myplr = omp;
+
+
     }
 
     monstkills[Monst->MType->mtype]++;
+
     Monst->_mhitpoints = 0;
     RemoveStoneMissiles(i, Monst->_mx, Monst->_my);
+
+
+
     SetRndSeed(ENG_random(GetRndSeed()));
+
+
     if (QuestStatus(Q_GARBUD) && Monst->mName == UniqMonst[UMT_GARBUD].mName)
         CreateTypeItem(Monst->_mx + 1, Monst->_my + 1, 1, ITYPE_MACE, IMISC_NONE, 1, 0);
-    else if (i >= 4)
-        SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+    else if (i >= 4) SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
 
-    if (Monst->_uniqtype)
-        stream_stop();
+
+    if (Monst->_uniqtype) stream_stop();
+
 
     if (Monst->MType->mtype == MT_DIABLO)
+
         M_DiabloDeath(i, 1, pnum);
+
     else
         PlayEffect(i, 2);
 
@@ -648,14 +663,13 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
     _mx = pmonster[i]._moldx;
     _my = pmonster[i]._moldy;
 
-    if (pnum >= 0)
-        md = M_GetDir(i);
-    else
-        md = Monst->_mdir;
+    if (pnum >= 0) md = M_GetDir(i);
+    else md = Monst->_mdir;
     Monst->_mdir = md;
     NewMonsterAnim(i, Monst->MType->Anims[MA_DEATH], md, MA_DEATH);
     Monst->_mmode = MM_DEATH;
     if (i >= 4) {
+
         Monst->_mxoff = 0;
         Monst->_myoff = 0;
     }
@@ -670,37 +684,43 @@ void MonstStartKill(int i, int pnum, unsigned char sendmsg)
     M_ClearSquares(i);
     dung_map[_mx][_my].dMonster = i + 1;
     CheckQuestKill(i, sendmsg);
+
     M_FallenFear(_mx, _my);
+
     if (Monst->MType->mtype >= MT_NACID && Monst->MType->mtype <= MT_NACID + 3)
         AddMissile(_mx, _my, 0, 0, 0, MIT_ACIDPUD, 1, i, Monst->_mint + 1, 0);
 }
 
+#line 952
 void SyncMonstStartKill(int i, int pnum, unsigned char sendmsg)
 {
+
+
+
     int md;
     MonsterStruct *Monst = &monster[i];
     int _mx, _my;
 
-    if (pnum >= 0)
-        Monst->mWhoHit = 1 << pnum;
+    if (pnum >= 0) Monst->mWhoHit = 1 << pnum;
+
+
 
     Monst->_mhitpoints = 0;
     SetRndSeed(ENG_random(GetRndSeed()));
 
-    if (i >= 4)
-        SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+    if (i >= 4) SpawnItem(i, Monst->_mx, Monst->_my, sendmsg);
+
 
     _mx = Monst->_moldx;
     _my = Monst->_moldy;
 
-    if (pnum >= 0)
-        md = M_GetDir(i);
-    else
-        md = Monst->_mdir;
+    if (pnum >= 0) md = M_GetDir(i);
+    else md = Monst->_mdir;
     Monst->_mdir = md;
     NewMonsterAnim(i, Monst->MType->Anims[MA_DEATH], md, MA_DEATH);
     Monst->_mmode = MM_DEATH;
     if (i >= 4) {
+
         Monst->_mxoff = 0;
         Monst->_myoff = 0;
     }
