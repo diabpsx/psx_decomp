@@ -326,7 +326,9 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
     for off, ln in sorted(op.items()):
         if off in rp:
             if tgt.setdefault(ln, rp[off]) != rp[off]:
-                if (not safe and off == max(op) and ln == max(op.values()) and rp[off] > tgt[ln]):
+                last_phys = src.physical_of(ln, logical)
+                top_level = (len(last_phys) == 1 and all(code[x].strip() == '' for x in range(last_phys[0] + 1, close_i)))
+                if (not safe and off == max(op) and ln == max(op.values()) and rp[off] > tgt[ln] and top_level):
                     # the function's epilogue carries a later retail line than its last statement: retail ended
                     # the void function with a `return;` on that line (the PC twins end with `return ...;`)
                     trailing_return = rp[off]; continue
