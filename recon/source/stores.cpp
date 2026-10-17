@@ -1418,31 +1418,36 @@ void S_StartHealer(void)
 }
 
 /* @0x8006E304 */
+#line 1687
 void S_ScrollHBuy(int idx)
 {
+
     int l;
 
     ClearSText(5, 0x15);
     stextup = 5;
     for (l = 5; l < 0xF; l += 4) {
-        if (_healitem[StorePlrNo][idx]._itype != -1) {
-            int ls;
-            int iclr;
-            char *StrPtr;
 
+        if (_healitem[StorePlrNo][idx]._itype != -1) {
+            int ls, iclr;
+            char *StrPtr;
             ls = l;
             iclr = (_healitem[StorePlrNo][idx]._iStatFlag == 0) * 2;
+
+
+
             StrPtr = MakeItemStr(&_healitem[StorePlrNo][idx], _healitem[StorePlrNo][idx]._iName, (StoreBackRect.w - 0x44) & 0xFFFF);
             AddSText(0xC, l, 0, StrPtr, iclr, 1);
             AddSTextVal(l, _healitem[StorePlrNo][idx]._iIvalue);
+
             PrintStoreItem(&_healitem[StorePlrNo][idx], l + MediumFont.GetWrap(StrPtr, &StoreBackRectClipper), iclr);
+
+
             stextdown = ls;
             idx++;
         }
     }
-    if (!stext[stextsel]._ssel && stextsel != 0x16) {
-        stextsel = stextdown;
-    }
+    if (!stext[stextsel]._ssel && stextsel != 0x16) stextsel = stextdown;
 }
 
 /* @0x8006E4EC */
@@ -2542,21 +2547,27 @@ void StoreSellItem(void)
 }
 
 /* @0x80071D44 */
+#line 2868
 void S_SSellEnter(void)
 {
+
+
+
+
+
+
+
     int idx;
 
     stextshold = 3;
     stextlhold = stextsel;
     stextvhold = stextsval;
+
     idx = (stextsel - stextup) / 8 + stextsval;
     plr[myplr].HoldItem = storehold[idx];
     SellIdx = idx;
-    if (StoreGoldFit(idx)) {
-        StartStore(0xB);
-    } else {
-        StartStore(0xA);
-    }
+    if (StoreGoldFit(idx)) StartStore(0xB);
+    else StartStore(0xA);
 }
 
 /* @0x80071E54 */
@@ -2717,25 +2728,33 @@ void S_WBuyEnter(void)
 }
 
 /* @0x80072818 */
+#line 3099
 void S_WSellEnter(void)
 {
+
+
+
+
+
+
+
     int idx;
 
     stextshold = 7;
     stextlhold = stextsel;
     stextvhold = stextsval;
+
+
     if (WStaffFlag != 0) {
         idx = (stextsel - stextup) / 8 + stextsval;
     } else {
         idx = (stextsel - stextup) / 4 + stextsval;
+
     }
     plr[myplr].HoldItem = storehold[idx];
     SellIdx = idx;
-    if (StoreGoldFit(idx)) {
-        StartStore(0xB);
-    } else {
-        StartStore(0xA);
-    }
+    if (StoreGoldFit(idx)) StartStore(0xB);
+    else StartStore(0xA);
 }
 
 /* @0x80072958 -- offset 0x3A9 (fixed, no idx multiply) decodes to InvBody[4] per byte-offset math;

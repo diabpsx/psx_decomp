@@ -1026,6 +1026,30 @@ would share a retail line with another statement, 237 retail statement boundarie
 our lines, 178 where retail has more statements, 119 reorders deferred to the unsafe pass), 83
 header inline members (PADS.H ... need anchors in the headers), 34 static-initialiser thunks.
 
+### Round 14c: layout passes 2-4 (2026-10-17)
+
+- `tools/relayout_pass2.py`: the unsafe moves (one-line statement reorders, hoists of
+  footprint-less statements into blank slack) one function at a time, kept only when the TU's
+  bytes+SYM gate and the function's SLD pass (29 kept, 3 reverted).
+- `relayout_all.py --headers`: the retail headers' inline members against the whole-program dump
+  (45 same-line methods, 20 re-laid, 2 joined; 17 remain).
+- New layout rules, all gated: retail's one-line wrapper functions (`void f(int n) { g(&plr[n]); }`),
+  same-type declaration merges (`int c, i;`) when the line budget demands, block-record lines read
+  as 1-based from the `{` (an end record names the block's last statement, not the `}`), and the
+  brace rules the SLD proves: a single-statement block whose statement shares the head's retail
+  line is brace-less in retail (`if (c) stmt;`, `} else stmt;`), its `}` dropped or `} else ...`
+  rewritten to `else ...`.  Comments that no longer fit a function's retail line budget are
+  re-emitted above the function's `#line` anchor (and `relayout_recover_comments.py` restored the
+  ones the first passes dropped, from git af73636).
+- State: 1525 functions exact on points and start line, strict comparer 1214/2687; 183/183
+  gates, images identical, 308 tests.  The residue (about 1050 TU functions) is structural:
+  retail statement boundaries inside one of our lines (228: nested ifs, extra statements; probe
+  C:/tmp_tpl/sld/probe3.py showed a split `&&`/`||` condition adds no note, a nested `if` does),
+  retail with more statements than ours (165), line budgets our source cannot meet without a
+  structural change (301), two statements on one retail line (183, e.g. `sx1 = sy1 = 0;` or
+  `sx1 = 0; sy1 = 0;`, unknowable from the SLD), reorders the safe rules refuse (71), and the 26
+  static-initialiser thunks whose lines follow the globals' definitions.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

@@ -177,12 +177,13 @@ def relayout(src, retail, ours, apply=False, verbose=False, only=None, safe=Fals
         res = relayout_function(src, name, r, o, open_i, close_i, logical, code, safe)
         if res is None:
             report['manual'] += 1; continue
-        kind, new_lines, anchor_i, anchor_val = res
+        kind, new_lines, anchor_i, anchor_val, *preface = res
+        preface = preface[0] if preface else []
         report[kind] += 1
         if verbose:
             print(f'  {kind:12s} {name}')
         if apply:
-            src.lines[anchor_i:close_i + 1] = [f'#line {anchor_val}'] + new_lines
+            src.lines[anchor_i:close_i + 1] = preface + [f'#line {anchor_val}'] + new_lines
             logical = src.logical(); code = code_only(src.lines); bound = anchor_i
     return report, notes
 
@@ -233,6 +234,29 @@ def decl_pair(lines, lead, merged):
         if m1 and m2 and m1.group(2) == m2.group(2) and lead[a + 1] not in texts:
             return a, f'{m1.group(1)}{m1.group(2)} {m1.group(3)}, {m2.group(3)};'
     return None
+
+
+HEAD_BRACE = re.compile(r'^(\s*(?:\}\s*)?(?:(?:else\s+)?(?:if|while|for)\s*\(.*\)|else))\s*\{\s*$')
+SIMPLE_STMT = re.compile(r'^(?:return\b[^;]*|break|continue)\s*;$')
+
+
+def single_statement_block(code, open_i, stmt_i, close_i):
+    """`head {` at open_i, one statement at stmt_i, its `}` directly after (blank lines allowed):
+    returns the index of the closing line or None."""
+    if not HEAD_BRACE.match(code[open_i]): return None
+    for j in range(open_i + 1, stmt_i):
+        if code[j].strip(): return None
+    k = stmt_i + 1
+    while k <= close_i and code[k].strip() == '': k += 1
+    if k > close_i or not re.match(r'^\s*\}(\s*else\b.*)?$', code[k].rstrip()): return None
+    return k
+
+
+def closing_rewrite(line):
+    """`}` -> dropped (None); `} else {` -> `else {`; `} else if (..) {` -> `else if (..) {`."""
+    m = re.match(r'^(\s*)\}\s*(else\b.*)?$', line.rstrip())
+    if m is None or m.group(2) is None: return None
+    return m.group(1) + m.group(2)
 
 
 def lis_keep(values):
@@ -352,7 +376,7 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
         moved = True
     # out: [text, is_code]; blank-line slack inserted before a statement may later host a footprint-less
     # statement that would otherwise push the next statement past its retail line
-    out = []
+    out = []; rewrites = {}; dropped = []   # out: [text, is_code, physical index or None]; rewrites: index -> text / None (drop)
     sig_lines = lines[sig_i:open_i]
     anchor_val = r['line'] - len(sig_lines)
     cur = r['line'] - 1
@@ -371,17 +395,29 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
     for target, group in items:
         last_i = group[-1]; lg_last = logical[last_i]
         if lg_last in joins:
-            stmt = lines[last_i].strip()
+            stmt = lines[last_i].strip(); stmt_code = code[last_i].strip()
             k = len(out) - 1
             while k >= 0 and not out[k][1]: k -= 1
             if k < 0: return manual(name, 'join target missing')
-            head = out[k][0].rstrip()
-            # only a complete simple statement joins, and only onto a control head (`for (..)`, `else`)
-            if (not STMT.match(stmt) and not re.match(r'^(?:return\b[^;]*|break|continue)\s*;$', stmt)) \
-                    or not (head.endswith(')') or head.endswith('else')) \
-                    or any(not blank(j) and not comment_only(j) for j in group[:-1]):
-                return manual(name, f'line {lg_last} would have to share retail line {target} with another statement')
-            out[k][0] = head + ' ' + stmt
+            kj = out[k][2]
+            head = (rewrites.get(kj) if kj is not None and kj in rewrites else out[k][0]) or ''
+            head_code = strip_comments(head).rstrip()
+            simple = STMT.match(stmt_code) or SIMPLE_STMT.match(stmt_code)
+            joined = None
+            if simple and head_code.endswith('{') and kj is not None:
+                # `head {` / stmt / `}`: retail kept the single-statement block brace-less on the head line
+                close_k = single_statement_block(code, kj, last_i, close_i)
+                if close_k is not None:
+                    joined = head_code[:-1].rstrip() + ' ' + stmt
+                    rewrites[close_k] = closing_rewrite(lines[close_k])
+            if joined is None:
+                # only a complete simple statement joins, and only onto a control head (`for (..)`, `else`)
+                if (not simple or not (head_code.endswith(')') or head_code.endswith('else'))
+                        or any(not blank(j) and not comment_only(j) for j in group[:-1])):
+                    return manual(name, f'line {lg_last} would have to share retail line {target} with another statement')
+                joined = head_code + ' ' + stmt
+            out[k][0] = joined
+            if kj is not None and kj in rewrites: rewrites[kj] = joined   # the line was itself a rewritten `} else {`
             continue
         lead = list(group[:-1])
         need = target - (cur + len(lead) + 1)
@@ -393,6 +429,7 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             # a comment: drop a whole comment (a block comment spans lines; never leave a half)
             unit = comment_unit(lines, lead)
             if unit is not None:
+                dropped.extend(lines[lead[j]] for j in unit)   # re-emitted above the anchor
                 for j in reversed(unit): lead.pop(j)
                 need += len(unit); continue
             # two plain declarations of one type on consecutive lines: `int c;` `int i;` -> `int c, i;`
@@ -400,34 +437,61 @@ def relayout_function(src, name, r, o, open_i, close_i, logical, code, safe=Fals
             if pair is None: break
             a, text = pair
             merged_decls.append((lead[a], text)); lead.pop(a + 1); need += 1
+        brace_join = None
+        if need < 0 and lead and (STMT.match(code[last_i].strip()) or SIMPLE_STMT.match(code[last_i].strip())):
+            close_k = single_statement_block(code, lead[-1], last_i, close_i)
+            if close_k is not None and rewrites.get(lead[-1], lines[lead[-1]]) is not None:
+                # `} else {` / stmt / `}` where retail wrote `} else stmt;`: the block loses its braces
+                head_i = lead.pop()
+                head_text = rewrites.get(head_i, lines[head_i])   # it may itself be a rewritten `} else {`
+                brace_join = (head_i, strip_comments(head_text).rstrip()[:-1].rstrip() + ' ' + lines[last_i].strip())
+                rewrites[close_k] = closing_rewrite(lines[close_k]); need += 1
+                rewrites[head_i] = brace_join[1]
         while need < 0 and lead and slack_n > 0 and not safe and movable_statement(code, lines, lead[0], out, slack_at):
             # a plain statement with no SLD footprint: it can only be placed where the budget allows; use
             # the blank slack before the previous statement (one statement per line; the bytes gate
             # proves the order is immaterial)
-            j = lead.pop(0); out[slack_at] = [lines[j], True]; slack_at += 1; slack_n -= 1; need += 1
+            j = lead.pop(0); out[slack_at] = [lines[j], True, j]; slack_at += 1; slack_n -= 1; need += 1
             invisible_moves += 1
         if need < 0:
             return manual(name, f'line {lg_last} cannot reach retail line {target} ({-need} too many lines before it)')
         slack_at = len(out); slack_n = need
-        out.extend([['', False] for _ in range(need)])
+        out.extend([['', False, None] for _ in range(need)])
         merged = dict(merged_decls)
-        out.extend([[merged.get(j, lines[j]), not blank(j) and not comment_only(j)] for j in lead])
+        out.extend([[merged.get(j, lines[j]), not blank(j) and not comment_only(j), j] for j in lead])
         last = lines[last_i]
+        if brace_join is not None:
+            out.append([brace_join[1], True, brace_join[0]]); cur = target
+            slack_at = None; slack_n = 0
+            continue
         if lg_last in splits:
             m = SPLIT.match(last) or SPLIT_ELSE.match(last)
             head, tail = m.group(1), m.group(2).strip()
             indent = re.match(r'\s*', head).group(0) + '    '
-            out.append([head.rstrip(), True]); cur = target
+            out.append([head.rstrip(), True, last_i]); cur = target
             gap = splits[lg_last] - cur - 1
             if gap < 0: return manual(name, 'split tail would go backwards')
-            out.extend([['', False] for _ in range(gap)]); out.append([indent + tail, True]); cur = splits[lg_last]
+            out.extend([['', False, None] for _ in range(gap)]); out.append([indent + tail, True, None]); cur = splits[lg_last]
             slack_at = None; slack_n = 0
             continue
-        out.append([last, True]); cur = target
-    out_lines = [t for t, _ in out] + [lines[i] for i in trailing]
+        out.append([last, True, last_i]); cur = target
+    # the closing braces of blocks made brace-less: dropped, or `} else ...` -> `else ...`
+    out_lines = []
+    for text, _, j in out:
+        if j is not None and j in rewrites:
+            if rewrites[j] is None: continue
+            text = rewrites[j]
+        out_lines.append(text)
+    for i in trailing:
+        if i in rewrites:
+            if rewrites[i] is None: continue
+            out_lines.append(rewrites[i])
+        else:
+            out_lines.append(lines[i])
     kind = 'reordered' if moved else ('joined/split' if (joins or splits) else 'relaid')
     if invisible_moves: kind = 'relaid+moved'
-    return kind, sig_lines + out_lines, anchor_i, anchor_val
+    preface = [] if not dropped else [d.strip() if i == 0 else d for i, d in enumerate(dropped)]
+    return kind, sig_lines + out_lines, anchor_i, anchor_val, dropped
 
 
 def main():

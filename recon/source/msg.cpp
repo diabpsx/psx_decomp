@@ -2017,6 +2017,11 @@ unsigned long ParseCmd(int pnum, const TCmd *pCmd)
 }
 
 /* @0x80052888 MSG.CPP:2790 */
+    /* the retail jump table (jtbl_80116868) has 90 entries (bCmd 0..89) and every "hole" (indices
+     * with no named handler here) targets the SAME default-fallthrough label 0x80052858 in the raw
+     * table -- these are exactly those hole indices (cross-checked word-for-word against the table,
+     * see the CMD_* block comment above), needed so gcc emits the SAME dense 90-entry table
+     * (`sltiu v0,a1,90`) with every slot landing on the right body instead of a sequential guess. */
 #line 2789
 DLevel *GetDLevel(int LevNum, BOOL SetLevel)
 {

@@ -1713,20 +1713,51 @@ int M_DoGotHit(int i)
     return 0;
 }
 
+#line 2015
 void DoEnding(int p)
 {
     myplr = p;
-    user_start = 0;
 
-    if (plr[p]._pClass == PC_WARRIOR) {
-        play_movie("DIABVIC3.MOV");
-    } else if (plr[p]._pClass == PC_SORCERER) {
-        play_movie("DIABVIC1.MOV");
-    } else {
-        play_movie("DIABVIC2.MOV");
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    user_start = 0;
+    if (plr[p]._pClass == PC_WARRIOR) play_movie("DIABVIC3.MOV");
+    else if (plr[p]._pClass == PC_SORCERER) play_movie("DIABVIC1.MOV");
+    else play_movie("DIABVIC2.MOV");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     music_stop();
+
+
+
 
     user_start = 1;
 }
@@ -3897,8 +3928,10 @@ void MAI_Warlord(int i)
     }
 }
 
+#line 4268
 void DeleteMonsterList(void)
 {
+
     int i, mi;
 
     for (i = 0; i < 4; i++) {
@@ -3914,14 +3947,13 @@ void DeleteMonsterList(void)
     }
 
     i = 4;
+
     while (i < nummonsters) {
         mi = monstactive[i];
         if (monster[mi]._mDelFlag) {
             DeleteMonster(i);
             i = 0;
-        } else {
-            i++;
-        }
+        } else i++;
     }
 }
 

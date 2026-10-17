@@ -1091,37 +1091,45 @@ void RemovePlrFromMap(PlayerStruct *ptrplr)
 /* PSX resets the gamepad cursor-select array first (`_pcursplr[sel_data] = -1`, not in devilution),
  * narrows the class-hit-sound cascade to 3 classes (no rogue/monk/bard/barbarian split), and drops
  * LoadPlrGFX/FixPlayerLocation/FixPlrWalkTags/dPlayer-occupancy like the other Start* functions. */
+    /* PSX-only guard: don't interrupt the current animation before it's half played. */
+#line 1907
 void StartPlrHit(PlayerStruct *ptrplr, int dam, unsigned char forcehit)
 {
+
+
     _pcursplr[sel_data] = -1;
+
+
 
     if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
         StartPlrKill(ptrplr, -1);
         return;
     }
 
-    if (ptrplr->_pClass == CLASS_WARRIOR) {
-        PlaySfxLoc(0x316, ptrplr->_px, ptrplr->_py);
-    } else if (ptrplr->_pClass == CLASS_ROGUE) {
-        PlaySfxLoc(0x2A8, ptrplr->_px, ptrplr->_py);
-    } else if (ptrplr->_pClass == CLASS_SORCERER) {
-        PlaySfxLoc(0x240, ptrplr->_px, ptrplr->_py);
-    }
+    if (ptrplr->_pClass == CLASS_WARRIOR) PlaySfxLoc(0x316, ptrplr->_px, ptrplr->_py);
+
+    else if (ptrplr->_pClass == CLASS_ROGUE) PlaySfxLoc(0x2A8, ptrplr->_px, ptrplr->_py);
+    else if (ptrplr->_pClass == CLASS_SORCERER) PlaySfxLoc(0x240, ptrplr->_px, ptrplr->_py);
+
+
 
     drawhpflag = TRUE;
+
 
     if ((dam >> 6) < ptrplr->_pLevel && !forcehit) {
         return;
     }
-
-    /* PSX-only guard: don't interrupt the current animation before it's half played. */
     if (ptrplr->_pAnimFrame < (ptrplr->_pAnimLen >> 1)) {
+
         return;
     }
 
     NewPlrAnim(ptrplr, 7, ptrplr->_pHFrames, 0);
     ptrplr->_pmode = PM_GOTHIT;
+
     ptrplr->_pVar8 = 1;
+
+
     SetPlayerOld(ptrplr);
 }
 
@@ -2040,26 +2048,59 @@ int PM_DoAttack(PlayerStruct *ptrplr)
 
 /* PSX drops devilution's ISPL_QUICKATTACK/ISPL_FASTATTACK origFrame-skip logic entirely (goes
  * straight from entry to the `_pAnimFrame==_pAFNum` fire check). */
+#line 3039
 int PM_DoRangeAttack(PlayerStruct *ptrplr)
 {
+
+
+
+
     int mistype;
     if (ptrplr->_pAnimFrame == ptrplr->_pAFNum) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         mistype = (ptrplr->_pIFlags & ISPL_FIRE_ARROWS) ? MIS_FARROW : MIS_ARROW;
-        if (ptrplr->_pIFlags & ISPL_LIGHT_ARROWS) {
-            mistype = MIS_LARROW;
-        }
+        if (ptrplr->_pIFlags & ISPL_LIGHT_ARROWS) mistype = MIS_LARROW;
+
+
+
+
+
+
         AddMissile(ptrplr->_px, ptrplr->_py, ptrplr->_pVar1, ptrplr->_pVar2, ptrplr->_pdir, mistype, 0, ptrplr != plr, 4, 0);
 
         PlaySfxLoc(4, ptrplr->_px, ptrplr->_py);
-
         if (WeaponDur(ptrplr, 40)) {
             StartStand(ptrplr, ptrplr->_pdir);
             ClearPlrPVars(ptrplr);
             return 1;
         }
     }
-
     if (ptrplr->_pAnimFrame >= ptrplr->_pAFrames) {
+
+
+
+
+
+
         StartStand(ptrplr, ptrplr->_pdir);
         ClearPlrPVars(ptrplr);
         return 1;

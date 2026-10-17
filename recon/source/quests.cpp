@@ -189,15 +189,17 @@ void CheckQuests(void)
     myplr = omp;
 }
 
+#line 272
 unsigned char ForceQuests(void)
 {
-    if (gbMaxPlayers != 1) {
-        return 0;
-    }
 
+
+
+    if (gbMaxPlayers != 1) return 0;
     for (int i = 0; i < MAXQUESTS; i++) {
         if (i == Q_BETRAYER) continue;
         if (currlevel != quests[i]._qlevel) continue;
+
         if (quests[i]._qslvl == 0) continue;
 
         int ql = quests[quests[i]._qidx]._qslvl - 1;
@@ -213,6 +215,7 @@ unsigned char ForceQuests(void)
             return 1;
         }
     }
+
 
     return 0;
 }
@@ -551,31 +554,32 @@ void DrawQuestLogTSK(TASK *T)
     Qfromoptions = 0;
 }
 
+#line 776
 void StartQuestlog(void)
 {
     int i;
 
     numqlines = 0;
     for (i = 0; i < ALLQUESTS; i++) {
+
+
         if (quests[i]._qactive == QUEST_ACTIVE && quests[i]._qlog != 0) {
+
             qlist[numqlines] = i;
             numqlines++;
         }
     }
-    if (numqlines < 7) {
-        qtopline = ((7 - numqlines) >> 1) * 2 + 6;
-    } else {
-        qtopline = 6;
-    }
-    if (numqlines != 0) {
-        qline = qtopline;
-    }
+    if (numqlines < 7) qtopline = ((7 - numqlines) >> 1) * 2 + 6;
+    else qtopline = 6;
+    if (numqlines != 0) qline = qtopline;
     questlog = 1;
     qtoffset = 0;
+
     PostGamePad(2, 0, 0, 0);
     GLUE_SetHomingScrollFlag(0);
     GLUE_SetShowPanelFlag(0);
     GLUE_SuspendGame();
+
     TSK_AddTask(0, DrawQuestLogTSK, 0x800, 0);
 }
 

@@ -327,6 +327,8 @@ void InitDungeon(void)
     }
 }
 
+    /* PSX oracle: only clears predungeon -- unlike devilution's InitDungeon this build does NOT also
+     * zero mydflags here (LoadL2Dungeon/LoadPreL2Dungeon each clear mydflags themselves instead). */
 #line 1508
 static void DRLG_LoadL2SP(void)
 {

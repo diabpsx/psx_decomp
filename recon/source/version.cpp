@@ -166,6 +166,7 @@ void DBG_Error(char *, char *, int);
 }
 void strupr(char *Buffa);
 
+/* @0x800826A0 VERSION.CPP:230 */
 #line 229
 void VER_InitVersion(void)
 {
@@ -178,6 +179,7 @@ void VER_InitVersion(void)
 }
 
 
+/* @0x800826E4 VERSION.CPP:241 */
 #line 240
 char *VER_GetVerString(void)
 {
@@ -185,6 +187,7 @@ char *VER_GetVerString(void)
 }
 
 
+/* @0x800B0A18 VERSION.CPP:252 */
 #line 251
 char *GetVersionString(char *VersionString2)
 {
@@ -214,6 +217,7 @@ char *GetVersionString(char *VersionString2)
 }
 
 
+/* @0x800826F4 VERSION.CPP:285 */
 #line 284
 int CharPair2Num(char *Str)
 {
@@ -221,6 +225,7 @@ int CharPair2Num(char *Str)
 }
 
 
+/* @0x800B0AEC VERSION.CPP:299 */
 #line 298
 char *GetWord(char *VStr)
 {
