@@ -22,20 +22,22 @@ unsigned char *pSquareCel;   /* @0x8011B778: uninitialised like spurtndx/stonend
 /* Retail owns this zero-initialized 372-byte array in .data at 0x800CEB10. */
 DeadStruct dead[31] = {0};
 
+#line 39
 void InitDead(void)
 {
     int nd, i, mi;
     int mtypes[MAXMONSTERS];
 
-    for (i = 0; i < MAXMONSTERS; i++)
-        mtypes[i] = 0;
+    for (i = 0; i < MAXMONSTERS; i++) mtypes[i] = 0;
 
     nd = 0;
-
     for (i = 0; i < nummtypes; i++) {
         if (mtypes[Monsters[i].mtype] == 0) {
+
             dead[nd]._deadtype = i;
             dead[nd]._deadFrame = Monsters[i].Anims[MA_DEATH].Frames;
+
+
             dead[nd]._deadtrans = 0;
             Monsters[i].mdeadval = nd + 1;
             mtypes[Monsters[i].mtype] = nd + 1;
@@ -43,20 +45,32 @@ void InitDead(void)
         }
     }
 
+
+
     dead[nd]._deadFrame = 8;
+
+
     dead[nd]._deadtrans = 0;
     spurtndx = nd + 1;
     nd++;
 
+
     dead[nd]._deadFrame = 12;
+
+
     dead[nd]._deadtrans = 0;
     stonendx = nd + 1;
     nd++;
 
+
     for (i = 0; i < nummonsters; i++) {
         mi = monstactive[i];
         if (monster[mi]._uniqtype != 0) {
+
             dead[nd]._deadFrame = monster[mi].MType->Anims[MA_DEATH].Frames;
+
+
+
             dead[nd]._deadtrans = monster[mi]._uniqtype + 4;
             monster[mi]._udeadval = nd + 1;
             nd++;
@@ -64,7 +78,11 @@ void InitDead(void)
     }
 }
 
+#line 98
 void AddDead(int dx, int dy, char dv, int ddir)
 {
+
+
+
     SetdDead(dx, dy, dv & 0x1F);
 }

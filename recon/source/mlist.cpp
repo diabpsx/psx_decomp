@@ -47,27 +47,33 @@ extern struct MonstLevel AllLevels[16];
 extern unsigned char setlevel;
 
 /* @0x8007D5F8 MLIST.CPP:71 */
+#line 70
 void ML_Init(void)
 {
     for (int f = 0; f < 16; f++) {
+
         MlTab[f] = -1;
         QlTab[f] = -1;
     }
 }
 
 /* @0x8007D630 MLIST.CPP:85 */
+#line 84
 int ML_GetList(int Level)
 {
+
+
     int RetVal = -1;
 
     if (Level) {
+
         Level--;
-        if (!(Level < 16))
-            DBG_Error(NULL, "source/MLIST.cpp", 93);
+        if (!(Level < 16)) DBG_Error(NULL, "source/MLIST.cpp", 93);
         if (!setlevel)
             RetVal = MlTab[Level];
         else
             RetVal = QlTab[Level];
+
     }
     return RetVal;
 }

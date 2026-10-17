@@ -81,17 +81,26 @@ static POLY_FT4 *DefaultObjPrint(ObjectStruct *OStr, int ScrX, int ScrY, TextDat
 }
 
 /* @0x8007DB7C OBJPRINT.CPP:312 */
+#line 311
 static POLY_FT4 *LightObjPrint(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     POLY_FT4 *Ft4;
 
     Ft4 = DefaultObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos, 0, 0);
+
     if (Ft4) {
+
         if (OStr->_olid != -1) {
             int x = ScrX + 1;
+
+
+
+
+
             int y = ScrY - 26;
             DrawSpinner(x, y, 0, 0, 0, 16, 64, 0, false, OtPos, true, false, 8);
         }
+
     }
     return Ft4;
 }
@@ -111,10 +120,13 @@ static POLY_FT4 *PrintOBJ_SARC(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *
 }
 
 /* @0x8007DD08 OBJPRINT.CPP:384 */
+#line 383
 void ResetFlames(void)
 {
     if (FireInit) {
+
         for (int i = 0; i < 16; i++) {
+
             Cinders[i].x = GU_GetRnd() % 5 + 2;
             Cinders[i].y = (GU_GetRnd() & 0xF) << 8;
             Cinders[i].yinc = (GU_GetRnd() & 0x7F) + 32;
@@ -227,6 +239,7 @@ static POLY_FT4 *DoorObjPrint(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *O
 }
 
 /* @0x8007E1C4 OBJPRINT.CPP:605 */
+#line 604
 void DrawLightSpark(int xo, int yo, int ot)
 {
     if (!PauseMode)
@@ -236,8 +249,16 @@ void DrawLightSpark(int xo, int yo, int ot)
 }
 
 /* @0x8007E2A4 OBJPRINT.CPP:624 */
+#line 623
 static POLY_FT4 *PrintOBJ_L1LIGHT(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
+
+
+
+
+
+
+
     PrintOBJ_FIRE(ScrX - 2, ScrY - 41, OtPos + 10);
     DrawLightSpark(ScrX - 1, ScrY - 40, OtPos + 12);
     return NULL;
@@ -298,22 +319,30 @@ static POLY_FT4 *PrintOBJ_TORCHR2(ObjectStruct *OStr, int ScrX, int ScrY, TextDa
 }
 
 /* @0x8007E5B8 OBJPRINT.CPP:744 */
+#line 743
 static POLY_FT4 *PrintOBJ_BARRELEX(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     int AnimFrame;
     POLY_FT4 *Ft4;
 
-    if (OStr->_oAnimFlag)
-        DrawObjExpl(OStr, ScrX, ScrY, OtPos);
+    if (OStr->_oAnimFlag) DrawObjExpl(OStr, ScrX, ScrY, OtPos);
+
     AnimFrame = OStr->_oAnimFrame - 2;
+
+
     if (AnimFrame <= ObjDat->GetNumOfFrames(9, 0)) {
+
         int PhysFrame = ObjDat->GetFrNum(9, 0, 0, AnimFrame);
         Ft4 = ObjDat->PrintFt4(PhysFrame, ScrX, ScrY, 0, OtPos, 0);
         setShadeTex(Ft4, 0);
+
         if (((unsigned long *)ObjDat->GetFr(PhysFrame))[1] & 0x1000000) {
+
+
             POLY_FT4 *ShadFt4 = PRIM_GetCopy(Ft4);
             CBlocks::ShadScaleSkew(ShadFt4);
             addPrim(ThisOt + OtPos, ShadFt4);
+
         }
     } else {
         Ft4 = NULL;
@@ -322,24 +351,33 @@ static POLY_FT4 *PrintOBJ_BARRELEX(ObjectStruct *OStr, int ScrX, int ScrY, TextD
 }
 
 /* @0x8007E710 OBJPRINT.CPP:780 */
+#line 779
 static POLY_FT4 *PrintOBJ_SHRINEL(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
+
     int AnimFrame = OStr->_oAnimFrame - 1;
+
     if (OStr->_oAnimFlag)
         DrawSpinner(ScrX - 12, ScrY - 28, 0, 0x50, 0xF0, AnimFrame << 3, 0x40, AnimFrame << 2, false, OtPos, true, false, 8);
+
     return DefaultObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos, 0, 0);
 }
 
 /* @0x8007E7E8 OBJPRINT.CPP:797 */
+#line 796
 static POLY_FT4 *PrintOBJ_SHRINER(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
+
     int AnimFrame = OStr->_oAnimFrame - 1;
+
     if (OStr->_oAnimFlag)
         DrawSpinner(ScrX + 8, ScrY - 29, 0, 0x50, 0xF0, AnimFrame << 3, 0x40, AnimFrame << 2, false, OtPos, true, false, 8);
+
     return DefaultObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos, 0, 0);
 }
 
 /* @0x8007E8C0 OBJPRINT.CPP:815 */
+#line 814
 static POLY_FT4 *PrintOBJ_BOOKCANDLE(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     return LightObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos);
@@ -402,33 +440,37 @@ static POLY_FT4 *PrintOBJ_STORYBOOK(ObjectStruct *OStr, int ScrX, int ScrY, Text
 }
 
 /* @0x8007EC08 OBJPRINT.CPP:900 */
+#line 899
 static POLY_FT4 *PrintOBJ_STORYCANDLE(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     return LightObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos);
 }
 
 /* @0x8007EC2C OBJPRINT.CPP:912 */
+#line 911
 static POLY_FT4 *PrintOBJ_CANDLE1(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     return LightObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos);
 }
 
 /* @0x8007EC50 OBJPRINT.CPP:923 */
+#line 922
 static POLY_FT4 *PrintOBJ_CANDLE2(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     return LightObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos);
 }
 
 /* @0x8007EC74 OBJPRINT.CPP:936 */
+#line 935
 static POLY_FT4 *PrintOBJ_STAND(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     int ot = OtPos - 1;
-    if (ot < 0)
-        ot = 0;
+    if (ot < 0) ot = 0;
     return DefaultObjPrint(OStr, ScrX, ScrY, ObjDat, ot, 0, 0);
 }
 
 /* @0x8007ECB0 OBJPRINT.CPP:951 */
+#line 950
 static POLY_FT4 *PrintOBJ_SKFIRE(ObjectStruct *OStr, int ScrX, int ScrY, TextDat *ObjDat, int OtPos)
 {
     POLY_FT4 *FT4 = DefaultObjPrint(OStr, ScrX, ScrY, ObjDat, OtPos, 0, 0);

@@ -30,6 +30,7 @@ static int LastDrawTime;
 static int DrawArea;
 
 /* @0x80096838 PROF.CPP:87 */
+#line 86
 void PROF_Open(void)
 {
     TimePerFrame = GTIMSYS_InitTimer();
@@ -42,42 +43,49 @@ void PROF_Open(void)
 }
 
 /* @0x80096878 PROF.CPP:99 */
+#line 98
 BOOL PROF_State(void)
 {
     return ProfOn;
 }
 
 /* @0x80096884 PROF.CPP:104 */
+#line 103
 void PROF_On(void)
 {
     ProfOn = 1;
 }
 
 /* @0x80096894 PROF.CPP:109 */
+#line 108
 void PROF_Off(void)
 {
     ProfOn = 0;
 }
 
 /* @0x800968A0 PROF.CPP:114 */
+#line 113
 void PROF_CpuEnd(void)
 {
     CpuTime = GTIMSYS_GetTimer() - CpuStart;
 }
 
 /* @0x800968D0 PROF.CPP:119 */
+#line 118
 void PROF_CpuStart(void)
 {
     CpuStart = GTIMSYS_GetTimer();
 }
 
 /* @0x800968F4 PROF.CPP:124 */
+#line 123
 void PROF_DrawStart(void)
 {
     DrawStart = GTIMSYS_GetTimer();
 }
 
 /* @0x80096918 PROF.CPP:129 */
+#line 128
 void PROF_DrawEnd(void)
 {
     DrawTime = GTIMSYS_GetTimer() - DrawStart;
@@ -124,6 +132,7 @@ void PROF_Draw(unsigned long *Ot)
 }
 
 /* @0x80096B3C PROF.CPP:179 */
+#line 178
 void PROF_Restart(void)
 {
     GTIMSYS_ResetTimer();

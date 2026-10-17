@@ -54,9 +54,11 @@ void StartStand(int pnum, int dir);   /* @0x80066CA4 PLAYER.CPP:4683 */
 /* @0x800CD650 (.data, no SYM record): spells that auto-target a monster */
 static int AutoTargetSpells[12] = { 0x1D, 0x1E, 0x1F, 0x23, 0x24, 0x0C, 0x0F, 0x14, 0x01, 0x03, 0x06, 0x08 };
 
+#line 41
 static BOOL IsAutoTarget(int Spell)
 {
     for (int i = 0; i < 12; i++) {
+
         if (AutoTargetSpells[i] == Spell)
             return TRUE;
     }
@@ -95,60 +97,84 @@ static void GetScrXY(int *wx, int *wy)
     }
 }
 
+#line 102
 void SpellTarget::ClearTrails(void)
 {
     for (int i = 0; i < 8; i++) {
+
         lastx[i] = -1;
         lasty[i] = -1;
     }
 }
 
+#line 113
 void SpellTarget::Init(int plrn)
 {
     pnum = plrn;
     player = &plr[plrn];
+
     if (player->_pSplType == 1) {
+
         if (!CheckSpell(pnum, player->_pSpell, 1, FALSE)) {
+
             if (player->_pSplType == 1) {
+
                 int SplLvl = player->_pSplLvl[player->_pSpell] + player->_pISplLvlAdd;
                 if (SplLvl == 0) {
-                    if (player->_pClass == 0)
-                        PlaySFX(0x2ED);
-                    else if (player->_pClass == 1)
-                        PlaySFX(0x27F);
-                    else if (player->_pClass == 2)
-                        PlaySFX(0x217);
+
+
+                    if (player->_pClass == 0) PlaySFX(0x2ED);
+
+                    else if (player->_pClass == 1) PlaySFX(0x27F);
+
+                    else if (player->_pClass == 2) PlaySFX(0x217);
+
+
                 } else {
-                    if (player->_pClass == 0)
-                        PlaySFX(0x2F4);
-                    else if (player->_pClass == 1)
-                        PlaySFX(0x286);
-                    else if (player->_pClass == 2)
-                        PlaySFX(0x21E);
+                    if (player->_pClass == 0) PlaySFX(0x2F4);
+
+                    else if (player->_pClass == 1) PlaySFX(0x286);
+
+                    else if (player->_pClass == 2) PlaySFX(0x21E);
                 }
             }
             return;
         }
+
     }
     active = TRUE;
+
     changed = TRUE;
     if (!forcespell) {
+
         _sx = _nsx = (player->_px + offset_x[player->_pdir]) << 3;
         _sy = _nsy = (player->_py + offset_y[player->_pdir]) << 3;
+
         ClearTrails();
+
+
+
+
+
     }
     if (spotid == -1)
+
         spotid = AddLight(_sx, _sy, pnum ? 0x12 : 0x42);
+
     ChangeLightOff(spotid, (_sx & 1) ? 4 : -4, (_sy & 1) ? 4 : -4);
+
     NewCursor(9);
     forcespell = 0;
 }
 
+#line 173
 void SpellTarget::Remove(void)
 {
     active = FALSE;
     _pcurs[pnum] = 1;
+
     if (spotid != -1) {
+
         AddUnLight(spotid);
         spotid = -1;
     }
@@ -419,11 +445,14 @@ static void ArrowTask(TASK *T)
     }
 }
 
+#line 539
 void SPL_Arrow(TARGET t, int pnum, int times, int size)
 {
     DEF_ARGS *args;
+
     TASK *T = TSK_AddTask(0x8000, ArrowTask, 0x400, 0x10);
     if (T) {
+
         args = (DEF_ARGS *)T->Data;
         args->a0 = pnum;
         args->a1 = times;

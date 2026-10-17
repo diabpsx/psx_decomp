@@ -17,6 +17,7 @@ struct block {   /* sizeof 532 */
     int outsize;
 
     /* @0x800AE364 PAK.CPP:55 */
+#line 54
     void fputc(unsigned char Val)
     {
         *Dest = Val;
@@ -26,19 +27,29 @@ struct block {   /* sizeof 532 */
 };
 
 /* @0x800ADF9C PAK.CPP:85 */
+#line 84
 static void writeblock(struct block *theblock)
 {
     if (theblock->blockrep && theblock->blocksize == 0) {
+
+
         theblock->fputc(0x80);
         theblock->fputc(0);
+
+
     } else if (theblock->blockrep) {
         theblock->fputc(theblock->blockoffset);
         theblock->fputc(theblock->blocksize);
+
+
     } else {
         theblock->fputc(theblock->blocksize & 0x7F);
+
         for (int i = 0; i <= theblock->blocksize; i++)
             theblock->fputc(theblock->data[i]);
     }
+
+
     theblock->blockrep = 0;
     theblock->blockoffset = 0;
     theblock->blocksize = -1;
@@ -52,9 +63,13 @@ static void writeblock(struct block *theblock)
  * Falsified: *(data + ++bs), bs += 1, split ++bs / store / inpos++ statements.  Next angle: a spelling whose
  * RTL materializes the data base 3+ insns before its use (or shares it with another use in the loop).  Kept
  * from this pass (131 -> 120): ptr1 = &buffer[inpos + bestoffset] before theptr, ptr3++ before ptr2++. */
+#line 117
 int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
 {
     long begin, end, bestlength;
+
+
+
     int offset, bestoffset;
     unsigned char *theptr, *ptr1, *ptr2, *ptr3;
     struct block theblock;
@@ -64,51 +79,88 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
     theblock.Dest = Dest;
     theblock.outsize = 0;
     theblock.blockrep = 0;
+
+
+
+
+
+
     inpos = 0;
     theblock.blocksize = -1;
     theblock.data[++theblock.blocksize] = buffer[inpos++];
     theblock.data[++theblock.blocksize] = buffer[inpos++];
+
     while (inpos < insize) {
+
+
+
         begin = -inpos;
         end = insize - inpos;
+
         if (begin < -128)
             begin = -128;
+
         if (end > FORWARDDIST)
             end = FORWARDDIST;
+
         bestoffset = begin;
         bestlength = 1;
+
         theptr = (unsigned char *)buffer + (inpos);
         ptr1 = (unsigned char *)buffer + (inpos + begin);
+
         for (offset = begin; offset < 0; offset++) {
+
             if (*ptr1 == *theptr) {
+
                 if (!memcmp(ptr1, theptr, bestlength + 1)) {
+
                     bestlength++;
                     bestoffset = offset;
                     ptr2 = ptr1 + bestlength;
                     ptr3 = theptr + bestlength;
+
                     while (*ptr2 == *ptr3) {
+
                         ptr2++;
                         ptr3++;
                         bestlength++;
                         if (bestlength >= end)
                             break;
+
                     }
                 }
             }
             if (bestlength >= end) {
+
                 bestlength = end;
                 break;
+
             }
             ptr1++;
         }
+
+
         if (bestlength < 3) {
+
+
+
             if (theblock.blockrep) {
+
+
+
+
+
                 writeblock(&theblock);
                 theblock.data[++theblock.blocksize] = buffer[inpos++];
             } else {
                 if (theblock.blocksize >= 127)
                     writeblock(&theblock);
+
                 theblock.data[++theblock.blocksize] = buffer[inpos++];
+
+
+
             }
         } else {
             writeblock(&theblock);
@@ -116,40 +168,58 @@ int PAK_DoPak(unsigned char *Dest, const unsigned char *buffer, int insize)
             theblock.blocksize = bestlength;
             theblock.blockoffset = bestoffset;
             inpos += bestlength;
+
+
+
         }
     }
     writeblock(&theblock);
+
+
+
     theblock.blockrep = 1;
     theblock.blocksize = 0;
     theblock.blockoffset = 0;
     writeblock(&theblock);
+
     return theblock.outsize;
 }
 
 /* @0x800AE2C4 PAK.CPP:245 */
+#line 244
 int PAK_DoUnpak(unsigned char *Dest, const unsigned char *Source)
 {
     int outsize = 0;
 
     while (1) {
         unsigned char *From;
+
+
         int size;
         int ch;
 
         ch = *Source++;
+
         if (ch < 0x80) {
+
             size = ch + 1;
             From = (unsigned char *)Source;
             Source += size;
+
+
         } else {
             size = *Source++;
+
             if (!size)
+
                 break;
             From = Dest + (char)ch;
+
         }
         memcpy(Dest, From, size);
         Dest += size;
         outsize += size;
+
     }
     return outsize;
 }

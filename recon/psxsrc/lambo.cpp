@@ -22,11 +22,15 @@ inline void TextDat::DumpDatFile()
 }
 
 /* @0x80095844 LAMBO.CPP:73 */
+#line 72
 void StevesDummyPoll(void)
 {
 }
 
 /* @0x8009584C LAMBO.CPP:77 */
+#line 76
 void Lambo(void)
 {
+
+
 }

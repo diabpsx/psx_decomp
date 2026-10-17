@@ -21,6 +21,7 @@ BOOL DoLoadedChar;   /* @0x8011B9EC: uninitialised, declared before gbValidSaveF
 unsigned char gbValidSaveFile;   /* @0x8011B9F0 */
 
 /* @0x8005FC20 PFILE.CPP:380 */
+#line 379
 static unsigned char game_2_ui_class(const PlayerStruct *p)
 {
     if (p->_pClass == CLASS_WARRIOR)
@@ -31,6 +32,7 @@ static unsigned char game_2_ui_class(const PlayerStruct *p)
 }
 
 /* @0x8005FC4C PFILE.CPP:391 */
+#line 390
 void game_2_ui_player(const PlayerStruct *p, _uiheroinfo *heroinfo, unsigned char bHasSaveFile)
 {
     memset(heroinfo, 0, sizeof(_uiheroinfo));

@@ -1007,6 +1007,25 @@ the 389 retail-only `88` records are the hand-assembled `.MIP`/`.ASM` members, w
 need the `.MIP` spelling and `C:\DIABPSX\PSXSRC` / `D:\LIB\PSX` working directories (open).
 Diagnostic copies compiled from outside recon/ (the tests' temporary TUs) record their own directory.
 
+### Round 14b: source lines laid out on retail's SLD, pass 1 (2026-10-17)
+
+`tools/relayout.py` (driver `tools/relayout_all.py [--apply] [--whole] [--safe] [FILE.CPP ...]`)
+rewrites a TU so that every function gets one `#line` anchor before its signature and every
+statement ends on its retail line.  Our SLD points and retail's pair by offset (the bytes match),
+so each code line has a retail target; the tool inserts or removes blank lines, drops whole
+comments where our annotations exceed retail's line budget, joins `if (c)` / `x;` pairs that retail
+kept on one line (and splits the reverse), and in unsafe mode reorders one-line statements and
+hoists footprint-less statements into blank slack (the bytes gate is the arbiter; the first unsafe
+pass broke 23 TUs, so pass 1 is `--safe`).  Functions whose SLD needs a different statement
+structure (retail had more statements: `Minutes /= 360;`-style recoveries, conditions split across
+lines, two statements on one line) are reported and left for the manual pass.
+
+Pass 1 (safe): 1235 functions re-laid, 1364/2687 SLD-exact (from 129), 183/183 gates, images
+identical, 308 tests.  Residue: 1170 functions in the TUs (294 line-budget conflicts, 260 that
+would share a retail line with another statement, 237 retail statement boundaries inside one of
+our lines, 178 where retail has more statements, 119 reorders deferred to the unsafe pass), 83
+header inline members (PADS.H ... need anchors in the headers), 34 static-initialiser thunks.
+
 ### FRONTEND DLG.CPP data (2026-10-10)
 
 DLG's `.rdata` (0x801435E8..0x801436EB) is one compiled section: the DumpDatFile inline's

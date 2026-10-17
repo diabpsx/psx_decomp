@@ -28,9 +28,15 @@ void MAIN_MainLoop(void);
 /* Texture-page helpers precede MAIN's entry points in the retail TU. */
 #include "psxsrc/tutils.h"
 /* @0x80083128 MAIN.CPP:116 */
+#line 115
 void Remove96(void)
 {
+
+
+
+
     *(int *)((char *)initpsxcdrom + 0x1C) = 0;
+
     EnterCriticalSection();
     FlushCache();
     ExitCriticalSection();
@@ -38,57 +44,217 @@ void Remove96(void)
 
 /* @0x80083160 MAIN.CPP:141 -- extern "C" in the real source (retail label is unmangled "AppMain",
  * the app's actual entry point called from the BIOS/exec stub). */
+#line 140
 extern "C" void AppMain(void)
 {
+
+
+
+
+
     Remove96();
     SYSI_Init();
+
     VER_InitVersion();
+
+
+
     InitPrinty();
     InitDialog();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     LANG_SetLang(LANG_JAP);
+
+
+
     if (FileSYS != 1)
         BL_LoadStreamDir();
+
+
+
+
+
+
+
     LoadKanji(LANG_DB_MAIN);
+
     SetKanjiLoaded(1);
+
+
+
+
     Init_GamePad();
+
     OVR_LoadFrontend();
+
     ADirtyFlagThatGaryWillLove = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     UPDATEPROGRESS(4);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     GameTaskPtr = TSK_AddTask(0x4000, (void (*)())GameTask, 0x5000, 0);
+
     for (;;)
         MAIN_MainLoop();
 }
 
 /* @0x80083224 MAIN.CPP:273 */
+#line 272
 void MAIN_RestartGameTask(void)
 {
     TSK_RepointProc(GameTaskPtr, (void (*)())GameTask);
 }
 
 /* @0x80083250 MAIN.CPP:356 */
+#line 355
 static void GameTask(TASK *T)
 {
+
+
+
+
+
     MSG_ClearOutCompMap();
+
     UPDATEPROGRESS(4);
+
+
+
+
+
+
+
     while (1) {
+
+
+
+
+
         OVR_LoadFrontend();
+
+
+
+
         InitAllItemsUseable();
+
+
+
         alloc_plr();
+
         ATT_DoAttract();
+
         if (demo_record_load == 1)
+
+
             set_pad_record_play(level_record);
+
+
         if (demo_pad_time != 0) {
+
+
+
+
+
+
+
+
+
             StartGame(1, 1);
         } else if (DoLoadedGame == 1) {
             StartGame(0, 1);
+
         } else {
             GLUE_PreTown();
+
+
+
             GAL_SetTimeStamp(4);
+
             StartGame(1, 1);
+
+
+
         }
         GLUE_SetFinished(1);
         TSK_Sleep(5);
+
         if (gbDoEnding != 0) {
+
             MSG_ClearOutCompMap();
             const int end2 = gbDoEnding;
             gbDoEnding = 0;
@@ -98,11 +264,17 @@ static void GameTask(TASK *T)
 }
 
 /* @0x8008335C MAIN.CPP:445 */
+#line 444
 void MAIN_MainLoop(void)
 {
-    if (demo_pad_time == 0)
-        PAD_Handler();
+    if (demo_pad_time == 0) PAD_Handler();
+
     TSK_DoTasks();
+
+
+
+
+
     VID_AfterDisplay();
     DEC_DoDecompRequests();
     TICK_Update();

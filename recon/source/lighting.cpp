@@ -214,18 +214,23 @@ LightListStruct2 LightList[80] = { 0 };
 unsigned char lightactive[80] = { 0 };
 LightListStruct VisionList[32] = { 0 };
 
+#line 327
 int veclen2(int ix, int iy)
 {
     int t;
 
     ix = ix < 0 ? -ix : ix;
     iy = iy < 0 ? -iy : iy;
+
     if (ix < iy) {
+
         ix ^= iy;
         iy ^= ix;
         ix ^= iy;
+
     }
     t = iy + (iy >> 1);
+
     return ix - (ix >> 5) - (ix >> 7) + (t >> 2) + (t >> 6);
 }
 
@@ -257,6 +262,7 @@ void set_light_bands(void)
     } while (--v >= 0);
 }
 
+#line 415
 void SetLightFX(int x, int y, short s_r, short s_g, short s_b, unsigned char d_r, unsigned char d_g, unsigned char d_b)
 {
     disp_tab_r = d_r << 8;
@@ -628,15 +634,19 @@ void DoUnLight(void)
     }
 }
 
+#line 891
 void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
 {
     int i, j, x1, y1, x2, y2;
+
     int vis_flag;
 
     switch (num) {
+
     case 0:
         vis_flag = 1;
         break;
+
     case 1:
         vis_flag = 2;
         break;
@@ -649,20 +659,22 @@ void DoUnVision(int nXPos, int nYPos, int nRadius, int num)
     y2 = nYPos + nRadius;
     x1 = nXPos - nRadius;
     x2 = nXPos + nRadius;
-    if (y1 < 0)
-        y1 = 0;
-    if (y2 > 0x60)
-        y2 = 0x60;
-    if (x1 < 0)
-        x1 = 0;
-    if (x2 > 0x60)
-        x2 = 0x60;
+    if (y1 < 0) y1 = 0;
+    if (y2 > 0x60) y2 = 0x60;
+    if (x1 < 0) x1 = 0;
+    if (x2 > 0x60) x2 = 0x60;
     for (i = x1; i < x2; i++) {
+
         for (j = y1; j < y2; j++) {
+
             if ((dung_map[i][j].dFlags & 1) && (dung_map[i][j].dFlags & 2))
+
+
+
                 dung_map[i][j].dFlags &= ~vis_flag;
             else
                 dung_map[i][j].dFlags &= ~(vis_flag | 4);
+
         }
     }
 }
@@ -770,14 +782,17 @@ void DoVision(int nXPos, int nYPos, int nRadius, unsigned char doautomap, unsign
     }
 }
 
+#line 1050
 void FreeLightTable(void)
 {
 }
 
+#line 1057
 void InitLightTable(void)
 {
 }
 
+#line 1063
 void MakeLightTable(void)
 {
 }
@@ -790,20 +805,28 @@ void InitLightMax(void)
         lightmax = -0x80;
 }
 
+#line 1165
 void InitLighting(void)
 {
     int i;
 
     numlights = 0;
+
+
     for (i = 0; i < MAXLIGHTS; i++)
         lightactive[i] = i;
+
+
+
     set_light_bands();
     weird = 0;
 }
 
+#line 1183
 int AddLight(int x, int y, int r)
 {
     int lid;
+
     struct LightListStruct2 *ll;
 
     lid = -1;
@@ -816,22 +839,35 @@ int AddLight(int x, int y, int r)
         ll->_xoff = 0;
         ll->_yoff = 0;
         ll->_ldel = 0;
+
+
     }
     return lid;
 }
 
+#line 1206
 void AddUnLight(int i)
 {
+
     if (i == -1)
         return;
     LightList[i]._ldel = 1;
+
 }
 
+#line 1217
 void ChangeLightRadius(int i, int r)
 {
+
     if (i == -1)
+
+
+
+
+
         return;
     LightList[i]._lradius = r;
+
 }
 
 void ChangeLightXY(int i, int x, int y)
@@ -845,8 +881,14 @@ void ChangeLightXY(int i, int x, int y)
     ll->_ly = y;
 }
 
+#line 1248
 void light_fix(int i)
 {
+
+
+
+
+
 }
 
 void ChangeLightOff(int i, int x, int y)
@@ -880,35 +922,107 @@ void ChangeLightColour(int i, int c)
     ll->_lradius = (ll->_lradius & 0xF) | c;
 }
 
+#line 1315
 void ProcessLightList(void)
 {
     int i, j;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     unsigned char temp;
     struct LightListStruct2 *ll;
 
     DoUnLight();
+
+
+
+
+
+
+
+
+
+
+
+
+
     for (j = 0; j < numlights; j++) {
+
         i = lightactive[j];
         ll = &LightList[i];
         if (!ll->_ldel)
+
             DoLighting(ll->_lx, ll->_ly, ll->_lradius, i);
+
+
     }
+
     for (j = 0; j < numlights;) {
+
         i = lightactive[j];
         ll = &LightList[i];
         if (ll->_ldel) {
             temp = lightactive[--numlights];
             lightactive[numlights] = lightactive[j];
             lightactive[j] = temp;
+
         } else
             j++;
+
     }
 }
 
+#line 1389
 void SavePreLighting(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
+#line 1421
 void InitVision(void)
 {
     int i;
@@ -916,8 +1030,8 @@ void InitVision(void)
     numvision = 0;
     dovision = 0;
     visionid = 1;
-    for (i = 0; i < TransVal; i++)
-        TransList[i] = 0;
+
+    for (i = 0; i < TransVal; i++) TransList[i] = 0;
 }
 
 int AddVision(int x, int y, int r, unsigned char mine)
@@ -942,9 +1056,11 @@ int AddVision(int x, int y, int r, unsigned char mine)
     return vid;
 }
 
+#line 1474
 void ChangeVisionRadius(int id, int r)
 {
     int i;
+
 
     for (i = 0; i < numvision; i++) {
         if (VisionList[i]._lid == id) {

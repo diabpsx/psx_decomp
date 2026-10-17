@@ -102,29 +102,36 @@ void InitMonsterGFX(int monst)
 }
 
 /* --------------------------------------------------------------------- */
+#line 275
 void PlaceMonster(int i, int mtype, int x, int y)
 {
     int rd;
 
     dung_map[x][y].dMonster = i + 1;
-
     rd = ENG_random(8);
+
     InitMonster(i, rd, mtype, x, y);
 }
 
 /* --------------------------------------------------------------------- */
+#line 285
 int AddMonsterType(int type, int placeflag)
 {
     int i;
     unsigned char done = 0;
+
+
 
     for (i = 0; i < nummtypes && !done; i++)
         done = Monsters[i].mtype == type;
     i--;
 
     if (!done) {
+
         i = nummtypes++;
         Monsters[i].mtype = type;
+
+
         InitMonsterGFX(i);
         InitMonsterSND(i);
     }
@@ -966,7 +973,9 @@ void decode_enemy(int m, int enemy)
 }
 
 /* --------------------------------------------------------------------- */
+#line 1374
 unsigned char IsGoat(int mt)
 {
+
     return (unsigned)(mt - 0x22) < 4 || (unsigned)(mt - 0x2A) < 4;
 }

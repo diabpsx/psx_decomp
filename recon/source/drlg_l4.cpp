@@ -182,10 +182,12 @@ static void InitL4Dungeon()
 }
 
 /* @0x8014F620 */
+#line 186
 void DRLG_LoadL4SP()
 {
     setloadflag = 0;
     if (QuestStatus(Q_WARLORD)) {
+
         pSetPiece = GRL_LoadFileInMemSig("Warlord.DUN", NULL);
         setloadflag = 1;
     }
@@ -196,8 +198,10 @@ void DRLG_LoadL4SP()
 }
 
 /* @0x8014F6C4 */
+#line 201
 void DRLG_FreeL4SP()
 {
+
     MemFreeDbg(pSetPiece);
 }
 
@@ -234,6 +238,7 @@ void DRLG_L4SetSPRoom(int rx1, int ry1)
 }
 
 /* @0x8014F7F4 */
+#line 242
 static void L4makeDmt()
 {
     int i, j;
@@ -937,9 +942,12 @@ static void DRLG_L4Subs()
 }
 
 /* @0x8015275C */
+#line 702
 static void L4makeDungeon()
 {
     int i, j, k, l;
+
+
 
     for (j = 0; j < 20; j++) {
         for (i = 0; i < 20; i++) {
@@ -951,6 +959,7 @@ static void L4makeDungeon()
             L4dungeon[k + 1][l + 1] = dung[i][j];
         }
     }
+
     for (j = 0; j < 20; j++) {
         for (i = 0; i < 20; i++) {
             k = i << 1;
@@ -961,6 +970,7 @@ static void L4makeDungeon()
             L4dungeon[k + 1][l + 41] = dung[i][19 - j];
         }
     }
+
     for (j = 0; j < 20; j++) {
         for (i = 0; i < 20; i++) {
             k = i << 1;
@@ -971,6 +981,7 @@ static void L4makeDungeon()
             L4dungeon[k + 41][l + 1] = dung[19 - i][j];
         }
     }
+
     for (j = 0; j < 20; j++) {
         for (i = 0; i < 20; i++) {
             k = i << 1;
@@ -1081,6 +1092,7 @@ static long GetArea()
 }
 
 /* @0x80152C8C */
+#line 842
 static void L4drawRoom(int x, int y, int width, int height)
 {
     int i, j;
@@ -1214,17 +1226,24 @@ static void L4roomGen(int x, int y, int w, int h, int dir)
 }
 
 /* @0x80153078 */
+#line 956
 static void L4firstRoom()
 {
     int x, y, w, h, rndx, rndy, xmin, xmax, ymin, ymax, tx, ty;
 
+
+
+
     if (currlevel != 16) {
         if (currlevel == quests[Q_WARLORD]._qlevel && quests[Q_WARLORD]._qactive != QUEST_NOTAVAIL) {
+
+
             w = 11;
             h = 11;
         } else if (currlevel == quests[Q_BETRAYER]._qlevel && gbMaxPlayers != 1) {
             w = 11;
             h = 11;
+
         } else {
             w = ENG_random(5) + 2;
             h = ENG_random(5) + 2;
@@ -1232,6 +1251,7 @@ static void L4firstRoom()
     } else {
         w = 14;
         h = 14;
+
     }
 
     xmin = (20 - w) >> 1;
@@ -1252,10 +1272,10 @@ static void L4firstRoom()
     } else {
         y = rndy;
     }
-
     if (currlevel == 16) {
         l4holdx = x;
         l4holdy = y;
+
     }
     if (QuestStatus(Q_WARLORD) || (currlevel == quests[Q_BETRAYER]._qlevel && gbMaxPlayers != 1)) {
         SP4x1 = x + 1;
@@ -1274,13 +1294,13 @@ static void L4firstRoom()
 }
 
 /* @0x80153284 */
+#line 1026
 void L4SaveQuads()
 {
     int i, j, x, y;
 
     x = l4holdx;
     y = l4holdy;
-
     for (j = 0; j < 14; j++) {
         for (i = 0; i < 14; i++) {
             DFLAGS(x + i, y + j) = 1;
@@ -1604,9 +1624,11 @@ unsigned char IsDLLWall(char dd)
 }
 
 /* @0x80154150 */
+#line 1406
 static void DRLG_L4TransFix()
 {
     int i, j, xx, yy;
+
 
     yy = 16;
     for (j = 0; j < DMAXY; j++) {
@@ -1640,6 +1662,7 @@ static void DRLG_L4TransFix()
             if (dungeon[i][j] == 53) {
                 dung_map[xx][yy - 1].dTransVal = dung_map[xx + 1][yy].dTransVal;
                 dung_map[xx][yy].dTransVal = dung_map[xx + 1][yy].dTransVal;
+
             }
             xx += 2;
         }
@@ -1692,19 +1715,35 @@ void DRLG_L4GeneralFix()
 
 /* @0x80154630 -- PSX-only pass, no devilution counterpart: seals/unseals BFLAG_MISSILE (0x20) on
  * dung_map per dungeon tile (set for a wall-open tile #6 or an unset tile #0, cleared otherwise). */
+#line 1492
 static void DRLG_L4SetWalls()
 {
     int i, j, yy;
 
+
     yy = 16;
+
     for (j = 0; j < DMAXY; j++) {
         int xx = 16;
+
+
         for (i = 0; i < DMAXX; i++) {
+
             int v = dungeon[i][j];
+
             if (v == 6 || v == 0) {
+
                 dung_map[xx][yy].dFlags |= 0x20;
+
+
+
+
+
             } else {
                 dung_map[xx][yy].dFlags &= ~0x20;
+
+
+
             }
             xx += 2;
         }
@@ -1871,9 +1910,31 @@ static void DRLG_L4(int entry)
 }
 
 /* @0x80154FE0 */
+#line 1695
 static void DRLG_L4Pass3()
 {
     int i, j, xx, yy;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     long v1, v2, v3, v4, lv;
 
     lv = 30 - 1;
@@ -1883,14 +1944,21 @@ static void DRLG_L4Pass3()
     v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
     v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
 
+
     for (yy = 0; yy < 96; yy += 2) {
         for (xx = 0; xx < 96; xx += 2) {
             SetDPiece(xx, yy, v1);
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
         }
     }
+
 
     yy = 16;
     for (j = 0; j < DMAXY; j++) {
@@ -1898,10 +1966,32 @@ static void DRLG_L4Pass3()
         for (i = 0; i < DMAXX; i++) {
             lv = dungeon[i][j] - 1;
             if (lv >= 0) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 v1 = *((short *)&pMegaTiles[lv * 8] + 0) + 1;
                 v2 = *((short *)&pMegaTiles[lv * 8] + 1) + 1;
                 v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
                 v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
+
             } else {
                 v1 = 0;
                 v2 = 0;
@@ -1912,6 +2002,11 @@ static void DRLG_L4Pass3()
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
             xx += 2;
         }
         yy += 2;

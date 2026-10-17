@@ -105,6 +105,7 @@ void InitQuests(void)
     }
 }
 
+#line 202
 void DrawButcher(void)
 {
     int x, y;

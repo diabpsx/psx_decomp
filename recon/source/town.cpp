@@ -45,62 +45,146 @@ static unsigned char *P3Tiles;
 int tile;   /* @0x8011BB0C: TOWN.CPP's uninitialised global, emitted after the literal pool */
 
 /* @0x80074478 TOWN.CPP:129 */
+#line 128
 void T_DrawView(int StartX, int StartY)
 {
+
+
+
     if (GLUE_Finished() || IsGameLoading())
+
+
+
+
+
+
+
+
+
+
+
+
+
         return;
 
     if ((stextflag) && (!qtextflag)) DrawSText();
 
+
+
+
+
+
+
+
+
+
+
+
+
     if (!chrflag && !questlog) {
+
         if (invflag)
             DrawInv();
+
         else {
             if (plr[0].plractive && plr[0]._pStatPts) DrawLevelUpIcon(0);
             if (plr[1].plractive && plr[1]._pStatPts) DrawLevelUpIcon(1);
+
+
+
+
+
+
+
+
         }
     }
 
     if (msgflag && !_spselflag[0] && !_spselflag[1] && !iscflag && !PauseMode) DrawDiabloMsg();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if (CowPlaying) CowPlaying--;
 }
 
 /* @0x80074628 TOWN.CPP:216 */
+#line 215
 void T_FillSector(unsigned char *P3Tiles, unsigned char *pSector, int xi, int yi, int w, int h, BOOL AddSec)
 {
     int i, j, xx, yy;
+
     long v1, v2, v3, v4, ii;
 
     ii = 4;
+
+
+
     yy = yi;
     if (AddSec) {
         unsigned short *Map = (unsigned short *)(pSector + 4);
+
+
         for (j = 0; j < h; j++)
             for (i = 0; i < w; i++)
                 dungeon[xi / 2 + i][yi / 2 + j] = Map[i + j * w];
     }
 
     for (j = 0; j < h; j++) {
+
         xx = xi;
         for (i = 0; i < w; i++) {
+
+
+
+
             long Dave = *(short *)(pSector + ii);
+
             if (Dave) {
+
                 Dave--;
                 v1 = *(short *)(P3Tiles + Dave * 8 + 0) + 1;
                 v2 = *(short *)(P3Tiles + Dave * 8 + 2) + 1;
                 v3 = *(short *)(P3Tiles + Dave * 8 + 4) + 1;
                 v4 = *(short *)(P3Tiles + Dave * 8 + 6) + 1;
+
+
             } else {
                 v1 = 0;
                 v2 = 0;
                 v3 = 0;
                 v4 = 0;
+
             }
             SetDPiece(xx, yy, v1);
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
+
             xx += 2;
             ii += 2;
         }
@@ -109,25 +193,68 @@ void T_FillSector(unsigned char *P3Tiles, unsigned char *pSector, int xi, int yi
 }
 
 /* @0x8007486C TOWN.CPP:282 */
+#line 281
 void T_FillTile(unsigned char *P3Tiles, int xx, int yy, int t)
 {
     long v1, v2, v3, v4;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     v1 = *(short *)(P3Tiles + (t - 1) * 8 + 0) + 1;
+
     SetDPiece(xx, yy, v1);
+
     v2 = *(short *)(P3Tiles + (t - 1) * 8 + 2) + 1;
+
     SetDPiece(xx + 1, yy, v2);
+
     v3 = *(short *)(P3Tiles + (t - 1) * 8 + 4) + 1;
+
     SetDPiece(xx, yy + 1, v3);
+
     v4 = *(short *)(P3Tiles + (t - 1) * 8 + 6) + 1;
+
     SetDPiece(xx + 1, yy + 1, v4);
+
     dungeon[xx / 2][yy / 2] = t;
 }
 
 /* @0x8007497C TOWN.CPP:343 */
+#line 342
 void TownFixupBodges(void)
 {
     T_FillTile(P3Tiles, 52, 54, 267);
+
     T_FillTile(P3Tiles, 40, 63, 267);
 }
 
@@ -196,8 +323,11 @@ void T_Pass3(void)
 }
 
 /* @0x80074D48 TOWN.CPP:453 */
+#line 452
 void CreateTown(int entry)
 {
+
+
     dminx = 10;
     dminy = 10;
     dmaxx = 84;
@@ -230,12 +360,23 @@ void CreateTown(int entry)
 
     T_Pass3();
 
+
+
+
+
+
     for (int y = 0; y < 112; y++) {
+
         for (int x = 0; x < 112; x++) {
+
+
+
             dung_map[x][y].dFlags = 0;
+
             dung_map[x][y].dMonster = 0;
             dung_map[x][y].dObject = 0;
             dung_map[x][y].dItem = 0;
+
         }
     }
 }
@@ -263,18 +404,34 @@ unsigned char *GRL_LoadFileInMemSig(const char *Name, unsigned long *Len)
 }
 
 /* @0x80074F80 TOWN.CPP:612 */
+#line 611
 void GRL_StripDir(char *Dest, const char *Src)
 {
+
+
+
+
     char *BSlash = strrchr(Src, '\\');
     char *FSlash = strrchr(Src, '/');
 
     if (BSlash || FSlash) {
+
         char *Last;
+
+
+
         if (!BSlash) BSlash = (char *)Src;
-        if (!FSlash) FSlash = (char *)Src;
+        if (!FSlash)
+            FSlash = (char *)Src;
+
+
         Last = BSlash;
         if (Last < FSlash) Last = FSlash;
+
+
+
         strcpy(Dest, Last + 1);
     } else
+
         strcpy(Dest, Src);
 }

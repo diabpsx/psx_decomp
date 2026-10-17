@@ -40,12 +40,14 @@ CompLevelMaps::CompLevelMaps(const CompClass &NewCompObj) : CompObj((CompClass *
 }
 
 /* @0x80081674 COMPMAP.CPP:71 */
+#line 70
 CompLevelMaps::~CompLevelMaps()
 {
     Init();
 }
 
 /* @0x80081704 COMPMAP.CPP:80 */
+#line 79
 void CompLevelMaps::Init()
 {
     InitAllMaps();
@@ -54,6 +56,7 @@ void CompLevelMaps::Init()
 }
 
 /* @0x80081734 COMPMAP.CPP:91 */
+#line 90
 void CompLevelMaps::InitAllMaps()
 {
     for (int f = 0; f < NUM_OF_MAPS; f++)
@@ -61,24 +64,33 @@ void CompLevelMaps::InitAllMaps()
 }
 
 /* @0x80081788 COMPMAP.CPP:101 */
+#line 100
 DLevel *CompLevelMaps::GetMap(int MapNum)
 {
     ASSERT(!MapOut, 102);
+
     MakeSureMapXDecomped(MapNum);
+
     MapOut = 1;
+
     LastNumOut = MapNum;
     LastMapOut = TheMaps[MapNum].GetMap();
+
     return LastMapOut;
 }
 
 /* @0x80081804 COMPMAP.CPP:119 */
+#line 118
 void CompLevelMaps::ReleaseMap(DLevel *Dl)
 {
     ASSERT(MapOut, 120);
+
     MapOut = 0;
     CheckMapNum(LastNumOut);
     ASSERT(Dl == LastMapOut, 124);
+
     TheMaps[LastNumOut].ReleaseMap(Dl);
+
     LastMapOut = NULL;
 }
 
@@ -94,12 +106,19 @@ void CompLevelMaps::ImportData(CompressedLevs *Levs)
 }
 
 /* @0x80081950 COMPMAP.CPP:176 */
+#line 175
 int CompLevelMaps::ExportData(unsigned char *U8Dest)
 {
+
+
+
+
     unsigned char *BinPtr = U8Dest + sizeof(CompressedLevs);
 
     ((CompressedLevs *)U8Dest)->Version = 0x100;
+
     for (int f = 0; f < NUM_OF_MAPS; f++) {
+
         ((CompressedLevs *)U8Dest)->Offset[f] = BinPtr - U8Dest;
         ((CompressedLevs *)U8Dest)->Size[f] = TheMaps[f].WriteCompressed(BinPtr, *CompObj);
         BinPtr += GAL_AlignSizeToType(((CompressedLevs *)U8Dest)->Size[f], 1);
@@ -108,16 +127,27 @@ int CompLevelMaps::ExportData(unsigned char *U8Dest)
 }
 
 /* @0x800819FC COMPMAP.CPP:199 */
+#line 198
 void CompLevelMaps::MakeSureMapXDecomped(int MapNum)
 {
+
+
+
     for (int f = 0; f < NUM_OF_MAPS; f++) {
+
         if (f != MapNum) {
             AMap &Map = TheMaps[f];
+
+
             if (!Map.IsCompressed())
                 Map.CompressMap(*CompObj);
         }
     }
+
+
+
     AMap &Map = TheMaps[MapNum];
+
     if (Map.IsCompressed())
         Map.DecompressMap(*CompObj);
 }
@@ -225,6 +255,7 @@ void AMap::CompressMap(const CompClass &CompObj)
 }
 
 /* @0x80081FEC COMPMAP.CPP:418 */
+#line 417
 void AMap::DecompressMap(const CompClass &CompObj)
 {
     long NewHnd;
@@ -233,14 +264,31 @@ void AMap::DecompressMap(const CompClass &CompObj)
 
     ASSERT(!CurrLevel, 423);
     ASSERT(Compressed, 424);
+
+
+
+
+
+
+
+
     NewHnd = GAL_Alloc(sizeof(DLevel), 1, "DECB");
     ASSERT(NewHnd != -1, 434);
+
     Dest = (unsigned char *)GAL_Lock(NewHnd);
     ASSERT(Dest, 437);
+
     Src = (unsigned char *)GetMap();
+
     CompObj.DoDecomp(Dest, Src, sizeof(DLevel), Size);
+
     ReleaseMap((DLevel *)Src);
+
+
     Init();
+
+
     hnd = NewHnd;
+
     Compressed = 0;
 }

@@ -4,6 +4,7 @@
 
 extern "C" void DBG_SendMessage(char *e);
 
+#line 61
 void PreGameOnlyTestRoutine(void)
 {
     DBG_SendMessage("You shouldn't get here");

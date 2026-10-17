@@ -28,19 +28,27 @@ public:
     unsigned short NumOfCols;   /* +0x12 */
     unsigned short JustUsed;    /* +0x14 */
 
+#line 77
     BOOL IsEqual(unsigned short _SourceClut, unsigned short _PixVal, int _NumOfCols) const { return _SourceClut == SourceClut && _PixVal == PixVal && NumOfCols == _NumOfCols; }   /* 77 */
+#line 82
     unsigned short GetClut() const { return Clut; }   /* 82 */
+#line 83
     void Init() { NumOfCols = 0; }                     /* 83 */
+#line 85
     BOOL SetJustUsed(BOOL NewVal)                      /* 86 */
     {
+
+
         return NewVal;
     }
+#line 92
     void Set(const InitPos &NewPos)                    /* 93 */
     {
         MyX = NewPos.x;
         MyY = NewPos.y;
         Clut = (MyY << 6) | ((MyX >> 4) & 0x3F);
     }
+#line 100
     void Set(unsigned short _SourceClut, unsigned short _PixVal, int _NumOfCols)   /* 101 */
     {
         SourceClut = _SourceClut;
@@ -73,15 +81,20 @@ static const InitPos InitialPositions[20] = {   /* @0x80110A74 */
 void SCR_DumpClut(void);
 
 /* @0x8009AC78 SCRATCH.CPP:162 */
+#line 161
 unsigned short SCR_GetBlackClut(void)
 {
     return ShadClut;
 }
 
 /* @0x8009AC84 SCRATCH.CPP:171 */
+#line 170
 void SCR_Open(void)
 {
     ThePals.Init(InitialPositions);
+
+
+
     SCR_DumpClut();
 }
 
@@ -103,16 +116,22 @@ void SCR_DumpClut(void)
 }
 
 /* @0x8009AD30 SCRATCH.CPP:212 */
+#line 211
 unsigned short SCR_NeedHighlightPal(unsigned short Clut, unsigned short PixVal, int NumOfCols)
 {
     return ThePals.GetHighlightPal(Clut, PixVal, NumOfCols);
 }
 
 /* @0x8009AD64 SCRATCH.CPP:223 */
+#line 222
 void PalCollection::Init(const InitPos *IPos)
 {
+
+
     Collection<PalEntry, 20>::Init();
+
     for (int f = 0; f < GetNumOfObjs(); f++) {
+
         Objects[f].Set(IPos[f]);
         Objects[f].Init();
     }
@@ -137,36 +156,76 @@ PalEntry *PalCollection::FindPal(unsigned short SourceClut, unsigned short PixVa
 }
 
 /* @0x8009AED0 SCRATCH.CPP:289 */
+#line 288
 PalEntry *PalCollection::NewPal(unsigned short SourceClut, unsigned short PixVal, int NumOfCols)
 {
+
+
     PalEntry *RetPal = GetObj();
 
-    if (!RetPal)
-        DBG_Error(NULL, "psxsrc/SCRATCH.CPP", 307);
+
+
+
+
+
+
+
+
+
+
+
+
+
+    if (!RetPal) DBG_Error(NULL, "psxsrc/SCRATCH.CPP", 307);
+
     RetPal->MakePal(SourceClut, PixVal, NumOfCols);
+
     return RetPal;
 }
 
 /* @0x8009AF50 SCRATCH.CPP:319 */
+#line 318
 void PalEntry::MakePal(unsigned short _SourceClut, unsigned short _PixVal, int _NumOfCols)
 {
     RECT SourceRect;
 
     Set(_SourceClut, _PixVal, _NumOfCols);
+
     SourceRect.x = (_SourceClut & 0x3F) << 4;
     SourceRect.y = _SourceClut >> 6;
     SourceRect.w = NumOfCols - 1;
     SourceRect.h = 1;
+
+
+
     GPUQ_MoveImage(&SourceRect, MyX, MyY);
+
+
+
     GPUQ_LoadClutAddr(MyX + NumOfCols - 1, MyY, 1, &PixVal);
 }
 
 /* @0x8009AFF0 SCRATCH.CPP:346 */
+#line 345
 unsigned short PalCollection::GetHighlightPal(unsigned short SourceClut, unsigned short PixVal, int NumOfCols)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
     PalEntry *RetPal = NewPal(SourceClut, PixVal, NumOfCols);
 
     RetPal->SetJustUsed(1);
+
     return RetPal->GetClut();
 }
 
@@ -184,6 +243,7 @@ void PalCollection::UpdatePals()
 }
 
 /* @0x8009B0AC SCRATCH.CPP:402 */
+#line 401
 void SCR_Handler(void)
 {
     ThePals.UpdatePals();

@@ -43,6 +43,7 @@ static void DefragItems(unsigned char *ilist, int num)
     }
 }
 
+#line 101
 static void removellist(unsigned char *ilist, unsigned char val)
 {
     for (int i = 0; i < 127; i++) {

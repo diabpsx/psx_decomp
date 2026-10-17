@@ -296,15 +296,17 @@ void DrawCreditsSubTitle(int SubTitleNo, int SubTitleFade, int SubTitleMode, int
 }
 
 /* @0x8013DBE8 CREDITS.CPP:629 */
+#line 628
 int CredCountNL(int Str)
 {
     int Count = 0;
-    char *StrPtr = GetStr(Str);
 
+    char *StrPtr = GetStr(Str);
     while (*StrPtr) {
-        if (*StrPtr == '|')
-            Count++;
+
+        if (*StrPtr == '|') Count++;
         StrPtr++;
+
     }
     return Count;
 }

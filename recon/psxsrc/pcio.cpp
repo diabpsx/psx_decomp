@@ -58,14 +58,19 @@ PCIO::PCIO(unsigned long OurMemId) : FileIO(OurMemId)
 }
 
 /* @0x8008611C PCIO.CPP:75 */
+#line 74
 PCIO::~PCIO()
 {
 }
 
 /* @0x80086174 PCIO.CPP:85 */
+#line 84
 BOOL PCIO::FileExists(const char *Name)
 {
+
+
     int FileHnd = PCopen((char *)Name, 0, 0);
+
     if (FileHnd == -1)
         return 0;
     PCclose(FileHnd);

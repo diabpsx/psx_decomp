@@ -105,6 +105,7 @@ static struct HelpStruct HelpList[25] = {
  * static-object thunks are named _GLOBAL__I/D_DrawHelp__Fv. */
 
 /* @0x800AE38C PSXHELP.CPP:72 */
+#line 71
 static void RemoveHelp(void)
 {
     helpflag = 0;
@@ -189,6 +190,7 @@ static int GetControlKey(int str, BOOL *iscombo)
 }
 
 /* @0x800AE6F0 PSXHELP.CPP:228 */
+#line 227
 static void InitHelp(void)
 {
     PostGamePad(0xB, options_pad, (int)txt_actions, 0);
@@ -199,35 +201,49 @@ static void InitHelp(void)
 }
 
 /* @0x800AE73C PSXHELP.CPP:294 */
+#line 293
 static int DrawHelpLine(int x, int y, char *txt, char R, char G, char B, struct HelpStruct *hp)
 {
     int eln;
 
     if (hp->DisplayType == 1) {
+
         int key;
         BOOL combo;
 
         key = GetControlKey(hp->HelpTxt, &combo);
         if (combo) {
+
             int nkey = GetControlKey(0xC6, &combo);
             if (nkey)
+
+
                 sprintf(tempstr, "%c + %c %s", nkey, key, txt);
+
+
             else {
                 R = REDR;
                 G = REDG;
+
+
+
                 B = REDB;
                 sprintf(tempstr, "    %s", txt);
             }
         } else if (key)
             sprintf(tempstr, "%c   %s", key, txt);
+
         else {
             R = REDR;
             G = REDG;
             B = REDB;
             sprintf(tempstr, "    %s", txt);
         }
+
         MediumFont.Print(x, y, tempstr, JustLeft, &HelpRect, R, G, B);
         eln = MediumFont.GetStrWidth(tempstr);
+
+
     } else {
         if (displayinghelp)
             MediumFont.Print(x, y, txt, JustCentre, &HelpRect, R, G, B);

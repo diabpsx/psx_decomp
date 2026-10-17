@@ -136,20 +136,33 @@ void ascii_to_sjis(unsigned char *asc, unsigned short *sjis)
 }
 
 /* @0x80142904 MEMCARD.CPP:246 */
+#line 245
 int is_sjis(unsigned char *buf)
 {
     return *buf >> 7;
 }
 
 /* @0x80142910 MEMCARD.CPP:251 */
+#line 250
 int sjis_to_ascii(unsigned short *sjis, char *asc)
 {
     to_ascii_invalid_char = 0;
+
+
+
     if (*sjis & 0x8000) {
+
         while (*sjis) *asc++ = to_ascii(*sjis++);
         *asc = 0;
+
+
+
     } else {
         strcpy(asc, (char *)sjis);
+
+
+
+
     }
     return to_ascii_invalid_char == 0;
 }
@@ -199,32 +212,90 @@ void read_card_directory(int card_number)
 
 /* @0x80142BF4 MEMCARD.CPP:418 — LIBCARD event poll after _card_load: ev0 = formatted, ev1/ev2 = card
  * gone, ev3 = new card (read block 0 and check the "MC" signature) */
+#line 417
 int test_card_format(int card_number)
 {
+
+
     _card_load(card_number << 4);
     _card_wait(card_number);
+
+
+
     if (TestEvent(card_ev0) == 1) return 1;
+
+
+
+
+
+
     if (TestEvent(card_ev1) == 1) {
+
+
+
+
+
+
+
+
+
+
         card_removed(card_number);
+
         return 0;
+
     }
     if (TestEvent(card_ev2) == 1) {
+
+
+
+
+
+
+
+
+
+
+
+
         card_removed(card_number);
         return 0;
     }
     if (TestEvent(card_ev3) == 1) {
+
+
+
+
+
+
+
+
+
         if (read_card_block(card_number, 0) && block_buf[0] == 'M' && block_buf[1] == 'C') return 1;
+
+
+
+
+
+
+
         return 0;
+
+
+
+
+
     }
     return 0;
 }
 
 /* @0x80142CE4 MEMCARD.CPP:503 */
+#line 502
 int checksum_data(char *buf, int size)
 {
     int chk = 0xDEADBEEF;
-
     while (size--) chk -= *buf++;
+
     return chk;
 }
 
@@ -379,33 +450,97 @@ void new_card(int card_number)
 
 /* @0x801434A0 MEMCARD.CPP:945 — per-frame card state follow-up: status 0 after 1/2/4 or status 3 flags a
  * new card, status 2 after 0 drops usability; a dirty card is re-tested and its directory re-read */
+#line 944
 void service_card(int card_number)
 {
     int last_status = last_card_status[card_number];
 
+
+
     switch (card_status[card_number]) {
+
     case 0:
         if (last_status == 1 || last_status == 2 || last_status == 4) new_card_flag[card_number] = true;
+
+
+
+
+
+
+
+
+
+
+
+
         break;
+
+
+
     case 1:
         break;
     case 2:
         if (last_status == 0) {
+
+
+
+
+
+
+
             if (mem_card_event_handler) mem_card_event_handler(8, card_number);
+
+
+
             card_usable[card_number] = 0;
         }
         break;
+
+
+
+
+
+
+
+
+
+
+
+
     case 3:
         new_card_flag[card_number] = true;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         break;
     case 4:
         break;
     }
     if (card_dirty[card_number]) {
+
+
+
+
+
         card_usable[card_number] = test_card_format(card_number);
+
         dirflag = 1;
+
         read_card_directory(card_number);
         dirflag = 0;
+
         card_dirty[card_number] = 0;
     }
 }

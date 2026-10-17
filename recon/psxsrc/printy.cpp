@@ -72,10 +72,12 @@ FontItem MFontTab[118] = {
 FontTab MFont = { &MediumFont, MFontTab, 118, 0x39 };
 
 /* @0x80089C60 PRINTY.CPP:102 */
+#line 101
 void FontTab::Set()
 {
     for (int Loop = 0; Loop < 256; Loop++)
         Fnt->SetChar(Loop, 0x3039);
+
     for (int f = 0; f < NumOfItems; f++)
         Fnt->SetChar(Items[f].ch, Items[f].Offset + FrameBase);
 }
@@ -97,6 +99,7 @@ void InitPrinty(void)
 }
 
 /* @0x80089DAC PRINTY.CPP:605 */
+#line 604
 void CFont::SetTextDat(TextDat *NewDat)
 {
     ThisDat = NewDat;
@@ -503,20 +506,19 @@ int CFont::GetStrWidth(char *Str)
 }
 
 /* @0x8008AB20 PRINTY.CPP:1226 */
+#line 1225
 void CFont::SetChar(int ch, unsigned short Frm)
 {
-    if (!(ch < 256))
-        DBG_Error(NULL, "psxsrc/PRINTY.CPP", 0x4CB);
-    if (!(ch >= 0))
-        DBG_Error(NULL, "psxsrc/PRINTY.CPP", 0x4CC);
+    if (!(ch < 256)) DBG_Error(NULL, "psxsrc/PRINTY.CPP", 0x4CB);
+    if (!(ch >= 0)) DBG_Error(NULL, "psxsrc/PRINTY.CPP", 0x4CC);
     FontTab[ch] = Frm;
 }
 
 /* @0x8008ABA0 PRINTY.CPP:1235 */
+#line 1234
 int CFont::SetOTpos(int OT)
 {
     int OldOT = PrintyOTpos;
-
     PrintyOTpos = OT;
     return OldOT;
 }

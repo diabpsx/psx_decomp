@@ -91,31 +91,50 @@ void VID_OpenModule(void)
 }
 
 /* @0x80084030 VID.CPP:149 */
+#line 148
 void VID_AfterDisplay(void)
 {
     PRIM_Flush();
+
+
+
+
+
+
     ClearKanjiCount();
 }
 
 /* @0x800B03E0 VID.CPP:184 (.STARTUP_text) */
+#line 183
 static void InitScreens(void)
 {
+
+
     ResetGraph(0);
+
+
     SetGraphDebug(0);
+
     InitGeom();
+
     SetDefDrawEnv(&screen[0].drawenv, 0, 0, 320, 240);
     SetDefDispEnv(&screen[0].dispenv, 320, 0, 320, 240);
+
     SetDefDrawEnv(&screen[1].drawenv, 320, 0, 320, 240);
     SetDefDispEnv(&screen[1].dispenv, 0, 0, 320, 240);
+
     screen[0].drawenv.isbg = 0;
     screen[1].drawenv.isbg = 0;
+
     screen[0].drawenv.dtd = 1;
     screen[1].drawenv.dtd = 1;
+
     SetDrawEnv(&screen[0].drawenv.dr_env, &screen[0].drawenv);
     SetDrawEnv(&screen[1].drawenv.dr_env, &screen[1].drawenv);
 }
 
 /* @0x80084058 VID.CPP:226 */
+#line 225
 void VID_ScrOn(void)
 {
     screen[0].drawenv.isbg = 1;
@@ -125,42 +144,53 @@ void VID_ScrOn(void)
 }
 
 /* @0x80084094 VID.CPP:249 */
+#line 248
 void VID_DoThisNextSync(void (*Func)())
 {
     VidWait = 0;
+
     while (!VID_NextSyncRoutHasExecuted())
         VidWait++;
+
     VbFunc = Func;
 }
 
 /* @0x800840EC VID.CPP:259 */
+#line 258
 unsigned char VID_NextSyncRoutHasExecuted(void)
 {
     return VbFunc == NULL;
 }
 
 /* @0x800840F8 VID.CPP:264 */
+#line 263
 unsigned long VID_GetTick(void)
 {
     return VidTick;
 }
 
 /* @0x80084104 VID.CPP:270 -- SYM class STAT, C linkage */
+#line 268
 extern "C" {
 static void VID_DispEnvSend(void)
 {
     unsigned long OldGp = ReloadGP();
 
     VidTick++;
+
     if (VbFunc) {
+
         VbFunc();
         VbFunc = NULL;
+
+
     }
     SetGP(OldGp);
 }
 }
 
 /* @0x8008415C VID.CPP:287 */
+#line 286
 void VID_SetXYOff(int x, int y)
 {
     VXOff = x;
@@ -168,12 +198,14 @@ void VID_SetXYOff(int x, int y)
 }
 
 /* @0x8008416C VID.CPP:293 */
+#line 292
 int VID_GetXOff(void)
 {
     return VXOff;
 }
 
 /* @0x80084178 VID.CPP:298 */
+#line 297
 int VID_GetYOff(void)
 {
     return VYOff;

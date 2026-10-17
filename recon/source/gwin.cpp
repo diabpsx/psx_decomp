@@ -21,20 +21,24 @@ void GRL_CallWindowProc(unsigned long hw, unsigned int msg, long wp, unsigned lo
 static WNDPROC CurrentProc;
 
 /* @0x8007B210 GWIN.CPP:94 */
+#line 93
 void GRL_InitGwin(void)
 {
     CurrentProc = 0;
 }
 
 /* @0x8007B21C GWIN.CPP:106 */
+#line 105
 WNDPROC GRL_SetWindowProc(WNDPROC NewProc)
 {
+
     WNDPROC OldProc = CurrentProc;
     CurrentProc = NewProc;
     return OldProc;
 }
 
 /* @0x8007B22C GWIN.CPP:121 */
+#line 120
 void GRL_CallWindowProc(unsigned long hw, unsigned int msg, long wp, unsigned long lp)
 {
     if (CurrentProc)
@@ -68,11 +72,14 @@ static const struct MESSAGE_STR AllMsgs[11] = {
     { 0x4D, "WM_DIAVNEWLVL" },
 };
 
+#line 159
 static char *Msg2Txt(int Msg)
 {
     for (int i = 0; i < sizeof(AllMsgs) / sizeof(struct MESSAGE_STR); i++) {
+
         if (Msg == AllMsgs[i].Msg)
             return AllMsgs[i].Text;
     }
+
     return 0;
 }

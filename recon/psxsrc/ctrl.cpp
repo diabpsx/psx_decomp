@@ -122,12 +122,14 @@ char *get_action_str(int pval, int combo)
 }
 
 /* @0x8009C728 CTRL.CPP:360 */
+#line 359
 int get_key_pad(int n)
 {
     int i;
     pad_assigns *pa = pad_txt;
 
     for (i = 0; i < 14; i++) {
+
         if (pa->pnum == n)
             return i;
         pa++;
@@ -151,9 +153,12 @@ static BOOL checkvalid(void)
 }
 
 /* @0x8009C7C4 CTRL.CPP:396 */
+#line 395
 BOOL RemoveCtrlScreen(void)
 {
     if (!checkvalid())
+
+
         return false;
     PostGamePad(9, options_pad, (int)txt_actions, 0);
     ctrlflag = 0;
@@ -181,26 +186,37 @@ static unsigned char Init_ctrl_pos(void)
 }
 
 /* @0x8009C8D8 CTRL.CPP:434 */
+#line 433
 static int remove_padval(int p)
 {
+
+
     for (int i = 0; i < 20; i++) {
+
         if (txt_actions[i].pad_val == p) {
+
             txt_actions[i].pad_val = 0;
             return i;
+
         }
     }
     return -1;
 }
 
 /* @0x8009C918 CTRL.CPP:450 */
+#line 449
 static int remove_comboval(int p, BOOL all)
 {
     int n = -1;
 
+
     for (int i = 0; i < 20; i++) {
+
         if (txt_actions[i].combo_val == p || all) {
+
             txt_actions[i].combo_val = 0;
             n = -1;
+
         }
     }
     return n;
@@ -251,13 +267,16 @@ static unsigned char set_buttons(int cline, int n)
 }
 
 /* @0x8009CAD8 CTRL.CPP:521 */
+#line 520
 void restore_controller_settings(CTRL_SET s)
 {
     KEY_ASSIGNS *ta = txt_actions;
 
     switch (s) {
+
     case CTRL_BEGINNER:
         for (int i = 0; i < 20; i++) {
+
             ta->pad_val = BeginnerDefaults[i][0];
             ta->combo_val = BeginnerDefaults[i][1];
             ta++;
@@ -265,24 +284,29 @@ void restore_controller_settings(CTRL_SET s)
         break;
     case CTRL_ADVANCED:
         for (int i = 0; i < 20; i++) {
+
             ta->pad_val = AdvancedDefaults[i][0];
             ta->combo_val = AdvancedDefaults[i][1];
             ta++;
         }
+
         break;
     }
 }
 
 /* @0x8009CB7C CTRL.CPP:551 */
+#line 550
 static BOOL only_one_button(int p)
 {
     int hand = 1;
     int count = 0;
 
+
     while (hand) {
         if (hand & p)
             count++;
         hand <<= 1;
+
     }
     return count < 2;
 }

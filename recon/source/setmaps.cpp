@@ -78,11 +78,11 @@ static unsigned char SkelChamTrans3[] = {
 };
 
 /* @0x801552D8 */
+#line 102
 int ObjIndex(int x, int y)
 {
     int i;
     int oi;
-
     for (i = 0; i < numobjects; i++) {
         oi = objectactive[i];
         if (object[oi]._ox == x && object[oi]._oy == y)
@@ -93,10 +93,14 @@ int ObjIndex(int x, int y)
 }
 
 /* @0x8015538C */
+#line 118
 void AddSKingObjs(void)
 {
+
     SetObjMapRange(ObjIndex(64, 34), 20, 7, 23, 10, 1);
     SetObjMapRange(ObjIndex(64, 59), 20, 14, 21, 16, 2);
+
+
     SetObjMapRange(ObjIndex(27, 37), 8, 1, 15, 11, 3);
     SetObjMapRange(ObjIndex(46, 35), 8, 1, 15, 11, 3);
     SetObjMapRange(ObjIndex(49, 53), 8, 1, 15, 11, 3);
@@ -104,24 +108,36 @@ void AddSKingObjs(void)
 }
 
 /* @0x801554BC */
+#line 134
 void AddSChamObjs(void)
 {
+
     SetObjMapRange(ObjIndex(37, 30), 17, 0, 21, 5, 1);
     SetObjMapRange(ObjIndex(37, 46), 13, 0, 16, 5, 2);
 }
 
 /* @0x80155538 */
+#line 144
 void AddVileObjs(void)
 {
+
     SetObjMapRange(ObjIndex(26, 45), 1, 1, 9, 10, 1);
     SetObjMapRange(ObjIndex(45, 46), 11, 1, 20, 10, 2);
+
+
     SetObjMapRange(ObjIndex(35, 36), 7, 11, 13, 18, 3);
 }
 
 /* @0x801555E4 */
+#line 157
 void DRLG_SetMapTrans(char *sFileName)
 {
     int i, j, rw, rh;
+
+
+
+
+
     unsigned char *pLevelMap, *lm;
     long mapoff;
 
@@ -131,9 +147,12 @@ void DRLG_SetMapTrans(char *sFileName)
     rw = *lm;
     lm += 2;
     rh = *lm;
+
     mapoff = ((rw * rh) << 1) + 2;
+
     rw = rw << 1;
     rh = rh << 1;
+
     mapoff += (((rw * rh) << 1) * 3);
     lm += mapoff;
     for (j = 0; j < rh; j++) {
@@ -142,6 +161,8 @@ void DRLG_SetMapTrans(char *sFileName)
             lm += 2;
         }
     }
+
+
     MemFreeDbg(pLevelMap);
 }
 

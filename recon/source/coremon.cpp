@@ -58,8 +58,34 @@
 #define MAXMONSTERS 190
 #define MAX_PLRS    2
 
+#line 109
 void M_CheckEFlag(int i)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void M_ClearSquares(int i)
@@ -80,6 +106,7 @@ void M_ClearSquares(int i)
     dung_map[mx][my + 1].dFlags &= ~BFLAG_MONSTLR;
 }
 
+#line 167
 unsigned char IsSkel(int mt)
 {
     if (currlevel == 16 && mt >= 112 && mt <= 115)
@@ -101,12 +128,20 @@ void NewMonsterAnim(int i, AnimStruct &anim, int md, int AnimType)
     Monst->Action = AnimType;
 }
 
+#line 208
 unsigned char M_Talker(int i)
 {
     unsigned char _mAi = monster[i]._mAi;
+
+
+
+
+
+
+
     if (_mAi == AI_LAZURUS || _mAi == AI_WARLORD || _mAi == AI_GARBUD || _mAi == AI_ZHAR
-        || _mAi == AI_SNOTSPIL || _mAi == AI_LACHDAN || _mAi == AI_LAZHELP)
-        return 1;
+        || _mAi == AI_SNOTSPIL || _mAi == AI_LACHDAN || _mAi == AI_LAZHELP) return 1;
+
     return 0;
 }
 
@@ -150,8 +185,10 @@ void M_Enemy(int i)
         Monst->_mFlags |= 0x400;
 }
 
+#line 369
 void ClearMVars(int i)
 {
+
     monster[i]._mVar1 = 0;
     monster[i]._mVar2 = 0;
     monster[i]._mVar3 = 0;
@@ -162,9 +199,14 @@ void ClearMVars(int i)
     monster[i]._mVar8 = 0;
 }
 
+#line 382
 void InitMonster(int i, int rd, int mtype, int x, int y)
 {
+
+
     CMonster *monst = &Monsters[mtype];
+
+
     MonsterStruct *pmonster = &monster[i];
 
     pmonster->_mdir = rd;
@@ -174,8 +216,10 @@ void InitMonster(int i, int rd, int mtype, int x, int y)
     pmonster->_mfuty = y;
     pmonster->_moldx = x;
     pmonster->_moldy = y;
+
     pmonster->_mMTidx = mtype;
     pmonster->_mmode = MM_STAND;
+
     pmonster->mName = monst->MData->mName;
     pmonster->MType = monst;
     pmonster->MData = monst->MData;
@@ -184,18 +228,20 @@ void InitMonster(int i, int rd, int mtype, int x, int y)
     pmonster->_mAnimCnt = ENG_random(pmonster->_mAnimDelay - 1);
     pmonster->_mAnimLen = monst->Anims[MA_STAND].Frames;
     pmonster->_mAnimFrame = ENG_random(pmonster->_mAnimLen - 1) + 1;
-
     if (monst->mtype == MT_DIABLO)
         pmonster->_mmaxhp = (ENG_random(1) + 1666) << 6;
     else
         pmonster->_mmaxhp = (ENG_random(monst->mMaxHP - monst->mMinHP + 1) + monst->mMinHP) << 6;
 
+
+
+
+
+
     if (gbMaxPlayers == 1) {
         pmonster->_mmaxhp >>= 1;
-        if (pmonster->_mmaxhp < 64)
-            pmonster->_mmaxhp = 64;
+        if (pmonster->_mmaxhp < 64) pmonster->_mmaxhp = 64;
     }
-
     pmonster->_mhitpoints = pmonster->_mmaxhp;
     pmonster->_mAi = monst->MData->mAi;
     pmonster->_mint = monst->MData->mInt;
@@ -203,25 +249,35 @@ void InitMonster(int i, int rd, int mtype, int x, int y)
     pmonster->_mgoalvar1 = 0;
     pmonster->_mgoalvar2 = 0;
     pmonster->_mgoalvar3 = 0;
+
+
     pmonster->_mDelFlag = 0;
     pmonster->_uniqtype = 0;
     pmonster->_msquelch = 0;
+
+
+
+
     pmonster->mWhoHit = 0;
+
     pmonster->mLevel = monst->MData->mLevel;
     pmonster->mExp = monst->MData->mExp;
 
     if (i < MAX_PLRS) {
+
         int slvl = plr[i]._pSplLvl[SPL_GOLEM] + plr[i]._pISplLvlAdd;
-        if (slvl < 0)
-            slvl = 0;
+        if (slvl < 0) slvl = 0;
         pmonster->mHit = monst->MData->mHit;
         pmonster->mMinDamage = monst->MData->mMinDamage;
         pmonster->mMaxDamage = monst->MData->mMaxDamage;
+
         monster[i]._mmaxhp = 2 * (plr[i]._pMaxMana / 3) + ((slvl << 9) + (slvl << 7));
         monster[i].mArmorClass = 25;
         monster[i].mHit = (unsigned char)plr[i]._pLevel * 2 + 40 + 5 * slvl;
         monster[i].mMinDamage = 2 * slvl + 8;
         monster[i].mMaxDamage = 2 * slvl + 16;
+
+
     } else {
         pmonster->mHit = monst->MData->mHit;
         pmonster->mMinDamage = monst->MData->mMinDamage;
@@ -238,6 +294,7 @@ void InitMonster(int i, int rd, int mtype, int x, int y)
     pmonster->mtalkmsg = 0;
 
     if (pmonster->_mAi == AI_GARG) {
+
         pmonster->Action = MA_SPECIAL;
         pmonster->_mAnimFrame = 1;
         pmonster->_mFlags |= MFLAG_ALLOW_SPECIAL;
@@ -257,7 +314,6 @@ void InitMonster(int i, int rd, int mtype, int x, int y)
         pmonster->mMaxDamage2 = 2 * pmonster->mMaxDamage2 + 4;
         pmonster->mArmorClass += 50;
     }
-
     if (gnDifficulty == DIFF_HELL) {
         pmonster->_mmaxhp = 4 * pmonster->_mmaxhp + 200;
         pmonster->_mhitpoints = pmonster->_mmaxhp;
@@ -336,6 +392,7 @@ void M_UpdateLeader(int i)
         monster[monster[i].leader].packsize--;
 }
 
+#line 581
 void ActivateSpawn(int i, int x, int y, int dir)
 {
     dung_map[x][y].dMonster = i + 1;
@@ -502,10 +559,12 @@ unsigned char CanPut(int i, int j)
     return 1;
 }
 
+#line 738
 int encode_enemy(int m)
 {
     if (monster[m]._mFlags & MFLAG_TARGETS_MONSTER)
         return monster[m]._menemy + MAX_PLRS;
+
     else
         return monster[m]._menemy;
 }

@@ -149,16 +149,26 @@ static int D_8011ADB0 = 4;
 
 /* -------------------------------------------------------------------------------------------- */
 
+#line 211
 unsigned int GPanel::GetPal(int Frm)
 {
     struct FRAME_HDR *Fr;
+
+
     void *Pal;
 
     Fr = PanelTData->GetFr(Frm & 0xFFFF);
+
+
     Pal = PanelTData->GetPal(*((unsigned char *)Fr + 6));
+
+
+
+
     return *(unsigned short *)((char *)Pal + 2);
 }
 
+#line 233
 GPanel::GPanel(int Ofs)
 {
     PanelTData = GM_UseTexData(0);
@@ -266,6 +276,7 @@ void GPanel::DrawFlask(struct PanelXY *XY, struct PlayerStruct *Plr)
     }
 }
 
+#line 381
 static unsigned char SpdTrimCol(short col)
 {
     if (col < 0) col = 0;

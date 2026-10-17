@@ -6,6 +6,34 @@
 /* TUTILS.H */
 #include "psxsrc/tutils.h"
 /* @0x80085874 TIMS.CPP:462 */
+#line 461
 void TimSwann(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

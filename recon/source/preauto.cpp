@@ -86,8 +86,11 @@ void InitAutomap(void)
     }
 }
 
+#line 218
 void InitAutomapOnce(void)
 {
+
     automapflag = 0;
+
     AutoMapTData = GM_UseTexData(0);
 }

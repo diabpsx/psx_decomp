@@ -39,92 +39,260 @@ static unsigned long sgdwXY;
 /* _cmd_id (devilution msg.h) */
 #define CMD_PLAYER_JOINLEVEL 0x35
 
+#line 301
 void interface_msg_pump(void)
 {
+
+
+
+
+
+
+
+
 }
 
+#line 335
 void ShowProgress(unsigned int uMsg)
 {
     unsigned long (*saveProc)(unsigned long, unsigned int, long, unsigned long);
 
+
     OVR_LoadPregame();
+
     gbSomebodyWonGameKludge = 0;
+
+
+
     saveProc = GRL_SetWindowProc(DisableInputWndProc);
     interface_msg_pump();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     sound_init();
 
-    if (uMsg != 0x4A)
-        DeltaSaveLevel();
+    if (uMsg != 0x4A) DeltaSaveLevel();
 
     switch (uMsg - 0x42) {
     case WM_DIABLOADGAME:
         app_fatal("OLD uMSG WM_DIABLOADGAME");
         break;
+
     case WM_DIABNEWGAME:
         FreeGameMem();
+
+
+
         LoadGameLevel(1, ENTRY_MAIN);
         break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     case WM_DIABNEXTLVL:
         FreeGameMem();
         currlevel++;
         leveltype = gnLevelTypeTbl[currlevel];
+
         LoadGameLevel(0, ENTRY_MAIN);
         break;
+
+
+
     case WM_DIABPREVLVL:
         FreeGameMem();
         currlevel--;
         leveltype = gnLevelTypeTbl[currlevel];
+
         LoadGameLevel(0, ENTRY_PREV);
         break;
+
     case WM_DIABSETLVL:
         SetReturnLvlPos();
+
+
         setlevel = 1;
         leveltype = setlvltype;
         FreeGameMem();
         LoadGameLevel(0, ENTRY_SETLVL);
+
         break;
+
+
+
     case WM_DIABRTNLVL:
         setlevel = 0;
         FreeGameMem();
         GetReturnLvlPos();
         LoadGameLevel(0, ENTRY_RTNLVL);
         break;
+
+
+
     case WM_DIABWARPLVL:
         FreeGameMem();
         GetPortalLevel();
         LoadGameLevel(0, ENTRY_WARPLVL);
         break;
+
+
+
     case WM_DIABTOWNWARP:
         FreeGameMem();
         currlevel = plr[myplr].plrlevel;
         leveltype = gnLevelTypeTbl[currlevel];
+
         LoadGameLevel(0, ENTRY_TWARPDN);
         break;
+
+
+
     case WM_DIABTWARPUP:
         FreeGameMem();
         currlevel = plr[myplr].plrlevel;
         leveltype = gnLevelTypeTbl[currlevel];
+
         LoadGameLevel(0, ENTRY_TWARPUP);
         break;
+
+
+
     case WM_DIABRETOWN:
         FreeGameMem();
         currlevel = plr[myplr].plrlevel;
         leveltype = gnLevelTypeTbl[currlevel];
+
         LoadGameLevel(0, ENTRY_MAIN);
+
         break;
     }
 
     OVR_LoadGame();
+
+
+
+
+
     SyncPortals();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     GRL_SetWindowProc(saveProc);
 
+
+
+
+
+
+
+
     NetSendCmdLocParam1(1, CMD_PLAYER_JOINLEVEL, plr[myplr]._px, plr[myplr]._py, (unsigned short)plr[myplr].plrlevel);
+
     if (plr[1].plractive) {
+
         myplr = 1;
+
+
+
+
+
+
         NetSendCmdLocParam1(1, CMD_PLAYER_JOINLEVEL, plr[myplr]._px, plr[myplr]._py, (unsigned short)plr[myplr].plrlevel);
         myplr = 0;
+
     }
 
     ResetPal();
+
+
+
+
+
+
     gbSomebodyWonGameKludge = 0;
 }

@@ -62,14 +62,17 @@ static void PrintGameOver(void);
 
 /* -------------------------------------------------------------------------------------------- */
 
+#line 82
 BOOL IS_GameOver(void)
 {
     return TSK_Exist(0, 0x8001, -1) != 0;
 }
 
+#line 93
 void GO_DoGameOver(void)
 {
     automapflag = 0;
+
     if (!IS_GameOver()) {
         TSK_AddTask(0x8001, (void *)GameOverTask, 0x800, 0);
     }

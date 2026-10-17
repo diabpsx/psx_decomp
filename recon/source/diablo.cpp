@@ -73,9 +73,19 @@ static int glMid2Seed[17];
 static int glMid3Seed[17];
 static int CreateEnv[12];
 
+#line 291
 void FreeGameMem(void)
 {
     music_stop();
+
+
+
+
+
+
+
+
+
     FreeObjectGFX();
     FreeMonsterSnd();
     FreeTownerGFX();
@@ -112,39 +122,67 @@ static void start_game(unsigned int uMsg)
     sgbMouseDown = 0;
 }
 
+#line 356
 static void free_game(void)
 {
     FreeControlPan();
     FreeInvGFX();
+
+
+
+
+
     FreeQuestText();
     FreeStoreMem();
     for (int i = 0; i < MAX_PLRS; i++)
         FreePlayerGFX(i);
     FreeItemGFX();
+
     FreeCursor();
     FreeLightTable();
+
     FreeGameMem();
 }
 
+#line 389
 void LittleStart(unsigned char bNewGame, unsigned char bSinglePlayer)
 {
     unsigned char fExitProgram = 0;
     unsigned int uMsg;
-
     if (!NetInit(bSinglePlayer, &fExitProgram))
+
         gbRunGameResult = !fExitProgram;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     if (bNewGame || !gbValidSaveFile) {
+
         currlevel = 1;
         leveltype = 1;
         setlevel = 1;
+
         InitLevels();
         InitQuests();
         InitPortals();
         InitDungMsgs(myplr);
         uMsg = 0x4A;
+
+
     } else {
         uMsg = 0x4B;
+
+
     }
     start_game(uMsg);
 }
@@ -247,55 +285,141 @@ static void run_game_loop(unsigned int uMsg)
     music_stop();
 }
 
+#line 1086
 unsigned char TryIconCurs(void)
 {
     if (_pcurs[myplr] == 8) {                   /* CURSOR_RESURRECT */
+
+
+
         NetSendCmdParam1(1, 0x1A, _pcursplr[sel_data]);
+
         return 1;
+
     }
     if (_pcurs[myplr] == 0xA) {                 /* CURSOR_HEALOTHER */
+
+
         NetSendCmdParam1(1, 0x4D, _pcursplr[sel_data]);
+
         return 1;
+
     }
     if (_pcurs[myplr] == 7) {                   /* CURSOR_TELEKINESIS */
+
+
         DoTelekinesis();
         return 1;
     }
     if (_pcurs[myplr] == 2) {                   /* CURSOR_IDENTIFY */
+
+
         if (_pcursinvitem[sel_data] != -1)
             CheckIdentify(myplr, _pcursinvitem[sel_data]);
+
         NewCursor(1);
         return 1;
     }
     if (_pcurs[myplr] == 3) {                   /* CURSOR_REPAIR */
+
+
         if (_pcursinvitem[sel_data] != -1)
             DoRepair(myplr, _pcursinvitem[sel_data]);
+
         NewCursor(1);
         return 1;
     }
     if (_pcurs[myplr] == 4) {                   /* CURSOR_RECHARGE */
+
+
         if (_pcursinvitem[sel_data] != -1)
             DoRecharge(myplr, _pcursinvitem[sel_data]);
+
         NewCursor(1);
         return 1;
+
+
+
+
+
+
+
+
+
+
     }
     if (_pcurs[myplr] == 9) {                   /* CURSOR_TELEPORT / TARGET */
+
+
+
+
+
         if (_pcursplr[sel_data] != -1)
             NetSendCmdParam3(1, 0x19, _pcursplr[sel_data], plr[myplr]._pTSpell, GetSpellLevel(myplr, plr[myplr]._pTSpell));
         else
             NetSendCmdLocParam2(1, 0xF, cursmx, cursmy, plr[myplr]._pTSpell, GetSpellLevel(myplr, plr[myplr]._pTSpell));
+
         NewCursor(1);
         return 1;
     }
     if (_pcurs[myplr] == 5 && _pcursobj[sel_data] == -1) {   /* CURSOR_DISARM */
+
+
         NewCursor(1);
         return 1;
     }
     return 0;
 }
 
+#line 2190
 unsigned long DisableInputWndProc(unsigned long hWnd, unsigned int uMsg, long wParam, unsigned long lParam)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return 0;
 }
 
@@ -352,8 +476,20 @@ void LoadMegaTiles(const char *LoadFile)
         DBG_Error(0, "source/DIABLO.cpp", 0x9A0);
 }
 
+#line 2471
 void LoadAllGFX(void)
 {
+
+
+
+
+
+
+
+
+
+
+
     InitObjectGFX();
 }
 
@@ -485,6 +621,7 @@ void AddQuestItems(void)
         SpawnQuestItem(IDI_ANVIL, 2 * setpc_x + 27, 2 * setpc_y + 27, 0, 1);
 }
 
+#line 2709
 static void AllSolid(int x, int y)
 {
     SetSOLID(x, y);
@@ -544,8 +681,11 @@ static void Lsaveplrpos(void)
     }
 }
 
+#line 2775
 static void Lrestoreplrpos(void)
 {
+
+
     PlacePlayer(1, plr[1]._pVar3, plr[1]._pVar4, 0);
     PlacePlayer(0, plr[1]._pVar5, plr[1]._pVar6, 0);
 }
@@ -741,12 +881,14 @@ void LoadGameLevel(unsigned char firstflag, int lvldir)
     }
 }
 
+#line 3162
 void SetSpeed(enum GM_SPEEDS Speed)
 {
     LastFrCount = -1;
     GameSpeed = Speed;
 }
 
+#line 3168
 enum GM_SPEEDS GetSpeed(void)
 {
     return GameSpeed;
@@ -839,51 +981,183 @@ static void timeout_cursor(unsigned char bTimeout)
     }
 }
 
+#line 3316
 static void game_loop(unsigned char bStartup)
 {
+
+
     if (IsGameLoading()) {
+
         pauseo = 0;
         return;
     }
     if (!pauseo) {
+
         pauseo = 1;
         PA_SetPauseOk(1);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     timeout_cursor(0);
+
+
+
     game_logic();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
+#line 3447
 void alloc_plr(void)
 {
+
+
+
+
 }
 
+#line 3515
 static void plr_encrypt(unsigned char bEncrypt)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
+#line 3580
 void assert_fail(int nLineNo, const char *pszFile, const char *pszFail)
 {
+
     DBG_Halt();
 }
 
+#line 3587
 void assert_fail(int nLineNo, const char *pszFile)
 {
+
     DBG_Halt();
 }
 
+#line 3592
 extern "C" void app_fatal(char *pszFile, ...)
 {
     DBG_Halt();
 }
 
+#line 3852
 void DoMemCardFromFrontEnd(void)
 {
     OVR_LoadMemcard();
+
+
+
+
     OVR_LoadFrontend();
 }
 
+#line 3862
 void DoMemCardFromInGame(void)
 {
     OVR_LoadMemcard();
+
+
+
+
     OVR_LoadGame();
 }

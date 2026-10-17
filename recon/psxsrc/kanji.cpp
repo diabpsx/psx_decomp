@@ -110,33 +110,60 @@ static int CacheLen = 0;                          /* @0x8011B2CC sdata */
 static BOOL KanjiLoaded = false;                  /* @0x8011B2D0 sdata */
 
 /* @0x800AD218 KANJI.CPP:71 */
+#line 70
 static void LoadKanjiFont(char *name)
 {
     FileIO *Fs = SYSI_GetFs();
 
+
+
+
     CDWAIT = 1;
     stream_stop();
     if (FileSYS != 1 && !IsGameLoading()) {
+
+
         BL_LoadFileAtAddr(name, KanjiFontData, 0);
+
         BL_WaitForAsyncFinish();
+
+
+
+
     } else {
         Fs->ReadAtAddr(name, KanjiFontData, -1);
     }
 }
 
 /* @0x800AD2C4 KANJI.CPP:107 */
+#line 106
 void FreeKanji(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
     CacheLen = 0;
 }
 
 /* @0x800AD2D0 KANJI.CPP:127 */
+#line 126
 void ClearKanjiCount(void)
 {
     struct vbuffS *kl = KanjiCache;
     int i;
 
     for (i = 0; i < CacheLen; i++) {
+
         kl->count = 0;
         kl++;
     }
@@ -216,14 +243,20 @@ static void KANJI_SetCache(KANJI_FRMS ct)
 }
 
 /* @0x800AD5D8 KANJI.CPP:245 */
+#line 244
 void LoadKanji(LANG_DB_NO NewLangDbNo)
 {
+
+
     FreeKanji();
+
     switch (NewLangDbNo) {
+
     case LANG_DB_MAIN:
         LoadKanjiFont("maintxt.out");
         KANJI_SetCache(KANJI_MAIN);
         if (qtextflag) {
+
             qtextflag = 0;
             PauseMode = 0;
             if (!FeFlag)
@@ -244,10 +277,12 @@ void LoadKanji(LANG_DB_NO NewLangDbNo)
         break;
     }
     ASSERT(CacheLen, 0x114);
+
     ClearKanjiBuffer();
 }
 
 /* @0x800AD708 KANJI.CPP:286 */
+#line 285
 BOOL SetKanjiLoaded(BOOL loaded)
 {
     BOOL iret = KanjiLoaded;
@@ -256,12 +291,14 @@ BOOL SetKanjiLoaded(BOOL loaded)
 }
 
 /* @0x800AD718 KANJI.CPP:294 */
+#line 293
 BOOL IsKanjiLoaded(void)
 {
     return KanjiLoaded;
 }
 
 /* @0x800AD724 KANJI.CPP:300 */
+#line 299
 void KanjiSetTSK(TASK *T)
 {
     struct DEF_ARGS *args = (struct DEF_ARGS *)T->Data;
@@ -269,7 +306,12 @@ void KanjiSetTSK(TASK *T)
 
     if (!FeFlag)
         TSK_Sleep(5);
+
     LoadKanji(NewLangDbNo);
+
+
+
+
     KanjiLoaded = true;
     CDWAIT = 0;
 }
@@ -289,78 +331,104 @@ void KANJI_SetDb(LANG_DB_NO NewLangDbNo)
 }
 
 /* @0x800AD7F4 KANJI.CPP:336 */
+#line 335
 static int inmem(short k)
 {
     struct vbuffS *kl = KanjiCache;
 
     ASSERT(CacheLen, 0x153);
+
     for (int i = 0; i < CacheLen; i++, kl++) {
+
         if (kl->kan == k)
+
             return i + 1;
     }
     return 0;
 }
 
 /* @0x800AD87C KANJI.CPP:351 */
+#line 350
 static unsigned short getb(unsigned short n)
 {
+
     n &= 0x7FFF;
     n--;
     return n;
 }
 
 /* @0x800AD88C KANJI.CPP:365 */
+#line 364
 static void ShadeBuff(unsigned char *b, int col, int border)
 {
+
+
     for (int y = 0; y < 12; y++) {
+
         for (int x = 0; x < 12; x++) {
+
+
             if ((char)*b == col) {
+
                 if (col == 7 && x) {
+
                     b--;
                     if (!*b)
                         *b = border;
                     b++;
                 }
                 if (x < 11) {
+
                     b++;
                     if (!*b)
                         *b = border;
                     b--;
+
                 }
                 if (col == 7 && y) {
+
                     b -= 12;
                     if (!*b)
                         *b = border;
                     b += 12;
+
                 }
                 if (y < 11) {
+
                     b += 12;
                     if (!*b)
                         *b = border;
                     b -= 12;
+
                 }
                 if (col == 7 && x && y) {
+
                     b -= 13;
                     if (!*b)
                         *b = border;
                     if (x < 11) {
+
                         b += 2;
                         if (!*b)
                             *b = border;
                         b += 11;
+
                     } else {
                         b += 13;
                     }
                 }
                 if (x < 11 && y < 11) {
+
                     b += 13;
                     if (!*b)
                         *b = border;
                     if (col == 7 && x) {
+
                         b -= 2;
                         if (!*b)
                             *b = border;
                         b -= 11;
+
                     } else {
                         b -= 13;
                     }
@@ -414,6 +482,7 @@ static void _get_font(unsigned char *d, unsigned short num, unsigned char *abuff
 }
 
 /* @0x800ADB68 KANJI.CPP:507 */
+#line 506
 static int getfreekan(void)
 {
     unsigned char max = 255;
@@ -422,16 +491,22 @@ static int getfreekan(void)
 
     ASSERT(CacheLen, 0x200);
     ASSERT(kl, 0x201);
+
     for (int i = 0; i < CacheLen; i++, kl++) {
+
         if (kl->count < max) {
+
             max = kl->count;
             n = i;
+
         }
     }
+
     return n;
 }
 
 /* @0x800ADC20 KANJI.CPP:530 */
+#line 529
 KANJI_FRMS GetKanjiCacheFrm(void)
 {
     return KanjiCacheType;

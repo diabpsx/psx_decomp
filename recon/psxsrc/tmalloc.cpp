@@ -24,28 +24,39 @@ struct MEMSTRUCT MemBlock[60] = {{0}};
 int NoTAllocs;
 
 /* @0x800882A8 TMALLOC.CPP:78 */
+#line 77
 void *Tmalloc(int MemSize)
 {
     long MyHnd;
+
+
+
     void *Addr;
     int i;
 
     MyHnd = GAL_Alloc(MemSize, 0x8001, "TMALL");
+
     if (MyHnd == -1)
+
+
+
         DBG_Error(NULL, "psxsrc/TMALLOC.CPP", 92);
+
+
     Addr = GAL_Lock(MyHnd);
-    if (!MyHnd)
-        DBG_Error(NULL, "psxsrc/TMALLOC.CPP", 96);
+    if (!MyHnd) DBG_Error(NULL, "psxsrc/TMALLOC.CPP", 96);
+
     for (i = 0; i < 60; i++) {
+
         if (!MemBlock[i].MemPtr) {
+
             MemBlock[i].MemPtr = Addr;
             MemBlock[i].Handle = MyHnd;
             NoTAllocs++;
             return Addr;
         }
     }
-    if (!!"OUT OF TMALLOC SLOTS")
-        DBG_Error(NULL, "psxsrc/TMALLOC.CPP", 108);
+    if (!!"OUT OF TMALLOC SLOTS") DBG_Error(NULL, "psxsrc/TMALLOC.CPP", 108);
     return 0;
 }
 
@@ -67,6 +78,7 @@ void Tfree(void *Addr)
 }
 
 /* @0x8008844C TMALLOC.CPP */
+#line 146
 void InitTmalloc(void)
 {
     int i;

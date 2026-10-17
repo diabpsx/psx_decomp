@@ -138,11 +138,13 @@ static void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BO
 
 
 
+#line 243
 void GLUE_SetMonsterList(int List)
 {
     CurrentMonsterList = List;
 }
 
+#line 254
 int GLUE_GetMonsterList(void)
 {
     return CurrentMonsterList;
@@ -170,20 +172,29 @@ void GLUE_ResumeGame(void)
     TSK_MakeTaskActive(T);
 }
 
+#line 295
 void GLUE_PreTown(void)
 {
+
+
+
+
     GRL_PostMessage__FUlUilUl(ghMainWnd, 0x4A, 0, 0);
 }
 
+#line 309
 void GLUE_PreDun(void)
 {
+
 }
 
+#line 330
 BOOL GLUE_Finished(void)
 {
     return GlueFinished;
 }
 
+#line 341
 void GLUE_SetFinished(BOOL NewFinished)
 {
     GlueFinished = NewFinished;
@@ -199,38 +210,40 @@ void GLUE_StartBg(int TextId, BOOL IsTown, int Level)
     Args->a2 = Level;
 }
 
+#line 370
 BOOL GLUE_SetShowGameScreenFlag(BOOL NewFlag)
 {
     BOOL OldFlag;
-
     OldFlag = DoDrawBg;
     DoDrawBg = NewFlag;
     return OldFlag;
 }
 
+#line 382
 BOOL GLUE_GetShowGameScreenFlag(void)
 {
     return DoDrawBg;
 }
 
+#line 391
 BOOL GLUE_SetHomingScrollFlag(BOOL NewFlag)
 {
     BOOL OldFlag;
-
     OldFlag = DoHomingScroll;
     DoHomingScroll = NewFlag;
     return OldFlag;
 }
 
+#line 403
 BOOL GLUE_SetShowPanelFlag(BOOL NewFlag)
 {
     BOOL OldFlag;
-
     OldFlag = DoShowPanel;
     DoShowPanel = NewFlag;
     return OldFlag;
 }
 
+#line 419
 BOOL GLUE_HasGameStarted(void)
 {
     return GameStarted;
@@ -256,6 +269,7 @@ void DoShowPanelGFX(struct GPanel *P1, struct GPanel *P2)
     }
 }
 
+#line 462
 void GLUE_DoQuake(int Time, int Amount)
 {
     QuakeTime = Time;
@@ -377,21 +391,29 @@ static void BgTask(struct TASK *T)
 
 static const char WepChar[10] = "NUSDBAMHT";
 
+#line 638
 static struct PInf *FindPlayerChar(char *Id)
 {
     for (int f = 0; f < 0x51; f++) {
+
         if (strcmp(PlayerInfo[f].Tx, Id) == 0)
+
             return &PlayerInfo[f];
+
     }
+
     DBG_Error(0, "psxsrc/GLUE.CPP", 0x288);
     return 0;
 }
 
+#line 653
 static struct PInf *FindPlayerChar(int Char, int Wep, int Arm)
 {
     char TxBuff[20];
-
     sprintf(TxBuff, PlayerFormat, CharChar[Char], ArmourChar[Arm], WepChar[Wep]);
+
+
+
     return FindPlayerChar(TxBuff);
 }
 
@@ -432,12 +454,15 @@ static int FindPlayerChar(struct PlayerStruct *P, BOOL InTown)
     }
 }
 
+#line 719
 static void MakeSurePlayerDressedProperly(CPlayer &Player, PlayerStruct &Plr, BOOL InTown, BOOL Blocking)
 {
     int Id;
 
     Id = FindPlayerChar(&Plr, InTown);
+
     if (Id != Player.GetTexId()) {
+
         if (Blocking != 0) {
             Player.Load(Id);
         } else {
@@ -483,8 +508,10 @@ void GLUE_StartGameExit(void)
     MSG_ClearOutCompMap();
 }
 
+#line 786
 void GLUE_Init(void)
 {
+
 }
 
 /* Out-of-line copies of inline members this TU uses (-fno-inline): cc1plus 2.7.2 emits them after all other

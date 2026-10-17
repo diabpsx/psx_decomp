@@ -414,28 +414,45 @@ void SetLoadedLang(LANG_TYPE LoadLang)
     OrigLang = LoadLang;
 }
 
+#line 1090
 void ChangeLang(void)
 {
     if (NewLang != OrigLang) {
+
         music_fade();
         if (FileSYS != 1) {
-            while (sghMusic->volume > 0)
-                TSK_Sleep(1);
+
+            while (sghMusic->volume > 0) TSK_Sleep(1);
+
         }
         CDWAIT = 1;
         LANG_SetLang(NewLang);
-        if (FileSYS != 1)
-            BL_LoadStreamDir();
+        if (FileSYS != 1) BL_LoadStreamDir();
         CDWAIT = 0;
+
         music_start(5);
+
         OrigLang = NewLang;
     }
 }
 
+#line 1120
 static void DrawLeftRight(void)
 {
+
+
+
+
+
+
+
+
+
+
+
 }
 
+#line 1136
 static void PrintMono(int ypos)
 {
     char *String;
@@ -445,8 +462,10 @@ static void PrintMono(int ypos)
         String = GetStr(0x29A);
     else
         String = GetStr(0x29C);
+
     len = MediumFont.GetStrWidth(String);
     len = len >> 1;
+
     MediumFont.Print(MonoX - len, ypos, String, JustLeft, &ORect, WHITER, WHITEG, WHITEB);
 }
 

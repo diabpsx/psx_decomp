@@ -204,6 +204,7 @@ int ItemH;
 int ItemNo;
 RECT BRect;
 
+#line 442
 void FreeInvGFX(void)
 {
 }
@@ -286,6 +287,7 @@ void InvDrawSlotBack(int X, int Y, int W, int H, unsigned char Flag)
     }
 }
 
+#line 507
 void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int TransFlag)
 {
     struct POLY_FT4 *Ft4;
@@ -295,14 +297,12 @@ void InvDrawItem(int ItemX, int ItemY, int ItemNo, unsigned char StatFlag, int T
         TData = InvPanelTData;
     else
         TData = InvGfxTData;
-
     Ft4 = TData->PrintFt4(InvGfxTable[ItemNo], ItemX + 0x80, ItemY - InvBackY + 0x20, 0, itemot, 0);
-
     setShadeTex(Ft4, 0);
     setSemiTrans(Ft4, TransFlag);
-
     if (StatFlag) {
         setRGB0(Ft4, 0x80, 0x80, 0x80);
+
     } else {
         setRGB0(Ft4, 0x80, 0, 0);
     }
@@ -509,13 +509,16 @@ void DrawInvStats(void)
     PrintStat(0xAC, 0x191, chrstr, 0);
 }
 
+#line 768
 void DrawInvBack(void)
 {
     Dialog InvBack;
 
     InvBack.SetOTpos(backot);
+
     InvBack.SetBack(5);
     InvBack.SetRGB(BORDERR, BORDERG, BORDERB);
+
     InvBack.Back(0x80, -InvBackY + 0x80, 0xB0, 0xBE);
     InvBack.Back(0x80, -InvBackY + 0x20, 0xB0, 0x5E);
 }
@@ -695,56 +698,75 @@ void DrawInvMsg(void)
     PRIM_Clip(&InfoRect, OldOt);
 }
 
+#line 965
 void DrawInvHelpTxt(void)
 {
     char TempStr[128];
-
     TempStr[0] = 0;
     if (LANG_GetLang() == 1) {
-        if (_pcurs[myplr] == 2)
-            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x208));
-        else if (_pcurs[myplr] == 3)
-            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x35A));
-        else if (_pcurs[myplr] == 4)
-            sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x34C));
-        else if (_pcurs[myplr] >= 0xC)
-            sprintf(TempStr, "%s  < %s", GetStr(0x4E6), GetStr(0x11D));
+
+        if (_pcurs[myplr] == 2) sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x208));
+
+        else if (_pcurs[myplr] == 3) sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x35A));
+
+        else if (_pcurs[myplr] == 4) sprintf(TempStr, "%s  _ %s", GetStr(0x331), GetStr(0x34C));
+
+        else if (_pcurs[myplr] >= 0xC) sprintf(TempStr, "%s  < %s", GetStr(0x4E6), GetStr(0x11D));
+
+
         else
             sprintf(TempStr, "%s", GetStr(0x4E6));
     } else {
-        if (_pcurs[myplr] == 2)
-            sprintf(TempStr, "_ %s  %s", GetStr(0x208), GetStr(0x331));
-        else if (_pcurs[myplr] == 3)
-            sprintf(TempStr, "_ %s  %s", GetStr(0x35A), GetStr(0x331));
-        else if (_pcurs[myplr] == 4)
-            sprintf(TempStr, "_ %s  %s", GetStr(0x34C), GetStr(0x331));
-        else if (_pcurs[myplr] >= 0xC)
-            sprintf(TempStr, "< %s  %s", GetStr(0x11D), GetStr(0x4E6));
+        if (_pcurs[myplr] == 2) sprintf(TempStr, "_ %s  %s", GetStr(0x208), GetStr(0x331));
+
+        else if (_pcurs[myplr] == 3) sprintf(TempStr, "_ %s  %s", GetStr(0x35A), GetStr(0x331));
+
+        else if (_pcurs[myplr] == 4) sprintf(TempStr, "_ %s  %s", GetStr(0x34C), GetStr(0x331));
+
+        else if (_pcurs[myplr] >= 0xC) sprintf(TempStr, "< %s  %s", GetStr(0x11D), GetStr(0x4E6));
         else
             sprintf(TempStr, "%s", GetStr(0x4E6));
     }
 
     if (InvBackY == 0) {
+
+
         MediumFont.SetChar(0x2E, 0x80);
         sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x2FE));
+
+
+
+
+
+
     } else {
         MediumFont.SetChar(0x2E, 0x7F);
         sprintf(TempStr, "%s  . %s ", TempStr, GetStr(0x132));
+
+
+
     }
 
     if (InvPageFlag)
+
         sprintf(TempStr, "%s  | %s ", TempStr, GetStr(0x2A4));
 
+
     MediumFont.Print(0, 0xE0, TempStr, JustCentre, NULL, WHITER, WHITEG, WHITEB);
+
+
     MediumFont.SetChar(0x2E, 0x6D);
 }
 
 static BOOL InvOn = 0;
 static unsigned long sgdwLastTime = 0;
 
+#line 1040
 void DrawInv(void)
 {
     if (InvOn == 0) {
+
+
         InvOn = 1;
         InvPageFlag = 0;
         InvPageNo = 0;
@@ -1245,6 +1267,7 @@ unsigned char WeaponAutoPlace(int pnum)
     return 1;
 }
 
+#line 1771
 int SwapItem(ItemStruct *a, ItemStruct *b)
 {
     ItemStruct h;
@@ -1252,7 +1275,6 @@ int SwapItem(ItemStruct *a, ItemStruct *b)
     h = *a;
     *a = *b;
     *b = h;
-
     return h._iCurs + 12 /* CURSOR_FIRSTITEM */;
 }
 
@@ -1818,6 +1840,7 @@ void RemoveSpdBarItem(int pnum, int iv)
     }
 }
 
+#line 2442
 void CheckInvScrn(void)
 {
     if (_pcurs[myplr] >= 12 /* CURSOR_FIRSTITEM */) {
@@ -2111,31 +2134,78 @@ void AutoGetItem(int pnum, int ii)
     }
 }
 
+#line 2841
 void SyncGetItem(int x, int y, int idx, unsigned short ci, int iseed)
 {
     int ii;
 
+
+
+
+
+
+
+
     if (dung_map[x][y].dItem) {
+
+
+
+
+
         ii = dung_map[x][y].dItem - 1;
         if (item[ii].IDidx == idx && item[ii]._iSeed == iseed && item[ii]._iCreateInfo == ci) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             /* ii already correct */
         } else {
             ii = FindGetItem(idx, ci, iseed);
         }
     } else {
         ii = FindGetItem(idx, ci, iseed);
+
+
+
+
+
+
     }
 
     if (ii != -1) {
         int j, jj;
 
+
+
         dung_map[item[ii]._ix][item[ii]._iy].dItem = 0;
+
+
         j = 0;
         while (j < numitems) {
             jj = itemactive[j];
+
             if (jj == ii) {
+
+
+
                 DeleteItem(jj, j);
+
+
+
+
                 j = 0;
+
             } else {
                 j++;
             }
@@ -2377,6 +2447,7 @@ char CheckInvHLight(void)
     return rv;
 }
 
+#line 3379
 void RemoveScroll(int pnum)
 {
     int i;
@@ -2385,6 +2456,7 @@ void RemoveScroll(int pnum)
         if (plr[pnum].InvList[i]._itype != ITYPE_NONE
             && (plr[pnum].InvList[i]._iMiscId == IMISC_SCROLL || plr[pnum].InvList[i]._iMiscId == IMISC_SCROLLT)
             && plr[pnum].InvList[i]._iSpell == plr[pnum]._pSpell) {
+
             RemoveInvItem(pnum, i);
             CalcPlrScrolls(pnum);
             return;
@@ -2394,6 +2466,7 @@ void RemoveScroll(int pnum)
         if (plr[pnum].SpdList[i]._itype != ITYPE_NONE
             && (plr[pnum].SpdList[i]._iMiscId == IMISC_SCROLL || plr[pnum].SpdList[i]._iMiscId == IMISC_SCROLLT)
             && plr[pnum].SpdList[i]._iSpell == plr[pnum]._pSpell) {
+
             RemoveSpdBarItem(pnum, i);
             CalcPlrScrolls(pnum);
             return;
@@ -2439,28 +2512,35 @@ void UseStaffCharge(PlayerStruct *ptrplr)
     }
 }
 
+#line 3452
 unsigned char UseStaff(void)
 {
-    if (_pcurs[myplr] != CURSOR_HAND)
-        return 0;
+    if (_pcurs[myplr] != CURSOR_HAND) return 0;
     if (plr[myplr].InvBody[INVLOC_HAND_LEFT]._itype != ITYPE_NONE
         && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iMiscId == IMISC_STAFF
         && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iSpell == plr[myplr]._pRSpell
         && plr[myplr].InvBody[INVLOC_HAND_LEFT]._iCharges > 0) {
         return 1;
     }
-
     return 0;
 }
 
+#line 3511
 void StartGoldDrop(void)
 {
+
     initialDropGoldIndex = _pcursinvitem[sel_data];
+
     if (_pcursinvitem[sel_data] < 0x2F /* INVITEM_INV_LAST+1 */)
+
         initialDropGoldValue = plr[myplr].InvList[_pcursinvitem[sel_data] - 7 /* INVITEM_INV_FIRST */]._ivalue;
+
     else
         initialDropGoldValue = plr[myplr].SpdList[_pcursinvitem[sel_data] - 0x2F /* INVITEM_BELT_FIRST */]._ivalue;
+
+
     dropGoldFlag = 1;
+
     dropGoldValue = 0;
 }
 
@@ -2571,29 +2651,39 @@ unsigned char UseInvItem(int pnum, int cii)
     return 1;
 }
 
+#line 3670
 void DoTelekinesis(void)
 {
     if (_pcursobj[sel_data] != -1)
         NetSendCmdParam1(1, 0x1B /* CMD_OPOBJT */, _pcursobj[sel_data]);
+
     if (_pcursitem[sel_data] != -1)
         NetSendCmdGItem(1, 0x28 /* CMD_REQUESTAGITEM */, myplr, myplr, _pcursitem[sel_data]);
+
+
     if (_pcursmonst[sel_data] != -1 && !M_Talker(_pcursmonst[sel_data]) && monster[_pcursmonst[sel_data]].mtalkmsg == 0)
         NetSendCmdParam1(1, 0x1C /* CMD_KNOCKBACK */, _pcursmonst[sel_data]);
+
+
     NewCursor(CURSOR_HAND);
 }
 
+#line 3689
 long CalculateGold(int pnum)
 {
     int i;
+
     long gold;
 
     gold = 0;
+
     for (i = 0; i < MAXBELTITEMS; i++) {
         if (plr[pnum].SpdList[i]._itype == ITYPE_GOLD) {
             gold += plr[pnum].SpdList[i]._ivalue;
             force_redraw = 255;
         }
     }
+
     for (i = 0; i < plr[pnum]._pNumInv; i++) {
         if (plr[pnum].InvList[i]._itype == ITYPE_GOLD)
             gold += plr[pnum].InvList[i]._ivalue;
@@ -2602,14 +2692,15 @@ long CalculateGold(int pnum)
     return gold;
 }
 
+#line 3722
 unsigned char DropItemBeforeTrig(void)
 {
     if (TryInvPut()) {
+
         NetSendCmdPItem(1, CMD_PUTITEM, cursmx, cursmy);
         NewCursor(CURSOR_HAND);
         return 1;
     }
-
     return 0;
 }
 

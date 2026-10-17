@@ -125,6 +125,7 @@ void FeInitBuffer(void)
 }
 
 /* @0x80139C50 FE.CPP:178 */
+#line 177
 void FeAddEntry(int X, int Y, TXT_JUST Just, unsigned short Str, FeTable *MenuPtr, CFont *Font)
 {
     FeBuffer[FeBufferCount].X = X;
@@ -138,10 +139,12 @@ void FeAddEntry(int X, int Y, TXT_JUST Just, unsigned short Str, FeTable *MenuPt
 }
 
 /* @0x80139CD4 FE.CPP:190 */
+#line 189
 void FeAddTable(FeMenuTable *Table, int Count)
 {
     FeInitBuffer();
     for (int Loop = 0; Loop < Count; Loop++) {
+
         FeAddEntry(Table[Loop].X, Table[Loop].Y, Table[Loop].Just, Table[Loop].Str, Table[Loop].MenuPtr, Table[Loop].Font);
     }
 }
@@ -305,46 +308,49 @@ void FePrevMenu(void)
 }
 
 /* @0x8013A66C FE.CPP:420 */
+#line 419
 void FeSelUp(int No)
 {
     int OldSel = FeCurMenu->Sel;
-
     FeCurMenu->Sel -= No;
-    if (FeCurMenu->Sel < 0)
-        FeCurMenu->Sel += FeBufferCount;
+
+    if (FeCurMenu->Sel < 0) FeCurMenu->Sel += FeBufferCount;
+
     while (FeBuffer[FeCurMenu->Sel].MenuPtr == NULL) {
+
         FeCurMenu->Sel--;
-        if (FeCurMenu->Sel < 0)
-            FeCurMenu->Sel += FeBufferCount;
+        if (FeCurMenu->Sel < 0) FeCurMenu->Sel += FeBufferCount;
     }
-    if (OldSel != FeCurMenu->Sel)
-        PlaySFX(0x32);
+    if (OldSel != FeCurMenu->Sel) PlaySFX(0x32);
 }
 
 /* @0x8013A754 FE.CPP:436 */
+#line 435
 void FeSelDown(int No)
 {
     int OldSel = FeCurMenu->Sel;
-
     FeCurMenu->Sel += No;
-    if (FeCurMenu->Sel >= FeBufferCount)
-        FeCurMenu->Sel = 0;
+
+    if (FeCurMenu->Sel >= FeBufferCount) FeCurMenu->Sel = 0;
+
     while (FeBuffer[FeCurMenu->Sel].MenuPtr == NULL) {
+
         FeCurMenu->Sel++;
-        if (FeCurMenu->Sel >= FeBufferCount)
-            FeCurMenu->Sel -= FeBufferCount;
+        if (FeCurMenu->Sel >= FeBufferCount) FeCurMenu->Sel -= FeBufferCount;
+
     }
-    if (OldSel != FeCurMenu->Sel)
-        PlaySFX(0x32);
+    if (OldSel != FeCurMenu->Sel) PlaySFX(0x32);
 }
 
 /* @0x8013A83C FE.CPP:457 */
+#line 456
 int FeGetCursor(void)
 {
     return FeCurMenu->Sel;
 }
 
 /* @0x8013A850 FE.CPP:462 */
+#line 461
 void FeSelect(void)
 {
     PlaySFX(0x33);
@@ -384,6 +390,7 @@ void FeMainKeyCtrl(CScreen *FeScreen)
 }
 
 /* @0x8013AA68 FE.CPP:531 */
+#line 530
 void InitDummyMenu(void)
 {
 }
@@ -436,13 +443,22 @@ void FeInitMainMenu(void)
 }
 
 /* @0x8013AC20 FE.CPP:625 */
+#line 624
 void FeInitNewGameMenu(void)
 {
     if (FeEnterLang != LANG_GetLang()) {
+
         FeEnterLang = LANG_GetLang();
+
+
         FePlayerName[0][0] = 0;
         FePlayerName[1][0] = 0;
+
+
+
+
         FePlayerNameFlag[0] = FePlayerNameFlag[1] = 1;
+
     }
     FeAddTable(FeNewGameMenuTable, 3);
     FeChrClass[0] = -1;
@@ -489,11 +505,16 @@ void FeNewGameMenuCtrl(void)
 }
 
 /* @0x8013AE64 FE.CPP:731 */
+#line 730
 void FeInitPlayer1ClassMenu(void)
 {
+
     LoadedChar[0] = 0;
+
     if (MemCardActive)
         MemcardOFF();
+
+
     FePlayerClassMenuTable[1].MenuPtr = &FeNewP1NameMenu;
     FePlayerClassMenuTable[2].MenuPtr = &FeNewP1NameMenu;
     FePlayerClassMenuTable[3].MenuPtr = &FeNewP1NameMenu;
@@ -505,11 +526,16 @@ void FeInitPlayer1ClassMenu(void)
 }
 
 /* @0x8013AEE8 FE.CPP:750 */
+#line 749
 void FeInitPlayer2ClassMenu(void)
 {
+
     LoadedChar[1] = 0;
+
     if (MemCardActive)
         MemcardOFF();
+
+
     FePlayerClassMenuTable[1].MenuPtr = &FeNewP2NameMenu;
     FePlayerClassMenuTable[2].MenuPtr = &FeNewP2NameMenu;
     FePlayerClassMenuTable[3].MenuPtr = &FeNewP2NameMenu;
@@ -521,6 +547,7 @@ void FeInitPlayer2ClassMenu(void)
 }
 
 /* @0x8013AF6C FE.CPP:770 */
+#line 769
 void FePlayerClassMenuCtrl(void)
 {
     FeChrClass[FePlayerNo] = FeCurMenu->Sel - 1;
@@ -606,9 +633,13 @@ int fileselect = 0;
 int BookMenu = 0;
 int FMVPress = 0;
 /* @0x8013B43C FE.CPP:918 */
+#line 917
 void FeInitNewP1NameMenu(void)
 {
+
+
     FeAddNameTable(FeNameEngMenuTable, 40);
+
     FeBackX = 0xC;
     FeBackY = 0x20;
     FeBackW = 0xA0;
@@ -618,8 +649,11 @@ void FeInitNewP1NameMenu(void)
 }
 
 /* @0x8013B498 FE.CPP:932 */
+#line 931
 void FeInitNewP2NameMenu(void)
 {
+
+
     FeAddNameTable(FeNameEngMenuTable, 40);
     FeBackX = 0xC;
     FeBackY = 0x20;
@@ -728,42 +762,65 @@ void FeNewNameMenuCtrl(void)
 }
 
 /* @0x8013BAB4 FE.CPP:1081 */
+#line 1080
 void FeCopyPlayerInfoForReturn(void)
 {
     CStruct->NumOfPlayers = FePlayerNo + 1;
+
     for (int Loop = 0; Loop <= FePlayerNo; Loop++) {
+
         if (!LoadedChar[Loop]) {
+
             CStruct->Plrs[Loop].Class = FeChrClass[Loop];
             strcpy(CStruct->Plrs[Loop].Name, FePlayerName[Loop]);
+
             CPad *Pad = PAD_GetPad(Loop, 0);   /* dead result: no SYM record; the decl keeps retail's zero-length then-block level */
+
+
         } else {
             int i;
+
+
+
             for (i = 0; i < 17; i++)
                 plr[Loop]._pLvlVisited[i] = 0;
+
             for (i = 0; i < 10; i++)
                 plr[Loop]._pSLvlVisited[i] = 0;
         }
+
     }
 }
 
 /* @0x8013BBC8 FE.CPP:1113 */
+#line 1112
 void FeEnterGame(void)
 {
+
+
     FeFlag = 2;
+
     FeCopyPlayerInfoForReturn();
 }
 
 /* @0x8013BBF0 FE.CPP:1134 */
+#line 1133
 void FeInitLoadMemcardSelect(void)
 {
     fileinfoflag = 0;
+
     if (!MemCardActive)
         cardondelay = 5;
+
+
+
     card_active[0] = card_active[1] = 1;
+
     FeBackX = 8;
     FeBackY = 0x20;
     FeBackW = 0x140;
     FeBackH = 0xA0;
+
     FeAddTable(FeMemcardMenuTable, 3);
 }
 
@@ -779,9 +836,12 @@ void FeInitLoadChar1Menu(void)
 }
 
 /* @0x8013BCD8 FE.CPP:1165 */
+#line 1164
 void FeInitLoadChar2Menu(void)
 {
     FeAddEntry(0, 0, JustCentre, 0x3B2, NULL, &MediumFont);
+
+
     current_card = 1;
     ActivateMemcard(0, 1);
     CharacterBlockLoaded = 0;
@@ -790,21 +850,28 @@ void FeInitLoadChar2Menu(void)
 }
 
 /* @0x8013BD48 FE.CPP:1190 */
+#line 1189
 void FeInitDifficultyMenu(void)
 {
     int MaxLevel;
 
     FeAddTable(FeDifficultyMenuTable, 4);
+
     MaxLevel = plr[0]._pLevel;
-    if (FePlayerNo && plr[1]._pLevel < MaxLevel)
-        MaxLevel = plr[1]._pLevel;
+    if (FePlayerNo && plr[1]._pLevel < MaxLevel) MaxLevel = plr[1]._pLevel;
+
+
+
+
     FeCurMenu->Sel = 1;
     if (MaxLevel < 20)
+
         FeBufferCount = 2;
     else if (MaxLevel < 30)
         FeBufferCount = 3;
     else
         FeBufferCount = 4;
+
     FeBackX = 0xC;
     FeBackY = 0x20;
     FeBackW = 0xA0;
@@ -831,6 +898,7 @@ void FeDifficultyMenuCtrl(void)
 }
 
 /* @0x8013BED0 FE.CPP:1277 */
+#line 1276
 void FeInitBackgroundMenu(void)
 {
     FeAddTable(FeBackgroundMenuTable, 4);
@@ -842,6 +910,7 @@ void FeInitBackgroundMenu(void)
 }
 
 /* @0x8013BF1C FE.CPP:1287 */
+#line 1286
 void FeInitBook1Menu(void)
 {
     FeAddTable(FeBook1MenuTable, 5);
@@ -853,6 +922,7 @@ void FeInitBook1Menu(void)
 }
 
 /* @0x8013BF6C FE.CPP:1297 */
+#line 1296
 void FeInitBook2Menu(void)
 {
     FeAddTable(FeBook2MenuTable, 6);
@@ -904,6 +974,7 @@ void FeBackBookMenuCtrl(void)
 }
 
 /* @0x8013C200 FE.CPP:1355 */
+#line 1354
 void PlayDemo(void)
 {
     PlayDemoFlag = 1;
@@ -964,17 +1035,25 @@ void DrawBackTSK(TASK *T)
 }
 
 /* @0x8013C460 FE.CPP:1484 */
+#line 1483
 void FeInitMainStuff(TASK *T2)
 {
     PutUpCutScreen(10);
+
     SPU_Init();
     snd_init(0);
     SND_LoadBank(0x11);
-    if (!FlameTData)
-        FlameTData = GM_UseTexData(0xCC);
+
+    if (!FlameTData) FlameTData = GM_UseTexData(0xCC);
     if (!FeTData)
+
         FeTData = GM_UseTexData(0xCB);
+
+
+
+
     if (!T2) {
+
         FinishProgress();
         TSK_AddTask(0, (void (*)())DrawBackTSK, 0x800, 0);
         TSK_Sleep(1);
@@ -1100,6 +1179,7 @@ void FrontEndTask(TASK *T)
 }
 
 /* @0x8013C9B8 FE.CPP:1723 */
+#line 1722
 void DrawFeTwinkle(int TwinkX, int TwinkY)
 {
     DrawSpinner(TwinkX, TwinkY, 0xA0, 0x40, 0xF0, 0x20, 0x40, 0, 1, 0xFFFF, 1, 0, 8);

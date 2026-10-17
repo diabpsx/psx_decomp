@@ -400,26 +400,56 @@ unsigned char block_buf[128];          /* @0x800CC7E8 */
 
 /* ---------------------------------------------------------------- functions */
 /* @0x800A5004 */
+#line 161
 void init_mem_card(void (*handler)(int, int), unsigned char read_dir)
 {
     ResetCallback();
+
+
+
+
+
+
+
+
+
     if (never_hooked_events) {
+
         EnterCriticalSection();
+
         card_ev0 = OpenEvent(0xF4000001, 0x0004, 0x2000, 0);
         card_ev1 = OpenEvent(0xF4000001, 0x8000, 0x2000, 0);
         card_ev2 = OpenEvent(0xF4000001, 0x0100, 0x2000, 0);
         card_ev3 = OpenEvent(0xF4000001, 0x2000, 0x2000, 0);
+
         card_ev10 = OpenEvent(0xF0000011, 0x0004, 0x2000, 0);
         card_ev11 = OpenEvent(0xF0000011, 0x8000, 0x2000, 0);
         card_ev12 = OpenEvent(0xF0000011, 0x0100, 0x2000, 0);
         card_ev13 = OpenEvent(0xF0000011, 0x2000, 0x2000, 0);
+
         ExitCriticalSection();
+
+
+
+
+
         InitCARD(1);
         StartCARD();
         ChangeClearPAD(0);
+
         never_hooked_events = 0;
+
+
+
+
+
     }
     _bu_init();
+
+
+
+
+
     EnableEvent(card_ev0);
     EnableEvent(card_ev1);
     EnableEvent(card_ev2);
@@ -428,15 +458,36 @@ void init_mem_card(void (*handler)(int, int), unsigned char read_dir)
     EnableEvent(card_ev11);
     EnableEvent(card_ev12);
     EnableEvent(card_ev13);
+
+
+
+
+
     card_status[0] = card_status[1] = 3;
     card_usable[0] = card_usable[1] = 0;
     card_files[0] = card_files[1] = 0;
     card_changed[0] = card_changed[1] = 1;
-    if (handler)
-        handler(7, 0);
+
+    if (handler) handler(7, 0);
+
+
+
+
+
+
     mem_card_event_handler = 0;
+
+
+
+
+
     init_card(0, read_dir != 0);
     init_card(1, read_dir != 0);
+
+
+
+
+
     mem_card_event_handler = (void (*)())handler;
 }
 
@@ -493,14 +544,22 @@ int ping_card(int card_number)
 }
 
 /* @0x800A53D4 */
+#line 327
 void DealWithCard(int side)
 {
+
+
     if (card_active[side]) {
+
+
         last_card_status[side] = card_status[side];
         card_status[side] = ping_card(side);
+
         service_card(side);
         TSK_Sleep(4);
+
         if (new_card_flag[side] && !AlertTxt) {
+
             new_card_flag[side] = 0;
             new_card(side);
             card_status[side] = 0;
@@ -509,65 +568,98 @@ void DealWithCard(int side)
 }
 
 /* @0x800A5498 */
+#line 349
 void CardUpdateTask(TASK *T)
 {
     int toggle = 0;
 
+
     while (1) {
         if (!toggle) {
+
             toggle = 1;
             DealWithCard(0);
+
+
         } else {
             toggle = 0;
             DealWithCard(1);
+
         }
         TSK_Sleep(1);
     }
 }
 
 /* @0x800A54EC */
+#line 370
 void MemcardON()
 {
+
+
+
+
+
+
+
+
+
+
+
     STR_pauseall();
     stream_stop();
     snd_stop_snd(0);
+
     OVR_LoadFrontend();
+
     init_mem_card(memcard_event, 1);
     MemcardTask = TSK_AddTask(0x45, CardUpdateTask, 0x2000, 0);
+
     MemCardActive = 1;
 }
 
 /* @0x800A5558 */
+#line 395
 void MemcardOFF()
 {
+
+
     TSK_Kill(MemcardTask);
+
     card_active[0] = card_active[1] = 0;
     MemCardActive = 0;
+
     STR_resumeall();
 }
 
 /* @0x800A5590 */
+#line 416
 void CheckSavedOptions()
 {
     int option_file;
-
     init_mem_card(memcard_event, 1);
+
     MemcardTask = TSK_AddTask(0x45, CardUpdateTask, 0x2000, 0);
+
     while (!TSK_Exist(0, 0x45, -1))
         TSK_Sleep(1);
+
     card_active[0] = 1;
     option_file = GetFileNumber(0, DiabloOptionFile);
     if (option_file != -1)
+
         PSX_OPT_LoadGame(0, option_file, 1);
     else {
         card_active[1] = 1;
         option_file = GetFileNumber(1, DiabloOptionFile);
         if (option_file != -1)
             PSX_OPT_LoadGame(1, option_file, 1);
+
     }
     TSK_Kill(MemcardTask);
+
     while (TSK_Exist(0, 0x45, -1))
         TSK_Sleep(1);
+
     card_active[0] = card_active[1] = 0;
 }
 
@@ -602,32 +694,47 @@ int test_hw_event()
 }
 
 /* @0x800A5790 */
+#line 491
 void ActivateMemcard(int card1, int card2)
 {
     card_active[0] = card1;
     card_active[1] = card2;
+
     if (!MemCardActive) {
+
         MemcardON();
         MemcardOverlay = 1;
     }
 }
 
 /* @0x800A57CC */
+#line 503
 void ActivateCharacterMemcard(int card1, int card2)
 {
+
     ActivateMemcard(card1, card2);
+
     if (!CharacterBlockLoaded) {
+
         int fileno;
+
         memset(&CharDataStruct, 0, 0x1DE0);
+
         fileno = GetFileNumber(current_card, DiabloCharacterFile);
+
         if (fileno != -1) {
+
             int ok = PSX_CH_LoadBlock(current_card, fileno);
             if (ok)
                 memset(&CharDataStruct, 0, 0x1DE0);
         } else
+
             PantsDelay();
     }
+
+
     countdownloadcharblock = 0;
+
     CharacterBlockLoaded = 1;
 }
 
@@ -736,31 +843,50 @@ int CountdownLoad(int Counter)
 }
 
 /* @0x800A5D7C */
+#line 694
 int CountdownSave(int Counter)
 {
     int cardstate[2];
 
     Counter++;
+
     if (Counter > 11) {
+
         if (GetSaveStatusMessage(save_blocks, Savefilename)) {
+
+
+
             ActivateMemcard(current_card == 0, current_card == 1);
+
             if (Savefilename != DiabloOptionFile) {
+
                 if (DoSaveGame())
                     AlertTxt = 0x50F;
                 else
                     AlertTxt = 0x508;
+
+
+
             } else {
                 if (DoSaveOptions())
                     AlertTxt = 0x50F;
                 else
                     AlertTxt = 0x2F8;
+
             }
             StatusTxt = 0;
             cardondelay = 0;
+
+
+
             service_card(current_card);
+
+
+
             ActivateMemcard(1, 1);
         }
         Counter = 0;
+
     }
     return Counter;
 }
@@ -810,53 +936,75 @@ void ShowLoadingBox(int Text)
 }
 
 /* @0x800A60E8 */
+#line 794
 void KillItemDead(int pnum, int InvPos, int Idx)
 {
     int ii, iv, i;
-
     if (InvPos >= 0 && InvPos <= 3 && plr[pnum].InvBody[0]._itype != -1)
+
         plr[pnum].InvBody[0]._itype = -1;
+
     if (InvPos == 4 && plr[pnum].InvBody[1]._itype != -1)
+
         plr[pnum].InvBody[1]._itype = -1;
+
     if (InvPos == 5 && plr[pnum].InvBody[2]._itype != -1)
+
         plr[pnum].InvBody[2]._itype = -1;
+
     if (InvPos == 6 && plr[pnum].InvBody[3]._itype != -1)
+
         plr[pnum].InvBody[3]._itype = -1;
+
     if (InvPos >= 7 && InvPos <= 12 && plr[pnum].InvBody[4]._itype != -1)
+
         plr[pnum].InvBody[4]._itype = -1;
+
     if (InvPos >= 13 && InvPos <= 18 && plr[pnum].InvBody[5]._itype != -1)
+
         plr[pnum].InvBody[5]._itype = -1;
+
     if (InvPos >= 19 && InvPos <= 24 && plr[pnum].InvBody[6]._itype != -1)
+
         plr[pnum].InvBody[6]._itype = -1;
 
+
     if (InvPos >= 25 && InvPos <= 64) {
+
         ii = InvPos - 25;
         if (plr[pnum].InvGrid[ii] != 0) {
+
             if (plr[pnum].InvGrid[ii] > 0)
                 iv = plr[pnum].InvGrid[ii];
             else
                 iv = -plr[pnum].InvGrid[ii];
+
             for (i = 0; i < 40; i++) {
+
                 if (plr[pnum].InvGrid[i] == iv || plr[pnum].InvGrid[i] == -iv)
                     plr[pnum].InvGrid[i] = 0;
             }
+
             iv--;
             plr[pnum].HoldItem = plr[pnum].InvList[iv];
             plr[pnum]._pNumInv--;
+
             if (plr[pnum]._pNumInv > 0 && plr[pnum]._pNumInv != iv) {
+
                 plr[pnum].InvList[iv] = plr[pnum].InvList[plr[pnum]._pNumInv];
                 for (i = 0; i < 40; i++) {
-                    if (plr[pnum].InvGrid[i] == plr[pnum]._pNumInv + 1)
-                        plr[pnum].InvGrid[i] = iv + 1;
-                    if (plr[pnum].InvGrid[i] == -(plr[pnum]._pNumInv + 1))
-                        plr[pnum].InvGrid[i] = -(iv + 1);
+
+                    if (plr[pnum].InvGrid[i] == plr[pnum]._pNumInv + 1) plr[pnum].InvGrid[i] = iv + 1;
+                    if (plr[pnum].InvGrid[i] == -(plr[pnum]._pNumInv + 1)) plr[pnum].InvGrid[i] = -(iv + 1);
                 }
             }
         }
     }
     if (InvPos >= 65) {
+
         ii = InvPos - 65;
         if (plr[pnum].SpdList[ii]._itype != -1) {
+
             plr[pnum].HoldItem = plr[pnum].SpdList[ii];
             plr[pnum].SpdList[ii]._itype = -1;
             drawsbarflag = 1;
@@ -865,22 +1013,83 @@ void KillItemDead(int pnum, int InvPos, int Idx)
 }
 
 /* @0x800A672C */
+#line 914
 void ClearLoadCharItems()
 {
     int i;
 
+
     if (FePlayerNo == 0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         KeefDaFeef(0);
+
+
+
+
+
     else {
         for (i = 0; i < 2; i++) {
+
             KeefDaFeef(i);
-            if (LoadedChar[0] && LoadedChar[1])
-                WinterSales(i);
+            if (LoadedChar[0] && LoadedChar[1]) WinterSales(i);
         }
     }
 }
 
 /* @0x800A67B4 */
+#line 1020
 void PantsDelay()
 {
     for (int i = 0; i < 180; i++)

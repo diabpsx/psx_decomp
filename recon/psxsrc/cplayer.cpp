@@ -65,31 +65,68 @@ static int WWorldY;   /* @0x8011C680 */
 
 static void FilthyTask(TASK *T);
 /* @0x80095854 CPLAYER.CPP:72 */
+#line 71
 CPlayer::CPlayer(BOOL Town, int mPlayerNum, int NewNumOfPlayers)
 {
     InTown = Town;
     PlayerNum = mPlayerNum;
     TexId = -1;
     hndDatMem = -1;
+
     NumOfPlayers = NewNumOfPlayers;
+
     LastScrX = 0;
     LastScrY = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     LastOtPos = 0;
     Init();
+
+
+
     switch (PlayerNum) {
+
     case 0:
         SetDecompArea(0x2C1, 2, 0x2C0, 0);
         break;
+
     case 1:
         SetDecompArea(0x2C1, 0x66, 0x2C0, 1);
         break;
+
     default:
         ASSERT(!"Illegal player num", 0x75);
+
         break;
     }
     PActiveArray[PlayerNum] = this;
+
     int SizeToAlloc = GetDatMaxSize();
+
     if (NewNumOfPlayers || mPlayerNum != 1) {
+
+
+
+
+
+
         long hnd = GAL_Alloc(SizeToAlloc, 1, "PLRDAT");
         ASSERT(hnd != -1, 0x85);
         hndDatMem = hnd;
@@ -108,6 +145,7 @@ CPlayer::~CPlayer()
 }
 
 /* @0x80095A3C CPLAYER.CPP:166 */
+#line 165
 void CPlayer::Load(int Id)
 {
     DumpData();
@@ -121,6 +159,7 @@ void CPlayer::Load(int Id)
  * PAL_1997_12_12 CPLAYER.CPP: pdir/wtime locals, TxyAdd adds); in this build their adds are dead, flow
  * deletes them, jump2 then deletes the emptied tests -- but only after allocation, which is what leaves
  * retail's s7 = &plr base (second plr[0] access) and the wtime REG $v0 record with no code. */
+#line 209
 void CPlayer::SetScrollTarget(PlayerStruct &Plr, CBlocks &Bg)
 {
     int ScrX = Plr._pxoff * 652 / 1000;
@@ -321,45 +360,59 @@ int CPlayer::FindAction(PlayerStruct &Plr)
 }
 
 /* @0x80096448 CPLAYER.CPP:540 */
+#line 539
 PACTION CPlayer::FindActionEnum(PlayerStruct &Plr)
 {
+
     switch (Plr._pmode) {
+
     case PM_STAND:
     case PM_NEWLVL:
     case PM_QUIT:
         return PL_STAND;
+
     case PM_WALK:
     case PM_WALK2:
     case PM_WALK3:
         return PL_WALK;
+
     case PM_ATTACK:
     case PM_RATTACK:
         return PL_ATTACK;
+
     case PM_BLOCK:
         return PL_BLOCK;
+
     case PM_SPELL:
         if (leveltype)
+
             return PL_LMAGIC;
         return PL_STAND;
+
     case PM_GOTHIT:
         return PL_HIT;
+
     case PM_DEATH:
         return PL_DEATH;
+
     }
     return PL_NOACTION;
 }
 
 /* @0x800964CC CPLAYER.CPP:585 */
+#line 584
 void CPlayer::Init()
 {
 }
 
 /* @0x800964D4 CPLAYER.CPP:595 */
+#line 594
 void CPlayer::Dump()
 {
 }
 
 /* @0x800964DC CPLAYER.CPP:606 */
+#line 605
 void CPlayer::LoadThis(int Id)
 {
     SetFileInfo(GetFileInfo(Id), -1);

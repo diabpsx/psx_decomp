@@ -14,6 +14,7 @@ struct Overlay {   /* sizeof 16 */
     char *FileName;        /* +0x8 */
     OVER_TYPE Over;        /* +0xC */
 
+#line 65
     OVER_TYPE GetOverType() { return Over; }   /* OVERLAY.CPP:65 */
     void ClearOut(void);
     void Load(void);
@@ -45,12 +46,14 @@ static void LoadOver(Overlay &Ovr);
 
 /* @0x800B0784 OVERLAY.CPP:110 (.STARTUP_text) */
 void OVR_Open(void) __attribute__((section(".STARTUP_text")));
+#line 109
 void OVR_Open(void)
 {
     ClearOutOverlays();
 }
 
 /* @0x800953F8 OVERLAY.CPP:119 */
+#line 118
 BOOL OVR_IsMemcardOverlayBlank(void)
 {
     ASSERT(0, 120);
@@ -66,36 +69,42 @@ static const unsigned long HaltTab[3] = {0x000101CD, 0x03E00008, 0};
 OVER_TYPE CurrentOverlay;   /* zero-initialized after the generated initializer's small literals */
 
 /* @0x80095424 OVERLAY.CPP:129 */
+#line 128
 void OVR_LoadPregame(void)
 {
     LoadOver(PregameOver);
 }
 
 /* @0x8009544C OVERLAY.CPP:137 */
+#line 136
 void OVR_LoadFrontend(void)
 {
     LoadOver(FrontEndOver);
 }
 
 /* @0x80095474 OVERLAY.CPP:146 */
+#line 145
 void OVR_LoadGame(void)
 {
     LoadOver(GameOver);
 }
 
 /* @0x8009549C OVERLAY.CPP:155 */
+#line 154
 void OVR_LoadFmv(void)
 {
     LoadOver(FmvOver);
 }
 
 /* @0x800954C4 OVERLAY.CPP:164 */
+#line 163
 void OVR_LoadMemcard(void)
 {
     ASSERT(0, 165);
 }
 
 /* @0x800954F0 OVERLAY.CPP:174 */
+#line 173
 static void ClearOutOverlays(void)
 {
     FrontEndOver.ClearOut();
@@ -105,6 +114,7 @@ static void ClearOutOverlays(void)
 }
 
 /* @0x80095548 OVERLAY.CPP:187 */
+#line 186
 void Overlay::ClearOut(void)
 {
     ASSERT(Size >= 12, 188);
@@ -129,15 +139,18 @@ void Overlay::Load(void)
 }
 
 /* @0x80095668 OVERLAY.CPP:225 */
+#line 224
 OVER_TYPE OVR_GetCurrentOverlay(void)
 {
     return CurrentOverlay;
 }
 
 /* @0x80095674 OVERLAY.CPP:234 */
+#line 233
 static void LoadOver(Overlay &Ovr)
 {
     if (CurrentOverlay != Ovr.GetOverType()) {
+
         ClearOutOverlays();
         Ovr.Load();
         CurrentOverlay = Ovr.GetOverType();

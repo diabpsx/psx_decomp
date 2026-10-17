@@ -57,14 +57,19 @@ DatIO::DatIO(unsigned long OurMemId) : FileIO(OurMemId)
 }
 
 /* @0x80086780 DATIO.CPP:78 */
+#line 77
 DatIO::~DatIO()
 {
 }
 
 /* @0x800867D8 DATIO.CPP:88 */
+#line 87
 BOOL DatIO::FileExists(const char *Name)
 {
+
+
     int FileHnd = DDXopen((char *)Name, 0);
+
     if (FileHnd == -1)
         return 0;
     DDXclose(FileHnd);

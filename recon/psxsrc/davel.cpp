@@ -166,13 +166,18 @@ static BOOL anyfuckingmenus = 0;                /* @0x8011B0FC */
 extern void Teleportfx(int scrnx, int scrny, int width, int height, int scale, int colmask, int numpart, int OtPos);
 
 /* @0x8009E3F4 DAVEL.CPP:92 */
+#line 91
 void DaveLDummyPoll()
 {
+
+
 }
 
 /* @0x8009E3FC DAVEL.CPP:98 */
+#line 97
 void DaveL()
 {
+
     DBG_SetPollRoutine(DaveLDummyPoll);
 }
 
@@ -336,6 +341,7 @@ void setUVparams(POLY_FT4 *Ft4, FRAME_HDR *Fr)
 }
 
 /* @0x8009EBE0 DAVEL.CPP:283 */
+#line 282
 void drawparticle(int x, int y, int scale, int anim, int colour, int OtPos)
 {
     TextDat *Dat;
@@ -345,16 +351,21 @@ void drawparticle(int x, int y, int scale, int anim, int colour, int OtPos)
     int w, h, f;
 
     f = anim + 0xD0;
+
     Dat = GM_UseTexData(0);
+
     Fr = Dat->GetFr(f);
     w = Fr->W;
     h = Fr->H;
+
     w = (w * scale) / 32768;
     h = (h * scale) / 32768;
     x -= w / 2;
     y -= h / 2;
+
     SpR = colour >> 16;
     SpG = colour >> 8;
+
     SpB = colour;
     PRIM_GetPrim(&Ft4);
     Dat->PrepareFt4(Ft4, f, x, y, 0, 0);
@@ -364,16 +375,19 @@ void drawparticle(int x, int y, int scale, int anim, int colour, int OtPos)
     setShadeTex(Ft4, 0);
     setUVparams(Ft4, Fr);
     addPrim(ThisOt + OtPos, Ft4);
+
     GM_FinishedUsing(Dat);
 }
 
 /* @0x8009EDD8 DAVEL.CPP:320 */
+#line 319
 void drawpolyF4(int x, int y, int w, int h, int colour, int OtPos)
 {
     POLY_F4 *F4;
     unsigned char SpR, SpG, SpB;
 
     SpR = colour >> 16;
+
     SpG = colour >> 8;
     SpB = colour;
     PRIM_GetPrim(&F4);
@@ -444,35 +458,45 @@ void particlejump(int ScrX, int ScrY)
 }
 
 /* @0x8009F2AC DAVEL.CPP:412 */
+#line 411
 void doparticlejump()
 {
     int ScrX, ScrY, ScrXOff, ScrYOff;
+
     int WorldX, WorldY;
     CBlocks *gblocks;
 
     gblocks = BL_GetCurrentBlocks();
+
     gblocks->GetXY(&WorldX, &WorldY);
+
     ScrXOff = (monster[partmonst]._mxoff * 625) / 1000;
     ScrYOff = (monster[partmonst]._myoff * 625) / 1000;
+
     int x = monster[partmonst]._mx * 20;
     int y = monster[partmonst]._my * 20;
+
     ScrX = gblocks->WorldToScrX(x, y) + ScrXOff - gblocks->WorldToScrX(WorldX >> 16, WorldY >> 16) - 100;
     ScrY = gblocks->WorldToScrY(x, y) + ScrYOff - gblocks->WorldToScrY(WorldX >> 16, WorldY >> 16) - 100;
-    if (partjumpflag)
-        particlejump(ScrX, ScrY);
+
+    if (partjumpflag) particlejump(ScrX, ScrY);
 }
 
 /* @0x8009F440 DAVEL.CPP:436 */
+#line 435
 void StartPartJump(int mi, int height, int scale, int colour, int OtPos)
 {
     int n;
 
     if (!(partjumpflag | partglowflag)) {
+
         partjumpflag = 1;
         partcolour = colour;
         partOtPos = OtPos;
         partmonst = mi;
+
         for (n = 0; n < 16; n++) {
+
             PartArray[n].partx = 100 << 16;
             PartArray[n].party = 100;
             PartArray[n].jumpflag = 1;
@@ -644,14 +668,17 @@ void Teleportfx(int scrnx, int scrny, int width, int height, int scale, int colm
 }
 
 /* @0x8009FDC0 DAVEL.CPP:645 */
+#line 644
 void ResurrectFX(int x, int height, int scale, int OtPos)
 {
     int t = (VID_GetTick() >> 2) & 1;
 
     Teleportfx(x, height / 2, 8, height, scale, 0, 64, OtPos);
+
     drawpolyG4(x - 10, 0, 10, (height * 3) / 2 + t, (height * 3) / 2 + 5, 0x202020, 0x808080, OtPos);
     drawpolyG4(x, 0, 8, (height * 3) / 2 + 6, (height * 3) / 2 + 6, 0x808080, 0x808080, OtPos);
     drawpolyG4(x + 8, 0, 10, (height * 3) / 2 + 5 + t, (height * 3) / 2, 0x808080, 0x202020, OtPos);
+
     drawpolyF4(x - 2, 0, 1, (height * 3) / 2 - 1, 0x606060, OtPos);
     drawpolyF4(x - 1, 0, 1, (height * 3) / 2, 0x808080, OtPos);
     drawpolyF4(x, 0, 2, (height * 3) / 2 + 1, 0x80C0C0, OtPos);
@@ -662,23 +689,32 @@ void ResurrectFX(int x, int height, int scale, int OtPos)
 }
 
 /* @0x8009FFE8 DAVEL.CPP:665 */
+#line 664
 void ParticleExp(MissileStruct *Ms, int ScrX, int ScrY, int colour, int OtPos)
 {
     ScrY -= 16;
+
     if (SetParticle) {
+
         SetParticle = 0;
         if (Ms->_misource == 0)
+
             p1partexecnum = 16;
+
         if (Ms->_misource == 1)
+
             p2partexecnum = 16;
+
     }
     doparticlechain(ScrX, ScrY, 0, 0, 16, 0xF000, 0x1000, 1, 0, colour, OtPos, Ms->_misource);
 }
 
 /* @0x800A0080 DAVEL.CPP:685 */
+#line 684
 void SPELLFX_DAT::GetPlrPos(PlayerStruct *ptrplr)
 {
     RECT R;
+
     CBlocks *gblocks = BL_GetCurrentBlocks();
     int ScrXOff = (ptrplr->_pxoff * 625) / 1000;
     int ScrYOff = (ptrplr->_pyoff * 625) / 1000;
@@ -715,6 +751,7 @@ void healFX()
 }
 
 /* @0x800A02E0 DAVEL.CPP:726 */
+#line 725
 void HealStart(int plr)
 {
     SpellFXDat[plr].healactive = 1;
@@ -722,6 +759,7 @@ void HealStart(int plr)
 }
 
 /* @0x800A0314 DAVEL.CPP:732 */
+#line 731
 void HealotherStart(int plr)
 {
     plr ^= 1;
@@ -730,6 +768,7 @@ void HealotherStart(int plr)
 }
 
 /* @0x800A034C DAVEL.CPP:739 */
+#line 738
 void TeleStart(int plr)
 {
     PlayerStruct *p = &::plr[plr];   /* copy-propagated: no SYM record, but evaluates the player address first */
@@ -741,6 +780,7 @@ void TeleStart(int plr)
 }
 
 /* @0x800A040C DAVEL.CPP:749 */
+#line 748
 void TeleStop(int plr)
 {
     SpellFXDat[plr].teleflag = 0;
@@ -748,6 +788,7 @@ void TeleStop(int plr)
 }
 
 /* @0x800A0438 DAVEL.CPP:755 */
+#line 754
 void PhaseStart(int plr)
 {
     SpellFXDat[plr].phaseflag = 5;
@@ -755,6 +796,7 @@ void PhaseStart(int plr)
 }
 
 /* @0x800A046C DAVEL.CPP:762 */
+#line 761
 void PhaseEnd(int plr)
 {
     SpellFXDat[plr].phaseflag = 0;
@@ -786,24 +828,35 @@ void SPELLFX_DAT::ApocInit(PlayerStruct *ptrplr)
 }
 
 /* @0x800A0680 DAVEL.CPP:798 */
+#line 797
 void ApocaStart(int plr)
 {
     PlayerStruct *p = &::plr[plr];   /* copy-propagated: no SYM record, but evaluates the player address first */
+
     SpellFXDat[plr].ApocInit(p);
 }
 
 /* @0x800A06E4 DAVEL.CPP:806 */
+#line 805
 void DaveLTask(TASK *T)
 {
+
     PAD_GetPad(1, 0);
+
+
+
     do {
         if (!CDWAIT) {
+
             anyfuckingmenus = (PauseMode | invflag | chrflag | sbookflag | questlog) != 0;
+
             mteleportfx();
+
             invistimer();
+
             healFX();
-            if (partjumpflag || partglowflag)
-                doparticlejump();
+
+            if (partjumpflag || partglowflag) doparticlejump();
         }
         TSK_Sleep(1);
     } while (GLUE_Finished() == 0);

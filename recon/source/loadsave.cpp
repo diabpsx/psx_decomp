@@ -51,37 +51,40 @@ extern int DirtyVidY;
 static unsigned char *tbuff;
 
 /* @0x8015B958 */
+#line 134
 char *GetOptStr(void)
 {
     return OptSaveName;
 }
 
 /* @0x8015B968 */
+#line 144
 char *GetDiabloStr(void)
 {
     return DiabloStr;
 }
 
 /* @0x8015B978 */
+#line 151
 static char BLoad(void)
 {
     return *tbuff++;
 }
 
 /* @0x8015B994 */
+#line 156
 static int ILoad(void)
 {
     int rv;
-
     rv = *tbuff++ << 24;
     rv |= *tbuff++ << 16;
     rv |= *tbuff++ << 8;
     rv |= *tbuff++;
-
     return rv;
 }
 
 /* @0x8015B9E8 */
+#line 181
 static unsigned char OLoad(void)
 {
     if (*tbuff++ == TRUE)
@@ -91,6 +94,7 @@ static unsigned char OLoad(void)
 }
 
 /* @0x8015BA0C */
+#line 252
 static void LoadQuest(int i)
 {
     memcpy(&quests[i], tbuff, sizeof(struct QuestStruct));
@@ -98,14 +102,19 @@ static void LoadQuest(int i)
 }
 
 /* @0x8015BAD4 */
+#line 446
 static void BSave(char v)
 {
     *tbuff++ = v;
 }
 
 /* @0x8015BAEC */
+#line 452
 static void ISave(int v)
 {
+
+
+
     *tbuff++ = v >> 24;
     *tbuff++ = v >> 16;
     *tbuff++ = v >> 8;
@@ -122,6 +131,7 @@ static void OSave(unsigned char v)
 }
 
 /* @0x8015BB90 */
+#line 543
 static void SaveQuest(int i)
 {
     memcpy(tbuff, &quests[i], sizeof(struct QuestStruct));
@@ -224,45 +234,95 @@ int PSX_GM_SaveGame(int card_number, char *name, char *title)
 }
 
 /* @0x8015C1BC */
+#line 1042
 int PSX_GM_LoadGame(unsigned char firstflag, int card_number, int file)
 {
     int result;
+
     unsigned char *LoadBuff;
 
     LoadBuff = save_buffer;
     tbuff = LoadBuff;
+
     FreeGameMem();
+
+
+
+
+
+
+
+
+
+
+
+
+
     result = read_card_file(card_number, file, 0x3001, (char *)tbuff);
+
+
+
     if (result != 0)
         return result;
 
     gbRunGame = 0;
+
     delta_init();
+
     GLUE_SetShowGameScreenFlag(0);
+
     result = RestoreLoadedData(firstflag != 0);
+
+
+
     if (result != (int)(tbuff - LoadBuff)) {
+
+
+
         VID_SetXYOff(0, 0);
         return -2;
+
+
     }
 
     gbMaxPlayers = FePlayerNo + 1;
+
+
+
     SetReturnLvlPos();
     ResyncQuests();
+
     SetLoadedVolumes();
     CalcVolumes();
+
     ClearQuestFlags();
+
+
+
+
     gbProcessPlayers = 1;
+
+
+
     *(int *)((char *)&plr[0] + 0x64) = -1;
     *(int *)((char *)&plr[1] + 0x64) = -1;
+
     options_pad = -1;
+
     deathflag = 0;
+
     return 0;
 }
 
 /* @0x8015C2E8 */
+#line 1123
 void PSX_CH_LoadGame(int slot)
 {
+
+
+
     gbMaxPlayers = FePlayerNo + 1;
+
     UnPackPlayer(&CharDataStruct.CharSlots[slot], FePlayerNo, 0);
     QSpell[FePlayerNo] = CharDataStruct.ToggleSave[slot];
     _spltotype[FePlayerNo] = CharDataStruct.spltypesave[slot];
@@ -303,17 +363,20 @@ int PSX_CH_SaveGame(int card_number, int slot)
 }
 
 /* @0x8015C51C */
+#line 1194
 void RestorePads(void)
 {
     int i;
-
     for (i = 0; i < 20; i++) {
+
         txt_actions[i].pad_val = ILoad();
         txt_actions[i].combo_val = ILoad();
     }
     PostGamePad(9, 0, (int)txt_actions, 0);
 
+
     for (i = 0; i < 20; i++) {
+
         txt_actions[i].pad_val = ILoad();
         txt_actions[i].combo_val = ILoad();
     }
@@ -321,18 +384,21 @@ void RestorePads(void)
 }
 
 /* @0x8015C5DC */
+#line 1213
 void StorePads(void)
 {
     int i;
 
     PostGamePad(11, 0, (int)txt_actions, 0);
     for (i = 0; i < 20; i++) {
+
         ISave(txt_actions[i].pad_val);
         ISave(txt_actions[i].combo_val);
     }
 
     PostGamePad(11, 1, (int)txt_actions, 0);
     for (i = 0; i < 20; i++) {
+
         ISave(txt_actions[i].pad_val);
         ISave(txt_actions[i].combo_val);
     }
@@ -345,17 +411,24 @@ void GetIcon(void)
 }
 
 /* @0x8015C6D4 */
+#line 1239
 int PSX_OPT_LoadGame(int card_number, int file, BOOL KillHandler)
 {
     int result;
     unsigned char *LoadBuff;
-
     LoadBuff = save_buffer;
     tbuff = LoadBuff;
+
+
+
+
     result = read_card_file(card_number, file, 0x3001, (char *)LoadBuff);
+
     if (result == 0) {
+
         LoadOptions();
         SetLoadedLang((enum LANG_TYPE)ILoad());
+
     }
     return result;
 }
@@ -390,6 +463,7 @@ int PSX_OPT_SaveGame(int card_number, char *filename)
 }
 
 /* @0x8015C850 */
+#line 1313
 void LoadOptions(void)
 {
     sglMasterVolume = ILoad();
@@ -398,26 +472,39 @@ void LoadOptions(void)
     sglSpeechVolume = ILoad();
 
     if (!ADirtyFlagThatGaryWillLove) {
+
         VID_SetXYOff(ILoad(), ILoad());
+
+
     } else {
         DirtyVidx = ILoad();
         DirtyVidY = ILoad();
+
+
     }
 
     RestorePads();
+
     MONO = BLoad() != 0;
     SetSpeed((enum GM_SPEEDS)BLoad());
 }
 
 /* @0x8015C928 */
+#line 1338
 void SaveOptions(void)
 {
+
+
+
+
     ISave(sglMasterVolume);
     ISave(sglMusicVolume);
     ISave(sglSoundVolume);
     ISave(sglSpeechVolume);
+
     ISave(VID_GetXOff());
     ISave(VID_GetYOff());
+
     StorePads();
     BSave(MONO);
     BSave((char)GetSpeed());

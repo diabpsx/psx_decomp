@@ -187,11 +187,13 @@ TASK *tonys;                                                /* @0x8011AE9C */
 static int buff[10];                                        /* @0x8011CDC8 bss */
 
 /* @0x8009B338 TONY.CPP:107 */
+#line 106
 static void stub(char *e, void *argptr)
 {
 }
 
 /* @0x8009B340 TONY.CPP:111 */
+#line 110
 void new_eprint(char *Text, char *File, int Line)
 {
     printf("File:%s Line:%d\t%s\n", File, Line, Text);
@@ -229,6 +231,7 @@ void SetAmbientLight()
 }
 
 /* @0x8009B4BC TONY.CPP:170 */
+#line 169
 void SetDemoPlayer()
 {
     plr[0]._pHitPoints = 0x9600;
@@ -310,21 +313,25 @@ void print_demo_task(TASK *T)
 #define	pollhost()	asm("break 1024")	/* inline to keep variable scope */
 
 /* @0x8009B82C TONY.CPP:259 */
+#line 258
 void TonysDummyPoll()
 {
     if (tony_poll) {
+
         DrawSync(0);
         pollhost();
     }
 }
 
 /* @0x8009B858 TONY.CPP:268 */
+#line 267
 void SetTonyPoll()
 {
     tony_poll = 0;
 }
 
 /* @0x8009B864 TONY.CPP:273 */
+#line 272
 void ClearTonyPoll()
 {
     tony_poll = 0;
@@ -369,28 +376,80 @@ void set_pad_record_play(int level)
 
 /* @0x8009B9A4 TONY.CPP:324 -- the 16-byte frame with no locals is the outgoing-argument area of a
  * call the optimiser deleted (dead code); ra is not saved because no call survives. */
+#line 323
 void start_demo()
 {
     if (0)
+
+
+
+
+
+
+
+
+
+
         TSK_Sleep(1);
 }
 
 /* @0x8009B9B4 TONY.CPP:340 */
+#line 339
 void SetQuest()
 {
 }
 
 /* @0x8009B9BC TONY.CPP:344 */
+#line 343
 void DrawManaShield(PlayerStruct *ptrplr)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x8009B9C4 TONY.CPP:368 */
+#line 367
 void ManaTask(TASK *T)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x8009B9CC TONY.CPP:389 */
+#line 388
 void tony()
 {
     DBG_SetErrorFunc((void (*)())new_eprint);

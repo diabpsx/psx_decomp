@@ -512,6 +512,7 @@ extern const UItemStruct UniqueItemList[91] = { /* @0x80114364 */
 };
 unsigned char AllItemsUseable[157] = { 0 };
 
+#line 968
 void InitAllItemsUseable(void)
 {
     for (int f = 0; f < 157; f++)

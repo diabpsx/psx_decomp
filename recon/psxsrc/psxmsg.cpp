@@ -137,11 +137,15 @@ static const unsigned short Level2Bgdata[25] = {   /* @0x8011073C: [leveltype * 
 };
 
 /* @0x80096B5C PSXMSG.CPP:194 */
+#line 193
 void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
 {
+
     switch (Msg) {
+
     case WM_DIABNEXTLVL:
         switch (gnLevelTypeTbl[currlevel]) {
+
         case 0:
             CutScreen = 0;
             break;
@@ -165,11 +169,14 @@ void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
             break;
         }
         break;
+
     case WM_DIABPREVLVL:
         if (gnLevelTypeTbl[currlevel - 1] == 0) {
+
             CutScreen = 0;
         } else {
             switch (gnLevelTypeTbl[currlevel]) {
+
             case 0:
                 CutScreen = 0;
                 break;
@@ -191,11 +198,15 @@ void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
             }
         }
         break;
+
     case WM_DIABSETLVL:
         if (setlvlnum == SL_BONECHAMB)
+
             CutScreen = 2;
         else if (setlvlnum == SL_VILEBETRAYER)
             CutScreen = 6;
+
+
         else
             CutScreen = 1;
         break;
@@ -204,19 +215,26 @@ void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
             CutScreen = 2;
         else if (setlvlnum == SL_VILEBETRAYER)
             CutScreen = 6;
+
+
         else
             CutScreen = 1;
         break;
     case WM_DIABWARPLVL:
         CutScreen = 5;
         break;
+
     case WM_DIABLOADGAME:
         if (setlvlnum == SL_BONECHAMB)
+
             CutScreen = 2;
         else if (setlvlnum == SL_VILEBETRAYER)
+
+
             CutScreen = 6;
         else {
             switch (gnLevelTypeTbl[currlevel]) {
+
             case 0:
                 CutScreen = 0;
                 break;
@@ -238,9 +256,11 @@ void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
             }
         }
         break;
+
     case WM_DIABNEWGAME:
         CutScreen = 7;
         break;
+
     case WM_DIABTOWNWARP:
     case WM_DIABTWARPUP:
         switch (gnLevelTypeTbl[plr[myplr].plrlevel]) {
@@ -258,19 +278,29 @@ void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
             break;
         }
         break;
+
+
     case WM_DIABRETOWN:
         CutScreen = 0;
         break;
     default:
         CutScreen = 9;
+
+
         break;
     }
 
     switch (Msg) {
+
+
+
+
+
     case WM_DIABNEXTLVL:
     case WM_DIABTOWNWARP:
         GoForwardLevel();
         break;
+
     case WM_DIABSETLVL:
         GoSetLevel();
         break;
@@ -279,33 +309,46 @@ void PSX_WndProc(unsigned int Msg, long wParam, unsigned long lParam)
     case WM_DIABTWARPUP:
         GoBackLevel();
         break;
+
     case WM_DIABWARPLVL:
         GoWarpLevel();
         break;
+
     case WM_DIABNEWGAME:
         GoNewGame();
         break;
+
     case WM_DIABLOADGAME:
         GoLoadGame();
         break;
+
     case WM_DIAVNEWLVL:
         GoNewLevel();
         break;
+
+
     default:
-        if (!(!"Msg not implemented"))
-            DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 383);
+        if (!(!"Msg not implemented")) DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 383);
         break;
     }
 }
 
 /* @0x80096EE0 PSXMSG.CPP:395 */
+#line 394
 void PSX_PostWndProc(unsigned int Msg, long wParam, unsigned long lParam)
 {
     switch (Msg) {
+
+
+
+
+
     case WM_DIABNEXTLVL:
     case WM_DIABTOWNWARP:
         PostGoForwardLevel();
         break;
+
+
     case WM_DIABPREVLVL:
     case WM_DIABRTNLVL:
     case WM_DIABSETLVL:
@@ -314,55 +357,80 @@ void PSX_PostWndProc(unsigned int Msg, long wParam, unsigned long lParam)
         SetReturnLvlPos();
         PostGoBackLevel();
         break;
+
     case WM_DIABNEWGAME:
         PostNewGame();
         break;
+
     case WM_DIABLOADGAME:
         PostLoadGame();
         break;
+
     case WM_DIAVNEWLVL:
         PostNewLevel();
         break;
+
+
     default:
-        if (!(!"Msg not implemented"))
-            DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 431);
+        if (!(!"Msg not implemented")) DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 431);
         break;
     }
 }
 
 /* @0x80096F98 PSXMSG.CPP:440 */
+#line 439
 static void GoSetLevel(void)
 {
+
+
     LevelToLevelInit();
-    if (!(currlevel > 0 && currlevel < 17))
-        DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 444);
-    if (quests[Q_BETRAYER]._qvar1 < 7 && setlvlnum == SL_VILEBETRAYER)
-        play_movie("FPRST3.MOV");
+    if (!(currlevel > 0 && currlevel < 17)) DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 444);
+
+
+    if (quests[Q_BETRAYER]._qvar1 < 7 && setlvlnum == SL_VILEBETRAYER) play_movie("FPRST3.MOV");
+
     PutUpCutScreen(CutScreen);
 }
 
 /* @0x80097030 PSXMSG.CPP:453 */
+#line 452
 static void GoBackLevel(void)
 {
+
+
     LevelToLevelInit();
-    if (!(currlevel > 0 && currlevel < 17))
-        DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 457);
+    if (!(currlevel > 0 && currlevel < 17)) DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 457);
+
+
     PutUpCutScreen(CutScreen);
 }
 
 /* @0x8009708C PSXMSG.CPP:464 */
+#line 463
 static void GoWarpLevel(void)
 {
+
+
     LevelToLevelInit();
+
     PutUpCutScreen(CutScreen);
 }
 
 /* @0x800970B8 PSXMSG.CPP:475 */
+#line 474
 static void PostLoadGame(void)
 {
     OVR_LoadGame();
+
+
+
     SyncPortals();
+
+
+
     int palnum = (LevPals[currlevel] == 0x80) ? 0 : LevPals[currlevel];
+
+
     GLUE_StartBg(Level2Bgdata[leveltype * 5 + palnum], leveltype == 0, currlevel);
 }
 
@@ -408,9 +476,17 @@ static void PostNewLevel(void)
 }
 
 /* @0x8009733C PSXMSG.CPP:556 */
+#line 555
 static void GoNewLevel(void)
 {
+
+
+
+
     LevelToLevelInit();
+
+
+
     PutUpCutScreen(CutScreen);
     FreeGameMem();
     OVR_LoadPregame();
@@ -430,11 +506,11 @@ static void PostGoBackLevel(void)
 }
 
 /* @0x80097430 PSXMSG.CPP:585 */
+#line 584
 static void GoForwardLevel(void)
 {
     LevelToLevelInit();
-    if (!(currlevel < 16))
-        DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 587);
+    if (!(currlevel < 16)) DBG_Error(NULL, "psxsrc/PSXMSG.CPP", 587);
     PutUpCutScreen(CutScreen);
 }
 
@@ -451,21 +527,32 @@ static void PostGoForwardLevel(void)
 }
 
 /* @0x80097530 PSXMSG.CPP:604 */
+#line 603
 static void GoNewGame(void)
 {
+
+
+
+
     PutUpCutScreen(CutScreen);
 }
 
 /* @0x80097554 PSXMSG.CPP:613 */
+#line 612
 static void PostNewGame(void)
 {
     GLUE_StartBg(39, 1, -1);
 }
 
 /* @0x8009757C PSXMSG.CPP:623 */
+#line 622
 static void LevelToLevelInit(void)
 {
+
     GLUE_SetFinished(1);
+
+
+
     while (TSK_Exist(NULL, 0x4001, 0xFFFFFFFF))
         TSK_Sleep(1);
     TSK_Sleep(2);

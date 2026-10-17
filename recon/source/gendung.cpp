@@ -74,17 +74,17 @@ unsigned char dung_map_g[56][56] = {0};
 unsigned char dung_map_b[56][56] = {0};
 int nSxy[16] = {0};
 
+#line 161
 void FillSolidBlockTbls()
 {
     unsigned long dwTiles;
     unsigned char *pSBFile;
     unsigned char *pTmp;
-
     memset(nBlockTable, 0, sizeof(nBlockTable));
     memset(nSolidTable, 0, sizeof(nSolidTable));
+
     memset(nMissileTable, 0, sizeof(nMissileTable));
     memset(nTrapTable, 0, sizeof(nTrapTable));
-
     pSBFile = 0;
     switch (leveltype) {
     case DTYPE_TOWN:
@@ -101,58 +101,71 @@ void FillSolidBlockTbls()
         break;
     case DTYPE_HELL:
         pSBFile = GRL_LoadFileInMemSig("Levels\\L4Data\\L4.SOL", &dwTiles);
+
+
+
+
         break;
     }
 
     pTmp = pSBFile;
 
     for (unsigned long d = 1; d <= dwTiles; d++) {
+
         unsigned char bv = *pTmp++;
-        if (bv & 1)
-            nSolidTable[d] = 1;
-        if (bv & 2)
-            nBlockTable[d] = 1;
-        if (bv & 4)
-            nMissileTable[d] = 1;
-        if (bv & 0x80)
-            nTrapTable[d] = 1;
+        if (bv & 1) nSolidTable[d] = 1;
+        if (bv & 2) nBlockTable[d] = 1;
+        if (bv & 4) nMissileTable[d] = 1;
+
+        if (bv & 0x80) nTrapTable[d] = 1;
+
     }
 
     ConvertdPiece();
+
+
     MemFreeDbg(pSBFile);
 }
 
+#line 221
 void SetDungeonMicros()
 {
 }
 
+#line 228
 void DRLG_InitTrans()
 {
     int x, y;
 
+
+
     for (y = 0; y < 96; y++)
         for (x = 0; x < 96; x++)
             dung_map[x][y].dTransVal = 0;
+
+
     memset(TransList, 0, sizeof(TransList));
     TransVal = 1;
 }
 
+#line 247
 void DRLG_RectTrans(int x1, int y1, int x2, int y2)
 {
     int i, j;
 
     for (j = y1; j <= y2; j++) {
-        for (i = x1; i <= x2; i++)
-            dung_map[i][j].dTransVal = TransVal;
+        for (i = x1; i <= x2; i++) dung_map[i][j].dTransVal = TransVal;
     }
     TransVal++;
 }
 
+#line 261
 void DRLG_CopyTrans(int sx, int sy, int dx, int dy)
 {
     dung_map[dx][dy].dTransVal = dung_map[sx][sy].dTransVal;
 }
 
+#line 269
 void DRLG_ListTrans(int num, unsigned char *List)
 {
     int i;
@@ -167,6 +180,7 @@ void DRLG_ListTrans(int num, unsigned char *List)
     }
 }
 
+#line 286
 void DRLG_AreaTrans(int num, unsigned char *List)
 {
     int i;
@@ -183,6 +197,7 @@ void DRLG_AreaTrans(int num, unsigned char *List)
     TransVal++;
 }
 
+#line 306
 void DRLG_InitSetPC()
 {
     setpc_x = 0;
@@ -297,6 +312,7 @@ unsigned char DRLG_WillThemeRoomFit(int floor, int x, int y, int minSize, int ma
     return 1;
 }
 
+#line 462
 void DRLG_CreateThemeRoom(int themeIndex)
 {
 	int xx;
@@ -406,9 +422,11 @@ void DRLG_CreateThemeRoom(int themeIndex)
 	}
 }
 
+#line 589
 void DRLG_PlaceThemeRooms(int minSize, int maxSize, int floor, int freq, unsigned char rndSize)
 {
     int i;
+
     int j;
     int themeW;
     int themeH;
@@ -416,27 +434,36 @@ void DRLG_PlaceThemeRooms(int minSize, int maxSize, int floor, int freq, unsigne
     themeCount = 0;
     memset(themeLoc, 0x00, sizeof(THEME_LOC));
 
+
     for (j = 0; j < DMAXY; j++) {
         for (i = 0; i < DMAXX; i++) {
+
             if ((dungeon[i][j] == floor) && (!ENG_random(freq))) {
+
                 if (DRLG_WillThemeRoomFit(floor, i, j, minSize, maxSize, &themeW, &themeH)) {
+
                     if (rndSize) {
                         int rv1, rv2, min, max;
+
                         min = minSize - 2;
                         max = maxSize - 2;
                         rv1 = ENG_random(((themeW - min) + 1));
                         rv2 = min + ENG_random(rv1);
                         if (rv2 < min || rv2 > max) themeW = min;
                         else themeW = rv2;
+
                         rv1 = ENG_random(((themeH - min) + 1));
                         rv2 = min + ENG_random(rv1);
                         if (rv2 < min || rv2 > max) themeH = min;
                         else themeH = rv2;
                     }
+
                     themeLoc[themeCount].x = i + 1;
                     themeLoc[themeCount].y = j + 1;
                     themeLoc[themeCount].width = themeW;
                     themeLoc[themeCount].height = themeH;
+
+
                     if (leveltype == 3) {
                         DRLG_RectTrans(
                             ((i + 2) << 1) + DIRTEDGED2,
@@ -445,7 +472,9 @@ void DRLG_PlaceThemeRooms(int minSize, int maxSize, int floor, int freq, unsigne
                             (((j + themeH) - 1) << 1) + DIRTEDGED2 + 1);
                     } else DRLG_MRectTrans(i + 1, j + 1, (i + themeW), (j + themeH));
                     themeLoc[themeCount].ttval = TransVal - 1;
+
                     DRLG_CreateThemeRoom(themeCount);
+
                     themeCount++;
                 }
             }
@@ -453,6 +482,7 @@ void DRLG_PlaceThemeRooms(int minSize, int maxSize, int floor, int freq, unsigne
     }
 }
 
+#line 656
 void DRLG_HoldThemeRooms()
 {
     int i, x, y;
@@ -461,6 +491,9 @@ void DRLG_HoldThemeRooms()
         for (i = 0; i < themeCount; i++) {
             for (y = themeLoc[i].y; y < themeLoc[i].y + themeLoc[i].height - 1; y++) {
                 for (x = themeLoc[i].x; x < themeLoc[i].x + themeLoc[i].width - 1; x++) {
+
+
+
                     dung_map[2 * x + 16][2 * y + 16].dFlags |= BFLAG_POPULATED;
                     dung_map[2 * x + 17][2 * y + 16].dFlags |= BFLAG_POPULATED;
                     dung_map[2 * x + 16][2 * y + 17].dFlags |= BFLAG_POPULATED;
@@ -471,19 +504,23 @@ void DRLG_HoldThemeRooms()
     }
 }
 
+#line 686
 unsigned char SkipThemeRoom(int x, int y)
 {
     int i;
 
+
     for (i = 0; i < themeCount; i++) {
         if (x >= themeLoc[i].x - 2 && x <= themeLoc[i].x + themeLoc[i].width + 2
             && y >= themeLoc[i].y - 2 && y <= themeLoc[i].y + themeLoc[i].height + 2)
+
             return 0;
     }
 
     return 1;
 }
 
+#line 703
 void InitLevels()
 {
     if (!leveldebug) {
@@ -491,6 +528,5 @@ void InitLevels()
         leveltype = DTYPE_TOWN;
         setlevel = 0;
     }
-    for (int i = 0; i < 16; i++)
-        nSxy[i] = -1;
+    for (int i = 0; i < 16; i++) nSxy[i] = -1;
 }

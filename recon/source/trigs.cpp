@@ -79,6 +79,7 @@ unsigned char townwarps[3] = {0};
 int TWarpFrom = 0;
 
 /* @0x80075018 */
+#line 116
 void InitVPTriggers(void)
 {
     numtrigs = 1;
@@ -89,14 +90,14 @@ void InitVPTriggers(void)
 }
 
 /* @0x80075060 */
+#line 129
 BOOL FindLevTrig(int x, int y, int l)
 {
     int i;
-
     i = 0;
     while (TrigList[l][i] != -1) {
-        if (x == TrigList[l][i] && y == TrigList[l][i + 1])
-            return TRUE;
+
+        if (x == TrigList[l][i] && y == TrigList[l][i + 1]) return TRUE;
         i += 2;
     }
     return FALSE;
@@ -201,12 +202,14 @@ static void ScanBlocks(short *list)
 }
 
 /* @0x800754E8 */
+#line 257
 void BuildLevTrigs(void)
 {
     NoBlocks = 0;
     levlist = NULL;
 
     switch (leveltype) {
+
     case DTYPE_TOWN:
         ScanMap(TownDownList, 0);
         ScanMap(TownWarp1List, 1);
@@ -250,9 +253,14 @@ void DrawFRIG(void)
 }
 
 /* @0x8007569C */
+#line 370
 unsigned char ForceTownTrig(void)
 {
+
+
+
     if (FindLevTrig(cursmx, cursmy, 0)) {
+
         strcpy(_infostr[sel_data], GetStr(0x113));
         cursmx = 25;
         cursmy = 29;
@@ -260,7 +268,9 @@ unsigned char ForceTownTrig(void)
     }
 
     if (townwarps[0]) {
+
         if (FindLevTrig(cursmx, cursmy, 1)) {
+
             strcpy(_infostr[sel_data], GetStr(0x110));
             cursmx = 49;
             cursmy = 21;
@@ -269,7 +279,9 @@ unsigned char ForceTownTrig(void)
     }
 
     if (townwarps[1]) {
+
         if (FindLevTrig(cursmx, cursmy, 2)) {
+
             strcpy(_infostr[sel_data], GetStr(0x111));
             cursmx = 17;
             cursmy = 69;
@@ -278,11 +290,48 @@ unsigned char ForceTownTrig(void)
     }
 
     if (townwarps[2]) {
+
         if (FindLevTrig(cursmx, cursmy, 3)) {
+
             strcpy(_infostr[sel_data], GetStr(0x114));
             cursmx = 41;
             cursmy = 80;
             return TRUE;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
 
@@ -290,17 +339,23 @@ unsigned char ForceTownTrig(void)
 }
 
 /* @0x80075888 */
+#line 455
 unsigned char ForceL1Trig(void)
 {
     int j;
 
+
     if (FindLevTrig(cursmx, cursmy, 0)) {
+
         if (currlevel > 1)
             sprintf(_infostr[sel_data], GetStr(0x4A7), currlevel - 1);
         else
             strcpy(_infostr[sel_data], GetStr(0x4A8));
+
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABPREVLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
@@ -309,9 +364,12 @@ unsigned char ForceL1Trig(void)
     }
 
     if (FindLevTrig(cursmx, cursmy, 1)) {
+
         sprintf(_infostr[sel_data], GetStr(0x115), currlevel + 1);
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABNEXTLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
@@ -323,17 +381,22 @@ unsigned char ForceL1Trig(void)
 }
 
 /* @0x80075A48 */
+#line 498
 unsigned char ForceL2Trig(void)
 {
     int j;
     int dx, dy;
 
     if (FindLevTrig(cursmx, cursmy, 0)) {
+
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABPREVLVL) {
+
                 dx = abs(trigs[j]._tx - cursmx);
                 dy = abs(trigs[j]._ty - cursmy);
                 if (dx < 4 && dy < 4) {
+
                     sprintf(_infostr[sel_data], GetStr(0x4A7), currlevel - 1);
                     cursmx = trigs[j]._tx;
                     cursmy = trigs[j]._ty;
@@ -344,9 +407,12 @@ unsigned char ForceL2Trig(void)
     }
 
     if (FindLevTrig(cursmx, cursmy, 1)) {
+
         sprintf(_infostr[sel_data], GetStr(0x115), currlevel + 1);
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABNEXTLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
@@ -355,12 +421,17 @@ unsigned char ForceL2Trig(void)
     }
 
     if (currlevel == 5) {
+
         if (FindLevTrig(cursmx, cursmy, 2)) {
+
             for (j = 0; j < numtrigs; j++) {
+
                 if (trigs[j]._tmsg == WM_DIABTWARPUP) {
+
                     dx = abs(trigs[j]._tx - cursmx);
                     dy = abs(trigs[j]._ty - cursmy);
                     if (dx < 4 && dy < 4) {
+
                         strcpy(_infostr[sel_data], GetStr(0x4A8));
                         cursmx = trigs[j]._tx;
                         cursmy = trigs[j]._ty;
@@ -370,31 +441,39 @@ unsigned char ForceL2Trig(void)
             }
         }
     }
-
     return FALSE;
 }
 
 /* @0x80075D48 */
+#line 563
 unsigned char ForceL3Trig(void)
 {
     int j;
     int dx, dy;
-
     if (FindLevTrig(cursmx, cursmy, 0)) {
+
         sprintf(_infostr[sel_data], GetStr(0x4A7), currlevel - 1);
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABPREVLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
             }
         }
+
+
+
     }
 
     if (FindLevTrig(cursmx, cursmy, 1) || FindLevTrig(cursmx + 1, cursmy, 1) || FindLevTrig(cursmx + 2, cursmy, 1)) {
+
         sprintf(_infostr[sel_data], GetStr(0x115), currlevel + 1);
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABNEXTLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
@@ -403,12 +482,17 @@ unsigned char ForceL3Trig(void)
     }
 
     if (currlevel == 9) {
+
         if (FindLevTrig(cursmx, cursmy, 2)) {
+
             for (j = 0; j < numtrigs; j++) {
+
                 if (trigs[j]._tmsg == WM_DIABTWARPUP) {
+
                     dx = abs(trigs[j]._tx - cursmx);
                     dy = abs(trigs[j]._ty - cursmy);
                     if (dx < 4 && dy < 4) {
+
                         strcpy(_infostr[sel_data], GetStr(0x4A8));
                         cursmx = trigs[j]._tx;
                         cursmy = trigs[j]._ty;
@@ -418,20 +502,22 @@ unsigned char ForceL3Trig(void)
             }
         }
     }
-
     return FALSE;
 }
 
 /* @0x80076054 */
+#line 625
 unsigned char ForceL4Trig(void)
 {
     int j;
     int dx, dy;
-
     if (FindLevTrig(cursmx, cursmy, 0)) {
+
         sprintf(_infostr[sel_data], GetStr(0x4A7), currlevel - 1);
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABPREVLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
@@ -440,23 +526,30 @@ unsigned char ForceL4Trig(void)
     }
 
     if (FindLevTrig(cursmx, cursmy, 1)) {
+
         sprintf(_infostr[sel_data], GetStr(0x115), currlevel + 1);
         for (j = 0; j < numtrigs; j++) {
+
             if (trigs[j]._tmsg == WM_DIABNEXTLVL) {
+
                 cursmx = trigs[j]._tx;
                 cursmy = trigs[j]._ty;
                 return TRUE;
             }
         }
     }
-
     if (currlevel == 13) {
+
         if (FindLevTrig(cursmx, cursmy, 2)) {
+
             for (j = 0; j < numtrigs; j++) {
+
                 if (trigs[j]._tmsg == WM_DIABTWARPUP) {
+
                     dx = abs(trigs[j]._tx - cursmx);
                     dy = abs(trigs[j]._ty - cursmy);
                     if (dx < 4 && dy < 4) {
+
                         strcpy(_infostr[sel_data], GetStr(0x4A8));
                         cursmx = trigs[j]._tx;
                         cursmy = trigs[j]._ty;
@@ -466,12 +559,15 @@ unsigned char ForceL4Trig(void)
             }
         }
     }
-
     if (currlevel == 15) {
+
         if (FindLevTrig(cursmx, cursmy, 3)) {
+
             strcpy(_infostr[sel_data], GetStr(0x112));
             for (j = 0; j < numtrigs; j++) {
+
                 if (trigs[j]._tmsg == WM_DIABNEXTLVL) {
+
                     cursmx = trigs[j]._tx;
                     cursmy = trigs[j]._ty;
                     return TRUE;
@@ -479,7 +575,6 @@ unsigned char ForceL4Trig(void)
             }
         }
     }
-
     return FALSE;
 }
 
@@ -502,9 +597,13 @@ void Freeupstairs(void)
 }
 
 /* @0x80076440 */
+#line 715
 unsigned char ForceSKingTrig(void)
 {
+
+
     if (FindLevTrig(cursmx, cursmy, 0)) {
+
         sprintf(_infostr[sel_data], GetStr(0x3B), quests[Q_SKELKING]._qlevel);
         cursmx = trigs[0]._tx;
         cursmy = trigs[0]._ty;
@@ -515,9 +614,13 @@ unsigned char ForceSKingTrig(void)
 }
 
 /* @0x800764CC */
+#line 732
 unsigned char ForceSChambTrig(void)
 {
+
+
     if (FindLevTrig(cursmx, cursmy, 1)) {
+
         sprintf(_infostr[sel_data], GetStr(0x3B), quests[Q_SCHAMB]._qlevel);
         cursmx = trigs[0]._tx;
         cursmy = trigs[0]._ty;
@@ -528,9 +631,13 @@ unsigned char ForceSChambTrig(void)
 }
 
 /* @0x80076558 */
+#line 749
 unsigned char ForcePWaterTrig(void)
 {
+
+
     if (FindLevTrig(cursmx, cursmy, 1)) {
+
         sprintf(_infostr[sel_data], GetStr(0x3B), quests[Q_PWATER]._qlevel);
         cursmx = trigs[0]._tx;
         cursmy = trigs[0]._ty;
@@ -599,6 +706,7 @@ void CheckTrigForce(void)
 }
 
 /* @0x800768F0 */
+#line 832
 void FadeGameOut(void)
 {
     PA_SetPauseOk(0);
@@ -607,8 +715,14 @@ void FadeGameOut(void)
     music_fade();
     stream_stop();
     if (PaletteFadeOut(8)) {
+
         while (GetFadeState()) {
+
             TSK_Sleep(1);
+
+
+
+
         }
     }
     GLUE_SetHomingScrollFlag(1);
@@ -643,6 +757,7 @@ BOOL IsTrigger(int x, int y)
 }
 
 /* @0x80076A8C */
+#line 887
 static BOOL CheckTrigLevel(int level)
 {
     if (plr[0]._pLevel >= level || plr[1]._pLevel >= level)

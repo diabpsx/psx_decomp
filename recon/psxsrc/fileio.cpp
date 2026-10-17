@@ -62,6 +62,7 @@ void strupr(char *Str);
 char FileIO::FileToLoad[50];   /* @0x800B7970 (SYM EXT _6FileIO.FileToLoad) */
 
 /* @0x8008587C FILEIO.CPP:61 */
+#line 60
 FileIO::FileIO(unsigned long OurMemId)
 {
     hndPath = -1;
@@ -69,6 +70,7 @@ FileIO::FileIO(unsigned long OurMemId)
 }
 
 /* @0x800858CC FILEIO.CPP:70 */
+#line 69
 FileIO::~FileIO()
 {
     DumpOldPath();
@@ -95,16 +97,23 @@ long FileIO::Read(const char *Name, unsigned long RamId)
 }
 
 /* @0x80085A90 FILEIO.CPP:112 */
+#line 111
 int FileIO::FileLen(const char *Name)
 {
+
+
     if (!FindFile(Name, FileToLoad))
+
+
         return -1;
     return GetFileLength(FileToLoad);
 }
 
 /* @0x80085AF4 FILEIO.CPP:129 */
+#line 128
 void FileIO::FileNotFound(const char *Name)
 {
+
     DBG_Halt();
 }
 
@@ -180,28 +189,37 @@ BOOL FileIO::FindFile(const char *Name, char *Buffa)
 }
 
 /* @0x80085F0C FILEIO.CPP:254 */
+#line 253
 char *FileIO::CopyPathItem(char *Dst, const char *Src)
 {
     const char *Ptr = Src;
     int Len;
-
     while (*Ptr && *Ptr != ';')
+
         Ptr++;
+
+
     Len = Ptr - Src;
+
     if (Len) {
+
         memcpy(Dst, Src, Len);
         Dst[Len] = 0;
         if (*Ptr)
             return (char *)Ptr + 1;
+
         return (char *)Ptr;
+
     }
     return NULL;
 }
 
 /* @0x80085FB4 FILEIO.CPP:282 */
+#line 281
 void FileIO::LockSearchPath()
 {
     if (SearchPathExists()) {
+
         SearchPath = (char *)GAL_Lock(hndPath);
         ASSERT(SearchPath, 0x11E);
     }
@@ -217,12 +235,14 @@ void FileIO::UnlockSearchPath()
 }
 
 /* @0x80086064 FILEIO.CPP:308 */
+#line 307
 BOOL FileIO::SearchPathExists()
 {
     return hndPath != -1;
 }
 
 /* @0x80086078 FILEIO.CPP:317 */
+#line 316
 BOOL FileIO::Save(const char *Name, unsigned char *Addr, int Len)
 {
     return LoSave(Name, Addr, Len);

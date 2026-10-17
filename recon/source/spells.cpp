@@ -38,9 +38,15 @@
 
 #define PC_WARRIOR 0
 
+#line 53
 int GetManaAmount(int id, int sn)
 {
     int i;
+
+
+
+
+
     int sl, ma, adj;
 
     adj = 0;
@@ -48,10 +54,13 @@ int GetManaAmount(int id, int sn)
     if (sl < 0) sl = 0;
     for (i = sl; i > 0; i--) adj += spelldata[sn].sManaAdj;
 
+
+
     if (sn == SPL_FIREBOLT) adj = adj >> 1;
     if (sn == SPL_RESURRECT && sl > 0) {
         adj = 0;
         for (i = sl; i > 0; i--) adj += spelldata[sn].sManaCost >> 3;
+
     }
 
     if (spelldata[sn].sManaCost == 0xFF)
@@ -59,17 +68,24 @@ int GetManaAmount(int id, int sn)
     else
         ma = (spelldata[sn].sManaCost - adj) << 6;
 
+
     if (sn == SPL_HEAL) ma = ((plr[id]._pLevel << 1) + spelldata[SPL_HEAL].sManaCost - adj) << 6;
     if (sn == SPL_HEALOTHER) ma = ((plr[id]._pLevel << 1) + spelldata[SPL_HEAL].sManaCost - adj) << 6;
     if (sn == SPL_RESURRECT) {
         adj = 0;
         for (i = sl; i > 0; i--) adj += spelldata[sn].sManaCost;
+
+
+
+
+
     }
 
-    if (plr[id]._pClass == PC_ROGUE)
-        ma -= (ma >> 2);
+    if (plr[id]._pClass == PC_ROGUE) ma -= (ma >> 2);
+
 
     if (spelldata[sn].sMinMana > (ma >> 6)) ma = spelldata[sn].sMinMana << 6;
+
     ma = (ma * (100 - plr[id]._pISplCost)) / 100;
 
     return (ma);

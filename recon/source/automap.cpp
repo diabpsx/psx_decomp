@@ -37,37 +37,38 @@ unsigned short automaptype[512] = { 0 };
 #define addPrim(ot, p) (setaddr(p, getaddr(ot)), setaddr(ot, p))
 
 /* line 130 @0x80161F58 */
+#line 129
 void StartAutomap(void)
 {
     automapflag = 1;
 }
 
 /* line 136 @0x80161F68 */
+#line 135
 void AutomapUp(void)
 {
-    if (AutoMapYOfs >= -0x27)
-        AutoMapYOfs -= 2;
+    if (AutoMapYOfs >= -0x27) AutoMapYOfs -= 2;
 }
 
 /* line 142 @0x80161F88 */
+#line 141
 void AutomapDown(void)
 {
-    if (AutoMapYOfs < 0x28)
-        AutoMapYOfs += 2;
+    if (AutoMapYOfs < 0x28) AutoMapYOfs += 2;
 }
 
 /* line 148 @0x80161FA8 */
+#line 147
 void AutomapLeft(void)
 {
-    if (AutoMapXOfs >= -0x4F)
-        AutoMapXOfs -= 2;
+    if (AutoMapXOfs >= -0x4F) AutoMapXOfs -= 2;
 }
 
 /* line 154 @0x80161FC8 */
+#line 153
 void AutomapRight(void)
 {
-    if (AutoMapXOfs < 0x50)
-        AutoMapXOfs += 2;
+    if (AutoMapXOfs < 0x50) AutoMapXOfs += 2;
 }
 
 /* line 176 @0x80161FE8 */
@@ -104,23 +105,30 @@ void AmDrawPlayer(int x0, int y0, int x1, int y1, int PNum)
 /* line 221 @0x80162124 -- twin: devilution DrawAutomapPlr's per-direction 3-segment marker, but each
  * segment is a colored AmDrawPlayer() GPU line (not a generic DrawLine), one marker per active
  * player (2-player split-screen), using this player's AMPx/AMPy offset from DrawAutomap. */
+#line 220
 void DrawAutomapPlr(void)
 {
     int x, y;
+
+
     int automaps3, automaps4, automaps5;
 
     automaps3 = AutoMapScale;
+
+
+
     automaps4 = automaps3 >> 1;
     automaps5 = automaps3 >> 2;
 
     for (int pc = 0; pc < 2; pc++) {
+
         if (!plr[pc].plractive)
             continue;
-
         x = AutoMapXOfs + AMPx[pc] + 0x9E;
         y = AutoMapYOfs + AMPy[pc] + 0x65;
 
         switch (plr[pc]._pdir) {
+
         case 4:
             AmDrawPlayer(x, y, x, y - automaps3, pc);
             AmDrawPlayer(x, y - automaps3, x - automaps5, y - automaps4, pc);
@@ -160,15 +168,19 @@ void DrawAutomapPlr(void)
             AmDrawPlayer(x, y, x - automaps3, y - automaps4, pc);
             AmDrawPlayer(x - automaps3, y - automaps4, x - automaps4, y - automaps4, pc);
             AmDrawPlayer(x - automaps3, y - automaps4, x - automaps4 - automaps5, y, pc);
+
             break;
         }
     }
 }
 
 /* line 335 @0x80162490 */
+#line 334
 void DrawAutoMapVertDoor(int X, int Y)
 {
     LINE_F2 *L2;
+
+
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
 
     Frac = AutoMapScale >> 1;
@@ -176,6 +188,7 @@ void DrawAutoMapVertDoor(int X, int Y)
     Y *= AutoMapScale;
     Lx = (X - Y) * 2;
     Ly = Y + X;
+
     Lx += AMPlayerX; Ly += AMPlayerY;
 
     L2 = AMGetLine(0x5F, 0x58, 0x38);
@@ -210,9 +223,12 @@ void DrawAutoMapVertDoor(int X, int Y)
 }
 
 /* line 383 @0x8016264C */
+#line 382
 void DrawAutoMapHorzDoor(int X, int Y)
 {
     LINE_F2 *L2;
+
+
     int Lx, Ly, Frac, y0, x1, y1, y2, x3;
 
     Frac = AutoMapScale >> 1;

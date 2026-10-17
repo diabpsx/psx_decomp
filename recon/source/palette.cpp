@@ -35,30 +35,72 @@ int mode = 0;
 static unsigned char FadeCoords[8]  = { 0, 0, 0xB0, 0, 0, 0x78, 0xB0, 0x78 };
 static unsigned char FadeCoords2[8] = { 0, 0x58, 0xB0, 0x55, 0, 0x78, 0xB0, 0x78 };
 
+#line 77
 void LoadPalette(const char *pszFileName)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
+#line 104
 void LoadRndLvlPal(int l)
 {
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
+#line 122
 void ResetPal(void)
 {
+
+
+
+
+
 }
 
+#line 136
 static void SetFadeLevel(int fadeval)
 {
     int nval;
 
     nval = 0x80 - fadeval;
-    if (nval < 0)
-        nval = 0;
-    if (nval > 0x80)
-        nval = 0x80;
+    if (nval < 0) nval = 0;
+    if (nval > 0x80) nval = 0x80;
+
     screenbright = nval;
 }
 
+#line 178
 BOOL GetFadeState(void)
 {
     return fading;
@@ -101,8 +143,31 @@ static void SetPolyXY(POLY_GT4 *gt4, unsigned char *coords)
 }
 
 
+#line 231
 void SmearScreen(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void DrawFadedScreen(void)
@@ -139,9 +204,14 @@ void BlackPalette(void)
     TSK_Sleep(1);
 }
 
+#line 310
 void PaletteFadeInTask(TASK *T)
 {
     int i;
+
+
+
+
 
     i = 0;
     VID_GetTick();
@@ -149,13 +219,19 @@ void PaletteFadeInTask(TASK *T)
         int dummy;   /* dead local: retail SYM keeps a record-less level at the loop test */
         SetFadeLevel(i);
         DrawFadedScreen();
+
+
+
         i += faderate;
+
         TSK_Sleep(1);
     }
     SetFadeLevel(0x80);
     DrawFadedScreen();
     TSK_Sleep(1);
+
     fading = 0;
+
     SetFadeLevel(0x80);
     DrawFadedScreen();
     TSK_Sleep(1);
@@ -172,9 +248,13 @@ BOOL PaletteFadeIn(int fr)
     return 1;
 }
 
+#line 360
 void PaletteFadeOutTask(TASK *T)
 {
     int i = 0x80;
+
+
+
 
     VID_GetTick();
     while (i >= 0) {
@@ -182,18 +262,28 @@ void PaletteFadeOutTask(TASK *T)
         SetFadeLevel(i);
         SmearScreen();
         DrawFadedScreen();
+
+
+
         i -= faderate;
+
         TSK_Sleep(1);
+
+
+
     }
     SetFadeLevel(0);
     DrawFadedScreen();
     TSK_Sleep(1);
+
     SetFadeLevel(0);
     DrawFadedScreen();
     TSK_Sleep(1);
+
     BlackPalette();
     sgbFadedIn = 0;
     fading = 0;
+
     BlackPalette();
     BlackPalette();
 }

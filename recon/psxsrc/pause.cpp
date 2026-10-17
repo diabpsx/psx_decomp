@@ -56,7 +56,9 @@ class CPauseMessages {
 public:
     int PadNum;   /* +0x0 ; vptr at +0x4 */
 
+#line 85
     CPauseMessages() {}
+#line 86
     virtual ~CPauseMessages() {}
     void DoPause(int nPadNum);
     BOOL DoPausedMessage();
@@ -78,6 +80,7 @@ class CTempPauseMessage : public CPauseMessages {
 public:
     struct TextDat *TData;   /* +0x8 */
 
+#line 115
     CTempPauseMessage() { TData = GM_UseTexData(0); }
     ~CTempPauseMessage();
     void MY_PausePrint(int s, int Txt, int Menu, struct RECT *PRect);
@@ -155,12 +158,26 @@ static int GetPausePad();
 static BOOL TryPadForPause(int);
 
 /* @0x800884C8 PAUSE.CPP:181 */
+#line 180
 static void PauseTask(TASK *T)
 {
     TPtr = T;
+
+
+
+
+
+
+
+
+
+
+
     while (1) {
         CTempPauseMessage Cpm;
+
         Cpm.DoPause(GetPausePad());
+
         Paused = 0;
     }
 }
@@ -194,8 +211,12 @@ static int GetPausePad(void)
 }
 
 /* @0x80088640 PAUSE.CPP:251 */
+#line 250
 static BOOL TryPadForPause(int PadNum)
 {
+
+
+
     if (PAD_GetPad(PadNum, 0)->GetDown() & 0x10)
         return true;
     return false;
@@ -275,6 +296,7 @@ BOOL CPauseMessages::DoPausedMessage()
 }
 
 /* @0x800889B4 PAUSE.CPP:462 */
+#line 461
 int CPauseMessages::DoQuitMessage()
 {
     int RetVal = 0;
@@ -282,30 +304,44 @@ int CPauseMessages::DoQuitMessage()
     int Menu = 1;
 
     InitPrintQuitMessage();
+
     while (!Done) {
         unsigned short PadVal;
         PrintQuitMessage(Menu);
+
         TSK_Sleep(1);
+
         PadVal = PAD_GetPad(PadNum, 1)->GetDown();
+
         if (PadVal & 3) {
+
+
             PlaySFX(0x32);
             Menu = !Menu;
+
         }
         if (PadVal & 0x50) {
+
             PlaySFX(0x33);
             Done = true;
             RetVal = !Menu;
+
+
         } else if (PadVal & 0x100) {
+
             PlaySFX(0x33);
             Done = true;
             RetVal = 0;
+
         }
     }
     LeavePrintQuitMessage(Menu);
+
     return RetVal;
 }
 
 /* @0x80088AD4 PAUSE.CPP:511 */
+#line 510
 BOOL CPauseMessages::AreYouSureMessage()
 {
     BOOL RetVal = false;
@@ -313,33 +349,45 @@ BOOL CPauseMessages::AreYouSureMessage()
     int Menu = 1;
 
     InitPrintAreYouSure();
+
     while (!Done) {
         unsigned short PadVal;
         PrintAreYouSure(Menu);
+
         TSK_Sleep(1);
+
         PadVal = PAD_GetPad(PadNum, 1)->GetDown();
+
         if (PadVal & 3) {
+
             PlaySFX(0x32);
             Menu = !Menu;
+
         }
         if (PadVal & 0x40) {
+
             PlaySFX(0x33);
             Done = true;
             RetVal = Menu;
+
         }
         if (PadVal & 0x100) {
+
             PlaySFX(0x33);
             Done = true;
             RetVal = true;
+
         }
     }
     LeavePrintAreYouSure(Menu);
+
     return RetVal;
 }
 
 /* @0x800B06E4 PAUSE.CPP:560 -- retail links this one into .STARTUP_text (startup segment); kept at its
  * source position here (it is also what keeps the static PauseTask referenced). */
 void PA_Open(void) __attribute__((section(".STARTUP_text")));
+#line 559
 void PA_Open(void)
 {
     CanPause = false;
@@ -348,6 +396,7 @@ void PA_Open(void)
 }
 
 /* @0x80088BF4 PAUSE.CPP:573 */
+#line 572
 BOOL PA_SetPauseOk(BOOL NewPause)
 {
     BOOL Ret = CanPause;
@@ -356,6 +405,7 @@ BOOL PA_SetPauseOk(BOOL NewPause)
 }
 
 /* @0x80088C04 PAUSE.CPP:586 */
+#line 585
 BOOL PA_GetPauseOk(void)
 {
     return CanPause;
@@ -388,6 +438,7 @@ void CTempPauseMessage::MY_PausePrint(int s, int Txt, int Menu, struct RECT *PRe
 }
 
 /* @0x80088E50 PAUSE.CPP:637 */
+#line 636
 void CTempPauseMessage::InitPrintQuitMessage()
 {
 }
@@ -421,11 +472,13 @@ void CTempPauseMessage::PrintQuitMessage(int Menu)
 }
 
 /* @0x80088FD0 PAUSE.CPP:669 */
+#line 668
 void CTempPauseMessage::LeavePrintQuitMessage(int Menu)
 {
 }
 
 /* @0x80088FD8 PAUSE.CPP:673 */
+#line 672
 void CTempPauseMessage::InitPrintAreYouSure()
 {
 }
@@ -459,11 +512,13 @@ void CTempPauseMessage::PrintAreYouSure(int Menu)
 }
 
 /* @0x80089158 PAUSE.CPP:706 */
+#line 705
 void CTempPauseMessage::LeavePrintAreYouSure(int Menu)
 {
 }
 
 /* @0x80089160 PAUSE.CPP:710 */
+#line 709
 void CTempPauseMessage::InitPrintPaused()
 {
 }
@@ -496,11 +551,13 @@ void CTempPauseMessage::PrintPaused()
 }
 
 /* @0x800892B8 PAUSE.CPP:761 */
+#line 760
 void CTempPauseMessage::LeavePrintPaused()
 {
 }
 
 /* @0x800892C0 PAUSE.CPP:765 */
+#line 764
 CTempPauseMessage::~CTempPauseMessage()
 {
 }

@@ -104,23 +104,59 @@ CdIO::CdIO(unsigned long OurMemId) : FileIO(OurMemId)
 }
 
 /* @0x80086C84 CDIO.CPP:136 */
+#line 135
 CdIO::~CdIO()
 {
 }
 
 /* @0x80086CDC CDIO.CPP:146 */
+#line 145
 BOOL CdIO::FileExists(const char *Name)
 {
+
+
+
+
+
+
+
+
+
     return BL_FileExists((char *)Name, 1);
 }
 
 /* @0x80086D00 CDIO.CPP:168 */
+#line 167
 BOOL CdIO::LoReadFileAtAddr(const char *Name, unsigned char *Dest, int Len)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if (CDWAIT && !IsGameLoading() && BL_FileExists((char *)Name, 0)) {
+
         if (BL_AsyncLoadFileAtAddr((char *)Name, Dest, 0)) {
+
             BL_WaitForAsyncFinish();
             return 1;
+
         }
         return 0;
     }
@@ -128,8 +164,18 @@ BOOL CdIO::LoReadFileAtAddr(const char *Name, unsigned char *Dest, int Len)
 }
 
 /* @0x80086D9C CDIO.CPP:209 */
+#line 208
 int CdIO::GetFileLength(const char *Name)
 {
+
+
+
+
+
+
+
+
+
     return BL_FileLength((char *)Name, 1);
 }
 
@@ -151,12 +197,24 @@ BOOL CdIO::LoSave(const char *Name, unsigned char *Addr, int Len)
 }
 
 /* @0x80086E94 CDIO.CPP:268 */
+#line 267
 BOOL CD_GetCdlFILE(const char *Name, struct CdlFILE *RetFile)
 {
     char SearchBuffer[256];
 
+
+
     sprintf(SearchBuffer, "\\%s;1", Name);
+
+
+
+
     while (!CdSearchFile(RetFile, SearchBuffer))
+
+
+
+
+
         ;
     return 1;
 }

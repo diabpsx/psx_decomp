@@ -48,6 +48,8 @@ public:
 
 BOOL iscflag;   /* @0x8011BE34: GAMEMENU.CPP's one surviving small-data global, after the literal pool */
 
+#line 63
 void gamemenu_off(void)
 {
+
 }

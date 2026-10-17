@@ -47,19 +47,39 @@ int sfxdnum = 0;
 #include "source/gen/table_effects.h"
 
 /* line 83 @0x8003CF34 */
+#line 82
 unsigned char effect_is_playing(int nSFX)
 {
-    if (sghStream && sghStream->SfxNo == nSFX) return 1;
+
+
+
+
+
+
+
+
+
+
+    if (sghStream && sghStream->SfxNo == nSFX)
+
+        return 1;
+
+
     return 0;
 }
 
 /* line 107 @0x8003CF5C */
+#line 106
 void stream_stop(void)
 {
+
     if (FileSYS == 2) {
+
         SFXTab[1].volume = 0;
         STR_setvolume(&SFXTab[1]);
         if (sghStream) {
+
+
             STR_SoundCommand(sghStream, 8);
             TSK_Sleep(1);
         }
@@ -87,29 +107,67 @@ void stream_resume(void)
 }
 
 /* line 169 @0x8003D06C */
+#line 168
 static void stream_play(TSFX *pSFX, long lVolume, long lPan)
 {
+
+
+
+
     if (FileSYS != 2) return;
+
     if (CDWAIT) return;
 
+
+
+
+
+
+
+
+
     if (pSFX->bFlags & sfx_STREAM) {
+
         lVolume = (sglSoundVolume * sglMasterVolume) >> 8;
         stream_stop();
+
+
     } else {
-        if (!(pSFX->bFlags & 0x70)) stream_stop();
+        if (!(pSFX->bFlags & 0x70))
+
+            stream_stop();
+
+
         lVolume = (sglSpeechVolume * sglMasterVolume) >> 8;
     }
-
     if (lVolume < 0) return;
     if (lVolume >= 0x4000) lVolume = 0x3FFF;
 
     sghStream = STR_PlaySound(pSFX->pszName, 0, lVolume, 0);
     sgpStreamSFX = pSFX;
+
+
 }
 
 /* line 213 @0x8003D158 */
+#line 212
 static void stream_update(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* line 235 @0x8003D160 */
@@ -119,17 +177,67 @@ static void sfx_stop(void)
 }
 
 /* line 249 @0x8003D17C */
+#line 248
 void InitMonsterSND(int monst)
 {
+
     if (!gbSndInited) return;
 
+
     int mtype = Monsters[monst].mtype;
+
     Monsters[monst].Snds = monsterdata[mtype].sndfile;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* line 286 @0x8003D1D4 */
+#line 285
 void FreeMonsterSnd(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* line 327 @0x8003D1DC */
@@ -221,26 +329,57 @@ static void PlaySFX_priv(TSFX *pSFX, unsigned char loc, int x, int y)
 }
 
 /* line 433 @0x8003D528 */
+#line 432
 void PlayEffect(int i, int mode)
 {
+
+
+
     ENG_random(2);
 
+
+
+
     if (plr[myplr].pLvlLoad) return;
+
+
     if (!gbSndInited) return;
+
+
+
+
+
+
+
     if (gbBufferMsgs) return;
 
+
     int mi = monster[i]._mMTidx;
+
+
+
+
+
+
+
+
+
+
+
     if (snd_playing(Monsters[mi].Snds + mode)) return;
+
 
     long lPan;
     long lVolume;
     if (!calc_snd_position(monster[i]._mx, monster[i]._my, &lVolume, &lPan))
+
         return;
 
     snd_play_msnd((Monsters[mi].Snds + mode) & 0xFFFF, lVolume, lPan);
 }
 
 /* line 485 @0x8003D670 */
+#line 484
 static int RndSFX(int psfx)
 {
     int nRand;
@@ -249,14 +388,23 @@ static int RndSFX(int psfx)
     else if (psfx == 0x2D9) nRand = 3;
     else if (psfx == 0x2DC) nRand = 3;
     else if (psfx == 0x2DF) nRand = 3;
+
     else if (psfx == 0x240) nRand = 2;
     else if (psfx == 0x2A8) nRand = 2;
+
     else if (psfx == 0x9) nRand = 2;
     else if (psfx == 0x43) nRand = 2;
+
     else if (psfx == 0x2C) nRand = 2;
     else if (psfx == 0x10) nRand = 2;
-    else if (psfx == 0) return 2;
+    else if (psfx == 0)
+
+
+        return 2;
+
+
     else if (psfx == 0x2CD) nRand = 3;
+
     else return psfx;
 
     return psfx + ENG_random(nRand);
@@ -290,11 +438,14 @@ void PlaySfxLoc(int psfx, int x, int y)
 }
 
 /* line 554 @0x8003D830 */
+#line 553
 void sound_stop(void)
 {
+
     snd_update(1);
     stream_stop();
     sfx_stop();
+
 
     int mi, mode, nr;
     for (mi = 0; mi < nummtypes; mi++) {
@@ -308,23 +459,49 @@ void sound_stop(void)
 }
 
 /* line 576 @0x8003D8C8 */
+#line 575
 void sound_update(void)
 {
+
     if (!gbSndInited) return;
+
     snd_update(0);
     stream_update();
+
+
+
+
 }
 
 /* line 594 @0x8003D8FC */
+#line 593
 static void priv_sound_init(unsigned char bLoadMask)
 {
+
     if (!gbSndInited) return;
+
+
+
 
     unsigned char bCharMask = bLoadMask & sfx_CHAR_MASK;
     bLoadMask ^= bCharMask;
 
+
     for (unsigned long d = 0; d < NUM_SFX; d++) {
+
+
+
+
         if (sgSFX[d].bFlags & sfx_STREAM) continue;
+
+
+
+
+
+
+
+
+
         if (bLoadMask && !(sgSFX[d].bFlags & bLoadMask)) continue;
         if (sgSFX[d].bFlags & sfx_CHAR_MASK) {
             if (!(sgSFX[d].bFlags & bCharMask)) continue;
@@ -333,6 +510,7 @@ static void priv_sound_init(unsigned char bLoadMask)
 }
 
 /* line 631 @0x8003D940 */
+#line 630
 void sound_init(void)
 {
     unsigned char bLoadMask = 0;
@@ -344,14 +522,22 @@ void sound_init(void)
         bLoadMask = sfx_ROGUE;
     else if (plr[myplr]._pClass == 2)
         bLoadMask = sfx_SORCEROR;
+
+
+
     priv_sound_init(bLoadMask);
 }
 
 /* line 656 @0x8003D9E8 */
+#line 655
 void stream_fade(void)
 {
+
     if (FileSYS == 2) {
+
         if (sghStream)
+
+
             STR_SoundCommand(sghStream, 5);
     }
 }

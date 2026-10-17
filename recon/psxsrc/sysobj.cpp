@@ -25,6 +25,7 @@ public:
 long SysObj::NewHnd = -1;
 
 /* @0x80086618 SYSOBJ.CPP */
+#line 64
 SysObj::SysObj()
 {
     MemHnd = NewHnd;
@@ -32,6 +33,7 @@ SysObj::SysObj()
 }
 
 /* @0x80086630 SYSOBJ.CPP */
+#line 76
 void *SysObj::operator new(int Amount)
 {
     DBG_Error(NULL, "psxsrc/SYSOBJ.CPP", 78);
@@ -39,18 +41,20 @@ void *SysObj::operator new(int Amount)
 }
 
 /* @0x8008665C SYSOBJ.CPP */
+#line 88
 void *SysObj::operator new(int Amount, unsigned long RamID)
 {
     long hnd;
     void *RetAddr;
 
     hnd = GAL_Alloc(Amount, RamID, NULL);
-    if (hnd == -1)
-        DBG_Error(NULL, "psxsrc/SYSOBJ.CPP", 94);
+    if (hnd == -1) DBG_Error(NULL, "psxsrc/SYSOBJ.CPP", 94);
+
     RetAddr = GAL_Lock(hnd);
-    if (!RetAddr)
-        DBG_Error(NULL, "psxsrc/SYSOBJ.CPP", 97);
+    if (!RetAddr) DBG_Error(NULL, "psxsrc/SYSOBJ.CPP", 97);
+
     NewHnd = hnd;
+
     return RetAddr;
 }
 

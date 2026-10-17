@@ -124,11 +124,13 @@ unsigned char IsDplayer(int x, int y)
     return 0;
 }
 
+#line 281
 BOOL ismyplr(PlayerStruct *ptrplr)
 {
     return &plr[myplr] == ptrplr;
 }
 
+#line 286
 int plrind(PlayerStruct *ptrplr)
 {
     return ptrplr != plr;
@@ -144,16 +146,42 @@ void InitPlayerGFX(PlayerStruct *ptrplr)
 
 /* PSX has no separately-allocated player GFX buffer to free (GLIB texture pool owns it) --
  * devilution's mem_freeing FreePlayerGFX collapses to clearing the load-state flag. */
+#line 539
 void FreePlayerGFX(PlayerStruct *ptrplr)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     ptrplr->_pGFXLoad = 0;
 }
 
 /* PSX stores an equipment-index BYTE (peq) for the GLIB texture pool instead of devilution's
  * BYTE* frame-data pointer (_pAnimData) -- no 5th `width` arg either (unused by the PSX renderer). */
+#line 565
 void NewPlrAnim(PlayerStruct *ptrplr, int Peq, int numFrames, int Delay)
 {
+
+
+
+
+
     ptrplr->peq = Peq;
+
     ptrplr->_pAnimLen = numFrames;
     ptrplr->_pAnimFrame = 1;
     ptrplr->_pAnimCnt = 0;
@@ -162,19 +190,39 @@ void NewPlrAnim(PlayerStruct *ptrplr, int Peq, int numFrames, int Delay)
 
 /* PSX oracle clears _pVar1-5 and _pVar8 but leaves _pVar6/_pVar7 untouched (devilution clears
  * all 8) -- transcribed literally, a genuine PSX behavioural delta, not a typo on our part. */
+#line 585
 void ClearPlrPVars(PlayerStruct *ptrplr)
 {
+
+
+
     ptrplr->_pVar1 = 0;
     ptrplr->_pVar2 = 0;
     ptrplr->_pVar3 = 0;
     ptrplr->_pVar4 = 0;
     ptrplr->_pVar5 = 0;
+
+
     ptrplr->_pVar8 = 0;
 }
 
+#line 603
 void SetPlrAnims(PlayerStruct *ptrplr)
 {
     int gn, pc;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     pc = ptrplr->_pClass;
     if (leveltype == 0) {
@@ -183,6 +231,7 @@ void SetPlrAnims(PlayerStruct *ptrplr)
         ptrplr->_pDFrames = PlrGFXAnimLens[pc][4];
         ptrplr->_pSFrames = PlrGFXAnimLens[pc][5];
         ptrplr->_pSFNum = PlrGFXAnimLens[pc][10];
+
     } else {
         ptrplr->_pNFrames = PlrGFXAnimLens[pc][0];
         ptrplr->_pWFrames = PlrGFXAnimLens[pc][2];
@@ -198,35 +247,46 @@ void SetPlrAnims(PlayerStruct *ptrplr)
     gn = ptrplr->_pgfxnum & 0xF;
     if (pc == CLASS_WARRIOR) {
         if (gn == 4) {
-            if (leveltype != 0)
-                ptrplr->_pNFrames = 8;
+            if (leveltype != 0) ptrplr->_pNFrames = 8;
+
             ptrplr->_pAFNum = 11;
+
         } else if (gn == 5) {
             ptrplr->_pAFrames = 20;
             ptrplr->_pAFNum = 10;
+
         } else if (gn == 8) {
             ptrplr->_pAFrames = 16;
             ptrplr->_pAFNum = 11;
+
+
         }
     } else if (pc == CLASS_ROGUE) {
         if (gn == 5) {
             ptrplr->_pAFrames = 22;
             ptrplr->_pAFNum = 13;
+
         } else if (gn == 4) {
             ptrplr->_pAFrames = 12;
             ptrplr->_pAFNum = 7;
+
         } else if (gn == 8) {
             ptrplr->_pAFrames = 16;
             ptrplr->_pAFNum = 11;
+
         }
     } else if (pc == CLASS_SORCERER) {
+
         if (gn == 0) {
             ptrplr->_pAFrames = 20;
+
         } else if (gn == 1) {
             ptrplr->_pAFNum = 9;
+
         } else if (gn == 4) {
             ptrplr->_pAFrames = 20;
             ptrplr->_pAFNum = 16;
+
         } else if (gn == 5) {
             ptrplr->_pAFrames = 24;
             ptrplr->_pAFNum = 16;
@@ -350,6 +410,7 @@ void CreatePlayer(PlayerStruct *ptrplr, char c)
     SetRndSeed(0);
 }
 
+#line 857
 int CalcStatDiff(PlayerStruct *ptrplr)
 {
     int c = ptrplr->_pClass;
@@ -554,25 +615,40 @@ void InitPlayer(PlayerStruct *ptrplr, unsigned char FirstTime)
 
 /* PSX oracle is `jr ra; nop` -- ViewX/ViewY aren't primed here (each player's own screen tracks its
  * own view directly; unlike PC there's no single shared ViewX/ViewY camera to seed at level start). */
+#line 1199
 void InitMultiView(void)
 {
+
+
+
+
+
 }
 
 /* PSX tail-calls the GLIB dpiece-flag accessor instead of devilution's nSolidTable[dPiece[x][y]]
  * lookup (and drops the bounds check -- callers already clamp). */
+#line 1338
 unsigned char SolidLoc(int x, int y)
 {
+
+
+
+
+
     return GetSOLID(x, y);
 }
 
 /* PSX keeps dTransVal as a FIELD of dung_map[x][y] (not a separate array) -- loop nesting is
  * devilution's original i(y) outer / j(x) inner. */
+#line 1401
 void PlrClrTrans(int x, int y)
 {
     int i, j;
 
+
     for (j = y - 1; j <= y + 1; j++) {
         for (i = x - 1; i <= x + 1; i++) {
+
             TransList[dung_map[i][j].dTransVal] = FALSE;
         }
     }
@@ -595,8 +671,11 @@ void PlrDoTrans(int x, int y)
     }
 }
 
+#line 1440
 void SetPlayerOld(PlayerStruct *ptrplr)
 {
+
+
     ptrplr->_poldx = ptrplr->_px;
     ptrplr->_poldy = ptrplr->_py;
 }
@@ -605,24 +684,49 @@ void SetPlayerOld(PlayerStruct *ptrplr)
  * load), FixPlayerLocation/FixPlrWalkTags/dPlayer-occupancy write (no such grid maintained here --
  * RemovePlrFromMap below is a matching no-op), and calls StartPlrKill (not SyncPlrKill). `_pdir` is
  * stored unconditionally before the invincible/dead/local-player kill check. */
+#line 1479
 void StartStand(PlayerStruct *ptrplr, int dir)
 {
     ptrplr->_pdir = dir;
+
+
+
+
+
+
     if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
         StartPlrKill(ptrplr, -1);
         return;
+
+
     }
     NewPlrAnim(ptrplr, 0, ptrplr->_pNFrames, 3);
     ptrplr->_pmode = PM_STAND;
     ptrplr->_pVar5 = 1;
+
+
+
     SetPlayerOld(ptrplr);
 }
 
 /* PSX drops devilution's CheckEFlag() call and the ScrollInfo/_sdir/ViewX/ViewY camera reset
  * (per-player split-screen doesn't recentre a shared camera the way the PC does). */
+#line 1505
 void StartWalkStand(PlayerStruct *ptrplr)
 {
     ptrplr->_pmode = PM_STAND;
+
+
+
+
+
+
+
+
+
+
+
+
     if (ismyplr(ptrplr)) {
         ScrollInfo._sxoff = 0;
         ScrollInfo._syoff = 0;
@@ -636,16 +740,99 @@ void StartWalkStand(PlayerStruct *ptrplr)
 
 /* PSX drops devilution's whole interpolated-offset/abs-clamp light math (xmul/ymul/lx/ly/offx/offy)
  * -- it derives the light offset directly from the low nibble of the WorldX/WorldY tile coords. */
+#line 1532
 void PM_ChangeLightOff(PlayerStruct *ptrplr)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     ChangeLightOff(ptrplr->_plid, (ptrplr->WorldX & 0xF) - 8, (ptrplr->WorldY & 0xF) - 8);
 }
 
 /* PSX drops devilution's whole _pVar6/_pVar7 sub-pixel accumulator + scroll-offset delta logic --
  * just bumps the frame counter and re-derives the light offset. */
+#line 1602
 void PM_ChangeOffset(PlayerStruct *ptrplr)
 {
+
+
+
     ptrplr->_pVar8++;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     PM_ChangeLightOff(ptrplr);
 }
 
@@ -692,15 +879,22 @@ void StartAttack(PlayerStruct *ptrplr, int d)
 /* PSX's `dir` param is unused (the block-facing direction isn't looked up -- Peq is a fixed literal
  * 3), and drops LoadPlrGFX/FixPlayerLocation like the other Start* functions. IS_ISWORD's PSX sound
  * id is 0x2A. */
+#line 1785
 void StartPlrBlock(PlayerStruct *ptrplr, int dir)
 {
+
+
     if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
         StartPlrKill(ptrplr, -1);
         return;
+
     }
     PlaySfxLoc(0x2A, ptrplr->_px, ptrplr->_py);
+
+
     NewPlrAnim(ptrplr, 3, ptrplr->_pBFrames, 2);
     ptrplr->_pmode = PM_BLOCK;
+
     SetPlayerOld(ptrplr);
 }
 
@@ -710,39 +904,75 @@ void StartPlrBlock(PlayerStruct *ptrplr, int dir)
  * `((char*)ptrplr + 3*sizeof(PlayerStruct)) != plr` that is ALWAYS true for both valid player
  * pointers (MAX_PLRS=2) -- transcribed literally byte-for-byte off the oracle; its real source
  * intent is unclear (possibly a leftover always-true guard), open for re-derivation. */
+#line 1806
 void StartSpell(PlayerStruct *ptrplr, int d, int cx, int cy)
 {
+
+
     if (ptrplr->_pInvincible && ptrplr->_pHitPoints == 0 && ismyplr(ptrplr)) {
         StartPlrKill(ptrplr, -1);
         return;
+
     }
     if (leveltype != DTYPE_TOWN) {
         switch (spelldata[ptrplr->_pSpell].sType) {
+
         case 0:
             NewPlrAnim(ptrplr, 4, ptrplr->_pSFrames, 0);
             break;
+
         case 1:
             NewPlrAnim(ptrplr, 5, ptrplr->_pSFrames, 0);
             break;
+
         case 2:
             NewPlrAnim(ptrplr, 6, ptrplr->_pSFrames, 0);
             break;
         }
     }
     PlaySfxLoc(spelldata[ptrplr->_pSpell].sSFX, ptrplr->_px, ptrplr->_py);
+
+
     ptrplr->_pmode = PM_SPELL;
+
     PostGamePad((int)((char *)ptrplr + 3 * sizeof(PlayerStruct)) != (int)plr, 0, 0, 0);
+
+
     SetPlayerOld(ptrplr);
+
     ptrplr->_pVar1 = cx;
     ptrplr->_pVar2 = cy;
     ptrplr->_pdir = GetDirection(ptrplr->_px, ptrplr->_py, cx, cy);
+
     ptrplr->_pVar4 = GetSpellLevel(ptrplr, ptrplr->_pSpell);
+
+
     ptrplr->_pVar8 = 1;
 }
 
 /* PSX no-op (see StartStand's comment above -- no dPlayer occupancy grid to clear). */
+#line 1881
 void RemovePlrFromMap(PlayerStruct *ptrplr)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* PSX resets the gamepad cursor-select array first (`_pcursplr[sel_data] = -1`, not in devilution),
@@ -782,13 +1012,23 @@ void StartPlrHit(PlayerStruct *ptrplr, int dam, unsigned char forcehit)
     SetPlayerOld(ptrplr);
 }
 
+#line 1952
 void RespawnDeadItem(ItemStruct *itm, int x, int y)
 {
     int ii;
 
     if (numitems < 127) {
+
+
+
         if (FindGetItem(itm->IDidx, itm->_iCreateInfo, itm->_iSeed) >= 0)
             SyncGetItem(x, y, itm->IDidx, itm->_iCreateInfo, itm->_iSeed);
+
+
+
+
+
+
 
         ii = itemavail[0];
         dung_map[x][y].dItem = ii + 1;
@@ -806,15 +1046,22 @@ void RespawnDeadItem(ItemStruct *itm, int x, int y)
     }
 }
 
+#line 1986
 static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy)
 {
+
+
     if (itm->_itype == -1)
+
+
+
         return;
 
     int x = ptrplr->_px + xx;
     int y = ptrplr->_py + yy;
 
     if ((xx != 0) || (yy != 0)) {
+
         if (ItemSpaceOk(x, y)) {
             RespawnDeadItem(itm, x, y);
             ptrplr->HoldItem = *itm;
@@ -829,6 +1076,7 @@ static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy)
             for (int i = -l; i <= l; i++) {
                 x = ptrplr->_px + i;
                 if (!ItemSpaceOk(x, y))
+
                     continue;
                 RespawnDeadItem(itm, x, y);
                 ptrplr->HoldItem = *itm;
@@ -841,6 +1089,7 @@ static void PlrDeadItem(PlayerStruct *ptrplr, ItemStruct *itm, int xx, int yy)
 
 /* ==== wave-3 additions ==== */
 
+#line 2031
 void StartPlayerDropItems(PlayerStruct *ptrplr, int EarFlag)
 {
     PlayerDeathCount[plrind(ptrplr)] = 5;
@@ -882,26 +1131,46 @@ void TryDropPlayerItems(PlayerStruct *ptrplr)
     }
 }
 
+#line 2085
 void StartPlayerKill(PlayerStruct *ptrplr, int earflag)
 {
     ItemStruct ear;
+
+
+
+
+
     PlayerStruct *p = ptrplr;
 
     automapflag = 0;
+
     if (gbActivePlayers == 1) {
+
+
         automapflag = 0;
         PA_SetPauseOk(FALSE);
+
     }
 
     if (ptrplr->_pHitPoints == 0 && ptrplr->_pmode == PM_DEATH)
+
+
+
+
+
+
+
+
+
+
         return;
 
-    if (ptrplr->_pClass == CLASS_WARRIOR)
-        PlaySfxLoc(0xB, ptrplr->_px, ptrplr->_py);
-    else if (ptrplr->_pClass == CLASS_ROGUE)
-        PlaySfxLoc(0x2AB, ptrplr->_px, ptrplr->_py);
-    else if (ptrplr->_pClass == CLASS_SORCERER)
-        PlaySfxLoc(0x243, ptrplr->_px, ptrplr->_py);
+    if (ptrplr->_pClass == CLASS_WARRIOR) PlaySfxLoc(0xB, ptrplr->_px, ptrplr->_py);
+
+    else if (ptrplr->_pClass == CLASS_ROGUE) PlaySfxLoc(0x2AB, ptrplr->_px, ptrplr->_py);
+    else if (ptrplr->_pClass == CLASS_SORCERER) PlaySfxLoc(0x243, ptrplr->_px, ptrplr->_py);
+
+
 
     if (gbActivePlayers == 1)
         GLUE_SetHomingScrollFlag(FALSE);
@@ -910,29 +1179,79 @@ void StartPlayerKill(PlayerStruct *ptrplr, int earflag)
     if (_spselflag[pn])
         TSK_Kill(_spselflag[pn]);
     _spselflag[pn] = 0;
+
+
+
     PauseMode = 1;
     TSK_Sleep(2);
-    while (sghStream)
-        TSK_Sleep(1);
+    while (sghStream) TSK_Sleep(1);
     PauseMode = 0;
 
+
+
+
     if (p->_pgfxnum) {
+
         p->_pgfxnum = 0;
         p->_pGFXLoad = 0;
         SetPlrAnims(ptrplr);
+
+
     }
 
     NewPlrAnim(ptrplr, 1, p->_pDFrames, 1);
+
     p->_pmode = PM_DEATH;
     p->_pBlockFlag = FALSE;
     p->_pInvincible = TRUE;
     SetPlayerHitPoints(ptrplr, 0);
     p->_pVar8 = 1;
     p->DeadLevel = currlevel;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     SetPlayerOld(ptrplr);
+
+
+
+
     drawhpflag = TRUE;
     deathdelay2[plrind(ptrplr)] = 30;
+
+
+
+
+
+
+
+
     StartPlayerDropItems(ptrplr, earflag);
+
+
+
 }
 
 void DropHalfPlayersGold(PlayerStruct *ptrplr)
@@ -969,35 +1288,44 @@ void DropHalfPlayersGold(PlayerStruct *ptrplr)
  * actually killing the player. `_misource` is XOR-compared against plrind(ptrplr) (the usual
  * plrind-style equality-via-xor idiom). */
 
+#line 2253
 void StartPlrKill(PlayerStruct *ptrplr, int earflag)
 {
     int i, mx;
-
     plrind(ptrplr);
+
+
 
     if ((ptrplr->_pHitPoints == 0) && (currlevel == 0)) {
         SetPlayerHitPoints(ptrplr, 64);
         return;
+
     }
 
     for (i = 0; i < nummissiles; i++) {
         mx = missileactive[i];
         if (missile[mx]._mitype == 13 && missile[mx]._misource == (ptrplr != plr) && !missile[mx]._miDelFlag) {
-            if (earflag != -1)
-                missile[mx]._miVar8 = earflag;
+            if (earflag != -1) missile[mx]._miVar8 = earflag;
             return;
         }
     }
 
+
     SetPlayerHitPoints(ptrplr, 0);
+
+
+
     StartPlayerKill(ptrplr, earflag);
 }
 
+#line 2285
 void SyncPlrKill(PlayerStruct *ptrplr, int earflag)
 {
+
     StartPlayerKill(ptrplr, earflag);
 }
 
+#line 2293
 void RemovePlrMissiles(PlayerStruct *ptrplr)
 {
     int i, mx;
@@ -1010,6 +1338,7 @@ void RemovePlrMissiles(PlayerStruct *ptrplr)
         monster[myplr]._mDelFlag = TRUE;
         DeleteMonsterList();
     }
+
 
     for (i = 0; i < nummissiles; i++) {
         mx = missileactive[i];
@@ -1026,21 +1355,32 @@ void RemovePlrMissiles(PlayerStruct *ptrplr)
     }
 }
 
+#line 2324
 void InitLevelChange(PlayerStruct *ptrplr)
 {
     RemovePlrMissiles(ptrplr);
+
     if (ismyplr(ptrplr) && qtextflag) {
+
         LANG_ReloadMainTXT();
         qtextflag = FALSE;
         stream_stop();
+
     }
     RemovePlrFromMap(ptrplr);
     SetPlayerOld(ptrplr);
+
+
+
     ptrplr->_pLvlVisited[ptrplr->plrlevel] = TRUE;
+
     ClrPlrPath(ptrplr);
     ptrplr->destAction = -1;
     ptrplr->_pLvlChanging = TRUE;
     ptrplr->pLvlLoad = 10;
+
+
+
     visible_level = -1;
 }
 
@@ -1135,6 +1475,7 @@ void StartWarpLvl(PlayerStruct *ptrplr, int pidx)
 
 /* PSX stubs: both are bare `return FALSE;` (the state-machine handler exists but does nothing on
  * this build -- PM_STAND/PM_NEWLVL need no per-frame processing here). */
+#line 2512
 int PM_DoStand(PlayerStruct *ptrplr)
 {
     return FALSE;
@@ -1921,6 +2262,7 @@ int PM_DoDeath(PlayerStruct *ptrplr)
     return 0;
 }
 
+#line 3439
 int PM_DoNewLvl(PlayerStruct *ptrplr)
 {
     return FALSE;
@@ -2070,18 +2412,24 @@ void ValidatePlayer(void)
     }
 }
 
+#line 3876
 static void CheckCheatStats(PlayerStruct *ptrplr)
 {
     if (ptrplr->_pStrength > 750)
         ptrplr->_pStrength = 750;
+
     if (ptrplr->_pDexterity > 750)
         ptrplr->_pDexterity = 750;
+
     if (ptrplr->_pMagic > 750)
         ptrplr->_pMagic = 750;
+
     if (ptrplr->_pVitality > 750)
         ptrplr->_pVitality = 750;
+
     if (ptrplr->_pHitPoints > 128000)
         ptrplr->_pHitPoints = 128000;
+
     if (ptrplr->_pMana > 128000)
         ptrplr->_pMana = 128000;
 }
@@ -2177,8 +2525,11 @@ void ProcessPlayers(void)
     myplr = tplayer;
 }
 
+#line 4040
 void ClrPlrPath(PlayerStruct *ptrplr)
 {
+
+
     memset(ptrplr->walkpath, 0xFF, 25);
 }
 
@@ -2230,8 +2581,60 @@ unsigned char PosOkPlayer(PlayerStruct *ptrplr, int px, int py)
     return TRUE;
 }
 
+#line 4085
 void MakePlrPath(PlayerStruct *ptrplr, int xx, int yy, unsigned char endspace)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void CheckPlrSpell(void)
@@ -2333,8 +2736,12 @@ void SyncInitPlrPos(PlayerStruct *ptrplr)
     }
 }
 
+#line 4347
 void SyncInitPlr(PlayerStruct *ptrplr)
 {
+
+
+
     SetPlrAnims(ptrplr);
     SyncInitPlrPos(ptrplr);
 }
@@ -2477,20 +2884,24 @@ void ModifyPlrVit(int p, int l)
     CalcPlrInv(p, TRUE);
 }
 
+#line 4501
 void SetPlayerHitPoints(PlayerStruct *ptrplr, int newhp)
 {
+
+
     ptrplr->_pHitPoints = newhp;
     ptrplr->_pHPBase = newhp - (ptrplr->_pMaxHP - ptrplr->_pMaxHPBase);
-    if (ismyplr(ptrplr))
-        drawhpflag = TRUE;
+    if (ismyplr(ptrplr)) drawhpflag = TRUE;
 }
 
+#line 4513
 void SetPlrStr(int p, int v)
 {
+
+
     PlayerStruct *player = &plr[p];
     player->_pBaseStr = v;
     CalcPlrInv(p, TRUE);
-
     if (player->_pClass == CLASS_ROGUE) {
         player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     } else {
@@ -2512,12 +2923,14 @@ void SetPlrMag(int p, int v)
     CalcPlrInv(p, TRUE);
 }
 
+#line 4545
 void SetPlrDex(int p, int v)
 {
+
+
     PlayerStruct *player = &plr[p];
     player->_pBaseDex = v;
     CalcPlrInv(p, TRUE);
-
     if (player->_pClass == CLASS_ROGUE) {
         player->_pDamageMod = (player->_pStrength + player->_pDexterity) * player->_pLevel / 200;
     } else {
@@ -2539,8 +2952,11 @@ void SetPlrVit(int p, int v)
     CalcPlrInv(p, TRUE);
 }
 
+#line 4577
 void InitDungMsgs(PlayerStruct *ptrplr)
 {
+
+
     ptrplr->pDungMsgs = 0;
 }
 
@@ -2842,6 +3258,7 @@ void SetPlayerOld(int pnum)
     SetPlayerOld(&plr[pnum]);
 }
 
+#line 4714
 void GetGoldSeed(PlayerStruct *ptrplr, ItemStruct *h)
 {
     GetGoldSeed(plrind(ptrplr), h);

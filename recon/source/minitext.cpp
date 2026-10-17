@@ -40,12 +40,19 @@ static int iBookName = 0;
 Dialog QBack;   /* @0x800D6790 -- first initialized public global: names the _GLOBAL_.I/D.QBack thunks */
 char MtPrevText[80] = {0};
 
+#line 111
 void FreeQuestText(void)
 {
+
+
 }
 
+#line 118
 void InitQuestText(void)
 {
+
+
+
     qtextflag = 0;
 }
 
@@ -314,14 +321,16 @@ void DrawQTextTSK(TASK *T)
 }
 
 /* These follow DrawQTextTSK's format string in retail small data. */
+#line 563
 int KANJI_strlen(char *str)
 {
     int l;
-
     l = 0;
     while (*str != 0) {
+
         if ((unsigned char)*str & 0x80)
             str++;
+
         str++;
         l++;
     }

@@ -21,6 +21,7 @@ inline void TextDat::DumpDatFile()
     }
 }
 
+#line 231
 void DisplayMonsterTypes(void)
 {
 }

@@ -266,18 +266,33 @@ int gnNumGetRecords = 0;           /* @0x8011B88C */
 int *ItemAnimSnds = ItemInvSnds;   /* @0x8011B890 */
 int idoppely = 16;                 /* @0x8011B894 */
 
+#line 555
 void InitItemGFX(void)
 {
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x8003E254 ITEMS.CPP:578 — PSX order: dMonster, dItem, dObject, dFlags&SETPC, !GetSOLID (no dPlayer field
  * in dung_map; nSolidTable[dPiece] -> GetSOLID(x,y)) */
+#line 572
 unsigned char ItemPlace(int xp, int yp)
 {
     if (dung_map[xp][yp].dMonster != 0) return FALSE;
+
     if (dung_map[xp][yp].dItem != 0) return FALSE;
     if (dung_map[xp][yp].dObject != 0) return FALSE;
     if (dung_map[xp][yp].dFlags & BFLAG_SETPC) return FALSE;
+
     if (GetSOLID(xp, yp)) return FALSE;
     return TRUE;
 }
@@ -285,17 +300,27 @@ unsigned char ItemPlace(int xp, int yp)
 
 /* @0x8003E2F0 ITEMS.CPP:588 — PSX: currlevel instead of GetEffLevel, single do/while placement loop,
  * _PlrCreate = FePlayerNo */
+#line 587
 void AddInitItems(void)
 {
+
+
+
     int j = ENG_random(3) + 3;
+
     for (int i = 0; i < j; i++) {
+
         int ii = itemavail[0];
+
         itemavail[0] = itemavail[MAXITEMS - numitems - 1];
+
         itemactive[numitems] = ii;
 
         int xx = ENG_random(DMAXX - 32) + 16;
         int yy = ENG_random(DMAXY - 32) + 16;
+
         while (!ItemPlace(xx, yy)) {
+
             xx = ENG_random(DMAXX - 32) + 16;
             yy = ENG_random(DMAXY - 32) + 16;
         }
@@ -303,12 +328,20 @@ void AddInitItems(void)
         item[ii]._ix = xx;
         item[ii]._iy = yy;
         dung_map[xx][yy].dItem = ii + 1;
+
+
         item[ii]._iSeed = GetRndSeed();
         SetRndSeed(item[ii]._iSeed);
+
+
+
+
+
         if (ENG_random(2)) GetItemAttrs(ii, IDI_HEAL, currlevel);
         else GetItemAttrs(ii, IDI_MANA, currlevel);
         item[ii]._iCreateInfo = currlevel + ICI_PREGEN;
         item[ii]._PlrCreate = FePlayerNo;
+
         SetupItem(ii);
         item[ii]._iAnimFrame = item[ii]._iAnimLen;
         item[ii]._iAnimFlag = FALSE;
@@ -321,9 +354,14 @@ void AddInitItems(void)
 
 /* @0x8003E4F8 ITEMS.CPP:641 — PSX: per-player golditem, _PlrCreate = FePlayerNo in the clear loop, no
  * quest spawns here (only AddInitItems) */
+#line 640
 void InitItems(bool re_init)
 {
     int i;
+
+
+
+
 
     GetItemAttrs(0, 0, 1);
     golditem = item[0];
@@ -331,6 +369,7 @@ void InitItems(bool re_init)
 
     numitems = 0;
     for (i = 0; i < MAXITEMS; i++) {
+
         item[i]._itype = 0;
         item[i]._ix = 0;
         item[i]._iy = 0;
@@ -342,11 +381,13 @@ void InitItems(bool re_init)
     }
 
     for (i = 0; i < MAXITEMS; i++) {
+
         itemavail[i] = i;
         itemactive[i] = 0;
     }
 
     if (!setlevel) {
+
         if (currlevel > 0 && currlevel < 16)
             AddInitItems();
     }
@@ -606,6 +647,7 @@ void CalcPlrItemVals(int p, unsigned char Loadgfx)
 }
 
 /* @0x8003F130 ITEMS.CPP:1205 */
+#line 944
 void CalcPlrScrolls(int p)
 {
     int i;
@@ -644,6 +686,7 @@ void CalcPlrScrolls(int p)
 /* @0x8003F4B0 ITEMS.CPP:1243 — PSX adds an else-branch (not in hellfire): if the wielded staff (InvBody[4]
  * = the left-hand slot) has run out of charges AND it was the readied spell (_pRSplType==SPT_ITEM,
  * _pRSpell==the staff's spell), the readied spell is reset (_pRSpell=1, _pRSplType=SPT_NONE) */
+#line 983
 void CalcPlrStaff(PlayerStruct *ptrplr)
 {
     ptrplr->_pISpells = 0;
@@ -652,13 +695,19 @@ void CalcPlrStaff(PlayerStruct *ptrplr)
     if (ptrplr->InvBody[4]._iCharges > 0) {
         unsigned long long t = 1;
         ptrplr->_pISpells |= t << (ptrplr->InvBody[4]._iSpell - 1);
+
+
+
     } else if (ptrplr->InvBody[4]._iSpell == ptrplr->_pRSpell && ptrplr->_pRSplType == SPT_ITEM) {
+
         ptrplr->_pRSpell = -1;
         ptrplr->_pRSplType = SPT_NONE;
     }
+
 }
 
 /* @0x8003F57C ITEMS.CPP:1255 */
+#line 1003
 void CalcSelfItems(int pnum)
 {
     int i;
@@ -668,6 +717,7 @@ void CalcSelfItems(int pnum)
     int sa = 0;
     int ma = 0;
     int da = 0;
+
 
     pi = &p->InvBody[0];
     for (i = NUM_INVLOC; i--; pi++) {
@@ -703,6 +753,7 @@ void CalcSelfItems(int pnum)
 }
 
 /* @0x8003F6DC ITEMS.CPP:1050 */
+#line 1049
 static unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x)
 {
     if (p->_pMagic < x->_iMinMag) return FALSE;
@@ -712,21 +763,25 @@ static unsigned char ItemMinStats(const PlayerStruct *p, const ItemStruct *x)
 }
 
 /* @0x8003F728 ITEMS.CPP:1058 */
+#line 1057
 void SetItemMinStats(const PlayerStruct *p, ItemStruct *x)
 {
     x->_iStatFlag = ItemMinStats(p, x);
 }
 
 /* @0x8003F754 ITEMS.CPP:1311 */
+#line 1064
 void CalcPlrItemMin(int pnum)
 {
     int i;
     ItemStruct *pi;
     PlayerStruct *p = &plr[pnum];
 
+
     pi = &p->InvList[0];
     for (i = p->_pNumInv; i--; pi++)
         pi->_iStatFlag = ItemMinStats(p, pi);
+
 
     pi = &p->SpdList[0];
     for (i = MAXSPD; i--; pi++) {
@@ -736,6 +791,7 @@ void CalcPlrItemMin(int pnum)
 }
 
 /* @0x8003F834 ITEMS.CPP:1086 — hellfire + a 20-slot bound on the per-player witchitem walk */
+#line 1085
 void CalcPlrBookVals(int p)
 {
     int i, slvl;
@@ -765,21 +821,25 @@ void CalcPlrBookVals(int p)
 
 /* @0x8003FB18 ITEMS.CPP:1360 — PSX drops the `p==myplr` guards around CalcPlrBookVals/Scrolls/Staff and
  * around the RecalcStoreStats currlevel check (single local player, presumably gated elsewhere) */
+#line 1113
 void CalcPlrInv(int p, unsigned char Loadgfx)
 {
     CalcPlrItemMin(p);
     CalcSelfItems(p);
     CalcPlrItemVals(p, Loadgfx);
     CalcPlrItemMin(p);
+
     CalcPlrBookVals(p);
     CalcPlrScrolls(p);
     CalcPlrStaff(&plr[p]);
+
     if (currlevel == 0) RecalcStoreStats();
 }
 
 /* item types / power flags (hellfire ITEMS.H) */
 
 /* @0x8003FBC8 ITEMS.CPP:1130 — PSX: text ids (_iName/_iIName = iName), staff charges stay 40 */
+#line 1129
 void SetPlrHandItem(ItemStruct *h, int idata)
 {
     const ItemDataStruct *pAllItem = &AllItemsList[idata];
@@ -787,6 +847,9 @@ void SetPlrHandItem(ItemStruct *h, int idata)
     memset(h, 0, sizeof(ItemStruct));
     h->_itype = pAllItem->itype;
     h->_iCurs = pAllItem->iCurs;
+
+
+
     h->_iName = pAllItem->iName;
     h->_iIName = pAllItem->iName;
     h->_iLoc = pAllItem->iLoc;
@@ -813,15 +876,21 @@ void SetPlrHandItem(ItemStruct *h, int idata)
 }
 
 /* @0x8003FCE0 ITEMS.CPP:1408 */
+#line 1166
 void GetPlrHandSeed(ItemStruct *h)
 {
+
+
     h->_iSeed = GetRndSeed();
 }
 
 /* @0x8003FD0C ITEMS.CPP:1178 — PSX: the inventory scan is not gated on pnum == myplr */
+#line 1177
 void GetGoldSeed(int pnum, ItemStruct *h)
 {
     int i, ii, s;
+
+
     unsigned char doneflag;
 
     do {
@@ -831,19 +900,25 @@ void GetGoldSeed(int pnum, ItemStruct *h)
             ii = itemactive[i];
             if (item[ii]._iSeed == s) doneflag = FALSE;
         }
+
         for (i = 0; i < plr[pnum]._pNumInv; i++)
             if (plr[pnum].InvList[i]._iSeed == s) doneflag = FALSE;
+
     } while (!doneflag);
     h->_iSeed = s;
 }
 
 /* @0x8003FE74 ITEMS.CPP:1437 */
+#line 1202
 void SetPlrHandSeed(ItemStruct *h, int iseed)
 {
+
+
     h->_iSeed = iseed;
 }
 
 /* @0x8003FE7C ITEMS.CPP:1444 */
+#line 1213
 void SetPlrHandGoldCurs(ItemStruct *h)
 {
     if (h->_ivalue >= GOLD_VT2) {
@@ -972,9 +1047,11 @@ unsigned char ItemSpaceOk(int i, int j)
 
 
 /* @0x8004068C ITEMS.CPP:1670 */
+#line 1396
 unsigned char GetItemSpace(int x, int y, char inum)
 {
     int i, j, xx, yy, rs;
+
     unsigned char savail;
 
     yy = 0;
@@ -994,9 +1071,12 @@ unsigned char GetItemSpace(int x, int y, char inum)
         }
     }
 
+
     rs = ENG_random(15) + 1;
 
+
     if (!savail) return FALSE;
+
 
     xx = 0;
     yy = 0;
@@ -1015,16 +1095,20 @@ unsigned char GetItemSpace(int x, int y, char inum)
     yy = yy + y - 1;
     item[inum]._ix = xx;
     item[inum]._iy = yy;
+
     dung_map[xx][yy].dItem = inum + 1;
     return TRUE;
 }
 
 /* @0x800408A4 ITEMS.CPP:1725 */
+#line 1451
 void GetSuperItemSpace(int x, int y, char inum)
 {
     int xx, yy;
-
     if (GetItemSpace(x, y, inum)) return;
+
+
+
 
     for (int l = 2; l < 50; l++) {
         for (int j = -l; j <= l; j++) {
@@ -1033,8 +1117,10 @@ void GetSuperItemSpace(int x, int y, char inum)
                 xx = x + i;
                 if (!ItemSpaceOk(xx, yy)) continue;
 
+
                 item[inum]._ix = xx;
                 item[inum]._iy = yy;
+
                 dung_map[xx][yy].dItem = inum + 1;
                 return;
             }
@@ -1043,8 +1129,10 @@ void GetSuperItemSpace(int x, int y, char inum)
 }
 
 /* @0x800409FC ITEMS.CPP:1754 */
+#line 1480
 void GetSuperItemLoc(int x, int y, int &xx, int &yy)
 {
+
     for (int l = 1; l < 50; l++) {
         for (int j = -l; j <= l; j++) {
             yy = y + j;
@@ -1058,6 +1146,7 @@ void GetSuperItemLoc(int x, int y, int &xx, int &yy)
 }
 
 /* @0x80040AC4 ITEMS.CPP:1772 */
+#line 1498
 void CalcItemValue(int i)
 {
     int v = item[i]._iVMult1 + item[i]._iVMult2;
@@ -1115,18 +1204,28 @@ void GetBookSpell(int i, int lvl)
 
 /* @0x80040DDC ITEMS.CPP:1564 — PSX: no pre local (the random is tested directly), no name building
  * (istr stays as an unused 128-byte frame slot, SYM AUTO), _iPrePower = preidx, no InfoFit block */
+#line 1563
 void GetStaffPower(int i, int lvl, int bs, unsigned char onlygood)
 {
     int l[256], nl;
+
+
+
+
     int j;
     int preidx;
     char istr[128];
     unsigned char addok;
 
     int pre = ENG_random(10);   /* hellfire's pre; no SYM record (only feeds the test) */
+
+
+
+
     preidx = -1;
 
     if ((pre == 0) || (onlygood)) {
+
         nl = 0;
         for (j = 0; PL_Prefix[j].PLPower != -1; j++) {
             if (((PL_Prefix[j].PLIType & PLF_STAFF) != 0) && (PL_Prefix[j].PLMinLvl <= lvl)) {
@@ -1145,9 +1244,28 @@ void GetStaffPower(int i, int lvl, int bs, unsigned char onlygood)
         }
         if (nl != 0) {
             preidx = l[ENG_random(nl)];
+
+
             item[i]._iMagical = 1;
             SaveItemPower(i, PL_Prefix[preidx].PLPower, PL_Prefix[preidx].PLParam1, PL_Prefix[preidx].PLParam2, PL_Prefix[preidx].PLMinVal, PL_Prefix[preidx].PLMaxVal, PL_Prefix[preidx].PLMultVal);
+
             item[i]._iPrePower = preidx;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
     CalcItemValue(i);
@@ -1213,12 +1331,22 @@ const short SinTab[32] = {
     0,-49,-97,-142,-181,-212,-236,-251,-255,-251,-236,-212,-181,-142,-97,-49
 };
 
+#line 1749
 void GetItemAttrs(int i, int idata, int lvl)
 {
     int rndv = 0;
 
+
+
+
+
+
+
+
     item[i]._itype = AllItemsList[idata].itype;
     item[i]._iCurs = AllItemsList[idata].iCurs;
+
+
     item[i]._iName = AllItemsList[idata].iName;
     item[i]._iIName = AllItemsList[idata].iName;
     item[i]._iLoc = AllItemsList[idata].iLoc;
@@ -1286,6 +1414,8 @@ void GetItemAttrs(int i, int idata, int lvl)
 
     if (item[i]._iMiscId == IMID_BOOK) GetBookSpell(i, lvl);
 
+
+
     if (item[i]._itype == IT_GOLD) {
         if (gnDifficulty == 0)
             rndv = (currlevel * 5) + ENG_random(currlevel * 10);
@@ -1293,7 +1423,6 @@ void GetItemAttrs(int i, int idata, int lvl)
             rndv = ((currlevel + 16) * 5) + ENG_random((currlevel + 16) * 10);
         if (gnDifficulty == 2)
             rndv = ((currlevel + 32) * 5) + ENG_random((currlevel + 32) * 10);
-
         if (leveltype == 4) rndv += (rndv >> 3);
         if (rndv > 5000) rndv = 5000;
         item[i]._ivalue = rndv;
@@ -1308,12 +1437,14 @@ void GetItemAttrs(int i, int idata, int lvl)
 }
 
 /* @0x8004180C ITEMS.CPP:2069 */
+#line 1856
 int RndPL(int param1, int param2)
 {
     return ENG_random(param2 - param1 + 1) + param1;
 }
 
 /* @0x80041840 ITEMS.CPP:2077 */
+#line 1864
 int PLVal(int pv, int p1, int p2, int minv, int maxv)
 {
     if (p1 == p2) return minv;
@@ -1634,9 +1765,14 @@ void SaveItemPower(int i, int power, int param1, int param2, int minval, int max
 
 /* @0x80042FE4 ITEMS.CPP:2165 — hellfire minus the name building / InfoFit block (text ids on PSX);
  * _iPrePower/_iSufPower = the table index; istr stays as an unused frame array (SYM AUTO) */
+#line 2164
 void GetItemPower(int i, int minlvl, int maxlvl, long flgs, unsigned char onlygood)
 {
     int pre, post;
+
+
+
+
     int l[256], nl;
     int j;
     int preidx, sufidx;
@@ -1645,6 +1781,7 @@ void GetItemPower(int i, int minlvl, int maxlvl, long flgs, unsigned char onlygo
 
     pre = ENG_random(4);
     post = ENG_random(3);
+
     if ((pre != 0) && (post == 0)) {
         if (ENG_random(2)) post = 1;
         else pre = 0;
@@ -1652,6 +1789,7 @@ void GetItemPower(int i, int minlvl, int maxlvl, long flgs, unsigned char onlygo
 
     preidx = -1;
     sufidx = -1;
+
     goe = 0;
 
     if ((!onlygood) && (ENG_random(3))) onlygood = TRUE;
@@ -1674,12 +1812,18 @@ void GetItemPower(int i, int minlvl, int maxlvl, long flgs, unsigned char onlygo
                 }
             }
         }
+
         if (nl != 0) {
+
             preidx = l[ENG_random(nl)];
+
+
             item[i]._iMagical = 1;
             SaveItemPower(i, PL_Prefix[preidx].PLPower, PL_Prefix[preidx].PLParam1, PL_Prefix[preidx].PLParam2, PL_Prefix[preidx].PLMinVal, PL_Prefix[preidx].PLMaxVal, PL_Prefix[preidx].PLMultVal);
+
             item[i]._iPrePower = preidx;
             goe = PL_Prefix[preidx].PLGOE;
+
         }
     }
     if (post != 0) {
@@ -1696,19 +1840,46 @@ void GetItemPower(int i, int minlvl, int maxlvl, long flgs, unsigned char onlygo
                 nl++;
             }
         }
+
         if (nl != 0) {
             sufidx = l[ENG_random(nl)];
+
+
             item[i]._iMagical = 1;
             SaveItemPower(i, PL_Suffix[sufidx].PLPower, PL_Suffix[sufidx].PLParam1, PL_Suffix[sufidx].PLParam2, PL_Suffix[sufidx].PLMinVal, PL_Suffix[sufidx].PLMaxVal, PL_Suffix[sufidx].PLMultVal);
+
             item[i]._iSufPower = sufidx;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
     if ((preidx != -1) || (sufidx != -1)) CalcItemValue(i);
 }
 
 /* @0x80043434 ITEMS.CPP:2274 — PSX: no SpellsOk parameter, a staff always gets a spell */
+#line 2273
 void GetItemBonus(int i, int idata, int minlvl, int maxlvl, unsigned char onlygood)
 {
+
+
+
+
     if (item[i]._iClass == IC_GOLD) return;
     if (minlvl > 25) minlvl = 25;
 
@@ -1794,9 +1965,11 @@ int RndItem(int m)
 
 /* @0x80043894 ITEMS.CPP:2669 — PSX drops the GetEffLevel() call (uses `currlevel` directly) and gates
  * SPL_RESURRECT/HEALOTHER on FePlayerNo==0, SPL_TELE/PHASE on FePlayerNo!=0 (same family as RndItem) */
+#line 2395
 int RndUItem(int m)
 {
     int ril[512];
+
     int ri, i;
     unsigned char okflag;
 
@@ -1820,6 +1993,7 @@ int RndUItem(int m)
         if (AllItemsList[i].iMiscId == IMID_BOOK) okflag = TRUE;
         if (AllItemsList[i].iSpell == SPL_RESURRECT && FePlayerNo == 0) okflag = FALSE;
         if (AllItemsList[i].iSpell == SPL_HEALOTHER && FePlayerNo == 0) okflag = FALSE;
+
         if (AllItemsList[i].iSpell == SPL_TELE && FePlayerNo != 0) okflag = FALSE;
         if (AllItemsList[i].iSpell == SPL_PHASE && FePlayerNo != 0) okflag = FALSE;
         if (okflag) ril[ri++] = i;
@@ -1882,17 +2056,25 @@ int RndTypeItems(int itype, int imid)
 
 
 /* @0x80043DB0 ITEMS.CPP:2757 */
+#line 2497
 int CheckUnique(int i, int lvl, int uper, unsigned char recreate)
 {
     int j, idata;
+
+
+
+
+
     unsigned char uok[MAXUITEMS];
     int numu, u;
 
     if (ENG_random(100) > uper) return -1;
 
+
     numu = 0;
     memset(uok, 0, sizeof(uok));
     for (j = 0; UniqueItemList[j].UIItemId != -1; j++) {
+
         idata = item[i].IDidx;
         if (UniqueItemList[j].UIItemId != AllItemsList[idata].iItemId) continue;
         if (lvl < UniqueItemList[j].UIMinLvl) continue;
@@ -1909,6 +2091,7 @@ int CheckUnique(int i, int lvl, int uper, unsigned char recreate)
         if (numu > 0) {
             j++;
             if (j == MAXUITEMS) j = 0;
+
         }
     }
     return j;
@@ -1919,9 +2102,11 @@ int CheckUnique(int i, int lvl, int uper, unsigned char recreate)
  * NEAR-MISS (count-exact, pure s1/s2 swap): retail i->s2, uid->s1; ours i->s1, uid->s2 (cc1plus -dg:
  * allocno i(72) outranks uid(74)). Falsified: 5 uid/OUid init spellings, `_uid >> 8` / `& 0xFFFFFF00` /
  * `OUid & ~0xFF` tests. Next: raise uid's ref count / shorten i's live range (-dg priority table). */
+#line 2540
 void GetUniqueItem(int i, int _uid)
 {
     long uid;
+
     long OUid;
 
     OUid = _uid;
@@ -1939,19 +2124,36 @@ void GetUniqueItem(int i, int _uid)
         SaveItemPower(i, UniqueItemList[uid].UIPower5, UniqueItemList[uid].UIParam9, UniqueItemList[uid].UIParam10, 0, 0, 1);
     if (UniqueItemList[uid].UINumPL > 5)
         SaveItemPower(i, UniqueItemList[uid].UIPower6, UniqueItemList[uid].UIParam11, UniqueItemList[uid].UIParam12, 0, 0, 1);
+
+
     item[i]._iIName = UniqueItemList[uid].UIName;
     item[i]._iIvalue = UniqueItemList[uid].UIValue;
+
+
+
+
     if (_uid & ~0xFF) {
+
         if (!UniqueItemFlag[uid]) UniqueItemFlag[uid]++;
         item[i]._iSeed = OUid;
+
+
     } else {
         UniqueItemFlag[uid]++;
         item[i]._iSeed = GetRndSeed() & 0xFFFF00;
         item[i]._iSeed |= uid | (UniqueItemFlag[uid] << 24);
+
+
+
+
+
+
     }
     item[i]._iUid = uid;
     item[i]._iMagical = IMAGIC_UNIQUE;
     item[i]._iCreateInfo |= ICI_UNIQUE;
+
+
     item[i]._PlrCreate = FePlayerNo;
 }
 
@@ -1976,6 +2178,7 @@ void SpawnUnique(int uid, int x, int y)
 }
 
 /* @0x800443F4 ITEMS.CPP:2851 */
+#line 2658
 void ItemRndDur(int ii)
 {
     if (item[ii]._iDurability == 0) return;
@@ -1987,41 +2190,73 @@ void ItemRndDur(int ii)
  * `_PlrCreate = FePlayerNo` after SetRndSeed and again after GetItemAttrs; a recreated item skips the
  * bonus pass (outer `&& !recreate`) yet keeps the dead inner `recreate ? iseed & 0xFF : CheckUnique`
  * select retail still compiles; the IMID_UNIQUE/recreate arm drops hellfire's IL_INV guard */
+#line 2669
 void SetupAllItems(int ii, int idx, int _iseed, int lvl, int uper, unsigned char onlygood, unsigned char recreate, unsigned char pregen)
 {
     int iblvl, uid;
     int iseed = _iseed;
 
+
+
+
+
+
     item[ii]._iSeed = iseed;
     SetRndSeed(iseed);
+
+
+
+
+
     item[ii]._PlrCreate = FePlayerNo;
     GetItemAttrs(ii, idx, lvl >> 1);
+
     item[ii]._iCreateInfo = lvl;
+
+
     item[ii]._PlrCreate = FePlayerNo;
     if (pregen) item[ii]._iCreateInfo |= ICI_PREGEN;
     if (onlygood) item[ii]._iCreateInfo |= ICI_ONLYGOOD;
     if (uper == 15) item[ii]._iCreateInfo |= ICI_UPER15;
     else if (uper == 1) item[ii]._iCreateInfo |= ICI_UPER1;
     if (item[ii]._iMiscId != IMID_UNIQUE && !recreate) {
+
         iblvl = -1;
         if (ENG_random(100) <= 10) iblvl = lvl;
+
+
         else if (ENG_random(100) <= lvl) iblvl = lvl;
+
         if ((iblvl == -1) && (item[ii]._iMiscId == IMID_STAFF)) iblvl = lvl;
         if ((iblvl == -1) && (item[ii]._iMiscId == IMID_RING)) iblvl = lvl;
         if ((iblvl == -1) && (item[ii]._iMiscId == IMID_AMULET)) iblvl = lvl;
         if (onlygood) iblvl = lvl;
+
+
+
         if (uper == 15) iblvl = lvl + 4;
         if (iblvl != -1) {
+
             if (recreate) uid = iseed & 0xFF;
+
+
             else uid = CheckUnique(ii, iblvl, uper, recreate);
+
+
             if (uid == -1)
                 GetItemBonus(ii, idx, iblvl >> 1, iblvl, onlygood);
+
             else {
                 GetUniqueItem(ii, uid);
                 item[ii]._iCreateInfo |= ICI_UNIQUE;
             }
         }
         if (item[ii]._iMagical != IMAGIC_UNIQUE) ItemRndDur(ii);
+
+
+
+
+
     } else {
         GetUniqueItem(ii, iseed);
     }
@@ -2031,24 +2266,38 @@ void SetupAllItems(int ii, int idx, int _iseed, int lvl, int uper, unsigned char
 
 /* @0x800447C8 ITEMS.CPP:2746 — hellfire order; PSX: onlygood = FALSE up front, NetSendCmdDItem before the
  * numitems++ */
+#line 2745
 void SpawnItem(int m, int x, int y, unsigned char sendmsg)
 {
     int ii, idx;
     unsigned char onlygood = FALSE;
 
+
+
+
+
+
+
     if ((monster[m]._uniqtype != 0) ||
         ((monster[m].MData->mTreasure & T_U) && (gbMaxPlayers != 1))) {
+
         idx = RndUItem(m);
+
+
+
         if (idx < 0) {
             SpawnUnique(-(idx + 1), x, y);
             return;
         }
         onlygood = TRUE;
+
     } else {
         if (quests[Q_BKMUSHRM]._qactive == QUEST_ACTIVE
                  && quests[Q_BKMUSHRM]._qvar1 == QS_MUSHGIVEN) {
             idx = IDI_BRAIN;
             quests[Q_BKMUSHRM]._qvar1 = QS_BRAINSPAWNED;
+
+
         } else {
             idx = RndItem(m);
             if (idx == 0) return;
@@ -2070,6 +2319,7 @@ void SpawnItem(int m, int x, int y, unsigned char sendmsg)
         else SetupAllItems(ii, idx, GetRndSeed(), monster[m].MData->mLevel, 1, onlygood, FALSE, FALSE);
 
         if (sendmsg) NetSendCmdDItem(FALSE, ii);
+
         numitems++;
     }
 }
@@ -2116,9 +2366,15 @@ void CreateItem(int uid, int x, int y)
 }
 
 /* @0x80044BD8 ITEMS.CPP:2862 */
+#line 2861
 void CreateRndItem(int x, int y, unsigned char onlygood, unsigned char sendmsg, unsigned char delta)
 {
     int ii, idx;
+
+
+
+
+
 
     if (onlygood) idx = RndUItem(-1);
     else idx = RndAllItems();
@@ -2136,25 +2392,32 @@ void CreateRndItem(int x, int y, unsigned char onlygood, unsigned char sendmsg, 
 
 /* @0x80044D20 ITEMS.CPP:3018 — PSX uses hellfire's `#if 0`'d ORIGINAL body (IDI_HEAL/IDI_MANA/IDI_PORTAL
  * coin-flips), not the active switch(random(34,7)) rewrite, and drops the "added 7/30/97" IDI_OILACC line */
+#line 2891
 void SetupAllUseful(int ii, int iseed, int lvl)
 {
     int idx;
 
+
     item[ii]._iSeed = iseed;
     SetRndSeed(iseed);
 
+
+
+
+
     if (ENG_random(2)) idx = 0x18;
     else idx = 0x19;
-
     if ((lvl > 1) && (ENG_random(3) == 0)) idx = 0x1b;
-
     GetItemAttrs(ii, idx, lvl);
     item[ii]._iCreateInfo = lvl + ICI_USEFUL;
+
+
     item[ii]._PlrCreate = FePlayerNo;
     SetupItem(ii);
 }
 
 /* @0x80044E04 ITEMS.CPP:2915 — PSX drops GetEffLevel() (uses currlevel directly) and the CHEATS block */
+#line 2914
 void CreateRndUseful(int pnum, int x, int y, unsigned char sendmsg)
 {
     int ii;
@@ -2172,9 +2435,13 @@ void CreateRndUseful(int pnum, int x, int y, unsigned char sendmsg)
 
 /* @0x80044EC4 ITEMS.CPP:3078 — PSX drops GetEffLevel() (uses currlevel directly) and the CHEATS block;
  * RndTypeItems here has only 2 params (itype,imisc) */
+#line 2933
 void CreateTypeItem(int x, int y, unsigned char onlygood, int itype, int imisc, unsigned char sendmsg, unsigned char delta)
 {
     int ii, idx;
+
+
+
 
     if (itype != IT_GOLD) idx = RndTypeItems(itype, imisc);
     else idx = 0;
@@ -2296,15 +2563,26 @@ void SpawnRock(void)
 
 
 /* @0x80045600 ITEMS.CPP:3088 — PSX: ItemFrame = Item2Frm[it] instead of the anim data/width fields */
+#line 3087
 void RespawnItem(int i, unsigned char FlipFlag)
 {
     int it;
 
+
+
     it = ItemCAnimTbl[item[i]._iCurs];
+
     item[i].ItemFrame = Item2Frm[it];
+
+
+
+
     item[i]._iAnimLen = ItemAnimLs[it];
+
+
     item[i]._iPostDraw = FALSE;
     item[i]._iRequest = FALSE;
+
     if (FlipFlag) {
         item[i]._iAnimFrame = 1;
         item[i]._iAnimFlag = TRUE;
@@ -2323,6 +2601,7 @@ void RespawnItem(int i, unsigned char FlipFlag)
 }
 
 /* @0x800457B8 ITEMS.CPP:3426 */
+#line 3126
 void DeleteItem(int ii, int i)
 {
     itemavail[MAXITEMS - numitems] = ii;
@@ -2333,6 +2612,7 @@ void DeleteItem(int ii, int i)
 }
 
 /* @0x8004580C ITEMS.CPP:3141 — hellfire verbatim; DIRTEDGED2 = 16, dItem -> dung_map[][].dItem */
+#line 3140
 void ItemDoppel(void)
 {
     int idoppelx;
@@ -2406,27 +2686,42 @@ void ProcessItems(void)
 }
 
 /* @0x80045B70 ITEMS.CPP:3255 — empty on PSX (PC itemanims[] free loop removed) */
+#line 3254
 void FreeItemGFX(void)
 {
+
+
+
+
 }
 
 
 /* @0x80045B78 ITEMS.CPP:3279 — PSX: gold text from the language table (GetStr 0x4FF), item names via
  * MakeItemStr(text id), infoclr reset to white first */
+#line 3278
 void GetItemStr(int i)
 {
+
     switch (item[i]._itype) {
+
     case IT_GOLD: {
+
         int nGold = item[i]._ivalue;
         const char *get_pieces_str(int nGold);
         sprintf(infostr, GetStr(0x4FF), nGold, get_pieces_str(nGold));
     }
         break;
 
+
     default:
         int s = item[i]._itype;
-        if (item[i]._iIdentified) strcpy(infostr, MakeItemStr(&item[i], item[i]._iIName, 256));
+        if (item[i]._iIdentified)
+            strcpy(infostr, MakeItemStr(&item[i], item[i]._iIName, 256));
+
+
         else strcpy(infostr, MakeItemStr(&item[i], item[i]._iName, 256));
+
+
         infoclr = 0;
         if (item[i]._iMagical == 1) infoclr = 1;
         if (item[i]._iMagical == IMAGIC_UNIQUE) infoclr = 3;
@@ -2454,11 +2749,13 @@ void CheckIdentify(int pnum, int cii)
 }
 
 /* @0x80045E1C ITEMS.CPP:3555 */
+#line 3327
 static void RepairItem(ItemStruct *i, int lvl)
 {
     int d, rep;
 
     if (i->_iDurability == i->_iMaxDur) return;
+
     if (i->_iMaxDur <= 0) {
         i->_itype = -1;
         return;
@@ -2469,6 +2766,7 @@ static void RepairItem(ItemStruct *i, int lvl)
         d = i->_iMaxDur / (9 + lvl);
         if (d < 1) d = 1;
         i->_iMaxDur -= d;
+
         if (i->_iMaxDur == 0) {
             i->_itype = -1;
             return;
@@ -2481,6 +2779,7 @@ static void RepairItem(ItemStruct *i, int lvl)
 
 /* @0x80045F0C ITEMS.CPP:3583 — PSX drops the `cii<NUM_INVLOC ? InvBody[cii] : InvList[cii-NUM_INVLOC]`
  * selector and always repairs `InvBody[cii]` */
+#line 3355
 void DoRepair(int pnum, int cii)
 {
     PlayerStruct *p = &plr[pnum];
@@ -2499,6 +2798,7 @@ void DoRepair(int pnum, int cii)
 }
 
 /* @0x80045FD0 ITEMS.CPP:3601 */
+#line 3373
 static void RechargeItem(ItemStruct *i, int r)
 {
     if (i->_iCharges == i->_iMaxCharges) return;
@@ -2506,6 +2806,7 @@ static void RechargeItem(ItemStruct *i, int r)
     do {
         i->_iMaxCharges--;
         if (i->_iMaxCharges == 0) {
+
             return;
         }
         i->_iCharges += r;
@@ -2540,29 +2841,122 @@ void DoRecharge(int pnum, int cii)
 
 /* @0x8004615C ITEMS.CPP:3516 — PSX: the per-id description is ONE language-table string (GetStr id), not
  * hellfire's pairs of literal strcpy lines; ids 8/9 have no text */
+#line 3515
 void PrintItemOil(char IDidx)
 {
     int StrVal = -1;
-
     switch (IDidx) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     case 2: StrVal = 0x170; break;
+
+
     case 3: StrVal = 0x352; break;
+
+
     case 4: StrVal = 0x34F; break;
+
+
     case 5: StrVal = 0xEA; break;
+
+
     case 6: StrVal = 0x351; break;
+
+
     case 7: StrVal = 0x172; break;
+
+
     case 10: StrVal = 0x215; break;
+
+
     case 11: StrVal = 0x214; break;
+
+
     case 12: StrVal = 0x213; break;
+
+
     case 13: StrVal = 0x216; break;
+
+
+
+
     case 14:
     case 15: StrVal = 0xF2; break;
+
+
     case 16: StrVal = 0xF1; break;
+
+
     case 17: StrVal = 0xF3; break;
+
+
     case 18: StrVal = 0x350; break;
+
     case 19: StrVal = 0x171; break;
+
+
     }
     if (StrVal != -1) {
+
         strcpy(tempstr, GetStr(StrVal));
         AddPanelString(tempstr, 1);
     }
@@ -2762,33 +3156,61 @@ void PrintItemPower(char plidx, const ItemStruct *x)
 
 /* @0x80046A1C ITEMS.CPP:3994 — PSX: GetStr text ids; scrolls/books add a "can't use" line when the inventory
  * is open and the item is not usable; potions (IMID 1..20) or a usable IDidx 20 get PrintItemOil */
+#line 3993
 void PrintItemMisc(const ItemStruct *x)
 {
+
     if (x->_iMiscId == IMID_SCROLL) {
+
+
+
         strcpy(tempstr, GetStr(0x32A));
         AddPanelString(tempstr, 1);
-        if (invflag && !x->_iStatFlag) AddPanelString(GetStr(0x35E), 1);
+        if (invflag && !x->_iStatFlag)
+            AddPanelString(GetStr(0x35E), 1);
     }
     if (x->_iMiscId == IMID_TSCROLL) {
+
+
+
         strcpy(tempstr, GetStr(0x32A));
         AddPanelString(tempstr, 1);
-        if (invflag && !x->_iStatFlag) AddPanelString(GetStr(0x35E), 1);
+
+
+        if (invflag && !x->_iStatFlag)
+            AddPanelString(GetStr(0x35E), 1);
+
+
     }
     if (((x->_iMiscId >= 1) && (x->_iMiscId <= 20)) || (x->IDidx == 20 && AllItemsUseable[x->IDidx])) {
+
+
+
         PrintItemOil(x->_iMiscId);
+
+
         strcpy(tempstr, GetStr(0x32B));
         AddPanelString(tempstr, 1);
     }
     if (x->_iMiscId == IMID_BOOK) {
+
+
+
         strcpy(tempstr, GetStr(0x32A));
         AddPanelString(tempstr, 1);
-        if (invflag && !x->_iStatFlag) AddPanelString(GetStr(0x35E), 1);
+        if (invflag && !x->_iStatFlag)
+            AddPanelString(GetStr(0x35E), 1);
+
     }
     if (x->_iMiscId == IMID_MAPOFDOOM) {
+
+
+
         strcpy(tempstr, GetStr(0x32C));
         AddPanelString(tempstr, 1);
     }
     if (x->_iMiscId == IMID_EAR) {
+
         sprintf(tempstr, GetStr(0x247), x->_ivalue);
         AddPanelString(tempstr, 1);
     }
@@ -2797,13 +3219,22 @@ void PrintItemMisc(const ItemStruct *x)
 /* @0x80046C7C ITEMS.CPP:4055 — PSX: weapon line as PrintItemDur; an identified unique armor (other than
  * text 0x2AF) shows only durability (the " x/y," is written over the last 6 chars of text 0x11F);
  * power lines index PL_Prefix/PL_Suffix by the stored table index */
+#line 4054
 void PrintItemDetails(const ItemStruct *x)
 {
+
     if (x->_iClass == IC_WEAP) {
+
+
         if (x->_iMaxDur == INFINITE_DUR)
+
+
             sprintf(tempstr, "%s:%i-%i  %s", GetStr(0xE1), x->_iMinDam, x->_iMaxDam, GetStr(0x217));
+
+
         else {
             char tsrt[40];
+
             sprintf(tempstr, "%s:%i-%i  ", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
             sprintf(tsrt, GetStr(0x11F), x->_iDurability, x->_iMaxDur);
             tsrt[strlen(tsrt) - 1] = 0;
@@ -2812,14 +3243,20 @@ void PrintItemDetails(const ItemStruct *x)
         AddPanelString(tempstr, 1);
     }
     if (x->_iClass == IC_ARMOR) {
+
         if (x->_iMagical == IMAGIC_UNIQUE && x->_iIdentified && x->_iIName != 0x2AF) {
+
             if (x->_iMaxDur == INFINITE_DUR)
                 strcpy(tempstr, GetStr(0x217));
+
             else {
                 char *tstr;
                 strcpy(tempstr, GetStr(0x11F));
                 tstr = &tempstr[strlen(tempstr)];
+
                 sprintf(tstr - 6, "%i/%i,", x->_iDurability, x->_iMaxDur);
+
+
             }
         } else {
             if (x->_iMaxDur == INFINITE_DUR)
@@ -2830,16 +3267,24 @@ void PrintItemDetails(const ItemStruct *x)
         AddPanelString(tempstr, 1);
     }
     if ((x->_iMiscId == IMID_STAFF) && (x->_iMaxCharges != 0)) {
+
         sprintf(tempstr, GetStr(0xE6), x->_iMinDam, x->_iMaxDam, x->_iDurability, x->_iMaxDur);
+
+
         sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
+
         AddPanelString(tempstr, 1);
     }
     if (x->_iPrePower != -1) {
+
+
+
         PrintItemPower(PL_Prefix[x->_iPrePower].PLPower, x);
         AddPanelString(tempstr, 1);
     }
     if (x->_iSufPower != -1) {
         PrintItemPower(PL_Suffix[x->_iSufPower].PLPower, x);
+
         AddPanelString(tempstr, 1);
     }
     if (x->_iMagical == IMAGIC_UNIQUE) {
@@ -2849,10 +3294,23 @@ void PrintItemDetails(const ItemStruct *x)
     }
     PrintItemMisc(x);
     if ((x->_iMinStr + x->_iMinMag + x->_iMinDex) != 0) {
+
         strcpy(tempstr, GetStr(0x35D));
+
+
+
+
+
+
+
+
+
+
         if (x->_iMinStr != 0) sprintf(tempstr, GetStr(0x51C), tempstr, x->_iMinStr);
         if (x->_iMinMag != 0) sprintf(tempstr, GetStr(0x51B), tempstr, x->_iMinMag);
         if (x->_iMinDex != 0) sprintf(tempstr, GetStr(0x51A), tempstr, x->_iMinDex);
+
+
         AddPanelString(tempstr, 1);
     }
     pinfoflag = TRUE;
@@ -2861,13 +3319,18 @@ void PrintItemDetails(const ItemStruct *x)
 
 /* @0x800470F8 ITEMS.CPP:4153 — PSX: language-table formats; a weapon's durability part is formatted into
  * tsrt, its last char dropped, then appended */
+#line 4152
 void PrintItemDur(const ItemStruct *x)
 {
     if (x->_iClass == IC_WEAP) {
+
         if (x->_iMaxDur == INFINITE_DUR)
+
             sprintf(tempstr, "%s:%i-%i  %s", GetStr(0xE1), x->_iMinDam, x->_iMaxDam, GetStr(0x217));
+
         else {
             char tsrt[40];
+
             sprintf(tempstr, "%s:%i-%i  ", GetStr(0xE1), x->_iMinDam, x->_iMaxDam);
             sprintf(tsrt, GetStr(0x11F), x->_iDurability, x->_iMaxDur);
             tsrt[strlen(tsrt) - 1] = 0;
@@ -2875,14 +3338,21 @@ void PrintItemDur(const ItemStruct *x)
         }
         AddPanelString(tempstr, 1);
         if ((x->_iMiscId == IMID_STAFF) && (x->_iMaxCharges != 0)) {
+
+
+
             sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
             AddPanelString(tempstr, 1);
+
         }
         if (x->_iMagical) {
+
             AddPanelString(GetStr(0x2BF), 1);
         }
     }
     if (x->_iClass == IC_ARMOR) {
+
+
         if (x->_iMaxDur == INFINITE_DUR)
             sprintf(tempstr, GetStr(0x2E), x->_iAC);
         else
@@ -2892,19 +3362,37 @@ void PrintItemDur(const ItemStruct *x)
             AddPanelString(GetStr(0x2BF), 1);
         }
         if ((x->_iMiscId == IMID_STAFF) && (x->_iMaxCharges != 0)) {
+
+
+
             sprintf(tempstr, GetStr(0xB2), x->_iCharges, x->_iMaxCharges);
             AddPanelString(tempstr, 1);
+
+
         }
     }
     if ((x->_itype == IT_RING) || (x->_itype == IT_AMULET)) {
+
         AddPanelString(GetStr(0x2BF), 1);
     }
     PrintItemMisc(x);
     if ((x->_iMinStr + x->_iMinMag + x->_iMinDex) != 0) {
+
         strcpy(tempstr, GetStr(0x35D));
+
+
+
+
+
+
+
+
+
+
         if (x->_iMinStr != 0) sprintf(tempstr, GetStr(0x51C), tempstr, x->_iMinStr);
         if (x->_iMinMag != 0) sprintf(tempstr, GetStr(0x51B), tempstr, x->_iMinMag);
         if (x->_iMinDex != 0) sprintf(tempstr, GetStr(0x51A), tempstr, x->_iMinDex);
+
         AddPanelString(tempstr, 1);
     }
     pinfoflag = TRUE;
@@ -2967,13 +3455,18 @@ void CastScroll(int pnum, int Spell)
 /* @0x800476F0 ITEMS.CPP:4313 — hellfire's case set/order through a cached ptrplr; PSX: potions scale by
  * <<6 (HP/MANA shift), rogue +50% / warrior x2 / sorcerer x2 only, mana potion uses |MaxMana>>8| and
  * at least 1, no mana on EMAG / no heal on EVIT, scrolls go through CastScroll */
+#line 4312
 void UseItem(int p, int Mid, int spl)
 {
     long l;
+
     unsigned long long t;
     PlayerStruct *ptrplr = &plr[p];
 
     switch (Mid) {
+
+
+
     case IMID_MEAT:
     case IMID_HEAL:
         l = ptrplr->_pMaxHP >> 8;
@@ -2986,11 +3479,13 @@ void UseItem(int p, int Mid, int spl)
         if (ptrplr->_pHPBase > ptrplr->_pMaxHPBase) ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
         drawhpflag = TRUE;
         break;
+
     case IMID_FULLHEAL:
         ptrplr->_pHitPoints = ptrplr->_pMaxHP;
         ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
         drawhpflag = TRUE;
         break;
+
     case IMID_MANA:
         l = ptrplr->_pMaxMana >> 8;
         if (l < 0) l = -l;
@@ -3006,6 +3501,7 @@ void UseItem(int p, int Mid, int spl)
             drawmanaflag = TRUE;
         }
         break;
+
     case IMID_FULLMANA:
         if (!(ptrplr->_pIFlags & IAF_LMANA)) {
             ptrplr->_pMana = ptrplr->_pMaxMana;
@@ -3013,18 +3509,23 @@ void UseItem(int p, int Mid, int spl)
             drawmanaflag = TRUE;
         }
         break;
+
     case IMID_ESTR:
         ModifyPlrStr(p, 1);
         break;
+
     case IMID_EMAG:
         ModifyPlrMag(p, 1);
         break;
+
     case IMID_EDEX:
         ModifyPlrDex(p, 1);
         break;
+
     case IMID_EVIT:
         ModifyPlrVit(p, 1);
         break;
+
     case IMID_BOOK:
         t = 1;
         ptrplr->_pMemSpells |= (t << (spl - 1));
@@ -3036,6 +3537,7 @@ void UseItem(int p, int Mid, int spl)
         if (p == myplr) CalcPlrBookVals(p);
         drawmanaflag = TRUE;
         break;
+
     case IMID_REJUV:
         l = ptrplr->_pMaxHP >> 8;
         l = ((ENG_random(l) + (l >> 1)) << 6);
@@ -3058,6 +3560,7 @@ void UseItem(int p, int Mid, int spl)
             drawmanaflag = TRUE;
         }
         break;
+
     case IMID_FREJUV:
         ptrplr->_pHitPoints = ptrplr->_pMaxHP;
         ptrplr->_pHPBase = ptrplr->_pMaxHPBase;
@@ -3068,29 +3571,72 @@ void UseItem(int p, int Mid, int spl)
             drawmanaflag = TRUE;
         }
         break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     case IMID_SCROLL:
         if (spelldata[spl].sTargeted) {
+
+
+
+
+
+
             ptrplr->_pTSpell = spl;
             ptrplr->_pTSplType = SPT_NONE;
         } else {
             ClrPlrPath(p);
+
             ptrplr->_pSpell = spl;
             ptrplr->_pTSplType = SPT_NONE;
+
             ptrplr->_pSplFrom = SPL_FROMSB;
             ptrplr->destParam1 = cursmx;
             ptrplr->destParam2 = cursmy;
         }
         CastScroll(p, spl);
         break;
+
     case IMID_TSCROLL:
         if (spelldata[spl].sTargeted) {
+
+
             ptrplr->_pTSpell = spl;
+
             ptrplr->_pTSplType = SPT_NONE;
+
+
+
+
+
+
+
+
+
+
+
         } else {
             ClrPlrPath(p);
             ptrplr->_pSpell = spl;
+
             ptrplr->_pSplType = SPT_NONE;
             ptrplr->_pSplFrom = SPL_FROMSB;
+
             ptrplr->destParam1 = cursmx;
             ptrplr->destParam2 = cursmy;
         }
@@ -3098,7 +3644,12 @@ void UseItem(int p, int Mid, int spl)
         break;
     case IMID_MAPOFDOOM:
         if (!(!"No Ta")) DBG_Error(NULL, "source/ITEMS.cpp", 4499);
+
+
+
+
         break;
+
     case IMID_SPECTRAL:
         ModifyPlrStr(p, 3);
         ModifyPlrMag(p, 3);
@@ -3109,10 +3660,10 @@ void UseItem(int p, int Mid, int spl)
 }
 
 /* @0x80047D04 ITEMS.CPP:4740 — retail folds the if/else-if chain into an && funnel (§3.12 lever 7) */
+#line 4520
 unsigned char StoreStatOk(ItemStruct *h)
 {
     unsigned char sf;
-
     sf = plr[myplr]._pStrength >= h->_iMinStr;
     if (plr[myplr]._pMagic < h->_iMinMag) sf = FALSE;
     if (plr[myplr]._pDexterity < h->_iMinDex) sf = FALSE;
@@ -3121,25 +3672,47 @@ unsigned char StoreStatOk(ItemStruct *h)
 
 /* @0x80047D98 ITEMS.CPP:4857 — PSX adds an unconditional IT_STAFF exclusion and gates RING/AMULET on
  * FePlayerNo (front-end player slot) instead of hellfire's gbMaxPlayers!=1 + IMID_OIL check */
+#line 4544
 unsigned char PremiumItemOk(int i)
 {
     unsigned char rv;
+
+
+
+
+
+
 
     rv = AllItemsList[i].itype != IT_MISC;
     if (AllItemsList[i].itype == IT_GOLD) rv = FALSE;
     if (AllItemsList[i].itype == IT_FOOD) rv = FALSE;
     if (AllItemsList[i].itype == IT_STAFF) rv = FALSE;
+
+
+
     if (FePlayerNo) {
+
         if (AllItemsList[i].itype == IT_RING) rv = FALSE;
         if (AllItemsList[i].itype == IT_AMULET) rv = FALSE;
+
+
+
     }
     return rv;
 }
 
 /* @0x80047E14 ITEMS.CPP:4876 */
+#line 4574
 int RndPremiumItem(int minlvl, int maxlvl)
 {
     int ril[512];
+
+
+
+
+
+
+
     int ri, i;
 
     ri = 0;
@@ -3156,6 +3729,7 @@ int RndPremiumItem(int minlvl, int maxlvl)
 
 /* @0x80047F18 ITEMS.CPP:4602 — the Diablo 1.0x form (no player-stat caps / noSpells), per-player store,
  * _PlrCreate = FePlayerNo */
+#line 4601
 void SpawnOnePremium(int i, int plvl)
 {
     int itype;
@@ -3164,28 +3738,48 @@ void SpawnOnePremium(int i, int plvl)
 
     holditem = item[0];
     maxval = 140000;
+
+
+
     if (plvl > 30) plvl = 30;
+
     if (plvl < 1) plvl = 1;
 
     do {
+
+
         item[0]._iSeed = GetRndSeed();
         SetRndSeed(item[0]._iSeed);
+
+
+
+
+
         itype = RndPremiumItem(plvl >> 2, plvl) - 1;
         GetItemAttrs(0, itype, plvl);
         GetItemBonus(0, itype, plvl >> 1, plvl, TRUE);
     } while (item[0]._iIvalue > maxval);
     premiumitem[i] = item[0];
     premiumitem[i]._iCreateInfo = plvl | ICI_PREMIUM;
+
+
     premiumitem[i]._PlrCreate = FePlayerNo;
+
+
+
+
     premiumitem[i]._iIdentified = TRUE;
+
     premiumitem[i]._iStatFlag = StoreStatOk(&premiumitem[i]);
     item[0] = holditem;
 }
 
 /* @0x8004820C ITEMS.CPP:4651 — MAXPREMIUM = 6 on PSX (shift 2/3/4/5 down, respawn slots 3 and 5) */
+#line 4650
 void SpawnPremium(int lvl)
 {
     int i;
+
 
     if (numpremium < MAXPREMIUM) {
         for (i = 0; i < MAXPREMIUM; i++) {
@@ -3193,6 +3787,7 @@ void SpawnPremium(int lvl)
                 SpawnOnePremium(i, premiumlevel + premiumlvladd[i]);
         }
         numpremium = MAXPREMIUM;
+
     }
     while (premiumlevel < lvl) {
         premiumlevel++;
@@ -3206,18 +3801,19 @@ void SpawnPremium(int lvl)
 }
 
 /* @0x800485AC ITEMS.CPP:4683 — hellfire verbatim on the per-player witchitem[] */
+#line 4682
 void WitchBookLevel(int ii)
 {
     if (witchitem[ii]._iMiscId != IMID_BOOK)
         return;
-
     witchitem[ii]._iMinMag = spelldata[witchitem[ii]._iSpell].sMinInt;
     int slvl = plr[myplr]._pSplLvl[witchitem[ii]._iSpell];
-
     while (slvl != 0) {
+
         witchitem[ii]._iMinMag += ((witchitem[ii]._iMinMag * 20) / 100);
         slvl--;
         if ((witchitem[ii]._iMinMag + ((witchitem[ii]._iMinMag * 20) / 100)) > 255) {
+
             witchitem[ii]._iMinMag = 255;
             slvl = 0;
         }
@@ -3225,8 +3821,10 @@ void WitchBookLevel(int ii)
 }
 
 /* @0x80048788 ITEMS.CPP:5496 */
+#line 4728
 void SpawnStoreGold(void)
 {
+
     GetItemAttrs(0, 0, 1);
     _golditem[StorePlrNo] = item[0];
     _golditem[StorePlrNo]._iStatFlag = TRUE;
@@ -3234,6 +3832,7 @@ void SpawnStoreGold(void)
 
 /* @0x80048858 ITEMS.CPP:5728 — PSX's per-player arrays are sized smaller than hellfire's MAXSMITHITEMS/
  * MAXPREMIUM/etc (20/6/20/20 here, matching the declared array sizes) */
+#line 4781
 void RecalcStoreStats(void)
 {
     int i;
@@ -3250,6 +3849,7 @@ void RecalcStoreStats(void)
 }
 
 /* @0x80048B3C ITEMS.CPP:5746 */
+#line 4804
 int ItemNoFlippy(void)
 {
     int r;
@@ -3265,10 +3865,13 @@ int ItemNoFlippy(void)
 /* @0x80048BA0 ITEMS.CPP:4832 — PSX-specific rewrite: no hellfire equivalent shape (no bookminlevel/
  * spelldata precheck); instead a do/while re-rolls SetupAllItems until the item is a book of the right
  * spell, same idiom as CreateMagicWeapon/CreateMagicArmor */
+#line 4831
 void CreateSpellBook(int x, int y, int ispell, unsigned char sendmsg, unsigned char delta)
 {
     int ii, idx;
     unsigned char done = FALSE;
+
+
 
     idx = RndTypeItems(IT_MISC, IMID_BOOK);
     if (numitems < MAXITEMS) {
@@ -3276,9 +3879,13 @@ void CreateSpellBook(int x, int y, int ispell, unsigned char sendmsg, unsigned c
         GetSuperItemSpace(x, y, ii);
         itemavail[0] = itemavail[MAXITEMS - numitems - 1];
         itemactive[numitems] = ii;
+
         do {
             SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, 1, 0, delta);
-            if (item[ii]._iMiscId == IMID_BOOK && item[ii]._iSpell == ispell) done = TRUE;
+
+            if (item[ii]._iMiscId == IMID_BOOK && item[ii]._iSpell == ispell)
+                done = TRUE;
+
         } while (!done);
         if (sendmsg) NetSendCmdDItem(0, ii);
         if (delta) DeltaAddItem(ii);
@@ -3288,20 +3895,25 @@ void CreateSpellBook(int x, int y, int ispell, unsigned char sendmsg, unsigned c
 
 /* @0x80048D30 — PSX: no GetEffLevel() call, currlevel used inline; RndTypeItems takes only
  * (itype, imid) on PSX, third efflevel arg dropped (matches RndTypeItems__Fii elsewhere) */
+#line 4861
 void CreateMagicArmor(int x, int y, int imisc, int icurs, unsigned char sendmsg, unsigned char delta)
 {
     int ii, idx;
     unsigned char done = FALSE;
+
+
 
     if (numitems < MAXITEMS) {
         ii = itemavail[0];
         GetSuperItemSpace(x, y, ii);
         itemavail[0] = itemavail[MAXITEMS - numitems - 1];
         itemactive[numitems] = ii;
+
         idx = RndTypeItems(imisc, IMID_NONE);
         do {
             SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, 1, 0, delta);
-            if (item[ii]._iCurs == icurs) done = TRUE;
+            if (item[ii]._iCurs == icurs)
+                done = TRUE;
             else idx = RndTypeItems(imisc, IMID_NONE);
         } while (!done);
         if (sendmsg) NetSendCmdDItem(0, ii);
@@ -3312,20 +3924,25 @@ void CreateMagicArmor(int x, int y, int imisc, int icurs, unsigned char sendmsg,
 
 /* @0x80048EAC — PSX: same shape as CreateMagicArmor; hellfire's IT_STAFF->IMID_STAFF special
  * case is dropped, RndTypeItems always called with IMID_NONE (2-arg form, no efflevel) */
+#line 4890
 void CreateMagicWeapon(int x, int y, int imisc, int icurs, unsigned char sendmsg, unsigned char delta)
 {
     int ii, idx;
     unsigned char done = FALSE;
+
+
 
     if (numitems < MAXITEMS) {
         ii = itemavail[0];
         GetSuperItemSpace(x, y, ii);
         itemavail[0] = itemavail[MAXITEMS - numitems - 1];
         itemactive[numitems] = ii;
+
         idx = RndTypeItems(imisc, IMID_NONE);
         do {
             SetupAllItems(ii, idx, GetRndSeed(), currlevel << 1, 1, 1, 0, delta);
-            if (item[ii]._iCurs == icurs) done = TRUE;
+            if (item[ii]._iCurs == icurs)
+                done = TRUE;
             else idx = RndTypeItems(imisc, IMID_NONE);
         } while (!done);
         if (sendmsg) NetSendCmdDItem(0, ii);
@@ -3338,31 +3955,49 @@ void CreateMagicWeapon(int x, int y, int imisc, int icurs, unsigned char sendmsg
 
 /* @0x80049028 ITEMS.CPP:5051 — PSX: no chrflag/questlog gate, no DrawUBack/PrintUString/DrawULine
  * (the unique info goes through the item panel strings: AddPanelString per power) */
+#line 5050
 void DrawUniqueInfo(void)
 {
     int u;
 
+
     u = curruitem._iUid;
+
+
+
+
     PrintItemPower(UniqueItemList[u].UIPower1, &curruitem);
+
+
     AddPanelString(tempstr, 1);
     if (UniqueItemList[u].UINumPL > 1) {
+
         PrintItemPower(UniqueItemList[u].UIPower2, &curruitem);
+
         AddPanelString(tempstr, 1);
     }
     if (UniqueItemList[u].UINumPL > 2) {
+
         PrintItemPower(UniqueItemList[u].UIPower3, &curruitem);
+
         AddPanelString(tempstr, 1);
     }
     if (UniqueItemList[u].UINumPL > 3) {
+
         PrintItemPower(UniqueItemList[u].UIPower4, &curruitem);
+
         AddPanelString(tempstr, 1);
     }
     if (UniqueItemList[u].UINumPL > 4) {
+
         PrintItemPower(UniqueItemList[u].UIPower5, &curruitem);
+
         AddPanelString(tempstr, 1);
     }
     if (UniqueItemList[u].UINumPL > 5) {
+
         PrintItemPower(UniqueItemList[u].UIPower6, &curruitem);
+
         AddPanelString(tempstr, 1);
     }
 }
@@ -3466,9 +4101,12 @@ char *MakeItemStr(ItemStruct *ItemPtr, unsigned short ItemNo, unsigned short Max
 BOOL FIRSTTIME = TRUE;             /* @0x8011B8D8 */
 unsigned char uitemflag = 0;       /* @0x8011B8DC */
 
+#line 5437
 unsigned char SmithItemOk(int i)
 {
     unsigned char rv;
+
+
 
     rv = AllItemsList[i].itype != IT_MISC;
     if (AllItemsList[i].itype == IT_GOLD) rv = FALSE;
@@ -3476,18 +4114,33 @@ unsigned char SmithItemOk(int i)
     if (AllItemsList[i].itype == IT_STAFF) rv = FALSE;
     if (AllItemsList[i].itype == IT_RING) rv = FALSE;
     if (AllItemsList[i].itype == IT_AMULET) rv = FALSE;
+
+
+
+
+
     return rv;
 }
 
 /* @0x8004966C ITEMS.CPP:5461 — PSX drops the `ri < 512` bounds checks (ril[512] sized exactly to fit) */
+#line 5460
 int RndSmithItem(int lvl)
 {
     int ril[512];
+
+
+
+
+
+
+
     int ri, i;
 
     ri = 0;
     for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+
         if (AllItemsList[i].iRnd && SmithItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) {
+
             ril[ri++] = i;
             if (AllItemsList[i].iRnd == IRND_DOUBLE) ril[ri++] = i;
         }
@@ -3497,19 +4150,28 @@ int RndSmithItem(int lvl)
 
 /* @0x80049774 ITEMS.CPP:5044 — PSX drops the oil-range check and the gbMaxPlayers==1 SPL_RESURRECT/
  * SPL_HEALOTHER checks (hellfire additions not present in this vanilla-Diablo-era build) */
+#line 5486
 unsigned char WitchItemOk(int i)
 {
     unsigned char rv;
+
 
     rv = AllItemsList[i].itype == IT_MISC;
     if (AllItemsList[i].itype == IT_STAFF) rv = TRUE;
 
     if (AllItemsList[i].iMiscId == IMID_PMANA) rv = FALSE;
     if (AllItemsList[i].iMiscId == IMID_PFMANA) rv = FALSE;
-
     if (AllItemsList[i].iSpell == SPL_TOWN) rv = FALSE;
+
     if (AllItemsList[i].iMiscId == IMID_PHEAL) rv = FALSE;
     if (AllItemsList[i].iMiscId == IMID_PLHEAL) rv = FALSE;
+
+
+
+
+
+
+
 
     return rv;
 }
@@ -3519,32 +4181,84 @@ unsigned char WitchItemOk(int i)
  * FePlayerNo==0, i.e. host) or SPL_PHASE/SPL_TELE (when FePlayerNo!=0, i.e. client) scroll ids for that
  * substitute item so the two sides of a multiplayer game don't roll different randoms for quest-critical
  * scrolls */
+#line 5512
 int RndWitchItem(int lvl)
 {
     int ril[512];
+
+
+
+
+
+
+
+
+
+
+
+
+
     int ri, i;
     int pi = 0;
-
     for (i = 1; AllItemsList[i].iLoc != -1; i++) {
-        if (AllItemsList[i].iMiscId == IMID_PMANA && !pi) pi = i;
+
+        if (AllItemsList[i].iMiscId == IMID_PMANA && !pi)
+
+            pi = i;
+
     }
+
+
 
     ri = 0;
     for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+
+
+
+
+
+
+
+
         if (AllItemsList[i].iRnd && WitchItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) {
             int is = i;
+
+
+
             if (FePlayerNo == 0) {
-                if (AllItemsList[i].iSpell == SPL_RESURRECT || AllItemsList[i].iSpell == SPL_HEALOTHER) is = pi;
+
+                if (AllItemsList[i].iSpell == SPL_RESURRECT || AllItemsList[i].iSpell == SPL_HEALOTHER)
+
+
+
+
+                    is = pi;
+
+
+
             } else {
-                if (AllItemsList[i].iSpell == SPL_PHASE || AllItemsList[i].iSpell == SPL_TELE) is = pi;
+                if (AllItemsList[i].iSpell == SPL_PHASE || AllItemsList[i].iSpell == SPL_TELE)
+
+
+
+                    is = pi;
+
+
             }
             ril[ri++] = is;
         }
+
+
+
+
     }
+
+
     return ril[ENG_random(ri)] + 1;
 }
 
 /* @0x800499B0 ITEMS.CPP:4796 */
+#line 5589
 void BubbleSwapItem(ItemStruct *a, ItemStruct *b)
 {
     ItemStruct h;
@@ -3577,24 +4291,39 @@ void SortWitch(void)
 
 /* @0x80049C48 ITEMS.CPP:5215 — PSX adds `if (lvl==0) lvl=1;` and a DBG_Error assert when no candidate
  * was found (ri==0) before indexing ril[] */
+#line 5620
 int RndBoyItem(int lvl)
 {
     int ril[512];
+
+
+
+
+
+
     int ri, i;
 
-    if (lvl == 0) lvl = 1;
+    if (lvl == 0)
+
+
+        lvl = 1;
+
 
     ri = 0;
     for (i = 1; AllItemsList[i].iLoc != -1; i++) {
+
         if (AllItemsList[i].iRnd && PremiumItemOk(i) && (lvl >= AllItemsList[i].iMinMLvl)) ril[ri++] = i;
     }
+
     if (ri == 0) DBG_Error(NULL, "source/ITEMS.cpp", 0x160B);
+
     return ril[ENG_random(ri)] + 1;
 }
 
 /* @0x80049D64 ITEMS.CPP:5378 — PSX simplifies hellfire's stat-gated elixirs (no MaxStats[]/plr check, just
  * the iMiscId test) and gates the elixir + resurrect/healother-scroll blocks on FePlayerNo==0 rather than
  * gbMaxPlayers; HEALOTHER also resolves to FALSE here (not TRUE as in hellfire) */
+#line 5650
 unsigned char HealerItemOk(int i)
 {
     unsigned char rv;
@@ -3605,9 +4334,12 @@ unsigned char HealerItemOk(int i)
     if (AllItemsList[i].iMiscId == IMID_SCROLL && AllItemsList[i].iSpell == SPL_HEAL) rv = TRUE;
 
     if (AllItemsList[i].iMiscId == IMID_TSCROLL && AllItemsList[i].iSpell == SPL_RESURRECT && FePlayerNo == 0) rv = FALSE;
+
     if (AllItemsList[i].iMiscId == IMID_TSCROLL && AllItemsList[i].iSpell == SPL_HEALOTHER && FePlayerNo == 0) rv = FALSE;
 
+
     if (FePlayerNo == 0) {
+
         if (AllItemsList[i].iMiscId == IMID_ESTR) rv = TRUE;
         if (AllItemsList[i].iMiscId == IMID_EMAG) rv = TRUE;
         if (AllItemsList[i].iMiscId == IMID_EDEX) rv = TRUE;
@@ -3617,11 +4349,12 @@ unsigned char HealerItemOk(int i)
     if (AllItemsList[i].iMiscId == IMID_PHEAL) rv = TRUE;
     if (AllItemsList[i].iMiscId == IMID_REJUV) rv = TRUE;
     if (AllItemsList[i].iMiscId == IMID_FREJUV) rv = TRUE;
+
     if (AllItemsList[i].iMiscId == IMID_PLHEAL) rv = FALSE;
     if (AllItemsList[i].iMiscId == IMID_PHEAL) rv = FALSE;
+
     if (AllItemsList[i].iMiscId == IMID_PMANA) rv = FALSE;
     if (AllItemsList[i].iMiscId == IMID_PFMANA) rv = FALSE;
-
     return rv;
 }
 
@@ -3639,13 +4372,19 @@ int RndHealerItem(int lvl)
 }
 
 /* @0x8004A014 ITEMS.CPP:5520 */
+#line 5751
 void RecreatePremiumItem(int ii, int idx, int plvl, int iseed)
 {
+
     SetRndSeed(iseed);
     int itype = RndPremiumItem(plvl >> 2, plvl) - 1;
     GetItemAttrs(ii, itype, plvl);
     GetItemBonus(ii, itype, plvl >> 1, plvl, TRUE);
+
+
     item[ii]._iSeed = iseed;
+
+
     item[ii]._iCreateInfo = plvl | ICI_PREMIUM;
     item[ii]._iIdentified = TRUE;
     item[ii]._PlrCreate = FePlayerNo;
@@ -3653,20 +4392,31 @@ void RecreatePremiumItem(int ii, int idx, int plvl, int iseed)
 
 /* @0x8004A0F0 ITEMS.CPP:5549 — PSX drops the hellfire "book range" (IDI_FIRST_BOOK..IDI_LAST_BOOK) special
  * case and the CHEATS block; idx values are IDI_MANA(0x19)/IDI_FULLMANA(0x1E)/IDI_PORTAL(0x1B) */
+#line 5769
 void RecreateWitchItem(int ii, int idx, int lvl, int iseed)
 {
+
     if ((idx == 0x19) || (idx == 0x1E) || (idx == 0x1B)) {
         GetItemAttrs(ii, idx, lvl);
     } else {
         SetRndSeed(iseed);
         int itype = RndWitchItem(lvl) - 1;
+
         GetItemAttrs(ii, itype, lvl);
         int iblvl = -1;
         if (ENG_random(100) < 6) iblvl = lvl << 1;
+
         if ((iblvl == -1) && (item[ii]._iMiscId == IMID_STAFF)) iblvl = lvl << 1;
+
+
+
         if (iblvl != -1) GetItemBonus(ii, itype, iblvl >> 1, iblvl, TRUE);
     }
+
+
     item[ii]._iSeed = iseed;
+
+
     item[ii]._iCreateInfo = lvl | ICI_WITCH;
     item[ii]._iIdentified = TRUE;
     item[ii]._PlrCreate = FePlayerNo;
@@ -3674,12 +4424,17 @@ void RecreateWitchItem(int ii, int idx, int lvl, int iseed)
 
 /* @0x8004A258 ITEMS.CPP:5507 — PSX adds `item[ii]._PlrCreate = FePlayerNo` (network item-ownership tag,
  * not in hellfire) */
+#line 5800
 void RecreateSmithItem(int ii, int idx, int lvl, int iseed)
 {
     SetRndSeed(iseed);
     int itype = RndSmithItem(lvl) - 1;
     GetItemAttrs(ii, itype, lvl);
+
+
     item[ii]._iSeed = iseed;
+
+
     item[ii]._iCreateInfo = lvl | ICI_SMITH;
     item[ii]._iIdentified = TRUE;
     item[ii]._PlrCreate = FePlayerNo;
@@ -3687,16 +4442,28 @@ void RecreateSmithItem(int ii, int idx, int lvl, int iseed)
 
 /* @0x8004A308 ITEMS.CPP:5581 — idx values are IDI_HEAL(0x18)/IDI_FULLHEAL(0x1D)/IDI_RESURRECT(0x22);
  * PSX adds `item[ii]._PlrCreate = FePlayerNo` (see RecreateSmithItem) */
+#line 5820
 void RecreateHealerItem(int ii, int idx, int lvl, int iseed)
 {
+
+
     if ((idx == 0x18) || (idx == 0x1D) || (idx == 0x22)) {
         GetItemAttrs(ii, idx, lvl);
+
     } else {
         SetRndSeed(iseed);
+
+
+
+
         int itype = RndHealerItem(lvl) - 1;
         GetItemAttrs(ii, itype, lvl);
     }
+
+
     item[ii]._iSeed = iseed;
+
+
     item[ii]._iCreateInfo = lvl | ICI_HEALER;
     item[ii]._iIdentified = TRUE;
     item[ii]._PlrCreate = FePlayerNo;
@@ -3704,13 +4471,20 @@ void RecreateHealerItem(int ii, int idx, int lvl, int iseed)
 
 /* @0x8004A3DC ITEMS.CPP:5534 — PSX's GetItemBonus has no hellfire SpellsOk 6th param; adds
  * `item[ii]._PlrCreate = FePlayerNo` (see RecreateSmithItem) */
+#line 5847
 void RecreateBoyItem(int ii, int idx, int lvl, int iseed)
 {
+
     SetRndSeed(iseed);
     int itype = RndBoyItem(lvl) - 1;
     GetItemAttrs(ii, itype, lvl);
+
     GetItemBonus(ii, itype, lvl, lvl << 1, TRUE);
+
+
     item[ii]._iSeed = iseed;
+
+
     item[ii]._iCreateInfo = lvl | ICI_BOY;
     item[ii]._iIdentified = TRUE;
     item[ii]._PlrCreate = FePlayerNo;
@@ -3718,12 +4492,19 @@ void RecreateBoyItem(int ii, int idx, int lvl, int iseed)
 
 /* @0x8004A4B4 ITEMS.CPP:5599 — PSX checks ICI_PREMIUM/BOY/WITCH/HEALER/SMITH in that order (hellfire
  * checks SMITH first); `ivalue` (5th param) is unused here */
+#line 5866
 void RecreateTownItem(int ii, int idx, unsigned short icreateinfo, int iseed, int ivalue)
 {
+
+
     if (icreateinfo & ICI_PREMIUM) RecreatePremiumItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+
     else if (icreateinfo & ICI_BOY) RecreateBoyItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+
     else if (icreateinfo & ICI_WITCH) RecreateWitchItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+
     else if (icreateinfo & ICI_HEALER) RecreateHealerItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
+
     else if (icreateinfo & ICI_SMITH) RecreateSmithItem(ii, idx, icreateinfo & ICI_LVLMASK, iseed);
 }
 
@@ -3755,11 +4536,16 @@ void SpawnSmith(int lvl)
 
 /* @0x8004A86C ITEMS.CPP:5924 — Diablo 1.0x shape (no book pass, witchitem 0..2 premade) on the
  * per-player witchitem, item[0] saved/restored, _PlrCreate = FePlayerNo */
+#line 5923
 void SpawnWitch(int lvl)
 {
     int itype, iblvl;
+
+
     int i, nsi;
     ItemStruct holditem = item[0];
+
+
 
     GetItemAttrs(0, IDI_MANA, 1);
     witchitem[0] = item[0];
@@ -3773,25 +4559,48 @@ void SpawnWitch(int lvl)
     witchitem[2] = item[0];
     witchitem[2]._iCreateInfo = lvl;
     witchitem[2]._iStatFlag = TRUE;
+
     nsi = ENG_random(MAXWITCHITEMS - 12) + 10;
     for (i = 3; i < nsi; i++) {
+
+
+
+
         do {
             item[0]._iSeed = GetRndSeed();
             SetRndSeed(item[0]._iSeed);
+
+
+
+
             itype = RndWitchItem(lvl) - 1;
+
             GetItemAttrs(0, itype, lvl);
             iblvl = -1;
             if (ENG_random(100) <= 5) iblvl = lvl << 1;
+
+
             if ((iblvl == -1) && (item[0]._iMiscId == IMID_STAFF)) iblvl = lvl << 1;
+
+
+
+
+
             if (iblvl != -1) GetItemBonus(0, itype, iblvl >> 1, iblvl, TRUE);
         } while (item[0]._iIvalue > 140000);
+
         witchitem[i] = item[0];
         witchitem[i]._iCreateInfo = lvl | ICI_WITCH;
+
+
         witchitem[i]._PlrCreate = FePlayerNo;
         witchitem[i]._iIdentified = TRUE;
         WitchBookLevel(i);
         witchitem[i]._iStatFlag = StoreStatOk(&witchitem[i]);
+
     }
+
+
     for (i = nsi; i < MAXWITCHITEMS; i++) witchitem[i]._itype = -1;
     SortWitch();
     item[0] = holditem;
@@ -3838,22 +4647,38 @@ void SpawnHealer(int lvl)
 }
 
 /* @0x8004B3FC ITEMS.CPP:6047 — Diablo 1.0x form (BOY_MAX_VALUE 90000), per-player boyitem/boylevel */
+#line 6046
 void SpawnBoy(int lvl)
 {
     int itype;
+
+
+
     ItemStruct holditem = item[0];
 
     if (boylevel < (lvl >> 1) || boyitem._itype == -1) {
         do {
+
+
             item[0]._iSeed = GetRndSeed();
             SetRndSeed(item[0]._iSeed);
+
+
+
+
+
             itype = RndBoyItem(lvl) - 1;
             GetItemAttrs(0, itype, lvl);
+
+
             GetItemBonus(0, itype, lvl, 2 * lvl, TRUE);
         } while (item[0]._iIvalue > 90000);
         boyitem = item[0];
         boyitem._iCreateInfo = lvl | ICI_BOY;
+
+
         boyitem._PlrCreate = FePlayerNo;
+
         boyitem._iIdentified = TRUE;
         boyitem._iStatFlag = StoreStatOk(&boyitem);
         boylevel = lvl >> 1;

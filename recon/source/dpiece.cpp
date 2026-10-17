@@ -25,20 +25,31 @@ extern void ClearTRAP(int x, int y);
 extern short GetDPiece(int x, int y);
 
 /* @0x800827D8 DPIECE.CPP:82 */
+#line 81
 static void DPIECE_ERROR(void)
 {
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x800827E0 DPIECE.CPP:98 */
+#line 97
 void AllocdPiece(void)
 {
     ASSERT(!dPiece, 99);
     dPiece = (short *)Tmalloc(112 * 112 * sizeof(short));
-    for (int i = 0; i < 112 * 112; i++)
-        dPiece[i] = 0;
+    for (int i = 0; i < 112 * 112; i++) dPiece[i] = 0;
 }
 
 /* @0x80082838 DPIECE.CPP:105 */
+#line 104
 void FreedPiece(void)
 {
     ASSERT(dPiece, 106);
@@ -78,19 +89,19 @@ void ConvertdPiece(void)
 }
 
 /* @0x80082A44 DPIECE.CPP:151 */
+#line 150
 short GetDPiece(int x, int y)
 {
-    if (!dPiece)
-        DPIECE_ERROR();
+    if (!dPiece) DPIECE_ERROR();
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 153);
     return dPiece[y * 112 + x];
 }
 
 /* @0x80082ACC DPIECE.CPP:158 */
+#line 157
 void SetDPiece(int x, int y, short v)
 {
-    if (!dPiece)
-        DPIECE_ERROR();
+    if (!dPiece) DPIECE_ERROR();
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 160);
     dPiece[y * 112 + x] = v;
 }
@@ -102,12 +113,14 @@ void SetdDead(int x, int y, unsigned char v)
 }
 
 /* @0x80082BA0 DPIECE.CPP:174 */
+#line 173
 unsigned char GetdDead(int x, int y)
 {
     return dung_map[x][y].dBits >> 4;
 }
 
 /* @0x80082BC8 DPIECE.CPP:182 */
+#line 181
 void SetSOLID(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 183);
@@ -115,6 +128,7 @@ void SetSOLID(int x, int y)
 }
 
 /* @0x80082C54 DPIECE.CPP:188 */
+#line 187
 void ClearSOLID(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 189);
@@ -130,6 +144,7 @@ BOOL GetSOLID(int x, int y)
 }
 
 /* @0x80082D28 DPIECE.CPP:207 */
+#line 206
 void SetMISSILE(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 208);
@@ -137,6 +152,7 @@ void SetMISSILE(int x, int y)
 }
 
 /* @0x80082DB4 DPIECE.CPP:213 */
+#line 212
 void ClearMISSILE(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 214);
@@ -144,6 +160,7 @@ void ClearMISSILE(int x, int y)
 }
 
 /* @0x80082E40 DPIECE.CPP:219 */
+#line 218
 BOOL GetMISSILE(int x, int y)
 {
     if (dung_map[x][y].dBits & 2)
@@ -152,6 +169,7 @@ BOOL GetMISSILE(int x, int y)
 }
 
 /* @0x80082E70 DPIECE.CPP:230 */
+#line 229
 void SetBLOCK(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 231);
@@ -159,6 +177,7 @@ void SetBLOCK(int x, int y)
 }
 
 /* @0x80082EFC DPIECE.CPP:236 */
+#line 235
 void ClearBLOCK(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 237);
@@ -166,6 +185,7 @@ void ClearBLOCK(int x, int y)
 }
 
 /* @0x80082F88 DPIECE.CPP:242 */
+#line 241
 BOOL GetBLOCK(int x, int y)
 {
     if (dung_map[x][y].dBits & 4)
@@ -174,6 +194,7 @@ BOOL GetBLOCK(int x, int y)
 }
 
 /* @0x80082FB8 DPIECE.CPP:253 */
+#line 252
 void SetTRAP(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 254);
@@ -181,6 +202,7 @@ void SetTRAP(int x, int y)
 }
 
 /* @0x80083044 DPIECE.CPP:259 */
+#line 258
 void ClearTRAP(int x, int y)
 {
     ASSERT((unsigned)x <= 112 && (unsigned)y <= 112, 260);
@@ -188,6 +210,7 @@ void ClearTRAP(int x, int y)
 }
 
 /* @0x800830D0 DPIECE.CPP:265 */
+#line 264
 BOOL GetTRAP(int x, int y)
 {
     if (dung_map[x][y].dBits & 8)

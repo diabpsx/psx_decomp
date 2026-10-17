@@ -14,6 +14,7 @@
 #define SUPERLEN_CODE   (MIN_SUPERLEN - MIN_LEN)    /* means "read superlength" */
 
 /* @0x800881D4 LZNP.CPP */
+#line 41
 int LZNP_Decode(unsigned char *in, unsigned char *out)
 {
     int i, j;
@@ -21,18 +22,26 @@ int LZNP_Decode(unsigned char *in, unsigned char *out)
     unsigned char *OriginalOut = out;
 
     for (flags = 0;;) {
+
         if (((flags >>= 1) & 0xff00) == 0) {
+
             flags = (*in++) | 0xff00;           /* uses higher byte cleverly (to count eight) */
         }
 
         if (!(flags & 1)) {
+
             *out++ = *in++;
+
+
         } else {
             i = *in++;
 
             if (i >= 0x60) {
+
                 i = 0x100 - i;                  /* i = copy offset */
                 j = SMALLEST_LEN;               /* j = copy length */
+
+
             } else {
                 j = i >> 4;
                 i = (i & 0x0F) << 8;
@@ -48,6 +57,7 @@ int LZNP_Decode(unsigned char *in, unsigned char *out)
             }
 
             for (i = -i, j++; --j; out++) {
+
                 out[0] = out[i];
             }
         }

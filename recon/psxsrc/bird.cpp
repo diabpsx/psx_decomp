@@ -30,20 +30,25 @@ static void BIRD_StartFly(BIRDSTRUCT *b);
 static void BIRD_StartLanding(BIRDSTRUCT *b);
 
 /* @0x800AB6B0 BIRD.CPP:47 */
+#line 46
 void SetBirdFrig(BOOL f)
 {
     if (f != BirdFrig) {
+
         BirdFrig = f;
         HappyMan(f ? 0x1C : 0);
     }
 }
 
 /* @0x800AB6E4 BIRD.CPP:84 */
+#line 83
 static unsigned char BirdDistanceOK(int WorldXa, int WorldYa, int WorldXb, int WorldYb)
 {
     int wx = abs(WorldXa - WorldXb);
     int wy = abs(WorldYa - WorldYb);
+
     if (wx < 25 && wy < 25)
+
         return 1;
     return 0;
 }
@@ -108,28 +113,34 @@ static void BirdWorld(BIRDSTRUCT *b, int wx, int wy)
 }
 
 /* @0x800AB910 BIRD.CPP:174 */
+#line 173
 static BOOL CheckDist(int x, int y)
 {
     int x1;
     int y1;
-
     for (int i = 0; i < 2; i++) {
+
         if (plr[i].plractive) {
+
             x1 = abs(x - plr[i]._px);
             y1 = abs(y - plr[i]._py);
             if (abs(x1) < 5 && abs(y1) < 5)
                 return i + 1;
         }
     }
+
+
     return 0;
 }
 
 static int GetPerch(BIRDSTRUCT *b);
 
 /* @0x800AB9F8 BIRD.CPP:200 */
+#line 199
 static int BirdScared(BIRDSTRUCT *b)
 {
     int scared = 0;
+
     int p = GetPerch(b);
     int i;
 
@@ -137,23 +148,31 @@ static int BirdScared(BIRDSTRUCT *b)
         i = CheckDist(perches[p].x, perches[p].y);
     else
         i = CheckDist(b->_bx, b->_by);
+
     if (i) {
         i--;
+
         PlayerStruct *player = &plr[i];
+
         if (last_seenx[i] != player->WorldX || last_seeny[i] != player->WorldY)
             scared = i + 1;
         last_seenx[i] = player->WorldX;
         last_seeny[i] = player->WorldY;
     }
+
+
     return scared;
 }
 
 /* @0x800ABB24 BIRD.CPP:232 */
+#line 231
 static int GetPerch(BIRDSTRUCT *b)
 {
     if (b->leader)
         b = b->leader;
+
     for (int n = 0; n < 16; n += 4) {
+
         if (&BirdList[n] == b)
             return n / 4;
     }
@@ -190,30 +209,39 @@ static void BIRD_StartHop(BIRDSTRUCT *b)
 }
 
 /* @0x800ABD4C BIRD.CPP:292 */
+#line 291
 static void BIRD_DoHop(BIRDSTRUCT *b)
 {
     if (hop_height / 2 >= b->flytime)
         b->height--;
     else
         b->height++;
+
     b->WorldX += offset_x[b->dir];
     b->WorldY += offset_y[b->dir];
+
     BirdWorld(b, b->WorldX, b->WorldY);
+
     b->animcount = 0;
+
     b->flytime--;
     if (b->flytime <= 0) {
+
         b->height = 0;
         b->flyvar--;
         if (b->flyvar == 0)
+
             BIRD_StartPerch(b);
     }
 }
 
 /* @0x800ABE50 BIRD.CPP:323 */
+#line 322
 static void BIRD_StartPerch(BIRDSTRUCT *b)
 {
     b->mode = BIRD_PERCH;
     b->flytime = ENG_random(50) + 50;
+
     last_seenx[0] = plr[0].WorldX;
     last_seeny[0] = plr[0].WorldY;
     last_seenx[1] = plr[1].WorldX;
@@ -236,15 +264,18 @@ static void BIRD_DoPerch(BIRDSTRUCT *b)
 }
 
 /* @0x800ABF3C BIRD.CPP:363 */
+#line 362
 static void BIRD_DoScatter(BIRDSTRUCT *b)
 {
     b->flytime--;
     if (b->flytime <= 0) {
+
         b->mode = BIRD_FLY;
         b->flytime = ENG_random(50) + 50;
         b->flyvar = ENG_random(10) + 5;
     }
     if (b->height < 50) {
+
         b->height += ENG_random(2);
         b->animcount += 8;
     }
@@ -298,20 +329,31 @@ static void BIRD_StartScatter(BIRDSTRUCT *b)
 }
 
 /* @0x800AC190 BIRD.CPP:437 */
+#line 436
 static void BIRD_StartFly(BIRDSTRUCT *b)
 {
     BIRDSTRUCT *leader = b->leader;
 
     if (b->mode == BIRD_FLY || b->mode == BIRD_SCATTER)
+
         return;
     BIRD_StartScatter(b);
     if (b->visible)
+
+
+
+
         PlaySFX(TSFX_BIRDCHR1);
+
+
+
     if (leader == NULL) {
         b++;
+
         for (int i = 0; i < 3; i++)
             BIRD_StartScatter(b++);
     }
+
 }
 
 /* @0x800AC21C BIRD.CPP:468 */
@@ -370,11 +412,13 @@ static void BIRD_StartLanding(BIRDSTRUCT *b)
 }
 
 /* @0x800AC520 BIRD.CPP:555 */
+#line 554
 static void BIRD_DoLanding(BIRDSTRUCT *b)
 {
     b->height--;
     AlterBirdPos(b, 1);
     if (b->height <= 0) {
+
         b->height = 0;
         if (!SolidLoc(b->_bx, b->_by))
             BIRD_StartPerch(b);
@@ -382,12 +426,14 @@ static void BIRD_DoLanding(BIRDSTRUCT *b)
 }
 
 /* @0x800AC58C BIRD.CPP:572 */
+#line 571
 static void PlaceFlock(BIRDSTRUCT *leader)
 {
     BIRDSTRUCT *b = leader;
 
     b++;
     for (int i = 0; i < 3; i++) {
+
         b->leader = leader;
         b->animcount = 0;
         b->flyvar = 0;
@@ -398,8 +444,8 @@ static void PlaceFlock(BIRDSTRUCT *leader)
         b->leadflag = 0;
         b->dir = ENG_random(8);
         b->rnddir = ENG_random(2) - 1;
-        if (b->rnddir == 0)
-            b->rnddir = 1;
+        if (b->rnddir == 0) b->rnddir = 1;
+
         b++;
     }
 }
@@ -422,12 +468,14 @@ static void ProcessFlock(BIRDSTRUCT *b)
 }
 
 /* @0x800AC764 BIRD.CPP:637 */
+#line 636
 void InitBird(void)
 {
     BIRDSTRUCT *b = BirdList;
     int p = 0;
 
     for (int i = 0; i < 16; i += 4) {
+
         b->dir = ENG_random(7);
         b->animcount = 0;
         b->flyvar = 0;
@@ -445,32 +493,42 @@ void InitBird(void)
 }
 
 /* @0x800AC838 BIRD.CPP:668 */
+#line 667
 void ProcessBird(void)
 {
     BIRDSTRUCT *b = BirdList;
 
     if (PauseMode || stextflag || qtextflag)
+
         return;
     for (int i = 0; i < 16; i++) {
+
         switch (b->mode) {
+
         case BIRD_HOP:
             BIRD_DoHop(b);
             break;
+
         case BIRD_PERCH:
             BIRD_DoPerch(b);
             break;
+
         case BIRD_FLY:
             BIRD_DoFly(b);
             break;
+
         case BIRD_SCATTER:
             BIRD_DoScatter(b);
             break;
+
         case BIRD_LANDING:
             BIRD_DoLanding(b);
+
             break;
         }
         if (!b->leadflag)
             ProcessFlock(b);
+
         b->animcount++;
         if (b->animcount >= 16)
             b->animcount = 0;
@@ -479,12 +537,15 @@ void ProcessBird(void)
 }
 
 /* @0x800AC97C BIRD.CPP:715 */
+#line 714
 static int GetBirdFrame(BIRDSTRUCT *b)
 {
     int banim = b->dir;
 
     if (b->mode == BIRD_PERCH || b->mode == BIRD_HOP) {
+
         switch (banim) {
+
         case 1:
         case 2:
         case 3:
@@ -535,6 +596,7 @@ static void bscale(POLY_FT4 *Ft4, int height)
 }
 
 /* @0x800ACB44 BIRD.CPP:775 */
+#line 774
 static void doshadow(BIRDSTRUCT *b, int x, int y)
 {
     CBlocks *gb = BL_GetCurrentBlocks();
@@ -542,10 +604,13 @@ static void doshadow(BIRDSTRUCT *b, int x, int y)
     TextDat *Dat = MissDat;
 
     if (b->height > 40)
+
         return;
     x -= b->height;
     y -= b->height >> 1;
+
     if ((unsigned)x < 320 && (unsigned)y < 240) {
+
         int ot = gb->GetOtPos(y);
         PRIM_GetPrim(&Ft4);
         Dat->PrepareFt4(Ft4, GetBirdFrame(b), x, y, 0, 0);

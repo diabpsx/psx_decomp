@@ -241,6 +241,7 @@ static void PrintCDWaitTask(TASK *T)
 }
 
 /* @0x80098AC4 STREAM.CPP:197 */
+#line 196
 void InitCDWaitIcon(void)
 {
     CDWAIT = false;
@@ -248,25 +249,67 @@ void InitCDWaitIcon(void)
 }
 
 /* @0x80098AF8 STREAM.CPP:209 */
+#line 208
 void STR_Debug(SFXHDR *sfh, char *e, ...)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x80098B0C STREAM.CPP:424 */
+#line 423
 void STR_SystemTask(TASK *T)
 {
     while (1) {
+
+
+
+
+
+
+
+
+
         systemtask(NULL);
+
+
+
+
+
+
+
         TSK_Sleep(1);
     }
 }
 
 /* @0x80098B3C STREAM.CPP:456 */
+#line 455
 void STR_AllocBuffer(void)
 {
     if (FileSYS == 2) {
-        for (int i = 0x47FF; i >= 0; i--)
-            STR_Buffer[i] = 0;
+
+
+
+
+
+
+        for (int i = 0x47FF; i >= 0; i--) STR_Buffer[i] = 0;
     }
 }
 
@@ -436,6 +479,7 @@ void STR_setvolume(SFXHDR *sfh)
 }
 
 /* @0x800990DC STREAM.CPP:761 */
+#line 760
 void STR_setpitch(SFXHDR *sfh)
 {
     voice_attr.mask = 0x10;
@@ -467,20 +511,24 @@ void STR_PlaySFX(SFXHDR *sfh)
 }
 
 /* @0x80099234 STREAM.CPP:816 */
+#line 815
 void STR_pauseall(void)
 {
+
     for (int i = 0; i < 2; i++) {
-        if (SFXTab[i].used)
-            STR_SoundCommand(&SFXTab[i], 3);
+
+        if (SFXTab[i].used) STR_SoundCommand(&SFXTab[i], 3);
     }
 }
 
 /* @0x800992A8 STREAM.CPP:831 */
+#line 830
 void STR_resumeall(void)
 {
+
     for (int i = 0; i < 2; i++) {
-        if (SFXTab[i].used)
-            STR_SoundCommand(&SFXTab[i], 4);
+
+        if (SFXTab[i].used) STR_SoundCommand(&SFXTab[i], 4);
     }
 }
 
@@ -859,28 +907,52 @@ void STR_AsyncTASK(TASK *T)
 }
 
 /* @0x8009A06C STREAM.CPP:1471 */
+#line 1470
 void STR_StreamMainTask(SFXHDR *sfh, char FileType)
 {
+
+
+
+
+
+
     if (!sfh->type && !FeFlag) {
+
         while (!GLUE_HasGameStarted())
+
             TSK_Sleep(1);
+
+
     }
     STRHDR *sh = BL_OpenStreamFile(sfh->name, 0);
     struct DEF_ARGS *A;
     if (sh) {
+
         TASK *T2;
+
+
         sfh->SizeIn = sh->Size;
+
         if (sh->Size <= 0x8E80)
             T2 = TSK_AddTask(0x8000, (void (*)())STR_AsyncWeeTASK, 0x800, sizeof(struct DEF_ARGS));
         else
             T2 = TSK_AddTask(0x8000, (void (*)())STR_AsyncTASK, 0x800, sizeof(struct DEF_ARGS));
+
         ASSERT(T2, 0x5DC);
         TSK_MakeTaskImmortal(T2);
+
         A = (struct DEF_ARGS *)T2->Data;
         A->a0 = (unsigned long)sh;
+
+
+
+
+
         A->a1 = (unsigned long)sfh;
+
     } else {
         printf("FILE %s NOT FOUND", sfh->name);
+
         STR_CloseStream(sfh);
     }
 }

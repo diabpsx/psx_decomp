@@ -17,25 +17,49 @@ void GAL_IterateUsedMem(unsigned long MemType, void (*Func)(long hnd, void *Addr
 unsigned long LastAddr;
 
 /* @0x800845BC GARYL.CPP:111 */
+#line 110
 void MemCb(long hnd, void *Addr, unsigned long Size, const char *Name, int Users, int TimeStamp)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
     LastAddr = (unsigned long)Addr;
+
     DBG_Halt();
 }
 
 /* @0x800845E0 GARYL.CPP:131 */
+#line 130
 void Spanker(void)
 {
+
+
+
     GAL_GetUsedMem(1);
     GAL_GetFreeMem(1);
     LastAddr = 0;
     GAL_LargestFreeBlock(1);
+
+
+
     GAL_SortUsedRegionsByAddress(1);
+
     GAL_IterateUsedMem(1, MemCb);
     DBG_Halt();
 }
 
 /* @0x80084634 GARYL.CPP:330 */
+#line 329
 void GaryLiddon(void)
 {
 }

@@ -33,17 +33,39 @@ static int WarpDropY[MAXPORTAL] = { 40, 40, 40, 40 };
 static int portalindex;
 
 /* @0x80080EF8 PORTAL.CPP:151 */
+#line 150
 void AddWarpMissile(int i, int x, int y)
 {
     int mi;
-
     missiledata[MIT_TOWN].mlSFX = -1;
+
+
     dung_map[x][y].dMissile = 0;
+
+
+
+
+
+
+
+
+
+
+
     mi = AddMissile(0, 0, x, y, 0, MIT_TOWN, MI_ENEMYMONST, i, 0, 0);
+
     if (mi == -1)
+
+
         return;
     SetMissDir(mi, 1);
+
+
+
+
     missile[i]._mlid = AddLight(missile[i]._mix, missile[i]._miy, 330);
+
+
     missiledata[MIT_TOWN].mlSFX = LS_SENTINEL;
 }
 
@@ -83,16 +105,19 @@ void ActivatePortal(int i, int x, int y, int lvl, int lvltype, unsigned char sp)
 }
 
 /* @0x800811C8 PORTAL.CPP:253 */
+#line 252
 void DeactivatePortal(int i)
 {
+
     portal[i].open = 0;
 }
 
 /* @0x800811E8 PORTAL.CPP:262 */
+#line 261
 unsigned char PortalOnLevel(int i)
 {
-    if (portal[i].level == currlevel)
-        return 1;
+
+    if (portal[i].level == currlevel) return 1;
     if (currlevel == 0)
         return 1;
     else
@@ -100,18 +125,24 @@ unsigned char PortalOnLevel(int i)
 }
 
 /* @0x80081220 PORTAL.CPP:272 */
+#line 271
 static void DelMis(int mi, int i)
 {
+
     missileavail[MAXMISSILES - nummissiles] = mi;
     nummissiles--;
+
     if (nummissiles > 0 && i != nummissiles)
+
         missileactive[i] = missileactive[nummissiles];
 }
 
 /* @0x80081280 PORTAL.CPP:285 */
+#line 284
 void RemovePortalMissile(int id)
 {
     int i, mi;
+
     struct MissileStruct *m;
 
     for (i = 0; i < nummissiles; i++) {
@@ -120,8 +151,7 @@ void RemovePortalMissile(int id)
         if (m->_mitype == MIT_TOWN && m->_misource == id) {
             dung_map[m->_mix][m->_miy].dFlags &= ~BFLAG_MISSILE;
             dung_map[m->_mix][m->_miy].dMissile = 0;
-            if (portal[id].level != 0)
-                AddUnLight(m->_mlid);
+            if (portal[id].level != 0) AddUnLight(m->_mlid);
             DelMis(mi, i);
             m->_miDelFlag = 1;
         }
@@ -129,12 +159,14 @@ void RemovePortalMissile(int id)
 }
 
 /* @0x800813E4 PORTAL.CPP:306 */
+#line 305
 void SetCurrentPortal(int p)
 {
     portalindex = p;
 }
 
 /* @0x800813F0 PORTAL.CPP:312 */
+#line 311
 void GetPortalLevel(void)
 {
     if (currlevel) {
@@ -144,6 +176,7 @@ void GetPortalLevel(void)
         plr[myplr].plrlevel = 0;
         leveltype = 0;
         return;
+
     }
     if (portal[portalindex].setlvl) {
         setlevel = 1;
@@ -151,20 +184,25 @@ void GetPortalLevel(void)
         currlevel = portal[portalindex].level;
         plr[myplr].plrlevel = currlevel;
         leveltype = portal[portalindex].ltype;
+
     } else {
         setlevel = 0;
         setlvlnum = 0;
         currlevel = portal[portalindex].level;
         plr[myplr].plrlevel = currlevel;
         leveltype = portal[portalindex].ltype;
+
     }
     NetSendCmd(1, CMD_DEACTIVATEPORTAL);
     DeactivatePortal(portalindex);
+
 }
 
 /* @0x80081554 PORTAL.CPP:346 */
+#line 345
 void GetPortalLvlPos(void)
 {
+
     if (!currlevel) {
         ViewX = WarpDropX[portalindex] + 1;
         ViewY = WarpDropY[portalindex] + 1;

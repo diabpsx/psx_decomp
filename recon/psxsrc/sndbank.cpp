@@ -141,21 +141,28 @@ static const unsigned short SFXRemapTab[60] = {   /* @0x801109C8: (missing sfx, 
 };
 
 /* @0x8009A198 SNDBANK.CPP:145 */
+#line 144
 void SND_Monitor(TASK *T)
 {
     char status[24];
 
     while (1) {
+
         SpuGetAllKeysStatus(status);
         for (int i = 2; i < 24; i++) {
+
             if (status[i] != 1)
+
+
                 CHStatus[i] = 0;
+
         }
         TSK_Sleep(1);
     }
 }
 
 /* @0x8009A224 SNDBANK.CPP:164 */
+#line 163
 void SPU_OnceOnlyInit(void)
 {
     SPU_Init();
@@ -163,32 +170,49 @@ void SPU_OnceOnlyInit(void)
 }
 
 /* @0x8009A25C SNDBANK.CPP:175 */
+#line 174
 void SPU_Init(void)
 {
     {   /* retail SYM: common_attr sits one level below the body level */
         SpuCommonAttr common_attr;
-
         for (int i = 2; i < 24; i++) {
+
             SND_StopSnd(i);
             CHStatus[i] = 0;
         }
+
         SND_ClearBank();
+
+
+
         SpuInitMalloc(32, spu_management);
+
         SpuSetTransferMode(0);
         SpuSetTransferStartAddr(0);
         SpuWrite0(0x80000);
         SpuIsTransferCompleted(1);
+
+
         common_attr.mask = 3;
         common_attr.mvol.left = 0x3FFF;
+
         common_attr.mvol.right = 0x3FFF;
         SpuSetCommonAttr(&common_attr);
+
+
+
+
+
         rev_attr.mask = 7;
         rev_attr.mode = 5;
         rev_attr.depth.left = 0x666;
         rev_attr.depth.right = 0x666;
+
         SpuSetReverbModeParam(&rev_attr);
         SpuSetReverb(1);
+
         SpuReserveReverbWorkArea(1);
+
         SpuSetReverbVoice(0, 0xFFFFFFFF);
         rev_attr.mask = 6;
         SpuSetReverbDepth(&rev_attr);
@@ -213,32 +237,42 @@ int SND_FindChannel(void)
 }
 
 /* @0x8009A3D0 SNDBANK.CPP:254 */
+#line 253
 void SND_ClearBank(void)
 {
     if (BankBase)
         SpuFree(BankBase);
+
     if (OffsetHandle != -1) {
+
+
+
         BOOL ok = GAL_Free(OffsetHandle);
-        if (!ok)
-            DBG_Error(NULL, "psxsrc/SNDBANK.CPP", 263);
+        if (!ok) DBG_Error(NULL, "psxsrc/SNDBANK.CPP", 263);
+
         OffsetHandle = -1;
     }
+
     BankBase = 0;
     NoSfx = 0;
 }
 
 /* @0x8009A440 SNDBANK.CPP:278 */
+#line 277
 BOOL SndLoadCallBack(unsigned char *Mem, int ReadSoFar, int Size, BOOL LastChunk)
 {
     static int DestAddr;
 
     if (!ReadSoFar)
         DestAddr = BankBase;
+
     SpuSetTransferMode(0);
     SpuSetTransferStartAddr(DestAddr);
     SpuWrite(Mem, Size);
     SpuIsTransferCompleted(1);
+
     DestAddr += Size;
+
     return 1;
 }
 
@@ -285,9 +319,11 @@ int SND_FindSFX(unsigned short Name)
 }
 
 /* @0x8009A6B8 SNDBANK.CPP:453 */
+#line 452
 void SND_StopSnd(int voice)
 {
     SpuSetReverbVoice(0, 1 << voice);
+
     SpuSetKey(0, 0xFFFFFFFF);
 }
 
@@ -303,11 +339,12 @@ BOOL SND_IsSfxPlaying(int SFXNo)
 }
 
 /* @0x8009A728 SNDBANK.CPP:483 */
+#line 482
 int SND_RemapSnd(int SFXNo)
 {
     for (int i = 0; i < NoSNDRemaps; i++) {
-        if (SFXRemapTab[i * 2] == SFXNo)
-            return SND_FindSFX(SFXRemapTab[i * 2 + 1]);
+
+        if (SFXRemapTab[i * 2] == SFXNo) return SND_FindSFX(SFXRemapTab[i * 2 + 1]);
     }
     return -1;
 }

@@ -62,100 +62,175 @@ enum LANG_DB_NO LangDbNo = LANG_DB_MAIN;
 extern int NumOfStrings;
 
 /* @0x8007B348 LANG.CPP:84 */
+#line 83
 enum LANG_TYPE LANG_GetLang(void)
 {
     return LanguageType;
 }
 
 /* @0x8007B354 LANG.CPP:92 */
+#line 91
 void LANG_SetDb(enum LANG_DB_NO NewLangDbNo)
 {
+
+
     if (LANG_GetLang() == LANG_JAP) {
-        while (!IsKanjiLoaded())
-            TSK_Sleep(1);
+        while (!IsKanjiLoaded()) TSK_Sleep(1);
+
     }
     if (NewLangDbNo != LangDbNo) {
         char FileNameBuffer[40];
+
         FileIO *FIO;
 
         FIO = SYSI_GetFs();
+
         DumpCurrentText();
         LangDbNo = NewLangDbNo;
         GetLangFileName(LanguageType, FileNameBuffer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         if (FileSYS != 1 && !IsGameLoading()) {
+
+
+
+
+
+
+
             CDWAIT = 1;
             hndText = BL_LoadFileAsync(FileNameBuffer, 0);
-            if (hndText == -1)
-                DBG_Error(0, "source/LANG.cpp", 138);
+            if (hndText == -1) DBG_Error(0, "source/LANG.cpp", 138);
             BL_WaitForAsyncFinish();
             CDWAIT = 0;
+
+
         } else {
             CDWAIT = 1;
             hndText = FIO->Read(FileNameBuffer, 1);
-            if (hndText == -1)
-                DBG_Error(0, "source/LANG.cpp", 146);
+            if (hndText == -1) DBG_Error(0, "source/LANG.cpp", 146);
             CDWAIT = 0;
+
         }
         GAL_SetMemName(hndText, "TEXTDB");
         TextPtr = (char **)GAL_Lock(hndText);
-        if (!TextPtr)
-            DBG_Error(0, "source/LANG.cpp", 152);
+        if (!TextPtr) DBG_Error(0, "source/LANG.cpp", 152);
         NumOfStrings = CalcNumOfStrings(TextPtr);
+
+
+
+
         KANJI_SetDb(NewLangDbNo);
+
+
         for (int f = 0; f < NumOfStrings; f++)
             TextPtr[f] += (int)TextPtr;
     }
 }
 
 /* @0x8007B528 LANG.CPP:171 */
+#line 170
 char *GetStr(int StrId)
 {
     if (StrId & 0x4000) {
+
+
         StrId -= 0x4000;
         LANG_SetDb(LANG_DB_CREDITS);
+
+
     } else if (StrId & 0x2000) {
+
+
         StrId -= 0x2000;
         LANG_SetDb(LANG_DB_BACK);
+
+
     } else if (StrId & 0x1000) {
+
+
         StrId -= 0x1000;
         LANG_SetDb(LANG_DB_QUEST);
+
+
+
     } else {
         LANG_SetDb(LANG_DB_MAIN);
+
     }
     return TextPtr[StrId];
 }
 
 /* @0x8007B5A4 LANG.CPP:204 */
+#line 203
 void LANG_ReloadMainTXT(void)
 {
     CDWAIT = 1;
+
     GetStr(0x302);
+
     if (IsKanjiLoaded())
+
         CDWAIT = 0;
 }
 
 /* @0x8007B5E8 LANG.CPP:222 */
+#line 221
 void LANG_SetLang(enum LANG_TYPE NewLanguageType)
 {
     if (NewLanguageType != LanguageType) {
+
         char FileNameBuffer[40];
         FileIO *FIO;
 
         FIO = SYSI_GetFs();
+
         DumpCurrentText();
         GetLangFileName(NewLanguageType, FileNameBuffer);
+
+
+
+
+
+
+
+
+
         CDWAIT = 1;
         hndText = FIO->Read(FileNameBuffer, 1);
-        if (hndText == -1)
-            DBG_Error(0, "source/LANG.cpp", 243);
+        if (hndText == -1) DBG_Error(0, "source/LANG.cpp", 243);
         CDWAIT = 0;
+
+
         GAL_SetMemName(hndText, "TEXTDB");
+
         TextPtr = (char **)GAL_Lock(hndText);
-        if (!TextPtr)
-            DBG_Error(0, "source/LANG.cpp", 250);
+        if (!TextPtr) DBG_Error(0, "source/LANG.cpp", 250);
+
         NumOfStrings = CalcNumOfStrings(TextPtr);
+
+
+
         for (int f = 0; f < NumOfStrings; f++)
             TextPtr[f] += (int)TextPtr;
+
         LanguageType = NewLanguageType;
     }
 }
@@ -173,8 +248,10 @@ static void DumpCurrentText(void)
 }
 
 /* @0x8007B758 LANG.CPP:294 */
+#line 293
 static int CalcNumOfStrings(char **TPtr)
 {
+
     return (unsigned long)*TPtr / 4;
 }
 

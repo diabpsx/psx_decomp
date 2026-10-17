@@ -116,12 +116,14 @@ void SYSI_Init(void)
 }
 
 /* @0x80084474 SYSINIT.CPP:182 */
+#line 181
 FileIO *SYSI_GetFs(void)
 {
     return FileSystem;
 }
 
 /* @0x80084480 SYSINIT.CPP:192 */
+#line 191
 FileIO *SYSI_GetOverlayFs(void)
 {
     return OverlayFileSystem;

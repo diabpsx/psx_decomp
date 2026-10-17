@@ -20,6 +20,7 @@ static CCritSect sgMemCrit;
 static int sgnWidth;   /* retained in retail .sbss even though unused here */
 
 /* @0x8003DA28 ENGINE.CPP:45 */
+#line 44
 int GetDirection(int x1, int y1, int x2, int y2)
 {
     int mx, my, md;
@@ -55,13 +56,16 @@ int GetDirection(int x1, int y1, int x2, int y2)
 }
 
 /* @0x8003DACC ENGINE.CPP:94 */
+#line 93
 void SetRndSeed(long s)
 {
     sglGameSeed = s;
+
     SeedCount = 0;
 }
 
 /* @0x8003DADC ENGINE.CPP:102 */
+#line 101
 long GetRndSeed(void)
 {
     SeedCount++;
@@ -72,9 +76,11 @@ long GetRndSeed(void)
 }
 
 /* @0x8003DB24 ENGINE.CPP:113 */
+#line 112
 long ENG_random(long v)
 {
     if (v <= 0) return 0;
+
 
     if (v < 0x0ffff) return (GetRndSeed() >> 16) % v;
 
@@ -82,28 +88,148 @@ long ENG_random(long v)
 }
 
 /* @0x8003DB90 ENGINE.CPP:371 */
+#line 370
 unsigned char *DiabloAllocPtr(unsigned long dwBytes)
 {
+
+
+
     sgMemCrit.Enter();
+
+
+
+
+
+
+
+
+
     unsigned char *rv = (unsigned char *)SMemAlloc(dwBytes, "source/ENGINE.cpp", 385, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return rv;
 }
 
 /* @0x8003DBDC ENGINE.CPP:432 */
+#line 431
 void mem_free_dbg(void *p)
 {
     if (!p) return;
+
+
+
+
     sgMemCrit.Enter();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     SMemFree(p, "source/ENGINE.cpp", 466, 0);
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x8003DC2C ENGINE.CPP:490 */
+#line 489
 unsigned char *LoadFileInMem(const char *pszName, unsigned long *pdwFileLen)
 {
+
+
+
+
+
+
+
+
+
     return 0;
 }
 
 /* @0x8003DC34 ENGINE.CPP:568 */
+#line 567
 void PlayInGameMovie(const char *pszMovie)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

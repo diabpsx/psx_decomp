@@ -596,6 +596,7 @@ static char item_select;                           /* @0x8011C6E8 */
 
 /* ---------------------------------------------------------------- functions */
 /* @0x800A09DC */
+#line 87
 void SetQSpell(int pnum, int Spell, int type)
 {
     QSpell[pnum] = Spell;
@@ -603,20 +604,35 @@ void SetQSpell(int pnum, int Spell, int type)
 }
 
 /* @0x800A09FC */
+#line 98
 void release_spell(int pnum)
 {
+
+
     SpellTarget *spl = GetSpellTarget(sel_data);
 
+
     myplr = pnum;
+
     cursmx = spl->_stx;
     cursmy = spl->_sty;
     TryIconCurs();
+
     RemoveTargetCursor(pnum);
 }
 
 /* @0x800A0A60 */
+#line 118
 void select_belt_item(int pnum)
 {
+
+
+
+
+
+
+
+
 }
 
 /* @0x800A0A68 */
@@ -668,6 +684,7 @@ void get_next_inv()
 }
 
 /* @0x800A0D30 */
+#line 203
 void pad_func_up(int pnum)
 {
     if (questlog)
@@ -675,6 +692,7 @@ void pad_func_up(int pnum)
 }
 
 /* @0x800A0D5C */
+#line 213
 void pad_func_down(int pnum)
 {
     if (questlog)
@@ -682,35 +700,48 @@ void pad_func_down(int pnum)
 }
 
 /* @0x800A0D88 */
+#line 223
 void pad_func_left(int pnum)
 {
 }
 
 /* @0x800A0D90 */
+#line 231
 void pad_func_right(int pnum)
 {
 }
 
 /* @0x800A0D98 */
+#line 250
 void pad_func_select(int pnum)
 {
+
     if (!(stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | sbookflag | invflag | questlog | chrflag)) {
+
         ToggleOptions();
         if (optionsflag) {
+
             PlaySFX(0x33);
             options_pad = pnum;
+
+
         } else
             options_pad = -1;
     }
 }
 
 /* @0x800A0E5C */
+#line 269
 static void SetFindMonsterXY(PlayerStruct *p, int i)
 {
+
     if (leveltype) {
+
         MonsterStruct *m = &monster[i];
         p->_pVar6 = m->_mfutx;
         p->_pVar7 = m->_mfuty;
+
+
     } else {
         TownerStruct *t = &towner[i];
         p->_pVar6 = t->_tx;
@@ -843,8 +874,12 @@ void RemoveTargetCursor(int pnum)
 }
 
 /* @0x800A17D4 */
+#line 481
 BOOL TargetingSpell(int sp)
 {
+
+
+
     if (sp == 7 || sp == 13 || sp == 23 || sp == 21 || sp == 33 || sp == 8 || sp == 6)
         return 1;
     return 0;
@@ -925,28 +960,47 @@ void pad_func_Cast_Spell(int pnum)
 }
 
 /* @0x800A1C44 */
+#line 601
 void pad_func_Use_Item(int pnum)
 {
     SpellTarget *spl = GetSpellTarget(pnum);
 
     if (!(chrflag | stextflag | qtextflag | sbookflag | questlog | optionsflag | spl->Active())) {
+
         PlayerStruct *player = &plr[pnum];
         if (_pcurr_inv[sel_data] != -1) {
+
             NewCursor(1);
+
+
+
+
             if (player->SpdList[_pcurr_inv[sel_data]]._iMiscId != 0x15 || !GetSpellTarget(pnum)->Active()) {
+
+
+
+
                 if (UseInvItem(pnum, _pcurr_inv[sel_data] + 47)) {
+
                     get_next_inv();
                     _pcursinvitem[sel_data] = -1;
                     if (_SpdBeltSelFlag[pnum]) {
+
                         _SpdBeltSelFlag[pnum] = 0;
                         PostGamePad(pnum + 6, 0, 0, 0);
+
+
                     }
                 } else
                     PlaySFX(0x3D3);
+
                 if (!any_belt_items()) {
+
                     _pcurr_inv[pnum] = -1;
                     _SpdBeltSelFlag[pnum] = 0;
                     PostGamePad(pnum + 6, 0, 0, 0);
+
+
                 }
             } else
                 PlaySFX(0x3D3);
@@ -972,18 +1026,22 @@ void pad_func_BeltList(int pnum)
 }
 
 /* @0x800A1FE0 */
+#line 681
 void pad_func_Chr(int pnum)
 {
     if (!(invflag | stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | sbookflag | questlog | optionsflag | _SpdBeltSelFlag[pnum])) {
+
         chrflag ^= 1;
         if (chrflag) {
-            if (pnum != -1)
-                PlaySFX(0x33);
+
+            if (pnum != -1) PlaySFX(0x33);
             RemoveTargetCursor(pnum);
             initchr = 1;
             options_pad = pnum;
             PostGamePad(2, 0, 0, 0);
             TSK_AddTask(0, DrawChrTSK, 0x1000, 0);
+
+
         } else {
             PlaySFX(0x33);
             PostGamePad(5, 0, 0, 0);
@@ -992,13 +1050,18 @@ void pad_func_Chr(int pnum)
 }
 
 /* @0x800A2114 */
+#line 703
 void pad_func_Inv(int pnum)
 {
     if (!(chrflag | stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | sbookflag | questlog | optionsflag | SelectorActive() | _SpdBeltSelFlag[pnum])) {
+
         if (invflag) {
+
             PlaySFX(0x33);
             PostGamePad(5, 0, 0, 0);
             options_pad = -1;
+
+
         } else {
             invflag = 1;
             PlaySFX(0x33);
@@ -1012,16 +1075,21 @@ void pad_func_Inv(int pnum)
 }
 
 /* @0x800A2244 */
+#line 726
 void pad_func_SplBook(int pnum)
 {
     if (!(chrflag | invflag | stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | questlog | optionsflag | SelectorActive() | _SpdBeltSelFlag[pnum])) {
+
         sbookflag ^= 1;
         if (sbookflag) {
+
             if (!Qfromoptions)
                 PlaySFX(0x33);
             options_pad = pnum;
             PostGamePad(2, 0, 0, 0);
             TSK_AddTask(0, DrawSpellBookTSK, 0x800, 0);
+
+
         } else {
             PostGamePad(5, 0, 0, 0);
             if (!Qfromoptions)
@@ -1031,9 +1099,11 @@ void pad_func_SplBook(int pnum)
 }
 
 /* @0x800A2390 */
+#line 749
 void pad_func_QLog(int pnum)
 {
     if (!(chrflag | questlog | invflag | stextflag | qtextflag | (int)_spselflag[0] | (int)_spselflag[1] | sbookflag | optionsflag | SelectorActive() | _SpdBeltSelFlag[pnum])) {
+
         options_pad = pnum;
         StartQuestlog();
         if (questlog && !Qfromoptions)
@@ -1042,9 +1112,11 @@ void pad_func_QLog(int pnum)
 }
 
 /* @0x800A2484 */
+#line 770
 void pad_func_SpellBook(int pnum)
 {
     if (!(stextflag | qtextflag | PauseMode | chrflag | invflag | questlog | optionsflag | sbookflag | GetSpellTarget(pnum)->Active() | _SpdBeltSelFlag[pnum] | SelectorActive())) {
+
         ToggleSpell(pnum);
         PlaySFX(0x33);
         RemoveTargetCursor(pnum);
@@ -1066,6 +1138,7 @@ void pad_func_AutoMap(int pnum)
 
 /* @0x800A2618  bytes: 1 insn differs, inside gcc's own 64-bit lshrdi3 template: the template's `b`
  * is assembled by ASPSX as `bgez $0` (retail) and by GNU as as `beq $0,$0`.  SYM exact. */
+#line 832
 void pad_func_Quick_Spell(int pnum)
 {
     PlayerStruct *player = &plr[pnum];
@@ -1075,13 +1148,20 @@ void pad_func_Quick_Spell(int pnum)
     int qst = _spltotype[pnum];
 
     if (GetSpellTarget(pnum)->Active()) {
+
         PlaySFX(0x3D3);
         return;
+
+
     }
     if (_spltotype[pnum] == 3) {
+
         if (((player->_pISpells >> (qps - 1)) & 1) == 0) {
+
             qps = -1;
             qst = 4;
+
+
         }
     }
     player->_pRSpell = qps;
@@ -1129,31 +1209,39 @@ static void check_inv(int pnum, char *ilist, int entries)
 }
 
 /* @0x800A2A0C */
+#line 941
 void pad_func_Quick_Use_Health(int pnum)
 {
     check_inv(pnum, health_order, 5);
 }
 
 /* @0x800A2A34 */
+#line 952
 void pad_func_Quick_Use_Mana(int pnum)
 {
     check_inv(pnum, mana_order, 4);
 }
 
 /* @0x800A2A5C */
+#line 958
 static BOOL sort_gold(int pnum)
 {
+
     found_objects *fo = &_pfind_list[sel_data][0];
     BOOL ngold = 0;
 
     for (int i = 0; i < _pfind_index[sel_data]; i++) {
+
         if (item[fo->index]._itype == 11) {
+
             ngold = 1;
+
             NetSendCmdLocParam1(1, 0x2A, fo->x, fo->y, fo->index);
         }
         CheckNewPath(pnum);
         fo++;
     }
+
     return ngold;
 }
 
@@ -1291,8 +1379,13 @@ static void DrawObjSelector(int pnum, PlayerStruct *player)
 }
 
 /* @0x800A336C */
+#line 1145
 BOOL SelectorActive()
 {
+
+
+
+
     return select_flag != 0;
 }
 
@@ -1364,10 +1457,22 @@ static void DrawObjTask(TASK *T)
 }
 
 /* @0x800A36B4 */
+#line 1240
 void add_area_find_object(int index, int x, int y)
 {
+
     if (_pfind_index[sel_data] < 10) {
+
         found_objects *fo = &_pfind_list[sel_data][_pfind_index[sel_data]++];
+
+
+
+
+
+
+
+
+
         fo->x = x;
         fo->y = y;
         fo->index = index;

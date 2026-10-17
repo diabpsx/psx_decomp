@@ -48,6 +48,7 @@ void ClrCursor(int num)
 }
 
 /* --------------------------------------------------------------------- */
+#line 126
 void HappyMan(int n)
 {
     HappyManFlag = n * 2;
@@ -108,6 +109,7 @@ void GamePad::flyabout(void)
 }
 
 /* --------------------------------------------------------------------- */
+#line 215
 static void CloseInvChr(void)
 {
     chrflag = 0;
@@ -189,6 +191,7 @@ GamePad::GamePad(int player_num)
 }
 
 /* --------------------------------------------------------------------- */
+#line 439
 void GamePad::SetMoveStyle(char style_num)
 {
     style = style_num;
@@ -302,24 +305,36 @@ void GamePad::GetAllButtons(struct KEY_ASSIGNS *actions)
 }
 
 /* --------------------------------------------------------------------- */
+#line 637
 int GamePad::GetActionButton(void (*func)(int))
 {
+
     for (int i = 0; i < 14; i++) {
+
         if (await_combo) {
+
             if (button_combo[i] == func)
+
                 return pad_txt[i].pnum;
+
+
+
         } else {
             if (button_down[i] == func)
+
                 return pad_txt[i].pnum;
+
         }
     }
     return 0;
 }
 
 /* --------------------------------------------------------------------- */
+#line 664
 void GamePad::SetUpAction(void (*func)(int), void (*upfunc)(int))
 {
     pad_up_button = GetActionButton(func);
+
     pad_up_action = upfunc;
 }
 
@@ -531,13 +546,16 @@ int GamePad::CheckDirs(int dir)
 }
 
 /* --------------------------------------------------------------------- */
+#line 1042
 int GamePad::CheckDirs(int dir, int wx, int wy)
 {
+
+
     wx %= 8;
     wy %= 8;
-
     /* case body order == retail layout (jtbl_80118AB0) */
     switch (dir) {
+
     case 4:
         if (wx < 4 && wy < 4)
             dir = -1;
@@ -1114,8 +1132,10 @@ void PostGamePad(int val, int var1, int var2, int var3)
 }
 
 /* --------------------------------------------------------------------- */
+#line 2013
 void Init_GamePad(void)
 {
+
     TSK_AddTask(0x42, GamePadTask, 0x1000, 0);
 }
 
@@ -1171,6 +1191,7 @@ void InitGamePadVars(void)
 }
 
 /* --------------------------------------------------------------------- */
+#line 2078
 int SetWalkStyle(int pnum, int style)
 {
     int ret;
@@ -1180,6 +1201,7 @@ int SetWalkStyle(int pnum, int style)
     ret = txt_actions[2].pad_val;
     txt_actions[2].pad_val = style;
     PostGamePad(9, 0, (int)ta, 0);
+
     return ret;
 }
 

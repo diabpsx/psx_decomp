@@ -37,6 +37,7 @@ public:
 #include "source/diablo.h"
 
 /* line 103 @0x8015F470 */
+#line 102
 void InitInv(void)
 {
     invflag = 0;

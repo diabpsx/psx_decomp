@@ -268,16 +268,16 @@ void FuncLIGHTNING(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007C4A0 MISPRINT.CPP:330 */
+#line 329
 void FuncGUARDIAN(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
-    if (Ms->_mimfnum == 0 && Ms->_miAnimFrame == 15)
-        Ms->_miAnimFrame = 14;
-    if (Ms->_miAnimFrame == 2 && Ms->_mimfnum == 0)
-        DrawSpinner(ScrX - 2, ScrY + 2, 0xF0, 0xF0, 0xF0, 0x18, 0xC0, 0x10, 1, OtPos, 1, 0, 8);
+    if (Ms->_mimfnum == 0 && Ms->_miAnimFrame == 15) Ms->_miAnimFrame = 14;
+    if (Ms->_miAnimFrame == 2 && Ms->_mimfnum == 0) DrawSpinner(ScrX - 2, ScrY + 2, 0xF0, 0xF0, 0xF0, 0x18, 0xC0, 0x10, 1, OtPos, 1, 0, 8);
     TempPrintMissile(ScrX, ScrY, OtPos, 3, Ms->_miAnimFrame, 0, Ms->_mimfnum, 0, 0, 0, 0x80, 0x80, 0x80, 0);
 }
 
 /* @0x8007C5C4 MISPRINT.CPP:337 */
+#line 336
 void FuncFIREWALL(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     int frame = (Ms->_miAnimFrame * 10) / 11;
@@ -285,6 +285,7 @@ void FuncFIREWALL(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007C65C MISPRINT.CPP:343 */
+#line 342
 void FuncFIREMOVE(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     int frame = (Ms->_miAnimFrame * 10) / 11;
@@ -434,12 +435,14 @@ void FuncACID(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007CC60 MISPRINT.CPP:493 */
+#line 492
 void FuncACIDSPLAT(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     TempPrintMissile(ScrX, ScrY, OtPos, 0xE, Ms->_miAnimFrame, Ms->_mimfnum, 0, 0, 0, 0, 0x80, 0x80, 0x80, 1);
 }
 
 /* @0x8007CCC8 MISPRINT.CPP:498 */
+#line 497
 void FuncACIDPUD(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     TempPrintMissile(ScrX, ScrY, OtPos, 0xF, Ms->_miAnimFrame, Ms->_mimfnum, 0, 0, 0, 0, 0x80, 0x80, 0x80, 1);
@@ -533,6 +536,7 @@ void FuncBOOM(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007D104 MISPRINT.CPP:561 */
+#line 560
 void FuncELEMENT(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     ScrX += Ms->_miVar6;
@@ -558,6 +562,7 @@ void FuncMISEXP(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007D244 MISPRINT.CPP:585 */
+#line 584
 void FuncRHINO(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
 }
@@ -598,11 +603,13 @@ void FuncMANASHIELD(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 }
 
 /* @0x8007D40C MISPRINT.CPP:616 */
+#line 615
 void FuncFLASH2(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
 }
 
 /* @0x8007D414 MISPRINT.CPP:620 */
+#line 619
 void FuncRESURRECTBEAM(MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
     ResurrectFX(ScrX - 4, ScrY / 2 + 24, 0x4000, OtPos);

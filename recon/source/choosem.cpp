@@ -93,61 +93,92 @@ static char *MgToText[34] = {
 static BOOL DoUiForChooseMonster = true;
 
 /* @0x80155A04 CHOOSEM.CPP:134 */
+#line 133
 unsigned long CM_QuestToBitPattern(int QuestNum)
 {
     unsigned long RetVal = 0;
 
     switch (QuestNum) {
+
     case 6:
         RetVal = 1;
         break;
+
     case 2:
         RetVal = 2;
         break;
+
     case 3:
         RetVal = 4;
         break;
+
     case 7:
         RetVal = 8;
         break;
+
     case 4:
         RetVal = 0x10;
         break;
+
     case 11:
         RetVal = 0x20;
         break;
+
     case 12:
         RetVal = 0x40;
         break;
+
     case 5:
         RetVal = 0x80;
         break;
+
     case 15:
         RetVal = 0x100;
         break;
+
     case 14:
         RetVal = 0x200;
         break;
+
     case 10:
         RetVal = 0x400;
         break;
+
     case 13:
         RetVal = 0x800;
         break;
+
     case 9:
         RetVal = 0x1000;
         break;
+
     default:
-        if (!!"Quest not supported")
-            DBG_Error(0, "source/CHOOSEM.cpp", 192);
+        if (!!"Quest not supported") DBG_Error(0, "source/CHOOSEM.cpp", 192);
         break;
     }
     return RetVal;
 }
 
 /* @0x80155ADC CHOOSEM.CPP:227 */
+#line 226
 void CM_ShowMonsterList(int Level, int List)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x80155AE4 CHOOSEM.CPP:253 */
@@ -172,15 +203,18 @@ int CM_ChooseMonsterList(int Level, unsigned long QuestsNeededMask)
 }
 
 /* @0x80155B84 CHOOSEM.CPP:290 */
+#line 289
 static int NoUiListChoose(int Level, unsigned long QuestsNeededMask)
 {
     return 0;
 }
 
 /* @0x80155B8C CHOOSEM.CPP:304 */
+#line 303
 static void ChooseTask(struct TASK *T)
 {
     struct DEF_ARGS *A;
+
     int *List;
     int Level;
     unsigned int NumOfLists;
@@ -189,20 +223,164 @@ static void ChooseTask(struct TASK *T)
     unsigned int Selection;
 
     GLUE_SuspendGame();
+
     A = (struct DEF_ARGS *)T->Data;
+
     Level = A->a0;
     List = (int *)A->a1;
     QuestsNeededMask = A->a2;
+
     Level--;
-    if (Level < 0 || Level >= NumOfMonsterListLevels)
-        DBG_Error(0, "source/CHOOSEM.cpp", 324);
+
+    if (Level < 0 || Level >= NumOfMonsterListLevels) DBG_Error(0, "source/CHOOSEM.cpp", 324);
+
+
+
+
     NumOfLists = GetListsAvailable(Level, QuestsNeededMask, ListsToChooseFrom);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     Selection = ENG_random(NumOfLists);
-    if (demo_pad_time)
-        Selection = 0;
-    if (Selection == NumOfLists)
-        Selection = 0;
+
+    if (demo_pad_time) Selection = 0;
+
+    if (Selection == NumOfLists) Selection = 0;
+
+
     *List = ListsToChooseFrom[Selection];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     GLUE_ResumeGame();
 }
 

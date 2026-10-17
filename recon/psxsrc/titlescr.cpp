@@ -87,6 +87,7 @@ void DrawFlameLogo(void)
 }
 
 /* @0x8009E3A0 TITLESCR.CPP:107 */
+#line 106
 void TitleScreen(CScreen *FeScreen)
 {
     DrawFlameLogo();

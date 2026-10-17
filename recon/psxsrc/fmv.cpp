@@ -297,12 +297,14 @@ extern "C" void init_cdstream(int chunksize, unsigned char *buf, int bufsize)
 }
 
 /* @0x80155E7C FMV.CPP:328 */
+#line 327
 extern "C" void flush_cdstream(void)
 {
     _get_count = _discard_count = stream_chunks_in = stream_chunks_total = stream_out = stream_in = stream_chunks_borrowed = 0;
 }
 
 /* @0x80155ED0 FMV.CPP:366 */
+#line 365
 extern "C" void reset_cdstream(void)
 {
     _cd_seek(cdstream_resetsec);
@@ -311,9 +313,11 @@ extern "C" void reset_cdstream(void)
 }
 
 /* @0x80155F00 FMV.CPP:373 */
+#line 372
 extern "C" void kill_stream_handlers(void)
 {
     if (stream_handler_installed != 0) {
+
         CdReadyCallback((void (*)(unsigned char, unsigned char *))old_cdready_handler);
         stream_handler_installed = 0;
     }
@@ -380,9 +384,11 @@ extern "C" void stream_cdready_handler(unsigned char status, unsigned char *resu
 }
 
 /* @0x80156184 FMV.CPP:509 */
+#line 508
 extern "C" void install_stream_handlers(void)
 {
     if (stream_handler_installed == 0) {
+
         old_cdready_handler = CdReadyCallback(stream_cdready_handler);
         stream_handler_installed = 1;
     }
@@ -420,46 +426,76 @@ extern "C" void cdstream_service(void)
 }
 
 /* @0x801562B0 FMV.CPP:581 */
+#line 580
 extern "C" int cdstream_get_chunk(unsigned char **data, StHEADER **h)
 {
     if (stream_chunks_in - stream_chunks_borrowed < 0)
+
         printf("underrun in get_chunk\n");
+
+
     if (stream_chunks_in != stream_chunks_borrowed) {
+
         *data = (unsigned char *)&stream_buf[stream_out * stream_chunksize];
         *h = &stream_bufh[stream_out * stream_chunksize];
+
         _get_count++;
+
         stream_out = (stream_out + 1) % stream_bufsize;
         stream_chunks_borrowed++;
+
         stream_got_chunks++;
+
         return 1;
+
     } else {
         *data = 0;
+
         *h = 0;
         return 0;
     }
 }
 
 /* @0x801563C8 FMV.CPP:616 */
+#line 615
 extern "C" int cdstream_is_last_chunk(void)
 {
     return stream_got_chunks == stream_last_chunk;
 }
 
 /* @0x801563E0 FMV.CPP:628 */
+#line 627
 extern "C" void cdstream_discard_chunk(void)
 {
+
+
+
+
+
+
     EnterCriticalSection();
     stream_chunks_in--;
     stream_chunks_borrowed--;
     ExitCriticalSection();
+
     _discard_count++;
     if (_discard_count > _get_count)
+
         printf("discarded more than got\n");
+
+
     if (stream_chunks_borrowed > stream_chunks_in)
+
         printf("overdraught ran out\n");
+
+
     if (stream_chunks_in < 0 || stream_chunks_borrowed < 0)
+
         printf("underrun in discard (in=%d borrowed=%d)\n", stream_chunks_in, stream_chunks_borrowed);
+
+
     if (stream_stalled != 0) {
+
         _cd_seek(stream_secnum);
         CdRead2(0xA0);
         stream_stalled = 0;
@@ -541,8 +577,10 @@ extern "C" int open_cdstream(char *fname, int secoffs, int seclen)
  * sits in const 0's class, so the equivalent-to-dest preference keeps a register copy from tsz
  * (retail `addu a1,a2,zero`); loop.c then sees a register initial value, the iteration count is
  * unknown and tsz stays a running total (13 insns rather than the folded 12). */
+#line 790
 extern "C" int set_mdec_img_buffer(unsigned char *p)
 {
+
     int i = 0, tsz = 0;
 
     for (i = 0; i < 21; i++)
@@ -596,15 +634,21 @@ extern "C" void DCT_out_handler(void)
 }
 
 /* @0x80156960 FMV.CPP:882 */
+#line 881
 extern "C" void init_mdec(unsigned char *vlc_buffer, unsigned char *vlc_table)
 {
     ordertab_length = 0x80;
+
     mbuf = 0;
+
     vlctab = (unsigned short *)vlc_table;
     DecDCTvlcBuild((u_short *)vlc_table);
+
     DecDCTReset(0);
     DecDCToutCallback(DCT_out_handler);
+
     slice.w = 0x10;
+
     vlcbuf[0] = (char *)vlc_buffer;
     vlcbuf[1] = (char *)vlc_buffer + 0xEA60;
 }
@@ -764,6 +808,7 @@ extern "C" void rebuild_mdec_polys(int x, int y)
 }
 
 /* @0x80156FA8 FMV.CPP:1034 */
+#line 1033
 extern "C" void clear_mdec_frame(void)
 {
     frame_decoded = 0;
@@ -817,12 +862,14 @@ extern "C" void invalidate_mdec_frame(void)
 }
 
 /* @0x80157340 FMV.CPP:1097 */
+#line 1096
 extern "C" int is_frame_decoded(void)
 {
     return slices_to_do == 0;
 }
 
 /* @0x8015734C FMV.CPP:1111 -- SYM: w/h decremented in place, RECT r + int i, separate copy loops. */
+#line 1110
 extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, int bx2, int by2, int correct)
 {
     RECT r;
@@ -849,10 +896,8 @@ extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, in
     num_pol[0] = split_poly_area(&tmdc_pol[0][0][0], &br[0][0][0], 0, &r, x - (r.w >> 1), y - (r.h >> 1), correct);
     mdec_pw[0] = area_pw;
     mdec_ph[0] = area_ph;
-    for (i = 0; i < num_pol[0]; i++)
-        tmdc_pol[1][0][i] = tmdc_pol[0][0][i];
-    for (i = 0; i < num_pol[0]; i++)
-        br[1][0][i] = br[0][0][i];
+    for (i = 0; i < num_pol[0]; i++) tmdc_pol[1][0][i] = tmdc_pol[0][0][i];
+    for (i = 0; i < num_pol[0]; i++) br[1][0][i] = br[0][0][i];
 
     r.x = bx2;
     r.y = by2;
@@ -860,10 +905,8 @@ extern "C" void init_mdec_polys(int x, int y, int w, int h, int bx1, int by1, in
     num_pol[1] = split_poly_area(&tmdc_pol[0][1][0], &br[0][1][0], 1, &r, x - (r.w >> 1), y - (r.h >> 1), correct);
     mdec_pw[1] = area_pw;
     mdec_ph[1] = area_ph;
-    for (i = 0; i < num_pol[1]; i++)
-        tmdc_pol[1][1][i] = tmdc_pol[0][1][i];
-    for (i = 0; i < num_pol[1]; i++)
-        br[1][1][i] = br[0][1][i];
+    for (i = 0; i < num_pol[1]; i++) tmdc_pol[1][1][i] = tmdc_pol[0][1][i];
+    for (i = 0; i < num_pol[1]; i++) br[1][1][i] = br[0][1][i];
 
     mdec_w = w;
     mdec_h = h;
@@ -894,11 +937,13 @@ extern "C" void set_mdec_poly_bright(int br)
 }
 
 /* @0x80157744 FMV.CPP:1180 */
+#line 1179
 extern "C" int init_mdec_stream(unsigned char *buftop, int sectors_per_frame, int mdec_frames_per_buffer)
 {
     mdec_sectors_per_frame = sectors_per_frame;
     init_cdstream(sectors_per_frame, buftop, mdec_frames_per_buffer);
     mdec_streaming = 0;
+
     return (mdec_frames_per_buffer * mdec_sectors_per_frame) << 0xB;
 }
 
@@ -948,6 +993,7 @@ extern "C" void init_mdec_audio(int rate)
 }
 
 /* @0x801578AC FMV.CPP:1283 */
+#line 1282
 extern "C" void kill_mdec_audio(void)
 {
     SpuFree(mdec_audio_buffer[0]);
@@ -955,6 +1001,7 @@ extern "C" void kill_mdec_audio(void)
 }
 
 /* @0x801578DC FMV.CPP:1290 */
+#line 1289
 extern "C" void stop_mdec_audio(void)
 {
     SpuSetKey(0, 3);
@@ -1077,12 +1124,16 @@ extern "C" void play_mdec_audio(unsigned char *data, asec *h)
  * UNSIGNED (srl) >>14 of the product's low word, not the previously-guessed `mdec_audio_rate`; the
  * shifted result overwrites the `vol` parameter itself (no separate local) to match its SYM register.
  * mask is the constant 3 (SPU_VOICE_VOLL|SPU_VOICE_VOLR) every iteration. @0x80157C34 FMV.CPP:1418 */
+#line 1417
 extern "C" void set_mdec_audio_volume(short vol)
 {
     int i;
+
     static SpuVoiceAttr voice_attr; /* Climax mdec.c order; overlay SYMMUNGE emits this before the block. */
     vol = (short)(((int)(sfx_volume * (int)vol)) >> 14);
+
     for (i = 0; i < 2; i++) {
+
         voice_attr.mask = SPU_VOICE_VOLL | SPU_VOICE_VOLR;
         voice_attr.volume.left = (i == 0) ? vol : 0;
         voice_attr.volume.right = (i == 1) ? vol : 0;
@@ -1093,12 +1144,14 @@ extern "C" void set_mdec_audio_volume(short vol)
 }
 
 /* @0x80157D00 FMV.CPP:1437 */
+#line 1436
 extern "C" void resync_audio(void)
 {
     mdec_audio_playing = 2;
 }
 
 /* @0x80157D10 FMV.CPP:1448 */
+#line 1447
 extern "C" void stop_mdec_stream(void)
 {
     SpuIsTransferCompleted(1);
@@ -1110,25 +1163,24 @@ extern "C" void stop_mdec_stream(void)
 }
 
 /* @0x80157D54 FMV.CPP:1460 */
+#line 1459
 extern "C" void dequeue_stream(void)
 {
     struct _mdecanim *a = &mdec_queue[mdec_waiting_tail];
     int len;
 
     if (mdecs_waiting != 0) {
+
         if (a->start == -1) {
-            /* seclen (3rd arg) is dead inside open_cdstream -- never read -- but the raw still computes
-             * and passes the literal -1 here, not 0; kept for byte-exactness. */
-            /* Raw stores literal 1 to offset 0x8 (a->start) and the computed quotient to offset 0xC
-             * (a->end) here -- NOT a->flag/a->start as the field names might suggest at a glance;
-             * confirmed via play_mdec_stream's struct-store offsets (0x0/0x4/0x8/0xC/0x10 =
-             * name/speed/start/end/flag). a->flag=1 happens once, common to both arms, below. */
+
             len = open_cdstream(a->name, 0, -1);
             a->start = 1;
             a->end = len / (mdec_sectors_per_frame << 11);
+
         } else {
             open_cdstream(a->name, a->start * mdec_sectors_per_frame,
                           (a->end - a->start) * mdec_sectors_per_frame);
+
         }
         a->flag = 1;
         mdecs_waiting -= 1;
@@ -1294,16 +1346,20 @@ extern "C" void clear_mdec_queue(void)
 
 /* @0x80158298 FMV.CPP:1666 */
 extern "C" { static void StrClearVRAM(void); }   /* retail SYM: STAT, C linkage */
+#line 1665
 static void StrClearVRAM(void)
 {
     RECT clrRect;
 
     clrRect.x = 0; clrRect.y = 0; clrRect.w = 320; clrRect.h = 256;
     ClearImage(&clrRect, 0, 0, 0);
+
     clrRect.x = 320; clrRect.y = 0; clrRect.w = 320; clrRect.h = 256;
     ClearImage(&clrRect, 0, 0, 0);
+
     clrRect.x = 0; clrRect.y = 256; clrRect.w = 320; clrRect.h = 256;
     ClearImage(&clrRect, 0, 0, 0);
+
     clrRect.x = 320; clrRect.y = 256; clrRect.w = 320; clrRect.h = 256;
     ClearImage(&clrRect, 0, 0, 0);
 }
@@ -1325,14 +1381,34 @@ static int Passedh;            /* h  ditto (@0x8011C760) */
  * .bss object before CONTROL's); the jump takes its last word, 0x8012E534. */
 static unsigned char TempStack[51200];
 
+#line 1699
 extern "C" short PlayFMVOverLay(char *filename, int w, int h)
 {
+
+
+
+
+
     sfx_volume = (sglMasterVolume * 0x3FFF) >> 8;
+
+
+
+
+
+
+
+
+
     if (!setjmp(CreateEnv)) {
+
         Passedfilename = filename;
         Passedw = w;
         Passedh = h;
         GSYS_SetStackAndJump(TempStack + sizeof(TempStack) - 4, LoPlayFMVOverLay, 0);
+
+
+
+
     }
     return 0;
 }

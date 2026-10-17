@@ -44,12 +44,17 @@ unsigned char gbSelectProvider = 0;
 unsigned char gbSomebodyWonGameKludge = 0;
 
 /* @0x80052BA4 MULTI.CPP:168 */
+#line 167
 void NetSendLoPri(const unsigned char *pbMsg, unsigned char bLen)
 {
+
+
+
     ParseCmd(myplr, (const TCmd *)pbMsg);
 }
 
 /* @0x80052BD0 MULTI.CPP:559 */
+#line 558
 static int InitLevelType(int l)
 {
     if (l == 0) return 0;
@@ -60,12 +65,28 @@ static int InitLevelType(int l)
 }
 
 /* @0x80052C1C MULTI.CPP:570 */
+#line 569
 static void SetupLocalCoords(void)
 {
+
     if (!leveldebug || gbMaxPlayers > 1) {
         currlevel = 0;
         leveltype = 0;
         setlevel = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     int x = STARTX;
@@ -76,6 +97,10 @@ static void SetupLocalCoords(void)
 
     plr[myplr]._px = x;
     plr[myplr]._py = y;
+
+
+
+
     plr[myplr].plrlevel = currlevel;
     plr[myplr]._pLvlChanging = 1;
     plr[myplr].pLvlLoad = 0;
@@ -84,9 +109,11 @@ static void SetupLocalCoords(void)
 }
 
 /* @0x80052D7C MULTI.CPP:687 */
+#line 686
 void InitNewSeed(long newseed)
 {
     SetRndSeed(newseed);
+
     for (int i = 0; i < 17; i++) {
         glSeedTbl[i] = GetRndSeed();
         gnLevelTypeTbl[i] = InitLevelType(i);

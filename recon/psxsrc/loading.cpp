@@ -96,9 +96,11 @@ static unsigned short progress;           /* @0x8011C6EC */
 extern void DrawCutScreen(int lev);
 
 /* @0x800A4524 LOADING.CPP:145 */
+#line 144
 void MY_TSK_Sleep(int time)
 {
     for (int i = 0; i < time; i++) {
+
         TICK_Update();
         PAD_Handler();
         VID_AfterDisplay();
@@ -106,18 +108,37 @@ void MY_TSK_Sleep(int time)
 }
 
 /* @0x800A457C LOADING.CPP:162 */
+#line 161
 void UPDATEPROGRESS(int inc)
 {
     if (BootScreen)
+
+
+
+
         return;
     if (inc == -1) {
+
         progress += 4;
+
         TSK_Sleep(1);
+
+
+
+
+
     } else {
+
+
+
         for (int i = 0; i < inc * 4; i++) {
+
             progress++;
             if (!BootScreen) {
+
                 TSK_Sleep(1);
+
+
             } else {
                 CutScr.Display(Level2CutScreen[11], 11, 0, 0);
                 DrawCutScreen(11);
@@ -125,9 +146,14 @@ void UPDATEPROGRESS(int inc)
             }
         }
     }
+
+
+
+
 }
 
 /* @0x800A4648 LOADING.CPP:212 */
+#line 211
 BOOL IsGameLoading(void)
 {
     return GameLoading;
@@ -242,33 +268,52 @@ void PutUpCutScreen(int lev)
 }
 
 /* @0x800A4CA8 LOADING.CPP:374 */
+#line 373
 void TakeDownCutScreen(void)
 {
     TitleFlag = 0;
-    if (ThisLev == 10)
-        TitleFlag = 1;
+    if (ThisLev == 10) TitleFlag = 1;
+
     if (CutScreenTSK) {
+
         if (PaletteFadeOut(8)) {
+
             while (GetFadeState())
+
                 TSK_Sleep(1);
+
+
+
+
+
+
         }
         GameLoading = 0;
         TSK_Kill(CutScreenTSK);
         CutScreenTSK = NULL;
-        if (ThisLev != 10)
-            CutScr.Unload();
+
+        if (ThisLev != 10) CutScr.Unload();
     }
 }
 
 /* @0x800A4D4C LOADING.CPP:407 */
+#line 406
 void FinishBootProgress(void)
 {
     int Lev = 11;
 
     if (BootScreen) {
+
+
+
+
+
         if (PaletteFadeOut(8)) {
+
             while (GetFadeState()) {
+
                 CutScr.Display(Level2CutScreen[Lev], 11, 0, 0);
+
                 TSK_Sleep(1);
             }
         }
@@ -278,11 +323,21 @@ void FinishBootProgress(void)
 }
 
 /* @0x800A4DD8 LOADING.CPP:438 */
+#line 437
 void FinishProgress(void)
 {
     if (!BootScreen) {
+
         while (progress < 256)
+
             UPDATEPROGRESS(-1);
+
+
+
+
+
+
+
     } else {
         FinishBootProgress();
     }

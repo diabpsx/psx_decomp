@@ -14,6 +14,7 @@ static TextDat *DecRequestors[10];
 
 /* @0x800B07A4 DECOMP.CPP:61 (linked into the startup segment) */
 void DEC_Open(void) __attribute__((section(".STARTUP_text")));
+#line 60
 void DEC_Open(void)
 {
     for (int f = 0; f < 10; f++)
@@ -21,43 +22,48 @@ void DEC_Open(void)
 }
 
 /* @0x800A4384 DECOMP.CPP:71 */
+#line 70
 void DEC_AddAsDecRequestor(TextDat *Td)
 {
     int TdIndex;
 
     TdIndex = FindThisTd(Td);
+
     if (TdIndex == -1) {
+
         TdIndex = FindEmptyIndex();
-        if (TdIndex == -1)
-            DBG_Error(NULL, "psxsrc/DECOMP.CPP", 79);
+        if (TdIndex == -1) DBG_Error(NULL, "psxsrc/DECOMP.CPP", 79);
         DecRequestors[TdIndex] = Td;
     }
 }
 
 /* @0x800A4400 DECOMP.CPP:90 */
+#line 89
 void DEC_RemoveAsDecRequestor(TextDat *Td)
 {
     int TdIndex;
-
     TdIndex = FindThisTd(Td);
-    if (TdIndex == -1)
-        DBG_Error(NULL, "psxsrc/DECOMP.CPP", 93);
+    if (TdIndex == -1) DBG_Error(NULL, "psxsrc/DECOMP.CPP", 93);
     DecRequestors[TdIndex] = 0;
 }
 
 /* @0x800A4458 DECOMP.CPP:102 */
+#line 101
 void DEC_DoDecompRequests(void)
 {
     for (int f = 0; f < 10; f++) {
+
         if (DecRequestors[f])
             DecRequestors[f]->DoDecompRequests();
     }
 }
 
 /* @0x800A44B4 DECOMP.CPP:116 */
+#line 115
 static int FindThisTd(TextDat *Td)
 {
     for (int f = 0; f < 10; f++) {
+
         if (DecRequestors[f] == Td)
             return f;
     }
@@ -65,9 +71,11 @@ static int FindThisTd(TextDat *Td)
 }
 
 /* @0x800A44EC DECOMP.CPP:130 */
+#line 129
 static int FindEmptyIndex(void)
 {
     for (int f = 0; f < 10; f++) {
+
         if (!DecRequestors[f])
             return f;
     }

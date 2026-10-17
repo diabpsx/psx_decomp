@@ -174,40 +174,68 @@ struct LocalLevel sgLocals[22] = { 0 };
 struct TCmdSpellXY { unsigned char bCmd, x, y, _pad; unsigned short wParam1, wParam2, wParam3; };
 struct TCmdSpellID { unsigned char bCmd, _pad; unsigned short wParam1, wParam2, wParam3; };
 
+#line 265
 void delta_init(void)
 {
     sgbDeltaChanged = 0;
     memset(&sgJunk, 0xFF, sizeof(sgJunk));
+
+
+
+
     GameMaps.Init();
+
+
     memset(sgLocals, 0, sizeof(sgLocals));
     deltaload = 0;
 }
 
 /* @0x8004EAF4 MSG.CPP:284 */
+#line 283
 void delta_kill_monster(int mi, unsigned char x, unsigned char y, unsigned char bLevel)
 {
     DMonsterStr *p;
+
+
+
+
+
+
+
     DLevel *Dl;
     sgbDeltaChanged = 1;
+
     Dl = GetDLevel(bLevel, setlevel);
+
     p = &Dl->monster[mi];
+
     p->_mx = x;
     p->_my = y;
     p->_mdir = monster[mi]._mdir;
     p->_mhitpoints = 0;
+
     ReleaseDLevel(Dl);
 }
 
 /* @0x8004EB90 MSG.CPP:312 */
+#line 311
 void delta_monster_hp(int mi, long hp, unsigned char bLevel)
 {
     DMonsterStr *p;
+
+
+
+
+
     DLevel *Dl;
     sgbDeltaChanged = 1;
+
     Dl = GetDLevel(bLevel, setlevel);
+
     p = &Dl->monster[mi];
-    if (p->_mhitpoints > hp)
-        p->_mhitpoints = hp;
+
+    if (p->_mhitpoints > hp) p->_mhitpoints = hp;
+
     ReleaseDLevel(Dl);
 }
 
@@ -240,11 +268,23 @@ void delta_leave_sync(unsigned char bLevel)
 }
 
 /* @0x8004EF38 MSG.CPP:416 */
+#line 415
 static void delta_sync_object(int oi, unsigned char bCmd, unsigned char bLevel)
 {
+
+
+
+
+
+
     sgbDeltaChanged = 1;
+
+
     DLevel *Dl = GetDLevel(bLevel, setlevel);
+
     DObjectStr *p = &Dl->object[oi];
+
+
     p->bCmd = bCmd;
     ReleaseDLevel(Dl);
 }
@@ -425,126 +465,185 @@ int DeltaExportData(char *Dst)
 
 /* @0x8004F58C MSG.CPP:754 -- single-arg (char *Src is reinterpreted straight as CompressedLevs*);
  * returns the pre-import compressed size (GetSize() called on Src BEFORE ImportData consumes it). */
+#line 753
 int DeltaImportData(char *Src)
 {
+
+
+
+
+
+
+
+
+
+
+
     int osize = ((CompressedLevs *)Src)->GetSize();
     GameMaps.ImportData((CompressedLevs *)Src);
+
+
+
+
+
+
+
     return osize;
 }
 
 /* @0x8004F5D4 MSG.CPP:780 */
+#line 779
 void DeltaSaveLevel(void)
 {
+
+
+
+
     for (int i = 0; i < 2; i++) {
-        if (i != myplr)
-            plr[i]._pGFXLoad = 0;
+        if (i != myplr) plr[i]._pGFXLoad = 0;
+
     }
+
     if (!setlevel)
         plr[myplr]._pLvlVisited[currlevel] = 1;
     else
         plr[myplr]._pSLvlVisited[setlvlnum] = 1;
+
     delta_leave_sync(currlevel);
 }
 
 /* @0x8004F6D0 MSG.CPP:870 */
+#line 869
 void NetSendCmd(unsigned char bHiPri, unsigned char bCmd)
 {
     TCmd cmd;
     cmd.bCmd = bCmd;
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F6F8 MSG.CPP:880 */
+#line 879
 void NetSendCmdGolem(unsigned char mx, unsigned char my, unsigned char dir, unsigned char menemy, long hp, unsigned char cl)
 {
     TCmdGolem cmd;
+
+
+
+
     cmd.bCmd = 90; /* confirmed literal, NOT the ParseCmd-position-derived value */
     cmd._mx = mx;
     cmd._my = my;
     cmd._mdir = dir;
     cmd._menemy = menemy;
     cmd._mhitpoints = (short)hp;
+
     cmd._currlevel = (unsigned char)cl;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F744 MSG.CPP:900 */
+#line 899
 void NetSendCmdLoc(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y)
 {
     TCmdLoc cmd;
+
+
+
+
     cmd.bCmd = bCmd;
     cmd.x = x;
+
     cmd.y = y;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F774 MSG.CPP:916 */
+#line 915
 void NetSendCmdLocParam1(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short wParam1)
 {
     TCmdLocParam1 cmd;
+
+
     cmd.bCmd = bCmd;
     cmd.x = x;
     cmd.y = y;
+
     cmd.wParam1 = wParam1;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F7AC MSG.CPP:931 */
+#line 930
 void NetSendCmdLocParam2(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short wParam1, unsigned short wParam2)
 {
     TCmdLocParam2 cmd;
+
+
     cmd.bCmd = bCmd;
     cmd.x = x;
     cmd.y = y;
     cmd.wParam1 = wParam1;
+
     cmd.wParam2 = wParam2;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F7EC MSG.CPP:947 */
+#line 946
 void NetSendCmdLocParam3(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y, unsigned short wParam1, unsigned short wParam2, unsigned short wParam3)
 {
     TCmdLocParam3 cmd;
+
+
     cmd.bCmd = bCmd;
     cmd.x = x;
     cmd.y = y;
     cmd.wParam1 = wParam1;
     cmd.wParam2 = wParam2;
     cmd.wParam3 = wParam3;
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F834 MSG.CPP:964 */
+#line 963
 void NetSendCmdParam1(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1)
 {
     TCmdParam1 cmd;
     cmd.bCmd = bCmd;
+
     cmd.wParam1 = wParam1;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F860 MSG.CPP:975 */
+#line 974
 void NetSendCmdParam2(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1, unsigned short wParam2)
 {
     TCmdParam2 cmd;
     cmd.bCmd = bCmd;
     cmd.wParam1 = wParam1;
+
     cmd.wParam2 = wParam2;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F890 MSG.CPP:986 */
+#line 985
 void NetSendCmdParam3(unsigned char bHiPri, unsigned char bCmd, unsigned short wParam1, unsigned short wParam2, unsigned short wParam3)
 {
     TCmdParam3 cmd;
     cmd.bCmd = bCmd;
     cmd.wParam1 = wParam1;
     cmd.wParam2 = wParam2;
+
     cmd.wParam3 = wParam3;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004F8C8 MSG.CPP:998 */
+#line 997
 void NetSendCmdQuest(unsigned char bHiPri, unsigned char q)
 {
     TCmdQuest cmd;
@@ -553,6 +652,7 @@ void NetSendCmdQuest(unsigned char bHiPri, unsigned char q)
     cmd.qstate = quests[q]._qactive;
     cmd.qlog = quests[q]._qlog;
     cmd.qvar1 = quests[q]._qvar1;
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
@@ -598,18 +698,37 @@ void NetSendCmdGItem2(unsigned char usonly, unsigned char bCmd, unsigned char ma
 /* @0x8004FB08 MSG.CPP:1100 */
 /* builds a local copy but never actually SENDS it (no NetSendLoPri call) -- dead-looking but that is
  * exactly what the raw does; always returns 1. */
+#line 1099
 unsigned char NetSendCmdReq2(unsigned char bCmd, unsigned char mast, unsigned char pnum, const TCmdGItem *p)
 {
+
+
+
+
     TCmdGItem cmd = *p;
     cmd.bCmd = bCmd;
     cmd.bPnum = pnum;
     cmd.bMaster = mast;
+
+
+
+
+
+
+
+
+
+
     return 1;
 }
 
 /* @0x8004FB68 MSG.CPP:1126 */
+#line 1125
 void NetSendCmdExtra(const TCmdGItem *p)
 {
+
+
+
     TCmdGItem cmd = *p;
     cmd.bCmd = 0x55; /* confirmed literal (not CMD_ITEMEXTRA's ParseCmd-position value) */
     cmd.dwTime = 0;
@@ -618,15 +737,47 @@ void NetSendCmdExtra(const TCmdGItem *p)
 
 /* @0x8004FBD8 MSG.CPP:1138 -- reads plr[myplr].HoldItem (the currently-held/dragged item), NOT
  * item[_pcursitem] -- confirmed by the raw's plr+0x1910-relative offsets. */
+#line 1137
 void NetSendCmdPItem(unsigned char bHiPri, unsigned char bCmd, unsigned char x, unsigned char y)
 {
     TCmdPItem cmd;
+
+
+
     cmd.bCmd = bCmd;
     cmd.x = x;
     cmd.y = y;
     cmd.wIndx = plr[myplr].HoldItem.IDidx;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     cmd.wCI = plr[myplr].HoldItem._iCreateInfo;
+
+
     cmd.dwSeed = plr[myplr].HoldItem._iSeed;
+
+
     cmd.bId = plr[myplr].HoldItem._iIdentified;
     cmd.bDur = plr[myplr].HoldItem._iDurability;
     cmd.bMDur = plr[myplr].HoldItem._iMaxDur;
@@ -634,10 +785,13 @@ void NetSendCmdPItem(unsigned char bHiPri, unsigned char bCmd, unsigned char x, 
     cmd.bMCh = plr[myplr].HoldItem._iMaxCharges;
     cmd.wValue = plr[myplr].HoldItem._ivalue;
     cmd.dwBuff = (signed char)plr[myplr].HoldItem._PlrCreate;
+
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FCF4 MSG.CPP:1192 -- bCmd param is UNUSED; the command byte is hardcoded 0x30 (CMD_CHANGEINVITEMS). */
+#line 1191
 void NetSendCmdChItem(unsigned char bHiPri, unsigned char bLoc)
 {
     TCmdChItem cmd;
@@ -645,30 +799,68 @@ void NetSendCmdChItem(unsigned char bHiPri, unsigned char bLoc)
     cmd.bLoc = bLoc;
     cmd.wIndx = plr[myplr].HoldItem.IDidx;
     cmd.wCI = plr[myplr].HoldItem._iCreateInfo;
+
     cmd.dwSeed = plr[myplr].HoldItem._iSeed;
+
+
+
     cmd.bId = plr[myplr].HoldItem._iIdentified;
+
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FD98 MSG.CPP:1212 */
+#line 1211
 void NetSendCmdDelItem(unsigned char bHiPri, unsigned char bLoc)
 {
     TCmdDelItem cmd;
     cmd.bCmd = 0x31; /* confirmed literal, bHiPri param unused */
     cmd.bLoc = bLoc;
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FDC8 MSG.CPP:1223 */
+#line 1222
 void NetSendCmdDItem(unsigned char bHiPri, int ii)
 {
     TCmdPItem cmd;
+
+
     cmd.bCmd = 0x34; /* confirmed literal, bHiPri param unused */
     cmd.x = item[ii]._ix;
     cmd.y = item[ii]._iy;
     cmd.wIndx = item[ii].IDidx;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     cmd.wCI = item[ii]._iCreateInfo;
+
     cmd.dwSeed = item[ii]._iSeed;
+
+
     cmd.bId = item[ii]._iIdentified;
     cmd.bDur = item[ii]._iDurability;
     cmd.bMDur = item[ii]._iMaxDur;
@@ -676,44 +868,81 @@ void NetSendCmdDItem(unsigned char bHiPri, int ii)
     cmd.bMCh = item[ii]._iMaxCharges;
     cmd.wValue = item[ii]._ivalue;
     cmd.dwBuff = (signed char)item[ii]._PlrCreate;
+
+
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FEF0 MSG.CPP:1274 */
+#line 1273
 static unsigned char i_own_level(int nReqLevel)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return 1;
 }
 
 /* @0x8004FEF8 MSG.CPP:1296 */
+#line 1295
 void NetSendCmdDamage(unsigned char bHiPri, unsigned char bPlr, unsigned long dwDam)
 {
     TCmdDamage cmd;
+
+
     cmd.bCmd = 0x32; /* confirmed literal, NOT the ParseCmd-position-derived CMD_PLRDAMAGE */
     cmd.bPlr = bPlr;
+
     cmd.dwDam = dwDam;
     NetSendLoPri((const unsigned char *)&cmd, sizeof(cmd));
 }
 
 /* @0x8004FF2C MSG.CPP:1339 */
+#line 1338
 void delta_close_portal(int pnum)
 {
+
     memset(&sgJunk.portal[pnum], 0xFF, sizeof(sgJunk.portal[pnum]));
     sgbDeltaChanged = 1;
 }
 
 /* @0x8004FF6C MSG.CPP:1348 */
+#line 1347
 static void check_update_plr(int pnum)
 {
+
+
+
+
+
+
+
+
 }
 
 /* ============================================================================================= */
 /* On_* command handlers. */
 
 /* @0x8004FF74 MSG.CPP:1368 */
+#line 1367
 static void On_WALKXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLoc *p = (const TCmdLoc *)pCmd;
+
+
+
     ClrPlrPath(pnum);
     MakePlrPath(pnum, p->x, p->y, 1);
     plr[pnum].destAction = -1;
@@ -761,9 +990,12 @@ static void On_SBSPELL(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050128 MSG.CPP:1469 */
+#line 1468
 static void On_GOTOGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+
+
     MakePlrPath(pnum, p->x, p->y, 0);
     plr[pnum].destAction = ACTION_WALK;
     plr[pnum].destParam1 = (char)p->wParam1;
@@ -823,9 +1055,13 @@ static void On_GETITEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x800504C4 MSG.CPP:1589 */
+#line 1588
 static void On_GOTOAGETITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+
+
+
     MakePlrPath(pnum, p->x, p->y, 0);
     plr[pnum].destAction = ACTION_PICKUPITEM;
     plr[pnum].destParam1 = (char)p->wParam1;
@@ -884,25 +1120,72 @@ static void On_AGETITEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8005084C MSG.CPP:1717 */
+#line 1716
 static void On_ITEMEXTRA(const TCmd *pCmd, int pnum)
 {
     const TCmdGItem *p = (const TCmdGItem *)pCmd;
+
+
+
+
+
     delta_get_item(p, p->bLevel);
+
+
+
+
+
+
     SyncGetItem(p->x, p->y, p->wIndx, p->wCI, p->dwSeed);
 }
 
 /* @0x80050898 MSG.CPP:1741 */
+#line 1740
 static void On_PUTITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
+
+
+
+
     if (numitems >= 0x7A) {
+
         PlaySFX(0x3D3);
+
         return;
+
+
+
+
+
     }
     int ii = InvPutItem(pnum, p->x, p->y);
+
+
+
     if (ii != -1) {
+
+
+
+
+
+
+
+
+
+
+
+
         delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
         check_update_plr(pnum);
+
+
+
+
+
+
+
+
     }
     check_update_plr(pnum);
 }
@@ -910,11 +1193,26 @@ static void On_PUTITEM(const TCmd *pCmd, int pnum)
 /* @0x80050978 MSG.CPP:1795 -- re-derived from the raw: check_update_plr(pnum) is ALWAYS called after
  * a successful SyncPutItem (was previously missing), same "delta_put_item echoes the placed item's
  * own _ix/_iy" pattern as On_PUTITEM. */
+#line 1794
 static void On_SYNCPUTITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
+
+
+
+
+
     int ii = SyncPutItem(pnum, p->x, p->y, p->wIndx, p->wCI, p->dwSeed, p->bId, p->bDur, p->bMDur, p->bCh, p->bMCh, p->wValue, p->dwBuff);
+
+
+
+
     if (ii != -1) {
+
+
+
+
+
         delta_put_item(p, item[ii]._ix, item[ii]._iy, plr[pnum].plrlevel);
         check_update_plr(pnum);
     }
@@ -939,9 +1237,13 @@ static void On_RESPAWNITEM(const TCmd *pCmd, int pnum)
  * only a target-id u16 + 2 more u16 params, both padded to 2-byte alignment after bCmd). */
 
 /* @0x80050B98 MSG.CPP:1851 */
+#line 1850
 static void On_SATTACKXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLoc *p = (const TCmdLoc *)pCmd;
+
+
+
     ClrPlrPath(pnum);
     plr[pnum].destAction = 9;
     plr[pnum].destParam1 = (char)p->x;
@@ -994,45 +1296,65 @@ static void On_TSPELLXY(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80050EC0 MSG.CPP:1934 */
+#line 1933
 static void On_OPOBJXY(const TCmd *pCmd, int pnum)
 {
+
+
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+
     if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
         MakePlrPath(pnum, p->x, p->y, 1);
     else
         MakePlrPath(pnum, p->x, p->y, 0);
+
     plr[pnum].destAction = 0xD;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x80050FA0 MSG.CPP:1952 */
+#line 1951
 static void On_DISARMXY(const TCmd *pCmd, int pnum)
 {
+
+
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+
     if (object[p->wParam1]._oSolidFlag == 0 && object[p->wParam1]._oDoorFlag == 0)
         MakePlrPath(pnum, p->x, p->y, 1);
     else
         MakePlrPath(pnum, p->x, p->y, 0);
+
     plr[pnum].destAction = 0xE;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x80051080 MSG.CPP:1971 */
+#line 1970
 static void On_OPOBJT(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+
+
+
     plr[pnum].destAction = ACTION_OPERATE;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x800510CC MSG.CPP:1984 */
+#line 1983
 static void On_ATTACKID(const TCmd *pCmd, int pnum)
 {
+
+
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+
     int dx = abs(plr[pnum]._px - monster[p->wParam1]._mfutx);
     int dy = abs(plr[pnum]._py - monster[p->wParam1]._mfuty);
+
     if (dx >= 2 || dy >= 2)
         MakePlrPath(pnum, monster[p->wParam1]._mfutx, monster[p->wParam1]._mfuty, 0);
+
     plr[pnum].destAction = 0x14;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
@@ -1091,40 +1413,57 @@ static void On_TSPELLPID(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051518 MSG.CPP:2078 */
+#line 2077
 static void On_KNOCKBACK(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
     int dir = GetDirection(plr[pnum]._px, plr[pnum]._py, monster[p->wParam1]._mx, monster[p->wParam1]._my);
+
+
     M_GetKnockback(p->wParam1, dir);
     M_StartHit(p->wParam1, pnum, 0);
 }
 
 /* @0x800515D4 MSG.CPP:2091 */
+#line 2090
 static void On_RESURRECT(const TCmd *pCmd, int pnum)
 {
+
     DoResurrect(pnum, ((const TCmdParam1 *)pCmd)->wParam1);
+
     check_update_plr(pnum);
 }
 
 /* @0x8005160C MSG.CPP:2101 */
+#line 2100
 static void On_HEALOTHER(const TCmd *pCmd, int pnum)
 {
+
+
+
     DoHealOther(pnum, ((const TCmdParam1 *)pCmd)->wParam1);
 }
 
 /* @0x80051634 MSG.CPP:2112 */
+#line 2111
 static void On_TALKXY(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam1 *p = (const TCmdLocParam1 *)pCmd;
+
+
+
     MakePlrPath(pnum, p->x, p->y, 0);
     plr[pnum].destAction = 0x11;
     plr[pnum].destParam1 = (char)p->wParam1;
 }
 
 /* @0x800516BC MSG.CPP:2127 */
+#line 2126
 static void On_NEWLVL(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
+
+
     StartNewLvl(pnum, p->wParam1, p->wParam2);
 }
 
@@ -1134,15 +1473,22 @@ static void On_NEWLVL(const TCmd *pCmd, int pnum)
  * plr[myplr].HoldItem @+0x1910, sizeof(ItemStruct)=0x64, into item + 0x64*127 = item+0x3194...
  * matches the observed +0x3594 dest only if ItemStruct is 0x6C; kept as item[127] via HoldItem
  * assignment, which is codegen-equivalent to the raw block-copy loop for a POD struct). */
+#line 2137
 static void On_WARP(const TCmd *pCmd, int pnum)
 {
     const TCmdParam1 *p = (const TCmdParam1 *)pCmd;
+
     InitGamePadVars();
     PA_SetPauseOk(0);
+
     FadeGameOut();
+
     StartWarpLvl(pnum, p->wParam1);
     TeleStop(pnum);
+
+
     if (pnum == myplr && _pcurs[pnum] >= 12) {
+
         item[127] = plr[myplr].HoldItem;
         AutoGetItem(myplr, 127);
     }
@@ -1172,16 +1518,27 @@ static void On_KILLGOLEM(const TCmd *pCmd, int pnum)
 
 /* @0x80051920 MSG.CPP:2187 -- spawn/refresh the awakened golem missile unless one already targets
  * this player's golem (the loop over missileactive[] guards against a duplicate MIS_GOLEM(0x21)). */
+#line 2186
 static void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 {
     {
+
+
+
     if (pnum != myplr) {
+
         unsigned char addok = 1;
+
         for (int i = 0; i < nummissiles; i++) {
+
             int mi = missileactive[i];
+
             if (missile[mi]._mitype == 0x21 && missile[mi]._misource == pnum)
                 addok = 0;
         }
+
+
+
         if (addok)
             AddMissile(plr[pnum]._px, plr[pnum]._py, ((const TCmdGolem *)pCmd)->_mx, ((const TCmdGolem *)pCmd)->_my, ((const TCmdGolem *)pCmd)->_mdir, 0x21, 0, pnum, 0, 1);
     }
@@ -1189,13 +1546,21 @@ static void On_AWAKEGOLEM(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80051A40 MSG.CPP:2216 */
+#line 2215
 static void On_MONSTDAMAGE(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
+
         int dummy1;
+
+
+
         monster[((const TCmdParam2 *)pCmd)->wParam1].mWhoHit |= (1 << pnum);
+
         if (monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints != 0) {
+
             monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints -= ((const TCmdParam2 *)pCmd)->wParam2;
+
             if ((monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints >> 6) <= 0)
                 monster[((const TCmdParam2 *)pCmd)->wParam1]._mhitpoints = 0x40;
             delta_monster_hp(((const TCmdParam2 *)pCmd)->wParam1,
@@ -1244,63 +1609,105 @@ static void On_PLRDAMAGE(const TCmd *pCmd, int pnum)
  * command's own ParseCmd dispatch id (41) -- it is a distinct object-action constant (OPENDOOR=0x2B,
  * CLOSEDOOR=0x2C, OPERATEOBJ=0x2D, PLROPOBJ=0x2E, BREAKOBJ=0x2F below), read straight off the raw
  * immediates since it doesn't correlate with the CMD_* dispatch numbering above. */
+#line 2322
 static void On_OPENDOOR(const TCmd *pCmd, int pnum)
 {
+
+
+
     SyncOpObject(pnum, 0x2B, ((const TCmdParam1 *)pCmd)->wParam1);
+
     delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2B, plr[pnum].plrlevel);
 }
 
 /* @0x80051D08 MSG.CPP:2336 */
+#line 2335
 static void On_CLOSEDOOR(const TCmd *pCmd, int pnum)
 {
+
+
+
     SyncOpObject(pnum, 0x2C, ((const TCmdParam1 *)pCmd)->wParam1);
+
     delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2C, plr[pnum].plrlevel);
 }
 
 /* @0x80051D84 MSG.CPP:2349 */
+#line 2348
 static void On_OPERATEOBJ(const TCmd *pCmd, int pnum)
 {
+
+
+
     SyncOpObject(pnum, 0x2D, ((const TCmdParam1 *)pCmd)->wParam1);
+
     delta_sync_object(((const TCmdParam1 *)pCmd)->wParam1, 0x2D, plr[pnum].plrlevel);
 }
 
 /* @0x80051E00 MSG.CPP:2362 -- TCmdParam2 shape (wParam1@+2 = the acting player index embedded in
  * the command, wParam2@+4 = oi); SyncOpObject's pnum arg comes from the COMMAND, not ParseCmd's pnum. */
+#line 2361
 static void On_PLROPOBJ(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
+
+
     SyncOpObject(p->wParam1, 0x2E, p->wParam2);
+
     delta_sync_object(p->wParam2, 0x2E, plr[pnum].plrlevel);
 }
 
 /* @0x80051E7C MSG.CPP:2374 -- both SyncBreakObj args come from the command (TCmdParam2 shape:
  * wParam1@+2, wParam2@+4), NOT from the ParseCmd pnum -- the raw never reads pnum before the call. */
+#line 2373
 static void On_BREAKOBJ(const TCmd *pCmd, int pnum)
 {
     const TCmdParam2 *p = (const TCmdParam2 *)pCmd;
+
+
     SyncBreakObj(p->wParam1, p->wParam2);
     delta_sync_object(p->wParam2, 0x2F, plr[pnum].plrlevel);
 }
 
 /* @0x80051EF4 MSG.CPP:2385 -- no-op: PSX has no cross-player inventory transfer command. */
+#line 2384
 static void On_CHANGEPLRITEMS(const TCmd *pCmd, int pnum)
 {
+
+
+
+
+
+
 }
 
 /* @0x80051EFC MSG.CPP:2398 -- no-op. */
+#line 2397
 static void On_DELPLRITEMS(const TCmd *pCmd, int pnum)
 {
+
+
 }
 
 /* @0x80051F04 MSG.CPP:2406 -- no-op. */
+#line 2405
 static void On_PLRLEVEL(const TCmd *pCmd, int pnum)
 {
+
+
+
+
+
 }
 
 /* @0x80051F0C MSG.CPP:2417 */
+#line 2416
 static void On_DROPITEM(const TCmd *pCmd, int pnum)
 {
     const TCmdPItem *p = (const TCmdPItem *)pCmd;
+
+
+
     delta_put_item(p, p->x, p->y, plr[pnum].plrlevel);
 }
 
@@ -1337,30 +1744,42 @@ static void On_PLAYER_JOINLEVEL(const TCmd *pCmd, int pnum)
 }
 
 /* @0x8005216C MSG.CPP:2487 -- UNVERIFIED. */
+#line 2486
 static void On_ACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 {
     const TCmdLocParam3 *p = (const TCmdLocParam3 *)pCmd;
+
+
     ActivatePortal(pnum, p->x, p->y, p->wParam1, p->wParam2, (unsigned char)p->wParam3);
 }
 
 /* @0x800521B0 MSG.CPP:2526 -- UNVERIFIED. */
 /* @0x800521B0 MSG.CPP:2494 -- re-derived: pnum is unused for anything BUT reused in place as the
  * 0..1 portal-index loop counter (SYM lists it at s0, matching the raw's loop register). */
+#line 2525
 static void On_DEACTIVATEPORTAL(const TCmd *pCmd, int pnum)
 {
+
     for (pnum = 0; pnum < 2; pnum++) {
+
         if (PortalOnLevel(pnum))
             RemovePortalMissile(pnum);
+
         DeactivatePortal(pnum);
         delta_close_portal(pnum);
     }
 }
 
 /* @0x80052210 MSG.CPP:2542 -- UNVERIFIED. */
+#line 2541
 static void On_RETOWN(const TCmd *pCmd, int pnum)
 {
     if (pnum == myplr)
+
         deathflag = 0;
+
+
+
     RestartTownLvl(pnum);
 }
 
@@ -1408,12 +1827,17 @@ static void On_SYNCQUEST(const TCmd *pCmd, int pnum)
 }
 
 /* @0x80052390 MSG.CPP:2624 -- UNVERIFIED (fsize 40, not individually re-derived). */
+#line 2623
 static void On_ENDSHIELD(const TCmd *pCmd, int pnum)
 {
     if (pnum != myplr) {
+
+
         for (int i = 0; i < nummissiles; i++) {
+
             int mi = missileactive[i];
             if (missile[mi]._mitype == 0xD && missile[mi]._misource == pnum) {
+
                 ClearMissileSpot(mi);
                 DeleteMissile(mi, i);
             }
@@ -1423,11 +1847,31 @@ static void On_ENDSHIELD(const TCmd *pCmd, int pnum)
 
 /* @0x80052468 MSG.CPP:2676 -- bare switch(pCmd->bCmd) dispatch; no bLen/plractive validation.
  * Case order and CMD_ values are read directly from jtbl_80116868 (see the #defines above). */
+#line 2675
 unsigned long ParseCmd(int pnum, const TCmd *pCmd)
 {
     static unsigned char sbLastCmd;
+
+
+
+
     sbLastCmd = pCmd->bCmd;
+
+
+
     switch (pCmd->bCmd) {
+
+
+
+
+
+
+
+
+
+
+
+
     case CMD_ON_WALKXY:        On_WALKXY(pCmd, pnum); break;
     case CMD_ADDSTR:           On_ADDSTR(pCmd, pnum); break;
     case CMD_ADDDEX:           On_ADDDEX(pCmd, pnum); break;
@@ -1487,39 +1931,65 @@ unsigned long ParseCmd(int pnum, const TCmd *pCmd)
     case CMD_SETVIT:           On_SETVIT(pCmd, pnum); break;
     case CMD_SYNCQUEST:        On_SYNCQUEST(pCmd, pnum); break;
     case CMD_ENDSHIELD:        On_ENDSHIELD(pCmd, pnum); break;
-    /* the retail jump table (jtbl_80116868) has 90 entries (bCmd 0..89) and every "hole" (indices
-     * with no named handler here) targets the SAME default-fallthrough label 0x80052858 in the raw
-     * table -- these are exactly those hole indices (cross-checked word-for-word against the table,
-     * see the CMD_* block comment above), needed so gcc emits the SAME dense 90-entry table
-     * (`sltiu v0,a1,90`) with every slot landing on the right body instead of a sequential guess. */
+
+
+
     case 2: case 12: case 13: case 19: case 20: case 21: case 32: case 33: case 34: case 35:
     case 54: case 58: case 59: case 60: case 61: case 62: case 63: case 64: case 65: case 66:
     case 67: case 68: case 69: case 70: case 71: case 72: case 73: case 74: case 75: case 76:
     case 78:
     default:
-        if ("Shouldn't get here")
-            DBG_Error(NULL, "source/MSG.cpp", 0xACE);
+        if ("Shouldn't get here") DBG_Error(NULL, "source/MSG.cpp", 0xACE);
+
+
+
+
+
+
+
+
+
         break;
     }
     return 0;
 }
 
 /* @0x80052888 MSG.CPP:2790 */
+#line 2789
 DLevel *GetDLevel(int LevNum, BOOL SetLevel)
 {
     if (setlevel)
         LevNum = setlvlnum + 16;
+
+
+
+
+
+
+
+
+
     return GameMaps.GetMap(LevNum);
 }
 
 /* @0x800528D0 MSG.CPP:2807 */
+#line 2806
 void ReleaseDLevel(DLevel *Dl)
 {
+
+
+
+
+
+
+
     GameMaps.ReleaseMap(Dl);
 }
 
 /* @0x800528FC MSG.CPP:2821 */
+#line 2820
 void MSG_ClearOutCompMap(void)
 {
+
     GameMaps.Init();
 }

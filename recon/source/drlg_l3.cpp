@@ -66,17 +66,24 @@ unsigned char lockout[40][40];
 
 /* ---------------------------------------------------------------------------------------------- */
 
+#line 398
 static void InitL3Dungeon(void)
 {
     int i, j;
 
+
     for (i = 0; i < 48; i++) {
+
         for (j = 0; j < 48; j++) {
+
             dungeon[j][i] = 0;
         }
     }
+
     for (i = 0; i < DMAXX; i++) {
+
         for (j = 0; j < DMAXY; j++) {
+
             mydflags[j + i * DMAXX] = 0;
         }
     }
@@ -1539,20 +1546,35 @@ unsigned char DRLG_L3Lockout(void)
     return false;
 }
 
+#line 1883
 static void DRLG_L3SetWalls(void)
 {
     int i, j, xx, yy;
 
+
     yy = 16;
+
     for (j = 0; j < DMAXX; j++) {
         xx = 16;
+
+
         for (i = 0; i < DMAXX; i++) {
+
             int v = dungeon[i][j];
 
             if ((unsigned int)(v - 7) < 2 || v == 0) {
+
                 dung_map[xx][yy].dFlags |= 0x20;
+
+
+
+
+
             } else {
                 dung_map[xx][yy].dFlags &= ~0x20;
+
+
+
             }
             xx += 2;
         }
@@ -1700,6 +1722,7 @@ static void DRLG_L3(int entry)
     DRLG_Init_Globals();
 }
 
+#line 2080
 static void DRLG_L3Pass3(void)
 {
     int i, j, xx, yy;
@@ -1712,25 +1735,40 @@ static void DRLG_L3Pass3(void)
     v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
     v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
 
+
     for (yy = 0; yy < 96; yy += 2) {
+
         for (xx = 0; xx < 96; xx += 2) {
+
             SetDPiece(xx, yy, v1);
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
         }
     }
 
+
     yy = 16;
     for (j = 0; j < DMAXY; j++) {
+
         xx = 16;
         for (i = 0; i < DMAXX; i++) {
+
             lv = dungeon[i][j] - 1;
             if (lv >= 0) {
+
                 v1 = *((short *)&pMegaTiles[lv * 8] + 0) + 1;
                 v2 = *((short *)&pMegaTiles[lv * 8] + 1) + 1;
                 v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
                 v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
+
+
+
             } else {
                 v1 = 0;
                 v2 = 0;
@@ -1741,23 +1779,76 @@ static void DRLG_L3Pass3(void)
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
             xx += 2;
         }
         yy += 2;
     }
 }
 
+#line 2152
 void CreateL3Dungeon(unsigned int rseed, int entry)
 {
+
+
     SetRndSeed(rseed);
+
     dminx = 16;
     dminy = 16;
     dmaxx = 80;
     dmaxy = 80;
+
+
     DRLG_InitTrans();
     DRLG_InitSetPC();
     DRLG_L3(entry);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     DRLG_L3Pass3();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     DRLG_SetPC();
 }
 

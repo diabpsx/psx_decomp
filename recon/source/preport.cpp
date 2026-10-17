@@ -26,9 +26,11 @@ inline void TextDat::DumpDatFile()
 
 #define MAXPORTAL 4
 
+#line 73
 void InitPortals(void)
 {
     for (int i = 0; i < MAXPORTAL; i++) {
+
         if (delta_portal_inited(i))
             portal[i].open = false;
     }

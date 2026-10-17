@@ -39,10 +39,10 @@ struct TownToCreature {   /* sizeof 2 */
     unsigned char GameEqu;
     unsigned char CreatureEquate;
 
+#line 238
     int GetCreature(int GameCreature)   /* BLOCK.CPP:239 */
     {
-        if (GameCreature != GameEqu)
-            return -1;
+        if (GameCreature != GameEqu) return -1;
         return CreatureEquate;
     }
 };
@@ -170,6 +170,7 @@ template <class T> inline int GetHighlightCol(int Index, T *SelList, unsigned sh
 }
 
 /* @0x8008D41C BLOCK.CPP:310 */
+#line 309
 void UpdateSel(unsigned short *Col, unsigned short Add, unsigned char *Count)
 {
     *Col &= 0x7FFF;
@@ -206,23 +207,29 @@ void CycleSelCols(void)
 }
 
 /* @0x8008D614 BLOCK.CPP:358 */
+#line 357
 int CBlocks::FindTownCreature(int GameEqu)
 {
     for (unsigned int f = 0; f < 10; f++) {
+
         int Creature = TownConv[f].GetCreature(GameEqu);
         if (Creature != -1)
             return Creature;
     }
+
     return -1;
 }
 
 /* @0x8008D688 BLOCK.CPP:375 */
+#line 374
 int CBlocks::FindCreature(int MgNum)
 {
     for (unsigned int f = 0; f < MonsterList->NumOfMonsters; f++) {
+
         if (MonsterList->TheList[f] == MgNum)
             return f;
     }
+
     DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x17E);
     return -1;
 }
@@ -271,6 +278,7 @@ CBlocks::CBlocks(int BgId, int ObjId, int ItemId, int Level, int List)
 }
 
 /* @0x8008D860 BLOCK.CPP:461 */
+#line 460
 void CBlocks::SetTownersGraphics()
 {
     MonstTexId = 0xCD;
@@ -278,23 +286,26 @@ void CBlocks::SetTownersGraphics()
 }
 
 /* @0x8008D898 BLOCK.CPP:472 */
+#line 471
 void CBlocks::SetMonsterGraphics(int Level, int List)
 {
     Level--;
-    if (Level < 0 || !(Level < NumOfMonsterListLevels))
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x1DB);
+
+    if (Level < 0 || !(Level < NumOfMonsterListLevels)) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x1DB);
     MonstLevel *MLev = &AllLevels[Level];
-    if (List < 0 || MLev->NumOfLists < List)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x1DD);
+    if (List < 0 || MLev->NumOfLists < List) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x1DD);
     MonstList *MList = &MLev->TheLists[List];
+
     MonstTexId = MList->TexNum;
     MonstTexDat = GM_UseTexData(MonstTexId);
+
     MonsterList = MList;
 }
 
 extern struct TextDat *MissDat;
 
 /* @0x8008D960 BLOCK.CPP:493 */
+#line 492
 CBlocks::~CBlocks()
 {
     DumpMonsters();
@@ -302,8 +313,11 @@ CBlocks::~CBlocks()
     DumpItems();
     DumpGt4s();
     DumpRects();
-    if (MissDat)
-        GM_FinishedUsing(MissDat);
+
+
+
+
+    if (MissDat) GM_FinishedUsing(MissDat);
     MissDat = NULL;
     CurrentBlocks = NULL;
 }
@@ -333,9 +347,11 @@ void CBlocks::DumpRects()
 }
 
 /* @0x8008DAB8 BLOCK.CPP:548 */
+#line 547
 void CBlocks::SetGraphics(struct TextDat **TDat, int *pId, int Id)
 {
     if (Id != *pId) {
+
         DumpGraphics(TDat, pId);
         *pId = Id;
         *TDat = GM_UseTexData(Id);
@@ -343,9 +359,11 @@ void CBlocks::SetGraphics(struct TextDat **TDat, int *pId, int Id)
 }
 
 /* @0x8008DB14 BLOCK.CPP:563 */
+#line 562
 void CBlocks::DumpGraphics(struct TextDat **TDat, int *Id)
 {
     if (*TDat) {
+
         GM_FinishedUsing(*TDat);
         *TDat = NULL;
     }
@@ -357,70 +375,89 @@ struct FileIO;
 FileIO *SYSI_GetFs(void);
 
 /* @0x8008DB64 BLOCK.CPP:624 */
+#line 623
 void CBlocks::Load(int Id)
 {
     if (!Loaded) {
+
         FileIO *Fs = SYSI_GetFs();
+
         SetFileInfo(TX_DatTab[Id], -1);
         Use(-1, 1, 0);
-        if (hndBlockOffsets == -1)
-            DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x277);
+        if (hndBlockOffsets == -1) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x277);
+
         NumOfBlocks = *(int *)Blocks;
         MakeGt4Table();
+
         MakeRectTable();
     }
 }
 
 /* @0x8008DC1C BLOCK.CPP:648 */
+#line 647
 void CBlocks::MakeRectTable()
 {
     unsigned char *MyBlocks;
+
+
+
+
+
+
+
     int *BlockOffsets;
 
     hndRects = GAL_Alloc(NumOfBlocks * 8, 0x8001, "RECTTAB");
-    if (hndRects == -1)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x296);
+
+
+    if (hndRects == -1) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x296);
 
     Rects = (RECT *)GAL_Lock(hndRects);
-    if (!Rects)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x299);
+    if (!Rects) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x299);
+
+
+
 
     BlockOffsets = (int *)GAL_Lock(hndBlockOffsets);
-    if (!BlockOffsets)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x29F);
+    if (!BlockOffsets) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x29F);
 
     MyBlocks = Blocks;
-    if (!MyBlocks)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2A2);
+    if (!MyBlocks) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2A2);
+
+
+
 
     for (int f = 0; f < NumOfBlocks; f++)
         ((CBlock *)&MyBlocks[BlockOffsets[f]])->GetBoundingBox(*this, Rects[f]);
 
+
+
     GAL_Unlock(hndBlockOffsets);
-    if (!hndBlockOffsets)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2AD);
+    if (!hndBlockOffsets) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2AD);
 }
 
 /* @0x8008DD70 BLOCK.CPP:698 */
+#line 697
 void CBlocks::MakeGt4Table()
 {
     hndGt4s = GAL_Alloc(Hdr->NumOfFrames * 16, 0x8001, "GT4TAB");
-    if (hndGt4s == -1)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2BC);
-
+    if (hndGt4s == -1) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2BC);
     Gt4s = (LittleGt4 *)GAL_Lock(hndGt4s);
-    if (!Gt4s)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2BE);
+    if (!Gt4s) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x2BE);
 
     for (unsigned int f = 0; f < Hdr->NumOfFrames; f++) {
         POLY_GT4 ThisGt4;
+
         MakeGt4(&ThisGt4, &Frames[f]);
         Gt4s[f].InitFromGt4(&ThisGt4, Frames[f].W, Frames[f].H);
         Gt4s[f].Flags = 0;
+
         if (Frames[f].Floor)
             Gt4s[f].Flags |= 1;
+
         if (Frames[f].Floor || Frames[f].NotTrans)
             Gt4s[f].Flags |= 2;
+
         if (Frames[f].Cycle && !leveltype)
             Gt4s[f].Flags |= 0x10;
     }
@@ -468,14 +505,18 @@ void CBlocks::MakeGt4(POLY_GT4 *GT4, FRAME_HDR *Fr)
 }
 
 /* @0x8008E07C BLOCK.CPP:801 -- mangled FR7CBlocksii = a FREE function taking CBlocks& (not a method) */
+#line 800
 void MyRoutine(CBlocks &B, int x, int y)
 {
     OldSp = (int)SetSp((void *)0x1F8003F0);
+
     B.PrintMap(x, y);
+
     SetSp((void *)OldSp);
 }
 
 /* @0x8008E0E4 BLOCK.CPP:810 */
+#line 809
 void CBlocks::SetRandOffset(int QuakeAmount)
 {
     RndX = GU_GetRndRange(QuakeAmount * 2) - QuakeAmount;
@@ -513,6 +554,7 @@ void CBlocks::Print()
 }
 
 /* @0x8008E25C BLOCK.CPP:854 */
+#line 853
 void CBlocks::SetXY(int nx, int ny)
 {
     Mx = nx;
@@ -521,6 +563,7 @@ void CBlocks::SetXY(int nx, int ny)
 }
 
 /* @0x8008E284 BLOCK.CPP:867 */
+#line 866
 void CBlocks::GetXY(int *nx, int *ny)
 {
     *nx = Mx;
@@ -528,66 +571,102 @@ void CBlocks::GetXY(int *nx, int *ny)
 }
 
 /* @0x8008E29C BLOCK.CPP:879 */
+#line 878
 void CBlocks::InitColourCycling()
 {
+
+
     int CycleIndex = -1;
+
     for (int f = 0; f < GetNumOfFrames() && CycleIndex == -1; f++) {
+
         if (Frames[f].Cycle) {
+
             unsigned short *pal = (unsigned short *)GetPal(Frames[f].PalNum);
+
+
+
             CycleIndex = pal[1];
         }
     }
+
     if (CycleIndex != -1)
+
         water_clut = CycleIndex;
 
+
+
     CycleIndex = -1;
+
     for (int f = 0; f < GetNumOfFrames() && CycleIndex == -1; f++) {
+
         if (Frames[f].PentaGram) {
+
             unsigned short *pal = (unsigned short *)GetPal(Frames[f].PalNum);
+
+
+
             CycleIndex = pal[1];
         }
     }
+
     if (CycleIndex != -1)
+
         penta_clut = CycleIndex;
 }
 
 /* @0x8008E3E8 BLOCK.CPP:958 */
+#line 957
 void CBlocks::GetGCol(int x, int y, unsigned char *Rgb, RGBData *Data)
 {
     int rgb_itxr, rgb_itxg, rgb_itxb;
+
+
+
+
+
     int rgb_leftr, rgb_leftg, rgb_leftb;
     int rgb_rightr, rgb_rightg, rgb_rightb;
     int rgb_cordr, rgb_cordg, rgb_cordb;
 
-    if (x > 64)
-        x = 64;
-    if (y > 128)
-        y = 128;
-    if (x < 0)
-        x = 0;
-    if (y < 0)
-        y = 0;
+    if (x > 64) x = 64;
+    if (y > 128) y = 128;
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+
     rgb_leftr = (y * Data->rgb_ity1.r) >> 16;
     rgb_leftr += Data->rgbb.r1;
+
     rgb_rightr = (y * Data->rgb_ity2.r) >> 16;
     rgb_rightr += Data->rgbb.r2;
+
     rgb_leftg = (y * Data->rgb_ity1.g) >> 16;
     rgb_leftg += Data->rgbb.g1;
+
     rgb_rightg = (y * Data->rgb_ity2.g) >> 16;
     rgb_rightg += Data->rgbb.g2;
+
     rgb_leftb = (y * Data->rgb_ity1.b) >> 16;
     rgb_leftb += Data->rgbb.b1;
+
     rgb_rightb = (y * Data->rgb_ity2.b) >> 16;
     rgb_rightb += Data->rgbb.b2;
+
+
     rgb_itxr = (rgb_rightr - rgb_leftr) << 10;
+
     rgb_itxg = (rgb_rightg - rgb_leftg) << 10;
+
     rgb_itxb = (rgb_rightb - rgb_leftb) << 10;
+
+
     rgb_cordr = (x * rgb_itxr) >> 16;
     rgb_cordr += rgb_leftr;
     rgb_cordg = (x * rgb_itxg) >> 16;
     rgb_cordg += rgb_leftg;
     rgb_cordb = (x * rgb_itxb) >> 16;
     rgb_cordb += rgb_leftb;
+
     Rgb[0] = rgb_cordr;
     Rgb[1] = rgb_cordg;
     Rgb[2] = rgb_cordb;
@@ -1223,16 +1302,25 @@ void CBlocks::PrintMonsters(int x, int y)
 }
 
 /* @0x8009009C BLOCK.CPP:1915 */
+#line 1914
 int AddTowners(CacheInfo *Info, map_info *p0, int bx, int by)
 {
+
+
     int nMonster = p0->dMonster;
+
     if (nMonster > 0) {
         MonsterStruct *MyMonst;
+
+
+
         int mi = nMonster - 1;
         MyMonst = &monster[mi];
+
         Info->uMStr.MyMonst = (unsigned long)MyMonst;
         Info->uMStr.Index = mi;
         return 1;
+
     }
     return 0;
 }
@@ -1325,14 +1413,21 @@ int ax = 0;   /* @0x8011ACE4 */
 int ay = 0;   /* @0x8011ACE8 */
 
 /* @0x800904B0 BLOCK.CPP:2051 */
+#line 2050
 int AddObject(CacheInfo *Info, map_info *p0, int bx, int by)
 {
+
+
     int bObject = p0->dObject;
+
     if (bObject > 0) {
+
+
         ObjectStruct *OStr = &object[bObject - 1];
         Info->uOStr.MyObject = (unsigned long)OStr;
         Info->uOStr.Index = bObject - 1;
         return 1;
+
     }
     return 0;
 }
@@ -1436,15 +1531,21 @@ void CBlocks::PrintObjects(int x, int y)
 }
 
 /* @0x80090968 BLOCK.CPP:2193 */
+#line 2192
 int AddDead(CacheInfo *Info, map_info *p0, int bx, int by)
 {
+
+
     int bDead = GetdDead(bx, by);
-    if (bDead >= 0x10)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x896);
+
+    if (bDead >= 0x10) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0x896);
+
     if (bDead) {
+
         Info->uDStr.x = bx;
         Info->uDStr.y = by;
         Info->uDStr.Index = bDead;
+
         return 1;
     }
     return 0;
@@ -1522,13 +1623,19 @@ void CBlocks::PrintDead(int x, int y)
 }
 
 /* @0x80090CB8 BLOCK.CPP:2308 */
+#line 2307
 int AddItem(CacheInfo *Info, map_info *p0, int bx, int by)
 {
+
+
     int bItem = p0->dItem;
+
     if (bItem) {
+
         Info->uIStr.MyItem = (unsigned long)&item[bItem - 1];
         Info->uIStr.Index = bItem - 1;
         return 1;
+
     }
     return 0;
 }
@@ -1723,18 +1830,21 @@ void CBlocks::PrintMissiles(int x, int y)
 }
 
 /* @0x800915E4 BLOCK.CPP:2597 */
+#line 2596
 int CBlocks::ScrToWorldX(int sx, int sy)
 {
     return sx / 2 + sy;
 }
 
 /* @0x800915F8 BLOCK.CPP:2608 */
+#line 2607
 int CBlocks::ScrToWorldY(int sx, int sy)
 {
     return sy - sx / 2;
 }
 
 /* @0x8009160C BLOCK.CPP:2619 */
+#line 2618
 void CBlocks::SetScrollTarget(int x, int y)
 {
     StX = (x - ScrToWorldX(ClipRect.w / 2, ClipRect.h / 2)) * 65536;
@@ -1772,23 +1882,34 @@ void CBlocks::DoScroll()
 unsigned short SCR_GetBlackClut(void);
 
 /* @0x800917BC BLOCK.CPP:2702 */
+#line 2701
 void CBlocks::SetPlayerPosBlocks(int PlayerNum, int bx, int by)
 {
-    if (PlayerNum < 0 || PlayerNum >= 2)
-        DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0xA8F);
+    if (PlayerNum < 0 || PlayerNum >= 2) DBG_Error(NULL, "psxsrc/BLOCK.CPP", 0xA8F);
+
     if (!IsTown) {
+
         bx -= 16;
         by -= 16;
+
     }
     pBlockX[PlayerNum] = bx / 2;
     pBlockY[PlayerNum] = by / 2;
 }
 
 /* @0x8009185C BLOCK.CPP:2723 */
+#line 2722
 void CBlocks::GetScrXY(RECT &R, int x, int y, int sxoff, int syoff)
 {
+
+
+
+
     int Sx = ClipRect.x + WorldToScrX(x, y) + sxoff - WorldToScrX((short)(Mx >> 16), (short)(My >> 16));
     int Sy = ClipRect.y + WorldToScrY(x, y) + syoff - WorldToScrY((short)(Mx >> 16), (short)(My >> 16));
+
+
+
     R.x = Sx;
     R.y = Sy;
 }
@@ -1816,19 +1937,28 @@ void CBlocks::ShadScaleSkew(POLY_FT4 *Ft4)
 }
 
 /* @0x800919D0 BLOCK.CPP:2789 */
+#line 2788
 int CBlocks::WorldToScrX(int x, int y)
 {
     return x - y;
 }
 
 /* @0x800919D8 BLOCK.CPP:2800 */
+#line 2799
 int CBlocks::WorldToScrY(int x, int y)
 {
     return (x + y) / 2;
 }
 
 /* @0x800919EC BLOCK.CPP:2805 */
+#line 2804
 CBlocks *BL_GetCurrentBlocks(void)
 {
+
+
+
+
+
+
     return CurrentBlocks;
 }

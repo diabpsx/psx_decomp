@@ -171,13 +171,16 @@ unsigned char TFit_Obj5(int t)
     return 1;
 }
 
+#line 198
 unsigned char TFit_SkelRoom(int t)
 {
     int i;
 
     if (leveltype == DTYPE_CATHEDRAL || leveltype == DTYPE_CATACOMBS) {
+
         for (i = 0; i < nummtypes; i++) {
             if (IsSkel(Monsters[i].mtype)) {
+
                 themeVar1 = i;
                 return TFit_Obj5(t);
             }
@@ -187,12 +190,14 @@ unsigned char TFit_SkelRoom(int t)
     return 0;
 }
 
+#line 219
 unsigned char TFit_GoatShrine(int t)
 {
     int i;
 
     for (i = 0; i < nummtypes; i++) {
         if (IsGoat(Monsters[i].mtype)) {
+
             themeVar1 = i;
             return TFit_Obj5(t);
         }
@@ -219,6 +224,7 @@ unsigned char CheckThemeObj3(int xp, int yp, int t, int f)
     return 1;
 }
 
+#line 259
 unsigned char TFit_Obj3(int t)
 {
     int xp, yp;
@@ -233,7 +239,6 @@ unsigned char TFit_Obj3(int t)
             }
         }
     }
-
     return 0;
 }
 
@@ -279,67 +284,60 @@ unsigned char CheckThemeReqs(int t)
     return rv;
 }
 
+#line 324
 unsigned char SpecialThemeFit(int i, int t)
 {
     unsigned char rv;
 
     rv = CheckThemeReqs(t);
+
     switch (t) {
     case THEME_SHRINE:
     case THEME_LIBRARY:
-        if (rv)
-            rv = TFit_Shrine(i);
+        if (rv) rv = TFit_Shrine(i);
         break;
     case THEME_SKELROOM:
-        if (rv)
-            rv = TFit_SkelRoom(i);
+        if (rv) rv = TFit_SkelRoom(i);
         break;
     case THEME_BLOODFOUNTAIN:
-        if (rv)
-            rv = TFit_Obj5(i);
-        if (rv)
-            bFountainFlag = 0;
+        if (rv) rv = TFit_Obj5(i);
+
+        if (rv) bFountainFlag = 0;
         break;
     case THEME_PURIFYINGFOUNTAIN:
-        if (rv)
-            rv = TFit_Obj5(i);
-        if (rv)
-            pFountainFlag = 0;
+        if (rv) rv = TFit_Obj5(i);
+
+        if (rv) pFountainFlag = 0;
         break;
     case THEME_MURKYFOUNTAIN:
-        if (rv)
-            rv = TFit_Obj5(i);
-        if (rv)
-            mFountainFlag = 0;
+        if (rv) rv = TFit_Obj5(i);
+
+        if (rv) mFountainFlag = 0;
         break;
     case THEME_TEARFOUNTAIN:
-        if (rv)
-            rv = TFit_Obj5(i);
-        if (rv)
-            tFountainFlag = 0;
+        if (rv) rv = TFit_Obj5(i);
+
+        if (rv) tFountainFlag = 0;
         break;
     case THEME_CAULDRON:
-        if (rv)
-            rv = TFit_Obj5(i);
-        if (rv)
-            cauldronFlag = 0;
+        if (rv) rv = TFit_Obj5(i);
+
+        if (rv) cauldronFlag = 0;
         break;
     case THEME_GOATSHRINE:
-        if (rv)
-            rv = TFit_GoatShrine(i);
+        if (rv) rv = TFit_GoatShrine(i);
         break;
     case THEME_TORTURE:
     case THEME_DECAPITATED:
     case THEME_ARMORSTAND:
     case THEME_BRNCROSS:
     case THEME_WEAPONRACK:
-        if (rv)
-            rv = TFit_Obj3(i);
+        if (rv) rv = TFit_Obj3(i);
         break;
     case THEME_TREASURE:
         rv = treasureFlag;
-        if (rv)
-            treasureFlag = 0;
+
+        if (rv) treasureFlag = 0;
         break;
     }
 
@@ -520,6 +518,7 @@ void Theme_Barrel(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 587
 void Theme_Shrine(int t)
 {
     char monstrnd[4] = { 6, 6, 3, 9 };
@@ -688,14 +687,18 @@ void Theme_Library(int t)
         PlaceThemeMonsts(t, monstrnd[leveltype]);
 }
 
+#line 788
 void Theme_Torture(int t)
 {
     int xp, yp;
     char tortrnd[4] = { 6, 8, 3, 8 };
     char monstrnd[4] = { 6, 8, 3, 9 };
 
+
+
     for (yp = 1; yp < MAXDUNY - 1; yp++) {
         for (xp = 1; xp < MAXDUNX - 1; xp++) {
+
             if (dung_map[xp][yp].dTransVal == theme[t].ttval && !GetSOLID(xp, yp)) {
                 if (CheckThemeObj3(xp, yp, t, -1) && ENG_random(tortrnd[leveltype - 1]) == 0)
                     AddObject(OBJ_TNUDEM2, xp, yp);
@@ -705,6 +708,7 @@ void Theme_Torture(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 811
 void Theme_BloodFountain(int t)
 {
     char monstrnd[4] = { 6, 8, 3, 9 };
@@ -714,14 +718,18 @@ void Theme_BloodFountain(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 823
 void Theme_Decap(int t)
 {
     int xp, yp;
     char decaprnd[4] = { 6, 8, 3, 8 };
     char monstrnd[4] = { 6, 8, 3, 9 };
 
+
+
     for (yp = 1; yp < MAXDUNY - 1; yp++) {
         for (xp = 1; xp < MAXDUNX - 1; xp++) {
+
             if (dung_map[xp][yp].dTransVal == theme[t].ttval && !GetSOLID(xp, yp)) {
                 if (CheckThemeObj3(xp, yp, t, -1) && ENG_random(decaprnd[leveltype - 1]) == 0)
                     AddObject(OBJ_DECAP, xp, yp);
@@ -731,6 +739,7 @@ void Theme_Decap(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 846
 void Theme_PurifyingFountain(int t)
 {
     char monstrnd[4] = { 6, 7, 3, 9 };
@@ -740,18 +749,23 @@ void Theme_PurifyingFountain(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 858
 void Theme_ArmorStand(int t)
 {
     int xp, yp;
     char armorrnd[4] = { 6, 8, 3, 8 };
     char monstrnd[4] = { 6, 7, 3, 9 };
 
+
+
     if (armorFlag) {
         TFit_Obj3(t);
         AddObject(OBJ_ARMORSTAND, themex, themey);
+
     }
     for (yp = 0; yp < MAXDUNY; yp++) {
         for (xp = 0; xp < MAXDUNX; xp++) {
+
             if (dung_map[xp][yp].dTransVal == theme[t].ttval && !GetSOLID(xp, yp)) {
                 if (CheckThemeObj3(xp, yp, t, -1) && ENG_random(armorrnd[leveltype - 1]) == 0)
                     AddObject(OBJ_ARMORSTANDN, xp, yp);
@@ -759,6 +773,7 @@ void Theme_ArmorStand(int t)
         }
     }
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
+
     armorFlag = 0;
 }
 
@@ -776,6 +791,7 @@ void Theme_GoatShrine(int t)
     }
 }
 
+#line 912
 void Theme_Cauldron(int t)
 {
     char monstrnd[4] = { 6, 7, 3, 9 };
@@ -785,6 +801,7 @@ void Theme_Cauldron(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 924
 void Theme_MurkyFountain(int t)
 {
     char monstrnd[4] = { 6, 7, 3, 9 };
@@ -794,6 +811,7 @@ void Theme_MurkyFountain(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 936
 void Theme_TearFountain(int t)
 {
     char monstrnd[4] = { 6, 7, 3, 9 };
@@ -803,14 +821,18 @@ void Theme_TearFountain(int t)
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
 }
 
+#line 948
 void Theme_BrnCross(int t)
 {
     int xp, yp;
+
     char monstrnd[4] = { 6, 8, 3, 9 };
     char bcrossrnd[4] = { 5, 7, 3, 8 };
 
+
     for (yp = 0; yp < MAXDUNY; yp++) {
         for (xp = 0; xp < MAXDUNX; xp++) {
+
             if (dung_map[xp][yp].dTransVal == theme[t].ttval && !GetSOLID(xp, yp)) {
                 if (CheckThemeObj3(xp, yp, t, -1) && ENG_random(bcrossrnd[leveltype - 1]) == 0)
                     AddObject(OBJ_TBCROSS, xp, yp);
@@ -818,21 +840,27 @@ void Theme_BrnCross(int t)
         }
     }
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
+
     bCrossFlag = 1;
 }
 
+#line 973
 void Theme_WeaponRack(int t)
 {
     int xp, yp;
     char weaponrnd[4] = { 6, 8, 5, 8 };
     char monstrnd[4] = { 6, 7, 3, 9 };
 
+
+
     if (weaponFlag) {
         TFit_Obj3(t);
         AddObject(OBJ_WEAPONRACK, themex, themey);
+
     }
     for (yp = 0; yp < MAXDUNY; yp++) {
         for (xp = 0; xp < MAXDUNX; xp++) {
+
             if (dung_map[xp][yp].dTransVal == theme[t].ttval && !GetSOLID(xp, yp)) {
                 if (CheckThemeObj3(xp, yp, t, -1) && ENG_random(weaponrnd[leveltype - 1]) == 0)
                     AddObject(OBJ_WEAPONRACKN, xp, yp);
@@ -840,9 +868,11 @@ void Theme_WeaponRack(int t)
         }
     }
     PlaceThemeMonsts(t, monstrnd[leveltype - 1]);
+
     weaponFlag = 0;
 }
 
+#line 1003
 void UpdateL4Trans()
 {
     int i, j;
@@ -855,6 +885,7 @@ void UpdateL4Trans()
     }
 }
 
+#line 1018
 void CreateThemeRooms()
 {
     int i;
@@ -862,66 +893,85 @@ void CreateThemeRooms()
     if (currlevel == 16)
         return;
     InitObjFlag = 1;
+
     for (i = 0; i < numthemes; i++) {
         themex = 0;
         themey = 0;
         switch (theme[i].ttype) {
+
         case THEME_BARREL:
             Theme_Barrel(i);
             break;
+
         case THEME_SHRINE:
             Theme_Shrine(i);
             break;
+
         case THEME_MONSTPIT:
             Theme_MonstPit(i);
             break;
+
         case THEME_SKELROOM:
             Theme_SkelRoom(i);
             break;
+
         case THEME_TREASURE:
             Theme_Treasure(i);
             break;
+
         case THEME_LIBRARY:
             Theme_Library(i);
             break;
+
         case THEME_TORTURE:
             Theme_Torture(i);
             break;
+
         case THEME_BLOODFOUNTAIN:
             Theme_BloodFountain(i);
             break;
+
         case THEME_DECAPITATED:
             Theme_Decap(i);
             break;
+
         case THEME_PURIFYINGFOUNTAIN:
             Theme_PurifyingFountain(i);
             break;
+
         case THEME_ARMORSTAND:
             Theme_ArmorStand(i);
             break;
+
         case THEME_GOATSHRINE:
             Theme_GoatShrine(i);
             break;
+
         case THEME_CAULDRON:
             Theme_Cauldron(i);
             break;
+
         case THEME_TEARFOUNTAIN:
             Theme_TearFountain(i);
             break;
+
         case THEME_MURKYFOUNTAIN:
             Theme_MurkyFountain(i);
             break;
+
         case THEME_BRNCROSS:
             Theme_BrnCross(i);
             break;
+
         case THEME_WEAPONRACK:
             Theme_WeaponRack(i);
             break;
         }
     }
     InitObjFlag = 0;
-    if (leveltype == DTYPE_HELL && themeCount > 0)
-        UpdateL4Trans();
+
+
+    if (leveltype == DTYPE_HELL && themeCount > 0) UpdateL4Trans();
 }
 
 /* Definitions follow the local constant templates, matching the retail pool.

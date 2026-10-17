@@ -388,6 +388,7 @@ void DrawSpellCel(long xp, long yp, unsigned char Trans, long nCel, unsigned cha
     }
 }
 
+#line 741
 void SetSpellTrans(char t)
 {
     SpellCol = t;
@@ -467,14 +468,35 @@ void DrawSpeedSpellTSK(TASK *T)
     _spselflag[pnum] = 0;
 }
 
+#line 836
 void ToggleSpell(int pnum)
 {
     DEF_ARGS *args;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     if (_spselflag[pnum] != 0) {
+
         TSK_Kill(_spselflag[pnum]);
         _spselflag[pnum] = 0;
+
         PostGamePad(pnum + 6, 0, 0, 0);
+
+
     } else {
         PostGamePad(pnum + 3, 0, 0, 0);
         GLUE_SetShowPanelFlag(1);
@@ -730,12 +752,17 @@ void DrawSpellList(void)
  * "%s%s%s" literal and precede BuildChr's "%i". */
 static unsigned char CrossCount[2] = { 0 };   /* @0x8011B6A0 */
 
+#line 1254
 void SetSpell(int pnum)
 {
+
     RemoveTargetCursor(pnum);
     ToggleSpell(pnum);
+
     PlaySFX(0x33);
+
     if (_pSpell[sel_data] != -1) {
+
         my_cur_spel[pnum] = spelldata[_pSpell[pnum]].sName;
         ClearPanel();
         plr[pnum]._pRSpell = _pSpell[pnum];
@@ -754,17 +781,20 @@ void AddPanelString(const char *str, int just)
     }
 }
 
+#line 1290
 void ClearPanel(void)
 {
     _pnumlines[sel_data] = 0;
     _pinfoflag[sel_data] = 0;
 }
 
+#line 1345
 void InitPanelStr(void)
 {
     ClearPanel();
 }
 
+#line 1432
 void InitControlPan(void)
 {
     int i;
@@ -773,63 +803,156 @@ void InitControlPan(void)
     scy1 = 0;
     scx2 = 0;
     scy2 = 0;
+
+
+
+
+
+
+
+
+
+
+
     pManaBuff = 0;
     pLifeBuff = 0;
+
+
+
+
     pPanelText = LoadFileInMem("CtrlPan\\SmalText.CEL", 0);
     pChrPanel = LoadFileInMem("Data\\Char.CEL", 0);
     pSpellCels = LoadFileInMem("CtrlPan\\SpelIcon.CEL", 0);
+
+
     SetSpellTrans(0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     talkflag = 0;
     if (gbMaxPlayers != 1) {
+
+
+
+
+
+
+
+
+
+
+
         pMultiBtns = 0;
         pTalkBtns = 0;
+
+
         talkofs = 0;
         sgszTalkMsg[0] = 0;
+
         for (i = 0; i < 2; i++)
             sgbPlrTalkTbl[i] = 1;
+
         for (i = 0; i < 3; i++)
             talkbtndown[i] = 0;
+
     }
     panelflag = 0;
+
     lvlbtndown = 0;
+
     pPanelButtons = LoadFileInMem("CtrlPan\\Panel8bu.CEL", 0);
+
+
+
+
     panbtndown = 0;
+
+
+
+
+
+
+
+
+
     pChrButtons = 0;
+
+
     for (i = 0; i < 4; i++)
         chrbtn[myplr][i] = 0;
+
+
+
+
     pDurIcons = 0;
+
+
     strcpy(infostr, GetStr(0x4FA));
     InitPanelStr();
     drawhpflag = 1;
     drawmanaflag = 1;
     chrflag = 0;
+
     _spselflag[0] = 0;
     _spselflag[1] = 0;
+
+
+
+
+
+
     pSpellBkCel = 0;
     pSBkBtnCel = 0;
     pSBkIconCels = 0;
+
+
+
     sbooktab = 0;
     sbookflag = 0;
     cur_spel[0] = 0;
     cur_spel[1] = 0;
     my_cur_spel[0] = 0;
     my_cur_spel[1] = 0;
+
     if (plr[myplr]._pClass == 0)
         SpellPages[0][0] = 0x1A;
-    else if (plr[myplr]._pClass == 1)
-        SpellPages[0][0] = 0x1C;
-    else if (plr[myplr]._pClass == 2)
-        SpellPages[0][0] = 0x1B;
+
+
+    else if (plr[myplr]._pClass == 1) SpellPages[0][0] = 0x1C;
+    else if (plr[myplr]._pClass == 2) SpellPages[0][0] = 0x1B;
+
+
+
+
+
+
     pQLogCel = 0;
     pGBoxBuff = 0;
+
+
+
     dropGoldFlag = 0;
     dropGoldValue = 0;
     initialDropGoldValue = 0;
     initialDropGoldIndex = 0;
 }
 
+#line 1588
 void DrawCtrlPan(void)
 {
+
     sel_data = 0;
     DrawInfoBox(InfoBoxRect);
 }
@@ -928,8 +1051,10 @@ void CheckPanelInfo(void)
 
 #undef pSpell
 
+#line 1855
 void FreeControlPan(void)
 {
+
     MemFreeDbg(pManaBuff);
     MemFreeDbg(pLifeBuff);
     MemFreeDbg(pPanelText);
@@ -1031,55 +1156,117 @@ static void PrintInfo(void)
     }
 }
 
+#line 2078
 void DrawInfoBox(RECT *InfoRect)
 {
     int pnum = sel_data;
-
     InfoBoxRect = InfoRect;
+
+
+
+
     if (!panelflag && !trigflag && cursinvitem == -1 && !_spselflag[pnum]) {
+
         infostr[0] = 0;
         infoclr = 0;
         ClearPanel();
+
     }
     if (!invflag && (_spselflag[pnum] || trigflag)) {
+
         infoclr = 0;
+
+
+
     } else if (_pcurs[myplr] >= 12) {
+
         if (plr[myplr].HoldItem._itype == 11) {
+
             int nGold = plr[myplr].HoldItem._ivalue;
+
             sprintf(infostr, GetStr(0x4FF), nGold, get_pieces_str(nGold));
+
         } else if (!plr[myplr].HoldItem._iStatFlag) {
+
             ClearPanel();
             AddPanelString(GetStr(0x35E), 1);
             pinfoflag = 1;
+
+
         } else {
             if (plr[myplr].HoldItem._iIdentified)
                 strcpy(infostr, MakeItemStr(&plr[myplr].HoldItem, plr[myplr].HoldItem._iIName, 256));
             else
                 strcpy(infostr, MakeItemStr(&plr[myplr].HoldItem, plr[myplr].HoldItem._iName, 256));
-            if (plr[myplr].HoldItem._iMagical == 1)
-                infoclr = 1;
-            if (plr[myplr].HoldItem._iMagical == 2)
-                infoclr = 3;
+            if (plr[myplr].HoldItem._iMagical == 1) infoclr = 1;
+            if (plr[myplr].HoldItem._iMagical == 2) infoclr = 3;
         }
+
+
+
+
+
+
     } else if (cursinvitem == -1 || invflag) {
+
+
+
+
+
+
+
+
+
+
         if (cursmonst != -1) {
+
             if (leveltype != 0 && !optionsflag) {
+
                 infoclr = 0;
                 strcpy(infostr, GetStr(monster[cursmonst].mName));
                 ClearPanel();
                 if (monster[cursmonst]._uniqtype != 0) {
+
                     infoclr = 3;
                     void PrintUniqueHistory();   /* hellfire's block-local declaration: its level is in the SYM */
                     PrintUniqueHistory();
+
                 } else
                     PrintMonstHistory(monster[cursmonst].MType->mtype);
             } else
+
+
                 strcpy(infostr, GetStr(towner[cursmonst]._tName));
+
+
+
+
         } else if (cursobj != -1) {
             GetObjectStr(cursobj);
+
+
         } else if (cursitem != -1) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             GetItemStr(cursitem);
+
+
+
+
         } else if (cursplr != -1) {
+
             infoclr = 3;
             strcpy(infostr, plr[cursplr]._pName);
             ClearPanel();
@@ -1088,9 +1275,11 @@ void DrawInfoBox(RECT *InfoRect)
             sprintf(tempstr, GetStr(0x1F1), plr[cursplr]._pHitPoints >> 6, plr[cursplr]._pMaxHP >> 6);
             AddPanelString(tempstr, 1);
         }
+
+
+
     }
-    if (infostr[0] != 0 || pnumlines != 0)
-        PrintInfo();
+    if (infostr[0] != 0 || pnumlines != 0) PrintInfo();
 }
 
 static void MY_PlrStringXY(void)
@@ -1205,15 +1394,23 @@ static void MY_PlrStringXY(void)
     }
 }
 
+#line 2397
 void ADD_PlrStringXY(const char *pszStr, char col)
 {
     CSDATA *ptr;
 
+
+
+
+
     ptr = &CS_Tab[CsNo];
+
     strcpy(ptr->String, pszStr);
     ptr->col = col;
+
     CsNo = CsNo + 1;
     if (CS_Tab[CsNo].w == 0) {
+
         CS_Tab[CsNo].String[0] = 0;
         CsNo++;
     }
@@ -2066,10 +2263,10 @@ void CheckSBook(void)
     }
 }
 
+#line 3562
 char *get_pieces_str(int nGold)
 {
-    if (nGold == 1)
-        return GetStr(0x30A);
+    if (nGold == 1) return GetStr(0x30A);
     return GetStr(0x309);
 }
 

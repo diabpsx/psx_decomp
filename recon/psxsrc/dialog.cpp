@@ -109,12 +109,11 @@ static char GShadeY;                        /* @0x8011C64E */
 static unsigned char RandBTab[8];           /* @0x8011C654 */
 
 /* @0x8008AD90 DIALOG.CPP:112 */
+#line 111
 unsigned char TrimCol(short col)
 {
-    if (col < 0)
-        col = 0;
-    if (col > 255)
-        col = 255;
+    if (col < 0) col = 0;
+    if (col > 255) col = 255;
     return col;
 }
 
@@ -389,35 +388,46 @@ void DropShadows(int x, int y, int w, int h)
 }
 
 /* @0x8008BB24 DIALOG.CPP:476 */
+#line 475
 void InitDialog()
 {
-    for (int i = 0; i < 6; i++)
-        GU_GetRnd();
+
+    for (int i = 0; i < 6; i++) GU_GetRnd();
+
     for (int y = 0; y < 8; y++) {
         unsigned char bits = 0;
+
         for (int x = 0; x < 8; x++) {
-            if (GU_GetRnd() % 3 == 0)
-                bits |= 1;
+
+            if (GU_GetRnd() % 3 == 0) bits |= 1;
             bits <<= 1;
         }
         RandBTab[y] = bits;
     }
+
     for (int i = 0; i < 14; i++) {
+
         Cxy[i * 2] = GU_GetRnd() % 224 + 16;
         Cxy[i * 2 + 1] = GU_GetRnd() % 144;
     }
 }
 
 /* @0x8008BC5C DIALOG.CPP:499 */
+#line 498
 void Dialog::GetSizes()
 {
     FRAME_HDR *Fr;
 
     DialogTData = GM_UseTexData(0);
+
+
     DialogBackGfx = BackGfx;
     Fr = DialogTData->GetFr(DialogBackGfx);
     DialogBackW = Fr->W;
     DialogBackH = Fr->H;
+
+
+
     DialogBorderGfx = BorderGfx;
     Fr = DialogTData->GetFr(DialogBorderGfx);
     DialogBorderTLW = Fr->W;
@@ -431,18 +441,23 @@ void Dialog::GetSizes()
     Fr = DialogTData->GetFr(DialogBorderGfx + 7);
     DialogBorderBRW = Fr->W;
     DialogBorderBRH = Fr->H;
+
     Fr = DialogTData->GetFr(DialogBorderGfx + 1);
     DialogBorderTW = Fr->W;
     DialogBorderTH = Fr->H;
     Fr = DialogTData->GetFr(DialogBorderGfx + 6);
     DialogBorderBW = Fr->W;
     DialogBorderBH = Fr->H;
+
     Fr = DialogTData->GetFr(DialogBorderGfx + 3);
     DialogBorderLW = Fr->W;
     DialogBorderLH = Fr->H;
     Fr = DialogTData->GetFr(DialogBorderGfx + 4);
     DialogBorderRW = Fr->W;
     DialogBorderRH = Fr->H;
+
+
+
     DialogBevelGfx = BevelGfx;
     Fr = DialogTData->GetFr(DialogBevelGfx);
     DialogBevelCW = Fr->W;
@@ -453,6 +468,9 @@ void Dialog::GetSizes()
     Fr = DialogTData->GetFr(DialogBevelGfx + 3);
     DialogBevelLRW = Fr->W;
     DialogBevelLRH = Fr->H;
+
+
+
     MY_DialogOTpos = DialogOTpos;
 }
 
@@ -761,10 +779,10 @@ void Dialog::Line(int DX, int DY, int DW)
 }
 
 /* @0x8008D228 DIALOG.CPP:1099 */
+#line 1098
 int Dialog::SetOTpos(int OT)
 {
     int OldOT = DialogOTpos;
-
     DialogOTpos = OT;
     MY_DialogOTpos = OT;
     return OldOT;

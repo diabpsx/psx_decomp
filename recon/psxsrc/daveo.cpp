@@ -282,6 +282,7 @@ short DavesPadDeb;      /* @0x8011AB14 */
 long PDosh[2];          /* @0x8011AB18 */
 
 /* @0x8008463C DAVEO.CPP:74 */
+#line 73
 void ReadPad(int NoDeb)
 {
     CPad *DPad;
@@ -294,64 +295,107 @@ void ReadPad(int NoDeb)
     int diffm = (int)&FeDifficultyMenu;
 
     if (DaveDebCount++ > 15) {
+
         DaveDebCount = 0;
         DavesPadDeb &= 0xFFF0;
+
     }
     if (CDWAIT)
+
+
+
         return;
     if (FeFlag) {
+
         if (cmem == p1mema || cmem == p1memb) {
+
+
             DPad = PAD_GetPad(0, 0);
             if (!DPad->CheckActive()) {
                 DavesPad = 0;
                 DavesPadDeb = 0;
                 DPad->Flush();
                 return;
+
+
             }
         } else if (cmem == p2mema || cmem == p2memb) {
+
+
             DPad = PAD_GetPad(1, 0);
             if (!DPad->CheckActive()) {
+
                 DavesPad = 0;
                 DavesPadDeb = 0;
                 DPad->Flush();
                 return;
+
+
             }
         } else if (cmem == diffm && FePlayerNo == 0)
+
             DPad = PAD_GetPad(0, 0);
+
         else
             DPad = PAD_GetPad(0, 1);
+
     } else
         DPad = PAD_GetPad(options_pad, 0);
+
+
     New = DPad->GetCur();
     DavesPad = New & ~DavesPadDeb;
+
     DavesPadDeb = New & NoDeb;
     if (!New)
         DaveDebCount = 0;
+
 }
 
 /* @0x800847C4 DAVEO.CPP:300 */
+#line 299
 void DummyPoll()
 {
+
+
 }
 
 /* @0x800847CC DAVEO.CPP:306 */
+#line 305
 void DaveOwens()
 {
+
+
+
+
+
+
+
+
 }
 
 /* @0x800847D4 DAVEO.CPP:319 */
+#line 318
 void DaveCentreStuff()
 {
     char TempStr[40];
 
+
+
+
+
     MediumFont.SetChar('.', 0x7F);
     MediumFont.Print(0x9B, 0x69, ".", JustLeft, NULL, WHITER, WHITEG, WHITEG);
+
     MediumFont.SetChar('.', 0x80);
     MediumFont.Print(0x9B, 0x8E, ".", JustLeft, NULL, WHITER, WHITEG, WHITEG);
+
     MediumFont.SetChar('.', 0x81);
     MediumFont.Print(0x8B, 0x7E, ".", JustLeft, NULL, WHITER, WHITEG, WHITEG);
+
     MediumFont.SetChar('.', 0x82);
     MediumFont.Print(0xB0, 0x7D, ".", JustLeft, NULL, WHITER, WHITEG, WHITEG);
+
     MediumFont.SetChar('.', 0x6D);
 }
 
@@ -383,17 +427,24 @@ void PlaceStoreGold2(int myplr, long v)
 }
 
 /* @0x80084B44 DAVEO.CPP:408 -- STORES.CPP StoreSellItem's gold placement */
+#line 407
 void GivePlayerDosh(int PlayerNo, long cost)
 {
     int i;
 
     plr[PlayerNo]._pGold += cost;
+
     for (i = 0; i < plr[PlayerNo]._pNumInv && cost > 0; i++) {
+
         if (plr[PlayerNo].InvList[i]._itype == 11 && plr[PlayerNo].InvList[i]._ivalue != 5000) {
+
             if (cost + plr[PlayerNo].InvList[i]._ivalue <= 5000) {
+
                 plr[PlayerNo].InvList[i]._ivalue += cost;
                 SetGoldCurs(PlayerNo, i);
                 cost = 0;
+
+
             } else {
                 cost -= 5000 - plr[PlayerNo].InvList[i]._ivalue;
                 plr[PlayerNo].InvList[i]._ivalue = 5000;
@@ -401,8 +452,11 @@ void GivePlayerDosh(int PlayerNo, long cost)
             }
         }
     }
+
     if (cost > 0) {
+
         while (cost > 5000) {
+
             PlaceStoreGold2(PlayerNo, 5000);
             cost -= 5000;
         }
@@ -634,7 +688,10 @@ void KeefDaFeef(int PlayerNo)
 }
 
 /* @0x800857F8 DAVEO.CPP:781 */
+#line 780
 void ClearQuestFlags()
 {
+
+
     EnableQuestItemsPleeeeeeeeeeeeeeeeeez();
 }

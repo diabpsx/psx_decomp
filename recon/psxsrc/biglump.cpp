@@ -369,20 +369,29 @@ BOOL BL_AsyncLoadDone(void)
     return FileLoaded != 0;
 }
 
+#line 622
 void BL_WaitForAsyncFinish(void)
 {
-    while (!BL_AsyncLoadDone())
-        TSK_Sleep(1);
+
+    while (!BL_AsyncLoadDone()) TSK_Sleep(1);
     systemtask(0);
 }
 
+#line 630
 void BL_AsyncLoadCallBack(int ah)
 {
     unsigned long OldGp = ReloadGP();
+
+
     FileLoaded++;
     CurrAsync++;
+
+
     cancelasyncload(ah);
     systemtask(0);
+
+
+
     SetGP(OldGp);
 }
 
@@ -448,7 +457,11 @@ STRHDR *BL_OpenStreamFile(char *Name, char LumpID)
     return sh;
 }
 
+#line 776
 BOOL BL_CloseStreamFile(STRHDR *StreamHDR)
 {
+
+
+
     return StreamHDR != NULL;
 }

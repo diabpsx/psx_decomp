@@ -89,14 +89,20 @@ void AS_CallBack1(int ah)
 }
 
 /* @0x8009AA8C ASYNC.CPP:122 */
+#line 121
 void AS_WasLastBlock(int ah, struct STRHDR *sh, struct SFXHDR *sfh)
 {
     unsigned char *ptr;
 
+
     sfh->SizeIn -= 0x2F80;
+
     if (sfh->SizeIn > 0) {
+
         ptr = sfh->mem;
         ptr += sfh->stream_sec * 0x3000;
+
+
         setasyncfile(STREAM_BIN);
         systemtask(0);
         if (!sfh->voice)
@@ -104,16 +110,20 @@ void AS_WasLastBlock(int ah, struct STRHDR *sh, struct SFXHDR *sfh)
         else
             ah = asyncloadsegmentcallback(sh->Offset + sfh->stream_read, ptr, 0x3000, AS_CallBack1);
         systemtask(0);
+
         sfh->ah = ah;
     }
 }
 
 /* @0x8009AB54 ASYNC.CPP:166 */
+#line 165
 int AS_OpenStream(struct STRHDR *sh, struct SFXHDR *sfh)
 {
     int ah;
 
+
     sfh->SizeIn = sh->Size;
+
     setasyncfile(STREAM_BIN);
     systemtask(0);
     if (!sfh->voice)
@@ -121,11 +131,15 @@ int AS_OpenStream(struct STRHDR *sh, struct SFXHDR *sfh)
     else
         ah = asyncloadsegmentcallback(sh->Offset, sfh->mem, 0x3000, AS_CallBack1);
     systemtask(0);
+
     sfh->ah = ah;
+
+
     return ah;
 }
 
 /* @0x8009ABF4 ASYNC.CPP:193 */
+#line 192
 char AS_GetBlock(struct SFXHDR *sfh)
 {
     systemtask(0);
@@ -133,9 +147,13 @@ char AS_GetBlock(struct SFXHDR *sfh)
 }
 
 /* @0x8009AC24 ASYNC.CPP:205 */
+#line 204
 void AS_CloseStream(struct STRHDR *sh, struct SFXHDR *sfh)
 {
+
     if (!AS_GetBlock(sfh)) {
+
+
         cancelasyncload(sfh->ah);
         sfh->ChunkGot = 1;
         systemtask(0);

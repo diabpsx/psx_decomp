@@ -383,11 +383,15 @@ MisFileData misfiledata[47] = { /* @0x800D6F60 */
 
 
 /* @0x8004EA8C MISDAT.CPP:33 */
+#line 32
 void nullmissile(int mi, int sx, int sy, int dx, int dy, int midir, char mienemy, int id, int dam)
 {
+
 }
 
 /* @0x8004EA94 MISDAT.CPP:812 */
+#line 811
 void FuncNULL(struct MissileStruct *Ms, int ScrX, int ScrY, int OtPos)
 {
+
 }

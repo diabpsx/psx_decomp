@@ -179,13 +179,22 @@ void ClrAllObjects();
 
 /* ---- simple per-type "Add" handlers (called only via PreObjObjAddSwitch / AddObject) ---- */
 
+#line 122
 void AddL1Door(int i, int x, int y, int ot)
 {
+
     object[i]._oDoorFlag = 1;
+
     object[i]._oAnimFlag = 0;
+
+
     if (ot == OBJ_L1LDOOR) {
+
+
         object[i]._oVar1 = GetDPiece(x, y);
         object[i]._oVar2 = GetDPiece(x, y - 1);
+
+
     } else {
         object[i]._oVar1 = GetDPiece(x, y);
         object[i]._oVar2 = GetDPiece(x - 1, y);
@@ -193,8 +202,15 @@ void AddL1Door(int i, int x, int y, int ot)
     object[i]._oVar4 = 0;
 }
 
+#line 147
 void AddSCambBook(int i)
 {
+
+
+
+
+
+
     object[i]._oVar1 = setpc_x;
     object[i]._oVar2 = setpc_y;
     object[i]._oVar3 = setpc_x + setpc_w + 1;
@@ -234,17 +250,25 @@ void AddChest(int i, int t)
     object[i]._oVar2 = ENG_random(8);
 }
 
+#line 198
 void AddL2Door(int i, int x, int y, int ot)
 {
+
     object[i]._oDoorFlag = 1;
+
+
     if (ot == OBJ_L2LDOOR) {
+
         ObjSetMicro(x, y, 538);
         dungeon[(x - 16) >> 1][(y - 16) >> 1] = 0x96;
         object[i]._oAnimFrame = 1;
+
+
     } else {
         ObjSetMicro(x, y, 540);
         dungeon[(x - 16) >> 1][(y - 16) >> 1] = 0x97;
         object[i]._oAnimFrame = 2;
+
     }
     object[i]._oVar4 = 0;
 }
@@ -273,54 +297,78 @@ void AddSarc(int i)
         object[i]._oVar2 = PreSpawnSkeleton();
 }
 
+#line 259
 void AddFlameTrap(int i)
 {
+
     object[i]._oVar1 = trapid;
     object[i]._oVar2 = 0;
     object[i]._oVar3 = trapdir;
     object[i]._oVar4 = 0;
 }
 
+#line 269
 void AddTrap(int i, int ot)
 {
     int mt;
 
+
     mt = currlevel / 3 + 1;
+
     mt = ENG_random(mt);
-    if (mt == 0)
-        object[i]._oVar3 = MIS_ARROW;
-    if (mt == 1)
-        object[i]._oVar3 = MIS_FIREBOLT;
-    if (mt == 2)
-        object[i]._oVar3 = MIS_LIGHTCTRL;
+
+    if (mt == 0) object[i]._oVar3 = MIS_ARROW;
+    if (mt == 1) object[i]._oVar3 = MIS_FIREBOLT;
+    if (mt == 2) object[i]._oVar3 = MIS_LIGHTCTRL;
     object[i]._oVar4 = 0;
 }
 
+#line 287
 void AddArmorStand(int i)
 {
+
     if (!armorFlag) {
+
+
         object[i]._oAnimFlag = 2;
         object[i]._oSelFlag = 0;
+
+
     }
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 306
 void AddObjLight(int i, int r)
 {
+
+
     if (!level_lamp[leveltype])
         return;
     if (InitObjFlag) {
+
+
         object[i]._olid = AddLight(object[i]._ox, object[i]._oy, r);
         object[i]._oVar1 = -1;
+
+
+
     } else {
         object[i]._oVar1 = 0;
     }
 }
 
+#line 325
 void AddBarrel(int i, int ot)
 {
+
+
     object[i]._oVar1 = 0;
+
+
     object[i]._oRndSeed = GetRndSeed();
+
+
     object[i]._oVar2 = ENG_random(10);
     object[i]._oVar3 = ENG_random(3);
     if (object[i]._oVar2 >= 8)
@@ -354,136 +402,209 @@ void AddShrine(int i)
     object[i]._oVar1 = st;
 }
 
+#line 377
 void AddBookcase(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
+
+
     object[i]._oPreFlag = 1;
 }
 
+#line 391
 void AddBookstand(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 404
 void AddBloodFtn(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 417
 void AddPurifyingFountain(int i)
 {
     int x, y;
 
+
     x = object[i]._ox;
     y = object[i]._oy;
     dung_map[x][y - 1].dObject = -1 - i;
     dung_map[x - 1][y].dObject = -1 - i;
     dung_map[x - 1][y - 1].dObject = -1 - i;
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 437
 void AddGoatShrine(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 450
 void AddCauldron(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 463
 void AddMurkyFountain(int i)
 {
     int x, y;
 
+
     x = object[i]._ox;
     y = object[i]._oy;
     dung_map[x][y - 1].dObject = -1 - i;
     dung_map[x - 1][y].dObject = -1 - i;
     dung_map[x - 1][y - 1].dObject = -1 - i;
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 483
 void AddTearFountain(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 496
 void AddDecap(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
+
+
     object[i]._oAnimFrame = ENG_random(1);
     object[i]._oPreFlag = 1;
 }
 
+#line 510
 void AddVilebook(int i)
 {
     if (setlevel && setlvlnum == 5 /* SL_VILEBETRAYER */)
+
         object[i]._oAnimFrame = 4;
 }
 
+#line 520
 void AddMagicCircle(int i)
 {
+
+
+
+
     object[i]._oRndSeed = GetRndSeed();
+
+
     object[i]._oPreFlag = 1;
     object[i]._oVar6 = 0;
     object[i]._oVar5 = 1;
 }
 
+#line 537
 void AddBrnCross(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 550
 void AddPedistal(int i)
 {
+
     object[i]._oVar1 = setpc_x;
     object[i]._oVar2 = setpc_y;
     object[i]._oVar3 = setpc_x + setpc_w;
     object[i]._oVar4 = setpc_y + setpc_h;
+
     if (quests[Q_BLOOD]._qvar2)
         object[i]._oVar6 = quests[Q_BLOOD]._qvar2 - 1;
     else
         object[i]._oVar6 = 0;
 }
 
+#line 572
 void AddStoryBook(int i)
 {
     int bookframe;
-
     SetRndSeed(glSeedTbl[16]);
+
     object[i]._oVar1 = ENG_random(3);
-    if (currlevel == 4)
-        object[i]._oVar2 = StoryText[object[i]._oVar1][0];
-    if (currlevel == 8)
-        object[i]._oVar2 = StoryText[object[i]._oVar1][1];
-    if (currlevel == 12)
-        object[i]._oVar2 = StoryText[object[i]._oVar1][2];
+    if (currlevel == 4) object[i]._oVar2 = StoryText[object[i]._oVar1][0];
+    if (currlevel == 8) object[i]._oVar2 = StoryText[object[i]._oVar1][1];
+    if (currlevel == 12) object[i]._oVar2 = StoryText[object[i]._oVar1][2];
     object[i]._oVar3 = (currlevel >> 2) + 3 * object[i]._oVar1 - 1;
+
     bookframe = 1;
+
+
     object[i]._oAnimFrame = bookframe;
     bookframe++;
+
+
     object[i]._oVar4 = bookframe;
 }
 
+#line 596
 void AddWeaponRack(int i)
 {
+
     if (!weaponFlag) {
+
+
         object[i]._oAnimFlag = 2;
         object[i]._oSelFlag = 0;
+
+
     }
     object[i]._oRndSeed = GetRndSeed();
 }
 
+#line 615
 void AddTorturedBody(int i)
 {
+
+
+
     object[i]._oRndSeed = GetRndSeed();
+
+
     object[i]._oAnimFrame = ENG_random(4) + 1;
     object[i]._oPreFlag = 1;
 }
 
+#line 631
 void AddFlameLvr(int i)
 {
+
     object[i]._oVar1 = trapid;
     object[i]._oVar2 = MIS_FLAMEC;
 }
@@ -515,12 +636,14 @@ void GetRndObjLoc(int randarea, int &xx, int &yy)
     }
 }
 
+#line 660
 void AddMushPatch()
 {
     int x, y;
 
     if (numobjects < MAXOBJECTS) {
         int i = objectavail[0];
+
         GetRndObjLoc(5, x, y);
         dung_map[x + 1][y + 1].dObject = -1 - i;
         dung_map[x + 2][y + 1].dObject = -1 - i;
@@ -529,6 +652,7 @@ void AddMushPatch()
     }
 }
 
+#line 676
 void AddSlainHero()
 {
     int x, y;
@@ -556,6 +680,7 @@ unsigned char RndLocOk(int xp, int yp)
     return 1;
 }
 
+#line 702
 unsigned char TrapLocOk(int xp, int yp)
 {
     if (dung_map[xp][yp].dFlags & BFLAG_POPULATED)
@@ -732,6 +857,7 @@ void SetMapObjects(unsigned char *pMap, int startx, int starty)
     InitObjFlag = 0;
 }
 
+#line 895
 void ClrAllObjects()
 {
     int i;
@@ -759,12 +885,14 @@ void ClrAllObjects()
     leverid = 1;
 }
 
+#line 923
 void AddTortures()
 {
     int yp, xp;
 
     for (yp = 0; yp < MAXDUNY; yp++) {
         for (xp = 0; xp < MAXDUNX; xp++) {
+
             if (GetDPiece(xp, yp) == 367) {
                 AddObject(OBJ_TORTURE1, xp, yp + 1);
                 AddObject(OBJ_TORTURE3, xp + 2, yp - 1);
@@ -783,12 +911,14 @@ void AddTortures()
     }
 }
 
+#line 951
 void AddCandles()
 {
     int xp, yp;
 
     xp = quests[Q_PWATER]._qtx;
     yp = quests[Q_PWATER]._qty;
+
     AddObject(OBJ_STORYCANDLE, xp - 2, yp + 1);
     AddObject(OBJ_STORYCANDLE, xp + 3, yp + 1);
     AddObject(OBJ_STORYCANDLE, xp - 1, yp + 2);
@@ -880,53 +1010,56 @@ void InitRndBarrels()
     }
 }
 
+#line 1187
 void AddL1Objs(int x1, int y1, int x2, int y2)
 {
     int i, j, pn;
 
     for (j = y1; j < y2; j++) {
         for (i = x1; i < x2; i++) {
+
             pn = GetDPiece(i, j);
-            if (pn == 270)
-                AddObject(OBJ_L1LIGHT, i, j);
+            if (pn == 270) AddObject(OBJ_L1LIGHT, i, j);
             if (pn == 44 || pn == 51 || pn == 214)
                 AddObject(OBJ_L1LDOOR, i, j);
-            if (pn == 46 || pn == 56)
-                AddObject(OBJ_L1RDOOR, i, j);
+            if (pn == 46 || pn == 56) AddObject(OBJ_L1RDOOR, i, j);
         }
     }
 }
 
+#line 1206
 void AddL2Objs(int x1, int y1, int x2, int y2)
 {
     int i, j, pn;
 
     for (j = y1; j < y2; j++) {
         for (i = x1; i < x2; i++) {
+
+
             pn = GetDPiece(i, j);
-            if (pn == 13 || pn == 541)
-                AddObject(OBJ_L2LDOOR, i, j);
-            if (pn == 17 || pn == 542)
-                AddObject(OBJ_L2RDOOR, i, j);
+            if (pn == 13 || pn == 541) AddObject(OBJ_L2LDOOR, i, j);
+            if (pn == 17 || pn == 542) AddObject(OBJ_L2RDOOR, i, j);
         }
     }
 }
 
+#line 1224
 void AddL3Objs(int x1, int y1, int x2, int y2)
 {
     int i, j, pn;
 
     for (j = y1; j < y2; j++) {
         for (i = x1; i < x2; i++) {
+
+
             pn = GetDPiece(i, j);
-            if (pn == 531)
-                AddObject(OBJ_L3LDOOR, i, j);
-            if (pn == 534)
-                AddObject(OBJ_L3RDOOR, i, j);
+            if (pn == 531) AddObject(OBJ_L3LDOOR, i, j);
+            if (pn == 534) AddObject(OBJ_L3RDOOR, i, j);
         }
     }
 }
 
+#line 1241
 unsigned char WallTrapLocOk(int xp, int yp)
 {
     if (dung_map[xp][yp].dFlags & BFLAG_POPULATED)
@@ -936,6 +1069,7 @@ unsigned char WallTrapLocOk(int xp, int yp)
     return 1;
 }
 
+#line 1252
 unsigned char TorchLocOK(int xp, int yp)
 {
     if (dung_map[xp][yp].dFlags & BFLAG_POPULATED)
@@ -943,27 +1077,22 @@ unsigned char TorchLocOK(int xp, int yp)
     return 1;
 }
 
+#line 1260
 void AddL2Torches()
 {
     int i, j, pn;
 
     for (j = 0; j < MAXDUNY; j++) {
         for (i = 0; i < MAXDUNX; i++) {
+
             if ((unsigned char)TorchLocOK(i, j) == 0)
                 continue;
-
             pn = GetDPiece(i, j);
-            if (pn == 1 && ENG_random(3) == 0)
-                AddObject(OBJ_TORCHL2, i, j);
+            if (pn == 1 && ENG_random(3) == 0) AddObject(OBJ_TORCHL2, i, j);
+            if (pn == 5 && ENG_random(3) == 0) AddObject(OBJ_TORCHR2, i, j);
+            if (pn == 37 && ENG_random(10) == 0 && dung_map[i - 1][j].dObject == 0) AddObject(OBJ_TORCHL, i - 1, j);
+            if (pn == 41 && ENG_random(10) == 0 && dung_map[i][j - 1].dObject == 0) AddObject(OBJ_TORCHR, i, j - 1);
 
-            if (pn == 5 && ENG_random(3) == 0)
-                AddObject(OBJ_TORCHR2, i, j);
-
-            if (pn == 37 && ENG_random(10) == 0 && dung_map[i - 1][j].dObject == 0)
-                AddObject(OBJ_TORCHL, i - 1, j);
-
-            if (pn == 41 && ENG_random(10) == 0 && dung_map[i][j - 1].dObject == 0)
-                AddObject(OBJ_TORCHR, i, j - 1);
         }
     }
 }
@@ -1171,6 +1300,7 @@ void AddHookedBodies(int freq)
     }
 }
 
+#line 1535
 void AddL4Goodies()
 {
     AddHookedBodies(6);
@@ -1248,8 +1378,11 @@ static void saveplrpos()
     ViewX = 0;
 }
 
+#line 1614
 static void restoreplrpos()
 {
+
+
     ViewX = plr[0]._pVar1;
     ViewY = plr[0]._pVar2;
     PlacePlayer(0, plr[0]._pVar3, plr[0]._pVar4, 0);

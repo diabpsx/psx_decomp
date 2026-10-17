@@ -42,16 +42,24 @@ void snd_stop_snd(TSnd *pSnd)
 }
 
 /* line 145 @0x80077D58 */
+#line 144
 void snd_play_snd(TSFX *pSnd, long lVolume, long lPan)
 {
     if (!pSnd)
+
+
+
+
+
+
+
+
+
         return;
 
     lVolume *= 2;
-    if (lVolume < 0)
-        lVolume = 0;
-    else if (lVolume >= 0x4000)
-        lVolume = 0x3FFF;
+    if (lVolume < 0) lVolume = 0;
+    else if (lVolume >= 0x4000) lVolume = 0x3FFF;
 
     SND_PlaySnd(pSnd->pszName, lVolume, lPan, 0);
 }
@@ -73,48 +81,67 @@ void snd_play_msnd(unsigned short pszName, long lVolume, long lPan)
 }
 
 /* line 209 @0x80077E40 */
+#line 208
 void snd_init(unsigned long hWnd)
 {
+
+
+
+
+
+
     gbSndInited = 1;
 }
 
 /* line 227 @0x80077E50 */
+#line 226
 void music_stop(void)
 {
     if (FileSYS == 2) {
+
         if (sghMusic)
+
             STR_SoundCommand(sghMusic, 8);
     }
 }
 
 /* line 245 @0x80077E90 */
+#line 244
 void music_fade(void)
 {
     if (FileSYS == 2) {
+
         if (sghMusic)
+
+
             STR_SoundCommand(sghMusic, 5);
     }
 }
 
 /* line 261 @0x80077ED0 */
+#line 260
 void music_start(int nTrack)
 {
     if (FileSYS == 2) {
+
         int MusicVolume;
 
-        if (sghMusic)
-            music_stop();
+
+        if (sghMusic) music_stop();
+
+
 
         MusicVolume = sglMusicVolume;
-        sghMusic = STR_PlaySound(sgszMusicTracks[nTrack], 1, (MusicVolume * sglMasterVolume) >> 8, 1);
-        if (!sghMusic)
-            DBG_Error(NULL, "source/SOUND.cpp", 0x113);
 
+
+        sghMusic = STR_PlaySound(sgszMusicTracks[nTrack], 1, (MusicVolume * sglMasterVolume) >> 8, 1);
+        if (!sghMusic) DBG_Error(NULL, "source/SOUND.cpp", 0x113);
         sgnMusicTrack = nTrack;
     }
 }
 
 /* line 315 @0x80077F70 */
+#line 314
 unsigned char snd_playing(int SFXNo)
 {
     return SND_IsSfxPlaying(SFXNo);

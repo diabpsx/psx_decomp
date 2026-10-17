@@ -315,12 +315,11 @@ static void DRLG_L2Shadows(void)
     }
 }
 
+#line 1489
 void InitDungeon(void)
 {
     int i, j;
 
-    /* PSX oracle: only clears predungeon -- unlike devilution's InitDungeon this build does NOT also
-     * zero mydflags here (LoadL2Dungeon/LoadPreL2Dungeon each clear mydflags themselves instead). */
     for (i = 0; i < DMAXY; i++) {
         for (j = 0; j < DMAXX; j++) {
             predungeon[j][i] = 32;
@@ -328,22 +327,27 @@ void InitDungeon(void)
     }
 }
 
+#line 1508
 static void DRLG_LoadL2SP(void)
 {
     setloadflag = false;
-
     if (QuestStatus(Q_BLIND)) {
         pSetPiece = GRL_LoadFileInMemSig("Blind2.DUN", 0);
         setloadflag = true;
+
     } else if (QuestStatus(Q_BLOOD)) {
+
         pSetPiece = GRL_LoadFileInMemSig("Blood1.DUN", 0);
         setloadflag = true;
+
     } else if (QuestStatus(Q_SCHAMB)) {
+
         pSetPiece = GRL_LoadFileInMemSig("Bonestr2.DUN", 0);
         setloadflag = true;
     }
 }
 
+#line 1530
 static void DRLG_FreeL2SP(void)
 {
     MemFreeDbg(pSetPiece);
@@ -380,9 +384,11 @@ static void DRLG_L2SetRoom(int rx1, int ry1)
     }
 }
 
+#line 1575
 static void DefineRoom(int nX1, int nY1, int nX2, int nY2, int ForceHW)
 {
     int i, j;
+
     unsigned char ft;
 
     predungeon[nX1][nY1] = 67;
@@ -403,6 +409,7 @@ static void DefineRoom(int nX1, int nY1, int nX2, int nY2, int ForceHW)
                 mydflags[i + j * DMAXX] |= DLRG_PROTECTED;
             }
         }
+
     }
     for (i = nX1 + 1; i <= nX2 - 1; i++) {
         predungeon[i][nY1] = 35;
@@ -452,6 +459,7 @@ static void CreateDoorType(int nX, int nY)
     }
 }
 
+#line 1656
 static void PlaceHallExt(int nX, int nY)
 {
     if (predungeon[nX][nY] == 32) {
@@ -625,6 +633,7 @@ static void CreateRoom(int nX1, int nY1, int nX2, int nY2, int nRDest, int nHDir
     }
 }
 
+#line 1825
 static void GetHall(int *nX1, int *nY1, int *nX2, int *nY2, int *nHd)
 {
     struct NODE *p1;
@@ -1352,9 +1361,31 @@ static unsigned char CreateDungeon(void)
     return true;
 }
 
+#line 2494
 static void DRLG_L2Pass3(void)
 {
     int i, j, xx, yy;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     long v1, v2, v3, v4, lv;
 
     lv = 12 - 1;
@@ -1364,28 +1395,71 @@ static void DRLG_L2Pass3(void)
     v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
     v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
 
+
+
     for (yy = 0; yy < 96; yy += 2) {
         for (xx = 0; xx < 96; xx += 2) {
+
             SetDPiece(xx, yy, v1);
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
         }
     }
+
 
     yy = 16;
     for (j = 0; j < DMAXY; j++) {
         xx = 16;
         for (i = 0; i < DMAXX; i++) {
             lv = dungeon[i][j] - 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             v1 = *((short *)&pMegaTiles[lv * 8] + 0) + 1;
             v2 = *((short *)&pMegaTiles[lv * 8] + 1) + 1;
             v3 = *((short *)&pMegaTiles[lv * 8] + 2) + 1;
             v4 = *((short *)&pMegaTiles[lv * 8] + 3) + 1;
+
+
             SetDPiece(xx, yy, v1);
             SetDPiece(xx + 1, yy, v2);
             SetDPiece(xx, yy + 1, v3);
             SetDPiece(xx + 1, yy + 1, v4);
+
+
+
+
+
             xx += 2;
         }
         yy += 2;
@@ -1439,9 +1513,11 @@ static void DRLG_L2FTVR(int i, int j, int x, int y, int d)
     }
 }
 
+#line 2646
 static void DRLG_L2FloodTVal(void)
 {
     int i, j, xx, yy;
+
 
     yy = 16;
     for (j = 0; j < DMAXY; j++) {
@@ -1457,9 +1533,11 @@ static void DRLG_L2FloodTVal(void)
     }
 }
 
+#line 2669
 static void DRLG_L2TransFix(void)
 {
     int i, j, xx, yy;
+
 
     yy = 16;
     for (j = 0; j < DMAXY; j++) {
@@ -1800,9 +1878,40 @@ static void DRLG_L2(int entry)
     DRLG_CheckQuests(nSx1, nSy1);
 }
 
+#line 3056
 static void DRLG_InitL2Vals(void)
 {
     /* PSX oracle: empty (0x8-byte jr-ra stub) -- the retail dSpecial[] highlight-frame feature this
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
      * function implements in devilution is compiled out entirely on this build (LoadL2Dungeon's
      * matching block is likewise absent from its oracle -- see below). */
 }
@@ -1918,16 +2027,56 @@ void LoadPreL2Dungeon(char *sFileName, int vx, int vy)
     }
 }
 
+#line 3237
 void CreateL2Dungeon(unsigned int rseed, int entry)
 {
     int idx;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     idx = (currlevel - 4) * 4;
     if (nSxy[idx] != -1) {
+
         nSx1 = nSxy[idx];
         nSy1 = nSxy[idx + 1];
         nSx2 = nSxy[idx + 2];
         nSy2 = nSxy[idx + 3];
+
     }
     pSetPiece = 0;
 
@@ -1938,16 +2087,21 @@ void CreateL2Dungeon(unsigned int rseed, int entry)
     dmaxx = 80;
     dmaxy = 80;
 
+
+
+
     DRLG_InitTrans();
     DRLG_InitSetPC();
     DRLG_LoadL2SP();
     DRLG_L2(entry);
+
     DRLG_L2Pass3();
     DRLG_FreeL2SP();
     DRLG_InitL2Vals();
     DRLG_SetPC();
 
     if (nSxy[idx] == -1) {
+
         nSxy[idx] = nSx1;
         nSxy[idx + 1] = nSy1;
         nSxy[idx + 2] = nSx2;

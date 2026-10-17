@@ -8,13 +8,16 @@ void LittleStart(unsigned char bNewGame, unsigned char bSinglePlayer);
 void alloc_plr(void);
 
 /* @0x8007B170 TESTCODE.CPP:66 */
+#line 65
 void DoGameTestStuff(void)
 {
     GRL_InitGwin();
+
     StartGame(1, 1);
 }
 
 /* @0x8007B19C TESTCODE.CPP:73 */
+#line 72
 void DoInitGameStuff(void)
 {
     GRL_InitGwin();

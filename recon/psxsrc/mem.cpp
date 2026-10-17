@@ -25,11 +25,32 @@ static MEM_INIT_INFO PsxMem = { 0, 0, 0, WorkRam, 4, SlowMemMove, 0, 0, 0, 0 };
 static MEM_INIT_INFO PsxFastMem = { 0, 0, 0, FastRam, 4, SlowMemMove, 0, 0, 0, 0 };
 
 /* @0x80084424 MEM.CPP:96 */
+#line 95
 void MyFilter(unsigned long MemType, unsigned long Size, const char *Name)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 /* @0x8008442C MEM.CPP:150 */
+#line 149
 static void SlowMemMove(void *Dest, void *Source, unsigned long size)
 {
     memmove(Dest, Source, size);
@@ -70,6 +91,7 @@ void MEM_SetupMem(void) __attribute__((section(".STARTUP_text")));
 static void SetupWorkRam(void) __attribute__((section(".STARTUP_text")));
 
 /* MEM.CPP:85 */
+#line 84
 void MEM_SetupMem(void)
 {
     Gaz = &OPT_LinkerOpts;
@@ -77,15 +99,20 @@ void MEM_SetupMem(void)
 }
 
 /* MEM.CPP:123 */
+#line 122
 static void SetupWorkRam(void)
 {
+
     PsxMem.Mem = OPT_FreeMemStart;
     PsxMem.Size = OPT_FreeMemSize;
     PsxMem.Type = 1;
+
     PsxFastMem.Mem = (void *)0x1F800000;
     PsxFastMem.Size = 0x400;
     PsxFastMem.Type = 2;
+
     memset(PsxMem.Mem, 0, PsxMem.Size);
+
     GAL_AddMemType(&PsxFastMem);
     GAL_AddMemType(&PsxMem);
     GAL_SetVerbosity(GAL_NOISY);

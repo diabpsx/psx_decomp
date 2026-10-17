@@ -2,6 +2,9 @@
  * presence-probe routine (empty in this overlay). */
 #include "diabpsx_types.h"
 
+#line 62
 void GameOnlyTestRoutine(void)
 {
+
+
 }

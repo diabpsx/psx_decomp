@@ -22,15 +22,18 @@ int ArgsSoFar;
 void GPUQ_FlushQ(void);
 
 /* @0x800833B0 GPUQ.CPP:76 */
+#line 75
 static void CheckMaxArgs(void)
 {
     if (ArgsSoFar == 0x1E) {
+
         DrawSync(0);
         GPUQ_FlushQ();
     }
 }
 
 /* @0x800833E4 GPUQ.CPP:96 */
+#line 95
 unsigned char GPUQ_InitModule(void)
 {
     ArgsSoFar = 0;
@@ -38,37 +41,51 @@ unsigned char GPUQ_InitModule(void)
 }
 
 /* @0x800833F0 GPUQ.CPP:106 */
+#line 105
 void GPUQ_FlushQ(void)
 {
     int f;
     LOAD_IMAGE_ARGS *Img;
 
     for (f = 0; f < ArgsSoFar; f++) {
+
         Img = &AllArgs[f];
+
         if (Img->Flags & 4) {
             MoveImage(&Img->Rect, Img->MoveX, Img->MoveY);
+
+
         } else if (Img->Flags & 1) {
             LoadImage(&Img->Rect, (unsigned long *)Img->Addr);
+
+
         } else {
             void *ImgMem = GAL_Lock(Img->Handle);
-            if (ImgMem == 0)
-                DBG_Error(0, "psxsrc/GPUQ.CPP", 0x7C);
+            if (ImgMem == 0) DBG_Error(0, "psxsrc/GPUQ.CPP", 0x7C);
             LoadImage(&Img->Rect, (unsigned long *)((long)ImgMem + Img->Offset));
         }
+
     }
+
     DrawSync(0);
+
     for (f = 0; f < ArgsSoFar; f++) {
         LOAD_IMAGE_ARGS *A = &AllArgs[f];
+
+
+
         unsigned char GalRet;
         if (!(A->Flags & 5)) {
+
             if (A->Flags & 2)
                 GalRet = GAL_Free(A->Handle);
             else
                 GalRet = GAL_Unlock(A->Handle);
-            if (!GalRet)
-                DBG_Error(0, "psxsrc/GPUQ.CPP", 0x91);
+
+            if (!GalRet) DBG_Error(0, "psxsrc/GPUQ.CPP", 0x91);
         }
     }
+
     ArgsSoFar = 0;
 }
 

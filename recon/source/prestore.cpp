@@ -63,34 +63,58 @@ void InitStores(void)
     }
 }
 
+#line 138
 void SetupTownStores(void)
 {
     int i, l;
+
+
+
+
     int OldMyPtr;
     int OldSeed;
 
     OldMyPtr = myplr;
     OldSeed = GetRndSeed();
     SetRndSeed(OldSeed);
+
     for (int Loop = 0; Loop < gbMaxPlayers; Loop++) {
+
         StorePlrNo = Loop;
         myplr = Loop;
+
+
+
         if (gbMaxPlayers == 1) {
+
             l = 0;
             for (i = 0; i < NUMLEVELS; i++)
                 if (plr[myplr]._pLvlVisited[i]) l = i;
         } else {
+
+
             l = plr[myplr]._pLevel >> 1;
+
+
         }
         l += 2;
         if (l < 6) l = 6;
         if (l > 16) l = 16;
+
+
+
         SpawnStoreGold();
+
         SpawnSmith(l);
+
         SpawnWitch(l);
+
         SpawnHealer(l);
+
         SpawnBoy(plr[myplr]._pLevel);
+
         SpawnPremium(plr[myplr]._pLevel);
+
     }
     myplr = OldMyPtr;
     SetRndSeed(OldSeed);

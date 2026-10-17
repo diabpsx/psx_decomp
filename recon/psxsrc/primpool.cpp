@@ -134,37 +134,52 @@ static unsigned char InitPrimBuffer(PRIM_BUFFER *Pr, int Prims, int OtSize)
 }
 
 /* @0x800839EC PRIMPOOL.CPP:216 */
+#line 215
 void PRIM_Clip(RECT *R, int Depth)
 {
     DR_MODE *DrArea;
     RECT RealRect;
 
     RealRect = *R;
+
     RealRect.x += VID_GetXOff();
     RealRect.y += VID_GetYOff();
+
+
+
     ClipRect(ScrRect, RealRect);
+
+
+
     RealRect.x += Screens[ScrNum].drawenv.clip.x;
     RealRect.y += Screens[ScrNum].drawenv.clip.y;
+
     DrArea = PRIM_GetNextDrArea();
+
     SetDrawArea(DrArea, &RealRect);
+
     addPrim(ThisOt + Depth, DrArea);
 }
 
 /* @0x80083B14 PRIMPOOL.CPP:248 */
+#line 247
 unsigned char PRIM_GetCurrentScreen(void)
 {
     return ScrNum;
 }
 
 /* @0x80083B20 PRIMPOOL.CPP:257 */
+#line 256
 void PRIM_FullScreen(int Depth)
 {
     RECT R;
-
     R.x = 0;
     R.y = 0;
     R.w = 320;
     R.h = 240;
+
+
+
     PRIM_Clip(&R, Depth);
 }
 
@@ -213,6 +228,7 @@ void PRIM_Flush(void)
 }
 
 /* @0x80083D8C PRIMPOOL.CPP:373 */
+#line 372
 unsigned long *PRIM_GetCurrentOtList(void)
 {
     return ThisOt;
@@ -227,91 +243,117 @@ static void ClearPbOnDrawSync(PRIM_BUFFER *Pb)
 }
 
 /* @0x80083DD4 PRIMPOOL.CPP:388 */
+#line 387
 static unsigned char ClearedYet(void)
 {
     return PbToClear == NULL;
 }
 
 /* @0x80083DE0 PRIMPOOL.CPP:397 */
+#line 396
 static void PrimDrawSycnCallBack(void)
 {
     if (PbToClear) {
+
         PbToClear->Drawing = 0;
         PbToClear = NULL;
     }
 }
 
 /* @0x80083E00 PRIMPOOL.CPP:411 */
+#line 410
 static void SendDispEnv(void)
 {
     PutDispEnv(DispEnvToPut);
 }
 
 /* @0x80083E24 PRIMPOOL.CPP:461 */
+#line 460
 POLY_F4 *PRIM_GetNextPolyF4(void)
 {
+
     POLY_F4 *RetPage = (POLY_F4 *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_F4));
     return RetPage;
 }
 
 /* @0x80083E3C PRIMPOOL.CPP:469 */
+#line 468
 POLY_FT4 *PRIM_GetNextPolyFt4(void)
 {
+
     POLY_FT4 *RetPage = (POLY_FT4 *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_FT4));
     return RetPage;
 }
 
 /* @0x80083E54 PRIMPOOL.CPP:477 -- retail advances 64 bytes (sizeof(DR_ENV)), not sizeof(POLY_GT4)=52 */
+#line 476
 POLY_GT4 *PRIM_GetNextPolyGt4(void)
 {
+
     POLY_GT4 *RetPage = (POLY_GT4 *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(DR_ENV));
     return RetPage;
 }
 
 /* @0x80083E6C PRIMPOOL.CPP:486 */
+#line 485
 POLY_G4 *PRIM_GetNextPolyG4(void)
 {
+
     POLY_G4 *RetPage = (POLY_G4 *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_G4));
     return RetPage;
 }
 
 /* @0x80083E84 PRIMPOOL.CPP:494 */
+#line 493
 POLY_F3 *PRIM_GetNextPolyF3(void)
 {
+
     POLY_F3 *RetPage = (POLY_F3 *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(POLY_F3));
     return RetPage;
 }
 
 /* @0x80083E9C PRIMPOOL.CPP:511 */
+#line 510
 DR_MODE *PRIM_GetNextDrArea(void)
 {
+
     DR_MODE *RetPage = (DR_MODE *)ThisPrimAddr;
     ThisPrimAddr = (POLY_FT4 *)((unsigned char *)ThisPrimAddr + sizeof(DR_MODE));
     return RetPage;
 }
 
 /* @0x80083EB4 PRIMPOOL.CPP:519 */
+#line 518
 static BOOL ClipRect(const RECT &ClipRect, RECT &RectToClip)
 {
     if (IsColiding(ClipRect, RectToClip)) {
+
         if (RectToClip.x < ClipRect.x) {
+
             RectToClip.w -= ClipRect.x - RectToClip.x;
             RectToClip.x = ClipRect.x;
+
         }
         if (RectToClip.y < ClipRect.y) {
+
             RectToClip.h -= ClipRect.y - RectToClip.y;
             RectToClip.y = ClipRect.y;
+
         }
         if (RectToClip.x + RectToClip.w > ClipRect.x + ClipRect.w)
             RectToClip.w -= (RectToClip.x + RectToClip.w) - (ClipRect.x + ClipRect.w);
+
         if (RectToClip.y + RectToClip.h > ClipRect.y + ClipRect.h)
             RectToClip.h -= (RectToClip.y + RectToClip.h) - (ClipRect.y + ClipRect.h);
+
         return 1;
+
+
     }
     RectToClip.w = 0;
     RectToClip.h = 0;

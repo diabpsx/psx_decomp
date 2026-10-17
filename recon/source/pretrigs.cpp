@@ -21,6 +21,7 @@
 
 #define Q_SCHAMB   14
 
+#line 85
 void InitNoTriggers(void)
 {
     numtrigs = 0;
@@ -85,6 +86,7 @@ void InitTownTriggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 160
 void InitL1Triggers(void)
 {
     int i, j;
@@ -92,11 +94,13 @@ void InitL1Triggers(void)
     numtrigs = 0;
     for (j = 0; j < MAXDUNY; j++) {
         for (i = 0; i < MAXDUNX; i++) {
+
             if (GetDPiece(i, j) == 0x81) {
                 trigs[numtrigs]._tx = i;
                 trigs[numtrigs]._ty = j;
                 trigs[numtrigs]._tmsg = WM_DIABPREVLVL;
                 numtrigs++;
+
             }
             if (GetDPiece(i, j) == 0x73) {
                 trigs[numtrigs]._tx = i;
@@ -140,6 +144,7 @@ void InitL2Triggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 228
 void InitL3Triggers(void)
 {
     int i, j;
@@ -147,17 +152,20 @@ void InitL3Triggers(void)
     numtrigs = 0;
     for (j = 0; j < MAXDUNY; j++) {
         for (i = 0; i < MAXDUNX; i++) {
+
             if (GetDPiece(i, j) == 0xAB) {
                 trigs[numtrigs]._tx = i;
                 trigs[numtrigs]._ty = j;
                 trigs[numtrigs]._tmsg = WM_DIABPREVLVL;
                 numtrigs++;
+
             }
             if (GetDPiece(i, j) == 0xA8) {
                 trigs[numtrigs]._tx = i;
                 trigs[numtrigs]._ty = j;
                 trigs[numtrigs]._tmsg = WM_DIABNEXTLVL;
                 numtrigs++;
+
             }
             if (GetDPiece(i, j) == 0x225) {
                 trigs[numtrigs]._tx = i;
@@ -212,6 +220,7 @@ void InitL4Triggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 315
 void InitSKingTriggers(void)
 {
     numtrigs = 1;
@@ -221,6 +230,7 @@ void InitSKingTriggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 327
 void InitSChambTriggers(void)
 {
     numtrigs = 1;
@@ -230,6 +240,7 @@ void InitSChambTriggers(void)
     _trigflag[sel_data] = 0;
 }
 
+#line 339
 void InitPWaterTriggers(void)
 {
     numtrigs = 1;

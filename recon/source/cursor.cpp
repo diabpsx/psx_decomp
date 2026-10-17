@@ -42,18 +42,36 @@ char _pcursplr[2];
 #define infostr _infostr[sel_data]
 
 /* @0x80037734 CURSOR.CPP:126 */
+#line 125
 void InitCursor(void)
 {
+
+
+
+
+
 }
 
 /* @0x8003773C CURSOR.CPP:137 */
+#line 136
 void FreeCursor(void)
 {
+
+
+
+
 }
 
 /* @0x80037744 CURSOR.CPP:148 */
+#line 147
 void SetICursor(int i)
 {
+
+
+
+
+
+
     icursW = InvItemWidth[i];
     icursH = InvItemHeight[i];
     icursW28 = icursW / 16;
@@ -61,8 +79,13 @@ void SetICursor(int i)
 }
 
 /* @0x800377A0 CURSOR.CPP:165 */
+#line 164
 void SetCursor(int i)
 {
+
+
+
+
     curs = i;
     cursW = InvItemWidth[curs];
     cursH = InvItemHeight[curs];
@@ -70,28 +93,35 @@ void SetCursor(int i)
 }
 
 /* @0x80037804 CURSOR.CPP:179 */
+#line 178
 void NewCursor(int i)
 {
     SetCursor(i);
 }
 
 /* @0x80037824 CURSOR.CPP:186 */
+#line 185
 void InitLevelCursor(void)
 {
     SetCursor(GLOVE_CURS);
     cursmx = ViewX;
     cursmy = ViewY;
+
     _pcursmonst[0] = -1;
     _pcursmonst[1] = -1;
+
     _pcursobj[0] = -1;
     _pcursobj[1] = -1;
+
     _pcursitem[0] = -1;
     _pcursitem[1] = -1;
+
     _pcursplr[0] = -1;
     _pcursplr[1] = -1;
 }
 
 /* @0x80037884 CURSOR.CPP:211 */
+#line 210
 void CheckTown(void)
 {
     int ocursmx = cursmx;
@@ -101,8 +131,10 @@ void CheckTown(void)
         int mx = missileactive[i];
         if (missile[mx]._mitype == MIT_TOWN) {
             for (int dir = 0; dir < 8; dir++) {
+
                 cursmx = ocursmx + offset_x[dir];
                 cursmy = ocursmy + offset_y[dir];
+
                 if (((cursmx == missile[mx]._mix - 1) && (cursmy == missile[mx]._miy)) ||
                     ((cursmx == missile[mx]._mix) && (cursmy == missile[mx]._miy - 1)) ||
                     ((cursmx == missile[mx]._mix - 1) && (cursmy == missile[mx]._miy - 1)) ||
@@ -161,6 +193,499 @@ void CheckRportal(void)
 }
 
 /* @0x80037D80 CURSOR.CPP:284 */
+#line 283
 void CheckCursMove(void)
 {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -44,10 +44,15 @@ void PadInit(int mode);                                                         
 
 /* ---------------------------------------------------------------- @0x800B071C PADS.CPP:103 (.STARTUP_text) */
 void PAD_Open(void) __attribute__((section(".STARTUP_text")));
+#line 102
 void PAD_Open(void)
 {
+
     InitTAP(RawPadData0, 34, RawPadData1, 34);
     StartTAP();
+
+
+
     PadInit(1);
 }
 
@@ -140,13 +145,16 @@ CPad *PAD_GetPad(int PadNum, unsigned char both)
 }
 
 /* ---------------------------------------------------------------- @0x800898A4 PADS.CPP:277 */
+#line 276
 void CPad::NewVal(unsigned short New)
 {
     New = Trans(New);
+
     Old = Cur;
     Cur = New;
     Down = New & (New ^ Old);
     Up = Old & ~Cur;
+
     Tick = MakeClickBits(Cur, Down, PADTICK, GazTickCount);
 }
 
@@ -163,10 +171,10 @@ void CPad::BothNewVal(unsigned short New, unsigned short New2)
 }
 
 /* ---------------------------------------------------------------- @0x800899AC PADS.CPP:309 */
+#line 308
 unsigned short CPad::Trans(unsigned short PadVal)
 {
     unsigned short RetVal;
-
     /* Climax TranslatePadVals idiom (cf. SBSPSS source/pad/pads.cpp) */
     RetVal  = PadVal&0x1000 ? 1 : 0;
     RetVal |= PadVal&0x4000 ? 2 : 0;
@@ -174,15 +182,28 @@ unsigned short CPad::Trans(unsigned short PadVal)
     RetVal |= PadVal&0x2000 ? 8 : 0;
     RetVal |= PadVal&0x800 ? 0x10 : 0;
     RetVal |= PadVal&0x100 ? 0x20 : 0;
+
+
     RetVal |= PadVal&0x100 ? 0x20 : 0;
+
+
     RetVal |= PadVal&0x40 ? 0x100 : 0;
     RetVal |= PadVal&0x80 ? 0x80 : 0;
     RetVal |= PadVal&0x20 ? 0x40 : 0;
     RetVal |= PadVal&0x10 ? 0x200 : 0;
+
+
+
+
+
+
+
     RetVal |= PadVal&0x4 ? 0x400 : 0;
     RetVal |= PadVal&0x1 ? 0x800 : 0;
+
     RetVal |= PadVal&0x8 ? 0x1000 : 0;
     RetVal |= PadVal&0x2 ? 0x2000 : 0;
+
     return RetVal;
 }
 
@@ -202,6 +223,7 @@ void CPad::Flush()
 }
 
 /* ---------------------------------------------------------------- @0x80089B24 PADS.CPP:357 */
+#line 356
 static void InitClickBits(unsigned short *CountArray)
 {
     int f;
